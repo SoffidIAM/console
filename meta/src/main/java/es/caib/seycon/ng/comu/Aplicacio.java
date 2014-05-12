@@ -52,4 +52,8 @@ public abstract class Aplicacio {
 	@Attribute(translated = "notificationEmails" )
 	public java.lang.String correusNotificacions;
 
+	@Description ("Aproval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed")
+	@Nullable
+	public String aprovalProcess;
+
 }

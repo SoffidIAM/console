@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="RoleGrant",
@@ -47,4 +49,18 @@ public abstract class RolGrant {
 	@Nullable
 	public java.lang.String user;
 
+	@Description ("Rol assignment start date. Null means since now")
+	@Nullable
+	public Date startDate;
+	
+	@Description ("Rol assignment end date. Null means forever")
+	@Nullable
+	public Date endDate;
+
+	@Attribute(defaultValue="true")
+	public boolean enabled;
+	
+	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
+	@Nullable
+	public String groupMebmership;
 }

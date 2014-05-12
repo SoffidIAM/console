@@ -55,7 +55,14 @@ public abstract class AplicacioEntity {
 	@Column (name="APL_MAILNOTIF", length=512)
 	@Nullable
 	public java.lang.String correusNotificacions;
+	
+	@Description ("Aproval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed")
+	@Column (name="APL_APRPRO", length=256)
+	@Nullable
+	public String aprovalProcess;
 
+	/************************** DAOS *********************************************************/
+	
 	@ForeignKey (foreignColumn="SOD_APL_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.SoDRuleEntity> sodRules;
 

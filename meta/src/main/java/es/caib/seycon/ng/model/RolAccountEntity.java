@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_ROLUSU" )
@@ -54,7 +56,30 @@ public abstract class RolAccountEntity {
 	@Column (name="RLU_RUL_ID")
 	@Nullable
 	public com.soffid.iam.model.RuleEntity rule;
-
+	
+	@Column (name="RLU_START")
+	@Nullable
+	public Date startDate;
+	
+	@Column (name="RLU_END")
+	@Nullable
+	public Date endDate;
+	
+	@Column (name="RLU_ENABLE", defaultValue="true")
+	public boolean enabled;
+	
+	@Description("This foreign key binds this the role assignment to the group membership that grants this role to the account. Not applicable for shared accounts")
+	@Column (name="RLU_GROUP")
+	@Nullable
+	public GrupEntity groupMembership;
+	
+	@Description("When an aproval process is needed to enable this rol assignment")
+	@Column(name="RLU_APRPRO")
+	@Nullable
+	public Long aprovalProcess;
+	
+	
+	/**************************** DAOs ******************************/
 	@DaoFinder("select ra\nfrom es.caib.seycon.ng.model.RolAccountEntity ra\ninner join    ra.account as account\ninner join    account.users as users\ninner join    users.user as user\ninner join    ra.rol as rol\nwhere user.codi = :codiUsuari and rol.nom = :nomRol")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuariAndNomRol(
 		java.lang.String codiUsuari, 

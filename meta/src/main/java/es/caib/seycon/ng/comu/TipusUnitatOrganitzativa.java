@@ -21,4 +21,7 @@ public abstract class TipusUnitatOrganitzativa {
 	@Nullable
 	public java.lang.Long id;
 
+	@Description("True if business units of this type can hold user roles")
+	@Nullable
+	public boolean rolHolder;
 }

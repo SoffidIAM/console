@@ -96,6 +96,13 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="AAC_GRU_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountAccessEntity> accountAccess;
 
+	@Description("This foreign key binds a group with all the role assignments that are granted to members of this group because they are members of this group")
+	@ForeignKey (foreignColumn="RLU_GROUP")
+	public java.util.Collection<es.caib.seycon.ng.model.RolAccountEntity> groupMemberRoles;
+
+	/*********************************************************** METHODS **************************************/
+	
+	
 	@DaoFinder("from es.caib.seycon.ng.model.GrupEntity grup where grup.pare.codi = :codi")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findSubGrupsByCodi(
 		java.lang.String codi) {

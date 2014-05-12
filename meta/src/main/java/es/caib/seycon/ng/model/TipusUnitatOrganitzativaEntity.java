@@ -27,6 +27,11 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@Column (name="TUO_PARE")
 	@Nullable
 	public es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity pare;
+	
+	@Description("True if business units of this type can hold user roles")
+	@Column (name="TUO_ROLHOL", defaultValue="false")
+	@Nullable
+	public boolean rolHolder;
 
 	@ForeignKey (foreignColumn="TUO_PARE")
 	public java.util.Collection<es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity> fills;

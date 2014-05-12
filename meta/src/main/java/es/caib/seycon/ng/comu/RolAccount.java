@@ -5,7 +5,11 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.model.GrupEntity;
 
 @ValueObject ( translatedName="RoleAccount",
 	 translatedPackage="com.soffid.iam.api")
@@ -76,4 +80,22 @@ public abstract class RolAccount {
 	@Nullable
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRule> sodRules;
 
+	@Description ("Rol assignment start date. Null means since now")
+	@Nullable
+	public Date startDate;
+	
+	@Description ("Rol assignment end date. Null means forever")
+	@Nullable
+	public Date endDate;
+
+	@Attribute(defaultValue="true")
+	public boolean enabled;
+	
+	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
+	@Nullable
+	public String groupMebmership;
+
+	@Description("When an aproval process is needed to enable this rol assignment")
+	@Nullable
+	public Long aprovalProcess;
 }

@@ -7,6 +7,8 @@
 package es.caib.bpm.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.vo.PredefinedProcessType;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={Roles.Tothom.class})
@@ -219,13 +221,24 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List findProcessDefinitions(
 		@Nullable java.lang.String name, 
-		boolean onlyLastVersions)
+		boolean onlyEnabled)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Description("Searches for process definition of a predefined type")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List findProcessDefinitions(
+		@Nullable java.lang.String name, 
+		PredefinedProcessType processType)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.ProcessInstance newProcess(
 		es.caib.bpm.vo.ProcessDefinition def)
@@ -421,9 +434,11 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void upgradeParFile(
 		java.io.InputStream stream)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
 }

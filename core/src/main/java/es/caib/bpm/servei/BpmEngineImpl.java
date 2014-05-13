@@ -115,6 +115,8 @@ import es.caib.bpm.utils.ColeccionesUtils;
 import es.caib.bpm.utils.FechaUtils;
 import es.caib.bpm.vo.BPMUser;
 import es.caib.bpm.vo.Job;
+import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.bpm.vo.PredefinedProcessTypeEnum;
 import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.ProcessLog;
@@ -1747,6 +1749,31 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	@Override
+	protected List handleFindProcessDefinitions(String name, PredefinedProcessType type)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			Vector resultadoFinal = new Vector();
+			for (Iterator it = context.getGraphSession()
+					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
+				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
+						.next();
+				es.caib.bpm.vo.ProcessDefinition def = VOFactory
+								.newProcessDefinition(definition, context);
+				if (def.isEnabled() && type.equals (def.getType()))
+				{
+					resultadoFinal.add(def);
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
 	protected ProcessInstance handleNewProcess(ProcessDefinition def)
 			throws Exception {
 		return newProcess(def, true);
@@ -2653,3 +2680,5 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 }
+
+

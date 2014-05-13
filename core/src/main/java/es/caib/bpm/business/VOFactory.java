@@ -29,6 +29,7 @@ import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.Comment;
 import es.caib.bpm.vo.ConfigParameterVO;
+import es.caib.bpm.vo.PredefinedProcessType;
 
 public class VOFactory {
 	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
@@ -163,6 +164,15 @@ public class VOFactory {
 		ProcessDefinitionPropertyDal dal = new ProcessDefinitionPropertyDal();
 		dal.setContext(context);
 		vo.setTag(dal.getProcessDefinitionProperty(instance.getId(), "tag")); //$NON-NLS-1$
+		String type = dal.getProcessDefinitionProperty(instance.getId(), "type"); //$NON-NLS-1$ 
+		if (type == null || type.isEmpty())
+		{
+			vo.setType(null);
+		}
+		else
+		{
+			vo.setType(PredefinedProcessType.fromString(type));
+		}
 		String disabled = dal.getProcessDefinitionProperty(instance.getId(), "disabled"); //$NON-NLS-1$
 		vo.setEnabled( ! "true".equals(disabled) ); //$NON-NLS-1$
 		String userCentric = dal.getProcessDefinitionProperty(instance.getId(), "appliesTo"); //$NON-NLS-1$

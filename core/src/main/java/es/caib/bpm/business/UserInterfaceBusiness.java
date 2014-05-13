@@ -192,6 +192,18 @@ public class UserInterfaceBusiness {
             } else
                 tag = ""; //$NON-NLS-1$
 
+            String type = (String) xpath.evaluate("/process/type", documento, //$NON-NLS-1$
+                            XPathConstants.STRING);
+            if (type != null) {
+                ProcessDefinitionProperty prop = new ProcessDefinitionProperty();
+                prop.setProcessDefinitionId(
+                		new Long(processDefinition.getId()));
+                prop.setName("type"); //$NON-NLS-1$
+                prop.setValue(type);
+                context.getSession().save(prop);
+            } else
+            	type = ""; //$NON-NLS-1$
+
             
             String userBased = (String) xpath.evaluate("/process/appliesTo", documento, //$NON-NLS-1$
                             XPathConstants.STRING);

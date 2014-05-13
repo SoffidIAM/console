@@ -12,8 +12,11 @@
 	<xs:complexType name="ProcessType">
 		<xs:sequence>
 			<xs:element name="tag" type="xs:string"></xs:element>
-            <xs:element name="appliesTo" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
-            <xs:element name="roles" maxOccurs="1" type="RolesGroupType"
+            <xs:element name="type" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="appliesTo" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="roles" maxOccurs="1" type="RolesGroupType"
 				minOccurs="0" />
 			<xs:element name="task" minOccurs="0" maxOccurs="unbounded"
 				type="TaskType" />

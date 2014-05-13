@@ -34,6 +34,18 @@ public class ProcessDefinition  implements Serializable {
 	protected boolean enabled;
 	protected String appliesTo;
 
+	protected PredefinedProcessType type;
+
+	public PredefinedProcessType getType()
+	{
+		return type;
+	}
+
+	public void setType(PredefinedProcessType type)
+	{
+		this.type = type;
+	}
+
 	public String getAppliesTo()
 	{
 		return appliesTo;

@@ -50,14 +50,8 @@ public abstract class DispatcherHandler {
     
     public abstract void processOBTask (TaskHandler task) throws InternalErrorException;
 
-	/**
-	 * @return the reconcile log
-	 */
 	public abstract void doReconcile (ScheduledTask task);
 
-	/**
-	 * @return
-	 */
-	public abstract String doAuthoritativeImport () ;
+	public abstract void doAuthoritativeImport (ScheduledTask task);
 
 }

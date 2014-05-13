@@ -5,11 +5,9 @@
  */
 package es.caib.seycon.ng.servei;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +17,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.taskmgmt.exe.TaskInstance;
+
+import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.AdministracioAplicacio;
@@ -32,40 +35,33 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoDRisk;
-import es.caib.seycon.ng.comu.SoDRole;
 import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariWFProcess;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.AplicacioEntityDao;
 import es.caib.seycon.ng.model.AutoritzacioPUERolEntity;
 import es.caib.seycon.ng.model.AutoritzacioRolEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.servei.Messages;
 import es.caib.seycon.ng.model.NotificacioEntity;
 import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.RolEntityDao;
 import es.caib.seycon.ng.model.RolsGrupEntity;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.SoDRoleEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.TasqueEntityDao;
-import es.caib.seycon.ng.model.AccountAccessEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 import es.caib.seycon.ng.model.XarxaACEntity;
 import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
@@ -932,6 +928,9 @@ public class AplicacioServiceImpl extends
         		rolsUsuaris.setAccountId(account.getId());
         	}
         	
+            // Check group holder
+        	checkGroupHolder (rolsUsuaris);
+        	
             RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
                     .rolAccountToEntity(rolsUsuaris);
             // Disable assigning roles to himself
@@ -943,6 +942,8 @@ public class AplicacioServiceImpl extends
                             Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
             	}
             }
+            // Enable or disable on dates
+            rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
             // Check for Sod Rules
             SoDRule rule = getSoDRuleService().isAllowed(rolsUsuaris);
             if (rule != null && rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
@@ -950,13 +951,22 @@ public class AplicacioServiceImpl extends
             	throw new InternalErrorException (String.format(Messages.getString("AplicacioServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
             					, rule.getName()));
             }
+            // Launch workflow approval process
+            boolean nwap = needsWorkflowApprovalProcess(rolsUsuarisEntity);
             
+           	rolsUsuarisEntity.setApprovalPending(nwap);
+           	
             getRolAccountEntityDao().create(rolsUsuarisEntity);
             AccountEntity account = rolsUsuarisEntity.getAccount();
             account.getRoles().add(rolsUsuarisEntity);
             rolsUsuaris = getRolAccountEntityDao().toRolAccount(rolsUsuarisEntity);
         	
-            getAccountEntityDao().propagateChanges(account);
+            if (nwap)
+            	launchWorkflowApprovalProcess(rolsUsuarisEntity);
+            else
+            	getAccountEntityDao().propagateChanges(account);
+            
+            enableOrDisableOnDates (rolsUsuaris, rolsUsuarisEntity);
             
             return rolsUsuaris;
         }
@@ -965,7 +975,123 @@ public class AplicacioServiceImpl extends
 
     }
 
-    protected void handleDelete(RolAccount rolsUsuaris) throws Exception {
+    /**
+     * @param rolAccountEntity
+     * @throws InternalErrorException 
+	 */
+	private boolean needsWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
+	{
+		RolEntity role = rolAccountEntity.getRol();
+		if (role != null && "S".equals(role.getGestionableWF()))
+		{
+			AplicacioEntity app = role.getAplicacio();
+			if (app != null && app.getApprovalProcess() != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+    /**
+     * @param rolAccountEntity
+     * @throws InternalErrorException 
+	 */
+	private void launchWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
+	{
+		RolEntity role = rolAccountEntity.getRol();
+		if (role != null && "S".equals(role.getGestionableWF()))
+		{
+			AplicacioEntity app = role.getAplicacio();
+			if (app != null && app.getApprovalProcess() != null)
+			{
+				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
+				if (def.isEmpty())
+					throw new InternalErrorException ("Approval process %s for application %s is not available",
+									app.getApprovalProcess(), app.getCodi());
+				JbpmContext ctx = getBpmEngine().getContext();
+				try {
+					ProcessInstance pi = ctx.newProcessInstance(app.getApprovalProcess());
+					pi.getContextInstance().createVariable("request", getRolAccountEntityDao().toRolAccount(rolAccountEntity));
+					pi.getContextInstance().createVariable("requesterAccount", Security.getCurrentAccount());
+					pi.getContextInstance().createVariable("requesterUser", Security.getCurrentUser());
+					pi.signal();
+					ctx.save(pi);
+					
+					for (UserAccountEntity ua: rolAccountEntity.getAccount().getUsers())
+					{
+    					UsuariWFProcess uwp = new UsuariWFProcess();
+    					uwp.setCodiUsuari(ua.getUser().getCodi());
+    					uwp.setIdProces(pi.getId());
+    					uwp.setFinalitzat(false);
+    					getUsuariService().create(uwp);
+					}
+					rolAccountEntity.setApprovalProcess(pi.getId());
+				} finally {
+					ctx.close();
+				}
+				getRolAccountEntityDao().update(rolAccountEntity);
+			}
+		}
+	}
+
+	UsuariEntity getAccountUser (Long accountId)
+    {
+    	// Guess usuari
+    	AccountEntity acc = getAccountEntityDao().load(accountId);
+    	if (acc.getType().equals(AccountType.USER))
+    	{
+    		for (UserAccountEntity ua: acc.getUsers())
+    		{
+    			if (ua.getUser() != null)
+    				return ua.getUser();
+    		}
+    		
+    	}
+    	return null;
+    }
+    /**
+	 * @param rolsUsuaris
+     * @throws InternalErrorException 
+     * @throws UnknownUserException 
+	 */
+	private void checkGroupHolder (RolAccount rolsUsuaris) throws InternalErrorException, UnknownUserException
+	{
+		if ("never".equals(System.getProperty("soffid.entitlement.group.holder")))
+			rolsUsuaris.setHolderGroup(null);
+		else
+		{
+			UsuariEntity ue = getAccountUser(rolsUsuaris.getAccountId());
+            if (ue == null)
+    			rolsUsuaris.setHolderGroup(null);
+            else
+            {
+            	if (rolsUsuaris.getHolderGroup() == null)
+            	{
+    				GrupEntity primaryGroup = ue.getGrupPrimari();
+    				if (primaryGroup.getTipusUnitatOrganizativa() != null && 
+    								primaryGroup.getTipusUnitatOrganizativa().isRolHolder())
+    					rolsUsuaris.setHolderGroup(primaryGroup.getCodi());
+    			}
+            	else
+            	{
+            		boolean found = false;
+            		for (Grup grup: getUsuariService().getUserGroupsHierarchy(ue.getId()))
+            		{
+            			if (grup.getCodi().equals (rolsUsuaris.getHolderGroup()))
+            			{
+            				found = true;
+            				break;
+            			}
+            		}
+            		if (! found)
+            			throw new InternalErrorException (String.format ("User %s is not member of %s group", ue.getCodi(), rolsUsuaris.getHolderGroup()));
+            	}
+            }
+		}
+	}
+
+	protected void handleDelete(RolAccount rolsUsuaris) throws Exception {
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
         // {
@@ -987,6 +1113,29 @@ public class AplicacioServiceImpl extends
             	}
             	user = ua.getUser();
             }
+            
+            if (rolsUsuarisEntity.isApprovalPending())
+            {
+            	JbpmContext ctx = getBpmEngine().getContext();
+            	try 
+            	{
+            		ProcessInstance pi = ctx.getProcessInstance(rolsUsuarisEntity.getApprovalProcess());
+            		if (pi != null && !pi.hasEnded())
+            		{
+            			pi.getRootToken().addComment("Requested role has been revoked");
+            			pi.getRootToken().end();
+            			for (TaskInstance ti: pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken()))
+            			{
+            				ti.setEnd(new Date());
+            				ctx.save(ti);
+            			}            			
+            			pi.end();
+            			ctx.save(pi);
+            		}
+            	} finally {
+            		ctx.close();
+            	}
+            }
             getRolAccountEntityDao().remove(rolsUsuarisEntity);
             
             if (user != null)
@@ -998,7 +1147,37 @@ public class AplicacioServiceImpl extends
 				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
     }
 
-    protected RolAccount handleUpdate(RolAccount rolsUsuaris)
+	@Override
+	protected void handleDenyApproval(RolAccount rolsUsuaris) throws Exception {
+        String codiAplicacio = rolsUsuaris.getCodiAplicacio();
+        // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
+        // {
+        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris,
+                getGrupEntityDao())) {
+
+        	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
+                    .rolAccountToEntity(rolsUsuaris);
+        	if (rolsUsuarisEntity.getRule() != null)
+                throw new InternalErrorException("This role cannot be manually revoked. It's granted by a rule.");
+            // Disable assigning roles to himself
+            for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())
+            {
+            	if (ua.getUser().getCodi().equals(getPrincipal().getName()))
+            	{
+                    throw new SeyconException(
+                            Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
+            	}
+            }
+            
+            getRolAccountEntityDao().remove(rolsUsuarisEntity);
+            
+            return;
+        } 
+        throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
+    }
+
+	protected RolAccount handleUpdate(RolAccount rolsUsuaris)
             throws Exception {
         RolAccount oldRolsUsuaris = getRolAccountEntityDao().toRolAccount(
         		getRolAccountEntityDao().load(rolsUsuaris.getId()));
@@ -1021,12 +1200,17 @@ public class AplicacioServiceImpl extends
             RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
                     .rolAccountToEntity(rolsUsuaris);
 
+        	rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
+        	
         	getRolAccountEntityDao().update(rolsUsuarisEntity);
+        	
             // Actualitzem darrera actualització de l'usuari
             getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+            
+            return rolsUsuaris;
         }
-
-		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        else
+        	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
     }
 
@@ -1053,10 +1237,6 @@ public class AplicacioServiceImpl extends
                 codiUsuari, "N"); //$NON-NLS-1$
     }
 
-    private void addInformacioTextualJerarquiaRoles ( AccountEntity account, Collection<ContenidorRol> resultatContenidorRol, HashMap<Long, RolEntity> totRol )
-    {
-    	
-    }
     
     protected Collection<ContenidorRol> handleFindInformacioTextualJerarquiaRolsUsuariByCodiUsuari(
             String codiUsuari, String filtraResultats) throws Exception {
@@ -1371,7 +1551,7 @@ public class AplicacioServiceImpl extends
                         rolsUsuarisEntity);
             }
         }
-        return new ArrayList();
+        return new ArrayList<AdministracioAplicacio>();
     }
 
     protected Collection<Rol> handleFindRolsByNomDominiAndCodiAplicacio(
@@ -2328,6 +2508,74 @@ public class AplicacioServiceImpl extends
 			}
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.AplicacioServiceBase#handleEnableOrDisableOnDates(es.caib.seycon.ng.comu.RolAccount)
+	 */
+	@Override
+	protected RolAccount handleEnableOrDisableOnDates (RolAccount rolAccount)
+					throws Exception
+	{
+		RolAccountEntity entity = getRolAccountEntityDao().load(rolAccount.getId());
+		enableOrDisableOnDates(rolAccount, entity);
+		return rolAccount;
+		
+	}
+
+	private void enableOrDisableOnDates (RolAccount rolAccount, RolAccountEntity entity)
+					throws InternalErrorException
+	{
+		rolAccount.setEnabled(getEnableState(entity));
+
+		if (entity.isEnabled() != rolAccount.isEnabled())
+		{
+    		entity.setEnabled(rolAccount.isEnabled());
+    		getRolAccountEntityDao().update(entity);
+    		getAccountEntityDao().propagateChanges(entity.getAccount());
+		}
+	}
+
+	private boolean getEnableState (RolAccountEntity entity)
+	{
+		Date now = new Date ();
+		if (entity.getEndDate() != null && entity.getEndDate().before(now))
+		{
+			return false;
+		}
+		else if (entity.getStartDate() == null || entity.getStartDate().before(now))
+		{
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.AplicacioServiceBase#handleEnableOrDisableAllOnDates()
+	 */
+	@Override
+	protected void handleEnableOrDisableAllOnDates () throws Exception
+	{
+		Date now = new Date();
+		for (RolAccountEntity toEnable: getRolAccountEntityDao().findRolAccountToEnable(now))
+		{
+			toEnable.setEnabled(true);
+    		getRolAccountEntityDao().update(toEnable);
+    		getAccountEntityDao().propagateChanges(toEnable.getAccount());
+		}
+
+		for (RolAccountEntity toDisable: getRolAccountEntityDao().findRolAccountToDisable(now))
+		{
+			toDisable.setEnabled(false);
+    		getRolAccountEntityDao().update(toDisable);
+    		getAccountEntityDao().propagateChanges(toDisable.getAccount());
+		}
+
+	}
+
+
 }
 
 class RolAccountDetail

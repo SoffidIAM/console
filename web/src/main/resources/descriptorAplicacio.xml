@@ -30,8 +30,34 @@
 			</script-finder>
 		</finder>
 		
+		<finder name="approvalProcess" type="approvalProcess">
+			<script-finder>
+				engine = new javax.naming.InitialContext()
+					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
+					.create();
+				java.util.LinkedList list = new java.util.LinkedList ();
+				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+				tv.setTag ("-");
+				tv.setValue(null);
+				list.add (tv);
+				for (def: engine.findProcessDefinitions (null, es.caib.bpm.vo.PredefinedProcessType.ROLE_APPROVAL))
+				{
+					tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+					tv.setTag (def.name);
+					tv.setValue(def.name);
+				
+					list.add (tv);
+				}
+				return list;
+			</script-finder>
+		</finder>
+		
 	</datanode>
 
+	<datanode name="approvalProcess" transient="true" >
+		
+	</datanode>
+	
 	<datanode name="risk" transient="true">
 		<custom-attribute name="literal">
 			if (instance.equals("H"))

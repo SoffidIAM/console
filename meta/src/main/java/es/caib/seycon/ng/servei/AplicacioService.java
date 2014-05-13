@@ -7,30 +7,40 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.servei.BpmEngine;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="ApplicationService",
-	translatedPackage="com.soffid.iam.service")
-@Depends ({es.caib.seycon.ng.model.NotificacioEntity.class,
+       translatedPackage="com.soffid.iam.service")
+@Depends ({
+	/// Entities
+	es.caib.seycon.ng.model.NotificacioEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
-	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
-	es.caib.seycon.ng.servei.GrupService.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.RolAssociacioRolEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
-	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
-	com.soffid.iam.service.RuleEvaluatorService.class,
-	es.caib.seycon.ng.servei.SoDRuleService.class,
 	es.caib.seycon.ng.model.RolsGrupEntity.class,
 	es.caib.seycon.ng.model.AutoritzacioPUERolEntity.class,
 	es.caib.seycon.ng.model.XarxaACEntity.class,
 	es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
-	es.caib.seycon.ng.servei.AutoritzacioService.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
-	es.caib.seycon.ng.model.RolEntity.class})
+	es.caib.seycon.ng.model.RolEntity.class,
+	// Services
+	es.caib.seycon.ng.servei.UsuariService.class,
+	es.caib.seycon.ng.servei.GrupService.class,
+	es.caib.seycon.ng.servei.AccountService.class,
+	com.soffid.iam.service.RuleEvaluatorService.class,
+	es.caib.seycon.ng.servei.SoDRuleService.class,
+	es.caib.seycon.ng.servei.AutoritzacioService.class,
+	BpmEngine.class
+	
+	}
+)
+
 public abstract class AplicacioService {
 
 	@Operation ( grantees={Roles.application_query.class},
@@ -226,6 +236,13 @@ public abstract class AplicacioService {
 		es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void denyApproval(
+		es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
 	@Operation (translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.RolAccount update(
@@ -233,6 +250,22 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Description ("Enables or disable a rolAccount based on the start and end dates")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.RolAccount enableOrDisableOnDates(
+		es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		 return null;
+	}
+	
+	@Description ("Enables or disable any rolAccount based on the start and end dates")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void enableOrDisableAllOnDates()
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
+	
 	@Operation ( grantees={Roles.application_query.class},
 			translated="findUsersRolesByRoleName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -506,5 +539,11 @@ public abstract class AplicacioService {
 		java.lang.String codiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+	
+	@Operation
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void revokeRolesHoldedOnGroup (long userId, long groupId)
+	{
 	}
 }

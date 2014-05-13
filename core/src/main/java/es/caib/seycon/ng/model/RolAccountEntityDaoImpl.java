@@ -435,6 +435,14 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
             // targetVO.setValorDomini(valorDomini); // No se muestra
         }
 
+        // Assign holder gorup
+        if (sourceEntity.getHolderGroup() == null)
+        	targetVO.setHolderGroup(null);
+        else
+        	targetVO.setHolderGroup(sourceEntity.getHolderGroup().getCodi());
+
+        
+        
         targetVO.setNomRol(sourceEntity.getRol().getNom());
         
         String nom;
@@ -660,6 +668,16 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         	targetEntity.setRule(null);
         else
         	targetEntity.setRule(getRuleEntityDao().load(sourceVO.getRuleId()));
+        
+        if (sourceVO.getHolderGroup() == null)
+        	targetEntity.setHolderGroup(null);
+        else
+        {
+        	GrupEntity grup = getGrupEntityDao().findByCodi(sourceVO.getHolderGroup());
+        	if (grup == null)
+        		throw new SeyconException (String.format("Unknown group %s", sourceVO.getHolderGroup()));
+        	targetEntity.setHolderGroup(grup);
+        }
     }
 
     private ValorDominiAplicacioEntity findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(
@@ -1035,6 +1053,10 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
 		{
 			target.setUser (ua.getUser().getCodi());
 		}
+		if (source.getHolderGroup() == null)
+			target.setHolderGroup(null);
+		else
+			target.setHolderGroup(source.getHolderGroup().getCodi());
     }
 
 }

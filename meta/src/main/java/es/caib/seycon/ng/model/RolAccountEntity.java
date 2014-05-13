@@ -10,21 +10,25 @@ import java.util.Date;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_ROLUSU" )
-@Depends ({es.caib.seycon.ng.comu.RolGrant.class,
-	es.caib.seycon.ng.comu.ContenidorRol.class,
+@Depends ({
+	// Other entties
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.NotificacioEntity.class,
-	es.caib.seycon.ng.comu.RolAccount.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.RolEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
 	es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
-	es.caib.seycon.ng.comu.AdministracioAplicacio.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
-	com.soffid.iam.model.RuleEntity.class})
+	com.soffid.iam.model.RuleEntity.class,
+	// Value objects
+	es.caib.seycon.ng.comu.RolGrant.class,
+	es.caib.seycon.ng.comu.ContenidorRol.class,
+	es.caib.seycon.ng.comu.RolAccount.class,
+	es.caib.seycon.ng.comu.AdministracioAplicacio.class
+	})
 public abstract class RolAccountEntity {
 
 	@Column (name="RLU_ROLUSU_GRU")
@@ -68,15 +72,18 @@ public abstract class RolAccountEntity {
 	@Column (name="RLU_ENABLE", defaultValue="true")
 	public boolean enabled;
 	
+	@Column (name="RLU_APRPEN", defaultValue="false")
+	public boolean approvalPending;
+	
 	@Description("This foreign key binds this the role assignment to the group membership that grants this role to the account. Not applicable for shared accounts")
 	@Column (name="RLU_GROUP")
 	@Nullable
-	public GrupEntity groupMembership;
+	public GrupEntity holderGroup;
 	
 	@Description("When an aproval process is needed to enable this rol assignment")
 	@Column(name="RLU_APRPRO")
 	@Nullable
-	public Long aprovalProcess;
+	public Long approvalProcess;
 	
 	
 	/**************************** DAOs ******************************/
@@ -133,10 +140,27 @@ public abstract class RolAccountEntity {
 		java.lang.String groupName) {
 	 return null;
 	}
+	
 	@DaoFinder("select ra\nfrom es.caib.seycon.ng.model.RolAccountEntity as ra\njoin ra.account.users as useraccount\nwhere ra.rule.id = :ruleId and useraccount.user.id = :userId and ra.account.type='U'")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByUserAndRule(
 		java.lang.Long userId, 
 		java.lang.Long ruleId) {
+	 return null;
+	}
+
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "where ra.endDate < :now and ra.enabled = true")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToDisable(
+		Date now) {
+	 return null;
+	}
+
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "where ra.startDate < :now and (ra.endDate is null or ra.endDate <= :now) and ra.enabled = false")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEnable(
+		Date now) {
 	 return null;
 	}
 }

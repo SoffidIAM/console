@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.servei.BpmEngine;
+
 @Entity (table="SC_APLICA" )
 @Depends ({es.caib.seycon.ng.comu.ValorDomini.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -16,7 +18,8 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.DominiAplicacioEntity.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.model.NotificacioEntity.class,
-	es.caib.seycon.ng.model.SoDRuleEntity.class})
+	es.caib.seycon.ng.model.SoDRuleEntity.class,
+	BpmEngine.class })
 public abstract class AplicacioEntity {
 
 	@Column (name="APL_ID")
@@ -56,10 +59,10 @@ public abstract class AplicacioEntity {
 	@Nullable
 	public java.lang.String correusNotificacions;
 	
-	@Description ("Aproval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed")
+	@Description ("Approval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed")
 	@Column (name="APL_APRPRO", length=256)
 	@Nullable
-	public String aprovalProcess;
+	public String approvalProcess;
 
 	/************************** DAOS *********************************************************/
 	

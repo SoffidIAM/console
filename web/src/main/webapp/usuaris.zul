@@ -1782,7 +1782,7 @@
 														bind="@usuariCreacio" id="usuariCreacio" lectura="true" />
 													<datebox
 														bind="@dataCreacioUsuari" disabled="true"
-														format="dd/MM/yyyy" id="dataCreacio" sclass="dateboxread" />
+														format="${c:l('usuaris.zul.dateFormat')}" id="dataCreacio" sclass="dateboxread" />
 												</hbox>
 											</row>
 											<row>
@@ -1794,7 +1794,7 @@
 														id="usuariDarreraModificacio" lectura="true" />
 													<datebox
 														bind="@dataDarreraModificacioUsuari" disabled="true"
-														format="dd/MM/yyyy" id="dataDarreraModificacio"
+														format="${c:l('usuaris.zul.dateFormat')}" id="dataDarreraModificacio"
 														sclass="dateboxread"/>
 												</hbox>
 											</row>
@@ -1813,7 +1813,7 @@
 																value="${c:l('usuaris.zul.DarreraccasalSEU')}" />
 															<datebox
 																bind="@usuariSEU/dataDarrerLogin" buttonVisible="false"
-																disabled="true" format="dd/MM/yyyy kk:mm"
+																disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
 																sclass="dateboxread" width="120px" />
 														</hbox>
 														<hbox
@@ -2024,19 +2024,19 @@
 												</treecell>
 												<treecell>
 													<datebox bind="@lastUpdated" buttonVisible="false"
-														disabled="true" format="dd/MM/yyyy kk:mm"
+														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
 														sclass="dateboxreadnoborder" width="100%" />
 												</treecell>
 												<treecelldestacat destacatBoolea="@caducada">
 													<datebox bind="@lastPasswordSet" buttonVisible="false"
-														disabled="true" format="dd/MM/yyyy kk:mm"
+														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
 														sclass="dateboxreadnoborder" width="100%" />
 												</treecelldestacat>
 												<treecelldestacat
 													destacatBoolea="@caducada">
 													<datebox bind="@passwordExpiration"
 														buttonVisible="false" disabled="true"
-														format="dd/MM/yyyy kk:mm"
+														format="${c:l('usuaris.zul.dateFormat')}"
 														sclass="dateboxreadnoborder" width="100%" />
 												</treecelldestacat>
 												<treecell>
@@ -2163,6 +2163,7 @@ void actualitza (event) {
 											ctx2.setValue("@codiAplicacio", event.getData()[1]);
 											ctx2.setValue("@descripcioRol", event.getData()[2]);
 											ctx2.setValue("@nomComplertUsuari", nomUsuari());
+											ctx2.setValue("@startDate", new Date());
 											
 											if (event.getData()[3] != null) {
 												es.caib.seycon.ng.comu.ValorDomini valor = new es.caib.seycon.ng.comu.ValorDomini();
@@ -2212,8 +2213,50 @@ void actualitza (event) {
 											image.setSrc("/img/risk-" + risk.getValue()+".png");
 											image.setVisible(true);
 										}
-											
-
+										
+										// Disable domain value
+										if ( XPathUtils.getValue (ctx, "valorDomini") == null ||
+											XPathUtils.getValue (ctx, "valorDomini/@valor") == null )
+										{
+											event.data.getChildren().get(1).getChildren().get(1).visible = false;
+										}
+										startbox = event.data.getChildren().get(5).getChildren().get(0);
+										endbox = event.data.getChildren().get(6).getChildren().get(0);
+										if (XPathUtils.getValue(ctx,"id") != null)
+										{
+											startbox.disabled = endbox.disabled = true;
+											Date d1 = XPathUtils.getValue(ctx,"@startDate");
+											Date d2 = XPathUtils.getValue(ctx,"@endDate");
+											Date now = new Date();
+											if (d1 != null && now.before(d1) )
+											{
+												for (c: event.data.getChildren())
+												{
+													c.style = "background-color: #ffffc0;";
+												}
+											}
+											else if (d2 != null && d2.before(now)) 
+											{
+												for (c: event.data.getChildren())
+												{
+													c.style = "text-decoration: line-through;";
+												}
+											} else {
+												event.data.style = event.data.style + "; background-color: blue;";
+											}
+										}
+										// Show sand clock when waiting for approval
+										approvalPending = XPathUtils.getValue(ctx,"@approvalPending");
+										if (approvalPending != null && approvalPending)
+										{
+											image.setVisible(false);
+											Image image2 = cellImage.getChildren().get(1);
+											image2.setVisible(true);
+											for (c: event.data.getChildren())
+											{
+												c.style = "background-color: #ffffc0;";
+											}
+										}
 									}
 ]]>
 </zscript>
@@ -2232,9 +2275,9 @@ void actualitza (event) {
 												label="${c:l('usuaris.zul.Aplicacia')}" sort="auto"
 												width="20%" />
 											<listheader
-												label="${c:l('usuaris.zul.Domini')}" width="15%" />
+												label="${c:l('usuaris.zul.startDate')}" width="10%" />
 											<listheader
-												label="${c:l('usuaris.zul.Valor')}" width="25%" />
+												label="${c:l('usuaris.zul.endDate')}" width="10%" />
 											<listheader
 												label="${c:l('usuaris.zul.')}"
 												visible="${canDeleteUserRole}" width="30px" />
@@ -2262,9 +2305,24 @@ void actualitza (event) {
 															new Object[] { sb.toString() }));
 ]]></attribute>
 												</imageclic>
+												<imageclic align="right" visible="false" width="24px" height="24px" src="/img/hourglass.gif">
+													<attribute name="onClick">
+													<![CDATA[
+	ctx = XPathUtils.getComponentContext(self);
+	proc = XPathUtils.getValue(ctx, "/@approvalProcess");
+	if (idProces != null) {
+		es.caib.zkib.zkiblaf.Application.call("wf/process.zul?id=" + proc);
+	}
+]]></attribute>
+												</imageclic>
 											</listcell>
-											<listcell bind="@nomRol"
-												tooltip="rolsTooltip" />
+											<listcell >
+												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
+												<div style="display:inline" tooltip="domainTooltip">
+													<label value = "/"></label>
+													<label  bind="valorDomini/@valor"/>
+												</div>
+											</listcell>
 											<listcell
 												bind="@baseDeDades" />
 
@@ -2273,10 +2331,12 @@ void actualitza (event) {
 
 											<listcell
 												bind="@codiAplicacio" />
-											<listcell
-												bind="valorDomini/@nomDomini" />
-											<listcell
-												bind="valorDomini/@descripcio" tooltip="valorDominiTooltip" />
+											<listcell >
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@startDate"></datebox>
+											</listcell>
+											<listcell >
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"></datebox>
+											</listcell>
 											<listcell>
 												<imageclic align="right"
 													src="~./img/list-remove.gif">
@@ -2352,52 +2412,52 @@ void actualitza (event) {
 									<popup id="rolsTooltip"
 										width="200px">
 										<attribute name="onOpen">
-	if (event.getReference() instanceof DataListcell) {
-		listCell = event.getReference();
-		dlistbox = listCell.getListbox();
-		modelo = dlistbox.getModel();
-		listItem = listCell.getParent();
-		posicio = listItem.getIndex();
-		elemPos = modelo.getElementAt(posicio);
-		xpath = elemPos.getDataContext().getXPath();
-		dataSource = gridRols.getDataSource();
-		context = dataSource.getJXPathContext();
-		dada = context.getValue(xpath + "/@nomRol");
-		desc = context.getValue(xpath + "/@descripcioRol");
-		rolsTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
+    label = event.getReference();
+    if (label != null)
+    {
+		listCell = label.parent;
+		if (listCell instanceof DataListcell) {
+			dlistbox = listCell.getListbox();
+			modelo = dlistbox.getModel();
+			listItem = listCell.getParent();
+			posicio = listItem.getIndex();
+			elemPos = modelo.getElementAt(posicio);
+			xpath = elemPos.getDataContext().getXPath();
+			dataSource = gridRols.getDataSource();
+			context = dataSource.getJXPathContext();
+			dada = context.getValue(xpath + "/@nomRol");
+			desc = context.getValue(xpath + "/@descripcioRol");
+			rolsTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
+		}
 	}
 </attribute>
 										<label id="rolsTooltipLabel"
 											multiline="true" value="" />
 									</popup>
-									<popup id="valorDominiTooltip"
+									<popup id="domainTooltip"
 										width="200px">
 										<attribute name="onOpen">
-	// L'amaguem per defecte: pot tindre valors nuls
-	valorDominiTooltipLabel.visible = false;
-	if (event.getReference() instanceof DataListcell) {
-		listCell = event.getReference();
-		dlistbox = listCell.getListbox();
-		modelo = dlistbox.getModel();
-		listItem = listCell.getParent();
-		posicio = listItem.getIndex();
-		elemPos = modelo.getElementAt(posicio);
-		xpath = elemPos.getDataContext().getXPath();
-		dataSource = gridRols.getDataSource();
-		context = dataSource.getJXPathContext();
-		if (context.getValue(xpath + "/valorDomini") != null) {
-			dada = "Valor domini = '"
-					+ context.getValue(xpath + "/valorDomini/@valor") + "'";
-			valorDominiTooltipLabel.visible = true;
-			valorDominiTooltipLabel.value = dada;
-		} else {
-			valorDominiTooltipLabel.visible = false;
-			valorDominiTooltipLabel.value = "";
+    label = event.getReference();
+    if (label != null)
+    {
+		listCell = label.parent;
+		if (listCell instanceof DataListcell) {
+			dlistbox = listCell.getListbox();
+			modelo = dlistbox.getModel();
+			listItem = listCell.getParent();
+			posicio = listItem.getIndex();
+			elemPos = modelo.getElementAt(posicio);
+			xpath = elemPos.getDataContext().getXPath();
+			dataSource = gridRols.getDataSource();
+			context = dataSource.getJXPathContext();
+			dada = context.getValue(xpath + "/valorDomini/@nomDomini");
+			desc = context.getValue(xpath + "/valorDomini/@descripcio");
+			domainTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
 		}
 	}
 </attribute>
-										<label
-											id="valorDominiTooltipLabel" value="" />
+										<label id="domainTooltipLabel"
+											multiline="true" value="" />
 									</popup>
 								</vbox>
 								<hbox width="100%" widths="50%,50%">
@@ -2407,6 +2467,7 @@ void actualitza (event) {
 											label="${c:l('usuaris.zul.Afegeixnou')}"
 											visible="${canCreateUserRole}">
 											<attribute name="onClick">
+	desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF", "true");
 	desktop.getPage("rolsLlista").setAttribute("tipus", "wizard");
 	desktop.getPage("rolsLlista").setAttribute("usuari",
 			form.getFellow("codi").getValue());

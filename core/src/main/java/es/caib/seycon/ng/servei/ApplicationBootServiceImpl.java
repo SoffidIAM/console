@@ -299,6 +299,10 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				cfg.setValor("8"); //$NON-NLS-1$
 				configSvc.update(cfg);
 			}
+			if (cfg.getValor().equals("8")) { //$NON-NLS-1$
+				cfg.setValor("9"); //$NON-NLS-1$
+				updateRolAccounts();
+			}
 		}
 		finally
 		{
@@ -307,6 +311,26 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 	}
 	
 	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateRolAccounts () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ROLUSU SET RLU_ENABLE=? WHERE RLU_ENABLE IS NULL",
+							new Object[] {true});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
 	/**
 	 * @throws InternalErrorException 
 	 * 
@@ -350,6 +374,14 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 			 ScheduledTaskHandler handler = new ScheduledTaskHandler();
 			 handler.setClassName("com.soffid.iam.sync.engine.cron.ReconcileAgentTask"); //$NON-NLS-1$
 			 handler.setName(SystemScheduledTasks.RECONCILE_DISPATCHER);
+			 getScheduledTaskService().create(handler);
+		 }
+
+		 if (! handlers.containsKey(SystemScheduledTasks.ENABLE_DISABLE_ROLES))
+		 {
+			 ScheduledTaskHandler handler = new ScheduledTaskHandler();
+			 handler.setClassName("com.soffid.iam.sync.engine.cron.ExpireRoleAssignmentsTask");
+			 handler.setName(SystemScheduledTasks.ENABLE_DISABLE_ROLES);
 			 getScheduledTaskService().create(handler);
 		 }
 
@@ -406,7 +438,22 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				 getScheduledTaskService().create(task);
 			 }
 		 }
-	}
+
+		 if (! tasks.containsKey(SystemScheduledTasks.ENABLE_DISABLE_ROLES))
+		 {
+			 ScheduledTask task = new ScheduledTask();
+			 task.setActive(true);
+			 task.setDayOfWeekPattern("*");
+			 task.setDayPattern("*");
+			 task.setHandlerName(SystemScheduledTasks.ENABLE_DISABLE_ROLES);
+			 task.setHoursPattern("0");
+			 task.setMinutesPattern("5");
+			 task.setMonthsPattern("*");
+			 task.setName("Apply date restrictions on roles");
+			 getScheduledTaskService().create(task);
+		 }
+		 
+}
 
 	/**
 	 * ALTER TABLE SC_AGEDES ADD ADE_ATTMAP BIT not null

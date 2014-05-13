@@ -13,7 +13,8 @@
 			{
 				ample = 850; //resolució mínima 800
 				
-				String amplaria = (ample - 50)+"px";  //$NON-NLS-1$
+//				String amplaria = (ample - 50)+"px";  //$NON-NLS-1$
+				String amplaria = "92%";
 				
 				sessio.setAttribute("ample", new Integer(ample)); //$NON-NLS-1$
 				sessio.setAttribute("amplaria", amplaria); //$NON-NLS-1$

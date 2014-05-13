@@ -221,9 +221,9 @@
 			<delete-method method="delete" >  <!-- user:role:delete -->
 				<parameter value="${instance}" />
 			</delete-method>
-			<!--update-method method="update"> // en principi no s'utilitza 
+			<update-method method="update"> 
 				<parameter value="${instance}" />
-			</update-method-->
+			</update-method>
 		</ejb-handler>
 	</datanode>
 	

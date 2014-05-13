@@ -62,5 +62,5 @@ public abstract class RolGrant {
 	
 	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
 	@Nullable
-	public String groupMebmership;
+	public String holderGroup;
 }

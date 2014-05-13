@@ -46,6 +46,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AccountService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.model.ServerEntity.class})
+
+
 public abstract class UsuariService {
 
 	@Operation (translated="createUser")

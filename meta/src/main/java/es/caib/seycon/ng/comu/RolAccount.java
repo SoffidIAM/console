@@ -88,14 +88,19 @@ public abstract class RolAccount {
 	@Nullable
 	public Date endDate;
 
+	@Description ("True if the role is enabled or not. When the start/end date reaches, the flag should change")
 	@Attribute(defaultValue="true")
 	public boolean enabled;
 	
+	@Attribute(defaultValue="true")
+	public boolean approvalPending;
+	
+	
 	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
 	@Nullable
-	public String groupMebmership;
+	public String holderGroup;
 
 	@Description("When an aproval process is needed to enable this rol assignment")
 	@Nullable
-	public Long aprovalProcess;
+	public Long approvalProcess;
 }

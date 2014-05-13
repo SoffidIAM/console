@@ -10,7 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.List;
 
+import es.caib.bpm.servei.BpmEngine;
+import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -130,7 +133,6 @@ public class AplicacioEntityDaoImpl
     {
 		targetVO.setGestionableWF(new Boolean(
 				sourceEntity.getGestionableWF().compareTo("S") == 0)); //$NON-NLS-1$
-
     }
 
 
@@ -254,6 +256,27 @@ public class AplicacioEntityDaoImpl
 				targetEntity.setCorreusNotificacions(correusFormatejats); //eliminem espais innecesaris
 			}			
 			
+		}
+		
+		// Check aproval process
+		if (sourceVO.getApprovalProcess() == null)
+			targetEntity.setApprovalProcess(null);
+		else
+		{
+			BpmEngine bpm = getBpmEngine ();
+			List definitions;
+			try
+			{
+				definitions = bpm.findProcessDefinitions(sourceVO.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
+				if (definitions.isEmpty())
+				{
+					throw new SeyconException(String.format("Unknown workflow '%s'", sourceVO.getApprovalProcess()));
+				}
+			}
+			catch (InternalErrorException e)
+			{
+				throw new SeyconException (e.toString());
+			}
 		}
 
 	}    

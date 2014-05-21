@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="aplicacions">
+		<finder name="aplicacio" type="aplicacio">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findAplicacioByCriteri"
+				if="${queryEnabled}">  <!-- application:query -->
+				<parameter value="${codi}" />
+				<parameter value="${nom}" />
+				<parameter value="${fonts}" />
+				<parameter value="${resp}" />
+				<parameter value="${exe}" />
+				<parameter value="${bbdd}" />
+				<parameter value="${rol}" />
+				<parameter value="${gestionableWF}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Aplicacio">
+			</new-instance-bean>
+		</finder>
+		
+		<finder name="risk" type="risk">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add ("L");
+				list.add ("H");
+				list.add ("F");
+				list.add ("N");
+				return list;
+			</script-finder>
+		</finder>
+		
+	</datanode>
+
+	<datanode name="risk" transient="true">
+		<custom-attribute name="literal">
+			if (instance.equals("H"))
+				return "High";
+			else if (instance.equals("L"))
+				return "Low";
+			else if (instance.equals("N"))
+				return "Unknown";
+			else if (instance.equals("F"))
+				return "Forbidden";
+			else
+				return instance;
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return es.caib.seycon.ng.comu.SoDRisk.fromString(instance);
+		</custom-attribute>
+
+	</datanode>
+
+	<datanode name="aplicacio">
+		<finder name="rol" type="rol">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRolsByCodiAplicacio">
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol">
+			</new-instance-bean>
+		</finder>
+		<finder name="responsable" type="responsable">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
+				<parameter value='SC_RESPONSABLE' />
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
+			</new-instance-bean>
+		</finder>
+		<finder name="respseg" type="respseg">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
+				<parameter value='SC_RESPONSABLE_SEGURETAT' />
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
+			</new-instance-bean>
+		</finder>
+		<finder name="admseg" type="admseg">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
+				<parameter value='SC_ADMINISTRADOR_SEGURETAT' />
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
+			</new-instance-bean>
+		</finder>
+		<finder name="consulta" type="consulta">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
+				<parameter value='SC_CON_APLICACIONS' />
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
+			</new-instance-bean>
+		</finder>
+		<finder name="domini" type="domini">
+			<ejb-finder jndi="java:comp/env/ejb/DominiEJB" method="findDominisAplicacioByCodiAplicacio"> <!-- application:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Domini">
+			</new-instance-bean>
+		</finder>
+		<finder name="dominirols" type="domini">
+			<ejb-finder jndi="java:comp/env/ejb/DominiEJB" method="findDominisByCodiAplicacio">  <!-- application:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Domini" />
+		</finder>
+		<finder name="rolUsuari" type="rolUsuari">
+			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
+				method="findRolsUsuarisAmbRolsDAplicacioByCodiAplicacio">  <!-- application:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount">
+			</new-instance-bean>
+		</finder>
+		<finder name="sodRule" type="sodRule">  <!-- application:query -->
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService"
+				method="findRuleByApplication">
+				<parameter value="${instance.id}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.SoDRule">
+			</new-instance-bean>
+		</finder>
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.nom}" notNull="true" friendlyName="applications.nameValidation"/>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="applications.codeValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="sodRule">
+		<finder name="sodRole" type="sodRole" refreshAfterCommit="true">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService"
+				method="findRolesByRule">
+				<parameter value="${instance.id}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.SoDRole">
+			</new-instance-bean>
+		</finder>
+		<script-handler>
+			<insert-script>
+				instance.applicationId = parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="remove">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="sodRule.name"/>
+		</validator>
+	</datanode>
+	
+	<datanode name="sodRole">
+		<script-handler>
+			<insert-script>
+				instance.ruleId = parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="remove">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="rol">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="responsable">  <!-- application:query -->
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="respseg">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="admseg">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="consulta">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="domini">
+		<finder name="valordomini" type="valordomini">
+			<ejb-finder jndi="java:comp/env/ejb/DominiEJB" method="findValorsDominiByFiltre">
+				<parameter value="${instance}" />
+				<parameter value="" />
+				<parameter value="" />
+				<parameter value="" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.ValorDomini">
+			</new-instance-bean>
+		</finder>
+		<ejb-handler jndi="java:comp/env/ejb/DominiEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.nom}" notNull="true" friendlyName="applications.domainNameValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="valordomini">
+		<ejb-handler jndi="java:comp/env/ejb/DominiEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="rols">
+		<finder name="rol" type="rol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRolsByFiltre"
+				if="${queryEnabled}"> <!--tothom i application:query i user:role:query[aplicacions] -->
+				<parameter value="${nom}" />
+				<parameter value="${descripcio}" />
+				<parameter value="${defecte}" />
+				<parameter value="${bbdd}" />
+				<parameter value="${contrasenya}" />
+				<parameter value="${aplicacio}" />
+				<parameter value="${gestionableWF}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol">
+			</new-instance-bean>
+		</finder>
+
+		<finder name="dispatcher" type="dispatcher">
+			<script-finder>
+				es.caib.seycon.ng.comu.Dispatcher dis = new
+				es.caib.seycon.ng.comu.Dispatcher();
+				return dis;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB" method="findDispatchersByFiltre">
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="rolUsuari" />
+
+	<datanode name="usuarisRol">
+		<finder name="usuariRol" type="usuariRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findUsuarisByNomRolAndCodiAplicacioRolAndCodiDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}" />
+				<parameter value="${codiAplicacio}" />
+				<parameter value="${bbdd}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="usuariRol" />
+
+	<datanode name="dispatcher" />
+
+</zkib-model>

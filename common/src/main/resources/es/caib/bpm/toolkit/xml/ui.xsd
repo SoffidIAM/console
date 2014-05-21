@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:annotation>
+		<xs:documentation xml:lang="es">
+			Schema de Archivo de Definición de UI.
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="process" type="ProcessType"/>
+	
+	<xs:complexType name="ProcessType">
+		<xs:sequence>
+			<xs:element name="tag" type="xs:string"></xs:element>
+            <xs:element name="appliesTo" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="roles" maxOccurs="1" type="RolesGroupType"
+				minOccurs="0" />
+			<xs:element name="task" minOccurs="0" maxOccurs="unbounded"
+				type="TaskType" />
+			<xs:element name="upgrade" type="UpgradeType" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="RolesGroupType">
+		<xs:sequence>
+			<xs:element name="initiator" maxOccurs="1" type="RolesType"/>
+			<xs:element name="supervisor" maxOccurs="1" type="RolesType"/>
+			<xs:element name="observer" maxOccurs="1" type="RolesType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="RolesType">
+		<xs:choice>
+			<xs:element name="role" maxOccurs="unbounded" type="RoleUserType"/>
+			<xs:element name="user" maxOccurs="unbounded" type="RoleUserType"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="RoleUserType">
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:complexType name="TaskType">
+		<xs:sequence>
+			<xs:element name="file" maxOccurs="1" type="FileType"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="FileType">
+		<xs:attribute name="path" type="xs:string"/>
+	</xs:complexType>
+
+	
+	<xs:complexType name="ClassResourceType">
+		<xs:attribute name="path" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="UpgradeType">
+		<xs:sequence>
+			<xs:element name="process" type="ProcessUpgradeType" maxOccurs="unbounded" minOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ProcessUpgradeType">
+		<xs:sequence>
+			<xs:element name="tag" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+            <xs:element name="name" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="task" type="TaskUpgradeType"
+				maxOccurs="unbounded" minOccurs="0">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="TaskUpgradeType">
+		<xs:attribute name="source" type="xs:string"></xs:attribute>
+		<xs:attribute name="target" type="xs:string"></xs:attribute>
+	</xs:complexType>
+</xs:schema>

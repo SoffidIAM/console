@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="dadesAddicionals">		
+		<finder name="dadaAddicional" type="dadaAddicional">
+			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
+				method="findTipusDadesByCodi" if = "${queryEnabled}">
+				<parameter value="${codi}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.TipusDada">
+			</new-instance-bean>
+		</finder>
+		<finder name="dataType" type="dataType">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				for (l: TypeEnumeration.literals())
+				{
+					list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
+	</datanode>	
+	
+	<datanode name="dadaAddicional">
+		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.ordre}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
+		</validator>
+	</datanode>
+	
+	<datanode name="dataType" transient="true">
+		<custom-attribute name="literal">
+			if (instance.length() == 0)
+				return "";
+			else
+			 	return org.zkoss.util.resource.Labels.getLabel("typeDadaAddicional."+instance);
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return es.caib.seycon.ng.comu.TypeEnumeration.fromString(instance);
+		</custom-attribute>
+	</datanode>
+	
+</zkib-model>

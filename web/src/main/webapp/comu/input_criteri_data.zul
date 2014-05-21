@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?component name="input_etiqueta" macro-uri="input_etiqueta.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style>
+		.datebox_amagatinp {display:none;}
+		span.rbtnbk {background-image: none; border: none;}
+		.datebox_amagatpp {background-color:white;}
+	</style>
+	
+	<hbox width="350px">
+		<attribute if="${arg.visible != null}" name="visible">${arg.visible}</attribute>
+		<attribute if="${arg.widths_custom == null}" name="widths">111px,111px,*</attribute>
+		<attribute if="${arg.widths_custom != null}" name="widths">${arg.widths_custom}</attribute>
+		<label sclass="etiqueta" value="${arg.etiqueta}"/>
+		<textbox id="textbox" sclass="textbox" value="" width="100%">
+			<attribute if="${arg.mascara != null}" name="constraint">${arg.mascara}</attribute>
+			<attribute if="${arg.lectura != null}" name="disabled">${arg.lectura}</attribute>
+			<attribute name="onChange">
+				org.zkoss.zk.ui.event.Events.postEvent(event.name, self.parent.parent, event.data);
+				if (! self.getValue().equals (datebox.getText()))
+					datebox.setText(self.getValue());
+			</attribute>
+		</textbox>
+		<datebox  sclass="datebox_amagat" id ="datebox">
+			<attribute if="${arg.bind != null}" name="bind">${arg.bind}</attribute>
+			<attribute if="${arg.format != null}" name="format">${arg.format}</attribute>
+			<attribute if="${arg.format == null}" name="format">dd/MM/yyyy</attribute>
+			<attribute name="onChange">
+				java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(self.format);
+				if (! self.getValue().equals (textbox.getText()))
+					textbox.setValue(sdf.format(self.getValue()));
+			</attribute>
+		</datebox>
+	</hbox>
+</zk>

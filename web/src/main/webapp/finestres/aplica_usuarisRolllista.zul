@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="usuarisRolLlista" title="Llista d'usuaris"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	<style src="/css/localSEU.css"/>
+	
+	<datamodel id="model" rootNode="rolsUsuarisRols" src="descriptorRolsUsuari.xml"/>
+	
+	<zscript>
+	
+		mode = "query"; 
+		view_altres = false;
+		model.getVariables().declareVariable("queryEnabled", false);
+	
+		void populateDetails ()
+		{
+			mode="query";
+		}	
+
+		void search (boolean queryEnabled) 
+		{ 
+			esquemaLlista.getFellow("listbox");
+			
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			if(queryEnabled){
+				model.getJXPathContext().getValue("/rolUsuari").refresh();
+				listbox.dataPath = "/model:/rolUsuari";
+				model.getJXPathContext().getValue("/jerarquiaRolUsuari").refresh();
+				listboxjerarquia.dataPath = "/model:/jerarquiaRolUsuari"; 
+				 
+			} 
+		}
+
+		void showAltres () 
+		{
+			if (view_altres==false) {
+				esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+				view_altres = true;
+			} else {
+				esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+				view_altres = false;
+			}
+		}
+
+		void cleanWindow(){
+			model.getVariables().declareVariable("queryEnabled", false);
+			listbox.dataPath = "/model:/rolUsuari[false]";
+			esquemaLlista.visible=false;
+			tabmenow.setSelectedIndex(0);
+			view_altres = false;							
+		}		
+				
+	</zscript>
+	
+ 	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('aplica_usuarisRolllista.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+
+			nomRol = desktop.getPage("usuarisRolLlista").getAttribute("rol");
+			codiApl = desktop.getPage("usuarisRolLlista").getAttribute("apl");
+			bbdd = desktop.getPage("usuarisRolLlista").getAttribute("bbdd");
+			tipusDominiRol = desktop.getPage("usuarisRolLlista").getAttribute("tipusDominiRol");
+			<!-- desktop.getPage("usuarisRolLlista").setTitle("Llista d'usuaris amb el rol " + nomRol + "@" + bbdd); -->
+			esquemaLlista.setTitle(String.format(org.zkoss.util.resource.Labels.getLabel("aplica_usuarisRolllista.Titol2"), new Object [] {nomRol, bbdd, tipusDominiRol}));
+			model.getVariables().declareVariable("nomRol",nomRol);
+			model.getVariables().declareVariable("codiAplicacio",codiApl);
+			model.getVariables().declareVariable("bbdd",bbdd);
+			search(true);
+				
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+		   		self.setMode("highlighted");
+		  	}else{
+		  		self.visible = true;
+		  	}      		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+		<vbox width="100%">
+		<tabbox id="tabmenow" width="100%">
+		<tabs>
+			<tab id="rolsdirectes" label="${c:l('aplica_usuarisRolllista.zul.Assignaciadirecta')}"/>
+			<tab label="${c:l('aplica_usuarisRolllista.zul.Ambelrolheretat')}"/>
+		</tabs>
+		<tabpanels>
+			<tabpanel>
+				<vbox width="100%">
+				<listbox autocommit="false" dataPath="/model:/rolUsuari" fixedLayout="true" height="300px" width="100%" id="listbox" rows="20">
+					<listhead>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Codi')}" width="9%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Nomcomplert')}" width="20%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Grup')}" width="9%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Rol')}"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Bbdd')}" width="10%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}" width="24%"/>
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@codiUsuari"/>
+						<listcell bind="@nomComplertUsuari"/>
+						<listcell bind="@codiGrupUsuari"/>
+						<listcell bind="@nomRol"/>
+						<listcell bind="@baseDeDades"/>
+						<listcell bind="valorDomini/@descripcio" tooltip="tvalorDomini"/>
+					</dataitem>
+				</listbox>
+				<popup id="tvalorDomini" width="200px">
+					<attribute name="onOpen">
+						if (event.getReference() instanceof DataListcell) {
+							try {  
+								listCell = event.getReference(); 
+								dlistbox = listCell.getListbox(); 
+								modelo = dlistbox.getModel(); 
+								listItem = listCell.getParent(); 
+								posicio = listItem.getIndex(); 
+								elemPos = modelo.getElementAt(posicio); 
+								xpath = elemPos.getDataContext().getXPath(); 
+								dataSource = listbox.getDataSource(); 
+								context = dataSource.getJXPathContext();
+								
+								dada = context.getValue(xpath+"/valorDomini/@valor");												
+								rolsValorDomini.value = "valor ='"+dada+"'";
+							} catch (Throwable th) {
+								rolsValorDomini.value ="";
+							}
+						}
+					</attribute>
+					<label id="rolsValorDomini" value=""/>
+				</popup>
+				
+				<div align="right">
+					<div style="float:right">
+					<button label="${c:l('aplica_usuarisRolllista.zul.Accepta')}" onClick="cleanWindow()"/>
+					</div>
+					<div style="float:left">
+						<listexportbutton acces="true" listbox="listbox"/>
+					</div>
+				</div>
+				</vbox>			
+			</tabpanel>
+			<tabpanel>
+				<vbox  width="100%">
+				<listbox autocommit="false" dataPath="/model:/jerarquiaRolUsuari" fixedLayout="true" height="300px" id="listboxjerarquia" rows="20">
+					<listhead>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Codi')}" sort="auto" width="20%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Nomcomplert')}" sort="auto" width="30%"/>
+						<listheader label="${c:l('aplica_usuarisRolllista.zul.Informaciadassignac')}" sort="auto"/>
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@tipus"/>
+						<listcell bind="@infoContenidor"/>
+						<listcell bind="@metaInfo"/>						
+					</dataitem>
+				</listbox>
+				<div align="right">
+				<div style="float:right">
+					<button label="${c:l('aplica_usuarisRolllista.zul.Accepta')}" onClick="cleanWindow()"/>
+					</div>
+					<div style="float:left">
+						<listexportbutton acces="true" listbox="listboxjerarquia"/>
+					</div>
+				</div>
+				</vbox>									
+			</tabpanel>
+		</tabpanels>
+		</tabbox>
+
+		</vbox>
+	</window>
+
+</zk>

@@ -1,0 +1,47 @@
+------- AndroMDA Exception Recording -------
+Version ........: 3.2
+Error ..........: Error performing ModelProcessor.process with model(s) --> '/home/u07286/src/im/seycon-3.1/mda/src/main/uml/uml/md/seycon.mdxml'
+Build ..........: ${build.date}
+Build System ...: Linux-2.6.32-34-generic
+Build JDK ......: Sun Microsystems Inc.-20.1-b02
+Build Builder ..: u07286
+Run System .....: Linux2.6.32-35-generic
+Run JDK ........: Sun Microsystems Inc.20.1-b02
+Main Exception .: java.io.FileNotFoundException: /home/u07286/src/im/seycon-3.1/mda/src/main/uml/uml/md/seycon.mdxml (No such file or directory)
+Root Exception .: java.io.FileNotFoundException: /home/u07286/src/im/seycon-3.1/mda/src/main/uml/uml/md/seycon.mdxml (No such file or directory)
+java.io.FileNotFoundException: /home/u07286/src/im/seycon-3.1/mda/src/main/uml/uml/md/seycon.mdxml (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:120)
+	at java.io.FileInputStream.<init>(FileInputStream.java:79)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:70)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:161)
+	at java.net.URL.openStream(URL.java:1010)
+	at org.andromda.core.transformation.XslTransformer.transform(XslTransformer.java:104)
+	at org.andromda.core.repository.Repositories.loadModel(Repositories.java:160)
+	at org.andromda.core.engine.ModelProcessor.loadModelIfNecessary(ModelProcessor.java:344)
+	at org.andromda.core.engine.ModelProcessor.loadIfNecessary(ModelProcessor.java:533)
+	at org.andromda.core.engine.ModelProcessor.processModels(ModelProcessor.java:225)
+	at org.andromda.core.engine.ModelProcessor.process(ModelProcessor.java:146)
+	at org.andromda.core.engine.ModelProcessor.process(ModelProcessor.java:82)
+	at org.andromda.core.engine.Engine.run(Engine.java:82)
+	at org.andromda.core.AndroMDA.run(AndroMDA.java:197)
+	at org.andromda.maven.plugin.AndroMDAMojo.execute(AndroMDAMojo.java:92)
+	at org.andromda.maven.plugin.AbstractAndroMDAMojo.execute(AbstractAndroMDAMojo.java:106)
+	at org.apache.maven.plugin.DefaultPluginManager.executeMojo(DefaultPluginManager.java:443)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:539)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalWithLifecycle(DefaultLifecycleExecutor.java:480)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoal(DefaultLifecycleExecutor.java:459)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalAndHandleFailures(DefaultLifecycleExecutor.java:311)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeTaskSegments(DefaultLifecycleExecutor.java:278)
+	at org.apache.maven.lifecycle.DefaultLifecycleExecutor.execute(DefaultLifecycleExecutor.java:143)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:334)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:125)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:280)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.codehaus.classworlds.Launcher.launchEnhanced(Launcher.java:315)
+	at org.codehaus.classworlds.Launcher.launch(Launcher.java:255)
+	at org.codehaus.classworlds.Launcher.mainWithExitCode(Launcher.java:430)
+	at org.codehaus.classworlds.Launcher.main(Launcher.java:375)

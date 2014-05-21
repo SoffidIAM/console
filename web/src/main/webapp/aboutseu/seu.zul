@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="aboutseu" title="Novetats de la versió"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	
+	<zscript>
+	try {es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource.Labels.getLabel("seu.Titol"));} catch (Exception ex){}
+	</zscript>
+	
+	<vbox align="center" sclass="novetats">
+	
+		<style>
+		.novetats {font-family:Arial; font-size:10pt;padding:10px;}
+		.novetats span {font-family:Arial; font-size:10pt;}
+		.t1 {font-size: 16pt !important; font-weight:bold; color: #494949; text-align:center}
+		.intro {text-align: justify;}
+		.binici {text-align:center; background-color: #FFF7EE; border:1px solid #8A4700; width:400px;margin:5px 0 5px 5px;}
+		.u {text-decoration:underline;display:inline;}
+		.i {font-weight:bold;color:#808080;}
+		.bu {font-weight:bold; text-decoration:underline;display:inline;}
+		.click {display:inline;}
+		.click span {font-weight:bold;color:#8A4700;font-size:10pt; }
+		.imatge {padding:3px;vertical-align:middle;margin:3px;}
+		.nou{font-size: 11pt !important; font-weight:bold; color: #8A4700; }
+		.anterior, .anterior span {font-size: 11pt !important; font-weight:bold; color: #494949; margin-top:10px; margin-bottom:5px;}
+		.canvis {margin-left:20px;margin-bottom:15px;}
+		.punt {display: list-item;list-style-type: square;}
+		div.wc-highlighted {
+			border: 2px solid #0e5462; background: #FFF;
+		}		
+		
+		</style>
+	
+		<zscript>
+			String versioSEU = "";
+			try {
+				versioSEU= es.caib.seycon.ng.web.ConfiguraSEU.getVersio();
+			} catch (Throwable th) {}
+		</zscript>	
+
+		<vbox style="padding: 5px;">
+			<div>
+				<!-- darrera versió -->
+				<label sclass="nou">${c:l('seu.Titol')} ${versioSEU}:</label>
+				<include src="/aboutseu/novetats.zul"/>
+				
+				<div sclass="anterior">${c:l('seu.zul.Versionsanteriors')}</div>
+				<!--  Versions anteriors -->
+				<include src="/aboutseu/oldseu.zul"/>
+			</div>
+		</vbox>
+	</vbox>
+</zk>

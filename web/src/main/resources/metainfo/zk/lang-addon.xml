@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<language-addon>
+
+	<addon-name>BPM-web</addon-name>
+	 <version>
+	  	<version-class>es.caib.bpm.ui.Version</version-class>
+	  	<version-uid>1.0</version-uid>
+	  </version>
+
+	<language-name>xul/html</language-name>
+	
+	<component>
+		<extends>treecell</extends>
+		<component-name>apptreecell</component-name>
+		<component-class>es.caib.bpm.ui.tree.ApplicationTreecell</component-class>
+	</component>
+	
+</language-addon>
+

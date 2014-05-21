@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+	<frame id="ui" title="${c:l('configure.title')}"
+		use="es.caib.bpm.ui.admin.ConfigureIndex" width="99%">
+		
+		<div sclass="titolpagina">
+			${c:l('configure.documentmng')}
+		</div>
+		
+		<zscript>
+			<![CDATA[
+				
+				void showElements(data)
+				{
+					String selected = data.getSelectedItem().getValue();
+					parent = data.getParent().getParent();
+					
+					switch (selected)
+					{
+						case "es.caib.bpm.nas.comm.LocalFileSystemStrategy":	// Local file system
+							
+							parent.getFellow("rowServer").setVisible(false);
+							parent.getFellow("rowPath").setVisible(true);
+							parent.getFellow("rowtempPath").setVisible(true);
+							parent.getFellow("rowUsername").setVisible(false);
+							parent.getFellow("rowUserPassword").setVisible(false);
+							
+							break;
+							
+						case "es.caib.bpm.nas.comm.CIFSStrategy":	// CIFS
+							
+							parent.getFellow("rowServer").setVisible(true);
+							parent.getFellow("rowPath").setVisible(true);
+							parent.getFellow("rowtempPath").setVisible(true);
+							parent.getFellow("rowUsername").setVisible(true);
+							parent.getFellow("rowUserPassword").setVisible(true);
+							
+							parent.getFellow("rowServer").getChildren()
+								.get(0).setValue(org.zkoss.util.resource.Labels
+										.getLabel("configure.domain"));
+							
+							break;
+							
+						case "es.caib.bpm.nas.comm.FTPStrategy": // FTP
+							
+							parent.getFellow("rowServer").setVisible(true);
+							parent.getFellow("rowPath").setVisible(true);
+							parent.getFellow("rowtempPath").setVisible(true);
+							parent.getFellow("rowUsername").setVisible(true);
+							parent.getFellow("rowUserPassword").setVisible(true);
+							
+							parent.getFellow("rowServer").getChildren()
+							.get(0).setValue(org.zkoss.util.resource.Labels
+									.getLabel("configure.server"));
+							
+							break;
+							
+						case "es.caib.bpm.nas.comm.HTTPStrategy":	// HTTP
+							
+							parent.getFellow("rowServer").setVisible(true);
+							parent.getFellow("rowPath").setVisible(false);
+							parent.getFellow("rowtempPath").setVisible(true);
+							parent.getFellow("rowUsername").setVisible(false);
+							parent.getFellow("rowUserPassword").setVisible(false);
+							
+							parent.getFellow("rowServer").getChildren()
+								.get(0).setValue(org.zkoss.util.resource.Labels
+										.getLabel("configure.url"));
+							
+							break;
+					}
+				}
+			]]>
+		</zscript>
+		<grid id="gridDocumentConfig">
+			<columns>
+				<column label="${c:l('configure.paramHeader')}" width="10%"/>
+				<column label="${c:l('configure.valueHeader')}"/>
+			</columns>
+			<rows>
+				<row id="rowStrategy">
+					<label id="labelStrategy" value="${c:l('configure.docstrategy')}" />
+					<listbox id="lbStrategy" mold="select" onSelect="showElements(self)">
+						<listitem id="itemLocal" label="${c:l('configure.local')}"
+							value="es.caib.bpm.nas.comm.LocalFileSystemStrategy" />
+						<listitem id="itemCIFS" label="${c:l('configure.CIFS')}"
+							value="es.caib.bpm.nas.comm.CIFSStrategy" />
+						<listitem id="itemFTP" label="${c:l('configure.FTP')}"
+							value="es.caib.bpm.nas.comm.FTPStrategy"/>
+						<listitem id="itemHTTP" label="${c:l('configure.HTTP')}"
+							value="es.caib.bpm.nas.comm.HTTPStrategy"/>
+					</listbox>
+				</row>
+				
+				<row id="rowServer">
+					<label id="labelServer" value="${c:l('configure.server')}" />
+					<textbox id="txtboxServer" width="40em"/>
+				</row>
+				
+				<row id="rowPath">
+					<label id="labelPath" value="${c:l('configure.filePath')}" />
+					<textbox id="txtboxPath" width="40em"/>
+				</row>
+				
+				<row id="rowtempPath">
+					<label id="labeltempPath" value="${c:l('configure.filetempPath')}" />
+					<textbox id="txtboxtempPath" width="40em"/>
+				</row>
+				
+				<row id="rowUsername">
+					<label id="labelUsername" value="${c:l('configure.username')}" />
+					<textbox id="txtboxUsername" width="40em"/>
+				</row>
+				
+				<row id="rowUserPassword">
+					<label id="labelUserPassword" value="${c:l('configure.password')}" />
+					<textbox id="txtboxPassword" width="40em" type="password"/>
+				</row>
+				
+				<row>
+					<label/>
+					<hbox>
+						<button label="${c:l('configure.configure')}"
+							onClick="ui.configureDocumentManager()"/>
+						<button label="${c:l('configure.cancel')}"
+							onClick="ui.getDocumentManagerSettings()"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		
+		<div sclass="titolpagina">
+			${c:l('configure.title')}
+		</div>
+		
+		<grid>
+			<columns>
+				<column width="15em"/>
+				<column width="50em"/>
+			</columns>
+			<rows>
+				<row>
+					<label sclass="label" value="${c:l('configure.luceneDir')}"/>
+					<textbox id="txt" width="40em"/>
+				</row>
+				<row>
+					<label/>
+					<button label="${c:l('configure.configure')}"
+						onClick="ui.configureIndex()"/>
+				</row>
+			</rows>
+		</grid>
+		<hbox>
+			<label value="${c:l('configure.reindex')}"/>
+			<button label="${c:l('configure.reindexBtn')}" onClick="ui.reindex()"/>
+		</hbox>
+	</frame>
+</zk>

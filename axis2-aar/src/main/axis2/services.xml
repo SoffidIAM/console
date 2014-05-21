@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<serviceGroup>
+	<parameter name="useOriginalwsdl">false</parameter>
+<!-- 
+    <service name="UsuariService">
+        <description>Hello! web service</description>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                class="org.apache.axis2.rpc.receivers.ejb.EJBInOnlyMessageReceiver"/>
+        	<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                class="org.apache.axis2.rpc.receivers.ejb.EJBMessageReceiver"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">es.caib.seycon.ng.servei.UsuariService</parameter>
+        <parameter name="remoteInterfaceName">es.caib.seycon.ng.servei.ejb.UsuariService</parameter>
+        <parameter name="homeInterfaceName">es.caib.seycon.ng.servei.ejb.UsuariServiceHome</parameter>
+        <parameter name="beanJndiName">soffid/ejb/es.caib.seycon.ng.servei.UsuariService</parameter>
+     </service>
+         -->
+
+    <service name="SubuService">
+        <description>Bubu web service</description>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+        	<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">com.soffid.iam.webservice.BubuService</parameter>
+        
+     </service>
+</serviceGroup>

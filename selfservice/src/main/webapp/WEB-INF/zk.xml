@@ -1,0 +1,98 @@
+<zk>
+	<listener>
+		<description>Inicializador de thread JBOSS</description>
+		<listener-class>es.caib.zkib.zkiblaf.jboss.JBossEventThreadInit</listener-class>
+	</listener>
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/error.zul</location>
+	</error-page>
+	<session-config>
+	<!--session-timeout
+	 	It specifies the time, in seconds, between client requests before a session is invalidated. 
+		A negative time indicates the session should never timeout. The default zero means to use the 
+		system default (which is usually specified in web.xml). 
+	-->
+  		<session-timeout>0</session-timeout>
+  		<timer-keep-alive>false</timer-keep-alive> 
+	</session-config>
+	<device-config>
+		<device-type>ajax</device-type>
+		<embed><![CDATA[
+ <script type="text/javascript">
+     AU_progressbar = function (id, msg) {
+         Boot_progressbox(id, msg, 0, 0, true, true);
+     };
+zk.error = function (msg) {
+	if (zk.booting) {
+		setTimeout(function () {zk.error(msg)}, 100);
+		return;
+	}
+	if (msg!=null && msg.startsWith("self.editor")) return;//evitem error de codepress (ausero)
+	tES="La pagina o componente";
+	tCA="La pàgina o el component";
+	tEN="The page or component";	
+	eES="Fallo al procesar";
+	eCA="Ha fallat el procés";
+	eEN="Failed to process";
+	esTimeout = (msg!=null && ((msg.startsWith(tES) || msg.startsWith(tCA)) || msg.startsWith(tEN)));
+	tError="setAttr";
+	tPopup="redirect";
+	esTerror = (msg!=null && msg.search(tError)!=-1);
+	esPopup = (msg!=null && msg.search(tPopup)!=-1);
+	if (msg!=null && esTerror) return;		
+	lES = (msg!=null && msg.startsWith(tES));
+	lCA = (msg!=null && msg.startsWith(tCA));
+	leES = (msg!=null && msg.startsWith(eES));
+	leCA = (msg!=null && msg.startsWith(eCA)); 
+	tancaES = (lES || leES);
+	tancaCA = (lCA || leCA);
+	titolFinestra = esTimeout?(lES?"Aviso: se ha excedido el tiempo de espera máximo":lCA?"Avís: s'ha excedit el temps d'espera màxim":"Warning: exceeded the maximum time"):(leES?"Atención: ha ocurrido un error":leCA?"Atenció: ha ocorregut un error":"Warning: An error occurred");
+	if (msg!=null && esPopup)
+		msg = eES?"Para poder ver el archivo debe permitir ventanas emergentes para este sitio!":eCA?"Per poder veure l'arxiu ha d'activar les finestres emergents!":"In order to download the file you must enable pop-ups!"; 
+	if (!zk._errcnt) zk._errcnt = 0; else 
+		try {document.getElementById("zk_err_" + zk._errcnt).style.display = 'none';document.getElementById("timeout.mask"+ zk._errcnt).style.display = 'none';} catch (ee){} //amaguem les anteriors
+	var id = "zk_err_" + (++zk._errcnt);
+	var box = document.createElement("DIV");
+	document.body.appendChild(box);
+	//t1 = esTimeout?"class='finestraTimeout'":"finestraError";
+	//t2 = esTimeout?"class='titolTout'":"";
+	//t3 = esTimeout?"class='rellotge'":"";
+	
+	var p_esq = (zk.innerWidth() - 550) / 2 + zk.innerX();
+	var p_top = (zk.innerHeight() - 60) / 2 + zk.innerY();
+	
+	//tdisable = esTimeout?"<div class='modal_mask' id='timeout.mask"+ zk._errcnt+"' style='left: 0px; top: 0px; width: "+zk.innerWidth()+"px; height: "+zk.innerHeight()+"px; display: block; z-index: 17;position:fixed;'></div>":"";
+	
+	var html =
+'<div style="position:absolute;background-color:white;border:1px solid #BCBCBC;z-index:99000;left:'
++p_esq+'px;top:'+p_top+'px;width:550px;" id="'
++id+'"><table cellpadding="0" cellspacing="0" width="100%">'
++'<thead><tr class="title"><td style="padding:2px 4px;">'+titolFinestra+'</td>'
++'<td align="right" class="mwt-highlighted"><img src="'+zk.getUpdateURI('/web/zul/img/close-off.gif')+
+'" style="cursor: default;" onmouseover="this.src=\''+zk.getUpdateURI('/web/zul/img/close-on.gif')+
+'\'" onmouseout="this.src=\''+zk.getUpdateURI('/web/zul/img/close-off.gif')+
+'\'" onclick="zk._msgclose(this);amaga();"></td></tr></thead>'
++'<tr valign="top"><td colspan="2" style="padding: 8px 8px 6px 60px;border-top:1px solid #BCBCBC;font-family:Arial;font-size:12px">'+zk.encodeXML(msg, true)+'</td></tr>'
++'<tr><td align="right" colspan="2" style="padding:0px 4px 2px 0">'
++'<button onclick="zk._msgclose(this);amaga();">'+(tancaES?'cerrar':tancaCA?'tanca':'close')+'</button></td></tr></table></div>';
+	zk._setOuterHTML(box, html);
+	box = $e(id); 
+	try {
+		new Draggable(box, {
+			handle: box, zindex: box.style.zIndex,
+			starteffect: zk.voidf, starteffect: zk.voidf, endeffect: zk.voidf, revert: true});
+	} catch (e) {}
+};
+amaga=function(){try {document.getElementById("timeout.mask"+ zk._errcnt).style.display = 'none';} catch (ee) {}}     
+ </script>
+     ]]></embed>
+	</device-config>
+	<system-config>
+		<max-upload-size>20480</max-upload-size>
+	</system-config>
+	<zscript-config>
+		<language-name>Java</language-name>
+		<interpreter-class>es.caib.seycon.ng.web.component.BSHInterpreter</interpreter-class>
+	</zscript-config>
+</zk>

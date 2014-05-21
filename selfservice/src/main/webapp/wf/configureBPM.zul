@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<frame id="configBPMWindow" title="${c:l('main.lblAdminBPM')}" width="100%">
+		<include src="wf/configureindex.zul"/>
+	</frame>
+</zk>

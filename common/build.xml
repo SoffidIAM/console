@@ -1,0 +1,466 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<project name="Seycon3" default="deploy-SeyconNetEAR" basedir=".">
+	<!--Set the output directories-->
+	<property name="deploy.expanded-no" value="true" />
+	<property name="source.dir" value="../source" />
+	<property name="source.outdir" value="../gen-source" />
+	<property name="compile.outdir" value="../class" />
+	<property name="javadoc.outdir" value="../javadoc" />
+	<property name="deploy.dir" value="../run" />
+	<property name="signed.dir" value="../run/signed" />
+	<property name="html.dir" value="../public_html" />
+	<property name="client.dir" value="../resources/client" />
+	<property name="build.dir" value="../build" />
+	<property name="xdoclet.dir" value="" />
+	<property name="resources.dir" value="../resources"/>
+	<property name="keystore" value="../resources/cert/keystore"/>
+	<property name="storepass" value="password"/>
+	<property name="alias" value="test"/>
+	<property name="lib" value="../lib"/>
+	<property environment="env"></property>
+	<property name="jbosslib" value="${env.JBOSS_HOME}/server/default/lib"/>
+	<property name="jboss.deploy.dir" value="${env.JBOSS_HOME}/server/default/deploy-caib" />
+	<!--Set the classpath-->
+	<path id="classpath">
+		<pathelement location="../class" />
+		<fileset dir="../lib">
+					<include name="*.jar" />
+		</fileset>
+		<fileset dir="../lib/xdoclet">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${jbosslib}">
+					<include name="*.jar" />
+		</fileset>
+	</path>
+	<!--Set the source path-->
+	<path id="srcpath">
+		<pathelement location="${source.dir}" />
+		<pathelement location="${source.outdir}" />
+	</path>
+	<target name="init">
+		<tstamp />
+	</target>
+	<target name="compile" depends="init, ejbdoclet">
+		<mkdir dir="${compile.outdir}" />
+		<!--Compile Java source files-->
+		<javac destdir="${compile.outdir}" debug="on"
+			target="1.4"
+			source="1.4"
+			encoding="UTF-8">
+			<classpath refid="classpath" />
+			<src refid="srcpath" />
+			<include name="bubu/test/seycon/Web.java" />
+			<include name="bubu/test/seycon/Password.java" />
+			<include name="bubu/util/*.java" />
+			<include name="es/caib/**/*.java" />
+			<include name="*.java" />
+		</javac>
+	</target>
+	<target name="doc" depends="init">
+		<mkdir dir="${javadoc.outdir}" />
+		<!--Create Javadoc-->
+		<javadoc sourcepathref="srcpath" classpathref="classpath"
+			destdir="${javadoc.outdir}" nodeprecated="true"
+			additionalparam="-encoding UTF-8 -J-Xmx32m -nosince">
+			<package name="es.caib.seycon.net.ejb.impl" />
+			<package name="es.caib.seycon.net.ejb" />
+			<package name="" />
+			<package name="es.caib.seycon.agent" />
+			<package name="es.caib.seycon.net.web.dlgmgr" />
+			<package name="es.caib.seycon.net.web" />
+			<package name="es.caib.seycon.net" />
+			<package name="es.caib.seycon.util" />
+			<package name="es.caib.util" />
+			<package name="es.caib.sso" />
+			<package name="es.caib.seycon" />
+		</javadoc>
+	</target>
+	<target name="clean">
+		<!--Delete output directories-->
+		<delete dir="${compile.outdir}" />
+		<delete dir="${javadoc.outdir}" />
+	</target>
+	<target name="make" depends="compile" />
+	<target name="rebuild" depends="clean,all" />
+	<target name="all" depends="doc,most" />
+
+	<target name="most"
+		depends="compile,hibernate,deploy-Seycon,deploy-SeyconNetEAR,deploy-SeyconNetClient,deploy-SeyconNetWSR,deploy-SeyconSsoClient" />
+
+	<target name="ejbdoclet">
+		<taskdef name="ejbdoclet"
+			classname="xdoclet.modules.ejb.EjbDocletTask"
+			classpathref="classpath" />
+		<ejbdoclet destdir="${source.outdir}"
+			excludedtags="@version,@author"
+			addedtags="@xdoclet-generated at ${TODAY}" ejbspec="2.0">
+			<fileset dir="${source.dir}">
+				<include
+					name="es/caib/seycon/net/ejb/impl/SiapEJBBean.java" />
+				<include
+					name="es/caib/seycon/net/ejb/impl/FitxerEJBBean.java" />
+				<include
+					name="es/caib/seycon/net/ejb/impl/LoginLOPDEJBBean.java" />
+				<include
+					name="es/caib/seycon/net/ejb/impl/DrugstoreUserEJBBean.java" />
+				<include
+					name="es/caib/seycon/net/ejb/impl/UsuarisCertEJBBean.java" />
+			</fileset>
+
+			<remoteinterface pattern="{0}">
+				<packageSubstitution packages="ejb.impl"
+					substituteWith="ejb" />
+			</remoteinterface>
+
+			<homeinterface pattern="{0}Home">
+				<packageSubstitution packages="ejb.impl"
+					substituteWith="ejb" />
+			</homeinterface>
+
+			<session></session>
+
+			<deploymentdescriptor destdir="${source.outdir}/META-INF"
+				mergedir="${resources.dir}/META-INF" />
+			<jboss version="3.2" mergedir="${resources.dir}/META-INF"
+				unauthenticatedPrincipal="nobody" securityDomain="java:/jaas/seycon"
+				destdir="${source.outdir}/META-INF" />
+		</ejbdoclet>
+	</target>
+
+
+	<target name="compile-rmi" depends="make">
+		<rmic base="${compile.outdir}" stubversion="1.4">
+			<classpath refid="classpath" />
+			<include name="es/caib/seycon/agent/Pruebas.class" />
+			<include name="es/caib/seycon/AgentMgrImpl.class" />
+			<include name="es/caib/seycon/ServerAdminImpl.class" />
+			<include name="es/caib/seycon/ServerAgent.class" />
+			<include name="es/caib/sso/LogonServer.class" />
+			<include name="es/caib/seycon/AS400Agent.class" />
+			<include name="es/caib/seycon/NotesAgent.class" />
+			<include name="es/caib/seycon/OracleAgent.class" />
+			<include name="es/caib/seycon/PresidAgent.class" />
+			<include name="es/caib/seycon/SapAgent.class" />
+			<include name="es/caib/seycon/SolarisAgent.class" />
+			<include name="es/caib/seycon/SolarisNISMasterAgent.class" />
+			<include name="es/caib/seycon/WeblogicAgent.class" />
+			<include name="es/caib/seycon/WindowsNTAgent.class" />
+			<include name="es/caib/seycon/WindowsNTWAgent.class" />
+			<include name="es/caib/seycon/WindowsNTBDCAgent.class" />
+			<include name="es/caib/seycon/WindowsNTPDCAgent.class" />
+			<include name="es/caib/seycon/agent/Domino65Agent.class" />
+			<include name="es/caib/seycon/agent/Domino65WFAgent.class" />
+			<include name="es/caib/seycon/agent/DominoAgent.class" />
+			<include name="es/caib/seycon/agent/DominoWFAgent.class" />
+			<include name="es/caib/seycon/agent/SiapConnector.class" />
+			<include name="es/caib/seycon/agent/PostFixAgent.class" />
+			<include name="es/caib/seycon/agent/PostFix2Agent.class" />
+			<include name="es/caib/seycon/agent/SiapAgent.class" />
+			<include name="es/caib/seycon/agent/SiapConnector.class" />
+			<include name="es/caib/seycon/agent/HisMapAgent.class" />
+			<include name="es/caib/seycon/agent/HisMapAgent.class" />
+			<include name="es/caib/seycon/agent/Domino65IDGeneratorServer.class" />
+			<include name="es/caib/seycon/agent/SSHAgent.class" />
+			<include name="es/caib/seycon/agent/DnsDhcpAgent.class" />
+			<include name="es/caib/seycon/agent/JBossAgent.class" />
+			<include name="es/caib/seycon/agent/SAPAgent.class" />
+			<include name="es/caib/seycon/agent/LDAPAgent.class" />
+			<include name="es/caib/seycon/agent/TestAgent.class" />
+		</rmic>
+	</target>
+	<target name="deploy-Seycon" depends="make,compile-rmi">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/seycon.zip">
+			<fileset dir="${compile.outdir}">
+				<include name="*.class" />
+				<include name="es/caib/seycon/*.class" />
+				<include name="es/caib/seycon/util/*.class" />
+				<include name="es/caib/seycon/timed/*.class" />
+				<include name="es/caib/sso/*.class" />
+				<include name="es/caib/seycon/agent/*.class" />
+				<include name="es/caib/seycon/ssl/*.class" />
+				<include name="bubu/util/*.dll"/>
+			</fileset>
+		</jar>
+	</target>
+	<target name="deploy-SeyconClient" depends="make,compile-rmi">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/seyconClient.jar">
+			<fileset dir="${compile.outdir}">
+				<include name="es/caib/seycon/*Info.class" />
+				<include name="es/caib/seycon/*Description.class" />
+				<include name="es/caib/seycon/*Mgr.class" />
+				<include name="es/caib/seycon/*Exception.class" />
+				<include name="es/caib/seycon/ServerAgent*.class" />
+				<include name="es/caib/seycon/TimedProcess.class" />
+				<include name="es/caib/seycon/TimeoutThread.class" />
+				<include name="es/caib/seycon/TimedOutException.class" />
+				<include name="es/caib/seycon/InputStreamThread.class" />
+				<include name="es/caib/seycon/Server.class" />
+				<include name="es/caib/seycon/Challenge.class" />
+				<include name="es/caib/seycon/LogEntry.class" />
+				<include name="es/caib/seycon/Password.class" />
+				<include
+					name="es/caib/seycon/agent/Domino65IDGenerator.class" />
+				<include
+					name="es/caib/seycon/agent/Domino65IDGeneratorServer_Skel.class" />
+				<include
+					name="es/caib/seycon/agent/Domino65IDGeneratorServer_Stub.class" />
+				<include name="es/caib/seycon/ssl/*.class" />
+				<include name="es/caib/sso/LogonServer*.class" />
+				<include name="es/caib/sso/*Exception.class" />
+				<include name="es/caib/sso/*Mgr.class" />
+				<include name="es/caib/sso/*Info.class" />
+				<include name="es/caib/sso/Challenge.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="deploy-SeyconSsoClient" depends="make,compile-rmi">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/seyconSsoClient.jar">
+			<fileset dir="${compile.outdir}">
+				<include name="es/caib/sso/client/*.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="deploy-SeyconNetClient"
+		depends="deploy-SeyconClient">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/SeyconNetClient.jar">
+			<zipfileset src="${deploy.dir}/seyconClient.jar">
+				<include name="**" />
+				<exclude name="**/MANIFEST.MF" />
+			</zipfileset>
+			<fileset dir="${compile.outdir}">
+				<include name="es/caib/seycon/net/*.class" />
+				<include name="es/caib/seycon/net/ejb/*.class" />
+				<include name="es/caib/seycon/hibernate/*.class" />
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="deploy-SeyconNetWar" depends="compile,signjar">
+		<!-- Crear el WAR -->
+		<mkdir dir="${deploy.dir}" />
+		<war warfile="${deploy.dir}/SeyconNet.war"
+			webxml="${html.dir}/WEB-INF/web.xml">
+			<!-- Recursos HTML propios -->
+			<fileset dir="${html.dir}">
+				<include name="**" />
+			</fileset>
+			<!-- Mödulos Java -->
+			<classes dir="${compile.outdir}">
+				<include name="es/caib/seycon/net/web/**" />
+				<include name="es/caib/seycon/net/ejb/*" />
+				<include name="es/caib/seycon/hibernate/*" />
+			</classes>
+			<!-- Configuracion Hibernate -->
+			<classes dir="${resources.dir}/META-INF">
+				<include name="hibernate.cfg.xml" />
+			</classes>
+			<!-- Bibliotecas ZK -->
+			<lib dir="../lib">
+				<include name="bsh.jar"/>
+				<include name="commons-el.jar"/>
+				<include name="commons-fileupload.jar"/>
+				<include name="custom_rhino.jar"/>
+				<include name="bsh.jar"/>
+				<include name="pxweb.jar"/>
+				<include name="pxcommon.jar"/>
+				<include name="zk.jar"/>
+				<include name="zul.jar"/>
+				<include name="zhtml.jar"/>
+			</lib>
+		</war>
+	</target>
+
+	<target name="deploy-SeyconNetClientWar" depends="compile,signjar">
+		<!-- Crear el WAR -->
+		<mkdir dir="${deploy.dir}" />
+		<war warfile="${deploy.dir}/SeyconNetClient.war"
+			webxml="${client.dir}/WEB-INF/web.xml">
+			<!-- Recursos HTML propios -->
+			<fileset dir="${client.dir}">
+				<include name="**" />
+			</fileset>
+			<!--Recursos FIRMADOS  -->
+			<fileset dir="${signed.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</war>
+	</target>
+
+	<target name="deploy-SeyconNetEJB"
+		depends="compile,deploy-SeyconClient">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/SeyconNetEjb.jar">
+			<fileset dir="${source.outdir}">
+				<include name="META-INF/jboss.xml" />
+				<include name="META-INF/ejb-jar.xml" />
+			</fileset>
+			<fileset dir="${compile.outdir}">
+				<include name="es/caib/seycon/net/*.class" />
+				<include name="es/caib/seycon/net/ejb/**" />
+				<include name="es/caib/seycon/hibernate/**" />
+			</fileset>
+			<zipfileset src="${deploy.dir}/seyconClient.jar">
+				<include name="**" />
+				<exclude name="**/MANIFEST.MF" />
+			</zipfileset>
+		</jar>
+	</target>
+
+
+	<target name="deploy-SeyconNetEAR"
+		depends="deploy-SeyconNetHAR,deploy-SeyconNetWar,deploy-SeyconNetEJB,deploy-SeyconNetWSR,deploy-SeyconNetClientWar">
+	    <antcall target="deploy-SeyconNetEAR.packed"/>
+	    <antcall target="deploy-SeyconNetEAR.expanded"/>
+     </target>
+
+  	 <target name="deploy-SeyconNetEAR.packed"  unless="deploy.expanded">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/SeyconNet.ear">
+			<fileset dir="${resources.dir}">
+				<include name="META-INF/application.xml" />
+				<include name="META-INF/jboss-app.xml" />
+			</fileset>
+			<fileset dir="${deploy.dir}">
+				<include name="SeyconNetEjb.jar" />
+				<include name="SeyconNet.war" />
+				<include name="SeyconNet.wsr" />
+				<include name="SeyconNet.har" />
+				<include name="SeyconNetClient.war" />
+			</fileset>
+		</jar>
+		<copy file="${deploy.dir}/SeyconNet.ear" todir="${jboss.deploy.dir}" />
+  	 </target>
+
+ 	 <target name="deploy-SeyconNetEAR.expanded"  if="deploy.expanded" >
+		<mkdir dir="${jboss.deploy.dir}/SeyconNet.ear" />
+		<mkdir dir="${jboss.deploy.dir}/SeyconNet.ear/META-INF" />
+		<unjar src="${deploy.dir}/SeyconNetEjb.jar"
+			dest="${jboss.deploy.dir}/SeyconNet.ear/SeyconNetEjb.jar" />
+		<unjar src="${deploy.dir}/SeyconNet.war"
+			dest="${jboss.deploy.dir}/SeyconNet.ear/SeyconNet.war" />
+		<unjar src="${deploy.dir}/SeyconNetClient.war"
+			dest="${jboss.deploy.dir}/SeyconNet.ear/SeyconNetClient.war" />
+		<unjar src="${deploy.dir}/SeyconNet.wsr"
+			dest="${jboss.deploy.dir}/SeyconNet.ear/SeyconNet.wsr" />
+		<unjar src="${deploy.dir}/SeyconNet.har"
+			dest="${jboss.deploy.dir}/SeyconNet.ear/SeyconNet.har" />
+		<copy file="${resources.dir}/META-INF/application.xml"
+			todir="${jboss.deploy.dir}/SeyconNet.ear/META-INF" overwrite="true" />
+	</target>
+
+	
+	<target name="deploy-SeyconNetWSR" depends="deploy-SeyconNetEJB">
+		<mkdir dir="${deploy.dir}" />
+		<jar jarfile="${deploy.dir}/SeyconNet.wsr">
+			<fileset dir="${resources.dir}">
+				<include name="META-INF/web-service.xml" />
+			</fileset>
+		</jar>
+		<!--
+			<copy file="${deploy.dir}/SeyconNet.wsr" todir="${jboss.deploy.dir}" />
+		-->
+	</target>
+
+	<target name="hibernate"
+		description="Generates Hibernate class descriptor files.">
+		<taskdef name="hibernatedoclet"
+			classname="xdoclet.modules.hibernate.HibernateDocletTask"
+			classpathref="classpath" />
+		<!-- Execute the hibernatedoclet task -->
+		<hibernatedoclet destdir="${compile.outdir}"
+			excludedtags="@version,@author,@todo" force="true" verbose="true"
+			mergedir="">
+			<fileset dir="${source.dir}">
+				<include name="es/caib/seycon/hibernate/*.java" />
+			</fileset>
+			<hibernate version="2.0" />
+		</hibernatedoclet>
+
+	</target>
+	<target name="deploy-SeyconNetHAR" depends="compile,hibernate">
+		<jar jarfile="${deploy.dir}/SeyconNet.har">
+			<fileset dir="${resources.dir}">
+				<include name="META-INF/hibernate.cfg.xml" />
+				<include name="META-INF/hibernate-service.xml" />
+			</fileset>
+			<fileset dir="${compile.outdir}">
+				<include name="es/caib/seycon/hibernate/**" />
+			</fileset>
+		</jar>
+	</target>
+		
+	<target name="lopdjar" depends="compile">
+			<manifest file="${compile.outdir}/lopd.mf" >
+				<attribute name="Main-Class" value="es.caib.seycon.net.ui.lopd.WPrincipal"/>
+				<attribute name="Class-Path" value="lopd.jar"/>
+			</manifest>
+			<!-- LOPD -->	
+		    <mkdir dir="${signed.dir}" />
+		    <jar jarfile="${signed.dir}/lopd.jar" manifest="${compile.outdir}/lopd.mf">
+		<!--	<jar destfile="output/lopd.jar" manifest="output/lopd.mf"> -->
+			    <fileset dir="${compile.outdir}">
+					<include name="es/caib/seycon/net/ui/lopd/*.class"/>
+			    	<include name="es/caib/sso/client/*.class"/>
+	            </fileset>
+		    	<fileset dir="${resources.dir}/login">
+						<include name="*.config"/>
+				</fileset>
+			</jar>
+	</target>
+	
+	<target name="signjar" depends="lopdjar,deploy-SeyconNetClient">
+		<copy file="${lib}/jcalendar.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/jcalendar.jar" 
+					keystore="${keystore}"
+					alias="${alias}" verbose="on"
+					storepass="${storepass}"/>
+		<copy file="${lib}/jbossall-client.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/jbossall-client.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<copy file="${deploy.dir}/SeyconNetClient.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/SeyconNetClient.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<copy file="${lib}/odmg-3.0.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/odmg-3.0.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<copy file="${lib}/looks-1.3.2.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/looks-1.3.2.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<copy file="${lib}/hibernate2.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/hibernate2.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<copy file="${lib}/ostermillerutils_1_05_00.jar"
+					todir="${signed.dir}/" overwrite="true" />
+		<signjar jar="${signed.dir}/ostermillerutils_1_05_00.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+		<signjar jar="${signed.dir}/lopd.jar" 
+					keystore="${keystore}"
+					alias="${alias}" 
+					storepass="${storepass}"/>
+	</target>
+</project>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zscript>
+Executions.sendRedirect("./index.zul?j_security_check");
+</zscript>

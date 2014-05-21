@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="authorization" title="New Authorization"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+<style src="~./styles/estil.css"/>
+
+<zscript>
+<![CDATA[
+	import es.caib.seycon.ng.comu.*;
+	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+	import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+
+	void cleanWindow(){
+		esquemaAuthorization.visible=false;
+	}
+
+	void onActualitza (Object []dadesPagina) 
+	{
+		String nivellAutoritzacio = esquemaAuthorization.getFellow("dades").getFellow("form").getFellow("r_tipusAutoritzacio").getSelectedItem().getValue();
+		String tipusAutoritzacio = esquemaAuthorization.getFellow("dades").getFellow("form").getFellow("tipusAutoritzacio").getSelectedItem().getValue();
+		if ("usuari".equals(tipusAutoritzacio)) {
+			//Obtenim les dades de l'usuari
+			//{codi, nom + " " + primerLlinatge + " " + segonLlinatge,id};
+			String codiUsuari = (String) dadesPagina[0];
+			String nomComplert = (String) dadesPagina[1];
+			String idUsuari = (String) dadesPagina[2];
+			// Creem l'autorització
+			AutoritzacioPuntEntrada auto = new AutoritzacioPuntEntrada();
+			auto.setDescripcioNivellAutoritzacio(nivellAutoritzacio);
+			auto.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.USUARI);
+			auto.setIdEntitatAutoritzada(new Long(idUsuari));
+			auto.setDescripcioEntitatAutoritzada(nomComplert+" ["+codiUsuari+"]");
+			auto.setCodiEntitatAutoritzada(codiUsuari.toUpperCase());
+			
+			Events.postEvent("onAutoritzacio", (Component) pageScope.get("contextComponent"), auto);
+			
+		} else if ("rol".equals(tipusAutoritzacio)) {
+			 //Obtenim les dades del rol
+			//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
+			String nomRol = (String) dadesPagina[0];
+			String codiAplicacio = (String) dadesPagina[1];
+			String descripcio = (String) dadesPagina[2];
+			String bbdd = (String) dadesPagina[5];
+			String idrol = (String) dadesPagina[6];
+			// Creem l'autorització
+			AutoritzacioPuntEntrada auto = new AutoritzacioPuntEntrada();
+			auto.setDescripcioNivellAutoritzacio(nivellAutoritzacio);
+			auto.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.ROL);
+			auto.setIdEntitatAutoritzada(new Long(idrol));
+			auto.setDescripcioEntitatAutoritzada(nomRol+"@"+bbdd+"&gt;"+codiAplicacio);//+(valorDomini!=null?" ["+valorDomini+"]":""));
+			auto.setCodiEntitatAutoritzada(nomRol.toUpperCase());//+"@"+bbdd+"&gt;"+codiAplicacio);
+			
+			Events.postEvent("onAutoritzacio", (Component) pageScope.get("contextComponent"), auto);
+			
+		} else if ("grup".equals(tipusAutoritzacio)) {
+			//Obtenim les dades del grup
+			//{codiGrup, descGrup, idGrup}
+			String codiGrup = (String) dadesPagina[0];
+			String descGrup = (String) dadesPagina[1];
+			String idGrup = (String) dadesPagina[2];
+			// Creem l'autorització
+			AutoritzacioPuntEntrada auto = new AutoritzacioPuntEntrada();
+			auto.setDescripcioNivellAutoritzacio(nivellAutoritzacio);
+			auto.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.GRUP);
+			auto.setIdEntitatAutoritzada(new Long(idGrup));
+			auto.setDescripcioEntitatAutoritzada(descGrup+" ["+codiGrup+"]");
+			auto.setCodiEntitatAutoritzada(codiGrup.toUpperCase());
+			
+			Events.postEvent("onAutoritzacio", (Component) pageScope.get("contextComponent"), auto);
+		}
+		cleanWindow();
+	}
+
+]]>
+</zscript>
+<window closable="true" id="esquemaAuthorization" position="center, center" sizable="true" title="${c:l('aplicaIntranet_autoritzacio.Titol')}" visible="false" width="600px">
+	
+	<attribute name="onInicia"><![CDATA[
+		pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.getFellow("dades").getFellow("form").getFellow("r_tipusAutoritzacio").setSelectedIndex(1);
+				self.getFellow("dades").getFellow("form").getFellow("tipusAutoritzacio").setSelectedIndex(0);
+				self.visible = true;
+			}
+	]]></attribute>
+	
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation();
+		</attribute>
+		
+	<detalls id="dades" width="99%" style="border:0px">
+		<form id="form" width="100%">
+			 <hbox width="100%" widths="15%, 20%, 25%, *">
+			 	<separator />
+				<vbox>
+					<label id="l_tipusAutoritzacio" style="font-weight:bold;" value="${c:l('aplicaIntranet_autoritzacio.Level')}"/>
+					<radiogroup id="r_tipusAutoritzacio">
+						<grid sclass="" width="100%">
+							<rows>
+								<row>
+									<radio label="${c:l('aplicacionsIntranet.zul.Administrador')}" value="Administrador"/>
+								</row>
+								<row>
+									<radio label="${c:l('aplicacionsIntranet.zul.Autoritzat')}" selected="true" value="Autoritzat"/>
+								</row>
+							</rows>
+						</grid>
+					</radiogroup>
+				</vbox>
+				<separator />
+				<vbox>
+					<label id="l_autoritzacio" style="font-weight:bold;" value="${c:l('aplicaIntranet_autoritzacio.Grantee')}"/>
+					<radiogroup id="tipusAutoritzacio">
+						<grid sclass="" width="100%">
+							<rows>
+								<row>
+									<radio label="${c:l('aplicaIntranet_autoritzacio.User')}" selected="true" value="usuari"/>
+								</row>
+								<row>
+									<radio label="${c:l('aplicaIntranet_autoritzacio.Group')}" value="grup"/>
+								</row>
+								<row>
+									<radio label="${c:l('aplicaIntranet_autoritzacio.Role')}" value="rol"/>
+								</row>
+							</rows>
+						</grid>
+					</radiogroup>
+		 		</vbox>
+			 </hbox>
+		</form>
+	</detalls>
+	<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+		 <button id="finishButton" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onActualitza="onActualitza(event.data);">
+				<attribute name="onClick">
+					String nivellAutoritzacio = dades.getFellow("form").getFellow("r_tipusAutoritzacio").getSelectedItem().getValue();
+					String tipusAutoritzacio = dades.getFellow("form").getFellow("tipusAutoritzacio").getSelectedItem().getValue();
+					//Object[] dadesPagina = (Object[]) event.getData(); 
+					if ("usuari".equals(tipusAutoritzacio)) {
+						Events.postEvent	("onInicia",desktop.getPage("usuarisLlista").getFellow("esquemaLlista"), finishButton);
+					} else if ("rol".equals(tipusAutoritzacio)) {
+						desktop.getPage("rolsLlista").setAttribute("tipus","cap");
+						desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF","true");//perquè mostre rols gestionableWF	
+						desktop.getPage("rolsLlista").setAttribute("usuari",""); //??	
+						Events.postEvent	("onInicia",desktop.getPage("rolsLlista").getFellow("esquemaLlista"),finishButton);
+					} else if ("grup".equals(tipusAutoritzacio)) {
+						desktop.getPage("grupsLlista").setAttribute("tipus","");		
+						desktop.getPage("grupsLlista").setAttribute("llistaObsolets",false);																									 
+						Events.postEvent	("onInicia",desktop.getPage("grupsLlista").getFellow("esquemaLlista"),finishButton);
+					}
+				</attribute>
+			</button>
+			<button label="${c:l('aplicaIntranet_autoritzacio.Cancel')}" onClick="cleanWindow()"/>								
+		</hbox>
+</window>
+</zk>

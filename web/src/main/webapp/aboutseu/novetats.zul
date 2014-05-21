@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk>
+	<div sclass="canvis">
+		<div sclass="punt">
+			<label sclass="i">${c:l('novetats.zul.Multilanguage')}</label>
+			<!--  ${c:l('novetats.zul.Nowconsoleistran')} -->
+		</div>
+	</div>
+</zk>

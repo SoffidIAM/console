@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
+	<style src="~./styles/estil.css" />
+	<style src="/css/localSEU.css" />
+		<zscript><![CDATA[
+		    httpRequest = execution.getNativeRequest();
+		    error = httpRequest.getAttribute("es.caib.loginModule/errorDetail");
+		    if (error != null && ! error.isEmpty())
+		      errorMessage.visible = true;
+		    if (httpRequest.getRequestURL().toString().endsWith("/zkau")) {
+                execution.getNativeResponse().sendError(401, "Unauthenticatd ajax request");
+            	return;
+            }
+		    System.out.println ("ERROR: "+error);
+		]]></zscript>
+		<html><![CDATA[
+		
+   		
+		<div class="login">
+        		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
+			<div class="loginbox"> 
+			<p>Please, identify yourself to proceed</p>
+			<form method="post" action="/j_security_check" accept-charset="UTF-8">
+			<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
+			<p>
+			
+				<div class="inputlogin">User name:
+				<input name="j_username" id="j_username" type="text" autocomplete="off" /></div>
+			</p>
+			<p>
+				<div class="inputlogin">Password:
+				<input name="j_password" id="j_password" type="password" autocomplete="off" /></div>
+			</p>
+			<p style="color:red;">${error}</p>
+				<input name="formUCboton" type="submit" value="Login"/>
+				</form>
+			</div>
+		</div>
+		]]></html>
+</zk>

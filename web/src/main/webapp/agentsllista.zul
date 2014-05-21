@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="agentsLlista" title="Llista d'agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml"/>
+	
+	<zscript>
+		fileres = es.caib.seycon.ng.web.Custom.FILERES;
+		
+		mode = "query"; 
+		view_altres = false;
+		model.getVariables().declareVariable("queryEnabled", false);
+	
+		void populateDetails ()
+		{
+			mode="query";
+		}	
+
+		void search ()
+		{ 
+			listbox =	esquemaLlista.getFellow("lista").getFellow("listbox"); 
+			codi = esquemaLlista.getFellow("queryWindow").getFellow("queryCodi").getFellow("textbox");
+			nom = esquemaLlista.getFellow("queryWindow").getFellow("queryNom").getFellow("textbox");
+			url = esquemaLlista.getFellow("queryWindow").getFellow("queryUrl").getFellow("textbox");
+			basatRols = null;
+			segur = null;
+				
+			queryEnabled = false;				
+			if(codi.value.trim().length() == 0){
+				model.getVariables().declareVariable("codi", "%");
+				queryEnabled = true;
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("codi", codi.value);
+			}
+			if(nom.value.trim().length() == 0){
+				model.getVariables().declareVariable("nom", "%");
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("nom", nom.value);
+			}
+			if(url.value.trim().length() == 0){
+				model.getVariables().declareVariable("url", "%");
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("url", url.value);
+			}
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			if(queryEnabled){
+				model.getJXPathContext().getValue("/agent").refresh();
+				listbox.dataPath = "/model:/agent"; 
+			} 
+		}
+
+		void showAltres () 
+		{
+			if (view_altres==false) {
+				esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+				view_altres = true;
+			} else {
+				esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+				view_altres = false;
+			}
+		}
+		
+		void cleanWindow()
+		{
+			queryWindow = esquemaLlista.getFellow("queryWindow");
+			queryWindow.getFellow("queryCodi").getFellow("textbox").setValue("");
+			queryWindow.getFellow("queryNom").getFellow("textbox").setValue("");
+			queryWindow.getFellow("queryUrl").getFellow("textbox").setValue("");
+			model.getVariables().declareVariable("queryEnabled", false);
+			lista.getFellow("listbox").dataPath = "/model:/agent[false]";
+			esquemaLlista.visible=false;
+			view_altres = false;							
+			esquemaLlista.getFellow("finishButton").disabled = true;				
+		}
+		
+		void acceptaDada()
+		{
+			ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
+			ctx = ds.getJXPathContext(); 
+			xpath = esquemaLlista.getFellow("lista").getFellow("listbox").getXPath();
+			index = esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedIndex();
+			pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
+			ctx2 = ctx.getRelativeContext(pointer);
+			codi = (String)ctx2.getPointer("@codi").getValue();
+			pointer.invalidate ();						
+			Component formComponent = (Component) pageScope.get("contextComponent");
+			Events.postEvent ("onActualitza", formComponent, codi);							
+			cleanWindow();
+		}
+		
+	</zscript>
+	
+	<esquema closable="true" id="esquemaLlista" position="center, center" title="${c:l('agentsllista.Titol')}" visible="false">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+		</attribute>
+		<attribute name="onIniciaSearch">
+			pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+			search();     		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+
+		<criteris height="45px" id="queryWindow" onOK="search()" width="790px">				
+			<hbox>
+				<input_criteri etiqueta="${c:l('agentsllista.zul.Codi')}" id="queryCodi"/>
+				<input_criteri etiqueta="${c:l('agentsllista.zul.Nom')}" id="queryNom"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>			
+			<hbox>
+			 	<input_criteri etiqueta="${c:l('agentsllista.zul.Url')}" id="queryUrl"/>
+			</hbox>				
+		</criteris>
+		
+		<navegador id="lista" width="790px">
+			<listbox autocommit="false" dataPath="/model:/agent" fixedLayout="true" id="listbox" rows="${fileres}">
+				<attribute name="onSelect">
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+				</attribute>
+				<listhead>
+					<listheader label="${c:l('agentsllista.zul.Codi-2')}" width="200px"/>
+					<listheader label="${c:l('agentsllista.zul.Nom-2')}" width="400px"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@codi">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@nomCla">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('agentsllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (! self.disabled) {
+						acceptaDada();
+					}
+				</attribute>
+			</button>
+			<button label="${c:l('agentsllista.zul.Cancel·la')}" onClick="cleanWindow()"/>			
+		</hbox>
+		
+	</esquema>
+
+</zk>

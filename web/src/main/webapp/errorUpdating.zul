@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<window border="normal" closable="true" id="errorWindow" onCreate="errorWindow.doModal();" title="Workflow - Error" width="400px">
+		<vbox>
+			<label value="${c:l('error.lblOcurrioError')} ${ requestScope['javax.servlet.error.message']}"/>
+		</vbox>
+		<hbox>
+		<!-- 
+			<button label="${c:l('error.btnContinuar')}" onClick="spaceOwner.detach()" />
+			 -->
+			<button label="${c:l('error.btnRecargar')}" onClick="Executions.sendRedirect(null)"/>			
+			<zscript>
+				e = requestScope.get("javax.servlet.error.exception") ;
+				if (e instanceof Throwable)
+				  e.printStackTrace();
+				else
+				  System.out.println(e);
+				es.caib.bpm.toolkit.EJBContainer.dropEJBContainer (session);
+			</zscript>
+		</hbox>				
+	</window>
+</zk>

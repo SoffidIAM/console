@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	 <class name="es.caib.bpm.nas.entity.BpmRole" table="BPM_ROLE">
+        
+        <id name="id">
+            <column name="ROL_ID" />
+            <generator class="native">
+            </generator>
+        </id>
+		
+		<property name="name" column="ROL_NAME" type="string" not-null="true" unique="true"/>
+		
+		<set name="accessLogs" inverse= "true">
+		    <key column="ACC_ROLE_ID"/>
+		    <one-to-many class="es.caib.bpm.nas.entity.BpmAccessLog"/>
+		</set>
+		
+		<set name="documents" table="BPM_PERMISSION" 
+		        cascade="persist">
+		    <key column="PER_ROL_ID"/>
+		    <many-to-many column="PER_DOC_ID" class="es.caib.bpm.nas.entity.BpmDocument"/>
+		</set>
+				
+    </class>
+</hibernate-mapping>

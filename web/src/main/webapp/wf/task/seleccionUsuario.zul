@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+	<window border="normal" closable="true" height="420px" id="win"
+		mode="highlighted" position="center, center"
+		title="${c:l('seleccionTransicion.lblTitulo')}"
+		use="es.caib.bpm.ui.task.SeleccionUsuarioUI" width="${amplefinestra}">
+
+		<vbox height="100%" id="SearchWindow" width="100%">
+
+			<grid fixedLayout="true" width="99.8%">
+				<auxhead>
+					<auxheader colspan="4"
+						label="${c:l('seleccionUsuario.gridTitleCerca')}"/>
+				</auxhead>
+				<columns>
+					<column label="${c:l('seleccionUsuario.lblCode')}" width="auto"/>
+					<column label="${c:l('seleccionUsuario.lblNom')}" width="auto"/>
+					<column label="${c:l('seleccionUsuario.lblLLinatges')}" width="auto"/>
+					<column width="80px"/>
+				</columns>
+				<rows width="100%">
+					<row width="auto">
+						<textbox id="usu_code" width="90%">
+							<attribute name="onOK">
+								win.searchDelegateUsers();
+							</attribute>
+						</textbox>
+						<textbox id="usu_nom" width="90%">
+							<attribute name="onOK">
+								win.searchDelegateUsers();
+							</attribute>
+						</textbox>
+						<textbox id="usu_lli" width="90%">
+							<attribute name="onOK">
+								win.searchDelegateUsers();
+							</attribute>
+						</textbox>
+						
+						<button id="buttonCerca" style="float:right;"
+							label="${c:l('seleccionUsuario.zul.Cercar')}">
+							<attribute name="onClick">
+								win.searchDelegateUsers();
+							</attribute>
+						</button>
+					</row>
+				</rows>
+			</grid>
+			
+			<separator/>
+			
+			<listbox id="busquedafirmanterows" fixedLayout="true" height="250px"
+				itemRenderer="${win.listRenderer}" model="${win.listModel}"
+				sclass="likeagrid" width="99.8%">
+				<auxhead>
+					<auxheader colspan="4"
+						label="${c:l('seleccionUsuario.gridTitleResultatsCerca')}"/>
+				</auxhead>
+				<listhead>
+					<listheader label="${c:l('seleccionUsuario.lblCodiUsuari')}" 
+						sortAscending="${win.cmpAsc[0]}" sortDescending="${win.cmpDsc[0]}"/>
+					<listheader label="${c:l('seleccionUsuario.lblNom')}" sort="auto" 
+						sortAscending="${win.cmpAsc[1]}" sortDescending="${win.cmpDsc[1]}"/>
+					<listheader label="${c:l('seleccionUsuario.lblLLinatges')}"
+						sort="auto" sortAscending="${win.cmpAsc[2]}" 
+						sortDescending="${win.cmpDsc[2]}" />
+					<listheader sort="auto"/>
+				</listhead>
+			</listbox>
+			<hbox width="99.8%">
+				<button label="${c:l('seleccionUsuario.btnCancelar')}"
+					onClick="win.detach()" style="float:right"/>
+			</hbox>
+		</vbox>
+	</window>
+</zk>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+<query name="searchProcessInstance">
+	<![CDATA[
+		select 
+			p
+		from 
+			org.jbpm.graph.exe.ProcessInstance p, 
+			org.jbpm.graph.def.ProcessDefinition def,
+			org.jbpm.graph.exe.Token tok,
+			org.jbpm.graph.def.Node node
+		where 
+			tok.processInstance = p
+			and p.processDefinition= def
+			and node= tok.node
+			and (p.id= :processId or :processId = -1)
+			and (def.id in (:id))
+			and (p.end is null or :finalizada is not null)
+			and (p.start > :fechaDesde)
+			and (p.start < :fechaHasta)
+			and (node.name like :estado or :estado is null)
+		order by
+			p.id
+	]]></query>
+	<query name="searchTasksInstance">
+	<![CDATA[
+		select 
+			t		
+		from 
+			org.jbpm.taskmgmt.exe.TaskInstance t,
+			org.jbpm.taskmgmt.def.Task task,
+			org.jbpm.graph.exe.ProcessInstance p,
+			org.jbpm.taskmgmt.exe.TaskMgmtInstance c,
+			org.jbpm.graph.def.ProcessDefinition def
+		where 
+			p.processDefinition= def
+			and t.taskMgmtInstance= c
+			and c.processInstance= p
+			and t.task= task
+			and (def.id in (:processId))
+			and (p.id= :processInstanceId or :processInstanceId = -1)
+			and (task.id= :taskId or :taskId = -1)
+			and (t.end is null or :finalizada is not null)
+			and (t.create > :fechaDesde)
+			and (t.create < :fechaHasta)
+			and (p.start > :fechaDesdeProceso)
+			and (p.start < :fechaHastaProceso)
+			and (t.actorId like :actor or :actor is null)
+		order by
+			t.id
+	]]></query>
+	<query name="searchTaskInstanceDistribution">
+	<![CDATA[
+		select
+			node.name,
+			count(*)
+		from
+			org.jbpm.graph.exe.Token tok,
+			org.jbpm.graph.def.Node node,
+			org.jbpm.graph.exe.ProcessInstance pi,
+			org.jbpm.graph.def.ProcessDefinition pd
+		where
+			pi.processDefinition= pd
+			and	tok.processInstance = pi
+			and node= tok.node
+			and pd.id= :defId
+		group by
+			node.name
+	]]></query>
+	<query name="dueDateJobs">
+	<![CDATA[
+      select job
+      from org.jbpm.job.Job as job
+      where job.dueDate < :now or job.exception is not null
+      order by job.dueDate asc
+	]]></query>
+</hibernate-mapping>

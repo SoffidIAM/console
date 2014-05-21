@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="parametres" title="Gestió dels Paràmetres de configuració"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="parametres" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+
+	<datamodel id="model" rootNode="parametres" src="descriptorParametre.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+					.Labels.getLabel("parametres.Titol"));
+			}
+			catch (Exception ex){}
+			
+			queryWindowMin = "50px";
+			queryWindowMax = "110px";
+			
+			mode = "query"; 
+			view_altres = false;
+			
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			canCreateParameter = AutoritzacionsUsuari.hasCreateParameter();
+			canUpdateParameter = AutoritzacionsUsuari.hasUpdateParameter();
+			canDeleteParameter = AutoritzacionsUsuari.hasDeleteParameter();
+			canQueryParameter = AutoritzacionsUsuari.hasQueryParameter();
+			canModifyParameter = canCreateParameter || canUpdateParameter;
+			
+			model.getVariables().declareVariable("queryEnabled", canQueryParameter);
+			model.getVariables().declareVariable("codi", "%");
+			
+			queryEnabled = false;
+			retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+	
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
+						.getFellow("textbox");
+				valor = esquema.getFellow("queryWindow").getFellow("queryValor")
+						.getFellow("textbox");
+				descripcio = esquema.getFellow("queryWindow")
+						.getFellow("queryDescripcio").getFellow("textbox");
+				xarxa = esquema.getFellow("queryWindow").getFellow("queryXarxa")
+						.getFellow("textbox");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) &&
+						(valor.value.trim().length() == 0) &&
+						(descripcio.value.trim().length() == 0) &&
+						(xarxa.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("valor", valor.value);
+				searchValues.put("descripcio", descripcio.value);
+				searchValues.put("xarxa", xarxa.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+
+				if (esquema.isCommitPending())
+				{
+					Missatgebox.avis (org.zkoss.util.resource
+							.Labels.getLabel("parametres.AbansConfirmar"),
+						org.zkoss.util.resource
+							.Labels.getLabel("parametres.CanvisPendents"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				} 
+
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox =	esquema.getFellow("lista").getFellow("listbox");
+				if (queryEnabled)
+				{
+					model.getJXPathContext().getValue("/parametre").refresh();
+					listbox.dataPath = "/model:/parametre"; 
+				}
+				
+				if (listbox.getModel().getSize() == 1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0); 
+				
+					if (elem!=null)
+					{
+						listbox.setSelectedItem(elem);
+					}
+					
+					select();
+					retrySearch = false;
+				}
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.hideFormulari(); //amaguem dades..
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+			
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+					}
+			}
+			
+			void showLista ()  
+			{
+				  esquema.getFellow("lista").getFellow("listbox").clearSelection();
+			}
+			
+			void showDetall () 
+			{
+				esquema.showFormulari();
+			}
+		]]>
+	</zscript>
+
+	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
+		 focusCriteri="queryCodi" onHideFormulari="showLista()">
+	
+		<criteris id="queryWindow" height="${queryWindowMin}" width="${amplaria}"
+			onOK="search()">
+			<hbox>
+				<input_criteri  id="queryCodi"
+					etiqueta="${c:l('parametres.zul.Parametre')}"/>
+				<input_criteri id="queryValor"
+					etiqueta="${c:l('parametres.zul.Valor')}" />
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox> 
+				<input_criteri id="queryDescripcio"
+					etiqueta="${c:l('parametres.zul.Descripcia')}"/>
+				<input_criteri id="queryXarxa"
+					etiqueta="${c:l('parametres.zul.Xarxa')}"/>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="${amplaria}">
+			<toolbar>
+				<insertbutton acces="${canCreateParameter}"
+					listbox="/esquema/lista/listbox" onClick="showDetall()"/>
+				<deletebutton acces="${canDeleteParameter}"
+					listbox="/esquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+			</toolbar>
+			<listbox id="listbox" autocommit="false" dataPath="/model:/parametre"
+				fixedLayout="true" height="340px" onClick="showDetall()"
+				onSelect="select()" rows="${fileres}" onCreate="checkTruncatedList(self)" >
+				<listhead>
+					<listheader label="${c:l('parametres.zul.Parametre-2')}" sort="auto"
+						width="20%"/>
+					<listheader label="${c:l('parametres.zul.Valor-2')}" sort="auto"/>
+					<listheader label="${c:l('parametres.zul.Xarxa-2')}" sort="auto"
+						width="10%"/>
+					<listheader label="${c:l('parametres.zul.Descripcia-2')}" sort="auto"
+						width="30%"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@codi"/>
+					<listcell bind="@valor"/>
+					<listcell bind="@codiXarxa"/>
+					<listcell bind="@descripcio"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades">
+			<zscript>
+				void onChangeDades()
+				{
+					try {
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						registre = ctx.getValue("/");
+						form.getFellow("detall_par").getFellow("dada").setDisabled(!registre.isNew());
+					} catch (Exception e) {
+						form.getFellow("detall_par").getFellow("dada").setDisabled(true);
+					}
+				}
+			</zscript>
+			
+			<form id="form" onChangeXPath="onChangeDades()"
+				dataPath="/esquema/lista/listbox:/." width="100%">
+				<attribute name="onActualitza">
+					dada = (String)event.getData();
+					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+					camp.setValue(dada);
+				</attribute>
+				<grid>
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('parametres.zul.Parametre-2')}"/>
+							
+							<hbox>
+								<input_dada bind="@codi" id="detall_par" maxim="50"
+									width_custom="${amplediv2_98-100}px" mascara="no empty"/>
+									
+								<label value="*" />
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('parametres.zul.Xarxa-2')}"/>
+							<hbox width="100%" widths="*,40px">
+								<input_dada id="detall_xarxa" bind="@codiXarxa"
+									lectura="${!canModifyParameter}"
+									width_custom="${amplediv2_98-100}px"/>
+								<imageclic align="right" src="~./img/xarxa.gif">
+									<attribute name="onClick">
+										if (canModifyParameter) {
+											idActualitza ="detall_xarxa";
+											Events.postEvent	("onInicia",desktop.getPage("xarxesLlista").getFellow("esquemaLlista"),form);
+										}
+									</attribute>
+								</imageclic>
+								<separator width="5px"/>
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('parametres.zul.Valor-2')}"/>
+							
+							<hbox>
+								<input_dada id="detall_valor" bind="@valor" 
+									lectura="${!canModifyParameter}" maxim="250"
+									width_custom="${amplediv2_98-100}px" mascara="no empty"/>
+									
+								<label value="*" />
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('parametres.zul.Descripcia-2')}"/>
+							<input_dada id="detall_descripcio" bind="@descripcio"
+								lectura="${!canModifyParameter}" maxim="255"
+								width_custom="${amplediv2_98-100}px"/>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>
+	</esquema>
+
+	<include src="xarxesllista.zul"/>
+</zk>

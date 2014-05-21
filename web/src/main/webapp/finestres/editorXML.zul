@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="editorXML" title="Editor XML" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+
+	<zscript>
+		<![CDATA[
+			void cleanWindow()
+			{
+				esquemaXML.getFellow("dades").getFellow("form")
+					.getFellow("code_xml").setValue("");
+				esquemaXML.visible=false;
+			}
+			
+			void acceptaDada()
+			{
+				String valor = esquemaXML.getFellow("dades").getFellow("form")
+						.getFellow("code_xml").getValue();
+				//String[] dades = {valor};
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, valor/*dades*/);
+				cleanWindow();
+			}
+			
+			es.caib.seycon.ng.servei.ejb.PuntEntradaService pueService;
+			public es.caib.seycon.ng.servei.ejb.PuntEntradaService getPuntEntradaService()
+			{
+				if (pueService==null)
+				{
+					javax.naming.Context context = new javax.naming.InitialContext();
+					Object objPUE = context.lookup(es.caib.seycon.ng
+							.servei.ejb.PuntEntradaServiceHome.JNDI_NAME);
+					es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome pueHome = (es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome) javax.rmi.PortableRemoteObject.narrow(
+						objPUE, es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.class);
+					/*es.caib.seycon.ng.servei.ejb.PuntEntradaService*/
+					pueService = pueHome.create();
+				}
+				
+				return 	pueService;
+			}
+			
+			// Method to validate XML Mazinger rule
+			import es.caib.zkib.zkiblaf.*;
+			String validaXMLMazinger(String xmlValidar)
+			{
+				try
+				{
+					// Generem un pue fictici
+					es.caib.seycon.ng.comu.PuntEntrada pue = new es.caib.seycon.ng
+						.comu.PuntEntrada("S","S","S", "S", new Long(0));
+					pue.setXmlPUE(xmlValidar);
+					return getPuntEntradaService().validaXMLPUE(pue);
+				}
+				catch (Throwable th)
+				{
+					return th.getMessage();
+				}
+			}
+			
+			// Method to validate Mazinger rule
+			void validaMazinger(boolean closeOnValidate)
+			{
+				String valor = esquemaXML.getFellow("dades").getFellow("form")
+						.getFellow("code_xml").getValue();
+					
+				// Validem mazinger
+				String errorValue = validaXMLMazinger(valor);
+				if ("".equals(errorValue))
+				{
+					if (closeOnValidate)
+					{
+						acceptaDada();
+					}
+					
+					else
+					{
+						Missatgebox.info(org.zkoss.util.resource
+								.Labels.getLabel("editorXML.Correcte"));
+					}
+				}
+				else
+				{
+					Missatgebox.info (String.format(org.zkoss.util.resource
+							.Labels.getLabel("editorXML.Error"),
+						new Object [] {errorValue}));
+				}
+			}
+		]]>
+	</zscript>
+	
+	<window id="esquemaXML" closable="true" position="center, center"
+		title="${c:l('editorXML.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				if (self.mode.compareToIgnoreCase("highlighted") != 0)
+				{
+					self.setMode("highlighted");
+				}
+				else
+				{
+					self.visible = true;
+				}
+				
+				// Ponemos el contenido:
+				String contingutXML = desktop.getPage("editorXML")
+					.getAttribute("contingutXML");
+				if (contingutXML != null)
+				{
+					esquemaXML.getFellow("dades").getFellow("form")
+						.getFellow("code_xml").setValue(contingutXML);
+				} 
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation ();
+			]]>
+		</attribute>
+		
+		<detalls id="dades" width="99%">
+			<hbox sclass="vcentre" style="padding:0 5px 3px 5px"
+				width="100%" widths="*,80px">
+				<div>
+					<label style="font-weight:bold;"
+						value="${c:l('editorXML.zul.Acceleradors')}"/>
+					<label value="${c:l('editorXML.zul.(escriureipolsarTAB)')}"/>
+					<label multiline="true" style="font-style:oblique;font-size:12px;"
+						value="${c:l('editorXML.zul.maz=Mazingerwebapp=W')}"/>
+				</div>
+				<div align="right">
+					<button id="bt_xml" image="~./img/accept.gif"
+						label="${c:l('editorXML.zul.Valida')}"
+						onClick="validaMazinger(false)" />
+				</div>
+			</hbox>
+			<form id="form" width="100%">
+				<codepress id="code_xml" autocomplete="true" language="mazinger"
+					style="width:99%; height:450px;"/>
+			</form>
+		</detalls>
+		
+		<separator spacing="5px"/>
+		<hbox width="100%">
+			<div align="right">
+			<button id="finishButton" label="${c:l('editorXML.zul.Accepta')}"
+				onClick="validaMazinger(true)"/>
+			<button label="${c:l('editorXML.zul.Cancel·la')}" onClick="cleanWindow()"/>
+			</div>
+		</hbox>
+	</window>
+</zk>

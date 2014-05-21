@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="domainsRoot" type="domainsRoot">
+			<script-finder>
+				return new es.caib.seycon.ng.web.StringContainer
+				("Domains");
+			</script-finder>
+		</finder>
+
+		<finder name="nameGenerator" type="nameGenerator">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findNameGenerators" if="${queryEnabled}">
+			</ejb-finder>
+		</finder>
+
+		<finder name="tipusUsuariIblanc" type="tipusUsuari" refreshAfterCommit="true">
+			<script-finder>
+				u = new es.caib.seycon.ng.comu.TipusUsuari();
+				u.setDescripcio ("- Select a user type -");
+				return u;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllTipusUsuari" if="${queryEnabled}">
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUsuari">
+			</new-instance-bean>
+		</finder>
+		<finder name="tipusUsuari" type="tipusUsuari">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllTipusUsuari" if="${queryEnabled}">
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUsuari">
+			</new-instance-bean>
+		</finder>
+		<finder name="badWords" type="badWords">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllParaulesProhibides" if="${queryEnabled}">
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.ParaulaProhibida">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="nameGenerator">
+		<custom-attribute name="text" depends="" expr="${instance}">
+		</custom-attribute>
+	</datanode>
+
+	<datanode name="dominiUsuarisMember">
+		<finder name="dominiUsuarisMember" type="dominiUsuarisMember">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findChildren" if="${queryEnabled}">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.DominiUsuarisMemberImpl">
+			</new-instance-bean>
+		</finder>
+
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="tipusUsuari">
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dominiUsuaris.CodiValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="badWords">
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.paraulaProhibida}" notNull="true" friendlyName="dominiUsuaris.ParaulaValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="badWordsContrasenya">
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="dominiUsuari">
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="politica">
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<custom-attribute name="codi" depends="tipusUsuari"
+			expr="Policy for type ${instance.tipusUsuari} users">
+		</custom-attribute>
+		<finder name="badWordsContrasenya" type="badWordsContrasenya">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findParaulesProhibidesPoliticaContrasenya" if="${queryEnabled}">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="dominiContrasenya">
+		<finder name="politica" type="politica">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllPolitiquesContrasenyaDomini" if="${queryEnabled}">
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.PoliticaContrasenya">
+				<bean-attribute name="codiDominiContrasenya" value="${instance.codi}" />
+			</new-instance-bean>
+		</finder>
+
+		<ejb-handler jndi="java:comp/env/ejb/DominiUsuariEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="domainsRoot">
+		<finder name="userDomainRoot" type="userDomainRoot">
+			<script-finder>
+				return new es.caib.seycon.ng.web.StringContainer
+				("User domains");
+			</script-finder>
+		</finder>
+		<finder name="passwordDomainRoot" type="passwordDomainRoot">
+			<script-finder>
+				return new es.caib.seycon.ng.web.StringContainer
+				("Password domains");
+			</script-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="userDomainRoot">
+		<finder name="dominiUsuari" type="dominiUsuari">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllDominiUsuari" if="${queryEnabled}">
+				<!-- <parameter value="${codiDomini}" /> -->
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.DominiUsuari">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="passwordDomainRoot">
+		<finder name="dominiContrasenya" type="dominiContrasenya">
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
+				method="findAllDominiContrasenya" if="${queryEnabled}">
+				<!-- <parameter value="${codiDomini}" /> -->
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.DominiContrasenya">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+</zkib-model>

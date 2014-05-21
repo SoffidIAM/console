@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="xarxes">
+		<finder name="xarxa" type="xarxa">
+			<ejb-finder jndi="java:comp/env/ejb/XarxaEJB"
+				method="findXarxaByFiltre" if="${queryEnabled}"> <!-- network:query -->
+				<parameter value="${codi}"/>
+				<parameter value="${ip}"/>
+				<parameter value="${descripcio}"/>
+				<parameter value="${mascara}"/>
+				<parameter value="${normalitzada}"/>
+				<parameter value="${dhcp}"/>
+				<parameter value="${maquina}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.Xarxa">
+			</new-instance-bean>
+		</finder>
+		<finder name="identitat" type="identitat">
+			<ejb-finder jndi="java:comp/env/ejb/XarxaEJB" 
+				method="findIdentitatsByCodi" if="${queryEnabled}"> <!-- network:query -->
+				<parameter value="${codi}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Identitat"> 
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="xarxa">
+		<finder name="xarxaACL" type="xarxaACL">
+			<ejb-finder jndi="java:comp/env/ejb/XarxaEJB" method="getACL">  <!-- network:query -->
+				<parameter value="${instance}"/>
+				<!-- <catch exception="java.rmi.RemoteException">
+					return null;
+				</catch> -->
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.NetworkAuthorization"> 
+			</new-instance-bean>
+		</finder>						
+		<ejb-handler jndi="java:comp/env/ejb/XarxaEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="networks.CodeValidation"/>
+			<attribute-validator expr="${instance.adreca}" notNull="true" friendlyName="networks.AddressValidation"/>
+			<attribute-validator expr="${instance.mascara}" notNull="true" friendlyName="networks.MaskValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="identitat">
+	</datanode>
+	
+	<datanode name="xarxaACL">	
+	<!-- 
+		<finder name="identitat" type="identitat">
+			<ejb-finder jndi="java:comp/env/ejb/XarxaEJB" method="getIdentitat">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Identitat"> 
+			</new-instance-bean>
+		</finder>
+	 -->		
+		<ejb-handler jndi="java:comp/env/ejb/XarxaEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+	</datanode>
+		
+</zkib-model>

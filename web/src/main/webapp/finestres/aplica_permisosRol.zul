@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="aplica_permisosRol" title="Llista d'usuaris"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	<style src="/css/localSEU.css"/>
+	
+	<datamodel id="model" rootNode="permisosUsuaris" src="finestres/descriptorPermisosRols.xml"/>
+	
+	<zscript>
+	
+		mode = "query"; 
+		view_altres = false;
+		model.getVariables().declareVariable("queryEnabled", false);
+	
+		void populateDetails ()
+		{
+			mode="query";
+		}	
+
+		void search (boolean queryEnabled) 
+		{ 
+			esquemaLlista.getFellow("listbox");
+			
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			if(queryEnabled){
+				model.getJXPathContext().getValue("/autoritzacionsRol").refresh();
+				listbox.dataPath = "/model:/autoritzacionsRol";
+				model.getJXPathContext().getValue("/aclXarxaRol").refresh();
+				listboxacl.dataPath = "/model:/aclXarxaRol";
+				model.getJXPathContext().getValue("/puntsEntradaRol").refresh();
+				listboxpue.dataPath = "/model:/puntsEntradaRol"; 
+			} 
+		}
+
+		void showAltres () 
+		{
+			if (view_altres==false) {
+				esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+				view_altres = true;
+			} else {
+				esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+				view_altres = false;
+			}
+		}
+
+		void cleanWindow(){
+			model.getVariables().declareVariable("queryEnabled", false);
+			listbox.dataPath = "/model:/rolUsuari[false]";
+			esquemaLlista.visible=false;
+			tabmenow.setSelectedIndex(0);
+			view_altres = false;							
+		}		
+				
+	</zscript>
+	
+ 	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('aplica_permisosRol.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+
+			nomRol = desktop.getPage("aplica_permisosRol").getAttribute("rol");
+			codiApl = desktop.getPage("aplica_permisosRol").getAttribute("apl");
+			bbdd = desktop.getPage("aplica_permisosRol").getAttribute("bbdd");
+			tipusDominiRol = desktop.getPage("aplica_permisosRol").getAttribute("tipusDominiRol");
+
+			esquemaLlista.setTitle(String.format(org.zkoss.util.resource.Labels.getLabel("aplica_permisosRol.Titol2"), new Object [] {nomRol, bbdd, tipusDominiRol}));
+			model.getVariables().declareVariable("nomRol",nomRol);
+			model.getVariables().declareVariable("codiAplicacio",codiApl);
+			model.getVariables().declareVariable("bbdd",bbdd);
+
+			search(true);
+				
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+		   		self.setMode("highlighted");
+		  	}else{
+		  		self.visible = true;
+		  	}      		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+		<vbox>
+		<tabbox id="tabmenow" width="100%">
+		<tabs>
+			<tab label="${c:l('aplica_permisosRol.zul.Autoritzacions')}"/>
+			<tab label="${c:l('aplica_permisosRol.zul.ACLsdeXarxa')}"/>
+			<tab label="${c:l('aplica_permisosRol.zul.Puntsdentrada')}"/>
+		</tabs>
+		<tabpanels>
+			<tabpanel>
+				<vbox>
+				<listbox autocommit="false" dataPath="/model:/autoritzacionsRol" fixedLayout="true" height="300px" id="listbox" rows="20">
+					<listhead>
+						<listheader label="${c:l('aplica_permisosRol.zul.Ambit')}" width="100px"/>
+						<listheader label="${c:l('aplica_permisosRol.zul.Autoritzacia')}" width="*"/>
+<!-- 						<listheader label="@autoritzacio" /> -->
+						<listheader label="${c:l('aplica_permisosRol.zul.Rolpermas')}" width="30%"/>
+<!-- 						<listheader label="@valorDominiRolUsuari" /> -->
+<!-- 						<listheader label="@tipusDomini" /> -->
+<!-- 						<listheader label="@scope" /> -->
+<!-- 						<listheader label="@hereta" /> -->
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@ambit"/>					
+						<listcell bind="@descripcio"/>
+<!-- 						<listcell bind="@autoritzacio" /> -->
+						<listcellnolabel bind="@rol">
+							<label bind="@rol/nom"/>@<label bind="@rol/baseDeDades"/>&gt;<label bind="@rol/codiAplicacio"/>
+						</listcellnolabel>
+<!-- 						<listcell bind="@valorDominiRolUsuari" /> -->
+<!-- 						<listcell bind="@tipusDomini" /> -->
+<!-- 						<listcell bind="@scope" /> -->
+<!-- 						<listcell bind="@hereta" /> -->
+					</dataitem>
+				</listbox>
+				<div align="right">
+					<div style="float:right">
+					<button label="${c:l('aplica_permisosRol.zul.Accepta')}" onClick="cleanWindow()"/>
+					</div>
+					<div style="float:left">
+						<listexportbutton acces="true" listbox="listbox"/>
+					</div>
+				</div>
+				</vbox>			
+			</tabpanel>
+			<tabpanel>
+				<vbox>
+				<listbox autocommit="false" dataPath="/model:/aclXarxaRol" fixedLayout="true" height="300px" id="listboxacl" rows="20">
+					<listhead>
+						<listheader label="${c:l('aplica_permisosRol.zul.Xarxa')}" width="100px"/>
+						<listheader label="${c:l('aplica_permisosRol.zul.Nivell')}" width="100px"/>
+						<listheader label="${c:l('aplica_permisosRol.zul.Maquines')}" width="*"/>
+<!-- 						<listheader label="@identitat/codiGrup"/> -->
+<!-- 						<listheader label="@identitat/codiIdentitat"/> -->
+<!-- 						<listheader label="@identitat/codiUsuari"/> -->
+<!-- 						<listheader label="@identitat/descripcio"/> -->
+						<listheader label="${c:l('aplica_permisosRol.zul.Roldelpermas')}" width="30%"/>
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@codiXarxa"/>					
+						<listcellnolabel bind="@nivell">
+							<label bind="@nivell">
+							<attribute name="onChangeXPath">
+								if (self.value.equals("-1")) {
+									self.value = "Sense accés";
+								 } else {
+								 	if (self.value.equals("0")) {
+										self.value = "Consulta";
+									} else {
+									 	if (self.value.equals("1")) {
+											self.value = "Suport";
+										} else {
+											self.value = "Administració";
+										}
+									}
+								 }
+							</attribute>		
+							</label>				
+						</listcellnolabel>
+						<listcell bind="@mascara"/>
+<!-- 						<listcell bind="@identitat/codiGrup"/> -->
+<!-- 						<listcell bind="@identitat/codiIdentitat"/> -->
+<!-- 						<listcell bind="@identitat/codiUsuari"/> -->
+<!-- 						<listcell bind="@identitat/descripcio"/> -->
+						<listcell bind="@identitat/nomRol"/>
+					</dataitem>
+				</listbox>
+				<div align="right">
+				<div style="float:right">
+					<button label="${c:l('aplica_permisosRol.zul.Accepta')}" onClick="cleanWindow()"/>
+					</div>
+					<div style="float:left">
+						<listexportbutton acces="true" listbox="listboxacl"/>
+					</div>
+				</div>
+				</vbox>									
+			</tabpanel>
+			<tabpanel>
+				<vbox>
+				<listbox autocommit="false" dataPath="/model:/puntsEntradaRol" fixedLayout="true" height="300px" id="listboxpue" rows="20">
+					<listhead>
+						<listheader label="${c:l('aplica_permisosRol.zul.Nivell')}" width="100px"/>
+						<listheader label="${c:l('aplica_permisosRol.zul.Nom')}" width="*"/>
+						<listheader label="${c:l('aplica_permisosRol.zul.Roldelpermas')}" width="30%"/>						
+<!-- 						<listheader label="@idEntitatAutoritzada"/> -->
+<!-- 						<listheader label="@idPuntEntrada"/> -->
+<!-- 						<listheader label="@tipusEntitatAutoritzada"/>						 -->
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@descripcioNivellAutoritzacio"/>					
+						<listcell bind="@codiEntitatAutoritzada"/>
+						<listcell bind="@descripcioEntitatAutoritzada"/>						
+<!-- 						<listcell bind="@idEntitatAutoritzada"/> -->
+<!-- 						<listcell bind="@idPuntEntrada"/> -->
+<!-- 						<listcell bind="@tipusEntitatAutoritzada"/> -->
+					</dataitem>
+				</listbox>
+				<div align="right">
+				<div style="float:right">
+					<button label="${c:l('aplica_permisosRol.zul.Accepta')}" onClick="cleanWindow()"/>
+					</div>
+					<div style="float:left">
+						<listexportbutton acces="true" listbox="listboxpue"/>
+					</div>
+				</div>
+				</vbox>									
+			</tabpanel>
+		</tabpanels>
+		</tabbox>
+
+		</vbox>
+	</window>
+</zk>

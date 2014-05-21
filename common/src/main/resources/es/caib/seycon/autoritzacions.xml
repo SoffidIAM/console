@@ -1,0 +1,1195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- IMPORTANT NOTE: -->
+<!-- Any changes made to the "codi" to add new authorizations or authorizations 
+	must also modify "Security.java" (constant authorizations) and "AutoritzacionsUsuari" 
+	to get them (new Capabilities). Also must be updated AndroMDA roles (if you 
+	change the code or add new) - codi: authorization code. - descripcio: textual 
+	description. - tipusDomini: domain type. ALWAYS include "SENSE_DOMINI"(!!) 
+	- scope: for "tipusDomini", groups indicates whether to include the group 
+	(one), the parents (parents), children (children), both (both). By default 
+	is the same group only - ambit: field information to sort the columns in 
+	the authorization window. - hereta: the inherits authorization code [using 
+	the corresponding domain values types using domain]. If its value is *, it 
+	inherits ALL permissions. NOTE: inheritance is not transitive (first level 
+	only) [IMPORTANT] -->
+
+<autoritzacions>
+	<autoritzacio>
+		<codi>authorization:all</codi>
+		<descripcio>Have global authorization: the authorizations</descripcio>
+		<ambit>Soffid</ambit>
+		<hereta>*</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:create</codi>
+		<descripcio>Create users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:update,
+			user:custom:update,
+			user:password:update,
+			user:query,
+			user:refresh,
+			user:role:query,
+			user:metadata:update,
+			user:group:create,
+			user:group:delete,
+			user:printer:create,
+			user:printer:delete,
+			group:query,
+			printer:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:reconcile</codi>
+		<descripcio>Import user and roles from managed systems</descripcio>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:update</codi>
+		<descripcio>Update users</descripcio> 
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:custom:update,
+			user:password:update,
+			user:query,
+			user:refresh,
+			user:role:query,
+			user:metadata:update,
+			user:group:create,
+			user:group:delete,
+			user:printer:create,
+			user:printer:delete,
+			group:query,
+			printer:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:delete</codi>
+		<descripcio>Delete users (WF)</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>user:query</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:custom:update</codi>
+		<descripcio>Update the user phone number and observations</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:password:update</codi>
+		<descripcio>Generate temporary password for user</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:query</codi>
+		<descripcio>View users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			organizationalUnit:query,
+			metadata:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:refresh</codi>
+		<descripcio>Propagate users and see users tasks</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:role:query</codi>
+		<descripcio>See the users roles</descripcio>
+		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:session:query</codi>
+		<descripcio>See the users opened sessions</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:metadata:update</codi>
+		<descripcio>Update users additional data</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:role:create</codi>
+		<descripcio>Make the assignment of users roles</descripcio>
+		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:role:delete</codi>
+		<descripcio>Delete the assignment of users roles</descripcio>
+		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:group:create</codi>
+		<descripcio>Assign secondary groups of users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			group:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:group:delete</codi>
+		<descripcio>Delete secondary groups of users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:printer:create</codi>
+		<descripcio>Create the assignment of printers for users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:printer:delete</codi>
+		<descripcio>Clear the assignment of printers for users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:printer:acl:create</codi>
+		<descripcio>Create the assignment of printers (ACL servers >= support)
+			for users</descripcio>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:printer:acl:delete</codi>
+		<descripcio>Delete the assignment of printers (ACL servers >= support)
+			for users</descripcio>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:accessRegister:query</codi>
+		<descripcio>See users access logs (User management window)
+		</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:mazinger:query</codi>
+		<descripcio>See Mazinger applications</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:create</codi>
+		<descripcio>Create groups</descripcio>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:update,
+			group:query,
+			group:printer:create,
+			group:printer:delete,
+			printer:query,
+			organizationalUnit:query,
+			group:role:query,
+			group:user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:update</codi>
+		<descripcio>Update groups</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:query,
+			group:printer:create,
+			group:printer:delete,
+			printer:query,
+			organizationalUnit:query,
+			group:role:query,
+			group:user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:query</codi>
+		<descripcio>See groups (Group management window)</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>both</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:role:query,
+			group:user:query,
+			organizationalUnit:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:role:query</codi>
+		<descripcio>See assigned roles to groups</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>both</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:user:query</codi>
+		<descripcio>See in the group management window the groups to which
+			users belong</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:printer:create</codi>
+		<descripcio>Create assignment of printers to groups</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:query,
+			printer:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>group:printer:delete</codi>
+		<descripcio>Delete assignment of printers to groups</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Groups</ambit>
+		<hereta>
+			group:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>organizationalUnit:create</codi>
+		<descripcio>Create organizational unit types</descripcio>
+		<ambit>Organizational unit</ambit>
+		<hereta>
+			organizationalUnit:query,
+			organizationalUnit:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>organizationalUnit:update</codi>
+		<descripcio>Update organizational unit types</descripcio>
+		<ambit>Organizational unit</ambit>
+		<hereta>
+			organizationalUnit:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>organizationalUnit:delete</codi>
+		<descripcio>Delete organizational unit types</descripcio>
+		<ambit>Organizational unit</ambit>
+		<hereta>
+			organizationalUnit:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>organizationalUnit:query</codi>
+		<descripcio>See the organizational unit types</descripcio>
+		<ambit>Organizational unit</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:all:create</codi>
+		<descripcio>Create hosts on any network</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:all:query,
+			host:all:update,
+			host:os:update,
+			network:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:all:update</codi>
+		<descripcio>Update all hosts</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:all:query,
+			host:os:update,
+			network:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:all:delete</codi>
+		<descripcio>Delete all hosts (WF)</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:all:query</codi>
+		<descripcio>See all hosts</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			network:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:os:update</codi>
+		<descripcio>Change the OS and make as print servers machines with
+			access query</descripcio>
+		<ambit>Hosts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:admin:query</codi>
+		<descripcio>See and revoke authorizations access to authorized
+			machines as local administrator. To see the machine administrator.
+		</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>host:support</codi>
+		<descripcio>Give VNC support for all hosts</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:all:query
+		</hereta>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>operatingSystem:create</codi>
+		<descripcio>Create new OS types</descripcio>
+		<ambit>Operating systems</ambit>
+		<hereta>
+			operatingSystem:update
+		</hereta>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>operatingSystem:delete</codi>
+		<descripcio>Delete OS types</descripcio>
+		<ambit>Operating systems</ambit>
+		<hereta>
+			operatingSystem:query
+		</hereta>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>operatingSystem:update</codi>
+		<descripcio>Update OS types</descripcio>
+		<ambit>Operating systems</ambit>
+		<hereta>
+			operatingSystem:query
+		</hereta>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>operatingSystem:query</codi>
+		<descripcio>Query OS types</descripcio>
+		<ambit>Operating systems</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>network:all:create</codi>
+		<descripcio>Create networks</descripcio>
+		<ambit>Networks</ambit>
+		<hereta>
+			network:all:update,
+			network:all:query,
+			host:all:query,
+			host:all:create,
+			host:os:update,
+			host:all:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>network:all:update</codi>
+		<descripcio>Update all networks</descripcio>
+		<ambit>Networks</ambit>
+		<hereta>
+			network:all:query,
+			host:all:query,
+			host:os:update,
+			host:all:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>network:all:delete</codi>
+		<descripcio>Delete all networks</descripcio>
+		<ambit>Networks</ambit>
+		<hereta>
+			network:all:query,
+			network:all:update,
+			host:all:update,
+			host:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>network:all:query</codi>
+		<descripcio>See all networks</descripcio>
+		<ambit>Networks</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>printer:create</codi>
+		<descripcio>Create printers</descripcio>
+		<ambit>Printers</ambit>
+		<hereta>
+			printer:query,
+			printer:update,
+			user:printer:delete
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>printer:update</codi>
+		<descripcio>Update printers data</descripcio>
+		<ambit>Printers</ambit>
+		<hereta>
+			printer:query,
+			user:printer:delete
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>printer:delete</codi>
+		<descripcio>Delete printers</descripcio>
+		<ambit>Printers</ambit>
+		<hereta>
+			printer:query,
+			user:printer:delete
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>printer:query</codi>
+		<descripcio>See all printers</descripcio>
+		<ambit>Printers</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>printer:acl:query</codi>
+		<descripcio>See all printers (with ACL server >= query)</descripcio>
+		<ambit>Printers</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>application:create</codi>
+		<descripcio>Create applications</descripcio>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query,
+			application:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>application:update</codi>
+		<descripcio>Update the applications data</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>application:delete</codi>
+		<descripcio>Delete applications</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>application:query</codi>
+		<descripcio>See applications and their roles</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			usersDomain:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>accessRegister:query</codi>
+		<descripcio>See all access logs</descripcio>
+		<ambit>Access logs</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>metadata:create</codi>
+		<descripcio>Create new additional data types</descripcio>
+		<ambit>Additional data</ambit>
+		<hereta>
+			metadata:query,
+			metadata:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>metadata:update</codi>
+		<descripcio>Update existing additional data</descripcio>
+		<ambit>Additional data</ambit>
+		<hereta>
+			metadata:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>metadata:delete</codi>
+		<descripcio>Delete a existing additional data type</descripcio>
+		<ambit>Additional data</ambit>
+		<hereta>
+			metadata:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>metadata:query</codi>
+		<descripcio>See the additional data types</descripcio>
+		<ambit>Additional data</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>service:create</codi>
+		<descripcio>Create services</descripcio>
+		<ambit>Services</ambit>
+		<hereta>
+			service:query,
+			service:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>service:update</codi>
+		<descripcio>Update services</descripcio>
+		<ambit>Services</ambit>
+		<hereta>
+			service:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>service:delete</codi>
+		<descripcio>Delete services</descripcio>
+		<ambit>Services</ambit>
+		<hereta>
+			service:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>service:query</codi>
+		<descripcio>See services</descripcio>
+		<ambit>Services</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>mail:create</codi>
+		<descripcio>Create domains and e-mail lists</descripcio>
+		<ambit>E-mail</ambit>
+		<hereta>
+			mail:query,
+			mail:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>mail:update</codi>
+		<descripcio>Update domains and e-mail lists</descripcio>
+		<ambit>E-mail</ambit>
+		<hereta>
+			mail:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>mail:delete</codi>
+		<descripcio>Delete domains and e-mail lists</descripcio>
+		<ambit>E-mail</ambit>
+		<hereta>
+			mail:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>mail:query</codi>
+		<descripcio>See domains and e-mail lists</descripcio>
+		<ambit>E-mail</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>parameter:create</codi>
+		<descripcio>Create configuration parameters</descripcio>
+		<ambit>Parameters</ambit>
+		<hereta>
+			parameter:query,
+			parameter:update
+		</hereta>
+	</autoritzacio>
+	<autoritzacio>
+		<codi>parameter:update</codi>
+		<descripcio>Update configuration parameters</descripcio>
+		<ambit>Parameters</ambit>
+		<hereta>
+			parameter:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>parameter:delete</codi>
+		<descripcio>Delete configuration parameters</descripcio>
+		<ambit>Parameters</ambit>
+		<hereta>
+			parameter:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>parameter:query</codi>
+		<descripcio>See configuration parameters</descripcio>
+		<ambit>Parameters</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:create</codi>
+		<descripcio>Create agents</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:update,
+			agent:query,
+			group:query,
+			plugins:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:update</codi>
+		<descripcio>Update agents</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			group:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:delete</codi>
+		<descripcio>Delete agents</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:query</codi>
+		<descripcio>See the agents configuration</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:refreshUsers</codi>
+		<descripcio>Propagate all agent users</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:refreshRoles</codi>
+		<descripcio>To propagate all agetn roles</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:accessControl:create</codi>
+		<descripcio>Create agents access control rules</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			agent:accessControl:query,
+			agent:accessControl:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:accessControl:update</codi>
+		<descripcio>Modify agents access controls</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			agent:accessControl:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:accessControl:delete</codi>
+		<descripcio>Delete agents access control rules</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			agent:accessControl:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:accessControl:query</codi>
+		<descripcio>See agents access control rules</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:accessControl:set</codi>
+		<descripcio>Enable/disable agents access control rules</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			agent:accessControl:query
+		</hereta>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>server:manage</codi>
+		<descripcio>Manage soffid synchronization servers</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			server:query
+		</hereta>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>server:query</codi>
+		<descripcio>Query servers</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query,
+			agent:accessControl:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>audit:query</codi>
+		<descripcio>See audit logs</descripcio>
+		<ambit>Audit</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>audit:custom:query</codi>
+		<descripcio>See the audit logs in users management window</descripcio>
+		<ambit>Audit</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>intranetMenus:admin</codi>
+		<descripcio>See and manage all intranet menus</descripcio>
+		<ambit>Intranet menus</ambit>
+		<hereta>
+			intranetMenus:all:query,
+			user:query,
+			group:query,
+			application:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>intranetMenus:all:query</codi>
+		<descripcio>See all intranet access menus</descripcio>
+		<ambit>Intranet menus</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>monitor:server:list</codi>
+		<descripcio>See the seycon servers status</descripcio>
+		<ambit>Monitoring</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>monitor:agent:list</codi>
+		<descripcio>See the seycon server agents status</descripcio>
+		<ambit>Monitoring</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>monitor:agent:restart</codi>
+		<descripcio>Reset the seycon server agents</descripcio>
+		<ambit>Monitoring</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>base:log:query</codi>
+		<descripcio>See the seycon servers logs</descripcio>
+		<ambit>Monitoring</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>plugins:query</codi>
+		<descripcio>Query installed plugins</descripcio>
+		<ambit>Agents</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>plugins:update</codi>
+		<descripcio>Install, update and enable or disable plugins</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			plugins:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>authorization:rol:create</codi>
+		<descripcio>Add roles to authorization definitions</descripcio>
+		<ambit>Authorizations</ambit>
+		<hereta>
+			authorization:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>authorization:rol:delete</codi>
+		<descripcio>Delete the roles that make up the authorizations
+		</descripcio>
+		<ambit>Authorizations</ambit>
+		<hereta>
+			authorization:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>authorization:query</codi>
+		<descripcio>Access in query mode to authorizations management
+		</descripcio>
+		<ambit>Authorizations</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pupil:create</codi>
+		<descripcio>Create users of "alumne" type, update their data and
+			passwords</descripcio>
+		<ambit>Alumnes</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>workflow:admin</codi>
+		<descripcio>Manage workflows</descripcio>
+		<ambit>Workflow</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>usersDomain:create</codi>
+		<descripcio>Create user domains</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			usersDomain:query,
+			usersDomain:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>usersDomain:update</codi>
+		<descripcio>Update user domains</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			usersDomain:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>usersDomain:delete</codi>
+		<descripcio>Delete user domains</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			usersDomain:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>usersDomain:query</codi>
+		<descripcio>See user domains</descripcio>
+		<ambit>User domains</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:agents:show</codi>
+		<descripcio>Access to agents window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:aplicacions:show</codi>
+		<descripcio>Access to applications window</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Soffid</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:auditoria:show</codi>
+		<descripcio>Access to audit window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:autoritzacions:show</codi>
+		<descripcio>Access to authorizations window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:correu:show</codi>
+		<descripcio>Access to mailing list window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:dominiscorreu:show</codi>
+		<descripcio>Access to mail domains window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:dadesAddicionals:show</codi>
+		<descripcio>Access to additional data window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:grups:show</codi>
+		<descripcio>Access to groups management window</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:impressores:show</codi>
+		<descripcio>Access to printers window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:parametres:show</codi>
+		<descripcio>Access to configuration parameters window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:plugins:show</codi>
+		<descripcio>Access to agents window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:registreAcces:show</codi>
+		<descripcio>Access to access logs window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:serveis:show</codi>
+		<descripcio>Access to services window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:tipusUO:show</codi>
+		<descripcio>Access to organizational unit window</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:usuaris:show</codi>
+		<descripcio>Access to users management window</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<ambit>Soffid</ambit>
+		<hereta>
+			usersDomain:query,
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:menusIntranet:show</codi>
+		<descripcio>Access to intranet menu access window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:monitor:show</codi>
+		<descripcio>Access to seycon server status window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:usersDomain:show</codi>
+		<descripcio>Access to user domains management window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:create</codi>
+		<descripcio>Create high risk accounts</descripcio>
+		<ambit>Accounts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:update</codi>
+		<descripcio>Update hight risk accounts</descripcio>
+		<ambit>Accounts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:query</codi>
+		<descripcio>Query high risk accounts</descripcio>
+		<ambit>Accounts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:delete</codi>
+		<descripcio>Delete high risk accounts</descripcio>
+		<ambit>Accounts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:password</codi>
+		<descripcio>Change account password</descripcio>
+		<ambit>Accounts</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:accounts:show</codi>
+		<descripcio>Use account management screen</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>rule:query</codi>
+		<descripcio>Query role assignment rules</descripcio>
+		<ambit>Rules</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>rule:admin</codi>
+		<descripcio>Manage role assignment rules</descripcio>
+		<ambit>Rules</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:rules:show</codi>
+		<descripcio>Access to role assignment rules screen</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>schedule:admin</codi>
+		<descripcio>Manage scheduled tasks</descripcio>
+		<ambit>Scheduled tasks</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>schedule:query</codi>
+		<descripcio>Query scheduled tasks status</descripcio>
+		<ambit>Scheduled tasks</ambit>
+	</autoritzacio>
+</autoritzacions>

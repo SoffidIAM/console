@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><zk>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<!-- 1.3.6 -->
+<label class="nou">${c:l('oldseu.zul.136')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.esmostrenelspermisos')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris')}</label>${c:l('oldseu.zul.escanvialallargariam')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Llistesdecorreu')}</label>${c:l('oldseu.zul.escanvialallargariam-2')}
+	</div>			
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Federaciadidentitat')}</label>${c:l('oldseu.zul.novasecciaperlagesti')}
+	</div>	
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Auditoria')}</label>${c:l('oldseu.zul.esmilloralainterfaci')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Registresdaccas')}</label>${c:l('oldseu.zul.esmilloralainterfaci-2')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Agents')}</label>${c:l('oldseu.zul.espermetfiltrarperce')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Maquines')}</label>${c:l('oldseu.zul.modificaciadautorit')}
+	</div>
+</div>	
+
+<!-- 1.3.4 -->
+<label class="nou">${c:l('oldseu.zul.134')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris')}</label>${c:l('oldseu.zul.simposalarestriccia')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Menasintranet')}</label>${c:l('oldseu.zul.sinclouuneditorpera')}	
+	</div>	
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Agents')}</label>${c:l('oldseu.zul.espermetlamonitoritz')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Impressores')}</label>${c:l('oldseu.zul.novesautoritzacionsp')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.esdanaunavasquansin')}	
+	</div>		
+</div>
+
+
+<!-- 1.3.3 -->
+<label class="nou">${c:l('oldseu.zul.133')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Agents')}</label>${c:l('oldseu.zul.novaautoritzaciaper(')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Correu')}</label>${c:l('oldseu.zul.esseparenlesautoritz')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Autoritzacions')}</label>${c:l('oldseu.zul.espermetatorgarautor')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.XarxesiMaquines')}</label>${c:l('oldseu.zul.esmostrenelsmenasaut')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Menasintranet')}</label>${c:l('oldseu.zul.esmostraelmenasilus')}	
+	</div>	
+</div>
+
+<!-- 1.3.2 -->
+<label class="nou">${c:l('oldseu.zul.132')}</label>
+<div sclass="canvis">
+<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Autoritzacions-2')}</label>${c:l('oldseu.zul.araelspermisosdacca')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Elmeuperfil')}</label>${c:l('oldseu.zul.Novasecciaonlusuari')}
+	</div>	
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Interficie')}</label>${c:l('oldseu.zul.Espermetajustarlamp')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Grups')}</label>${c:l('oldseu.zul.esdestaquenelsgrupsm')}	
+	</div>	
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions-2')}</label>${c:l('oldseu.zul.correcciaaleliminac')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Rolsdaplicacions')}</label>${c:l('oldseu.zul.safegeixlarestricci')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris-2')}</label>${c:l('oldseu.zul.esllevenelsespaisaln')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.MenasdaccasalaIntra')}</label>${c:l('oldseu.zul.espermetobtindretots')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Agents')}</label>${c:l('oldseu.zul.safegeixlaopciadus')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Maquines')}</label>${c:l('oldseu.zul.espotmarcarunamaquin')}<label sclass="u">${c:l('oldseu.zul.servidordimpressore')}</label>${c:l('oldseu.zul.
+		(')}<label sclass="u">${c:l('oldseu.zul.shadedesmarcarcomas')}</label>${c:l('oldseu.zul.
+		perquanosurtaalsr')}
+	</div>	
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Sessionsdelamaquina')}</label>${c:l('oldseu.zul.Esmouenaunanovapesta')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Sessionsdelusuari')}</label>${c:l('oldseu.zul.esmostraladatadecrea')}	
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Registresdaccas')}</label>${c:l('oldseu.zul.esmilloraelmatodedec')}	
+	</div>		
+
+</div>
+
+<!-- 1.2.13 -->
+<label class="nou">${c:l('oldseu.zul.1213')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Xarxes')}</label>${c:l('oldseu.zul.sajustalamplariade')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Tasques')}</label>${c:l('oldseu.zul.espermetlacercadelu')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris-2')}</label>${c:l('oldseu.zul.espermetveurelaudit')}
+	</div>		
+</div>		
+<!-- 1.2.11 -->
+<label class="nou">${c:l('oldseu.zul.1211')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris-2')}</label>${c:l('oldseu.zul.alafinestradetasques')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Grups-2')}</label>${c:l('oldseu.zul.espermetunvalormalti')}
+	</div>
+</div>
+<!-- 1.2.10 -->
+<label class="nou">${c:l('oldseu.zul.1210')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Llistesdecorreu')}</label>${c:l('oldseu.zul.esmostrenlesllistesd')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris')}</label>${c:l('oldseu.zul.mostremladescripciad')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.MenasdaccasalaIntra')}</label>${c:l('oldseu.zul.safegeixuneditorXML')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.shabilitalarecepcia')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Auditoria')}</label>${c:l('oldseu.zul.espermetcercarpertip')}
+	</div>
+</div>		
+<!-- 1.2.9 -->
+<label class="nou">${c:l('oldseu.zul.129')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.UsuarisCorrecciader')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Logoutfemlaintegraci')}
+	</div>
+</div>
+
+<!-- 1.2.6 -->
+<label class="nou">${c:l('oldseu.zul.126')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.Usuarisesguardaladat')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.MenasdaccasalaIntra-2')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Grupsnoespermetcodis')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Aplicacionsalsrolsde')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Auditoriaespermetcer')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Exportaciaderesultat')}
+	</div>	
+	<div sclass="punt">
+		${c:l('oldseu.zul.MissatgesdeerrordeZK')}
+	</div>	
+	<div sclass="punt">
+		${c:l('oldseu.zul.Canvialesfinestresde')}
+	</div>
+</div>
+<!-- 1.2.3 -->
+<label class="nou">${c:l('oldseu.zul.123')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.Canvialesfinestresde-2')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Aliesdecorreunomases')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Assignaciaderolsnoes')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Agentsespermetpropag')}
+	</div>	
+	<div sclass="punt">
+		${c:l('oldseu.zul.VNCEscanvialordedel')}
+	</div>
+</div>
+<!-- 1.2.2 -->
+<label class="nou">${c:l('oldseu.zul.122')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.Espermet')}<label class="i">${c:l('oldseu.zul.recarregarlapagina')}</label>${c:l('oldseu.zul.mantenintsealamateix')}
+	</div>
+	<div sclass="punt">
+		<label class="i">${c:l('oldseu.zul.Novetatsdelaversia')}</label>${c:l('oldseu.zul.onespotveurelhistar')}
+	</div>
+	<div sclass="punt">
+		<label class="i">${c:l('oldseu.zul.Cercadeprocediments')}</label>${c:l('oldseu.zul.cercaamblesdatesdin')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Maquines')}</label>${c:l('oldseu.zul.correcciadelordenac')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.nourolSCCONAPLICACIO')}
+		<!-- Posibilitat de rebre informació sobre les actualitzacions de l'aplicació per correu electrònic (l'assignació/eliminació de rols de l'aplicació als usuaris) -->  
+		<label sclass="i">${c:l('oldseu.zul.Atorgaciaderols')}</label>${c:l('oldseu.zul.donemmasinformaciade')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.MenasdaccasalaIntra')}</label>${c:l('oldseu.zul.espermetferlacercad')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris')}</label>${c:l('oldseu.zul.aregistresdaccasesm')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Registresdaccas')}</label>${c:l('oldseu.zul.shaafegitlacolumnap')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Grups')}</label>${c:l('oldseu.zul.esmostrenelsrolsquee')}
+	</div>	
+</div>
+<!-- 1.2.1 -->
+<label class="nou">${c:l('oldseu.zul.121')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.Milloradelagestiadel')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.MenasdaccasalaIntra-3')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Maquines')}</label>${c:l('oldseu.zul.accasalsdarrersregis')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.alsusuarisdelaplica')}
+		<label sclass="u">${c:l('oldseu.zul.Ordenacia')}</label>${c:l('oldseu.zul.delllistatderolsiusu')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Usuaris')}</label>${c:l('oldseu.zul.ordenaciadelllistatd')}
+	</div>					
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Grups')}</label>${c:l('oldseu.zul.espotcercarperseccia')}<label sclass="i">${c:l('oldseu.zul.usuarisambrols')}</label>${c:l('oldseu.zul.ambvalordedomini')}<label sclass="i">${c:l('oldseu.zul.delgrup')}</label>${c:l('oldseu.zul.')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Xarxes-2')}</label>${c:l('oldseu.zul.espotordenarelsresul')}<label sclass="u">${c:l('oldseu.zul.total')}</label>${c:l('oldseu.zul.delesmaquinesquepert')}<label sclass="u">${c:l('oldseu.zul.navegar')}</label>${c:l('oldseu.zul.desdaquestllistatal')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Agents')}</label>${c:l('oldseu.zul.gestiadel')}<label sclass="u">${c:l('oldseu.zul.controldaccas')}</label>${c:l('oldseu.zul.i')}<label sclass="u">${c:l('oldseu.zul.propagacia')}</label>${c:l('oldseu.zul.delsusuarisalagent')}
+	</div>
+</div>
+
+<!-- 1.2.0 -->
+<label sclass="nou">${c:l('oldseu.zul.120')}</label>
+<div sclass="canvis">
+	<div sclass="punt">
+		${c:l('oldseu.zul.Milloradelainterfaci')}
+		<label sclass="u">${c:l('oldseu.zul.gestiadetasques')}</label>${c:l('oldseu.zul.(SafatadentradaCerc')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Accasdirectealesdife')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Maquines')}</label>${c:l('oldseu.zul.milloraenlagestiadel')}<label sclass="u">${c:l('oldseu.zul.alies')}</label>${c:l('oldseu.zul.esllevalarestricciad')}
+	</div>
+	<div sclass="punt">
+		${c:l('oldseu.zul.Milloresenladminist')}<label sclass="u">${c:l('oldseu.zul.intranet')}</label>${c:l('oldseu.zul.espermetfercapiaienl')}
+	</div>
+	<div sclass="punt">
+		<label sclass="i">${c:l('oldseu.zul.Aplicacions')}</label>${c:l('oldseu.zul.escanvialamplariade')}<label sclass="u">${c:l('oldseu.zul.codi')}</label>${c:l('oldseu.zul.a20caracters
+		Esper')}<label sclass="u">${c:l('oldseu.zul.exportar')}</label>${c:l('oldseu.zul.elsusuarisquetenenas')}
+	</div>
+</div>
+</zk>

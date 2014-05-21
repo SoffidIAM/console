@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="impressoresLlista" title="Llista d'impressores"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="impressores" src="descriptorImpressora.xml"/>
+	
+	<zscript src="comu/checkTruncatedResults.zul" />
+	
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			
+			mode = "query"; 
+			view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			queryEnabled = false;
+			retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+			
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquemaLlista.getFellow("queryWindow").getFellow("queryCodi")
+						.getFellow("textbox");
+				nom = esquemaLlista.getFellow("queryWindow").getFellow("queryModel")
+						.getFellow("textbox");
+				servidor = esquemaLlista.getFellow("queryWindow")
+						.getFellow("queryServidor").getFellow("textbox");
+				local = esquemaLlista.getFellow("queryWindow")
+						.getFellow("queryLocal").getFellow("textbox");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) &&
+						((nom == null) || (nom.value == null) ||
+						(nom.value.trim().length() == 0)) &&
+						(servidor.value.trim().length() == 0) &&
+						(local.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("nom", nom.value);
+				searchValues.put("servidor", servidor.value);
+				searchValues.put("servidor", servidor.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox = esquemaLlista.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/impressora").refresh();
+					listbox.dataPath = "/model:/impressora"; 
+				}
+				
+				if ((listbox.getModel().getSize() == 0) && !retrySearch)
+				{
+					retrySearch = true;
+					search();
+				}
+				
+				else
+				{
+					retrySearch = false;
+				}
+				
+				checkTruncatedList(listbox);
+			}
+			
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				
+				else
+				{
+					esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void populateDetails ()
+			{	
+				mode="query";
+			}
+			
+			void cleanWindow(){
+				queryWindow = esquemaLlista.getFellow("queryWindow");
+				queryWindow.getFellow("queryCodi").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryModel").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryServidor").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryLocal").getFellow("textbox").value = "";
+				model.getVariables().declareVariable("queryEnabled", false);
+				model.getVariables().declareVariable("queryEnabled", false);
+				lista.getFellow("listbox").dataPath = "/model:/impressora[false]";
+				esquemaLlista.visible=false;
+				view_altres = false;
+				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void acceptaDada()
+			{
+				ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
+				ctx = ds.getJXPathContext(); 
+				xpath = esquemaLlista.getFellow("lista").getFellow("listbox").getXPath();
+				index = esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedIndex();
+				pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
+				ctx2 = ctx.getRelativeContext(pointer);
+				codiImpressora = (String)ctx2.getPointer("@codi").getValue();
+				nomServidor = (String) ctx2.getPointer("@nomMaquina").getValue();
+				pointer.invalidate ();
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Object[] dades = {codiImpressora, nomServidor}; 
+				Events.postEvent ("onActualitza", formComponent, dades);
+				cleanWindow();
+			}
+		]]>
+	</zscript>
+
+	<esquema closable="true" id="esquemaLlista" position="center, center" title="${c:l('impressoresllista.Titol')}" visible="false">
+		<attribute name="onInicia">
+     		pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+		
+		<criteris id="queryWindow" onOK="search()" width="790px">
+			<hbox>
+				<input_criteri etiqueta="${c:l('impressoresllista.zul.Codi')}" id="queryCodi"/>
+				<input_criteri etiqueta="${c:l('impressoresllista.zul.Model')}" id="queryModel"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox> 
+				<input_criteri etiqueta="${c:l('impressoresllista.zul.ServImpressia')}" id="queryServidor"/>
+				<input_criteri etiqueta="${c:l('impressoresllista.zul.Local')}" id="queryLocal"/>
+				<!-- <input_criteri id="queryLocal" etiqueta="Local:" mascara="/[N,S,n,s,\null]/: Introdueix S/s o N/n"/> -->
+			</hbox>	
+		</criteris>
+		
+		<navegador id="lista" width="790px">
+			<listbox id="listbox" autocommit="false" dataPath="/model:/impressora"
+				fixedLayout="true" rows="${fileres}">
+				<attribute name="onSelect">
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+				</attribute>
+				<listhead>
+					<listheader label="${c:l('impressoresllista.zul.Codi-2')}" width="200px"/>
+					<listheader label="${c:l('impressoresllista.zul.Servidor')}" width="150px"/>
+					<listheader label="${c:l('impressoresllista.zul.Model-2')}" width="*"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@codi">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@nomMaquina">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@model">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('impressoresllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (! self.disabled) {
+						acceptaDada();
+					}
+				</attribute>
+			</button>
+			<button label="${c:l('impressoresllista.zul.Cancel·la')}" onClick="cleanWindow()"/>								
+		</hbox>
+		
+	</esquema>
+
+</zk>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<label id="label">
+		<attribute if="${arg.bind != null}" name="bind">${arg.bind}</attribute>
+		<attribute if="${arg.bind == null}" name="value">${arg.value}</attribute>
+		<attribute if="${arg.width_custom != null}" name="width">${arg.width_custom}</attribute>		
+		<attribute if="${arg.tooltip != null}" name="tooltip">${arg.tooltip}</attribute>
+		<attribute if="${arg.sclass != null}" name="sclass">${arg.sclass}</attribute>
+		<attribute if="${arg.sclass == null}" name="sclass">etiqueta</attribute>
+		<attribute if="${arg.tooltiptext != null}" name="tooltiptext">${arg.tooltiptext}</attribute>
+	</label>
+	
+</zk>

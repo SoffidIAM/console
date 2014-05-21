@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="rolsUsuarisRols">
+		<finder name="rolUsuari" type="rolUsuari">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findRolsUsuariByNomRolAndCodiAplicacioRolAndCodiDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}"/>
+				<parameter value="${codiAplicacio}"/>
+				<parameter value="${bbdd}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.RolsUsuaris">
+			</new-instance-bean>			
+		</finder>
+		<finder name="jerarquiaRolUsuari" type="jerarquiaRolUsuari">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findInformacioTextualJerarquiaRolsByRolAplicacioAndDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}"/>
+				<parameter value="${codiAplicacio}"/>
+				<parameter value="${bbdd}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.ContenidorRol">
+			</new-instance-bean>			
+		</finder>
+	</datanode>	
+	
+	<datanode name="rolUsuari"/>
+	<datanode name="jerarquiaRolUsuari"/>
+	
+</zkib-model>

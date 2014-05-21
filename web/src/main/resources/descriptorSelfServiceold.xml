@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="usuari" type="usuari">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService" method="getCurrentUsuari">
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.Usuari">
+			</new-instance-bean>
+		</finder>
+		<finder name="moure" type="moure">  
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="findRoot" />
+			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
+		</finder>
+	</datanode>
+	
+	<datanode name="usuari">
+		<finder name="grup" type="void"> 
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="findUsuariGrupsByCodiUsuari">
+			</ejb-finder>
+		</finder>
+		<finder name="rol" type="void"> 
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="findRolAccounts">
+			</ejb-finder>
+		</finder>
+		<finder name="account" type="account">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="getUserAccounts">
+			</ejb-finder>
+		</finder> 
+	</datanode>
+	
+	<datanode name="moure">
+	 	<finder name="moure" type="moure">  
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="findChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder> 	
+	</datanode>
+	
+	<datanode name="account">
+		<finder name="estatContrasenya" type="void">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService" 
+				method="passwordsStatus">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="void" />
+	
+</zkib-model>

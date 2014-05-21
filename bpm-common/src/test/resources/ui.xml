@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+	<tag>1.0</tag>
+	<roles>
+		<initiator>
+			<role name="Secure"/>
+		</initiator>
+		<supervisor>
+			<role name="Secure"/>
+		</supervisor>
+		<observer>
+			<role name="Secure"/>
+		</observer>
+	</roles>
+	<task name="Cargar Bug">
+		<file path="ui/cargarBug.zul"/>
+	</task>
+	<task name="Confirmar Bug">
+		<file path="ui/confirmarBug.zul"/>
+	</task>
+	<task name="Corregir Bug">
+		<file path="ui/corregirBug.zul"/>
+	</task>
+	<task name="Validar Bug">
+		<file path="ui/validarBug.zul"/>
+	</task>
+</process>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="index" title="Soffid Identity and Access Manager" ?>
+
+<?meta name="viewport" content="width=device-width, initial-scale=1"?>
+
+<vbox xmlns="http://www.zkoss.org/2005/zul" 
+	xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="finestraSEU"  
+	width="100%" 
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	use="es.caib.seycon.ng.web.ConfiguraSEU">
+	<style src="~./styles/estil.css"/>
+	<style src="/css/localSEU.css"/>
+	<style src="/css/devices.css"/>
+	
+	<script src="/js/jquery-1.9.1.min.js" />
+	
+	<script>
+		var dom = {};
+		bj = jQuery.noConflict(true);
+	</script>
+	
+	<style>
+		/*Tabla: Mis Tareas*/
+		.classThree, .classFour, .classFive{display:none;}
+	</style>
+	
+	<script src="/js/own_style.js"></script>
+	
+	<application allowOpenMultipleTabs="true" 
+		autoReload="false" 
+		favorits="//favorits/favorits" 
+		initialPage="self_service.zul" 
+		logoutPage="/logout/?logoutTo=selfservice/index.zul" 
+		mainWindowTitle="Soffid IAM" 
+		menu="//menu/menu" 
+		showFavorites="false" 
+		showProfile="false"
+		width="100%"/>	
+	<include src="menu.zul"/>
+	<div id="appletFirmaDiv"/>
+</vbox>

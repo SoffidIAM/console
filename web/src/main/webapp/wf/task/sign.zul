@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="sign"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	 
+
+	<div style="z-index:-32768">
+	<signapplet height="1" id="appletFirma" use="es.caib.bpm.ui.SignApplet" visible="false" width="1">
+		
+	</signapplet>
+	</div>
+
+	<window border="normal" id="window" style="width:450px;z-index:10" title="Opcions de firma" visible="false">
+	
+	<!-- attributs de la window:
+		type: indica el tipus de firma ["PDF","CMS","PDF-CERTIFY","PDF-EXTENDED"]
+		pdfType: indica el tipus de segell a la firma PDF
+	
+	 -->
+
+<!-- INICI OPCIONS FIRMA PDF -->
+		<div id="windowTipusSegell" visible="false">
+		${c:l('sign.zul.Tipusdesegell')}
+		<div align="center">
+			<radiogroup id="tipusFirmaPDF">
+				<radio id="sello_ADOBE" label="${c:l('sign.zul.SegellAdobe')}" value="ADOBE">
+					<attribute name="onCheck">
+					<![CDATA[
+						panellOpcionsPDFCodiPunts.setVisible(false);
+						panellOpcionsPDFAdobe.setVisible(true);
+					]]>
+					</attribute>
+				</radio>
+				<radio id="sello_PDF417" label="${c:l('sign.zul.Codidepunts')}" value="PDF417">
+					<attribute name="onCheck">
+					<![CDATA[
+								panellOpcionsPDFCodiPunts.setVisible(true);
+								panellOpcionsPDFAdobe.setVisible(false);				
+					]]>
+					</attribute>
+				</radio>
+
+				<radio checked="true" id="sello_NONE" label="${c:l('sign.zul.Sensesegell')}" value="NONE">
+					<attribute name="onCheck">
+					<![CDATA[
+								panellOpcionsPDFCodiPunts.setVisible(false);
+								panellOpcionsPDFAdobe.setVisible(false);
+					]]>
+					</attribute>
+				</radio>
+			</radiogroup>
+
+		</div>
+					<space bar="false" height="15px" orient="horizontal" width="100%"/>
+		</div>
+<!-- PDF417  -->
+		<vbox id="panellOpcionsPDFCodiPunts" visible="false" width="100%">
+			<hbox align="center" id="panellOpcionsPDFCodiPunts_Posicio" width="310px">
+				<label value="${c:l('sign.zul.Posiciadelestampa')}" width="200px"/>
+				<radiogroup id="posicioEstampaPDFCodiPunts">
+					<vbox align="center" height="70px" style="border: 1px solid black" width="55px">
+						<hbox>
+							<radio id="PDF417_TOP" value="1"/>
+						</hbox>
+						<hbox>
+							<radio id="PDF417_LEFT" value="4"/>
+							<div/>
+							<radio id="PDF417_RIGHT" value="8"/>
+						</hbox>
+
+						<hbox>
+							<radio id="PDF417_BOTTOM" value="2"/>
+						</hbox>
+
+					</vbox>
+				</radiogroup>
+
+			</hbox>
+			<vbox>
+
+
+				<hbox align="center" id="panellOpcionsPDFCodiPunts_TextAddicional" width="400px">
+					<label value="${c:l('sign.zul.Textaddicional')}"/>
+					<textbox id="textAddicional" multiline="false" width="250"/>
+				</hbox>
+			</vbox>
+
+			<space bar="false" height="15px" orient="horizontal" width="100%"/>
+		</vbox>
+<!-- ADOBE -->
+		<vbox id="panellOpcionsPDFAdobe" visible="false" width="100%">
+			<vbox id="vbox1">
+				<space orient="horizontal"/>
+				<hbox id="panellOpcionsPDFAdobe_OpcionsPosicio">
+					<vbox>
+
+						<checkbox checked="true" id="ADOBE_LAST_PAGE" label="${c:l('sign.zul.Afegirnomasalaltima')}"/>
+						<space orient="horizontal"/>
+						<hbox align="center" id="panellOpcionsPDFAdobe_Posicio" width="310px">
+							<label value="${c:l('sign.zul.Posiciadelestampa')}" width="200px"/>
+							<radiogroup id="posicioEstampaPDFAdobe">
+								<vbox align="center" height="70px" style="border: 1px solid black" width="55px">
+									<hbox>
+										<radio id="ADOBE_TOP_LEFT" value="5"/>
+										<radio id="ADOBE_TOP" value="1"/>
+										<radio id="ADOBE_TOP_RIGHT" value="9"/>
+									</hbox>
+									<hbox>
+										<div/>
+										
+									</hbox>
+
+									<hbox>
+										<radio id="ADOBE_BOTTOM_LEFT" value="6"/>
+										<radio id="ADOBE_BOTTOM" value="2"/>
+										<radio id="ADOBE_BOTTOM_RIGHT" value="10"/>
+									</hbox>
+
+								</vbox>
+							</radiogroup>
+
+						</hbox>
+					</vbox>
+				</hbox>
+				<hbox id="panellOpcionsPDFAdobe_MotiuDeFirma">
+					<label value="${c:l('sign.zul.Motiudefirma')}"/>
+					<textbox id="motiuDeFirma" multiline="false" width="270"/>
+				</hbox>
+			</vbox>
+			
+			<space bar="false" height="15px" orient="horizontal" width="100%"/>
+
+		</vbox>
+<!-- Posicionable -->		
+		<vbox id="panellOpcionsPDFExtesa" visible="false" width="100%">
+			<hbox id="panellOpcionsPDFExtesa_x" visible="true">
+							<label value="${c:l('sign.zul.PosiciaX')}"/>
+							<textbox id="signPDFExt_x" multiline="false" width="50"/>
+			</hbox>
+			<hbox id="panellOpcionsPDFExtesa_y" visible="true">
+							<label value="${c:l('sign.zul.PosiciaY')}"/>
+							<textbox id="signPDFExt_y" multiline="false" width="50"/>							
+			</hbox>
+			<hbox id="panellOpcionsPDFExtesa_height" visible="true">
+							<label value="${c:l('sign.zul.Alcada')}"/>
+							<textbox id="signPDFExt_height" multiline="false" width="50"/>
+			</hbox>
+			<hbox id="panellOpcionsPDFExtesa_width" visible="true">
+							<label value="${c:l('sign.zul.Amplada')}"/>
+							<textbox id="signPDFExt_width" multiline="false" width="50"/>							
+			</hbox>
+			<hbox id="panellOpcionsPDFExtesa_degrees" visible="true">
+							<label value="${c:l('sign.zul.Rotacia(enelsentitde')}"/>
+							<textbox id="signPDFExt_degrees" multiline="false" width="50"/>							
+			</hbox>
+			
+		</vbox>
+		
+<!-- INICI OPCIONS COMPULSA -->		
+		<vbox id="panellOpcionsCompulsaPDF" visible="false" width="100%">
+			<hbox id="panellOpcionsCompulsaPDF_x" visible="false">
+							<label value="${c:l('sign.zul.PosiciaX')}"/>
+							<textbox id="compulsaPDF_x" multiline="false" width="50"/>
+			</hbox>
+			<hbox id="panellOpcionsCompulsaPDF_y" visible="false">
+							<label value="${c:l('sign.zul.PosiciaY')}"/>
+							<textbox id="compulsaPDF_y" multiline="false" width="50"/>							
+			</hbox>
+			<hbox id="panellOpcionsCompulsaPDF_degrees" visible="false">
+							<label value="${c:l('sign.zul.Rotacia(enelsentitde')}"/>
+							<textbox id="compulsaPDF_degrees" multiline="false" width="50"/>							
+			</hbox>
+			<hbox id="panellOpcionsCompulsaPDF_url" visible="false">
+							<label value="${c:l('sign.zul.Codideverificacia')}"/>
+							<textbox id="compulsaPDF_url" multiline="false" width="50"/>							
+			</hbox>
+			<hbox id="panellOpcionsCompulsaPDF_location">
+							<label value="${c:l('sign.zul.Municipidesdonesrea')}"/>
+							<textbox id="compulsaPDF_location" multiline="false" width="50"/>							
+			</hbox>
+			
+		</vbox>
+
+	<vbox style="width:100%">	
+		<vbox>
+			<label value="${c:l('sign.zul.Sel·leccionielcertif')}"/>
+			<toolbarbutton id="button" label="" onClick="Executions.getCurrent().sendRedirect((String)self.getAttribute(&quot;url&quot;),&quot;_new&quot;);"/>
+					<div align="center">
+						<listbox id="certificats" mold="select"/>
+					</div>
+					<separator/>
+					<hbox>
+					<button label="${c:l('sign.zul.ActualitzarCertifica')}" onClick="new Path(&quot;//sign/appletFirma&quot;).getComponent().loadCerts()"/>
+					<button label="${c:l('sign.zul.Signar')}">
+						<attribute name="onClick">
+						    Listitem selected = certificats.getSelectedItem();
+						    if (selected == null) {
+						    	es.caib.zkib.zkiblaf.Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("sign.NoCertificat"), 
+						    											org.zkoss.util.resource.Labels.getLabel("sign.Avis");
+						    }
+						    else
+						    {
+						    	if ("PDF".equals(window.getAttribute("type"))) {
+									String motiu="";
+									if(sello_ADOBE.isChecked()){
+										motiu=motiuDeFirma.getValue();
+									}else if(sello_PDF417.isChecked()){
+										motiu=textAddicional.getValue();
+									}
+									
+									appletFirma.signPDF (
+										selected.getValue(),
+										motiu,
+										appletFirma.calculaPDFStampPositionValue()
+									);
+								} else if ("PDF-CERTIFY".equals(window.getAttribute("type"))){
+									//comprobamos que ha introducido los campos obligatorios
+									if(!"".equals(compulsaPDF_location.getValue())){	
+							            //crea cookie
+							            javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)Executions.getCurrent().getNativeResponse();
+							            javax.servlet.http.Cookie userCookie = new javax.servlet.http.Cookie(es.caib.bpm.toolkit.SignaturaHandler.CERTIFY_LOCATION_COOKIEID, java.net.URLEncoder.encode(compulsaPDF_location.getValue()));
+							            userCookie.setMaxAge(31536000); //1 any
+							            response.addCookie(userCookie);
+								             
+										appletFirma.certifyPDF (selected.getValue(),compulsaPDF_x.getValue(),compulsaPDF_y.getValue(),compulsaPDF_degrees.getValue(),compulsaPDF_url.getValue(),compulsaPDF_location.getValue());
+									}else{
+										es.caib.zkib.zkiblaf.Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("sign.ObligatoriMunicipi"), 
+																				org.zkoss.util.resource.Labels.getLabel("sign.Avis"));
+										compulsaPDF_location.setStyle("background-color:#ff9999");
+									}
+								}else if ("PDF-EXTENDED".equals(window.getAttribute("type"))){
+									String motiu="";
+									if(sello_ADOBE.isChecked()){
+										motiu=motiuDeFirma.getValue();
+									}else if(sello_PDF417.isChecked()){
+										motiu=textAddicional.getValue();
+									}
+									
+
+									appletFirma.signPDFExtended (
+										selected.getValue()
+										,motiu
+										,appletFirma.calculaPDFStampPositionValue()
+										,signPDFExt_y.getValue()
+										,signPDFExt_x.getValue()
+										,signPDFExt_height.getValue()
+										,signPDFExt_width.getValue()
+										,signPDFExt_degrees.getValue()
+									);
+								}else{
+									//firma normal
+									appletFirma.sign (selected.getValue());
+								}
+							}
+						</attribute>
+					</button>
+
+					<button label="${c:l('sign.zul.Cancel·lar')}">
+						<attribute name="onClick">
+						    window.setVisible(false);
+						</attribute>
+					</button>
+
+				</hbox>
+		</vbox>
+	</vbox>
+	
+	
+	<attribute name="onSetSource">
+		<![CDATA[
+			applet = new Path("//sign/appletFirma").getComponent();
+			applet.setSource (event.data);
+			self.setAttribute("signature", null);
+			button.setAttribute("url", event.data);
+			button.label = event.data;
+		]]>
+		</attribute>
+		<attribute name="onSetTarget">
+		<![CDATA[
+			applet = new Path("//sign/appletFirma").getComponent();
+			applet.setTarget (event.data);
+			self.setAttribute("signature", null);
+		]]>
+		</attribute>
+
+		<attribute name="onClose">
+		<![CDATA[
+			self.setAttribute("signature", null);
+			self.setVisible(false);
+			event.stopPropagation();
+		]]>
+		</attribute>
+</window>
+
+</zk>

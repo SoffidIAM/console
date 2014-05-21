@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="autoritzacionsUsuari">
+		<finder name="autoritzacio" type="autoritzacioRol">   <!-- tothom -->
+			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+				method="getDescriptionUserAuthorizations">
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="autoritzacioRol" />
+
+</zkib-model>

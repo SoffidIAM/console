@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="permisosUsuaris">
+		<finder name="autoritzacionsRol" type="autoritzacionsRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findAutoritzacionsRolByNomRolAndCodiAplicacioRolAndCodiDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}"/>
+				<parameter value="${codiAplicacio}"/>
+				<parameter value="${bbdd}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.AutoritzacioRol">
+			</new-instance-bean>			
+		</finder>
+		<finder name="aclXarxaRol" type="aclXarxaRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findACLsXarxesRolByNomRolAndCodiAplicacioRolAndCodiDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}"/>
+				<parameter value="${codiAplicacio}"/>
+				<parameter value="${bbdd}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.NetworkAuthorization">
+			</new-instance-bean>			
+		</finder>
+		<finder name="puntsEntradaRol" type="puntsEntradaRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findPuntsEntradaRolByNomRolAndCodiAplicacioRolAndCodiDispatcher" if="${queryEnabled}">
+				<parameter value="${nomRol}"/>
+				<parameter value="${codiAplicacio}"/>
+				<parameter value="${bbdd}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.AutoritzacioPuntEntrada">
+			</new-instance-bean>			
+		</finder>
+	</datanode>	
+	
+	<datanode name="autoritzacionsRol"/>
+	<datanode name="aclXarxaRol"/>
+	<datanode name="puntsEntradaRol"/>
+	
+</zkib-model>

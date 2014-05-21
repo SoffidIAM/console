@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.soffid.iam.console</groupId>
+	<artifactId>test</artifactId>
+	<name>Maven Quick Start Archetype</name>
+	<version>1.0-SNAPSHOT</version>
+	<url>http://maven.apache.org</url>
+	<build>
+		<!-- 
+			<plugins>
+			<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+			<useSystemClassLoader>true</useSystemClassLoader>
+			</configuration>
+			</plugin>
+			</plugins>
+		-->
+		<defaultGoal>test</defaultGoal>
+	</build>
+	<packaging>pom</packaging>
+	<modules>
+		<module>plugin-test</module>
+	</modules>
+</project>

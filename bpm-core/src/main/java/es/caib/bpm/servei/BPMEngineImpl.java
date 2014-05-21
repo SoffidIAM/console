@@ -1,0 +1,2467 @@
+package es.caib.bpm.servei;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.zip.ZipInputStream;
+
+import javax.ejb.CreateException;
+import javax.ejb.EJBException;
+import javax.naming.NamingException;
+import javax.security.auth.login.LoginException;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanFilter;
+import org.apache.lucene.search.FilterClause;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TermRangeFilter;
+import org.apache.lucene.search.TermsFilter;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.util.Version;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.XPath;
+import org.dom4j.xpath.DefaultXPath;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.jbpm.JbpmConfiguration;
+import org.jbpm.JbpmContext;
+import org.jbpm.JbpmException;
+import org.jbpm.context.exe.ContextInstance;
+import org.jbpm.file.def.FileDefinition;
+import org.jbpm.graph.def.Node;
+import org.jbpm.graph.exe.Comment;
+import org.jbpm.graph.log.ActionLog;
+import org.jbpm.graph.log.ProcessInstanceCreateLog;
+import org.jbpm.graph.log.ProcessInstanceEndLog;
+import org.jbpm.graph.log.TransitionLog;
+import org.jbpm.graph.node.TaskNode;
+import org.jbpm.jpdl.JpdlException;
+import org.jbpm.jpdl.xml.Problem;
+import org.jbpm.logging.exe.LoggingInstance;
+import org.jbpm.logging.log.CompositeLog;
+import org.jbpm.logging.log.MessageLog;
+import org.jbpm.taskmgmt.def.Task;
+import org.jbpm.taskmgmt.exe.PooledActor;
+import org.jbpm.taskmgmt.exe.SwimlaneInstance;
+import org.xml.sax.SAXException;
+import org.zkoss.zk.ui.Sessions;
+
+import es.caib.bpm.business.ProcessDefinitionRolesBusiness;
+import es.caib.bpm.business.UserInterfaceBusiness;
+import es.caib.bpm.business.VOFactory;
+import es.caib.bpm.config.BpmServiceLocator;
+import es.caib.bpm.config.Configuration;
+import es.caib.bpm.entity.AuthenticationLog;
+import es.caib.bpm.entity.DBProperty;
+import es.caib.bpm.entity.ProcessDefinitionProperty;
+import es.caib.bpm.entity.UserInterface;
+import es.caib.bpm.exception.BPMErrorCodes;
+import es.caib.bpm.exception.BPMException;
+import es.caib.bpm.exception.InvalidConfigurationException;
+import es.caib.bpm.exception.InvalidParameterException;
+import es.caib.bpm.index.DirectoryFactory;
+import es.caib.bpm.index.Indexer;
+import es.caib.bpm.servei.impl.UserContextCache;
+import es.caib.bpm.util.Timer;
+import es.caib.bpm.utils.ColeccionesUtils;
+import es.caib.bpm.utils.FechaUtils;
+import es.caib.bpm.vo.Job;
+import es.caib.bpm.vo.ProcessDefinition;
+import es.caib.bpm.vo.ProcessInstance;
+import es.caib.bpm.vo.ProcessLog;
+import es.caib.bpm.vo.TaskDefinition;
+import es.caib.bpm.vo.TaskInstance;
+import es.caib.bpm.vo.Token;
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.UnknownUserException;
+import es.caib.seycon.ng.servei.UsuariService;
+import es.caib.seycon.ng.utils.Security;
+
+public class BPMEngineImpl extends BPMEngineBase {
+	public static final String OBSERVER_ROLE = "observer";
+	public static final String SUPERVISOR_ROLE = "supervisor";
+	public static final String BPM_EJB_APP = "BPM_EJB";
+	public static final String INITIATOR_ROLE = "initiator";
+	public static final String BPM_APPLICATION_ID = "BPM";
+	public static final String LUCENE_DIR_PARAM = "lucene.dir";
+	private Log log;
+
+	public BPMEngineImpl() {
+		log = LogFactory.getLog(getClass());
+	}
+
+	LRUMap map = new LRUMap();
+
+	private String getUserName() {
+		Principal p = Security.getPrincipal();
+		if (p == null)
+			return "nobody";
+		else
+			return Security.getPrincipal().getName();
+	}
+
+	private UserContextCache getUserContextCache()
+			throws InternalErrorException, UnknownUserException, BPMException {
+		String sessionId;
+		String user = getUserName();
+
+		UserContextCache cached;
+		if (user == null) {
+			cached = new UserContextCache();
+			cached.setRoles(new String[] { "anonymous" });
+			return cached;
+		}
+
+		org.zkoss.zk.ui.Session session = Sessions.getCurrent();
+		if (session == null) {
+			sessionId = user;
+		} else {
+			sessionId = "session-" + session.hashCode();
+		}
+
+		cached = UserContextCache.get(sessionId);
+		if (cached == null) {
+			cached = new UserContextCache();
+			UsuariService usuariService = getUsuariService();
+			Usuari userData = usuariService.getUserInfo(user);
+
+			if (userData == null) {
+				throw new BPMException(
+						String.format(
+								"Usuari amb codi '%s' no trobat al sistema JBPM.",
+								user), 0);
+			} else {
+				LinkedList<String> userGroups = new LinkedList<String>();
+				userGroups.add(user);
+				Collection<Grup> grups = usuariService
+						.getUserGroupsHierarchy(userData.getId());
+				for (Grup grup : grups) {
+					userGroups.add(grup.getCodi());
+				}
+				Collection<RolGrant> roles = usuariService
+						.getUserRoles(userData.getId());
+				for (RolGrant role : roles) {
+					String name = role.getRolName();
+					if (role.getDomainValue() != null)
+						name = name + "/" + role.getDomainValue();
+					if (!role.getDispatcher().equals("seu"))
+						name = name + "@" + role.getRolName();
+					userGroups.add(name);
+				}
+				cached.setRoles(userGroups.toArray(new String[userGroups.size()]));
+				UserContextCache.put(sessionId, cached);
+			}
+		}
+		return cached;
+	}
+
+	/**
+	 * Recupera los roles del usuario. Si el nombre del usuario es "anonymous",
+	 * se le asigna el grupo "anonymous" Si el usuario es anónimo (no hace
+	 * login), pero el nombre de usuario no es "anonymous" se trata como un
+	 * usuario del sistema. Esto es útil para llamadas entre ejb's sin login que
+	 * hacen un run-as
+	 * 
+	 * @param context
+	 * @return
+	 * @throws BPMException
+	 * @throws UnknownUserException
+	 * @throws InternalErrorException
+	 */
+	private String[] getUserGroups() throws BPMException,
+			InternalErrorException, UnknownUserException {
+		UserContextCache userCtx = getUserContextCache();
+		return userCtx.getRoles();
+	}
+
+	private void flushContext(JbpmContext ctx) {
+		if (ctx != null) {
+			ctx.setActorId(null);
+			ctx.close();
+		}
+	}
+
+	@Override
+	protected List handleFindMyProcesses() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			LinkedList<ProcessInstance> resultadoFinal = new LinkedList<ProcessInstance>();
+
+			Session session = context.getSession();
+			Query query = session.createQuery("select pi "
+					+ "from org.jbpm.graph.exe.ProcessInstance as pi "
+					+ "where pi.end is null " + "order by pi.start desc");
+			for (Iterator it = query.iterate(); it.hasNext();) {
+				org.jbpm.graph.exe.ProcessInstance instance = (org.jbpm.graph.exe.ProcessInstance) it
+						.next();
+				List logs = instance.getLoggingInstance().getLogs(
+						ProcessInstanceCreateLog.class);
+				if (logs.size() > 0) {
+					ProcessInstanceCreateLog log = (ProcessInstanceCreateLog) logs
+							.get(0);
+					if (getUserName().equals(log.getActorId())) {
+						resultadoFinal.add(VOFactory
+								.newProcessInstance(instance));
+					}
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessDefinition handleGetProcessDefinition(
+			ProcessInstance process) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.exe.ProcessInstance instance = context
+					.loadProcessInstance(process.getId());
+			org.jbpm.graph.def.ProcessDefinition definition = instance
+					.getProcessDefinition();
+			return VOFactory.newProcessDefinition(definition, context);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	public void startAuthenticationLog(org.jbpm.graph.exe.Token token) {
+		LoggingInstance li = (LoggingInstance) token.getProcessInstance()
+				.getInstance(LoggingInstance.class);
+		if (li == null) {
+			li = new LoggingInstance();
+			token.getProcessInstance().addInstance(li);
+		}
+		AuthenticationLog log = new AuthenticationLog();
+		log.setToken(token);
+		log.setActorId(getUserName());
+		li.startCompositeLog(log);
+	}
+
+	/**
+	 * convenience method for ending a composite log. Make sure you put this in
+	 * a finally block.
+	 */
+	public void endAuthenticationLog(org.jbpm.graph.exe.Token token) {
+		LoggingInstance li = (LoggingInstance) token.getProcessInstance()
+				.getInstance(LoggingInstance.class);
+		if (li != null) {
+			li.endCompositeLog();
+		}
+	}
+
+	@Override
+	protected ProcessInstance handleCancel(ProcessInstance process)
+			throws Exception {
+		JbpmContext context = getContext();
+		;
+		try {
+			org.jbpm.graph.exe.ProcessInstance instance = context
+					.getProcessInstance(process.getId());
+			startAuthenticationLog(instance.getRootToken());
+			instance.end();
+			for (Iterator it = instance.getTaskMgmtInstance()
+					.getTaskInstances().iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance taskInstance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+
+				if (!taskInstance.hasEnded()) {
+					taskInstance.cancel();
+				}
+			}
+			endAuthenticationLog(instance.getRootToken());
+			context.save(instance);
+			return VOFactory.newProcessInstance(instance);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleSearchProcessInstances(String query, String startDate,
+			String endDate, boolean finished) throws Exception {
+		JbpmContext context = getContext();
+		ArrayList resultado = new ArrayList();
+		try {
+			IndexSearcher is = new IndexSearcher(
+					DirectoryFactory.getDirectory(context.getSession()));
+			QueryParser qp = new QueryParser(Version.LUCENE_30, "$contents",
+					DirectoryFactory.getAnalyzer());
+			org.apache.lucene.search.Query q = qp.parse(query);
+			// Verifiquem el format de les dates
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			String dataInici = null, dataFi = null;
+			if (startDate != null && !"".equals(startDate)) {
+				dataInici = startDate;
+			} else {
+				Calendar dataIniciWF = Calendar.getInstance();
+				dataIniciWF.set(2005, 1, 1); // data d'inici 1 de gener de 2005
+				dataInici = sdf.format(dataIniciWF.getTime());
+			}
+			if (endDate != null && !"".equals(endDate)) {
+				dataFi = endDate;
+			} else {
+				// Posem com a limit superior demà:
+				// dataIni > hui
+				if (dataInici != null) {
+					try {
+						Date d_dataInici = sdf.parse(dataInici);
+						Calendar dema = Calendar.getInstance();
+						dema.set(Calendar.HOUR_OF_DAY, 0);
+						dema.set(Calendar.MINUTE, 0);
+						dema.set(Calendar.SECOND, 0);
+						dema.set(Calendar.MILLISECOND, 0);
+						dema.add(Calendar.DATE, 1);
+						if (d_dataInici.getTime() >= dema.getTimeInMillis()) {
+							throw new BPMException(
+									"Error: No es permet que la Data d'Inici siga posterior a hui",
+									-1);
+						}
+					} catch (java.text.ParseException ex) {
+
+					}
+				}
+				Calendar dema = Calendar.getInstance();
+				dema.add(Calendar.DATE, 2); // afegim 2 dies
+				dataFi = sdf.format(dema.getTime());
+			}
+
+			TopDocs hits;
+			BooleanFilter b = new BooleanFilter();
+			boolean complexQuery = false;
+			if (startDate != null && !"".equals(startDate)) {
+				TermRangeFilter fstart = new TermRangeFilter("$startDate",
+						dataInici, dataFi, true, true); // inclusiu
+				b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
+				complexQuery = true;
+			}
+			if (endDate != null && !"".equals(endDate)) {
+				TermRangeFilter fend = new TermRangeFilter("$endDate",
+						dataInici, dataFi, true, true); // inclusiu
+				b.add(new FilterClause(fend, BooleanClause.Occur.MUST));
+				complexQuery = true;
+			}
+
+			if (!finished) {
+				TermsFilter f = new TermsFilter();
+				f.addTerm(new Term("$end", "false"));
+				b.add(new FilterClause(f, BooleanClause.Occur.MUST));
+				complexQuery = true;
+				if (complexQuery)
+					hits = is.search(q, b, 1000);
+				else
+					hits = is.search(q, f, 1000); // Sense filtre de dates
+
+			} else {
+				if (complexQuery)
+					hits = is.search(q, b, 1000);
+				else
+					hits = is.search(q, 1000); // Sense cap filtre
+			}
+
+			for (int i = 0; i < hits.totalHits; i++) {
+				int id = hits.scoreDocs[i].doc;
+				org.apache.lucene.document.Document d = is.getIndexReader()
+						.document(id);
+				Field f = d.getField("$id");
+				if (f != null) {
+					long processId = Long.parseLong(f.stringValue());
+					try {
+						es.caib.bpm.vo.ProcessInstance proc = getProcess(processId);
+						if (proc != null) {
+							resultado.add(proc);
+						}
+					} catch (SecurityException e) {
+						// Ignorar
+					}
+				}
+			}
+			is.close();
+			return resultado;
+		} catch (CorruptIndexException e) {
+			throw new BPMException("Error intern. Índex corrupte", e, -1);
+		} catch (IOException e) {
+			throw new BPMException("Error intern. Índex corrupte", e, -1);
+		} catch (ParseException e) {
+			throw new BPMException("Error al paràmetre de cerca: "
+					+ e.getMessage(), -1);
+		} catch (ArrayIndexOutOfBoundsException e) { // Problema quan obtenim
+														// més de maximRes
+														// resultats
+														// (IndexSearcher.
+														// search(xxxx,maximRes))
+			throw new BPMException(
+					"Massa registres trobats: és necessari donar un filtre més restrictiu.",
+					-1);
+		} catch (Exception e) {
+			throw new BPMException("Error: " + e.getMessage(), -1); // Enmascarem
+																	// d'altres
+																	// excepcions
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindProcessInstances(List definitions,
+			String processId, String estado, String actor, Date startDate,
+			boolean finalizada) throws Exception {
+		JbpmContext context = getContext();
+		try {
+
+			Query query = context.getSession().getNamedQuery(
+					"searchProcessInstance");
+
+			if (definitions != null) {
+				try {
+					query.setParameterList("id", ColeccionesUtils
+							.getValorCampoElemento(definitions, "getId"));
+				} catch (Exception ex) {
+					throw new InvalidParameterException(
+							BPMErrorCodes.PARAMETRO_INVALIDO);
+				}
+			}
+
+			if (!processId.trim().equals("")) {
+				query.setParameter("processId", new Long(processId));
+			} else {
+				query.setParameter("processId", new Long(-1));
+			}
+
+			query.setParameter("estado", estado);
+
+			if (finalizada) {
+				query.setParameter("finalizada", "FINALIZADA");
+			} else {
+				query.setParameter("finalizada", null);
+			}
+
+			try {
+				if (startDate != null) {
+					query.setParameter("fechaDesde",
+							FechaUtils.establecerFechaInicioDia(startDate));
+					query.setParameter("fechaHasta",
+							FechaUtils.establecerFechaFinDia(startDate));
+				} else {
+					Calendar calendar = new GregorianCalendar();
+					calendar.set(2200, 1, 1);
+
+					query.setParameter("fechaDesde", new Date(0L));
+					query.setParameter("fechaHasta", calendar.getTime());
+				}
+			} catch (Exception ex) {
+				throw new InvalidParameterException(
+						BPMErrorCodes.PARAMETRO_INVALIDO);
+			}
+
+			ArrayList resultado = new ArrayList();
+
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			for (Iterator it = query.iterate(); it.hasNext();) {
+				org.jbpm.graph.exe.ProcessInstance p = (org.jbpm.graph.exe.ProcessInstance) it
+						.next();
+
+				try {
+					if (business.isUserAuthorized(OBSERVER_ROLE,
+							getUserGroups(), p.getProcessDefinition())
+							|| business.isUserAuthorized(SUPERVISOR_ROLE,
+									getUserGroups(), p.getProcessDefinition()))
+						resultado.add(VOFactory.newProcessInstance(p));
+				} catch (JbpmException e) {
+					log.warn(e);
+				}
+
+			}
+
+			return resultado;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindProcessInstances(ProcessDefinition def)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			LinkedList<ProcessInstance> resultadoFinal = new LinkedList<ProcessInstance>();
+			org.jbpm.graph.def.ProcessDefinition definition = context
+					.getGraphSession().getProcessDefinition(def.getId());
+
+			if (business.isUserAuthorized(OBSERVER_ROLE, getUserGroups(),
+					definition)
+					|| business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), definition)) {
+				{
+					for (Iterator it = context.getGraphSession()
+							.findProcessInstances(definition.getId())
+							.iterator(); it.hasNext();) {
+						org.jbpm.graph.exe.ProcessInstance instance = (org.jbpm.graph.exe.ProcessInstance) it
+								.next();
+						try {
+							resultadoFinal.add(VOFactory
+									.newProcessInstance(instance));
+						} catch (JbpmException e) {
+							log.warn(e);
+						}
+					}
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessDefinition handleGetDefinition(ProcessInstance process)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.exe.ProcessInstance instance = context
+					.getProcessInstance(process.getId());
+			return VOFactory.newProcessDefinition(
+					instance.getProcessDefinition(), context);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private boolean isInternalService() {
+		return Security.isUserInRole("BPM_INTERNAL");
+	}
+
+	@Override
+	protected void handleUpdate(ProcessInstance process) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			org.jbpm.graph.exe.ProcessInstance pi = context
+					.loadProcessInstance(process.getId());
+			if (!isInternalService()
+					&& pi.getRootToken().getNode().getId() != pi
+							.getProcessDefinition().getStartState().getId()) {
+				throw new BPMException(
+						"No es pot modificar un procés ja iniciat", -1);
+			}
+			if (isInternalService()
+					|| business.isUserAuthorized(INITIATOR_ROLE,
+							getUserGroups(), pi.getProcessDefinition())) {
+				ContextInstance ctx = pi.getContextInstance();
+				HashMap map = new HashMap();
+
+				startAuthenticationLog(pi.getRootToken());
+				if (process.getVariables() != null)
+					map.putAll(process.getVariables());
+
+				if (ctx.getVariables() != null) {
+					// Borrar y modificar variables
+					for (Iterator it = ctx.getVariables().keySet().iterator(); it
+							.hasNext();) {
+						String key = (String) it.next();
+						Object value = map.get(key); // PJR canvio
+														// value=map.get(key) :
+														// això no feia un
+														// update!
+						ctx.setVariable(key, value);
+						map.remove(key);
+					}
+				}
+
+				// Agregar variables
+				for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+					String key = (String) it.next();
+					Object value = map.get(key);
+					ctx.setVariable(key, value);
+				}
+				endAuthenticationLog(pi.getRootToken());
+				context.save(pi);
+			} else {
+				throw new SecurityException("Not authorized");
+			}
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleStartProcess(ProcessInstance process) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			org.jbpm.graph.exe.ProcessInstance pi = context
+					.loadProcessInstance(process.getId());
+			if (pi.getRootToken().getNode().getId() != pi
+					.getProcessDefinition().getStartState().getId()) {
+				throw new BPMException(
+						"No es pot modificar un procés ja iniciat", -1);
+			}
+			if (!isInternalService()
+					|| business.isUserAuthorized(INITIATOR_ROLE,
+							getUserGroups(), pi.getProcessDefinition())) {
+				startAuthenticationLog(pi.getRootToken());
+				pi.signal();
+				endAuthenticationLog(pi.getRootToken());
+				context.save(pi);
+			} else {
+				throw new SecurityException("Not authorized");
+			}
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessInstance handleGetProcess(long id) throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+
+			org.jbpm.graph.exe.ProcessInstance process = jbpmContext
+					.getProcessInstance(id);
+			org.jbpm.graph.def.ProcessDefinition definition = process
+					.getProcessDefinition();
+			if (process == null)
+				return null;
+
+			if (!isInternalService()
+					&& !business.isUserAuthorized(OBSERVER_ROLE,
+							getUserGroups(), definition)
+					&& !business.isUserAuthorized(INITIATOR_ROLE,
+							getUserGroups(), definition)
+					&& !business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), definition)) {
+				Collection list = process.getTaskMgmtInstance()
+						.getTaskInstances();
+				for (Iterator it = list.iterator(); it.hasNext();) {
+					org.jbpm.taskmgmt.exe.TaskInstance ti = (org.jbpm.taskmgmt.exe.TaskInstance) it
+							.next();
+					if (business.canAccess(getUserGroups(), ti)) {
+						return VOFactory.newProcessInstance(process);
+					}
+				}
+				throw new SecurityException("No autoritzat a accedir al procés");
+			} else {
+				return VOFactory.newProcessInstance(process);
+			}
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	private void recursiveFillTokens(org.jbpm.graph.exe.Token rootToken,
+			Collection tokens) {
+		es.caib.bpm.vo.Token t2 = VOFactory.newToken(rootToken);
+		tokens.add(t2);
+		for (Iterator it = rootToken.getChildren().values().iterator(); it
+				.hasNext();) {
+			recursiveFillTokens((org.jbpm.graph.exe.Token) it.next(), tokens);
+		}
+	}
+
+	@Override
+	protected Token[] handleGetTokens(long id) throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			org.jbpm.graph.exe.ProcessInstance process = jbpmContext
+					.getProcessInstance(id);
+
+			Vector v = new Vector(1);
+			recursiveFillTokens(process.getRootToken(), v);
+
+			return (es.caib.bpm.vo.Token[]) v
+					.toArray(new es.caib.bpm.vo.Token[v.size()]);
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
+	protected ProcessLog[] handleGetProcessLog(ProcessInstance instanceVO)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.exe.ProcessInstance process = context
+					.loadProcessInstance(instanceVO.getId());
+			Vector parsedLogs = new Vector();
+			parseLog(context, process, parsedLogs, process.getRootToken());
+			Collections.sort(parsedLogs, new Comparator() {
+				public int compare(Object arg0, Object arg1) {
+					ProcessLog l1 = (ProcessLog) arg0;
+					ProcessLog l2 = (ProcessLog) arg1;
+					return l1.getDate().compareTo(l2.getDate());
+				}
+			});
+			ProcessLog[] logs = (ProcessLog[]) parsedLogs
+					.toArray(new ProcessLog[parsedLogs.size()]);
+			return logs;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private void parseLog(JbpmContext context,
+			org.jbpm.graph.exe.ProcessInstance process, Vector parsedLogs,
+			org.jbpm.graph.exe.Token t) {
+		Criteria criteria = null;
+
+		criteria = context.getSession().createCriteria(
+				org.jbpm.logging.log.ProcessLog.class);
+
+		criteria.add(Restrictions.eq("token", t));
+		criteria.add(Restrictions.isNull("parent"));
+		Iterator it = criteria.list().iterator();
+		while (it.hasNext()) {
+			org.jbpm.logging.log.ProcessLog pl = (org.jbpm.logging.log.ProcessLog) it
+					.next();
+			parseLog(process, parsedLogs, pl);
+		}
+		for (Iterator it2 = t.getChildren().values().iterator(); it2.hasNext();) {
+			org.jbpm.graph.exe.Token childToken = (org.jbpm.graph.exe.Token) it2
+					.next();
+			parseLog(context, process, parsedLogs, childToken);
+		}
+
+	}
+
+	private void parseLog(org.jbpm.graph.exe.ProcessInstance process,
+			Vector parsedLogs, org.jbpm.logging.log.ProcessLog pl) {
+		ProcessLog logLine = new ProcessLog();
+		logLine.setDate(pl.getDate());
+		logLine.setProcessId(process.getId());
+		logLine.setUser(pl.getActorId());
+		StringBuffer b = new StringBuffer();
+		org.jbpm.logging.log.ProcessLog pl2 = pl.getParent();
+		while (pl2 != null) {
+			b.append("\\ ");
+			pl2 = pl2.getParent();
+		}
+		// log.debug(b.toString()+pl.getId()+" - "+pl.getClass().getName()+": "+pl.toString());
+		if (pl instanceof ProcessInstanceCreateLog) {
+			logLine.setAction("Procés iniciat");
+			parsedLogs.add(logLine);
+		} else if (pl instanceof TransitionLog) {
+			TransitionLog tl = (TransitionLog) pl;
+			logLine.setAction((tl.getTransition().getName() != null ? tl
+					.getTransition().getName() + ": " : "")
+					+ tl.getSourceNode().getName()
+					+ " -> "
+					+ tl.getDestinationNode().getName());
+			parsedLogs.add(logLine);
+		} else if (pl instanceof ProcessInstanceEndLog) {
+			logLine.setAction("Fin del procés");
+			parsedLogs.add(logLine);
+		} else if (pl instanceof MessageLog) {
+			logLine.setAction(((MessageLog) pl).getMessage());
+			parsedLogs.add(logLine);
+		} else if (pl instanceof ActionLog) {
+			ActionLog al = (ActionLog) pl;
+			if (al.getException() != null) {
+				logLine.setAction("Error a la tasca automàtica "
+						+ al.getAction().getName() + ":\n" + al.getException());
+				parsedLogs.add(logLine);
+			}
+		} else if (pl instanceof CompositeLog) {
+			CompositeLog cl = (CompositeLog) pl;
+			for (Iterator it = cl.getChildren().iterator(); it.hasNext();) {
+				org.jbpm.logging.log.ProcessLog child = (org.jbpm.logging.log.ProcessLog) it
+						.next();
+				if (child != null) {
+					parseLog(process, parsedLogs, child);
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void handleUpgradeProcess(ProcessInstance instanceVO)
+			throws Exception {
+		InputStream streamLectura = null;
+
+		JbpmContext context = getContext();
+		try {
+
+			org.jbpm.graph.exe.ProcessInstance process = context
+					.loadProcessInstance(instanceVO.getId());
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			if (business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
+					process)) {
+
+				UserInterfaceBusiness business2 = new UserInterfaceBusiness(
+						context);
+				String messages[] = business2.upgradeProcess(process);
+				getUserContextCache().setMessages(messages);
+			}
+		} catch (JpdlException ex) {
+			generateUpgradeMessages(ex);
+			context.setRollbackOnly();
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		} catch (Exception ex) {
+			generateUpgradeMessage(ex);
+			context.setRollbackOnly();
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private void generateUpgradeMessages(JpdlException ex)
+			throws InternalErrorException, UnknownUserException, BPMException {
+		Vector v = new Vector();
+		List l = ex.getProblems();
+		String message;
+		for (Iterator it = l.iterator(); it.hasNext();) {
+			Problem p = (Problem) it.next();
+			if (p.getLine() == null) {
+				message = p.getDescription();
+				if (p.getException() != null)
+					message = message + ": " + p.getException().toString();
+			} else
+				message = p.getResource() + " line " + p.getLine() + ": "
+						+ p.getDescription();
+			v.add(message);
+		}
+		getUserContextCache().setMessages(
+				(String[]) v.toArray(new String[v.size()]));
+	}
+
+	private void generateUpgradeMessage(Exception ex)
+			throws InternalErrorException, UnknownUserException, BPMException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		PrintStream p = new PrintStream(out);
+		ex.printStackTrace(p);
+		p.close();
+		getUserContextCache().setMessages(new String[] { out.toString() });
+	}
+
+	@Override
+	protected List handleFindMyTasks() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			Vector resultadoFinal = new Vector();
+			// u88683: solucionem problema de oracle quan n'hi ha més de 1000
+			// elements
+			// és una restricció ORA-01795: maximum number of expressions in a
+			// list is 1000
+			int groupIndex = 0;
+			List tasks = new LinkedList();
+			String[] userGroups = getUserGroups(); // mai null
+			while (groupIndex < userGroups.length) {
+				// Recuperem les tasques de 1000 en 1000
+				Vector ugVector = new Vector(1000);
+				for (int max = groupIndex + 1000; 
+						groupIndex < max && groupIndex < userGroups.length;
+						groupIndex++) {
+					ugVector.add(userGroups[groupIndex]);
+				}
+				List newTasks = context.getTaskMgmtSession()
+						.findPooledTaskInstances(ugVector);
+				tasks.addAll(newTasks);
+			}
+
+			for (Iterator it = tasks.iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				if (instance.isOpen() && !instance.isCancelled()) {
+					try {
+						resultadoFinal.add(VOFactory.newTaskInstance(instance));
+					} catch (RuntimeException e) {
+						log.warn(
+								"Unable to serialize task " + instance.getId(),
+								e);
+					}
+
+				}
+			}
+
+			tasks = context.getTaskMgmtSession().findTaskInstances(
+					getUserName());
+
+			for (Iterator it = tasks.iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				if (instance.isOpen() && !instance.isCancelled())
+					try {
+						resultadoFinal.add(VOFactory.newTaskInstance(instance));
+					} catch (RuntimeException e) {
+						log.warn(
+								"Unable to serialize task " + instance.getId(),
+								e);
+					}
+
+			}
+
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindMyTasksLightweight() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			Vector resultadoFinal = new Vector();
+			// u88683: solucionem problema de oracle quan n'hi ha més de 1000
+			// elements
+			// és una restricció ORA-01795: maximum number of expressions in a
+			// list is 1000
+			int groupIndex = 0;
+			List tasks = new LinkedList();
+			String[] userGroups = getUserGroups(); // mai null
+			while (groupIndex < userGroups.length) {
+				// Recuperem les tasques de 1000 en 1000
+				Vector ugVector = new Vector(1000);
+				for (int max = groupIndex + 1000; 
+						groupIndex < max && groupIndex < userGroups.length; 
+						groupIndex++) {
+					ugVector.add(userGroups[groupIndex]);
+				}
+				List newTasks = context.getTaskMgmtSession()
+						.findPooledTaskInstances(ugVector);
+				tasks.addAll(newTasks);
+			}
+
+			for (Iterator it = tasks.iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				if (instance.isOpen() && !instance.isCancelled()) {
+					try {
+						resultadoFinal.add(VOFactory
+								.newLightweightTaskInstance(instance));
+					} catch (RuntimeException e) {
+						log.warn(
+								"Unable to serialize task " + instance.getId(),
+								e);
+					}
+
+				}
+			}
+
+			tasks = context.getTaskMgmtSession().findTaskInstances(
+					getUserName());
+
+			for (Iterator it = tasks.iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				if (instance.isOpen() && !instance.isCancelled())
+					try {
+						resultadoFinal.add(VOFactory
+								.newLightweightTaskInstance(instance));
+					} catch (RuntimeException e) {
+						log.warn(
+								"Unable to serialize task " + instance.getId(),
+								e);
+					}
+
+			}
+
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindGroupTasks() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			AltresTasques altresTasques = new AltresTasques() {
+				public List findAltresTasques(JbpmContext context,
+						String usuariId, Collection altresIds) {
+					Vector tasques = new Vector();
+
+					Query q = context
+							.getSession()
+							.createQuery(
+									"select distinct ti.id "
+											+ "from org.jbpm.taskmgmt.exe.TaskInstance ti "
+											+ "join ti.pooledActors pooledActor "
+											+ "where pooledActor.actorId in ( :actorIds ) "
+											+ "and ti.actorId is not null "
+											+ "and ti.actorId != :myself "
+											+ "and ti.isSuspended != true "
+											+ "and ti.isCancelled != true "
+											+ "and ti.isOpen = true");
+					q.setParameterList("actorIds", altresIds);
+					q.setParameter("myself", usuariId);
+					for (Iterator i = q.list().iterator(); i.hasNext();) {
+						Long taskInstanceId = (Long) i.next();
+						org.jbpm.taskmgmt.exe.TaskInstance instance = context
+								.getTaskInstance(taskInstanceId.longValue());
+						try {
+							if (instance == null)
+								log.warn("Unable to load task "
+										+ taskInstanceId.longValue());
+							else
+								tasques.add(VOFactory.newTaskInstance(instance));
+						} catch (RuntimeException e) {
+							log.warn(
+									"Unable to deserialize task "
+											+ instance.getId(), e);
+						}
+					}
+					return tasques;
+				}
+
+			};
+			int groupIndex = 0;
+			List tasks = new LinkedList();
+			String[] userGroups = getUserGroups(); // mai null
+			while (groupIndex < userGroups.length) {
+				// Recuperem les tasques de 1000 en 1000
+				Vector ugVector = new Vector(1000);
+				for (int max = groupIndex + 1000; 
+						groupIndex < max && groupIndex < userGroups.length; 
+						groupIndex++) {
+					ugVector.add(userGroups[groupIndex]);
+				}
+				tasks.addAll(altresTasques.findAltresTasques(context,
+						getUserName(), ugVector));
+			}
+			return tasks;
+
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected TaskInstance handleStartTask(TaskInstance task) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			org.jbpm.taskmgmt.exe.TaskInstance ti = context
+					.loadTaskInstance(task.getId());
+			if (business.canAccess(getUserGroups(), ti)) {
+				startAuthenticationLog(ti.getToken());
+				if (ti.getStart() == null)
+					ti.start(getUserName());
+				else
+					ti.setActorId(getUserName());
+				endAuthenticationLog(ti.getToken());
+				context.save(ti);
+			} else {
+				throw new SecurityException("Not authorized");
+			}
+			return VOFactory.newTaskInstance(ti);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected TaskInstance handleAddComment(TaskInstance task, String comment)
+			throws Exception {
+		JbpmContext jbpmContext = null;
+		Session session = null;
+
+		try {
+			jbpmContext = getContext();
+
+			session = jbpmContext.getSession();
+
+			org.jbpm.taskmgmt.exe.TaskInstance ti = jbpmContext
+					.getTaskInstanceForUpdate(task.getId());
+			Comment c = new Comment(getUserName(), comment);
+			ti.addComment(c);
+			jbpmContext.save(ti);
+			return VOFactory.newTaskInstance(ti);
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+
+	}
+
+	@Override
+	protected TaskInstance handleExecuteTask(TaskInstance task,
+			String transitionName) throws Exception {
+		JbpmContext context = getContext();
+		;
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = doUpdate(context,
+					task);
+			startAuthenticationLog(instance.getToken());
+			instance.end(transitionName);
+			endAuthenticationLog(instance.getToken());
+			context.save(instance);
+			return VOFactory.newTaskInstance(instance);
+		} catch (Exception e) {
+			context.setRollbackOnly();
+			throw new BPMException("Error during transition: ", e, -1);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private org.jbpm.taskmgmt.exe.TaskInstance doUpdate(JbpmContext context,
+			es.caib.bpm.vo.TaskInstance task) throws BPMException, InternalErrorException, UnknownUserException {
+		ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+		business.setContext(context);
+
+		org.jbpm.taskmgmt.exe.TaskInstance ti = context.loadTaskInstance(task
+				.getId());
+		if (business.canAccess(getUserGroups(), ti)) {
+			startAuthenticationLog(ti.getToken());
+			ti.setActorId(task.getActorId());
+			ti.setBlocking(task.isBlocking());
+			ti.setDescription(task.getDescription());
+			ti.setName(task.getName());
+			ti.setDueDate(task.getDueDate());
+			ti.setEnd(task.getEnd());
+			ti.setPriority(task.getPriority());
+			ti.setSignalling(task.isSignalling());
+
+			Vector v = new Vector();
+			v.addAll(task.getPooledActors());
+			// Borrar y modificar pooled actors
+			if (ti.getPooledActors() != null) {
+				for (Iterator it = ti.getPooledActors().iterator(); it
+						.hasNext();) {
+					PooledActor actor = (PooledActor) it.next();
+					String name = null;
+					if (actor.getActorId() != null)
+						name = actor.getActorId();
+					else if (actor.getSwimlaneInstance() != null)
+						name = actor.getSwimlaneInstance().getName();
+
+					if (name != null) {
+						if (!v.contains(name)) {
+							it.remove();
+						}
+					}
+				}
+				// Agregar actores
+				for (Iterator it = task.getPooledActors().iterator(); it
+						.hasNext();) {
+					String key = (String) it.next();
+					PooledActor actor = new PooledActor();
+					SwimlaneInstance swimlane = ti.getTaskMgmtInstance()
+							.getSwimlaneInstance(key);
+					if (swimlane != null) {
+						actor.setSwimlaneInstance(swimlane);
+					} else {
+						actor.setActorId(key);
+					}
+					ti.getPooledActors().add(actor);
+				}
+			}
+
+			HashMap map = new HashMap();
+			map.putAll(task.getVariables());
+			// Borrar y modificar variables
+			for (Iterator it = ti.getVariables().keySet().iterator(); it
+					.hasNext();) {
+				String key = (String) it.next();
+				Object value = map.get(key);
+				ti.setVariable(key, value);
+				map.remove(key);
+			}
+			// Agregar variables
+			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+				String key = (String) it.next();
+				Object value = map.get(key);
+				ti.setVariable(key, value);
+			}
+			endAuthenticationLog(ti.getToken());
+			context.save(ti);
+			return ti;
+		} else {
+			throw new SecurityException("Not authorized");
+		}
+	}
+
+	@Override
+	protected TaskInstance handleReserveTask(TaskInstance task)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			org.jbpm.taskmgmt.exe.TaskInstance ti = context
+					.loadTaskInstance(task.getId());
+			startAuthenticationLog(ti.getToken());
+			if (business.canAccess(getUserGroups(), ti)) {
+				ti.setActorId(getUserName());
+			} else {
+				throw new SecurityException("Not authorized");
+			}
+			endAuthenticationLog(ti.getToken());
+			context.save(ti);
+			return VOFactory.newTaskInstance(ti);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected TaskInstance handleDelegateTaskToUser(TaskInstance task,
+			String username) throws Exception {
+		JbpmContext context = getContext();
+		;
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.getTaskInstance(task.getId());
+			startAuthenticationLog(instance.getToken());
+			instance.setActorId(username);
+			endAuthenticationLog(instance.getToken());
+			context.save(instance);
+			return VOFactory.newTaskInstance(instance);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleUpdate(TaskInstance task) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			doUpdate(context, task);
+
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleUpdateSwimlane(TaskInstance task, String swimlane,
+			String actorIds[]) throws Exception {
+		JbpmContext context = getContext();
+		ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+		business.setContext(context);
+
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance ti = context
+					.loadTaskInstance(task.getId());
+			if (business.canAccess(getUserGroups(), ti)) {
+				startAuthenticationLog(ti.getToken());
+				SwimlaneInstance swimlaneInstance = ti.getTaskMgmtInstance()
+						.getSwimlaneInstance(swimlane);
+				swimlaneInstance.setPooledActors(actorIds);
+				endAuthenticationLog(ti.getToken());
+				context.save(ti);
+			}
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessInstance handleGetProcessInstance(TaskInstance task)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.loadTaskInstance(task.getId());
+			return VOFactory.newProcessInstance(instance.getToken()
+					.getProcessInstance());
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected TaskInstance handleCancel(TaskInstance task) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.getTaskInstance(task.getId());
+			startAuthenticationLog(instance.getToken());
+			instance.cancel();
+			endAuthenticationLog(instance.getToken());
+			context.save(instance);
+			return VOFactory.newTaskInstance(instance);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindTasks(List def, TaskDefinition task, String actor,
+			Date processStartDate, Date taskCreationDate, boolean finalizada)
+			throws Exception {
+		JbpmContext context = getContext();
+		List resultado = new Vector();
+		Query query = null;
+		List searchObjects = null;
+		GregorianCalendar calendar = null;
+
+		try {
+			query = context.getSession().getNamedQuery("searchTasksInstance");
+
+			if (def != null) {
+				try {
+					query.setParameterList("processId", ColeccionesUtils
+							.getValorCampoElemento(def, "getId"));
+				} catch (Exception e) {
+					throw new InvalidParameterException(
+							BPMErrorCodes.PARAMETRO_INVALIDO);
+				}
+			}
+
+			query.setParameter("processInstanceId", new Long(-1));
+
+			if (task != null) {
+				query.setParameter("taskId", new Long(task.getId()));
+			} else {
+				query.setParameter("taskId", new Long(-1));
+			}
+
+			if (finalizada) {
+				query.setParameter("finalizada", "FINALIZADA");
+			} else {
+				query.setParameter("finalizada", null);
+			}
+
+			query.setParameter("actor", actor);
+
+			try {
+				if (processStartDate != null) {
+					query.setParameter("fechaDesdeProceso", FechaUtils
+							.establecerFechaInicioDia(processStartDate));
+					query.setParameter("fechaHastaProceso",
+							FechaUtils.establecerFechaFinDia(processStartDate));
+				} else {
+					calendar = new GregorianCalendar();
+					calendar.set(2200, 1, 1);
+
+					query.setParameter("fechaDesdeProceso", new Date(0L));
+					query.setParameter("fechaHastaProceso", calendar.getTime());
+				}
+
+				if (taskCreationDate != null) {
+					query.setParameter("fechaDesde", FechaUtils
+							.establecerFechaInicioDia(taskCreationDate));
+					query.setParameter("fechaHasta",
+							FechaUtils.establecerFechaFinDia(taskCreationDate));
+				} else {
+					calendar = new GregorianCalendar();
+					calendar.set(2200, 1, 1);
+
+					query.setParameter("fechaDesde", new Date(0L));
+					query.setParameter("fechaHasta", calendar.getTime());
+				}
+			} catch (Exception ex) {
+				throw new InvalidParameterException(
+						BPMErrorCodes.PARAMETRO_INVALIDO);
+			}
+
+			resultado = new Vector();
+
+			for (Iterator it = query.list().iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				try {
+					resultado.add(VOFactory.newTaskInstance(instance));
+				} catch (RuntimeException e) {
+					log.warn("Unable to serialize task " + instance.getId(), e);
+				}
+			}
+		} finally {
+			flushContext(context);
+		}
+
+		return resultado;
+	}
+
+	@Override
+	protected List handleFindTasks(List def, String processId,
+			TaskDefinition task, String actor, Date processStartDate,
+			Date taskCreationDate, boolean finalizada) throws Exception {
+		JbpmContext context = getContext();
+		List resultado = new Vector();
+		Query query = null;
+		List searchObjects = null;
+		GregorianCalendar calendar = null;
+
+		try {
+			query = context.getSession().getNamedQuery("searchTasksInstance");
+
+			if (def != null) {
+				try {
+					query.setParameterList("processId", ColeccionesUtils
+							.getValorCampoElemento(def, "getId"));
+				} catch (Exception e) {
+					throw new InvalidParameterException(
+							BPMErrorCodes.PARAMETRO_INVALIDO);
+				}
+			} else {
+				def.add(new Integer(-1));
+				query.setParameter("processId", def);
+			}
+
+			if (!processId.trim().equals("")) {
+				query.setParameter("processInstanceId", new Long(processId));
+			} else {
+				query.setParameter("processInstanceId", new Long(-1));
+			}
+
+			if (task != null) {
+				query.setParameter("taskId", new Long(task.getId()));
+			} else {
+				query.setParameter("taskId", new Long(-1));
+			}
+
+			if (finalizada) {
+				query.setParameter("finalizada", "FINALIZADA");
+			} else {
+				query.setParameter("finalizada", null);
+			}
+
+			query.setParameter("actor", actor);
+
+			try {
+				if (processStartDate != null) {
+					query.setParameter("fechaDesdeProceso", FechaUtils
+							.establecerFechaInicioDia(processStartDate));
+					query.setParameter("fechaHastaProceso",
+							FechaUtils.establecerFechaFinDia(processStartDate));
+				} else {
+					calendar = new GregorianCalendar();
+					calendar.set(2200, 1, 1);
+
+					query.setParameter("fechaDesdeProceso", new Date(0L));
+					query.setParameter("fechaHastaProceso", calendar.getTime());
+				}
+
+				if (taskCreationDate != null) {
+					query.setParameter("fechaDesde", FechaUtils
+							.establecerFechaInicioDia(taskCreationDate));
+					query.setParameter("fechaHasta",
+							FechaUtils.establecerFechaFinDia(taskCreationDate));
+				} else {
+					calendar = new GregorianCalendar();
+					calendar.set(2200, 1, 1);
+
+					query.setParameter("fechaDesde", new Date(0L));
+					query.setParameter("fechaHasta", calendar.getTime());
+				}
+			} catch (Exception ex) {
+				throw new InvalidParameterException(
+						BPMErrorCodes.PARAMETRO_INVALIDO);
+			}
+
+			resultado = new Vector();
+
+			for (Iterator it = query.list().iterator(); it.hasNext();) {
+				org.jbpm.taskmgmt.exe.TaskInstance instance = (org.jbpm.taskmgmt.exe.TaskInstance) it
+						.next();
+				try {
+					resultado.add(VOFactory.newTaskInstance(instance));
+				} catch (RuntimeException e) {
+					log.warn(e);
+				}
+			}
+		} finally {
+			flushContext(context);
+		}
+
+		return resultado;
+	}
+
+	@Override
+	protected String handleGetUI(TaskInstance task) throws Exception {
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.getTaskInstance(task.getId());
+			org.jbpm.graph.def.ProcessDefinition pd = instance
+					.getContextInstance().getProcessInstance()
+					.getProcessDefinition();
+			FileDefinition fd = pd.getFileDefinition();
+
+			String url = getUIfor(context, pd, instance.getTask().getName());
+			if (url != null) {
+				byte ba[] = (byte[]) fd.getBytes(url);
+				try {
+					if (ba != null)
+						return new String(ba, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			String name = "ui/" + task.getName().replaceAll(" ", "[ _\\\\-.]?")
+					+ "\\..+";
+			Pattern p = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+			Map map = fd.getBytesMap();
+			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+				String key = (String) it.next();
+				if (p.matcher(key).matches()) {
+					byte ba[] = (byte[]) map.get(key);
+					try {
+						if (ba != null)
+							return new String(ba, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+			return null;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected String handleGetUI(ProcessInstance process) throws Exception {
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.graph.exe.ProcessInstance pi = context
+					.getProcessInstance(process.getId());
+			org.jbpm.graph.def.ProcessDefinition pd = pi.getProcessDefinition();
+			FileDefinition fd = pd.getFileDefinition();
+
+			try {
+				byte b[] = fd.getBytes("ui/default.zul");
+				if (b != null) {
+					try {
+						return new String(b, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			} catch (JbpmException e) {
+				// Page does not exist
+			}
+			return null;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private String getUIfor(JbpmContext context,
+			org.jbpm.graph.def.ProcessDefinition pd, String taskName) {
+		Criteria busqueda = context.getSession().createCriteria(
+				UserInterface.class);
+		busqueda.add(Restrictions.eq("processDefinitionId",
+				new Long(pd.getId())));
+		busqueda.add(Restrictions.eq("tarea", taskName));
+
+		List resultado = busqueda.list();
+
+		for (Iterator it = resultado.iterator(); it.hasNext();) {
+			UserInterface ui = (UserInterface) it.next();
+			return ui.getFileName();
+		}
+		return null;
+	}
+
+	@Override
+	protected TaskDefinition handleGetDefinition(TaskInstance task)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.loadTaskInstance(task.getId());
+			return VOFactory.newTaskDefinition(instance.getTask());
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleGetPendingTasks(ProcessInstance process)
+			throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+			if (process == null)
+				return null;
+
+			org.jbpm.graph.exe.ProcessInstance instance = jbpmContext
+					.getProcessInstance(process.getId());
+			Vector v = new Vector();
+
+			if (instance.getTaskMgmtInstance() != null
+					&& instance.getTaskMgmtInstance().getTaskInstances() != null) {
+				for (Iterator it = instance.getTaskMgmtInstance()
+						.getTaskInstances().iterator(); it.hasNext();) {
+					org.jbpm.taskmgmt.exe.TaskInstance task = (org.jbpm.taskmgmt.exe.TaskInstance) it
+							.next();
+					if (!task.hasEnded()
+							&& business.canAccess(getUserGroups(), task)) {
+						try {
+							v.add(VOFactory.newTaskInstance(task));
+						} catch (RuntimeException e) {
+							log.warn(
+									"Unable to serialize task " + task.getId(),
+									e);
+						}
+					}
+				}
+			}
+			return v;
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
+	protected List handleFindProcessDefinitions(String name, boolean onlyEnabled)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			Vector resultadoFinal = new Vector();
+			for (Iterator it = context.getGraphSession()
+					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
+				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
+						.next();
+
+				if (business
+						.isUserAuthorized(name, getUserGroups(), definition)) {
+					es.caib.bpm.vo.ProcessDefinition def = VOFactory
+							.newProcessDefinition(definition, context);
+					if (def.isEnabled() || !onlyEnabled)
+						resultadoFinal.add(def);
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessInstance handleNewProcess(ProcessDefinition def)
+			throws Exception {
+		return newProcess(def, true);
+	}
+
+	@Override
+	protected ProcessInstance handleNewProcess(ProcessDefinition def,
+			boolean start) throws Exception {
+		JbpmContext context = getContext();
+		try {
+
+			org.jbpm.graph.def.ProcessDefinition definition = context
+					.getGraphSession().findLatestProcessDefinition(
+							def.getName());
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			if (!isInternalService()
+					&& !business.isUserAuthorized(INITIATOR_ROLE,
+							getUserGroups(), definition))
+				throw new SecurityException("No autoritzat a crear el procés");
+
+			ProcessDefinitionProperty prop = getProcessDefinitionDisabledProperty(
+					context, definition);
+			if (prop != null && "true".equals(prop.getValue()))
+				throw new BPMException("This process has been disabled", 2);
+
+			org.jbpm.graph.exe.ProcessInstance pi = new org.jbpm.graph.exe.ProcessInstance(
+					definition);
+			if (start) {
+				startAuthenticationLog(pi.getRootToken());
+				pi.signal();
+				endAuthenticationLog(pi.getRootToken());
+				context.save(pi);
+			}
+			return VOFactory.newProcessInstance(pi);
+		} catch (Exception e) {
+			context.setRollbackOnly();
+			if (e instanceof BPMException)
+				throw (BPMException) e;
+			else
+				throw new BPMException("No pot crear el procés", e, -1);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private ProcessDefinitionProperty getProcessDefinitionDisabledProperty(
+			JbpmContext context, org.jbpm.graph.def.ProcessDefinition def) {
+		ProcessDefinitionProperty prop;
+		Query q = context
+				.getSession()
+				.createQuery(
+						"select pdp "
+								+ "from es.caib.bpm.entity.ProcessDefinitionProperty pdp "
+								+ "where pdp.name = 'disabled' and pdp.processDefinitionId=:id ");
+		q.setParameter("id", new Long(def.getId()));
+		prop = (ProcessDefinitionProperty) q.uniqueResult();
+		return prop;
+	}
+
+	@Override
+	protected byte[] handleGetProcessDefinitionImage(ProcessDefinition def)
+			throws Exception {
+		JbpmContext context = getContext();
+
+		byte[] resultado = null;
+
+		try {
+			org.jbpm.graph.def.ProcessDefinition definition = context
+					.getGraphSession().getProcessDefinition(def.getId());
+
+			return definition.getFileDefinition().getBytes("processimage.jpg");
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected int[] handleGetCoordinates(TaskInstance task) throws Exception {
+		Node node = null;
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context
+					.getTaskInstance(task.getId());
+			node = instance.getTask().getTaskNode();
+
+			return getCoordinates(node);
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private int[] getCoordinates(Node node) throws DocumentException {
+		org.jbpm.graph.def.ProcessDefinition definition;
+		String nodeName;
+		XPath xPath;
+		byte[] resultado;
+		int result[] = new int[4];
+		if (node != null) {
+			definition = node.getProcessDefinition();
+
+			resultado = definition.getFileDefinition().getBytes("gpd.xml");
+
+			nodeName = node.getName();
+
+			// Hacer el PARSE XML del documento
+			org.dom4j.io.SAXReader reader = new org.dom4j.io.SAXReader();
+			Document doc = reader.read(new ByteArrayInputStream(resultado));
+
+			xPath = new DefaultXPath("//node[@name='"
+					+ nodeName.replaceAll("'", "&apos;") + "']");
+			Element domNode = (Element) xPath.selectSingleNode(doc);
+
+			if (domNode == null) {
+				result[0] = result[1] = result[2] = result[3] = 0;
+				;
+			} else {
+				result[0] = Integer.valueOf(domNode.attribute("x").getValue())
+						.intValue();
+				result[1] = Integer.valueOf(domNode.attribute("y").getValue())
+						.intValue();
+				result[2] = Integer.valueOf(
+						domNode.attribute("width").getValue()).intValue();
+				result[3] = Integer.valueOf(
+						domNode.attribute("height").getValue()).intValue();
+			}
+		}
+		return result;
+	}
+
+	@Override
+	protected int[] handleGetCoordinates(ProcessInstance processVO)
+			throws Exception {
+		Node node = null;
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.exe.ProcessInstance pi = context
+					.getProcessInstance(processVO.getId());
+			node = pi.getRootToken().getNode();
+			return getCoordinates(node);
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindInitiatorProcessDefinitions() throws Exception {
+		return findProcessDefinitions(INITIATOR_ROLE, true);
+	}
+
+	@Override
+	protected List handleFindObserverProcessDefinitions() throws Exception {
+		return findProcessDefinitions(OBSERVER_ROLE, true);
+	}
+
+	@Override
+	protected List handleFindSupervisorProcessDefinitions() throws Exception {
+		return findProcessDefinitions(SUPERVISOR_ROLE, true);
+	}
+
+	@Override
+	protected Map handleGetUIClassesForTask(ProcessDefinition def)
+			throws Exception {
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.graph.def.ProcessDefinition process = context
+					.getGraphSession().getProcessDefinition(def.getId());
+			FileDefinition fd = process.getFileDefinition();
+			Map map = fd.getBytesMap();
+			Map newMap = new HashMap();
+			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+				String key = (String) it.next();
+				if (key.startsWith("classes/")) {
+					byte[] ba = (byte[]) map.get(key);
+					if (ba != null) {
+						String resource = key.substring(8);
+						newMap.put(resource, ba);
+					}
+				}
+			}
+			return newMap;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindTaskDefinitions(ProcessDefinition def)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			Vector resultadoFinal = new Vector();
+			org.jbpm.graph.def.ProcessDefinition definition = context
+					.getGraphSession().getProcessDefinition(def.getId());
+
+			if (business.isUserAuthorized(OBSERVER_ROLE, getUserGroups(),
+					definition)
+					|| business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), definition)) {
+				{
+					for (Iterator it = definition.getNodes().iterator(); it
+							.hasNext();) {
+						Node n = (Node) it.next();
+						if (n instanceof TaskNode) {
+							TaskNode tn = (TaskNode) n;
+							for (Iterator it2 = tn.getTasks().iterator(); it2
+									.hasNext();) {
+								Task task = (Task) it2.next();
+
+								resultadoFinal.add(VOFactory
+										.newTaskDefinition(task));
+							}
+						}
+					}
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected ProcessDefinition handleEnableProcessDefinition(
+			ProcessDefinition defVO) throws Exception {
+		return disableProcessDefinition(defVO, "false");
+	}
+
+	@Override
+	protected ProcessDefinition handleDisableProcessDefinition(
+			ProcessDefinition defVO) throws Exception {
+		return disableProcessDefinition(defVO, "false");
+	}
+
+	private es.caib.bpm.vo.ProcessDefinition disableProcessDefinition(
+			es.caib.bpm.vo.ProcessDefinition defVO, String value)
+			throws BPMException, InternalErrorException, UnknownUserException {
+		InputStream streamLectura = null;
+
+		JbpmContext context = getContext();
+		try {
+
+			org.jbpm.graph.def.ProcessDefinition def = context
+					.getGraphSession().loadProcessDefinition(defVO.getId());
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			if (business
+					.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(), def)) {
+				ProcessDefinitionProperty prop;
+				prop = getProcessDefinitionDisabledProperty(context, def);
+				if (prop == null) {
+					prop = new ProcessDefinitionProperty();
+					prop.setProcessDefinitionId(new Long(def.getId()));
+					prop.setName("disabled");
+				}
+				prop.setValue(value);
+				context.getSession().save(prop);
+			}
+			return VOFactory.newProcessDefinition(def, context);
+		} catch (JpdlException ex) {
+			generateUpgradeMessages(ex);
+			context.setRollbackOnly();
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		} catch (Exception ex) {
+			generateUpgradeMessage(ex);
+			context.setRollbackOnly();
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleOpenDeployParDefinitionTransfer() throws Exception {
+		try {
+			UserContextCache cache = getUserContextCache();
+			if (cache.getOutputStream() != null) {
+				cache.getOutputStream().close();
+			}
+
+			cache.setTempFile(getTempFile());
+
+			cache.setOutputStream(new FileOutputStream(cache.getTempFile()));
+		} catch (Exception ex) {
+			throw new BPMException(ex, BPMErrorCodes.ERROR_ENTRADA_SALIDA);
+		}
+	}
+
+	private synchronized File getTempFile() throws FileNotFoundException,
+			IOException, InvalidConfigurationException {
+		String jbossTemp = System.getProperty("jboss.server.temp.dir");
+		if (jbossTemp == null)
+			jbossTemp = System.getProperty("java.io.tmpdir");
+
+		File tmp = new File(new File(jbossTemp), "bpm");
+		tmp.mkdirs();
+
+		return File.createTempFile("jbpmwf", ".par", tmp);
+	}
+
+	@Override
+	protected void handleNextDeployParDefinitionPackage(byte filePackage[],
+			int length) throws Exception {
+		try {
+			UserContextCache cache = getUserContextCache();
+			cache.getOutputStream().write(filePackage, 0, length);
+		} catch (Exception ex) {
+			throw new BPMException(ex, BPMErrorCodes.ERROR_ENTRADA_SALIDA);
+		}
+	}
+
+	@Override
+	protected void handleEndDeployParDefinitionTransfer() throws Exception {
+		InputStream streamLectura = null;
+
+		try {
+			UserContextCache cache = getUserContextCache();
+			cache.getOutputStream().close();
+
+			cache.setMessages(deployProcessParDefinition(cache.getTempFile()));
+
+			cache.getTempFile().delete();
+			cache.setTempFile(null);
+			cache.setOutputStream(null);
+		} catch (JpdlException ex) {
+			generateUpgradeMessages(ex);
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		} catch (Exception ex) {
+			generateUpgradeMessage(ex);
+			throw new BPMException(ex, BPMErrorCodes.ERROR_DESPLIEGUE_PROCESO);
+		}
+	}
+
+	private String[] deployProcessParDefinition(File tempFile)
+			throws Exception {
+		org.jbpm.graph.def.ProcessDefinition definition = null;
+		InputStream streamLectura = null;
+		UserInterfaceBusiness business = null;
+		JbpmContext context = null;
+
+		try {
+			context = getContext();
+
+			streamLectura = new FileInputStream(tempFile);
+
+			definition = org.jbpm.graph.def.ProcessDefinition
+					.parseParZipInputStream(new ZipInputStream(streamLectura));
+
+			streamLectura.close();
+
+			context.deployProcessDefinition(definition);
+
+			business = new UserInterfaceBusiness(context);
+
+			return business.procesarDefinicionUI(tempFile, definition);
+		} catch (Exception e) {
+			context.setRollbackOnly();
+			throw e;
+		} finally {
+			flushContext(context);
+			if (streamLectura != null) {
+				streamLectura.close();
+			}
+		}
+	}
+
+	@Override
+	protected String[] handleGetDeployMessages() throws Exception {
+		UserContextCache cache = getUserContextCache();
+		return cache.getMessages();
+	}
+
+	@Override
+	protected TaskInstance handleGetTask(long id) throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+
+			org.jbpm.taskmgmt.exe.TaskInstance task = jbpmContext
+					.getTaskInstance(id);
+			if (task == null)
+				return null;
+
+			if (business.canAccess(getUserGroups(), task)) {
+				return VOFactory.newTaskInstance(task);
+			} else {
+				return null;
+			}
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
+	protected JbpmConfiguration handleGetJBpmConfiguration() throws Exception {
+		return Configuration.getConfig();
+	}
+
+	@Override
+	protected JbpmContext handleGetContext() throws Exception {
+		JbpmContext myContext = Configuration.getConfig().createJbpmContext();
+		myContext.setActorId(Security.getPrincipal().getName());
+		return myContext;
+	}
+
+	@Override
+	protected void handleSignal(ProcessInstance instanceVO) throws Exception {
+		signal(instanceVO, null);
+	}
+
+	@Override
+	protected void handleSignal(ProcessInstance instanceVO,
+			String transitionName) throws Exception {
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.graph.exe.ProcessInstance instance = context
+					.loadProcessInstance(instanceVO.getId());
+			org.jbpm.graph.def.ProcessDefinition definition = instance
+					.getProcessDefinition();
+
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			if (isInternalService()
+					|| business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), definition)) {
+				startAuthenticationLog(instance.getRootToken());
+				if (transitionName != null)
+					instance.signal(transitionName);
+				else
+					instance.signal();
+				endAuthenticationLog(instance.getRootToken());
+				context.save(instance);
+			}
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected boolean handleCanAdmin(ProcessInstance instanceVO)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+
+			org.jbpm.graph.exe.ProcessInstance process = context
+					.loadProcessInstance(instanceVO.getId());
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			return business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
+					process);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleGetActiveJobs(ProcessInstance process)
+			throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+			if (process == null)
+				return null;
+
+			org.jbpm.graph.exe.ProcessInstance instance = jbpmContext
+					.getProcessInstance(process.getId());
+
+			if (!business.isUserAuthorized(OBSERVER_ROLE, getUserGroups(),
+					instance))
+				return null;
+
+			Vector v = new Vector();
+
+			populateJobs(jbpmContext, instance.getRootToken(), v);
+			return v;
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	private void populateJobs(JbpmContext jbpmContext,
+			org.jbpm.graph.exe.Token token, Vector v) {
+
+		List l = jbpmContext.getJobSession().findJobsByToken(token);
+		for (Iterator it = l.iterator(); it.hasNext();) {
+			org.jbpm.job.Job j = (org.jbpm.job.Job) it.next();
+			v.add(VOFactory.newJob(j));
+		}
+		for (Iterator it = token.getActiveChildren().values().iterator(); it
+				.hasNext();) {
+			org.jbpm.graph.exe.Token childToken = (org.jbpm.graph.exe.Token) it
+					.next();
+			populateJobs(jbpmContext, childToken, v);
+		}
+	}
+
+	@Override
+	protected List handleGetActiveTasks(ProcessInstance process)
+			throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+			if (process == null)
+				return null;
+
+			org.jbpm.graph.exe.ProcessInstance instance = jbpmContext
+					.getProcessInstance(process.getId());
+
+			Vector v = new Vector();
+
+			boolean canObserve = business.isUserAuthorized(OBSERVER_ROLE,
+					getUserGroups(), instance)
+					|| business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), instance);
+			if (instance.getTaskMgmtInstance() != null
+					&& instance.getTaskMgmtInstance().getTaskInstances() != null) {
+				for (Iterator it = instance.getTaskMgmtInstance()
+						.getTaskInstances().iterator(); it.hasNext();) {
+					org.jbpm.taskmgmt.exe.TaskInstance task = (org.jbpm.taskmgmt.exe.TaskInstance) it
+							.next();
+					if (!task.hasEnded()) {
+						try {
+							if (canObserve
+									|| business
+											.canAccess(getUserGroups(), task)) {
+								v.add(VOFactory.newTaskInstance(task));
+							}
+						} catch (RuntimeException e) {
+							log.warn(
+									"Unable to serialize task " + task.getId(),
+									e);
+						}
+					}
+				}
+			}
+			return v;
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
+	protected List handleGetActiveJobs() throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+
+			Query q = jbpmContext.getSession().getNamedQuery("dueDateJobs");
+			q.setParameter("now", new Date());
+			List l = q.list();
+
+			Vector v = new Vector();
+			for (Iterator it = l.iterator(); it.hasNext();) {
+				org.jbpm.job.Job j = (org.jbpm.job.Job) it.next();
+				org.jbpm.graph.exe.ProcessInstance pi = j.getProcessInstance();
+				if (business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
+						pi))
+					v.add(VOFactory.newJob(j));
+			}
+
+			return v;
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
+	protected void handleResumeJob(Job jobvo) throws Exception {
+	    enableJob(jobvo, true);
+	}
+
+	@Override
+	protected void handlePauseJob(Job jobvo) throws Exception {
+	    enableJob(jobvo, false);
+	}
+
+	public void enableJob(es.caib.bpm.vo.Job jobvo, boolean enable)
+			throws BPMException, InternalErrorException, UnknownUserException {
+
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.job.Job job = context.getJobSession()
+					.getJob(jobvo.getId());
+			if (job == null)
+				throw new BPMException("Aquesta tasca no existeix", -1);
+			org.jbpm.graph.exe.ProcessInstance instance = job
+					.getProcessInstance();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			if (isInternalService()
+					|| business.isUserAuthorized(SUPERVISOR_ROLE,
+							getUserGroups(), instance)) {
+				startAuthenticationLog(instance.getRootToken());
+				job.setSuspended(!enable);
+				endAuthenticationLog(instance.getRootToken());
+				context.save(instance);
+			}
+		} finally {
+			flushContext(context);
+		}
+
+	}
+
+	@Override
+	protected void handleRetryJob(Job jobvo) throws Exception {
+		JbpmContext context = getContext();
+
+		try {
+			org.jbpm.job.Job job = context.getJobSession().getJob(jobvo.getId());
+			if (job == null)
+				throw new BPMException("Aquesta tasca no existeix", -1);
+		    org.jbpm.graph.exe.ProcessInstance instance = job.getProcessInstance();
+		    ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+		    business.setContext(context);
+	
+		    if (isInternalService() || 
+		    		business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(), instance)) {
+		    	startAuthenticationLog(instance.getRootToken());
+		    	job.setSuspended(false);
+		    	job.setRetries(1);
+		    	job.setException(null);
+		        endAuthenticationLog(instance.getRootToken());
+		        context.save(instance);
+		    }
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleChangeConfiguration(Map m) throws Exception {
+		JbpmContext context = getContext();
+		HashSet s = new HashSet(m.keySet());
+		try {
+            Query q = context.getSession().createQuery("select prop "+
+                    "from es.caib.bpm.entity.DBProperty prop "+
+                    "where prop.app='"+BPM_APPLICATION_ID+"'");
+            for (Iterator i = q.list().iterator(); i.hasNext();) {
+            	DBProperty prop = (DBProperty) i.next();
+            	String value = (String) m.get(prop.getKey());
+            	if (value == null)
+            		context.getSession().delete(prop);
+            	else
+            	{
+            		prop.setValue(value);
+            		context.getSession().save(prop);
+            		s.remove(prop.getKey());
+            	}
+            }
+            for (Iterator i = s.iterator(); i.hasNext();)
+            {
+            	String key = (String) i.next();
+            	DBProperty prop = new DBProperty();
+            	prop.setApp(BPM_APPLICATION_ID);
+            	prop.setKey(key);
+            	prop.setValue((String) m.get(key));
+            	context.getSession().save(prop);
+            }
+            DirectoryFactory.reconfigureDirectory(context);
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected Map handleGetConfiguration() throws Exception {
+		JbpmContext context = getContext();
+		HashMap m = new HashMap();
+		
+		try {
+            Query q = context.getSession().createQuery("select prop "+
+                    "from es.caib.bpm.entity.DBProperty prop "+
+                    "where prop.app='"+BPM_APPLICATION_ID+"'");
+            for (Iterator i = q.list().iterator(); i.hasNext();) {
+            	DBProperty prop = (DBProperty) i.next();
+            	m.put (prop.getKey(), prop.getValue());
+            }
+            return m;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected void handleReindex() throws Exception {
+		  Indexer.getIndexer().reindexAll();
+	}
+
+	@Override
+	protected void handlePing() throws Exception {
+		// Nothing to do
+	}
+
+	@Override
+	protected InputStream handleGetResourceAsStream(ProcessInstance process,
+			String resource) throws Exception {
+    	JbpmContext context = getContext();
+        try {
+            org.jbpm.graph.exe.ProcessInstance instance = context.loadProcessInstance(process.getId());
+            org.jbpm.graph.def.ProcessDefinition definition = instance.getProcessDefinition();
+
+            return definition.getFileDefinition().getInputStream(resource);
+        } finally {
+            flushContext(context);
+        }
+	}
+
+	@Override
+	protected InputStream handleGetResourceAsStream(
+			ProcessDefinition processdef, String resource) throws Exception {
+    	JbpmContext context = getContext();
+        try {
+            org.jbpm.graph.def.ProcessDefinition definition = context.getGraphSession().getProcessDefinition(processdef.getId());
+
+            return definition.getFileDefinition().getInputStream(resource);
+        } finally {
+            flushContext(context);
+        }
+	}
+
+	private interface AltresTasques {
+		List findAltresTasques(JbpmContext context, String usuariId,
+				Collection altresIds);
+	}
+}

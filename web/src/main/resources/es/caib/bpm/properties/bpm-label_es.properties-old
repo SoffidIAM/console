@@ -1,0 +1,295 @@
+##LOGIN
+login.lblUser= Usuario
+login.lblPassword= Password
+login.msgUsuarioPasswordIncorrectos= Usuario o Contraseña Incorrectos.
+login.msgIngresePassword= Por favor introduzca usuario y password.
+login.lblProyecto=Proyecto cofinanciado por la Unión Europea en el marco del Proyecto
+
+##MAIN
+main.lblTabInbox= Inbox
+main.lblTabSupervision= Seguimiento
+main.lblTabNuevoProceso= Nuevo Proceso
+main.lblLogOut= LogOut
+main.lblUsuario= Bienvenido
+main.loading= Cargando página ....
+main.lblSearch= Busqueda de procedimientos
+main.lblDeploy= Administrar definición de procesos
+main.lblAdmin= Tareas de administración
+main.lblAdminJobs= Administrar tareas automáticas
+main.lblConfiguracioPersonal= Configuración personalizada
+main.lblAdminBPM= Configurar motor de tareas
+main.lblAdminJobs= Administrar tareas automáticas
+main.lblAdminConfiguracioPersonal= Configuración personalizada
+
+##INBOX
+inbox.lblIdentificador= Identificador
+inbox.lblTareasPendientes= Tareas Pendientes - Filtrar por:
+inbox.lblProcesoVersion= Proceso (Versión)
+inbox.lbldefinicionTarea= Def. Tarea
+inbox.lblTarea= Tarea
+inbox.lblFecha= Fecha Inicio
+inbox.lblFechaPrevistaFin= Fecha Prevista Fin
+inbox.lblActoresAsignados= Actores Asignados
+inbox.lblDefinicionProceso= Definición
+inbox.lblMapaProceso= Registro de acciones
+inbox.lblFiltroTareas1= Mis tareas
+inbox.lblFiltroTareas2= Otras tareas
+inbox.lblRecargar= Recargar
+inbox.lblAnexos= Anexos
+inbox.lblProceso= Proceso
+inbox.lblFiltroTareasActivado=Filtro de tareas activado
+inbox.lblFiltroTareasActivarFiltro=Activar filtro
+inbox.lblFiltroTareasDesactivado=Filtro de tareas desactivado
+inbox.lblFiltroTareasEditarFiltro=Editar filtro
+
+##DETALLE TAREA
+task.lblProceso= Proceso
+task.lblContenido= Anexos
+task.lblNotas= Notas
+task.lblHistorial= Historial
+task.msgSeleccionTarea= Debe seleccionar una tarea.
+task.msgEjecucionExitosa= Se ha ejecutado la tarea correctamente.
+task.btnDelegar= Delegar
+task.btnSalvar= Guardar
+task.btnCerrar= Cerrar
+task.btnTomar= Iniciar
+task.msgError= Ha ocurrido el siguiente error al procesar la petición:
+task.lblVencimiento= Tarea sin vencimiento
+task.addcomentari= Agregar comentario
+task.autor= Usuario
+task.data= Fecha y hora
+task.comentari= Comentarios
+task.estat.pendent= Pendiente
+task.estat.encurs= En curso
+task.estat.fi= Finalizada
+task.msgDeseaSalir= ¿Desea salir sin guardar los cambios realizados?
+task.titleDeseaSalir= Cambios pendientes de guardar
+task.accio= Acción
+task.lblConfigFiltre=Configuración del filtro de tareas
+
+##Filtro de tareas
+task.filter.lblResumen=Seleccione los grupos cuyas tareas desea ignorar en el listado principal de tareas pendientes
+task.filter.lblConfirmaCambios=Confirma los cambios
+task.filter.lblCancelaCambios=Cancela los cambios
+task.filter.lblVolver=Volver
+
+##PROCESO TAREA
+process.lblProceso= Proceso
+process.lblIdentificador= Identificador
+process.lblFechaInicio= Fecha de inicio
+process.lblAsignadoA= Tarea asignada a
+process.lblFechaFinalizacion= Fecha de finalización
+process.lblTarea= Tarea
+process.lblFechaCreacion= Fecha de la última tarea
+process.lblEstado= Estado
+process.lblTareas= Tareas en curso
+process.verDiagrama= Ver diagrama
+process.wndDiagrama= Diagrama del proceso
+process.btnCancel= Cancelar el proceso
+process.btnUpgrade= Actualizar la definición del proceso
+process.upgraderesult= Resultado de la actualización
+process.confirmCancel= Si continua cancelará el proceso actual. ¿Desea continuar?
+process.warning= Atención
+process.lblTokens=Tokens
+
+token.lblActive=En curso
+token.lblLocked=Bloqueado
+token.lblFinished=Finalizado
+token.lblSuspended=Suspendido
+
+##SUPERVISION
+sup.lblBusquedaCasos= Búsqueda de Casos
+sup.lblProceso= Proceso
+sup.lblTarea= Tarea
+sup.lblFechaInicio= Fecha de inicio
+sup.lblFechaCreacion= Fecha de creación
+sup.lblActorAsignado= Actor asignado
+sup.lblFinalizada= Finalizada 
+sup.btnBuscar= Buscar
+sup.lblResultadoBusqueda= Resultado de la búsqueda
+sup.lblMapaProceso= Mapa
+sup.resultadoVacio= No se encontraron tareas que cumplan con los criterios.
+sup.seleccioneProceso= Debe seleccionar un proceso
+sup.lblIdProceso= Id Proceso
+sup.lblSelect = -Seleccione-
+
+##NUEVO PROCESO
+nuevoProceso.lblNuevaInstanciaProceso= Nueva instancia
+nuevoProceso.btnNuevoProceso= Nuevo procedimiento
+nuevoProceso.msgCreacionProceso= Se cre\u00F3 correctamente el nuevo proceso con el id\: 
+nuevoProceso.lblDefinicionesProceso= Definiciones de proceso
+nuevoProceso.msgSeleccionProceso=Seleccione un proceso
+nuevoProceso.lblVersion=Versión
+
+##DIALOGO SELECCION DE TRANSICION
+seleccionTransicion.lblTitulo= Selección de transición
+seleccionTransicion.lblDescripcion= Por favor seleccione una transición
+seleccionTransicion.btnAceptar= Aceptar
+seleccionTransicion.btnCancelar= Cancelar
+
+##DIALOGO SELECCION DE USUARIOS
+seleccionUsuario.lblTitulo= Selección de usuario
+seleccionUsuario.lblDescripcion= Por favor seleccione un usuario
+seleccionUsuario.btnDelegar= Delegar
+seleccionUsuario.btnCancelar= Cancelar
+seleccionUsuario.lblNom= Nombre
+seleccionUsuario.lblLLinatges= Apellidos
+seleccionUsuario.lblEmail= Email
+seleccionUsuario.lblCodiUsuari= Código
+seleccionUsuario.lblDireccioGeneral= DG
+seleccionUsuario.gridTitleCerca= Búsqueda de usuarios
+seleccionUsuario.gridTitleResultatsCerca= Resultados de la búsqueda
+
+##DIALOGO SELECCION DE ROLES
+seleccionRol.lblTitulo= Selección de roles
+seleccionRol.lblDescripcion= Por favor seleccione un rol
+seleccionRol.btnAceptar= Aceptar
+seleccionRol.btnCancelar= Cancelar
+
+##CONTENIDO
+contenidoTarea.lblDocumento= Documento
+contenidoTarea.lblMimeType= Mime Type
+contenidoTarea.lblPublico= Público/Privado
+contenidoTarea.lblRoles= Roles
+contenidoTarea.btnVer= Ver
+contenidoTarea.btnDescargar= Descargar
+contenidoTarea.btnAgregar= Agregar
+contenidoTarea.btnEliminar= Eliminar
+contenidoTarea.lblDescripcion= Archivos
+contenidoTarea.lblRol= Rol
+contenidoTarea.lblCA= CA
+contenidoTarea.lblTimestamp= Timestamp
+contenidoTarea.lblCertificado= Certificado
+contenidoTarea.btnVerificar= Verificar
+contenidoTarea.lblRolesAcceso= Roles Acceso
+contenidoTarea.lblFirmantes= Firmantes
+contenidoTarea.msgSeleccionRol= Debe seleccionar un rol
+contenidoTarea.msgFirmaInvalida= La firma es INVÁLIDA.
+contenidoTarea.msgFirmaValida= La firma es VÁLIDA.
+contenidoTarea.msgSeleccionFirma= Debe seleccionar una firma.
+contenidoTarea.msgEliminarRol= No se pudo eliminar el rol seleccionado.
+contenidoTarea.msgSeleccionArchi= Debe seleccionar un archivo.
+
+##DIALOGO ALTA DE DOCUMENTO
+altaDocumento.lblTitulo= Alta de documentos
+altaDocumento.lblNombreExterno= Nombre externo
+altaDocumento.lblMimeType= Mime Type
+altaDocumento.btnBrowse= Upload
+altaDocumento.btnAceptar= Aceptar
+altaDocumento.btnCancelar= Cancelar
+
+##SEGUIMIENTO
+seguimiento.lblBusquedaProcesos= Búsqueda de procesos
+seguimiento.lblBusquedaTareas= Búsqueda de tareas
+
+##OBSERVACION
+observacion.lblBusquedaCasos= Búsqueda de casos
+observacion.lblProceso= Proceso
+observacion.lblTarea= Estado
+observacion.lblFechaInicio= Fecha de inicio
+observacion.lblFechaFinalizacion= Fecha de finalización
+observacion.lblActorAsignado= Actor asignado
+observacion.lblFinalizada= Incluir finalizadas
+observacion.lblIdProceso= Id Proceso
+observacion.btnBuscar= Buscar
+observacion.lblResultadoBusqueda= Resultado de la búsqueda
+observacion.lblMapaProceso= Mapa
+observacion.resultadoVacio= No se encontraron procesos que cumplan con los criterios.
+observacion.validacionDefinicionProceso= Debe seleccionar una definición de proceso.
+observacion.help = Sintaxis de la búsqueda
+
+##BPM ERROR CODES
+error.code.1000= La tarea ya se encuentra asignada directamente a un usuario.
+error.code.1001= El usuario no se encuentra asignado a ningún grupo.
+error.code.2000= Uno de los parámetros es inválido.
+
+##document ERROR CODES
+document.error.code.1002= El archivo no es una firma digital
+
+##ERRORES
+error.lblErrorCode= Error:
+error.lblCausa= Causado por:
+error.lblOcurrioError= Ha ocurrido el siguiente error.
+error.btnContinuar= Continuar
+error.btnRecargar= Recargar
+error.msgFirma1= Es necesaria la firma electrónica
+error.msgFirma2= La firma no corresponde al usuario
+error.msgFirma3= Falta el anexo
+
+index.Inici=Inicio
+menu.title=Menú principal
+menu.currentTasks=Trabajos en curso
+favorits.title=Favoritos
+favorits.recent=Recientes
+
+job.lblId=Identificador
+job.status.error=Error
+job.status.warning=Error subsanable
+job.status.pending=Pendiente
+job.status.pause=Tarea retenida
+job.lbldefinicionTarea=Tarea automática
+job.title=Detalles de la tarea automática
+job.name=Nombre
+job.dueDate=Próxima ejecución
+job.failures=Intentos fallidos
+job.status=Estado
+job.error=Mensaje de error
+job.button.close=Cerrar
+job.button.pause=Retener
+job.button.resume=Reanudar
+job.button.retry=Reintentar
+job.process.open=Abrir proceso
+
+
+
+##ADMIN - DESPLIEGUE
+deploy.lblProcesosActuales= Procesos desplegados actualmente
+deploy.lblProceso= Proceso
+deploy.lblVersion= Versión
+deploy.lblFechaDespliegue= Fecha despliegue
+deploy.lblIdProceso= Id Proceso
+deploy.lblNuevoProceso= Desplegar nuevo proceso
+deploy.btnDeploy= Desplegar...
+deploy.lblResultadoDespliegue= Resultado del despliegue
+deploy.msgProcesoDesplegadoCorrectamente= Se desplegó el proceso correctamente
+deploy.msgDesplegandoProceso= Desplegando proceso...
+deploy.msgErrorDesplegandoProceso= Ocurrió el siguiente error mientras se desplegaba el proceso
+deploy.btnEnable= Habilitar
+deploy.btnDisable= Deshabilitar
+deploy.lblDisabled= Deshabilitado
+
+configure.title=Configuración del índice textual
+configure.luceneDir=Directorio para índices
+configure.configure=Actualizar
+configure.reindex=Si cambia el directorio de índices, será necesaria una reindexación global de todos los procedimientos
+configure.reindexBtn=Reindexar
+configure.isindexing=El sistema ha comenzado la regeneración del índice
+configure.endIndexing=Indexación completa
+
+
+## SEU
+seu.recursoshumans=Recursos humanos
+seu.usuaris=Usuarios
+seu.grups=Grupos
+seu.tipusuorg=Tipos de unidad organizativa
+seu.dadesaddicionals=Datos adicionales
+seu.recursostecnologics=Recursos tecnológicos
+seu.xarxes=Redes
+seu.maquines=Máquinas
+seu.impressores=Impresoras
+seu.serveis=Servicios
+seu.sistemesinformacio=Sistemas de información
+seu.aplciacions=Aplicaciones
+seu.dominiscorreu=Dominios de correo
+seu.llistescorreu=Listas de correo
+seu.fitxerslopd=Ficheros con datos de carácter personal
+seu.adminintranet=Menús de acceso a la Intranet
+seu.configaudito=Configuración y Auditoría
+seu.parametres=Parámetros
+seu.agents=Agentes
+seu.auditoria=Auditoría
+seu.registresaccess=Registros de acceso
+seu.cpd=Acceso al CPD
+seu.portescpd=Puertas del CPD
+seu.targetescpd=Tarjetas del CPD
+seu.registrescpd=Registros de acceso al CPD

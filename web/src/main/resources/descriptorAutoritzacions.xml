@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="autoritzacions">
+		<finder name="autoritzacio" type="autoritzacio">   <!-- tothom -->
+			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+				method="findAuthorizations">
+				<parameter value="${ambitList}" />
+				<parameter value="${description}" />
+				<parameter value="${codi}" />
+			</ejb-finder>
+		<!-- 	<new-instance-bean className="es.caib.seycon.ng.comu.AutoritzacioRol">
+			</new-instance-bean>-->
+		</finder>
+		<finder name="scope" type="scope">
+			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+				method="getScopeList">
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="scope" transient="true">
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return instance
+		</custom-attribute>
+	</datanode>
+	
+	<datanode name="autoritzacio">
+		<finder name="autoritzacioRol" type="autoritzacioRol">   <!-- tothom -->
+			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+				method="getRolsAutoritzacio">
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AutoritzacioRol">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="autoritzacioRol">
+		<ejb-handler jndi="java:comp/env/ejb/AutoritzacioRolsEJB">
+			<insert-method method="create" returnBean="true"> 
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete"> 
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

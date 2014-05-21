@@ -1,0 +1,2007 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="applicacionsIntranet" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<style src="~./styles/estil.css"/>
+	<style src="/css/localSEU.css"/>
+	<style>
+		.lruta {cursor: pointer; display: block;}
+		.lruta:hover {text-decoration:underline;}
+	</style>
+	
+	<!-- Los estilos propios se han incluido en /css/localSEU.css: 
+		problemas en IE al incluirlo en un frame... no obtiene estilos locales (IE6,7,8)
+	 -->
+	<datamodel id="model" rootNode="appsintranet" src="descriptorAplicacionsIntranet.xml"
+		onChange="showCancelButton()"
+		onCommit="onRefrescaArbreIntern(true);"/>
+	<datamodel id="modelCerca" rootNode="cerca" src="descriptorAplicacionsIntranet.xml"/>
+	<datamodel id="modelMime" rootNode="tipusmime" src="descriptorAplicacionsIntranet.xml"/>
+
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.zkiblaf.Missatgebox;
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
+			
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+					.Labels.getLabel("aplicacionsIntranet.lblMenuAccesIntranet"));
+			}
+			catch (Exception ex){}
+			
+			queryWindowMin = "55px";
+			queryWindowMax = "110px";
+			
+			// Autoritzacions 
+			//canQueryMenusIntranet = AutoritzacionsUsuari.hasQueryMenusIntranet();
+			hasQueryALLMenusIntranet = AutoritzacionsUsuari.hasQueryAllMenusIntranet();
+			
+			import es.caib.seycon.ng.comu.*;
+			import es.caib.seycon.ng.utils.AmbitsExecucioPuntEntrada;
+			import es.caib.zkib.datamodel.xml.XmlDataNode;
+			import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+			import org.zkoss.image.*;
+			import org.zkoss.zul.*;
+		
+			mode = "query";
+			view_altres = false;
+		
+			model.getVariables().declareVariable("queryEnabled", true);
+			model.getVariables().declareVariable("codi", "%");
+			model.getVariables().declareVariable("nom", "%");
+			model.getVariables().declareVariable("codiAplicacio", "%");
+			model.getVariables().declareVariable("codiRol", "%");
+			model.getVariables().declareVariable("codiGrup", "%");
+			model.getVariables().declareVariable("codiUsuari", "%");
+			
+			queryEnabled = false;
+			retrySearch = false;
+			Boolean cerca = new Boolean(false);
+		
+			void populateDetails()
+			{
+				mode = "query";
+			}
+			
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				es.caib.seycon.ng.comu.Aplicacio app = new Aplicacio();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
+						.getFellow("textbox");
+				nom = esquema.getFellow("queryWindow").getFellow("queryNom")
+						.getFellow("textbox");
+				codiAplicacio = esquema.getFellow("queryWindow")
+						.getFellow("queryAplicacio");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) ||
+						(nom.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				if ((codiAplicacio.getSelectedItem() != null) &&
+						(codiAplicacio.getSelectedItem().getValue() != null))
+				{
+					Object obj = codiAplicacio.getSelectedItem().getValue().getInstance();
+				
+					if (obj instanceof es.caib.seycon.ng.comu.Aplicacio)
+					{
+						es.caib.seycon.ng.comu.Aplicacio app = (es.caib.seycon.ng.comu.Aplicacio) obj;
+						
+						if (app.getCodi() != null)
+						{
+							model.getVariables().declareVariable("codiAplicacio", app.getCodi());
+							cerca = new Boolean(true);
+						}
+					}
+				}
+				
+				queryEnabled = true;
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("nom", nom.value);
+				searchValues.put("codiAplicacio", app.getCodi());
+				searchValues.put("codiRol", "");
+				searchValues.put("codiGrup", null);
+				searchValues.put("codiUsuari", null);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+		
+				if (esquema.isCommitPending())
+				{
+					Missatgebox.avis (org.zkoss.util.resource.Labels
+							.getLabel("aplicacionsIntranet.Confirmar"),
+						org.zkoss.util.resource.Labels
+							.getLabel("aplicacionsIntranet.PendentConfirmar"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+			
+				//if (!canQueryMenusIntranet) queryEnabled = false; //si no pot cercar menús intranet
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				treebox = esquema.getFellow("lista").getFellow("treebox"); 
+				if (queryEnabled)
+				{
+					model.getJXPathContext().getValue("/").refresh();
+					treebox.setDataPath( "/model:/" );
+				}
+				
+				if ((treebox.getItemCount() == 0) && !retrySearch)
+				{
+					retrySearch = true;
+					search();
+				}
+				
+				else
+				{
+					retrySearch = false;
+				}
+				
+				desktop.getPage("applicacionsIntranet")
+					.setAttribute("cercaActiva", cerca);
+			}
+			
+			void showAltres() {
+				/*if (view_altres==false) {
+					esquema.getFellow("queryWindow").setHeight("120px"); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				} else {
+					esquema.getFellow("queryWindow").setHeight("77px"); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+					view_altres = false;
+				}*/
+			}
+			
+			int seleccionaElementListbox(DataListbox llista, Object elemcodi)
+			{
+				String codi = elemcodi.toString(); //Missatgebox.info ("select "+llista+" codi "+elemcodi);
+				java.util.List elems =  llista.getItems();
+				for (int i=0; i < elems.size(); i++)
+				{
+					Object actual = elems.get(i).getValue(); 
+					if (actual instanceof es.caib.zkib.datamodel.xml.XmlDataNode)
+					{ 
+						XmlDataNode elem = (XmlDataNode) actual;
+						Object dades = elem.getInstance();
+						if (dades instanceof TipusExecucioPuntEntrada)
+						{
+							TipusExecucioPuntEntrada tipexe = (TipusExecucioPuntEntrada) dades;
+							if (tipexe.getCodi().equals(codi))
+							{
+								llista.setSelectedIndex(i);
+								return i;
+							}
+						} else if (dades instanceof Aplicacio) {
+							Aplicacio aplica = (Aplicacio) dades; 
+							if (aplica.getId().toString().equals(codi)) {
+								llista.setSelectedIndex(i); //Missatgebox.info ("aplicacio trobada");
+								return i;
+							}
+						}
+					}  
+					else if (actual instanceof String) {
+						String elem = (String) actual;
+						if (elem.equals(codi)) {
+							//Missatgebox.info ("llista = "+llista);
+							llista.setSelectedItem(elems.get(i));
+							return i;
+						}
+					}
+					//else borrar+="otro tipo de datos "+actual.getClass().getName()+" ## ";//elems.get(i).getValue()+"##";//Missatgebox.info ("tipus dades = "+elems.get(i).getValue());
+				} 
+				//Missatgebox.info ("no s'ha trobat !!"+elemcodi+" msg ="+borrar);
+				return -1; 
+			}
+		
+			void select() 
+			{
+				// Depenent de l'autorizació amaguem o mostrem els nodes inserir i esborrar
+				arbre = esquema.getFellow("lista").getFellow("treebox");
+				// En mode cerca restringim permisos
+				Object cercaActiva = desktop.getPage("applicacionsIntranet").getAttribute("cercaActiva");
+				boolean cercant = false;
+				if ((cercaActiva != null) && (cercaActiva instanceof Boolean))
+				{
+					cercant = ((Boolean) cercaActiva).booleanValue();
+				}
+				if ((arbre.selectedItem != null) &&
+						(arbre.selectedItem.value != null))
+				{
+					PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
+					oesmenu = esquema.getFellow("dades").getFellow("form")
+							.getFellow("appsGrid").getFellow("oesmenu");
+					boolean canAdmin = getPuntEntradaService().canAdmin(nodeActual);
+					boolean esMenu = "S".equals(nodeActual.getMenu()); 
+					boolean teID = (nodeActual.getId()!=null); //Sólo puede insertar tras commit
+					b_inserir.setVisible(!cercant && canAdmin && esMenu && teID); // Només deixem inserir als menus
+					boolean esRoot = nodeActual.getId()!=null &&
+						(nodeActual.getId().equals(new Long(0)) ||
+								"Root".equals(nodeActual.getCodi()));
+					b_esborrar.setVisible(!cercant && canAdmin && !esRoot);
+					oesmenu.setDisabled(teID); // per defecte deshabilitat
+					populateDetails (); 
+					showDetall ();
+				}
+			}
+			
+			void showLista()
+			{
+				esquema.getFellow("lista").getFellow("treebox").clearSelection();
+				esquema.getFellow("lista").getFellow("treebox").setRows(fileresO);
+			}
+			
+			void showDetall() {
+				esquema.hideCriteris();
+				esquema.getFellow("lista").getFellow("treebox").setRows(10);
+				esquema.showFormulari();
+			}
+			
+			void amagaDadesExecucio(quina){
+				treebox =	esquema.getFellow("dades").getFellow("form").getFellow("appsGrid");
+				treebox.getFellow("v_"+quina).setVisible(false);
+				treebox.getFellow("cb"+quina).setChecked(false);
+			}
+			
+			String tipusAutoritzacio = null;
+			
+			void afegeixAutoritzacio(AutoritzacioPuntEntrada auto) {
+				arbre = esquema.getFellow("lista").getFellow("treebox");
+				PuntEntrada actual = arbre.getSelectedItem().getValue().getInstance();
+				if (actual==null) return;
+		
+				// Verificamos en el PUE
+				boolean jaExisteix = false;
+				Collection autos = actual.getAutoritzacions();
+				if (autos!=null) for (Iterator it = autos.iterator(); !jaExisteix && it.hasNext(); ) {
+					AutoritzacioPuntEntrada au = (AutoritzacioPuntEntrada) it.next();
+					if (auto.getTipusEntitatAutoritzada().equals (au.getTipusEntitatAutoritzada()) 
+						//@and auto.getCodiEntitatAutoritzada().equalsIgnoreCase(au.getCodiEntitatAutoritzada())) {
+						/* cambiamos el código por la descripción: tema de roles donde su código es solo el nombre */
+						&& auto.getDescripcioEntitatAutoritzada().equalsIgnoreCase(au.getDescripcioEntitatAutoritzada())) {
+							jaExisteix = true;
+					}
+				}
+				
+				if (jaExisteix) {
+					Missatgebox.avis(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.AutoritzacioExistent"),
+						new Object [] {auto.getTipusEntitatAutoritzada(),auto.getDescripcioEntitatAutoritzada()}),
+						org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorNovaAutoritzacio"));
+				} else { //La creem
+					modelInstance = gridAutoritzacions.getModel();
+					modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridAutoritzacions.getModel();
+					position = modelProxy.newInstance();
+					ds = gridAutoritzacions.getDataSource();
+					ctx = ds.getJXPathContext();
+					xpath = gridAutoritzacions.getXPath()
+							+ modelProxy.getBind(position);
+					pointer = ctx.createPath(xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+		
+					ctx2.setValue("@id", null); // l'autorització és nova
+					ctx2.setValue("@descripcioNivellAutoritzacio", auto
+							.getDescripcioNivellAutoritzacio());
+					ctx2.setValue("@idPuntEntrada", auto.getIdPuntEntrada());
+					ctx2.setValue("@tipusEntitatAutoritzada", auto
+							.getTipusEntitatAutoritzada());
+					ctx2.setValue("@idEntitatAutoritzada", auto
+							.getIdEntitatAutoritzada());
+					ctx2.setValue("@descripcioEntitatAutoritzada", auto
+							.getDescripcioEntitatAutoritzada());
+					ctx2.setValue("@codiEntitatAutoritzada", auto
+							.getCodiEntitatAutoritzada());
+					pointer.invalidate();
+					// Afegim al VO
+					if (autos==null) autos = new ArrayList();
+					autos.add(auto);
+					actual.setAutoritzacions(autos);
+				}
+			}
+			
+			public abstract class IconaClickEvent implements org.zkoss.zk.ui.event.EventListener {
+				public void onEvent(Event event);
+			};
+		
+			public IconaClickEvent iconaAdd = new IconaClickEvent(){
+				 public void onEvent(Event event) {
+				 	setIcona(event.getTarget().getId());
+				 }
+			};
+			
+			public IconaClickEvent iconaDelete = new IconaClickEvent(){
+				 public void onEvent(Event event) {
+				 	esborraIcona(event.getTarget().getId());
+				 }
+			};
+			
+		
+			void mostraImatge(quina, byte[] imatge, boolean canAdmin) {
+				org.zkoss.zul.Image img = form.getFellow("img_"+quina);
+				add = form.getFellow("oafegir_"+quina);
+				del = form.getFellow("oesborrar_"+quina);
+				
+				if (canAdmin) {
+					add.addEventListener(Events.ON_CLICK,iconaAdd);
+					del.addEventListener(Events.ON_CLICK,iconaDelete);
+					add.setSclass("click");
+					del.setSclass("click");
+					
+					if (imatge!=null && imatge.length!=0) {
+						img.setContent(new AImage(quina,imatge));
+						img.setSclass("pue_img_noclick");
+						
+					} else {
+						//img.setContent(null);
+						img.setSclass("pue_noimg_noclick");
+					}
+				} else {
+					add.removeEventListener(Events.ON_CLICK,iconaAdd);
+					del.removeEventListener(Events.ON_CLICK,iconaDelete);
+					add.setSclass("noclick");
+					del.setSclass("noclick");
+					if (imatge!=null && imatge.length!=0) {
+						img.setContent(new AImage(quina,imatge));
+						img.setSclass("pue_img_noclick");
+					} else {
+						img.setContent(null);
+						img.setSclass("pue_noimg_noclick");
+					}
+				}
+			}
+			
+			ExecucioPuntEntrada intranetEM, extranetEM, internetEM;
+			Long idPuntEntrada;
+			
+			void setIcona (String quina) {
+				//Missatgebox.info ("icona "+quina);
+				arbre = esquema.getFellow("lista").getFellow("treebox");
+				PuntEntrada actual = arbre.getSelectedItem().getValue().getInstance();
+				if (actual==null) return;
+				
+				Object media = Fileupload.get(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CarregaImatge"),org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.TriarImatge"));
+				if (media!=null && media instanceof org.zkoss.image.Image)
+				{
+					byte[] bimatge = media.getByteData();
+					if (bimatge!=null) {
+						modelInstance = arbre.getModel();
+						modelProxy = (es.caib.zkib.binder.tree.FullTreeModelProxy) arbre.getModel();
+						ds = arbre.getDataSource();
+						ctx = ds.getJXPathContext();
+					
+						xpath = arbre.selectedItem.value.getXPath();
+						pointer = ctx.getPointer(xpath);
+						ctx2 = ctx.getRelativeContext(pointer);
+					
+						if (quina.endsWith("icona1")) {
+							actual.setImgIcona1(bimatge);
+							ctx2.setValue("@imgIcona1", bimatge);
+							ctx2.setValue("@idIcona1", null);
+							pointer.invalidate();
+							mostraImatge("icona1",bimatge,true);
+						}
+					}
+				}
+			}
+			
+			void esborraIcona (String quina) {
+				//Missatgebox.info ("icona "+quina);
+				arbre = esquema.getFellow("lista").getFellow("treebox");
+				PuntEntrada actual = arbre.getSelectedItem().getValue().getInstance();
+				if (actual==null) return;
+				
+				modelInstance = arbre.getModel();
+				modelProxy = (es.caib.zkib.binder.tree.FullTreeModelProxy) arbre.getModel();
+				ds = arbre.getDataSource();
+				ctx = ds.getJXPathContext();
+					
+				xpath = arbre.selectedItem.value.getXPath();
+				pointer = ctx.getPointer(xpath);
+				ctx2 = ctx.getRelativeContext(pointer);
+					
+				if (quina.endsWith("icona1") && actual.getImgIcona1()!=null ) {
+					actual.setImgIcona1(null);
+					ctx2.setValue("@imgIcona1", null);
+					ctx2.setValue("@idIcona1", -1);ctx2.setValue("@idIcona1", null);
+					mostraImatge("icona1",null,true);
+				}
+			}				
+				
+			
+			void mostraDadesPuntEntrada(boolean canAdmin, PuntEntrada nodeActual) {
+				
+				if (nodeActual==null) return;
+				//Ocultamos los puntos de ejecución
+				amagaDadesExecucio("intranetEM");
+				amagaDadesExecucio("extranetEM");
+				amagaDadesExecucio("internetEM");
+		
+				idAplicacio = nodeActual.getIdAplicacio();
+				idPuntEntrada = nodeActual.getId();
+					
+				if (idAplicacio!=null) {
+					DataListbox laplica = odetall_aplicacio;
+					int posApp = seleccionaElementListbox (laplica,idAplicacio);
+					laplica.setSelectedIndex(posApp); 
+				} 
+				// Iconas
+				if (nodeActual.getImgIcona1()!=null) { 
+					mostraImatge("icona1",nodeActual.getImgIcona1(),canAdmin);
+				} 
+				else{
+					mostraImatge("icona1",null,canAdmin);
+				}
+					
+				
+				//Mostrem execucions, autoritzacions segons si és visible sense permis
+				boolean visible = false;
+				String code = nodeActual.getCodi();
+				String name = nodeActual.getNom();
+				boolean autoritzat = false;
+				if(name != null) 
+					autoritzat = getPuntEntradaService().esAutoritzat(nodeActual, TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO);
+				else
+					Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMostraPuntEntrada")); 
+				
+				if ("S".equals(nodeActual.getEsPublic())) { //Si es público
+					visible = true;
+				} else {
+					visible = autoritzat || canAdmin || hasQueryALLMenusIntranet; //sólo si está autorizado (o pot veure tots)
+				}
+				
+				p_autoritzacions.setVisible(autoritzat || canAdmin || hasQueryALLMenusIntranet); //solo si autorizado
+				
+				// En mode cerca restringim permisos
+				Object cercaActiva = desktop.getPage("applicacionsIntranet").getAttribute("cercaActiva");
+				boolean cercant = false;
+				if (cercaActiva!=null && cercaActiva instanceof Boolean) {
+					cercant = ((Boolean) cercaActiva).booleanValue();
+				}
+				
+				// Amaguem la pestanya de moure (si no té permís)
+				p_moure.setVisible(canAdmin && (!cercant));
+				
+				// Quitem selecció de l'arbre
+				mouretreebox.clearSelection();
+				
+				if ("N".equals(nodeActual.getMenu())) {// de tipus Acció
+					p_execucions.setVisible(visible); //solo si autorizado (o público) o pot veure tots
+					orow_tipusmenu.setVisible(false);
+					// Obtenim els mètodes d'execució
+					Collection execucions = nodeActual.getExecucions();
+					if (execucions!=null) for (Iterator it = execucions.iterator(); it.hasNext(); ) {
+					ExecucioPuntEntrada exe = (ExecucioPuntEntrada) it.next();
+						if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Extranet)) {
+							extranetEM = exe;						
+							mostraExecucio(exe,"extra");
+						} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Intranet)) {
+							intranetEM = exe;
+							mostraExecucio(exe,"intra");
+						} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Internet)) {
+							internetEM = exe;						
+							mostraExecucio(exe,"inter");
+						}					
+					}
+					/*if (canAdmin) {
+						arbre = esquema.getFellow("lista").getFellow("treebox");
+						if (arbre.getSelectedItem()!=null) {
+							branca = arbre.getSelectedItem().getParent().getParent().getValue();
+		
+							mouretreebox.selectNodeByXpath(branca.getXPath().replaceAll("/app","/moure"));  	
+						}
+					}*/
+				}
+				else { // Tipus Menú
+					//Amaguem les Execucions
+					p_execucions.setVisible(false);
+					//I mostrem la fila de tipus de menu
+					orow_tipusmenu.setVisible(true);
+					// Mostrem la branca actual a l'abre per moure (si pot moure)
+					/*if (canAdmin) {
+						arbre = esquema.getFellow("lista").getFellow("treebox");
+						if (arbre.getSelectedItem()!=null) {
+							actual = arbre.getSelectedItem().getValue();
+			
+							mouretreebox.selectNodeByXpath(actual.getXPath().replaceAll("/app","/moure"));  	
+						}
+					}*/ 
+				}
+				// mostrem la pestanya de XML i (des)habilitem edició
+				p_xml.setVisible(autoritzat || canAdmin || hasQueryALLMenusIntranet); //si pot veure tots
+				content_xml.setReadonly(!canAdmin);
+				bt_xml.setDisabled(!canAdmin);
+				bt_editaxml.setDisabled(!canAdmin);
+				// Verifiquem que la pestanya que es mostra siga sent vàlida:
+				if ( (!p_autoritzacions.isVisible() && p_autoritzacions.isSelected() ) 
+					|| (!p_execucions.isVisible() && p_execucions.isSelected()) 
+					|| (!p_moure.isVisible()) && p_moure.isSelected()
+					|| (!p_xml.isVisible()) && p_xml.isSelected()
+					)
+					panels.setSelectedIndex(0); //Mostrem primer panel
+			}
+			
+			boolean cercaMime (DataListbox llista, ExecucioPuntEntrada exec) {
+				int posE = seleccionaElementListbox (llista,exec.getCodiTipusExecucio());
+				if (posE != -1) {
+					llista.setSelectedIndex(posE);
+					return true;
+				}
+				return false;
+			}
+			
+			void mostraExecucio(ExecucioPuntEntrada exec,String tipus) {
+				if (tipus.equals("extra")) {
+					if (exec!=null) {
+						cbextranetEM.setChecked(true);
+						content_extranetEM.setValue(exec.getContingut());
+					cercaMime (mime_extranetEM,exec);
+					v_extranetEM.setVisible(true);
+				} else {
+					cbextranetEM.setChecked(false);
+					content_extranetEM.setValue("");
+					v_extranetEM.setVisible(false);
+				}
+				
+			} else if (tipus.equals("intra")) {
+				if (exec!=null) {
+					cbintranetEM.setChecked(true);
+					content_intranetEM.setValue(exec.getContingut());
+					cercaMime (mime_intranetEM,exec);
+					v_intranetEM.setVisible(true);
+				} else {
+					cbintranetEM.setChecked(false);
+					content_intranetEM.setValue(""); 
+					v_intranetEM.setVisible(false);
+				}
+			} else if (tipus.equals("inter")) {
+				if (exec!=null) {
+					cbinternetEM.setChecked(true);
+					content_internetEM.setValue(exec.getContingut());
+					cercaMime (mime_internetEM,exec);
+					v_internetEM.setVisible(true);
+				} else {
+					cbinternetEM.setChecked(false);
+					content_internetEM.setValue("");
+					v_internetEM.setVisible(false);
+				}
+			}
+		}
+		
+		String[] campsDisable = {"opublicaccess","ovisible","odetall_aplicacio","oautousu",
+			"otipus_menu","cbintranetEM","mime_intranetEM","content_intranetEM","cbextranetEM",
+			"mime_extranetEM","content_extranetEM","cbinternetEM","mime_internetEM","content_internetEM",
+			"bt_editajsInternet","bt_editajsExtranet","bt_editajsIntranet"};
+		String[] campsLectura = {"odetall_name","odetall_codi","onum_columnes"};
+		String[] campsVisible = {"oremoveautoritzacio"};
+		void habilitaModificacions(boolean habilitat) {
+			form = esquema.getFellow("dades").getFellow("form");
+			for (int i=0; i < campsDisable.length; i++) {
+				String nomElem = campsDisable[i];
+				elem =	form.getFellow(nomElem);
+				elem.setDisabled (!habilitat);
+			}
+			for (int i=0; i < campsLectura.length; i++) {
+				String nomElem = campsLectura[i];
+				elem =	form.getFellow(nomElem).getFellow("dada");
+				elem.setReadonly (!habilitat);
+			}
+			for (int i=0; i < campsVisible.length; i++) {
+				String nomElem = campsVisible[i];
+				elem =	form.getFellow(nomElem);
+				elem.setVisible (habilitat);	
+			}
+		}
+		
+		String[] campsExecute = {"provar_internetEM","provar_intranetEM","provar_extranetEM"};
+		void habilitaExecucions(boolean potExecutar) {
+			form = esquema.getFellow("dades").getFellow("form");
+			for (int i=0; i < campsExecute.length; i++) {
+				String nomElem = campsExecute[i];
+				elem = form.getFellow(nomElem);
+				//elem.setVisible (potExecutar);
+			}
+		}
+					
+		void onChangeDades()
+		{ 
+			// Inicializamos los datos:
+			intranetEM = null;
+			extranetEM = null;
+			internetEM = null;
+			idPuntEntrada = null;
+			
+			//Missatgebox.info("onChangeDades");
+			try {													
+				ds = form.getDataSource(); 
+				ctx =  ds.getJXPathContext();
+	
+				try {
+					registre = ctx.getValue("/"); // tipus XmlDataNode
+				} catch (Exception ex) {
+					esquema.hideFormulari();
+					return;
+				}	
+				Object obj = registre.getInstance();
+				// Verificamos el tipo de registro y según eso realizamos la acción correspondiente:
+				// NOU
+				if (registre.isNew()) {
+					if (obj instanceof PuntEntrada ) {
+						PuntEntrada pueNou = (PuntEntrada) obj; 
+						if (pueNou.menu==null) { 
+							// Comprobamos que no se haya creado ya (si tiene autorizaciones)
+							onInserir(registre);
+							return;
+						}						
+					} 
+				} 
+				
+				// MOSTREM
+				if (obj instanceof PuntEntrada) {
+					PuntEntrada pue = (PuntEntrada) obj; 
+					if (pue.id == null) {
+						oesmenu = esquema.getFellow("dades").getFellow("form").getFellow("appsGrid").getFellow("oesmenu");	
+						oesmenu.setDisabled(false);
+					}
+					boolean canAdmin = getPuntEntradaService().canAdmin(pue);
+					habilitaModificacions(canAdmin);
+					boolean canExecute = getPuntEntradaService().canExecute(pue);
+					habilitaExecucions(canExecute);
+					mostraDadesPuntEntrada(canAdmin,pue);
+				}
+			} catch (Exception e) {
+				//Missatgebox.info ("hej!: Avís d'error: "+e.getMessage()); e.printStackTrace();
+			}
+			
+		}
+		
+		// Només als pue nous (encara no existeeixen a la base de dades);
+		void canviaTipusPUE(String esMenu) { 
+			Tree arbre = esquema.getFellow("lista").getFellow("treebox");
+			PuntEntrada actual = arbre.getSelectedItem().getValue().getInstance();
+			Collection execs = actual.getExecucions() !=null? actual.getExecucions(): new ArrayList();
+			//Missatgebox.info ("actual, esmenu = "+actual.getMenu() +" Execs "+execs.size());
+			mostraDadesPuntEntrada(true,actual); // Si pot crear, está autoritzat
+		}
+		
+		void canviaAplicacio() {
+			DataListbox odetall_aplicacio = esquema.getFellow("dades").getFellow("form").getFellow("odetall_aplicacio");
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			if (odetall_aplicacio.selectedItem!=null) {
+				if (arbre.selectedItem != null && arbre.selectedItem.value != null) {
+					PuntEntrada pueActual = arbre.selectedItem.getValue().getInstance();
+					Long idAplica = odetall_aplicacio.selectedItem.value.getInstance().getId();
+						//Missatgebox.info ("antiga ="+pueActual.getIdAplicacio()+" nova ="+idAplica);
+					pueActual.setIdAplicacio(idAplica);
+					
+					modelInstance = arbre.getModel();
+					modelProxy = (es.caib.zkib.binder.tree.FullTreeModelProxy) arbre.getModel();
+					ds = arbre.getDataSource();
+					ctx = ds.getJXPathContext();
+				
+					xpath = arbre.selectedItem.value.getXPath();
+					pointer = ctx.getPointer(xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@idAplicacio", idAplica); // l'autorització és nova
+				}
+			}
+		}
+		
+		void canviaExecucio(quina) {
+			String laexecucio = quina.substring(8); 
+			ds = gridExecucions.getDataSource();
+			ctx = ds.getJXPathContext();
+			Collection filas = gridExecucions.getRows().getChildren();
+			for (Iterator it = filas.iterator(); it.hasNext(); ) {
+				DataRow fila = (DataRow) it.next();
+				String xpath = fila.getXPath();
+				ExecucioPuntEntrada exe = (ExecucioPuntEntrada) ctx.getValue(xpath).getInstance();
+				if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Extranet) && laexecucio.equals("extranetEM")) {
+					pointer = ctx.getPointer(xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@contingut",content_extranetEM.getValue());
+				} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Intranet) && laexecucio.equals("intranetEM")) {
+					pointer = ctx.getPointer(xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@contingut",content_intranetEM.getValue());
+				} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Internet) && laexecucio.equals("internetEM")) {
+					pointer = ctx.getPointer(xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@contingut",content_internetEM.getValue());
+				}
+								
+			}
+		}
+		
+		void setExecucio (quina, actiu) {
+			String laexecucio = quina.substring(2);
+			Collection filas = gridExecucions.getRows().getChildren();
+			PuntEntrada pueActual; Collection execs = null;
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			if (arbre.selectedItem != null && arbre.selectedItem.value != null) { 
+				pueActual = arbre.selectedItem.getValue().getInstance();
+				execs = pueActual.getExecucions() !=null ? pueActual.getExecucions(): new ArrayList();
+			}
+			
+			if (!actiu) { // Eliminamos el que corresponda
+				boolean trobat = false;
+				
+				for (Iterator it = filas.iterator(); !trobat && it.hasNext(); ) {
+					DataRow fila = (DataRow) it.next();
+					String xpath = fila.getXPath();
+					ds = gridExecucions.getDataSource();
+					ctx = ds.getJXPathContext();
+					ExecucioPuntEntrada exe = (ExecucioPuntEntrada) ctx.getValue(xpath).getInstance();
+					if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Extranet) && laexecucio.equals("extranetEM")) {
+						// Eliminamos
+						ctx.removePath(xpath);
+						extranetEM=null; //Missatgebox.info ("execs abans ="+execs.size());
+						// L'esborrem del punt d'entrada
+						if (pueActual!=null) execs.remove(exe);  //Missatgebox.info ("execs després ="+execs.size());						
+						mostraExecucio(null,"extra");trobat=true;
+					} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Intranet) && laexecucio.equals("intranetEM")) {
+						// Eliminamos
+						ctx.removePath(xpath);
+						intranetEM=null; //Missatgebox.info ("execs abans ="+execs.size());
+						// L'esborrem del punt d'entrada
+						if (pueActual!=null) execs.remove(exe);  //Missatgebox.info ("execs després ="+execs.size());						
+						mostraExecucio(null,"intra");trobat=true;
+					} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Internet) && laexecucio.equals("internetEM")) {
+						// Eliminamos
+						ctx.removePath(xpath);
+						internetEM=null; //Missatgebox.info ("execs abans ="+execs.size());
+						// L'esborrem del punt d'entrada
+						if (pueActual!=null) execs.remove(exe);  //Missatgebox.info ("execs després ="+execs.size());						
+						mostraExecucio(null,"inter");trobat=true;
+					}
+				}
+				if (trobat) pueActual.setExecucions(execs);
+				
+			} else {
+				// Creamos la nueva ejecución
+				modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridExecucions.getModel();
+				ds = gridExecucions.getDataSource();
+				ctx = ds.getJXPathContext();
+				position = modelProxy.newInstance();
+				xpath = gridExecucions.getXPath() + modelProxy.getBind(position);
+				pointer = ctx.createPath(xpath);
+				ctx2 = ctx.getRelativeContext(pointer);
+				ExecucioPuntEntrada novaExecucio = (ExecucioPuntEntrada) ctx.getValue(xpath).getInstance(); 					
+				ctx2.setValue("@id", null); // l'autorització és nova
+				novaExecucio.setId(null);
+				// Ámbito
+				if (laexecucio.equals("extranetEM")) {
+					TipusExecucioPuntEntrada mime =  mime_extranetEM.getItems().get(0).getValue().getInstance(); // element per defecte
+					ctx2.setValue("@ambit",AmbitsExecucioPuntEntrada.Extranet);
+					ctx2.setValue("@contingut",mime.getPlantilla());
+					ctx2.setValue("@codiTipusExecucio",mime.getCodi());
+					ctx2.setValue("@tipusMimeExecucio",mime.getTipusMime());
+					novaExecucio.setAmbit(AmbitsExecucioPuntEntrada.Extranet);						
+					novaExecucio.setContingut(mime.getPlantilla());
+					novaExecucio.setCodiTipusExecucio(mime.getCodi());
+					novaExecucio.setTipusMimeExecucio(mime.getTipusMime());
+					extranetEM = novaExecucio; execs.add(novaExecucio);
+					mostraExecucio(novaExecucio,"extra");
+				} else if (laexecucio.equals("intranetEM")) {
+					TipusExecucioPuntEntrada mime =  mime_intranetEM.getItems().get(0).getValue().getInstance(); // element per defecte
+					ctx2.setValue("@ambit",AmbitsExecucioPuntEntrada.Intranet);
+					ctx2.setValue("@contingut",mime.getPlantilla());
+					ctx2.setValue("@codiTipusExecucio",mime.getCodi());
+					ctx2.setValue("@tipusMimeExecucio",mime.getTipusMime());
+					novaExecucio.setAmbit(AmbitsExecucioPuntEntrada.Intranet);
+					novaExecucio.setContingut(mime.getPlantilla());
+					novaExecucio.setCodiTipusExecucio(mime.getCodi());
+					novaExecucio.setTipusMimeExecucio(mime.getTipusMime());
+					intranetEM = novaExecucio; execs.add(novaExecucio);
+					mostraExecucio(novaExecucio,"intra");
+				} else if (laexecucio.equals("internetEM")) {
+					TipusExecucioPuntEntrada mime =  mime_internetEM.getItems().get(0).getValue().getInstance(); // element per defecte
+					ctx2.setValue("@ambit",AmbitsExecucioPuntEntrada.Internet);
+					ctx2.setValue("@contingut",mime.getPlantilla());
+					ctx2.setValue("@codiTipusExecucio",mime.getCodi());
+					ctx2.setValue("@tipusMimeExecucio",mime.getTipusMime());
+					novaExecucio.setAmbit(AmbitsExecucioPuntEntrada.Internet);
+					novaExecucio.setContingut(mime.getPlantilla());
+					novaExecucio.setCodiTipusExecucio(mime.getCodi());
+					novaExecucio.setTipusMimeExecucio(mime.getTipusMime());
+					internetEM = novaExecucio; execs.add(novaExecucio);
+					mostraExecucio(novaExecucio,"inter");
+				}
+				// Guardamos la execuciones en el pue
+				pueActual.setExecucions(execs); 
+			}
+		}
+		
+		
+		void aplicaPlantillaTipusMime(String quin) {
+			String laexecucio = quin.substring(5); 
+			treebox = esquema.getFellow("dades").getFellow("form").getFellow("appsGrid");
+			DataListbox llista = treebox.getFellow("mime_"+laexecucio);
+			int pos =llista.getSelectedIndex();
+			if (pos == -1) pos = 0;
+			
+			if (llista.getItems().get(pos).getValue() instanceof XmlDataNode) {
+				XmlDataNode elem = (XmlDataNode) llista.getItems().get(pos).getValue();
+				Object dades = elem.getInstance();
+				if (dades instanceof TipusExecucioPuntEntrada) {
+					TipusExecucioPuntEntrada tipusExe = (TipusExecucioPuntEntrada) dades;
+					// Obtenemos las ejecuciones
+					ds = gridExecucions.getDataSource();
+					ctx = ds.getJXPathContext();
+					Collection filas = gridExecucions.getRows().getChildren();
+					for (Iterator it = filas.iterator(); it.hasNext(); ) {
+						DataRow fila = (DataRow) it.next();
+						String xpath = fila.getXPath();
+						ExecucioPuntEntrada exe = (ExecucioPuntEntrada) ctx.getValue(xpath).getInstance();
+						if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Extranet) && laexecucio.equals("extranetEM")) {
+							pointer = ctx.getPointer(xpath);
+							ctx2 = ctx.getRelativeContext(pointer);
+							ctx2.setValue("@codiTipusExecucio", tipusExe.getCodi());
+							ctx2.setValue("@tipusMimeExecucio", tipusExe.getTipusMime());
+							ctx2.setValue("@contingut",tipusExe.getPlantilla());
+							mostraExecucio(exe,"extra");
+						} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Intranet) && laexecucio.equals("intranetEM")) {
+							pointer = ctx.getPointer(xpath);
+							ctx2 = ctx.getRelativeContext(pointer);
+							ctx2.setValue("@codiTipusExecucio", tipusExe.getCodi());
+							ctx2.setValue("@tipusMimeExecucio", tipusExe.getTipusMime());
+							ctx2.setValue("@contingut",tipusExe.getPlantilla());
+							mostraExecucio(exe,"intra");
+						} else if (exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Internet) && laexecucio.equals("internetEM")) {
+							pointer = ctx.getPointer(xpath);
+							ctx2 = ctx.getRelativeContext(pointer);
+							ctx2.setValue("@codiTipusExecucio", tipusExe.getCodi());
+							ctx2.setValue("@tipusMimeExecucio", tipusExe.getTipusMime());
+							ctx2.setValue("@contingut",tipusExe.getPlantilla());
+							mostraExecucio(exe,"inter");
+						}
+										
+					}
+				} 
+			} 
+		}
+		
+		String getExtensio (String mime) {
+			if ("application/x-rdp".equals(mime)) {
+				return ".rdp";
+			} else if ("application/x-ica".equals(mime)) {
+				return ".ica";
+			} else if ("application/wwstart".equals(mime)) {
+				return ".wpi";
+			} else if ("application/x-java-jnlp-file".equals(mime)) {
+				return ".jnlp";
+			} else return "";
+		}
+	
+	
+		void provarExecucio(String quina) {
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			PuntEntrada actual = arbre.getSelectedItem().getValue().getInstance();
+			if (actual==null) return;
+			Collection execucions = actual.getExecucions() !=null? actual.getExecucions(): new ArrayList();
+			boolean trobat = false;
+			if (execucions!=null) for (Iterator it = execucions.iterator(); !trobat && it.hasNext(); ) {
+				ExecucioPuntEntrada exe = (ExecucioPuntEntrada) it.next();
+				if (quina.endsWith("extranetEM") && exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Extranet)) {
+					String mime = java.net.URLEncoder.encode(exe.getTipusMimeExecucio(),"UTF-8");
+					String contingutEncoded = java.net.URLEncoder.encode(exe.getContingut(),"UTF-8");
+					String name =  java.net.URLEncoder.encode(actual.getNom()+getExtensio(exe.getTipusMimeExecucio()),"UTF-8");
+					Clients.evalJavaScript("window.open('./execucions/"+name+"?mime="+mime+"&amp;contingut="+contingutEncoded+"', '_blank');"); 
+				} else if (quina.endsWith("intranetEM") && exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Intranet)) {
+					String mime = java.net.URLEncoder.encode(exe.getTipusMimeExecucio(),"UTF-8");
+					String contingutEncoded = java.net.URLEncoder.encode(exe.getContingut(),"UTF-8");
+					String name =  java.net.URLEncoder.encode(actual.getNom()+getExtensio(exe.getTipusMimeExecucio()),"UTF-8");
+					Clients.evalJavaScript("window.open('./execucions/"+name+"?mime="+mime+"&amp;contingut="+contingutEncoded+"', '_blank');");
+				} else if (quina.endsWith("internetEM") && exe.getAmbit().equals(AmbitsExecucioPuntEntrada.Internet)) {
+					String mime = java.net.URLEncoder.encode(exe.getTipusMimeExecucio(),"UTF-8");
+					String contingutEncoded = java.net.URLEncoder.encode(exe.getContingut(),"UTF-8");
+					String name =  java.net.URLEncoder.encode(actual.getNom()+getExtensio(exe.getTipusMimeExecucio()),"UTF-8");
+					Clients.evalJavaScript("window.open('./execucions/"+name+"?mime="+mime+"&amp;contingut="+contingutEncoded+"', '_blank');");
+				}
+			}
+		}
+		
+		void showCancelButton()
+		{
+			b_cancel = esquema.getFellow("lista").getFellow("b_cancel");
+			b_cancel.setVisible(true);
+		}
+		
+		void hiddeButtons()
+		{
+			b_inserir = esquema.getFellow("lista").getFellow("treebox")
+					.getFellow("b_inserir");
+			b_commit = esquema.getFellow("lista").getFellow("treebox").getFellow("b_commit");
+			b_cancel = esquema.getFellow("lista").getFellow("b_cancel");
+			
+			b_inserir.setVisible(false);
+			b_commit.setVisible(false);
+			b_cancel.setVisible(false);
+		}
+		
+		boolean onInserir (registre)
+		{
+			// Seleccionem la primera pestanya
+			panels.setSelectedIndex(0);
+			// Serà de tipus menú, amaguem execucions:
+			amagaDadesExecucio("intranetEM");
+			amagaDadesExecucio("extranetEM");
+			amagaDadesExecucio("internetEM");
+			p_execucions.setVisible(false);
+			orow_tipusmenu.setVisible(true);
+			
+			// Amaguem icones
+			mostraImatge("icona1", null, true);
+			
+			// Tenim garantit que tenim permís d'administrador al pare i que el pare és de tipus menú
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			b_inserir = esquema.getFellow("lista").getFellow("treebox")
+				.getFellow("b_inserir");
+			
+			Treeitem current = arbre.getSelectedItem();
+			Treeitem pare = current.getParent().getParent();
+			
+			try
+			{
+				PuntEntrada nodeNou = registre.getInstance();
+				PuntEntrada nodePare = pare.getValue().getInstance(); //Missatgebox.info ("Pare = "+nodePare.getNom()+" id="+nodePare.getId());
+				boolean canAdmin = getPuntEntradaService().canAdmin(nodePare);
+				
+				if (!canAdmin)
+				{
+					throw new CreateException (org.zkoss.util.resource
+						.Labels.getLabel("aplicacionsIntranet.ErrorAdministrarAplicacio"));
+				}
+				
+				//Amaguem botó afegeix nou
+				b_inserir.setVisible(false);
+				
+				// Show cancel changes button
+				showCancelButton();
+				
+				// Omplim les dades del nou punt d'entrada
+				appsGrid = esquema.getFellow("dades").getFellow("form");
+				b_tipusMenu = appsGrid.getFellow("oesmenu");
+				b_tipusMenu.setDisabled(false);// habilitem el selector de si és tipus Menú
+				// Posem per defecte les opcions del pare:
+				seleccionaElementListbox(appsGrid.getFellow("oesmenu"),
+						nodePare.getMenu()); //Si és de tipus menu
+				seleccionaElementListbox(appsGrid.getFellow("otipus_menu"), "L"); //tipus menu = LLista
+				seleccionaElementListbox(appsGrid.getFellow("opublicaccess"),
+						nodePare.getEsPublic()); // si és public
+				seleccionaElementListbox(appsGrid.getFellow("ovisible"),
+						nodePare.getVisible()); // si és visible
+				seleccionaElementListbox(appsGrid.getFellow("odetall_aplicacio"),
+						nodePare.getIdAplicacio()); //aplicacio
+				// Hacemos los cambios en el VO
+				nodeNou.setMenu("N"); // de tipus menú per defecte
+				nodeNou.setTipusMenu("L");// de tipus llista
+				nodeNou.setEsPublic(nodePare.getEsPublic());
+				nodeNou.setVisible(nodePare.getVisible());
+				nodeNou.setIdAplicacio(nodePare.getIdAplicacio());
+				nodeNou.setIdPare(nodePare.getId());//id pare
+				String rutaFill = nodePare.getRutaArbre() + " > " + nodePare.getNom();
+				nodeNou.setRutaArbre(rutaFill); // Copiem ruta del pare
+				// Copiem les autoritzacions del pare:
+				Collection autoritzacions = new ArrayList();
+				if (nodePare.getAutoritzacions() != null)
+				{
+					for(Iterator it = nodePare.getAutoritzacions().iterator();
+							it.hasNext();)
+					{
+						//Clonem les autoritzacions del pare
+						AutoritzacioPuntEntrada apare= (AutoritzacioPuntEntrada) it.next();
+						AutoritzacioPuntEntrada auto = new AutoritzacioPuntEntrada();
+						auto.setDescripcioNivellAutoritzacio(apare.getDescripcioNivellAutoritzacio());
+						auto.setIdPuntEntrada(nodeNou.getId());
+						auto.setTipusEntitatAutoritzada(apare.getTipusEntitatAutoritzada());
+						auto.setIdEntitatAutoritzada(apare.getIdEntitatAutoritzada());
+						auto.setDescripcioEntitatAutoritzada(apare.getDescripcioEntitatAutoritzada());
+						auto.setCodiEntitatAutoritzada(apare.getCodiEntitatAutoritzada());
+						autoritzacions.add(auto);
+						afegeixAutoritzacio(auto);
+					}
+				}
+				//nodeNou.setAutoritzacions(autoritzacions); //ja se fa en afegeixautoritzacio 
+				
+				// y en el modelo
+				modelInstance = arbre.getModel();
+				modelProxy = (es.caib.zkib.binder.tree.FullTreeModelProxy) arbre.getModel();
+				ds = arbre.getDataSource();
+				ctx = ds.getJXPathContext();
+						
+				xpath = arbre.selectedItem.value.getXPath();
+				pointer = ctx.getPointer(xpath);
+				ctx2 = ctx.getRelativeContext(pointer);
+				ctx2.setValue("@menu", nodeNou.getMenu());
+				ctx2.setValue("@esPublic", nodeNou.getEsPublic());
+				ctx2.setValue("@tipusMenu", "L");
+				ctx2.setValue("@visible", nodeNou.getVisible());
+				ctx2.setValue("@idAplicacio", nodeNou.getIdAplicacio());
+				ctx2.setValue("@idPare", nodePare.getId()); //Node pare
+				ctx2.setValue("@rutaArbre", rutaFill); //Posem la ruta 
+				
+				if (arbre.getSelectedCount()!=0) {// si no dóna error mostrem detalls
+					onChangeDades ();
+					showDetall();
+				}
+				return true;
+			} catch (Exception ex) {
+				Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCreant"), 
+												new Object [] {ex.getMessage()})); 
+				return false;
+			  }
+			return false;
+		}
+		
+		es.caib.seycon.ng.servei.ejb.PuntEntradaService pueService;
+		public es.caib.seycon.ng.servei.ejb.PuntEntradaService getPuntEntradaService() {
+			if (pueService==null) {
+				javax.naming.Context context = new javax.naming.InitialContext();
+				Object objPUE = context.lookup(es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.JNDI_NAME);
+				es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome pueHome = (es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome) javax.rmi.PortableRemoteObject.narrow(
+					objPUE, es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.class);
+				/*es.caib.seycon.ng.servei.ejb.PuntEntradaService*/ pueService = pueHome.create();
+			}
+			return 	pueService;
+		
+		}
+		
+		public void validaXML() {
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
+			//Missatgebox.info ("validant xML = "+nodeActual.getXmlPUE());
+			try {		
+				String errorVal = getPuntEntradaService().validaXMLPUE(nodeActual);
+				Missatgebox.info (!"".equals(errorVal) ? errorVal : org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Correcte"));
+			} catch (Throwable th) {
+				Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorValidacio"), 
+												new Object [] {th.getMessage()}));
+			} 
+			
+		}
+		
+		public void onMoureTree(DropEvent evt) { // Versió drag'n'drop
+			Object cercaActiva = desktop.getPage("applicacionsIntranet").getAttribute("cercaActiva");
+			boolean cercant = false;
+			if (cercaActiva!=null && cercaActiva instanceof Boolean) {
+				cercant = ((Boolean) cercaActiva).booleanValue();
+			}
+			if (cercant) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Drag"));
+				return; 
+			}
+			// Ens asegurem que es pot moure elements (les dades estan actualitzades)
+			if (esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MourePunts"));
+				return;
+			}		
+		
+			/*if (esquema.isFormulariVisible()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MourePuntsDetalls"));
+				return;
+			}*/	
+			DataTree arbre = esquema.getFellow("lista").getFellow("treebox");
+			Treerow droppedRow = (Treerow) evt.getDragged();
+			Treerow targetRow = (Treerow) evt.getTarget();
+			
+			Treeitem droppedElem = (Treeitem) droppedRow.getTreeitem();
+			Treeitem targetElem = (Treeitem) targetRow.getParent();
+			
+			// No es permet modificar el nivell 0 (Govern de les Illes Balears)
+			if (targetElem.getParent().getParent() instanceof DataTree || droppedElem.getParent().getParent() instanceof DataTree ) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.NoMoure"));
+				return;
+			}
+			
+			PuntEntrada pueDropped = droppedElem.getValue().getInstance();
+			PuntEntrada pueTarget = targetElem.getValue().getInstance();
+			
+			if ( !getPuntEntradaService().canAdmin(pueDropped) || !getPuntEntradaService().canAdmin(pueTarget) ) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.NoAutoritzat")); return;
+			}
+			
+			Treeitem brancaDesti = (Treeitem) targetElem.getParent().getParent();
+			Treeitem brancaOrigen = (Treeitem) droppedElem.getParent().getParent();
+			
+			XmlDataNode nodeBrancaDesti = brancaDesti.getValue();
+			XmlDataNode nodeBrancaOrigen = brancaOrigen.getValue();
+			
+			//Missatgebox.info (nodeBrancaDesti.getInstance().getId() +"-"+ nodeBrancaOrigen.getInstance().getId()); return; 
+			
+			String nomDropped = pueDropped.getNom();
+			String nomPareTarget = nodeBrancaDesti.getInstance().getNom();
+			String missatge = ""; String titol="Moure?";
+			boolean mateixPare = false;
+			
+			if (droppedElem.getParent().equals(targetElem.getParent())) {
+				// Mateix pare, els reordenem
+				missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.SegurCanviarOrdre"), new Object [] {nomDropped}); 
+				titol = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CanviarOrdre"), new Object [] {nomDropped});
+				mateixPare = true;
+				// Evitem moviment que no fa res.. 
+				try {
+					int posOrigen = Integer.parseInt(pueDropped.getOrdre());
+					int posDesti = Integer.parseInt(pueTarget.getOrdre());
+					if (posOrigen == (posDesti-1)) {
+						return; // No es fa res.. el moviment s'ha de fer a la inversa
+					}
+				}
+				catch (Exception ex) {}
+			} else {
+				// Hem de esborrar l'arbre anterior i crear un de nou
+				// en la posició indicada
+				missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MoureOrdre"), new Object [] {nomDropped,nomPareTarget});
+			}		
+			
+			String avis = org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Avis2");
+			
+			Missatgebox.confirmaOK_CANCEL(
+				missatge+avis,
+				titol,
+				new EventListener() {
+					public void onEvent(Event evt) {
+						if ("onOK".equals(evt.getName())) {
+							//onOK
+							try {
+								boolean resultat = getPuntEntradaService().reordenaPuntEntrada(pueDropped,pueTarget);
+								if (!resultat)
+									Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMoure"));
+								else {
+									// Hem de refrescar les branques amb els nous fills
+				
+									// Refresquem tot l'arbre
+									model.getJXPathContext().getValue("/").refresh();
+									arbre.setDataPath( "/model:/" );
+									esquema.getFellow("dades").getFellow("form").getFellow("mouretreebox").setDataPath( "/model:/" );
+									// I obrim les branques origen i destí (si correspon)  
+									// nota: pot fallar si es canvia l'ordre.. però s'aproxima.. [IDEA fer-ho per instance si és l'ultim nivell]
+									if (!mateixPare)
+										arbre.obreBrancaByXpath(nodeBrancaOrigen.getXPath());
+									arbre.obreBrancaByXpath(nodeBrancaDesti.getXPath());
+								}
+								
+							} catch (Exception ex) {
+								Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMourePunt"), 
+												new Object [] {ex.getMessage()}));
+								ex.printStackTrace();
+							}
+						} 
+	   				}
+	   			}
+	   		);		
+	
+			
+		}
+		
+		public void onMoureTreeSeleccio() { // Accés usant botó dintre de pestanya
+			// Ens asegurem que es pot moure elements (les dades estan actualitzades)
+			if (esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MoureConfirmar"));
+				return;
+			}		
+		
+			/*if (esquema.isFormulariVisible()) {
+				Missatgebox.avis ("Avís: Per poder moure els punts d'entrada ha de tancar abans 'Detalls'");
+				return;
+			}*/	
+			
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			arbreMoure = form.getFellow("mouretreebox");
+			
+			Treeitem droppedElem = (Treeitem) arbre.getSelectedItem();
+			Treeitem targetElem = (Treeitem) arbreMoure.getSelectedItem();
+			
+			if (droppedElem==null || targetElem==null) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMourePuntArbre")); 
+				return;
+			}
+			
+			// No es permet modificar el nivell 0 (Govern de les Illes Balears)
+			if (droppedElem.getParent().getParent() instanceof DataTree ) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.NoMoureNivell"));
+				return;
+			}
+			
+			PuntEntrada pueDropped = droppedElem.getValue().getInstance();
+			PuntEntrada pueTarget = targetElem.getValue().getInstance();
+			
+			if (pueDropped.getId().equals(pueTarget.getId()) || pueDropped.getIdPare().equals(pueTarget.getId())) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MovimentInvalid")); return;
+			}
+			
+			if ( !getPuntEntradaService().canAdmin(pueDropped) || !getPuntEntradaService().canAdmin(pueTarget) ) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.NoAutoritzat")); return;
+			}
+			
+			if (!"S".equals(pueTarget.getMenu())) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.DestiMenu")); return;
+			}
+	
+			Treeitem brancaOrigen = (Treeitem) droppedElem.getParent().getParent();
+			
+			String nomDropped = pueDropped.getNom();
+			String nomTarget = pueTarget.getNom();
+			String missatge = ""; String titol=org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Moure");
+			boolean mateixPare = false;
+	
+			if (droppedElem.getParent().equals(targetElem.getParent())) {
+				// Mateix pare, els reordenem
+				missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.SegurCanviarOrdre"), 
+												new Object [] {nomDropped }); 
+				titol=String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CanviarOrdre"), 
+												new Object [] {nomDropped });
+				mateixPare = true;
+				// Evitem moviment que no fa res.. 
+				try {
+					int posOrigen = Integer.parseInt(pueDropped.getOrdre());
+					int posDesti = Integer.parseInt(pueTarget.getOrdre());
+					if (posOrigen == (posDesti-1)) {
+						return; // No es fa res.. el moviment s'ha de fer a la inversa
+					}
+				}
+				catch (Exception ex) {}
+			} else {
+				// Hem de esborrar l'arbre anterior i crear un de nou
+				// en la posició indicada
+				missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MoureOrdre"),
+					new Object [] {nomDropped,nomTarget});
+			}
+			
+			String avis = org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Avis");
+
+			if (Messagebox.show(missatge+avis,titol,Messagebox.OK|Messagebox.CANCEL,Messagebox.QUESTION) == Messagebox.OK) {
+				try {
+					boolean resultat = getPuntEntradaService().moureMenusPuntEntrada(pueDropped,pueTarget);
+					if (!resultat)
+						Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMoure"));
+					else {
+						// Hem de refrescar les branques amb els nous fills
+	
+						// Refresquem tot l'arbre
+						model.getJXPathContext().getValue("/").refresh();
+						treebox = esquema.getFellow("lista").getFellow("treebox");
+						treebox.setDataPath("/model:/");
+						arbreMoure.setDataPath("/model:/");
+						
+						// I obrim la braca destí  
+						arbre.obreBrancaByXpath(targetElem.getValue().getXPath().replaceAll("/moure","/app"));//otro árbol
+	
+					}
+					
+				} catch (Exception ex) {
+					Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMourePunt"), 
+												new Object [] {ex.getMessage()}));
+					ex.printStackTrace();
+				}
+																		
+			}
+			
+		}
+		
+		public void onCopiarTreeSeleccio() { // Estem dintre de pestanya
+			// Ens asegurem que es pot moure elements (les dades estan actualitzades)
+			if (esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Copiar"));
+				return;
+			}		
+		
+			/*if (esquema.isFormulariVisible()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.TancarDetalls"));
+				return;
+			}*/	
+			
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			arbreMoure = form.getFellow("mouretreebox");
+			
+			Treeitem droppedElem = (Treeitem) arbre.getSelectedItem();
+			Treeitem targetElem = (Treeitem) arbreMoure.getSelectedItem();
+			
+			if (droppedElem==null || targetElem==null) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopiant")); 
+				return;
+			}
+			
+			// No es permet modificar el nivell 0 (Govern de les Illes Balears)
+			if (droppedElem.getParent().getParent() instanceof DataTree ) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopiantNivell"));
+				return;
+			}
+			
+			PuntEntrada pueDropped = droppedElem.getValue().getInstance();
+			PuntEntrada pueTarget = targetElem.getValue().getInstance();
+			
+			// Deixem que es copie dintre del matiex pare
+			if (pueDropped.getId().equals(pueTarget.getId()) /*|| pueDropped.getIdPare().equals(pueTarget.getId())*/) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MovimentInvalid")); 
+				return;
+			}
+			
+			if ( !getPuntEntradaService().canAdmin(pueDropped) || !getPuntEntradaService().canAdmin(pueTarget) ) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.NoAutoritzatCopiar")); 
+				return;
+			}
+			
+			if (!"S".equals(pueTarget.getMenu())) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.DestiMenu")); 
+				return;
+			}
+	
+			Treeitem brancaOrigen = (Treeitem) droppedElem.getParent().getParent();
+			
+			String nomDropped = pueDropped.getNom();
+			String nomTarget = pueTarget.getNom();
+			String missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.SegurCopiaBranca"), 
+												new Object [] {nomDropped,nomTarget}); 
+			String titol=org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Copia");
+			boolean mateixPare = false;
+	
+			if (droppedElem.getParent().equals(targetElem.getParent())) {
+				// Mateix pare
+				mateixPare = true;
+			} 		
+			String avis = org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Avis");
+			
+			if (Messagebox.show(missatge+avis,titol,Messagebox.OK|Messagebox.CANCEL,Messagebox.QUESTION) == Messagebox.OK) {
+				try {
+					boolean resultat = getPuntEntradaService().copiaPuntEntrada(pueDropped,pueTarget);
+					if (!resultat)
+						Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopia"));
+					else {
+						// Hem de refrescar les branques amb els nous fills
+	
+						// Refresquem tot l'arbre
+						model.getJXPathContext().getValue("/").refresh();
+						treebox = esquema.getFellow("lista").getFellow("treebox");
+						treebox.setDataPath("/model:/");
+						arbreMoure.setDataPath("/model:/");
+						
+						// I obrim la braca destí  
+						if (!mateixPare) {
+							XmlDataNode nodeBrancaOrigen = brancaOrigen.getValue();
+							arbre.obreBrancaByXpath(nodeBrancaOrigen.getXPath());
+						}
+						
+						arbre.obreBrancaByXpath(targetElem.getValue().getXPath().replaceAll("/moure","/app"));//otro árbol
+	
+					}
+					
+				} catch (Exception ex) {
+					Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopiaPunt"), 
+												new Object [] {ex.getMessage()}));
+					ex.printStackTrace();
+				}
+																		
+			}	
+		
+		}	
+		
+		public void onCopiarEnlaceTreeSeleccio() { // Estem dintre de pestanya
+			// Ens asegurem que es pot moure elements (les dades estan actualitzades)
+			if (esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiaConfirmar"));
+				return;
+			}		
+		
+			/*if (esquema.isFormulariVisible()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiaDetalls"));
+				return;
+			}*/	
+			
+			arbre = esquema.getFellow("lista").getFellow("treebox");
+			arbreMoure = form.getFellow("mouretreebox");
+			
+			Treeitem droppedElem = (Treeitem) arbre.getSelectedItem();
+			Treeitem targetElem = (Treeitem) arbreMoure.getSelectedItem();
+			
+			if (droppedElem==null || targetElem==null) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiaArbre")); 
+				return;
+			}
+			
+			// No es permet modificar el nivell 0 (Govern de les Illes Balears)
+			if (droppedElem.getParent().getParent() instanceof DataTree ) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiaNivell"));
+				return;
+			}
+			
+			PuntEntrada pueDropped = droppedElem.getValue().getInstance();
+			PuntEntrada pueTarget = targetElem.getValue().getInstance();
+			
+			// Deixem que es copie dintre del matiex pare
+			if (pueDropped.getId().equals(pueTarget.getId()) || pueDropped.getIdPare().equals(pueTarget.getId())) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.MovimentIncorrecte")); 
+				return;
+			}
+			
+			if ( !getPuntEntradaService().canAdmin(pueDropped) || !getPuntEntradaService().canAdmin(pueTarget) ) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiaNoAutoritzat")); 
+				return;
+			}
+			
+			if (!"S".equals(pueTarget.getMenu())) {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.DestiMenu")); 
+				return;
+			}
+	
+			Treeitem brancaOrigen = (Treeitem) droppedElem.getParent().getParent();
+			
+			String nomDropped = pueDropped.getNom();
+			String nomTarget = pueTarget.getNom();
+			String missatge = String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Enlazar"), 
+												new Object [] {nomDropped,nomTarget}); 
+			String titol=org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.CopiarEnlla");
+			boolean mateixPare = false;
+	
+			if (droppedElem.getParent().equals(targetElem.getParent())) {
+				// Mateix pare
+				mateixPare = true;
+			} 		
+			String avis = org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Avis");
+			
+			if (Messagebox.show(missatge+avis,titol,Messagebox.OK|Messagebox.CANCEL,Messagebox.QUESTION) == Messagebox.OK) {
+				try {
+					boolean resultat = getPuntEntradaService().copiaEnlacePuntEntrada(pueDropped,pueTarget);
+					if (!resultat)
+						Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopia"));
+					else {
+						// Hem de refrescar les branques amb els nous fills
+	
+						// Refresquem tot l'arbre
+						model.getJXPathContext().getValue("/").refresh();
+						treebox = esquema.getFellow("lista").getFellow("treebox");
+						treebox.setDataPath("/model:/");
+						arbreMoure.setDataPath("/model:/");
+						
+						// I obrim la braca destí  
+						if (!mateixPare) {
+							XmlDataNode nodeBrancaOrigen = brancaOrigen.getValue();
+							arbre.obreBrancaByXpath(nodeBrancaOrigen.getXPath());
+						}
+						
+						arbre.obreBrancaByXpath(targetElem.getValue().getXPath().replaceAll("/moure","/app"));//otro árbol
+	
+					}
+					
+				} catch (Exception ex) {
+					Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorCopiaPunt"), 
+												new Object [] {ex.getMessage()}));
+					ex.printStackTrace();
+				}
+																		
+			}	
+		}
+		
+		void onSalvarCanvis() {//Recibimos el evento una vez se ha salvado (aunque haya fallado)
+			//Al hacer click en commit no dejamos que se cambie el tipo de menú
+			esquema.getFellow("dades").getFellow("form").getFellow("appsGrid").getFellow("oesmenu").setDisabled(true);
+			
+			// Si es nuevo: repintamos los árboles y abrimos la rama correspondiente
+			/*b_inserir = esquema.getFellow("lista").getFellow("treebox").getFellow("b_inserir");
+			Treeitem pare = b_inserir.getPareNode();
+			if (pare!=null) {//Només en nous elements
+				// Tornem a pintar els arbres:
+				treebox.setDataPath( "/model:/" );
+				// I obrim la branca del pare del nou node:
+				treebox.obreBrancaByXpath(pare.getValue().getXPath());
+				esquema.getFellow("dades").getFellow("form").getFellow("mouretreebox").setDataPath( "/model:/" );
+			} else {
+				// Repintamos el árbol interno (por si se eliminan menús)
+				esquema.getFellow("dades").getFellow("form").getFellow("mouretreebox").setDataPath( "/model:/" );
+			}
+			*/
+		}
+		
+		void onCommitDone() {
+			//Missatgebox.info ("oncommit done");
+		}	
+		
+		void onRefrescaArbreIntern(boolean checkCommit) {
+			treebox = esquema.getFellow("lista").getFellow("treebox");
+			if (checkCommit && esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ConfirmarRefrescar"));
+				return;
+			}
+			
+			arbreMoure = esquema.getFellow("dades").getFellow("form").getFellow("mouretreebox");		
+			
+			String xpath_arbre  = null;
+			String xpath_arbre_intern = null;
+			if (treebox.getSelectedItem()!=null) {
+				xpath_arbre = treebox.getSelectedItem().getValue().getXPath();
+			}
+			if (arbreMoure.getSelectedItem()!=null) {
+				xpath_arbre_intern = arbreMoure.getSelectedItem().getValue().getXPath();
+			}
+			// Refresquem el contingut
+			model.getJXPathContext().getValue("/").refresh();
+			treebox.setDataPath("/model:/");
+			arbreMoure.setDataPath("/model:/");
+			// I tornem a obrir les branques als dos arbres
+			if (xpath_arbre!=null) {
+				treebox.obreBrancaByXpath(xpath_arbre);
+			}
+			if (xpath_arbre_intern!=null) {
+				arbreMoure.obreBrancaByXpath(xpath_arbre_intern);
+			}
+			
+			hiddeButtons();
+		}	
+		
+		void onAutoritzacio (AutoritzacioPuntEntrada auto)
+		{
+			if(auto != null){
+				auto.setIdPuntEntrada(idPuntEntrada);
+				afegeixAutoritzacio(auto);
+			}
+		}
+		]]>
+	</zscript>
+	
+	<esquemavertical datamodel="/model" focusCriteri="queryNom" id="esquema" onHideFormulari="showLista()">
+		<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()" width="${amplaria}"> 
+			<hbox>
+				<input_criteri etiqueta="${c:l('aplicacionsIntranet.zul.Nom')}" id="queryNom" width_custom="400px" widths_custom="100px,300px"/>
+				<input_criteri etiqueta="${c:l('aplicacionsIntranet.zul.Codi')}" id="queryCodi" width_custom="306px" widths_custom="50px,*"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<separator height="5px"/>
+			<hbox widths="100px,*">
+				<label sclass="etiqueta" value="${c:l('aplicacionsIntranet.zul.Aplicacia')}"/>
+				<listbox dataPath="/modelCerca:/aplicacionsCerca" id="queryAplicacio" mold="select" width="570px"> <!-- onSelect="org.zkoss.zk.ui.event.Events.postEvent(Events.ON_CHANGE, queryWindow, event.data)"  -->
+					<dataitem bind=".">
+						<listcell bind="@nom"/>
+					</dataitem>
+				</listbox>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="${amplaria}">
+			<toolbar>
+				<inserttreebutton acces="${true}" id="b_inserir" path="/app" tree="/esquema/lista/treebox" visible="${false}"/>
+				<deletetreebutton acces="${true}" confirmarAbansEsborrar="true" id="b_esborrar" potEsborrarBranquesAmbFills="false" tree="/esquema/lista/treebox" visible="${false}"/> 
+				<commitbutton id="b_commit" datamodel="/model" onClick="onSalvarCanvis()"/>
+				<toolbarbutton id="b_cancel" image="~./img/document-undo.gif"
+					visible="${false}"
+					label="${c:l('aplicacionsIntranet.zul.CancelChanges')}"
+					onClick="onRefrescaArbreIntern(false);hiddeButtons();" />
+				<toolbarbutton image="~./img/reload-petit16b.png" label="${c:l('aplicacionsIntranet.zul.Refrescaarbre')}" onClick="onRefrescaArbreIntern(true)"/>
+			</toolbar>
+			<tree autocommit="false" dataPath="/model:/" fixedLayout="true" height="96%" id="treebox" onSelect="select()" pageSize="19" rows="${fileres}">
+				<treeitemfinder bind="." open="false" path="/app">
+					<treerow draggable="true" droppable="true" onDrop="onMoureTree(event)">
+						<treecell bind="@nom"/>
+					</treerow>
+				</treeitemfinder>
+			</tree>
+		</navegador>
+		<detalls id="dades" width="${amplaria}">
+			<form id="form" dataPath="/esquema/lista/treebox:/"
+				onChangeXPath="onChangeDades()" width="99%">
+				<attribute name="onActualitza">
+					Object[] dades = (Object[]) event.getData();
+				</attribute>
+				<tabbox id="panels" width="${amplaria2}">
+					<tabs>
+						<tab id="p_basico" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+						<tab id="p_autoritzacions" label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
+						<tab id="p_execucions" label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
+						<tab id="p_moure" label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
+						<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/>
+					</tabs>
+					<tabpanels>
+						<tabpanel id="basica">
+							<hbox width="99%">
+								<label id="lbrutaArbre" bind="@rutaArbre" sclass="etiqueta"/>
+								<hbox align="right" style="float:right;">
+									<label value="${c:l('aplicacionsIntranet.zul.[')}"/>
+									<div sclass="lruta">${c:l('aplicacionsIntranet.zul.Obtindrecaminsdacca')}
+									<attribute name="onClick">
+										arbre = esquema.getFellow("lista").getFellow("treebox");
+										PUEActual = arbre.selectedItem.getValue().getInstance();
+										Collection rutes = getPuntEntradaService().getArbreInversPuntEntrada (PUEActual);
+										String camins = "";
+										for (Iterator it = rutes.iterator(); it.hasNext(); ) {
+											camins += (String)it.next()+"\n\n";
+										}
+										Missatgebox.info (camins,org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.DiferentsCamins"));
+									</attribute>
+									</div>
+									<label value="${c:l('aplicacionsIntranet.zul.]')}"/>
+								</hbox>
+							</hbox>
+							<separator height="3px"/>
+							<grid id="appsGrid" width="99%">
+								<rows>
+									<row visible="false">
+										<input_etiqueta bind="@id" id="idpent"/>
+									</row>
+									<row>
+										<input_etiqueta style="width:100px;display:block;"
+											value="${c:l('aplicacionsIntranet.zul.Nom-2')}"/>
+										<hbox width="100%">
+											<input_dada id="odetall_name" bind="@nom"
+												mascara="no empty" lectura="true" maxim="128"
+												width_custom="98%"/>
+											<label value="*"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('aplicacionsIntranet.zul.Codi-2')}"/>
+										<hbox>
+											<input_dada id="odetall_codi" bind="@codi"
+												lectura="true" maxim="10"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+										<listbox id="odetall_aplicacio"
+											dataPath="/model:/aplicacions" disabled="${true}"
+											mold="select" onSelect="canviaAplicacio()">
+											<dataitem bind=".">
+												<listcell bind="@nom"/>
+											</dataitem>
+										</listbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipus')}"/>
+										<listbox bind="@menu" disabled="${true}" id="oesmenu" mold="select" onSelect="canviaTipusPUE(self.selectedItem.value)" width="100px"> <!--  no es pot canviar: només a les noves -->
+											<listitem label="${c:l('aplicacionsIntranet.zul.Mena')}" value="S"/>
+											<listitem label="${c:l('aplicacionsIntranet.zul.Accia')}" value="N"/>
+										</listbox>
+									</row>
+									<row id="orow_tipusmenu">
+										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipusdemena')}"/>
+										<hbox>
+											<listbox bind="@tipusMenu" disabled="${true}" id="otipus_menu" mold="select" onSelect="" width="100px">
+												<listitem label="${c:l('aplicacionsIntranet.zul.Llista')}" value="L"/>
+												<listitem label="${c:l('aplicacionsIntranet.zul.Icones')}" value="I"/>
+												<listitem label="${c:l('aplicacionsIntranet.zul.Arbre')}" value="A"/>
+											</listbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Namerodecolumnes')}"/>
+											<input_dada bind="@numColumnes" id="onum_columnes" lectura="true" maxim="10" width_custom="120px"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Accas')}"/>
+										<listbox bind="@esPublic" disabled="${true}" id="opublicaccess" mold="select" onSelect="" width="100px">
+											<listitem label="${c:l('aplicacionsIntranet.zul.Pablic')}" value="S"/>
+											<listitem label="${c:l('aplicacionsIntranet.zul.Restringit')}" value="N"/>
+										</listbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Visiblesensepermas')}"/>
+										<listbox bind="@visible" disabled="${true}" id="ovisible" mold="select" onSelect="">
+											<listitem label="${c:l('aplicacionsIntranet.zul.Si')}" value="S"/>
+											<listitem label="${c:l('aplicacionsIntranet.zul.No')}" value="N"/>
+										</listbox>
+									</row>
+								</rows>
+							</grid>
+							<hbox height="50px"> <hbox class="ticona">
+								<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Iconas')}"/>
+								<image id="img_icona1" sclass="pue_img"/>
+								<vbox id="opcionsicona1" visible="true">
+									<image id="oafegir_icona1" src="~./img/list-add.gif" tooltiptext="${c:l('aplicacionsIntranet.AfegirIcona')}"/>
+									<image id="oesborrar_icona1" src="~./img/list-remove.gif" tooltiptext="${c:l('aplicacionsIntranet.EsborraIcona')}"/>
+								</vbox>
+							</hbox></hbox>
+						</tabpanel>
+						
+						<tabpanel>
+							<vbox width="100%">
+								<grid id="gridAutoritzacions"
+									dataPath="/esquema/lista/treebox:/autoritzacions"
+									fixedLayout="true" height="280px" width="99%"
+									onAutoritzacio="onAutoritzacio(event.data)">
+										
+									<columns>
+										<column label="${c:l('aplicacionsIntranet.zul.Nivell')}"
+											width="100px"/>
+										<column label="${c:l('aplicacionsIntranet.zul.Tipusdautoritzacia')}"
+											width="120px"/>
+										<column label="${c:l('aplicacionsIntranet.zul.Propietari')}"/>
+										<column id="oremoveautoritzacio"
+											label="${c:l('aplicacionsIntranet.zul.')}" visible="${true}"
+											width="40px"/>
+									</columns>
+									<datarow>
+										<label bind="@descripcioNivellAutoritzacio"/>
+										<label bind="@tipusEntitatAutoritzada"/>
+										<label bind="@descripcioEntitatAutoritzada"/>
+										<imageclic align="center" src="~./img/list-remove.gif">
+											<attribute name="onClick">	
+												arbre = esquema.getFellow("lista").getFellow("treebox"); 
+												if (arbre.selectedItem != null @and arbre.selectedItem.value != null) {
+													PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
+													dataRow = self.getParent();
+													xpath = dataRow.getXPath();
+													dataSource = gridAutoritzacions.getDataSource();
+													context = dataSource.getJXPathContext();
+													dada = context.getValue(xpath+"/@descripcioEntitatAutoritzada");
+													if (Messagebox.show(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.RevocarAutoritzacio"), 
+															new Object [] {dada}),org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Revocar"),Messagebox.OK|Messagebox.CANCEL,Messagebox.QUESTION) == Messagebox.OK) {												
+														AutoritzacioPuntEntrada autoBorrar =context.getValue(xpath).getInstance();
+														Collection autos = nodeActual.getAutoritzacions();
+														if (autos!=null) {//Missatgebox.info ("autos ="+autos.size()+" id borrar ="+autoBorrar.getId() ); 
+															boolean trobatA = false;
+															for (Iterator it = autos.iterator(); !trobatA @and it.hasNext(); ) {
+																AutoritzacioPuntEntrada aa = (AutoritzacioPuntEntrada) it.next();
+																if (aa.getCodiEntitatAutoritzada().equals(autoBorrar.getCodiEntitatAutoritzada())
+																	@and aa.getTipusEntitatAutoritzada().equals(autoBorrar.getTipusEntitatAutoritzada())
+																) 
+																{ //L'hem trobada
+																	it.remove(); 
+																	trobatA=true;
+																}
+															} 
+															nodeActual.setAutoritzacions(autos); //Missatgebox.info ("autos despres="+autos.size());
+															context.removePath(xpath);
+														}
+													}
+												}
+											</attribute>														
+										</imageclic>
+									</datarow>
+								</grid>
+								<button id="oautousu" image="~./img/list-add.gif"
+									label="${c:l('aplicacionsIntranet.Afegeixnou')}">
+									<attribute name="onClick">
+										Events.postEvent	("onInicia",desktop.getPage("authorization").getFellow("esquemaAuthorization"),gridAutoritzacions);
+									</attribute>
+								</button>
+							</vbox>
+						</tabpanel>
+						<zscript>
+							void editorJS(contingut, quina_execucio) {
+								if (Executions.getCurrent().isSafari()) {
+									Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Navegador")); 
+									return;
+								}
+								desktop.getPage("editorJS").setAttribute("contingutJS",contingut);
+								desktop.getPage("editorJS").setAttribute("procedenciaFrom",quina_execucio);
+								Events.postEvent ("onInicia",desktop.getPage("editorJS").getFellow("esquemaJS"),t_execucions);
+							}			
+						</zscript>
+						<tabpanel id="t_execucions">
+							<attribute name="onActualitza">
+								dadesjs = event.getData();
+								if (dadesjs !=null @and dadesjs instanceof Object[]) {
+									if ("intranet".equals((String)dadesjs[0])) { 
+										content_intranetEM.setValue(dadesjs[1]);
+										canviaExecucio(content_intranetEM.id);
+									}
+									else if ("extranet".equals((String)dadesjs[0])) { 
+										content_extranetEM.setValue(dadesjs[1]);
+										canviaExecucio(content_extranetEM.id);
+									}
+									else if ("internet".equals((String)dadesjs[0])) { 
+										content_internetEM.setValue(dadesjs[1]);
+										canviaExecucio(content_internetEM.id);
+									}
+								}
+							</attribute>
+							<grid id="gridExecucions"
+								dataPath="/esquema/lista/treebox:/execucions" fixedLayout="true"
+								height="100px" visible="false" width="99%">
+								<columns>
+									<column label="${c:l('aplicacionsIntranet.zul.Ambit')}"
+										width="100px"/>
+									<column label="${c:l('aplicacionsIntranet.zul.TipusMime')}"
+										width="100px"/>
+								</columns>
+								<datarow>
+									<label bind="@ambit"/>
+									<label bind="@tipusMimeExecucio"/>
+								</datarow>
+							</grid>
+							<vbox>
+								<hbox>
+									<checkbox id="cbintranetEM"
+										onCheck="setExecucio(self.id, self.isChecked())"/>
+									<input_etiqueta
+										value="${c:l('aplicacionsIntranet.zul.ExecuciadesdIntrane')}"/>
+								</hbox>
+								<vbox id="v_intranetEM" visible="false">
+									<groupbox style="padding: 5px;" width="730px">
+										<hbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipus')}"/>
+											<listbox  id="mime_intranetEM" dataPath="/modelMime:/tipusmime"
+												disabled="${false}" mold="select"
+												onSelect="aplicaPlantillaTipusMime(self.id)" width="200px">
+												<dataitem bind=".">
+													<listcell bind="@tipusMime"/>
+												</dataitem>
+											</listbox>
+										</hbox>
+										<hbox>
+										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
+										<textbox id="content_intranetEM" cols="60" disabled="false"
+											onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+											width="600px"/>
+										<vbox>
+											<button id="bt_editajsIntranet" image="img/pencil.png"
+												label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
+												<attribute name="onClick">
+													editorJS(content_intranetEM.value,"intranet");
+												</attribute>
+											</button>
+											<separator height="20px"/>
+											<button id="provar_intranetEM" visible="false"
+												label="${c:l('aplicacionsIntranet.zul.Provar')}"
+												onClick="provarExecucio(self.id)" width="60px"/>
+										</vbox>
+									</hbox>
+									</groupbox>
+								</vbox>
+								<hbox>
+									<checkbox id="cbextranetEM"
+										onCheck="setExecucio(self.id, self.isChecked())"/>
+									<input_etiqueta
+										value="${c:l('aplicacionsIntranet.zul.ExecuciadesdExtrane')}"/>
+								</hbox>
+								<vbox id="v_extranetEM" visible="false">
+									<groupbox style="padding: 5px;" width="730px">
+										<hbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipus')}"/>
+											<listbox dataPath="/modelMime:/tipusmime" disabled="${false}" id="mime_extranetEM" mold="select" onSelect="aplicaPlantillaTipusMime(self.id)" width="200px">
+												<dataitem bind=".">
+													<listcell bind="@tipusMime"/>
+												</dataitem>
+											</listbox>
+										</hbox>
+										<hbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
+											<textbox cols="60" disabled="false" id="content_extranetEM"
+												onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+												width="600px"/>
+											<vbox>
+												<button id="bt_editajsExtranet" image="img/pencil.png"
+													label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
+													<attribute name="onClick">
+														editorJS(content_extranetEM.value,"extranet")
+													</attribute>
+												</button>
+												<separator height="20px"/>
+												<button id="provar_extranetEM" visible="false"
+													label="${c:l('aplicacionsIntranet.zul.Provar')}"
+													onClick="provarExecucio(self.id)" width="60px"/>
+											</vbox>					
+										</hbox>
+									</groupbox>
+								</vbox>
+								<hbox>
+									<checkbox id="cbinternetEM" onCheck="setExecucio(self.id, self.isChecked())"/>
+									<input_etiqueta value="${c:l('aplicacionsIntranet.zul.ExecuciadesdInterne')}"/>
+								</hbox>
+								<vbox id="v_internetEM" visible="false">
+									<groupbox style="padding: 5px;" width="730px">
+										<hbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipus')}"/>
+											<listbox dataPath="/modelMime:/tipusmime" disabled="${false}" id="mime_internetEM" mold="select" onSelect="aplicaPlantillaTipusMime(self.id)" width="200px">
+												<dataitem bind=".">
+													<listcell bind="@tipusMime"/>
+												</dataitem>
+											</listbox>
+										</hbox>
+										<hbox>
+											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
+											<textbox id="content_internetEM" cols="60" disabled="false"
+												onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+												width="600px"/>
+											<vbox>
+												<button id="bt_editajsInternet" image="img/pencil.png"
+													label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
+													<attribute name="onClick">
+														editorJS(content_internetEM.value,"internet")
+													</attribute>
+												</button>
+												<separator height="20px"/>
+												<button id="provar_internetEM" visible="false"
+													label="${c:l('aplicacionsIntranet.zul.Provar')}"
+													onClick="provarExecucio(self.id)" width="60px"/>
+											</vbox>					
+										</hbox>
+									</groupbox>
+								</vbox>
+							</vbox>	<!-- vbox d'execucions: només visible si NO sóc de tipus menú -->
+						</tabpanel>
+						<tabpanel>
+							<vbox>
+								<label value="${c:l('aplicacionsIntranet.zul.Sel·leccioneelmenaon')}"/>
+								<vbox>
+									<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="mouretreebox" pageSize="19" rows="12">
+										<treeitemfinder bind="." open="false" path="/moure">
+											<treerow>
+												<treecell bind="@nom"/>
+											</treerow>
+										</treeitemfinder>
+									</tree>
+								</vbox>
+								<hbox>
+									<button image="~./img/mou.png" label="${c:l('aplicacionsIntranet.zul.Moupuntdentrada')}" onClick="onMoureTreeSeleccio()" sclass="pue"/>
+									<button image="~./img/copia.png" label="${c:l('aplicacionsIntranet.zul.Copiapuntdentrada')}" onClick="onCopiarTreeSeleccio()" sclass="pue"/>
+									<button image="~./img/copia_link.png" label="${c:l('aplicacionsIntranet.zul.Enllacapuntdentrada')}" onClick="onCopiarEnlaceTreeSeleccio()" sclass="pue"/>
+								</hbox>
+							</vbox>
+						</tabpanel>
+						<zscript>
+							void editorXML(contingut) {
+								if (Executions.getCurrent().isSafari()) {
+									Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Navegador")); 
+									return;
+								}
+								desktop.getPage("editorXML").setAttribute("contingutXML",contingut);
+								Events.postEvent ("onInicia",desktop.getPage("editorXML").getFellow("esquemaXML"),t_mazinger);
+							}
+						</zscript>
+						<tabpanel id="t_mazinger">
+							<attribute name="onActualitza">
+								dada = (String) event.getData();
+								if (dada!=null) content_xml.setValue(dada);
+							</attribute>
+							<vbox width="100%">
+								<textbox bind="@xmlPUE" cols="70" disabled="false" id="content_xml" onChange="" rows="15" sclass="textbox" width="100%"/>
+								<div align="right">
+									<button id="bt_editaxml" image="~./img/edit.gif" label="${c:l('aplicacionsIntranet.zul.EditorXML')}" onClick="editorXML(content_xml.value)"/>
+									<button id="bt_xml" image="~./img/accept.gif" label="${c:l('aplicacionsIntranet.zul.Valida')}" onClick="validaXML()"/>
+								</div>
+							</vbox>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+			</form>
+		</detalls>
+	</esquemavertical>
+	
+	<include src="usuarisllista.zul"/>
+	<include src="grupsllista.zul"/>
+	<include src="rolsllista.zul"/>
+	<include src="finestres/editorXML.zul"/>
+	<include src="finestres/editorJS.zul"/>
+	<include src="finestres/aplicaIntranet_autoritzacio.zul"/>
+</zk>

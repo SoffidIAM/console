@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="rule" type="rule">
+			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.RulesService"
+				method="findRules" if = "${queryEnabled}"> <!--agent:query, application:update-->
+				<parameter value="${description}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.Rule">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="rule">
+		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.RulesService">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="rule.descriptionValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.bshExpression}" notNull="true" friendlyName="rule.bshExpressionValidation"/>
+		</validator>
+		<finder name="ruleAssignedRole" type="ruleAssignedRole">
+			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.RulesService"
+				method="findRuleAssignments"> <!--agent:query, application:update-->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.RuleAssignedRole">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	
+	<datanode name="ruleAssignedRole">
+		<script-handler>
+			<insert-script>
+				instance.ruleId = parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.RulesService">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<finder name="role" type="role">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findRolById"> <!--agent:query, application:update-->
+				<parameter value="${instance.roleId}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.common.Rol">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="role" />
+</zkib-model>

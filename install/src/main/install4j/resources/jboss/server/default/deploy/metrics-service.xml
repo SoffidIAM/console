@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+<!-- $Id: metrics-service.xml,v 1.2 2009-04-08 07:28:03 u07286 Exp $ -->
+
+<server>
+
+  <classpath codebase="lib" archives="jboss.jar"/>
+  
+	
+  <!-- ==================================================================== -->
+  <!-- Metrics Service                                                    -->
+  <!-- ==================================================================== -->
+  <mbean code="org.jboss.ejb.plugins.MetricsLookup" 
+          name="jboss:service=MetricsLookup">
+          <attribute name="SanityInterval">30000</attribute>
+          <attribute name="AlarmProcess">${jboss.home.dir}/bin/metrics_${jboss.server.name}.sh</attribute>
+          <attribute name="EjbPattern">*</attribute>
+          <attribute name="MethodPattern">*</attribute>
+          <attribute name="ShowParams">false</attribute>
+  </mbean>
+
+</server>

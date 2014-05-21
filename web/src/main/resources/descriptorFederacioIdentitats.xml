@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="federacioIdentitats">
+		<finder name="entitygroupmember" type="entitygroupmember">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findEntityGroupByNom" if="${queryEnabled}">
+				<parameter value="${name}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
+		</finder>
+		<finder name="policy" type="policy">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findPolicies">
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Policy" />
+		</finder>
+	</datanode>
+
+	<datanode name="atribut">
+		<finder name="atribut" type="atribut">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findAtributs" if="${queryEnabled}">
+				<parameter value="${name}" />
+				<parameter value="${shortname}" />
+				<parameter value="${oid}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
+		</finder>
+	</datanode>
+
+	<datanode name="entitygroupmember">
+		<finder name="entitygroupmember" type="entitygroupmember">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
+		</finder>
+		<finder name="profile" type="profile">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB"
+				method="findProfilesByFederationMember" if="${instance.federationMember != null}">
+				<parameter value="${instance.federationMember}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.SAMLProfile" />
+		</finder>
+
+		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="federationMember">
+		<finder name="federationMember" type="federationMember">
+			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findFederationMemberByEntityGroupAndPublicIdAndTipus">
+				<parameter value="${entityGroupName}" />
+				<parameter value="${publicId}" />
+				<parameter value="${tipusFM}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
+		</finder>	
+		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="profile">
+		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="policy">
+		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="atributPolicy">
+		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

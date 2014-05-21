@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="valorsDominisRol" title="Llista de valors de dominis d'aplicació"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="../comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="valors" src="descriptorValorDomini.xml"/>
+	
+	<zscript>
+		fileres = es.caib.seycon.ng.web.Custom.FILERES;
+	
+		mode = "query"; 
+		view_altres = false;
+		model.getVariables().declareVariable("queryEnabled", false);
+	
+		void populateDetails ()
+		{
+			mode="query";
+		}	
+
+		void search (boolean queryEnabled) 
+		{ 
+			listbox =	esquemaLlista.getFellow("lista").getFellow("listbox"); 
+			codi = esquemaLlista.getFellow("queryWindow").getFellow("queryCodi").getFellow("textbox");
+			descripcio = esquemaLlista.getFellow("queryWindow").getFellow("queryDescripcio").getFellow("textbox");			
+
+			if(codi.value.trim().length() == 0){
+				model.getVariables().declareVariable("codi", "%");
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("codi", codi.value);
+			}
+			if(descripcio.value.trim().length() == 0){
+				model.getVariables().declareVariable("descripcio", "%");
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("descripcio", descripcio.value);
+			}			
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			if (queryEnabled) {
+				model.getJXPathContext().getValue("/valor").refresh();
+				listbox.dataPath = "/model:/valor"; 
+			} 
+		}
+
+		void showAltres () 
+		{
+			if (view_altres==false) {
+				esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+				view_altres = true;
+			} else {
+				esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+				esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+				esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+				view_altres = false;
+			}
+		}
+
+		void cleanWindow(){
+			queryWindow = esquemaLlista.getFellow("queryWindow");
+			queryWindow.getFellow("queryCodi").getFellow("textbox").value = "";
+			queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
+			model.getVariables().declareVariable("queryEnabled", false);		
+			lista.getFellow("listbox").dataPath = "/model:/valor[false]";
+			esquemaLlista.visible=false;			
+			view_altres = false;							
+			esquemaLlista.getFellow("finishButton").disabled = true;		
+			esquemaLlista.getFellow("senseValorDominiButton").disabled = true;
+			esquemaLlista.getFellow("senseValorDominiButton").visible = false;
+					
+		}		
+		
+		void acceptaDada()
+		{ // Retornem valorDomini, descripcioValor, tipusDomini
+			ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
+			ctx = ds.getJXPathContext(); 
+			xpath = esquemaLlista.getFellow("lista").getFellow("listbox").getXPath();
+			index = esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedIndex();
+			pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
+			ctx2 = ctx.getRelativeContext(pointer);
+			valor = (String)ctx2.getPointer("@valor").getValue();			
+			descripcio = (String)ctx2.getPointer("@descripcio").getValue();			
+			pointer.invalidate ();
+			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
+			String [] dades = {valor, descripcio, tipusDomini};
+			Component formComponent = (Component) pageScope.get("contextComponent");
+			Events.postEvent ("onActualitza", formComponent, dades);							
+			cleanWindow();
+		}
+		
+		void acceptaDadaSenseValorDomini() 
+		{ //Retornem "QUALQUE_VALOR_DOMINI","Rol atorgat a qualsevol valor domini",tipusDomini
+			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
+			String [] dades = { // Valors constants
+				es.caib.seycon.ng.utils.TipusDomini.QUALQUE_VALOR_DOMINI,
+				es.caib.seycon.ng.utils.TipusDomini.Descripcio.QUALQUE_VALOR_DOMINI,
+				tipusDomini
+			};
+			Component formComponent = (Component) pageScope.get("contextComponent");
+			Events.postEvent ("onActualitza", formComponent, dades);							
+			cleanWindow();
+		}
+		
+	</zscript>
+	
+	<esquema closable="true" id="esquemaLlista" position="center, center" title="${c:l('aplica_rol_valorDomini.Titol')}" visible="false">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+
+			usuari = desktop.getPage("valorsDominisRol").getAttribute("usuari");  
+			domini = desktop.getPage("valorsDominisRol").getAttribute("domini");  
+			senseDomini = desktop.getPage("valorsDominisRol").getAttribute("senseDomini");
+			
+			if (senseDomini!=null @and "S".equals(senseDomini)) {
+				esquemaLlista.getFellow("senseValorDominiButton").disabled = false;
+				esquemaLlista.getFellow("senseValorDominiButton").visible = true;
+				
+			}
+			
+			
+			if (domini != null) {
+				<!-- desktop.getPage("valorsDominisLlista").setTitle("Llista de valors del domini " + domini.getNom()); -->
+				esquemaLlista.setTitle("Llista de valors del domini " + domini.getNom());
+				model.getVariables().declareVariable("domini",domini);
+				model.getVariables().declareVariable("usuari",usuari);
+				model.getVariables().declareVariable("tipusDomini",domini.getNom());
+				if ( (domini.getNom().equals("GRUPS")) || 
+   			         (domini.getNom().equals("APLICACIONS")) ) {				
+					esquemaLlista.getFellow("queryWindow").setVisible(true);
+				} else {
+					esquemaLlista.getFellow("queryWindow").setVisible(false);				
+					search(true);
+				}
+			} else {
+				<!-- desktop.getPage("valorsDominisLlista").setTitle("Llista de valors de dominis"); -->
+				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("aplica_rol_valorDomini.Titol2"));
+			}
+				
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}     		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+
+		<criteris id="queryWindow" onOK="search(false)" width="790px">
+			<hbox>
+				<input_criteri etiqueta="${c:l('aplica_rol_valorDomini.zul.Codi')}" id="queryCodi"/>
+				<imageclic onClick="search(false)" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<input_criteri etiqueta="${c:l('aplica_rol_valorDomini.zul.Descripcia')}" id="queryDescripcio"/>			
+		</criteris>		
+		
+		<navegador id="lista" width="790px">
+			<listbox autocommit="false" dataPath="/model:/valor" fixedLayout="true" id="listbox" rows="${fileres}">
+				<attribute name="onSelect">
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+				</attribute>
+				<listhead>
+					<listheader label="${c:l('aplica_rol_valorDomini.zul.Valor')}" width="250px"/>
+					<listheader label="${c:l('aplica_rol_valorDomini.zul.Descripcia-2')}" width="350px"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@valor">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@descripcio">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<separator spacing="5px"/>
+		<hbox width="100%" widths="200px,*,200px">
+			<hbox>
+				<button disabled="true" id="senseValorDominiButton" label="${c:l('aplica_rol_valorDomini.zul.SenseValordedomini')}" visible="true">
+					<attribute name="onClick">
+						if (! self.disabled) {
+							acceptaDadaSenseValorDomini();
+						}
+					</attribute>
+				</button>		
+			</hbox>
+			<hbox style="margin-left:auto; margin-right:auto" width="100%">
+				<button disabled="true" id="finishButton" label="${c:l('aplica_rol_valorDomini.zul.Accepta')}" style="float:right">
+					<attribute name="onClick">
+						if (! self.disabled) {
+							acceptaDada();
+						}
+					</attribute>
+				</button>
+				<button label="${c:l('aplica_rol_valorDomini.zul.Cancel·la')}" onClick="cleanWindow()"/>			
+			</hbox>
+			<hbox>
+				<separator width="100px"/>
+			</hbox>
+		</hbox>
+		
+	</esquema>
+
+</zk>

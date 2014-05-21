@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="selfservice" title="${c:l('selfService.Titol')}" style="width:100%;height:100%"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<frame id="p_selfService" saveContent="true"
+		title="${c:l('selfService.Titol')}" width="100%" height="100%">
+		<attribute name="onReturn">
+			Events.postEvent("onReturn", inboxhandler, null); 
+		</attribute>
+		<attribute name="onClientInfo">
+			<![CDATA[ 
+				Box form = Path.getComponent("//selfservice/fusuaris");
+				boolean petit=false;
+				if (form != null){
+					int heigthPantalla = event.getDesktopHeight();
+					int hPantalla2 = (int) ((heigthPantalla)*0.90);
+					form.setHeight(""+hPantalla2+"px");
+					int ample = event.getDesktopWidth();
+					if(ample <568){
+						petit=true;
+						Component headQ = self.getFellow("headQuery");
+						headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords2"));
+						Component headP = self.getFellow("headChange");
+						headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword2"));
+					}else{
+						petit=false;
+						Component headQ = self.getFellow("headQuery");
+						headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords"));
+						Component headP = self.getFellow("headChange");
+						headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword"));
+					}
+				}
+			]]>
+		</attribute>
+
+		<!-- <style src="~./styles/estil.css"/>-->
+		
+		<datamodel id="model" rootNode="root" src="descriptorSelfService.xml"/>
+		<zscript>
+			<![CDATA[
+				import org.zkoss.image.*;
+				import org.zkoss.zul.*;
+				import es.caib.zkib.datasource.XPathUtils;
+				import es.caib.seycon.ng.comu.*;
+				import java.util.Calendar;
+				
+				timerDelay = 10000;
+				
+				try
+				{
+					es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+							.Labels.getLabel("selfService.Titol"));
+					
+				}
+				catch (Exception ex) {}
+			
+				void setPassword (Component button)
+				{
+					try{
+						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
+						Account account = XPathUtils.getValue(ctx, ".").getInstance();
+						if (account.getType().equals(AccountType.USER)){
+							newPasswordS.setAttribute("acco", account);
+							es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+								.create();
+							String afectats = service.queryOtherAffectedAccounts(account);
+							if(afectats != null){
+								Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
+										new Object[] {afectats}), 
+										org.zkoss.util.resource.Labels.getLabel("selfService.Segur2") , 
+										new EventListener(){
+											public void onEvent(Event evt){
+												if("onOK".equals(evt.getName())){
+													newPasswordS.setVisible(true);
+													newPasswordS.setMode("highlighted");
+												}
+											}
+										});
+							}
+						}else if (account.getType().equals(AccountType.SHARED)){
+							newPasswordS.setAttribute("acco", account);
+							newPasswordS.setVisible(true);
+							newPasswordS.setMode("highlighted");
+						}else if (account.getType().equals(AccountType.PRIVILEGED)){
+							newPassword.setAttribute("acco", account);
+							Calendar dia = Calendar.getInstance();
+							dia.add(Calendar.DAY_OF_MONTH, 1);
+							newPassword.getFellow("timepwd").setValue(dia.getTime());
+							dia.clear();
+							newPassword.setVisible(true);
+							newPassword.setMode("highlighted");
+						}
+					} catch ( InterruptedException e) {	}
+				}
+				
+				void queryPassword(Component button){
+					try{
+						showPassword.getFellow("qpassword").setValue("");
+						showPassword.getFellow("popupPwd").setValue("");
+						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
+						Account account = XPathUtils.getValue(ctx, ".").getInstance();
+						es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
+								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
+								.create();
+						if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
+						{
+							showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
+							showPassword.getFellow("labelPWDis").setVisible(false);
+							showPassword.getFellow("qpassword").setMultiline(true);
+							showPassword.setVisible(true);
+							showPassword.setMode("highlighted");
+						}
+						else
+						{
+							Password pawd = service.queryAccountPassword(account);
+							if(pawd!=null){
+									String cadena = pawd.getPassword();
+									String cadenaResultant = "";
+									showPassword.getFellow("qpassword").setValue(cadena);
+									int i = cadena.length();
+									for(int j=0; j<i; j++){
+										cadenaResultant = cadenaResultant + cadena.charAt(j) + "\t";
+										Character c = cadena.charAt(j);
+										if(c.isUpperCase(c)){
+											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Majuscula");
+										}
+										if(c.isLowerCase(c)){
+											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Minuscula");
+										}
+										if(c.isDigit(c)){
+											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Number");
+										}
+										if(!c.isLetter(c) && !c.isDigit(c)){
+											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Symbol");
+										}
+										cadenaResultant = cadenaResultant + "\n";
+									}
+									showPassword.getFellow("popupPwd").setValue(cadenaResultant);
+									showPassword.getFellow("labelPWDis").setVisible(true);
+							}
+							else{
+								showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.EmptyField"));
+								showPassword.getFellow("popupPwd").setValue("");
+								showPassword.getFellow("labelPWDis").setVisible(true);
+							}
+							showPassword.setVisible(true);
+							showPassword.setMode("highlighted");
+						}	
+					} catch ( InterruptedException e){}
+				}
+				
+				void select(){
+					PuntEntrada instan = fusuaris.getFellow("treebox").getSelectedItem().getValue().getInstance();
+					Long name = instan.getId();
+					LinkedList punt = instan.getExecucions();
+					if(!punt.isEmpty())
+						Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');"); 
+				}
+				
+				void carregaIcona(Component r){
+					es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
+					byte [] imgIcona1 = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@imgIcona1");
+					String tm = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@menu");
+					org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
+					if (imgIcona1 != null)
+					{
+						img.setContent(new AImage("prova", imgIcona1));
+					}else if (imgIcona1 == null && tm.equals("S")){
+						img.setSrc("/img/root.gif");
+					}else if (imgIcona1 == null && tm.equals("N")){
+						img.setSrc("/img/punt-verd.gif");
+					}
+				}
+				
+				void checkIsUpdatePending(Component item)
+				{
+					es.caib.zkib.binder.BindContext ctx = XPathUtils
+							.getComponentContext(item);
+					es.caib.zkib.datamodel.DataNode dn = XPathUtils.getValue(ctx, ".");
+					
+					if (dn != null)
+					{
+						Account acc = dn.getInstance();
+						if (acc != null && acc.getId() != null)
+						{
+							es.caib.seycon.ng.servei.AccountService accountService =
+									es.caib.seycon.ng.ServiceLocator
+										.instance().getAccountService();
+							
+							Image img = item.getChildren().get(2).getChildren().get(0)
+									.getChildren().get(2);
+							img.setVisible(accountService.isUpdatePending(acc));
+							
+							es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
+						}
+					}
+				}
+				
+				void openTree(Treeitem selected){
+					System.out.println("selected: " + selected.getValue().getInstance());
+					Object obj = selected.getValue().getInstance();
+					if(obj instanceof PuntEntrada){
+						PuntEntrada instance = (PuntEntrada) obj;
+						if(!selected.isOpen() && instance.getMenu().equals("S")){
+							selected.setOpen(true);
+						}else if (instance.getMenu().equals("S"))
+							selected.setOpen(false);
+						else{
+							Long name = instance.getId();
+							LinkedList punt = instance.getExecucions();
+							if(!punt.isEmpty())
+								Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
+						}
+							
+					}
+				}
+			]]>
+		</zscript>
+		
+		<zscript>
+			es.caib.seycon.ng.servei.ejb.SelfService servei = new javax.naming.InitialContext()
+				.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+				.create();
+			ambit = (servei.getClientHost());
+		</zscript>
+		<popup id="toolCaducat">
+			<vbox>
+				<label value="${c:l('selfService.Expired')}" multiline="true"/>
+			</vbox>
+		</popup>	
+		<popup id="toolPropCaducar">
+			<vbox>
+				<label value="${c:l('selfService.NearToExpire')}" multiline="true"/>
+			</vbox>
+		</popup>
+		<div class="content">
+			<div class="sidebar aplications">
+				<label value="${c:l('selfService.Applications')}" sclass="titolSelf"/>
+				<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="treebox" 
+							onNewRow="carregaIcona(event.data)" onSelect="select()" sclass="senseBorder1">
+					<treeitemfinder bind="." open="false" path="/moure">
+						<treerow sclass="fons">
+							<treecell>
+								<image align="center" height="15px" width="15px" onClick="openTree(self.parent.parent.parent)"/>
+								<label value="  " onClick="openTree(self.parent.parent.parent)"/>
+								<label bind="@nom" onClick="openTree(self.parent.parent.parent)"/> 
+							</treecell>
+						</treerow>
+					</treeitemfinder>
+				</tree>
+			</div>
+			<div class="wrap">
+				<div class="tasks accounts">
+					<div class="tasks">
+						<vbox use="es.caib.bpm.ui.inbox.InboxHandler" id="inboxhandler">
+							<label value="${c:l('selfService.MyTasks')}" sclass="titolSelf"/>
+							<listbox fixedLayout="true" id="listadoTareas" mold="paging" pageSize="15" sclass="senseBorder">
+								<listhead>
+									<listheader label="${c:l('inbox.lbldefinicionTarea')}" sort="auto" width="40%"/>
+									<listheader label="${c:l('inbox.lblFecha')}" sort="auto" width="15%"/>
+								</listhead>
+							</listbox>
+						</vbox>
+					</div>
+					<div class="accounts">
+						<label value="${c:l('selfService.Accounts')}" sclass="titolSelf"/>
+						<listbox id="listadoAccounts" autocommit="false"
+							dataPath="/model:/usuari/account" fixedLayout="true"
+							sclass="senseBorder tabla-cuentas">
+							<listhead>
+								<listheader label="${c:l('accounts.dispatcher')}" width="20%"/>
+								<listheader label="${c:l('accounts.description')}" width="30%"/>
+								<listheader label="${c:l('accounts.name')}" width="20%"/>
+								<listheader sclass="short-passwd" id="headQuery" label="${c:l('selfService.QueryPasswords')}" width="15%"/>
+								<listheader sclass="short-change" id="headChange" label="${c:l('selfService.ChangePassword')}" width="15%"/>
+							</listhead>
+					
+							<dataitem bind=".">
+								<listcell>
+									<label bind="@dispatcher" passwordDataPath="estatContrasenya" use="com.soffid.selfservice.utils.Inputlabel"/>
+								</listcell>
+								<listcell>
+									<label bind="dispatcherInformation/@description"/>
+								</listcell>
+								<listcell>
+									<hbox widths="*, 3px, 16px">
+										<label bind="@name" passwordDataPath="estatContrasenya" use="com.soffid.selfservice.utils.Inputlabel" width="90%"/>
+										<separator></separator>
+										<image src="~./img/exclamacio.gif" visible="false"
+											width="16px" height="16px">
+										</image>
+									</hbox>
+								</listcell>
+								
+								<listcell style="text-align: center">
+									<imageclic src="/img/lupa.gif">
+										<attribute name="onClick">
+											queryPassword(self);
+										</attribute>
+									</imageclic>
+									<timer delay="${timerDelay}" repeats="true"
+										onTimer="checkIsUpdatePending(self.parent.parent);" />
+								</listcell>	
+								<listcell style="text-align: center">
+									<imageclic src="~./img/pwd.gif">
+										<attribute name="onClick">
+											
+											setPassword(self);
+										</attribute>
+									</imageclic>
+								</listcell>
+							</dataitem>
+						</listbox> 
+					</div>
+				</div>
+				<div class="user-info">
+					<form id="fusuaris" dataPath="/model:/usuari" sclass="fons">
+						<tabbox id="panels">
+							<tabs>
+								<tab label="${c:l('selfService.Identification')}" />
+								<tab label="${c:l('selfService.ApplPermissions')}" />
+							</tabs>
+							<tabpanels>
+								<tabpanel id="identification">
+									<grid sclass="fonsBlanc">
+										<columns>
+											<column width="135px"/>
+											<column width="*"/>
+										</columns>
+										<rows>
+											<row>
+												<input_etiqueta	value="${c:l('usuaris.zul.Codi-2')}"/>
+												<label bind="@codi" id="codi" width="*"/>
+											</row>
+											<row>
+												<input_etiqueta value="${c:l('usuaris.zul.Nom-2')}"/>
+												<label id="nom" bind="@nom" />
+											</row>
+											<row>
+												<input_etiqueta style="white-space:nowrap;"
+													value="${c:l('usuaris.zul.Primerllinatge-2')}"/>
+												<label id="primerLlinatge" bind="@primerLlinatge"/>
+											</row>
+											<row>
+												<input_etiqueta value="${c:l('usuaris.zul.Segonllinatge-2')}"/>
+												<label id="segonLlinatge" bind="@segonLlinatge" />
+											</row>
+											<row>
+												<input_etiqueta value="${c:l('usuaris.zul.Grupprimari-2')}"/>
+												<label id="codiGrupPrimari" bind="@codiGrupPrimari" />
+											</row>
+											<row>
+												<input_etiqueta value="${c:l('selfService.AltresGrups')}"/>
+												<grid id="gridGrups" dataPath="grup" fixedLayout="true"
+													sclass="fonsBlanc">
+													<datarow>
+														<label bind="@codiGrup"/>
+													</datarow>
+												</grid>
+											</row>
+										</rows>
+									</grid>
+									<popup id="pwd">
+										<label value="${c:l('usuaris.zul.Canviacontrasenya')}" />
+									</popup>
+								</tabpanel>
+						
+								<tabpanel id="applicationPermissions">
+									<div>
+										<listbox fixedLayout="true" dataPath="/rol">
+											<listhead>
+												<listheader label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" />
+												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" />
+												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="10%" />
+												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="20%" />
+												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
+												<listheader label="${c:l('usuaris.zul.Valor')}" width="*" />
+											</listhead>
+											<dataitem>
+												<listcell bind="@nomRol"/>
+												<listcell bind="@baseDeDades" />
+												<listcell bind="@accountName"/>
+												<listcell bind="@codiAplicacio" />
+												<listcell bind="valorDomini/@nomDomini" />
+												<listcell bind="valorDomini/@descripcio"/>
+											</dataitem>
+										</listbox>
+									</div>
+								</tabpanel> 
+							</tabpanels>
+						</tabbox>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div class="own-ip">
+			<hbox align="end" pack="end">
+				<label value="${c:l('selfService.Conneted')} ${ambit}"/>
+			</hbox>
+		</div>
+			
+ 		<window id="newPassword" closable="true" sclass="new-pass"
+ 			position="center, center" sizable="true"
+ 			title="${c:l('selfService.NewPassword')}" visible="false" width="31em"
+ 			onClose="onCancelPassword(); event.stopPropagation();">
+			<zscript>
+				<![CDATA[
+					void onCancelPassword() {
+						Window wnd = Path.getComponent("/newPassword");
+						password.setValue("");
+						wnd.setVisible(false);
+					}
+	
+					void onSetPassword() {
+						es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+								.create();
+						Window wnd = Path.getComponent("/newPassword");
+						Account account = wnd.getAttribute("acco");
+						timepwd.getValue();
+						service.setHPAccountPassword(account,
+								new Password(password.getValue()), timepwd.getValue(),
+									checkpwd.isChecked());
+						es.caib.zkib.zkiblaf.Missatgebox
+								.confirmaOK(org.zkoss.util.resource.Labels
+								.getLabel("accounts.setPassword.msg"));
+						onCancelPassword();
+					}
+				]]>
+			</zscript>
+			<div width="100%">
+		 		<div class="label" align="center">
+					<label value="${c:l('accounts.setPassword.label')}"/>
+					<space width="1em"/>
+					<textbox id="password" type="password" width="18em" onOK="onSetPassword();"/>
+				</div>
+				<div class="label" align="center">
+					<label id="lblpwd" value="${c:l('selfService.Valid')}"/>
+					<space width="1em"/>
+					<datebox id="timepwd" width="18em"
+						format="${c:l('selfService.Format')}" constraint="no past,no empty"/>
+				</div>
+				<div class="label" align="center">
+					<label id="lblcheckpwd" value="${c:l('selfService.Force')}"/>
+					<checkbox id="checkpwd"/> 
+				</div>
+				<div align="center">
+					<button label="${c:l('accounts.setPassword.OK')}"
+						onClick="onSetPassword()" />
+					<space width="1em" />
+					<button label="${c:l('accounts.setPassword.Cancel')}"
+						onClick="onCancelPassword()" />
+				</div>
+			</div>
+		</window>
+		<window id="showPassword" closable="true" sclass="show-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.QueryPasswords')}" visible="false" width="31em"
+			onClose="onCancelPassword(); event.stopPropagation();">
+			<zscript>
+				<![CDATA[
+					void onCancelPassword() {
+						Window wnd = Path.getComponent("/showPassword");
+						qpassword.setValue("");
+						wnd.setVisible(false);
+					}
+				]]>
+			</zscript>
+			<popup id="toolPwd">
+				<vbox>
+					<label id="popupPwd" multiline="true"/>
+				</vbox>
+			</popup>
+			<vbox width="100%" align="center">
+				<space width="2em"/>
+				<hbox align="center">
+					<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}"/>
+					<label id="qpassword" tooltip="toolPwd"/>
+				</hbox>
+				<space width="2em"/>
+				<hbox>
+					<button label="${c:l('selfService.Close')}"
+						onClick="onCancelPassword()" />
+				</hbox>
+				<space width="1em"/>
+			</vbox>
+		</window>
+		<window id="newPasswordS" closable="true" sclass="new-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.NewPassword')}" visible="false" width="34em"
+			onClose="onCancelPassword(); event.stopPropagation();">
+			<zscript>
+				<![CDATA[
+					void onCancelPassword() {
+						Window wnd = Path.getComponent("/newPasswordS");
+						p1.setValue("");
+						wnd.setVisible(false);
+					}
+					
+					void onSetPassword() {
+						es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+								.create();
+						Window wnd = Path.getComponent("/newPasswordS");
+						Account account = wnd.getAttribute("acco");
+						service.setAccountPassword(account, new Password(p1.getValue()));
+						es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
+						onCancelPassword();
+					}
+				]]>
+			</zscript>
+			<vbox width="100%" align="center">
+		 		<div align="center" class="label">
+					<label value="${c:l('accounts.setPassword.label')}"/>
+					<space width="1em"/>
+					<textbox type="password" width="18em" id="p1" onOK="onSetPassword();"/>
+				</div>
+				
+				<div align="center">
+					<button label="${c:l('accounts.setPassword.OK')}"
+						onClick="onSetPassword()" />
+					<space width="1em"/>
+					<button label="${c:l('accounts.setPassword.Cancel')}"
+						onClick="onCancelPassword()" />
+				</div>
+			</vbox>
+		</window>
+	</frame>
+</zk>

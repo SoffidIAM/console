@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?component name="input_etiqueta" macro-uri="input_etiqueta.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<hbox>
+		<attribute if="${arg.visible != null}" name="visible">${arg.visible}</attribute>
+		<attribute if="${arg.width_custom == null}" name="width">250px</attribute>
+		<attribute if="${arg.width_custom != null}" name="width">${arg.width_custom}</attribute>		
+		<attribute if="${arg.widths_custom == null}" name="widths">100px,*</attribute>
+		<attribute if="${arg.widths_custom != null}" name="widths">${arg.widths_custom}</attribute>
+		<label sclass="etiqueta" value="${arg.etiqueta}"/>
+		<textbox id="textbox" onChange="org.zkoss.zk.ui.event.Events.postEvent(event.name, self.parent.parent, event.data)" sclass="textbox" value="${arg.value}" width="85%">
+			<attribute if="${arg.mascara != null}" name="constraint">${arg.mascara}</attribute>
+			<attribute if="${arg.bind != null}" name="bind">${arg.bind}</attribute>
+			<attribute if="${arg.lectura !=null}" name="disabled">${arg.lectura}</attribute>
+		</textbox>
+	</hbox>	
+	
+</zk>

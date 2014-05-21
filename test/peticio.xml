@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?> 
+<Peticio>
+	<Nom>
+		Nom
+	</Nom>
+	<NomCurt>
+		whhwww
+	</NomCurt>
+	<NIF>
+		34239999F
+	</NIF>
+	<PrimerLlinatge>
+		Primera
+	</PrimerLlinatge>
+	<SegonLlinatge>
+		Segunda
+	</SegonLlinatge>
+	<UnitatOrganitzativa>
+		DGTIC
+	</UnitatOrganitzativa>
+	<CertificacioDeValidesa>
+		CARRÉ CARDONA PAU amb DNI 43152441W certifica que les dades de la sol·licitud d'alta de Nom Primera Segunda amb DNI 34239999F són correctes.
+	</CertificacioDeValidesa>
+	<CertificacioDeCondicions>
+		CARRÉ CARDONA PAU amb DNI 43152441W certifica que Nom Primera Segunda amb DNI 34239999F ha acceptat mitjançant la seva firma les obligacions i responsabilitat d'ús del compte d'usuari.
+	</CertificacioDeCondicions>
+	<TipusUsuari>
+		E
+	</TipusUsuari>
+</Peticio>

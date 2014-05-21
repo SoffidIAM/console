@@ -1,0 +1,1547 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="comu/input_password.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	<style>
+		.tcoth div {text-align:center !important;}
+		tr.seld td div.cell-inner input.text {
+			background-color: #D3D3D3;
+		}
+		.readonly {background-color: transparent !important}
+	</style>
+
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+			
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+						.Labels.getLabel("agents.lblGestioAgents"));
+			}
+			catch (Exception ex){}
+			
+			queryWindowMin = "50px";
+			queryWindowMax = "110px";
+			
+			mode = "query"; 
+			view_altres = false;
+		
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			import es.caib.zkib.datasource.*;
+			canCreateAgent = AutoritzacionsUsuari.hasCreateAgent();
+			canDeleteAgent = AutoritzacionsUsuari.hasDeleteAgent();
+			canUpdateAgent = AutoritzacionsUsuari.hasUpdateAgent();
+			canQueryAgent = AutoritzacionsUsuari.hasQueryAgent();
+			canPropagateAgentUsers = AutoritzacionsUsuari.hasPropagateAgentUsers();
+			canPropagateAgentRoles = AutoritzacionsUsuari.hasPropagateAgentRoles();
+			canModifyAgent = canCreateAgent || canUpdateAgent;
+			// regles de control d'accés (oracle)
+			canCreateAccessControlAgent = AutoritzacionsUsuari.hasCreateAccessControlAgent();
+			canDeleteAccessControlAgent = AutoritzacionsUsuari.hasDeleteAccessControlAgent();
+			canUpdateAccessControlAgent = AutoritzacionsUsuari.hasUpdateAccessControlAgent();
+			canQueryAccessControlAgent = AutoritzacionsUsuari.hasQueryAccessControlAgent();
+			canModifyAccessControl = canCreateAccessControlAgent || canUpdateAccessControlAgent;
+			canSetAccessControl = AutoritzacionsUsuari.hasSetAccessControlAgent();
+			
+			model.getVariables().declareVariable("queryEnabled", canQueryAgent);
+			model.getVariables().declareVariable("codi", "%");
+			model.getVariables().declareVariable("codiAgent", "%");
+			model.getVariables().declareVariable("actiu", new Boolean(true));
+			// Per als nous agents (inicialització)
+			model.getVariables().declareVariable("codiDominiUsuaris", "CAIB");
+			
+			queryEnabled = false;
+			retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode="query";
+			}
+	             
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi").getFellow("textbox");
+				nom = esquema.getFellow("queryWindow").getFellow("queryNom").getFellow("textbox");
+				
+				url = esquema.getFellow("queryWindow").getFellow("queryUrl").getFellow("textbox");
+				actiu = esquema.getFellow("queryWindow").getFellow("queryActiu");
+				basatRols = null;
+				segur = null;
+					
+				// Check enable query
+				if ((codi.value.trim().length() == 0) && 
+						(url.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				
+				searchValues.put("url", url.value);
+				
+				if ((nom == null) || (nom.value.trim().length() == 0))
+				{
+					// mirem la llista
+					nomLlista = esquema.getFellow("queryWindow")
+						.getFellow("queryNomLlista").getSelectedItem();
+					
+					 // cap element seleccionat
+					if (nomLlista == null)
+					{
+						searchValues.put("nom", nom.value);
+						queryEnabled = true;
+					}
+					
+					else
+					{ //Mirem la llista
+						// qualque element seleccionat
+						queryEnabled = true;
+						searchValues.put("nom",
+								nomLlista.getValue().getInstance().getClassName());
+					}
+				}
+				
+				else
+				{
+					queryEnabled = true;
+					model.getVariables().declareVariable("nom", nom.value);
+				}
+				
+				if (actiu.isChecked())
+				{
+					queryEnabled = true;
+					searchValues.put("actiu", new Boolean(true));
+				}
+				
+				else
+				{
+					model.getVariables().declareVariable("actiu", null);
+				}
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (esquema.isCommitPending()) {
+					Missatgebox.avis (org.zkoss.util.resource.Labels
+							.getLabel("agents.Avis"),
+							org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled",
+						queryEnabled && canQueryAgent);
+				
+				listbox = esquema.getFellow("lista").getFellow("listbox");
+				if (queryEnabled)
+				{
+					model.getJXPathContext().getValue("/agent").refresh();
+					listbox.dataPath = "/model:/agent"; 
+				}
+				
+				if (listbox.getModel().getSize() == 1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0); 
+					
+					if (elem!=null)
+						listbox.setSelectedItem(elem);
+					
+					select();
+					retrySearch = false;
+				}
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.tancaDetalls(); //amaguem dades..
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+			
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null && 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+						verificaControlAcces ();
+					}
+			}
+			
+			void showLista ()  
+			{
+				esquema.getFellow("lista").getFellow("listbox").clearSelection();
+				esquema.getFellow("lista").getFellow("listbox").setRows(fileres);
+			}
+			
+			void showDetall () 
+			{
+				esquema.hideCriteris();
+				esquema.getFellow("lista").getFellow("listbox").setRows(5);
+				esquema.getFellow("dades").getFellow("form").getFellow("missatge").setVisible(false);
+				esquema.showFormulari();
+			}
+			
+			void creaNou()
+			{
+				setVisibleControlAcces(false);
+				setVisibleAttributeMapping(false);
+				showDetall();
+			}
+			
+			void xifra(Textbox camp)
+			{
+				Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.Xifrar"),
+					org.zkoss.util.resource.Labels.getLabel("agents.Xifrar2"),
+					new EventListener() {
+						public void onEvent(Event evt) {
+							if ("onOK".equals(evt.getName())) {
+								valor = camp.getValue();
+								xifrat = new es.caib.seycon.Password(valor).toString(); 
+								camp.setValue(xifrat);
+							}
+						}
+					}
+				);
+			}
+			
+			void verificaControlAcces() {
+				// l'amaguem per defecte
+				setVisibleControlAcces(false);
+				
+				// si no pot veure el control d'accés sortim
+				if (!canQueryAccessControlAgent) return;
+				
+				// Ací obtenim el nom de l'agent per veure la seua classe
+				Object elem = esquema.getFellow("lista").getFellow("listbox").selectedItem.value;
+				if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
+					Object obj = elem.getInstance();
+					if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
+						es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
+						String nomClass = agent.getNomCla();
+						String codiAgent = agent.getCodi();
+						model.getVariables().declareVariable("codiAgent", codiAgent);
+						try {
+							// Mostramos o no el control d'accés segons el plugin
+							cacActiu = model.getJXPathContext().getValue("/plugin[className='"+nomClass+"']/enableAccessControl");
+							//Missatgebox.info ("cacActiu= "+cacActiu);
+							if (cacActiu!=null && cacActiu) { //es boolea
+								setVisibleControlAcces(true); 
+								carregaControlAcces();
+							}
+						}
+						
+						catch (Throwable th) {
+							//Missatgebox.error ("error "+th.getMessage());
+							setVisibleControlAcces(false);
+						}
+						
+						if (agent.getNomCla().equals("com.soffid.iam.addons.replica.agent.ReplicaAgent"))
+							esquema.getFellow("lista").getFellow("delete_box").setVisible(false);
+						
+						else
+							esquema.getFellow("lista").getFellow("delete_box").setVisible(true);
+					}
+				}
+			}
+			
+			void setVisibleControlAcces(boolean visible) {
+				esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
+				esquema.getFellow("dades").getFellow("r_controlAcces").setVisible(visible);
+			}
+			
+			void setVisibleAttributeMapping(boolean visible) {
+				esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
+				esquema.getFellow("dades").getFellow("r_attributeMapping").setVisible(visible);
+			}
+			
+			void carregaControlAcces() {
+				model.getJXPathContext().getValue("/agent/controlAcces").refresh();
+				gridControlAccess.dataPath = "/esquema/lista/listbox:/controlAcces"; 
+			}
+			
+			void propagaCanvisAgent_Usuaris()  {
+				Object elem = esquema.getFellow("lista").getFellow("listbox").selectedItem.value;
+				if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
+					Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.Usuaris"),
+						org.zkoss.util.resource.Labels.getLabel("agents.PropagarUsuaris"),
+						new EventListener() {
+							public void onEvent(Event evt) {
+								if ("onOK".equals(evt.getName())) { 
+									Object obj = elem.getInstance();
+									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
+										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
+										String codiAgent = agent.getCodi();
+										javax.naming.Context context = new javax.naming.InitialContext();
+										Object objDis = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
+										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
+											objDis, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
+										es.caib.seycon.ng.servei.ejb.DispatcherService disService = disHome.create();
+										disService.propagateUsuarisDispatcher(codiAgent);
+									}
+								}
+							}
+						}
+					);
+				}
+				
+				else {
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("agents.Select"));
+				}
+			}
+			
+			void propagaCanvisAgent_Rols()  {
+				Object elem = esquema.getFellow("lista").getFellow("listbox").selectedItem.value;
+				if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
+					Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.Rols"),
+						org.zkoss.util.resource.Labels.getLabel("agents.PropagarRols"),
+						new EventListener() {
+							public void onEvent(Event evt) {
+								if ("onOK".equals(evt.getName())) { 
+									Object obj = elem.getInstance();
+									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
+										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
+										String codiAgent = agent.getCodi(); 
+										javax.naming.Context context = new javax.naming.InitialContext();
+										Object objDis2 = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
+										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome2 = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
+											objDis2, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
+										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR = disHome2.create();
+										disServiceR.propagateRolsDispatcher(codiAgent);
+									}
+								}
+							}
+						}
+					);
+				}
+				
+				else {
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("agents.Select"));
+				}
+			}
+			
+			import es.caib.seycon.ng.comu.TipusUsuari;
+			void seleccionaTipusUsuari ( String relacioLaboral) {
+				String [] tipusUsuari  = null;
+				if (relacioLaboral!=null)  tipusUsuari= relacioLaboral.split(",");
+				if (tipusUsuari!=null) {
+					List fills = lbTipusUsuari.getChildren();
+					if (fills!=null) for (int i=0; i < fills.size(); i++)  {
+						Listitem elem = fills.get(i);
+						if (elem.getValue()!=null && elem.getValue().getInstance() instanceof TipusUsuari) {
+							TipusUsuari tu = (TipusUsuari) elem.getValue().getInstance();
+							for (int j=0; j < tipusUsuari.length; j++) {
+								if (tipusUsuari[j]!=null && tipusUsuari[j].equals(tu.getCodi())) {
+									elem.setSelected(true);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			void checkPropagateChanges()
+			{
+				DataListbox listbox = esquema.getFellow("lista").getFellow("listbox");
+				
+				if ((listbox.selectedItem != null) &&
+						(listbox.selectedItem.getValue() != null))
+				{
+					if (Missatgebox.confirmaOK_CANCEL(
+								org.zkoss.util.resource.Labels.getLabel("agents.DeleteAgentAccounts"),
+								org.zkoss.util.resource.Labels.getLabel("process.warning")) &&
+							Missatgebox.confirmaOK_CANCEL(
+								org.zkoss.util.resource.Labels.getLabel("agents.DeleteAgentRoles"),
+								org.zkoss.util.resource.Labels.getLabel("process.warning")))
+					{
+						listbox.delete();
+					}
+				}
+			}
+		]]>
+	</zscript>
+
+	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
+		onHideFormulari="showLista()">
+	
+		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
+			width="${amplaria}">
+
+			<hbox style="margin-bottom:1px">
+				<input_criteri id="queryCodi" etiqueta="${c:l('agents.zul.Codi')}"/>
+				<hbox width="320px" widths="99px,200px,*">
+					<input_etiqueta value="${c:l('agents.zul.Tipus')}" width="100%"/>
+					<listbox id="queryNomLlista" dataPath="/model:/pluginNames"
+						mold="select" style="font-size:11px;width:100%">
+						<dataitem bind=".">
+							<listcell bind="@description"/>
+						</dataitem>
+					</listbox>
+					<separator/>
+				</hbox>
+				<input_criteri id="queryNom" etiqueta="${c:l('agents.zul.Classe')}"/>
+				<separator width="10px"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox> 
+				<input_criteri id="queryUrl" etiqueta="${c:l('agents.zul.Url')}"/>
+				<hbox widths="99px,*">
+					<input_etiqueta value="${c:l('agents.zul.Actiu?')}" width="100%"/>
+					<checkbox id="queryActiu"
+						label="${c:l('agents.zul.Mostranomasagentsact')}" checked="true"/>
+				</hbox>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="${amplaria}">
+			<toolbar>
+				<hbox>
+					<insertbutton acces="${canCreateAgent}" listbox="/esquema/lista/listbox"
+						onClick="creaNou()"/>
+					<hbox id="delete_box">
+						<imageclic id="imgDelete" if="${canDeleteAgent}"
+							src="~./img/list-remove.gif" onClick="checkPropagateChanges()"/>
+						<label value="${c:l('agents.DeleteAgent')}" 
+							style="font-family: Arial; font-size: 11px; font-weight: bold; color: #FFF; cursor: pointer"
+							onClick="checkPropagateChanges()"/>
+					</hbox>
+					<commitbutton datamodel="/model" />
+					<undobutton datamodel="/model" listbox="/esquema/lista/listbox"
+						onClick="setVisibleControlAcces(false); setVisibleAttributeMapping(false)"/>
+					<listexporttoolbarbutton acces="${canQueryAgent}"
+						listbox="/esquema/lista/listbox"/>
+				</hbox>
+			</toolbar>
+			
+			<listbox id="listbox" autocommit="false" dataPath="/model:/agent"
+				fixedLayout="true" height="96%" onClick="showDetall()" 
+				onSelect="select()" rows="${fileres}" onCreate="checkTruncatedList(self)">
+				<listhead>
+					<listheader label="${c:l('agents.zul.Codi-2')}" sort="auto"
+						width="21%"/>
+					<listheader label="${c:l('agents.zul.Classe-2')}" sort="auto"
+						width="43%"/>
+					<listheader label="${c:l('agents.zul.Url-2')}" sort="auto"
+						width="36%"/>
+				</listhead>
+				
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				
+				<dataitem bind=".">
+					<listcell bind="@codi"/>
+					<listcell bind="@nomCla"/>
+					<listcell bind="@url"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<detalls id="dades" width="${amplaria}">
+			<zscript>
+				<![CDATA[
+					es.caib.zkib.component.DataModel dm = model;
+					dm.addEventListener("onCommit", new org.zkoss.zk.ui.event.EventListener ()
+					{
+						public void onEvent(Event event) {
+							onChangeClass();
+						}
+					});
+					
+					void onChangeDades()
+					{
+						try {
+							ds = form.getDataSource(); 
+							ctx =  ds.getJXPathContext(); 
+							registre = ctx.getValue("/");
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(!registre.isNew());
+							Listbox lbTipusUsuari = form.getFellow("lbTipusUsuari");
+							lbTipusUsuari.selectItem(null); //esborrem seleccio
+							
+							// Agent existent:
+							if (!registre.isNew()) {
+								// Cargamos los checkboxes del tipo de usuario
+								String relacioLaboral = ctx.getValue("@relacioLaboral");
+								seleccionaTipusUsuari(relacioLaboral);	
+								String url = esquema.getFellow("dades").getFellow("form").getFellow("basica")
+										.getFellow("detall_url").getSelectedItem().getValue();
+								if(url.trim().length() == 0)
+								{
+									esquema.getFellow("dades").getFellow("form").getFellow("basica")
+									.getFellow("imgPropaga").setDisabled(true);
+								}
+								else
+								{
+									esquema.getFellow("dades").getFellow("form").getFellow("basica")
+									.getFellow("imgPropaga").setDisabled(false);
+								}
+							} 
+						}
+						
+						catch (Exception e) {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
+							//Missatgebox.error ("Error "+e.getMessage());
+						}
+					}
+					
+					void onChangeClass() {
+						//System.out.println("On change class");
+						String value=detall_nom.getValue();
+						ctx = model.getJXPathContext ();
+						row_authoritative.visible = false; 
+						boolean isReplica = false;
+						if (value==null || "".equals(value)) 
+						{
+							customAgentProperties.visible = false;
+						}
+						else
+						{
+							customAgentProperties.getChildren().clear ();
+							try {
+								auth = ctx.getValue("/plugin[className='"+value+"']/@authoritativeSource");
+								row_authoritative.visible = auth != null && auth; 
+							}
+							
+							catch (Exception e) { 
+								row_authoritative.visible = false; 
+							}
+							
+							try {
+								data = ctx.getValue("/plugin[className='"+value+"']/userInterface");
+								
+								//System.out.println("AgentDescriptor = "+data.getClass().getName());
+								defaultAgentProperties.visible = false;
+								java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(data);
+								xmlDoc = new org.zkoss.idom.input.SAXBuilder(false, false).build(in);
+								Executions.createComponentsDirectly(xmlDoc, "zul", customAgentProperties, new java.util.HashMap());
+								customAgentProperties.visible = true;
+								enable = ctx.getValue("/plugin[className='"+value+"']/@enableAttributeMapping");
+								agentId = XPathUtils.getValue(
+										XPathUtils.getComponentContext(form), "@id");
+								setVisibleAttributeMapping (agentId != null && enable);
+							}
+							
+							catch (Exception e) {
+	//							alert(e);
+							    //e.printStackTrace();
+								defaultAgentProperties.visible = false;
+								//Missatgebox.error("error "+e.getMessage());
+								//System.out.println("Sin descriptor");
+								customAgentProperties.visible = false;
+							}
+							
+							try {
+								isReplica = form.getJXPathContext().getValue("@databaseReplicaId") != null;
+							} 
+							catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {	}
+						}
+						
+						detall_segur.setDisabled (isReplica);
+						detall_readonly.setDisabled(isReplica);
+						detall_basatRols.setDisabled(isReplica);
+						grups.getFellow("dada").setReadonly(isReplica);
+						cbDominiUsuaris.setDisabled(isReplica);
+						cbDominiContrasenyes.setDisabled(isReplica);
+						r_tipusUsuari.setVisible(!isReplica);
+						cbClassDescription.setDisabled(isReplica);
+					}
+				]]>
+			</zscript>
+			
+			<form id="form" dataPath="/esquema/lista/listbox:/."
+				onChangeXPath="onChangeDades()">
+				<attribute name="onActualitza">
+					if (event.getData() instanceof String) {
+						dada = (String)event.getData();
+					} else {
+						dada = (String)(event.getData()[0]);
+					}
+					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+					String oldValue= camp.getValue();
+					if(oldValue == null || oldValue.trim().compareTo("") == 0){
+						oldValue = null;
+					}
+					<!-- Va afegint els grups separats per comes -->
+					camp.setValue((oldValue == null ? "" : oldValue + ", ") + dada);
+				</attribute>
+				<tabbox id="panels" width="${amplaria2}">
+				<tabs>
+					<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
+					<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
+					<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
+				</tabs>
+				<tabpanels>
+					<tabpanel id="basica">
+					<vbox width="${amplaria2}">
+					<grid width="99%">
+					<columns visible="false"><column width="14%"/><column/> </columns>
+						<rows>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Codi-2')}"/>
+								<hbox width="100%">
+									<attribute if="${canPropagateAgentUsers or canPropagateAgentRoles}" name="widths">90%,10%</attribute>
+									<attribute name="width" unless="${canPropagateAgentUsers or canPropagateAgentRoles}">90%</attribute>
+									
+									<hbox width="100%">
+										<input_dada bind="@codi" id="detall_codi" maxim="50"
+											width_custom="99%" mascara="no empty"/>
+											
+										<label value="*" />
+									</hbox>
+									
+									<div if="${canPropagateAgentUsers or canPropagateAgentRoles}">
+										<imageclic id="imgPropaga" if="${canPropagateAgentUsers}" src="/img/propagausu.gif" tooltiptext="${c:l('agents.PropagaUsuaris')}"> 
+											<attribute name="onClick">
+												<![CDATA[
+													if (canPropagateAgentUsers)
+													{
+														propagaCanvisAgent_Usuaris();
+													}
+												]]>
+											</attribute>
+										</imageclic>
+										<space width="4px"/>
+										<imageclic id="imgPropagaRols" if="${canPropagateAgentRoles}" src="/img/propagarols.gif" tooltiptext="${c:l('agents.PropagaRols')}"> 
+											<attribute name="onClick">
+											 	if (canPropagateAgentRoles) {
+													propagaCanvisAgent_Rols();
+												}
+											</attribute>
+										</imageclic>
+									</div>
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Descripcion') }"/>
+								<hbox width="100%">
+									<hbox width="100%">
+										<input_dada bind="@description" id="detall_description" maxim="250" width_custom="88%"/>
+									</hbox>
+								</hbox>
+							</row>
+							
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Tipus-2')}"/>
+								<hbox width="90%" widths="45%,*">
+									<combobox bind="@nomCla" dataPath="/model:/plugin"  id="cbClassDescription"
+										onChange="onChangeClass();" readonly="true" width="96%">
+										<datacomboitem bind="@className" labelBind="@description"/>
+									</combobox>
+									
+									<label value="*"/>
+									
+									<hbox width="98%" widths="*,80%">
+										<label sclass="etiqueta" value="${c:l('agents.zul.Classe')}"/>
+										<textbox bind="@nomCla" disabled="true" id="detall_nom" onChangeXPath="onChangeClass();" readonly="true" width="98%"/>
+									</hbox>
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Server')}"/>
+								<hbox width="90%">
+									<!-- <input_dada bind="@url" id="detall_url" lectura="${!canModifyAgent}" maxim="100" width_custom="98%"/>-->
+	<!-- 								<textbox bind="@url" id="detall_url" readonly="${!canModifyAgent}" maxlength="100" width="98%" onChange=""/>  -->
+									<listbox
+										disabled="${!canModifyAgent}"
+										width="98%"
+										bind="@url" mold="select"
+										dataPath="/model:/serverSelector"
+										id="detall_url">
+										<dataitem bind="@url">
+											<listcell bind="@nom"/>
+										</dataitem>
+									</listbox>
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Fiable')}"/>
+								<checkbox bind="@segur" disabled="${!canModifyAgent}" id="detall_segur" onCheck=""/>
+							</row>
+							<row id="row_authoritative">
+								<input_etiqueta value="${c:l('agents.zul.Authoritative')}"/>
+								<checkbox bind="@authoritative" disabled="${!canModifyAgent}" id="detall_authoritative" onCheck=""/>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Readonly')}"/>
+								<checkbox bind="@readOnly" disabled="${!canModifyAgent}" id="detall_readonly" onCheck=""/>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Basatenrols')}"/>
+								<checkbox bind="@basRol" disabled="${!canModifyAgent}" id="detall_basatRols" onCheck=""/>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@grups" id="grups" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/grup.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												String idActualitza ="grups";
+												desktop.getPage("grupsLlista").setAttribute("tipus","");
+												desktop.getPage("grupsLlista").setAttribute("llistaObsolets",false);
+												Events.postEvent("onInicia",desktop.getPage("grupsLlista").getFellow("esquemaLlista"),form);
+											}
+										</attribute>
+									</imageclic>				
+								</hbox>		
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Dominidusuaris')}"/>
+								<hbox width="50%" widths="*,*">
+									<listbox mold="select" bind="@dominiUsuaris" dataPath="/model:/dominisUsuari" id="cbDominiUsuaris" width="90%">
+										<dataitem bind="@codi">
+											<listcell bind="@descripcio"/>
+										</dataitem>
+									</listbox>
+									
+									<label value="*"/>
+								</hbox>
+							</row>
+							
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.DominideContrasenyes')}"/>
+								<hbox width="50%" widths="*,*">
+									<listbox mold="select" bind="@dominiContrasenyes" dataPath="/model:/dominisContrasenya" id="cbDominiContrasenyes" width="90%">
+										<dataitem bind="@codi">
+											<listcell bind="@descripcio"/>
+										</dataitem>
+									</listbox>
+									
+									<label value="*"/>
+								</hbox>
+							</row>
+							<row id="r_tipusUsuari">
+								<input_etiqueta value="${c:l('agents.zul.Tipusdusuari')}"/>
+								<hbox>  
+									<listbox checkmark="true" dataPath="/model:/tipusUsuari" id="lbTipusUsuari" multiple="true">
+										<attribute name="onSelect">
+											missatge.setVisible(true);
+											// no es pot saber quin és el darrer que ha seleccionat... els agafem tots
+											elements = self.getSelectedItems(); // de Listitem
+											String tipusUsuariSeleccionats = "";
+											int numSel = 0;
+											if (elements!=null) for (Iterator it=elements.iterator(); it.hasNext(); ) {
+												Listitem li = it.next();
+												if (li.getValue() instanceof XmlDataNode) {
+													tipusUsuariSeleccionats +=li.getValue().getInstance().getCodi()+",";
+													numSel++;
+												}
+											}
+											//Missatgebox.info ("tipus d'usuaris seleccionats "+tipusUsuariSeleccionats);
+											// Ho guardem
+											ds = form.getDataSource(); 
+											ctx =  ds.getJXPathContext();
+											// Obtenim el valor anterior
+											tipusAnterior = ctx.getValue("@relacioLaboral");
+											boolean confirma = false;
+											String[] tu = null;
+											if (tipusAnterior!=null) {
+												tu = tipusAnterior.split(",");
+												// només quan es canvien de més de 2 a 1
+												if (tu!=null @and tu.length @gt 2 @and numSel == 1) {
+													confirma = true;
+												}
+											}
+											if (confirma @and tu!=null) {
+												if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("agents.CanviarTipusUsuari"), new Object [] {tu.length,numSel}),
+													org.zkoss.util.resource.Labels.getLabel("agents.VerificarCanviarTipusUsuari"))) {
+														ctx.setValue("@relacioLaboral",tipusUsuariSeleccionats);		
+												} else {
+													//Posem el canvi
+													seleccionaTipusUsuari(tipusAnterior);
+												}
+											} else {
+												//No demanem confirmació
+												ctx.setValue("@relacioLaboral",tipusUsuariSeleccionats);
+											}
+											
+										</attribute>
+										<dataitem bind=".">
+											<listcellnolabel bind="@codi">
+												<textbox bind="@descripcio" readonly="true" style="border: none;padding 4px 1px;"/>
+											</listcellnolabel>
+										</dataitem>
+									</listbox>
+									<!--label id="lb_tipusUsuari" bind="@relacioLaboral"/--> 
+									<label id="missatge" value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;" visible="false"/>
+								</hbox>		
+							</row>
+						</rows>
+					</grid>
+					<label sclass="etiqueta" value="${c:l('agents.zul.Parametresdelagent')}" width="100%"/>
+					<vbox id="defaultAgentProperties" width="100%" visible="false">
+						<grid width="99%">
+						<columns visible="false"><column width="14%"/><column/> </columns>
+						<rows>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre0')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param0" id="detall_par0" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											 if (canModifyAgent) {
+												xifra(form.getFellow("detall_par0").getFellow("dada"));										
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre1')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param1" id="detall_par1" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par1").getFellow("dada"));										
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre2')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param2" id="detall_par2" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par2").getFellow("dada"));										
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre3')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param3" id="detall_par3" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par3").getFellow("dada"));										
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>						
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre4')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param4" id="detall_par4" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par4").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre5')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param5" id="detall_par5" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par5").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre6')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param6" id="detall_par6" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par6").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre7')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param7" id="detall_par7" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par7").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>							
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre8')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param8" id="detall_par8" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par8").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>							
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.Parametre9')}"/>
+								<hbox widths="90%,10%">
+									<input_dada bind="@param9" id="detall_par9" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<imageclic src="~./img/xifrar.gif">
+										<attribute name="onClick">
+											if (canModifyAgent) {
+												xifra(form.getFellow("detall_par9").getFellow("dada"));
+											}
+										</attribute>
+									</imageclic>							
+								</hbox>							
+							</row>
+						</rows>
+					</grid>
+					</vbox>
+					<vbox id="customAgentProperties" visible="false" width="100%"/>
+					</vbox>
+					</tabpanel>
+					<tabpanel id="tabAttributeMapping">
+						<toolbar>
+							<toolbarbutton image="/img/refresca.png" label="Create default mapping">
+								<attribute name="onClick"><![CDATA[
+	if (canUpdateAgent)
+	{
+								Missatgebox.confirmaOK_CANCEL(
+										org.zkoss.util.resource.Labels.getLabel("agents.resetMappings"),
+											org.zkoss.util.resource.Labels.getLabel("agents.reset"),
+										new EventListener() {
+											public void onEvent(Event evt) {
+												if ("onOK".equals(evt.getName())) {
+						   							es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
+						   							listbox.commit();
+													Long id = XPathUtils.getValue(listbox, "/@id");
+													es.caib.seycon.ng.servei.ejb.DispatcherService ejb = 
+														new javax.naming.InitialContext().
+															lookup (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME).
+																create ();
+													ejb.setDefaultMappingsByDispatcher(id);
+													XPathUtils.getValue(listbox, "/objectMapping").refresh();
+												}														
+											}
+										}
+						   			);
+	}
+								]]>
+								</attribute>
+							</toolbarbutton>
+						</toolbar>
+						<grid dataPath="/esquema/lista/listbox:/objectMapping" id="objectsGrid" width="100%">
+							<columns>
+								<column label="System objects" valign="top">
+								</column>
+								<column label="" width="2em"  valign="top">
+									<insertbutton acces="${canCreateAgent}" listbox="/esquema/dades/objectsGrid" label="">
+										<attribute name="onClick"><![CDATA[
+			if (canUpdateAgent)
+			{
+										es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();							                                   
+										XPathUtils.createPath(listbox, "/objectMapping");
+			}							                                   
+										]]>
+										</attribute>
+									</insertbutton>
+								</column>
+							</columns>
+							<datarow>
+								<window width="95%" >
+									<div>
+										<input_dada bind="@systemObject" width_custom ="15%"></input_dada>
+										<label value="based on" width="10%"></label>
+										<listbox bind="@soffidObject" mold="select" dataPath="/model:/soffidObjectType" width="15%">
+											<dataitem bind="@value">
+												<listcell bind="@literal"/>
+											</dataitem>
+										</listbox>
+										<label value="Condition: " width="10%"></label>
+										<input_dada bind="@condition" width_custom ="45%"></input_dada>
+									</div>
+	
+										
+									<div style="width: 90%; float: right; display:block; ">
+									
+										<div style="display: block; ">
+	
+										<image src="~./zul/img/tree/close.png" width="16px" style="float: left; ">
+											<attribute name="onClick">
+												propertiesDiv = event.target.getFellow("propertiesDiv");
+												if (propertiesDiv.isVisible() )
+												{
+													propertiesDiv.setVisible(false);
+													propertiesLabel.setVisible(true);
+													self.src = "~./zul/img/tree/close.png";
+												} else {
+													propertiesDiv.setVisible(true);
+													propertiesLabel.setVisible(false);
+													self.src = "~./zul/img/tree/open.png";
+												}
+											</attribute>
+										</image>
+										
+										<div id="propertiesLabel" style="height: 20px;" >
+											<label value="Properties" sclass="titol_capsa"/>
+										</div>
+																					
+										<div style="" id="propertiesDiv"  visible="false" >																				
+											<grid dataPath="property" width="95%"  fixedLayout="true" id ="propertiesGrid">
+												<columns>
+													<column label="Property" width = "15em">
+													</column>
+													<column label="Value">
+													</column>
+													<column label="" width="2em">
+														<imageclic align="right" src="~./img/list-add.gif">
+															<attribute name="onClick"><![CDATA[
+								if (canUpdateAgent)
+								{
+															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
+															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+								}
+															]]>
+															</attribute>
+														</imageclic>
+													</column>
+												</columns>
+												<datarow>
+													<input_dada bind="@property" width_custom ="95%"></input_dada>
+													<input_dada bind="@value" width_custom ="95%"></input_dada>
+													<imageclic align="right" src="~./img/list-remove.gif">
+														<attribute name="onClick">
+															<![CDATA[
+				if (canUpdateAgent)
+				{
+							ctx = XPathUtils.getComponentContext (self);
+							XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
+				}												]]>
+														</attribute>
+													</imageclic>
+												</datarow>
+											</grid>
+											<div style="height: 20px;" />
+										</div>
+									</div>
+									
+									<div style="display: block">
+	
+										<image src="~./zul/img/tree/close.png" style="float: left;" >
+											<attribute name="onClick">
+												attributesDiv = event.target.getFellow("attributesDiv");
+												if (attributesDiv.isVisible() )
+												{
+													attributesDiv.setVisible(false);
+													attributesLabel.setVisible(true);
+													self.src = "~./zul/img/tree/close.png";
+												} else {
+													attributesDiv.setVisible(true);
+													attributesLabel.setVisible(false);
+													self.src = "~./zul/img/tree/open.png";
+												}
+											</attribute>
+										</image>
+	
+										<div id="attributesLabel" style="height: 20px;" >
+											<label value="Attributes" sclass="titol_capsa"/>
+										</div>
+																					
+																															
+										<div style="" id="attributesDiv"  visible="false">																				
+											<grid dataPath="attributeMapping" id="attributesGrid" style="width: 95%">
+												<columns>
+													<column label="System attribute">
+													</column>
+													<column label="Direction" width="6em">
+													</column>
+													<column label="Soffid attribute">
+													</column>
+													<column label="" width="2em">
+														<imageclic  align="right" src="~./img/list-add.gif">
+															<attribute name="onClick"><![CDATA[
+								if (canUpdateAgent)
+								{
+															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(self);							                                   
+															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+								}														                                   
+															]]>
+															</attribute>
+														</imageclic>
+													</column>
+												</columns>
+												<datarow>
+													<input_dada bind="@systemAttribute" width_custom ="95%"></input_dada>
+													<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection">
+														<dataitem bind="@value">
+															<listcell bind="@literal"/>
+														</dataitem>
+													</listbox>
+													<input_dada bind="@soffidAttribute" width_custom ="95%"></input_dada>
+													<imageclic align="right" src="~./img/list-remove.gif">
+														<attribute name="onClick">
+															<![CDATA[
+						ctx = XPathUtils.getComponentContext (self);
+						XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
+															]]>
+														</attribute>
+													</imageclic>
+												</datarow>
+											</grid>
+											<div style="height: 20px;" />
+										</div>
+									</div>
+									<div style="width: 15px; height: 15px;"/>
+									</div>
+								</window>
+								<imageclic align="right" src="~./img/list-remove.gif">
+									<attribute name="onClick">
+										<![CDATA[
+	                                  if (canUpdateAgent) 
+	                                  {
+										ctx = XPathUtils.getComponentContext (self);
+										XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
+	                                  }
+										]]>
+									</attribute>
+								</imageclic>
+							</datarow>
+						</grid>
+					</tabpanel>
+					<tabpanel id="tabControlAcces">
+					<vbox width="${amplaria2}">
+						<checkbox bind="@controlAccess" disabled="${!canSetAccessControl}" id="c_controlAcces" label="${c:l('agents.zul.Activarcontroldacca')}" onCheck=""/>
+						<listbox dataPath="/esquema/lista/listbox:/controlAcces" fixedLayout="true" height="300px" id="gridControlAccess" sclass="likeagrid" width="98%">
+						<attribute name="onActualitza">
+							// NOVA FILERA DE CONTROL D'ACCÉS
+							dada = event.getData();
+							// Datos: usuari, idUsuari, usuari_generic, rol, idRol, maquina, idMaquina, maquines_generic, programa, idFicticia
+							//Missatgebox.info ("rebudes #"+dada.length+ " dades "+dada)
+	            			modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
+	            			ds = gridControlAccess.getDataSource(); 
+	            			ctx =  ds.getJXPathContext();
+	            			// codi dispatcher actual
+	            			v_codi = model.getVariables().getVariable("codiAgent");
+	            			// user: pot ésser usuari(idUsuari), usuari_generic o rol
+	            			v_usuari = dada[0];
+	            			v_idUsuari = dada[1];
+	            			v_usuari_generic = dada[2];
+	            			v_rol = dada[3];
+	            			v_idRol = dada[4];
+	            			// maquina: pot ésser maquina (idMaquina) o maquines_generic
+	            			v_maquina = dada[5];
+	            			v_idMaquina = dada[6];
+	            			v_maquines_generic = dada[7];
+	            			// programa
+	            			v_programa = dada[8];
+	            			// id ficiticia
+	            			v_idCAC = dada[9];
+	            			
+	            			String condicio = "[@nomAgent = '"+v_codi+"'"; //no tanquem ]
+	            			// user: pot ésser usuari(idUsuari), usuari_generic o rol
+	            			/*if (v_idUsuari != null ) {
+	            				condicio += " and @idUsuari='"+v_idUsuari+"' ";
+	            			} else */
+	            			if (v_idRol != null) {
+	            				condicio += " and @idRol ='"+v_idRol+"' ";
+	            			} else  {// genèric
+	            				condicio += " and (@usuariGeneric = '"+v_usuari_generic+"') ";
+	            				//" and (@usuariGeneric = '"+v_usuari_generic+"' or @codiUsuari = '"+v_usuari_generic+"') ";
+							}
+							// maquina: pot ésser maquina (idMaquina) o maquines_generic
+							if (v_idMaquina!=null) {
+								condicio += " and @idMaquina = '"+v_idMaquina+"' ";
+							} else { // genèric (comparem amb el nom de la màquina)
+								condicio += "and @nomMaquina = '"+v_maquines_generic+"' ";
+								//" and @maquinaGeneric = '"+v_maquines_generic+"' ";
+							}
+							
+							// programa
+							condicio +=" and @program='"+v_programa+"']"; //tanquem ]
+							
+							//Missatgebox.info ("condicio =" +condicio);              			
+	            			
+	            			xpath = gridControlAccess.getXPath() + condicio;
+	            			boolean jaExisteix = true;
+	            			try {
+	             				valor = ctx.getValue(xpath);
+	            			} catch(Exception e) {
+	             				jaExisteix = false;
+	            			}
+	            			if (jaExisteix) {
+	            				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("agents.JaExisteix"));
+	            				return;
+	            			} else { // Creem un de nou
+		              			position = modelProxy.newInstance();
+		              			ds = gridControlAccess.getDataSource(); 
+		              			ctx =  ds.getJXPathContext(); 
+		              			xpath = gridControlAccess.getXPath() + modelProxy.getBind(position); 
+		              			pointer =ctx.createPath (xpath);
+		             			ctx2 = ctx.getRelativeContext(pointer);
+		             			ctx2.setValue("@nomAgent", v_codi);
+								// user: pot ésser usuari(idUsuari), usuari_generic o rol
+		            			/*if (v_idUsuari != null ) { 
+		            				ctx2.setValue("@codiUsuari", v_usuari);
+		            				ctx2.setValue("@idUsuari", v_idUsuari);
+		            			} else */
+		            			if (v_idRol != null) {
+		            				ctx2.setValue("@descripcioRol", v_rol);
+		            				ctx2.setValue("@idRol", v_idRol);
+		            			} else  {// genèric
+		            				ctx2.setValue("@usuariGeneric", v_usuari_generic);
+		            				//ctx2.setValue("@codiUsuari", v_usuari); // no té id serà genèric
+								}
+								// maquina: pot ésser maquina (idMaquina) o maquines_generic
+								/*if (v_idMaquina!=null) {
+		            				ctx2.setValue("@nomMaquina", v_maquina);
+		            				ctx2.setValue("@idMaquina", v_idMaquina);
+								} else { // genèric
+								*/
+									ctx2.setValue("@maquinaGeneric", v_maquines_generic);
+									ctx2.setValue("@nomMaquina", v_maquina); // no té id serà genèric
+								//}
+								
+								// programa
+								ctx2.setValue("@program", v_programa);  
+					            pointer.invalidate ();
+					            
+					            // id ficticia del CAC (per poder editar) -- no s'empra després
+					            ctx2.setValue("@id", v_idCAC);
+	            			}
+							
+						</attribute>
+						<attribute name="onUpdate">
+							dada = event.getData();
+							// Datos: usuari, idUsuari, usuari_generic, rol, idRol, maquina, idMaquina, maquines_generic, programa, id (real o ficticia)
+	            			modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
+	            			ds = gridControlAccess.getDataSource(); 
+	            			ctx =  ds.getJXPathContext();
+	            			// codi dispatcher actual
+	            			v_codi = model.getVariables().getVariable("codiAgent");
+	            			// user: pot ésser usuari(idUsuari), usuari_generic o rol
+	            			v_usuari = dada[0];
+	            			v_idUsuari = dada[1];
+	            			v_usuari_generic = dada[2];
+	            			v_rol = dada[3];
+	            			v_idRol = dada[4];
+	            			// maquina: pot ésser maquina (idMaquina) o maquines_generic
+	            			v_maquina = dada[5];
+	            			v_idMaquina = dada[6];
+	            			v_maquines_generic = dada[7];
+	            			// programa
+	            			v_programa = dada[8];
+	            			// idCAC: real o ficticia
+	            			v_idCAC = dada[9];
+	            			//Missatgebox.info("dada "+dada);
+	            			
+	            			xpath = gridControlAccess.getXPath() + "[@id = '"+v_idCAC+"']";
+	            			boolean jaExisteix = false;
+	            			try {
+	             				valor = ctx.getValue(xpath);
+	             				jaExisteix = true;
+	            			} catch(Exception e) {
+	             				jaExisteix = false;
+	            			}
+	            			if (!jaExisteix) {
+	            				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("agents.NoRegla"));
+	            				return;
+	            			} else { // Actualitzem
+	            				pointer = ctx.getPointer(xpath);	
+								ctx2 = ctx.getRelativeContext(pointer);
+		             			ctx2.setValue("@nomAgent", v_codi);
+								// user: pot ésser usuari(idUsuari), usuari_generic o rol
+		            			/*if (v_idUsuari != null ) { 
+		            				ctx2.setValue("@codiUsuari", v_usuari);
+		            				ctx2.setValue("@idUsuari", v_idUsuari);
+		            			} else */
+		            			if (v_idRol != null) {
+		            				ctx2.setValue("@descripcioRol", v_rol);
+		            				ctx2.setValue("@idRol", v_idRol);
+		            			} else  {// genèric
+		            				ctx2.setValue("@usuariGeneric", v_usuari_generic);
+		            				//ctx2.setValue("@codiUsuari", v_usuari); // no té id serà genèric
+								}
+								// maquina: pot ésser maquina (idMaquina) o maquines_generic
+								/*if (v_idMaquina!=null) {
+		            				ctx2.setValue("@nomMaquina", v_maquina);
+		            				ctx2.setValue("@idMaquina", v_idMaquina);
+								} else { // genèric
+								*/
+									ctx2.setValue("@maquinaGeneric", v_maquines_generic);
+									ctx2.setValue("@nomMaquina", v_maquina); // no té id serà genèric
+								//}
+								
+								// programa
+								ctx2.setValue("@program", v_programa);
+								// esborrem ips propagades
+								ctx2.setValue("@ipsPropagades","");  
+					            pointer.invalidate ();
+	            			}
+							
+						</attribute>					
+					<listhead>
+						<listheader label="${c:l('agents.zul.Usuari')}" sort="auto" width="15%"/>
+						<listheader label="${c:l('agents.zul.Rol')}" sort="auto" width="15%"/>
+						<listheader label="${c:l('agents.zul.Maquina/IP')}" sort="auto" width="20%"/>
+						<listheader label="${c:l('agents.zul.Programa')}" sort="auto" width="25%"/>
+						<listheader label="${c:l('agents.zul.IPsPropagades')}" sort="auto" tooltiptext="${c:l('agents.IPsPropagades')}"/>
+						<listheader id="c_gestionaRol" label="${c:l('agents.zul.*')}" sclass="tcoth" visible="${canModifyAccessControl}" width="30px"/>
+						<listheader label="${c:l('agents.zul.')}" visible="${canDeleteAccessControlAgent}" width="30px"/>					
+					</listhead>
+					<dataitem bind=".">
+						<listcell bind="@usuariGeneric"/>
+						<listcell bind="@descripcioRol"/>
+						<listcell bind="@nomMaquina"/>
+						<listcell bind="@program"/>
+						<listcell bind="@ipsPropagades"/>
+						<listcell sclass="tcoth">
+						<imageclic src="~./img/vincula.gif" tooltiptext="Modificar regla">
+							<attribute name="onClick">
+							<![CDATA[
+								if (canModifyAccessControl) {
+									listCell = self.getParent(); 
+									dlistbox = listCell.getListbox(); 
+									modelo = dlistbox.getModel();
+									listItem = listCell.getParent(); 
+									posicio = listItem.getIndex(); 
+									elemPos = modelo.getElementAt(posicio); 
+									xpath = elemPos.getDataContext().getXPath(); 
+									ds = gridControlAccess.getDataSource();
+									ctx = ds.getJXPathContext();																												
+									
+									// Guardem el id per poder moficiar la fila que correspon
+									desktop.getPage("controlAcces").setAttribute("idCAC", ctx.getValue(xpath+"/@id"));
+									desktop.getPage("controlAcces").setAttribute("usuariGeneric", ctx.getValue(xpath+"/@usuariGeneric"));
+									desktop.getPage("controlAcces").setAttribute("idRol", ctx.getValue(xpath+"/@idRol"));
+									desktop.getPage("controlAcces").setAttribute("descripcioRol", ctx.getValue(xpath+"/@descripcioRol"));
+									desktop.getPage("controlAcces").setAttribute("nomMaquina", ctx.getValue(xpath+"/@nomMaquina"));
+									desktop.getPage("controlAcces").setAttribute("idMaquina", ctx.getValue(xpath+"/@idMaquina"));
+									desktop.getPage("controlAcces").setAttribute("maquinaGeneric", ctx.getValue(xpath+"/@maquinaGeneric"));
+									desktop.getPage("controlAcces").setAttribute("programa", ctx.getValue(xpath+"/@program"));
+									desktop.getPage("controlAcces").setAttribute("rol_bbdd", model.getVariables().getVariable("codiAgent"));
+									Events.postEvent ("onIniciaUpdate",desktop.getPage("controlAcces").getFellow("esquemaLlista"),gridControlAccess);
+								}
+								
+								]]>
+							</attribute>														
+						</imageclic>
+						</listcell>					
+						<listcell>
+						<imageclic align="right" src="~./img/list-remove.gif">
+							<attribute name="onClick">
+								if (canDeleteAccessControlAgent) {
+									listCell = self.getParent(); 
+									dlistbox = listCell.getListbox(); 
+									modelo = dlistbox.getModel();
+									listItem = listCell.getParent(); 
+									posicio = listItem.getIndex(); 
+									elemPos = modelo.getElementAt(posicio); 
+									xpath = elemPos.getDataContext().getXPath(); 
+									dataSource = gridControlAccess.getDataSource();
+									context = dataSource.getJXPathContext();
+									c_usuari = context.getValue(xpath+"/@usuariGeneric");
+									c_rol = context.getValue(xpath+"/@descripcioRol");
+									c_program = context.getValue(xpath+"/@program");
+									dada = c_usuari==null?c_rol:c_usuari;
+									Missatgebox.confirmaOK_CANCEL(
+										String.format(org.zkoss.util.resource.Labels.getLabel("agents.SegurEsborra"), new Object [] {dada,c_program}),
+										org.zkoss.util.resource.Labels.getLabel("agents.Esborra"),
+										new EventListener() {
+											public void onEvent(Event evt) {
+												if ("onOK".equals(evt.getName())) {
+													context.removePath(xpath);
+												}														
+											}
+										}
+						   			);								
+								}
+							</attribute>														
+						</imageclic>
+						</listcell>					
+					</dataitem>
+					</listbox>
+						<hbox width="98.5%">
+						<zscript>
+							int generaRandomNegatiu() {
+							 	java.util.Random randomGenerator = new java.util.Random();
+	   						    int randomInt = randomGenerator.nextInt(100000);
+	   						    return -randomInt; //negatiu
+							}
+							boolean existeixCACId(int random) {
+								// verifiquem que no existisca
+								modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
+								ds = gridControlAccess.getDataSource(); 
+								ctx =  ds.getJXPathContext();
+								xpath = gridControlAccess.getXPath() + "[@id="+random+"]";
+								boolean jaExisteix = false;
+								try {
+	             					valor = ctx.getValue(xpath);
+	             					jaExisteix = true;
+	            				} catch(Throwable th) {
+	             					jaExisteix = false; // ha de donar error (!!)
+	            				}
+	            				//Missatgebox.info("valor id "+random+" existeix? "+jaExisteix);
+	            				return jaExisteix;	
+	            									
+							}
+						
+						</zscript>
+						<div align="left">
+						<hbox>
+						<button disabled="${!canCreateAccessControlAgent}" image="~./img/list-add.gif" label="${c:l('agents.zul.Afegeixnou')}">
+							<attribute name="onClick">	
+								// NOVES fileres
+								//Obtenim un número aleatori per al id nou de la filera
+								int idRandom = generaRandomNegatiu(); 
+								// iterem fins conseguir un id fictici q no existisca
+								while (existeixCACId(idRandom)) {
+									idRandom = generaRandomNegatiu();
+								}
+								// Guardem el valor del id fictici per a les noves fileres
+								desktop.getPage("controlAcces").setAttribute("idCAC", idRandom);
+								
+								desktop.getPage("controlAcces").setAttribute("rol_bbdd",model.getVariables().getVariable("codiAgent"));
+								Events.postEvent	("onInicia",desktop.getPage("controlAcces").getFellow("esquemaLlista"),gridControlAccess);
+							</attribute>
+						</button>
+						<separator width="1px"/>
+						<button disabled="${!canCreateAccessControlAgent}" image="~./img/copia.png" label="${c:l('agents.zul.Clonaregla')}">
+							<attribute name="onClick">
+							<![CDATA[
+							    // Mirem si s'ha seleccionat una filera
+							    Listitem sel = gridControlAccess.getSelectedItem();
+							    if (sel==null)  {
+							    	Missatgebox.error(org.zkoss.util.resource.Labels.getLabel("agents.SeleccionarRegla"));
+							    	return;
+							    }
+							    
+								dlistbox = gridControlAccess; 
+								modelo = dlistbox.getModel();
+								listItem = sel; 
+								posicio = listItem.getIndex(); 
+								elemPos = modelo.getElementAt(posicio); 
+								xpath = elemPos.getDataContext().getXPath(); 
+								ds = gridControlAccess.getDataSource();
+								ctx = ds.getJXPathContext();																												
+							    
+								// copia de la filera seleccionada
+								desktop.getPage("controlAcces").setAttribute("usuariGeneric", ctx.getValue(xpath+"/@usuariGeneric"));
+								desktop.getPage("controlAcces").setAttribute("idRol", ctx.getValue(xpath+"/@idRol"));
+								desktop.getPage("controlAcces").setAttribute("descripcioRol", ctx.getValue(xpath+"/@descripcioRol"));
+								desktop.getPage("controlAcces").setAttribute("nomMaquina", ctx.getValue(xpath+"/@nomMaquina"));
+								desktop.getPage("controlAcces").setAttribute("idMaquina", ctx.getValue(xpath+"/@idMaquina"));
+								desktop.getPage("controlAcces").setAttribute("maquinaGeneric", ctx.getValue(xpath+"/@maquinaGeneric"));
+								desktop.getPage("controlAcces").setAttribute("programa", ctx.getValue(xpath+"/@program"));
+								desktop.getPage("controlAcces").setAttribute("rol_bbdd", model.getVariables().getVariable("codiAgent"));
+								
+								//NOVES fileres (còpia d'altra filera)
+								//Obtenim un número aleatori per al id nou de la filera
+								int idRandom = generaRandomNegatiu(); 
+								// iterem fins conseguir un id fictici q no existisca
+								while (existeixCACId(idRandom)) {
+									idRandom = generaRandomNegatiu();
+								}
+								
+								// Guardem el valor del id fictici per a les noves fileres
+								desktop.getPage("controlAcces").setAttribute("idCAC", idRandom);
+								
+								Events.postEvent	("onIniciaClon",desktop.getPage("controlAcces").getFellow("esquemaLlista"),gridControlAccess);
+								]]>
+							</attribute>
+						
+						</button>
+						</hbox>
+						</div>
+						<div align="right"><listexportbutton acces="${canQueryAgent}" listbox="gridControlAccess"/></div>
+						</hbox>
+					</vbox>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>				
+			</form>
+		</detalls>
+	</esquemavertical>
+	<include src="grupsllista.zul"/>
+	<include src="controlAcces.zul"/>
+</zk>

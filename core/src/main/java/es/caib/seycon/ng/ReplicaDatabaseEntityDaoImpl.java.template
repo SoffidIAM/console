@@ -1,0 +1,12 @@
+//
+// (C) 2013 Soffid
+//
+//
+
+package es.caib.seycon.ng;
+/**
+ * DAO ReplicaDatabaseEntity implementation
+ */
+public class ReplicaDatabaseEntityDaoImpl extends ReplicaDatabaseEntityDaoBase
+{
+}

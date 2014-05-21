@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
+	<style src="~./styles/estil.css" />
+	<style src="/css/localSEU.css" />
+		<zscript><![CDATA[
+		    if (execution.isUserInRole("SEYCON_CHANGE_PASSWORD"))
+		    	execution.sendRedirect("/changepass.zul");
+		]]></zscript>
+		<html><![CDATA[
+		
+   		<p style="height:100px; "/>
+		<div style="margin-left:auto; margin-right: auto; width:40em; text-align:center; margin-top:auto; margin-bottom:auto; min-height:10em; vertical-align:middle;">
+        	<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
+   			<p style="height:100px; "/>
+        
+			<p style="color:red">Not authorized (403 forbidden)</p>
+		</div>
+		]]></html>
+</zk>

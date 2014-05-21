@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    
+
+    
+
+    <xsd:complexType name="MazingerType">
+        <xsd:sequence>
+        	<xsd:element name="Action" type="ActionEntityType"
+        		maxOccurs="unbounded" minOccurs="0">
+        	</xsd:element>
+        	<xsd:element name="DomainPassword"
+        		type="DomainPasswordCheckType" maxOccurs="unbounded"
+        		minOccurs="0">
+        	</xsd:element>
+        	<xsd:element name="Application" type="ApplicationType"
+        		maxOccurs="unbounded" minOccurs="0">
+        	</xsd:element>
+        	<xsd:element name="WebApplication" type="WebApplicationType"
+        		maxOccurs="unbounded" minOccurs="0">
+        	</xsd:element>
+        	<xsd:element name="HllApplication" type="HllApplicationType"
+        		maxOccurs="unbounded" minOccurs="0">
+        	</xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="ApplicationType">
+    	<xsd:sequence>
+    		<xsd:element name="Component" type="ComponentType" maxOccurs="unbounded" minOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="cmdLine" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="ComponentType">
+    	<xsd:sequence>
+    		<xsd:element name="Action" type="ActionEntityType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</xsd:element>
+    		<xsd:element name="Component" type="ComponentType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="class" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="text" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="title" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="check" type="CheckType"></xsd:attribute>
+    	<xsd:attribute name="dlgId" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="optional">
+    		<xsd:simpleType>
+    			<xsd:restriction base="xsd:string">
+    				<xsd:enumeration value="true"></xsd:enumeration>
+    				<xsd:enumeration value="false"></xsd:enumeration>
+    			</xsd:restriction>
+    		</xsd:simpleType>
+    	</xsd:attribute>
+    	<xsd:attribute name="ref-as" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+
+
+
+    <xsd:simpleType name="ActionType">
+    	<xsd:restriction base="xsd:string">
+    		<xsd:enumeration value="setText"></xsd:enumeration>
+    		<xsd:enumeration value="type"></xsd:enumeration>
+    		<xsd:enumeration value="script"></xsd:enumeration>
+    		<xsd:enumeration value="click"></xsd:enumeration>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:element name="Mazinger" type="MazingerType"></xsd:element>
+
+    <xsd:complexType name="ActionEntityType">
+    	<xsd:simpleContent>
+    		<xsd:extension base="xsd:string">
+    			<xsd:attribute name="type" type="ActionType"></xsd:attribute>
+    			<xsd:attribute name="text" type="xsd:string"></xsd:attribute>
+    			<xsd:attribute name="repeat" type="conditionType"></xsd:attribute>
+    			<xsd:attribute name="delay" type="xsd:int"></xsd:attribute>
+    			<xsd:attribute name="event" type="xsd:string"></xsd:attribute>
+    		</xsd:extension>
+    	</xsd:simpleContent>
+    </xsd:complexType>
+
+
+    <xsd:simpleType name="CheckType">
+    	<xsd:restriction base="xsd:string">
+    		<xsd:enumeration value="full"></xsd:enumeration>
+    		<xsd:enumeration value="partial"></xsd:enumeration>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="conditionType">
+    	<xsd:restriction base="xsd:string">
+    		<xsd:enumeration value="true"></xsd:enumeration>
+    		<xsd:enumeration value="false"></xsd:enumeration>
+    	</xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="DomainPasswordCheckType">
+    	<xsd:sequence>
+    		<xsd:element name="Action" type="ActionEntityType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="domain" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="servers" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="userSecret" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="passwordSecret" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="WebApplicationType">
+        <xsd:sequence>
+    		<xsd:element name="Input" type="WebInput" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    		<xsd:element name="Form" type="WebForm" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    		<xsd:element name="Action" type="ActionEntityType" maxOccurs="unbounded" minOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="url" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="title" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="content" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+    
+
+    <xsd:complexType name="WebElement">
+    	<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="id" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="ref-as" type="xsd:string"></xsd:attribute>
+    	<xsd:attribute name="optional" type="xsd:boolean"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="WebForm">
+    	<xsd:complexContent>
+    		<xsd:extension base="WebElement">
+    			<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+    				<xsd:element name="Input" type="WebInput"></xsd:element>
+    			</xsd:sequence>
+    			<xsd:attribute name="action" type="xsd:string"></xsd:attribute>
+    			<xsd:attribute name="method" type="xsd:string"></xsd:attribute>
+    		</xsd:extension>
+    	</xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="WebInput">
+    	<xsd:complexContent>
+    		<xsd:extension base="WebElement">
+    			<xsd:attribute name="type" type="xsd:string"></xsd:attribute>
+    			<xsd:attribute name="value" type="xsd:string"></xsd:attribute>
+    		</xsd:extension>
+    	</xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:group name="NewGroupDefinition">
+    	<xsd:sequence></xsd:sequence>
+    </xsd:group>
+
+    <xsd:complexType name="HllApplicationType">
+    	<xsd:sequence>
+    		<xsd:element name="Pattern" type="HllPatternType"
+    			minOccurs="0" maxOccurs="unbounded">
+    		</xsd:element>
+    		<xsd:element name="Action" type="ActionEntityType"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="HllPatternType">
+    	<xsd:simpleContent>
+    		<xsd:extension base="xsd:string">
+    			<xsd:attribute name="row" type="xsd:int"></xsd:attribute>
+    		</xsd:extension>
+    	</xsd:simpleContent>
+    </xsd:complexType>
+</xsd:schema>

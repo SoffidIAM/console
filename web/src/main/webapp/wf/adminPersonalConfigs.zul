@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<frame id="administraConfigUsuaris" title="${c:l('main.lblAdminConfiguracioPersonal')}" use="es.caib.bpm.ui.user.UsersConfigAminWindow" width="100%">
+
+		<vbox height="100%" id="RevisorsSearchWindow" spacing="5" width="99%">
+
+			<grid fixedLayout="true" width="99%">
+				<auxhead>
+					<auxheader colspan="3" label="${c:l('seleccionUsuario.gridTitleCerca')}"/>
+				</auxhead>
+				<columns>
+					<column label="${c:l('seleccionUsuario.lblNom')}" width="auto"/>
+					<column label="${c:l('seleccionUsuario.lblLLinatges')}" width="auto"/>
+					<column label="    " width="60px"/>
+				</columns>
+				<rows width="auto">
+					<row width="auto">
+						<zscript>
+					<![CDATA[
+						
+					]]>
+					</zscript>
+						<textbox id="rev_usu_nom" width="90%">
+							<attribute name="onOK">
+								administraConfigUsuaris.searchDelegateUsers();	
+							</attribute>
+						</textbox>
+						<textbox id="rev_usu_lli" width="90%">
+							<attribute name="onOK">
+								administraConfigUsuaris.searchDelegateUsers();	
+							</attribute>
+						</textbox>
+
+						<button id="buttonCerca" label="${c:l('adminPersonalConfigs.zul.Cercar')}" style="float:right;">
+							<attribute name="onClick">
+								administraConfigUsuaris.searchDelegateUsers();	
+							</attribute>
+						</button>
+					</row>
+				</rows>
+			</grid>
+
+			<separator/>
+
+			<listbox fixedLayout="true" height="99%" id="searchUsuariList" itemRenderer="${administraConfigUsuaris.searchRenderer}" model="${administraConfigUsuaris.searchModel}" sclass="likeagrid" width="99%">
+				<auxhead>
+					<auxheader colspan="5" label="${c:l('seleccionUsuario.gridTitleResultatsCerca')}"/>
+				</auxhead>
+				<listhead>
+					<listheader label="${c:l('seleccionUsuario.lblCodiUsuari')}" sortAscending="${administraConfigUsuaris.cmpAsc[0]}" sortDescending="${administraConfigUsuaris.cmpDsc[0]}" width="20%"/>
+					<listheader label="${c:l('seleccionUsuario.lblNom')}" sort="auto" sortAscending="${administraConfigUsuaris.cmpAsc[1]}" sortDescending="${administraConfigUsuaris.cmpDsc[1]}" width="20%"/>
+					<listheader label="${c:l('seleccionUsuario.lblLLinatges')}" sort="auto" sortAscending="${administraConfigUsuaris.cmpAsc[2]}" sortDescending="${administraConfigUsuaris.cmpDsc[2]}" width="20%"/>
+					<listheader label="${c:l('adminPersonalConfigs.zul.nif')}" sort="auto" visible="false" width="0%"/>
+					<listheader label="${c:l('seleccionUsuario.lblDireccioGeneral')}" sort="auto" sortAscending="${administraConfigUsuaris.cmpAsc[3]}" sortDescending="${administraConfigUsuaris.cmpDsc[3]}" width="20%"/>
+					<listheader label="    " width="20%"/>
+				</listhead>
+			</listbox>
+		</vbox>
+		<tabbox id="userConfigUITabbox" visible="false" width="98%">
+			<tabs>
+				<tab label="${c:l('config.lblNotificacions')}"/>
+
+			</tabs>
+
+			<tabpanels width="100%">
+				<tabpanel id="userConfigNotificacions" style="min-height:30em;overflow:auto" width="100%">
+					<vbox id="notificacionsUsuariPannel" spacing="5" visible="false" width="100%">
+						<groupbox width="99%">
+							<caption label="${c:l('main.lblNotificacionsPersonalitzades')}"/>
+							<vbox>
+
+								<label style="font-size:14px;" value="${c:l('revisors.NotificacionsDesc')}"/>
+
+								<hbox style="float:center;">
+									<textbox id="emailNotificacions" width="300px"/>
+									<button id="botoActualitza" label="${c:l('configure.configure')}">
+										<attribute name="onClick">
+											administraConfigUsuaris.actualitzaConfiguracioNotificacions();
+										</attribute>
+									</button>
+								</hbox>
+							</vbox>
+						</groupbox>
+					</vbox>
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+	</frame>
+</zk>

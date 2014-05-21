@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" default-access="field">
+
+  <subclass name="es.caib.bpm.entity.AuthenticationLog" 
+            extends="org.jbpm.logging.log.CompositeLog"
+            discriminator-value="$">
+            
+    <property name="actorId" column="TASKACTORID_" type="text"/>
+
+  </subclass>
+
+</hibernate-mapping>

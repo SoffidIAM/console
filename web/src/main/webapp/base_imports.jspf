@@ -1,0 +1,2 @@
+<% String URLbase=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort(); %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>

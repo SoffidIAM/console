@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="renameAccount"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css" />
+
+	<zscript>
+	import es.caib.zkib.zkiblaf.Missatgebox;
+<![CDATA[
+	void cleanWindow() {
+		changeName.visible = false;
+	}
+	void onWindowClose(Event event) {
+		cleanWindow();
+		event.stopPropagation();
+	}
+	void onChange() 
+	{
+		es.caib.zkib.datasource.DataSource ds = page.getAttribute("dataSource");
+		String path = page.getAttribute("dataPath")  + "/@name";
+		String v = dades.getFellow("detall_nom").getValue();
+		ds.getJXPathContext().setValue(path, v);
+		cleanWindow();
+		
+	}
+]]>
+	</zscript>
+
+	<window closable="true" id="changeName" position="center, center"
+		sizable="true" title="${c:l('user_renameaccount.Titol')}"
+		visible="false" width="70em" onClose="onWindowClose(event)">
+
+		<!--  Event received on window popup
+			Event parameter: caller component
+			Page attributes: dataPath Datapath containing the path where the account is located 
+		-->
+		<attribute name="onInicia"><![CDATA[
+		                                    
+	if (event.data != null)
+		pageScope.put("contextComponent", event.data);
+
+	if (self.mode.compareToIgnoreCase("highlighted") != 0) {
+		self.setMode("highlighted");
+	} else {
+		self.visible = true;
+	}
+
+	es.caib.zkib.datasource.DataSource ds = page.getAttribute("dataSource");
+	String path = page.getAttribute("dataPath") + "/@name";
+	dades.getFellow("detall_nom").setValue (ds.getJXPathContext().getValue(path));
+	
+	]]>
+		</attribute>
+
+		<beandatasource id="nullbean" />
+
+		<detalls id="dades" width="99%">
+			<form id="form" width="100%"
+				dataPath="/changeName/nullbean:/">
+				<grid width="99%">
+					<rows>
+						<row>
+							<input_etiqueta
+								value="${c:l('user_renameaccount.Nom')}" />
+							<textbox id="detall_nom" maxlength="50"
+								sclass="textbox" width="99%">
+							</textbox>
+
+						</row>
+					</rows>
+				</grid>
+			</form>
+			<separator spacing="5px" />
+			<hbox style="margin-left:auto; margin-right:auto">
+				<button label="${c:l('user_renameaccount.Accept')}"
+					onClick="onChange()" />
+				<button label="${c:l('user_renameaccount.Close')}"
+					onClick="onWindowClose(event)" />
+			</hbox>
+		</detalls>
+	</window>
+
+</zk>

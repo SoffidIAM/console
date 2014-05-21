@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<language-addon>
+
+	<addon-name>BPM</addon-name>
+	 <version>
+	  	<version-class>es.caib.bpm.toolkit.Version</version-class>
+	  	<version-uid>1.0</version-uid>
+	  </version>
+
+	<language-name>xul/html</language-name>
+	
+
+	<component>
+		<extends>window</extends>
+		<component-name>task</component-name>
+		<component-class>es.caib.bpm.toolkit.WorkflowWindow</component-class>
+	</component>
+
+</language-addon>
+

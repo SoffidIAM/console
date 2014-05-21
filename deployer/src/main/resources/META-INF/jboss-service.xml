@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id: jboss-service.xml,v 1.1.2.1 2012-05-16 10:36:49 u07286 Exp $ -->
+
+<!-- ===================================================================== -->
+<!--  JBoss Server Configuration                                           -->
+<!-- ===================================================================== -->
+
+<server>
+
+   <!-- Load all jars from the JBOSS_DIST/server/<config>/lib directory. This
+     can be restricted to specific jars by specifying them in the archives
+     attribute.
+    -->
+
+   <!-- ==================================================================== -->
+   <!-- JSR-77 Single JBoss Server Management Domain                         -->
+   <!-- ==================================================================== -->
+   <mbean code="com.soffid.iam.deployer.DeployerService"
+      name="com.soffid.iam:name=deployer">
+      	<depends>jboss.jca:name=jdbc/seycon,service=LocalTxCM</depends>
+      	<depends optional-attribute-name="Deployer">jboss.system:service=MainDeployer</depends>
+	<attribute name="FailSafe">false</attribute>
+   </mbean>
+   
+</server>

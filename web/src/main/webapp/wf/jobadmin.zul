@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="ui" title="${c:l('main.lblAdminJobs')}" use="es.caib.bpm.ui.admin.ActiveJobHandler" 
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+	<datamodel id="model" src="descriptorSchedule.xml" rootNode="root" ></datamodel>
+	
+	<vbox width="100%">
+		<toolbar height="16px">
+			<toolbarbutton label="${c:l('job.oneTimeJob') }" />
+			<toolbarbutton style="float: right;" image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="ui.refresh()" sclass="reloadtasks"/>
+		</toolbar>
+		<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="20">
+			<listhead>
+				<listheader label="${c:l('job.lblId')}" sort="auto"/>
+				<listheader label="${c:l('job.lbldefinicionTarea')}" sort="auto"/>
+				<listheader label="${c:l('inbox.lblFecha')}" sort="auto"/>
+				<listheader label="${c:l('process.lblEstado')}" sort="auto"/>
+			</listhead>
+		</listbox>
+		<div height="20px">
+		</div> 
+		
+		<zscript><![CDATA[
+void onNewRow(Row r)
+{
+	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
+	com.soffid.iam.api.ScheduledTask task = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").getInstance();
+	
+	
+	Div d2 = r.getChildren().get(8);
+	Div d = d2.getChildren().get(0);
+	Label l = d2.getChildren().get(1).getChildren().get(0);
+	Image i = d.getChildren().get(0);
+	
+	String dateformat = org.zkoss.util.resource.Labels.getLabel("selfService.Format");
+	java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat (dateformat);
+	if (task.getLastExecution() == null)
+	{
+		l.setValue("Not executed");
+		l.setStyle("color: gray;");
+	}
+	else if (task.isActive())
+	{
+		l.setValue(sdf.format ( task.getLastExecution().getTime()) );
+		i.setSrc ("/img/semafor-ambar.png");
+		i.setVisible(true);
+	}
+	else if (task.isError())
+	{
+	
+		String s = "";
+		if (task.getLastExecution() != null)
+			s = sdf.format(task.getLastExecution().getTime());
+		if (task.getLastEnd () != null)
+			s = s +  " - " +
+				 sdf.format ( task.getLastEnd().getTime());
+		l.setValue(s);
+		i.setSrc ("/img/semafor-vermell.png");
+		i.setVisible(true);
+	}
+	else
+	{
+		
+		String s = "";
+		if (task.getLastExecution() != null)
+			s = sdf.format(task.getLastExecution().getTime());
+		if (task.getLastEnd () != null)
+			s = s +  " - " +
+				 sdf.format ( task.getLastEnd().getTime());
+		l.setValue(s);
+		i.setSrc ("/img/semafor-verd.png");
+		i.setVisible(true);
+	}
+}
+
+void showMessage (Image img)
+{
+	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(img);
+	StringBuffer sb = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@lastLog");
+	logWindow.setTitle(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name"));
+	logWindow.getFellow("tb").value = sb.toString();
+	logWindow.doHighlighted();
+	
+}
+		]]></zscript>
+		
+		<toolbar height="16px">
+			<toolbarbutton label="${c:l('job.cronJob') }" />
+			<toolbarbutton style="float: right" image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="model.refresh()" sclass="reloadtasks"/>
+			<commitbutton style="float: right" datamodel="/model" />
+			<undobutton style="float: right" datamodel="/model"/>
+		</toolbar>
+		<grid mold="paging"  pageSize="20" dataPath="/model:/task" onNewRow="onNewRow(event.data)">
+			<columns>
+				<column label="${c:l('jobadmin.enable') }" width="4em"/>
+				<column label="${c:l('jobadmin.task') }"/>
+				<column label="${c:l('jobadmin.month') }" width="6em"/>
+				<column label="${c:l('jobadmin.day') }" width="6em"/>
+				<column label="${c:l('jobadmin.hour') }" width="6em"/>
+				<column label="${c:l('jobadmin.minute') }" width="6em"/>
+				<column label="${c:l('jobadmin.dayOfWeek') }" width="6em"/>
+				<column label="${c:l('jobadmin.server') }"/>
+				<column label="${c:l('jobadmin.status') }" width="14em" />
+			</columns>
+			<datarow>
+				<checkbox bind="@enabled"  onCheck=""></checkbox>
+				<label bind="@name"></label>
+				<textbox bind="@monthsPattern"  width="6em" onChange=""></textbox>
+				<textbox bind="@dayPattern"  width="6em" onChange=""></textbox>
+				<textbox bind="@hoursPattern" width="6em" onChange=""></textbox>
+				<textbox bind="@minutesPattern" width="6em" onChange=""></textbox>
+				<textbox bind="@dayOfWeekPattern" width="6em" onChange=""></textbox>
+				<listbox bind="@serverName" mold="select" dataPath="/model:/server">
+					<dataitem bind="@nom">
+						<listcell bind="@nom"/>
+					</dataitem>
+				</listbox>
+				<div style="display: inline; width: 100%; height: 100%; ">
+					<div style="vertical-align: middle;  height: 100%; width: 32px; display: inline-block; ">
+						<image visible="false" style="vertical-align: middle" onClick="showMessage(self)"/>
+					</div>
+					<div style="vertical-align: middle; width: 8em; height: 100%; display:inline-block; ">
+						<label style="vertical-align: top; line-height: 20px;"/>
+					</div>
+				</div>
+			</datarow>
+		</grid>
+		
+	</vbox>
+	
+	<window closable="true" width="80%" height="15em" id="logWindow"
+		title=""
+		onClose='self.visible=false; event.stopPropagation();'
+		visible="false">
+		<textbox id="tb" width="100%" height="100%" multiline="true"/>
+	</window>
+	
+</frame>

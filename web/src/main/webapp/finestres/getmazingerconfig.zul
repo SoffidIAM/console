@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="mazingerconfig" title="Configuració de Mazinger"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="../comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<zscript>
+		import es.caib.zkib.zkiblaf.Missatgebox;
+		void cleanWindow(){
+			esquemaLlista.visible = false;
+		}
+		
+	</zscript> 
+
+	<style src="~./styles/estil.css"/>
+	
+	<window closable="true" id="esquemaLlista" position="center, center" title="${c:l('getmazingerconfig.Titol')}" visible="false" width="800px" height="400px">
+		<attribute name="onInicia">
+		<![CDATA[
+			pageScope.put("contextComponent", event.data);
+
+			String usuari = desktop.getPage("mazingerconfig").getAttribute("usuari");
+			
+			if (usuari != null) {
+				es.caib.seycon.ng.servei.ejb.UsuariServiceHome home = new javax.naming.InitialContext().
+				lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
+				es.caib.seycon.ng.servei.ejb.UsuariService ejb=home.create();
+				byte[] rules = ejb.getMazingerRules(usuari);
+				String rulesStr = new String(rules,"UTF-8");
+				esquemaLlista.setTitle(String.format(org.zkoss.util.resource.Labels.getLabel("getmazingerconfig.Usuari"),new Object [] {usuari}));
+				mazingercontent.value=rulesStr;
+				mazingercontent.setVisible(true);
+			} else {
+				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("getmazingerconfig.Titol"));
+			}
+				
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}  ]]>    		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>	
+		<vbox width="100%" widths="90%,6px, *">	
+			<grid style="border:0px !important" width="100%" height="100%">
+				<rows>
+					<row>
+						<textbox id="mazingercontent" readonly="true" visible="false" multiline="true" height="300px" width="100%"/>
+					</row>
+				</rows>
+			</grid>
+			<separator />
+			<hbox style="margin-left:auto; margin-right:auto">
+				<button label="${c:l('getmazingerconfig.Tanca')}" onClick="cleanWindow()"/>
+			</hbox>
+		</vbox>	
+	</window>
+	
+</zk>

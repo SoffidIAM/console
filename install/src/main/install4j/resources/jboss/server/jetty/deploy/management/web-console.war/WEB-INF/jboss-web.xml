@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+ 
+<!DOCTYPE jboss-web
+    PUBLIC "-//JBoss//DTD Web Application 2.3V2//EN"
+    "http://www.jboss.org/j2ee/dtd/jboss-web_3_2.dtd">
+
+<jboss-web>
+   <!-- Isolate the console mgr classes from other deployments -->
+   <class-loading>
+      <loader-repository>
+         jboss.console:sar=console-mgr.sar
+         <loader-repository-config>
+            java2ParentDelegation=true
+         </loader-repository-config>
+      </loader-repository>
+   </class-loading>
+   <!-- Uncomment the security-domain to enable security. You will
+   need to edit the htmladaptor login configuration to setup the
+   login modules used to authentication users.
+   -->
+   <security-domain>java:/jaas/seycon</security-domain>
+</jboss-web>

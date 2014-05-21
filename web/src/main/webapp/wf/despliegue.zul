@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<zk>
+	<frame xmlns="http://www.zkoss.org/2005/zul"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:zk="http://www.zkoss.org/2005/zk" id="ui"
+		title="${c:l('main.lblDeploy')}"
+		use="es.caib.bpm.ui.admin.DespliegueUI" width="100%"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+		<toolbar>
+			<checkbox id="todos" label="${c:l('deploy.btnReloadTodos')}"
+				visible="true" class="toolbar-checkbox" checked="false">
+				<attribute name="onCheck">
+					if (todos.checked)
+						ui.cargarListadoProcesos();
+					else
+						ui.cargarProcesosHabilitados();
+				</attribute>
+			</checkbox>
+			<toolbarbutton image="/img/upload.png" label="${c:l('deploy.btnDeploy')}">
+				<attribute name="onClick">
+					ui.upload();
+					if (todos.checked)
+						ui.cargarListadoProcesos();
+					else
+						ui.cargarProcesosHabilitados();
+				</attribute>
+			</toolbarbutton>
+		</toolbar>
+		<listbox id="listbox" fixedLayout="true" mold="paging"
+			pageSize="15" width="100%">
+			<listhead>
+				<listheader label="${c:l('deploy.lblProceso')}" sort="auto" />
+				<listheader label="${c:l('deploy.lblVersion')}" sort="auto" />
+				<listheader label="${c:l('deploy.CanviarEstat')}" sort="auto" />
+			</listhead>
+		</listbox>
+		<separator height="8px" />
+		<label sclass="label" style="padding-left:15px"
+			value="${c:l('deploy.lblResultadoDespliegue')}" />
+		<textbox id="txtResultadoDespliegue" readonly="true" rows="5" width="100%" />
+	</frame>
+</zk>

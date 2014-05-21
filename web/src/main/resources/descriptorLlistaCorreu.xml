@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="llistesCorreu">
+		<finder name="llistaCorreu" type="llistaCorreu">   <!-- mail:query -->
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findLlistesDeCorreuByDades" if="${queryEnabled}">
+				<parameter value="${nom}" />
+				<parameter value="${domini}" />
+				<parameter value="${descripcio}" />
+				<parameter value="" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.LlistaCorreu">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="llistaCorreu">
+		<finder name="usuari" type="usuari">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findLlistaCorreuUsuariByNomLlistaCorreuAndCodiDomini">  <!-- mail:query -->
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.LlistaCorreuUsuari">
+			</new-instance-bean>
+		</finder>
+		<finder name="llista" type="llista">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findRelacionsLlistaCorreuByNomLlistaCorreuConteAndCodiDomini">  <!-- mail:query -->
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.RelacioLlistaCorreu">
+			</new-instance-bean>
+		</finder>
+		<finder name="llistaPertany" type="llista">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findRelacionsLlistaCorreuByNomLlistaCorreuPertanyAndCodiDomini">   <!-- mail:query -->
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.RelacioLlistaCorreu">
+			</new-instance-bean>
+		</finder>		
+		<finder name="extern" type="extern">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findCorreusExternsByNomLlistaCorreuAndCodiDomini">   <!-- mail:query -->
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.CorreuExtern">
+			</new-instance-bean>
+		</finder>
+		<!-- 
+		<finder name="llistaCompactaUsuaris"
+			type="llistaCompactaUsuaris">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini">
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+		</finder>
+		<finder name="llistaCompactaLlistes"
+			type="llistaCompactaLlistes">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini">
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+		</finder>
+		<finder name="llistaCompactaExterns"
+			type="llistaCompactaExterns">
+			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
+				method="findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini">
+				<parameter value="${instance.nom}" />
+				<parameter value="${instance.codiDomini}" />
+			</ejb-finder>
+		</finder>
+		 -->
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="create" returnBean="true">  <!-- mail:create -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">  <!-- mail:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">  <!-- mail:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.nom}" notNull="true" friendlyName="mailList.NameValidation"/>
+		</validator>
+	</datanode>
+
+<!-- 
+	<datanode name="llistaCompactaUsuaris">
+	</datanode>
+	
+	<datanode name="llistaCompactaLlistes">
+	</datanode>
+
+	<datanode name="llistaCompactaExterns">
+	</datanode>
+ -->
+ 
+	<datanode name="usuari">
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteAtomic">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="llista">
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteAtomic">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="extern">
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteAtomic">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

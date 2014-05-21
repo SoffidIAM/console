@@ -1,0 +1,85 @@
+
+<server>
+ 
+  <mbean code="es.caib.loginModule.jmx.SeyconRealmServer" 
+         name="jboss.security:service=SeyconRealm">
+    <!--  Etiqueta para distinguir los dominios -->
+    <attribute name="RealmName">SEU</attribute>
+    <!--  Hosts que deben recibir la cookie de sesión -->
+    <attribute name="Domain">.${domainName}</attribute>
+    <!--  Duración de la sesión -->
+    <!--<attribute name="Duration">28800</attribute>-->
+    <attribute name="Duration">7000</attribute> <!-- Almost two hours (116 mins) -->
+    <!--  Clave privada y pública para el firmado de la cookie -->
+    <attribute name="PrivateKeyFile">${jboss.server.home.dir}/conf/seu.privatekey</attribute>
+    <attribute name="PublicKeyFile">${jboss.server.home.dir}/conf/seu.publickey</attribute>
+    <!--  Activar a true para que se generen nuevas claves en caso de no existir -->
+    <attribute name="CreateNewKey">true</attribute>
+    <!--  EJB para el mantenimiento de la sesión -->
+    <attribute name="Bean">es.caib.loginModule.SesionEJB</attribute>
+    <!--  Servlet para la creación automática de usuarios a partir de un certificado -->
+    <attribute name="CreateUserServlet">https://${hostName}.${domainName}:8080/seycon-webservice/createuserservice</attribute>
+    <!--  Dominios de seguridad -->
+    <attribute name="Domains">
+    	seycon=java:/jdbc/SeyconDS
+    </attribute>
+    <!--  Datasources donde registrar los logs de acceso -->
+    <attribute name="LogDS">
+    	java:/jdbc/SeyconDS
+    </attribute>
+    <attribute name="Legacy">false</attribute>
+    <attribute name="ServletURL">http://${hostName}.${domainName}:8080/seyconsession</attribute>
+    <attribute name="TrustedProxies">
+    	localhost
+    </attribute>
+    
+    <!--
+    	Configuración del servidor de autenticación vía certificados digitales
+    -->
+    
+    
+    
+    <!-- Si arrancamos Jetty: Url donde se levanta el Jetty-->
+    <!-- Si arrancamos Jboss: Url donde escucha el Jetty -->
+    <!-- Url servidor de autenticación, tipo https://nombre_de_host:puerto --> 
+    <!-- Este campo NO puede estar vacío. Si no, saltará una excepción al arrancar JBoss. -->
+    <attribute name="X509AuthUrl">https://${hostName}.${domainName}:443</attribute>
+    
+    
+    <!-- Configuración del Jetty -->
+    <!--  Activa o desactiva el servidor de autenticación via certificados digitales. Valores: true|false true:activa jetty, false: jetty no activado-->
+    <attribute name="ActivateX509Auth">false</attribute>
+    <!-- Keystore, ruta absoluta al keystore donde está el certificado que identifica al servidor de autenticación SSL -->
+    <!-- CUIDADO: En Windows usar barras normales, no invertidas. Ejemplo: C:/ruta/hacia/keystore.jks -->
+    <attribute name="KeystorePath"></attribute>
+    <!-- Contraseña keystore -->
+    <attribute name="KeystorePassword"></attribute>
+    <!-- URL del web service de validación de certificados -->
+    <attribute name="CertificateValidationWebServiceUrl">https://${hostName}.${domainName}:8080/signatura/services/ValidacionCertificados</attribute>
+    <!-- Entorno de validación de certificados. Puede ser: DESARROLLO o PRODUCCION -->
+    <attribute name="CertificateValidationEnvironment">PRODUCCION</attribute>
+    
+    <!-- Configuración del Jboss -->
+    <!-- URL hacia la aplicación de gestión de identidades -->
+    <attribute name="IdentityManagementModuleUrl"></attribute>
+    <!-- URL que podrá ser sobreescrita por las aplicaciones para poder establecer el punto de entrada -->
+    <!-- URL del nombre del servidor -->
+    <attribute name="ServerNameUrl">http://${hostName}.${domainName}</attribute>
+  </mbean>
+  
+  <!-- Mbean de actualización del truststore del servidor de autenticación via certificados digitales -->
+  <!-- <mbean code="org.jboss.varia.scheduler.Scheduler" name="caib:service=Scheduler">
+    <attribute name="StartAtStartup">true</attribute>
+    <attribute name="SchedulableMBean">jboss.security:service=SeyconRealm</attribute>
+    <attribute name="SchedulableMBeanMethod">updateAuthServerTrustStore</attribute>
+    <attribute name="InitialStartDate">NOW</attribute>
+    <attribute name="SchedulePeriod">86400000</attribute>
+    <attribute name="InitialRepetitions">-1</attribute>
+    <depends>
+      <mbean code="javax.management.timer.Timer" name="jboss:service=Timer"/>
+      <mbean code="es.caib.loginModule.jmx.SeyconRealmServer" name="jboss.security:service=SeyconRealm" />
+    </depends>
+  </mbean> -->
+
+
+</server>

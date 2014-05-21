@@ -210,7 +210,8 @@
 				{
 					for (Listitem item : listbox.getItems())
 					{
-						listbox.setSelectedItem(item);
+						if (valueToSelect_bbdd.equals(item.getValue()))
+							listbox.setSelectedItem(item);
 					}
 				}
 			}

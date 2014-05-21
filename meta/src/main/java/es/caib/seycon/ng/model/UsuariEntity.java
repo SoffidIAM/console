@@ -161,6 +161,11 @@ public abstract class UsuariEntity {
 	@ForeignKey (foreignColumn="CTR_IDUSU")
 	public java.util.Collection<es.caib.seycon.ng.model.ContrasenyaEntity> contrasenyes;
 
+	@ForeignKey (foreignColumn="PAU_USU_ID")
+	public java.util.Collection<es.caib.seycon.ng.model.AuthoritativeChangeEntity> pendingAuthoritativeChanges;
+
+	
+	/************************ DAOs **********************************/
 	@DaoFinder("from es.caib.seycon.ng.model.UsuariEntity  where codi = :codi")
 	public es.caib.seycon.ng.model.UsuariEntity findByCodi(
 		java.lang.String codi) {

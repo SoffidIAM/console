@@ -23,5 +23,5 @@ public abstract class TipusUnitatOrganitzativa {
 
 	@Description("True if business units of this type can hold user roles")
 	@Nullable
-	public boolean rolHolder;
+	public boolean roleHolder;
 }

@@ -659,7 +659,7 @@
 								<vbox width="100%">
 									<listbox id="gridRols" dataPath="/esquema/lista/listbox:/rol"
 										fixedLayout="true" height="400px" sclass="likeagrid">
-										<attribute name="onNewRow">
+										<attribute name="onNewRow"><![CDATA[
 											ctx = XPathUtils.getComponentContext(event.data);
 											Listcell cellImage = event.data.getChildren().get(0);
 											Image image = cellImage.getChildren().get(0);
@@ -669,7 +669,50 @@
 												image.setSrc("/img/risk-" + risk.getValue()+".png");
 												image.setVisible(true);
 											}
-										</attribute>
+											// Disable domain value
+											if ( XPathUtils.getValue (ctx, "valorDomini") == null ||
+												XPathUtils.getValue (ctx, "valorDomini/@valor") == null )
+											{
+												event.data.getChildren().get(1).getChildren().get(1).visible = false;
+											}
+											startbox = event.data.getChildren().get(4).getChildren().get(0);
+											endbox = event.data.getChildren().get(5).getChildren().get(0);
+											if (XPathUtils.getValue(ctx,"id") != null)
+											{
+												startbox.disabled = endbox.disabled = true;
+												Date d1 = XPathUtils.getValue(ctx,"@startDate");
+												Date d2 = XPathUtils.getValue(ctx,"@endDate");
+												Date now = new Date();
+												if (d1 != null && now.before(d1) )
+												{
+													for (c: event.data.getChildren())
+													{
+														c.style = "background-color: #ffffc0;";
+													}
+												}
+												else if (d2 != null && d2.before(now)) 
+												{
+													for (c: event.data.getChildren())
+													{
+														c.style = "text-decoration: line-through;";
+													}
+												} else {
+													event.data.style = event.data.style + "; background-color: blue;";
+												}
+											}
+											// Show sand clock when waiting for approval
+											approvalPending = XPathUtils.getValue(ctx,"@approvalPending");
+											if (approvalPending != null && approvalPending)
+											{
+												image.setVisible(false);
+												Image image2 = cellImage.getChildren().get(1);
+												image2.setVisible(true);
+												for (c: event.data.getChildren())
+												{
+													c.style = "background-color: #ffffc0;";
+												}
+											}
+										]]></attribute>
 										<attribute name="onActualitza">
 											<![CDATA[
 												dada = (String) (event.getData()[0]);
@@ -745,10 +788,10 @@
 												width="10%" />
 											<listheader label="${c:l('usuaris.zul.Aplicacia')}"
 												sort="auto" width="20%" />
-											<listheader label="${c:l('usuaris.zul.Domini')}"
-												width="15%" />
-											<listheader label="${c:l('usuaris.zul.Valor')}"
-												width="25%" />
+											<listheader
+												label="${c:l('usuaris.zul.startDate')}" width="10%" />
+											<listheader
+												label="${c:l('usuaris.zul.endDate')}" width="10%" />
 											<listheader label="${c:l('usuaris.zul.')}"
 												visible="${canDeleteUserRole}" width="30px" />
 											<listheader label="${c:l('usuaris.zul.')}"
@@ -774,13 +817,32 @@
 															new Object[] { sb.toString() }));
 ]]></attribute>
 												</imageclic>
+												<imageclic align="right" visible="false" width="24px" height="24px" src="/img/hourglass.gif">
+													<attribute name="onClick">
+													<![CDATA[
+	ctx = XPathUtils.getComponentContext(self);
+	proc = XPathUtils.getValue(ctx, "/@approvalProcess");
+	if (idProces != null) {
+		es.caib.zkib.zkiblaf.Application.call("wf/process.zul?id=" + proc);
+	}
+]]></attribute>
+												</imageclic>
 											</listcell>
-											<listcell bind="@nomRol" tooltip="rolsTooltip" />
+											<listcell >
+												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
+												<div style="display:inline" tooltip="domainTooltip">
+													<label value = "/"></label>
+													<label  bind="valorDomini/@valor"/>
+												</div>
+											</listcell>
 											<listcell bind="@baseDeDades" />
 											<listcell bind="@codiAplicacio" />
-											<listcell bind="valorDomini/@nomDomini" />
-											<listcell bind="valorDomini/@descripcio"
-												tooltip="valorDominiTooltip" />
+											<listcell >
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@startDate"></datebox>
+											</listcell>
+											<listcell >
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"></datebox>
+											</listcell>
 											<listcell>
 												<imageclic align="right" src="~./img/list-remove.gif">
 													<attribute name="onClick">
@@ -857,36 +919,30 @@
 											]]>
 										</attribute>
 										<label id="rolsTooltipLabel" multiline="true" value="" />
-									</popup>
-									<popup id="valorDominiTooltip" width="200px">
-										<attribute name="onOpen">
-											<![CDATA[
-												// L'amaguem per defecte: pot tindre valors nuls
-												valorDominiTooltipLabel.visible = false;
-												if (event.getReference() instanceof DataListcell) {
-													listCell = event.getReference();
-													dlistbox = listCell.getListbox();
-													modelo = dlistbox.getModel();
-													listItem = listCell.getParent();
-													posicio = listItem.getIndex();
-													elemPos = modelo.getElementAt(posicio);
-													xpath = elemPos.getDataContext().getXPath();
-													dataSource = gridRols.getDataSource();
-													context = dataSource.getJXPathContext();
-													if (context.getValue(xpath + "/valorDomini") != null) {
-														dada = "Valor domini = '"
-																+ context.getValue(xpath + "/valorDomini/@valor") + "'";
-														valorDominiTooltipLabel.visible = true;
-														valorDominiTooltipLabel.value = dada;
-													} else {
-														valorDominiTooltipLabel.visible = false;
-														valorDominiTooltipLabel.value = "";
+										</popup>
+										<popup id="domainTooltip" width="200px">
+											<attribute name="onOpen">
+											    label = event.getReference();
+											    if (label != null)
+											    {
+													listCell = label.parent;
+													if (listCell instanceof DataListcell) {
+														dlistbox = listCell.getListbox();
+														modelo = dlistbox.getModel();
+														listItem = listCell.getParent();
+														posicio = listItem.getIndex();
+														elemPos = modelo.getElementAt(posicio);
+														xpath = elemPos.getDataContext().getXPath();
+														dataSource = gridRols.getDataSource();
+														context = dataSource.getJXPathContext();
+														dada = context.getValue(xpath + "/valorDomini/@nomDomini");
+														desc = context.getValue(xpath + "/valorDomini/@descripcio");
+														domainTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
 													}
 												}
-											]]>
-										</attribute>
-										<label id="valorDominiTooltipLabel" value="" />
-									</popup>
+											</attribute>
+											<label id="domainTooltipLabel" multiline="true" value="" />
+										</popup>
 								</vbox>
 								<hbox width="100%" widths="50%,50%">
 									<hbox>
@@ -898,6 +954,7 @@
 													es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
 													String dispatcher = XPathUtils.getValue(ctx, "@dispatcher");
 													desktop.getPage("rolsLlista").setAttribute("tipus", "wizard");
+													desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF", "true");
 													desktop.getPage("rolsLlista").setAttribute("usuari", null);
 													desktop.getPage("rolsLlista").setAttribute("rol_bbdd", dispatcher);
 													Events.postEvent("onInicia",

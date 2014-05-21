@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_DISPAT" )
@@ -146,6 +148,16 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String description;
 
+	@Column (name="DIS_APRPRO", length=250)
+	@Description ("Approval process to launch when an incoming authoritative change is received")
+	@Nullable
+	public String approvalProcess;
+	
+	@ForeignKey(foreignColumn="PAU_DIS_ID")
+	@Description ("Current authoritative changes pending to apply")
+	public Collection<AuthoritativeChangeEntity> pendingChanges;
+	
+	/************************ DAOS *******************************/
 	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity\nwhere\n(:codi is null or upper(codi) like upper(:codi)) and\n(:nomCla is null or upper(nomCla) like upper(:nomCla)) and\n(:url is null or upper(url) like upper(:url)) and\n(:basRol is null or upper(basRol) = upper(:basRol)) and\n(:segur is null or segur = :segur) and\n(:actiu is null or url is not null)")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findDispatchersByFiltre(
 		java.lang.String codi, 

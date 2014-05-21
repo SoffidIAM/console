@@ -4,20 +4,26 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.DominiContrasenya;
+import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.TipusUnitatOrganitzativaService;
 import es.caib.seycon.ng.utils.Security;
 
 public class RoleDependencyTest extends AbstractTest
 {
+
+	private TipusUnitatOrganitzativaService tuoSvc;
 
 	public void testMultiRole () throws InternalErrorException
 	{
@@ -185,6 +191,11 @@ public class RoleDependencyTest extends AbstractTest
 
 	private RolAccount grant (Usuari usu, Rol rol) throws InternalErrorException
 	{
+		return grant (usu, rol, null);
+	}
+	
+	private RolAccount grant (Usuari usu, Rol rol, String holderGroup) throws InternalErrorException
+	{
 		boolean found = false;
 		for (RolAccount ru : appSvc.findRolsUsuarisByCodiUsuariAndNomRol(
 				usu.getCodi(), rol.getNom()))
@@ -199,11 +210,12 @@ public class RoleDependencyTest extends AbstractTest
 		ru.setCodiAplicacio(rol.getCodiAplicacio());
 		ru.setCodiUsuari(usu.getCodi());
 		ru.setNomRol(rol.getNom());
+		ru.setHolderGroup(holderGroup);
 		appSvc.create(ru);
 		return ru;
 	
 	}
-	
+
 	private Rol createRol(Dispatcher dis, Aplicacio app, String name)
 			throws InternalErrorException
 	{
@@ -225,4 +237,119 @@ public class RoleDependencyTest extends AbstractTest
 		}
 		return rol;
 	}
+
+	public int countRoles (Usuari u) throws InternalErrorException
+	{
+		List<UserAccount> accounts = accountSvc.listUserAccounts(u);
+		int i = 0;
+		for (UserAccount account: accounts)
+		{
+			System.out.println ("Account: "+account.getName()+" on "+account.getDispatcher());
+			Collection<RolGrant> grants = appSvc.findRolGrantByAccount(account.getId());
+			System.out.println (">>> Roles:");
+			for (RolGrant ru : grants)
+			{
+				System.out.println (">>>   ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+				i ++;
+			}
+			System.out.println ("<<< End");
+		}
+		return i;
+	}
+	
+	public void testRoleHolder () throws InternalErrorException
+	{
+		
+		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
+		try {
+			System.setProperty("soffid.entitlement.group.holder", "optional");
+			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
+			
+			Dispatcher dis = dispatcherSvc.findDispatcherByCodi("soffid");
+			assertNotNull(dis);
+
+			tuoSvc = ServiceLocator.instance().getTipusUnitatOrganitzativaService();
+			TipusUnitatOrganitzativa tuo = new TipusUnitatOrganitzativa();
+			tuo.setCodi("grup");
+			tuo.setDescripcio("Grup");
+			tuo.setRoleHolder(true);
+			tuoSvc.create(tuo);
+			
+			Grup gr = new Grup ();
+			gr.setCodi("group1");
+			gr.setDescripcio("Group1");
+			gr.setCodiPare("enterprise");
+			gr.setTipus(tuo.getCodi());
+			grupSvc.create(gr);
+			
+			
+			Usuari u = new Usuari ();
+			u.setCodi("user2");
+			u.setNom("user2");
+			u.setPrimerLlinatge("user2");
+			u.setServidorCorreu("null");
+			u.setServidorHome("null");
+			u.setServidorPerfil("null");
+			u.setCodiGrupPrimari(gr.getCodi());
+			u.setActiu(true);
+			u.setTipusUsuari("I");
+			u = usuariSvc.create(u);
+
+
+			Aplicacio app = appSvc.findAplicacioByCodiAplicacio("SOFFID"); //$NON-NLS-1$
+
+			Rol rol1 = createRol(dis, app, "TEST_ROL_1");
+			
+			// Test 1 => Remove from priamry group
+			grant (u, rol1, gr.getCodi());
+
+			assertEquals(countRoles(u), 1);
+
+			u.setCodiGrupPrimari("enterprise");
+			usuariSvc.update(u);
+			
+			assertEquals(countRoles(u), 0);
+
+			// Test 2 => Remove from secondary group
+			grupSvc.addGrupToUsuari(u.getCodi(), gr.getCodi());
+
+			grant (u, rol1, gr.getCodi());
+
+			assertEquals(countRoles(u), 1);
+
+			grupSvc.removeGrupFromUsuari(u.getCodi(), gr.getCodi());
+			assertEquals(countRoles(u), 0);
+
+			// Test 3 => Remove from secondary group but keep primary group
+			u.setCodiGrupPrimari(gr.getCodi());
+			usuariSvc.update(u);
+			grupSvc.addGrupToUsuari(u.getCodi(), gr.getCodi());
+			grant (u, rol1, gr.getCodi());
+
+			assertEquals(countRoles(u), 1);
+
+			grupSvc.removeGrupFromUsuari(u.getCodi(), gr.getCodi());
+			assertEquals(countRoles(u), 1);
+			u.setCodiGrupPrimari("enterprise");
+			usuariSvc.update(u);
+			assertEquals(countRoles(u), 0);
+
+			// Test 3 => Remove from primary group but keep secondary group
+			u.setCodiGrupPrimari(gr.getCodi());
+			usuariSvc.update(u);
+			grupSvc.addGrupToUsuari(u.getCodi(), gr.getCodi());
+			grant (u, rol1, gr.getCodi());
+
+			assertEquals(countRoles(u), 1);
+
+			u.setCodiGrupPrimari("enterprise");
+			usuariSvc.update(u);
+			assertEquals(countRoles(u), 1);
+			grupSvc.removeGrupFromUsuari(u.getCodi(), gr.getCodi());
+			assertEquals(countRoles(u), 0);
+		} finally {
+			Security.nestedLogoff();
+		}
+	}
+
 }

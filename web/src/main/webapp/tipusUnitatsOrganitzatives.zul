@@ -273,6 +273,10 @@
 							<input_dada id="detall_descripcio" bind="@descripcio" maxim="50" 
 								lectura="${!canModifyOrganizationalUnit}" width_custom="97%"/>
 						</row>
+						<row>
+							<input_etiqueta value="${c:l('tipusUnitatsOrganitzatives.zul.RoleHolder')}"/>
+							<checkbox disabled="${!canModifyOrganizationalUnit}" bind="@roleHolder" onCheck=""/>
+						</row>
 					</rows>
 				</grid>
 			</form>

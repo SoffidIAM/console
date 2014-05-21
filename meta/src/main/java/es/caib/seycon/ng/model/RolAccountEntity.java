@@ -158,7 +158,7 @@ public abstract class RolAccountEntity {
 
 	@DaoFinder("select ra "
 			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
-			   + "where ra.startDate < :now and (ra.endDate is null or ra.endDate <= :now) and ra.enabled = false")
+			   + "where ra.startDate < :now and (ra.endDate is null or ra.endDate >= :now) and ra.enabled = false")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEnable(
 		Date now) {
 	 return null;

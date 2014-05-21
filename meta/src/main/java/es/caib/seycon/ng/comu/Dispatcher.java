@@ -105,4 +105,6 @@ public abstract class Dispatcher {
 	@Nullable
 	public java.lang.String description;
 
+	@Nullable
+	public String approvalProcess;
 }

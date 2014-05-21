@@ -5,4 +5,5 @@ import com.soffid.mda.annotation.Enumeration;
 @Enumeration
 public class PredefinedProcessType {
 	public final String ROLE_APPROVAL = "RoleApproval";
+	public final String AUTHORITATIVE_CHANGE = "AuthoritativeChange";
 }

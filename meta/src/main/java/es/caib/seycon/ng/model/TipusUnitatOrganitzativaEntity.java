@@ -31,7 +31,7 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@Description("True if business units of this type can hold user roles")
 	@Column (name="TUO_ROLHOL", defaultValue="false")
 	@Nullable
-	public boolean rolHolder;
+	public boolean roleHolder;
 
 	@ForeignKey (foreignColumn="TUO_PARE")
 	public java.util.Collection<es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity> fills;
@@ -39,6 +39,7 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@ForeignKey (foreignColumn="GRU_TIPUS")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupEntity> grupEntities;
 
+	/************************* DAOS ***********************************/
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity findByCodi(
 		java.lang.String codi) {

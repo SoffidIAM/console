@@ -35,6 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
+import org.jboss.mq.il.uil2.msgs.GetIDMsg;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -1697,8 +1698,12 @@ public class UsuariServiceImpl extends
 		
 		/*IAM-318: Propagar canvis de grup primari*/
 		GrupService service = getGrupService();
+		boolean revokeHolderGroupRoles = false;
+		Long groupHolderToRemove = null;
 		if(!usuari.getCodiGrupPrimari().equals(usuariAbans.getGrupPrimari().getCodi()))
 		{
+			revokeHolderGroupRoles = true;
+			groupHolderToRemove = usuariAbans.getGrupPrimari().getId();
 			service.propagateRolsChangesToDispatcher(usuari.getCodiGrupPrimari());
 			service.propagateRolsChangesToDispatcher(usuariAbans.getGrupPrimari().getCodi());
 		}
@@ -1710,6 +1715,9 @@ public class UsuariServiceImpl extends
 		if (entity != null) {
 			getUsuariEntityDao().update(entity);
 			getAccountService().generateUserAccounts(usuari.getCodi());
+			if (revokeHolderGroupRoles)
+				getAplicacioService().revokeRolesHoldedOnGroup(usuariAbans.getId(), groupHolderToRemove);
+			
 			getRuleEvaluatorService().applyRules(entity);
 			return getUsuariEntityDao().toUsuari(entity);
 		}

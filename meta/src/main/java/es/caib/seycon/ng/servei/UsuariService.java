@@ -640,4 +640,5 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 }

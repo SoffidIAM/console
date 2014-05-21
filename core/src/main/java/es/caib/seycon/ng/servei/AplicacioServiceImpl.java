@@ -6,6 +6,7 @@
 package es.caib.seycon.ng.servei;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.Vector;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
+
+import com.soffid.iam.api.RoleAccount;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
@@ -1012,7 +1015,12 @@ public class AplicacioServiceImpl extends
 				JbpmContext ctx = getBpmEngine().getContext();
 				try {
 					ProcessInstance pi = ctx.newProcessInstance(app.getApprovalProcess());
-					pi.getContextInstance().createVariable("request", getRolAccountEntityDao().toRolAccount(rolAccountEntity));
+					RolAccount ra = getRolAccountEntityDao().toRolAccount(rolAccountEntity);
+		            SoDRule rule = getSoDRuleService().isAllowed(ra);
+		            if (rule != null)
+		            	ra.setSodRisk(rule.getRisk());
+
+					pi.getContextInstance().createVariable("request", ra);
 					pi.getContextInstance().createVariable("requesterAccount", Security.getCurrentAccount());
 					pi.getContextInstance().createVariable("requesterUser", Security.getCurrentUser());
 					pi.signal();
@@ -1070,9 +1078,13 @@ public class AplicacioServiceImpl extends
             	{
     				GrupEntity primaryGroup = ue.getGrupPrimari();
     				if (primaryGroup.getTipusUnitatOrganizativa() != null && 
-    								primaryGroup.getTipusUnitatOrganizativa().isRolHolder())
+    								primaryGroup.getTipusUnitatOrganizativa().isRoleHolder())
     					rolsUsuaris.setHolderGroup(primaryGroup.getCodi());
     			}
+            	else if (rolsUsuaris.getHolderGroup().length () == 0 && "optional".equals(System.getProperty("soffid.entitlement.group.holder")))
+            	{
+            		rolsUsuaris.setHolderGroup(null);			
+            	}
             	else
             	{
             		boolean found = false;
@@ -1085,7 +1097,7 @@ public class AplicacioServiceImpl extends
             			}
             		}
             		if (! found)
-            			throw new InternalErrorException (String.format ("User %s is not member of %s group", ue.getCodi(), rolsUsuaris.getHolderGroup()));
+            			throw new InternalErrorException (String.format ("User %s is not member of '%s' group", ue.getCodi(), rolsUsuaris.getHolderGroup()));
             	}
             }
 		}
@@ -1114,38 +1126,44 @@ public class AplicacioServiceImpl extends
             	user = ua.getUser();
             }
             
-            if (rolsUsuarisEntity.isApprovalPending())
-            {
-            	JbpmContext ctx = getBpmEngine().getContext();
-            	try 
-            	{
-            		ProcessInstance pi = ctx.getProcessInstance(rolsUsuarisEntity.getApprovalProcess());
-            		if (pi != null && !pi.hasEnded())
-            		{
-            			pi.getRootToken().addComment("Requested role has been revoked");
-            			pi.getRootToken().end();
-            			for (TaskInstance ti: pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken()))
-            			{
-            				ti.setEnd(new Date());
-            				ctx.save(ti);
-            			}            			
-            			pi.end();
-            			ctx.save(pi);
-            		}
-            	} finally {
-            		ctx.close();
-            	}
-            }
-            getRolAccountEntityDao().remove(rolsUsuarisEntity);
-            
-            if (user != null)
-            	getRuleEvaluatorService().applyRules(user);
-            getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+            deleteRolAccountEntity(rolsUsuarisEntity, user);
             return;
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
     }
+
+	private void deleteRolAccountEntity (RolAccountEntity rolsUsuarisEntity,
+					UsuariEntity user) throws InternalErrorException
+	{
+		if (rolsUsuarisEntity.isApprovalPending())
+		{
+			JbpmContext ctx = getBpmEngine().getContext();
+			try 
+			{
+				ProcessInstance pi = ctx.getProcessInstance(rolsUsuarisEntity.getApprovalProcess());
+				if (pi != null && !pi.hasEnded())
+				{
+					pi.getRootToken().addComment("Requested role has been revoked");
+					pi.getRootToken().end();
+					for (TaskInstance ti: pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken()))
+					{
+						ti.setEnd(new Date());
+						ctx.save(ti);
+					}            			
+					pi.end();
+					ctx.save(pi);
+				}
+			} finally {
+				ctx.close();
+			}
+		}
+		getRolAccountEntityDao().remove(rolsUsuarisEntity);
+		
+		if (user != null)
+			getRuleEvaluatorService().applyRules(user);
+		getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+	}
 
 	@Override
 	protected void handleDenyApproval(RolAccount rolsUsuaris) throws Exception {
@@ -2263,6 +2281,27 @@ public class AplicacioServiceImpl extends
 		}
 	}
 
+	
+	private boolean shouldBeEnabled (RolAccountEntity e)
+	{
+		if (e.isApprovalPending())
+			return false;
+		if (e.getStartDate() == null && e.getEndDate() == null)
+			return true;
+		
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		Date today = c.getTime();
+		c.add(Calendar.DAY_OF_YEAR, 1);
+		Date tomorrow = c.getTime();
+		
+		return (e.getStartDate() == null || tomorrow.after(e.getStartDate())) &&
+				(e.getEndDate() == null  || today.equals(e.getEndDate()) || today.before(e.getEndDate()));
+	}
+	
 	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UsuariEntity user)
 	{
 		for (RolAccountEntity ra: account.getRoles())
@@ -2272,7 +2311,7 @@ public class AplicacioServiceImpl extends
 			{
 				if (type == DIRECT || type == ALL) 
 					rad.add(n);
-				if (type == INDIRECT || type == ALL)
+				if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra))
 					populateRoleRoles(rad, ALL, ra.getRol(), user, account);
 			}
 		}
@@ -2290,7 +2329,7 @@ public class AplicacioServiceImpl extends
 		{
 			if (rad.granted.getBaseDeDades().getId().equals (account.getDispatcher().getId()))
 			{
-				if (rad.rolAccount != null)
+				if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
 					rg.add (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
 				if (rad.rolRol != null)
 					rg.add (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
@@ -2332,15 +2371,18 @@ public class AplicacioServiceImpl extends
 		for (RolAccountDetail rad: radSet)
 		{
 			RolGrant rg = null;
-			if (rad.rolAccount != null)
+			if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
 				rg = (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
 			if (rad.rolRol != null)
 				rg = (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
 			if (rad.rolGrup != null)
 				rg = (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
-			if (rad.account != null)
-				rg.setOwnerAccountName(rad.account.getName());
-			rgl.add(rg);
+			if (rg != null)
+			{
+    			if (rad.account != null)
+    				rg.setOwnerAccountName(rad.account.getName());
+    			rgl.add(rg);
+			}
 		}
 		return rgl;
 	}
@@ -2366,7 +2408,7 @@ public class AplicacioServiceImpl extends
 		{
 			if (rad.account != null && rad.account.getId().longValue() == accountId)
 			{
-				if (rad.rolAccount != null)
+				if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
 					rg.add (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
 				if (rad.rolRol != null)
 					rg.add (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
@@ -2393,7 +2435,14 @@ public class AplicacioServiceImpl extends
                                 new Parameter("rolId", rolId)//$NON-NLS-1$
                                 },
                           config);
-        // transformem a VO
+    	// Remove inactive grants
+    	for (Iterator<RolAccountEntity> it = usuaris.iterator(); it.hasNext();)
+    	{
+    		RolAccountEntity rae = it.next();
+    		if (! shouldBeEnabled(rae))
+    			it.remove();
+    	}
+    	// Convert to VO
         return getRolAccountEntityDao().toRolGrantList(usuaris);
 	}
 
@@ -2437,18 +2486,21 @@ public class AplicacioServiceImpl extends
 	{
 		for (RolAccountEntity rac: rol.getAccounts())
 		{
-			RolAccountDetail rad;
-			if (originalGrant == null)
-				rad = new RolAccountDetail(rac, rac.getAccount());
-			else if (originalGrant instanceof RolAccountEntity)
-				rad = new RolAccountDetail((RolAccountEntity) originalGrant, rac.getAccount());
-			else if (originalGrant instanceof RolAssociacioRolEntity)
-				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount());
-			else
-				rad = new RolAccountDetail((RolsGrupEntity) originalGrant, rac.getAccount());
-			if (! radSet.contains(rad))
+			if (shouldBeEnabled(rac))
 			{
-				radSet.add(rad);
+    			RolAccountDetail rad;
+    			if (originalGrant == null)
+    				rad = new RolAccountDetail(rac, rac.getAccount());
+    			else if (originalGrant instanceof RolAccountEntity)
+    				rad = new RolAccountDetail((RolAccountEntity) originalGrant, rac.getAccount());
+    			else if (originalGrant instanceof RolAssociacioRolEntity)
+    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount());
+    			else
+    				rad = new RolAccountDetail((RolsGrupEntity) originalGrant, rac.getAccount());
+    			if (! radSet.contains(rad))
+    			{
+    				radSet.add(rad);
+    			}
 			}
 		}
 		
@@ -2573,6 +2625,39 @@ public class AplicacioServiceImpl extends
     		getAccountEntityDao().propagateChanges(toDisable.getAccount());
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.AplicacioServiceBase#handleRevokeRolesHoldedOnGroup(long, long)
+	 */
+	@Override
+	protected void handleRevokeRolesHoldedOnGroup (long userId, long groupId)
+					throws Exception
+	{
+		// Check that the group is not assigned as primary or secondary group
+		UsuariEntity user = getUsuariEntityDao().load(userId);
+		if (user.getGrupPrimari().getId().equals(groupId))
+			return;
+		
+		for (UsuariGrupEntity uge: user.getGrupsSecundaris())
+		{
+			if (uge.getGrup().getId().equals(groupId))
+				return;
+		}
+		
+		GrupEntity ge = getGrupEntityDao().load(groupId);
+		for (UserAccountEntity uae: user.getAccounts())
+		{
+			AccountEntity acc = uae.getAccount();
+			
+			for (RolAccountEntity rae: new LinkedList<RolAccountEntity>(acc.getRoles()))
+			{
+				if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals (groupId))
+				{
+					deleteRolAccountEntity(rae, user);
+				}
+			}
+		}
 	}
 
 

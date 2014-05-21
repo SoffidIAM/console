@@ -549,6 +549,11 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
     	AccountEntity account = null;
     	AccountEntityDao accDao = getAccountEntityDao();
     	
+        if (targetEntity.getStartDate() != null)
+        	targetEntity.setStartDate(removeSeconds(targetEntity.getStartDate()));
+        if (targetEntity.getEndDate() != null)
+        	targetEntity.setEndDate(removeSeconds(targetEntity.getEndDate()));
+
     	if (sourceVO.getAccountId() != null)
     		account = accDao.load (sourceVO.getAccountId().longValue());
     	else if (sourceVO.getAccountName() != null && sourceVO.getAccountDispatcher() != null)
@@ -767,6 +772,16 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         return false;
     }
 
+    private Date removeSeconds (Date d)
+    {
+		Calendar c = Calendar.getInstance();
+		c.setTime(d);
+		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTime();
+    }
     /**
      * @see es.caib.seycon.ng.model.RolAccountEntityDao#rolsUsuarisToEntity(es.caib.seycon.ng.comu.RolAccount,
      *      es.caib.seycon.ng.model.RolAccountEntity)
@@ -774,6 +789,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
     public void rolAccountToEntity(es.caib.seycon.ng.comu.RolAccount sourceVO,
             es.caib.seycon.ng.model.RolAccountEntity targetEntity, boolean copyIfNull) {
         super.rolAccountToEntity(sourceVO, targetEntity, copyIfNull);
+
         rolsUsuarisToEntityCustom(sourceVO, targetEntity);
     }
 

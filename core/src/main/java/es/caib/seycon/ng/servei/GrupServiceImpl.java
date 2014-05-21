@@ -339,9 +339,13 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 	protected void handleRemoveGrupFromUsuari(String codiUsuari, String codiGrup) throws Exception {
 		UsuariGrupEntity usuariGrup = getUsuariGrupEntityDao().findByCodiUsuariAndCodiGrup(codiUsuari, codiGrup);
+		long userId = usuariGrup.getUsuari().getId();
+		long groupId = usuariGrup.getGrup().getId();
 		getUsuariGrupEntityDao().remove(usuariGrup);
 		/*IAM-318*/
 		handlePropagateRolsChangesToDispatcher(codiGrup);
+		getAplicacioService().revokeRolesHoldedOnGroup(userId, groupId);
+
 	}
 
 	protected Grup handleFindGrupPrimariByCodiUsuari(String codiUsuari) throws Exception {
@@ -447,12 +451,18 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 		// Mirem les autoritzacions
 		if (AutoritzacionsUsuari.canDeleteUserGroup(usuariGrupEntity.getUsuari())) {
+			
 			UsuariEntity usuari = usuariGrupEntity.getUsuari();
 			usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
 			usuari.setUsuariDarreraModificacio(getPrincipal().getName());
 			getUsuariEntityDao().update(usuari);
+			long groupId = usuariGrupEntity.getGrup().getId();
 
 			getUsuariGrupEntityDao().remove(usuariGrupEntity);
+			
+			usuari.getGrupsSecundaris().remove(usuariGrupEntity);
+
+			getAplicacioService().revokeRolesHoldedOnGroup(usuari.getId(), groupId);
 
 			getRuleEvaluatorService().applyRules(usuari);
 		} else {

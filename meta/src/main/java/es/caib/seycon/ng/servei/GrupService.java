@@ -11,16 +11,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="GroupService",
 	translatedPackage="com.soffid.iam.service")
-@Depends ({es.caib.seycon.ng.model.RolsGrupEntity.class,
+@Depends ({
+	/********** Entities *************/
+	es.caib.seycon.ng.model.RolsGrupEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.RolEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
 	es.caib.seycon.ng.model.UsuariGrupEntity.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
-	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.ConfiguracioEntity.class,
-	es.caib.seycon.ng.model.GrupEntity.class})
+	es.caib.seycon.ng.model.GrupEntity.class,
+	/************** Services ***************/
+	com.soffid.iam.service.RuleEvaluatorService.class,
+	es.caib.seycon.ng.service.AplicacioService.class
+})
 public abstract class GrupService {
 
 	@Operation ( grantees={Roles.group_create.class},

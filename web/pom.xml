@@ -179,13 +179,13 @@
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>
-			<version>1.11</version>
+			<version>${zkiblaf.version}</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>
-			<version>1.11</version>
+			<version>${zkiblaf.version}</version>
 			<classifier>classes</classifier>
 			<scope>provided</scope>
 		</dependency>		

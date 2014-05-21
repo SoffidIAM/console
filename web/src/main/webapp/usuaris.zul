@@ -27,6 +27,15 @@
 
 		<zscript>
 			<![CDATA[
+				boolean showHolderGroup = false;
+				boolean enforceHolderGroup = false;
+				
+				String ghp = System.getProperty("soffid.entitlement.group.holder");
+				if ("always".equals(ghp))
+					showHolderGroup = enforceHolderGroup = true;
+				else if ("optional".equals(ghp))
+					showHolderGroup = true;
+				
 				fileres = es.caib.seycon.ng.web.Custom.FILERES;
 				fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
 				refreshPageTime = 10000;
@@ -2199,10 +2208,10 @@ void actualitza (event) {
 										Long rule = XPathUtils.getValue(ctx, "@ruleId");
 										if (rule != null)
 										{
-											Listcell cell = event.data.getChildren().get(7);
+											Listcell cell = event.data.getChildren().get(8);
 											cell.getChildren().get(0).visible = false;
 											cell.getChildren().get(1).visible = true;
-											cell = event.data.getChildren().get(7);
+											cell = event.data.getChildren().get(9);
 											cell.getChildren().get(0).visible = false;
 										}
 										Listcell cellImage = event.data.getChildren().get(0);
@@ -2244,6 +2253,9 @@ void actualitza (event) {
 											} else {
 												event.data.style = event.data.style + "; background-color: blue;";
 											}
+										} else if (showHolderGroup) {
+											// Change holdergroup textbox to a new listbox
+											createHolderGroupListbox(event.data);
 										}
 										// Show sand clock when waiting for approval
 										approvalPending = XPathUtils.getValue(ctx,"@approvalPending");
@@ -2257,6 +2269,65 @@ void actualitza (event) {
 												c.style = "background-color: #ffffc0;";
 											}
 										}
+									}
+									
+									void createHolderGroupListbox(Listitem row) {
+										Listcell cell = row.getChildren().get(7);
+										cell.getChildren().get(0).visible = false;
+										es.caib.zkib.component.DataListbox lb = new es.caib.zkib.component.DataListbox ();
+										lb.setBind("@holderGroup");
+										lb.setMold("select");
+										lb.setParent(cell);
+										Listitem selected = null;
+										if (! enforceHolderGroup)
+										{
+											Listitem item = new Listitem();
+											item.setValue("");
+											item.setLabel("");
+											lb.getChildren().add (item);
+											lb.setSelectedItem(item);
+										}
+										Set groups = new LinkedHashSet();
+										es.caib.zkib.jxpath.JXPathContext jxpc = form.getDataSource().getJXPathContext();
+										groups.add(jxpc.getValue("/@codiGrupPrimari"));
+										for (Iterator it = jxpc.iterate("/grup/@codiGrup"); it.hasNext();)
+										{
+											groups.add(it.next());
+										}
+										
+										es.caib.seycon.ng.servei.ejb.GrupService gs = 
+												new javax.naming.InitialContext()
+													.lookup (es.caib.seycon.ng.servei.ejb.GrupServiceHome.JNDI_NAME)
+														.create();
+										es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus =
+												new javax.naming.InitialContext()
+													.lookup (es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaServiceHome.JNDI_NAME)
+														.create();
+										for (String group: groups)
+										{
+											Grup grup = gs.findGrupByCodiGrup(group);
+											if (grup.getTipus() != null)
+											{
+												list = tus.findTipusUnitatOrganitzativaByFiltre(grup.getTipus(), null);
+												if (! list.isEmpty())
+												{
+									 				TipusUnitatOrganitzativa tuo = list.get(0);
+									 				if (tuo.isRoleHolder())
+									 				{
+														Listitem item = new Listitem();
+														item.setValue(group);
+														item.setLabel(group);
+														if (selected == null)
+															selected = item;
+														lb.getChildren().add (item);
+									 				}
+												}
+											}
+										}
+										
+										if (selected != null)
+											lb.setSelectedItem(selected);
+
 									}
 ]]>
 </zscript>
@@ -2278,6 +2349,8 @@ void actualitza (event) {
 												label="${c:l('usuaris.zul.startDate')}" width="10%" />
 											<listheader
 												label="${c:l('usuaris.zul.endDate')}" width="10%" />
+											<listheader
+												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"/>
 											<listheader
 												label="${c:l('usuaris.zul.')}"
 												visible="${canDeleteUserRole}" width="30px" />
@@ -2336,6 +2409,9 @@ void actualitza (event) {
 											</listcell>
 											<listcell >
 												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"></datebox>
+											</listcell>
+											<listcell>
+												<label bind="@holderGroup" />
 											</listcell>
 											<listcell>
 												<imageclic align="right"
@@ -2495,7 +2571,7 @@ String nomRolsBorrar = "";
 											Listcell cell = (Listcell) itcell.next();
 											if (pos==1) {nomRol = cell.getLabel(); celdaBorrar = cell;} 
 											else
-												if (pos==8) {
+												if (pos==9) {
 													Iterator itcb = cell.getChildren().iterator();
 													if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
 												}

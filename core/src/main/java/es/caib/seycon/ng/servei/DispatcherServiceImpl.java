@@ -117,14 +117,15 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         dispatcherEntity.setMainDispatcher ( getDispatcherEntityDao().loadAll().isEmpty());
         dispatcherEntity.setTimeStamp(new Date());
         getDispatcherEntityDao().create(dispatcherEntity);
-
-        updateTipusAndGrups(dispatcher, dispatcherEntity);
-        
-        dispatcher = getDispatcherEntityDao().toDispatcher(dispatcherEntity);
+        dispatcher.setId(dispatcherEntity.getId());
         
         updateAutomaticTasks (dispatcher, false);
 
         handleSetDefaultMappingsByDispatcher(dispatcher.getId());
+        
+        updateTipusAndGrups(dispatcher, dispatcherEntity);
+        
+        dispatcher = getDispatcherEntityDao().toDispatcher(dispatcherEntity);
         
         return dispatcher;
     }
@@ -185,9 +186,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         DispatcherEntity entity = getDispatcherEntityDao().dispatcherToEntity(dispatcher);
         entity.setTimeStamp(new Date());
 
-        updateTipusAndGrups(dispatcher, entity);
-
         updateAutomaticTasks (dispatcher, false);
+
+        updateTipusAndGrups(dispatcher, entity);
 
         return getDispatcherEntityDao().toDispatcher(entity);
     }

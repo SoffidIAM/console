@@ -130,7 +130,7 @@
 				if (actiu.isChecked())
 				{
 					queryEnabled = true;
-					searchValues.put("actiu", new Boolean(true));
+					model.getVariables().declareVariable("actiu", new Boolean(true));
 				}
 				
 				else

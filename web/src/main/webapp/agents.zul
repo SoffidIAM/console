@@ -608,9 +608,11 @@
 							catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {	}
 						}
 						
+						detall_url.setDisabled(isReplica);
 						detall_segur.setDisabled (isReplica);
 						detall_readonly.setDisabled(isReplica);
 						detall_basatRols.setDisabled(isReplica);
+						select_group.setDisabled(isReplica);
 						grups.getFellow("dada").setReadonly(isReplica);
 						cbDominiUsuaris.setDisabled(isReplica);
 						cbDominiContrasenyes.setDisabled(isReplica);
@@ -745,7 +747,7 @@
 								<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
 								<hbox widths="90%,10%">
 									<input_dada bind="@grups" id="grups" lectura="${!canModifyAgent}" width_custom="98%"/>
-									<imageclic src="~./img/grup.gif">
+									<imageclic id="select_group" src="~./img/grup.gif">
 										<attribute name="onClick">
 											if (canModifyAgent) {
 												String idActualitza ="grups";

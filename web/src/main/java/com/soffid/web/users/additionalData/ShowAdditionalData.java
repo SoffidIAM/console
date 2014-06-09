@@ -42,9 +42,24 @@ public class ShowAdditionalData {
 	}
 	@SuppressWarnings("unchecked")
 	public List<DadaUsuari> getDadaUsuari(String codiUsuari) throws InternalErrorException{
-		if(!codiUsuari.equals("admin")){
 			final Collection<TipusDada> tipusDadaList =  dadesAddicionalsServ.findTipusDadesByCodi("%");
-			List<DadaUsuari> dadaUsuariCollection = new LinkedList<DadaUsuari> (usuariServ.findDadesUsuariByCodiUsuari(codiUsuari));
+			List<DadaUsuari> dadaUsuariCollection;
+			if (codiUsuari != null) 
+				dadaUsuariCollection = new LinkedList<DadaUsuari> (usuariServ.findDadesUsuariByCodiUsuari(codiUsuari));
+			else
+			{
+				dadaUsuariCollection = new LinkedList<DadaUsuari>();
+				for (TipusDada tda: tipusDadaList)
+				{
+					if (! "PHONE". equals (tda.getCodi()) && ! "NIF".equals(tda.getCodi()))
+					{
+						DadaUsuari du = new DadaUsuari ();
+						du.setCodiDada(tda.getCodi());
+						du.setDataLabel(tda.getLabel());
+						dadaUsuariCollection.add(du);
+					}
+				}
+			}
 			Collections.sort(dadaUsuariCollection, new Comparator<DadaUsuari>() {
 
 				public int compare(DadaUsuari o1, DadaUsuari o2) {
@@ -57,8 +72,5 @@ public class ShowAdditionalData {
 				
 			});
 			return dadaUsuariCollection;
-		}else{
-			return null;
-		}
 	}
 }

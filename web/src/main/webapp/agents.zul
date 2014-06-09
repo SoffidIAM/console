@@ -733,7 +733,12 @@
 							</row>
 							<row id="row_authoritative">
 								<input_etiqueta value="${c:l('agents.zul.Authoritative')}"/>
-								<checkbox bind="@authoritative" disabled="${!canModifyAgent}" id="detall_authoritative" onCheck=""/>
+								<div style="inline-block">
+									<checkbox bind="@authoritative" disabled="${!canModifyAgent}" id="detall_authoritative" onCheck=""/>
+									<listbox mold="select" dataPath="/model:/authoritativeProcess" disabled="${!canModifyAgent}"  bind="@authoritativeProcess">
+										<dataitem bind="@value"><listcell bind="@tag"></listcell></dataitem>
+									</listbox>
+								</div>
 							</row>
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Readonly')}"/>

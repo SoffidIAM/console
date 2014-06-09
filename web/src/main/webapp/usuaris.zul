@@ -790,6 +790,10 @@
 					}
 				}
 				
+				void setDisabledColor ()
+				{
+					disabledRow.setVisible (! actiu.isChecked());   					
+				}
 				
 			]]>
 		</zscript>
@@ -955,6 +959,7 @@
 									Usuari usu = registre.getInstance();
 								}
 							}
+							setDisabledColor();
 						} catch (Exception e) {
 							//Missatgebox.info ("Error "+e);
 							form.getFellow("codi").setDisabled(true);
@@ -981,7 +986,7 @@
 							<tab label="${c:l('usuaris.zul.Accounts')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />
 							<tab label="${c:l('usuaris.zul.RolsHeretats')}" />
-							<tab label="${c:l('usuaris.zul.Dades')}" />
+							<tab label="${c:l('usuaris.zul.Impressora')}" />
 							<tab label="${c:l('usuaris.zul.Sessions')}" />
 							<tab
 								label="${c:l('usuaris.zul.Processosdusuari')}" />
@@ -1255,11 +1260,14 @@
 															</imageclic>
 														</hbox>
 													</row>
-													<row>
+													<row  >
 														<input_etiqueta
 															value="${c:l('usuaris.zul.Actiu-2')}" />
-														<checkbox id="actiu" bind="@actiu"
-															disabled="${!canModifyUser}" onCheck="" />
+														<div>
+															<checkbox id="actiu" bind="@actiu"
+																disabled="${!canModifyUser}" onCheck='setDisabledColor()' />
+															<label value="${c:l('accounts.Disabled')}" style="background-color: red; color:white;" visible="false" id="disabledRow"/>
+														</div>
 													</row>
 													<row>
 														<input_etiqueta
@@ -1520,7 +1528,30 @@
 
 								<hbox width="100%"
 									widths="40%,1px,40%,1px,*">
-									<vbox width="100%">
+								<vbox width="99%">
+									<label sclass="etiqueta"
+										value="${c:l('usuaris.zul.Dadesaddicionals')}" />
+									<grid dataPath="/esquema/lista/listbox:/dada"
+										if="${canUpdateUserMetadata}" width="98%">
+										<datarow>
+											<input_etiqueta bind="@dataLabel" width_custom="250px"
+												value="${c:l('usuaris.zul.@codiDada')}"/>
+												<div use="com.soffid.web.users.additionalData.InputField" onChange=""/>
+										</datarow>
+									</grid>
+									<grid
+										dataPath="/esquema/lista/listbox:/dada"
+										if="${!canUpdateUserMetadata}" width="98%">
+										<datarow>
+											<input_etiqueta
+												bind="@dataLabel" value="${c:l('usuaris.zul.@codiDada')}"
+												width_custom="250px" />
+												<div use="com.soffid.web.users.additionalData.InputField"/>
+										</datarow>
+									</grid>
+								</vbox>
+									<separator width="1px" />
+									<vbox width="99%">
 										<grid
 											dataPath="/esquema/lista/listbox:/grup" fixedLayout="true"
 											height="130px" id="gridGrups" width="99%">
@@ -1622,151 +1653,6 @@
 											<label
 												id="grupsTooltipLabel" value="" />
 										</popup>
-									</vbox>
-									<separator width="1px" />
-									<vbox
-										if="${!canCreateUserPrinter and !canDeleteUserPrinter}"
-										width="99%">
-										<grid
-											dataPath="/esquema/lista/listbox:/impressora"
-											fixedLayout="true" height="130px"
-											id="gridImpressora_SoloLectura">
-											<columns>
-												<column
-													label="${c:l('usuaris.zul.Impressora')}" width="60%" />
-												<column
-													label="${c:l('usuaris.zul.Servidor')}" width="*" />
-												<column
-													label="${c:l('usuaris.zul.Def')}" width="30px" />
-											</columns>
-											<datarow>
-												<label
-													bind="@codiImpressora" />
-												<label
-													bind="@nomServidorImpressora" />
-												<checkbox
-													bind="@perDefecte" disabled="true" />
-											</datarow>
-										</grid>
-									</vbox>
-									<vbox
-										if="${canCreateUserPrinter or canDeleteUserPrinter}"
-										width="99%">
-										<grid
-											dataPath="/esquema/lista/listbox:/impressora"
-											fixedLayout="true" height="130px" id="gridImpressora">
-											<attribute name="onActualitza">
-	Object[] dades = (Object[]) event.getData();
-	codiI = (String) dades[0];
-	nomS = (String) dades[1];
-	modelInstance = gridImpressora.getModel();
-	modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridImpressora
-			.getModel();
-	ds = gridImpressora.getDataSource();
-	ctx = ds.getJXPathContext();
-	xpath = gridImpressora.getXPath() + "[@codiImpressora = '"
-			+ (event.getData()[0]) + "']";
-	boolean jaExisteix = true;
-	try {
-		valor = ctx.getValue(xpath);
-	} catch (Exception e) {
-		jaExisteix = false;
-	}
-	if (jaExisteix) {
-		Missatgebox.info(String.format(org.zkoss.util.resource.Labels
-				.getLabel("usuaris.ImpressoraAssignada"),
-				new Object[] { codiI }), org.zkoss.util.resource.Labels
-				.getLabel("usuaris.ErrorImpressora"));
-	} else {
-		position = modelProxy.newInstance();
-		ds = gridImpressora.getDataSource();
-		ctx = ds.getJXPathContext();
-		xpath = gridImpressora.getXPath() + modelProxy.getBind(position);
-		pointer = ctx.createPath(xpath);
-		ctx2 = ctx.getRelativeContext(pointer);
-		campCodiUsuari = (DataTextbox) form.getFellow("codi");
-		codiUsuari = campCodiUsuari.getValue();
-		ctx2.setValue("@codiImpressora", codiI);
-		ctx2.setValue("@nomServidorImpressora", nomS);
-		ctx2.setValue("@codiUsuari", codiUsuari);
-		pointer.invalidate();
-	}
-</attribute>
-											<columns>
-												<column
-													label="${c:l('usuaris.zul.Impressora')}" width="60%" />
-												<column
-													label="${c:l('usuaris.zul.Servidor')}" width="*" />
-												<column
-													label="${c:l('usuaris.zul.Def')}" width="30px" />
-												<column
-													label="${c:l('usuaris.zul.')}"
-													visible="${canDeleteUserPrinter}" width="30px" />
-											</columns>
-											<datarow>
-												<label
-													bind="@codiImpressora" />
-												<label
-													bind="@nomServidorImpressora" />
-												<checkbox
-													bind="@perDefecte">
-													<attribute name="onCheck">
-	dataRow = self.getParent();
-	xpathActual = dataRow.getXPath();
-	ds = gridImpressora.getDataSource();
-	ctx = ds.getJXPathContext();
-	actual = ctx.getValue(xpathActual + "/@codiImpressora");
-	jaMarcat = true;
-	try {
-		xpathAltra = gridImpressora.getXPath() + "[@codiImpressora != '"
-				+ actual + "' and @perDefecte='true']";
-		valor = ctx.getValue(xpathAltra + "/@codiImpressora");
-	} catch (Exception e) {
-		jaMarcat = false;
-	}
-	if (jaMarcat) {
-		xpathAltra = gridImpressora.getXPath() + "[@codiImpressora = '" + valor
-				+ "']";
-		pointer = ctx.getPointer(xpathAltra);
-		ctx2 = ctx.getRelativeContext(pointer);
-		ctx2.setValue("/@perDefecte", false);
-		pointer.invalidate();
-	}
-</attribute>
-												</checkbox>
-												<imageclic
-													src="~./img/list-remove.gif">
-													<attribute name="onClick">
-	if (canDeleteUserPrinter) {
-		dataRow = self.getParent();
-		xpath = dataRow.getXPath();
-		dataSource = gridImpressora.getDataSource();
-		context = dataSource.getJXPathContext();
-		dada = context.getValue(xpath + "/@codiImpressora");
-		Missatgebox.confirmaOK_CANCEL(String.format(
-				org.zkoss.util.resource.Labels
-						.getLabel("usuaris.EsborraImpressora"),
-				new Object[] { dada }), org.zkoss.util.resource.Labels
-				.getLabel("usuaris.Esborra"), new EventListener() {
-			public void onEvent(Event evt) {
-				if ("onOK".equals(evt.getName())) {
-					context.removePath(xpath);
-				}
-			}
-		});
-	}
-</attribute>
-												</imageclic>
-											</datarow>
-										</grid>
-										<button
-											if="${canCreateUserPrinter}" image="~./img/list-add.gif"
-											label="${c:l('usuaris.zul.Afegeixnova')}">
-											<attribute name="onClick">
-	Events.postEvent("onInicia", desktop.getPage("impressoresLlista")
-			.getFellow("esquemaLlista"), gridImpressora);
-</attribute>
-										</button>
 									</vbox>
 									<separator width="1px" />
 									<vbox width="99%">
@@ -2639,28 +2525,151 @@ String nomRolsBorrar = "";
 							</tabpanel>
 
 							<tabpanel id="dadesAddicionals">
-								<vbox width="100%">
-									<label sclass="etiqueta"
-										value="${c:l('usuaris.zul.Dadesaddicionals')}" />
-									<grid dataPath="/esquema/lista/listbox:/dada"
-										if="${canUpdateUserMetadata}" width="750px">
-										<datarow>
-											<input_etiqueta bind="@codiDada" width_custom="250px"
-												value="${c:l('usuaris.zul.@codiDada')}"/>
-												<div use="com.soffid.web.users.additionalData.InputField" onChange=""/>
-										</datarow>
-									</grid>
-									<grid
-										dataPath="/esquema/lista/listbox:/dada"
-										if="${!canUpdateUserMetadata}" width="750px">
-										<datarow>
-											<input_etiqueta
-												bind="@codiDada" value="${c:l('usuaris.zul.@codiDada')}"
-												width_custom="250px" />
-												<div use="com.soffid.web.users.additionalData.InputField"/>
-										</datarow>
-									</grid>
-								</vbox>
+									<vbox
+										if="${!canCreateUserPrinter and !canDeleteUserPrinter}"
+										width="99%">
+										<grid
+											dataPath="/esquema/lista/listbox:/impressora"
+											fixedLayout="true" height="130px"
+											id="gridImpressora_SoloLectura">
+											<columns>
+												<column
+													label="${c:l('usuaris.zul.Impressora')}" width="60%" />
+												<column
+													label="${c:l('usuaris.zul.Servidor')}" width="*" />
+												<column
+													label="${c:l('usuaris.zul.Def')}" width="30px" />
+											</columns>
+											<datarow>
+												<label
+													bind="@codiImpressora" />
+												<label
+													bind="@nomServidorImpressora" />
+												<checkbox
+													bind="@perDefecte" disabled="true" />
+											</datarow>
+										</grid>
+									</vbox>
+									<vbox
+										if="${canCreateUserPrinter or canDeleteUserPrinter}"
+										width="99%">
+										<grid
+											dataPath="/esquema/lista/listbox:/impressora"
+											fixedLayout="true" height="130px" id="gridImpressora">
+											<attribute name="onActualitza">
+	Object[] dades = (Object[]) event.getData();
+	codiI = (String) dades[0];
+	nomS = (String) dades[1];
+	modelInstance = gridImpressora.getModel();
+	modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridImpressora
+			.getModel();
+	ds = gridImpressora.getDataSource();
+	ctx = ds.getJXPathContext();
+	xpath = gridImpressora.getXPath() + "[@codiImpressora = '"
+			+ (event.getData()[0]) + "']";
+	boolean jaExisteix = true;
+	try {
+		valor = ctx.getValue(xpath);
+	} catch (Exception e) {
+		jaExisteix = false;
+	}
+	if (jaExisteix) {
+		Missatgebox.info(String.format(org.zkoss.util.resource.Labels
+				.getLabel("usuaris.ImpressoraAssignada"),
+				new Object[] { codiI }), org.zkoss.util.resource.Labels
+				.getLabel("usuaris.ErrorImpressora"));
+	} else {
+		position = modelProxy.newInstance();
+		ds = gridImpressora.getDataSource();
+		ctx = ds.getJXPathContext();
+		xpath = gridImpressora.getXPath() + modelProxy.getBind(position);
+		pointer = ctx.createPath(xpath);
+		ctx2 = ctx.getRelativeContext(pointer);
+		campCodiUsuari = (DataTextbox) form.getFellow("codi");
+		codiUsuari = campCodiUsuari.getValue();
+		ctx2.setValue("@codiImpressora", codiI);
+		ctx2.setValue("@nomServidorImpressora", nomS);
+		ctx2.setValue("@codiUsuari", codiUsuari);
+		pointer.invalidate();
+	}
+</attribute>
+											<columns>
+												<column
+													label="${c:l('usuaris.zul.Impressora')}" width="60%" />
+												<column
+													label="${c:l('usuaris.zul.Servidor')}" width="*" />
+												<column
+													label="${c:l('usuaris.zul.Def')}" width="30px" />
+												<column
+													label="${c:l('usuaris.zul.')}"
+													visible="${canDeleteUserPrinter}" width="30px" />
+											</columns>
+											<datarow>
+												<label
+													bind="@codiImpressora" />
+												<label
+													bind="@nomServidorImpressora" />
+												<checkbox
+													bind="@perDefecte">
+													<attribute name="onCheck">
+	dataRow = self.getParent();
+	xpathActual = dataRow.getXPath();
+	ds = gridImpressora.getDataSource();
+	ctx = ds.getJXPathContext();
+	actual = ctx.getValue(xpathActual + "/@codiImpressora");
+	jaMarcat = true;
+	try {
+		xpathAltra = gridImpressora.getXPath() + "[@codiImpressora != '"
+				+ actual + "' and @perDefecte='true']";
+		valor = ctx.getValue(xpathAltra + "/@codiImpressora");
+	} catch (Exception e) {
+		jaMarcat = false;
+	}
+	if (jaMarcat) {
+		xpathAltra = gridImpressora.getXPath() + "[@codiImpressora = '" + valor
+				+ "']";
+		pointer = ctx.getPointer(xpathAltra);
+		ctx2 = ctx.getRelativeContext(pointer);
+		ctx2.setValue("/@perDefecte", false);
+		pointer.invalidate();
+	}
+</attribute>
+												</checkbox>
+												<imageclic
+													src="~./img/list-remove.gif">
+													<attribute name="onClick">
+	if (canDeleteUserPrinter) {
+		dataRow = self.getParent();
+		xpath = dataRow.getXPath();
+		dataSource = gridImpressora.getDataSource();
+		context = dataSource.getJXPathContext();
+		dada = context.getValue(xpath + "/@codiImpressora");
+		Missatgebox.confirmaOK_CANCEL(String.format(
+				org.zkoss.util.resource.Labels
+						.getLabel("usuaris.EsborraImpressora"),
+				new Object[] { dada }), org.zkoss.util.resource.Labels
+				.getLabel("usuaris.Esborra"), new EventListener() {
+			public void onEvent(Event evt) {
+				if ("onOK".equals(evt.getName())) {
+					context.removePath(xpath);
+				}
+			}
+		});
+	}
+</attribute>
+												</imageclic>
+											</datarow>
+										</grid>
+										<button
+											if="${canCreateUserPrinter}" image="~./img/list-add.gif"
+											label="${c:l('usuaris.zul.Afegeixnova')}">
+											<attribute name="onClick">
+	Events.postEvent("onInicia", desktop.getPage("impressoresLlista")
+			.getFellow("esquemaLlista"), gridImpressora);
+</attribute>
+										</button>
+									</vbox>
+
 							</tabpanel>
 
 							<tabpanel id="Sessions">

@@ -16,6 +16,7 @@
 
 	<zscript>
 		<![CDATA[
+			import es.caib.zkib.datasource.XPathUtils;
 			try
 			{
 				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -182,13 +183,13 @@
 		]]>
 	</zscript>
 
-	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
+	<esquema id="esquema" ample="${amplaria} }" datamodel="/model"
 		focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}" width="${amplaria}"
+		<criteris id="queryWindow" height="${queryWindowMin}" width="100%"
 			onOK="search()">
 		
-			<hbox>
+			<hbox width="100%">
 				<input_criteri etiqueta="${c:l('dadesAddicionals.zul.Codi')}" id="queryCodi"/>
 				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
 			</hbox>
@@ -223,20 +224,36 @@
 	
 		<detalls id="dades">
 			<zscript>
+				void displayValues ()
+				{
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						es.caib.seycon.ng.comu.TipusDada registre = ctx.getValue("/").getInstance();
+						if (registre.getType().equals (es.caib.seycon.ng.comu.TypeEnumeration.STRING_TYPE))
+							valuesRow.setVisible(true);
+						else
+							valuesRow.setVisible(false);
+				}
+				
 				void onChangeDades()
 				{
 					try {
 						ds = form.getDataSource(); 
 						ctx =  ds.getJXPathContext(); 
-						registre = ctx.getValue("/");
-						form.getFellow("detall_ordre").setDisabled(!registre.isNew());
+						es.caib.zkib.datamodel.DataNode registre = ctx.getValue("/");
+						// form.getFellow("detall_ordre").setDisabled(!registre.isNew());
+						displayValues();
 					} catch (Exception e) {
-						form.getFellow("detall_ordre").setDisabled(true);
+						// form.getFellow("detall_ordre").setDisabled(true);
 					}
 				}
 			</zscript>		
 			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
 				<grid width="99%">
+					<columns>
+						<column width="15%"></column>
+						<column width="85%"/>
+					</columns>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Ordre')}"/>
@@ -256,18 +273,55 @@
 							
 						</row>
 						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Label')}"/>
+							<textbox bind="@label" maxlength="50"
+									sclass="textbox" readonly="${!canModifyMetadata}" width="80%" onChange=""/>
+						</row>
+						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Type')}"/>
 								<listbox width="99%" visible="true" bind="@type" mold="select" disabled="${!canModifyMetadata}"
 											style="font-size: 10px" dataPath="/model:/dataType">
 									<dataitem bind="@value">
 										<listcell bind="@literal"/>
-									</dataitem>
+									</dataitem>  
 								</listbox>
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}"/>
 								<textbox bind="@size" id="detail_size" maxlength="50"
-									sclass="textbox" readonly="${!canModifyMetadata}" width="99%"/>
+									sclass="textbox" readonly="${!canModifyMetadata}" width="8em" onChange=""/>
+						</row>
+						<row id="valuesRow">
+							<input_etiqueta value=""/>
+							<grid dataPath="/values" id="gridValues">
+								<columns>
+									<column label="${c:l('dadesAddicionals.zul.Values')}"></column>
+									<column visible="${canModifyMetadata}" width="2em">
+																		<imageclic align="center" src="~./img/list-add.gif">
+																			<attribute name="onClick"><![CDATA[
+	if (canModifyMetadata) {
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(form);
+		es.caib.seycon.ng.comu.TipusDada tda = XPathUtils.getValue(ctx, ".").getInstance();
+		XPathUtils.createPath(ctx.getDataSource(), "/values", "");
+	}
+	]]>
+											</attribute>
+										</imageclic>
+									</column>
+								</columns>
+								<datarow>
+									<textbox bind="."  maxlength="50"
+										sclass="textbox" readonly="false" width="80%" onChange=""/>
+									<imageclic align="center" src="~./img/list-remove.gif">
+										<attribute name="onClick"><![CDATA[
+											if (canModifyMetadata) {
+												es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
+												XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
+											}
+										]]></attribute>
+									</imageclic>
+								</datarow>
+							</grid>
 						</row>
 					</rows>
 				</grid>
@@ -275,5 +329,4 @@
 		</detalls>		
 			
 	</esquema>
-	
 </zk>

@@ -38,6 +38,7 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
@@ -329,10 +330,19 @@ public class TaskUI extends Frame implements EventListener {
                 map.put("taskInstance", task); //$NON-NLS-1$
                 map.put("processInstance", instanciaProceso); //$NON-NLS-1$
                 map.put("engine", engine); //$NON-NLS-1$
-                componenteGenerado = Executions.createComponentsDirectly(ui,
-                        "zul", ventanaDinamica, map); //$NON-NLS-1$
-                if (!canManage || task.isCancelled() || task.getEnd()!=null)
-                    disableInputbox(componenteGenerado);
+                try {
+	                componenteGenerado = Executions.createComponentsDirectly(ui,
+	                        "zul", ventanaDinamica, map); //$NON-NLS-1$
+	                if (!canManage || task.isCancelled() || task.getEnd()!=null)
+	                    disableInputbox(componenteGenerado);
+                } catch (Exception e) {
+	        		Label l = new Label (e.toString());
+	        		l.setMultiline(true);
+	        		ventanaDinamica.appendChild(l);
+	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
+           		Executions.createComponents(def, ventanaDinamica, null);
+           		componenteGenerado = getWorkflowWindow();
+                }
             }
 
             this.updateBotonera(componenteGenerado);
@@ -642,16 +652,12 @@ public class TaskUI extends Frame implements EventListener {
 
     private WorkflowWindow getWorkflowWindow() {
     	
-        if (ventanaDinamica.getChildren().size() > 0) 
+        for (Object c: ventanaDinamica.getChildren()) 
         {
-            Component c = (Component) ventanaDinamica.getChildren().get(0);
             if ( c instanceof WorkflowWindow)
             	return (WorkflowWindow) c;
-            else
-            	return null;
         }
-        else
-        	return null;
+        return null;
 	}
 
 	public void salvarTarea() throws InterruptedException, IOException,

@@ -110,7 +110,7 @@ public class InputField extends Div implements XPathSubscriber{
 				if(typeData.getSize() != null)
 					size = typeData.getSize();
 				if(stringType != null && !stringType.trim().isEmpty()){
-					if(stringType.equals("B"))
+					if(TypeEnumeration.BINARY_TYPE.equals(type))
 					{
 						boolean visible = fileAlreadySaved();
 						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
@@ -118,7 +118,7 @@ public class InputField extends Div implements XPathSubscriber{
 									"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
 									"</button></h:span>";
 					}
-					else if(stringType.equals("P"))
+					else if(TypeEnumeration.PHOTO_TYPE.equals(type))
 					{
 						if(binder3.getValue() != null){
 							map.put("image", byteArrayToImage(getBlobDataValue()));
@@ -132,7 +132,7 @@ public class InputField extends Div implements XPathSubscriber{
 									"</button><div height=\"100px\" width=\"100px\" style=\"overflow:auto\"></div></h:span>";
 						}
 					}
-					else if(stringType.equals("D"))
+					else if(TypeEnumeration.DATE_TYPE.equals(type))
 					{
 						if((binder4.getValue() != null) || (binder.getValue() != null)) {
 							Calendar stringDate = null;
@@ -146,7 +146,7 @@ public class InputField extends Div implements XPathSubscriber{
 							result = "<datebox bind=\"@valorDadaDate\" onChange=\"\" disabled=\"${!canUpdateUserMetadata}\"/>";
 						}
 					}
-					else if(stringType.equals("E"))
+					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 					{
 						if(binder.getValue() != null && !binder.getValue().toString().trim().isEmpty()){
 							boolean isEmail = testEmail(binder.getValue().toString());
@@ -160,12 +160,21 @@ public class InputField extends Div implements XPathSubscriber{
 						}else
 							result = "<textbox bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
 					}	
-					else //String
+					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
 					{
 						if(binder.getValue() != null)
 							result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
 						else
 							result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
+					} else { // Listbox
+						result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" disabled=\"${!canUpdateUserMetadata}\">";
+						result = result + "<listitem value=\"\"/>";
+						for (String v: typeData.getValues())
+						{
+							String s = v.replaceAll("\"", "&quot;");
+							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+						}
+						result = result + "</listbox>";
 					}
 				}
 				if (result.equals(""))

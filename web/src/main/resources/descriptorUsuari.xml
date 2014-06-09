@@ -111,7 +111,7 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.UsuariImpressora"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="dada" type="dada">  <!-- user:query -->
+		<finder name="dada" type="dada" executeOnNewObjects="true">  <!-- user:query -->
 			<script-finder>
 				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
 				return obj.getDadaUsuari(instance.codi); 
@@ -158,6 +158,12 @@
 	</datanode>
 	
 	<datanode name="dada">
+		<script-handler>
+			<update-script>
+				if (instance.getCodiUsuari() == null)
+					instance.setCodiUsuari (parent.instance.getCodi());
+			</update-script>
+		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
 			<insert-method method="create"  returnBean="true" > <!-- user:metadata:update -->
 				<parameter value="${instance}" />

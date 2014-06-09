@@ -8,9 +8,11 @@
 				method="findTipusDadesByCodi" if = "${queryEnabled}">
 				<parameter value="${codi}"/>
 			</ejb-finder>
-			<new-instance-bean
-				className="es.caib.seycon.ng.comu.TipusDada">
-			</new-instance-bean>
+			<new-instance-script>
+				obj = new es.caib.seycon.ng.comu.TipusDada();
+				obj.setValues ( new java.util.LinkedList());
+				return obj;
+			</new-instance-script>
 		</finder>
 		<finder name="dataType" type="dataType">
 			<script-finder>

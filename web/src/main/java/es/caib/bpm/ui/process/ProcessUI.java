@@ -164,16 +164,12 @@ public class ProcessUI extends Frame {
 
     private WorkflowWindow getWorkflowWindow() {
     	
-        if (ventanaDinamica.getChildren().size() > 0) 
+        for (Object c: ventanaDinamica.getChildren()) 
         {
-            Component c = (Component) ventanaDinamica.getChildren().get(0);
             if ( c instanceof WorkflowWindow)
             	return (WorkflowWindow) c;
-            else
-            	return null;
         }
-        else
-        	return null;
+       	return null;
 	}
 
     public ProcessInstance getCurrentProcess() {
@@ -320,12 +316,20 @@ public class ProcessUI extends Frame {
             if (ui == null)
             {
             	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-            	Executions.createComponents(def, ventanaDinamica, null);
+           		Executions.createComponents(def, ventanaDinamica, null);
             }
             else
             {
-                Executions.createComponentsDirectly(ui,
+            	try {
+            		Executions.createComponentsDirectly(ui,
                         "zul", ventanaDinamica, null); //$NON-NLS-1$
+	        	} catch (Exception e) {
+	        		Label l = new Label (e.toString());
+	        		l.setMultiline(true);
+	        		ventanaDinamica.appendChild(l);
+	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
+	           		Executions.createComponents(def, ventanaDinamica, null);
+	        	}
             }
 
             // Actualizar comentarios

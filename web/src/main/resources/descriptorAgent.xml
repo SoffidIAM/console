@@ -138,7 +138,30 @@
 				return v;				
 			</script-finder>
 		</finder>
+		<finder name="authoritativeProcess" type="authoritativeProcess">
+			<script-finder>
+				engine = new javax.naming.InitialContext()
+					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
+					.create();
+				java.util.LinkedList list = new java.util.LinkedList ();
+				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+				tv.setTag ("-");
+				tv.setValue(null);
+				list.add (tv);
+				for (def: engine.findProcessDefinitions (null, es.caib.bpm.vo.PredefinedProcessType.AUTHORITATIVE_CHANGE))
+				{
+					tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+					tv.setTag (def.name);
+					tv.setValue(def.name);
+				
+					list.add (tv);
+				}
+				return list;
+			</script-finder>
+		</finder>
 	</datanode>
+
+	<datanode name="authoritativeProcess"></datanode>	
 	
 	<datanode name="servertype"/>
 	

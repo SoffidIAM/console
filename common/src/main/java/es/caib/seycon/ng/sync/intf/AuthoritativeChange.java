@@ -10,9 +10,21 @@ public class AuthoritativeChange implements Serializable
 {
 	AuthoritativeChangeIdentifier id;
 	
+	String sourceSystem;
+	
+	public String getSourceSystem()
+	{
+		return sourceSystem;
+	}
+
+	public void setSourceSystem(String sourceSystem)
+	{
+		this.sourceSystem = sourceSystem;
+	}
+
 	Usuari user;
 	
-	Map<String, String> attributes;
+	Map<String, Object> attributes;
 	
 	Set<String> groups;
 
@@ -46,12 +58,12 @@ public class AuthoritativeChange implements Serializable
 		this.user = user;
 	}
 
-	public Map<String, String> getAttributes()
+	public Map<String, Object> getAttributes()
 	{
 		return attributes;
 	}
 
-	public void setAttributes(Map<String, String> attributes)
+	public void setAttributes(Map<String, Object> attributes)
 	{
 		this.attributes = attributes;
 	}

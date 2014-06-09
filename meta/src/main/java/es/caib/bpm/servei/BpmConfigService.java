@@ -7,10 +7,12 @@
 package es.caib.bpm.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.ApplicationBootService;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={Roles.Tothom.class})
-public abstract class BpmConfigService {
+public abstract class BpmConfigService extends ApplicationBootService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.bpm.vo.ConfigParameterVO> findAll()
@@ -30,6 +32,7 @@ public abstract class BpmConfigService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
+	
 	@Operation ( grantees={Roles.anonymous.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.ConfigParameterVO findFirstByAppKey(

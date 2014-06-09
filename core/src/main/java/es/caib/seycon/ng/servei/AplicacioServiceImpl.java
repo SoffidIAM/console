@@ -1146,12 +1146,12 @@ public class AplicacioServiceImpl extends
 				{
 					pi.getRootToken().addComment("Requested role has been revoked");
 					pi.getRootToken().end();
+					pi.end();
 					for (TaskInstance ti: pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken()))
 					{
-						ti.setEnd(new Date());
-						ctx.save(ti);
+						if (!ti.hasEnded())
+							ti.cancel();
 					}            			
-					pi.end();
 					ctx.save(pi);
 				}
 			} finally {

@@ -12,5 +12,21 @@ public class Configuration {
         return jBpmConfiguration;
     }
 
+	/**
+	 * 
+	 */
+	public static void configureForServer ()
+	{
+		jBpmConfiguration = JbpmConfiguration.getInstance("es/caib/seycon/ng/sync/jbpm/jbpm.cfg.xml");
+	}
+
+	/**
+	 * 
+	 */
+	public static void configureForConsole ()
+	{
+        jBpmConfiguration = JbpmConfiguration.getInstance();
+	}
+
 
 }

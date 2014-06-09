@@ -5,8 +5,13 @@
  */
 package es.caib.seycon.ng.model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
@@ -46,6 +51,26 @@ public class TipusDadaEntityDaoImpl extends
 			es.caib.seycon.ng.model.TipusDadaEntity sourceEntity,
 			es.caib.seycon.ng.comu.TipusDada targetVO) {
 		super.toTipusDada(sourceEntity, targetVO);
+		if (sourceEntity.getLabel() == null)
+			targetVO.setLabel(sourceEntity.getCodi());
+		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)
+			targetVO.setValues ( new LinkedList<String>() );
+		else
+		{
+			List<String> values = new LinkedList<String>();
+			for (String s: sourceEntity.getValues().split(" "))
+			{
+				try
+				{
+					values.add (URLDecoder.decode(s, "UTF-8"));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException (e);
+				}
+			}
+			targetVO.setValues(values);
+		}
 	}
 
 	/**
@@ -92,6 +117,26 @@ public class TipusDadaEntityDaoImpl extends
 			es.caib.seycon.ng.model.TipusDadaEntity targetEntity,
 			boolean copyIfNull) {
 		super.tipusDadaToEntity(sourceVO, targetEntity, copyIfNull);
+		if (sourceVO.getValues() == null || sourceVO.getValues().isEmpty())
+			targetEntity.setValues(null);
+		else
+		{
+			StringBuffer b = new StringBuffer();
+			for (String s: sourceVO.getValues())
+			{
+				if (b.length() > 0)
+					b.append (" ");
+				try
+				{
+					b.append (URLEncoder.encode(s, "UTF-8"));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException (e);
+				}
+			}
+			targetEntity.setValues(b.toString());
+		}
 	}
 	
 	public void create(Collection entities) {

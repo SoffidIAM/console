@@ -18,6 +18,7 @@ import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
@@ -29,6 +30,11 @@ public class DadaUsuariEntityDaoImpl
     extends es.caib.seycon.ng.model.DadaUsuariEntityDaoBase
 {
 	
+	/**
+	 * 
+	 */
+	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss";
+
 	private void assertPhoneExists ()
 	{
         org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
@@ -110,12 +116,13 @@ public class DadaUsuariEntityDaoImpl
     {        
         targetVO.setCodiDada(sourceEntity.getTipusDada().getCodi());
         targetVO.setCodiUsuari(sourceEntity.getUsuari().getCodi());
+    	targetVO.setDataLabel(sourceEntity.getTipusDada().getLabel());
         if(sourceEntity.getTipusDada()!=null && sourceEntity.getValorDada() != null){
         	if(sourceEntity.getTipusDada().getType()!= null){
         		if(sourceEntity.getTipusDada().getType().toString().equals("D")){ //$NON-NLS-1$
         			try{
         				String data = sourceEntity.getValorDada().toString();
-        				SimpleDateFormat curFormater = new SimpleDateFormat("dd/MM/yyyy");  //$NON-NLS-1$
+        				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
         				Date dateObj = curFormater.parse(data);
         				Calendar calendar = Calendar.getInstance();
         				calendar .setTime(dateObj);
@@ -174,6 +181,11 @@ public class DadaUsuariEntityDaoImpl
 			}
             targetEntity.setUsuari(usuariEntity);
             targetEntity.setTipusDada(tipusDadaEntity);
+            if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()) && sourceVO.getValorDadaDate() != null)
+            {
+				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
+            	targetEntity.setValorDada(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+            }
         }
 
     /**

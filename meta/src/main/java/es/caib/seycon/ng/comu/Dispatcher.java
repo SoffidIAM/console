@@ -106,5 +106,5 @@ public abstract class Dispatcher {
 	public java.lang.String description;
 
 	@Nullable
-	public String approvalProcess;
+	public String authoritativeProcess;
 }

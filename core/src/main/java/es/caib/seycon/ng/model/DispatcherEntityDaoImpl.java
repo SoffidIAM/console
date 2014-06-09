@@ -169,6 +169,7 @@ public class DispatcherEntityDaoImpl extends es.caib.seycon.ng.model.DispatcherE
         	targetVO.setDatabaseReplicaId(null);
         else
         	targetVO.setDatabaseReplicaId(sourceEntity.getReplicaDatabases().iterator().next().getId());
+        	
     }
 
     /**

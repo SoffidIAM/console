@@ -12,7 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -22,6 +21,7 @@ import es.caib.seycon.ng.utils.Security;
 /**
  * @see es.caib.seycon.ng.model.ConfiguracioEntity
  */
+
 public class ConfiguracioEntityDaoImpl extends
 		es.caib.seycon.ng.model.ConfiguracioEntityDaoBase {
 	

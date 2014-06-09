@@ -162,7 +162,7 @@ public abstract class UsuariEntity {
 	public java.util.Collection<es.caib.seycon.ng.model.ContrasenyaEntity> contrasenyes;
 
 	@ForeignKey (foreignColumn="PAU_USU_ID")
-	public java.util.Collection<es.caib.seycon.ng.model.AuthoritativeChangeEntity> pendingAuthoritativeChanges;
+	public java.util.Collection<com.soffid.iam.authoritative.model.AuthoritativeChangeEntity> pendingAuthoritativeChanges;
 
 	
 	/************************ DAOs **********************************/

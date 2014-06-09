@@ -17,6 +17,7 @@ import es.caib.bpm.config.Configuration;
 import es.caib.bpm.entity.DBProperty;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.vo.ConfigParameterVO;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 	Stack<Object> jbpmContextStack = new Stack<Object>();
@@ -239,4 +240,24 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 	protected void handleUpdateAll(Collection<ConfigParameterVO> config)
 	{
 	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.ApplicationBootServiceBase#handleSyncServerBoot()
+	 */
+	@Override
+	protected void handleSyncServerBoot () throws Exception
+	{
+		Configuration.configureForServer();
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.ApplicationBootServiceBase#handleConsoleBoot()
+	 */
+	@Override
+	protected void handleConsoleBoot () throws Exception
+	{
+		Configuration.configureForConsole();
+	}
+
+
 }

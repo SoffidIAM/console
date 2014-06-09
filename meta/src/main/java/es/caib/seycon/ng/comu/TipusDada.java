@@ -5,6 +5,9 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DataType",
@@ -25,5 +28,12 @@ public abstract class TipusDada {
 
 	@Nullable
 	public java.lang.Integer size;
-
+	
+	@Nullable
+	public String label;
+	
+	@Nullable
+	@Description("List of allowed values")
+	@Attribute(defaultValue="new java.util.LinkedList<String>()")
+	public List<String> values;
 }

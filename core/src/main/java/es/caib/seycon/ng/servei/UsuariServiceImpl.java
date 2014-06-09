@@ -1805,7 +1805,7 @@ public class UsuariServiceImpl extends
 				}
 				if (!teTipusDada) {
 					dades.add(new DadaUsuari(tipusDada.getCodi(), null, //$NON-NLS-1$
-							codiUsuari, null, null, null));
+							codiUsuari, null, null, null, tipusDada.getLabel() == null ? tipusDada.getCodi(): tipusDada.getLabel()));
 				}
 			}
 		}

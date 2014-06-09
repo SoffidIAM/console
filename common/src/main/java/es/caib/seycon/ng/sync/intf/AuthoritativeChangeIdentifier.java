@@ -11,6 +11,19 @@ public class AuthoritativeChangeIdentifier implements Serializable
 	Date date;
 	
 	Object changeId;
+	
+	Long internalId;
+	
+
+	public Long getInternalId()
+	{
+		return internalId;
+	}
+
+	public void setInternalId(Long internalId)
+	{
+		this.internalId = internalId;
+	}
 
 	public Object getEmployeeId()
 	{

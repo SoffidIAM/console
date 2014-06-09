@@ -30,4 +30,6 @@ public abstract class DadaUsuari {
 	@Nullable
 	public java.util.Calendar valorDadaDate;
 
+	@Nullable
+	public String dataLabel;
 }

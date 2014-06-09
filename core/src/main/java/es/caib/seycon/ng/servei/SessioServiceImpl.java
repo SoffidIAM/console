@@ -295,7 +295,7 @@ public class SessioServiceImpl extends es.caib.seycon.ng.servei.SessioServiceBas
     protected Sessio handleGetSessioByHost(long id, String hostIp) throws Exception {
         SessioEntity se = getSessioEntityDao().load(id);
 
-        if (se.getMaquina().getAdreca().equals(hostIp)) {
+        if (se != null && se.getMaquina() != null && hostIp.equals(se.getMaquina().getAdreca())) {
             Sessio s = getSessioEntityDao().toSessio(se);
             s.setClau(se.getClau());
             s.setClauTemporal(se.getNovaClau());

@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 import java.util.Collection;
 
+import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_DISPAT" )
@@ -148,10 +149,10 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String description;
 
-	@Column (name="DIS_APRPRO", length=250)
+	@Column (name="DIS_AUTPRO", length=250)
 	@Description ("Approval process to launch when an incoming authoritative change is received")
 	@Nullable
-	public String approvalProcess;
+	public String authoritativeProcess;
 	
 	@ForeignKey(foreignColumn="PAU_DIS_ID")
 	@Description ("Current authoritative changes pending to apply")

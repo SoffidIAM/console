@@ -33,7 +33,18 @@ public abstract class TipusDadaEntity {
 	@Column (name="TDA_SIZE")
 	@Nullable
 	public java.lang.Integer size;
+	
+	@Description ("blank separated list of url-encoded values")
+	@Column (name="TDA_VALUE", length=64000)
+	@Nullable
+	public String values;
 
+	@Description("Label to display")
+	@Column (name="TDA_LABEL", length=64)
+	@Nullable
+	public String label;
+	
+	/********************** DAOS ************************/
 	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
 		java.lang.String codi) {

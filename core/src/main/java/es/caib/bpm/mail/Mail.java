@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -46,7 +47,6 @@ import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.jbpm.util.ClassLoaderUtil;
 import org.jbpm.util.XmlUtil;
-import org.zkoss.util.Locales;
 
 import es.caib.bpm.servei.BpmConfigService;
 import es.caib.bpm.toolkit.EJBContainer;
@@ -60,6 +60,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.comu.lang.MessageFactory;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.AutoritzacioService;
@@ -167,13 +168,13 @@ public class Mail implements ActionHandler {
 
 	private InputStream getMailContent ()
 	{
-		String locale = Locales.getCurrent().getLanguage();
+		Locale locale = MessageFactory.getLocale();
 		
-		InputStream in = getClass().getResourceAsStream(template+"_"+locale+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
+		InputStream in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-custom.html"); //$NON-NLS-1$
 		if (in == null)
-			in = getClass().getResourceAsStream(template+"_"+locale+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
 		return in;

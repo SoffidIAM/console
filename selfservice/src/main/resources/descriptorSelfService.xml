@@ -56,6 +56,12 @@
 				<parameter value="${instance.dispatcher}"/>
 			</ejb-finder>
 		</finder>
+		<finder name="owner" type="void">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+				method="getHPAccountOwner">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
 	</datanode>
 	
 	<datanode name="void" />

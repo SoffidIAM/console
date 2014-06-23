@@ -219,6 +219,43 @@
 							
 					}
 				}
+				
+				void onNewAccount (Listitem row)
+				{
+					es.caib.zkib.binder.BindContext ctx  = XPathUtils.getComponentContext(row);
+					try {
+						owner = XPathUtils.getValue(ctx, "/owner[1]/codi");
+						if (owner != null)
+						{
+							row.getChildren().get(2).getChildren().get(1).visible = true;
+							if (owner.equals ( execution.getUserPrincipal().getName()))
+									row.getChildren().get(2).getChildren().get(1).getChildren().get(2).visible = true;
+						}
+					} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) 
+					{
+						
+					}
+						
+				}
+				
+				void checkinAccount (Component c)
+				{
+					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(c);
+					Account acc = XPathUtils.getValue(ctx, ".").getInstance();
+					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account", 
+							new org.zkoss.zk.ui.event.EventListener() {
+								public void onEvent(Event evt) {
+									if ("onOK".equals(evt.getName()))
+									{
+										javax.naming.Context ctx = new javax.naming.InitialContext();
+										es.caib.seycon.ng.servei.ejb.AccountService ejb = ctx.lookup( es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME ).create();
+										ejb.checkinHPAccount(acc);
+										model.refresh();
+									}
+								}
+						}
+					);
+				}
 			]]>
 		</zscript>
 		
@@ -271,33 +308,38 @@
 						<label value="${c:l('selfService.Accounts')}" sclass="titolSelf"/>
 						<listbox id="listadoAccounts" autocommit="false"
 							dataPath="/model:/usuari/account" fixedLayout="true"
+							onNewRow="onNewAccount(event.data)"
 							sclass="senseBorder tabla-cuentas">
 							<listhead>
-								<listheader label="${c:l('accounts.dispatcher')}" width="20%"/>
-								<listheader label="${c:l('accounts.description')}" width="30%"/>
+								<listheader label="${c:l('accounts.dispatcher')}" width="20%" visible="false"/>
+								<listheader label="${c:l('accounts.dispatcher')}" width="20%"/> 
 								<listheader label="${c:l('accounts.name')}" width="20%"/>
 								<listheader sclass="short-passwd" id="headQuery" label="${c:l('selfService.QueryPasswords')}" width="15%"/>
 								<listheader sclass="short-change" id="headChange" label="${c:l('selfService.ChangePassword')}" width="15%"/>
 							</listhead>
 					
 							<dataitem bind=".">
-								<listcell>
+								<listcell style="vertical-align: top;">
 									<label bind="@dispatcher" passwordDataPath="estatContrasenya" use="com.soffid.selfservice.utils.Inputlabel"/>
 								</listcell>
-								<listcell>
-									<label bind="dispatcherInformation/@description"/>
+								<listcell style="vertical-align: top;">
+									<label bind="dispatcherInformation/@description" use="com.soffid.selfservice.utils.Inputlabel" passwordDataPath="estatContrasenya" />
 								</listcell>
-								<listcell>
-									<hbox widths="*, 3px, 16px">
-										<label bind="@name" passwordDataPath="estatContrasenya" use="com.soffid.selfservice.utils.Inputlabel" width="90%"/>
-										<separator></separator>
+								<listcell style="vertical-align: top;"> 
+									<div width="100%" style="display: inline-flex">
+										<label bind="@name" passwordDataPath="estatContrasenya" style="display: inline" 											 use="com.soffid.selfservice.utils.Inputlabel"/>
+										<separator width="3px"></separator>
 										<image src="~./img/exclamacio.gif" visible="false"
 											width="16px" height="16px">
 										</image>
-									</hbox>
+									</div>
+									<div visible="false" style="background-color: darkgray; border: 3px solid darkgray; border-radius: 3px; display: inline-block">
+										<label value="owner:" style="font-size: 8pt; vertical-align:top"/>
+										<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@codi"></label>
+										<image src="/img/cancel.png" width="12px" height="12px" visible="false" onClick="checkinAccount(self)"/>
+									</div>
 								</listcell>
-								
-								<listcell style="text-align: center">
+								<listcell style="text-align: center; vertical-align: top;">
 									<imageclic src="/img/lupa.gif">
 										<attribute name="onClick">
 											queryPassword(self);
@@ -306,7 +348,7 @@
 									<timer delay="${timerDelay}" repeats="true"
 										onTimer="checkIsUpdatePending(self.parent.parent);" />
 								</listcell>	
-								<listcell style="text-align: center">
+								<listcell style="text-align: center; vertical-align: top;">
 									<imageclic src="~./img/pwd.gif">
 										<attribute name="onClick">
 											
@@ -431,6 +473,7 @@
 								.confirmaOK(org.zkoss.util.resource.Labels
 								.getLabel("accounts.setPassword.msg"));
 						onCancelPassword();
+						model.refresh();
 					}
 				]]>
 			</zscript>
@@ -501,6 +544,7 @@
 						Window wnd = Path.getComponent("/newPasswordS");
 						p1.setValue("");
 						wnd.setVisible(false);
+						model.refresh();
 					}
 					
 					void onSetPassword() {
@@ -510,6 +554,7 @@
 						Window wnd = Path.getComponent("/newPasswordS");
 						Account account = wnd.getAttribute("acco");
 						service.setAccountPassword(account, new Password(p1.getValue()));
+						model.refresh();
 						es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
 						onCancelPassword();
 					}

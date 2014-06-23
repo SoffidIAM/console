@@ -28,7 +28,6 @@ import com.soffid.iam.reconcile.common.ReconcileAccount;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -1052,6 +1051,15 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
 		}
 		
+		if (! force )
+		{
+			if ( ! ae.getUsers().isEmpty())
+			{
+				UsuariEntity currentUser = ae.getUsers().iterator().next().getUser();
+				if (! currentUser.getId().equals(callerUe.getId()))
+					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getCodi()));
+			}
+		}
 		/// Now, do the job
         PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
         if (! check.isValid()) {
@@ -1071,7 +1079,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		uae.setAccount(ae);
 		uae.setUser(callerUe);
 		uae.setUntilDate(date);
-		getUserAccountEntityDao().create(uae);
+		dao.create(uae);
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
 	}
@@ -1310,5 +1318,105 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 
 		return accounts;
+	}
+
+	@Override
+	protected Usuari handleGetHPAccountOwner(Account account) throws Exception {
+		AccountEntity ae = getAccountEntityDao().load(account.getId());
+
+		if (! ae.getType().equals(AccountType.PRIVILEGED))
+		{
+			return null;
+		}
+
+
+		String principal = Security.getPrincipal().getName();
+		InternalPasswordService ips = getInternalPasswordService ();
+		String dispatcher = ips.getDefaultDispatcher();
+		AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+		if (caller == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
+		UsuariEntity callerUe = getUserForAccount(caller);
+		if (callerUe == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
+
+		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
+		{
+			if (caller.getId() != ae.getId())
+			{
+				if (ae.getType().equals(AccountType.USER))
+				{
+					return null;
+				}
+				else if (ae.getType().equals(AccountType.IGNORED))
+				{
+					return null;
+				}
+				else if (ae.getType().equals(AccountType.PRIVILEGED))
+				{
+					if (callerUe == null)
+						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
+					Collection<String> users = handleGetAccountUsers(account);
+					boolean found = false;
+					for ( String user: users)
+					{
+						if (user.equals(callerUe.getCodi()))
+						{
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+						return null;
+				}
+				else if (ae.getType().equals(AccountType.SHARED))
+				{
+					return null;
+				}
+			}
+		}
+		
+		if ( ae.getUsers().isEmpty())
+			return null;
+		else
+		{
+			UsuariEntity currentUser = ae.getUsers().iterator().next().getUser();
+			return getUsuariEntityDao().toUsuari(currentUser);
+		}
+	}
+
+	@Override
+	protected void handleCheckinHPAccount(Account account) throws Exception {
+		AccountEntity ae = getAccountEntityDao().load(account.getId());
+
+		if (! ae.getType().equals(AccountType.PRIVILEGED))
+		{
+			throw new InternalErrorException("Trying to check in a non privileged account");
+		}
+
+		
+		String principal = Security.getPrincipal().getName();
+		InternalPasswordService ips = getInternalPasswordService ();
+		String dispatcher = ips.getDefaultDispatcher();
+		AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+		if (caller == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
+		UsuariEntity callerUe = getUserForAccount(caller);
+		if (callerUe == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
+
+		if ( ! ae.getUsers().isEmpty())
+		{
+			UserAccountEntity uae = ae.getUsers().iterator().next();
+			UsuariEntity currentUser = uae.getUser();
+			if (currentUser.getId().equals (callerUe.getId()))
+			{
+				getUserAccountEntityDao().remove(uae);
+			}
+			else
+			{
+				throw new SecurityException("Trying to checkin a not owned account");
+			}
+		}
 	}
 }

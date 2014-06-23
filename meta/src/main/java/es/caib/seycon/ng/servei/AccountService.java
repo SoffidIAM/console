@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Usuari;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="AccountService",
@@ -190,6 +192,7 @@ public abstract class AccountService {
 		es.caib.seycon.ng.comu.Password password)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
 	@Operation ( grantees={Roles.Tothom.class},
 			translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -200,6 +203,24 @@ public abstract class AccountService {
 		boolean force)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	
+	@Operation ( grantees={Roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void checkinHPAccount(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+
+	@Operation ( grantees={Roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Usuari getHPAccountOwner(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation ( grantees={Roles.Tothom.class},
 			translated="getUserAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})

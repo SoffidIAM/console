@@ -665,7 +665,17 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 					}
 
 					// Check previous assignment reconciled
-					if (appService.findRolAccountByAccount(account.getId()).size() == 0)
+					boolean found = false;
+					for (RolAccount ra: appService.findRolAccountByAccount(account.getId()))
+					{
+						if (ra.getNomRol().equals(assignmentAccount.getRoleName()) &&
+							ra.getBaseDeDades().equals(assignmentAccount.getDispatcher()))
+						{
+							found = true ;
+							break;
+						}
+					}
+					if (! found) 
 					{
 						accountRole = new RolAccount();
 						accountRole.setBaseDeDades(assignmentAccount.getDispatcher());

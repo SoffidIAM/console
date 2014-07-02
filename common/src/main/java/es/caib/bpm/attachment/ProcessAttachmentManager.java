@@ -8,6 +8,8 @@ import java.util.Hashtable;
 import java.util.Set;
 
 import javax.ejb.CreateException;
+import javax.ejb.EJBException;
+import javax.ejb.RemoveException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,7 +20,8 @@ import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
 
-import es.caib.bpm.beans.exception.DocumentBeanException;
+import com.soffid.iam.doc.exception.DocumentBeanException;
+
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
@@ -47,13 +50,13 @@ public class ProcessAttachmentManager extends AbstractAttachmentManager {
 
     public void uploadFile(Media dataSubida) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException {
         uploadFile (dataSubida, dataSubida.getName());
     }
 
     public void uploadFile(Media dataSubida, String tag) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException {
         InputStream in ;
         if (dataSubida.inMemory())
         {
@@ -80,7 +83,7 @@ public class ProcessAttachmentManager extends AbstractAttachmentManager {
     public void uploadFile(InputStream stream, String contentType,
             String originalName, String tag) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException {
         super.uploadFile(stream, contentType, originalName, tag);
 
         HttpSession sesion = (HttpSession) Sessions.getCurrent()

@@ -13,8 +13,9 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import es.caib.bpm.nas.NASManager;
-import es.caib.bpm.nas.exception.NASException;
+import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.doc.nas.NASManager;
+
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.model.BlobConfigurationEntity;

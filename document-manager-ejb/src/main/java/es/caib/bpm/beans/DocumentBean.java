@@ -18,19 +18,10 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 
-import org.apache.log4j.Logger;
 
 import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.nas.DocumentManagerErrorCodes;
-import es.caib.bpm.nas.NASManager;
-import es.caib.bpm.nas.crypto.CryptoUtil;
-import es.caib.bpm.nas.dao.NasModelDAO;
-import es.caib.bpm.nas.entity.BpmAccessLog;
-import es.caib.bpm.nas.entity.BpmDocument;
-import es.caib.bpm.nas.entity.BpmRole;
 import es.caib.bpm.nas.exception.NASException;
 import es.caib.bpm.vo.DocumentReference;
-import es.caib.signatura.api.Signature;
 
 /**
  * @ejb.bean name="Document"
@@ -42,6 +33,7 @@ import es.caib.signatura.api.Signature;
  */
 public class DocumentBean implements SessionBean {
 
+	DocumentService docService;
 	/**
 	 * 
 	 */

@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.ejb.CreateException;
+import javax.ejb.EJBException;
+import javax.ejb.RemoveException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -18,11 +20,12 @@ import javax.rmi.PortableRemoteObject;
 
 import org.apache.log4j.Logger;
 
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.home.DocumentHome;
-import es.caib.bpm.beans.remote.Document;
+import com.soffid.iam.doc.api.DocumentReference;
+import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.doc.service.ejb.DocumentServiceHome;
+
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.vo.DocumentReference;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public abstract class AbstractAttachmentManager {
@@ -39,8 +42,8 @@ public abstract class AbstractAttachmentManager {
     public void uploadFile(InputStream stream, String contentType,
             String originalName, String tag) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
-        Document document = createDocument(contentType, originalName);
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException {
+        DocumentService document = createDocument(contentType, originalName);
         byte[] buffer = new byte[4096];
  
         int leidos = 0;
@@ -58,51 +61,55 @@ public abstract class AbstractAttachmentManager {
 
         attach(tag, document);
         
+        document.remove();
+        
     }
 
-    public void attach(String tag, Document document) throws RemoteException {
+    public void attach(String tag, DocumentService document) throws RemoteException, InternalErrorException {
         log.debug(Messages.getString("AbstractAttachmentManager.CloseSystemReference")); //$NON-NLS-1$
-        putVariable(PREFIX + tag, document.getReference());
+        putVariable(PREFIX + tag, document.getReference().toString());
     }
 
-    public Document createDocument(String contentType,
+    public DocumentService createDocument(String contentType,
             String originalName) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException {
-        DocumentHome documentHome = null;
-        Document document = null;
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
+        DocumentServiceHome documentHome = null;
+        DocumentService document = null;
         Context context = null;
 
         log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
         context = new InitialContext();
 
         log.debug(Messages.getString("AbstractAttachmentManager.SendToHome")); //$NON-NLS-1$
-        Object o = context.lookup(DocumentHome.JNDI_NAME);
-        documentHome = (DocumentHome) PortableRemoteObject.narrow(o,
-                DocumentHome.class);
+        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
+        documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(o,
+                DocumentServiceHome.class);
 
         log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        document = documentHome.createNew(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
+        document = documentHome.create();
+        document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
 
         return document;
     }
     
-    public Document createDocument(Context context,String contentType,
+    public DocumentService createDocument(Context context,String contentType,
             String originalName) throws IOException,
             NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException {
-        DocumentHome documentHome = null;
-        Document document = null;
+            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
+        DocumentServiceHome documentHome = null;
+        DocumentService document = null;
 
         log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
 
         log.debug(Messages.getString("AbstractAttachmentManager.SendToHome")); //$NON-NLS-1$
-        Object o = context.lookup(DocumentHome.JNDI_NAME);
-        documentHome = (DocumentHome) PortableRemoteObject.narrow(o,
-                DocumentHome.class);
+        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
+        documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(o,
+                DocumentServiceHome.class);
 
         log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        document = documentHome.createNew(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
+        document = documentHome.create();
+        document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
 
         return document;
     }
@@ -113,7 +120,7 @@ public abstract class AbstractAttachmentManager {
     }
 
     public DocumentReference getReference(String tag) {
-        return (DocumentReference) getVariable(PREFIX + tag);
+        return new DocumentReference ((String) getVariable(PREFIX + tag));
     }
 
     public List getTags() {
@@ -124,7 +131,7 @@ public abstract class AbstractAttachmentManager {
 	            String key = (String) it.next();
 	            if (key.startsWith(PREFIX)) {
 	                Object value = getVariable (key);
-	                if (value != null && value instanceof DocumentReference) {
+	                if (value != null && value instanceof String) {
 	                    String tag = key.substring(PREFIX.length());
 	                    v.add(tag);
 	                }
@@ -136,17 +143,21 @@ public abstract class AbstractAttachmentManager {
         }
     }
 
-    public Document getDocument(String tag) throws NamingException,
-            RemoteException, CreateException {
-        DocumentHome documentHome = (DocumentHome) PortableRemoteObject.narrow(
-                new InitialContext().lookup(DocumentHome.JNDI_NAME),
-                DocumentHome.class);
+    public DocumentService getDocument(String tag) throws NamingException,
+            RemoteException, CreateException, InternalErrorException {
+        DocumentServiceHome documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(
+                new InitialContext().lookup(DocumentServiceHome.JNDI_NAME),
+                DocumentServiceHome.class);
         DocumentReference ref = getReference(tag);
 
         if (ref == null)
             return null;
         else
-            return documentHome.create(ref);
+        {
+            DocumentService doc = documentHome.create();
+            doc.openDocument(ref);
+            return doc;
+        }
     }
 
     private static Logger log = Logger.getLogger(AbstractAttachmentManager.class);

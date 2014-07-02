@@ -97,27 +97,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>document-manager-ejb</artifactId>
-			<version>${pom.version}</version>
-			<type>ejb-client</type>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>jta</artifactId>
-					<groupId>javax.transaction</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>signaturaapi</artifactId>
-					<groupId>es.caib.signatura.api</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-j2ee</artifactId>
-					<groupId>jboss</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>es.caib.signatura.api</groupId>
 			<artifactId>signaturaapi</artifactId>
 			<version>2.3</version>

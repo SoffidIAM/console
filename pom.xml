@@ -64,7 +64,7 @@
         <plugin>
           <groupId>com.soffid.tools</groupId>
           <artifactId>mda-maven-plugin</artifactId>
-          <version>2.0.19</version>
+          <version>2.0.22-SNAPSHOT</version>
           <configuration>
             <translate>false</translate>
           </configuration>
@@ -116,7 +116,6 @@
     <module>web</module>
     <module>selfservice</module>
     <module>webservice</module>
-    <module>document-manager-ejb</module>
     <module>upload-components</module>
     <module>ear</module>
     <module>install</module>

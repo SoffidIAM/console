@@ -70,12 +70,6 @@
 		</dependency>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
-			<artifactId>document-manager-ejb</artifactId>
-			<version>${pom.version}</version>
-			<type>ejb</type>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
 			<artifactId>upload-components</artifactId>
 			<version>${pom.version}</version>
 			<type>sar</type>

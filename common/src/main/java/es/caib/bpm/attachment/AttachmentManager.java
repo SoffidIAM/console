@@ -26,13 +26,9 @@ import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zul.Messagebox;
 
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.home.DocumentHome;
-import es.caib.bpm.beans.remote.Document;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.vo.Deserializer;
-import es.caib.bpm.vo.DocumentReference;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
 

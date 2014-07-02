@@ -264,30 +264,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>document-manager-ejb</artifactId>
-			<version>${pom.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>jta</artifactId>
-					<groupId>javax.transaction</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jbossall-client</artifactId>
-					<groupId>jboss</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>signaturaapi</artifactId>
-					<groupId>es.caib.signatura.api</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-j2ee</artifactId>
-					<groupId>jboss</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>es.caib.signatura.api</groupId>
 			<artifactId>signaturaapi</artifactId>
 			<version>2.3</version>
@@ -589,6 +565,31 @@
 	    	<artifactId>cron4j</artifactId>
 	    	<version>2.2.5</version>
 	    </dependency>
+		<dependency>
+			<groupId>com.twmacinta</groupId>
+			<artifactId>fast-md5</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.finj</groupId>
+			<artifactId>finj</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jcifs</groupId>
+			<artifactId>jcifs</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.w3c</groupId>
+			<artifactId>winie</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.w3c</groupId>
+			<artifactId>client</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 </project>
 

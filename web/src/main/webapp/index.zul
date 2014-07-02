@@ -42,6 +42,12 @@
     <zscript><![CDATA[
 		void find ( Treechildren treechildren, String target)
 		{
+			String page;
+			int i = target.indexOf('?');
+			if ( i < 0)
+				page = target;
+			else
+				page = target.substring(0, i);
 			Collection children = treechildren.getItems();
 			for (Iterator it = children.iterator(); it.hasNext();)
 			{
@@ -55,7 +61,7 @@
 					if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 					{
 						es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-						if (target.equals(atc.getPagina()))
+						if (page.equals(atc.getPagina()))
 						{
 							app.setInitialPage(target);
 						}

@@ -546,10 +546,4 @@ public abstract class AplicacioService {
 	public void revokeRolesHoldedOnGroup (long userId, long groupId)
 	{
 	}
-	
-	@Operation
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void revokeRolesHoldedOnGroup (long userId, long groupId)
-	{
-	}
 }

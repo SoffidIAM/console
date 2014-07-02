@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.GrupEntity.class,
 	/************** Services ***************/
 	com.soffid.iam.service.RuleEvaluatorService.class,
-	es.caib.seycon.ng.service.AplicacioService.class
+	es.caib.seycon.ng.servei.AplicacioService.class
 })
 public abstract class GrupService {
 

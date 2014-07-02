@@ -92,6 +92,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String segur;
 
+	@Description("Manual account creation")
+	@Column (name="DIS_MAACCR", length=1)
+	@Nullable
+	public Boolean manualAccountCreation;
+
 	@ForeignKey (foreignColumn="ROL_IDDISPAT")
 	public java.util.Collection<es.caib.seycon.ng.model.RolEntity> rol;
 

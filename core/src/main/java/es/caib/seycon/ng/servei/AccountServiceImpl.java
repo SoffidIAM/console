@@ -477,7 +477,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		DispatcherEntityDao disDao = getDispatcherEntityDao();
 		for (DispatcherEntity disEntity: disDao.loadAll())
 		{
-			if (disEntity.isMainDispatcher() || disEntity.getUrl() != null)
+			if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue())
+			{
+				// Ignore
+			}
+			else if (disEntity.isMainDispatcher() || disEntity.getUrl() != null)
 			{
     			Dispatcher dis = disDao.toDispatcher(disEntity);
     			List<AccountEntity> accs = getAccountEntityDao().findByUsuariAndDispatcher(user, dis.getCodi());
@@ -569,6 +573,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected String handleGessAccountName(String userName, String dispatcherName)
 			throws Exception
 	{
+		DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi(dispatcherName);
+		if (dispatcher.getManualAccountCreation() != null && dispatcher.getManualAccountCreation().booleanValue())
+			return null;
+		
 		DominiUsuariEntity du = getDominiUsuariEntityDao().findByDispatcher (dispatcherName);
 		// Search if already has a user name for this user domain
 		

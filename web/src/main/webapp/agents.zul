@@ -522,6 +522,7 @@
 					
 					void onChangeDades()
 					{
+						onEnableManualAccount();
 						try {
 							ds = form.getDataSource(); 
 							ctx =  ds.getJXPathContext(); 
@@ -531,7 +532,8 @@
 							lbTipusUsuari.selectItem(null); //esborrem seleccio
 							
 							// Agent existent:
-							if (!registre.isNew()) {
+							if (!registre.isNew()) 
+							{
 								// Cargamos los checkboxes del tipo de usuario
 								String relacioLaboral = ctx.getValue("@relacioLaboral");
 								seleccionaTipusUsuari(relacioLaboral);	
@@ -548,13 +550,32 @@
 									.getFellow("imgPropaga").setDisabled(false);
 								}
 							} 
-						}
 						
-						catch (Exception e) {
+
+						} catch (Exception e) {
 							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
 							//Missatgebox.error ("Error "+e.getMessage());
 						}
 					}
+					
+					void onEnableManualAccount ()
+					{
+						if (detall_manual.isChecked())
+						{
+							rols_row.setVisible(false);
+							r_tipusUsuari.setVisible(false);
+							groups_row.setVisible(false);
+							userdomain_row.setVisible(false);
+						}
+						else
+						{
+							rols_row.setVisible(true);
+							r_tipusUsuari.setVisible(true);
+							groups_row.setVisible(true);
+							userdomain_row.setVisible(true);
+						}
+					}
+					
 					
 					void onChangeClass() {
 						//System.out.println("On change class");
@@ -616,7 +637,7 @@
 						grups.getFellow("dada").setReadonly(isReplica);
 						cbDominiUsuaris.setDisabled(isReplica);
 						cbDominiContrasenyes.setDisabled(isReplica);
-						r_tipusUsuari.setVisible(!isReplica);
+						r_tipusUsuari.setVisible(!isReplica && ! detall_manual.isChecked());
 						cbClassDescription.setDisabled(isReplica);
 					}
 				]]>
@@ -745,10 +766,14 @@
 								<checkbox bind="@readOnly" disabled="${!canModifyAgent}" id="detall_readonly" onCheck=""/>
 							</row>
 							<row>
+								<input_etiqueta value="${c:l('agents.zul.ManualAccountCreation')}"/>
+								<checkbox bind="@manualAccountCreation" disabled="${!canModifyAgent}" id="detall_manual" onCheck="onEnableManualAccount()"/>
+							</row>
+							<row id="rols_row">
 								<input_etiqueta value="${c:l('agents.zul.Basatenrols')}"/>
 								<checkbox bind="@basRol" disabled="${!canModifyAgent}" id="detall_basatRols" onCheck=""/>
 							</row>
-							<row>
+							<row id="groups_row">
 								<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
 								<hbox widths="90%,10%">
 									<input_dada bind="@grups" id="grups" lectura="${!canModifyAgent}" width_custom="98%"/>
@@ -764,7 +789,7 @@
 									</imageclic>				
 								</hbox>		
 							</row>
-							<row>
+							<row id="userdomain_row">
 								<input_etiqueta value="${c:l('agents.zul.Dominidusuaris')}"/>
 								<hbox width="50%" widths="*,*">
 									<listbox mold="select" bind="@dominiUsuaris" dataPath="/model:/dominisUsuari" id="cbDominiUsuaris" width="90%">
@@ -789,6 +814,7 @@
 									<label value="*"/>
 								</hbox>
 							</row>
+							
 							<row id="r_tipusUsuari">
 								<input_etiqueta value="${c:l('agents.zul.Tipusdusuari')}"/>
 								<hbox>  

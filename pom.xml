@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:maven="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:maven="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.soffid.iam.console</groupId>
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>1.5.0-SNAPSHOT</version>
+  <version>1.4.1</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -98,7 +98,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>

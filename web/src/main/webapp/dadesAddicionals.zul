@@ -183,7 +183,7 @@
 		]]>
 	</zscript>
 
-	<esquema id="esquema" ample="${amplaria} }" datamodel="/model"
+	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
 		focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
 		<criteris id="queryWindow" height="${queryWindowMin}" width="100%"
@@ -196,7 +196,7 @@
 			<separator spacing="17px"/>
 		</criteris>
 		
-		<navegador id="lista" width="${amplaria}">
+		<navegador id="lista" width="100%">
 			<toolbar style="border-top:0.1px solid white;">
 				<insertbutton acces="${canCreateMetadata}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
 				<deletebutton acces="${canDeleteMetadata}" listbox="/esquema/lista/listbox"/>
@@ -208,8 +208,10 @@
 				onSelect="select()" rows="${fileres}"
 				 onCreate="checkTruncatedList(self)">
 				<listhead>
+					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto"
+						width="5%"/>
 					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto"
-						width="100%"/>
+						width="95%"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">
@@ -217,12 +219,13 @@
 					</listfooter>
 				</listfoot>
 				<dataitem bind=".">
+					<listcell bind="@ordre"/>
 					<listcell bind="@codi"/>
 				</dataitem>
 			</listbox>
 		</navegador>
 	
-		<detalls id="dades">
+		<detalls id="dades" width="100%">
 			<zscript>
 				void displayValues ()
 				{

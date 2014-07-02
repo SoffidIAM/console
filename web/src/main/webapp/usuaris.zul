@@ -444,13 +444,11 @@
 					}
 					else
 					{
-						String nouPassword = getUsuariService()
-								.canviPassword(codiUsuari,domini);
-						Events.postEvent("onInicia", desktop.getPage("canviPassword")
-								.getFellow("password"), new String[] { nouPassword, domini });
+						changePassword (domini);
 					}
 				}
-				
+				]]></zscript>
+				<zscript id="changePasswordScript"><![CDATA[
 				void changePassword(String dominiContrasenyes)
 				{
 					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
@@ -478,6 +476,10 @@
 						}
 					} catch ( InterruptedException e) {}
 				}
+				]]>
+				</zscript>
+				<zscript>
+				<![CDATA[
 				
 				void propagaCanvis()
 				{
@@ -1529,10 +1531,12 @@
 								<hbox width="100%"
 									widths="40%,1px,40%,1px,*">
 								<vbox width="99%">
-									<label sclass="etiqueta"
-										value="${c:l('usuaris.zul.Dadesaddicionals')}" />
 									<grid dataPath="/esquema/lista/listbox:/dada"
 										if="${canUpdateUserMetadata}" width="98%">
+										<columns>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column></column>
+										</columns>
 										<datarow>
 											<input_etiqueta bind="@dataLabel" width_custom="250px"
 												value="${c:l('usuaris.zul.@codiDada')}"/>
@@ -1542,6 +1546,10 @@
 									<grid
 										dataPath="/esquema/lista/listbox:/dada"
 										if="${!canUpdateUserMetadata}" width="98%">
+										<columns>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column></column>
+										</columns>
 										<datarow>
 											<input_etiqueta
 												bind="@dataLabel" value="${c:l('usuaris.zul.@codiDada')}"
@@ -2828,6 +2836,7 @@ String nomRolsBorrar = "";
 		</zscript>
 		</window>
 
+		<include src="usuarisllista.zul" />
 		<include src="dominisCorreullista.zul" />
 		<include src="grupsllista.zul" />
 		<include src="finestres/maquinesllistaUsuari.zul" />
@@ -2897,4 +2906,17 @@ String nomRolsBorrar = "";
 			</vbox>
 		</window>
 	</frame>
+	<zscript>
+	<![CDATA[
+			String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
+			if (requestedUser != null)
+			{
+				qw = esquema.getFellow("queryWindow");
+				qw.getFellow("queryCodi").getFellow("textbox").setValue (requestedUser);
+				Events.postEvent ("onOK", qw, null );				
+				esquema.getFellow("queryWindow").parent.parent.setVisible(false);
+				esquema.getFellow("lista").parent.setVisible(false);
+			}
+	]]>
+	</zscript>
 </zk>

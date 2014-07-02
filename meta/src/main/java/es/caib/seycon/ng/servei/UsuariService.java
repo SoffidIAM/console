@@ -182,7 +182,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="findDataByTypeDataName")
+	@Operation (translated="findDataByTypeDataName", grantees={Roles.user_query.class, Roles.metadata_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DadaUsuari findDadaByCodiTipusDada(
 		java.lang.String codiUsuari, 

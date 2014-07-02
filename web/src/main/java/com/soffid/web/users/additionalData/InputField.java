@@ -21,18 +21,25 @@ import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Window;
 
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
+import es.caib.seycon.ng.servei.ejb.UsuariService;
+import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.events.XPathEvent;
@@ -46,6 +53,7 @@ public class InputField extends Div implements XPathSubscriber{
 	 */
 	private static final long serialVersionUID = 1L;
 	private String compos;
+	boolean userType;
 	
 	private DadesAddicionalsService dadesAddicionalsServ;
 	private SingletonBinder binder = new SingletonBinder(this);
@@ -83,6 +91,50 @@ public class InputField extends Div implements XPathSubscriber{
 	
 	boolean disableRecursive = false;
 	
+	
+	public void onSelectUser (Event event)
+	{
+		Page p = getDesktop().getPage("usuarisLlista");
+		Events.postEvent("onInicia", p
+				.getFellow("esquemaLlista"), event.getTarget());
+
+	}
+	
+	public void onActualitza(Event event)
+	{
+		String [] data = (String[]) event.getData();
+		String userName = data[0];
+		binder.setValue(userName);
+	}
+	
+	public void openUser ()
+	{
+		Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul?user="+binder.getValue(), "_new");
+	}
+	public boolean updateUser()
+	{
+		String user = (String) binder.getValue();
+		Label l = (Label) ((Component) getChildren().get(0)).getChildren().get(2);
+		try {
+			if (user == null)
+				l.setValue("");
+			else
+			{
+				UsuariService ejb = ((UsuariServiceHome) new InitialContext(). lookup (UsuariServiceHome.JNDI_NAME))
+						.create();
+				Usuari u = ejb.findUsuariByCodiUsuari(user);
+				if (u == null)
+				{
+					l.setValue("?");
+					return false;
+				}
+				l.setValue(u.getFullName());
+			}
+		} catch (Exception e) {
+		}
+		return true;
+	}
+	
 	private synchronized void createField() throws NamingException, CreateException, InternalErrorException, IOException{
 		
 		if (getPage() == null)
@@ -100,6 +152,9 @@ public class InputField extends Div implements XPathSubscriber{
 			List<TipusDada> tipusDadaList = (List) dadesAddicionalsServ.findTipusDadesByCodi(binder2.getValue().toString());
 			String result = "";
 			Map <String,Object> map=new HashMap<String, Object>();
+			boolean updateUser = false;
+
+
 			for(int i=0; i<tipusDadaList.size(); i++){
 				TipusDada typeData = tipusDadaList.get(i);
 				TypeEnumeration type = typeData.getType();
@@ -110,7 +165,16 @@ public class InputField extends Div implements XPathSubscriber{
 				if(typeData.getSize() != null)
 					size = typeData.getSize();
 				if(stringType != null && !stringType.trim().isEmpty()){
-					if(TypeEnumeration.BINARY_TYPE.equals(type))
+					if(TypeEnumeration.USER_TYPE.equals(type))
+					{
+						updateUser = true;
+						result = "<div style='display:inline-block'>"
+								+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>"+
+								"<imageclic src='/img/user.png' onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"
+								+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
+								+ "</div>";
+					}
+					else if(TypeEnumeration.BINARY_TYPE.equals(type))
 					{
 						boolean visible = fileAlreadySaved();
 						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
@@ -190,6 +254,7 @@ public class InputField extends Div implements XPathSubscriber{
 				}
 				compos=result;
 				Executions.createComponentsDirectly(result, "zul", this, map);
+				if (updateUser) updateUser ();
 			}
 			//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
 			//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre

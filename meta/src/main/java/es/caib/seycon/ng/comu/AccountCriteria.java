@@ -32,7 +32,7 @@ public abstract class AccountCriteria {
 	public java.lang.String grantedRoles;
 
 	@Nullable
-	@CriteriaColumn(parameter="acl.dispatcher.codi")
+	@CriteriaColumn(parameter="dispatcher.codi")
 	public java.lang.String dispatcher;
 
 	@Nullable

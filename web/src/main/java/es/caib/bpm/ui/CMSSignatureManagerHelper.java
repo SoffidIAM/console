@@ -14,16 +14,15 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
-import es.caib.bpm.nas.exception.NASException;
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 
 public class CMSSignatureManagerHelper {
-	protected static void doSign(Window window,TaskAttachmentManager am, String tag, Document doc) throws Exception {
+	protected static void doSign(Window window,TaskAttachmentManager am, String tag, DocumentService doc) throws Exception {
     	// Generar archivo
 		String url = am.getDownloadURL(tag);
 		

@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.ejb.CreateException;
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
@@ -49,13 +50,14 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 
+import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.ProcessAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
 import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.nas.exception.NASException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.bpm.toolkit.WorkflowWindow;
@@ -584,7 +586,7 @@ public class ProcessUI extends Frame {
     }
 
     public void refreshListadoArchivos() throws IOException, NamingException,
-            CreateException {
+            CreateException, InternalErrorException {
         this.getDesktop().getSession();
         Listbox tablaArchivos = null;
 
@@ -596,7 +598,7 @@ public class ProcessUI extends Frame {
     }
 
     public void cargarTablaArchivos(ProcessInstance process, Listbox tablaArchivos)
-            throws IOException, NamingException, CreateException {
+            throws IOException, NamingException, CreateException, InternalErrorException {
         Listitem item = null;
         String roles = null;
 
@@ -606,30 +608,15 @@ public class ProcessUI extends Frame {
 
         for (Iterator it = business.getTags().iterator(); it.hasNext();) {
             String tag = (String) it.next();
-            Document document = business.getDocument(tag);
+            DocumentService document = business.getDocument(tag);
 
             item = new Listitem();
             item.appendChild(new Listcell(document.getExternalName()));
             item.appendChild(new Listcell(document.getMimeType()));
             item.setValue(tag);
 
-            if (document.getRoles().isEmpty()) {
-                item.appendChild(new Listcell(Messages.getString("ProcessUI.PublicInfo"))); //$NON-NLS-1$
-                item.appendChild(new Listcell("")); //$NON-NLS-1$
-            } else {
-                item.appendChild(new Listcell(Messages.getString("ProcessUI.PrivateInfo"))); //$NON-NLS-1$
-                roles = ""; //$NON-NLS-1$
-
-                for (Iterator itRoles = document.getRoles().iterator(); itRoles
-                        .hasNext();) {
-                    String role = (String) itRoles.next();
-
-                    roles += role + " "; //$NON-NLS-1$
-                }
-
-                item.appendChild(new Listcell(roles));
-            }
-
+            item.appendChild(new Listcell(Messages.getString("ProcessUI.PublicInfo"))); //$NON-NLS-1$
+            item.appendChild(new Listcell("")); //$NON-NLS-1$
             tablaArchivos.getItems().add(item);
         }
     }
@@ -706,12 +693,12 @@ public class ProcessUI extends Frame {
             }
     }
     
-    public void seleccionarDocumento() throws SignatureTimestampException, IOException, ClassNotFoundException, NASException, NamingException, CreateException
+    public void seleccionarDocumento() throws SignatureTimestampException, IOException, ClassNotFoundException, NASException, NamingException, CreateException, InternalErrorException
     {
             Listbox tablaArchivos= null;
             Listitem item= null;
             Listitem roleListItem= null;
-            Document document= null;
+            DocumentService document= null;
             Set rolesDocumento= null;
             String role= null;
             Listbox tablaRoles= null;
@@ -741,22 +728,6 @@ public class ProcessUI extends Frame {
                             String tag = (String) item.getValue();
                     
                             document = am.getDocument(tag);
-                            
-                            // Actualizar roles
-                            rolesDocumento= document.getRoles();
-                            
-                            tablaRoles.getItems().clear ();
-                            for(Iterator it= rolesDocumento.iterator(); it.hasNext();)
-                            {
-                                    role= (String)it.next();
-                                    
-                                    roleListItem= new Listitem();
-                                    
-                                    roleListItem.setValue(role);
-                                    roleListItem.appendChild(new Listcell(role));
-                                    
-                                    tablaRoles.appendChild(roleListItem);
-                            }
                             
                             // Actualizar firmas
                             tablaFirmas.getItems().clear ();

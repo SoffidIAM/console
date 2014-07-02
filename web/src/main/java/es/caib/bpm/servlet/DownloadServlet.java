@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 import javax.ejb.CreateException;
+import javax.ejb.EJBException;
+import javax.ejb.RemoveException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -12,11 +15,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.AbstractAttachmentManager;
 import es.caib.bpm.attachment.ProcessAttachmentManager;
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
@@ -70,7 +74,7 @@ public class DownloadServlet extends HttpServlet {
 			} else {
 				am = new TaskAttachmentManager(task);
 			}
-			Document d = am.getDocument(split[1]);
+			DocumentService d = am.getDocument(split[1]);
 			if (d == null) {
 				resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 				return;
@@ -87,6 +91,7 @@ public class DownloadServlet extends HttpServlet {
 				b = d.nextDownloadPackage(8192);
 			}
 			d.endDownloadTransfer();
+			d.remove();
 		} catch (CreateException e) {
 			throw new ServletException(Messages.getString("DownloadServlet.SessionExpired"), e); //$NON-NLS-1$
 		} catch (NamingException e) {
@@ -96,6 +101,10 @@ public class DownloadServlet extends HttpServlet {
 		} catch (DocumentBeanException e) {
 			throw new ServletException(String.format(Messages.getString("DownloadServlet.NotDownloadDocument"), split[0], split[1]), e);   //$NON-NLS-1$
 		} catch (InternalErrorException e) {
+			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
+		} catch (EJBException e) {
+			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
+		} catch (RemoveException e) {
 			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
 		}
 	}

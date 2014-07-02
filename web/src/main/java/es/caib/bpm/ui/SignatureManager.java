@@ -14,10 +14,9 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.SuspendNotAllowedException;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
-import es.caib.bpm.nas.exception.NASException;
 import es.caib.bpm.toolkit.PrincipalSignatureAuthenticator;
 import es.caib.bpm.toolkit.SignaturaHandler;
 import es.caib.bpm.toolkit.WorkflowWindow;
@@ -61,7 +60,7 @@ public class SignatureManager implements SignaturaHandler {
 		try {
 			// Obtener el usuario actual (y su NIF)
 			TaskAttachmentManager am = new TaskAttachmentManager(window.getTask());
-			Document doc = am.getDocument(tag);
+			DocumentService doc = am.getDocument(tag);
 			if (doc == null)
 				throw new SystemWorkflowException(Labels.getLabel("error.msgFirma3")+" " +tag); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -74,6 +73,8 @@ public class SignatureManager implements SignaturaHandler {
 			//si no està signat per l'usuari actual
 			// Ahora mostrar el interfaz de usuario para firmar
 			CMSSignatureManagerHelper.doSign (window,am, tag, doc);
+			
+			doc.remove();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -87,11 +88,13 @@ public class SignatureManager implements SignaturaHandler {
 		try {
 			// Obtener el usuario actual (y su NIF)
 			TaskAttachmentManager am = new TaskAttachmentManager(window.getTask());
-			Document doc = am.getDocument(inputTag);
+			DocumentService doc = am.getDocument(inputTag);
 			if (doc == null)
 				throw new SystemWorkflowException(Labels.getLabel("error.msgFirma3")+" " +inputTag); //$NON-NLS-1$ //$NON-NLS-2$
 			// Ahora mostrar el interfaz de usuario
 			SignPDFSignatureManagerHelper.doSignPDF (am, inputTag,outputTag, enabledStampType, enabledPositions, forcedAdditionalText);
+			
+			doc.remove();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -106,11 +109,13 @@ public class SignatureManager implements SignaturaHandler {
 		try {
 			// Obtener el usuario actual (y su NIF)
 			TaskAttachmentManager am = new TaskAttachmentManager(window.getTask());
-			Document doc = am.getDocument(inputTag);
+			DocumentService doc = am.getDocument(inputTag);
 			if (doc == null)
 				throw new SystemWorkflowException(Labels.getLabel("error.msgFirma3")+" " +inputTag); //$NON-NLS-1$ //$NON-NLS-2$
 			// Ahora mostrar el interfaz de usuario
 			SignPDFSignatureManagerHelper.doSignPDF (am, inputTag,outputTag, enabledStampType, stampPositions, top, left, height, width, rotation, forcedAdditionalText);
+			
+			doc.remove();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -160,13 +165,14 @@ public class SignatureManager implements SignaturaHandler {
 			try {
 
 				TaskAttachmentManager am = new TaskAttachmentManager(window.getTask());
-				Document doc = am.getDocument(inputTag);
+				DocumentService doc = am.getDocument(inputTag);
 				if (doc == null)
 					throw new SystemWorkflowException(Labels.getLabel("error.msgFirma3")+" " +inputTag); //$NON-NLS-1$ //$NON-NLS-2$
 				
 				// Ahora mostrar el interfaz de usuario
 				CertifyDigitalCopyPDFSignatureManagerHelper.doCompulsaPDF (am, inputTag,outputTag,url,location,x,y,rotation);
 				
+				doc.remove();
 			} catch (UserWorkflowException e) {
 				throw e;
 			

@@ -30,7 +30,7 @@ void showDetall ()
 		<criteris visible="false">
 		</criteris>
 		
-		<navegador id="lista">
+		<navegador id="lista" width="100%">
 			<toolbar>
 				<deletebutton acces="${canManageServers}" listbox="/srvesquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>
@@ -40,7 +40,7 @@ void showDetall ()
 			</toolbar>
 			<listbox id="listbox" autocommit="false" dataPath="/model:/server"
 				fixedLayout="true" height="96%" onSelect="showDetall()" 
-				rows="${fileres}" onCreate="checkTruncatedList(self)">
+				rows="${fileres}" width="100%" onCreate="checkTruncatedList(self)">
 				<listhead>
 					<listheader label="${c:l('servers.zul.Name')}" sort="auto"
 						width="21%"/>
@@ -62,7 +62,7 @@ void showDetall ()
 			</listbox>
 		</navegador>
 	
-		<detalls id="dades">
+		<detalls id="dades"  width="100%">
 			<zscript><![CDATA[
 			    void onChangeServerType (boolean modify)
 			    {

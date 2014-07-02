@@ -500,7 +500,7 @@
 										<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
 										
 										<hbox>
-											<textbox bind="@codi" id="detall_codi" maxlength="15"
+											<textbox bind="@codi" id="detall_codi" maxlength="20"
 												onChange="llevaEspais(self)" sclass="textbox"
 												constraint="no empty"/>
 												

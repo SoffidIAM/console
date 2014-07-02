@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
+import javax.ejb.RemoveException;
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -59,13 +60,14 @@ import org.zkoss.zul.Tree;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.impl.InputElement;
 
+import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
 import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.nas.exception.NASException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.bpm.toolkit.WorkflowWindow;
@@ -436,7 +438,7 @@ public class TaskUI extends Frame implements EventListener {
     }
 
     public void refreshListadoArchivos() throws IOException, NamingException,
-            CreateException {
+            CreateException, InternalErrorException {
         Listbox tablaArchivos = null;
 
         tablaArchivos = getAttachmentsListbox();
@@ -447,7 +449,7 @@ public class TaskUI extends Frame implements EventListener {
     }
 
     public void cargarTablaArchivos(TaskInstance task, Listbox tablaArchivos)
-            throws IOException, NamingException, CreateException {
+            throws IOException, NamingException, CreateException, InternalErrorException {
         Listitem item = null;
         String roles = null;
 
@@ -458,29 +460,15 @@ public class TaskUI extends Frame implements EventListener {
 
         for (Iterator it = business.getTags().iterator(); it.hasNext();) {
             String tag = (String) it.next();
-            Document document = business.getDocument(tag);
+            DocumentService document = business.getDocument(tag);
 
             item = new Listitem();
             item.appendChild(new Listcell(document.getExternalName()));
             item.appendChild(new Listcell(document.getMimeType()));
             item.setValue(tag);
 
-            if (document.getRoles().isEmpty()) {
-                item.appendChild(new Listcell(Messages.getString("TaskUI.PublicInfo"))); //$NON-NLS-1$
-                item.appendChild(new Listcell("")); //$NON-NLS-1$
-            } else {
-                item.appendChild(new Listcell(Messages.getString("TaskUI.PrivateInfo"))); //$NON-NLS-1$
-                roles = ""; //$NON-NLS-1$
-
-                for (Iterator itRoles = document.getRoles().iterator(); itRoles
-                        .hasNext();) {
-                    String role = (String) itRoles.next();
-
-                    roles += role + " "; //$NON-NLS-1$
-                }
-
-                item.appendChild(new Listcell(roles));
-            }
+            item.appendChild(new Listcell(Messages.getString("TaskUI.PublicInfo"))); //$NON-NLS-1$
+            item.appendChild(new Listcell("")); //$NON-NLS-1$
 
             tablaArchivos.getItems().add(item);
         }
@@ -778,7 +766,7 @@ public class TaskUI extends Frame implements EventListener {
         return BPMApplication.getEngine();
     }
 
-    public void subirArchivo() throws InterruptedException, IOException, NamingException, CreateException, DocumentBeanException, BPMException, InternalErrorException
+    public void subirArchivo() throws InterruptedException, IOException, NamingException, CreateException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException
     {
 
             Media dataSubida= null;
@@ -845,12 +833,12 @@ public class TaskUI extends Frame implements EventListener {
             }
     }
     
-    public void seleccionarDocumento() throws SignatureTimestampException, IOException, ClassNotFoundException, NASException, NamingException, CreateException
+    public void seleccionarDocumento() throws SignatureTimestampException, IOException, ClassNotFoundException, NASException, NamingException, CreateException, InternalErrorException
     {
             Listbox tablaArchivos= null;
             Listitem item= null;
             Listitem roleListItem= null;
-            Document document= null;
+            DocumentService document= null;
             Set rolesDocumento= null;
             String role= null;
             Listbox tablaRoles= null;
@@ -880,23 +868,7 @@ public class TaskUI extends Frame implements EventListener {
                             String tag = (String) item.getValue();
                     
                             document = am.getDocument(tag);
-                            
-                            // Actualizar roles
-                            rolesDocumento= document.getRoles();
-                            
-                            tablaRoles.getItems().clear ();
-                            for(Iterator it= rolesDocumento.iterator(); it.hasNext();)
-                            {
-                                    role= (String)it.next();
-                                    
-                                    roleListItem= new Listitem();
-                                    
-                                    roleListItem.setValue(role);
-                                    roleListItem.appendChild(new Listcell(role));
-                                    
-                                    tablaRoles.appendChild(roleListItem);
-                            }
-                            
+                                                        
                             // Actualizar firmas
                             tablaFirmas.getItems().clear ();
                             firmas= document.getSigns();

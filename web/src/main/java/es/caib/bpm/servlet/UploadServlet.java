@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ejb.CreateException;
+import javax.ejb.EJBException;
+import javax.ejb.RemoveException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,9 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.zk.ui.Executions;
 
+import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.doc.service.ejb.DocumentService;
+
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.beans.exception.DocumentBeanException;
-import es.caib.bpm.beans.remote.Document;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
@@ -53,7 +56,7 @@ public class UploadServlet extends HttpServlet {
 			String tag=split[1];
             String type = req.getParameter("type"); //$NON-NLS-1$
             String name = req.getParameter("name"); //$NON-NLS-1$
-            Document d = am.createDocument(type == null ? "octet/binary-stream": type, //$NON-NLS-1$
+            DocumentService d = am.createDocument(type == null ? "octet/binary-stream": type, //$NON-NLS-1$
             							   name == null ? "unknown": name); //$NON-NLS-1$
             d.openUploadTransfer();
             BufferedInputStream in = new BufferedInputStream (req.getInputStream());
@@ -72,7 +75,7 @@ public class UploadServlet extends HttpServlet {
             //si no fem update, el attach no es guarda
             engine.update(task);
             
-            
+            d.remove();
         } catch (CreateException e) {
             throw new ServletException(Messages.getString("UploadServlet.SessionExpired"), e); //$NON-NLS-1$
         } catch (NamingException e) {
@@ -84,6 +87,10 @@ public class UploadServlet extends HttpServlet {
         } catch (InterruptedException e) {
             throw new ServletException(String.format(Messages.getString("UploadServlet.NotCreateDoc"), split[0], split[1]), e);  //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-1$
 		} catch (InternalErrorException e) {
+            throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
+		} catch (EJBException e) {
+            throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
+		} catch (RemoveException e) {
             throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
 		}
     }
@@ -125,7 +132,7 @@ public class UploadServlet extends HttpServlet {
 			TaskAttachmentManager am = new TaskAttachmentManager(task);
 	
 			//inici procés d'upload al document manager
-				Document doc=am.createDocument(mime,tag);
+				DocumentService doc=am.createDocument(mime,tag);
 				doc.openUploadTransfer();
 	         
 				byte [] b = new byte [10240];
@@ -145,7 +152,7 @@ public class UploadServlet extends HttpServlet {
 				
 				//si no fem update, el attach no es guarda
 				//engine.update(task);
-	        	
+	        	doc.remove();
 	        //fi de procés d'upload al document manager
 		}catch(Exception e){
 			throw new ServletException(e);

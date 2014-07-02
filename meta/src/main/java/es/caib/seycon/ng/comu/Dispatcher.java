@@ -107,4 +107,7 @@ public abstract class Dispatcher {
 
 	@Nullable
 	public String authoritativeProcess;
+
+	@Nullable
+	public Boolean manualAccountCreation;
 }

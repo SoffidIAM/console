@@ -180,7 +180,8 @@ public class DadesAddicionalsServiceImpl extends
 			if (dadaUsuari.getValorDada() == null
 					|| "".equals(dadaUsuari.getValorDada().trim())) { //$NON-NLS-1$
 				delete(dadaUsuari); // esborrar dada
-				return null;
+				dadaUsuari.setId(null);
+				return dadaUsuari;
 			} else {
 				// Aquí comprovem si pot actualitzar totes les dades addicionals
 				// o només el telèfon

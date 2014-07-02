@@ -171,7 +171,7 @@
 			<!--delete-method method="delete">  // NOTA: és un update 
 				<parameter value="${instance}" />
 			</delete-method-->
-			<update-method method="update"> <!-- user:metadata:update -->
+			<update-method method="update"  returnBean="true"> <!-- user:metadata:update -->
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>

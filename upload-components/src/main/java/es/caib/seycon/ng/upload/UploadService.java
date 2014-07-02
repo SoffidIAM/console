@@ -132,6 +132,8 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
 			uploadComponentCurrent("com.soffid.iam.console", "dbtools", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("org.jbpm.jbpm3", "jbpm-jpdl", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentCurrent("jasperreports","jasperreports", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("spring", "1.2.7", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("hibernate", "3.2.6.ga", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("commons-collections", "3.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

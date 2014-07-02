@@ -492,7 +492,8 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                 || transactionCode.equals(TaskHandler.VALIDATE_PASSWORD)
                 || transactionCode.equals(TaskHandler.UPDATE_USER_ALIAS)
                 || transactionCode.equals(TaskHandler.EXPIRE_USER_PASSWORD)
-                || transactionCode.equals(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD))
+                || transactionCode.equals(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD) 
+                || transactionCode.equals(TaskHandler.RECONCILE_USER))
             result = result + " " + tasca.getUsuari(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_ACCOUNT) ||
@@ -505,7 +506,8 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
         if (transactionCode.equals(TaskHandler.UPDATE_GROUP)) //$NON-NLS-1$
             result = result + " " + tasca.getGrup(); //$NON-NLS-1$
 
-        if (transactionCode.equals(TaskHandler.UPDATE_ROLE)) //$NON-NLS-1$
+        if (transactionCode.equals(TaskHandler.UPDATE_ROLE)  
+        		|| transactionCode.equals(TaskHandler.RECONCILE_ROLE)) //$NON-NLS-1$
             result = result + " " + tasca.getRole(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.CREATE_FOLDER)) //$NON-NLS-1$

@@ -159,7 +159,7 @@
 				treebox = esquema.getFellow("lista").getFellow("treebox");
 				if (queryEnabled)
 				{
-					model.getJXPathContext().getValue("/").refresh();
+					model.getJXPathContext().getValue("/grup").refresh();
 					treebox.setDataPath( "/model:/" );
 				}
 				
@@ -247,7 +247,7 @@
 				}
 				
 				// Refresquem el contingut
-				model.getJXPathContext().getValue("/").refresh();
+				model.getJXPathContext().getValue("/grup").refresh();
 				treebox.setDataPath("/model:/");
 				
 				// I tornem a obrir les branques als dos arbres
@@ -299,7 +299,7 @@
 					<listbox id="queryTipus" mold="select"  
 						dataPath="/model:/tipusUnitatOrganitzativa">
 						<dataitem bind="@codi">
-							<listcelllabel bind="@codi" labelBind="@descripcio" />
+							<listcell bind="@descripcio" />
 						</dataitem>
 					</listbox>
 				</hbox>

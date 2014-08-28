@@ -5,7 +5,7 @@
  */
 package es.caib.seycon.ng.model;
 
-import es.caib.seycon.ng.utils.TipusDomini;
+import es.caib.seycon.ng.comu.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.model.RolAssociacioRolEntity

@@ -35,6 +35,7 @@ import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.comu.TipusUsuari;
 import es.caib.seycon.ng.comu.Usuari;
@@ -44,7 +45,6 @@ import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.model.UsuariEntity
@@ -146,8 +146,6 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
     public void update(es.caib.seycon.ng.model.UsuariEntity usuari) throws RuntimeException {
         try {
             UsuariEntity actualUsuari = load (usuari.getId());
-            if (actualUsuari.getCodi().equals(Security.getCurrentUser()))
-                throw new SecurityException(Messages.getString("UsuariEntityDaoImpl.cannotGrantYourself")); //$NON-NLS-1$
 
             if (usuari.getDominiCorreu() != null
                     && (actualUsuari.getDominiCorreu() == null || actualUsuari.getDominiCorreu()

@@ -33,6 +33,7 @@ import es.caib.seycon.ng.comu.Notificacio;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -43,7 +44,6 @@ import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.MailUtils;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.model.RolAccountEntity
@@ -529,14 +529,11 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
     private RolEntity findRolByNomAndCodiApliacio(String nom, String codiAplicacio, String bbdd) {
         String query = "select rol " //$NON-NLS-1$
                 + "from es.caib.seycon.ng.model.RolEntity rol " //$NON-NLS-1$
-                + "left join rol.aplicacio aplicacio " //$NON-NLS-1$
                 + "where " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
                 + "rol.nom = :nom and " + " rol.baseDeDades.codi = :bbdd"; //$NON-NLS-1$ //$NON-NLS-2$
-        Parameter codiAplicacioParameter = new Parameter("codiAplicacio", codiAplicacio); //$NON-NLS-1$
         Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
         Parameter bbddParameter = new Parameter("bbdd", bbdd); //$NON-NLS-1$
-        Parameter[] parameters = { codiAplicacioParameter, nomParameter, bbddParameter };
+        Parameter[] parameters = { nomParameter, bbddParameter };
         Collection rols = getRolEntityDao().query(query, parameters);
         if (rols != null && !rols.isEmpty()) {
             return (RolEntity) rols.iterator().next();
@@ -597,7 +594,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
             valorDomini.setNomDomini(TipusDomini.SENSE_DOMINI);
             valorDomini.setValor(TipusDomini.SENSE_DOMINI);
         }
-        String nomDomini = valorDomini.getNomDomini();
+        String nomDomini = rol.getTipusDomini();
         if (nomDomini.compareTo(TipusDomini.GRUPS) == 0
                 || nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0
                 || nomDomini.compareTo(TipusDomini.APLICACIONS) == 0
@@ -648,24 +645,22 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
                 targetEntity.setValorDominiAplicacio(null);
                 targetEntity.setTipusDomini(TipusDomini.SENSE_DOMINI);
             }
-        } else {
+        } else if (rol.getDominiAplicacio() != null){
             /*
              * Domini d'aplicació
              */
-            String nomDominiAplicacio = valorDomini.getNomDomini();
-            if (nomDomini != null) {
-                String codiAplicacio = valorDomini.getCodiExternDomini();
-                String valor = valorDomini.getValor();
-                ValorDominiAplicacioEntity valorDominiAplicacioEntity = findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(
-                        nomDomini, codiAplicacio, valor);
-                if (valorDominiAplicacioEntity != null) {
-                    targetEntity.setValorDominiAplicacio(valorDominiAplicacioEntity);
-                    targetEntity.setTipusDomini(TipusDomini.DOMINI_APLICACIO);
-                    targetEntity.setGrup(null);
-                    targetEntity.setAplicacioAdministrada(null);
-                } else {
-                    throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valor )); //$NON-NLS-1$
-                }
+            nomDomini = rol.getDominiAplicacio().getNom();
+            String codiAplicacio = rol.getAplicacio().getCodi();
+            String valor = valorDomini.getValor();
+            ValorDominiAplicacioEntity valorDominiAplicacioEntity = findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(
+                    nomDomini, codiAplicacio, valor);
+            if (valorDominiAplicacioEntity != null) {
+                targetEntity.setValorDominiAplicacio(valorDominiAplicacioEntity);
+                targetEntity.setTipusDomini(TipusDomini.DOMINI_APLICACIO);
+                targetEntity.setGrup(null);
+                targetEntity.setAplicacioAdministrada(null);
+            } else {
+                throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valor )); //$NON-NLS-1$
             }
         }
         

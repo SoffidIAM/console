@@ -15,10 +15,10 @@ import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAssociacioRol;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.model.RolAssociacioRolEntity

@@ -23,6 +23,7 @@ import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolsGrup;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -41,7 +42,6 @@ import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.servei.GrupService
@@ -642,16 +642,19 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	/*IAM-318*/
 	protected void handlePropagateRolsChangesToDispatcher(String grup) throws InternalErrorException{
 		GrupEntity grupEntity = getGrupEntityDao().findByCodi(grup);
-						
-		for (RolsGrupEntity rolGrup: grupEntity.getRolsOtorgatsGrup())
+		if (grupEntity != null)
 		{
-			RolEntity rol = rolGrup.getRolOtorgat();
-            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_ROLE);
-            tasque.setRole(rol.getNom());
-            tasque.setBd(rol.getBaseDeDades().getCodi());
-            getTasqueEntityDao().create(tasque);
+							
+			for (RolsGrupEntity rolGrup: grupEntity.getRolsOtorgatsGrup())
+			{
+				RolEntity rol = rolGrup.getRolOtorgat();
+	            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+	            tasque.setData(new Timestamp(System.currentTimeMillis()));
+	            tasque.setTransa(TaskHandler.UPDATE_ROLE);
+	            tasque.setRole(rol.getNom());
+	            tasque.setBd(rol.getBaseDeDades().getCodi());
+	            getTasqueEntityDao().create(tasque);
+			}
 		}
 	}
 }

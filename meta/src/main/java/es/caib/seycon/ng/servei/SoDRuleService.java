@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.ConfiguracioService.class})
 public abstract class SoDRuleService {
 
-	@Operation ( grantees={Roles.application_update.class,
-			Roles.application_query.class},
+	@Operation ( grantees={roles.application_update.class,
+			roles.application_query.class},
 			translated="findRuleByApplication")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRule> findRuleByApplication(
@@ -29,8 +29,8 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class,
-			Roles.application_query.class},
+	@Operation ( grantees={roles.application_update.class,
+			roles.application_query.class},
 			translated="findRolesByRule")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRole> findRolesByRule(
@@ -38,7 +38,7 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRule create(
@@ -46,7 +46,7 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRule update(
@@ -54,14 +54,14 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="remove")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void remove(
 		es.caib.seycon.ng.comu.SoDRule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRole create(
@@ -69,14 +69,14 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="remove")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void remove(
 		es.caib.seycon.ng.comu.SoDRole role)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="isAllowed")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRule isAllowed(
@@ -84,15 +84,15 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_query.class},
+	@Operation ( grantees={roles.user_role_query.class},
 			translated="qualifyRolAccountList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void qualifyRolAccountList(
 		java.util.List<es.caib.seycon.ng.comu.RolAccount> ra)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.user_role_query.class,
-			Roles.application_query.class},
+	@Operation ( grantees={roles.user_role_query.class,
+			roles.application_query.class},
 			translated="findAffectingRulesByRolAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRule> findAffectingRulesByRolAccount(
@@ -100,8 +100,8 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_query.class,
-			Roles.application_query.class},
+	@Operation ( grantees={roles.user_role_query.class,
+			roles.application_query.class},
 			translated="getRuleById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRule getRuleById(

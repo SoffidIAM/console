@@ -11,7 +11,7 @@ import es.caib.bpm.vo.PredefinedProcessType;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={Roles.Tothom.class})
+@Service ( grantees={roles.Tothom.class})
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,

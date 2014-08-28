@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AuditoriaEntity.class})
 public abstract class AccountService {
 
-	@Operation ( grantees={Roles.user_create.class,Roles.user_update.class,Roles.user_query.class},
+	@Operation ( grantees={roles.user_create.class,roles.user_update.class,roles.user_query.class},
 			translated="listUserAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.UserAccount> listUserAccounts(
@@ -41,7 +41,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUsersAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.UserAccount> findUserAccounts(
@@ -50,7 +50,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_create.class,Roles.user_update.class},
+	@Operation ( grantees={roles.user_create.class,roles.user_update.class},
 			translated="createAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UserAccount createAccount(
@@ -60,14 +60,14 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.NeedsAccountNameException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_create.class,Roles.user_update.class},
+	@Operation ( grantees={roles.user_create.class,roles.user_update.class},
 			translated="removeAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void removeAccount(
 		es.caib.seycon.ng.comu.UserAccount account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class,Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_query.class,roles.agent_update.class},
 			translated="listNonUserAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.Account> listNonUserAccounts(
@@ -76,7 +76,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class,Roles.account_create.class},
+	@Operation ( grantees={roles.agent_update.class,roles.account_create.class},
 			translated="createAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Account createAccount(
@@ -84,16 +84,16 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class,Roles.account_update.class},
+	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
 			translated="updateAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void updateAccount(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 	}
-	@Operation ( grantees={Roles.user_create.class,Roles.user_query.class,
-			Roles.user_update.class,Roles.agent_query.class,
-			Roles.agent_update.class},
+	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
+			roles.user_update.class,roles.agent_query.class,
+			roles.agent_update.class},
 			translated="findAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Account findAccount(
@@ -102,7 +102,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class,Roles.actor_delete.class},
+	@Operation ( grantees={roles.agent_update.class,roles.actor_delete.class},
 			translated="removeAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void removeAccount(
@@ -115,7 +115,7 @@ public abstract class AccountService {
 		java.lang.String user)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUserAccountsByDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.UserAccount> findUserAccountsByDomain(
@@ -124,7 +124,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="gessAccountName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String gessAccountName(
@@ -133,14 +133,14 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="renameAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void renameAccount(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 	}
-	@Operation ( grantees={Roles.account_query.class},
+	@Operation ( grantees={roles.account_query.class},
 			translated="findAccountsByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.Account> findAccountsByCriteria(
@@ -155,7 +155,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getUserGrantedAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> getUserGrantedAccounts(
@@ -176,7 +176,7 @@ public abstract class AccountService {
 		@Nullable java.lang.Long passwordTerm)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="queryAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountPassword(
@@ -184,7 +184,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="setAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setAccountPassword(
@@ -193,7 +193,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setHPAccountPassword(
@@ -205,7 +205,7 @@ public abstract class AccountService {
 	}
 
 	
-	@Operation ( grantees={Roles.Tothom.class})
+	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void checkinHPAccount(
 		es.caib.seycon.ng.comu.Account account)
@@ -213,7 +213,7 @@ public abstract class AccountService {
 	}
 
 
-	@Operation ( grantees={Roles.Tothom.class})
+	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public Usuari getHPAccountOwner(
 		es.caib.seycon.ng.comu.Account account)
@@ -221,7 +221,7 @@ public abstract class AccountService {
 		return null;
 	}
 
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getUserAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UserAccount> getUserAccounts(
@@ -236,8 +236,8 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class,Roles.account_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.user_query.class,roles.account_query.class,
+			roles.Tothom.class},
 			translated="isUpdatePending")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public boolean isUpdatePending(

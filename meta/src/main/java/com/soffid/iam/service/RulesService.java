@@ -18,61 +18,61 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AuditoriaEntity.class})
 public abstract class RulesService {
 
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.Rule create(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.Rule update(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.rule_query.class})
+	@Operation ( grantees={roles.rule_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<com.soffid.iam.api.Rule> findRules(
 		@Nullable java.lang.String description)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.RuleAssignedRole create(
 		com.soffid.iam.api.RuleAssignedRole ruleAssignment)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.RuleAssignedRole update(
 		com.soffid.iam.api.RuleAssignedRole ruleAssignment)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		com.soffid.iam.api.RuleAssignedRole ruleAssignment)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.rule_query.class})
+	@Operation ( grantees={roles.rule_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<com.soffid.iam.api.RuleAssignedRole> findRuleAssignments(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.rule_admin.class})
+	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void apply(
 		com.soffid.iam.api.Rule rule)

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.BlobConfigurationEntity.class})
 public abstract class ConfiguracioService {
 
-	@Operation ( grantees={Roles.parameter_query.class},
+	@Operation ( grantees={roles.parameter_query.class},
 			translated="findParameterByNameAndNetworkName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Configuracio findParametreByCodiAndCodiXarxa(
@@ -24,21 +24,21 @@ public abstract class ConfiguracioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.parameter_query.class},
+	@Operation ( grantees={roles.parameter_query.class},
 			translated="getParameters")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Configuracio> getParametres()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.parameter_delete.class},
+	@Operation ( grantees={roles.parameter_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Configuracio configuracio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.parameter_create.class},
+	@Operation ( grantees={roles.parameter_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Configuracio create(
@@ -46,7 +46,7 @@ public abstract class ConfiguracioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.parameter_query.class},
+	@Operation ( grantees={roles.parameter_query.class},
 			translated="findConfigurationByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Configuracio> findConfiguracioByFiltre(
@@ -57,7 +57,7 @@ public abstract class ConfiguracioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.parameter_update.class},
+	@Operation ( grantees={roles.parameter_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Configuracio update(

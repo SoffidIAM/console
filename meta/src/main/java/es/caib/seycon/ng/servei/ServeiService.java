@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.ServeiEntity.class})
 public abstract class ServeiService {
 
-	@Operation ( grantees={Roles.service_create.class},
+	@Operation ( grantees={roles.service_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Servei create(
@@ -22,14 +22,14 @@ public abstract class ServeiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.service_delete.class},
+	@Operation ( grantees={roles.service_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Servei servei)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.service_update.class},
+	@Operation ( grantees={roles.service_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Servei update(
@@ -37,7 +37,7 @@ public abstract class ServeiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.service_query.class},
+	@Operation ( grantees={roles.service_query.class},
 			translated="findServicesByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Servei> findServeisByCriteri(

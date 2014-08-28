@@ -47,7 +47,7 @@ public abstract class ServidorsService {
 		java.lang.String content)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.Tothom.class})
+	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void sendMailGeneric(
 		java.lang.String adrecaCorreuCompleta, 

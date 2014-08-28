@@ -43,14 +43,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AplicacioService {
 
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="getApplications")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> getAplicacions()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class},
+	@Operation ( grantees={roles.application_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Aplicacio create(
@@ -58,21 +58,21 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_delete.class},
+	@Operation ( grantees={roles.application_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Aplicacio aplicacio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void update(
 		es.caib.seycon.ng.comu.Aplicacio aplicacio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Aplicacio findAplicacioByCodiAplicacio(
@@ -80,7 +80,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findAplicacioByCriteri(
@@ -95,7 +95,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.application_query.class,roles.Tothom.class},
 			translated="findRolesByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByCodiAplicacio(
@@ -103,8 +103,8 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AdministracioAplicacio create(
@@ -112,15 +112,15 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class,Roles.application_delete.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class,roles.application_delete.class},
 			translated="manageApplication")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.AdministracioAplicacio administracioAplicacio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUsersWhoManageApplicationByRoleNameAndApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuarisAdministrenAplicacioByNomRolAndCodiAplicacio(
@@ -129,7 +129,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationManageByRoleNameApplicationNameAndUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AdministracioAplicacio findAdministracioAplicacioByNomRolAndCodiAplicacioAndCodiUsuar(
@@ -139,7 +139,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationManageByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AdministracioAplicacio> findAdministracioAplicacioByCodiAplicacio(
@@ -147,7 +147,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRolesByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByCodiUsuari(
@@ -155,14 +155,14 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="getRoles")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> getRols()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUsersByRoleNameAndRoleApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuarisByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -172,7 +172,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRolesByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByFiltre(
@@ -185,7 +185,8 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleByRoleNameAndApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Rol findRolByNomRolAndCodiAplicacioAndCodiDispatcher(
@@ -195,8 +196,18 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class},
+
+	@Operation ( grantees={roles.application_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Rol findRoleByNameAndSystem(
+		java.lang.String name, 
+		java.lang.String system)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Rol create(
@@ -204,15 +215,15 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class,Roles.application_delete.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class,roles.application_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Rol rol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Rol update(
@@ -220,7 +231,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_create.class},
+	@Operation ( grantees={roles.user_role_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.RolAccount create(
@@ -228,8 +239,8 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_delete.class,
-			Roles.application_delete.class},
+	@Operation ( grantees={roles.user_role_delete.class,
+			roles.application_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
@@ -266,7 +277,7 @@ public abstract class AplicacioService {
 	}
 	
 	
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUsersRolesByRoleName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByNomRol(
@@ -274,7 +285,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUsersRolesByUserNameAndRoleName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuariAndNomRol(
@@ -283,7 +294,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUpgradeableApplicationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findAplicacionsActualitzablesByCodiUsuari(
@@ -291,7 +302,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUsersWithUpdatePermissionsByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuarisAmbPermisosActualitzacioByCodiAplicacio(
@@ -299,7 +310,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,Roles.user_role_create.class,Roles.user_role_delete.class},
+	@Operation ( grantees={roles.application_query.class,roles.user_role_create.class,roles.user_role_delete.class},
 			translated="findApplicationManageByRoleNameAndApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AdministracioAplicacio> findAdministracioAplicacioByNomRolAndCodiAplicacio(
@@ -308,7 +319,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRolesByDomainNameAndApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByNomDominiAndCodiAplicacio(
@@ -317,7 +328,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_update.class},
+	@Operation ( grantees={roles.application_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AdministracioAplicacio update(
@@ -325,8 +336,8 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,
-			Roles.authorization_query.class},
+	@Operation ( grantees={roles.application_query.class,
+			roles.authorization_query.class},
 			translated="findRoleById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Rol findRolById(
@@ -334,7 +345,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleHoldersGroupsByRole")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGrupsPosseidorsdelRolByRol(
@@ -342,7 +353,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findGrantedRolesToGroupByGroup")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsOtorgatsalGrupByGrup(
@@ -350,7 +361,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,Roles.user_role_query.class},
+	@Operation ( grantees={roles.application_query.class,roles.user_role_query.class},
 			translated="findTextualInformationAndUserRolesHierachyByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ContenidorRol> findInformacioTextualJerarquiaRolsUsuariByCodiUsuari(
@@ -358,7 +369,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findBpmEnabledApplicationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findAplicacionsGestionablesWFAdministradesByCodiUsuari(
@@ -366,7 +377,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationByApplicationNameUnrestricted")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Aplicacio findAplicacioByCodiAplicacioSenseRestriccions(
@@ -388,7 +399,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRolesByApplicationNameUnrestricted")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByCodiAplicacioSenseRestriccions(
@@ -396,7 +407,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuariByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -406,7 +417,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.application_query.class,roles.Tothom.class},
 			translated="findRolesByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByFiltre(
@@ -420,7 +431,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findTextualInformationAndRolesHierachyByApplicationRoleAndDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ContenidorRol> findInformacioTextualJerarquiaRolsByRolAplicacioAndDispatcher(
@@ -430,7 +441,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_query.class,Roles.application_query.class},
+	@Operation ( grantees={roles.user_role_query.class,roles.application_query.class},
 			translated="findTextualInformationAndUserRolesHierachyByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ContenidorRol> findInformacioTextualJerarquiaRolsUsuariByCodiUsuari(
@@ -453,7 +464,7 @@ public abstract class AplicacioService {
 		java.util.Date dataDelete)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleGrantByRole")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findRolGrantByRol(
@@ -462,7 +473,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleAuthorizationsByRoleNameAndApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> findAutoritzacionsRolByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -472,7 +483,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationAccessTreeRolesByRoleNameAndRoleApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioPuntEntrada> findPuntsEntradaRolByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -482,7 +493,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findNetworkACLRolesByRoleNameAndApplicationNameAndDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findACLsXarxesRolByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -492,7 +503,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleGrantByAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findRolGrantByAccount(
@@ -500,7 +511,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findRoleAccountByAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolAccountByAccount(
@@ -508,7 +519,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findEffectiveRoleGrantByUser")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findEffectiveRolGrantByUser(
@@ -516,7 +527,7 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findEffectiveRolGrantByAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findEffectiveRolGrantByAccount(
@@ -531,8 +542,8 @@ public abstract class AplicacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,
-			Roles.user_query.class},
+	@Operation ( grantees={roles.application_query.class,
+			roles.user_query.class},
 			translated="findUsersRolesByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuari(

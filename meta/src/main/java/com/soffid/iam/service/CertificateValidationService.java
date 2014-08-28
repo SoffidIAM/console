@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( serverPath="/seycon/CertificateValidationService",
 	 translatedName="CertificateValidationService",
 	 translatedPackage="com.soffid.iam.service",
-	 grantees={Roles.anonymous.class})
+	 grantees={roles.anonymous.class})
 public abstract class CertificateValidationService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

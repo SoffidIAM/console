@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class})
 public abstract class AuditoriaService {
 
-	@Operation ( grantees={Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_query.class},
 			translated="findAuditById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Auditoria findAuditoriaById(
@@ -22,7 +22,7 @@ public abstract class AuditoriaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_query.class},
 			translated="find")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] find(
@@ -30,7 +30,7 @@ public abstract class AuditoriaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_query.class},
 			translated="findAuditsByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Auditoria> findAuditoriesByCriteri(
@@ -43,7 +43,7 @@ public abstract class AuditoriaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.audit_custom_query.class,Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_custom_query.class,roles.audit_query.class},
 			translated="findAuditsByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Auditoria> findAuditoriesByCriteri(
@@ -58,7 +58,7 @@ public abstract class AuditoriaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_query.class},
 			translated="findAuditsByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Auditoria> findAuditoriesByCriteri(
@@ -70,7 +70,7 @@ public abstract class AuditoriaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.audit_query.class},
+	@Operation ( grantees={roles.audit_query.class},
 			translated="findAuditsByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Auditoria> findAuditoriesByCriteri(

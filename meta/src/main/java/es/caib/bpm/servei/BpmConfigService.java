@@ -11,7 +11,7 @@ import es.caib.seycon.ng.servei.ApplicationBootService;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={Roles.Tothom.class})
+@Service ( grantees={roles.Tothom.class})
 public abstract class BpmConfigService extends ApplicationBootService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -33,7 +33,7 @@ public abstract class BpmConfigService extends ApplicationBootService {
 	 return null;
 	}
 	
-	@Operation ( grantees={Roles.anonymous.class})
+	@Operation ( grantees={roles.anonymous.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.ConfigParameterVO findFirstByAppKey(
 		java.lang.String app, 

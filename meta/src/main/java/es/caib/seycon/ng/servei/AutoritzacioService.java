@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.SessionCacheService.class})
 public abstract class AutoritzacioService {
 
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getUserAuthorization")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> getUserAuthorization(
@@ -30,7 +30,7 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getUserAuthorization")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> getUserAuthorization(
@@ -39,7 +39,7 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.authorization_rol_create.class},
+	@Operation ( grantees={roles.authorization_rol_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AutoritzacioRol create(
@@ -47,14 +47,14 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.authorization_rol_delete.class},
+	@Operation ( grantees={roles.authorization_rol_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.AutoritzacioRol autoritzacio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.Tothom.class,Roles.authorization_query.class},
+	@Operation ( grantees={roles.Tothom.class,roles.authorization_query.class},
 			translated="getAuthorizationRoles")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> getRolsAutoritzacio(
@@ -103,14 +103,14 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getDescriptionUserAuthorizations")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> getDescriptionUserAuthorizations()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getDescriptionUserAuthorizations")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioRol> getDescriptionUserAuthorizations(
@@ -125,7 +125,7 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.authorization_query.class},
+	@Operation ( grantees={roles.authorization_query.class},
 			translated="findAuthorizations")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection findAuthorizations(
@@ -135,7 +135,7 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.authorization_query.class},
+	@Operation ( grantees={roles.authorization_query.class},
 			translated="getScopeList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List getScopeList()

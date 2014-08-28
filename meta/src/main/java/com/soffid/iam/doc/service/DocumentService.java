@@ -5,8 +5,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
-import Roles.Tothom;
-import Roles.anonymous;
+import roles.Tothom;
+import roles.anonymous;
 
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.exception.DocumentBeanException;

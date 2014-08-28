@@ -5,7 +5,9 @@
  */
 package es.caib.seycon.ng.servei;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -60,8 +62,11 @@ import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.model.TipusUsuariEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.engine.ReplicaConnection;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
+import es.caib.seycon.ng.sync.servei.LogonService;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
 import es.caib.seycon.util.Base64;
 
@@ -700,9 +705,11 @@ public class InternalPasswordServiceImpl extends
             }
         }
 
+        boolean taskQueue = false;
     	try {
     		if (checkTrusted && getTaskQueue() != null)
     		{
+    			taskQueue = true;
 	            final long timeToWait = 60000; // 1 minute
 	            TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getCodi(), user.getCodi(),
 	                    password, false);
@@ -713,7 +720,7 @@ public class InternalPasswordServiceImpl extends
 	                    th.wait(timeToWait);
 	                }
 	            }
-            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
+	            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
                     : PasswordValidation.PASSWORD_WRONG;
         	}
     	}
@@ -721,6 +728,19 @@ public class InternalPasswordServiceImpl extends
         {
         
         }
+		if (checkTrusted && ! taskQueue && "true".equals(System.getProperty("soffid.auth.trustedLogin")))
+		{
+			for (UserAccountEntity userAccount: user.getAccounts())
+			{
+				AccountEntity ae = userAccount.getAccount();
+				if (!ae.isDisabled() && ae.getDispatcher().getDomini() == passwordDomain)
+				{
+					PasswordValidation status = validatePasswordOnServer(ae, password);
+					if (status.equals (PasswordValidation.PASSWORD_GOOD))
+						return status;
+				}
+			}
+		}
 
         return PasswordValidation.PASSWORD_WRONG;
     }
@@ -1136,6 +1156,10 @@ public class InternalPasswordServiceImpl extends
 		            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
 	                    : PasswordValidation.PASSWORD_WRONG;
 	        	}
+	    		else if (checkTrusted && "true".equals(System.getProperty("soffid.auth.trustedLogin"))) 
+	    		{
+	    			return validatePasswordOnServer (account, password);
+	    		}
 	    	}
 	        catch (NoSuchBeanDefinitionException e) 
 	        {
@@ -1146,7 +1170,19 @@ public class InternalPasswordServiceImpl extends
 		}
 	}
 
-    private DominiContrasenyaEntity getPasswordDomain(AccountEntity account)
+    private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password) throws InternalErrorException, IOException {
+    	
+    	if ( "S".equals(account.getDispatcher().getSegur()))
+    	{
+    		ConsoleLogonService ls = (ConsoleLogonService) getSeyconServerService().getServerService(ConsoleLogonService.REMOTE_PATH);
+    		if (ls != null)
+    			return ls.validatePassword(account.getName(), account.getDispatcher().getCodi(), password.getPassword());
+    	}
+
+    	return PasswordValidation.PASSWORD_WRONG;
+	}
+
+	private DominiContrasenyaEntity getPasswordDomain(AccountEntity account)
 	{
 		return account.getDispatcher().getDomini();
 	}
@@ -1341,6 +1377,14 @@ public class InternalPasswordServiceImpl extends
 		if (defaultDispatcher == null)
 		{
 			DispatcherEntityDao dao = getDispatcherEntityDao();
+			String defaultName = System.getProperty("soffid.auth.system");
+			if (defaultName != null)
+			{
+				DispatcherEntity dispatcher = dao.findByCodi(defaultName); //$NON-NLS-1$
+				if (dispatcher != null)
+					return defaultName;
+			}
+			
 			for (DispatcherEntity dispatcher: dao.loadAll())
 			{
 				if (dispatcher.isMainDispatcher())

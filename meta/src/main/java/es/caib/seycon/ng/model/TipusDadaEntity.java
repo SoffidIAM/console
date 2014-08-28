@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_TIPDAD" )
@@ -34,6 +35,10 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public java.lang.Integer size;
 	
+	@Column (name="TDA_REQUIR")
+	@Nullable
+	public Boolean required;
+	
 	@Description ("blank separated list of url-encoded values")
 	@Column (name="TDA_VALUE", length=64000)
 	@Nullable
@@ -44,6 +49,23 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public String label;
 	
+	@Description("Administrator visibility")
+	@Column (name="TDA_ADMVIS", length=1)
+	@Nullable
+	public AttributeVisibilityEnum adminVisibility;
+	
+	@Description("Administrator visibility")
+	@Column (name="TDA_OPEVIS", length=1)
+	@Nullable
+	public AttributeVisibilityEnum operatorVisibility;
+	
+
+	@Description("User visibility")
+	@Column (name="TDA_USEVIS", length=1)
+	@Nullable
+	public AttributeVisibilityEnum userVisibility;
+	
+
 	/********************** DAOS ************************/
 	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(

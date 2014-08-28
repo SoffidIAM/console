@@ -32,6 +32,13 @@
 				method="getUserAccounts">
 			</ejb-finder>
 		</finder> 
+		<finder name="dada" type="dada" executeOnNewObjects="true">  <!-- user:query -->
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="getUserAttributes">
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.DadaUsuari"> 
+			</new-instance-bean>
+		</finder>
 	</datanode>
 	
 	<datanode name="moure">
@@ -66,5 +73,27 @@
 	
 	<datanode name="void" />
 	<datanode name="dispatcherInformation"/>
+
+	<datanode name="dada">
+		<script-handler>
+			<update-script>
+				if (instance.getCodiUsuari() == null)
+					instance.setCodiUsuari (parent.instance.getCodi());
+				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttribute(self); 
+			</update-script>
+		</script-handler>
+		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService">
+			<insert-method method="updateUserAttribute"  returnBean="true" > <!-- user:metadata:update -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<!--delete-method method="delete">  // NOTA: és un update 
+				<parameter value="${instance}" />
+			</delete-method-->
+			<update-method method="updateUserAttribute"  returnBean="true"> <!-- user:metadata:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
 	
 </zkib-model>

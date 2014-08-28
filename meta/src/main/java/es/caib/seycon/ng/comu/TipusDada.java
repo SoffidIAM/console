@@ -8,6 +8,7 @@ package es.caib.seycon.ng.comu;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DataType",
@@ -29,6 +30,8 @@ public abstract class TipusDada {
 	@Nullable
 	public java.lang.Integer size;
 	
+	public boolean required;
+	
 	@Nullable
 	public String label;
 	
@@ -36,4 +39,19 @@ public abstract class TipusDada {
 	@Description("List of allowed values")
 	@Attribute(defaultValue="new java.util.LinkedList<String>()")
 	public List<String> values;
+
+	@Description("Administrator visibility")
+	@Nullable
+	public AttributeVisibilityEnum adminVisibility;
+	
+	@Description("Operator visibility")
+	@Nullable
+	public AttributeVisibilityEnum operatorVisibility;
+	
+
+	@Description("User visibility")
+	@Nullable
+	public AttributeVisibilityEnum userVisibility;
+	
+
 }

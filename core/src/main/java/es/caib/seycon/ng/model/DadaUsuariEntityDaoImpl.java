@@ -20,6 +20,7 @@ import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 
@@ -134,6 +135,7 @@ public class DadaUsuariEntityDaoImpl
         			targetVO.setValorDadaDate(null);
         	}
         }
+        targetVO.setVisibility(AutoritzacionsUsuari.getAttributeVisibility(sourceEntity.getUsuari(), sourceEntity.getTipusDada()));
     }
 
     /**
@@ -173,7 +175,7 @@ public class DadaUsuariEntityDaoImpl
     		assertPhoneExists();
             UsuariEntity usuariEntity = getUsuariEntityDao().findByCodi(sourceVO.getCodiUsuari());
             if(usuariEntity == null){
-			throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.3"), sourceVO.getCodiUsuari()));  //$NON-NLS-1$
+            	throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.3"), sourceVO.getCodiUsuari()));  //$NON-NLS-1$
             }
             TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao().findTipusDadaByCodi(sourceVO.getCodiDada());
 			if (tipusDadaEntity == null) {
@@ -181,14 +183,67 @@ public class DadaUsuariEntityDaoImpl
 			}
             targetEntity.setUsuari(usuariEntity);
             targetEntity.setTipusDada(tipusDadaEntity);
-            if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()) && sourceVO.getValorDadaDate() != null)
+            if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()))
             {
-				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
-            	targetEntity.setValorDada(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+            	if (sourceVO.getValorDadaDate() == null && sourceVO.getValorDada() != null)
+            	{
+            		sourceVO.setValorDadaDate(parseDate(sourceVO.getValorDada()));
+            	}
+            	if (sourceVO.getValorDadaDate() != null)
+	            {
+					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
+	            	targetEntity.setValorDada(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+	            }
             }
         }
 
-    /**
+    private Calendar parseDate(String valorDada) {
+    	String leftParse ;
+    	String rightParse = "";
+    	String leftValue = valorDada;
+    	String rightValue = ""; 
+    	if (valorDada.endsWith("z") || valorDada.endsWith("Z"))
+    	{
+        	leftValue = valorDada.substring(0, valorDada.length()-1);
+    	}
+    	else
+    	{
+    		int i = valorDada.lastIndexOf('+');
+    		int j = valorDada.lastIndexOf('-');
+    		int last = i > j ? i : j;
+    		if (last > 0 && valorDada.length() - last == 5)
+    		{
+    			rightParse = "Z";
+    			leftValue = valorDada.substring(0, last);
+    			rightValue = valorDada.substring (last+1);
+    		}
+    		else if (last > 0)
+    		{
+    			rightParse = "X";
+    		}
+    	}
+    	
+    	if (leftValue.length() > 14 && leftValue.charAt(14) == ',')
+        	leftParse = "yyyyMMddHHmmss,SSS";
+    	else
+    		leftParse = "yyyyMMddHHmmss.SSS";
+    		
+    	if (leftValue.length() < leftParse.length())
+    		leftParse = leftParse.substring(0, leftValue.length());
+
+    	SimpleDateFormat sdf = new SimpleDateFormat(leftParse + rightParse);
+   		try {
+			Date t = sdf.parse(leftValue + rightValue);
+       		Calendar c = Calendar.getInstance();
+       		c.setTime(t);
+       		return c;
+		} catch (ParseException e) {
+    	}
+    	return null;
+
+	}
+
+	/**
      * @see es.caib.seycon.ng.model.DadaUsuariEntityDao#dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari)
      */
     public es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari dadaUsuari)

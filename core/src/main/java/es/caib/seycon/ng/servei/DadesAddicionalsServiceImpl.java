@@ -5,12 +5,15 @@
  */
 package es.caib.seycon.ng.servei;
 
+import java.nio.file.attribute.AttributeView;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
+
+import com.soffid.iam.api.AttributeVisibilityEnum;
 
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
@@ -46,6 +49,13 @@ public class DadesAddicionalsServiceImpl extends
 	protected es.caib.seycon.ng.comu.TipusDada handleCreate(
 			es.caib.seycon.ng.comu.TipusDada tipusDada)
 			throws java.lang.Exception {
+		if (tipusDada.getAdminVisibility() == null)
+			tipusDada.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
+		if (tipusDada.getAdminVisibility() == null)
+			tipusDada.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
+		if (tipusDada.getAdminVisibility() == null)
+			tipusDada.setUserVisibility(AttributeVisibilityEnum.READONLY);
+
 		Long order = tipusDada.getOrdre();
 		String code = new String();
 		boolean found = false;
@@ -93,6 +103,14 @@ public class DadesAddicionalsServiceImpl extends
 			throws java.lang.Exception {
 		TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao()
 				.tipusDadaToEntity(tipusDada);
+		
+		if (tipusDadaEntity.getAdminVisibility() == null)
+			tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
+		if (tipusDadaEntity.getAdminVisibility() == null)
+			tipusDadaEntity.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
+		if (tipusDadaEntity.getAdminVisibility() == null)
+			tipusDadaEntity.setUserVisibility(AttributeVisibilityEnum.READONLY);
+
 		getTipusDadaEntityDao().update(tipusDadaEntity);
 		return getTipusDadaEntityDao().toTipusDada(tipusDadaEntity);
 	}
@@ -147,9 +165,15 @@ public class DadesAddicionalsServiceImpl extends
 	}
 
 	public DadaUsuari handleCreate(DadaUsuari dadaUsuari) throws InternalErrorException {
+		
 		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 				.dadaUsuariToEntity(dadaUsuari);
 
+		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+
+		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
+			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
+		
 		UsuariEntity usuari = dadaUsuariEntity.getUsuari();
 		usuari.setDataDarreraModificacio(GregorianCalendar.getInstance()
 				.getTime());
@@ -164,6 +188,11 @@ public class DadesAddicionalsServiceImpl extends
 	public void handleDelete(DadaUsuari dadaUsuari) throws InternalErrorException {
 		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 				.dadaUsuariToEntity(dadaUsuari);
+
+		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+
+		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
+			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
 
 		UsuariEntity usuari = dadaUsuariEntity.getUsuari();
 		usuari.setDataDarreraModificacio(GregorianCalendar.getInstance()
@@ -188,26 +217,21 @@ public class DadesAddicionalsServiceImpl extends
 				DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 						.dadaUsuariToEntity(dadaUsuari);
 				
-				if (AutoritzacionsUsuari.canUpdateUserMetadata(dadaUsuariEntity.getUsuari()) 
-						|| (AutoritzacionsUsuari.canUpdateCustomUser(dadaUsuariEntity.getUsuari()) && 
-								dadaUsuariEntity.getTipusDada().getCodi().equals("PHONE"))) { //$NON-NLS-1$
+				AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
 
-					UsuariEntity usuari = dadaUsuariEntity.getUsuari();
-					usuari.setDataDarreraModificacio(GregorianCalendar
-							.getInstance().getTime());
-					usuari.setUsuariDarreraModificacio(Security.getCurrentAccount());
-					getUsuariEntityDao().update(usuari);
+				if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
+					throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
+				
+				UsuariEntity usuari = dadaUsuariEntity.getUsuari();
+				usuari.setDataDarreraModificacio(GregorianCalendar
+						.getInstance().getTime());
+				usuari.setUsuariDarreraModificacio(Security.getCurrentAccount());
+				getUsuariEntityDao().update(usuari);
 
-					getDadaUsuariEntityDao().update(dadaUsuariEntity);
-					getRuleEvaluatorService().applyRules(usuari);
-					return getDadaUsuariEntityDao().toDadaUsuari(
-							dadaUsuariEntity);
-				} else
-					throw new SeyconAccessLocalException(
-							"DadesAddicionalsService", "update (DadaUsuari)", //$NON-NLS-1$ //$NON-NLS-2$
-							"user:metadata:update", //$NON-NLS-1$
-							"Probably not authorized to update users in that group"); //$NON-NLS-1$
-
+				getDadaUsuariEntityDao().update(dadaUsuariEntity);
+				getRuleEvaluatorService().applyRules(usuari);
+				return getDadaUsuariEntityDao().toDadaUsuari(
+						dadaUsuariEntity);
 			}
 		} else {
 			return create(dadaUsuari);

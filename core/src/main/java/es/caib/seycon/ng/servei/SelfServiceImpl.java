@@ -12,6 +12,7 @@ import java.util.LinkedList;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.EstatContrasenya;
 import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
@@ -19,6 +20,7 @@ import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.RolAccount;
+import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
@@ -324,5 +326,20 @@ public class SelfServiceImpl extends SelfServiceBase
 		dispatcher.setDominiContrasenyes(complet.getDominiContrasenyes());
 		
 		return dispatcher;
+	}
+	@Override
+	protected Collection<DadaUsuari> handleGetUserAttributes() throws Exception {
+		Usuari usuari = getUsuariService().getCurrentUsuari();
+		return getUsuariService().findDadesUsuariByCodiUsuari(usuari.getCodi());
+	}
+	@Override
+	protected DadaUsuari handleUpdateUserAttribute(DadaUsuari attribute)
+			throws Exception {
+		return getDadesAddicionalsService().update(attribute);
+	}
+	@Override
+	protected TipusDada handleGetDataTypeDescription(String attName)
+			throws Exception {
+		return getDadesAddicionalsService().findTipusDadaByCodi(attName);
 	}
 }

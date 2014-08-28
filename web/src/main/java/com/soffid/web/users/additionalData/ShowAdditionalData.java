@@ -10,6 +10,8 @@ import javax.ejb.CreateException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.zkoss.util.resource.Labels;
+
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -18,6 +20,9 @@ import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
+import es.caib.zkib.datamodel.DataModelCollection;
+import es.caib.zkib.datamodel.DataModelNode;
+import es.caib.zkib.datamodel.DataNode;
 
 public class ShowAdditionalData {
 	
@@ -72,5 +77,35 @@ public class ShowAdditionalData {
 				
 			});
 			return dadaUsuariCollection;
+	}
+	
+	
+	void checkRequiredAttributes (DataNode userNode) throws InternalErrorException
+	{
+		DataModelCollection lm = userNode.getListModel("dada");
+		for (int i = 0; i < lm.getSize(); i++)
+		{
+			DataNode dadaNode = (DataNode) lm.getDataModel(i);
+			checkRequiredAttribute(dadaNode);
+		}
+	}
+
+	void checkRequiredAttribute (DataNode dadaNode) throws InternalErrorException
+	{
+		if (dadaNode != null)
+		{
+			DadaUsuari du = (DadaUsuari) dadaNode.getInstance();
+			if (du != null)
+			{
+				if ((du.getBlobDataValue() == null || du.getBlobDataValue().length == 0) &&
+						(du.getValorDada() == null || du.getValorDada().length() == 0) && 
+						du.getValorDadaDate() == null)
+				{
+					TipusDada tda = dadesAddicionalsServ.findTipusDadaByCodi(du.getCodiDada());
+					if (tda.isRequired())
+						throw new InternalErrorException (String.format (Labels.getLabel("usuaris.zul.RequiredAttribute"), tda.getLabel()));
+				}
+			}
+		}
 	}
 }

@@ -187,8 +187,20 @@ public class NASManager
 		
 		number= fileSystemDao.nextNumberFor(application, year);
 		
-		path= "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
+		do
+		{
+			path= "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
 
+			try {
+				File f = this.comStrategy.retreiveFile(path);
+				if (f == null || ! f.canRead())
+					break;
+			} catch (NASException e ) {
+				break;
+			}
+			number ++;
+		} while (true);
+		
 		this.comStrategy.uploadFile(file, path);
 		
 		return path;

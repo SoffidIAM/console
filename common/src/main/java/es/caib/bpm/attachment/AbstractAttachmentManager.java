@@ -70,6 +70,11 @@ public abstract class AbstractAttachmentManager {
         putVariable(PREFIX + tag, document.getReference().toString());
     }
 
+    public void attach(String tag, DocumentReference documentReference) throws RemoteException, InternalErrorException {
+        log.debug(Messages.getString("AbstractAttachmentManager.CloseSystemReference")); //$NON-NLS-1$
+        putVariable(PREFIX + tag, documentReference.toString());
+    }
+
     public DocumentService createDocument(String contentType,
             String originalName) throws IOException,
             NamingException, CreateException, DocumentBeanException,

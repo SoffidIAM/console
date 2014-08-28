@@ -26,6 +26,8 @@
 	boolean canViewSeyconServer = AutoritzacionsUsuari.hasViewSeyconServerSEU();
 	boolean canViewDominiUsuaris = AutoritzacionsUsuari.hasViewDominiUsuaris();
 	boolean canViewAccounts = AutoritzacionsUsuari.hasViewAccountsSEU();
+	boolean canViewAttributeTranslation = es.caib.seycon.ng.utils.Security.isUserInRole("seu:attributeTranslation:show");
+	
 	boolean canViewRules = es.caib.seycon.ng.utils.Security.isUserInRole("seu:rules:show");
 	// Ara es mira per ACL de xarxes i màquines
 	hasACL_xarxesMaquines = session.getAttribute("hasACLXarxes");
@@ -201,7 +203,7 @@
     		</treeitem>   		   		
     	   		
 <!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->    		
-    		<treeitem id="configaudito" if="${canViewParametres || canViewDadesAddicionals || canViewAgents || canViewPlugins || canViewDominiUsuaris || admin || canViewAutoritzacions}" open="false">
+    		<treeitem id="configaudito" if="${canViewParametres || canViewDadesAddicionals || canViewAgents || canViewPlugins || canViewDominiUsuaris || admin || canViewAutoritzacions || canViewAttributeTranslation}" open="false">
     			<treerow>
     				<treecell label="${c:l('seu.configaudito')}" onClick="configaudito.setOpen ( ! configaudito.isOpen() )"/>
     			</treerow>
@@ -246,6 +248,13 @@
 		    				<apptreecell if="${canViewAutoritzacions}" langlabel="seu.autoritzacions" pagina="/autoritzacions.zul"/>
 		    			</treerow>
 		    		</treeitem>	    				    		
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewAttributeTranslation}" langlabel="seu.attributeTranslation" pagina="/attributeTranslation.zul"/>
+		    			</treerow>
+		    		</treeitem>	    				    		
+
+
 		    	</treechildren>
     		</treeitem>
     		

@@ -691,8 +691,7 @@ public class AutoritzacioServiceImpl extends
                             valorDominiUsuari = " " + valors.toString(); //$NON-NLS-1$
                     }
 
-                    // afegim "poder" per que siga més descriptiú
-                    auto.setDescripcio("poder " + autoSEU.getDescripcio() //$NON-NLS-1$
+                    auto.setDescripcio(autoSEU.getDescripcio() //$NON-NLS-1$
                             + valorDominiUsuari);
                     auto.setTipusDomini(autoSEU.getTipusDomini());
                     auto.setScope(autoSEU.getScope());

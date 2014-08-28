@@ -32,7 +32,7 @@
 		<![CDATA[
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
-			int refreshPageTime = 10000; 
+			int refreshPageTime = 5000; 
 			boolean refreshPage = true;
 			
 			try {
@@ -241,20 +241,17 @@
 					if (t_tasques.isVisible())
 					{
 						agentsTasks = (t_tasquesagent.isVisible() && t_tasquesagent.isSelected());
-						viewTasks(p_seyconserver.getFellow("buttonViewTasks"), agentsTasks);
 					}
 					
 					// Check server additional info active
-					if (t_seyconInfo.isVisible() && !t_dbpool.isVisible())
+					if (t_seyconInfo.isVisible() && !t_dbpool.isVisible() && serverInfoComponent != null)
 					{
-						viewServerAdditionalInfo(p_seyconserver.getFellow("imgServerInfo"));
+						viewServerAdditionalInfo(serverInfoComponent);
 					}
 					
 					// Check agent tasks info active
 					if (t_tasquesagent.isVisible())
 					{
-	//					veureTasquesAgent(l_tasquesAgent.getValue(),
-	//						l_tasquesAgentURL.getValue());
 					}
 					
 					// Check server DB queries active
@@ -359,9 +356,11 @@
 				}
 			}
 			
+			Component serverInfoComponent = null;
 			// Functionality to view server additional info
 			void viewServerAdditionalInfo(self)
 			{
+				serverInfoComponent = self;
 				// Get server URL
 				dadaurl = getURLServer(self);
 				
@@ -605,7 +604,7 @@
 			
 			void checkRefreshPage()
 			{
-				String numAgents = model.getJXPathContext().getValue("/server/@numAgents");
+				String numAgents = model.getJXPathContext().getValue("/server[1]/@numAgents");
 				
 				try
 				{

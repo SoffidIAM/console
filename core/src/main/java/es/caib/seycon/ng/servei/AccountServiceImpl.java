@@ -24,6 +24,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
 
 import bsh.EvalError;
@@ -153,7 +155,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (acc != null)
 		{
 			if (acc.getType().equals (AccountType.IGNORED) && acc.getAcl().isEmpty() &&
-				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE) && ! nullName)
+				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE))
 			{
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
@@ -479,7 +481,15 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue())
 			{
-				// Ignore
+    			List<AccountEntity> accs = getAccountEntityDao().findByUsuariAndDispatcher(user, disEntity.getCodi());
+				for (AccountEntity acc : accs)
+				{
+					if (acc.isDisabled() )
+					{
+						acc.setDisabled(false);
+						getAccountEntityDao().update(acc);
+					}
+				}
 			}
 			else if (disEntity.isMainDispatcher() || disEntity.getUrl() != null)
 			{
@@ -580,16 +590,22 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		DominiUsuariEntity du = getDominiUsuariEntityDao().findByDispatcher (dispatcherName);
 		// Search if already has a user name for this user domain
 		
+		UsuariEntity ue = getUsuariEntityDao().findByCodi(userName);
+		if (ue == null)
+			return null;
+
 		if (du.getTipus().equals (TipusDominiUsuariEnumeration.PRINCIPAL))
 			return userName;
 		else if (du.getTipus().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
 			Interpreter interpreter = new Interpreter();
-			UsuariEntity ue = getUsuariEntityDao().findByCodi(userName);
 			DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
-			interpreter.set("user", ue); //$NON-NLS-1$
-			interpreter.set("userDomain", du); //$NON-NLS-1$
-			interpreter.set("dispatcher", de); //$NON-NLS-1$
+			interpreter.set("usuariEntity", ue); //$NON-NLS-1$
+			interpreter.set("user", User.toUser(getUsuariEntityDao().toUsuari(ue))); //$NON-NLS-1$
+			interpreter.set("dominiEntity", du); //$NON-NLS-1$
+			interpreter.set("userDomain", UserDomain.toUserDomain(getDominiUsuariEntityDao().toDominiUsuari(du))); //$NON-NLS-1$
+			interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
+			interpreter.set("system", com.soffid.iam.api.System.toSystem(getDispatcherEntityDao().toDispatcher(de))); //$NON-NLS-1$
 			interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
 			return (String) interpreter.eval(du.getBshExpr());
 		}
@@ -601,7 +617,6 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			if (! (obj instanceof AccountNameGenerator))
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
 			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			UsuariEntity ue= getUsuariEntityDao().findByCodi(userName);
 			DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
 			return generator.getAccountName(ue, de);
 		}

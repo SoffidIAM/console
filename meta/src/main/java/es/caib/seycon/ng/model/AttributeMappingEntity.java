@@ -17,10 +17,10 @@ public abstract class AttributeMappingEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="ATM_SOFATR")
+	@Column (name="ATM_SOFATR", length=1000)
 	public java.lang.String soffidAttribute;
 
-	@Column (name="ATM_SYSATR")
+	@Column (name="ATM_SYSATR", length=1000)
 	public java.lang.String systemAttribute;
 
 	@Column (name="ATM_DIRECT")

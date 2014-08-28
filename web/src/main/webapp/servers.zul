@@ -40,14 +40,14 @@ void showDetall ()
 			</toolbar>
 			<listbox id="listbox" autocommit="false" dataPath="/model:/server"
 				fixedLayout="true" height="96%" onSelect="showDetall()" 
-				rows="${fileres}" width="100%" onCreate="checkTruncatedList(self)">
+				rows="${fileres}" width="100%" onCreate="checkTruncatedList(self)"
+				style="">
 				<listhead>
 					<listheader label="${c:l('servers.zul.Name')}" sort="auto"
 						width="21%"/>
 					<listheader label="${c:l('servers.zul.Type')}" sort="auto"
 						width="21%"/>
-					<listheader label="${c:l('servers.zul.URL')}" sort="auto"
-						width="21%"/>
+					<listheader label="${c:l('servers.zul.URL')}" sort="auto"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">
@@ -62,7 +62,7 @@ void showDetall ()
 			</listbox>
 		</navegador>
 	
-		<detalls id="dades"  width="100%">
+		<detalls id="dades"  width="100%" style="width: 100%; min-width:30em;">
 			<zscript><![CDATA[
 			    void onChangeServerType (boolean modify)
 			    {
@@ -94,13 +94,17 @@ void showDetall ()
 				}
 				]]>			
 			</zscript>		
-			<form dataPath="/srvesquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()">
-				<grid width="99%">
-					<columns visible="false"><column width="14%"/><column/> </columns>
+			<form dataPath="/srvesquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="99%"
+				style="">
+				<grid width="100%" fixedLayout="false" style="width: 100%; mxargin-left: 5px; mxargin-right. 5px;">
+					<columns visible="false">
+						<column width="14%"/>
+						<column width="86%"/> 
+					</columns>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('servers.zul.Name')}"/>
-							<div width="30em">
+							<div width="100%">
 								<input_dada lectura="true" bind="@nom" maxim="50"
 												width_custom="26em" mascara="no empty"/>
 								<label value="*" />
@@ -108,7 +112,7 @@ void showDetall ()
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('servers.zul.URL')}"/>
-							<div width="30em">
+							<div width="100%">
 								<input_dada lectura="true" bind="@url" maxim="50"
 												width_custom="26em" mascara="no empty"/>
 								<label value="*" />

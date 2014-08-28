@@ -51,7 +51,6 @@ zk.error = function (msg) {
 	leCA = (msg!=null && msg.startsWith(eCA)); 
 	tancaES = (lES || leES);
 	tancaCA = (lCA || leCA);
-	alert ("ERROR: "+msg);
 	titolFinestra = esTimeout?(lES?"Aviso: se ha excedido el tiempo de espera máximo":
 								lCA?"Avís: s'ha excedit el temps d'espera màxim":
 									"Warning: exceeded the maximum time"):

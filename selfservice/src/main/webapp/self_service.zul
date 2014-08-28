@@ -48,6 +48,8 @@
 				import es.caib.seycon.ng.comu.*;
 				import java.util.Calendar;
 				
+				canUpdateUserMetadata = true;
+				
 				timerDelay = 10000;
 				
 				try
@@ -406,6 +408,17 @@
 												</grid>
 											</row>
 										</rows>
+									</grid>
+									<grid sclass="fonsBlanc" dataPath="/dada"  onNewRow="event.data.getChildren().get(1).onCreate()"> 
+										<columns>
+											<column width="135px"/>
+											<column width="*"/>
+										</columns>
+										<datarow>
+											<input_etiqueta bind="@dataLabel" width_custom="135px"
+												value="${c:l('usuaris.zul.@codiDada')}"/>
+											<div use="com.soffid.web.users.additionalData.InputField" twoPhaseEdit="true" onChange=""/>
+										</datarow>
 									</grid>
 									<popup id="pwd">
 										<label value="${c:l('usuaris.zul.Canviacontrasenya')}" />

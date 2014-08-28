@@ -94,29 +94,32 @@ public class UserInterfaceBusiness {
 	{
 		TaskMgmtDefinition taskDef = processDefinition.getTaskMgmtDefinition();
 		Map<String, Task> tasks = (Map<String, Task>) taskDef.getTasks();
-		for (Task task : tasks.values())
+		if (tasks != null && tasks.values() != null)
 		{
-			Event event = task.getEvent(Event.EVENTTYPE_TASK_ASSIGN);
-			if (event != null)
+			for (Task task : tasks.values())
 			{
-				Iterator it = event.getActions().iterator();
-				while (it.hasNext())
+				Event event = task.getEvent(Event.EVENTTYPE_TASK_ASSIGN);
+				if (event != null)
 				{
-					Action action = (Action) it.next();
-					if (action.getName().equals(task.getName())
-									&& action.getActionDelegation() != null
-									&& "es.caib.bpm.mail.Mail".equals(action //$NON-NLS-1$
-													.getActionDelegation()
-													.getClassName()))
+					Iterator it = event.getActions().iterator();
+					while (it.hasNext())
 					{
-						it.remove();
-						Event event2 = task.getEvent(Event.EVENTTYPE_TASK_CREATE);
-						if (event2 == null)
+						Action action = (Action) it.next();
+						if (action.getName().equals(task.getName())
+										&& action.getActionDelegation() != null
+										&& "es.caib.bpm.mail.Mail".equals(action //$NON-NLS-1$
+														.getActionDelegation()
+														.getClassName()))
 						{
-							event2 = new Event(Event.EVENTTYPE_TASK_CREATE);
-							task.addEvent(event2);
+							it.remove();
+							Event event2 = task.getEvent(Event.EVENTTYPE_TASK_CREATE);
+							if (event2 == null)
+							{
+								event2 = new Event(Event.EVENTTYPE_TASK_CREATE);
+								task.addEvent(event2);
+							}
+							event2.addAction(action);
 						}
-						event2.addAction(action);
 					}
 				}
 			}

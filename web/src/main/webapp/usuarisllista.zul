@@ -262,7 +262,7 @@
 	</zscript>
 	
 	<esquema id="esquemaLlista" closable="true" position="center, center"
-		title="${c:l('usuarisllista.Titol')}" visible="false">
+		title="${c:l('usuarisllista.Titol')}" visible="false" width="${amplefinestra}">
 		<attribute name="onInicia">
 			<![CDATA[
 				pageScope.put("contextComponent", event.data);

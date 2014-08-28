@@ -44,7 +44,8 @@
 			canUpdateAgent = AutoritzacionsUsuari.hasUpdateAgent();
 			canQueryAgent = AutoritzacionsUsuari.hasQueryAgent();
 			canPropagateAgentUsers = AutoritzacionsUsuari.hasPropagateAgentUsers();
-			canPropagateAgentRoles = AutoritzacionsUsuari.hasPropagateAgentRoles();
+			canPropagateAgentUsers = AutoritzacionsUsuari.hasPropagateAgentUsers();
+			canPropagateAgentGroups = AutoritzacionsUsuari.hasPropagateAgentGroups();
 			canModifyAgent = canCreateAgent || canUpdateAgent;
 			// regles de control d'accés (oracle)
 			canCreateAccessControlAgent = AutoritzacionsUsuari.hasCreateAccessControlAgent();
@@ -316,12 +317,14 @@
 			}
 			
 			void setVisibleControlAcces(boolean visible) {
-				esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
+				if (visible == false && esquema.getFellow("dades").getFellow("r_controlAcces").isSelected())
+					esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
 				esquema.getFellow("dades").getFellow("r_controlAcces").setVisible(visible);
 			}
 			
 			void setVisibleAttributeMapping(boolean visible) {
-				esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
+				if (visible == false && esquema.getFellow("dades").getFellow("r_attributeMapping").isSelected())
+					esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
 				esquema.getFellow("dades").getFellow("r_attributeMapping").setVisible(visible);
 			}
 			
@@ -390,6 +393,37 @@
 				}
 			}
 			
+			void propagaCanvisAgent_Groups()  {
+				Object elem = esquema.getFellow("lista").getFellow("listbox").selectedItem.value;
+				if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
+					Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.Groups"),
+						org.zkoss.util.resource.Labels.getLabel("agents.PropagaGroups"),
+						new EventListener() {
+							public void onEvent(Event evt) {
+								if ("onOK".equals(evt.getName())) { 
+									Object obj = elem.getInstance();
+									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
+										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
+										String codiAgent = agent.getCodi(); 
+										javax.naming.Context context = new javax.naming.InitialContext();
+										Object objDis2 = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
+										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome2 = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
+											objDis2, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
+										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR = disHome2.create();
+										disServiceR.propagateDispatcherGroups(codiAgent);
+									}
+								}
+							}
+						}
+					);
+				}
+				
+				else {
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("agents.Select"));
+				}
+			}
+			
+
 			import es.caib.seycon.ng.comu.TipusUsuari;
 			void seleccionaTipusUsuari ( String relacioLaboral) {
 				String [] tipusUsuari  = null;
@@ -519,7 +553,6 @@
 							onChangeClass();
 						}
 					});
-					
 					void onChangeDades()
 					{
 						onEnableManualAccount();
@@ -565,14 +598,14 @@
 							rols_row.setVisible(false);
 							r_tipusUsuari.setVisible(false);
 							groups_row.setVisible(false);
-							userdomain_row.setVisible(false);
+							//userdomain_row.setVisible(false);
 						}
 						else
 						{
 							rols_row.setVisible(true);
 							r_tipusUsuari.setVisible(true);
 							groups_row.setVisible(true);
-							userdomain_row.setVisible(true);
+							//userdomain_row.setVisible(true);
 						}
 					}
 					
@@ -615,8 +648,7 @@
 							}
 							
 							catch (Exception e) {
-	//							alert(e);
-							    //e.printStackTrace();
+							    e.printStackTrace();
 								defaultAgentProperties.visible = false;
 								//Missatgebox.error("error "+e.getMessage());
 								//System.out.println("Sin descriptor");
@@ -684,7 +716,7 @@
 										<label value="*" />
 									</hbox>
 									
-									<div if="${canPropagateAgentUsers or canPropagateAgentRoles}">
+									<div if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}">
 										<imageclic id="imgPropaga" if="${canPropagateAgentUsers}" src="/img/propagausu.gif" tooltiptext="${c:l('agents.PropagaUsuaris')}"> 
 											<attribute name="onClick">
 												<![CDATA[
@@ -700,6 +732,14 @@
 											<attribute name="onClick">
 											 	if (canPropagateAgentRoles) {
 													propagaCanvisAgent_Rols();
+												}
+											</attribute>
+										</imageclic>
+										<space width="4px"/>
+										<imageclic id="imgPropagaGroups" if="${canPropagateAgentGroups}" src="/img/group.png" tooltiptext="${c:l('agents.PropagaRols')}"> 
+											<attribute name="onClick">
+											 	if (canPropagateAgentGroups) {
+													propagaCanvisAgent_Groups();
 												}
 											</attribute>
 										</imageclic>
@@ -1122,13 +1162,23 @@
 												</columns>
 												<datarow>
 													<input_dada bind="@property" width_custom ="95%"></input_dada>
-													<input_dada bind="@value" width_custom ="95%"></input_dada>
+													<textbox bind="@value" width ="95%" onChange="" >
+															<attribute name="onFocus"><![CDATA[
+			  String v = self.getValue();
+			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+			  {
+				  self.setMultiline(true);
+				  self.setRows(5);
+			  }
+			
+															]]></attribute>
+													</textbox>
 													<imageclic align="right" src="~./img/list-remove.gif">
 														<attribute name="onClick">
 															<![CDATA[
 				if (canUpdateAgent)
 				{
-							ctx = XPathUtils.getComponentContext (self);
+							ctx = XPathUtils.getComponentContext (event.target);
 							XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 				}												]]>
 														</attribute>
@@ -1176,7 +1226,7 @@
 															<attribute name="onClick"><![CDATA[
 								if (canUpdateAgent)
 								{
-															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(self);							                                   
+															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
 															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
 								}														                                   
 															]]>
@@ -1185,17 +1235,37 @@
 													</column>
 												</columns>
 												<datarow>
-													<input_dada bind="@systemAttribute" width_custom ="95%"></input_dada>
+													<textbox bind="@systemAttribute" width ="95%" onChange="" >
+															<attribute name="onFocus"><![CDATA[
+			  String v = self.getValue();
+			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+			  {
+				  self.setMultiline(true);
+				  self.setRows(5);
+			  }
+			
+															]]></attribute>
+													</textbox>
 													<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection">
 														<dataitem bind="@value">
 															<listcell bind="@literal"/>
 														</dataitem>
 													</listbox>
-													<input_dada bind="@soffidAttribute" width_custom ="95%"></input_dada>
+													<textbox bind="@soffidAttribute" width ="95%" onChange="" >
+															<attribute name="onFocus"><![CDATA[
+			  String v = self.getValue();
+			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+			  {
+				  self.setMultiline(true);
+				  self.setRows(5);
+			  }
+			
+															]]></attribute>
+													</textbox>
 													<imageclic align="right" src="~./img/list-remove.gif">
 														<attribute name="onClick">
 															<![CDATA[
-						ctx = XPathUtils.getComponentContext (self);
+						ctx = XPathUtils.getComponentContext (event.target);
 						XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 															]]>
 														</attribute>
@@ -1213,7 +1283,7 @@
 										<![CDATA[
 	                                  if (canUpdateAgent) 
 	                                  {
-										ctx = XPathUtils.getComponentContext (self);
+										ctx = XPathUtils.getComponentContext (event.target);
 										XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 	                                  }
 										]]>

@@ -216,7 +216,7 @@
 					   ctx = XPathUtils.getComponentContext(row);
 					   try {
 						   Domini domini = XPathUtils.getValue(ctx, "/role[1]/domini");
-						   if (domini == null || domini.getNom().equals(es.caib.seycon.ng.utils.TipusDomini.SENSE_DOMINI))
+						   if (domini == null || domini.getNom().equals(es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI))
 						   {
 							   b.setVisible(false);
 						   }

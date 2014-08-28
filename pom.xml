@@ -131,6 +131,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.beanshell</groupId>
+        <artifactId>bsh</artifactId>
+        <version>2.0b4</version>
+      </dependency>
+      <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>1.7.0</version>
@@ -381,6 +386,16 @@
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
+      <dependency>
+        <groupId>com.soffid.zkib</groupId>
+        <artifactId>zkiblaf</artifactId>
+        <version>${zkiblaf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.soffid.zkib</groupId>
+        <artifactId>zkdb</artifactId>
+        <version>${zkdb.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <properties>
@@ -389,7 +404,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.12-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.11-SNAPSHOT</zkdb.version>
+    <zkdb.version>1.12-SNAPSHOT</zkdb.version>
     <mda.reconcile.version>82</mda.reconcile.version>
   </properties>
   <pluginRepositories>

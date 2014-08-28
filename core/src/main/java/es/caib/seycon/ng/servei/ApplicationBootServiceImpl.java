@@ -30,6 +30,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.service.SystemScheduledTasks;
@@ -958,6 +959,7 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 			dis = new Dispatcher();
 			dis.setBasRol(new Boolean(true));
 			dis.setCodi("soffid"); //$NON-NLS-1$
+			dis.setDescription("Soffid database");
 			dis.setControlAccess(new Boolean(false));
 			dis.setDominiContrasenyes(dc.getCodi());
 			dis.setDominiUsuaris(du.getCodi());

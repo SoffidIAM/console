@@ -39,6 +39,7 @@ import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRule;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariWFProcess;
@@ -69,7 +70,6 @@ import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.servei.AplicacioService Versió remixed, remade &
@@ -1111,7 +1111,7 @@ public class AplicacioServiceImpl extends
                 getGrupEntityDao())) {
 
         	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
+                    .load(rolsUsuaris.getId());
         	if (rolsUsuarisEntity.getRule() != null)
                 throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
             // Disable assigning roles to himself
@@ -1136,7 +1136,7 @@ public class AplicacioServiceImpl extends
 	private void deleteRolAccountEntity (RolAccountEntity rolsUsuarisEntity,
 					UsuariEntity user) throws InternalErrorException
 	{
-		if (rolsUsuarisEntity.isApprovalPending())
+		if (rolsUsuarisEntity.isApprovalPending() && rolsUsuarisEntity.getApprovalProcess() != null)
 		{
 			JbpmContext ctx = getBpmEngine().getContext();
 			try 
@@ -2658,6 +2658,24 @@ public class AplicacioServiceImpl extends
 				}
 			}
 		}
+	}
+
+	@Override
+	protected Rol handleFindRoleByNameAndSystem(String name, String system)
+			throws Exception {
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNameAndDispatcher(name, system);
+        if (rolEntity == null)
+        	return null;
+        // Cap dels tres paràmetres pot ésser null
+        // Mirem l'autorització de l'aplicació (fer query als rols de la app
+        // no requereixen tindre una autorització específica)
+        if (AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getAplicacio().getCodi())) {
+            return getRolEntityDao().toRol(rolEntity);
+        } else {
+			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+					getPrincipal().getName(), name));
+        }
 	}
 
 

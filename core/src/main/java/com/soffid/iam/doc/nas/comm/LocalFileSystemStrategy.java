@@ -134,4 +134,12 @@ public class LocalFileSystemStrategy implements CommunicationStrategy
 		// NO HACEMOS NADA
 
 	}
+
+	public void deleteFile(String path) throws NASException {
+		File archivo = null;
+
+		archivo = new File(this.rootPath, path);
+
+		archivo.delete();
+	}
 }

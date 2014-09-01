@@ -232,4 +232,19 @@ public class FTPStrategy implements CommunicationStrategy
 			archivo.delete();
 		}
 	}
+
+	public void deleteFile(String path) throws NASException {
+		try
+		{
+			this.client.open(this.server);
+			this.client.login(this.user, this.password.toCharArray());
+			this.client.deleteFile(this.rootPath + "/" +
+					path.substring(path.indexOf("/") + 1));
+
+		}
+		catch(Exception ex)
+		{
+			throw new NASException(ex);
+		}
+	}
 }

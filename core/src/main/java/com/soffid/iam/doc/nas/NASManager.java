@@ -219,6 +219,18 @@ public class NASManager
 	}
 	
 	/**
+	 * Elimina un archivo del NAS a partir del path.
+	 * 
+	 * @param path
+	 * @return
+	 * @throws NASException 
+	 */
+	public void deleteFile(String path) throws NASException
+	{
+		this.comStrategy.deleteFile(path);
+	}
+	
+	/**
 	 * Limpia los recursos temporarios.
 	 *
 	 */

@@ -53,4 +53,6 @@ public class DocumentService
 	
 	public void endDownloadTransfer() throws DocumentBeanException {};
 	
+	public void deleteDocument(DocumentReference reference) {}
+	
 }

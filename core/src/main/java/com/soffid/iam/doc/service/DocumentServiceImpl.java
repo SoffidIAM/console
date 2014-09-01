@@ -402,4 +402,22 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 		this.application= application;
 		this.year= Calendar.getInstance().get(Calendar.YEAR);
 	}
+
+	@Override
+	protected void handleDeleteDocument(DocumentReference reference)
+			throws Exception {
+		DocumentEntity result= null;
+		boolean roleFound= false;
+		
+		Long l = Long.decode(reference.getId());
+		result = getDocumentEntityDao().load(l);
+		
+		if(result== null || !result.getHash().equals(reference.getHash()))
+		{
+			throw new DocumentBeanException("No se encontro un documento con referencia " + reference);
+		}
+		
+		getNASManager().deleteFile(result.getFsPath());
+		getDocumentEntityDao().remove(result);
+	}
 }

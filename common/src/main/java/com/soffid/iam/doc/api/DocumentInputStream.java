@@ -31,12 +31,29 @@ public class DocumentInputStream extends InputStream {
 			}
 			documentService = null;
 		}
+		if (ejbDocumentService != null)
+		{
+			try
+			{
+				ejbDocumentService.endDownloadTransfer();
+			}
+			catch (InternalErrorException e)
+			{
+				throw new IOException(e);
+			}
+			catch (DocumentBeanException e)
+			{
+				throw new IOException(e);
+			}
+			ejbDocumentService = null;
+		}
 	}
 
 	byte buffer[] = null;
 	int used = 0;
 	int index = 0;
-	private DocumentService documentService;
+	private DocumentService documentService = null;
+	private com.soffid.iam.doc.service.ejb.DocumentService ejbDocumentService = null;
 	
 	public DocumentInputStream (DocumentService documentService) throws DocumentBeanException, InternalErrorException
 	{
@@ -44,16 +61,25 @@ public class DocumentInputStream extends InputStream {
 		documentService.openDownloadTransfer();
 	}
 
+	public DocumentInputStream (com.soffid.iam.doc.service.ejb.DocumentService ejbDocumentService) throws DocumentBeanException, InternalErrorException
+	{
+		this.ejbDocumentService = ejbDocumentService;
+		ejbDocumentService.openDownloadTransfer();
+	}
+
 	@Override
 	public int read() throws IOException
 	{
-		if (documentService == null)
+		if (documentService == null && ejbDocumentService == null)
 			return -1;
 		if (buffer == null || index >= buffer.length)
 		{
 			try
 			{
-				buffer = documentService.nextDownloadPackage(4096);
+				if (documentService != null)
+					buffer = documentService.nextDownloadPackage(4096);
+				if (ejbDocumentService != null)
+					buffer = ejbDocumentService.nextDownloadPackage(4096);
 			}
 			catch (InternalErrorException e)
 			{
@@ -70,7 +96,8 @@ public class DocumentInputStream extends InputStream {
 			}
 			index = 0;
 		}
-		return buffer[index++];
+		byte b = buffer[index++];
+		return b >= 0 ? b : b + 256;
 	}
 
 	

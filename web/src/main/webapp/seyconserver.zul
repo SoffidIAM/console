@@ -32,7 +32,7 @@
 		<![CDATA[
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
-			int refreshPageTime = 10000;
+			int refreshPageTime = 5000; 
 			boolean refreshPage = true;
 			
 			try {
@@ -215,8 +215,8 @@
 					//model.getVariables().declareVariable("urlserver", dada);
 					// hem de posar el label abans
 					model.getVariables().declareVariable("codiAgent", codiAgent);
-					model.getJXPathContext().getValue("/server/tasquesagentserver").refresh();
-					listboxTasquesAgent.dataPath = "/model:/server/tasquesagentserver";
+					model.getJXPathContext().getValue("/tasquesagentserver").refresh();
+					listboxTasquesAgent.dataPath = "/model:/tasquesagentserver";
 					l_tasquesAgent.setValue(codiAgent);
 					l_tasquesAgentURL.setValue(url);
 				}
@@ -241,20 +241,17 @@
 					if (t_tasques.isVisible())
 					{
 						agentsTasks = (t_tasquesagent.isVisible() && t_tasquesagent.isSelected());
-						viewTasks(p_seyconserver.getFellow("buttonViewTasks"), agentsTasks);
 					}
 					
 					// Check server additional info active
-					if (t_seyconInfo.isVisible() && !t_dbpool.isVisible())
+					if (t_seyconInfo.isVisible() && !t_dbpool.isVisible() && serverInfoComponent != null)
 					{
-						viewServerAdditionalInfo(p_seyconserver.getFellow("imgServerInfo"));
+						viewServerAdditionalInfo(serverInfoComponent);
 					}
 					
 					// Check agent tasks info active
 					if (t_tasquesagent.isVisible())
 					{
-	//					veureTasquesAgent(l_tasquesAgent.getValue(),
-	//						l_tasquesAgentURL.getValue());
 					}
 					
 					// Check server DB queries active
@@ -269,19 +266,11 @@
 			}
 			
 			// Functionality to get server URL
-			String getURLServer(data)
+			String getURLServer(Component data)
 			{
-				listCell = data.getParent().getParent();
-				dlistbox = listCell.getListbox();
-				modelo = dlistbox.getModel();
-				listItem = listCell.getParent();
-				posicio = listItem.getIndex();
-				elemPos = modelo.getElementAt(posicio);
-				xpath = elemPos.getDataContext().getXPath();
-				dataSource = gridServidors.getDataSource();
-				context = dataSource.getJXPathContext();
+				es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(data);
 				
-				return context.getValue(xpath + "/@url");
+				return es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@url");
 			}
 			
 			// Functionality to show agents info
@@ -293,14 +282,16 @@
 					{
 						// Get server URL
 						dada = getURLServer(self);
-						
+						es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+						String path = ctx.getXPath();
 						// Refresh servers
 						refrescaServidors();
 						model.getVariables().declareVariable("queryAgentsEnabled", true);
 						model.getVariables().declareVariable("urlserver", dada);
 						urlservidor.setValue(dada); //mostrem url
-						model.getJXPathContext().getValue("/server/agentsserver").refresh();
-						gridAgents.dataPath = "/model:/server/agentsserver";
+						model.getJXPathContext().getValue("/agentsserver").refresh();
+						es.caib.zkib.datamodel.DataNodeCollection dm = model.getJXPathContext().getValue("/agentsserver");
+						gridAgents.setDataPath("/model:/agentsserver");
 						mostraPanel("agents");
 					}
 					
@@ -365,9 +356,11 @@
 				}
 			}
 			
+			Component serverInfoComponent = null;
 			// Functionality to view server additional info
 			void viewServerAdditionalInfo(self)
 			{
+				serverInfoComponent = self;
 				// Get server URL
 				dadaurl = getURLServer(self);
 				
@@ -611,7 +604,7 @@
 			
 			void checkRefreshPage()
 			{
-				String numAgents = model.getJXPathContext().getValue("/server/@numAgents");
+				String numAgents = model.getJXPathContext().getValue("/server[1]/@numAgents");
 				
 				try
 				{
@@ -684,7 +677,7 @@
 					<hbox width="100%" widths="*,85px">
 						<label bind="@numAgents"
 							tooltiptext="${c:l('seyconserver.zul.TotalAgentsConnectats')}"/>
-						<button id="buttonViewAgents" if="${canQueryAgentList}"
+						<button if="${canQueryAgentList}"
 							label="${c:l('seyconserver.zul.VeureAgents')}" width="100%">
 							<attribute name="onClick">
 								viewAgents(self);
@@ -696,7 +689,7 @@
 					<hbox width="99%" widths="*,85px">
 						<label bind="@numTasquesPendents"
 							tooltiptext="${c:l('seyconserver.zul.TotalTasquesPendents')}"/>
-						<button id="buttonViewTasks" if="${canQueryAgentList}"
+						<button if="${canQueryAgentList}"
 							label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
 							<attribute name="onClick">
 								viewTasks(self, false);
@@ -706,7 +699,7 @@
 				</listcell>
 				<listcell>
 					<div align="center">
-						<imageclic id="imgServerInfo" align="middle" src="img/info.png"
+						<imageclic align="middle" src="img/info.png"
 							style="margin-right:10px;" tooltiptext="${c:l('seyconserver.Informacio')}">
 							<attribute name="onClick">
 								viewServerAdditionalInfo(self);
@@ -786,7 +779,7 @@
 	</tabs>
 	<tabpanels>
 		<tabpanel id="tagents">
-			<listbox id="gridAgents" dataPath="/model:/server/agentsserver"
+			<listbox id="gridAgents" dataPath="/model:/agentsserver"
 				fixedLayout="true" sclass="likeagrid headcentrat doscolors" width="100%">
 				<listhead>
 					<listheader label="${c:l('seyconserver.zul.Agent')}" sort="auto" width="140px"/>
@@ -914,7 +907,7 @@
 					</image>
 				</div>
 			</hbox>
-			<listbox dataPath="/model:/server/tasquesagentserver" fixedLayout="true"
+			<listbox dataPath="/model:/tasquesagentserver" fixedLayout="true"
 				id="listboxTasquesAgent" mold="paging" pageSize="20"
 				sclass="likeagrid doscolors" width="99%">
 				<listhead>
@@ -1028,7 +1021,7 @@
 		
 		<tabpanel id="tReset">
 			<hbox width="600px">
-				<listbox dataPath="/model:/server/servidorsagents" fixedLayout="true"
+				<listbox dataPath="/model:/servidorsagents" fixedLayout="true"
 					id="listboxReset" sclass="likeagrid" width="99%">
 					<listhead>
 						<listheader sort="auto">Servidor</listheader>

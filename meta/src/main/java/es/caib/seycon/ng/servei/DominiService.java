@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AplicacioEntity.class})
 public abstract class DominiService {
 
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Domini create(
@@ -29,15 +29,15 @@ public abstract class DominiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_delete.class},
+	@Operation ( grantees={roles.application_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Domini domini)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ValorDomini create(
@@ -45,8 +45,8 @@ public abstract class DominiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_create.class,
-			Roles.application_update.class,Roles.application_delete.class},
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class,roles.application_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
@@ -73,8 +73,8 @@ public abstract class DominiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class,
-			Roles.user_role_query.class},
+	@Operation ( grantees={roles.application_query.class,
+			roles.user_role_query.class},
 			translated="findDomainValuesByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ValorDomini> findValorsDominiByFiltre(
@@ -101,7 +101,7 @@ public abstract class DominiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findApplicationDomainsByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Domini> findDominisAplicacioByCodiAplicacio(
@@ -116,7 +116,7 @@ public abstract class DominiService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findDomainsByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Domini> findDominisByCodiAplicacio(

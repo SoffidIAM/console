@@ -204,4 +204,22 @@ public class CIFSStrategy implements CommunicationStrategy
 			archivo.delete();
 		}
 	}
+
+	public void deleteFile(String path) throws NASException {
+		SmbFile archivo= null;
+		
+		try
+		{
+			archivo= new SmbFile(this.rootPath + path.substring(path.indexOf("/") + 1));
+			
+			archivo.delete();
+		}
+		catch(Exception ex)
+		{
+			throw new NASException(ex);
+		}
+		finally
+		{
+		}
+	}
 }

@@ -11,10 +11,10 @@ import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.RolsGrup;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.model.RolsGrupEntity

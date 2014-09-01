@@ -26,8 +26,9 @@
 				obj.descripcio = " - Select user type - ";
 				return obj;
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
-			</ejb-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari"
+				if='${isUserInRole("usersDomain:query")}'>
+			</ejb-finder> 
 			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUsuari">
 			</new-instance-bean>
 		</finder>
@@ -95,6 +96,12 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.ContenidorRol"> 
 			</new-instance-bean>
 		</finder>
+		<finder name="primaryGroup" type="grup">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB"
+				method="findGrupByCodiGrup" if="${canQueryUser}">
+				<parameter value="${instance.codiGrupPrimari}" />
+			</ejb-finder>
+		</finder>
 		<finder name="grup" type="grup"> <!-- user:query -->
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB"
 				method="findUsuariGrupsByCodiUsuari" if="${canQueryUser}">
@@ -134,6 +141,16 @@
 			<new-instance-bean className="es.caib.bpm.vo.ProcessInstance">
 			</new-instance-bean>
 		</finder>
+		<script-handler>
+			<insert-script>
+				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttributes(self); 
+			</insert-script>
+			<update-script>
+				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttributes(self); 
+			</update-script>
+		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/UsuariEJB">
 			<insert-method method="create" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
@@ -162,6 +179,8 @@
 			<update-script>
 				if (instance.getCodiUsuari() == null)
 					instance.setCodiUsuari (parent.instance.getCodi());
+				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttribute(self); 
 			</update-script>
 		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">

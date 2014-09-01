@@ -1128,13 +1128,13 @@
 														<input_etiqueta
 															value="${c:l('usuaris.zul.Grupprimari-2')}" />
 
-														<hbox>
+														<div style="display: inline; ">
 															<input_dada id="codiGrupPrimari"
 																bind="@codiGrupPrimari" mascara="no empty"
-																lectura="${!canModifyUser}" width_custom="200px" />
-															<label value="*" />
-															<separator width="0px" />
-															<imageclic src="~./img/grup.gif">
+																lectura="${!canModifyUser}" width_custom="200px" 
+																tooltip="tooltipGrup" style="display: inline-block; "/>
+															<label value="*" style="display: inline-block; padding-left: 4px; padding-right: 4px;"/>
+															<imageclic src="~./img/grup.gif" style="display: inline-block; ">
 																<attribute name="onClick">
 																	if (canModifyUser)
 																	{
@@ -1149,7 +1149,8 @@
 																	}
 																</attribute>
 															</imageclic>
-														</hbox>
+															<label bind="primaryGroup[1]/descripcio" style="display: inline; padding-left: 4px;"/>
+														</div>
 													</row>
 													<row>
 														<input_etiqueta
@@ -1491,7 +1492,6 @@
 	}
 </attribute>
 										</imageclic>
-
 										<popup id="pwd">
 											<label
 												value="${c:l('usuaris.zul.Canviacontrasenya')}" />

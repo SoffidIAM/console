@@ -18,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ImpressoraEntity.class})
 public abstract class ImpressoraService {
 
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getPrinters")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Impressora> getImpressores()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.printer_create.class},
+	@Operation ( grantees={roles.printer_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Impressora create(
@@ -33,14 +33,14 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.printer_delete.class},
+	@Operation ( grantees={roles.printer_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Impressora impressora)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.printer_update.class},
+	@Operation ( grantees={roles.printer_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Impressora update(
@@ -48,7 +48,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findPrintersByPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Impressora> findImpressoresByCodiImpressora(
@@ -56,7 +56,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.printer_query.class},
+	@Operation ( grantees={roles.printer_query.class},
 			translated="findPrintersByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Impressora> findImpressoresByCriteri(
@@ -67,7 +67,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findPrinterByPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Impressora findImpressoraByCodiImpressora(
@@ -75,8 +75,8 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_printer_create.class,
-			Roles.user_printer_acl_create.class},
+	@Operation ( grantees={roles.user_printer_create.class,
+			roles.user_printer_acl_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariImpressora create(
@@ -84,15 +84,15 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_printer_delete.class,
-			Roles.user_printer_acl_delete.class},
+	@Operation ( grantees={roles.user_printer_delete.class,
+			roles.user_printer_acl_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.UsuariImpressora usuariImpressora)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.group_printer_create.class},
+	@Operation ( grantees={roles.group_printer_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.GrupImpressora create(
@@ -100,14 +100,14 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_printer_delete.class},
+	@Operation ( grantees={roles.group_printer_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.GrupImpressora grupImpressora)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findPrinterGroupByGroupNameAndPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.GrupImpressora findGrupImpressoraByCodiGrupAndCodiImpressora(
@@ -116,7 +116,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findPrinterUserByUserNameAndPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariImpressora findUsuariImpressoraByCodiUsuariAndCodiImpressora(
@@ -125,7 +125,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.printer_query.class},
+	@Operation ( grantees={roles.printer_query.class},
 			translated="getUserPrintersByPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UsuariImpressora> getUsuariImpressoresByCodiImpressora(
@@ -133,7 +133,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="getPrintersGroupByPrinterName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection getGrupImpressoresByCodiImpressora(
@@ -141,9 +141,9 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_printer_create.class,
-			Roles.user_custom_update.class,
-			Roles.user_printer_acl_create.class},
+	@Operation ( grantees={roles.user_printer_create.class,
+			roles.user_custom_update.class,
+			roles.user_printer_acl_create.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariImpressora update(
@@ -151,7 +151,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class,Roles.group_query.class},
+	@Operation ( grantees={roles.Tothom.class,roles.group_query.class},
 			translated="findPrintersGroupByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.GrupImpressora> findGrupImpressoresByCodiGrup(
@@ -159,7 +159,7 @@ public abstract class ImpressoraService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_printer_create.class},
+	@Operation ( grantees={roles.group_printer_create.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.GrupImpressora update(

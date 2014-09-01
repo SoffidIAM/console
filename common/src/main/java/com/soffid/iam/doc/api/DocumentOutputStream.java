@@ -26,7 +26,8 @@ public class DocumentOutputStream extends OutputStream {
 
 
 	int used = 0;
-	private DocumentService documentService;
+	private DocumentService documentService = null;
+	private com.soffid.iam.doc.service.ejb.DocumentService ejbDocumentService = null;
 	
 	public DocumentOutputStream (DocumentService documentService) throws DocumentBeanException, InternalErrorException
 	{
@@ -34,6 +35,11 @@ public class DocumentOutputStream extends OutputStream {
 		documentService.openUploadTransfer();
 	}
 
+	public DocumentOutputStream (com.soffid.iam.doc.service.ejb.DocumentService ejbDocumentService) throws DocumentBeanException, InternalErrorException
+	{
+		this.ejbDocumentService = ejbDocumentService;
+		ejbDocumentService.openUploadTransfer();
+	}
 	
 	@Override
 	public void write(byte[] b) throws IOException {
@@ -49,7 +55,10 @@ public class DocumentOutputStream extends OutputStream {
 		{
 			byte newArray [] = Arrays.copyOfRange(b, off, off+len);
 			try {
-				documentService.nextUploadPackage(newArray, newArray.length);
+				if (documentService != null)
+					documentService.nextUploadPackage(newArray, newArray.length);
+				if (ejbDocumentService != null)
+					ejbDocumentService.nextUploadPackage(newArray, newArray.length);
 			} catch (Exception e) {
 				throw new IOException("Cannot upload document", e);
 			}
@@ -66,7 +75,11 @@ public class DocumentOutputStream extends OutputStream {
 	public void close() throws IOException {
 		flush ();
 		try {
-			documentService.endUploadTransfer();
+			if (documentService != null)
+				documentService.endUploadTransfer();
+			if (ejbDocumentService != null)
+				ejbDocumentService.endUploadTransfer();
+			
 		} catch (InternalErrorException e) {
 			throw new IOException("Cannot upload document", e);
 		} catch (DocumentBeanException e) {

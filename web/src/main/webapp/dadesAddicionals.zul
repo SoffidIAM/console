@@ -290,6 +290,10 @@
 								</listbox>
 						</row>
 						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Required')}"/>
+								<checkbox bind="@required" disabled="${!canModifyMetadata}" onClick="" onCheck=""/>
+						</row>
+						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}"/>
 								<textbox bind="@size" id="detail_size" maxlength="50"
 									sclass="textbox" readonly="${!canModifyMetadata}" width="8em" onChange=""/>
@@ -325,6 +329,42 @@
 									</imageclic>
 								</datarow>
 							</grid>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.AdminVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@adminVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.OperatorVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@operatorVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.UserVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@userVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
 						</row>
 					</rows>
 				</grid>

@@ -31,6 +31,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -40,7 +41,6 @@ import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
 
@@ -679,7 +679,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             targetEntity.setTipusDomini(nomDomini);
         } else {
             DominiAplicacioEntity dominiAplicacioEntity = findDominiByNomAndCodiApliacio(
-                    domini.getNom(), domini.getCodiExtern());
+                    domini.getNom(), sourceVO.getCodiAplicacio());
             if (dominiAplicacioEntity != null) {
                 targetEntity.setDominiAplicacio(dominiAplicacioEntity);
                 targetEntity.setTipusDomini(TipusDomini.DOMINI_APLICACIO);

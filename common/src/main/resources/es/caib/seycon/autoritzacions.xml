@@ -788,12 +788,22 @@
 
 	<autoritzacio>
 		<codi>agent:refreshRoles</codi>
-		<descripcio>To propagate all agetn roles</descripcio>
+		<descripcio>To propagate all agent roles</descripcio>
 		<ambit>Agents</ambit>
 		<hereta>
 			agent:query
 		</hereta>
 	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:refreshGroups</codi>
+		<descripcio>To propagate all agent groups</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
 
 	<autoritzacio>
 		<codi>agent:accessControl:create</codi>
@@ -1192,4 +1202,43 @@
 		<descripcio>Query scheduled tasks status</descripcio>
 		<ambit>Scheduled tasks</ambit>
 	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>schedule:query</codi>
+		<descripcio>Query scheduled tasks status</descripcio>
+		<ambit>Scheduled tasks</ambit>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>attributeTranslation:query</codi>
+		<descripcio>Query attribute translation tables</descripcio>
+		<ambit>Attribute translation</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>attributeTranslation:create</codi>
+		<descripcio>Create attribute translation tables</descripcio>
+		<ambit>Attribute translation</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>attributeTranslation:update</codi>
+		<descripcio>Update attribute translation tables</descripcio>
+		<ambit>Attribute translation</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>attributeTranslation:delete</codi>
+		<descripcio>Delete attribute translation tables</descripcio>
+		<ambit>Attribute translation</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:attributeTranslation:show</codi>
+		<descripcio>Access to attribute translation window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
 </autoritzacions>

@@ -19,9 +19,6 @@
 				className="es.caib.seycon.ng.comu.SeyconServerInfo">
 			</new-instance-bean>			
 		</finder>		
-	</datanode>	
-	
-	<datanode name="server">
 		<finder name="agentsserver" type="agentserver"> <!-- monitor:agent:list -->
 			<ejb-finder jndi="java:comp/env/ejb/SeyconServerEJB"
 				method="getServerAgentStatus" if = "${queryAgentsEnabled}">
@@ -54,6 +51,9 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.SeyconServerInfo" />
 		</finder>		
 		<ejb-handler jndi="java:comp/env/ejb/SeyconServerEJB"/>
+	</datanode>	
+	
+	<datanode name="server">
 	</datanode>
 	
 	<datanode name="agentserver"/>

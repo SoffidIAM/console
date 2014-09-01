@@ -168,11 +168,13 @@ public class ApplicationTreecell extends Treecell {
 					org.zkoss.zk.ui.Executions.getCurrent().sendRedirect(path, "_blank"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} else {
-				
-				Executions.getCurrent().addAuResponse("setUrl", 
-						new AuScript(this, 
-								String.format("window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");",
-										getPagina(), getLabel(), path)));
+				if (!Executions.getCurrent().isExplorer())
+				{
+					Executions.getCurrent().addAuResponse("setUrl", 
+							new AuScript(this, 
+									String.format("window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");",
+											getPagina(), getLabel(), path)));
+				}
 				
 				es.caib.zkib.zkiblaf.Application.setPage(pagina);
 			}

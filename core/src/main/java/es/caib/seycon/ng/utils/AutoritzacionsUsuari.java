@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
+
 import es.caib.seycon.net.SeyconServiceLocator;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
@@ -23,8 +25,10 @@ import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.GrupEntityDao;
 import es.caib.seycon.ng.model.MaquinaEntity;
+import es.caib.seycon.ng.model.Messages;
 import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
@@ -112,8 +116,12 @@ public class AutoritzacionsUsuari
 	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateUser (Usuari usuari, GrupEntityDao grupEntityDao)
+	public static boolean canUpdateUser (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
+		Usuari currentUser = getCurrentUsuari();
+		
+        if (currentUser != null && currentUser.getId().equals(usuari.getId()))
+        	return false;
 		// user:update [GRUPS]
 		// Sólo es necesario comprobar los grupos primarios y
 		// secundarios, no sus padres (ya están en la lista de
@@ -377,6 +385,8 @@ public class AutoritzacionsUsuari
 	public static boolean canUpdateUserMetadata (UsuariEntity usuari)
 	{
 		// user:metadata:update [GRUPS]
+		if (! hasUpdateUserMetadata())
+			return false;
 
 		// Si pot actualitzar tots els usuaris
 		if (Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + Security.AUTO_ALL))
@@ -1167,6 +1177,11 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_AGENT_PROPAGATE_ROLES);
 	}
 
+	public static boolean hasPropagateAgentGroups ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_PROPAGATE_GROUPS);
+	}
+
 	public static boolean hasCreateAccessControlAgent ()
 	{
 		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_CREATE);
@@ -1837,27 +1852,7 @@ public class AutoritzacionsUsuari
 				// Sólo es necesario comprobar los grupos primarios y
 				// secundarios, no sus padres (ya están en la lista de
 				// autorizaciones)
-				boolean trobat = false;
-				if (usuariActual.getGrupPrimari() != null
-								&& Security.isUserInRole(Security.AUTO_USER_QUERY
-												+ "/" //$NON-NLS-1$
-												+ usuariActual.getGrupPrimari()
-																.getCodi()))
-					trobat = true;
-				if (!trobat)
-				{ // mirem grups secundaris
-					Collection grupsSecundaris = usuariActual.getGrupsSecundaris(); // UsuariGrupEntity
-					for (Iterator itGS = grupsSecundaris.iterator(); !trobat
-									&& itGS.hasNext();)
-					{
-						UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-						GrupEntity grupS = usuGrupActual.getGrup();
-						if (grupS != null
-										&& Security.isUserInRole(Security.AUTO_USER_QUERY
-														+ "/" + grupS.getCodi())) //$NON-NLS-1$
-							trobat = true;
-					}
-				}
+				boolean trobat = canQueryUser(usuariActual);
 				if (trobat)
 				{
 					usuarisPermis.add(usuariActual);
@@ -1866,6 +1861,35 @@ public class AutoritzacionsUsuari
 		}
 
 		return usuarisPermis;
+	}
+
+	public static boolean canQueryUser(UsuariEntity user) {
+		boolean trobat = false;
+
+		if (Security.isUserInRole(Security.AUTO_USER_QUERY + Security.AUTO_ALL))
+			return true;
+
+		if (user.getGrupPrimari() != null
+						&& Security.isUserInRole(Security.AUTO_USER_QUERY
+										+ "/" //$NON-NLS-1$
+										+ user.getGrupPrimari()
+														.getCodi()))
+			trobat = true;
+		if (!trobat)
+		{ // mirem grups secundaris
+			Collection grupsSecundaris = user.getGrupsSecundaris(); // UsuariGrupEntity
+			for (Iterator itGS = grupsSecundaris.iterator(); !trobat
+							&& itGS.hasNext();)
+			{
+				UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
+				GrupEntity grupS = usuGrupActual.getGrup();
+				if (grupS != null
+								&& Security.isUserInRole(Security.AUTO_USER_QUERY
+												+ "/" + grupS.getCodi())) //$NON-NLS-1$
+					trobat = true;
+			}
+		}
+		return trobat;
 	}
 
 	public static boolean canUpdateUserPassword (String codiGrup)
@@ -2157,4 +2181,23 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_REMEMBER_PASSWORD_QUERY);
 	}
 
+	public static AttributeVisibilityEnum getAttributeVisibility(UsuariEntity user, TipusDadaEntity tda) {
+		if (Security.getCurrentUser() != null && Security.getCurrentUser().equals(user.getCodi()))
+			return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
+		else if (AutoritzacionsUsuari.canUpdateUserMetadata(user))
+			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
+		else if (AutoritzacionsUsuari.canQueryUser(user))
+		{
+			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
+			if (AttributeVisibilityEnum.EDITABLE.equals (v))
+				v = AttributeVisibilityEnum.READONLY;
+			return v;
+		}
+		else
+			return AttributeVisibilityEnum.HIDDEN;
+	}
+
 }
+

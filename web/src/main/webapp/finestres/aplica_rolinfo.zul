@@ -85,6 +85,8 @@
 				
 				dades.getFellow("detall_nom").setReadonly(modifica);
 				dades.getFellow("detall_agent").setDisabled(modifica);
+				dades.getFellow("detall_codiAplicacio").setDisabled(true);
+				dades.getFellow("detall_codiAplicacio_button").setVisible(true);
 				
 				if (self.mode.compareToIgnoreCase("highlighted") != 0)
 				{
@@ -191,6 +193,19 @@
 							</hbox>
 						</row>
 						<row>
+							<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
+							
+							<hbox>
+								<textbox bind="@codiAplicacio" maxlength="20"
+									sclass="textbox"
+									constraint="no empty" id="detall_codiAplicacio"/>
+								<imageclic src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '
+									id ="detall_codiAplicacio_button"/>
+								<label value="*" />
+							</hbox>
+								
+						</row>
+						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Descripcia')}"/>
 							
 							<hbox width="100%">
@@ -271,7 +286,7 @@
 									label="${c:l('aplica_rolinfo.zul.Atorgarelrolaunaltre')}">
 									<attribute name="onClick">
 										String s_valor_domini = form.getJXPathContext().getValue("/domini/nom");
-										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || es.caib.seycon.ng.utils.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
+										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
 											Events.postEvent ("onInicia",desktop.getPage("rolsLlista").getFellow("esquemaLlista"), form);
 										} else {
 											Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.ErrorAtorgarRol"),
@@ -350,7 +365,7 @@
 										selected = form.getFellow("detall_domini").getSelectedItem().getValue(); 
 										String s_valor_domini = selected == null ? null: selected.getInstance().getNom();
 										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || 
-											es.caib.seycon.ng.utils.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) 
+											es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) 
 										{
 											desktop.getPage("grups_posseidors").setAttribute("tipusUnitatOrganizativa","");
 											desktop.getPage("grups_posseidors").setAttribute("llistaObsolets",false);

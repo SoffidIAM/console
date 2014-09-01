@@ -136,4 +136,23 @@ public class HTTPStrategy implements CommunicationStrategy
 			archivo.delete();
 		}
 	}
+
+	public void deleteFile(String path) throws NASException {
+		String urlPath= null;
+		
+		try
+		{
+			urlPath= this.rootURL + path.substring(1);
+			
+			this.filePutter.delete(urlPath);
+			
+		}
+		catch(Exception ex)
+		{
+			throw new NASException(ex);
+		}
+		finally
+		{
+		}
+	}
 }

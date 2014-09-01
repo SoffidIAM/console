@@ -96,8 +96,8 @@
 		{ //Retornem "QUALQUE_VALOR_DOMINI","Rol atorgat a qualsevol valor domini",tipusDomini
 			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
 			String [] dades = { // Valors constants
-				es.caib.seycon.ng.utils.TipusDomini.QUALQUE_VALOR_DOMINI,
-				es.caib.seycon.ng.utils.TipusDomini.Descripcio.QUALQUE_VALOR_DOMINI,
+				es.caib.seycon.ng.comu.TipusDomini.QUALQUE_VALOR_DOMINI,
+				es.caib.seycon.ng.comu.TipusDomini.Descripcio.QUALQUE_VALOR_DOMINI,
 				tipusDomini
 			};
 			Component formComponent = (Component) pageScope.get("contextComponent");

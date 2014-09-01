@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 })
 public abstract class GrupService {
 
-	@Operation ( grantees={Roles.group_create.class},
+	@Operation ( grantees={roles.group_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Grup create(
@@ -42,7 +42,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class},
+	@Operation ( grantees={roles.group_query.class},
 			translated="findGroupByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Grup findGrupByCodiGrup(
@@ -50,7 +50,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class,Roles.lopd_query.class},
+	@Operation ( grantees={roles.group_query.class,roles.lopd_query.class},
 			translated="findSubgroupsByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findSubGrupsByCodiGrup(
@@ -58,7 +58,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="removeGroupFormUser")
+	@Operation (translated="removeGroupFormUser", grantees={roles.user_group_delete.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void removeGrupFromUsuari(
 		java.lang.String codiUsuari, 
@@ -92,7 +92,7 @@ public abstract class GrupService {
 		es.caib.seycon.ng.comu.Grup grup)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.group_update.class},
+	@Operation ( grantees={roles.group_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Grup update(
@@ -119,7 +119,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="addGroupToUser")
+	@Operation (translated="addGroupToUser", grantees={roles.user_group_create.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void addGrupToUsuari(
 		java.lang.String codiUsuari, 
@@ -147,7 +147,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_group_create.class},
+	@Operation ( grantees={roles.user_group_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariGrup create(
@@ -155,7 +155,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_group_delete.class},
+	@Operation ( grantees={roles.user_group_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
@@ -170,7 +170,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.lopd_query.class},
+	@Operation ( grantees={roles.lopd_query.class},
 			translated="getSuperGroup")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Grup getSuperGrup(
@@ -178,7 +178,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUsersGroupByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UsuariGrup> findUsuariGrupsByCodiUsuari(
@@ -193,13 +193,13 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.lopd_query.class})
+	@Operation ( grantees={roles.lopd_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> getConselleriesAmbDireccionsGenerals()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class},
+	@Operation ( grantees={roles.group_query.class},
 			translated="getParentList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> getLlistaDePares(
@@ -207,7 +207,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class},
+	@Operation ( grantees={roles.group_query.class},
 			translated="findGroupById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Grup findGrupById(
@@ -215,7 +215,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class},
+	@Operation ( grantees={roles.group_query.class},
 			translated="getRolesFromGroup")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> getRolsFromGrup(
@@ -223,7 +223,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_user_query.class},
+	@Operation ( grantees={roles.group_user_query.class},
 			translated="findUsersBelongtoGroupByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UsuariGrup> findUsuarisPertanyenAlGrupByCodiGrup(
@@ -238,7 +238,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_role_query.class},
+	@Operation ( grantees={roles.group_role_query.class},
 			translated="findUsersRolesDomainTypeAndUserGroups")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisTipusDominiGrupsAndGrupsUsuari(
@@ -246,7 +246,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_query.class},
+	@Operation ( grantees={roles.group_query.class},
 			translated="findGroupsByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGrupsByFiltre(
@@ -261,7 +261,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.group_role_query.class},
+	@Operation ( grantees={roles.group_role_query.class},
 			translated="getRolesFromGroupAndParentGroup")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolsGrup> getRolsFromGrupYParesGrup(

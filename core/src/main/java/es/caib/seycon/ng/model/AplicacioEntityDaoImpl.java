@@ -15,12 +15,12 @@ import java.util.List;
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Auditoria;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 /**
  * @see es.caib.seycon.ng.model.AplicacioEntity
  */

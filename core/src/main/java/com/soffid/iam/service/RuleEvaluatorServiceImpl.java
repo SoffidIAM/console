@@ -27,6 +27,7 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.ValorDomini;
@@ -47,7 +48,6 @@ import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @author bubu

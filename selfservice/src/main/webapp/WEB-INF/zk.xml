@@ -1,7 +1,11 @@
 <zk>
 	<listener>
-		<description>Inicializador de thread JBOSS</description>
+		<description>Jboss thread start event</description>
 		<listener-class>es.caib.zkib.zkiblaf.jboss.JBossEventThreadInit</listener-class>
+	</listener>
+	<listener>
+		<description>JBoss thread end event</description>
+		<listener-class>es.caib.zkib.zkiblaf.jboss.JBossEventThreadCleanup</listener-class>
 	</listener>
 	<error-page>
 		<exception-type>java.lang.Throwable</exception-type>
@@ -47,9 +51,14 @@ zk.error = function (msg) {
 	leCA = (msg!=null && msg.startsWith(eCA)); 
 	tancaES = (lES || leES);
 	tancaCA = (lCA || leCA);
-	titolFinestra = esTimeout?(lES?"Aviso: se ha excedido el tiempo de espera máximo":lCA?"Avís: s'ha excedit el temps d'espera màxim":"Warning: exceeded the maximum time"):(leES?"Atención: ha ocurrido un error":leCA?"Atenció: ha ocorregut un error":"Warning: An error occurred");
+	titolFinestra = esTimeout?(lES?"Aviso: se ha excedido el tiempo de espera máximo":
+								lCA?"Avís: s'ha excedit el temps d'espera màxim":
+									"Warning: exceeded the maximum time"):
+							(leES?"Atención: ha ocurrido un error":leCA?"Atenció: ha ocorregut un error":"Warning: An error occurred");
 	if (msg!=null && esPopup)
-		msg = eES?"Para poder ver el archivo debe permitir ventanas emergentes para este sitio!":eCA?"Per poder veure l'arxiu ha d'activar les finestres emergents!":"In order to download the file you must enable pop-ups!"; 
+		msg = lES?"Para poder ver el archivo debe permitir ventanas emergentes para este sitio!":
+			lCA?"Per poder veure l'arxiu ha d'activar les finestres emergents!":
+			"In order to download the file you must enable pop-ups!"; 
 	if (!zk._errcnt) zk._errcnt = 0; else 
 		try {document.getElementById("zk_err_" + zk._errcnt).style.display = 'none';document.getElementById("timeout.mask"+ zk._errcnt).style.display = 'none';} catch (ee){} //amaguem les anteriors
 	var id = "zk_err_" + (++zk._errcnt);

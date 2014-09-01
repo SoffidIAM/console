@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.model.AccountPasswordEntity.class,
-	es.caib.seycon.ng.model.AccountEntity.class})
+	es.caib.seycon.ng.model.AccountEntity.class,
+	SeyconServerService.class})
+
 public abstract class InternalPasswordService {
 
 	@Operation(translated="checkPolicy")

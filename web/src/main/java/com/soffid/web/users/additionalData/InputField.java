@@ -2,15 +2,11 @@ package com.soffid.web.users.additionalData;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -21,29 +17,34 @@ import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Window;
+
+import com.soffid.iam.api.AttributeVisibilityEnum;
 
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
-import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
+import es.caib.seycon.ng.servei.ejb.SelfService;
+import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
+import es.caib.zkib.events.XPathValueEvent;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField extends Div implements XPathSubscriber{
@@ -55,11 +56,20 @@ public class InputField extends Div implements XPathSubscriber{
 	private String compos;
 	boolean userType;
 	
-	private DadesAddicionalsService dadesAddicionalsServ;
 	private SingletonBinder binder = new SingletonBinder(this);
 	private SingletonBinder binder2 = new SingletonBinder(this);
 	private SingletonBinder binder3 = new SingletonBinder(this);
 	private SingletonBinder binder4 = new SingletonBinder(this);
+	private SingletonBinder binder5  = new SingletonBinder(this);;
+	private boolean twoPhaseEdit;
+
+	public boolean isTwoPhaseEdit() {
+		return twoPhaseEdit;
+	}
+
+	public void setTwoPhaseEdit(boolean twoPhaseEdit) {
+		this.twoPhaseEdit = twoPhaseEdit;
+	}
 
 	public InputField(){
 		super();
@@ -72,24 +82,32 @@ public class InputField extends Div implements XPathSubscriber{
 		binder2.setDataPath("@codiDada");
 		binder3.setDataPath("@blobDataValue");
 		binder4.setDataPath("@valorDadaDate");
+		binder5.setDataPath("@visibility");
 		createField();
 	}
 	
 	public void onUpdate(XPathEvent arg0) 
 	{
 		try {
-			binder.setDataPath("@valorDada");
-			binder2.setDataPath("@codiDada");
-			binder3.setDataPath("@blobDataValue");
-			binder4.setDataPath("@valorDadaDate");
-			compos = new String();
-			createField();
+			if (! ( arg0 instanceof XPathValueEvent))
+			{
+				binder.setDataPath("@valorDada");
+				binder2.setDataPath("@codiDada");
+				binder3.setDataPath("@blobDataValue");
+				binder4.setDataPath("@valorDadaDate");
+				binder5.setDataPath("@visibility");
+				compos = new String();
+				createField();
+			}
+			else if (updateUser)
+				updateUser();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	boolean disableRecursive = false;
+	private boolean updateUser;
 	
 	
 	public void onSelectUser (Event event)
@@ -98,6 +116,19 @@ public class InputField extends Div implements XPathSubscriber{
 		Events.postEvent("onInicia", p
 				.getFellow("esquemaLlista"), event.getTarget());
 
+	}
+	
+	/** 
+	 * Event received on two phase edit 
+	 * @throws CommitException */
+	public void changeData() throws CommitException
+	{
+		binder.getDataSource().commit();
+		Div div = (Div) getChildren().get(0);
+		((HtmlBasedComponent)div.getChildren().get(0)).setVisible(true);
+		((HtmlBasedComponent)div.getChildren().get(1)).setVisible(true);
+		((HtmlBasedComponent)div.getChildren().get(2)).setVisible(false);
+		((HtmlBasedComponent)div.getChildren().get(3)).setVisible(false);
 	}
 	
 	public void onActualitza(Event event)
@@ -111,10 +142,19 @@ public class InputField extends Div implements XPathSubscriber{
 	{
 		Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul?user="+binder.getValue(), "_new");
 	}
+	
 	public boolean updateUser()
 	{
 		String user = (String) binder.getValue();
-		Label l = (Label) ((Component) getChildren().get(0)).getChildren().get(2);
+		Component c = (Component) ((Component) getChildren().get(0));
+		
+		Label l;
+		
+		if (c.getChildren().get(2) instanceof Label)
+			l = (Label) c.getChildren().get(2);
+		else
+			l = (Label) c.getChildren().get(4);
+
 		try {
 			if (user == null)
 				l.setValue("");
@@ -135,7 +175,7 @@ public class InputField extends Div implements XPathSubscriber{
 		return true;
 	}
 	
-	private synchronized void createField() throws NamingException, CreateException, InternalErrorException, IOException{
+	public synchronized void createField() throws NamingException, CreateException, InternalErrorException, IOException{
 		
 		if (getPage() == null)
 			return;	
@@ -145,106 +185,163 @@ public class InputField extends Div implements XPathSubscriber{
 		
 		disableRecursive = true;
 		
-		DadesAddicionalsServiceHome homeDades = (DadesAddicionalsServiceHome) new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
-		dadesAddicionalsServ = homeDades.create();
+		SelfServiceHome home = (SelfServiceHome)  new InitialContext().lookup (SelfServiceHome.JNDI_NAME);
+		SelfService ejb = home.create();
 		
 		if(binder2.getValue() != null){
-			List<TipusDada> tipusDadaList = (List) dadesAddicionalsServ.findTipusDadesByCodi(binder2.getValue().toString());
 			String result = "";
 			Map <String,Object> map=new HashMap<String, Object>();
-			boolean updateUser = false;
+			updateUser = false;
+			AttributeVisibilityEnum visibility = (AttributeVisibilityEnum) binder5.getValue();
 
+			boolean readonly = AttributeVisibilityEnum.READONLY.equals(visibility);
+			boolean dualEdit = twoPhaseEdit && ! readonly;
+			String readonlyExpr = readonly ? 
+					"true" : "${!canUpdateUserMetadata}";
 
-			for(int i=0; i<tipusDadaList.size(); i++){
-				TipusDada typeData = tipusDadaList.get(i);
-				TypeEnumeration type = typeData.getType();
-				String stringType = new String();
-				if(type!=null)
-					stringType = type.toString();
-				int size = 0;
-				if(typeData.getSize() != null)
-					size = typeData.getSize();
-				if(stringType != null && !stringType.trim().isEmpty()){
-					if(TypeEnumeration.USER_TYPE.equals(type))
-					{
-						updateUser = true;
-						result = "<div style='display:inline-block'>"
-								+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>"+
-								"<imageclic src='/img/user.png' onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"
-								+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
-								+ "</div>";
-					}
-					else if(TypeEnumeration.BINARY_TYPE.equals(type))
-					{
-						boolean visible = fileAlreadySaved();
-						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
-									"onClick=\"self.parent.parent.uploadBinary();\" disabled=\"${!canUpdateUserMetadata}\">" +
-									"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
-									"</button></h:span>";
-					}
-					else if(TypeEnumeration.PHOTO_TYPE.equals(type))
-					{
-						if(binder3.getValue() != null){
-							map.put("image", byteArrayToImage(getBlobDataValue()));
-							result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
-								    " onClick=\"self.parent.parent.upload(self.parent);\" disabled=\"${!canUpdateUserMetadata}\">" +
-									"</button><div height=\"100px\" width=\"100px\" style=\"overflow:auto\"><image content=\"${arg.image}" + 
-									 "\"/></div></h:span>";
-						}else{
-							result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
-								    " onClick=\"self.parent.parent.upload(self.parent);\" disabled=\"${!canUpdateUserMetadata}\">" +
-									"</button><div height=\"100px\" width=\"100px\" style=\"overflow:auto\"></div></h:span>";
-						}
-					}
-					else if(TypeEnumeration.DATE_TYPE.equals(type))
-					{
-						if((binder4.getValue() != null) || (binder.getValue() != null)) {
-							Calendar stringDate = null;
-							if(binder4.getValue() != null)
-								stringDate =  (Calendar) binder4.getValue();
-							else if(stringDate == null)
-								stringDate = (Calendar) binder.getValue();
-							result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><datebox bind=\"@valorDadaDate\" " +
-									"format=\"dd/MM/yyyy\" disabled=\"${!canUpdateUserMetadata}\"/></h:span>"; 
-						}else{
-							result = "<datebox bind=\"@valorDadaDate\" onChange=\"\" disabled=\"${!canUpdateUserMetadata}\"/>";
-						}
-					}
-					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
-					{
-						if(binder.getValue() != null && !binder.getValue().toString().trim().isEmpty()){
-							boolean isEmail = testEmail(binder.getValue().toString());
-							String email = binder.getValue().toString();
-							if(!isEmail){
-								result = "<textbox maxlength=\"" + size +"\" value=\"\" tooltip=\"${c:l('InputField.NoCorrectEmail')}\" " +
-										"onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
-							}else{
-								result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
-							}
-						}else
-							result = "<textbox bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
-					}	
-					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
-					{
-						if(binder.getValue() != null)
-							result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
-						else
-							result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\"${!canUpdateUserMetadata}\"/>";
-					} else { // Listbox
-						result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" disabled=\"${!canUpdateUserMetadata}\">";
-						result = result + "<listitem value=\"\"/>";
-						for (String v: typeData.getValues())
-						{
-							String s = v.replaceAll("\"", "&quot;");
-							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
-						}
-						result = result + "</listbox>";
-					}
-				}
-				if (result.equals(""))
+			TipusDada typeData = ejb.getDataTypeDescription(binder2.getValue().toString());
+			TypeEnumeration type = typeData.getType();
+			String stringType = new String();
+			if(type!=null)
+				stringType = type.toString();
+			int size = 0;
+			if(typeData.getSize() != null)
+				size = typeData.getSize();
+			String required = "";
+			if (typeData.isRequired())
+				required = "*";
+				
+			if(stringType != null && !stringType.trim().isEmpty()){
+				if(TypeEnumeration.USER_TYPE.equals(type))
 				{
-					result= result + "<textbox bind=\"@valorDada\" readonly=\"${!canUpdateUserMetadata}\"/>";
+					updateUser = true;
+					if (dualEdit)
+					{
+						result= "<div style='display:inline;'>"
+								+ "<label bind=\"@valorDada\" />"
+								+ "<imageclic src='/img/pencil.png' "
+									+ "onClick='self.visible = self.previousSibling.visible = false; "
+										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+								+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+									+readonlyExpr+"\" visible='false'/>" 
+								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"
+								+ "<label/>"+required+"</div>";
+					} else {
+						result = "<div style='display:inline' visible='"+(!dualEdit)+"'>"
+								+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+								+readonlyExpr+"\"/>" +
+								"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"
+								+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
+								+ required+"</div>";
+					}
 				}
+				else if(TypeEnumeration.BINARY_TYPE.equals(type))
+				{
+					boolean visible = fileAlreadySaved();
+					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
+								"onClick=\"self.parent.parent.uploadBinary();\" "
+								+ "disabled=\""+readonlyExpr+"\">" +
+								"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
+								"</button>"+required+"</h:span>";
+				}
+				else if(TypeEnumeration.PHOTO_TYPE.equals(type))
+				{
+					if(binder3.getValue() != null){
+						map.put("image", byteArrayToImage(getBlobDataValue()));
+						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" "
+							    + " onClick=\"self.parent.parent.upload(self.parent);\" "
+							    + "disabled=\""+readonlyExpr+"\"/>"
+								+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+"</h:span>";
+					}else{
+						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
+							    " onClick=\"self.parent.parent.upload(self.parent);\" "
+							    + "disabled=\""+readonlyExpr+"\">" +
+								"</button>"+required+"</h:span>";
+					}
+				}
+				else if(TypeEnumeration.DATE_TYPE.equals(type))
+				{
+					result = "<zk><datebox bind=\"@valorDadaDate\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"' />"+required+"</zk>"; 
+					if (dualEdit)
+					{
+						result= "<div style='display:inline-block;'><datebox bind=\"@valorDadaDate\" disabled='true' format=\"${c:l('usuaris.zul.dateFormat2')}\" onChange=\"\" />"
+								+ "<imageclic src='/img/pencil.png' "
+									+ "onClick='self.visible = self.previousSibling.visible = false; "
+										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+								+ result
+								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/></div>";
+					}
+				}
+				else if(TypeEnumeration.EMAIL_TYPE.equals(type))
+				{
+					result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' visible='"+(!dualEdit)+"' "
+								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\"/>";
+					if (dualEdit)
+					{
+						result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+								+ "<imageclic src='/img/pencil.png' "
+									+ "onClick='self.visible = self.previousSibling.visible = false; "
+										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+								+ result
+								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
+					}
+					else if (required.length() > 0)
+					{
+						result = "<zk>"+result+required+"</zk>"; 
+							
+					}
+				}	
+				else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
+				{
+					if (dualEdit)
+						result= result + "<div style='display:inline-block;'><label bind='@valorDada'/>"
+								+ "<imageclic src='/img/pencil.png' "
+									+ "onClick='self.visible = self.previousSibling.visible = false; "
+										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+								+ "<textbox bind=\"@valorDada\" maxlength=\"" + size +"\" width='80%' "
+										+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='self.parent.parent.changeData()'/>"
+								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
+					else
+						result = "<zk><textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' "
+								+ "readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
+				} else { // Listbox
+					result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" "
+							+ "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"'>";
+					result = result + "<listitem value=\"\"/>";
+					for (String v: typeData.getValues())
+					{
+						String s = v.replaceAll("\"", "&quot;");
+						result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+					}
+					result = result + "</listbox>";
+					if (dualEdit)
+					{
+						result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+								+ "<imageclic src='/img/pencil.png' "
+									+ "onClick='self.visible = self.previousSibling.visible = false; "
+										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+								+ result
+								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
+					}
+					else if (required.length() > 0)
+					{
+						result = "<zk>"+result+required+"</zk>"; 
+							
+					}
+				}
+			}
+			if (result.equals(""))
+			{
+				if (twoPhaseEdit && ! readonly)
+					result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+							+ "<imageclic src='/img/pencil.png' "
+								+ "onClick='self.visible = self.previousSibling.visible = false; "
+									+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+							+ "<textbox bind=\"@valorDada\" width='70%' "
+									+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()'/>"
+							+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()'/>"+required+"</div>";
+				else
+					result= "<zk><textbox bind=\"@valorDada\" width='80%' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 			}
 			if(compos.isEmpty() || !compos.equals(result))
 			{
@@ -300,9 +397,20 @@ public class InputField extends Div implements XPathSubscriber{
             data = os.toByteArray();
         }
         setBlobDataValue(data);
+        for (Iterator it = span.getChildren().iterator(); it.hasNext();)
+        {
+        	Component c = (Component) it.next();
+        	if (c instanceof Image)
+        		it.remove();
+        }
         org.zkoss.zul.Image img = new org.zkoss.zul.Image();
         img.setContent(byteArrayToImage(data));
-        img.setParent((Component) span.getChildren().get(1));        
+        img.setParent(span);       
+        img.setStyle("max-width: 100px; max-height: 100px; ");
+        if (twoPhaseEdit)
+        {
+        	binder.getDataSource().commit();
+        }
     }
 	
 
@@ -350,7 +458,8 @@ public class InputField extends Div implements XPathSubscriber{
 	        }
         }
         setBlobDataValue(data);
-        System.out.println("Uploaded file. ");
+        if (twoPhaseEdit)
+        	binder.getDataSource().commit();
     }
 	
 	public void downloadBinary(Component span) throws Exception {
@@ -380,6 +489,7 @@ public class InputField extends Div implements XPathSubscriber{
 		binder2.setPage(page);
 		binder3.setPage(page);
 		binder4.setPage(page);
+		binder5.setPage(page);
 	}
 
 	public void setParent(Component parent) {
@@ -388,6 +498,7 @@ public class InputField extends Div implements XPathSubscriber{
 		binder2.setParent(parent);
 		binder3.setParent(parent);
 		binder4.setParent(parent);
+		binder5.setParent(parent);
 	}
 
 	public Object clone() {
@@ -400,6 +511,8 @@ public class InputField extends Div implements XPathSubscriber{
 		clone.binder3.setDataPath(binder3.getDataPath());
 		clone.binder4 = new SingletonBinder(clone);
 		clone.binder4.setDataPath(binder4.getDataPath());
+		clone.binder5 = new SingletonBinder(clone);
+		clone.binder5.setDataPath(binder5.getDataPath());
 		return clone;
 	}
 		

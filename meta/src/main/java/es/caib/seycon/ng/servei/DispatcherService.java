@@ -31,10 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class,
 	ScheduledTaskService.class,
-	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class})
+	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
+	SeyconServerService.class})
 public abstract class DispatcherService {
 
-	@Operation ( grantees={Roles.agent_create.class},
+	@Operation ( grantees={roles.agent_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Dispatcher create(
@@ -42,11 +43,11 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class,
-			Roles.agent_accessControl_set.class,
-			Roles.agent_accessControl_delete.class,
-			Roles.agent_accessControl_create.class,
-			Roles.agent_accessControl_update.class},
+	@Operation ( grantees={roles.agent_update.class,
+			roles.agent_accessControl_set.class,
+			roles.agent_accessControl_delete.class,
+			roles.agent_accessControl_create.class,
+			roles.agent_accessControl_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Dispatcher update(
@@ -54,15 +55,15 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_delete.class},
+	@Operation ( grantees={roles.agent_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Dispatcher dispatcher)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class,
-			Roles.application_update.class},
+	@Operation ( grantees={roles.agent_query.class,
+			roles.application_update.class},
 			translated="findDispatchersByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Dispatcher> findDispatchersByFiltre(
@@ -75,7 +76,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="findDispatcherByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Dispatcher findDispatcherByCodi(
@@ -83,7 +84,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_accessControl_create.class},
+	@Operation ( grantees={roles.agent_accessControl_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ControlAcces create(
@@ -91,15 +92,15 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_delete.class,
-			Roles.agent_accessControl_delete.class},
+	@Operation ( grantees={roles.agent_delete.class,
+			roles.agent_accessControl_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ControlAcces controlAcces)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="findAccessControlByDispatcherName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ControlAcces> findControlAccesByCodiAgent(
@@ -107,22 +108,31 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_refreshUsers.class},
+	@Operation ( grantees={roles.agent_refreshUsers.class},
 			translated="porpagateUsersDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void propagateUsuarisDispatcher(
 		java.lang.String codiAgent)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_refreshRoles.class},
+	@Operation ( grantees={roles.agent_refreshRoles.class},
 			translated="propagateDispatcherRoles")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void propagateRolsDispatcher(
 		java.lang.String codiAgent)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_accessControl_update.class,
-			Roles.agent_accessControl_create.class},
+
+	@Operation ( grantees={roles.agent_refreshGroups.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void propagateDispatcherGroups(
+		java.lang.String codiAgent)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	
+	@Operation ( grantees={roles.agent_accessControl_update.class,
+			roles.agent_accessControl_create.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ControlAcces update(
@@ -130,7 +140,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_create.class,Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_create.class,roles.agent_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.TipusUsuariDispatcher create(
@@ -138,14 +148,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_delete.class,Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_delete.class,roles.agent_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.TipusUsuariDispatcher tipusUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_create.class,Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_create.class,roles.agent_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.GrupDispatcher create(
@@ -153,14 +163,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_delete.class,Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_delete.class,roles.agent_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.GrupDispatcher grupDispatcher)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.TipusUsuariDispatcher update(
@@ -168,7 +178,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.GrupDispatcher update(
@@ -176,7 +186,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="getAccessControl")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ControlAcces> getControlAcces(
@@ -184,7 +194,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="getDispatcherGroups")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.GrupDispatcher> getGrupsDispatcher(
@@ -192,7 +202,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="getDispatcherUserTypes")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusUsuariDispatcher> getTipusUsuariDispatcher(
@@ -208,8 +218,8 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	@Operation ( grantees={Roles.user_role_create.class,
-			Roles.agent_query.class},
+	@Operation ( grantees={roles.user_role_create.class,
+			roles.agent_query.class},
 			translated="findAllActiveDispatchers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Dispatcher> findAllActiveDispatchers()
@@ -224,14 +234,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	@Operation ( grantees={Roles.server_query.class},
+	@Operation ( grantees={roles.server_query.class},
 			translated="findAllDatabases")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ReplicaDatabase> findAllDatabases()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ReplicaDatabase update(
@@ -239,7 +249,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ReplicaDatabase create(
@@ -247,14 +257,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.server_query.class},
+	@Operation ( grantees={roles.server_query.class},
 			translated="findAllServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Server> findAllServers()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Server update(
@@ -262,21 +272,21 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Server server)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ReplicaDatabase database)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Server create(
@@ -291,7 +301,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AttributeMapping create(
@@ -299,7 +309,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AttributeMapping update(
@@ -307,14 +317,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.AttributeMapping mapping)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="findAttributeMappingsByObject")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AttributeMapping> findAttributeMappingsByObject(
@@ -322,14 +332,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="setDefaultMappingsByDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setDefaultMappingsByDispatcher(
 		java.lang.Long dispatcherId)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ObjectMapping create(
@@ -337,7 +347,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ObjectMapping update(
@@ -345,14 +355,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ObjectMapping om)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ObjectMappingProperty create(
@@ -360,7 +370,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ObjectMappingProperty update(
@@ -368,14 +378,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ObjectMappingProperty omp)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="findObjectMappingsByDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ObjectMapping> findObjectMappingsByDispatcher(
@@ -383,7 +393,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.agent_query.class},
+	@Operation ( grantees={roles.agent_query.class},
 			translated="findObjectMappingPropertiesByObject")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ObjectMappingProperty> findObjectMappingPropertiesByObject(

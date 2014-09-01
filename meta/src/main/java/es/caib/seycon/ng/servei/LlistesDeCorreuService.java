@@ -20,14 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.RelacioLlistaCorreuEntity.class})
 public abstract class LlistesDeCorreuService {
 
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="getMailLists")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreu> getLlistesDeCorreu()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_delete.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_delete.class},
 			translated="findUsersByMailListNameAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuarisByNomLlistaCorreuAndCodiDomini(
@@ -36,7 +36,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_update.class},
 			translated="findExternalMailsByNameListAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.CorreuExtern> findCorreusExternsByNomLlistaCorreuAndCodiDomini(
@@ -45,7 +45,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="findMailListsByData")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreu> findLlistesDeCorreuByDades(
@@ -56,8 +56,8 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_create.class,Roles.user_create.class,
-			Roles.user_update.class},
+	@Operation ( grantees={roles.mail_create.class,roles.user_create.class,
+			roles.user_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.LlistaCorreu create(
@@ -65,14 +65,14 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_delete.class,Roles.user_delete.class},
+	@Operation ( grantees={roles.mail_delete.class,roles.user_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.LlistaCorreu llistaCorreu)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_update.class,Roles.mail_delete.class},
+	@Operation ( grantees={roles.mail_update.class,roles.mail_delete.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.LlistaCorreu update(
@@ -80,7 +80,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_update.class},
 	translated="findUserMailListByListNameAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreuUsuari> findLlistaCorreuUsuariByNomLlistaCorreuAndCodiDomini(
@@ -89,9 +89,9 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_create.class,Roles.user_create.class,
-			Roles.user_delete.class,Roles.user_update.class,
-			Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_create.class,roles.user_create.class,
+			roles.user_delete.class,roles.user_update.class,
+			roles.mail_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.LlistaCorreuUsuari create(
@@ -99,15 +99,15 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_delete.class,Roles.user_delete.class,
-			Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_delete.class,roles.user_delete.class,
+			roles.mail_update.class},
 			translated="userMailList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.LlistaCorreuUsuari llistaCorreuUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_create.class,Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.CorreuExtern create(
@@ -115,15 +115,15 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_delete.class,Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_delete.class,roles.mail_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.CorreuExtern correuExtern)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_create.class,
-			Roles.user_delete.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_create.class,
+			roles.user_delete.class,roles.user_update.class},
 			translated="findUserMailListByListNameAndDomainNameAndUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.LlistaCorreuUsuari findLlistaCorreuUsuariByNomLlistaCorreuAndCodiDominiAndCodiUsuari(
@@ -133,7 +133,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_delete.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_delete.class},
 			translated="findUserMailListByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreuUsuari> findLlistaCorreuUsuariByCodiUsuari(
@@ -141,7 +141,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_create.class},
+	@Operation ( grantees={roles.mail_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiCorreu create(
@@ -149,7 +149,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiCorreu update(
@@ -157,21 +157,21 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_delete.class},
+	@Operation ( grantees={roles.mail_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.DominiCorreu dominiCorreu)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="getDomainMails")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.DominiCorreu> getDominiCorreus()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="findMailDomainByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiCorreu findDominiCorreuByCodi(
@@ -179,7 +179,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="finExternalMailByEmail")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.CorreuExtern findCorreuExternByAdreca(
@@ -187,14 +187,14 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_delete.class,Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_delete.class,roles.mail_update.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.RelacioLlistaCorreu relacioLlistaCorreu)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_create.class,Roles.mail_update.class},
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.RelacioLlistaCorreu create(
@@ -202,7 +202,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class},
+	@Operation ( grantees={roles.mail_query.class},
 			translated="findRelationsMailListByNameAndBelongsMailListNameAndNameAndContainsMailListName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.RelacioLlistaCorreu findRelacioLlistaCorreuByNomAndCodiLlistaCorreuPertanyAndNomAndCodiLlistaCorreuConte(
@@ -213,7 +213,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_update.class},
 			translated="findRelationsMailListByNameBelongsMailListAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RelacioLlistaCorreu> findRelacionsLlistaCorreuByNomLlistaCorreuPertanyAndCodiDomini(
@@ -222,7 +222,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_update.class},
 			translated="findRelationsMailListByNameContainsMailListAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RelacioLlistaCorreu> findRelacionsLlistaCorreuByNomLlistaCorreuConteAndCodiDomini(
@@ -231,7 +231,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_create.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_create.class,roles.user_update.class},
 			translated="findMailDomainsByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.DominiCorreu> findDominisCorreuByFiltre(
@@ -241,7 +241,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.mail_query.class,Roles.user_create.class,Roles.user_update.class},
+	@Operation ( grantees={roles.mail_query.class,roles.user_create.class,roles.user_update.class},
 			translated="findMailListByNameAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.LlistaCorreu findLlistaCorreuByNomAndCodiDomini(
@@ -257,21 +257,21 @@ public abstract class LlistesDeCorreuService {
 		@Nullable java.lang.String codiDomini)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_delete.class},
+	@Operation ( grantees={roles.mail_delete.class},
 			translated="deleteAtomic")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deleteAtomic(
 		es.caib.seycon.ng.comu.LlistaCorreuUsuari llistaCorreuUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_delete.class},
+	@Operation ( grantees={roles.mail_delete.class},
 			translated="deleteAtomic")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deleteAtomic(
 		es.caib.seycon.ng.comu.CorreuExtern correuExtern)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.mail_delete.class},
+	@Operation ( grantees={roles.mail_delete.class},
 			translated="deleteAtomic")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deleteAtomic(

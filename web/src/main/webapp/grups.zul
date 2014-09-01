@@ -159,7 +159,7 @@
 				treebox = esquema.getFellow("lista").getFellow("treebox");
 				if (queryEnabled)
 				{
-					model.getJXPathContext().getValue("/").refresh();
+					model.getJXPathContext().getValue("/grup").refresh();
 					treebox.setDataPath( "/model:/" );
 				}
 				
@@ -247,7 +247,7 @@
 				}
 				
 				// Refresquem el contingut
-				model.getJXPathContext().getValue("/").refresh();
+				model.getJXPathContext().getValue("/grup").refresh();
 				treebox.setDataPath("/model:/");
 				
 				// I tornem a obrir les branques als dos arbres
@@ -299,7 +299,7 @@
 					<listbox id="queryTipus" mold="select"  
 						dataPath="/model:/tipusUnitatOrganitzativa">
 						<dataitem bind="@codi">
-							<listcelllabel bind="@codi" labelBind="@descripcio" />
+							<listcell bind="@descripcio" />
 						</dataitem>
 					</listbox>
 				</hbox>
@@ -367,7 +367,8 @@
 							ds = form.getDataSource(); 
 							ctx =  ds.getJXPathContext(); 
 							registre = ctx.getValue("/");
-							form.getFellow("detall_codi")/*.getFellow("dada")*/.setDisabled(!registre.isNew());
+							form.getFellow("detall_codi").setDisabled(!registre.isNew());
+							form.getFellow("detall_codi_edit").setVisible(!registre.isNew());
 							if (!registre.isNew()) { 
 								llistaDePares();
 							} else {
@@ -381,6 +382,7 @@
 							}
 						} catch (Exception e) {
 							form.getFellow("detall_codi")/*.getFellow("dada")*/.setDisabled(true);
+							form.getFellow("detall_codi_edit")/*.getFellow("dada")*/.setVisible(false);
 						}
 					}
 					
@@ -503,11 +505,10 @@
 											<textbox bind="@codi" id="detall_codi" maxlength="20"
 												onChange="llevaEspais(self)" sclass="textbox"
 												constraint="no empty"/>
-												
+											<imageclic id='detall_codi_edit' src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '/>
 											<label value="*" />
 										</hbox>
 											
-										<!--input_dada id="detall_codi" bind="@codi" maxim="15" /-->
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('grups.zul.Descripcia-2')}"/>

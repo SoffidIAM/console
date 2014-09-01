@@ -5,11 +5,16 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.TipusDada;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={Roles.Tothom.class},
+@Service ( grantees={roles.Tothom.class},
 		translatedName="SelfService",
 		translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.servei.AccountService.class,
@@ -20,7 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.XarxaService.class,
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
-	es.caib.seycon.ng.servei.DispatcherService.class})
+	es.caib.seycon.ng.servei.DispatcherService.class,
+	DadesAddicionalsService.class})
 public abstract class SelfService {
 
 	@Operation(translated="getUserAccounts")
@@ -70,8 +76,8 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_query.class,
-			Roles.application_query.class},
+	@Operation ( grantees={roles.user_role_query.class,
+			roles.application_query.class},
 			translated="findRoleAccounts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolAccounts()
@@ -112,4 +118,13 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	public Collection<DadaUsuari> getUserAttributes(){
+	 return null;
+	}
+	
+	public DadaUsuari updateUserAttribute (DadaUsuari attribute)
+	{return null;}
+
+	public TipusDada getDataTypeDescription (String attName) { return null; }
 }

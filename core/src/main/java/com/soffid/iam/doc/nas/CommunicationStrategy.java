@@ -45,4 +45,6 @@ public interface CommunicationStrategy
 	 * @throws NASException
 	 */
 	public void cleanTemporaryResources() throws NASException;
+
+	public void deleteFile(String path) throws NASException;
 }

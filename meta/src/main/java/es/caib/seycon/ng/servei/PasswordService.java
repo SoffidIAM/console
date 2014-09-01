@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={Roles.Tothom.class},
+@Service ( grantees={roles.Tothom.class},
 		translatedName="PasswordService",
 		translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
@@ -67,7 +67,7 @@ public abstract class PasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	@Operation ( grantees={Roles.user_password_update.class},
+	@Operation ( grantees={roles.user_password_update.class},
 			translated="getDefaultDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getDefaultDispatcher()

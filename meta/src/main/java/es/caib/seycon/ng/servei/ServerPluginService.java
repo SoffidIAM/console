@@ -20,14 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.ConfiguracioService.class})
 public abstract class ServerPluginService {
 
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="deployPlugin")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deployPlugin(
 		byte[] i)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.servei.DuplicatedClassException {
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="enablePlugin")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void enablePlugin(
@@ -35,7 +35,7 @@ public abstract class ServerPluginService {
 		boolean status)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.plugins_query.class},
+	@Operation ( grantees={roles.plugins_query.class},
 			translated="getAgentDescriptor")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AgentDescriptor getAgentDescriptor(
@@ -43,14 +43,14 @@ public abstract class ServerPluginService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.plugins_query.class},
+	@Operation ( grantees={roles.plugins_query.class},
 			translated="getAgentDescriptors")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AgentDescriptor> getAgentDescriptors()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="getPluginAgentDescriptors")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AgentDescriptor> getPluginAgentDescriptors(
@@ -58,28 +58,28 @@ public abstract class ServerPluginService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="listServerPlugins")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ServerPlugin> listServerPlugins()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="getServerVersion")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getServerVersion()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="deletePlugin")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deletePlugin(
 		es.caib.seycon.ng.comu.ServerPlugin plugin)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.plugins_update.class},
+	@Operation ( grantees={roles.plugins_update.class},
 			translated="getAllAgentDescriptorsInfo")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AgentDescriptor> getAllAgentDescriptorsInfo()

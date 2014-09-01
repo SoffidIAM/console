@@ -54,6 +54,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		{
 			applyChange(change);
 			getAuthoritativeChangeEntityDao().remove(ch);
+			ch.setId(null);
 		}
 	}
 
@@ -69,6 +70,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		if (ch != null)
 		{
 			getAuthoritativeChangeEntityDao().remove(ch);
+			ch.setId(null);
 		}
 	}
 
@@ -143,8 +145,12 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			Long processId = createProcessInstance(change, dispatcher) ;
 			
 			// Now updates the data base record
-			ch.setProcessId(processId);
-			getAuthoritativeChangeEntityDao().update(ch);
+			// id will be null if the whole workflow has been executed and the change is already processed
+			if (ch.getId() != null)
+			{
+				ch.setProcessId(processId);
+				getAuthoritativeChangeEntityDao().update(ch);
+			}
 
 			return false;
 		}
@@ -411,6 +417,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		Usuari oldUser = getUsuariService().findUsuariByCodiUsuari(user.getCodi());
 		if (oldUser == null)
 		{
+			if (user.getCodiGrupPrimari() == null) user.setCodiGrupPrimari("World");
+			if (user.getNom() == null) user.setNom("?");
+			if (user.getPrimerLlinatge() == null) user.setPrimerLlinatge("?");
 			if (user.getActiu() == null) user.setActiu(Boolean.TRUE);
 			if (user.getMultiSessio() == null) user.setMultiSessio(Boolean.FALSE);
 			if (user.getServidorCorreu() == null) user.setServidorCorreu("null");

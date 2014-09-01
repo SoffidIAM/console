@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={Roles.intranetMenus_admin.class,Roles.Tothom.class},
+@Service ( grantees={roles.intranetMenus_admin.class,roles.Tothom.class},
 		translatedName="EntryPointService",
 		translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.PuntEntradaEntity.class,

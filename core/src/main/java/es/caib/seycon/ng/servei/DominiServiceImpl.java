@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Vector;
 
 import es.caib.seycon.ng.comu.Domini;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -20,7 +21,6 @@ import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiService

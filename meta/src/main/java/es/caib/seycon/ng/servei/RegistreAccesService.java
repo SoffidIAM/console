@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ServeiEntity.class})
 public abstract class RegistreAccesService {
 
-	@Operation ( grantees={Roles.accessRegister_query.class},
+	@Operation ( grantees={roles.accessRegister_query.class},
 			translated="findEntryByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistresAccesByFiltre(
@@ -29,7 +29,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.accessRegister_query.class},
+	@Operation ( grantees={roles.accessRegister_query.class},
 			translated="findEntryByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistresAccesByFiltre(
@@ -41,7 +41,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class},
 			translated="findEntryByHost")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistresAccesByMaquina(
@@ -52,7 +52,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class},
 			translated="findEntryBySSOHostAccess")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistresAccesByMaquinaAccesSSO(
@@ -62,7 +62,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_accessRegister_query.class},
+	@Operation ( grantees={roles.user_accessRegister_query.class},
 			translated="findEntryByInitialDataAndUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistreByDataIniAndCodiUsuari(
@@ -72,7 +72,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_accessRegister_query.class},
+	@Operation ( grantees={roles.user_accessRegister_query.class},
 			translated="findLastEntriesByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findDarrersRegistresByCodiUsuari(
@@ -82,7 +82,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.accessRegister_query.class},
+	@Operation ( grantees={roles.accessRegister_query.class},
 			translated="findEntryByNewFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findRegistresAccesByFiltreNou(
@@ -94,7 +94,7 @@ public abstract class RegistreAccesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class},
 			translated="findLastEntriesSSOHostAccess")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RegistreAcces> findDarrersRegistresAccesMaquinaSSO(

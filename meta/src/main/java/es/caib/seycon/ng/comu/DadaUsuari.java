@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.comu;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserData",
@@ -32,4 +33,7 @@ public abstract class DadaUsuari {
 
 	@Nullable
 	public String dataLabel;
+	
+	@Nullable
+	public AttributeVisibilityEnum visibility;
 }

@@ -35,6 +35,7 @@ import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -52,7 +53,6 @@ import es.caib.seycon.ng.servei.DispatcherService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
-import es.caib.seycon.ng.utils.TipusDomini;
 
 /**
  * @author (C) Soffid 2013

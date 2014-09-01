@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity.class})
 public abstract class DominiUsuariService {
 
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiUsuari create(
@@ -30,7 +30,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiUsuari update(
@@ -38,14 +38,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.DominiUsuari dominiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.TipusUsuari create(
@@ -53,7 +53,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.TipusUsuari update(
@@ -61,28 +61,28 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.TipusUsuari tipusUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllUserDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.DominiUsuari> findAllDominiUsuari()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllUserType")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusUsuari> findAllTipusUsuari()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllPasswordPolicyDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.PoliticaContrasenya> findAllPolitiquesContrasenyaDomini(
@@ -90,14 +90,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllForbiddenWords")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ParaulaProhibida> findAllParaulesProhibides()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PoliticaContrasenya create(
@@ -105,7 +105,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PoliticaContrasenya update(
@@ -113,14 +113,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.PoliticaContrasenya politicaContrasenyaDomini)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ParaulaProhibida create(
@@ -128,7 +128,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ParaulaProhibida update(
@@ -136,14 +136,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ParaulaProhibida paraulaProhibida)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya create(
@@ -151,7 +151,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya update(
@@ -159,14 +159,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenya)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_create.class},
+	@Operation ( grantees={roles.usersDomain_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiContrasenya create(
@@ -174,7 +174,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_update.class},
+	@Operation ( grantees={roles.usersDomain_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiContrasenya update(
@@ -182,14 +182,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_delete.class},
+	@Operation ( grantees={roles.usersDomain_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.DominiContrasenya dominiContrasenya)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findUserDomainByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiUsuari findDominiUsuariByCodi(
@@ -197,7 +197,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findForbiddenWordsPasswordPolicy")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya> findParaulesProhibidesPoliticaContrasenya(
@@ -205,7 +205,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findPasswordDomainByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DominiContrasenya findDominiContrasenyaByCodi(
@@ -213,7 +213,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findPolicyByTypeAndPasswordDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PoliticaContrasenya findPoliticaByTipusAndDominiContrasenyas(
@@ -222,14 +222,14 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllPasswordDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.DominiContrasenya> findAllDominiContrasenya()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findNameGenerators")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<java.lang.String> findNameGenerators()

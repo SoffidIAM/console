@@ -187,8 +187,20 @@ public class NASManager
 		
 		number= fileSystemDao.nextNumberFor(application, year);
 		
-		path= "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
+		do
+		{
+			path= "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
 
+			try {
+				File f = this.comStrategy.retreiveFile(path);
+				if (f == null || ! f.canRead())
+					break;
+			} catch (NASException e ) {
+				break;
+			}
+			number ++;
+		} while (true);
+		
 		this.comStrategy.uploadFile(file, path);
 		
 		return path;
@@ -204,6 +216,18 @@ public class NASManager
 	public File retreiveFile(String path) throws NASException
 	{
 		return this.comStrategy.retreiveFile(path);
+	}
+	
+	/**
+	 * Elimina un archivo del NAS a partir del path.
+	 * 
+	 * @param path
+	 * @return
+	 * @throws NASException 
+	 */
+	public void deleteFile(String path) throws NASException
+	{
+		this.comStrategy.deleteFile(path);
 	}
 	
 	/**

@@ -1118,7 +1118,7 @@ public class SesionEJB implements EntityBean {
             }
 
             String passwordDomain = ps.getDefaultDispatcher();
-            if (ps.checkPassword(principal.getIntranetUser(), passwordDomain, new Password(pass), false,
+            if (ps.checkPassword(principal.getIntranetUser(), passwordDomain, new Password(pass), true,
                     false)) {
                 sesionInfo.setNeedsChangePassword(false);
                 LockoutTracker.registerSuccess(principal.getIntranetUser());

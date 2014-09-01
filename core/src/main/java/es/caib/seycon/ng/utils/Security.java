@@ -11,7 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.ejb.CreateException;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
@@ -21,6 +23,7 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.UsuariService;
+import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 
 // import org.jboss.security.SecurityAssociation;
 
@@ -181,6 +184,7 @@ public class Security {
     public static final String AUTO_AGENT_QUERY = "agent:query"; //$NON-NLS-1$
     public static final String AUTO_AGENT_PROPAGATE_USERS = "agent:refreshUsers"; //$NON-NLS-1$
     public static final String AUTO_AGENT_PROPAGATE_ROLES = "agent:refreshRoles"; //$NON-NLS-1$
+    public static final String AUTO_AGENT_PROPAGATE_GROUPS = "agent:refreshGroups"; //$NON-NLS-1$
 
     public static final String AUTO_AGENT_ACCESSCONTROL_CREATE = "agent:accessControl:create"; //$NON-NLS-1$
     public static final String AUTO_AGENT_ACCESSCONTROL_UPDATE = "agent:accessControl:update"; //$NON-NLS-1$
@@ -274,7 +278,7 @@ public class Security {
 
     private static ThreadLocal identities = new ThreadLocal();
     private static boolean disableAllSecurityForEver = false;
-	private static UsuariService usuariService = null;
+	private static es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariServiceHome = null;
 
     private static Stack getIdentities() {
         Stack s = (Stack) identities.get();
@@ -286,6 +290,8 @@ public class Security {
     }
 
     public static boolean isUserInRole(String role) {
+        if (disableAllSecurityForEver)
+            return true;
 
         int roleCercatSenseDomini = role.lastIndexOf("/"); //$NON-NLS-1$
         boolean rolAmbDomini = (roleCercatSenseDomini != -1);
@@ -494,11 +500,17 @@ public class Security {
     		return "???"; //$NON-NLS-1$
     	else
     	{
-            if (usuariService == null)
-            	usuariService  = ServiceLocator.instance().getUsuariService();
+            if (usuariServiceHome == null)
+            {
+            	try {
+					usuariServiceHome = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
+				} catch (NamingException e) {
+					return null;
+				}
+            }
             try
 			{
-				Usuari usuari = usuariService.getCurrentUsuari();
+				Usuari usuari = usuariServiceHome.create().getCurrentUsuari();
 				if (usuari == null)
 					return null;
 				else
@@ -506,6 +518,8 @@ public class Security {
 			}
 			catch (InternalErrorException e)
 			{
+				return null;
+			} catch (CreateException e) {
 				return null;
 			}
     	}

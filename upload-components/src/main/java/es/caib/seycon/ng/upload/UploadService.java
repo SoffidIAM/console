@@ -53,6 +53,7 @@ import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.identity.IdentityGeneratorBean;
 import es.caib.seycon.ng.servei.ApplicationBootService;
+import es.caib.seycon.ng.servei.ApplicationShutdownService;
 import es.caib.seycon.ng.servei.ConfiguracioService;
 import es.caib.seycon.ng.servei.SeyconServiceLocator;
 
@@ -275,6 +276,16 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
     }
 
     protected void stopService() throws Exception {
+        Map beans = SeyconServiceLocator.instance().getContext().
+        		getBeansOfType(ApplicationShutdownService.class);
+        
+        for ( Object service: beans.keySet())
+        {
+        	log.info ("Executing shtudown bean: " + service);
+        	
+        	((ApplicationShutdownService) beans.get(service)).consoleShutdown();
+        }
+        
     }
 
     protected void updateDatabase () throws Exception

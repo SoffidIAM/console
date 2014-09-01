@@ -46,6 +46,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
+
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
@@ -70,6 +72,7 @@ import es.caib.seycon.ng.comu.SeyconServerInfo;
 import es.caib.seycon.ng.comu.TargetaExtranet;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariAlumne;
@@ -121,7 +124,6 @@ import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.LimitDates;
 import es.caib.seycon.ng.utils.ProcesWFUsuari;
 import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusDomini;
 import es.caib.signatura.api.ParsedCertificate;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.cliente.ValidadorCertificados;
@@ -1648,7 +1650,9 @@ public class UsuariServiceImpl extends
 		}
 		
 		// Ara hem de comprovar que si es modifica l'usuari [nom,llinatges o DNI, es verifique que siga correcte]
-		UsuariEntity usuariAbans = getUsuariEntityDao().findByCodi(usuari.getCodi());
+		UsuariEntity usuariAbans = usuari.getId() != null ?  
+			getUsuariEntityDao().load(usuari.getId()) : 
+			getUsuariEntityDao().findByCodi(usuari.getCodi());
 		// Verifiquem si hem de fer la comprovació de la identitat:
 		// s'ha modifcat el nif de l'usuari??
 		DadaUsuariEntity nifAnterior = getDadaUsuariEntityDao().findDadaByCodiTipusDada(usuari.getCodi(), "NIF"); //$NON-NLS-1$
@@ -1778,7 +1782,8 @@ public class UsuariServiceImpl extends
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		Collection<DadaUsuari> dades = getDadaUsuariEntityDao().
 		        toDadaUsuariList(usuari.getDadaUsuari());
-
+		LinkedList<DadaUsuari> result = new LinkedList<DadaUsuari>();
+		
 		List<TipusDadaEntity> tipusDades = getTipusDadaEntityDao().loadAll();
 		Collections.sort(tipusDades, new Comparator<TipusDadaEntity>(){
 			public int compare(TipusDadaEntity o1, TipusDadaEntity o2) {
@@ -1789,28 +1794,35 @@ public class UsuariServiceImpl extends
 		Iterator<TipusDadaEntity> tipusDadesIterator = tipusDades.iterator();
 		while (tipusDadesIterator.hasNext()) {
 			TipusDadaEntity tipusDada = tipusDadesIterator.next();
+			AttributeVisibilityEnum v = AutoritzacionsUsuari.getAttributeVisibility(usuari, tipusDada);
 			if (tipusDada.getCodi().compareTo(NIF) != 0
-					&& tipusDada.getCodi().compareTo(TELEFON) != 0) {
+					&& tipusDada.getCodi().compareTo(TELEFON) != 0 &&
+					! v.equals(AttributeVisibilityEnum.HIDDEN)) {
 				Iterator<DadaUsuari> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
 					DadaUsuari dada = dadesIterator.next();
-					teTipusDada = teTipusDada
-							|| dada.getCodiDada()
-									.compareTo(tipusDada.getCodi()) == 0;
-					if (dada.getCodiDada().compareTo(NIF) == 0
-							|| dada.getCodiDada().compareTo(TELEFON) == 0) {
-						dadesIterator.remove();
+					if (dada.getCodiDada().compareTo(NIF) != 0
+							&& dada.getCodiDada().compareTo(TELEFON) != 0 
+							&& dada.getCodiDada().compareTo(tipusDada.getCodi()) == 0)
+					{
+						
+						teTipusDada = true;
+						result.add(dada);
 					}
 				}
 				if (!teTipusDada) {
-					dades.add(new DadaUsuari(tipusDada.getCodi(), null, //$NON-NLS-1$
-							codiUsuari, null, null, null, tipusDada.getLabel() == null ? tipusDada.getCodi(): tipusDada.getLabel()));
+					DadaUsuari dus = new DadaUsuari();
+					dus.setCodiDada(tipusDada.getCodi());
+					dus.setDataLabel(tipusDada.getLabel() == null ? tipusDada.getCodi(): tipusDada.getLabel());
+					dus.setCodiUsuari(codiUsuari);
+					dus.setVisibility(v);
+					result.add(dus);
 				}
 			}
 		}
 
-		return dades;
+		return result;
 	}
 
 	protected DadaUsuari handleFindDadaByCodiTipusDada(String codiUsuari,

@@ -605,10 +605,7 @@
 		<home>es.caib.seycon.ng.servei.ejb.DominiUsuariServiceHome</home>
 		<remote>es.caib.seycon.ng.servei.ejb.DominiUsuariService</remote>
 	</ejb-ref>        
-	        
-	        
-
- 
+	         
 
 
 	<env-entry>

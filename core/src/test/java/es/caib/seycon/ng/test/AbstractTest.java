@@ -1,5 +1,6 @@
 package es.caib.seycon.ng.test;
 
+import java.io.File;
 import java.util.Collection;
 
 import javax.sql.rowset.spi.XmlReader;
@@ -70,9 +71,22 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		super();
 	}
 
+	void deleteDir (File f)
+	{
+		if (f != null && f.isDirectory())
+		{
+			for (File s: f.listFiles())
+				deleteDir (s);
+		}
+		f.delete();
+	}
 	public void setupdb() throws InternalErrorException,
 			NeedsAccountNameException
 	{
+		
+		System.setProperty("jboss.home.dir", "target/server");
+		deleteDir (new File("target/docs"));
+
 		ApplicationBootService bootSvc = (ApplicationBootService) context.getBean(ApplicationBootService.SERVICE_NAME);
 		bootSvc.consoleBoot();
 		

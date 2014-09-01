@@ -72,7 +72,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.anonymous.class},
+	@Operation ( grantees={roles.anonymous.class},
 			translated="findUsersByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuarisByCodiUsuari(
@@ -90,8 +90,8 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class,Roles.mail_update.class,
-			Roles.lopd_update.class},
+	@Operation ( grantees={roles.user_query.class,roles.mail_update.class,
+			roles.lopd_update.class},
 			translated="findUserByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUsuariByCriteri(
@@ -117,8 +117,8 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_update.class,
-			Roles.user_custom_update.class},
+	@Operation ( grantees={roles.user_update.class,
+			roles.user_custom_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari update(
@@ -126,13 +126,13 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation(translated="delete")
+	@Operation(translated="delete", grantees={roles.user_delete.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Usuari usuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findNetworksACByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findXarxesACByCodiUsuari(
@@ -168,7 +168,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUserDataByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.DadaUsuari> findDadesUsuariByCodiUsuari(
@@ -182,7 +182,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="findDataByTypeDataName", grantees={Roles.user_query.class, Roles.metadata_query.class})
+	@Operation (translated="findDataByTypeDataName", grantees={roles.user_query.class, roles.metadata_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.DadaUsuari findDadaByCodiTipusDada(
 		java.lang.String codiUsuari, 
@@ -190,7 +190,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_session_query.class},
+	@Operation ( grantees={roles.user_session_query.class},
 			translated="findSessionByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> findSessionsByCodiUsuari(
@@ -232,7 +232,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findUserByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari findUsuariByCodiUsuari(
@@ -254,7 +254,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_create.class},
+	@Operation ( grantees={roles.user_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari create(
@@ -262,7 +262,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUserPrintersByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UsuariImpressora> findUsuariImpressoresByCodiUsuari(
@@ -270,7 +270,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_refresh.class},
+	@Operation ( grantees={roles.user_refresh.class},
 			translated="refreshChanges")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] refreshCanvis(
@@ -278,7 +278,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_password_update.class},
+	@Operation ( grantees={roles.user_password_update.class},
 			translated="changePassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String canviPassword(
@@ -287,7 +287,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_refresh.class,Roles.user_query.class},
+	@Operation ( grantees={roles.user_refresh.class,roles.user_query.class},
 			translated="getTasks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] getTasques(
@@ -295,14 +295,14 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_create.class},
+	@Operation ( grantees={roles.user_create.class},
 			translated="getFollowingName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getSeguentCodi()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.application_query.class},
+	@Operation ( grantees={roles.application_query.class},
 			translated="findUserRolesWithApplicationRolesByApplicationName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisAmbRolsDAplicacioByCodiAplicacio(
@@ -400,7 +400,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_update.class,Roles.user_create.class},
+	@Operation ( grantees={roles.user_update.class,roles.user_create.class},
 			translated="checkUserIdentity")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] verificarIdentitatUsuari(
@@ -411,7 +411,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_update.class,Roles.user_create.class},
+	@Operation ( grantees={roles.user_update.class,roles.user_create.class},
 			translated="checkUserIdentity")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] verificarIdentitatUsuari(
@@ -424,7 +424,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariSEU update(
@@ -432,7 +432,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariSEU create(
@@ -440,7 +440,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class,Roles.anonymous.class},
+	@Operation ( grantees={roles.Tothom.class,roles.anonymous.class},
 			translated="findConsoleUserByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariSEU findUsuariSEUByCodiUsuari(
@@ -502,7 +502,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="updateUserCoreData")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari updateDadesBasiquesUsuari(
@@ -510,7 +510,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="createNewUserProcess")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String creaNouProcesUsuari(
@@ -520,7 +520,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="getBpmUserProcessList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.ProcesWF> obteLlistaProcessosWFUsuari()
@@ -574,7 +574,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 	translated="findBpmUserProcessInstanceByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.bpm.vo.ProcessInstance> findProcessInstanceWFUsuariByCodiUsuari(
@@ -617,14 +617,14 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 	translated="getCurrentUser")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari getCurrentUsuari()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_role_query.class},
+	@Operation ( grantees={roles.user_role_query.class},
 	translated="getESSORules")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public byte[] getMazingerRules(
@@ -632,7 +632,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_query.class},
+	@Operation ( grantees={roles.user_query.class},
 			translated="findUserByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByCriteria(

@@ -15,6 +15,10 @@ import javax.servlet.http.HttpSession;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.scripting.Interpreters;
 
+import com.soffid.web.SecurityFunctionMapper;
+
+import es.caib.zkib.datamodel.xml.FunctionMapperChain;
+
 
 
 /**
@@ -51,6 +55,7 @@ public class WorkflowInterceptor implements Filter
 		if (!configured) {
 			Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
 			Interpreters.add("java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
+			FunctionMapperChain.addFunctionMapper(new SecurityFunctionMapper ());
 			configured = true;
 		}
 		if (request instanceof HttpServletRequest) 

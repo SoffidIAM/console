@@ -29,14 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.XarxaACEntity.class})
 public abstract class XarxaService {
 
-	@Operation ( grantees={Roles.host_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class},
 			translated="getNetworks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Xarxa> getXarxes()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_create.class},
+	@Operation ( grantees={roles.network_all_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Xarxa create(
@@ -44,21 +44,21 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_update.class},
+	@Operation ( grantees={roles.network_all_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void update(
 		es.caib.seycon.ng.comu.Xarxa xarxa)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.network_all_delete.class},
+	@Operation ( grantees={roles.network_all_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Xarxa xarxa)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,roles.Tothom.class},
 			translated="getACL")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> getACL(
@@ -66,7 +66,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,roles.Tothom.class},
 			translated="findNetworkByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Xarxa findXarxaByCodi(
@@ -74,7 +74,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_create.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_create.class,roles.Tothom.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Maquina create(
@@ -82,24 +82,24 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_update.class,
-			Roles.host_update_os.class,Roles.host_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_update.class,
+			roles.host_update_os.class,roles.host_all_query.class,
+			roles.Tothom.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void update(
 		es.caib.seycon.ng.comu.Maquina maquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.host_all_delete.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_delete.class,roles.Tothom.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Maquina maquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.agent_query.class,Roles.host_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.agent_query.class,roles.host_all_query.class,
+			roles.Tothom.class},
 			translated="findHostByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Maquina findMaquinaByNom(
@@ -107,7 +107,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findHostByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltre(
@@ -126,16 +126,16 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class,roles.Tothom.class},
 			translated="getHosts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getMaquines()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class,roles.Tothom.class},
 			translated="findHostsByNetwork")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinesByXarxa(
@@ -143,32 +143,32 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class,roles.Tothom.class},
 			translated="getMailServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsCorreu()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class,roles.Tothom.class},
 			translated="getProfileServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsPerfil()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class,roles.Tothom.class},
 			translated="getHomeServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsHome()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.parameter_update.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.parameter_update.class,roles.Tothom.class},
 			translated="findNetworkByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Xarxa> findXarxaByFiltre(
@@ -182,8 +182,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_create.class,
-			Roles.network_all_update.class},
+	@Operation ( grantees={roles.network_all_create.class,
+			roles.network_all_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.NetworkAuthorization create(
@@ -191,16 +191,16 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_update.class,
-			Roles.network_all_create.class,Roles.network_all_delete.class},
+	@Operation ( grantees={roles.network_all_update.class,
+			roles.network_all_create.class,roles.network_all_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.NetworkAuthorization accessList)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.network_all_create.class,
-			Roles.network_all_update.class},
+	@Operation ( grantees={roles.network_all_create.class,
+			roles.network_all_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.NetworkAuthorization update(
@@ -208,8 +208,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class},
 			translated="findIdentitiesByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Identitat> findIdentitatsByCodi(
@@ -217,8 +217,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class},
 			translated="findIdentityByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Identitat findIdentitatByCodi(
@@ -226,8 +226,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class},
 			translated="findNetworkAuthorizationsByNetworkNameAndIdentityName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.NetworkAuthorization findNetworkAuthorizationByCodiXarxaAndCodiIdentitat(
@@ -236,8 +236,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class},
 			translated="findNetworkAuthorizationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiUsuari(
@@ -245,8 +245,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class},
 			translated="findNetworkAuthorizationsByRoleName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByNomRol(
@@ -254,8 +254,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class},
 			translated="findNetworkAuthorizationsByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiGrup(
@@ -263,8 +263,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class},
 			translated="hasNetworkAccess")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Boolean teAccesAXarxa(
@@ -273,9 +273,9 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_create.class,
-			Roles.host_all_update.class,Roles.host_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_create.class,
+			roles.host_all_update.class,roles.host_all_query.class,
+			roles.Tothom.class},
 			translated="getFirstAvailableIP")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getPrimeraIPLliure(
@@ -283,10 +283,10 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_create.class,
-			Roles.network_all_update.class,Roles.host_all_update.class,
-			Roles.host_all_create.class,Roles.host_all_query.class,
-			Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_create.class,
+			roles.network_all_update.class,roles.host_all_update.class,
+			roles.host_all_create.class,roles.host_all_query.class,
+			roles.network_all_query.class,roles.Tothom.class},
 			translated="getAvailableIPs")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Long getIPsBuides(
@@ -294,9 +294,9 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_create.class,
-			Roles.network_all_update.class,Roles.network_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_create.class,
+			roles.network_all_update.class,roles.network_all_query.class,
+			roles.Tothom.class},
 			translated="getNotAvailableIPs")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Long getIPsOcupades(
@@ -304,8 +304,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class,roles.Tothom.class},
 			translated="findHostById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Maquina findMaquinaById(
@@ -313,8 +313,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,
-			Roles.network_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,
+			roles.network_all_query.class,roles.Tothom.class},
 			translated="findHostByIp")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Maquina findMaquinaByIp(
@@ -322,7 +322,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findAccessLevelByHostNameAndNetworkName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Long findNivellAccesByNomMaquinaAndCodiXarxa(
@@ -331,15 +331,15 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="hasManagedNetwork")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Boolean teXarxaAdministrada()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.network_all_query.class,
-			Roles.host_all_query.class},
+	@Operation ( grantees={roles.network_all_query.class,
+			roles.host_all_query.class},
 			translated="isManaged")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Boolean esXarxaAdministrada(
@@ -347,7 +347,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findSessionsByHostName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> findSessionsByNomMaquina(
@@ -355,7 +355,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="getTasks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] getTasques(
@@ -363,7 +363,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findAliasByHostName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AliasMaquina> findAliasByNomMaquina(
@@ -371,9 +371,9 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_create.class,
-			Roles.host_all_update.class,Roles.host_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_create.class,
+			roles.host_all_update.class,roles.host_all_query.class,
+			roles.Tothom.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AliasMaquina create(
@@ -381,24 +381,24 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_all_update.class,
-			Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_update.class,
+			roles.host_all_query.class,roles.Tothom.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void update(
 		es.caib.seycon.ng.comu.AliasMaquina aliasMaquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.host_all_delete.class,
-			Roles.host_all_update.class,Roles.host_all_create.class,
-			Roles.host_all_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_all_delete.class,
+			roles.host_all_update.class,roles.host_all_create.class,
+			roles.host_all_query.class,roles.Tothom.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.AliasMaquina aliasMaquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findHostByFilterUnrestricted")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltreSenseRestriccions(
@@ -417,7 +417,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador create(
@@ -425,7 +425,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador> findAutoritzacionsAccesMaquinaComAdministradorByHostAndDataPeticio(
@@ -435,7 +435,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_admin_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_admin_query.class,roles.Tothom.class},
 			translated="getHostAdminUserAndPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] getUsuariAndContrasenyaAdministradorHost(
@@ -443,10 +443,10 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.user_create.class,Roles.user_update.class,
-			Roles.group_create.class,Roles.group_update.class,
-			Roles.printer_query.class,Roles.host_all_query.class,
-			Roles.Tothom.class},
+	@Operation ( grantees={roles.user_create.class,roles.user_update.class,
+			roles.group_create.class,roles.group_update.class,
+			roles.printer_query.class,roles.host_all_query.class,
+			roles.Tothom.class},
 			translated="findOfficeHostUserByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaOfirmaticaUsuariByFiltre(
@@ -466,7 +466,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="launchVNC")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Boolean launchVNC(
@@ -474,7 +474,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="hasAnyACLNetworks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.Boolean hasAnyACLXarxes(
@@ -482,7 +482,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findALLNetworkAuthorizationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findALLNetworkAuthorizationsByCodiUsuari(
@@ -490,7 +490,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.host_admin_query.class,Roles.Tothom.class},
+	@Operation ( grantees={roles.host_admin_query.class,roles.Tothom.class},
 			translated="revokeAdministratorAccessHost")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador revocarAccesHostComAdministrador(
@@ -498,7 +498,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="setAdministratorPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setContrasenyaAdministrador(
@@ -514,7 +514,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="registerDynamicIP")
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"es.caib.seycon.ng.exception.UnknownNetworkException","es.caib.seycon.ng.exception.UnknownHostException"})
 	public es.caib.seycon.ng.comu.Maquina registerDynamicIP(
@@ -524,14 +524,14 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownHostException, es.caib.seycon.ng.exception.UnknownNetworkException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class,Roles.host_all_query.class},
+	@Operation ( grantees={roles.Tothom.class,roles.host_all_query.class},
 			translated="findAllOSTypes")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<es.caib.seycon.ng.comu.OsType> findAllOSType()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.Tothom.class},
+	@Operation ( grantees={roles.Tothom.class},
 			translated="findOSTypeById")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.OsType findOSTypeById(
@@ -539,7 +539,7 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.operatingSystem_create.class},
+	@Operation ( grantees={roles.operatingSystem_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.OsType create(
@@ -547,14 +547,14 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={Roles.operatingSystem_delete.class},
+	@Operation ( grantees={roles.operatingSystem_delete.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.OsType osType)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={Roles.operatingSystem_update.class},
+	@Operation ( grantees={roles.operatingSystem_update.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void update(

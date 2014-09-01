@@ -20,7 +20,6 @@ import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AgentStatusInfo;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
@@ -460,8 +459,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
     }
 
     private String getServerList() throws InternalErrorException, SQLException, NamingException {
-        ConfiguracioService configuracioService = ServiceLocator.instance()
-                .getConfiguracioService();
+        ConfiguracioService configuracioService = getConfiguracioService();
         Configuracio parametre = configuracioService.findParametreByCodiAndCodiXarxa(
                 "seycon.server.list", null); //$NON-NLS-1$
         
@@ -473,8 +471,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
     }
 
     private String getServerPort() throws InternalErrorException, SQLException, NamingException {
-        ConfiguracioService configuracioService = ServiceLocator.instance()
-                .getConfiguracioService();
+        ConfiguracioService configuracioService = getConfiguracioService();
         Configuracio parametre = configuracioService.findParametreByCodiAndCodiXarxa(
                 "seycon.https.port", null); //$NON-NLS-1$
         return parametre.getValor();
@@ -669,6 +666,48 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
         }
         return null;
     }
+
+    int roundrobin = 0;
+	@Override
+	protected Object handleGetServerService(String servicePath)
+			throws Exception {
+        String name = getServerList();
+        String serv[] = name.split("[ ,]+"); //$NON-NLS-1$
+        
+        roundrobin ++;
+        for (int i = 0; i < serv.length; i++) {
+        	String serverName = serv [ (i + roundrobin) % serv.length];
+            RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
+            try {
+                Object service = rsl.getRemoteService(servicePath);
+                if (service != null)
+                	return service;
+            } catch (Throwable e) {
+            }
+        }
+        return null;
+	}
+
+	@Override
+	protected void handleUpdateDispatcherConfiguration() throws Exception {
+        String name = getServerList();
+        if (name != null && name.trim().length() > 0)
+        {
+	        String serv[] = name.split("[ ,]+"); //$NON-NLS-1$
+	        
+	        roundrobin ++;
+	        for (int i = 0; i < serv.length; i++) {
+	        	String serverName = serv [ (i + roundrobin) % serv.length];
+	            RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
+	            try {
+	                SyncStatusService service = rsl.getSyncStatusService();
+	                if (service != null)
+	                	service.reconfigureDispatchers();;
+	            } catch (Throwable e) {
+	            }
+	        }
+        }
+	}
 
 }
 

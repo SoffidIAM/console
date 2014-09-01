@@ -74,4 +74,8 @@ public abstract class SyncStatusService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void reconfigureDispatchers()
+		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
+	}
 }

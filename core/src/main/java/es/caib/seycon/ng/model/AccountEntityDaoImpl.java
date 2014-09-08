@@ -189,6 +189,7 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
     		tasque.setData(new Timestamp(System.currentTimeMillis()));
 			tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
 			tasque.setBd(account.getDispatcher().getCodi());
+			tasque.setCoddis(account.getDispatcher().getCodi());
 			tasque.setUsuari(account.getName());
 			getTasqueEntityDao().create(tasque);
     	}

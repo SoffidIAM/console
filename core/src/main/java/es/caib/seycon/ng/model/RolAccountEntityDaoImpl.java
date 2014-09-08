@@ -236,6 +236,8 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
 	        tasque = getTasqueEntityDao().newTasqueEntity();
 	        tasque.setData(new Timestamp(System.currentTimeMillis()));
 	        tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
+	        tasque.setCoddis(grant.getAccount().getDispatcher().getCodi());
+	        tasque.setBd(grant.getAccount().getDispatcher().getCodi());
 	        tasque.setUsuari(grant.getAccount().getName());
 	        getTasqueEntityDao().create(tasque);
         }
@@ -368,8 +370,10 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
             {
             	rolsUsuaris.getAccount().getRoles().remove(rolsUsuaris);
             }
+
+            generateTasks(rolsUsuaris);
+
             super.remove(rolsUsuaris);
-            getSession(false).flush();
 
             auditarRolAccount("D", rolsUsuaris); //$NON-NLS-1$
         } catch (Throwable e) {

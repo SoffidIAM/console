@@ -72,7 +72,7 @@ class InputStreamThread extends Thread
   /** Corriente de salida donde volcar una copia de la entrada */
   private PrintStream os;
   /** Cadena donde se vuelca el contenido de la salida */
-  private String output;
+  private ByteArrayOutputStream output;
   /** Constructor
    * @param is corriente de salida del proceso ( entrada para Java )
    * @param os corriente de salida donde se copia el resultado
@@ -82,7 +82,7 @@ class InputStreamThread extends Thread
   {
      this.is = is;
      this.os = os;
-     output = ""; //$NON-NLS-1$
+     output = new ByteArrayOutputStream(); //$NON-NLS-1$
   }
   /** Bucle principal del thread. Consumira la corriente y la almacena 
    * internamente
@@ -96,7 +96,7 @@ class InputStreamThread extends Thread
       i = is.read ();
       while (i >= 0)
       {
-        output = output + (char) i;
+        output.write(i);
         if (os != null) os.write (i);
 //        os.flush();
         i = is.read ();
@@ -112,10 +112,11 @@ class InputStreamThread extends Thread
    * @return salida producido 
    */
   public String getOutput () {
-    if (output.length() > 0 && output.charAt(output.length()-1) == '\n')
-      return output.substring (0, output.length() - 1);
+	String out = output.toString();
+	if (out.length() > 0 && out.charAt(out.length()-1) == '\n')
+      return out.substring (0, out.length() - 1);
     else
-      return output;
+      return out;
   }
 }
 
@@ -179,6 +180,7 @@ public class TimedProcess extends Object
   InputStreamThread outputThread;
   /** Activar la información de debug */
   boolean debug;
+private String[] environment;
   /**
    * Construir un nuevo TimedProcess
    * @param timeout tiempo máximo de ejecución (en milisegundos)
@@ -272,13 +274,27 @@ public class TimedProcess extends Object
 
     if (debug)
       System.out.println (String.format(Messages.getString("TimedProcess.RunningCommand"), command));  //$NON-NLS-1$
-    process = java.lang.Runtime.getRuntime ().
+    if (environment == null)
+    	process = java.lang.Runtime.getRuntime ().
               exec (command);
+    else
+    	process = java.lang.Runtime.getRuntime ().
+        	exec (command, environment);
     timeoutThread = new TimeoutThread (process, timeout);
     timeoutThread.start ();
   }
 
-  /** 
+  public String[] getEnvironment()
+  {
+	return environment;
+  }
+
+  public void setEnvironment(String[] environment)
+  {
+	this.environment = environment;
+  }
+
+/** 
    * Ejecutar el proceso de forma asíncrona. La llamada finaliza de forma
    * casi inmediata y el proceso se inicia de fondo.
    * @param command proceso (con parámetros) de sistema operativo a ejecutar
@@ -300,8 +316,12 @@ public class TimedProcess extends Object
         System.out.print (command[i]+" "); //$NON-NLS-1$
       System.out.println ();
     }
-    process = java.lang.Runtime.getRuntime ().
+    if (environment == null)
+    	process = java.lang.Runtime.getRuntime ().
               exec (command);
+    else
+    	process = java.lang.Runtime.getRuntime ().
+              exec (command, environment);
     timeoutThread = new TimeoutThread (process, timeout);
     timeoutThread.start ();
   }

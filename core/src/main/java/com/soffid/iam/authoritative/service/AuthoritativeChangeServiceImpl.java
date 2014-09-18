@@ -265,6 +265,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detectGroupChange (AuthoritativeChange change) throws InternalErrorException
 	{
+		if (change.getGroups() == null)
+			return false;
+		
 		Collection<UsuariGrup> grups = getGrupService().findUsuariGrupsByCodiUsuari(change.getUser().getCodi());
 		
 		Set<String> actualGroups = new HashSet<String>(change.getGroups());

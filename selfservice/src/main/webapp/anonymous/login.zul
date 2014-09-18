@@ -12,28 +12,29 @@
                 execution.getNativeResponse().sendError(401, "Unauthenticatd ajax request");
             	return;
             }
-		    System.out.println ("ERROR: "+error);
+			try {
+				es.caib.seycon.ng.web.ConfiguraSEU.configuraLocale(null); 
+			} catch (Throwable th) {
+			}		    
 		]]></zscript>
 		<html><![CDATA[
-		
-   		
 		<div class="login">
-        		<p><img src="/selfservice/anonymous/logo.png" alt="Soffid logo" /> </p> 
+        		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
 			<div class="loginbox"> 
-			<p>Please, identify yourself to proceed</p>
-			<form method="post" action="/selfservice/j_security_check" accept-charset="UTF-8">
+			<p>${c:l('configure.header')}</p>
+			<form method="post" action="/j_security_check" accept-charset="UTF-8">
 			<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 			<p>
 			
-				<div class="inputlogin">User name:
+				<div class="inputlogin">${c:l('configure.username')}
 				<input name="j_username" id="j_username" type="text" autocomplete="off" /></div>
 			</p>
 			<p>
-				<div class="inputlogin">Password:
+				<div class="inputlogin">${c:l('configure.password')}
 				<input name="j_password" id="j_password" type="password" autocomplete="off" /></div>
 			</p>
 			<p style="color:red;">${error}</p>
-				<input name="formUCboton" type="submit" value="Login"/>
+				<input name="formUCboton" type="submit" value="${c:l('configure.Login')}"/>
 				</form>
 			</div>
 		</div>

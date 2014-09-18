@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -189,14 +190,15 @@ public class ConfiguraSEU extends Vbox {
 	 * la pàgina de login
 	 * @param language
 	 */
-	private void configuraLocale (String language) {
+	public static Locale configuraLocale (String language) {
 		
-		java.util.Locale idioma;
+		java.util.Locale idioma = null; 
 		org.zkoss.zk.ui.Session sessio = org.zkoss.zk.ui.Sessions.getCurrent();
 		
 		// Intentem crear un locale del idioma
 		try {
-			idioma = new Locale (language);
+			if (language != null)
+				idioma = new Locale (language);
 		} catch (Throwable th) {
 			idioma = null;
 		}
@@ -205,35 +207,49 @@ public class ConfiguraSEU extends Vbox {
 		// Si l'usuari no té com a preferència l'idioma, agafem el de
 		// el navegador o de la pàgina de login
 		if (idioma == null)  {
-			// Per defecte posem el anglès si no n'hi ha cap
-		  	idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-			try {
-				// El idioma del login
-				idioma = (java.util.Locale) sessio
-						.getAttribute("es.caib.loginModule.authenticator.locale"); //$NON-NLS-1$
-			} catch (Throwable th) {
-				try {
-					// Obtenim el paràmetre de configuració del login
-					HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
-							.getCurrent().getNativeRequest();
-					String lang = (String) req.getParameter("lang"); //$NON-NLS-1$
-					if (lang != null) {
-						idioma = new Locale(lang);
-					} else {
-						idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				} catch (Throwable thl) {
-				}
-			}
+			HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
+					.getCurrent().getNativeRequest();
+            if (idioma == null)
+            {
+    			// Medium priority, web browser preferences ( if any )
+                Enumeration e = req.getLocales();
+                while (e.hasMoreElements())
+                {
+                        Locale l = (Locale) e.nextElement();
+                        if (l.getLanguage().equalsIgnoreCase("ca"))
+                        {
+                        	idioma = l;
+                        	break;
+                        }
+                        else if (l.getLanguage().equalsIgnoreCase("es"))
+                        {
+                        	idioma = l;
+                        	break;
+                        }
+                        else if (l.getLanguage().equalsIgnoreCase("en"))
+                        {
+                        	idioma = l;
+                        	break;
+                        }
+                }
+                if (idioma == null)
+                {
+                    // Low priority, default language
+        			if (System.getProperty("soffid.language.default") == null)
+        				idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
+        			else
+        				idioma = new Locale (System.getProperty("soffid.language.default"));
+        		
+                }
+            	
+            }
 
-		} else {
-			sessio.setAttribute("es.caib.loginModule.authenticator.locale",idioma); //$NON-NLS-1$
 		}
 		
 		// Con esto, el zk establece el idioma:
 		sessio.setAttribute("px_preferred_locale", idioma); //$NON-NLS-1$
 		org.zkoss.util.Locales.setThreadLocal(idioma);
+		return idioma;
 	}
 	
 	private UsuariService usuari_service = null;
@@ -294,15 +310,13 @@ public class ConfiguraSEU extends Vbox {
 		Usuari user = findCurrentUsuari();
 		if (user == null)
 		{
-			String lang = "en";  //$NON-NLS-1$
-			configuraLocale(lang);
-			sessio.setAttribute(SESSIO_IDIOMA, lang);
+			Locale l = configuraLocale(null);
+			sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
 			String currentIPUsuari = getClientIPValue();
 			if (currentIPUsuari!=null) {
 				sessio.setAttribute(SESSIO_CURRENT_IP_SEU, currentIPUsuari);
 			}
 			
-//			throw new SeyconException(String.format(Messages.getString("ConfiguraSEU.UserNotFound"), codiUsuari)); //$NON-NLS-1$
 			return;
 		}
 		
@@ -344,12 +358,8 @@ public class ConfiguraSEU extends Vbox {
 				// Establim les seves preferències d'idioma
 				// per defecte en català.. a no se que l'usuari
 				// ho especifique
-				String lang = "en";  //$NON-NLS-1$
-				if (usuariSEU.getPreferenciesSEU().get(SEU_LANG)!=null) {
-					lang = (String)usuariSEU.getPreferenciesSEU().get(SEU_LANG);
-				}
-				configuraLocale(lang);
-				sessio.setAttribute(SESSIO_IDIOMA, lang);
+				Locale l  = configuraLocale((String) usuariSEU.getPreferenciesSEU().get(SEU_LANG));
+				sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
 				
 				// Actualitzem el seu darrer login
 				usuariSEU.setDataDarrerLogin(Calendar.getInstance());
@@ -397,9 +407,9 @@ public class ConfiguraSEU extends Vbox {
 				HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui
 								.Executions.getCurrent().getNativeRequest();
 				
-				String lang = req.getLocale().getLanguage();
-				configuraLocale(lang);
-				sessio.setAttribute(SESSIO_IDIOMA, lang);
+				Locale lang = configuraLocale(null);
+				sessio.setAttribute(SESSIO_IDIOMA, lang.getLanguage());
+				usuariSEU.getPreferenciesSEU().put(SEU_LANG, lang.getLanguage());
 				
 				// Guardem les variable de sessio:
 				sessio.setAttribute(SESSIO_LAST_LOGIN_SEU, null);

@@ -79,9 +79,20 @@ void showMessage (Image img)
 {
 	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(img);
 	StringBuffer sb = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@lastLog");
-	logWindow.setTitle(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name"));
-	logWindow.getFellow("tb").value = sb.toString();
-	logWindow.doHighlighted();
+	String name = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name");
+	if (sb.length() > 8000)
+	{                              
+		org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(name+".txt", null, "binary/octet-stream; charset=utf-8", sb.toString().getBytes("UTF-8"));
+	    downloadWindow.setContent(media);
+    	downloadWindow.invalidate();
+	}
+	else
+	{
+		logWindow.setTitle(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name"));
+		logWindow.getFellow("tb").value = sb.toString();
+		logWindow.doHighlighted();
+	}
+	
 	
 }
 		]]></zscript>
@@ -137,4 +148,5 @@ void showMessage (Image img)
 		<textbox id="tb" width="100%" height="100%" multiline="true"/>
 	</window>
 	
+    <iframe height="1" id="downloadWindow" visible="true" width="1"/>
 </frame>

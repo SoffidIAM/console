@@ -1162,7 +1162,7 @@
 												</columns>
 												<datarow>
 													<input_dada bind="@property" width_custom ="95%"></input_dada>
-													<textbox bind="@value" width ="95%" onChange="" >
+													<textbox bind="@value" width ="95%" onChange=""  multiline="true" rows="1">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
@@ -1235,7 +1235,7 @@
 													</column>
 												</columns>
 												<datarow>
-													<textbox bind="@systemAttribute" width ="95%" onChange="" >
+													<textbox bind="@systemAttribute" width ="95%" onChange="" multiline="true" rows="1">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
@@ -1251,7 +1251,7 @@
 															<listcell bind="@literal"/>
 														</dataitem>
 													</listbox>
-													<textbox bind="@soffidAttribute" width ="95%" onChange="" >
+													<textbox bind="@soffidAttribute" width ="95%" onChange=""  multiline="true" rows="1">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)

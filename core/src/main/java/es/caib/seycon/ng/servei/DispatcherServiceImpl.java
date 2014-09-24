@@ -1200,13 +1200,24 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		{
 			getObjectMappingPropertyEntityDao().remove(ompe);
 		}
+
+		for (AttributeMappingEntity ame: ome.getAttributeMappings())
+		{
+			getAttributeMappingEntityDao().remove(ame);
+		}
+
+
+		DispatcherEntity de = ome.getDispatcher();
 		getObjectMappingEntityDao().remove(ome);
-        ome.getDispatcher().setTimeStamp(new Date());
+		
+		de.setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getDispatcher(), "objectMappings")) //$NON-NLS-1$
         {
-        	ome.getDispatcher().getObjectMappings().add(ome);
+        	de.getObjectMappings().remove(ome);
         }
-        getDispatcherEntityDao().update(ome.getDispatcher());
+        
+
+        getDispatcherEntityDao().update(de);
         updateServers();
 	}
 

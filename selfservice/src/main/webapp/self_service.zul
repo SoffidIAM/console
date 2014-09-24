@@ -364,14 +364,14 @@
 				</div>
 				<div class="user-info">
 					<form id="fusuaris" dataPath="/model:/usuari" sclass="fons">
-						<tabbox id="panels">
+						<tabbox id="panels" width="100%">
 							<tabs>
 								<tab label="${c:l('selfService.Identification')}" />
 								<tab label="${c:l('selfService.ApplPermissions')}" />
 							</tabs>
 							<tabpanels>
-								<tabpanel id="identification">
-									<grid sclass="fonsBlanc">
+								<tabpanel id="identification"  width="100%">
+									<grid sclass="fonsBlanc" width="95%" fixedLayout="true">
 										<columns>
 											<column width="135px"/>
 											<column width="*"/>
@@ -425,16 +425,16 @@
 									</popup>
 								</tabpanel>
 						
-								<tabpanel id="applicationPermissions">
+								<tabpanel id="applicationPermissions" width="100%">
 									<div>
-										<listbox fixedLayout="true" dataPath="/rol">
+										<listbox fixedLayout="true" dataPath="/rol"  width="100%">
 											<listhead>
 												<listheader label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" />
-												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" />
-												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="10%" />
+												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="15%" />
+												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="20%" />
 												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
-												<listheader label="${c:l('usuaris.zul.Valor')}" width="*" />
+												<listheader label="${c:l('usuaris.zul.Valor')}" width="15%" />
 											</listhead>
 											<dataitem>
 												<listcell bind="@nomRol"/>

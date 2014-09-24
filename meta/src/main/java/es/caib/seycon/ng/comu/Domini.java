@@ -12,16 +12,20 @@ import com.soffid.mda.annotation.*;
 public abstract class Domini {
 
 	@Nullable
+	@Description("Unique identifier")
 	public java.lang.Long id;
 
 	@Attribute(translated = "name" )
+	@Description ("Domain name")
 	public java.lang.String nom;
 
 	@Nullable
+	@Description ("Information system name")
 	@Attribute(translated = "externalCode" )
 	public java.lang.String codiExtern;
 
 	@Nullable
+	@Description ("Domain description")
 	@Attribute(translated = "description" )
 	public java.lang.String descripcio;
 

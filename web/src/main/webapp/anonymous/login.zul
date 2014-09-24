@@ -28,11 +28,11 @@
 			<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 			<p>
 			
-				<div class="inputlogin">${c:l('configure.username')}
+				<div class="inputlogin">${c:l('login.lblUser')} :
 				<input name="j_username" id="j_username" type="text" autocomplete="off" /></div>
 			</p>
 			<p>
-				<div class="inputlogin">${c:l('configure.password')}
+				<div class="inputlogin">${c:l('login.lblPassword')} :
 				<input name="j_password" id="j_password" type="password" autocomplete="off" /></div>
 			</p>
 			<p style="color:red;">${error}</p>

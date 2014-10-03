@@ -1162,13 +1162,13 @@
 												</columns>
 												<datarow>
 													<input_dada bind="@property" width_custom ="95%"></input_dada>
-													<textbox bind="@value" width ="95%" onChange=""  multiline="true" rows="1">
+													<textbox bind="@value" width ="95%" onChange=""  multiline="true"  height="1em">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
 			  {
 				  self.setMultiline(true);
-				  self.setRows(5);
+				  self.setHeight("5em"));
 			  }
 			
 															]]></attribute>
@@ -1235,13 +1235,13 @@
 													</column>
 												</columns>
 												<datarow>
-													<textbox bind="@systemAttribute" width ="95%" onChange="" multiline="true" rows="1">
+													<textbox bind="@systemAttribute" width ="95%" onChange="" multiline="true" height="1em">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
 			  {
 				  self.setMultiline(true);
-				  self.setRows(5);
+				  self.setHeight("5em");
 			  }
 			
 															]]></attribute>
@@ -1251,13 +1251,13 @@
 															<listcell bind="@literal"/>
 														</dataitem>
 													</listbox>
-													<textbox bind="@soffidAttribute" width ="95%" onChange=""  multiline="true" rows="1">
+													<textbox bind="@soffidAttribute" width ="95%" onChange=""  multiline="true"  height="1em">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
 			  {
 				  self.setMultiline(true);
-				  self.setRows(5);
+				  self.setHeight("5em");
 			  }
 			
 															]]></attribute>

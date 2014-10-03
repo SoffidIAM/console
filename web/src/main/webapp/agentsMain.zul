@@ -74,9 +74,8 @@
 		<tabs>
 			<tab id="p_database" label="${c:l('agentsMain.zul.databases')}"
 				width="150px" visible="false"/>
-			<tab id="p_server" label="${c:l('agentsMain.zul.server')}" width="150px"
-				selected="true"/> 
-			<tab id="p_agent" label="${c:l('agentsMain.zul.agent')}" width="150px"/>
+			<tab id="p_server" label="${c:l('agentsMain.zul.server')}" width="150px"/> 
+			<tab id="p_agent" label="${c:l('agentsMain.zul.agent')}" width="150px" selected="true"/>
 		</tabs>
 		<tabpanels>
 			<tabpanel>

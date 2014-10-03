@@ -27,14 +27,23 @@ import es.caib.zkib.datamodel.DataNode;
 public class ShowAdditionalData {
 	
 	private UsuariService usuariServ;
-	private DadesAddicionalsService dadesAddicionalsServ;
+	private DadesAddicionalsService dadesAddicionalsService;
+	private DadesAddicionalsService getDadesAddicionalsService () throws CreateException, NamingException
+	{
+		if (dadesAddicionalsService == null)
+		{
+			DadesAddicionalsServiceHome homeDades = (DadesAddicionalsServiceHome) new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
+			dadesAddicionalsService = homeDades.create();
+		}
+		return dadesAddicionalsService;
+	}
+	
 	public ShowAdditionalData() throws NamingException, CreateException{
 		UsuariServiceHome home = (UsuariServiceHome) new InitialContext().lookup (UsuariServiceHome.JNDI_NAME);
 		usuariServ = home.create();
 		
-		DadesAddicionalsServiceHome homeDades = (DadesAddicionalsServiceHome) new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
-		dadesAddicionalsServ = homeDades.create();
 	}
+
 	
 	private long getOrder (Collection<TipusDada> tdaList, String attName)
 	{
@@ -46,8 +55,8 @@ public class ShowAdditionalData {
 		return -1;
 	}
 	@SuppressWarnings("unchecked")
-	public List<DadaUsuari> getDadaUsuari(String codiUsuari) throws InternalErrorException{
-			final Collection<TipusDada> tipusDadaList =  dadesAddicionalsServ.findTipusDadesByCodi("%");
+	public List<DadaUsuari> getDadaUsuari(String codiUsuari) throws InternalErrorException, CreateException, NamingException{
+			final Collection<TipusDada> tipusDadaList =  getDadesAddicionalsService().findTipusDadesByCodi("%");
 			List<DadaUsuari> dadaUsuariCollection;
 			if (codiUsuari != null) 
 				dadaUsuariCollection = new LinkedList<DadaUsuari> (usuariServ.findDadesUsuariByCodiUsuari(codiUsuari));
@@ -80,7 +89,7 @@ public class ShowAdditionalData {
 	}
 	
 	
-	void checkRequiredAttributes (DataNode userNode) throws InternalErrorException
+	public void checkRequiredAttributes (DataNode userNode) throws InternalErrorException, CreateException, NamingException
 	{
 		DataModelCollection lm = userNode.getListModel("dada");
 		for (int i = 0; i < lm.getSize(); i++)
@@ -90,7 +99,7 @@ public class ShowAdditionalData {
 		}
 	}
 
-	void checkRequiredAttribute (DataNode dadaNode) throws InternalErrorException
+	public void checkRequiredAttribute (DataNode dadaNode) throws InternalErrorException, CreateException, NamingException
 	{
 		if (dadaNode != null)
 		{
@@ -101,7 +110,7 @@ public class ShowAdditionalData {
 						(du.getValorDada() == null || du.getValorDada().length() == 0) && 
 						du.getValorDadaDate() == null)
 				{
-					TipusDada tda = dadesAddicionalsServ.findTipusDadaByCodi(du.getCodiDada());
+					TipusDada tda = getDadesAddicionalsService().findTipusDadaByCodi(du.getCodiDada());
 					if (tda.isRequired())
 						throw new InternalErrorException (String.format (Labels.getLabel("usuaris.zul.RequiredAttribute"), tda.getLabel()));
 				}

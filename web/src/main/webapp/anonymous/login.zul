@@ -4,7 +4,10 @@
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
 		<zscript><![CDATA[
-		    httpRequest = execution.getNativeRequest();
+			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
+				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+			
+		   	httpRequest = execution.getNativeRequest();
 		    error = httpRequest.getAttribute("es.caib.loginModule/errorDetail");
 		    if (error != null && ! error.isEmpty())
 		      errorMessage.visible = true;

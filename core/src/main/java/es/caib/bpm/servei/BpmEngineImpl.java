@@ -732,10 +732,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 			org.jbpm.graph.exe.ProcessInstance process = jbpmContext
 					.getProcessInstance(id);
-			org.jbpm.graph.def.ProcessDefinition definition = process
-					.getProcessDefinition();
 			if (process == null)
 				return null;
+			
+			org.jbpm.graph.def.ProcessDefinition definition = process
+					.getProcessDefinition();
 
 			if (!isInternalService()
 					&& !business.isUserAuthorized(OBSERVER_ROLE,

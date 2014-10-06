@@ -304,6 +304,10 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				cfg.setValor("9"); //$NON-NLS-1$
 				updateRolAccounts();
 			}
+			if (cfg.getValor().equals("0")) { //$NON-NLS-1$
+				cfg.setValor("10"); //$NON-NLS-1$
+				updateRolAccounts2();
+			}
 		}
 		finally
 		{
@@ -325,6 +329,28 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 		{
 			executeSentence(conn, "UPDATE SC_ROLUSU SET RLU_ENABLE=? WHERE RLU_ENABLE IS NULL",
 							new Object[] {true});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateRolAccounts2 () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ROLUSU SET RLU_APRPEN=? WHERE RLU_APRPEN IS NULL",
+							new Object[] {false});
+			executeSentence(conn, "UPDATE SC_TIPUSUO SET TUO_ROLHOL=? WHERE TUO_ROLHOL IS NULL",
+					new Object[] {false});
 		}
 		finally
 		{

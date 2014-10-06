@@ -166,17 +166,19 @@
 				
 				void carregaIcona(Component r){
 					es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
-					byte [] imgIcona1 = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@imgIcona1");
-					String tm = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@menu");
-					org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
-					if (imgIcona1 != null)
-					{
-						img.setContent(new AImage("prova", imgIcona1));
-					}else if (imgIcona1 == null && tm.equals("S")){
-						img.setSrc("/img/root.gif");
-					}else if (imgIcona1 == null && tm.equals("N")){
-						img.setSrc("/img/punt-verd.gif");
-					}
+					try {
+						byte [] imgIcona1 = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@imgIcona1");
+						String tm = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@menu");
+						org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
+						if (imgIcona1 != null)
+						{
+							img.setContent(new AImage("prova", imgIcona1));
+						}else if (imgIcona1 == null && tm != null && tm.equals("S")){
+							img.setSrc("/img/root.gif");
+						}else if (imgIcona1 == null && tm != null && tm.equals("N")){
+							img.setSrc("/img/punt-verd.gif");
+						}
+					} catch (NullPointerException e) {}
 				}
 				
 				void checkIsUpdatePending(Component item)
@@ -328,8 +330,9 @@
 									<label bind="dispatcherInformation/@description" use="com.soffid.selfservice.utils.Inputlabel" passwordDataPath="estatContrasenya" />
 								</listcell>
 								<listcell style="vertical-align: top;"> 
-									<div width="100%" style="display: inline-flex">
-										<label bind="@name" passwordDataPath="estatContrasenya" style="display: inline" 											 use="com.soffid.selfservice.utils.Inputlabel"/>
+									<div style="display: inline-flex">
+										<label bind="@name" passwordDataPath="estatContrasenya" style="display: inline-block"
+										 	   use="com.soffid.selfservice.utils.Inputlabel"/>
 										<separator width="3px"></separator>
 										<image src="~./img/exclamacio.gif" visible="false"
 											width="16px" height="16px">
@@ -364,14 +367,14 @@
 				</div>
 				<div class="user-info">
 					<form id="fusuaris" dataPath="/model:/usuari" sclass="fons">
-						<tabbox id="panels">
+						<tabbox id="panels" width="100%">
 							<tabs>
 								<tab label="${c:l('selfService.Identification')}" />
 								<tab label="${c:l('selfService.ApplPermissions')}" />
 							</tabs>
 							<tabpanels>
-								<tabpanel id="identification">
-									<grid sclass="fonsBlanc">
+								<tabpanel id="identification"  width="100%">
+									<grid sclass="fonsBlanc" width="95%" fixedLayout="true">
 										<columns>
 											<column width="135px"/>
 											<column width="*"/>
@@ -425,16 +428,16 @@
 									</popup>
 								</tabpanel>
 						
-								<tabpanel id="applicationPermissions">
+								<tabpanel id="applicationPermissions" width="100%">
 									<div>
-										<listbox fixedLayout="true" dataPath="/rol">
+										<listbox fixedLayout="true" dataPath="/rol"  width="100%">
 											<listhead>
 												<listheader label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" />
-												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" />
-												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="10%" />
+												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="15%" />
+												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="20%" />
 												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
-												<listheader label="${c:l('usuaris.zul.Valor')}" width="*" />
+												<listheader label="${c:l('usuaris.zul.Valor')}" width="15%" />
 											</listhead>
 											<dataitem>
 												<listcell bind="@nomRol"/>

@@ -969,8 +969,8 @@
 			amagaDadesExecucio("intranetEM");
 			amagaDadesExecucio("extranetEM");
 			amagaDadesExecucio("internetEM");
-			p_execucions.setVisible(false);
-			orow_tipusmenu.setVisible(true);
+			p_execucions.setVisible(true);
+			orow_tipusmenu.setVisible(false);
 			
 			// Amaguem icones
 			mostraImatge("icona1", null, true);

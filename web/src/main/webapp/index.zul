@@ -2,7 +2,10 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="Soffid Identity and Access Manager" ?>
-<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+<?meta http-equiv="X-UA-Compatible" content="IE=8" ?>
+
+<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	style="overflow: visible">
 	<style src="~./styles/estil.css"/>
 	<style src="/css/localSEU.css"/>
 	<zscript>
@@ -24,6 +27,7 @@
 	
 	<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
 		initialPage="wf/inbox.zul"
+		style="overflow: visible"
 		logoutPage="/logout/" mainWindowTitle="Soffid IAM" menu="//menu/menu" showFavorites="false" width="100%">
 		<hbox id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
 			<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>

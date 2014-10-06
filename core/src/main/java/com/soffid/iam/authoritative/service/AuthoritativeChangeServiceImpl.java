@@ -200,13 +200,17 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			
 			Usuari u = change.getUser();
 			if (u.getCodi() != null)
+			{
 				u = getUsuariService().findUsuariByCodiUsuari(u.getCodi());
+			}
 			
-			AuthoritativeChange current = getCurrentAttributes(u.getCodi());
-
 			pi.getContextInstance().createVariable("change", change);
-			pi.getContextInstance().createVariable("current", current);
-			pi.getContextInstance().createVariable("user", u);
+			if (u != null)
+			{
+				AuthoritativeChange current = getCurrentAttributes(u.getCodi());
+				pi.getContextInstance().createVariable("current", current);
+				pi.getContextInstance().createVariable("user", u);
+			}
 			
 			ctx.save(pi);
 			pi.signal();
@@ -232,27 +236,30 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detecteAttributeChange (AuthoritativeChange change) throws InternalErrorException
 	{
-		for (String attribute: change.getAttributes().keySet())
+		if (change.getAttributes() != null)
 		{
-			Object value = change.getAttributes().get(attribute);
-			if (value != null && value instanceof Date)
+			for (String attribute: change.getAttributes().keySet())
 			{
-				Calendar c = Calendar.getInstance();
-				c.setTime( (Date) value);
-				value = c;
+				Object value = change.getAttributes().get(attribute);
+				if (value != null && value instanceof Date)
+				{
+					Calendar c = Calendar.getInstance();
+					c.setTime( (Date) value);
+					value = c;
+				}
+				DadaUsuari dada = getUsuariService().findDadaByCodiTipusDada(change.getUser().getCodi(), attribute);
+				if (dada == null && value != null)
+					return true;
+				else if (value == null && dada!= null)
+					return true;
+				else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
+					return true;
+				else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getBlobDataValue())) 
+					return true;
+				else if (value != null && ! value.equals(dada.getValorDada())) 
+					return true;
+				
 			}
-			DadaUsuari dada = getUsuariService().findDadaByCodiTipusDada(change.getUser().getCodi(), attribute);
-			if (dada == null && value != null)
-				return true;
-			else if (value == null && dada!= null)
-				return true;
-			else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
-				return true;
-			else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getBlobDataValue())) 
-				return true;
-			else if (value != null && ! value.equals(dada.getValorDada())) 
-				return true;
-			
 		}
 		return false;
 	}
@@ -265,6 +272,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detectGroupChange (AuthoritativeChange change) throws InternalErrorException
 	{
+		if (change.getGroups() == null)
+			return false;
+		
 		Collection<UsuariGrup> grups = getGrupService().findUsuariGrupsByCodiUsuari(change.getUser().getCodi());
 		
 		Set<String> actualGroups = new HashSet<String>(change.getGroups());

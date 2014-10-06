@@ -76,7 +76,7 @@ public abstract class TasqueEntity {
 	@Nullable
 	public java.lang.String domcor;
 
-	@Column (name="TAS_ROLE", length=50)
+	@Column (name="TAS_ROLE", length=150)
 	@Nullable
 	public java.lang.String role;
 

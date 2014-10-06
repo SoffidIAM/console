@@ -127,8 +127,7 @@
 					{
 						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
 								.replaceAsteriskChar(criteria.getDescription()));
-						criteria.setDispatcher(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getDispatcher()));
+						criteria.setDispatcher(criteria.getDispatcher());
 						criteria.setExcludeType(criteria.getExcludeType());
 						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
 								.replaceAsteriskChar(criteria.getGrantedGroups()));
@@ -145,8 +144,7 @@
 					{
 						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
 								.addPercentChar(criteria.getDescription()));
-						criteria.setDispatcher(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getDispatcher()));
+						criteria.setDispatcher(criteria.getDispatcher());
 						criteria.setExcludeType(criteria.getExcludeType());
 						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
 								.addPercentChar(criteria.getGrantedGroups()));

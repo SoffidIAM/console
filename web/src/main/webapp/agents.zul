@@ -1168,7 +1168,7 @@
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
 			  {
 				  self.setMultiline(true);
-				  self.setHeight("5em"));
+				  self.setHeight("5em");
 			  }
 			
 															]]></attribute>

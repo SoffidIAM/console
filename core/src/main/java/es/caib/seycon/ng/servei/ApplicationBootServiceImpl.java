@@ -304,7 +304,7 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				cfg.setValor("9"); //$NON-NLS-1$
 				updateRolAccounts();
 			}
-			if (cfg.getValor().equals("0")) { //$NON-NLS-1$
+			if (cfg.getValor().equals("9")) { //$NON-NLS-1$
 				cfg.setValor("10"); //$NON-NLS-1$
 				updateRolAccounts2();
 			}

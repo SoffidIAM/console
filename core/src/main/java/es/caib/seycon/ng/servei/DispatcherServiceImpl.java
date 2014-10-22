@@ -134,18 +134,31 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
 	private void updateAutomaticTasks (Dispatcher dispatcher, boolean remove) throws InternalErrorException
 	{
-		if (dispatcher.isReadOnly())
-			updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER, 
-							"Reconcile unmanaged accounts from %s", //$NON-NLS-1$
-							dispatcher, remove);
-		else
+		if (dispatcher.getUrl() == null || dispatcher.getUrl().isEmpty())
+		{
 			updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER, 
 					"Reconcile all accounts from %s", //$NON-NLS-1$
-					dispatcher, remove);
+					dispatcher, true);
 		
-		updateAutomaticTasks(SystemScheduledTasks.AUTHORITATIVE_DATA_IMPORT, 
+			updateAutomaticTasks(SystemScheduledTasks.AUTHORITATIVE_DATA_IMPORT, 
 						"Import authoritative data from %s", //$NON-NLS-1$
-						dispatcher, remove || ! dispatcher.isAuthoritative());
+						dispatcher, true);
+		}
+		else
+		{
+			if (dispatcher.isReadOnly())
+				updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER, 
+								"Reconcile all accounts from %s", //$NON-NLS-1$
+								dispatcher, remove);
+			else
+				updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER, 
+						"Reconcile unmanaged accounts from %s", //$NON-NLS-1$
+						dispatcher, remove);
+			
+			updateAutomaticTasks(SystemScheduledTasks.AUTHORITATIVE_DATA_IMPORT, 
+							"Import authoritative data from %s", //$NON-NLS-1$
+							dispatcher, remove || ! dispatcher.isAuthoritative());
+		}
 	}
 	
 	private void updateAutomaticTasks (String handler, String description,

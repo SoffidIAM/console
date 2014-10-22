@@ -48,7 +48,10 @@ public class PasswordServiceImpl
         throws java.lang.Exception
     {
        	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(user, passwordDomain);
-        return getInternalPasswordService().checkAccountPolicy(acc, password);
+       	if (acc == null)
+       		return null;
+       	else
+       		return getInternalPasswordService().checkAccountPolicy(acc, password);
     }
 
     /**

@@ -24,6 +24,7 @@
   <url>http://www.soffid.com/doc/console</url>
   <scm>
         <connection>scm:git:ssh://git@stash.dev.lab:7999/iam2/console.git</connection>
+    <tag>HEAD</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>

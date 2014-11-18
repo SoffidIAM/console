@@ -6,7 +6,6 @@
 package es.caib.seycon.ng.servei;
 
 import java.net.InetAddress;
-import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -84,14 +83,16 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     public static final int ADMINISTRACIO = 2;
 
     protected Boolean handleTeXarxaAdministrada() throws Exception {
-        String codiUsuari = this.getPrincipal().getName();
-        Collection codisXarxa = getCodiXarxesAmbAccesAdministracio(codiUsuari);
+        Usuari usuari = getUsuariService().getCurrentUsuari();
+        Collection codisXarxa = getCodiXarxesAmbAccesAdministracio(usuari.getCodi());
         return new Boolean(codisXarxa.size() > 0);
     }
 
     protected Boolean handleEsXarxaAdministrada(String codiXarxa) throws Exception {
-        String codiUsuari = this.getPrincipal().getName();
-        Collection codisXarxa = getCodiXarxesAmbAccesAdministracio(codiUsuari);
+        Usuari usuari = getUsuariService().getCurrentUsuari();
+        if (usuari == null)
+        	return false;
+        Collection codisXarxa = getCodiXarxesAmbAccesAdministracio(usuari.getCodi());
         for (Iterator iterator = codisXarxa.iterator(); iterator.hasNext();) {
             String currentCodiXarxa = (String) iterator.next();
             if (currentCodiXarxa.compareTo(codiXarxa) == 0) {
@@ -113,6 +114,9 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     protected Long handleFindNivellAccesByNomMaquinaAndCodiXarxa(String nomMaquina, String codiXarxa)
             throws Exception {
         String codiUsuari = Security.getCurrentUser();
+        if (codiUsuari == null)
+        	return new Long(SENSE_PERMISOS);
+        
         Collection networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
         
         
@@ -631,14 +635,15 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
 	}
 
     protected NetworkAuthorization handleCreate(NetworkAuthorization accessList) throws Exception {
+    	String u = Security.getCurrentUser();
         // Si pot crear qualsevol xarxa o actualitzar qualsevol xarxa
         if (AutoritzacionsUsuari.canCreateAllNetworks()
                 || AutoritzacionsUsuari.canUpdateAllNetworks()
-                || hasNetworkAuthorizations(Security.getCurrentUser(),
+                || hasNetworkAuthorizations(u,
                         accessList.getCodiXarxa(), new int[] { ADMINISTRACIO })) {
             XarxaACEntity entity = getXarxaACEntityDao().networkAuthorizationToEntity(accessList);
             if (entity.getUsuari() != null) {
-                if (entity.getUsuari().getCodi().compareTo(getPrincipal().getName()) == 0) {
+                if (entity.getUsuari().getCodi().compareTo(u) == 0) {
                     throw new SeyconException(
                             Messages.getString("XarxaServiceImpl.NoAutoassignNetLists")); //$NON-NLS-1$
                 }
@@ -921,9 +926,6 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         }
     }
 
-    protected java.security.Principal getPrincipal() {
-        return Security.getPrincipal();
-    }
 
     protected String[] handleGetTasques(String nomMaquina) throws Exception {
         String[] resultats = getMaquinaEntityDao().getTasques(nomMaquina);
@@ -1083,24 +1085,30 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 || AutoritzacionsUsuari.canSupportAllNetworks_VNC()) {
             return xarxes;
         }
-        String codiUsuari = getPrincipal().getName();
-        Collection codiXarxes = getCodiXarxesAmbAcces(codiUsuari);
+        String codiUsuari = Security.getCurrentUser();
         Collection xarxesPermeses = new LinkedList();
-        Iterator iterator = xarxes.iterator();
-        while (iterator.hasNext()) {
-            Xarxa xarxa = (Xarxa) iterator.next();
-            if (codiXarxes.contains(xarxa.getCodi())) {
-                xarxesPermeses.add(xarxa);
-            }
+        if (codiUsuari != null)
+        {
+	        Collection codiXarxes = getCodiXarxesAmbAcces(codiUsuari);
+	        Iterator iterator = xarxes.iterator();
+	        while (iterator.hasNext()) {
+	            Xarxa xarxa = (Xarxa) iterator.next();
+	            if (codiXarxes.contains(xarxa.getCodi())) {
+	                xarxesPermeses.add(xarxa);
+	            }
+	        }
         }
         return xarxesPermeses;
     }
 
     private boolean maquinaPermesa(Maquina maquina, int accessLevel) throws InternalErrorException {
-        String codiUsuari = getPrincipal().getName();
-        Collection networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
-        if (maquinaPermesa(networkAuthorizations, maquina, accessLevel)) {
-            return true;
+        String codiUsuari = Security.getCurrentUser();
+        if (codiUsuari != null)
+        {
+	        Collection networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
+	        if (maquinaPermesa(networkAuthorizations, maquina, accessLevel)) {
+	            return true;
+	        }
         }
         return false;
     }
@@ -1131,15 +1139,18 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 || AutoritzacionsUsuari.canSupportAllNetworks_VNC()) {
             return maquines;
         }
-        String codiUsuari = getPrincipal().getName();
-        Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
+        String codiUsuari = Security.getCurrentUser();
         Collection<Maquina> maquinesPermeses = new LinkedList();
-        Iterator iterator = maquines.iterator();
-        while (iterator.hasNext()) {
-            Maquina maquina = (Maquina) iterator.next();
-            if (maquinaPermesa(networkAuthorizations, maquina, accessLevel)) {
-                maquinesPermeses.add(maquina);
-            }
+        if ( codiUsuari != null)
+        {
+	        Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
+	        Iterator iterator = maquines.iterator();
+	        while (iterator.hasNext()) {
+	            Maquina maquina = (Maquina) iterator.next();
+	            if (maquinaPermesa(networkAuthorizations, maquina, accessLevel)) {
+	                maquinesPermeses.add(maquina);
+	            }
+	        }
         }
         return maquinesPermeses;
     }
@@ -1185,6 +1196,9 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
      */
     private boolean hasNetworkAuthorizations(String codiUsuari, String codiXarxa,
             int autoritzacions[]) throws InternalErrorException {
+    	if (codiUsuari == null)
+    		return false;
+    	
         // Su código es igual al de getNetworkAuthorizations, pero no devuelve
         // la lista
         // acces list per codi d'usuari
@@ -1603,7 +1617,10 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         if (AutoritzacionsUsuari.canSupportAllNetworks_VNC())
             return new Long(SUPORT);
 
-        String codiUsuari = getPrincipal().getName();
+        String codiUsuari = Security.getCurrentUser();
+        if (codiUsuari == null)
+        	return new Long (SENSE_PERMISOS);
+        
         Collection networkAuthorizations = findALLNetworkAuthorizationsByCodiUsuari(codiUsuari);
         return getAccessLevel(networkAuthorizations, nomMaquina, codiXarxa);
     }

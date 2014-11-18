@@ -19,6 +19,7 @@
 
 	<zscript>
 		<![CDATA[
+		    import es.caib.zkib.datasource.XPathUtils;
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
 			try
@@ -1511,7 +1512,19 @@ void removeSodRule (Component button)
 								<rows>
 									<row>
 										<vbox width="100%">
-											<listbox dataPath="/esquema/lista/listbox:/rolUsuari" fixedLayout="true" id="gridUsuaris" mold="paging" pageSize="15" sclass="likeagrid">
+											<listbox dataPath="/esquema/lista/listbox:/rolUsuari" fixedLayout="true" id="gridUsuaris" 
+												mold="paging" pageSize="15" sclass="likeagrid">
+											<attribute name="onNewRow">
+											
+										ctx = XPathUtils.getComponentContext(event.data);
+										Long rule = XPathUtils.getValue(ctx, "@ruleId");
+										if (rule != null)
+										{
+											Listcell cell = event.data.getChildren().get(6);
+											cell.getChildren().get(0).visible = false;
+											cell.getChildren().get(1).visible = true;
+										}
+											</attribute>
 												<listhead>
 													<listheader label="${c:l('aplicacions.zul.Codi-2')}" sort="auto" width="10%"/>
 													<listheader label="${c:l('aplicacions.zul.Nomcomplert')}" sort="auto" width="25%"/>
@@ -1519,14 +1532,32 @@ void removeSodRule (Component button)
 													<listheader label="${c:l('aplicacions.zul.Rol')}" sort="auto" width="17%"/>
 													<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="17%"/>
 													<listheader label="${c:l('aplicacions.zul.ValordeDomini')}" width="17%"/>
+													<listheader label="${c:l('usuaris.zul.recertification')}" width="17%"/>
 												</listhead>
 												<dataitem bind=".">
-													<listcell bind="@codiUsuari"/>
+													<listcell bind="@accountName"/>
 													<listcell bind="@nomComplertUsuari"/>
 													<listcell bind="@codiGrupUsuari"/>
 													<listcell bind="@nomRol"/>
 													<listcell bind="@baseDeDades"/>
 													<listcell bind="valorDomini/@descripcio"/>
+													<listcell>
+														<datebox bind="@certificationDate" disabled="true" buttonVisible="false"
+															format="${c:l('usuaris.zul.dateFormat')}" sclass="dateboxread">
+														</datebox> 
+														<imageclic align="center" visible="false"
+															src="/img/info.png">
+															<attribute name="onClick">
+															<![CDATA[
+															ctx = XPathUtils.getComponentContext(self);
+															String ruleDescription = XPathUtils.getValue(ctx, "@ruleDescription");
+															Missatgebox.info(
+																	org.zkoss.util.resource.Labels
+																			.getLabel("usuaris.assignedByRule",
+																	new Object[] { ruleDescription }));
+		]]></attribute>
+														</imageclic>
+													</listcell>
 												</dataitem>
 											</listbox>
 											<hbox style="float:right;">

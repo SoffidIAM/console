@@ -85,6 +85,11 @@ public abstract class RolAccountEntity {
 	@Nullable
 	public Long approvalProcess;
 	
+	@Description("Last certification date")
+	@Column (name="RLU_CERDAT")
+	@Nullable
+	public Date certificationDate;
+	
 	
 	/**************************** DAOs ******************************/
 	@DaoFinder("select ra\nfrom es.caib.seycon.ng.model.RolAccountEntity ra\ninner join    ra.account as account\ninner join    account.users as users\ninner join    users.user as user\ninner join    ra.rol as rol\nwhere user.codi = :codiUsuari and rol.nom = :nomRol")

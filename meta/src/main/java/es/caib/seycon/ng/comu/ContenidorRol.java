@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ContainerRole",
@@ -18,6 +20,10 @@ public abstract class ContenidorRol {
 
 	@Attribute(translated = "type" )
 	public java.lang.String tipus;
+
+	@Description("Last certification date")
+	@Nullable
+	public Date certificationDate;
 
 	public java.lang.String metaInfo;
 

@@ -103,4 +103,8 @@ public abstract class RolAccount {
 	@Description("When an aproval process is needed to enable this rol assignment")
 	@Nullable
 	public Long approvalProcess;
+
+	@Description("Last certification date")
+	@Nullable
+	public Date certificationDate;
 }

@@ -10,7 +10,8 @@
 	<datamodel id="model" rootNode="rolsUsuarisRols" src="descriptorRolsUsuari.xml"/>
 	
 	<zscript>
-	
+
+	    import es.caib.zkib.datasource.XPathUtils;
 		mode = "query"; 
 		view_altres = false;
 		model.getVariables().declareVariable("queryEnabled", false);
@@ -94,6 +95,16 @@
 			<tabpanel>
 				<vbox width="100%">
 				<listbox autocommit="false" dataPath="/model:/rolUsuari" fixedLayout="true" height="300px" width="100%" id="listbox" rows="20">
+					<attribute name="onNewRow">
+						ctx = XPathUtils.getComponentContext(event.data);
+						Long rule = XPathUtils.getValue(ctx, "@ruleId");
+						if (rule != null)
+						{
+							Listcell cell = event.data.getChildren().get(6);
+							cell.getChildren().get(0).visible = false;
+							cell.getChildren().get(1).visible = true;
+						}
+					</attribute>
 					<listhead>
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.Codi')}" width="9%"/>
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.Nomcomplert')}" width="20%"/>
@@ -101,14 +112,32 @@
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.Rol')}"/>
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.Bbdd')}" width="10%"/>
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}" width="24%"/>
+						<listheader label="${c:l('usuaris.zul.recertification')}"/>
 					</listhead>
 					<dataitem bind=".">
-						<listcell bind="@codiUsuari"/>
+						<listcell bind="@accountName"/>
 						<listcell bind="@nomComplertUsuari"/>
 						<listcell bind="@codiGrupUsuari"/>
 						<listcell bind="@nomRol"/>
 						<listcell bind="@baseDeDades"/>
 						<listcell bind="valorDomini/@descripcio" tooltip="tvalorDomini"/>
+						<listcell>
+								<datebox bind="@certificationDate" disabled="true" buttonVisible="false"
+									format="${c:l('usuaris.zul.dateFormat')}" sclass="dateboxread"  >
+								</datebox> 
+							<imageclic align="center" visible="false"
+								src="/img/info.png">
+								<attribute name="onClick">
+								<![CDATA[
+								ctx = XPathUtils.getComponentContext(self);
+								String ruleDescription = XPathUtils.getValue(ctx, "@ruleDescription");
+								Missatgebox.info(
+										org.zkoss.util.resource.Labels
+												.getLabel("usuaris.assignedByRule",
+										new Object[] { ruleDescription }));
+								]]></attribute>
+							</imageclic>
+						</listcell>
 					</dataitem>
 				</listbox>
 				<popup id="tvalorDomini" width="200px">

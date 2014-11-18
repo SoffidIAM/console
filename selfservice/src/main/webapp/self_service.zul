@@ -52,6 +52,8 @@
 				
 				timerDelay = 10000;
 				
+				model.getVariables().declareVariable("query", false);
+				
 				try
 				{
 					es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -167,16 +169,22 @@
 				void carregaIcona(Component r){
 					es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
 					try {
-						byte [] imgIcona1 = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@imgIcona1");
-						String tm = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@menu");
-						org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
-						if (imgIcona1 != null)
+						PuntEntrada pe = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").getInstance();
+						if (pe != null)
 						{
-							img.setContent(new AImage("prova", imgIcona1));
-						}else if (imgIcona1 == null && tm != null && tm.equals("S")){
-							img.setSrc("/img/root.gif");
-						}else if (imgIcona1 == null && tm != null && tm.equals("N")){
-							img.setSrc("/img/punt-verd.gif");
+							byte [] imgIcona1 = pe.getImgIcona1();
+							String tm = pe.getMenu();
+							org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
+							if (imgIcona1 != null)
+							{
+								img.setContent(new AImage(pe.getId(), imgIcona1));
+							} else if (imgIcona1 == null && tm != null && tm.equals("S")){
+								img.setSrc("/img/root.gif");
+							} else if (imgIcona1 == null && tm != null && tm.equals("N")){
+								img.setSrc("/img/punt-verd.gif");
+							}
+							if (tm.equals("N") && pe.getExecucions().isEmpty())
+								r.getChildren().get(0).getChildren().get(0).getChildren().get(2).setStyle("color: #EEEEEE; ");
 						}
 					} catch (NullPointerException e) {}
 				}
@@ -196,7 +204,7 @@
 									es.caib.seycon.ng.ServiceLocator
 										.instance().getAccountService();
 							
-							Image img = item.getChildren().get(2).getChildren().get(0)
+							Component img = item.getChildren().get(2).getChildren().get(0)
 									.getChildren().get(2);
 							img.setVisible(accountService.isUpdatePending(acc));
 							
@@ -219,6 +227,8 @@
 							LinkedList punt = instance.getExecucions();
 							if(!punt.isEmpty())
 								Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
+							else
+								alert("Cannot execute");
 						}
 							
 					}
@@ -260,6 +270,20 @@
 						}
 					);
 				}
+				
+				void search (String s) 
+				{
+					es.caib.zkib.jxpath.JXPathContext ctx = model.getJXPathContext();
+					es.caib.zkib.jxpath.Variables v = ctx.getVariables();
+					if (s == null || s.trim().isEmpty())
+					{
+						v.declareVariable("query", false);
+					} else {
+						v.declareVariable("query", true);
+						v.declareVariable("queryName", s);
+					}
+					model.getValue("/moure").refresh();
+				}
 			]]>
 		</zscript>
 		
@@ -282,6 +306,12 @@
 		<div class="content">
 			<div class="sidebar aplications">
 				<label value="${c:l('selfService.Applications')}" sclass="titolSelf"/>
+				<div>
+					<textbox style="width:90%" onChanging="search(event.value)" focus="true" id="appfinder"
+						onCancel='appfinder.setValue(""); search(null)'
+						onOK='search(appfinder.getValue())'></textbox>
+					<imageclic src="/img/cancel.png" onClick='appfinder.setValue(""); search(null);'/>
+				</div>
 				<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="treebox" 
 							onNewRow="carregaIcona(event.data)" onSelect="select()" sclass="senseBorder1">
 					<treeitemfinder bind="." open="false" path="/moure">
@@ -374,7 +404,7 @@
 							</tabs>
 							<tabpanels>
 								<tabpanel id="identification"  width="100%">
-									<grid sclass="fonsBlanc" width="95%" fixedLayout="true">
+									<grid sclass="fonsBlanc" width="100%" fixedLayout="true">
 										<columns>
 											<column width="135px"/>
 											<column width="*"/>
@@ -412,7 +442,8 @@
 											</row>
 										</rows>
 									</grid>
-									<grid sclass="fonsBlanc" dataPath="/dada"  onNewRow="event.data.getChildren().get(1).onCreate()"> 
+									<grid sclass="fonsBlanc" dataPath="/dada"  onNewRow="event.data.getChildren().get(1).onCreate()"
+										fixedLayout="true" width="100%"> 
 										<columns>
 											<column width="135px"/>
 											<column width="*"/>

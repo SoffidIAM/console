@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
@@ -66,7 +67,7 @@ public class SelfServiceImpl extends SelfServiceBase
 	{
 		Usuari u = getCurrentUsuari();
 		Collection<Account> accounts = new LinkedList<Account>();
-		for (Account acc: getAccountService().getUserGrantedAccounts(u))
+		for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
 		{
 			if (!acc.getType().equals(AccountType.IGNORED))
 				accounts.add (acc);
@@ -341,5 +342,10 @@ public class SelfServiceImpl extends SelfServiceBase
 	protected TipusDada handleGetDataTypeDescription(String attName)
 			throws Exception {
 		return getDadesAddicionalsService().findTipusDadaByCodi(attName);
+	}
+	
+	@Override
+	protected Collection<PuntEntrada> handleFindEntryPoints(String name) throws Exception {
+		return getPuntEntradaService().findPuntsEntrada("%"+name+"%", "%", "%", "%", "%", "%");
 	}
 }

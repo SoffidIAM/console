@@ -822,7 +822,7 @@
 													<datarow>
 														<label bind="@codiUsuari"/>
 														<label bind="@nomComplert"/>
-														<imagemap align="center" src="~./img/list-remove.gif">
+														<imageclic align="center" src="~./img/list-remove.gif">
 															<attribute name="onClick">
 																if (canUpdateCorreu || canDeleteCorreu) {
 																	dataRow = self.getParent();
@@ -837,7 +837,7 @@
 																	}
 																}
 															</attribute>
-														</imagemap>
+														</imageclic>
 													</datarow>
 												</grid>
 												<hbox width="99%">
@@ -879,7 +879,7 @@
 													<datarow>
 														<label bind="@nomLlistaCorreuPertany"/>
 														<label bind="@codiDominiCorreuPertany"/>
-														<imagemap align="center" src="~./img/list-remove.gif">
+														<imageclic align="center" src="~./img/list-remove.gif">
 															<attribute name="onClick">
 																if (canUpdateCorreu || canDeleteCorreu) {
 																	dataRow = self.getParent();
@@ -896,7 +896,7 @@
 																	}
 																}
 															</attribute>
-														</imagemap>
+														</imageclic>
 													</datarow>
 												</grid>
 												<hbox width="99%">
@@ -962,7 +962,7 @@
 													</columns>
 													<datarow>
 														<label bind="@adreca"/>
-														<imagemap align="center" src="~./img/list-remove.gif">
+														<imageclic align="center" src="~./img/list-remove.gif">
 															<attribute name="onClick">
 																if (canUpdateCorreu || canDeleteCorreu) {
 																	dataRow = self.getParent();
@@ -977,7 +977,7 @@
 																	}
 																}
 															</attribute>
-														</imagemap>
+														</imageclic>
 													</datarow>
 												</grid>
 												<hbox width="99%"> 

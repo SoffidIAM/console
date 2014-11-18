@@ -155,6 +155,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 	LRUMap map = new LRUMap();
 
 	private String getUserName() {
+		if (getPrincipal() == null)
+			return "nobody";
+		
 		String p = null;
 		p = Security.getCurrentUser();
 		if (p == null)
@@ -2198,7 +2201,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 	@Override
 	protected JbpmContext handleGetContext() throws Exception {
 		JbpmContext myContext = Configuration.getConfig().createJbpmContext();
-		myContext.setActorId(Security.getCurrentUser());
+		Principal p = getPrincipal();
+		if ( p == null)
+			myContext.setActorId(null);
+		else
+			myContext.setActorId(Security.getCurrentUser());
 		return myContext;
 	}
 

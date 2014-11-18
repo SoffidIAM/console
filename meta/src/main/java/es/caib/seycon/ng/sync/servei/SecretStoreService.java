@@ -50,6 +50,7 @@ public abstract class SecretStoreService {
 		es.caib.seycon.ng.comu.Usuari user)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> getUsersWithSecrets()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

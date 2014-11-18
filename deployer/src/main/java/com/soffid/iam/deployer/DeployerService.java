@@ -336,11 +336,19 @@ public class DeployerService extends AbstractDeploymentScanner
         	}
         	else
         	{
+        		String entryName = entry.getName();
 	            File f = new File(warFile, entry.getName());
 	            if (entry.isDirectory()) {
 	                f.mkdirs();
 	            } else {
-	            	if (isXslPath(warFile, entry))
+	        		if (f.getName().startsWith("replace-"))
+	        		{
+	        			f = new File (f.getParentFile(), f.getName().substring(8));
+	            		log.info("Replacing file "+f.getPath());
+		                f.getParentFile().mkdirs();
+		                extractFile(zin, f);
+	        		} 
+	        		else if (isXslPath(warFile, entry))
 	            	{
 	            		log.info("Applying XSL transformation to "+f.getPath());
 	            		File patchedFile = getPatchedFile(warFile, entry);
@@ -384,7 +392,7 @@ public class DeployerService extends AbstractDeploymentScanner
 	            	}
 	            	else if (f.canRead())
 	            	{
-            			log.warn("Error deploying web module "+name+". Cannot replace file "+f.getPath());
+            			log.warn("Module "+name+". Ignoring file "+f.getPath());
 	            	}
 	            	else
 	            	{

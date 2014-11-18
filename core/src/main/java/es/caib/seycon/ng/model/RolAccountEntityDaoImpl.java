@@ -250,6 +250,8 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
             // - Si existe, no se crea, pero no se da ERROR (carga masiva)
             RolAccountEntity rolUsuariExistent = findExisteixRolUsuari(rolsUsuaris);
             if (rolUsuariExistent == null) { // Lo creamos si no existe
+            	
+            	rolsUsuaris.setCertificationDate(new Date());
 
                 super.create(rolsUsuaris);
                 getSession(false).flush();
@@ -460,6 +462,10 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
 	        segonCognom = segonCognom != null ? segonCognom : ""; //$NON-NLS-1$
 	        targetVO.setNomComplertUsuari(nom + " " + primerCognom + " " + segonCognom); //$NON-NLS-1$ //$NON-NLS-2$
 	        targetVO.setCodiUsuari(usuariEntity == null? null: usuariEntity.getCodi());
+        }
+        else
+        {
+        	targetVO.setNomComplertUsuari(sourceEntity.getAccount().getDescription());
         }
         
         targetVO.setAccountName(sourceEntity.getAccount().getName());        

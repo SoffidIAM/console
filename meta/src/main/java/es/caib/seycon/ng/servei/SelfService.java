@@ -10,6 +10,7 @@ import java.util.Collection;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -63,12 +64,23 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	/** Application entry point methods **/
+	
 	@Operation(translated="findRoot")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PuntEntrada findRoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Description("Finds entry points by name")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Collection<PuntEntrada> findEntryPoints(String name)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation(translated="findChildren")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.PuntEntrada> findChildren(
@@ -76,6 +88,7 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation ( grantees={roles.user_role_query.class,
 			roles.application_query.class},
 			translated="findRoleAccounts")

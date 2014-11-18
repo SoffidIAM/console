@@ -125,7 +125,7 @@ public class Search extends Frame
 					item.appendChild(new Listcell(Long.toString(instance.getId())));
 					item.appendChild(new Listcell(definition.getName()));
 					item.appendChild(new Listcell(instance.getCurrentTask()));
-					item.appendChild(new Listcell(formatConHora.format(instance.getStart())));
+					item.appendChild(new Listcell(instance.getStart() != null? formatConHora.format(instance.getStart()): ""));
 					item.appendChild(new Listcell((instance.getEnd()!= null) ?
 							formatConHora.format(instance.getEnd()) : "")); //$NON-NLS-1$
 					

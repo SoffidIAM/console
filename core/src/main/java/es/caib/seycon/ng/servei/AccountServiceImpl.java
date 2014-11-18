@@ -33,6 +33,7 @@ import bsh.Interpreter;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -255,101 +256,179 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidAccountType"), account.getType().toString())); //$NON-NLS-1$
 		}
 	}
-	
+
+	private Collection<Grup> getAclGrupCollectionForLevel (Account account, AccountAccessLevelEnum level)
+	{
+		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
+			return account.getManagerGroups();
+		else if (level == AccountAccessLevelEnum.ACCESS_USER)
+			return account.getGrantedGroups();
+		else
+			return account.getOwnerGroups();
+	}
+
+	private Collection<Usuari> getAclUsuariCollectionForLevel (Account account, AccountAccessLevelEnum level)
+	{
+		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
+			return account.getManagerUsers();
+		else if (level == AccountAccessLevelEnum.ACCESS_USER)
+			return account.getGrantedUsers();
+		else
+			return account.getOwnerUsers();
+	}
+
+	private Collection<Rol> getAclRolCollectionForLevel (Account account, AccountAccessLevelEnum level)
+	{
+		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
+			return account.getManagerRoles();
+		else if (level == AccountAccessLevelEnum.ACCESS_USER)
+			return account.getGrantedRoles();
+		else
+			return account.getOwnerRoles();
+	}
+
 	private void updateAcl(AccountEntity acc, es.caib.seycon.ng.comu.Account account)
 	{
-		List<Grup> newgrups = new LinkedList<Grup>( account.getGrantedGroups());
-		List<Rol> newroles = new LinkedList<Rol>( account.getGrantedRoles());
-		List<Usuari> newusers = new LinkedList<Usuari>( account.getGrantedUsers());
+		AccountAccessLevelEnum levels[] = new AccountAccessLevelEnum[] {AccountAccessLevelEnum.ACCESS_USER,
+				AccountAccessLevelEnum.ACCESS_MANAGER, AccountAccessLevelEnum.ACCESS_OWNER
+		};
+		if (account.getGrantedGroups() == null)
+			account.setGrantedGroups(Collections.EMPTY_LIST);
+		if (account.getManagerGroups() == null)
+			account.setManagerGroups(Collections.EMPTY_LIST);
+		if (account.getOwnerGroups() == null)
+			account.setOwnerGroups(Collections.EMPTY_LIST);
+		if (account.getGrantedUsers() == null)
+			account.setGrantedUsers(Collections.EMPTY_LIST);
+		if (account.getManagerUsers() == null)
+			account.setManagerUsers(Collections.EMPTY_LIST);
+		if (account.getOwnerUsers() == null)
+			account.setOwnerUsers(Collections.EMPTY_LIST);
+		if (account.getGrantedRoles() == null)
+			account.setGrantedRoles(Collections.EMPTY_LIST);
+		if (account.getManagerRoles() == null)
+			account.setManagerRoles(Collections.EMPTY_LIST);
+		if (account.getOwnerRoles() == null)
+			account.setOwnerRoles(Collections.EMPTY_LIST);
+		@SuppressWarnings("unchecked")
+		List<Grup> newgrups []= new List[] {
+			new LinkedList<Grup>(account.getGrantedGroups()),
+			new LinkedList<Grup>(account.getManagerGroups()),
+			new LinkedList<Grup>(account.getOwnerGroups())
+		};
+		@SuppressWarnings("unchecked")
+		List<Rol> newroles []= new List[] {
+			new LinkedList<Rol>(account.getGrantedRoles()),
+			new LinkedList<Rol>(account.getManagerRoles()),
+			new LinkedList<Rol>(account.getOwnerRoles())
+		};
+		@SuppressWarnings("unchecked")
+		List<Usuari> newusers []= new List[] {
+			new LinkedList<Usuari>(account.getGrantedUsers()),
+			new LinkedList<Usuari>(account.getManagerUsers()),
+			new LinkedList<Usuari>(account.getOwnerUsers())
+		};
 		// Remove grants
 		for (Iterator<AccountAccessEntity> aclIterator = acc.getAcl().iterator(); aclIterator.hasNext();)
 		{
 			AccountAccessEntity access = aclIterator.next();
-			boolean found = false;
-			if (access.getGroup() != null)
+			for (int index = 0; index < levels.length; index++)
 			{
-				for (Iterator<Grup> it = newgrups.iterator(); !found && it.hasNext();)
+				if (levels[index] == access.getLevel())
 				{
-					Grup g = it.next();
-					if (g.getId().equals (access.getGroup().getId()))
+					boolean found = false;
+					if (access.getGroup() != null)
 					{
-						it.remove();
-						found = true;
+						for (Iterator<Grup> it = newgrups[index].iterator(); !found && it.hasNext();)
+						{
+							Grup g = it.next();
+							if (g.getId().equals (access.getGroup().getId()))
+							{
+								it.remove();
+								found = true;
+							}
+						}
+					}
+					else if (access.getRol() != null)
+					{
+						for (Iterator<Rol> it = newroles[index].iterator(); !found && it.hasNext();)
+						{
+							Rol r = it.next();
+							if (r.getId().equals (access.getRol().getId()))
+							{
+								it.remove();
+								found = true;
+							}
+						}
+					}
+					else if (access.getUser() != null)
+					{
+						for (Iterator<Usuari> it = newusers[index].iterator(); !found && it.hasNext();)
+						{
+							Usuari u = it.next();
+							if (u.getId().equals (access.getUser().getId()))
+							{
+								it.remove();
+								found = true;
+							}
+						}
+					}
+					if (!found)
+					{
+						aclIterator.remove();
+						notifyAccountPasswordChange(access.getAccount(),
+							access.getGroup(), access.getRol(), access.getUser());
+						getAccountAccessEntityDao().remove(access);
 					}
 				}
-			}
-			else if (access.getRol() != null)
-			{
-				for (Iterator<Rol> it = newroles.iterator(); !found && it.hasNext();)
-				{
-					Rol r = it.next();
-					if (r.getId().equals (access.getRol().getId()))
-					{
-						it.remove();
-						found = true;
-					}
-				}
-			}
-			else if (access.getUser() != null)
-			{
-				for (Iterator<Usuari> it = newusers.iterator(); !found && it.hasNext();)
-				{
-					Usuari u = it.next();
-					if (u.getId().equals (access.getUser().getId()))
-					{
-						it.remove();
-						found = true;
-					}
-				}
-			}
-			if (!found)
-			{
-				aclIterator.remove();
-				notifyAccountPasswordChange(access.getAccount(),
-					access.getGroup(), access.getRol(), access.getUser());
-				getAccountAccessEntityDao().remove(access);
 			}
 		}
 		// Add new groups
-		for (Grup g: newgrups) {
-			GrupEntity ge = getGrupEntityDao().load(g.getId());
-			if (ge != null)
-			{
-				AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-				access.setGroup(ge);
-				access.setAccount(acc);
-				getAccountAccessEntityDao().create(access);
-				acc.getAcl().add(access);
-				
-				notifyAccountPasswordChange(acc, ge, null, null);
+		for (int index = 0 ; index < levels.length; index++)
+		{
+			for (Grup g: newgrups[index]) {
+				GrupEntity ge = getGrupEntityDao().load(g.getId());
+				if (ge != null)
+				{
+					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+					access.setGroup(ge);
+					access.setAccount(acc);
+					access.setLevel(levels[index]);
+					getAccountAccessEntityDao().create(access);
+					acc.getAcl().add(access);
+					
+					notifyAccountPasswordChange(acc, ge, null, null);
+				}
 			}
-		}
-		// Add new roles
-		for (Rol r: newroles) {
-			RolEntity re = getRolEntityDao().load(r.getId());
-			if (re != null)
-			{
-				AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-				access.setRol(re);
-				access.setAccount(acc);
-				getAccountAccessEntityDao().create(access);
-				acc.getAcl().add(access);
-				
-				notifyAccountPasswordChange(acc, null, re, null);
+			// Add new roles
+			for (Rol r: newroles[index]) {
+				RolEntity re = getRolEntityDao().load(r.getId());
+				if (re != null)
+				{
+					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+					access.setRol(re);
+					access.setAccount(acc);
+					access.setLevel(levels[index]);
+					getAccountAccessEntityDao().create(access);
+					acc.getAcl().add(access);
+					
+					notifyAccountPasswordChange(acc, null, re, null);
+				}
 			}
-		}
-		// Add new users
-		for (Usuari u: newusers) {
-			UsuariEntity ue = getUsuariEntityDao().load(u.getId());
-			if (ue != null)
-			{
-				AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-				access.setUser(ue);
-				access.setAccount(acc);
-				getAccountAccessEntityDao().create(access);
-				acc.getAcl().add(access);
-				
-				notifyAccountPasswordChange(acc, null, null, ue);
+			// Add new users
+			for (Usuari u: newusers[index]) {
+				UsuariEntity ue = getUsuariEntityDao().load(u.getId());
+				if (ue != null)
+				{
+					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+					access.setUser(ue);
+					access.setAccount(acc);
+					access.setLevel(levels[index]);
+					getAccountAccessEntityDao().create(access);
+					acc.getAcl().add(access);
+					
+					notifyAccountPasswordChange(acc, null, null, ue);
+				}
 			}
 		}
 	}
@@ -688,6 +767,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 */
 	public Collection<String> handleGetAccountUsers (Account account) throws InternalErrorException
 	{
+		return handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_OWNER);
+	}
+	
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.AccountService#getAccountUsers(es.caib.seycon.ng.comu.Account)
+	 */
+	public Collection<String> handleGetAccountUsers (Account account, AccountAccessLevelEnum level) throws InternalErrorException
+	{
 		Set<String> users = new HashSet<String>();
 		AccountEntity acc = getAccountEntityDao().load(account.getId());
 		if (acc.getType().equals(AccountType.USER))
@@ -699,15 +786,15 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		} else {
 			for (AccountAccessEntity aae: acc.getAcl())
 			{
-				if (aae.getGroup() != null)
+				if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level))
 				{
 					addGroupMembers(aae.getGroup(), users);
 				}
-				if (aae.getRol() != null)
+				if (aae.getRol() != null && isGreaterOrIqualThan(aae.getLevel(), level))
 				{
 					addRolMembers (aae.getRol(), users);
 				}
-				if (aae.getUser() != null)
+				if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level))
 				{
 					users.add(aae.getUser().getCodi());
 				}
@@ -759,64 +846,24 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected Collection<Account> handleGetUserGrantedAccounts (Usuari usuari)
 					throws Exception
 	{
-		if (!AutoritzacionsUsuari.hasQueryAccount())
-		{
-			Usuari caller = AutoritzacionsUsuari.getCurrentUsuari();
-			if (caller.getId() != usuari.getId())
-				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
-		}
-		Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantByUser(usuari.getId());
-		Set<AccountEntity> accounts = new HashSet<AccountEntity>();
-		for (RolGrant rg: grants)
-		{
-			RolEntity r = getRolEntityDao().load(rg.getIdRol());
-			for (AccountAccessEntity aae: r.getAccountAccess())
-			{
-				accounts.add(aae.getAccount());
-			}
-		}
-		UsuariEntity ue = getUsuariEntityDao().load(usuari.getId());
-		addGrantedAccounts (ue.getGrupPrimari(), accounts);
-		for (UsuariGrupEntity ug: ue.getGrupsSecundaris())
-		{
-			addGrantedAccounts (ug.getGrup(), accounts);
-		}
-		for (AccountAccessEntity aae: ue.getAccountAccess())
-		{
-			accounts.add(aae.getAccount());
-		}
-		
-		for (UserAccountEntity uae: ue.getAccounts())
-		{
-			if (uae.getAccount().getType().equals (AccountType.USER))
-				accounts.add(uae.getAccount());
-		}
-		List<Account> vos = new LinkedList<Account>();
-		for ( AccountEntity accEntity: accounts)
-		{
-			if (!accEntity.isDisabled())
-			{
-				if (accEntity.getType().equals(AccountType.USER))
-					vos.addAll(getUserAccountEntityDao().toUserAccountList(accEntity.getUsers()));
-				else
-					vos.add(getAccountEntityDao().toAccount(accEntity));
-			}
-		}
-		return vos;
+		return handleGetUserGrantedAccounts(usuari, AccountAccessLevelEnum.ACCESS_USER);
 	}
 
 	/**
 	 * @param grupPrimari
 	 * @param accounts
 	 */
-	private void addGrantedAccounts (GrupEntity grup, Set<AccountEntity> accounts)
+	private void addGrantedAccounts (GrupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level)
 	{
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
-			accounts.add(aae.getAccount());
+			if (isGreaterOrIqualThan(aae.getLevel(), level))
+			{
+				accounts.add(aae.getAccount());
+			}
 		}
 		if (grup.getPare() != null)
-			addGrantedAccounts(grup.getPare(), accounts);
+			addGrantedAccounts(grup.getPare(), accounts, level);
 	}
 
 	/* (non-Javadoc)
@@ -968,7 +1015,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
 					for ( String user: users)
 					{
@@ -1045,7 +1092,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
 					for ( String user: users)
 					{
@@ -1379,7 +1426,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
 					for ( String user: users)
 					{
@@ -1441,5 +1488,69 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				throw new SecurityException("Trying to checkin a not owned account");
 			}
 		}
+	}
+
+	private boolean isGreaterOrIqualThan (AccountAccessLevelEnum first, AccountAccessLevelEnum second)
+	{
+		if (first.equals(second))
+			return true;
+		else if (first == AccountAccessLevelEnum.ACCESS_OWNER)
+			return true;
+		else if (second == AccountAccessLevelEnum.ACCESS_USER)
+			return true;
+		else
+			return false;
+	}
+	
+	@Override
+	protected Collection<Account> handleGetUserGrantedAccounts(Usuari usuari,
+			AccountAccessLevelEnum level) throws Exception {
+		if (!AutoritzacionsUsuari.hasQueryAccount())
+		{
+			Usuari caller = AutoritzacionsUsuari.getCurrentUsuari();
+			if (caller.getId() != usuari.getId())
+				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
+		}
+		Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantByUser(usuari.getId());
+		Set<AccountEntity> accounts = new HashSet<AccountEntity>();
+		for (RolGrant rg: grants)
+		{
+			RolEntity r = getRolEntityDao().load(rg.getIdRol());
+			for (AccountAccessEntity aae: r.getAccountAccess())
+			{
+				if (isGreaterOrIqualThan(aae.getLevel(), level))
+						accounts.add(aae.getAccount());
+			}
+		}
+		UsuariEntity ue = getUsuariEntityDao().load(usuari.getId());
+		addGrantedAccounts (ue.getGrupPrimari(), accounts, level);
+		for (UsuariGrupEntity ug: ue.getGrupsSecundaris())
+		{
+			addGrantedAccounts (ug.getGrup(), accounts, level);
+		}
+		
+		for (AccountAccessEntity aae: ue.getAccountAccess())
+		{
+			if (isGreaterOrIqualThan(aae.getLevel(), level))
+				accounts.add(aae.getAccount());
+		}
+		
+		for (UserAccountEntity uae: ue.getAccounts())
+		{
+			if (uae.getAccount().getType().equals (AccountType.USER))
+				accounts.add(uae.getAccount());
+		}
+		List<Account> vos = new LinkedList<Account>();
+		for ( AccountEntity accEntity: accounts)
+		{
+			if (!accEntity.isDisabled())
+			{
+				if (accEntity.getType().equals(AccountType.USER))
+					vos.addAll(getUserAccountEntityDao().toUserAccountList(accEntity.getUsers()));
+				else
+					vos.add(getAccountEntityDao().toAccount(accEntity));
+			}
+		}
+		return vos;
 	}
 }

@@ -1793,6 +1793,7 @@ public class AplicacioServiceImpl extends
                     cr.setMetaInfo("Rol atorgat al rol='"  //$NON-NLS-1$
                             + getRolAssociacioRolEntityDao().toContenidorRol(
                                     rolAsocActual).getInfoContenidor());
+                    cr.setCertificationDate(ru.getCertificationDate());
                     resultat.add(cr); // Añadimos el contenedor
                 }
                 else
@@ -1802,6 +1803,7 @@ public class AplicacioServiceImpl extends
                     cr.setInfoContenidor(Messages.getString("AplicacioServiceImpl.SharedAccount")); //$NON-NLS-1$
                     cr.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol") //$NON-NLS-1$
                            ,getRolAssociacioRolEntityDao().toContenidorRol(rolAsocActual).getInfoContenidor()));
+                    cr.setCertificationDate(ru.getCertificationDate());
                     resultat.add(cr); // Añadimos el contenedor
                 }
 

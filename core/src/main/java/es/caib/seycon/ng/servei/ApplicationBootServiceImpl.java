@@ -303,10 +303,22 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 			if (cfg.getValor().equals("8")) { //$NON-NLS-1$
 				cfg.setValor("9"); //$NON-NLS-1$
 				updateRolAccounts();
+				configSvc.update(cfg);
 			}
 			if (cfg.getValor().equals("9")) { //$NON-NLS-1$
 				cfg.setValor("10"); //$NON-NLS-1$
 				updateRolAccounts2();
+				configSvc.update(cfg);
+			}
+			if (cfg.getValor().equals("10")) { //$NON-NLS-1$
+				cfg.setValor("11"); //$NON-NLS-1$
+				updateRolAccounts3();
+				configSvc.update(cfg);
+			}
+			if (cfg.getValor().equals("11")) { //$NON-NLS-1$
+				cfg.setValor("12"); //$NON-NLS-1$
+				updateAccountAccessLevel();
+				configSvc.update(cfg);
 			}
 		}
 		finally
@@ -351,6 +363,46 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 							new Object[] {false});
 			executeSentence(conn, "UPDATE SC_TIPUSUO SET TUO_ROLHOL=? WHERE TUO_ROLHOL IS NULL",
 					new Object[] {false});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateRolAccounts3 () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ROLUSU SET RLU_CERDAT=? WHERE RLU_CERDAT IS NULL ",
+							new Object[] {new java.util.Date()});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateAccountAccessLevel () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ACCACC SET AAC_LEVEL='M' WHERE AAC_LEVEL IS NULL OR AAC_LEVEL=''",
+							new Object[0]);
 		}
 		finally
 		{

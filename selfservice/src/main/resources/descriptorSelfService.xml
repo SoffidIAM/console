@@ -11,7 +11,11 @@
 		</finder>
 		<finder name="moure" type="moure">  
 			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
-				method="findRoot" />
+				method="findRoot" if="${!query}"/>
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"
+				method="findEntryPoints" if="${query}">
+				<parameter value="${queryName}"/>
+			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
 		</finder>
 	</datanode>

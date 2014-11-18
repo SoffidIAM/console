@@ -115,38 +115,7 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 
 	public Object setAttribute (String attribute, Object value)
 	{
-		if (attribute.contains("{"))
-		{
-			Pattern p = Pattern.compile("(\\S+)\\s*\\{\\s*\"([^\"]*)\"\\s*\\}");
-			Matcher m = p.matcher(attribute.trim());
-			if (m.matches())
-			{
-				String mapName = m.group(1);
-				String attributeName = m.group(2);
-				if (mapName.equals ("this"))
-				{
-					return attributes.put(attributeName, value);
-				} else {
-					Object obj = attributes.get(mapName);
-					if (obj == null)
-					{
-						obj = new HashMap<String, Object>();
-						attributes.put(mapName, obj);
-					}
-					if (obj instanceof Map)
-					{
-						return ((Map) obj).put(attributeName, value);
-					}
-					else
-					{
-						throw new RuntimeException (String.format("Attribute %s is not a map", mapName));
-					}
-				}
-			} else
-				throw new RuntimeException (String.format("Unable to parse attribute %s", attribute));
-		}
-		else
-			return attributes.put(attribute, value);
+		return attributes.put(attribute, value);
 	}
 
 	public void removeAttribte(String attribute)
@@ -159,3 +128,5 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 		return attributes.keySet();
 	}
 }
+
+

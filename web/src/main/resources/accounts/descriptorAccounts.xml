@@ -123,6 +123,38 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
 			</new-instance-bean>
 		</finder>
+
+		<finder name="ownerUsers" type ="ownerUser">
+			<collection-finder collection="${instance.ownerUsers}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="ownerGroups" type ="ownerGroup">
+			<collection-finder collection="${instance.ownerGroups}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="ownerRoles" type ="ownerRole">
+			<collection-finder collection="${instance.ownerRoles}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
+			</new-instance-bean>
+		</finder>
+
+		<finder name="managerUsers" type ="managerUser">
+			<collection-finder collection="${instance.managerUsers}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="managerGroups" type ="managerGroup">
+			<collection-finder collection="${instance.managerGroups}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="managerRoles" type ="managerRole">
+			<collection-finder collection="${instance.managerRoles}"/>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
+			</new-instance-bean>
+		</finder>
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
 			<attribute-validator expr="${instance.dispatcher}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
@@ -140,6 +172,30 @@
 
 	<datanode name="grantedGroup">
 		<collection-handler collection="${self.instance.grantedGroups}"/>
+	</datanode>
+
+	<datanode name="ownerUser">
+		<collection-handler collection="${self.instance.ownerUsers}"/>
+	</datanode>
+	
+	<datanode name="ownerRole">
+		<collection-handler collection="${self.instance.ownerRoles}"/>
+	</datanode>
+
+	<datanode name="ownerGroup">
+		<collection-handler collection="${self.instance.ownerGroups}"/>
+	</datanode>
+
+	<datanode name="managerUser">
+		<collection-handler collection="${self.instance.managerUsers}"/>
+	</datanode>
+	
+	<datanode name="managerRole">
+		<collection-handler collection="${self.instance.managerRoles}"/>
+	</datanode>
+
+	<datanode name="managerGroup">
+		<collection-handler collection="${self.instance.managerGroups}"/>
 	</datanode>
 
 	<datanode name="rol">

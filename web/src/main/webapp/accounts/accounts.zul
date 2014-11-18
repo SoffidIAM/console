@@ -6,6 +6,7 @@
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="account_acl" macro-uri="/accounts/accountAcl.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<style dynamic="true">
 
@@ -252,9 +253,12 @@
 									.setReadonly(false);
 							form.getFellow("lbAccountType").setDisabled(false);
 							form.getFellow("lbAccountDisabled").setDisabled(false);
-							form.getFellow("btnGrantUser").setDisabled(false);
-							form.getFellow("btnGrantGroup").setDisabled(false);
-							form.getFellow("btnGrantRole").setDisabled(false);
+							for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
+							{
+								form.getFellow(s).getFellow("btnGrantUser").setDisabled(false);
+								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(false);
+								form.getFellow(s).getFellow("btnGrantRole").setDisabled(false);
+							}
 						} else if (item.instance.type == AccountType.USER) {
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(true);
@@ -262,9 +266,12 @@
 									.setReadonly(true);
 							form.getFellow("lbAccountType").setDisabled(true);
 							form.getFellow("lbAccountDisabled").setDisabled(true);
-							form.getFellow("btnGrantUser").setDisabled(true);
-							form.getFellow("btnGrantGroup").setDisabled(true);
-							form.getFellow("btnGrantRole").setDisabled(true);
+							for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
+							{
+								form.getFellow(s).getFellow("btnGrantUser").setDisabled(true);
+								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(true);
+								form.getFellow(s).getFellow("btnGrantRole").setDisabled(true);
+							}
 						} else {
 							form.getFellow("lbAccountType").getItemAtIndex(0)
 									.setVisible(false);
@@ -276,14 +283,20 @@
 									.setReadonly(false);
 							form.getFellow("lbAccountType").setDisabled(false);
 							form.getFellow("lbAccountDisabled").setDisabled(false);
-							form.getFellow("btnGrantUser").setDisabled(false);
-							form.getFellow("btnGrantGroup").setDisabled(false);
-							form.getFellow("btnGrantRole").setDisabled(false);
+							for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
+							{
+								form.getFellow(s).getFellow("btnGrantUser").setDisabled(false);
+								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(false);
+								form.getFellow(s).getFellow("btnGrantRole").setDisabled(false);
+							}
 						}
 					} else {
-						form.getFellow("btnGrantUser").setDisabled(true);
-						form.getFellow("btnGrantGroup").setDisabled(true);
-						form.getFellow("btnGrantRole").setDisabled(true);
+						for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
+						{
+							form.getFellow(s).getFellow("btnGrantUser").setDisabled(true);
+							form.getFellow(s).getFellow("btnGrantGroup").setDisabled(true);
+							form.getFellow(s).getFellow("btnGrantRole").setDisabled(true);
+						}
 						form.getFellow("txtAccountName").getFellow("dada")
 								.setReadonly(true);
 						form.getFellow("txtAccountDescription").getFellow("dada")
@@ -301,69 +314,6 @@
 					esquema.hideCriteris();
 					esquema.getFellow("lista").getFellow("listbox").setRows(5);
 					esquema.showFormulari();
-				}
-				void addGrantedUser() {
-					Events.postEvent("onInicia", desktop.getPage("usuarisLlista")
-							.getFellow("esquemaLlista"), self);
-				}
-				void grantUser(Object[] dades) {
-					String codiUsuari = (String) dades[0];
-					String nomComplert = (String) dades[1];
-					String idUsuari = (String) dades[2];
-					// Creem l'autorització
-					Usuari u = new Usuari();
-					u.setId(Long.decode(idUsuari));
-					u.setCodi(codiUsuari);
-					u.setFullName(nomComplert);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/grantedUsers", u);
-				}
-				void addGrantedRole() {
-					desktop.getPage("rolsLlista").setAttribute("tipus", "cap");
-					desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF",
-							"true");//perquè mostre rols gestionableWF	
-					desktop.getPage("rolsLlista").setAttribute("usuari", ""); //??	
-					Events.postEvent("onInicia",
-							desktop.getPage("rolsLlista").getFellow("esquemaLlista"), self);
-				}
-				void grantRole(Object[] dades) {
-					//Obtenim les dades del rol
-					//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
-					String nomRol = (String) dades[0];
-					String codiAplicacio = (String) dades[1];
-					String descripcio = (String) dades[2];
-					String bbdd = (String) dades[5];
-					String idrol = (String) dades[6];
-					// Creem l'autorització
-					Rol r = new Rol();
-					r.setId(Long.decode(idrol));
-					r.setNom(nomRol);
-					r.setDescripcio(descripcio);
-					r.setBaseDeDades(bbdd);
-					r.setCodiAplicacio(codiAplicacio);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/grantedRoles", r);
-				}
-				void addGrantedGroup() {
-					desktop.getPage("grupsLlista").setAttribute("tipus", "");
-					desktop.getPage("grupsLlista").setAttribute("llistaObsolets", false);
-					Events.postEvent("onInicia",
-							desktop.getPage("grupsLlista").getFellow("esquemaLlista"), self);
-				}
-				void grantGroup(Object[] dades) {
-					String codiGrup = (String) dades[0];
-					String descGrup = (String) dades[1];
-					String idGrup = (String) dades[2];
-					// Creem l'autorització
-					Grup g = new Grup();
-					g.setCodi(codiGrup);
-					g.setId(Long.decode(idGrup));
-					g.setDescripcio(descGrup);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/grantedGroups", g);
 				}
 				
 				void setPassword ()
@@ -607,48 +557,12 @@
 									</grid>
 									<separator />
 									<vbox>
-										<label value="${c:l('accounts.acl')}" />
-										<toolbar>
-											<toolbarbutton image="~./img/list-add.gif"
-												id="btnGrantUser" label="${c:l('accounts.addUser')}"
-												visible="${canModifyAccounts}" onClick="addGrantedUser()"
-												onActualitza="grantUser(event.data)" />
-											<toolbarbutton image="~./img/list-add.gif"
-												id="btnGrantGroup" label="${c:l('accounts.addGroup')}"
-												visible="${canModifyAccounts}" onClick="addGrantedGroup()"
-												onActualitza="grantGroup(event.data)" />
-											<toolbarbutton image="~./img/list-add.gif"
-												id="btnGrantRole" label="${c:l('accounts.addRole')}"
-												visible="${canModifyAccounts}" onClick="addGrantedRole()"
-												onActualitza="grantRole(event.data)" />
-											<deletetreebutton acces="${canModifyAccounts}"
-												id="b_esborrar" potEsborrarBranquesAmbFills="false"
-												tree="/esquema/dades/treeGrants" />
-										</toolbar>
-										<tree autocommit="false" dataPath="." id="treeGrants">
-											<treecols>
-												<treecol label="${c:l('accounts.grantee')}" />
-												<treecol label="${c:l('accounts.description')}" />
-											</treecols>
-											<treeitemfinder bind="." open="true" path="/grantedUsers">
-												<treerow>
-													<treecellimage bind="@codi" image="/img/user.png" />
-													<treecell bind="@fullName" />
-												</treerow>
-											</treeitemfinder>
-											<treeitemfinder bind="." open="true" path="/grantedGroups">
-												<treerow>
-													<treecellimage bind="@codi" image="/img/group.png" />
-													<treecell bind="@descripcio" />
-												</treerow>
-											</treeitemfinder>
-											<treeitemfinder bind="." open="true" path="/grantedRoles">
-												<treerow>
-													<treecellimage bind="@nom" image="/img/key.png" />
-													<treecell bind="@descripcio" />
-												</treerow>
-											</treeitemfinder>
-										</tree>
+										<label value="${c:l('accounts.owner')}" />
+										<account_acl id="ownerAcl" userList="ownerUsers" groupList="ownerGroups" roleList="ownerRoles"/>
+										<label value="${c:l('accounts.manager')}" />
+										<account_acl id="managerAcl" userList="managerUsers" groupList="managerGroups" roleList="managerRoles"/>
+										<label value="${c:l('accounts.user')}" />
+										<account_acl id="userAcl" userList="grantedUsers" groupList="grantedGroups" roleList="grantedRoles"/>
 									</vbox>
 								</hbox>
 							</tabpanel>

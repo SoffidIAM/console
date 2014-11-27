@@ -230,7 +230,8 @@ public class VOFactory {
 		es.caib.bpm.vo.Token vo = new es.caib.bpm.vo.Token();
 		
 		vo.setProcessId(t.getProcessInstance().getId());
-		vo.setNodeName(t.getNode().getName());
+		if (t.getNode() != null)
+			vo.setNodeName(t.getNode().getName());
 		vo.setTokenName(t.getFullName());
 		
 		vo.setFinished(t.hasEnded());

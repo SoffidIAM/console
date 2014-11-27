@@ -2278,7 +2278,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.getProcessInstance(process.getId());
 
 			if (!business.isUserAuthorized(OBSERVER_ROLE, getUserGroups(),
-					instance))
+					instance) &&
+				!business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
+							instance))
 				return null;
 
 			Vector v = new Vector();
@@ -2446,6 +2448,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		    	job.setSuspended(false);
 		    	job.setRetries(1);
 		    	job.setException(null);
+		    	job.setDueDate(new Date());
 		        endAuthenticationLog(instance.getRootToken());
 		        context.save(instance);
 		    }

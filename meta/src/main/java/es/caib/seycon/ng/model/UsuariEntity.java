@@ -133,9 +133,12 @@ public abstract class UsuariEntity {
 	@Nullable
 	public java.lang.String multiSessio;
 
-	@Column (name="USU_ALCOAN", length=240)
-	@Nullable
-	public java.lang.String aliesCorreu;
+	/**
+	 * @Column (name="USU_ALCOAN", length=240)
+	 * 	@Nullable
+	 * Not used
+	 * public java.lang.String aliesCorreu;
+	 */
 
 	@ForeignKey (foreignColumn="APL_IDCONTACT")
 	public java.util.Collection<es.caib.seycon.ng.model.AplicacioEntity> aplicacioSocPersonaResponsable;

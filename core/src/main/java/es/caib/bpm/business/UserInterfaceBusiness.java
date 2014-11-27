@@ -414,7 +414,7 @@ public class UserInterfaceBusiness {
         }
         translations.put(token, newNode);
         boolean ok = true;
-        for (Iterator it = token.getChildren().entrySet().iterator(); ok
+        for (Iterator it = token.getChildren().values().iterator(); ok
                 && it.hasNext();) {
             Token child = (Token) it.next();
             ok = upgradeToken(child, target, upgradeDefinition, translations, messages);

@@ -67,6 +67,13 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 
 	protected void doApply (RuleEntity rule, UsuariEntity user, InterpreterEnvironment env) throws Exception
 	{
+		Security.nestedLogin(Security.getCurrentAccount(), new String [] {
+			Security.AUTO_USER_QUERY+Security.AUTO_ALL,
+			Security.AUTO_APPLICATION_QUERY+Security.AUTO_ALL,
+			Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL,
+			Security.AUTO_USER_ROLE_DELETE+Security.AUTO_ALL,
+			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL
+		});
 		try {
 			RolAccountEntityDao raDao = getRolAccountEntityDao();
 			Object result = null;
@@ -137,6 +144,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		} catch (Exception e) {
 			throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.EvaluationRuleError"), rule.getDescription(), user.getCodi()), //$NON-NLS-1$
 							e);
+		} finally {
+			Security.nestedLogoff();
 		}
 	}
 

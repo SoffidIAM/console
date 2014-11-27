@@ -555,6 +555,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected void handleGenerateUserAccounts(String user) throws Exception
 	{
 		UsuariEntity ue = getUsuariEntityDao().findByCodi(user);
+		if (ue == null)
+			return;
+		
 		DispatcherEntityDao disDao = getDispatcherEntityDao();
 		for (DispatcherEntity disEntity: disDao.loadAll())
 		{
@@ -1218,13 +1221,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected boolean handleIsUpdatePending (Account account) throws Exception
 	{
 		AccountEntity accEntity = getAccountEntityDao().load(account.getId());
-		if (accEntity != null)
-		{
-			Account account2 = getAccountEntityDao().toAccount(accEntity);
-			account.setLastPasswordSet(account2.getLastPasswordSet());
-			account.setLastUpdated(account2.getLastUpdated());
-			account.setPasswordExpiration(account2.getPasswordExpiration());
-		}
+		if (accEntity == null)
+			return false;
+		
+		Account account2 = getAccountEntityDao().toAccount(accEntity);
+		account.setLastPasswordSet(account2.getLastPasswordSet());
+		account.setLastUpdated(account2.getLastUpdated());
+		account.setPasswordExpiration(account2.getPasswordExpiration());
+
 		List<TasqueEntity> coll = getTasqueEntityDao().findByAccount (accEntity.getName(), accEntity.getDispatcher().getCodi());
 		for (TasqueEntity tasque: coll)
 		{

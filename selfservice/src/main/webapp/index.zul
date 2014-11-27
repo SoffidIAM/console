@@ -5,7 +5,7 @@
 <?meta name="viewport" content="width=device-width, initial-scale=1"?>
 <?meta http-equiv="X-UA-Compatible" content="IE=9" ?>
 
-<zk xmlns="http://www.zkoss.org/2005/zul" 
+<vbox xmlns="http://www.zkoss.org/2005/zul" 
 	xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:zk="http://www.zkoss.org/2005/zk" 
@@ -13,6 +13,7 @@
 	width="100%" 
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	use="es.caib.seycon.ng.web.ConfiguraSEU">
+    <div>
 	<style src="~./styles/estil.css"/>
 	<style src="/css/localSEU.css"/>
 	<style src="/css/devices.css"/>
@@ -38,4 +39,5 @@
 		width="100%"/>	
 	<include src="menu.zul"/>
 	<div id="appletFirmaDiv"/>
-</zk>
+    </div>
+</vbox>

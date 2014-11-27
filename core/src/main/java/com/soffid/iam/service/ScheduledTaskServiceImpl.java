@@ -88,7 +88,14 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	protected ScheduledTask handleUpdate (ScheduledTask task) throws Exception
 	{
 		reconfigureTasks();
-		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
+		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
+		ScheduledTask oldtask = getScheduledTaskEntityDao().toScheduledTask(entity);
+		task.setError(oldtask.isError());
+		task.setActive(oldtask.isActive());
+		task.setLastEnd(oldtask.getLastEnd());
+		task.setLastExecution(oldtask.getLastExecution());
+		task.setNextExecution(oldtask.getNextExecution());
+		getScheduledTaskEntityDao().scheduledTaskToEntity(task, entity, true);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "U"); //$NON-NLS-1$
 		return getScheduledTaskEntityDao().toScheduledTask(entity);

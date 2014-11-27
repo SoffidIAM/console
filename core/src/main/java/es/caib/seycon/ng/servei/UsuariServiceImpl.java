@@ -1342,7 +1342,7 @@ public class UsuariServiceImpl extends
 		String aliesDeCorreuCollection = usuari.getAliesCorreu();
 		if (aliesDeCorreuCollection != null
 				&& aliesDeCorreuCollection.trim().compareTo("") != 0) { //$NON-NLS-1$
-			String aliesDeCorreu[] = aliesDeCorreuCollection.split(","); //$NON-NLS-1$
+			String aliesDeCorreu[] = aliesDeCorreuCollection.split("[, ]+"); //$NON-NLS-1$
 			for (int i = 0; i < aliesDeCorreu.length; i++) {
 				String aliesDeCorreuParticionada[] = aliesDeCorreu[i].trim()
 						.split("@"); //$NON-NLS-1$
@@ -1381,7 +1381,7 @@ public class UsuariServiceImpl extends
 		String aliesDeCorreuCollection = usuari.getAliesCorreu();
 		if (aliesDeCorreuCollection != null
 				&& aliesDeCorreuCollection.trim().compareTo("") != 0) { //$NON-NLS-1$
-			String aliesDeCorreu[] = aliesDeCorreuCollection.split(","); //$NON-NLS-1$
+			String aliesDeCorreu[] = aliesDeCorreuCollection.split("[ ,]+"); //$NON-NLS-1$
 			for (int i = 0; i < aliesDeCorreu.length; i++) {
 				String aliesDeCorreuParticionada[] = aliesDeCorreu[i].trim()
 						.split("@"); //$NON-NLS-1$
@@ -1427,7 +1427,7 @@ public class UsuariServiceImpl extends
 		boolean aliesTrobatNou[];
 		if (aliesDeCorreuCollectionNou != null
 				&& aliesDeCorreuCollectionNou.trim().compareTo("") != 0) { //$NON-NLS-1$
-			aliesDeCorreuNou = aliesDeCorreuCollectionNou.split(","); //$NON-NLS-1$
+			aliesDeCorreuNou = aliesDeCorreuCollectionNou.split("[ ,]+"); //$NON-NLS-1$
 			for (int i = 0; i < aliesDeCorreuNou.length; i++) {
 				aliesDeCorreuNou[i] = aliesDeCorreuNou[i].trim();
 			}
@@ -1444,7 +1444,7 @@ public class UsuariServiceImpl extends
 		boolean aliesTrobatVell[];
 		if (aliesDeCorreuCollectionVell != null
 				&& aliesDeCorreuCollectionVell.trim().compareTo("") != 0) { //$NON-NLS-1$
-			aliesDeCorreuVell = aliesDeCorreuCollectionVell.split(","); //$NON-NLS-1$
+			aliesDeCorreuVell = aliesDeCorreuCollectionVell.split("[ ,]+"); //$NON-NLS-1$
 			for (int i = 0; i < aliesDeCorreuVell.length; i++) {
 				aliesDeCorreuVell[i] = aliesDeCorreuVell[i].trim();
 			}
@@ -1634,7 +1634,7 @@ public class UsuariServiceImpl extends
 			if (usuarisMateixNIF!=null) {
 				if (usuarisMateixNIF.size()==1) {//comprobamos que no sea al mismo !!
 					UsuariEntity usuariExist = (UsuariEntity) usuarisMateixNIF.iterator().next();
-					if (!usuari.getCodi().equals(usuariExist.getCodi()))
+					if (!usuari.getId().equals(usuariExist.getId()))
 						throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.ExistsUser"), //$NON-NLS-1$
 								usuariExist.getCodi())); 
 				} else if (usuarisMateixNIF.size()!=0) { // hay más de 1
@@ -1656,6 +1656,17 @@ public class UsuariServiceImpl extends
 		// Verifiquem si hem de fer la comprovació de la identitat:
 		// s'ha modifcat el nif de l'usuari??
 		DadaUsuariEntity nifAnterior = getDadaUsuariEntityDao().findDadaByCodiTipusDada(usuari.getCodi(), "NIF"); //$NON-NLS-1$
+		// Updates user name (if needed)
+		if (! usuariAbans.getCodi().equals(usuari.getCodi()))
+		{
+			for (UsuariWFProcessEntity upe: getUsuariWFProcessEntityDao().findByCodiUsuari(usuariAbans.getCodi()))
+			{
+				upe.setCodiUsuari(usuari.getCodi());
+				getUsuariWFProcessEntityDao().update(upe);
+			}
+			usuariAbans.setCodi(usuari.getCodi());
+			getUsuariEntityDao().update(usuariAbans);
+		}
 		// verifiquem canvis al nom, llinatges i nif de l'usuari
 		if (usuariAbans != null
 				&& (usuariAbans.getNom()!=null && !usuariAbans.getNom().equals(usuari.getNom()))

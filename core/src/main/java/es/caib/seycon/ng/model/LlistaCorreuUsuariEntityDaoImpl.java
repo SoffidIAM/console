@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
+import org.hibernate.Hibernate;
+import org.jbpm.db.hibernate.HibernateHelper;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -69,6 +72,12 @@ public class LlistaCorreuUsuariEntityDaoImpl extends
                 }
             }
             super.create(llistaCorreuUsuari);
+            if (Hibernate.isInitialized(llistaCorreuUsuari.getLlistaDeCorreu().getLlistaDeCorreuUsuari()))
+            		llistaCorreuUsuari.getLlistaDeCorreu().getLlistaDeCorreuUsuari().add(llistaCorreuUsuari);
+            
+            if (Hibernate.isInitialized(llistaCorreuUsuari.getUsuari().getLlistaDeCorreuUsuari()))
+            		llistaCorreuUsuari.getUsuari().getLlistaDeCorreuUsuari().add(llistaCorreuUsuari);
+            
             createTask(llistaCorreuUsuari);
             getSession(false).flush();
 
@@ -107,6 +116,11 @@ public class LlistaCorreuUsuariEntityDaoImpl extends
             es.caib.seycon.ng.model.LlistaCorreuUsuariEntity llistaCorreuUsuari)
             throws RuntimeException {
         try {
+            if (Hibernate.isInitialized(llistaCorreuUsuari.getLlistaDeCorreu().getLlistaDeCorreuUsuari()))
+        		llistaCorreuUsuari.getLlistaDeCorreu().getLlistaDeCorreuUsuari().remove(llistaCorreuUsuari);
+        
+            if (Hibernate.isInitialized(llistaCorreuUsuari.getUsuari().getLlistaDeCorreuUsuari()))
+        		llistaCorreuUsuari.getUsuari().getLlistaDeCorreuUsuari().remove(llistaCorreuUsuari);
             super.remove(llistaCorreuUsuari);
             createTask(llistaCorreuUsuari);
             getSession(false).flush();

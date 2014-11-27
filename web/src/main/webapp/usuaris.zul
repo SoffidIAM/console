@@ -1289,7 +1289,7 @@
 														<input_etiqueta
 															value="${c:l('usuaris.zul.Aliesdecorreu')}" />
 														<textbox id="aliesCorreu" bind="@aliesCorreu"
-															maxlength="240" readonly="${!canModifyUser}"
+															readonly="${!canModifyUser}"
 															sclass="textbox" width="${ample-250}px">
 															<attribute name="onChange">
 																self.value = self.value.toLowerCase();

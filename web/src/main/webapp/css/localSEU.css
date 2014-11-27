@@ -1,3 +1,4 @@
+.wc-overlapped {overflow-y: scroll}
 .vbox {margin-top:20px;margin-right:2px;background-color:#EEEEEE}
 button.vbuton {text-align:left;width:130px;margin:0 0 5px 0;padding:1px;}
 .pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer}

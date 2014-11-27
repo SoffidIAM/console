@@ -35,9 +35,9 @@
 			</tabs>
 			<tabpanels width="100%">
 				<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
-					<form dataPath="BPMdata:/processInstance/variables">
+					<form dataPath="BPMdata:/processInstance/variables" width="100%">
 						 
-						<vbox id="datosElementoWorkflow">
+						<vbox id="datosElementoWorkflow" width="100%">
 					
 						</vbox>
 					</form>

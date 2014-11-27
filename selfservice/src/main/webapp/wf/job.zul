@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<window xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" border="normal" closable="true" height="30em" id="job.window" left="15%" title="${c:l('job.title')}" top="30%" width="70%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+<window xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
+border="normal" closable="true" height="30em" id="job.window"
+ left="15%" title="${c:l('job.title')}" top="30%" width="70%" 
+ style="overflow: scroll"
+ xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
     <grid>
     	<rows height="28em" style="overflow: scroll;" width="99%">
 	    	<row>

@@ -2210,7 +2210,7 @@ public class AplicacioServiceImpl extends
 					if (type == INDIRECT || type == ALL)
 					{
 						for (AccountEntity acc: getAccountsForDispatcher(originUser, null, rg.getRolOtorgat().getBaseDeDades()))
-							populateRoleRoles (rad, ALL, rg.getRolOtorgat(), originUser, acc);
+							populateRoleRoles (rad, ALL, n, originUser, acc);
 					}
 				}
 			}
@@ -2259,10 +2259,12 @@ public class AplicacioServiceImpl extends
 	}
 	
 	private void populateRoleRoles(Set<RolAccountDetail> rad, int type,
-			RolEntity rol, UsuariEntity originUser, AccountEntity originAccount)
+			RolAccountDetail currentRol, UsuariEntity originUser, AccountEntity originAccount)
 	{
 		if (type == NONE)
 			return;
+		
+		RolEntity rol = currentRol.granted;
 		
 		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContenidor())
 		{
@@ -2271,13 +2273,22 @@ public class AplicacioServiceImpl extends
 			{
 				RolAccountDetail n = new RolAccountDetail(ra, ae);
 				n.granteeRol = rol;
+				if (rol.getTipusDomini().equals(TipusDomini.GRUPS) && currentRol.qualifierGroup != null)
+					n.qualifierGroup = currentRol.qualifierGroup;
+				if (rol.getTipusDomini().equals(TipusDomini.GRUPS_USUARI) && currentRol.qualifierGroup != null)
+					n.qualifierGroup = currentRol.qualifierGroup;
+				if (rol.getTipusDomini().equals(TipusDomini.APLICACIONS) && currentRol.qualifierAplicacio != null)
+					n.qualifierAplicacio = currentRol.qualifierAplicacio;
+				if (rol.getTipusDomini().equals(TipusDomini.DOMINI_APLICACIO) && currentRol.qualifierGroup != null)
+					n.qualifier = currentRol.qualifier;
+					
 				
 				if ( ! rad.contains(n))
 				{
 					if (type == DIRECT || type == ALL) 
 						rad.add(n);
 					if (type == INDIRECT || type == ALL)
-						populateRoleRoles(rad, ALL, ra.getRolContingut(), originUser, originAccount);
+						populateRoleRoles(rad, ALL, n, originUser, originAccount);
 				}
 			}
 		}
@@ -2314,7 +2325,7 @@ public class AplicacioServiceImpl extends
 				if (type == DIRECT || type == ALL) 
 					rad.add(n);
 				if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra))
-					populateRoleRoles(rad, ALL, ra.getRol(), user, account);
+					populateRoleRoles(rad, ALL, n, user, account);
 			}
 		}
 	}
@@ -2376,7 +2387,15 @@ public class AplicacioServiceImpl extends
 			if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
 				rg = (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
 			if (rad.rolRol != null)
+			{
 				rg = (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
+				if (rad.qualifier != null)
+					rg.setDomainValue(rad.qualifier.getValor());
+				else if (rad.qualifierAplicacio != null)
+					rg.setDomainValue(rad.qualifierAplicacio.getCodi());
+				else if (rad.qualifierGroup != null)
+					rg.setDomainValue(rad.qualifierGroup.getCodi());
+			}
 			if (rad.rolGrup != null)
 				rg = (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
 			if (rg != null)
@@ -2413,7 +2432,16 @@ public class AplicacioServiceImpl extends
 				if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
 					rg.add (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
 				if (rad.rolRol != null)
-					rg.add (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
+				{
+					RolGrant r = getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol);
+					if (rad.qualifier != null)
+						r.setDomainValue(rad.qualifier.getValor());
+					else if (rad.qualifierAplicacio != null)
+						r.setDomainValue(rad.qualifierAplicacio.getCodi());
+					else if (rad.qualifierGroup != null)
+						r.setDomainValue(rad.qualifierGroup.getCodi());
+					rg.add(r);
+				}
 				if (rad.rolGrup != null)
 					rg.add (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
 			}
@@ -2463,7 +2491,15 @@ public class AplicacioServiceImpl extends
 			if (rad.rolAccount != null)
 				grant = getRolAccountEntityDao().toRolGrant(rad.rolAccount);
 			else if (rad.rolRol != null)
+			{
 				grant = getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol);
+				if (rad.qualifier != null)
+					grant.setDomainValue(rad.qualifier.getValor());
+				else if (rad.qualifierAplicacio != null)
+					grant.setDomainValue(rad.qualifierAplicacio.getCodi());
+				else if (rad.qualifierGroup != null)
+					grant.setDomainValue(rad.qualifierGroup.getCodi());
+			}
 			else
 				grant = getRolsGrupEntityDao().toRolGrant(rad.rolGrup);
 			if (rad.account != null)

@@ -443,11 +443,36 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			if (ae.getType().equals(AccountType.USER))
 			{
-				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangePersonalAccount")); //$NON-NLS-1$
+				account.setOwnerUsers(new LinkedList<Usuari>());
+				for (UserAccountEntity ua: ae.getUsers())
+				{
+					Usuari u = getUsuariService().getUserInfo(ua.getUser().getCodi());
+					getUserAccountEntityDao().remove(ua);
+					account.getOwnerUsers().add(u);
+				}
+				
 			}
 			if (account.getType().equals(AccountType.USER))
 			{
-				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
+				if (account.getOwnerUsers().size() != 1 ||
+					!account.getOwnerRoles().isEmpty() ||
+					!account.getOwnerGroups().isEmpty() ||
+					!account.getManagerUsers().isEmpty() ||
+					!account.getManagerRoles().isEmpty() ||
+					!account.getManagerGroups().isEmpty() ||
+					!account.getGrantedUsers().isEmpty() ||
+					!account.getGrantedRoles().isEmpty() ||
+					!account.getGrantedGroups().isEmpty())
+					throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
+				
+				Usuari owner = account.getOwnerUsers().iterator().next();
+				
+				UsuariEntity ue = getUsuariEntityDao().load(owner.getId());
+				UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
+				uae.setAccount(ae);
+				uae.setUser(ue);
+				getUserAccountEntityDao().create(uae);
+				account.setDescription(owner.getFullName());
 			}
 			ae.setType(account.getType());
 		}
@@ -458,10 +483,20 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				throw new AccountAlreadyExistsException();
 		}
 		getAccountEntityDao().accountToEntity(account, ae, false);
-		
-		updateAcl(ae, account);
+
+		if (account.getType().equals(AccountType.USER))
+			removeAcl (ae);
+		else
+			updateAcl(ae, account);
 		getAccountEntityDao().update(ae);
 		createAccountTask(ae);
+	}
+
+	private void removeAcl(AccountEntity ae) {
+		for (AccountAccessEntity aae: ae.getAcl())
+		{
+			getAccountAccessEntityDao().remove(aae);
+		}
 	}
 
 	@Override

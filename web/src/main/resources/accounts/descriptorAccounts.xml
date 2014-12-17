@@ -47,6 +47,12 @@
 				bean.setGrantedUsers ( new LinkedList()) ;
 				bean.setGrantedRoles (new LinkedList());
 				bean.setGrantedGroups (new LinkedList());
+				bean.setManagerUsers ( new LinkedList()) ;
+				bean.setManagerRoles (new LinkedList());
+				bean.setManagerGroups (new LinkedList());
+				bean.setOwnerUsers ( new LinkedList()) ;
+				bean.setOwnerRoles (new LinkedList());
+				bean.setOwnerGroups (new LinkedList());
 				return bean;
 			</new-instance-script>
 		</finder>
@@ -108,49 +114,49 @@
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 		</finder>
-		<finder name="grantedUsers" type ="grantedUser">
+		<finder name="grantedUsers" type ="grantedUser" refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedUsers}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="grantedGroups" type ="grantedGroup">
+		<finder name="grantedGroups" type ="grantedGroup"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedGroups}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="grantedRoles" type ="grantedRole">
+		<finder name="grantedRoles" type ="grantedRole"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedRoles}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
 			</new-instance-bean>
 		</finder>
 
-		<finder name="ownerUsers" type ="ownerUser">
+		<finder name="ownerUsers" type ="ownerUser"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.ownerUsers}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="ownerGroups" type ="ownerGroup">
+		<finder name="ownerGroups" type ="ownerGroup"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.ownerGroups}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="ownerRoles" type ="ownerRole">
+		<finder name="ownerRoles" type ="ownerRole"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.ownerRoles}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
 			</new-instance-bean>
 		</finder>
 
-		<finder name="managerUsers" type ="managerUser">
+		<finder name="managerUsers" type ="managerUser"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.managerUsers}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="managerGroups" type ="managerGroup">
+		<finder name="managerGroups" type ="managerGroup" refreshAfterCommit="true">
 			<collection-finder collection="${instance.managerGroups}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="managerRoles" type ="managerRole">
+		<finder name="managerRoles" type ="managerRole" refreshAfterCommit="true">
 			<collection-finder collection="${instance.managerRoles}"/>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
 			</new-instance-bean>

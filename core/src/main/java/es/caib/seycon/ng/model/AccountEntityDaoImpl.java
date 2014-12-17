@@ -106,29 +106,39 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 		Collection<Grup> ownerGrups = new LinkedList<Grup>();
 		Collection<Rol> ownerRoles = new LinkedList<Rol>();
 		Collection<Usuari> ownerUsers = new LinkedList<Usuari>();
-		for (AccountAccessEntity acl: source.getAcl())
+		if ( source.getType().equals (AccountType.USER))
 		{
-			// Users
-			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				grups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				roles.add(getRolEntityDao().toRol(acl.getRol()));
-			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				usuaris.add(getUsuariEntityDao().toUsuari(acl.getUser()));
-			// Managers
-			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerRoles.add(getRolEntityDao().toRol(acl.getRol()));
-			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
-			// Users
-			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerRoles.add(getRolEntityDao().toRol(acl.getRol()));
-			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+			for (UserAccountEntity uae: source.getUsers())
+			{
+				ownerUsers.add( getUsuariEntityDao().toUsuari(uae.getUser()));
+			}
+		}
+		else
+		{
+			for (AccountAccessEntity acl: source.getAcl())
+			{
+				// Users
+				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+					grups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+					roles.add(getRolEntityDao().toRol(acl.getRol()));
+				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+					usuaris.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+				// Managers
+				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+					managerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+					managerRoles.add(getRolEntityDao().toRol(acl.getRol()));
+				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+					managerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+				// Users
+				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+					ownerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+					ownerRoles.add(getRolEntityDao().toRol(acl.getRol()));
+				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+					ownerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+			}
 		}
 		target.setGrantedGroups(grups);
 		target.setGrantedRoles(roles);

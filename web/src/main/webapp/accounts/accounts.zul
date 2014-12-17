@@ -32,7 +32,7 @@
 		<zscript src="/comu/netejaCriteris.zul" />
 		<zscript src="/comu/checkTruncatedResults.zul" />
 
-		<datamodel id="model" rootNode="root"
+		<datamodel id="model" rootNode="root" onCommit="updateFormFields()"
 			src="accounts/descriptorAccounts.xml" />
 
 		<zscript>
@@ -258,25 +258,31 @@
 								form.getFellow(s).getFellow("btnGrantUser").setDisabled(false);
 								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(false);
 								form.getFellow(s).getFellow("btnGrantRole").setDisabled(false);
+								form.getFellow(s).getFellow("b_esborrar").setDisabled(false);
 							}
 						} else if (item.instance.type == AccountType.USER) {
+							form.getFellow("lbAccountType").getItemAtIndex(0)
+									.setVisible(false);
+							form.getFellow("lbAccountType").getItemAtIndex(1)
+									.setVisible(true);
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(true);
 							form.getFellow("txtAccountDescription").getFellow("dada")
 									.setReadonly(true);
-							form.getFellow("lbAccountType").setDisabled(true);
+							form.getFellow("lbAccountType").setDisabled(false);
 							form.getFellow("lbAccountDisabled").setDisabled(true);
 							for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
 							{
 								form.getFellow(s).getFellow("btnGrantUser").setDisabled(true);
 								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(true);
 								form.getFellow(s).getFellow("btnGrantRole").setDisabled(true);
+								form.getFellow(s).getFellow("b_esborrar").setDisabled(true);
 							}
 						} else {
 							form.getFellow("lbAccountType").getItemAtIndex(0)
 									.setVisible(false);
 							form.getFellow("lbAccountType").getItemAtIndex(1)
-									.setVisible(false);
+									.setVisible(true);
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(true);
 							form.getFellow("txtAccountDescription").getFellow("dada")
@@ -288,6 +294,7 @@
 								form.getFellow(s).getFellow("btnGrantUser").setDisabled(false);
 								form.getFellow(s).getFellow("btnGrantGroup").setDisabled(false);
 								form.getFellow(s).getFellow("btnGrantRole").setDisabled(false);
+								form.getFellow(s).getFellow("b_esborrar").setDisabled(false);
 							}
 						}
 					} else {
@@ -296,6 +303,7 @@
 							form.getFellow(s).getFellow("btnGrantUser").setDisabled(true);
 							form.getFellow(s).getFellow("btnGrantGroup").setDisabled(true);
 							form.getFellow(s).getFellow("btnGrantRole").setDisabled(true);
+								form.getFellow(s).getFellow("b_esborrar").setDisabled(true);
 						}
 						form.getFellow("txtAccountName").getFellow("dada")
 								.setReadonly(true);

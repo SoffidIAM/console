@@ -620,7 +620,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
 
     private PermissionsCache getCurrentAuthorizations() throws InternalErrorException {
-        String user = getPrincipal().getName();
+        String user = Security.getCurrentUser();
         PermissionsCache entry = permisosCache.get(user);
         if (entry != null && !entry.isValid())
             permisosCache.remove(user);
@@ -663,7 +663,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             permisosCache.put(user, entry);
             return entry;
         } else {
-            return null;
+            return new PermissionsCache();
         }
     }
 

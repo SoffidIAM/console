@@ -1258,257 +1258,55 @@ public class AplicacioServiceImpl extends
     
     protected Collection<ContenidorRol> handleFindInformacioTextualJerarquiaRolsUsuariByCodiUsuari(
             String codiUsuari, String filtraResultats) throws Exception {
-        // NOTA IMPORTANT!!
-        // Si es modifica aquest mètode, modificar també el se UsuariServiceImpl
-        // mètode: handleFindJerarquiaRolsUsuariByCodiUsuari
-        //
-        // TINDRE EN COMPTE TAMBÉN EL MÉTODE d'AplicacioService
-        // findInformacioTextualJerarquiaRolsByRolAplicacioAndDispatcher
-        //
-        // Obtenemos los roles contenidos del usuario (en modo textual !!)
-        Collection<ContenidorRol> resultatContenidorRol = new LinkedList<ContenidorRol>();
-
         // Obtenemos el usuario
         UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 
-        // Sus roles (RU)
+		UsuariEntity user = getUsuariEntityDao().load(usuari.getId());
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		populateRoles(radSet, ALL, user);
+		LinkedList<ContenidorRol> rgl = new LinkedList<ContenidorRol>();
+		for (RolAccountDetail rad: radSet)
+		{
+			RolGrant rg = null;
+			if (rad.rolRol != null)
+			{
+				RolAssociacioRolEntity rar = rad.rolRol;
+                ContenidorRol cContingut = getRolAssociacioRolEntityDao()
+                        .toContenidorRol(rar);
+                // Y la información del rol contingut
+                ContenidorRol crol = getRolEntityDao()
+                        .toContenidorRol(rar.getRolContingut());
+                if (rad.qualifier != null)
+                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifier.getValor());
+                if (rad.qualifierGroup != null)
+                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifierGroup.getCodi());
+                if (rad.qualifierAplicacio != null)
+                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifierAplicacio.getCodi());
+				// mostrem rol q el té atorgat
+                crol.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol"),  //$NON-NLS-1$
+                        cContingut.getInfoContenidor()));
+                rgl.add(crol); // Añadimos el
+                                                 // contenedor
 
-        HashMap<Long, RolEntity> totRol = new HashMap<Long, RolEntity>();
-        // Los añadimos al listado de roles (hash = Id)
-        for (UserAccountEntity uae: usuari.getAccounts())
-        {
-        	AccountEntity account = uae.getAccount();
-        	if (account.getType().equals(AccountType.USER))
-        	{
-		        for (RolAccountEntity sourceEntity: account.getRoles()) {
-		            RolEntity rol = (RolEntity) sourceEntity.getRol();
-		            totRol.put(rol.getId(), rol);
-		            // No incluimos los roles de los usuarios: ya están en otra pestaña
-		            // ContenidorRol cr =
-		            // getRolAccountEntityDao().toContenidorRol(sourceEntity);
-		            // cr.setMetaInfo("Rol de l'usuari");
-		            // resultat.add(cr); //Añadimos el contenedor
-		        }
-        	}
-        }
-        
-        // Obtener grupos : primario y secundarios (y sus padres)
-        LinkedList<GrupEntity> grupsUsuariAnalizar = new LinkedList<GrupEntity>(); // LIFO
-        grupsUsuariAnalizar.add(usuari.getGrupPrimari()); // Grupo Primario
-
-
-        // Now secundary groups
-        Collection grupsSecundaris = usuari.getGrupsSecundaris(); // Grupos
-                                                                  // secundarios
-        for (Iterator it = grupsSecundaris.iterator(); it.hasNext();) {
-            UsuariGrupEntity uge = (UsuariGrupEntity) it.next();
-            grupsUsuariAnalizar.add(uge.getGrup());
-        }
-
-        // Buscamos los padres de estos grupos, para obtener sus roles
-        HashMap<Long, GrupEntity> totsGrups = new HashMap<Long, GrupEntity>(); // hash = ID
-        GrupEntity grupActual = null;
-        while ((grupActual = (GrupEntity) grupsUsuariAnalizar.poll()) != null) {
-            if (!totsGrups.containsKey(grupActual.getId())) {
-                // Nuevo
-                totsGrups.put(grupActual.getId(), grupActual);
-                // Su padre
-                GrupEntity pare = grupActual.getPare();
-                if (pare != null && !totsGrups.containsKey(pare.getId())) {
-                    // Padre no analizado, lo añadimos para procesarlo
-                    grupsUsuariAnalizar.add(pare);
-                }
-            }
-        }
-
-        // Ya tenemos los grupos, obtenemos los roles de estos grupos
-        for (Iterator it = totsGrups.entrySet().iterator(); it.hasNext();) {
-            Entry entryGrup = (Entry) it.next();
-            GrupEntity grup = (GrupEntity) entryGrup.getValue();
-            // Sólo nos interesan los roles otorgados (los de usuario del grupo
-            // ya los tenemos a partir del usuario)
-            Collection rolsAtorgats = grup.getRolsOtorgatsGrup();
-            for (Iterator ait = rolsAtorgats.iterator(); ait.hasNext();) {
-                RolsGrupEntity rge = (RolsGrupEntity) ait.next();
-                RolEntity rol = rge.getRolOtorgat();
-                totRol.put(rol.getId(), rol);
-                ContenidorRol cr = getRolEntityDao().toContenidorRol(rol);
+			}
+			if (rad.rolGrup != null)
+			{
+                ContenidorRol cr = getRolEntityDao().toContenidorRol(rad.rolGrup.getRolOtorgat());
                 cr.setMetaInfo(
                 		String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToGroup"), //$NON-NLS-1$
-                				rge.getGrupPosseidor().getCodi() ));
-                resultatContenidorRol.add(cr); // Añadimos el contenedor
-            }
-            // Now shared accounts granted to this group
-        }
+                				rad.rolGrup.getGrupPosseidor().getCodi() ));
+                rgl.add(cr); // Añadimos el contenedor
+			}
+		}
 
-        // Montamos la jerarquía de roles
-        if (totRol != null) {
-            // Añadimos todos los roles del usuario
-            // Usamos la estructura de cola (LIFO)
-            LinkedList rolesAnalizar = new LinkedList();
-            for (Iterator it = totRol.entrySet().iterator(); it.hasNext();) {
-                Entry es = (Entry) it.next();
-                RolEntity rol = (RolEntity) es.getValue(); // El rol
-                rolesAnalizar.add(rol);
-            }
-
-            // Aquí metemos toda la jerarquía (su hash es el id)
-            HashMap jerarquiaRoles = new HashMap();
-
-            RolEntity rolActual = null;
-
-            // Recorremos cola hasta que no queden elementos
-            while ((rolActual = (RolEntity) rolesAnalizar.poll()) != null) {
-                // Guardamos el rolActual (si no se ha analizado ya)
-                if (!jerarquiaRoles.containsKey(rolActual.getId())) {
-                    // Si no lo tiene, lo añadimos y buscamos dónde está
-                    // contenido
-                    jerarquiaRoles.put(rolActual.getId(), rolActual);
-                    // Obtenemos los roles que tiene otorgados (están contenidos
-                    // en mi)
-                    Collection rolsSocContingut = rolActual
-                            .getRolAssociacioRolSocContenidor();
-                    for (Iterator it = rolsSocContingut.iterator(); it
-                            .hasNext();) {
-                        RolAssociacioRolEntity rar = (RolAssociacioRolEntity) it
-                                .next();
-                        // Analizamos el tipo de Dominio del rol otorgado
-                        boolean afegir = false;
-                        // Si la asociación no tiene dominio la agregamos (puede
-                        // ser nulo)
-                        if (TipusDomini.SENSE_DOMINI.equals(rar
-                                .getTipusDomini())
-                                || rar.getTipusDomini() == null)
-                            afegir = true;
-                        else {
-                            // En el caso de que la asociación tenga dominio,
-                            // hay que mirar el rol contingut (atorgado)
-                            // Y comprobar en los roles del usuario si tiene el
-                            // mismo dominio que el rol atorgat
-
-                            // Si no tiene valor de dominio
-                            // (QUALQUE_VALOR_DOMINI), las entidades
-                            // referenciadas son nulas:
-                            if (rar.getAplicacioDomini() == null
-                                    && rar.getGrupDomini() == null
-                                    && rar.getValorDominiAplicacio() == null)
-                                afegir = true;
-                            else {
-                                // Recorremos los roles del usuario hasta
-                                // encontrar el rol que corresponda con la
-                                // asociación:
-                                // Si es sin valor de dominio, lo agregamos
-                            	
-                                for (UserAccountEntity uae: usuari.getAccounts())
-                                {
-                                	AccountEntity account = uae.getAccount();
-                                	if (account.getType().equals(AccountType.USER))
-                                	{
-                        		        for (RolAccountEntity ruEntity: account.getRoles()) {
-		                                    if (ruEntity
-		                                            .getRol()
-		                                            .getId()
-		                                            .equals(rar.getRolContenidor()
-		                                                    .getId())) { // Es el rol
-		                                                                 // correspondiente
-		                                        String tipusDominiRolUsuari = ruEntity
-		                                                .getTipusDomini();
-		                                        if (TipusDomini.GRUPS
-		                                                .equals(tipusDominiRolUsuari)
-		                                                || TipusDomini.GRUPS_USUARI
-		                                                        .equals(tipusDominiRolUsuari)) {
-		                                            // Grups
-		                                            if (rar.getGrupDomini() == null
-		                                                    || (rar.getGrupDomini() != null && rar
-		                                                            .getGrupDomini()
-		                                                            .getId()
-		                                                            .equals(ruEntity
-		                                                                    .getGrup()
-		                                                                    .getId())))
-		                                                afegir = true;
-		                                        } else if (TipusDomini.APLICACIONS
-		                                                .equals(tipusDominiRolUsuari)) {
-		                                            // Aplicacions
-		                                            if (rar.getAplicacioDomini() == null
-		                                                    || (rar.getAplicacioDomini() != null && rar
-		                                                            .getAplicacioDomini()
-		                                                            .getId()
-		                                                            .equals(ruEntity
-		                                                                    .getAplicacioAdministrada()
-		                                                                    .getId())))
-		                                                afegir = true;
-		                                        } else if (TipusDomini.DOMINI_APLICACIO
-		                                                .equals(tipusDominiRolUsuari)) {
-		                                            // Valor de domini de aplicació
-		                                            if (rar.getValorDominiAplicacio() == null
-		                                                    || (rar.getValorDominiAplicacio() != null && rar
-		                                                            .getValorDominiAplicacio()
-		                                                            .getId()
-		                                                            .equals(ruEntity
-		                                                                    .getValorDominiAplicacio()
-		                                                                    .getId())))
-		                                                afegir = true;
-		                                        } else if (TipusDomini.SENSE_DOMINI
-		                                                .equals(rar.getTipusDomini())
-		                                                || rar.getTipusDomini() == null) {
-		                                            // incloem ací els de SENSE_DOMINI
-		                                            // (l'usuari ha de tindre el rol
-		                                            // concedit..)
-		                                            afegir = true; // No hem de comparar
-		                                                           // res
-		                                        }
-		                                    }
-	                                        if (afegir) break;
-
-                        		        }
-                                	}
-                                    if (afegir) break;
-                                }
-                            }
-                        }
-
-                        if (afegir) {
-                            // Añadimos el contenedor de asociación con otro rol
-                            ContenidorRol cContingut = getRolAssociacioRolEntityDao()
-                                    .toContenidorRol(rar);
-                            // Y la información del rol contingut
-                            ContenidorRol crol = getRolEntityDao()
-                                    .toContenidorRol(rar.getRolContingut());
-							// mostrem rol q el té atorgat
-                            crol.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol"),  //$NON-NLS-1$
-                                    cContingut.getInfoContenidor()));
-                            resultatContenidorRol.add(crol); // Añadimos el
-                                                             // contenedor
-
-                            /*
-                             * RolEntity contenidor = rar.getRolContenidor(); //
-                             * ¿Hemos analizado ya el rol en el que estamos
-                             * contenidos? if
-                             * (!jerarquiaRoles.containsKey(contenidor.getId()))
-                             * { // Nuevo, lo añadimos a la lista de roles a
-                             * analizar rolesAnalizar.add(contenidor); }
-                             */
-                            RolEntity contingut = rar.getRolContingut();
-                            // ¿Hemos analizado ya el rol que contenemos?
-                            if (!jerarquiaRoles.containsKey(contingut.getId())) {
-                                // Nuevo, lo añadimos a la lista de roles a
-                                // analizar
-                                rolesAnalizar.add(contingut);
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
         // Filtrado de roles (si se requiere) - per autoritzacions
         if ("S".equals(filtraResultats)) { //$NON-NLS-1$
             // user:role:query [SENSE_DOMINI, GRUPS, APLICACIONS]
             return AutoritzacionsUsuari.filtraContenidorRolCanQuery(codiUsuari,
-                    resultatContenidorRol, getGrupEntityDao());
+                    rgl, getGrupEntityDao());
         }
 
-        return resultatContenidorRol;
+		return rgl;
     }
 
     protected Collection<RolAccount> handleFindRolsUsuarisByCodiUsuariAndNomRol(
@@ -2271,7 +2069,7 @@ public class AplicacioServiceImpl extends
 			for (AccountEntity ae: getAccountsForDispatcher(originUser,
 					originAccount, ra.getRolContingut().getBaseDeDades()))
 			{
-				RolAccountDetail n = new RolAccountDetail(ra, ae);
+				RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
 				n.granteeRol = rol;
 				if (rol.getTipusDomini().equals(TipusDomini.GRUPS) && currentRol.qualifierGroup != null)
 					n.qualifierGroup = currentRol.qualifierGroup;
@@ -2532,7 +2330,7 @@ public class AplicacioServiceImpl extends
     			else if (originalGrant instanceof RolAccountEntity)
     				rad = new RolAccountDetail((RolAccountEntity) originalGrant, rac.getAccount());
     			else if (originalGrant instanceof RolAssociacioRolEntity)
-    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount());
+    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount(), null);
     			else
     				rad = new RolAccountDetail((RolsGrupEntity) originalGrant, rac.getAccount());
     			if (! radSet.contains(rad))
@@ -2741,13 +2539,19 @@ class RolAccountDetail
 		generateHash();
 	}
 	
-	public RolAccountDetail(RolAssociacioRolEntity ra, AccountEntity account)
+	public RolAccountDetail(RolAssociacioRolEntity ra, AccountEntity account, RolAccountDetail previous)
 	{
 		this.account = account; 
 		granted = ra.getRolContingut();
 		qualifier = ra.getValorDominiAplicacio();
 		qualifierAplicacio = ra.getAplicacioDomini();
 		qualifierGroup = ra.getGrupDomini();
+		if (qualifier == null && previous != null)
+			qualifier = previous.qualifier;
+		if (qualifierAplicacio == null && previous != null)
+			qualifierAplicacio = previous.qualifierAplicacio;
+		if (qualifierGroup == null && previous != null)
+			qualifierGroup = previous.qualifierGroup;
 		rolRol = ra;
 		generateHash();
 	}

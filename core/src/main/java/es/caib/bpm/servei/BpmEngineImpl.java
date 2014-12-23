@@ -200,8 +200,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 						for (Grup grup : grups) {
 							userGroups.add(grup.getCodi());
 						}
-						Collection<RolGrant> roles = usuariService
-								.getUserRoles(userData.getId());
+						
+						Collection<RolGrant> roles = getAplicacioService().findEffectiveRolGrantByUser(userData.getId());
 						for (RolGrant role : roles) {
 							String name = role.getRolName();
 							if (!role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$

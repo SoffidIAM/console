@@ -4,7 +4,7 @@
 	<parent>
         	<groupId>com.soffid.iam.console</groupId>
         	<artifactId>root</artifactId>
-        	<version>1.6.0-SNAPSHOT</version>
+        	<version>1.5.3</version>
 	</parent>
 	<artifactId>deployer</artifactId>
 	<name>SEU component deployer</name>

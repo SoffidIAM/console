@@ -75,7 +75,8 @@ public class Inputlabel extends DataLabel implements XPathSubscriber{
 			{
 				EstatContrasenya ec = (EstatContrasenya) ((DataNode) dnc.getDataModel(0)).getInstance();
 				boolean caducada = ec.getCaducada();
-				Calendar caducitat = ec.getCaducitat();
+				
+				Calendar caducitat = (Calendar) ec.getCaducitat().clone();
 				Calendar avui = Calendar.getInstance();
 				caducitat.add(Calendar.DAY_OF_MONTH, -5);
 				if(caducada)

@@ -3,6 +3,7 @@ package com.soffid.iam.doc.nas.comm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.w3c.jwput.JWPut;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.nas.CommunicationStrategy;
+
+import es.caib.seycon.util.Base64;
 
 
 public class HTTPStrategy implements CommunicationStrategy 
@@ -32,6 +35,8 @@ public class HTTPStrategy implements CommunicationStrategy
 	private JWPut filePutter= null;
 	
 	Log log = LogFactory.getLog(getClass());
+	private String user;
+	private String password;
 	
 	/**
 	 * @see com.soffid.iam.doc.nas.CommunicationStrategy#retreiveFile(java.lang.String)
@@ -91,11 +96,25 @@ public class HTTPStrategy implements CommunicationStrategy
 		this.tempPath= properties.getProperty("soffid.ui.docTempPath");
 		
 		properties.put(JWOptions.QUIET_P, JWOptions.TRUE_P);
+		this.user = properties.getProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
+		this.password = properties.getProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
+		if (user != null && password != null)
+		{
+			properties.put (JWOptions.USER_P, user);
+			try {
+				properties.put(JWOptions.PASSWORD_P, Base64.encodeBytes(password.getBytes("UTF-8")));
+			} catch (UnsupportedEncodingException e) {
+				throw new NASException(e);
+			}
+		}
+		
 		
 		this.fileGetter= new JWGet(properties);
 		this.filePutter= new JWPut("application/octet-stream", properties);
 		
+
 		this.filesToClean= new ArrayList();
+		
 	}
 
 	/**

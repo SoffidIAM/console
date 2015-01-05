@@ -30,7 +30,7 @@
 			<p>
 			
                                 <div class="inputlogin">${c:l('login.lblUser')} :
-				<input name="j_username" id="j_username" type="text" autocomplete="off" /></div>
+				<input name="j_username" id="j_username" type="text" autocomplete="off" autofocus /></div>
 			</p>
 			<p>
 				<div class="inputlogin">${c:l('login.lblPassword')} :

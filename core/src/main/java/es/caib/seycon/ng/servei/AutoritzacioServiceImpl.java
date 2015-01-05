@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.RolAssociacioRol;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
@@ -41,6 +42,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AutoritzacioRolEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
+import es.caib.seycon.ng.model.RolAssociacioRolEntity;
+import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TipusDomini;
@@ -271,15 +274,18 @@ public class AutoritzacioServiceImpl extends
                 if (rols.containsKey(idRol)) {
                 	for (RolGrant rg: rols.get(idRol))
                 	{
-                    	RolAccountEntity ra = getRolAccountEntityDao().load(rg.getId());
-                		if (rg.getDomainValue() != null)
+                    	String tipusDomini = null;
+                   		RolEntity role = getRolEntityDao().load(idRol);
+                   		if (role != null)
+                    		tipusDomini = role.getTipusDomini();
+                    	if (rg.getDomainValue() != null && tipusDomini != null)
                 		{
+                    		
                             autoRolVO.getValorDominiRolUsuari().add(
-                            	new ValorDomini(rg.getDomainValue(), 
-                            					ra.getRol().getTipusDomini()));
+                            	new ValorDomini(rg.getDomainValue(),tipusDomini));
                             
-                            if (TipusDomini.GRUPS.equals(ra.getRol().getTipusDomini()) ||
-                            	TipusDomini.GRUPS_USUARI.equals(ra.getRol().getTipusDomini()))
+                            if (TipusDomini.GRUPS.equals(tipusDomini) ||
+                            	TipusDomini.GRUPS_USUARI.equals(tipusDomini))
                             {
                                 // Obtenim els grups segons el scope de
                                 // l'autorització:
@@ -315,7 +321,7 @@ public class AutoritzacioServiceImpl extends
                                     autoRolVO.getValorDominiRolUsuari()
                                             .add(new ValorDomini(
                                                     codiGrup,
-                                                    ra.getRol().getTipusDomini()));
+                                                    tipusDomini));
                                 }
 
                             }

@@ -8,12 +8,13 @@ package es.caib.bpm.servei;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.servei.AplicacioService;
 
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={roles.Tothom.class})
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
-	es.caib.seycon.ng.servei.UsuariService.class,
+	es.caib.seycon.ng.servei.UsuariService.class, AplicacioService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.servei.SessionCacheService.class})

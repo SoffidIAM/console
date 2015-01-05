@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.RolAssociacioRolEntity;
+import es.caib.seycon.ng.model.RolEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="AuthorizationService",
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
 	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
+	RolEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.servei.AplicacioService.class,

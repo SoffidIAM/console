@@ -6,6 +6,7 @@
     <service name="persistence" factory="org.jbpm.persistence.db.DbPersistenceServiceFactory" />
     <service name="scheduler" factory="org.jbpm.scheduler.db.DbSchedulerServiceFactory" />
     <service name="tx" factory="org.jbpm.tx.TxServiceFactory" />
+    <service name="event" factory="es.caib.bpm.servei.EventServiceFactory"/>
   </jbpm-context>
 
   <!-- configuration property used by persistence service impl org.jbpm.persistence.db.DbPersistenceServiceFactory -->

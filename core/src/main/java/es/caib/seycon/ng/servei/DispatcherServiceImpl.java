@@ -146,7 +146,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		}
 		else
 		{
-			if (dispatcher.isReadOnly())
+			if (dispatcher.isReadOnly() || dispatcher.isAuthoritative())
 				updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER, 
 								"Reconcile all accounts from %s", //$NON-NLS-1$
 								dispatcher, remove);

@@ -286,12 +286,12 @@
 									label="${c:l('aplica_rolinfo.zul.Atorgarelrolaunaltre')}">
 									<attribute name="onClick">
 										String s_valor_domini = form.getJXPathContext().getValue("/domini/nom");
-										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
+//										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
 											Events.postEvent ("onInicia",desktop.getPage("rolsLlista").getFellow("esquemaLlista"), form);
-										} else {
-											Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.ErrorAtorgarRol"),
-																org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error2"));
-										}
+//										} else {
+//											Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.ErrorAtorgarRol"),
+//																org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error2"));
+//										}
 									</attribute>
 								</button>
 							</vbox>

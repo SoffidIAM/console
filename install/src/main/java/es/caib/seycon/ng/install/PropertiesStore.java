@@ -31,7 +31,7 @@ public class PropertiesStore {
         String s = ctx.getInstallationDirectory().getPath();
         s += "/jboss/server/default/conf/seu.properties"; //$NON-NLS-1$
         File configFile = new File(s);
-        if (configFile.isFile()) {
+        if (configFile.isFile() && configFile.canRead()) {
             Properties p = new Properties();
             try {
                 p.load(new FileInputStream(configFile));

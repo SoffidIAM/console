@@ -198,7 +198,7 @@ public class NASManager
 			} catch (NASException e ) {
 				break;
 			}
-			number ++;
+			number = fileSystemDao.nextNumberFor(application, year);
 		} while (true);
 		
 		this.comStrategy.uploadFile(file, path);

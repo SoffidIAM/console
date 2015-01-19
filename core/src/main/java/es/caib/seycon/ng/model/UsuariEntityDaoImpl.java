@@ -135,10 +135,6 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
             getTasqueEntityDao().create(tasque);
             tasque = getTasqueEntityDao().newTasqueEntity();
             tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlies(usuari.getNom());
-            if (usuari.getDominiCorreu() != null)
-                tasque.setDomcor(usuari.getDominiCorreu().getCodi());
             getTasqueEntityDao().create(tasque);
         }
     }
@@ -537,7 +533,11 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         }
 
         String dominiCorreu = sourceVO.getDominiCorreu();
-        if (dominiCorreu != null && dominiCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
+        if (! sourceVO.getActiu())
+        {
+        	// Skip mail check
+        }
+        else if (dominiCorreu != null && dominiCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
             DominiCorreuEntity dominiCorreuEntity = getDominiCorreuEntityDao().findByCodi(
                     dominiCorreu);
             if (dominiCorreuEntity != null) {

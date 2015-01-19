@@ -8,7 +8,6 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -19,6 +18,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
+
+import org.zkoss.util.logging.Log;
 
 public class MailUtils {
 
@@ -87,7 +88,8 @@ public class MailUtils {
 		Properties props = new Properties();
 
 		// -- Attaching to default Session, or we could start a new one --
-		props.put("mail.smtp.host", (smtpServer != null) ? smtpServer : "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
+		String mailHost =  (smtpServer != null) ? smtpServer : "localhost";
+		props.put("mail.smtp.host", mailHost); //$NON-NLS-1$ //$NON-NLS-2$
 		Session session = getSession().getInstance(props, null);
 
 		MimeMessage msg = new MimeMessage(session);
@@ -96,6 +98,8 @@ public class MailUtils {
 		// -- Set the FROM and TO fields --
 		try
 		{
+			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
+				.info("Sending mail ["+subject+"] from ["+from+"] to ["+to+"] via ["+mailHost+"]");
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
 			// -- Set the subject and body text --
@@ -112,15 +116,15 @@ public class MailUtils {
 		}
 		catch (AddressException e)
 		{
-			e.printStackTrace();
-			// throw e;
+			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
+				.warn("Error sending message to ["+to+"] :", e);
 		}
 		catch (MessagingException e)
 		{
-			e.printStackTrace();
-			// throw e;
+			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
+				.warn("Error sending message to ["+to+"] :", e);
 		}
-
+		
 		// System.out.println("Message sent OK.");
 	}
 

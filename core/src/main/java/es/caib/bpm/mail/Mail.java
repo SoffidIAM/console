@@ -32,6 +32,7 @@ import javax.naming.InitialContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.properties.GetContentLengthProperty;
+import org.jboss.system.server.ServerLoader;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmException;
 import org.jbpm.graph.def.Action;
@@ -55,6 +56,7 @@ import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
@@ -62,6 +64,8 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.comu.lang.MessageFactory;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.DispatcherEntity;
+import es.caib.seycon.ng.model.DispatcherEntityDao;
 import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.servei.ConfiguracioService;
@@ -121,6 +125,7 @@ public class Mail implements ActionHandler {
 
 	public void execute(ExecutionContext executionContext) throws InternalErrorException, IOException {
 		debug(Messages.getString("Mail.ExecuteBegin")); //$NON-NLS-1$
+		this.__processInstanceId = executionContext.getProcessInstance().getId();
 		this.executionContext = executionContext;
 		send();
 		debug(Messages.getString("Mail.ExecuteEnd")); //$NON-NLS-1$
@@ -192,6 +197,7 @@ public class Mail implements ActionHandler {
 			while (0 < retries) {
 				retries--;
 				try {
+					log.info("Sending mail ["+subject+"] to "+recipients);
 					sendMailInternal(fromAddress,
 							recipients, subject, text);
 					break;
@@ -313,7 +319,7 @@ public class Mail implements ActionHandler {
 	 */
 	private String getAddress (String actorId) throws InternalErrorException
 	{
-		
+		debug ("Resolving address for "+actorId);
 		if (actorId.startsWith("auth:")) //$NON-NLS-1$
 		{
 			String autorization = actorId.substring(5);
@@ -326,6 +332,7 @@ public class Mail implements ActionHandler {
 			}
 			AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
 			StringBuffer mailList = new StringBuffer();
+			debug ("Resolving address for AUTHORIZATION "+autorization);
 			for (AutoritzacioRol ar: autService.getRolsAutoritzacio(autorization))
 			{
 				if (mailList.length() > 0 )
@@ -349,21 +356,28 @@ public class Mail implements ActionHandler {
     		Usuari usuari = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(actorId);
     		if (usuari != null)
     		{
+    			debug ("Resolving address for user "+usuari.getCodi());
     			if (usuari.getActiu().booleanValue())
     			{
         			if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
         			{
-        				return usuari.getFullName().replace('<', ' ')
-        								.replace ('>', ' ')+
-        								" <"+usuari.getNomCurt()+"@"+usuari.getDominiCorreu()+">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				String s = usuari.getFullName().replace('<', ' ')
+								.replace ('>', ' ')+
+								" <"+usuari.getNomCurt()+"@"+usuari.getDominiCorreu()+">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            			debug ("Resolved address "+s);
+            			return s;
         			}
         			else
         			{
         				DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(actorId, "EMAIL"); //$NON-NLS-1$
         				if (dada != null && dada.getValorDada() != null)
-        					return usuari.getFullName().replace('<', ' ')
+        				{
+        					String s = usuari.getFullName().replace('<', ' ')
         									.replace ('>', ' ')+
         									" <"+dada.getValorDada()+">"; //$NON-NLS-1$ //$NON-NLS-2$
+                			debug ("Resolved address "+s);
+                			return s;
+        				}
         			}
     			}
     		}
@@ -374,6 +388,7 @@ public class Mail implements ActionHandler {
     			if (grup != null)
     			{
     				StringBuffer sb = new StringBuffer();
+        			debug ("Resolving group members: "+grup.getCodi());
     				for (UsuariGrup ug: gs.findUsuarisPertanyenAlGrupByCodiGrup(actorId))
     				{
     					String mail = getAddress(ug.getCodiUsuari());
@@ -401,7 +416,9 @@ public class Mail implements ActionHandler {
     				else
     				{
     					roleName = actorId;
-    					dispatcher = ServiceLocator.instance().getPasswordService().getDefaultDispatcher();
+    					DispatcherEntityDao dao = (DispatcherEntityDao) ServiceLocator.instance().getService("dispatcherEntityDao");
+						DispatcherEntity defaultDispatcher = dao.findSoffidDispatcher();
+    					dispatcher = defaultDispatcher.getCodi();
     				}
     				i = roleName.lastIndexOf('/');
     				if (i >= 0)
@@ -409,9 +426,11 @@ public class Mail implements ActionHandler {
     					scope = roleName.substring(i+1);
     					roleName = roleName.substring(0, i);
     				}
+        			debug ("Resolving role"+roleName+"@"+dispatcher);
     				AplicacioService aplicacioService = ServiceLocator.instance().getAplicacioService();
 					for (Rol role: aplicacioService.findRolsByFiltre(roleName, "%", "%", dispatcher, "%", "%")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     				{
+	        			debug ("Resolving role grantees: "+role.getNom()+"@"+role.getBaseDeDades());
     					for (RolGrant grant: aplicacioService.findEffectiveRolGrantsByRolId(role.getId()))
     					{
     						if (scope == null || scope.equals (grant.getDomainValue()))
@@ -429,6 +448,7 @@ public class Mail implements ActionHandler {
     				return sb.toString();
     			}
     		}
+			debug ("Unable to resolve address for "+actorId);
     		return null;
 		} finally {
 			Security.nestedLogoff();
@@ -444,6 +464,7 @@ public class Mail implements ActionHandler {
 	private String getAddress (Set<PooledActor> pooledActors) throws InternalErrorException
 	{
 		StringBuffer sb = new StringBuffer();
+		debug ("Resolving addres for actor pool");
 		for (PooledActor actor: pooledActors)
 		{
 			String mail = null;
@@ -451,6 +472,7 @@ public class Mail implements ActionHandler {
 				mail = getAddress(actor.getActorId());
 			else if (actor.getSwimlaneInstance() != null)
 			{
+				debug ("Resolving addres for swimlane "+actor.getSwimlaneInstance().getName());
 				mail = getSwimlaneRecipients(actor.getSwimlaneInstance());
 			}
 			if (mail != null)

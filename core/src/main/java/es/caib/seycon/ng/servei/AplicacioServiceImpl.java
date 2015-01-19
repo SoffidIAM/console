@@ -2318,7 +2318,7 @@ public class AplicacioServiceImpl extends
 	}
 
 	private void populateParentGrantsForRol(HashSet<RolAccountDetail> radSet, RolEntity rol, 
-			Object originalGrant)
+			RolAssociacioRolEntity originalGrant)
 	{
 		for (RolAccountEntity rac: rol.getAccounts())
 		{
@@ -2327,12 +2327,11 @@ public class AplicacioServiceImpl extends
     			RolAccountDetail rad;
     			if (originalGrant == null)
     				rad = new RolAccountDetail(rac, rac.getAccount());
-    			else if (originalGrant instanceof RolAccountEntity)
-    				rad = new RolAccountDetail((RolAccountEntity) originalGrant, rac.getAccount());
-    			else if (originalGrant instanceof RolAssociacioRolEntity)
-    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount(), null);
-    			else
-    				rad = new RolAccountDetail((RolsGrupEntity) originalGrant, rac.getAccount());
+    			else 
+    			{
+    				RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount());
+    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount(), previousRad);
+    			}
     			if (! radSet.contains(rad))
     			{
     				radSet.add(rad);

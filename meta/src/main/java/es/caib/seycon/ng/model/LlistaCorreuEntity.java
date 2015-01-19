@@ -27,7 +27,7 @@ public abstract class LlistaCorreuEntity {
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="LCO_NOM", length=25)
+	@Column (name="LCO_NOM", length=50)
 	public java.lang.String nom;
 
 	@ForeignKey (foreignColumn="ELC_IDLCO")

@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.bytes.ByteArray;
+import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.def.Transition;
@@ -25,6 +26,7 @@ import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import es.caib.bpm.dal.ProcessDefinitionPropertyDal;
 import es.caib.bpm.exception.BPMException;
+import es.caib.bpm.mail.Mail;
 import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.Comment;
@@ -210,7 +212,11 @@ public class VOFactory {
 		if (j instanceof org.jbpm.job.Timer)
 		{
 			org.jbpm.job.Timer t = (org.jbpm.job.Timer) j;
-			vo.setName(t.getName());
+			Action action = ((org.jbpm.job.Timer) j).getAction();
+			if (action.getActionDelegation() != null && Mail.class.getName().equals(action.getActionDelegation().getClassName())) 
+				vo.setName(t.getName()+" (Mail notification)");
+			else
+				vo.setName(t.getName()+" (Timer)");
 		}
 		if (j instanceof org.jbpm.job.CleanUpProcessJob)
 		{

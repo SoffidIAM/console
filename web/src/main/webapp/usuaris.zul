@@ -165,7 +165,7 @@
 							(grupPrimari.value.trim().length() == 0) &&
 							(dominiCorreu.value.trim().length() == 0) &&
 							((tipusUsuari == null) || (tipusUsuari.getValue() == null)) &&
-							((actiu == null) || (activu.getValue() == null)) &&
+							((actiu == null) || (actiu.getValue() == null)) &&
 							(grupSecundari.value.trim().length() == 0) &&
 							(nomCurt.value.trim().length() == 0) &&
 							(accountName.value.trim().length() == 0) &&

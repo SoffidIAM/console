@@ -1374,13 +1374,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			query += " and ("; //$NON-NLS-1$
 			
-			it = userTypes.iterator();
-			while (it.hasNext())
+			Iterator<TipusUsuari> it2 = userTypes.iterator();
+			while (it2.hasNext())
 			{
-				element = it.next().toString();
-				query += "passwordPolicy.codi = :passwordPolicy" + element; //$NON-NLS-1$
-				paramsList.add(new Parameter("passwordPolicy" + element, //$NON-NLS-1$
-					element));
+				TipusUsuari element2 = it2.next();
+				query += "passwordPolicy.codi = :passwordPolicy" + element2.getCodi(); //$NON-NLS-1$
+				paramsList.add(new Parameter("passwordPolicy" + element2.getCodi(), //$NON-NLS-1$
+					element2.getCodi()));
 				
 				// Check last element
 				if (it.hasNext())

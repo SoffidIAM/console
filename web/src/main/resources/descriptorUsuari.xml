@@ -239,6 +239,14 @@
 	<datanode name="processDefinition"/>
 
 	<datanode name="rol">
+		<script-handler>
+			<insert-script>
+				if (instance.getCodiUsuari() == null)
+				{
+					instance.setCodiUsuari ( parent.getInstance().getCodi ());
+				}
+			</insert-script>
+		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
 			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
 				<parameter value="${instance}"/>

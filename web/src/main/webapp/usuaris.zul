@@ -449,18 +449,15 @@
 				}
 				]]></zscript>
 				<zscript id="changePasswordScript"><![CDATA[
-				void changePassword(String dominiContrasenyes)
-				{
-					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
-					ctx = ds.getJXPathContext();
-					String codiUsuari = ctx.getValue("@codi");
-					
-					String nouPassword = getUsuariService().canviPassword(codiUsuari,
-								dominiContrasenyes);
-					Events.postEvent("onInicia", desktop.getPage("canviPassword")
-								.getFellow("password"), new String[] { nouPassword,
-								dominiContrasenyes });
-				}
+                    				void changePassword(String dominiContrasenyes)
+                    				{
+                    					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
+                    					ctx = ds.getJXPathContext();
+                    					String codiUsuari = ctx.getValue("@codi");
+                    					newPassword2.setAttribute("user", codiUsuari);
+                    					newPassword2.setAttribute("domain", dominiContrasenyes);
+                    					Events.postEvent("onStart", newPassword2, null);
+                    				}
 				
 				void enterPassword(es.caib.zkib.datasource.DataSource ds, String xpath)
 				{
@@ -1758,30 +1755,10 @@
 												xpath2 = xpath.substring(0, xpath.lastIndexOf("/")) + "/@codi";
 												dominiContrasenyes = ctx.getValue(xpath2);
 									
-												Missatgebox.confirmaOK_CANCEL(String.format(
-														org.zkoss.util.resource.Labels
-																.getLabel("usuaris.CanviarPwdDomini"),
-														new Object[] { dominiContrasenyes }),
-														org.zkoss.util.resource.Labels
-																.getLabel("usuaris.CanviarPwd"),
-														new EventListener() {
-															public void onEvent(Event evt) {
-																if ("onOK".equals(evt.getName())) {
-																	if (form.getFellow("actiu").isChecked()) {
-																		if (tipus.equals ("M") )
-																			changePassword(dominiContrasenyes);
-																		else
-																			enterPassword (ds, xpath);
-																	} else {
-																		Missatgebox.info(
-																				org.zkoss.util.resource.Labels
-																						.getLabel("usuaris.NoActiu"),
-																				org.zkoss.util.resource.Labels
-																						.getLabel("usuaris.CanviarPwd"));
-																	}
-																}
-															}
-														});
+												if (tipus.equals ("M") )
+													changePassword(dominiContrasenyes);
+												else
+													enterPassword (ds, xpath);
 											} else {
 												Missatgebox.info(org.zkoss.util.resource.Labels
 														.getLabel("usuaris.SelUsuari"),
@@ -2240,11 +2217,11 @@ void actualitza (event) {
 												label="${c:l('usuaris.zul.Aplicacia')}" sort="auto"
 												width="20%" />
 											<listheader
-												label="${c:l('usuaris.zul.startDate')}" width="10%" />
+												label="${c:l('usuaris.zul.startDate')}" width="10%"  sort="auto"/>
 											<listheader
-												label="${c:l('usuaris.zul.endDate')}" width="10%" />
+												label="${c:l('usuaris.zul.endDate')}" width="10%"  sort="auto"/>
 											<listheader
-												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"/>
+												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"  sort="auto"/>
 											<listheader
 												label="${c:l('usuaris.zul.')}"
 												visible="${canDeleteUserRole}" width="30px" />
@@ -2905,6 +2882,93 @@ String nomRolsBorrar = "";
 				</hbox>
 			</vbox>
 		</window>
+
+		<window closable="true" id="newPassword2" position="center, center"
+			sizable="true" title="${c:l('accounts.setPassword.title')}"
+			visible="false" width="34em"
+			onClose="onCancelPassword(); event.stopPropagation();">
+			<attribute name="onStart"><![CDATA[
+			        newPassword2.doHighlighted();
+			        generationType.selectedItem = generationRandom;
+			        onChangeSelectedGeneration ();
+			]]></attribute>
+			<zscript>
+				<![CDATA[
+					void onCancelPassword()
+					{
+						Window wnd = Path.getComponent("/newPassword2");
+						password.setValue("");
+						wnd.setVisible(false);
+					}
+					
+					void onSetPassword()
+					{
+						model.commit();
+						es.caib.seycon.ng.servei.ejb.UsuariService service = new javax.naming.InitialContext()
+							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
+							.create();
+						String user = newPassword2.getAttribute("user");
+						String domain = newPassword2.getAttribute("domain");
+						if (generationType.selectedItem == generationSet)
+						{
+							service.setTemporaryPassword(user, domain, new Password(password.getValue()));
+							es.caib.zkib.zkiblaf.Missatgebox
+									.confirmaOK(org.zkoss.util.resource.Labels
+											.getLabel("accounts.setPassword.msg"));
+						}
+						else
+						{
+							String nouPassword = service.canviPassword(user, domain);
+							Events.postEvent("onInicia", desktop.getPage("canviPassword")
+									.getFellow("password"), new String[] { nouPassword,
+									domain });
+						}
+				
+						onCancelPassword();
+					}
+					
+					void onChangeSelectedGeneration ()
+					{
+						if (generationType.selectedItem == generationSet)
+						{
+							password.setDisabled (false);
+							password.setFocus(true);
+							passworddiv.setStyle("visibility: visible");
+						} else {
+							password.setDisabled (true);
+							setButton.setFocus(true);
+							passworddiv.setStyle("visibility: hidden");
+						}
+					}
+				]]>
+			</zscript>
+			<vbox width="30em" heights="3em, 2em" style="margin: 4em">
+				<radiogroup id="generationType" width="24em" orient="vertical">
+					<attribute name="onCheck"><![CDATA[
+					    onChangeSelectedGeneration();
+					]]></attribute>
+					<radio label="${c:l('usuaris.zul.radomPassword')}" id="generationRandom" width="20em" selected="true" value="random" onSelect=""/>
+					<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" value="set" onSelect=""/>
+				</radiogroup>
+				<div style="visibility: hidden" id="passworddiv">
+					<label 
+						value="${c:l('accounts.setPassword.label')}">
+					</label>
+					<textbox style="margin-left: 2em;" disabled="true" type="password" width="18em" id="password"
+						onOK="onSetPassword();">
+					</textbox>
+				</div>
+				<hbox align="center" pack="end" width="26em">
+					<button
+						label="${c:l('accounts.setPassword.Cancel')}"
+						onClick="onCancelPassword()" />
+					<button id = "setButton"
+					    label="${c:l('accounts.setPassword.OK')}"
+						onClick="onSetPassword()" />
+				</hbox>
+			</vbox>
+		</window>
+
 	</frame>
 	<zscript>
 	<![CDATA[

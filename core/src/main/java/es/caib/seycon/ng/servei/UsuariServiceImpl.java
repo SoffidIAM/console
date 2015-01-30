@@ -62,6 +62,7 @@ import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PolicyCheckResult;
 import es.caib.seycon.ng.comu.ProcesWF;
 import es.caib.seycon.ng.comu.Renovacio;
 import es.caib.seycon.ng.comu.Rol;
@@ -81,6 +82,7 @@ import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.comu.UsuariWFProcess;
 import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -3717,5 +3719,26 @@ public class UsuariServiceImpl extends
 
 		}
 		return new Vector();
+	}
+
+	@Override
+	protected void handleSetTemporaryPassword(String codiUsuari,
+			String codiDominiContrasenyes, Password newPassword)
+			throws Exception {
+		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
+		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
+			if ( AutoritzacionsUsuari.canSetUserPassword(usuari.getGrupPrimari().getCodi()) ) {
+				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
+				PolicyCheckResult validation = getInternalPasswordService().checkPolicy(usuari, dominiContrasenyes, newPassword);
+				if (! validation.isValid())
+					throw new BadPasswordException(validation.getReason());
+				getInternalPasswordService().storeAndForwardPassword(usuari, dominiContrasenyes, newPassword, true);
+				auditaCanviPassword(codiUsuari, dominiContrasenyes.getCodi());
+			} else {
+				throw new SecurityException(String.format(Messages.getString("UsuariServiceImpl.NoAuthorizedToChangePass"), codiUsuari)); //$NON-NLS-1$
+			}
+		} else {
+			throw new SeyconException(Messages.getString("UsuariServiceImpl.UserInactiveToChangePass")); //$NON-NLS-1$
+		}
 	}
 }

@@ -1905,6 +1905,19 @@ public class AutoritzacionsUsuari
 		return false;
 	}
 
+	public static boolean canSetUserPassword (String codiGrup)
+	{
+
+		if (Security.isUserInRole(Security.AUTO_USER_SET_PASSWORD + Security.AUTO_ALL)
+						||
+						// Mirem si té atorgat drets sobre el grup
+						Security.isUserInRole(Security.AUTO_USER_SET_PASSWORD + "/" //$NON-NLS-1$
+										+ codiGrup))
+			return true;
+
+		return false;
+	}
+
 	//
 	// A NIVELL DE XARXES
 	//

@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
+import org.hibernate.Hibernate;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -68,6 +70,8 @@ public class DadaUsuariEntityDaoImpl
 		try {
 			assertPhoneExists();
 			super.create(dadaUsuari);
+			if (Hibernate.isInitialized(dadaUsuari.getUsuari().getDadaUsuari()))
+				dadaUsuari.getUsuari().getDadaUsuari().add(dadaUsuari);
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);

@@ -429,7 +429,11 @@
 											</row>
 											<row>
 												<input_etiqueta value="${c:l('usuaris.zul.Grupprimari-2')}"/>
-												<label id="codiGrupPrimari" bind="@codiGrupPrimari" />
+												<div>
+													<label id="codiGrupPrimari" bind="@codiGrupPrimari" />
+													:
+													<label bind="@descripcioGrupPrimari" />
+												</div>
 											</row>
 											<row>
 												<input_etiqueta value="${c:l('selfService.AltresGrups')}"/>

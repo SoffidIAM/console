@@ -1320,6 +1320,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
+        if (account.getType().equals (AccountType.USER))
+        {
+        	for (UserAccountEntity ua: account.getUsers())
+        		auditoria.setUsuari(ua.getUser().getCodi());
+        }
 
         AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
         getAuditoriaEntityDao().create(auditoriaEntity);

@@ -221,7 +221,7 @@ public class RolAssociacioRolEntityDaoImpl extends
 
     @Override
     public void toRolGrant(RolAssociacioRolEntity source, RolGrant target) {
-        String tipus = source.getRolContenidor().getTipusDomini();
+        String tipus = source.getRolContingut().getTipusDomini();
         if (TipusDomini.APLICACIONS.equals(tipus) && 
                 source.getAplicacioDomini() != null) {
             target.setDomainValue(source.getAplicacioDomini().getCodi());

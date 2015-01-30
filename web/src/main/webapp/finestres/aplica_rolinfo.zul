@@ -141,7 +141,8 @@
 	
 		<detalls id="dades" width="99%">
 			<form id="form" width="100%" dataPath="/esquemaRol/dsAgents:/rol[1]"
-				onAfegirRolPare="afegirRolPare(event.data)">
+				onAfegirRolPare="afegirRolPare(event.data)"
+				onSelectedDomainValue="onSelectedDomainValue(event.data)">
 				<attribute name="onAfegirGrupPosseidor">
 					<!-- Añadir un GRUPO poseedor del rol -->
 					afegirGrupPare((es.caib.seycon.ng.comu.Grup) event.getData());
@@ -160,11 +161,30 @@
 							rg.setRolName(currentRol.getNom());
 							rg.setDispatcher(currentRol.getBaseDeDades());
 							rg.setIdRol(currentRol.getId());
-							path = es.caib.zkib.datasource.XPathUtils.createPath(dsAgents,
+							String path = es.caib.zkib.datasource.XPathUtils.createPath(dsAgents,
 								"/rol[1]/ownerRoles", rg);
 							ownerRolesGrid.dataPath = ownerRolesGrid.dataPath;
+							es.caib.seycon.ng.comu.Domini d = form.getJXPathContext().getValue("/domini"); 
+							String s_valor_domini = d.getNom();
+							if (s_valor_domini!=null && ! "".equals(s_valor_domini.trim()) && ! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
+								Page p = desktop.getPage("valorsDominisRol");
+								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+								p.setAttribute("domini", d);
+								p.setAttribute("senseDomini", "S");
+								p.setAttribute("newElement", path);
+								Events.postEvent ("onInicia", p.getFellow("esquemaLlista"),form);
+								
+							}
 						}
 						
+						void onSelectedDomainValue (String[] dades)
+						{
+							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
+							String path = desktop.getPage("valorsDominisRol").getAttribute("newElement");
+							es.caib.zkib.datasource.XPathUtils.setValue(dsAgents, path+"/@domainValue", dades[0]);
+							dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, path));
+						}
+
 						void afegirGrupPare (es.caib.seycon.ng.comu.Grup grantedGroup)
 						{
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
@@ -268,13 +288,15 @@
 											]]>
 										</zscript>
 										<columns>
-											<column label="Rol" width="20em"/>
-											<column label="System" width="20em"/>
+											<column label="${c:l('aplica_rolinfo.zul.Rol')}" width="15em"/>
+											<column label="${c:l('aplica_rolsllista.zul.Basededades-2')}" width="15em"/>
+											<column label="${c:l('aplica_rolinfo.zul.Domini')}" width="15em"/>
 											<column label="${c:l('aplica_rolinfo.zul.')}" width="30px"/>
 										</columns> 
 										<datarow width="100%">
 											<label bind="@ownerRolName"/>
 											<label bind="@ownerDispatcher"/>
+											<label bind="@domainValue"/>
 											<imageclic align="right" src="~./img/list-remove.gif"
 												onClick="onDeleteRow()">
 											</imageclic>
@@ -285,13 +307,7 @@
 								<button image="~./img/list-add.gif"
 									label="${c:l('aplica_rolinfo.zul.Atorgarelrolaunaltre')}">
 									<attribute name="onClick">
-										String s_valor_domini = form.getJXPathContext().getValue("/domini/nom");
-//										if (s_valor_domini==null || "".equals(s_valor_domini.trim()) || es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
-											Events.postEvent ("onInicia",desktop.getPage("rolsLlista").getFellow("esquemaLlista"), form);
-//										} else {
-//											Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.ErrorAtorgarRol"),
-//																org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error2"));
-//										}
+										Events.postEvent ("onInicia",desktop.getPage("rolsLlista").getFellow("esquemaLlista"), form);
 									</attribute>
 								</button>
 							</vbox>
@@ -303,14 +319,14 @@
 								<hbox width="100%">
 									<grid fixedLayout="true" dataPath="/ownedRoles">
 										<columns>
-											<column label="Rol"/>
-											<column label="System"/>
-											<column label="${c:l('aplica_rolinfo.zul.')}"
-												visible="false"/>
+											<column label="${c:l('aplica_rolinfo.zul.Rol')}" width="15em"/>
+											<column label="${c:l('aplica_rolsllista.zul.Basededades-2')}" width="15em"/>
+											<column label="${c:l('aplica_rolinfo.zul.Domini')}" width="15em"/>
 										</columns> 
 										<datarow width="100%">
 											<label bind="@rolName"/>
 											<label bind="@dispatcher"/>
+											<label bind="@domainValue"/>
 										</datarow>
 									</grid>
 									<separator width="10px"/>

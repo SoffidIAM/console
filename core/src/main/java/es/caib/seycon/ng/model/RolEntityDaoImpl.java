@@ -724,17 +724,12 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                     if (rolEntityFound != null) {
                         // Podemos tener dos casos: que el rol no tenga Dominio
                         // o que si tenga
-                        String tipusDominiAsoc = rolEntityFound.getTipusDomini();
+                        String tipusDominiAsoc = targetEntity.getTipusDomini();
                         // Primer mirem que no siga sense valor domini (si té
                         // valor de domini)
-                        if (tipusDominiAsoc != null
-                                && currentPare.getDomainValue() == null) {
-                            RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-                            rare.setTipusDomini(tipusDominiAsoc);
-                            rare.setRolContingut(targetEntity);
-                            rare.setRolContenidor(rolEntityFound);
-                            rolAssociacioRolSocContingut.add(rare);
-                        } else if (tipusDominiAsoc == null
+                        if (currentPare.getDomainValue() == null ||
+                        		currentPare.getDomainValue().trim().length () == 0 ||
+                        		tipusDominiAsoc == null
                                 || TipusDomini.SENSE_DOMINI
                                         .equals(tipusDominiAsoc)) {
                             RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();

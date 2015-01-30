@@ -30,13 +30,13 @@
 				model.getVariables().declareVariable("codi", "%");
 			}else{
 				queryEnabled = true;
-				model.getVariables().declareVariable("codi", codi.value);
+				model.getVariables().declareVariable("codi", es.caib.seycon.ng.web.utils.Autowildcards.replaceAsteriskChar(codi.value));
 			}
 			if(descripcio.value.trim().length() == 0){
 				model.getVariables().declareVariable("descripcio", "%");
 			}else{
 				queryEnabled = true;
-				model.getVariables().declareVariable("descripcio", descripcio.value);
+				model.getVariables().declareVariable("descripcio", es.caib.seycon.ng.web.utils.Autowildcards.replaceAsteriskChar(descripcio.value));
 			}			
 			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
 			if (queryEnabled) {
@@ -88,7 +88,7 @@
 			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
 			String [] dades = {valor, descripcio, tipusDomini};
 			Component formComponent = (Component) pageScope.get("contextComponent");
-			Events.postEvent ("onActualitza", formComponent, dades);							
+			Events.postEvent ("onSelectedDomainValue", formComponent, dades);							
 			cleanWindow();
 		}
 		
@@ -96,12 +96,12 @@
 		{ //Retornem "QUALQUE_VALOR_DOMINI","Rol atorgat a qualsevol valor domini",tipusDomini
 			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
 			String [] dades = { // Valors constants
-				es.caib.seycon.ng.comu.TipusDomini.QUALQUE_VALOR_DOMINI,
-				es.caib.seycon.ng.comu.TipusDomini.Descripcio.QUALQUE_VALOR_DOMINI,
+				null,
+				null,
 				tipusDomini
 			};
 			Component formComponent = (Component) pageScope.get("contextComponent");
-			Events.postEvent ("onActualitza", formComponent, dades);							
+			Events.postEvent ("onSelectedDomainValue", formComponent, dades);							
 			cleanWindow();
 		}
 		

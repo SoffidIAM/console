@@ -319,6 +319,8 @@ public class Mail implements ActionHandler {
 	 */
 	private String getAddress (String actorId) throws InternalErrorException
 	{
+		if (actorId == null)
+			return "";
 		debug ("Resolving address for "+actorId);
 		if (actorId.startsWith("auth:")) //$NON-NLS-1$
 		{

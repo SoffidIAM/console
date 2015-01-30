@@ -213,7 +213,9 @@ public class VOFactory {
 		{
 			org.jbpm.job.Timer t = (org.jbpm.job.Timer) j;
 			Action action = ((org.jbpm.job.Timer) j).getAction();
-			if (action.getActionDelegation() != null && Mail.class.getName().equals(action.getActionDelegation().getClassName())) 
+			if (action != null && action.getActionDelegation() != null && 
+					action.getActionDelegation().getClassName() != null &&
+					Mail.class.getName().equals(action.getActionDelegation().getClassName())) 
 				vo.setName(t.getName()+" (Mail notification)");
 			else
 				vo.setName(t.getName()+" (Timer)");

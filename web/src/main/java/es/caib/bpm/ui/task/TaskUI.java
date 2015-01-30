@@ -340,10 +340,11 @@ public class TaskUI extends Frame implements EventListener {
                 } catch (Exception e) {
 	        		Label l = new Label (e.toString());
 	        		l.setMultiline(true);
+	                ventanaDinamica.getChildren().clear();
 	        		ventanaDinamica.appendChild(l);
 	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-           		Executions.createComponents(def, ventanaDinamica, null);
-           		componenteGenerado = getWorkflowWindow();
+	            	Executions.createComponents(def, ventanaDinamica, null);
+	            	componenteGenerado = getWorkflowWindow();
                 }
             }
 

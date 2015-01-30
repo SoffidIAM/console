@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.soffid.iam.console</groupId>
@@ -9,6 +10,9 @@
 	<packaging>war</packaging>
 	<name>Soffid Web Services</name>
 	<build>
+		<sourceDirectory>
+			
+		</sourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -26,10 +30,76 @@
 				<artifactId>build-helper-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo.jspc</groupId>
+				<artifactId>jspc-maven-plugin</artifactId>
+				<version>2.0-alpha-3</version>
+				<executions>
+					<execution>
+						<id>precompileJsp</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<directory>${basedir}/src/main/webapp</directory>
+								<includes>
+									<include>**/*.jsp</include>
+								</includes>
+							</sources>
+							<source></source>
+							1.5
+							<target>1.5</target>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.mojo.jspc</groupId>
+						<artifactId>jspc-compiler-tomcat5</artifactId>
+						<version>2.0-alpha-3</version>
+					</dependency>
+					<dependency>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+						<version>1.5.6</version>
+					</dependency>
+					<dependency>
+						<groupId>org.slf4j</groupId>
+						<artifactId>jcl-over-slf4j</artifactId>
+						<version>1.5.6</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/jsp-source</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- plugin> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-jspc-maven-plugin</artifactId> 
+				<version>9.2.6.v20141205</version> <executions> <execution> <id>jspc</id> 
+				<goals> <goal>jspc</goal> </goals> </execution> </executions> <configuration> 
+				<useProvidedScope>true</useProvidedScope> <keepSources>true</keepSources> 
+				</configuration> </plugin -->
+			<plugin>
 
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<webXml>target/jspweb.xml</webXml>
 					<filteringDeploymentDescriptors>
 						false
 					</filteringDeploymentDescriptors>
@@ -51,8 +121,18 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<warSourceDirectory>target/src</warSourceDirectory>
-					<excludes>**/*.java</excludes>
+					<excludes>**/*.jsp</excludes>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<webResources>
+						<resource>
+							<!-- this is relative to the pom.xml directory -->
+							<directory>src/main/webapp</directory>
+							<!-- there's no default value for this -->
+							<excludes>
+								<exclude>**/*.jsp</exclude>
+							</excludes>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -130,6 +210,18 @@
 			<groupId>es.caib.signatura.api</groupId>
 			<artifactId>signaturaapi</artifactId>
 			<version>2.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ws.commons.axiom</groupId>
+			<artifactId>axiom-impl</artifactId>
+			<version>1.2.13</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-http</artifactId>
+			<version>1.6.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

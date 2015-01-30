@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -40,7 +41,7 @@ import es.caib.seycon.ng.utils.Security;
  */
 public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBase
 {
-
+	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.AuthoritativeChangeServiceBase#handleFinishAuthoritativeChange(es.caib.seycon.ng.sync.intf.AuthoritativeChange)
 	 */
@@ -252,11 +253,17 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 					return true;
 				else if (value == null && dada!= null)
 					return true;
-				else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
-					return true;
-				else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getBlobDataValue())) 
-					return true;
-				else if (value != null && ! value.equals(dada.getValorDada())) 
+				else if (value != null && value instanceof byte[])
+				{
+					if (((byte[])value).equals(dada.getBlobDataValue())) 
+						return true;
+				}
+				else if (value != null && value instanceof Calendar)
+				{
+					if ( ! ((Calendar)value).equals(dada.getValorDadaDate())) 
+						return true;
+				}
+				else if (value != null && ! value.toString().equals(dada.getValorDada())) 
 					return true;
 				
 			}
@@ -285,6 +292,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			UsuariGrup ug = it.next();
 			if (actualGroups.contains(ug.getCodiGrup()))
 			{
+				log.info("Received user without group "+ug.getCodiGrup());
 				actualGroups.remove(ug.getCodiGrup());
 			}
 			else
@@ -310,10 +318,16 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private boolean detectUserChange (AuthoritativeChange change) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InternalErrorException
 	{
 		if (change.getUser().getCodi() == null)
+		{
+			log.info("Received change without userName. New user is expected");
 			return true;
+		}
 		Usuari old = getUsuariService().findUsuariByCodiUsuari(change.getUser().getCodi());
 		if (old == null)
+		{
+			log.info("Received new user");
 			return true;
+		}
 		else
 			return !compareUsers(change.getUser(), old);
 	}
@@ -471,6 +485,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 				
 				if (oldValue == null || !oldValue.equals(value))
 				{
+					log.info("Received change on attribute "+att);
 					setter.invoke(oldUser, value);
 					anyChange = true;
 				}

@@ -122,6 +122,8 @@ public class DadaUsuariEntityDaoImpl
         targetVO.setCodiDada(sourceEntity.getTipusDada().getCodi());
         targetVO.setCodiUsuari(sourceEntity.getUsuari().getCodi());
     	targetVO.setDataLabel(sourceEntity.getTipusDada().getLabel());
+    	if (targetVO.getDataLabel() == null || targetVO.getDataLabel().trim().length() == 0) 
+    		targetVO.setDataLabel(sourceEntity.getTipusDada().getCodi());
         if(sourceEntity.getTipusDada()!=null && sourceEntity.getValorDada() != null){
         	if(sourceEntity.getTipusDada().getType()!= null){
         		if(sourceEntity.getTipusDada().getType().toString().equals("D")){ //$NON-NLS-1$

@@ -770,8 +770,8 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                                 .equals(tipusDominiAsoc)) {
                             ValorDominiAplicacioEntity valdomAsoc = getValorDominiAplicacioEntityDao()
                                     .findValorDominiByNomDominiAndNomRolDominiAndValorDomini(
-                                            rolEntityFound.getDominiAplicacio().getNom(), 
-                                            rolEntityFound.getNom(),
+                                            targetEntity.getDominiAplicacio().getNom(), 
+                                            targetEntity.getNom(),
                                             currentPare.getDomainValue());
                             if (valdomAsoc == null) {
 								throw new SeyconException(String.format(

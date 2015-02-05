@@ -49,7 +49,7 @@
 				catch (Exception ex) {}
 			
 				queryWindowMin = "75px";
-				queryWindowMax = "110px";
+				queryWindowMax = "130px";
 			
 				mode = "query";
 				boolean view_altres = false;
@@ -154,6 +154,12 @@
 					roleSystem = esquema.getFellow("queryWindow")
 							.getFellow("queryWindowAltres").getFellow("queryRoleSystem")
 							.getFellow("textbox");
+					attName = esquema.getFellow("queryWindow")
+							.getFellow("queryWindowAltres").getFellow("queryAttributeName")
+							.getSelectedItem();
+					attValue = esquema.getFellow("queryWindow")
+							.getFellow("queryWindowAltres").getFellow("queryAttributeValue")
+							.getFellow("textbox");
 					
 					// Check enable query
 					if ((codi.value.trim().length() == 0) &&
@@ -171,7 +177,9 @@
 							(accountName.value.trim().length() == 0) &&
 							(accountSystem.value.trim().length() == 0) &&
 							(roleName.value.trim().length() == 0) &&
-							(roleSystem.value.trim().length() == 0) )
+							(roleSystem.value.trim().length() == 0) &&
+							(attName == null || attName.value == null || attName.value.trim().length() == 0) &&
+							(attValue.value.trim().length() == 0))
 					{
 						queryEnabled = false;
 					}
@@ -193,6 +201,9 @@
 					searchValues.put("accountSystem", accountSystem.value);
 					searchValues.put("roleName", roleName.value);
 					searchValues.put("roleSystem", roleSystem.value);
+					searchValues.put("attributeValue", attValue.value);
+					if (attName != null)
+						searchValues.put("attributeName", attName.value);
 					
 					if ((tipusUsuari == null) || (tipusUsuari.getValue() == null))
 						searchValues.put("tipusUsuari", "");
@@ -253,7 +264,9 @@
 					criteria.setAccountSystem(lista.get("accountSystem"));
 					criteria.setRolName(lista.get("roleName"));
 					criteria.setRolSystem(lista.get("roleSystem"));
-
+					criteria.setAttributeName(lista.get("attributeName"));
+					criteria.setAttributeValue(lista.get("attributeValue"));
+					
 					model.getVariables().declareVariable("criteria", criteria);
 					
 					model.getVariables().declareVariable("restringeixCerca", true);
@@ -800,7 +813,7 @@
 		<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 			onHideFormulari="showLista()">
 
-			<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
+			<criteris id="queryWindow" style="min-height=${queryWindowMin}" onOK="search()"
 				width="${amplaria}">
 
 				<hbox>
@@ -871,6 +884,18 @@
 								<listitem value="N" label="${c:l('usuaris.zul.Actiu.no')}"/>
 							</listbox>
 						</hbox>
+					</hbox>
+					<hbox>
+						<hbox width="250px" widths="100px,150px">
+							<label sclass="etiqueta" value="${c:l('usuaris.zul.attributeName')}"/>
+							<listbox id="queryAttributeName" mold="select" dataPath="/model:/tipusDada" width="85%">
+								<dataitem bind="@codi">
+									<listcell bind="@label"/>
+								</dataitem>
+							</listbox>
+						</hbox>
+						<input_criteri id="queryAttributeValue"
+							etiqueta="${c:l('usuaris.zul.attributeValue')}" />
 					</hbox>
 				</altres_criteris>
 				<separator spacing="9px" />

@@ -3670,6 +3670,21 @@ public class UsuariServiceImpl extends
 		if (criteria.getActiu() != null)
 			addString(criteria.getActiu().booleanValue()?"S":"N", "usuari.actiu", null, joins, queries, params); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		if (criteria.getAttributeValue() != null &&
+			criteria.getAttributeName() != null &&
+			criteria.getAttributeName().trim().length() > 0)
+		{
+			addString(criteria.getAttributeName(), "tipusDada2.codi",  //$NON-NLS-1$
+					new String[] {
+					"inner join usuari.dadaUsuari as dadaUsuari2", //$NON-NLS-1$
+					"inner join dadaUsuari2.tipusDada as tipusDada2"}, joins, queries, params); //$NON-NLS-1$
+
+			addString(criteria.getAttributeValue(), "dadaUsuari2.valorDada", new String[] { //$NON-NLS-1$
+				"inner join usuari.dadaUsuari as dadaUsuari2" //$NON-NLS-1$
+			}, joins, queries, params);
+		}
+
+
 		StringBuffer sb = new StringBuffer ("select usuari from es.caib.seycon.ng.model.UsuariEntity as usuari"); //$NON-NLS-1$
 		for (String join: joins)
 		{

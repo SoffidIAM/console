@@ -32,6 +32,18 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUsuari">
 			</new-instance-bean>
 		</finder>
+		
+		<finder name="tipusDada" type="tipusUsuari">
+			<script-finder>
+				obj = new es.caib.seycon.ng.comu.TipusDada();
+				obj.label = " - Select - ";
+				return obj;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB" method="findTipusDadesByCodi"
+				if='${isUserInRole("usersDomain:query")}'>
+					<parameter value="%"/>
+			</ejb-finder> 
+		</finder>
 	</datanode>
 	
 	<datanode name="politicaContrasenya">
@@ -173,7 +185,9 @@
 			<attribute-validator expr="${instance.servidorPerfil}" notNull="true" friendlyName="usuaris.ProfileValidation"/>
 		</validator>
 	</datanode>
-	
+
+	<datanode name="tipusDada" transient="true" />
+		
 	<datanode name="dada">
 		<script-handler>
 			<update-script>
@@ -239,6 +253,14 @@
 	<datanode name="processDefinition"/>
 
 	<datanode name="rol">
+		<script-handler>
+			<insert-script>
+				if (instance.getCodiUsuari() == null)
+				{
+					instance.setCodiUsuari ( parent.getInstance().getCodi ());
+				}
+			</insert-script>
+		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
 			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
 				<parameter value="${instance}"/>

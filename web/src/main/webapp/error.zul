@@ -39,23 +39,10 @@
 			</vbox>
 		</div>		
 
-		<separator bar="true" spacing="10px"/>
-		<hbox style="margin-left:auto; margin-right:auto">
-			<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="spaceOwner.detach()"/>
-			<button label="${c:l('error.zul.Reinicia')}" id="resetButton">
-				<attribute name="onClick">
-				<![CDATA[
-					if (es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("error.SiReinicia"),
-						org.zkoss.util.resource.Labels.getLabel("error.zul.Reinicia"))) {
-						Executions.sendRedirect(null);
-					} 
-				]]>
-				</attribute>
-			</button>
-			<button label="${c:l('error.zul.Reinicia')}" id="resetButton2" visible="false">
-				<attribute name="onClick">
-				<![CDATA[
-					Executions.sendRedirect("/");
+		<zscript><![CDATA[
+			void resetSession ()
+			{
+					Executions.sendRedirect(null);
 					Execution ex = Executions.getCurrent();
 					javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) ex.getNativeRequest();
 					javax.servlet.http.HttpServletResponse resp = (javax.servlet.http.HttpServletResponse) ex.getNativeResponse();
@@ -78,6 +65,25 @@
 					}
 					javax.servlet.http.HttpSession httpSession = req.getSession();
 					httpSession.invalidate();
+				}
+		]]></zscript>
+		<separator bar="true" spacing="10px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="spaceOwner.detach()"/>
+			<button label="${c:l('error.zul.Reinicia')}" id="resetButton">
+				<attribute name="onClick">
+				<![CDATA[
+					if (es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("error.SiReinicia"),
+						org.zkoss.util.resource.Labels.getLabel("error.zul.Reinicia"))) {
+						Executions.sendRedirect(null);
+					} 
+				]]>
+				</attribute>
+			</button>
+			<button label="${c:l('error.zul.Reinicia')}" id="resetButton2" visible="false">
+				<attribute name="onClick">
+				<![CDATA[
+					resetSession ();
 				]]>
 				</attribute>
 			</button>
@@ -124,6 +130,9 @@
 					self.getFellow("closeButton").setVisible(false);
 					self.getFellow("resetButton").setVisible(false);
 					self.getFellow("resetButton2").setVisible(true);
+					resetSession ();
+					return;
+					
 				} else // Canviem el missatge per les autoritzacions quan no té permis
 				    if (noTeAutoritzacions) {
 				    	try {

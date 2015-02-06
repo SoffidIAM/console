@@ -1320,6 +1320,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
+        if (account.getType().equals (AccountType.USER))
+        {
+        	for (UserAccountEntity ua: account.getUsers())
+        		auditoria.setUsuari(ua.getUser().getCodi());
+        }
 
         AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
         getAuditoriaEntityDao().create(auditoriaEntity);
@@ -1374,13 +1379,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			query += " and ("; //$NON-NLS-1$
 			
-			it = userTypes.iterator();
-			while (it.hasNext())
+			Iterator<TipusUsuari> it2 = userTypes.iterator();
+			while (it2.hasNext())
 			{
-				element = it.next().toString();
-				query += "passwordPolicy.codi = :passwordPolicy" + element; //$NON-NLS-1$
-				paramsList.add(new Parameter("passwordPolicy" + element, //$NON-NLS-1$
-					element));
+				TipusUsuari element2 = it2.next();
+				query += "passwordPolicy.codi = :passwordPolicy" + element2.getCodi(); //$NON-NLS-1$
+				paramsList.add(new Parameter("passwordPolicy" + element2.getCodi(), //$NON-NLS-1$
+					element2.getCodi()));
 				
 				// Check last element
 				if (it.hasNext())

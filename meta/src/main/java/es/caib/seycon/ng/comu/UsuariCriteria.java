@@ -123,5 +123,11 @@ public abstract class UsuariCriteria {
 
 	@Nullable
 	public java.lang.String secondaryGroup;
+	
+	@Nullable
+	public String attributeName;
+	
+	@Nullable
+	public String attributeValue;
 
 }

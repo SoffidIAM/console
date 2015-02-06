@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.exception.BadPasswordException;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverPath="/seycon/UsuariService", serverRole="agent",
@@ -278,6 +281,8 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Description("Generates a random temporary password for a user")
 	@Operation ( grantees={roles.user_password_update.class},
 			translated="changePassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -287,6 +292,19 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	
+	@Description ("Sets a temporary password for a user")
+	@Operation ( grantees={roles.user_password_update.class},
+			translated="changePassword")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void setTemporaryPassword(
+		java.lang.String codiUsuari, 
+		java.lang.String codiDominiContrasenyes,
+		Password newPassword)
+		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
+	}
+
 	@Operation ( grantees={roles.user_refresh.class,roles.user_query.class},
 			translated="getTasks")
 	@Transactional(rollbackFor={java.lang.Exception.class})

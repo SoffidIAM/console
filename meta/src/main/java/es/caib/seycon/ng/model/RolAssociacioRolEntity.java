@@ -13,7 +13,6 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.AplicacioEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
-	es.caib.seycon.ng.comu.RolAssociacioRol.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.RolEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class})
@@ -29,21 +28,31 @@ public abstract class RolAssociacioRolEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RRL_TIPDOM", length=20)
+
+	@Column (name="RRL_APLICA2")
 	@Nullable
-	public java.lang.String tipusDomini;
+	public es.caib.seycon.ng.model.AplicacioEntity granteeApplicationDomain;
+
+	@Column (name="RRL_GRUP2")
+	@Nullable
+	public es.caib.seycon.ng.model.GrupEntity granteeGroupDomain;
+
+	@Column (name="RRL_VALDOM2")
+	@Nullable
+	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity granteeDomainValue;
+
 
 	@Column (name="RRL_APLICA")
 	@Nullable
-	public es.caib.seycon.ng.model.AplicacioEntity aplicacioDomini;
+	public es.caib.seycon.ng.model.AplicacioEntity grantedApplicationDomain;
 
 	@Column (name="RRL_GRUP")
 	@Nullable
-	public es.caib.seycon.ng.model.GrupEntity grupDomini;
+	public es.caib.seycon.ng.model.GrupEntity grantedGroupDomain;
 
 	@Column (name="RRL_VALDOM")
 	@Nullable
-	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio;
+	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity grantedDomainValue;
 
 	@DaoFinder("select rolAssociacioRol.rolContenidor\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut.nom = :nomRol and\nrolAssociacioRol.rolContingut.aplicacio.codi = :codiAplicacio and\nrolAssociacioRol.rolContingut.baseDeDades.codi = :codiBBDD\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findContenidorsByNomRolCodiAplicacioCodiBBDD(

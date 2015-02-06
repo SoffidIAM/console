@@ -126,8 +126,10 @@
 						logout();
 					}
 				} catch (es.caib.seycon.ng.exception.BadPasswordException e) {
-					Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("changepass.PWDAntic4"),
-										org.zkoss.util.resource.Labels.getLabel("changepass.PWDInvalid"));
+						Missatgebox.error(String.format(org.zkoss.util.resource
+									.Labels.getLabel("changepass.PWDAntic4"),
+								new Object[] { e.getMessage() }),
+								org.zkoss.util.resource.Labels.getLabel("changepass.PWDInvalid"));
 				} catch (es.caib.seycon.ng.exception.InvalidPasswordException e) {
 					Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("changepass.PWDAntic"),
 										org.zkoss.util.resource.Labels.getLabel("changepass.PWDInvalid"));

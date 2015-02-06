@@ -246,6 +246,21 @@
 		<url-pattern>/zkau/*</url-pattern>
 		<!-- //// -->
 	</servlet-mapping>
+
+	<servlet>
+		<description>
+			<![CDATA[Soffid Error Servlet]]>
+		</description>
+		<servlet-name>soffidErrorServlet</servlet-name>
+		<servlet-class>
+			com.soffid.web.ErrorServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>soffidErrorServlet</servlet-name>
+		<url-pattern>/anonymous/error.zul</url-pattern>
+		<!-- //// -->
+	</servlet-mapping>
 	<!-- Miscellaneous -->
 
 

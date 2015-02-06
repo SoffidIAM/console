@@ -46,6 +46,9 @@ public abstract class Rol {
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> ownerGroups;
 
 	@Nullable
+	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> granteeGroups;
+
+	@Nullable
 	@Attribute(translated = "indirectAssignment" )
 	public java.lang.String assignacioIndirecta;
 

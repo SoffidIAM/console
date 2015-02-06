@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
+import org.hibernate.Hibernate;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -68,6 +70,8 @@ public class DadaUsuariEntityDaoImpl
 		try {
 			assertPhoneExists();
 			super.create(dadaUsuari);
+			if (Hibernate.isInitialized(dadaUsuari.getUsuari().getDadaUsuari()))
+				dadaUsuari.getUsuari().getDadaUsuari().add(dadaUsuari);
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
@@ -118,6 +122,8 @@ public class DadaUsuariEntityDaoImpl
         targetVO.setCodiDada(sourceEntity.getTipusDada().getCodi());
         targetVO.setCodiUsuari(sourceEntity.getUsuari().getCodi());
     	targetVO.setDataLabel(sourceEntity.getTipusDada().getLabel());
+    	if (targetVO.getDataLabel() == null || targetVO.getDataLabel().trim().length() == 0) 
+    		targetVO.setDataLabel(sourceEntity.getTipusDada().getCodi());
         if(sourceEntity.getTipusDada()!=null && sourceEntity.getValorDada() != null){
         	if(sourceEntity.getTipusDada().getType()!= null){
         		if(sourceEntity.getTipusDada().getType().toString().equals("D")){ //$NON-NLS-1$

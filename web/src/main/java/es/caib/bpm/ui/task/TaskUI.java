@@ -236,7 +236,7 @@ public class TaskUI extends Frame implements EventListener {
 
     public void openTaskInstance(TaskInstance task) throws IOException,
             DocumentException, ClassNotFoundException, SQLException,
-            NamingException, CreateException, InternalErrorException {
+            NamingException, CreateException, InternalErrorException, BPMException {
         ProcessDefinition definicion;
         BpmEngine engine = getEngine();
         Component componenteGenerado = null;
@@ -306,8 +306,15 @@ public class TaskUI extends Frame implements EventListener {
                     users = users + ", " + (String) it.next(); //$NON-NLS-1$
             }
             asignadoA.setValue(users);
-        } else
+        } else {
             asignadoA.setValue(task.getActorId());
+            if (task.isOpen() && task.getStart() == null && task.getActorId().equals(Security.getCurrentUser()))
+            {
+            	task = engine.startTask(task);
+            	setCurrentTask(task);
+            	canManage = true;
+            }
+        }
         fechaCreacionTarea.setValue(task.getCreate());
 
         if (task.isOpen()) {
@@ -340,10 +347,11 @@ public class TaskUI extends Frame implements EventListener {
                 } catch (Exception e) {
 	        		Label l = new Label (e.toString());
 	        		l.setMultiline(true);
+	                ventanaDinamica.getChildren().clear();
 	        		ventanaDinamica.appendChild(l);
 	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-           		Executions.createComponents(def, ventanaDinamica, null);
-           		componenteGenerado = getWorkflowWindow();
+	            	Executions.createComponents(def, ventanaDinamica, null);
+	            	componenteGenerado = getWorkflowWindow();
                 }
             }
 
@@ -596,17 +604,26 @@ public class TaskUI extends Frame implements EventListener {
                             workflowWindow, transicion));
 
                     // Locate next task from same process
-                    List tasks = engine.getPendingTasks(process);
+                    List<TaskInstance> tasks = engine.getPendingTasks(process);
 
                     getDataModel().commit();
-                    if (tasks != null && tasks.size() > 0) {
-                        TaskInstance newTask = (TaskInstance) tasks.get(0);
-                        newTask = engine.startTask(newTask);
-                        
-                        Application.jumpTo(BPMApplication.getTaskURL(newTask));
-                    } else {
-                    	Application.goBack();
+                    if (tasks != null)
+                    {
+                    	for (TaskInstance ti: tasks)
+                    	{
+                    		if (ti.getActorId() == null ||
+                    				ti.getActorId().equals (Security.getCurrentUser()))
+                    		{
+                                ti = engine.startTask(ti);
+                                
+                                Application.jumpTo(BPMApplication.getTaskURL(ti));
+                                
+                                return ;
+                    			
+                    		}
+                    	}
                     }
+                   	Application.goBack();
 
                 } catch (Exception ex) {
                     log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$

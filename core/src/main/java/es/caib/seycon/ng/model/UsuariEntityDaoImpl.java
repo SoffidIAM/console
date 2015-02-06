@@ -133,13 +133,6 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
             tasque.setTransa(TaskHandler.UPDATE_USER_ALIAS);
             tasque.setUsuari(usuari.getCodi());
             getTasqueEntityDao().create(tasque);
-            tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlies(usuari.getNom());
-            if (usuari.getDominiCorreu() != null)
-                tasque.setDomcor(usuari.getDominiCorreu().getCodi());
-            getTasqueEntityDao().create(tasque);
         }
     }
 
@@ -537,7 +530,14 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         }
 
         String dominiCorreu = sourceVO.getDominiCorreu();
-        if (dominiCorreu != null && dominiCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
+        if (! sourceVO.getActiu())
+        {
+        	// Skip mail check
+            DominiCorreuEntity dominiCorreuEntity = getDominiCorreuEntityDao().findByCodi(
+                    dominiCorreu);
+            targetEntity.setDominiCorreu(dominiCorreuEntity);
+        }
+        else if (dominiCorreu != null && dominiCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
             DominiCorreuEntity dominiCorreuEntity = getDominiCorreuEntityDao().findByCodi(
                     dominiCorreu);
             if (dominiCorreuEntity != null) {

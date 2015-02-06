@@ -73,7 +73,7 @@ public class Security {
                                                                  // (WF)
     public static final String AUTO_USER_UPDATE_CUSTOM = "user:custom:update"; // OperateUsuari //$NON-NLS-1$
     public static final String AUTO_USER_UPDATE_PASSWORD = "user:password:update"; // Generar //$NON-NLS-1$
-                                                                                   // pass
+    public static final String AUTO_USER_SET_PASSWORD = "user:password:set"; // pass
                                                                                    // temporal
     public static final String AUTO_USER_QUERY = "user:query"; //$NON-NLS-1$
     public static final String AUTO_USER_PROPAGATE = "user:refresh"; //$NON-NLS-1$

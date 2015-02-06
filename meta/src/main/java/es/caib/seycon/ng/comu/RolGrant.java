@@ -24,6 +24,10 @@ public abstract class RolGrant {
 	@Attribute(translated = "system" )
 	public java.lang.String dispatcher;
 
+	@Description("true if the grant has domain or scope")
+	public boolean hasDomain;
+
+	@Description("The grant domain or scope")
 	@Nullable
 	public java.lang.String domainValue;
 
@@ -33,14 +37,18 @@ public abstract class RolGrant {
 	@Nullable
 	public java.lang.String ownerDispatcher;
 
+	@Description ("Owner group, if any. Applies to roles granted to groups")
 	@Nullable
 	public java.lang.String ownerGroup;
 
+	@Description ("Owner role id, if any. Applies to roles granted to roles")
 	@Nullable
 	@Attribute(translated = "ownerRole" )
 	public java.lang.Long ownerRol;
 
-	public boolean hasDomain;
+	@Description ("Scope to be applied to owner role grant")
+	@Nullable
+	public java.lang.String ownerRolDomainValue;
 
 	@Nullable
 	@Attribute(translated = "ownerRoleName" )

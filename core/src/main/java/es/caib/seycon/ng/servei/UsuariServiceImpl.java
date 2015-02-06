@@ -62,6 +62,7 @@ import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PolicyCheckResult;
 import es.caib.seycon.ng.comu.ProcesWF;
 import es.caib.seycon.ng.comu.Renovacio;
 import es.caib.seycon.ng.comu.Rol;
@@ -81,6 +82,7 @@ import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.comu.UsuariWFProcess;
 import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -2455,183 +2457,25 @@ public class UsuariServiceImpl extends
 	}
 	
 	protected Collection<Rol> handleFindJerarquiaRolsUsuariByCodiUsuari (
-			String codiUsuari, Boolean incloureRolsDirectes) throws Exception {
-		// NOTA IMPORTANT!!
-		// Si es modifica aquest mètode, modificar també el se AplicacioServiceImpl
-		// mètode: handleFindInformacioTextualJerarquiaRolsUsuariByCodiUsuari
-		//
-		// TINDRE EN COMPTE TAMBÉN EL MÉTODE AplicacioServiceImpl
-		// findInformacioTextualJerarquiaRolsByRolAplicacioAndDispatcher
-		//
-		// Aquest mètode a diferència del de Aplicació retorna RolEntity
-		// S'empra per obtindre els punts d'entrada atorgats a l'usuari
-		
-		
-		// Obtenemos los roles heredados del usuario
-		Collection<Rol> jerarquiaRolsUsuari = new ArrayList();
-		
+			String codiUsuari, Boolean incloureRolsDirectes) throws Exception 
+	{
 		// Obtenemos el usuario
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		
 		if (usuari == null) return new ArrayList(); //usuari nobody
-		
-		// Sus roles (RU)
-		HashMap totRol = new HashMap();
-		// Los añadimos al listado de roles (hash = Id)
-		List<RolAccountEntity> rolsUsuaris = new LinkedList<RolAccountEntity>();
-		for (UserAccountEntity uae: usuari.getAccounts())
+	
+		List<Rol> roles = new LinkedList<Rol>();
+		for (RolGrant rg: getAplicacioService().findEffectiveRolGrantsByRolId(usuari.getId()))
 		{
-			AccountEntity account = uae.getAccount();
-			if (account.getType().equals(AccountType.USER) ) 
+			if ( incloureRolsDirectes.booleanValue() ||
+					rg.getOwnerGroup() != null ||
+					rg.getOwnerRol() != null)
 			{
-				for (RolAccountEntity ra: account.getRoles())
-				{
-					RolEntity rol = (RolEntity) ra.getRol();
-					rolsUsuaris.add(ra);
-					totRol.put(rol.getId(), rol);
-					// A veces no interesa incluir los roles directos (ej: usuari - roles heredados)
-					if (incloureRolsDirectes.booleanValue()) {
-						Rol r = getRolEntityDao().toRol(rol);
-						jerarquiaRolsUsuari.add(r);
-					}
-				}
+				RolEntity r = getRolEntityDao().load(rg.getIdRol());
+				roles.add  ( getRolEntityDao().toRol(r));
 			}
 		}
-		
-		
-		// Obtener grupos : primario y secundarios (y sus padres)
-		LinkedList grupsUsuariAnalizar = new LinkedList(); // FIFO
-		grupsUsuariAnalizar.add(usuari.getGrupPrimari()); // Grupo Primario
-		Collection grupsSecundaris = usuari.getGrupsSecundaris(); // Grupos secundarios
-		for (Iterator it = grupsSecundaris.iterator(); it.hasNext(); ) {
-			UsuariGrupEntity uge = (UsuariGrupEntity) it.next();
-			grupsUsuariAnalizar.add(uge.getGrup()); 
-		}
-		
-		// Buscamos los padres de estos grupos, para obtener sus roles
-		HashMap totsGrups = new HashMap(); // hash = ID
-		GrupEntity grupActual = null;
-		while ( (grupActual = (GrupEntity) grupsUsuariAnalizar.poll()) !=null) {
-			if (!totsGrups.containsKey(grupActual.getId()) ) {
-				// Nuevo
-				totsGrups.put(grupActual.getId(), grupActual);
-				// Su padre
-				GrupEntity pare = grupActual.getPare(); 
-				if (pare!=null && !totsGrups.containsKey(pare.getId()) ) {
-					// Padre no analizado, lo añadimos para procesarlo
-					grupsUsuariAnalizar.add(pare);
-				}
-			}
-		}
-		
-		
-		// Ya tenemos los grupos, obtenemos los roles de estos grupos
-		for (Iterator it = totsGrups.entrySet().iterator(); it.hasNext(); ) {
-			Entry entryGrup = (Entry) it.next();
-			GrupEntity grup = (GrupEntity) entryGrup.getValue();
-			// Sólo nos interesan los roles otorgados (los de usuario del grupo
-			// ya los tenemos a partir del usuario)
-			Collection rolsAtorgats = grup.getRolsOtorgatsGrup();
-			for (Iterator ait = rolsAtorgats.iterator(); ait.hasNext(); ) {
-				RolsGrupEntity rge = (RolsGrupEntity)ait.next();
-				RolEntity rol = rge.getRolOtorgat();
-				totRol.put(rol.getId(),rol);
-				Rol r = getRolEntityDao().toRol(rol);
-				jerarquiaRolsUsuari.add(r); //Añadimos el rol otorgado al grupo				
-			}
-		}
-
- 		// Montamos la jerarquía de roles
-		if (totRol != null) {
-			// Añadimos todos los roles del usuario 
-			// Usamos la estructura de cola (LIFO)
-			LinkedList rolesAnalizar = new LinkedList();
-			for (Iterator it = totRol.entrySet().iterator(); it.hasNext(); ) {
-				Entry es = (Entry) it.next(); 
-				RolEntity rol = (RolEntity) es.getValue(); //El rol
-				rolesAnalizar.add(rol);
-			}
-			
-			// Aquí metemos toda la jerarquía (su hash es el id)
-			HashMap jerarquiaRolesAnalizar = new HashMap();
-			
-			RolEntity rolActual = null;
-			
-			// Recorremos cola hasta que no queden elementos
-			while ( (rolActual = (RolEntity) rolesAnalizar.poll()) !=null) {
-				// Guardamos el rolActual (si no se ha analizado ya)
-				if (!jerarquiaRolesAnalizar.containsKey(rolActual.getId())) {
-					// Si no lo tiene, lo añadimos y buscamos dónde está contenido
-					jerarquiaRolesAnalizar.put(rolActual.getId(), rolActual);
-					// Obtenemos los roles que tiene otorgados (están contenidos en mi)
-					Collection rolsSocContingut = rolActual.getRolAssociacioRolSocContenidor();
-					for (Iterator it = rolsSocContingut.iterator(); it.hasNext();) {
-						RolAssociacioRolEntity rar = (RolAssociacioRolEntity) it.next();
-						// Analizamos el tipo de Dominio del rol otorgado
-						boolean afegir = false;
-						// Si la asociación no tiene dominio la agregamos (puede ser nulo)
-						if (TipusDomini.SENSE_DOMINI.equals(rar.getTipusDomini()) || rar.getTipusDomini()==null)
-							afegir = true;
-						else {
-							// En el caso de que la asociación tenga dominio, hay que mirar el rol contingut (atorgado)
-							// Y comprobar en los roles del USUARIO si tiene el mismo dominio que el rol atorgat
-
-							// Si no tiene valor de dominio (QUALQUE_VALOR_DOMINI), las entidades referenciadas son nulas:
-							if (rar.getAplicacioDomini()==null && rar.getGrupDomini()==null && rar.getValorDominiAplicacio()==null)
-								afegir = true;
-							else {
-								// Recorremos los roles del usuario hasta encontrar el rol que corresponda con la asociación:
-								// Si es sin valor de dominio, lo agregamos
-								for (RolAccountEntity ruEntity: rolsUsuaris ) {
-									if (ruEntity.getRol().getId().equals(rar.getRolContenidor().getId())) { // Es el rol correspondiente 
-										String tipusDominiRolUsuari = ruEntity.getTipusDomini();
-										if (TipusDomini.GRUPS.equals(tipusDominiRolUsuari) || TipusDomini.GRUPS_USUARI.equals(tipusDominiRolUsuari) ) {
-											// Grups
-											if (rar.getGrupDomini()==null 
-													|| (rar.getGrupDomini()!=null && 
-															rar.getGrupDomini().getId().equals(ruEntity.getGrup().getId())) )
-													afegir = true;
-										} else if (TipusDomini.APLICACIONS.equals(tipusDominiRolUsuari)) {
-											// Aplicacions
-											if (rar.getAplicacioDomini() == null
-													|| (rar.getAplicacioDomini() != null && 
-															rar.getAplicacioDomini().getId().equals(ruEntity.getAplicacioAdministrada().getId())))
-												afegir = true;
-										} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiRolUsuari)) {
-											// Valor de domini de aplicació
-											if (rar.getValorDominiAplicacio()==null 
-													|| (rar.getValorDominiAplicacio()!=null && 
-															rar.getValorDominiAplicacio().getId().equals(ruEntity.getValorDominiAplicacio().getId())))
-												afegir = true;
-										} else if (TipusDomini.SENSE_DOMINI.equals(rar.getTipusDomini()) || rar.getTipusDomini()==null) {
-											// incloem ací els de SENSE_DOMINI (l'usuari ha de tindre el rol concedit..)
-											afegir = true; // No hem de comparar res
-										}
-									}
-								}
-							}
-						}
-
-						
-						if (afegir) {
-							// Añadimos el rol contenido al listado:
-							Rol rc = getRolEntityDao().toRol(rar.getRolContingut());
-							jerarquiaRolsUsuari.add(rc);
-							
-							RolEntity contingut = rar.getRolContingut();
-							// ¿Hemos analizado ya el rol que contenemos?
-							if (!jerarquiaRolesAnalizar.containsKey(contingut.getId())) {
-								// Nuevo, lo añadimos a la lista de roles a analizar
-								rolesAnalizar.add(contingut);							
-							}
-						}
-					}
-				}
-			}
-			
-		}
-		
-		return jerarquiaRolsUsuari; //Tots de tipus RolEntity		
+		return roles;
 	}
 	
 	// Per a VerificarIdentitatUsuari
@@ -3668,6 +3512,21 @@ public class UsuariServiceImpl extends
 		if (criteria.getActiu() != null)
 			addString(criteria.getActiu().booleanValue()?"S":"N", "usuari.actiu", null, joins, queries, params); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		if (criteria.getAttributeValue() != null &&
+			criteria.getAttributeName() != null &&
+			criteria.getAttributeName().trim().length() > 0)
+		{
+			addString(criteria.getAttributeName(), "tipusDada2.codi",  //$NON-NLS-1$
+					new String[] {
+					"inner join usuari.dadaUsuari as dadaUsuari2", //$NON-NLS-1$
+					"inner join dadaUsuari2.tipusDada as tipusDada2"}, joins, queries, params); //$NON-NLS-1$
+
+			addString(criteria.getAttributeValue(), "dadaUsuari2.valorDada", new String[] { //$NON-NLS-1$
+				"inner join usuari.dadaUsuari as dadaUsuari2" //$NON-NLS-1$
+			}, joins, queries, params);
+		}
+
+
 		StringBuffer sb = new StringBuffer ("select usuari from es.caib.seycon.ng.model.UsuariEntity as usuari"); //$NON-NLS-1$
 		for (String join: joins)
 		{
@@ -3717,5 +3576,26 @@ public class UsuariServiceImpl extends
 
 		}
 		return new Vector();
+	}
+
+	@Override
+	protected void handleSetTemporaryPassword(String codiUsuari,
+			String codiDominiContrasenyes, Password newPassword)
+			throws Exception {
+		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
+		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
+			if ( AutoritzacionsUsuari.canSetUserPassword(usuari.getGrupPrimari().getCodi()) ) {
+				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
+				PolicyCheckResult validation = getInternalPasswordService().checkPolicy(usuari, dominiContrasenyes, newPassword);
+				if (! validation.isValid())
+					throw new BadPasswordException(validation.getReason());
+				getInternalPasswordService().storeAndForwardPassword(usuari, dominiContrasenyes, newPassword, true);
+				auditaCanviPassword(codiUsuari, dominiContrasenyes.getCodi());
+			} else {
+				throw new SecurityException(String.format(Messages.getString("UsuariServiceImpl.NoAuthorizedToChangePass"), codiUsuari)); //$NON-NLS-1$
+			}
+		} else {
+			throw new SeyconException(Messages.getString("UsuariServiceImpl.UserInactiveToChangePass")); //$NON-NLS-1$
+		}
 	}
 }

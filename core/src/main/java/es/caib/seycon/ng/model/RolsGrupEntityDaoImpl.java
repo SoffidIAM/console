@@ -97,37 +97,41 @@ public class RolsGrupEntityDaoImpl extends
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
         if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
-            DominiAplicacioEntity dominiAplicacio = sourceEntity
-                    .getRolOtorgat().getDominiAplicacio();
-            ValorDomini valorDomini = new ValorDomini();
-            // Le asignamos como nombre la descripción del dominio de aplicación
-            valorDomini.setNomDomini(sourceEntity.getRolOtorgat()
-                    .getDominiAplicacio().getNom());
-            // Sin descripción (puede ser de distintos valores de dominio)
-            valorDomini.setDescripcio(null);
-            targetVO.setValorDomini(valorDomini);
+        	ValorDomini valorDomini;
+            if (sourceEntity.getGrantedDomainValue() != null)
+            {
+            	valorDomini  = getValorDominiAplicacioEntityDao().toValorDomini(sourceEntity.getGrantedDomainValue());
+            }
+            else
+            {
+                DominiAplicacioEntity dominiAplicacio = sourceEntity
+                        .getRolOtorgat().getDominiAplicacio();
+                valorDomini = new ValorDomini();
+                // Le asignamos como nombre la descripción del dominio de aplicación
+                valorDomini.setNomDomini(sourceEntity.getRolOtorgat()
+                        .getDominiAplicacio().getNom());
+            }
+        	targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
                 || tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
             ValorDomini valorDomini = new ValorDomini();
-            // valorDomini.setDescripcio(sourceEntity.getGrupPosseidor().getDescripcio());
-            valorDomini.setDescripcio(""); // no el mostrem //$NON-NLS-1$
-            if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-                // valorDomini.setCodiExternDomini(sourceEntity.getUsuari().getCodi());
-                valorDomini.setNomDomini(TipusDomini.GRUPS_USUARI);
-            } else {
-                valorDomini.setCodiExternDomini(null);
-                valorDomini.setNomDomini(TipusDomini.GRUPS);
+            valorDomini.setNomDomini(tipusDomini);
+            if (sourceEntity.getGrantedGroupDomain() != null)
+            {
+            	valorDomini.setDescripcio(sourceEntity.getGrantedGroupDomain().getDescripcio());
+            	valorDomini.setValor(sourceEntity.getGrantedGroupDomain().getCodi());
             }
-            valorDomini.setValor(sourceEntity.getGrupPosseidor().getCodi());
+            valorDomini.setCodiExternDomini(null);
             targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
             ValorDomini valorDomini = new ValorDomini();
+            valorDomini.setNomDomini(tipusDomini);
+            if (sourceEntity.getGrantedGroupDomain() != null)
+            {
+            	valorDomini.setDescripcio(sourceEntity.getGrantedApplicationDomain().getNom());
+            	valorDomini.setValor(sourceEntity.getGrantedApplicationDomain().getCodi());
+            }
             valorDomini.setCodiExternDomini(null);
-            // valorDomini.setDescripcio(sourceEntity.getRolOtorgat().getAplicacio().getNom());
-            valorDomini.setDescripcio("");// No el mostrem //$NON-NLS-1$
-            valorDomini.setNomDomini(TipusDomini.APLICACIONS);
-            valorDomini.setValor(sourceEntity.getRolOtorgat().getAplicacio()
-                    .getCodi());
             targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
             ValorDomini valorDomini = new ValorDomini();
@@ -179,9 +183,18 @@ public class RolsGrupEntityDaoImpl extends
         target.setDispatcher(source.getRolOtorgat().getBaseDeDades()
                 .getCodi());
         String tipus = source.getRolOtorgat().getTipusDomini();
-        if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus)) {
-            target.setHasDomain(true);
+        if (TipusDomini.SENSE_DOMINI.equals(tipus)) {
+            target.setHasDomain(false);
             target.setDomainValue(null);
+        } else if (TipusDomini.APLICACIONS.equals(tipus)) {
+        	target.setHasDomain(true);
+        	target.setDomainValue(source.getGrantedApplicationDomain().getCodi());
+        } else if (TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) {
+        	target.setHasDomain(true);
+        	target.setDomainValue(source.getGrantedGroupDomain().getCodi());
+        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus)) {
+        	target.setHasDomain(true);
+        	target.setDomainValue(source.getGrantedDomainValue().getValor());
         } else {
             target.setHasDomain(false);
             target.setDomainValue(null);
@@ -194,6 +207,7 @@ public class RolsGrupEntityDaoImpl extends
         target.setId(source.getId());
         target.setIdRol(source.getRolOtorgat().getId());
         target.setRolName(source.getRolOtorgat().getNom());
+        
     }
 
 }

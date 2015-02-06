@@ -91,11 +91,25 @@ public class RoleDependencyTest extends AbstractTest
 			rol3.getOwnerRoles().add(rg);
 			appSvc.update(rol3);
 
-			rol4.getOwnerGroups().add(grupSvc.findGrupByCodiGrup("enterprise"));
+			rg = new RolGrant();
+			rg.setOwnerGroup(grupSvc.findGrupByCodiGrup("enterprise").getCodi());
+			rg.setIdRol(rol4.getId());
+			rg.setDispatcher(rol4.getBaseDeDades());
+			rg.setRolName(rol4.getNom());
+			rg.setDomainValue(null);
+			rg.setHasDomain(false);
+			rol4.getGranteeGroups().add(rg);
 			appSvc.update(rol4);
 
 
-			rol5.getOwnerGroups().add(grupSvc.findGrupByCodiGrup("world"));
+			rg = new RolGrant();
+			rg.setOwnerGroup(grupSvc.findGrupByCodiGrup("world").getCodi());
+			rg.setIdRol(rol5.getId());
+			rg.setDispatcher(rol5.getBaseDeDades());
+			rg.setRolName(rol5.getNom());
+			rg.setDomainValue(null);
+			rg.setHasDomain(false);
+			rol5.getGranteeGroups().add(rg);
 			appSvc.update(rol5);
 
 			List<UserAccount> accounts = accountSvc.listUserAccounts(u);

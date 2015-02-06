@@ -27,6 +27,19 @@ public abstract class RolsGrupEntity {
 	@Column (name="RLG_ROL")
 	public es.caib.seycon.ng.model.RolEntity rolOtorgat;
 
+	@Column (name="RLG_APL_ID")
+	@Nullable
+	public es.caib.seycon.ng.model.AplicacioEntity grantedApplicationDomain;
+
+	@Column (name="RLG_GRU_ID")
+	@Nullable
+	public es.caib.seycon.ng.model.GrupEntity grantedGroupDomain;
+
+	@Column (name="RLG_VDO_ID")
+	@Nullable
+	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity grantedDomainValue;
+
+
 	@DaoFinder("select rolsgrup from es.caib.seycon.ng.model.RolsGrupEntity rolsgrup where rolsgrup.rolOtorgat = :rolOtorgat")
 	public java.util.List<es.caib.seycon.ng.model.RolsGrupEntity> findGrupsPosseidorsRol(
 		es.caib.seycon.ng.model.RolEntity rolOtorgat) {

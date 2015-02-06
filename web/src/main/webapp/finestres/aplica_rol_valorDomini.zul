@@ -8,7 +8,7 @@
 	
 	<datamodel id="model" rootNode="valors" src="descriptorValorDomini.xml"/>
 	
-	<zscript>
+	<zscript><![CDATA[
 		fileres = es.caib.seycon.ng.web.Custom.FILERES;
 	
 		mode = "query"; 
@@ -74,6 +74,14 @@
 					
 		}		
 		
+		void cancel ()
+		{
+			Component formComponent = (Component) pageScope.get("contextComponent");
+			String eventName = (String) pageScope.get("eventName");
+			Events.postEvent (eventName, formComponent, null);
+			cleanWindow ();
+		}							
+		
 		void acceptaDada()
 		{ // Retornem valorDomini, descripcioValor, tipusDomini
 			ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
@@ -88,7 +96,8 @@
 			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
 			String [] dades = {valor, descripcio, tipusDomini};
 			Component formComponent = (Component) pageScope.get("contextComponent");
-			Events.postEvent ("onSelectedDomainValue", formComponent, dades);							
+			String eventName = (String) pageScope.get("eventName");
+			Events.postEvent (eventName, formComponent, dades);							
 			cleanWindow();
 		}
 		
@@ -101,13 +110,14 @@
 				tipusDomini
 			};
 			Component formComponent = (Component) pageScope.get("contextComponent");
-			Events.postEvent ("onSelectedDomainValue", formComponent, dades);							
+			String eventName = (String) pageScope.get("eventName");
+			Events.postEvent (eventName, formComponent, dades);							
 			cleanWindow();
 		}
-		
+	]]>
 	</zscript>
 	
-	<esquema closable="true" id="esquemaLlista" position="center, center" title="${c:l('aplica_rol_valorDomini.Titol')}" visible="false">
+	<esquema closable="true" id="esquemaLlista" position="center, center" ample="800px" title="${c:l('aplica_rol_valorDomini.Titol')}" visible="false">
 		<attribute name="onInicia">
 			pageScope.put("contextComponent", event.data);
 
@@ -147,8 +157,8 @@
 			}     		
 		</attribute>
 		<attribute name="onClose">
-			cleanWindow();
-			event.stopPropagation ();
+			event.stopPropagation();
+			cancel();
 		</attribute>
 
 		<criteris id="queryWindow" onOK="search(false)" width="790px">
@@ -202,7 +212,7 @@
 						}
 					</attribute>
 				</button>
-				<button label="${c:l('aplica_rol_valorDomini.zul.Cancel·la')}" onClick="cleanWindow()"/>			
+				<button label="${c:l('aplica_rol_valorDomini.zul.Cancel·la')}" onClick="cancel()"/>			
 			</hbox>
 			<hbox>
 				<separator width="100px"/>

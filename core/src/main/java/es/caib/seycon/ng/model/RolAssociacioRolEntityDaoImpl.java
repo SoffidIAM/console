@@ -13,7 +13,6 @@ import java.util.List;
 
 import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolAssociacioRol;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -118,7 +117,6 @@ public class RolAssociacioRolEntityDaoImpl extends
 
     public RolAssociacioRolEntity contenidorRolToEntity(
             ContenidorRol contenidorRol) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -141,8 +139,8 @@ public class RolAssociacioRolEntityDaoImpl extends
         String infoDomini = ""; //$NON-NLS-1$
         // Si es nulo o valor SENSE_DOMINI no ponemos valor de dominio
         if (!TipusDomini.SENSE_DOMINI
-                .equals(rolAssocRolEntity.getTipusDomini())) {
-            String tipusDominiAsoc = rolAssocRolEntity.getTipusDomini(); // Tipo
+                .equals(rolAssocRolEntity.getRolContingut().getTipusDomini())) {
+            String tipusDominiAsoc = rolAssocRolEntity.getRolContingut().getTipusDomini(); // Tipo
                                                                          // de
                                                                          // dominio
                                                                          // de
@@ -151,7 +149,7 @@ public class RolAssociacioRolEntityDaoImpl extends
             String tipusDominiRol = rcontenidor.getTipusDomini();
             // "{"+tipusDomini+":"+valorDomini+"["+descripcioValorDomini+"]}"
             if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
-                AplicacioEntity app = rolAssocRolEntity.getAplicacioDomini();
+                AplicacioEntity app = rolAssocRolEntity.getGrantedApplicationDomain();
                 if (app != null) {
                     infoDomini = "{" + tipusDominiAsoc + ":" + app.getCodi() //$NON-NLS-1$ //$NON-NLS-2$
                             + "[" + app.getNom() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,7 +161,7 @@ public class RolAssociacioRolEntityDaoImpl extends
                 }
             } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
                     || TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
-                GrupEntity gr = rolAssocRolEntity.getGrupDomini();
+                GrupEntity gr = rolAssocRolEntity.getGrantedGroupDomain();
                 if (gr != null) {
                     infoDomini = "{" + tipusDominiAsoc + ":" + gr.getCodi() //$NON-NLS-1$ //$NON-NLS-2$
                             + "[" + gr.getDescripcio() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -175,7 +173,7 @@ public class RolAssociacioRolEntityDaoImpl extends
                 }
             } else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
                 ValorDominiAplicacioEntity vd = rolAssocRolEntity
-                        .getValorDominiAplicacio();
+                        .getGrantedDomainValue();
                 if (vd != null) {
                     infoDomini = "{" + tipusDominiAsoc + ":" + vd.getValor() //$NON-NLS-1$ //$NON-NLS-2$
                             + "[" + vd.getDomini().getNom() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -204,36 +202,26 @@ public class RolAssociacioRolEntityDaoImpl extends
         return contenidorRol;
     }
 
-    public RolAssociacioRolEntity rolAssociacioRolToEntity(
-            RolAssociacioRol rolAssociacioRol) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void toRolAssociacioRol(RolAssociacioRolEntity source,
-            RolAssociacioRol target) {
-        super.toRolAssociacioRol(source, target);
-    }
-
     public RolAssociacioRolEntity rolGrantToEntity(RolGrant rolGrant) {
         return load(rolGrant.getId());
     }
 
     @Override
     public void toRolGrant(RolAssociacioRolEntity source, RolGrant target) {
+    	// Translate granted domain
         String tipus = source.getRolContingut().getTipusDomini();
         if (TipusDomini.APLICACIONS.equals(tipus) && 
-                source.getAplicacioDomini() != null) {
-            target.setDomainValue(source.getAplicacioDomini().getCodi());
+                source.getGrantedApplicationDomain() != null) {
+            target.setDomainValue(source.getGrantedApplicationDomain().getCodi());
             target.setHasDomain(true);
         } else if (( TipusDomini.GRUPS.equals(tipus)
                 || TipusDomini.GRUPS_USUARI.equals(tipus) ) &&
-                source.getGrupDomini() != null) {
-            target.setDomainValue(source.getGrupDomini().getCodi());
+                source.getGrantedGroupDomain() != null) {
+            target.setDomainValue(source.getGrantedGroupDomain().getCodi());
             target.setHasDomain(true);
         } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) &&
-                source.getValorDominiAplicacio() != null) {
-            target.setDomainValue(source.getValorDominiAplicacio().getValor());
+                source.getGrantedDomainValue() != null) {
+            target.setDomainValue(source.getGrantedDomainValue().getValor());
             target.setHasDomain(true);
         } else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus) ) {
             target.setHasDomain(true);
@@ -241,6 +229,23 @@ public class RolAssociacioRolEntityDaoImpl extends
         } else {
             target.setHasDomain(false);
             target.setDomainValue(null);
+        }
+    	// Translate grantee domain
+        tipus = source.getRolContenidor().getTipusDomini();
+        if (TipusDomini.APLICACIONS.equals(tipus) && 
+                source.getGranteeApplicationDomain() != null) {
+            target.setOwnerRolDomainValue(source.getGranteeApplicationDomain().getCodi());
+        } else if (( TipusDomini.GRUPS.equals(tipus)
+                || TipusDomini.GRUPS_USUARI.equals(tipus) ) &&
+                source.getGranteeGroupDomain() != null) {
+            target.setOwnerRolDomainValue(source.getGranteeGroupDomain().getCodi());
+        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) &&
+                source.getGranteeDomainValue() != null) {
+            target.setOwnerRolDomainValue(source.getGranteeDomainValue().getValor());
+        } else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus) ) {
+            target.setOwnerRolDomainValue(null);
+        } else {
+            target.setOwnerRolDomainValue(null);
         }
         target.setOwnerRol(source.getRolContenidor().getId());
         target.setOwnerRolName(source.getRolContenidor().getNom());

@@ -468,19 +468,22 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         Collection grupsEntityPosseidors = sourceEntity.getGrupsPosseidorsRol(); // tipo
                                                                                  // RolsGrupEntity
         Collection<Grup> grupsPosseidors = new ArrayList<Grup>(); // tipo Grup
+        Collection<RolGrant> granteeGroups = new ArrayList<RolGrant>(); // tipo Grup
         if (grupsEntityPosseidors != null) {
             for (Iterator it = grupsEntityPosseidors.iterator(); it.hasNext();) {
                 RolsGrupEntity rg = (RolsGrupEntity) it.next(); // Rol-Grup
                                                                 // (Entity)
                 if (rg.getGrupPosseidor() != null) {
                     GrupEntity posseidor = (GrupEntity) rg.getGrupPosseidor();
-                    Grup grupo = new GrupEntityDaoImpl().toGrup(posseidor); // Grup
+                    Grup grupo = getGrupEntityDao().toGrup(posseidor); // Grup
                                                                             // VO
                     grupsPosseidors.add(grupo);
+                    granteeGroups.add ( getRolsGrupEntityDao().toRolGrant(rg));
                 }
             }
         }
         targetVO.setOwnerGroups(grupsPosseidors);
+        targetVO.setGranteeGroups(granteeGroups);
 
         String tipusDomini = sourceEntity.getTipusDomini();
         if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
@@ -647,9 +650,10 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         // GRUPOS POSEEDORES DEL ROL: NUEVO
         // Collección de Grups posseidors (VO)
         Collection<Grup> grupsPosseidors = sourceVO.getOwnerGroups();
+        Collection<RolGrant> granteeGroups = sourceVO.getGranteeGroups();
         // Eliminamos las referencias existentes
         Collection<RolsGrupEntity> grupsPosseidorsRolEntity = new HashSet<RolsGrupEntity>();
-        if (grupsPosseidors != null) {
+        if (granteeGroups == null && grupsPosseidors != null) {
             // Creamos las relaciones existentes con los grupos
             for (Iterator<Grup> it = grupsPosseidors.iterator(); it.hasNext();) {
                 // El VO grup siempre tendrá ID (!!)
@@ -662,6 +666,40 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 rge.setGrupPosseidor(grupEntity);
                 grupsPosseidorsRolEntity.add(rge);
             }
+        } else if (granteeGroups != null) {
+            // Creamos las relaciones existentes con los grupos
+            for (Iterator<RolGrant> it = granteeGroups.iterator(); it.hasNext();) {
+                // El VO grup siempre tendrá ID (!!)
+                RolGrant grant = it.next();
+                GrupEntity grupEntity = getGrupEntityDao().findByCodi(grant.getOwnerGroup());
+                if (grupEntity == null)
+                	throw new java.lang.IllegalArgumentException("group "+grant.getOwnerGroup());
+                // creamos la instancia A NIVEL DE OBJETO
+                RolsGrupEntity rge = getRolsGrupEntityDao().newRolsGrupEntity();
+                rge.setRolOtorgat(targetEntity);
+                rge.setGrupPosseidor(grupEntity);
+                Domini domini = sourceVO.getDomini();
+                String nomDomini = domini.getNom();
+                if (TipusDomini.APLICACIONS.equals(nomDomini))
+                {
+                	rge.setGrantedApplicationDomain(getAplicacioEntityDao().findByCodi(grant.getDomainValue()));
+                }
+                else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini))
+                {
+                	rge.setGrantedGroupDomain(getGrupEntityDao().findByCodi(grant.getDomainValue()));
+                }
+                else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini))
+                {
+                	rge.setGrantedDomainValue(
+                			getValorDominiAplicacioEntityDao()
+                				.findByApplicationDomainValue(
+                						sourceVO.getCodiAplicacio(), 
+                						sourceVO.getDomini().getCodiExtern(), 
+                						grant.getDomainValue()));
+                }
+                grupsPosseidorsRolEntity.add(rge);
+            }
+        	
         }
         targetEntity.setGrupsPosseidorsRol(grupsPosseidorsRolEntity);
 
@@ -715,83 +753,22 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 // Los pares son una cadena
                 // nomrol@dispatcher>aplicacio{tipusdomini:valor[descripcio]}
                 // (la part del domini és opcional)
-                RolGrant currentPare = iterator.next();
-                if (currentPare != null) { //$NON-NLS-1$
+                RolGrant currentGrant = iterator.next();
+                if (currentGrant != null) { //$NON-NLS-1$
                     // Obtenemos la entidad Rol padre desde la BBDD
-                    RolEntity rolEntityFound = load (currentPare.getOwnerRol()); 
+                    RolEntity rolEntityFound = load (currentGrant.getOwnerRol()); 
+    		        RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
+    		        
+    		        rare.setRolContingut(targetEntity);
+    		        rare.setRolContenidor(rolEntityFound);
 
-                    // Añadimos la relación con el padre
-                    if (rolEntityFound != null) {
-                        // Podemos tener dos casos: que el rol no tenga Dominio
-                        // o que si tenga
-                        String tipusDominiAsoc = targetEntity.getTipusDomini();
-                        // Primer mirem que no siga sense valor domini (si té
-                        // valor de domini)
-                        if (currentPare.getDomainValue() == null ||
-                        		currentPare.getDomainValue().trim().length () == 0 ||
-                        		tipusDominiAsoc == null
-                                || TipusDomini.SENSE_DOMINI
-                                        .equals(tipusDominiAsoc)) {
-                            RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-                            rare.setTipusDomini(tipusDominiAsoc);
-                            rare.setRolContingut(targetEntity);
-                            rare.setRolContenidor(rolEntityFound);
-                            rolAssociacioRolSocContingut.add(rare);
-                        } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
-                                || TipusDomini.GRUPS_USUARI
-                                        .equals(tipusDominiAsoc)) {
-                            GrupEntity grupAsoc = getGrupEntityDao()
-                                    .findByCodi(currentPare.getDomainValue());
-                            if (grupAsoc == null) {
-								throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.14"),   //$NON-NLS-1$
-										currentPare.getDomainValue()));
-                            }
-                            RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-                            rare.setTipusDomini(tipusDominiAsoc);
-                            rare.setRolContingut(targetEntity);
-                            rare.setRolContenidor(rolEntityFound);
-                            rare.setGrupDomini(grupAsoc);
-                            rolAssociacioRolSocContingut.add(rare);
-                        } else if (TipusDomini.APLICACIONS
-                                .equals(tipusDominiAsoc)) {
-                            AplicacioEntity appAsoc = getAplicacioEntityDao()
-                                    .findByCodi(currentPare.getDomainValue());
-                            if (appAsoc == null) {
-								throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.15"),  //$NON-NLS-1$
-										currentPare.getDomainValue()));
-                            }
-                            RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-                            rare.setTipusDomini(tipusDominiAsoc);
-                            rare.setRolContingut(targetEntity);
-                            rare.setRolContenidor(rolEntityFound);
-                            rare.setAplicacioDomini(appAsoc);
-                            rolAssociacioRolSocContingut.add(rare);
-                        } else if (TipusDomini.DOMINI_APLICACIO
-                                .equals(tipusDominiAsoc)) {
-                            ValorDominiAplicacioEntity valdomAsoc = getValorDominiAplicacioEntityDao()
-                                    .findValorDominiByNomDominiAndNomRolDominiAndValorDomini(
-                                            targetEntity.getDominiAplicacio().getNom(), 
-                                            targetEntity.getNom(),
-                                            currentPare.getDomainValue());
-                            if (valdomAsoc == null) {
-								throw new SeyconException(String.format(
-										Messages.getString("RolEntityDaoImpl.16"),   //$NON-NLS-1$
-										rolEntityFound.getDominiAplicacio().getNom(),
-										currentPare.getDomainValue()));
-                            }
-                            RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-                            rare.setTipusDomini(tipusDominiAsoc);
-                            rare.setRolContingut(targetEntity);
-                            rare.setRolContenidor(rolEntityFound);
-                            rare.setValorDominiAplicacio(valdomAsoc);
-                            rolAssociacioRolSocContingut.add(rare);
-                        }
-                    } else {
-						throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.17"),   //$NON-NLS-1$
-								currentPare.getOwnerRolName(), 
-								currentPare.getOwnerRol(), 
-								currentPare.getOwnerDispatcher()));
-                    }
+    		        assignDomainValue(rare, currentGrant, targetEntity,
+                    		rolEntityFound);
+
+                    assignGranteeDomainValue(rare, currentGrant, targetEntity,
+                    		rolEntityFound);
+
+    		        rolAssociacioRolSocContingut.add(rare);
                 }
 
             }
@@ -843,7 +820,125 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
 
     }
 
-    private DominiAplicacioEntity findDominiByNomAndCodiApliacio(String nom,
+	private void assignDomainValue(
+			RolAssociacioRolEntity rare,
+			RolGrant currentPare, 
+			es.caib.seycon.ng.model.RolEntity grantedRole,
+			RolEntity granteeRole) {
+		// Añadimos la relación con el padre
+		if (granteeRole != null) {
+		    // Podemos tener dos casos: que el rol no tenga Dominio
+		    // o que si tenga
+		    String tipusDominiAsoc = grantedRole.getTipusDomini();
+		    // Primer mirem que no siga sense valor domini (si té
+		    // valor de domini)
+		    if (currentPare.getDomainValue() == null ||
+		    		currentPare.getDomainValue().trim().length () == 0 ||
+		    		tipusDominiAsoc == null
+		            || TipusDomini.SENSE_DOMINI
+		                    .equals(tipusDominiAsoc)) {
+		    } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
+		            || TipusDomini.GRUPS_USUARI
+		                    .equals(tipusDominiAsoc)) {
+		        GrupEntity grupAsoc = getGrupEntityDao()
+		                .findByCodi(currentPare.getDomainValue());
+		        if (grupAsoc == null) {
+					throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.14"),   //$NON-NLS-1$
+							currentPare.getDomainValue()));
+		        }
+		        rare.setGrantedGroupDomain(grupAsoc);
+		    } else if (TipusDomini.APLICACIONS
+		            .equals(tipusDominiAsoc)) {
+		        AplicacioEntity appAsoc = getAplicacioEntityDao()
+		                .findByCodi(currentPare.getDomainValue());
+		        if (appAsoc == null) {
+					throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.15"),  //$NON-NLS-1$
+							currentPare.getDomainValue()));
+		        }
+		        rare.setGrantedApplicationDomain(appAsoc);
+		    } else if (TipusDomini.DOMINI_APLICACIO
+		            .equals(tipusDominiAsoc)) {
+		        ValorDominiAplicacioEntity valdomAsoc = getValorDominiAplicacioEntityDao()
+		                .findValorDominiByNomDominiAndNomRolDominiAndValorDomini(
+		                        grantedRole.getDominiAplicacio().getNom(), 
+		                        grantedRole.getNom(),
+		                        currentPare.getDomainValue());
+		        if (valdomAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RolEntityDaoImpl.16"),   //$NON-NLS-1$
+							granteeRole.getDominiAplicacio().getNom(),
+							currentPare.getDomainValue()));
+		        }
+		        rare.setGrantedDomainValue(valdomAsoc);
+		    }
+		} else {
+			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.17"),   //$NON-NLS-1$
+					currentPare.getOwnerRolName(), 
+					currentPare.getOwnerRol(), 
+					currentPare.getOwnerDispatcher()));
+		}
+	}
+
+	private void assignGranteeDomainValue(
+			RolAssociacioRolEntity rare,
+			RolGrant grant, 
+			es.caib.seycon.ng.model.RolEntity grantedRole,
+			RolEntity granteeRole) {
+		// Añadimos la relación con el padre
+		if (granteeRole != null) {
+		    // Podemos tener dos casos: que el rol no tenga Dominio
+		    // o que si tenga
+		    String tipusDominiAsoc = granteeRole.getTipusDomini();
+		    // Primer mirem que no siga sense valor domini (si té
+		    // valor de domini)
+		    if (grant.getOwnerRolDomainValue() == null ||
+		    		grant.getOwnerRolDomainValue().trim().length () == 0 ||
+		    		tipusDominiAsoc == null
+		            || TipusDomini.SENSE_DOMINI
+		                    .equals(tipusDominiAsoc)) {
+		    } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
+		            || TipusDomini.GRUPS_USUARI
+		                    .equals(tipusDominiAsoc)) {
+		        GrupEntity grupAsoc = getGrupEntityDao()
+		                .findByCodi(grant.getOwnerRolDomainValue());
+		        if (grupAsoc == null) {
+					throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.14"),   //$NON-NLS-1$
+							grant.getDomainValue()));
+		        }
+		        rare.setGranteeGroupDomain(grupAsoc);
+		    } else if (TipusDomini.APLICACIONS
+		            .equals(tipusDominiAsoc)) {
+		        AplicacioEntity appAsoc = getAplicacioEntityDao()
+		                .findByCodi(grant.getOwnerRolDomainValue());
+		        if (appAsoc == null) {
+					throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.15"),  //$NON-NLS-1$
+							grant.getDomainValue()));
+		        }
+		        rare.setGranteeApplicationDomain(appAsoc);
+		    } else if (TipusDomini.DOMINI_APLICACIO
+		            .equals(tipusDominiAsoc)) {
+		        ValorDominiAplicacioEntity valdomAsoc = getValorDominiAplicacioEntityDao()
+		                .findValorDominiByNomDominiAndNomRolDominiAndValorDomini(
+		                        granteeRole.getDominiAplicacio().getNom(), 
+		                        granteeRole.getNom(),
+		                        grant.getOwnerRolDomainValue());
+		        if (valdomAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RolEntityDaoImpl.16"),   //$NON-NLS-1$
+							granteeRole.getDominiAplicacio().getNom(),
+							grant.getDomainValue()));
+		        }
+		        rare.setGranteeDomainValue(valdomAsoc);
+		    }
+		} else {
+			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.17"),   //$NON-NLS-1$
+					grant.getOwnerRolName(), 
+					grant.getOwnerRol(), 
+					grant.getOwnerDispatcher()));
+		}
+	}
+
+	private DominiAplicacioEntity findDominiByNomAndCodiApliacio(String nom,
             String codiAplicacio) {
         String query = "select domini " //$NON-NLS-1$
                 + "from es.caib.seycon.ng.model.DominiAplicacioEntity domini " //$NON-NLS-1$
@@ -1078,9 +1173,9 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                     Collection<RolAccountEntity> rolsUsuarisRolContenidor = new ArrayList<RolAccountEntity>();
                     // Cerquem usuaris amb el rol d'usuari amb valor de domini
                     // corresponent
-                    if (associacio.getGrupDomini() != null
-                            || associacio.getAplicacioDomini() != null
-                            || associacio.getValorDominiAplicacio() != null) {
+                    if (associacio.getGrantedGroupDomain() != null
+                            || associacio.getGrantedApplicationDomain() != null
+                            || associacio.getGrantedDomainValue() != null) {
                         rolsUsuarisRolContenidor = getRolAccountEntityDao()
                                 .findByRolAndValorDomini(
                                         rolContenidor.getNom(),
@@ -1088,14 +1183,14 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                                                 .getCodi(),
                                         rolContenidor.getAplicacio().getCodi(),
                                         rolContenidor.getTipusDomini(),
-                                        associacio.getGrupDomini() != null ? associacio
-                                                .getGrupDomini().getCodi()
+                                        associacio.getGrantedGroupDomain() != null ? associacio
+                                                .getGrantedGroupDomain().getCodi()
                                                 : null,
-                                        associacio.getAplicacioDomini() != null ? associacio
-                                                .getAplicacioDomini().getCodi()
+                                        associacio.getGrantedApplicationDomain() != null ? associacio
+                                                .getGrantedApplicationDomain().getCodi()
                                                 : null,
-                                        associacio.getValorDominiAplicacio() != null ? associacio
-                                                .getValorDominiAplicacio()
+                                        associacio.getGrantedApplicationDomain() != null ? associacio
+                                                .getGrantedApplicationDomain()
                                                 .getId() : null);
                     } else {// Cerquem a tots els valors de domini (sense_domini
                             // o qualque_valor)

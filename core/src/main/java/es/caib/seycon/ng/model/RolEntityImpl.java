@@ -36,7 +36,7 @@ public class RolEntityImpl
     }
 
 	public String toDescripcioRol() {//Imporante: CUIDADO AL CAMBIARLO, puede afectar a funcionalidad
-		return getNom()+"@"+getBaseDeDades().getCodi()+">"+getAplicacio().getCodi(); //$NON-NLS-1$ //$NON-NLS-2$ 
+		return getNom()+"@"+getBaseDeDades().getCodi()+" ("+getAplicacio().getCodi()+")"; //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 
 }

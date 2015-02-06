@@ -1292,6 +1292,12 @@ public class AplicacioServiceImpl extends
 			if (rad.rolGrup != null)
 			{
                 ContenidorRol cr = getRolEntityDao().toContenidorRol(rad.rolGrup.getRolOtorgat());
+                if (rad.qualifier != null)
+                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifier.getValor());
+                if (rad.qualifierGroup != null)
+                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifierGroup.getCodi());
+                if (rad.qualifierAplicacio != null)
+                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifierAplicacio.getCodi());
                 cr.setMetaInfo(
                 		String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToGroup"), //$NON-NLS-1$
                 				rad.rolGrup.getGrupPosseidor().getCodi() ));
@@ -1493,179 +1499,68 @@ public class AplicacioServiceImpl extends
             String nomRole, String codiAplicacioRol, String codiDispatcher) {
 
         // Obtenemos los roles contenidos del usuario (en modo textual !!)
-        Collection resultat = new ArrayList();
+        Collection<ContenidorRol> resultat = new ArrayList<ContenidorRol>();
 
+        
         // Obtenemos el ROL
         RolEntity theRol = getRolEntityDao()
                 .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
                         codiAplicacioRol, codiDispatcher);
 
-        // Analizamos las asociaciones con roles
-        LinkedList associacioRolAnalitzar = new LinkedList(); // LIFO
-        // Posem les associacions amb els rols a qui soc atorgat
-        associacioRolAnalitzar.addAll(theRol.getRolAssociacioRolSocContingut());
-
-        // Analizamos los grupos a los que es otorgado
-        LinkedList grupsPosseidorsAnalitzar = new LinkedList(); // LIFO
-        Collection grupsPos = theRol.getGrupsPosseidorsRol();
-        for (Iterator it = grupsPos.iterator(); it.hasNext();) {
-            RolsGrupEntity rolPosGrup = (RolsGrupEntity) it.next();
-            GrupEntity grupPos = rolPosGrup.getGrupPosseidor();
-            grupsPosseidorsAnalitzar.add(grupPos);
-        }
-
-        // Analizamos las asociaciones con roles (obtenemos usuarios)
-        RolAssociacioRolEntity rolAsocActual = null;
-        while ((rolAsocActual = (RolAssociacioRolEntity) associacioRolAnalitzar
-                .poll()) != null) {
-        	// rol a qui sóc otorgat
-            RolEntity rolSocAtorgat = rolAsocActual.getRolContenidor(); 
-
-            // añadimos los grupos poseedores del rol al que somos otorgados
-            for (Iterator it = rolSocAtorgat.getGrupsPosseidorsRol().iterator(); it
-                    .hasNext();) {
-                RolsGrupEntity rolPosGrup = (RolsGrupEntity) it.next();
-                GrupEntity grupPos = rolPosGrup.getGrupPosseidor();
-                grupsPosseidorsAnalitzar.add(grupPos);
-            }
-            // Obtenemos los usuarios que tienen este rol
-            String tipusDominiAsoc = rolAsocActual.getTipusDomini();
-            String valorCodiGrup = null, valorCodiApli = null;
-            Long idValorDomAp = null;
-            boolean senseDomini = false;
-            if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
-                    || TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
-                // Grups
-                if (rolAsocActual.getGrupDomini() != null) {
-                    valorCodiGrup = rolAsocActual.getGrupDomini().getCodi();
-                }
-            } else if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
-                // Aplicacions
-                if (rolAsocActual.getAplicacioDomini() != null) {
-                    valorCodiApli = rolAsocActual.getAplicacioDomini()
-                            .getCodi();
-                }
-            } else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
-                // Valor de domini de aplicació
-                if (rolAsocActual.getValorDominiAplicacio() != null) {
-                    idValorDomAp = rolAsocActual.getValorDominiAplicacio()
-                            .getId();
-                }
-            } else if (TipusDomini.SENSE_DOMINI.equals(tipusDominiAsoc)
-                    || tipusDominiAsoc == null) {
-                senseDomini = true;
-            }
-
-            // Importante: el tipo de dominio tiene que venir por la asociación,
-            // no por el rol (!!)
-            Collection rolsUsuRolAtorgat = null;
-            if (senseDomini
-                    || (valorCodiGrup == null && valorCodiApli == null && idValorDomAp == null)) {
-                rolsUsuRolAtorgat = getRolAccountEntityDao()
-                        .findByRolAndTipusDomini(
-                                rolSocAtorgat.getNom(),
-                                rolSocAtorgat.getBaseDeDades().getCodi(),
-                                rolSocAtorgat.getAplicacio().getCodi(),
-                                tipusDominiAsoc);
-            } else
-                rolsUsuRolAtorgat = getRolAccountEntityDao()
-                        .findByRolAndValorDomini(
-                                rolSocAtorgat.getNom(),
-                                rolSocAtorgat.getBaseDeDades().getCodi(),
-                                rolSocAtorgat.getAplicacio().getCodi(),
-                                tipusDominiAsoc, valorCodiGrup, valorCodiApli,
-                                idValorDomAp);
-
-            // Guardamos los usuarios y su meta-información
-            for (Iterator it = rolsUsuRolAtorgat.iterator(); it.hasNext();) {
-                RolAccountEntity ru = (RolAccountEntity) it.next();
-                AccountEntity account = ru.getAccount();
-                if (account.getType().equals(AccountType.USER) && account.getUsers().size() == 1)
-                {
-                    UsuariEntity usu = account.getUsers().iterator().next().getUser();
-                    ContenidorRol cr = new ContenidorRol();
-                    cr.setTipus(usu.getCodi()); // codi d'usuari
-                    cr.setInfoContenidor(usu.getNom() + " " //$NON-NLS-1$
-                            + usu.getPrimerLlinatge() + " " //$NON-NLS-1$
-                            + usu.getSegonLlinatge());
-                    cr.setMetaInfo("Rol atorgat al rol='"  //$NON-NLS-1$
-                            + getRolAssociacioRolEntityDao().toContenidorRol(
-                                    rolAsocActual).getInfoContenidor());
-                    cr.setCertificationDate(ru.getCertificationDate());
-                    resultat.add(cr); // Añadimos el contenedor
-                }
-                else
-                {
-                    ContenidorRol cr = new ContenidorRol();
-                    cr.setTipus(account.getName()); // codi d'usuari
-                    cr.setInfoContenidor(Messages.getString("AplicacioServiceImpl.SharedAccount")); //$NON-NLS-1$
-                    cr.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol") //$NON-NLS-1$
-                           ,getRolAssociacioRolEntityDao().toContenidorRol(rolAsocActual).getInfoContenidor()));
-                    cr.setCertificationDate(ru.getCertificationDate());
-                    resultat.add(cr); // Añadimos el contenedor
-                }
-
-            }
-        }
-
-        // Ara cerquem els grups fills dels grups a qui és atorgat el rol (i
-        // posseidors del rol)
-        // Els usuaris dels grups no ténen condició
-        HashMap totsGrups = new HashMap();
-        GrupEntity grupActual = null;
-        while ((grupActual = (GrupEntity) grupsPosseidorsAnalitzar.poll()) != null) {
-            if (!totsGrups.containsKey(grupActual.getId())) {
-                // Nuevo
-                totsGrups.put(grupActual.getId(), grupActual);
-                // Sus hijos
-                Collection fills = grupActual.getFills();
-                if (fills != null && fills.size() != 0) {
-                    for (Iterator it = fills.iterator(); it.hasNext();) {
-                        GrupEntity fill = (GrupEntity) it.next();
-                        if (!totsGrups.containsKey(fill.getId())) {
-                            grupsPosseidorsAnalitzar.add(fill);
-                        }
-                    }
-                }
-            }
-        }
-
-        for (Iterator it = totsGrups.entrySet().iterator(); it.hasNext();) {
-            Entry entryGrup = (Entry) it.next();
-            GrupEntity grup = (GrupEntity) entryGrup.getValue();
-            Collection usuarisGrupP = grup.getUsuarisGrupPrimari();
-            Collection usuarisGrupS = grup.getUsuarisGrupSecundari();
-
-            // Els usuaris q ho tenen com a grup primari:
-            for (Iterator uit = usuarisGrupP.iterator(); uit.hasNext();) {
-                UsuariEntity usu = (UsuariEntity) uit.next();
-                ContenidorRol cr = new ContenidorRol();
-                cr.setTipus(usu.getCodi()); // codi d'usuari
-                // Información específica:
-                cr.setInfoContenidor(usu.getNom() + " " //$NON-NLS-1$
-                        + usu.getPrimerLlinatge() + " " //$NON-NLS-1$
-                        + usu.getSegonLlinatge());
-                cr.setMetaInfo("Rol atorgat al grup '" + grup.getCodi() + "'");   //$NON-NLS-1$//$NON-NLS-2$
-                resultat.add(cr);
-            }
-
-            // Procesem els que ho tenen com a grup secundari
-            for (Iterator git = usuarisGrupS.iterator(); git.hasNext();) {
-                UsuariGrupEntity usuGrup = (UsuariGrupEntity) git.next();
-                ContenidorRol cr = new ContenidorRol();
-                UsuariEntity usu = usuGrup.getUsuari();
-                cr.setTipus(usuGrup.getUsuari().getCodi()); // codi d'usuari
-                // Información específica:
-                cr.setInfoContenidor(usu.getNom() + " " //$NON-NLS-1$
-                        + usu.getPrimerLlinatge() + " " //$NON-NLS-1$
-                        + usu.getSegonLlinatge());
-                cr.setMetaInfo("Rol atorgat al grup '" + grup.getCodi() + "'");   //$NON-NLS-1$ //$NON-NLS-2$
-                resultat.add(cr);
-            }
-        }
-
-        // Cerquem els usuaris dels rols
-        return resultat;
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		
+		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
+		populateParentGrantsForRol(radSet, theRol, null);
+		for (RolAccountDetail rad: radSet)
+		{
+			if (rad.granteeRol != null)
+			{
+				if (rad.account.getType().equals(AccountType.USER) )
+				{
+					for (UserAccountEntity uae: rad.account.getUsers())
+					{
+		                ContenidorRol cr = new ContenidorRol();
+		                UsuariEntity ue = uae.getUser();
+		                cr.setTipus(ue.getCodi()); // codi d'usuari
+		                cr.setInfoContenidor(ue.getFullName());
+		                cr.setMetaInfo(rad.granteeRol.toDescripcioRol());
+		                resultat.add(cr);
+					}
+				}
+				else
+				{
+	                ContenidorRol cr = new ContenidorRol();
+	                cr.setTipus(rad.account.getName()); // codi d'usuari
+	                cr.setInfoContenidor(rad.account.getDescription());
+	                cr.setMetaInfo(rad.granteeRol.toDescripcioRol());
+	                resultat.add(cr);
+				}
+			}
+			else if (rad.granteeGrup != null)
+			{
+				if (rad.account.getType().equals(AccountType.USER) )
+				{
+					for (UserAccountEntity uae: rad.account.getUsers())
+					{
+		                ContenidorRol cr = new ContenidorRol();
+		                UsuariEntity ue = uae.getUser();
+		                cr.setTipus(ue.getCodi()); // codi d'usuari
+		                cr.setInfoContenidor(ue.getFullName());
+		                cr.setMetaInfo(rad.granteeGrup.getCodi()+" - "+rad.granteeGrup.getDescripcio());
+		                resultat.add(cr);
+					}
+				}
+				else
+				{
+	                ContenidorRol cr = new ContenidorRol();
+	                cr.setTipus(rad.account.getName()); // codi d'usuari
+	                cr.setInfoContenidor(rad.account.getDescription());
+	                cr.setMetaInfo(rad.granteeGrup.getCodi()+" - "+rad.granteeGrup.getDescripcio());
+	                resultat.add(cr);
+				}
+			}
+		}
+		return resultat;
 
     }
 
@@ -2066,33 +1961,60 @@ public class AplicacioServiceImpl extends
 		
 		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContenidor())
 		{
-			for (AccountEntity ae: getAccountsForDispatcher(originUser,
-					originAccount, ra.getRolContingut().getBaseDeDades()))
+			// Only propagate if domain value matches
+			if (matchesGranteeDomainValue (currentRol, ra))
 			{
-				RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
-				n.granteeRol = rol;
-				if (rol.getTipusDomini().equals(TipusDomini.GRUPS) && currentRol.qualifierGroup != null)
-					n.qualifierGroup = currentRol.qualifierGroup;
-				if (rol.getTipusDomini().equals(TipusDomini.GRUPS_USUARI) && currentRol.qualifierGroup != null)
-					n.qualifierGroup = currentRol.qualifierGroup;
-				if (rol.getTipusDomini().equals(TipusDomini.APLICACIONS) && currentRol.qualifierAplicacio != null)
-					n.qualifierAplicacio = currentRol.qualifierAplicacio;
-				if (rol.getTipusDomini().equals(TipusDomini.DOMINI_APLICACIO) && currentRol.qualifierGroup != null)
-					n.qualifier = currentRol.qualifier;
-					
-				
-				if ( ! rad.contains(n))
+				for (AccountEntity ae: getAccountsForDispatcher(originUser,
+						originAccount, ra.getRolContingut().getBaseDeDades()))
 				{
-					if (type == DIRECT || type == ALL) 
-						rad.add(n);
-					if (type == INDIRECT || type == ALL)
-						populateRoleRoles(rad, ALL, n, originUser, originAccount);
+					RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
+					n.granteeRol = rol;
+					n.generateHash();
+						
+					
+					if ( ! rad.contains(n))
+					{
+						if (type == DIRECT || type == ALL) 
+							rad.add(n);
+						if (type == INDIRECT || type == ALL)
+							populateRoleRoles(rad, ALL, n, originUser, originAccount);
+					}
 				}
 			}
 		}
 	}
 
 	
+	private boolean matchesGranteeDomainValue(RolAccountDetail currentRol,
+			RolAssociacioRolEntity ra) {
+		if (ra.getRolContenidor().getTipusDomini() == null ||
+				ra.getRolContenidor().getTipusDomini().equals (TipusDomini.SENSE_DOMINI))
+			return true;
+		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.APLICACIONS))
+		{
+			return ra.getGranteeApplicationDomain() == null ||
+					currentRol.qualifierAplicacio == null ||
+					ra.getGrantedApplicationDomain().getId().equals (currentRol.qualifierAplicacio.getId()); 
+		}
+		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS) ||
+				ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS_USUARI) )
+		{
+			return ra.getGranteeGroupDomain() == null ||
+					currentRol.qualifierGroup == null || 
+					ra.getGranteeGroupDomain().getId().equals (currentRol.qualifierGroup.getId()); 
+		}
+		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.DOMINI_APLICACIO))
+		{
+			return ra.getGranteeDomainValue() == null ||
+					currentRol.qualifier == null || 
+					ra.getGranteeDomainValue().getId().equals (currentRol.qualifier.getId()); 
+		}
+		else
+		{
+			throw new RuntimeException ("Unexpected domain value " +ra.getRolContenidor().getTipusDomini());
+		}
+	}
+
 	private boolean shouldBeEnabled (RolAccountEntity e)
 	{
 		if (e.isApprovalPending())
@@ -2334,7 +2256,11 @@ public class AplicacioServiceImpl extends
     			}
     			if (! radSet.contains(rad))
     			{
-    				radSet.add(rad);
+    				if (originalGrant == null ||
+    					matchesGranteeDomainValue(rad, originalGrant))
+    				{
+    					radSet.add(rad);
+    				}
     			}
 			}
 		}
@@ -2344,7 +2270,6 @@ public class AplicacioServiceImpl extends
 			populateParentGrantsForRol(radSet, ra.getRolContenidor(), originalGrant == null? ra: originalGrant);
 		}
 
-		
 		for (RolsGrupEntity rg: rol.getGrupsPosseidorsRol())
 		{
 			populateParentGrantsForGroup(radSet, rg.getGrupPosseidor(), originalGrant == null ? rg: originalGrant);
@@ -2534,6 +2459,9 @@ class RolAccountDetail
 	{
 		this.account = account; 
 		granted = rg.getRolOtorgat();
+		qualifier = rg.getGrantedDomainValue();
+		qualifierAplicacio = rg.getGrantedApplicationDomain();
+		qualifierGroup = rg.getGrantedGroupDomain();
 		rolGrup = rg;
 		generateHash();
 	}
@@ -2542,15 +2470,17 @@ class RolAccountDetail
 	{
 		this.account = account; 
 		granted = ra.getRolContingut();
-		qualifier = ra.getValorDominiAplicacio();
-		qualifierAplicacio = ra.getAplicacioDomini();
-		qualifierGroup = ra.getGrupDomini();
+		qualifier = ra.getGrantedDomainValue();
+		qualifierAplicacio = ra.getGrantedApplicationDomain();
+		qualifierGroup = ra.getGrantedGroupDomain();
 		if (qualifier == null && previous != null)
 			qualifier = previous.qualifier;
 		if (qualifierAplicacio == null && previous != null)
 			qualifierAplicacio = previous.qualifierAplicacio;
 		if (qualifierGroup == null && previous != null)
 			qualifierGroup = previous.qualifierGroup;
+		if (previous.granted != null)
+			granteeRol = previous.granted;
 		rolRol = ra;
 		generateHash();
 	}

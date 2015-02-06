@@ -5,6 +5,8 @@
  */
 package es.caib.seycon.ng.model;
 
+import org.apache.webdav.lib.properties.GetContentLengthProperty;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 
 /**
@@ -22,32 +24,42 @@ public class RolAssociacioRolEntityImpl
      * @see es.caib.seycon.ng.model.RolAssociacioRolEntity#toString()
      */
 	public java.lang.String toString() {
-		String sdomini = String.format(Messages.getString("RolAssociacioRolEntityImpl.domain"),getTipusDomini()); //$NON-NLS-1$
-		if (!TipusDomini.SENSE_DOMINI.equals(getTipusDomini())) {
-			String tipusDomini = getTipusDomini();
-			if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
-				GrupEntity grup = getGrupDomini();
-				sdomini += String.format(Messages.getString("RolAssociacioRolEntityImpl.group"), grup != null ? grup.getCodi() //$NON-NLS-1$
-						: TipusDomini.QUALQUE_VALOR_DOMINI );
-			} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
-				AplicacioEntity app = getAplicacioDomini();
-				sdomini += String.format(Messages.getString("RolAssociacioRolEntityImpl.application"), app != null ? getAplicacioDomini() //$NON-NLS-1$
-						.getCodi() : TipusDomini.QUALQUE_VALOR_DOMINI);
-			} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
-				ValorDominiAplicacioEntity vd = getValorDominiAplicacio();
-				sdomini += String.format(Messages.getString("RolAssociacioRolEntityImpl.domainValue"), //$NON-NLS-1$
-				        vd != null ? vd.getDomini().getNom()
-						: TipusDomini.QUALQUE_VALOR_DOMINI,
-					vd != null ? getValorDominiAplicacio().getValor()
-						: TipusDomini.Descripcio.QUALQUE_VALOR_DOMINI);
-			} else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipusDomini) || tipusDomini==null) {
-				sdomini += String.format(Messages.getString("RolAssociacioRolEntityImpl.domainType"), //$NON-NLS-1$
-						getRolContenidor().getTipusDomini(),
-						TipusDomini.QUALQUE_VALOR_DOMINI);
-			}
+		StringBuffer b = new StringBuffer();
+		b.append(getRolContenidor().toString());
+		String tipusDomini = getRolContenidor().getTipusDomini();
+		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+			GrupEntity grup = getGranteeGroupDomain();
+			if (grup != null)
+				b.append(" / ").append (grup.getCodi());
+		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
+			AplicacioEntity app = getGranteeApplicationDomain();
+			if (app != null)
+				b.append(" / ").append (app.getCodi());
+		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
+			ValorDominiAplicacioEntity vd = getGranteeDomainValue();
+			if (vd != null)
+				b.append (" / ").append(vd.getValor());
 		}
-		return String.format(Messages.getString("RolAssociacioRolEntityImpl.assignedTo"),getRolContingut().toDescripcioRol(), getRolContenidor().toDescripcioRol(),sdomini); //$NON-NLS-1$
+
+		b.append (" => ");
+		b.append(getRolContingut().toString());
+
+		tipusDomini = getRolContenidor().getTipusDomini();
+		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+			GrupEntity grup = getGrantedGroupDomain();
+			if (grup != null)
+				b.append(" / ").append (grup.getCodi());
+		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
+			AplicacioEntity app = getGrantedApplicationDomain();
+			if (app != null)
+				b.append(" / ").append (app.getCodi());
+		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
+			ValorDominiAplicacioEntity vd = getGrantedDomainValue();
+			if (vd != null)
+				b.append (" / ").append(vd.getValor());
+		}
 				
+		return b.toString();
 	}
 
 	public boolean equals(Object object) {
@@ -70,34 +82,60 @@ public class RolAssociacioRolEntityImpl
 				)
 				return false;
 			
-			// Comparamos valor de dominio
-			if (!getTipusDomini().equals(rare.getTipusDomini())) return false;
-			
 			// Caso sense valor de domini (el grup, aplicacio, valor_domini_app será nulo )
-			if (getGrupDomini() == null && getAplicacioDomini() == null && getValorDominiAplicacio() == null
-					&& (rare.getGrupDomini() != null  || rare.getAplicacioDomini() != null || rare
-							.getValorDominiAplicacio() != null))
+			if (getGrantedGroupDomain() == null && getGrantedApplicationDomain() == null && getGrantedDomainValue() == null
+					&& (rare.getGrantedGroupDomain() != null  || rare.getGrantedApplicationDomain() != null ||
+						rare.getGrantedDomainValue() != null))
 				return false;
 			
 			// Grupo
-			if ( (getGrupDomini()!=null && rare.getGrupDomini()==null) || (getGrupDomini()==null && rare.getGrupDomini()!=null) )
+			if ( (getGrantedGroupDomain()!=null && rare.getGrantedGroupDomain()==null) || (getGrantedGroupDomain()==null && rare.getGrantedGroupDomain()!=null) )
 				return false;
-			if (getGrupDomini()!=null && rare.getGrupDomini()!=null && !getGrupDomini().getId().equals(rare.getGrupDomini().getId()))
+			if (getGrantedGroupDomain()!=null && rare.getGrantedGroupDomain()!=null && !getGrantedGroupDomain().getId().equals(rare.getGrantedGroupDomain().getId()))
 					return false;
 			
 			// Domini aplicacio
-			if ((getAplicacioDomini() !=null && rare.getAplicacioDomini()==null) || (getAplicacioDomini()==null && rare.getAplicacioDomini()!=null) )
+			if ((getGranteeApplicationDomain() !=null && rare.getGranteeApplicationDomain()==null) || (getGranteeApplicationDomain()==null && rare.getGranteeApplicationDomain()!=null) )
 				return false;
-			if (getAplicacioDomini() != null && rare.getAplicacioDomini() != null
-					&& !getAplicacioDomini().getId().equals(rare.getAplicacioDomini().getId()))
+			if (getGranteeApplicationDomain() != null && rare.getGranteeApplicationDomain() != null
+					&& !getGranteeApplicationDomain().getId().equals(rare.getGranteeApplicationDomain().getId()))
 				return false;
 			
 			// Valor de domini
-			if ( (getValorDominiAplicacio()!=null && rare.getValorDominiAplicacio()==null) || (getValorDominiAplicacio()==null && rare.getValorDominiAplicacio()!=null))
+			if ( (getGranteeDomainValue()!=null && rare.getGranteeDomainValue()==null) || (getGranteeDomainValue()==null && rare.getGranteeDomainValue()!=null))
 				return false;
-			if (getValorDominiAplicacio() != null && rare.getValorDominiAplicacio() != null
-					&& !getValorDominiAplicacio().getId().equals(rare.getValorDominiAplicacio().getId()))
+			if (getGranteeDomainValue() != null && rare.getGranteeDomainValue() != null
+					&& !getGranteeDomainValue().getId().equals(rare.getGranteeDomainValue().getId()))
 				return false;
+			
+			// The same for grantee domains
+			// Caso sense valor de domini (el grup, aplicacio, valor_domini_app será nulo )
+			if (getGranteeGroupDomain() == null && getGranteeApplicationDomain() == null && getGranteeDomainValue() == null
+					&& (rare.getGranteeGroupDomain() != null  || rare.getGranteeApplicationDomain() != null ||
+						rare.getGranteeDomainValue() != null))
+				return false;
+			
+			// Grupo
+			if ( (getGranteeGroupDomain()!=null && rare.getGranteeGroupDomain()==null) || (getGranteeGroupDomain()==null && rare.getGranteeGroupDomain()!=null) )
+				return false;
+			if (getGranteeGroupDomain()!=null && rare.getGranteeGroupDomain()!=null && !getGranteeGroupDomain().getId().equals(rare.getGranteeGroupDomain().getId()))
+					return false;
+			
+			// Domini aplicacio
+			if ((getGranteeApplicationDomain() !=null && rare.getGranteeApplicationDomain()==null) || (getGranteeApplicationDomain()==null && rare.getGranteeApplicationDomain()!=null) )
+				return false;
+			if (getGranteeApplicationDomain() != null && rare.getGranteeApplicationDomain() != null
+					&& !getGranteeApplicationDomain().getId().equals(rare.getGranteeApplicationDomain().getId()))
+				return false;
+			
+			// Valor de domini
+			if ( (getGranteeDomainValue()!=null && rare.getGranteeDomainValue()==null) || (getGranteeDomainValue()==null && rare.getGranteeDomainValue()!=null))
+				return false;
+			if (getGranteeDomainValue() != null && rare.getGranteeDomainValue() != null
+					&& !getGranteeDomainValue().getId().equals(rare.getGranteeDomainValue().getId()))
+				return false;
+			
+
 			
 			return true;
 		} 

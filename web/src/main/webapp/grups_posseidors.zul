@@ -167,7 +167,7 @@
 		]]>
 	</zscript>
 
-	<esquema id="esquemaLlista" closable="true" position="center, center"
+	<esquema id="esquemaLlista" closable="true" position="center, center" ample="800px"
 		title="${c:l('grups_posseidors.Titol')}" visible="false">
 		<attribute name="onInicia">
 			<![CDATA[
@@ -206,6 +206,7 @@
 				*/
 				
 				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setWidth("800px");
 					self.setMode("highlighted");
 				}else{
 					self.visible = true;

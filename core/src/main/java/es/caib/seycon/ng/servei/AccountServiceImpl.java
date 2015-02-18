@@ -164,7 +164,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	    		getAccountEntityDao().update(acc);
 			}
 			else
-				throw new AccountAlreadyExistsException();
+				throw new AccountAlreadyExistsException(
+						String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
+						name+"@"+de.getCodi()));
 		} else {
     		acc = getAccountEntityDao().newAccountEntity();
     		acc.setDescription(ue.getFullName());
@@ -231,7 +233,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			throw new AccountAlreadyExistsException(
 				String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
-				account.getName()));
+				account.getName()+"@"+account.getDispatcher()));
 		}
 		if (account.getType().equals(AccountType.IGNORED) || account.getType().equals(AccountType.PRIVILEGED) ||
 				account.getType().equals(AccountType.SHARED))
@@ -449,6 +451,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					Usuari u = getUsuariService().getUserInfo(ua.getUser().getCodi());
 					getUserAccountEntityDao().remove(ua);
 					account.getOwnerUsers().add(u);
+					createUserTask(u);
 				}
 				
 			}
@@ -480,7 +483,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (! account.getName().equals(ae.getName()))
 		{
 			if (getAccountEntityDao().findByNameAndDispatcher(account.getName(), ae.getDispatcher().getCodi()) != null)
-				throw new AccountAlreadyExistsException();
+				throw new AccountAlreadyExistsException(
+						String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
+						account.getName()+"@"+ae.getDispatcher().getCodi()));
 		}
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
@@ -490,6 +495,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			updateAcl(ae, account);
 		getAccountEntityDao().update(ae);
 		createAccountTask(ae);
+	}
+
+	private void createUserTask(Usuari u) {
+		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+		tasque.setTransa(TaskHandler.UPDATE_USER);
+		tasque.setUsuari(u.getCodi());
+		getTasqueEntityDao().create(tasque);
 	}
 
 	private void removeAcl(AccountEntity ae) {
@@ -692,7 +704,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		else if (! oldAccount.getId().equals(accountEntity.getId()))
 		{
-			throw new AccountAlreadyExistsException(account.getName());
+			throw new AccountAlreadyExistsException(account.getName() + "@" + account.getDispatcher());
 		}
 	}
 

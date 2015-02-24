@@ -235,6 +235,7 @@ public abstract class ServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InvalidPasswordException, es.caib.seycon.ng.exception.UnknownUserException {
 	 return null;
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void changePassword(
 		java.lang.String account, 
@@ -243,6 +244,16 @@ public abstract class ServerService {
 		boolean mustChange)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.BadPasswordException, es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void changePasswordSync(
+		java.lang.String account, 
+		java.lang.String dispatcherId, 
+		es.caib.seycon.ng.comu.Password p, 
+		boolean mustChange)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.BadPasswordException, es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
 	public byte[] getUserMazingerRules(
 		long userId, 
@@ -328,6 +339,7 @@ public abstract class ServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.UserAccount> getUserAccounts(
 		long userId, 
@@ -335,6 +347,16 @@ public abstract class ServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Description ("Retrieves an account from soffid database")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Account getAccountInfo(
+		String accountName, 
+		java.lang.String dispatcherId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari getUserInfo(
 		long userId)

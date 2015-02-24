@@ -37,6 +37,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -671,8 +672,13 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 						if (ra.getNomRol().equals(assignmentAccount.getRoleName()) &&
 							ra.getBaseDeDades().equals(assignmentAccount.getDispatcher()))
 						{
-							found = true ;
-							break;
+							if (assignmentAccount.getDomainValue() == null ||
+									ra.getValorDomini() == null ||
+									assignmentAccount.getDomainValue().equals(ra.getValorDomini().getValor()))
+							{
+								found = true ;
+								break;
+							}
 						}
 					}
 					if (! found) 
@@ -683,6 +689,12 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 						accountRole.setAccountName(account.getName());
 						accountRole.setNomRol(role.getNom());
 						accountRole.setCodiAplicacio(role.getCodiAplicacio());
+						if (assignmentAccount.getDomainValue() != null)
+						{
+							accountRole.setValorDomini(new ValorDomini());
+							accountRole.getValorDomini().setValor(assignmentAccount.getDomainValue());
+						}
+						
 
 						appService.create(accountRole);
 					}

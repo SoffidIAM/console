@@ -25,4 +25,6 @@ public abstract class ReconcileAssignment {
 
 	public java.lang.String dispatcher;
 
+	@Nullable
+	public java.lang.String domainValue;
 }

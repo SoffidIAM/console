@@ -1083,6 +1083,29 @@
 								]]>
 								</attribute>
 							</toolbarbutton>
+							<toolbarbutton image="~./img/exporta.gif" label="Export">
+								<attribute name="onClick">
+									<![CDATA[
+	es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
+	String t = new com.soffid.web.agent.Exporter().export (listbox);
+	org.zkoss.util.media.AMedia m = new org.zkoss.util.media.AMedia("agent-config.xml",
+			null, "text/xml", t.getBytes("UTF-8"));
+	Filedownload.save(m);
+									]]>
+								</attribute>
+							</toolbarbutton>
+							<toolbarbutton image="/img/upload.png" label="Import">
+								<attribute name="onClick">
+									<![CDATA[
+{
+	org.zkoss.util.media.Media m = Fileupload.get();
+	es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
+	new com.soffid.web.agent.Importer().doImport(m, listbox);
+	listbox.sendEvent( new es.caib.zkib.events.XPathRerunEvent( listbox, "/" ) );
+}
+									]]>
+								</attribute>
+							</toolbarbutton>
 						</toolbar>
 						<grid dataPath="/esquema/lista/listbox:/objectMapping" id="objectsGrid" width="100%">
 							<columns>

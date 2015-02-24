@@ -209,9 +209,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			
 			UserAccountEntity ua = list.iterator().next();
 			
-//			getUserAccountEntityDao().remove(ua);
-			getAccountEntityDao().remove(acc);
 			createAccountTask(acc);
+			getAccountEntityDao().remove(acc);
 		}
 	}
 
@@ -451,7 +450,6 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					Usuari u = getUsuariService().getUserInfo(ua.getUser().getCodi());
 					getUserAccountEntityDao().remove(ua);
 					account.getOwnerUsers().add(u);
-					createUserTask(u);
 				}
 				
 			}
@@ -476,6 +474,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				uae.setUser(ue);
 				getUserAccountEntityDao().create(uae);
 				account.setDescription(owner.getFullName());
+
+				createUserTask(ue);
+
 			}
 			ae.setType(account.getType());
 		}
@@ -497,10 +498,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		createAccountTask(ae);
 	}
 
-	private void createUserTask(Usuari u) {
+	private void createUserTask(UsuariEntity ue) {
 		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
 		tasque.setTransa(TaskHandler.UPDATE_USER);
-		tasque.setUsuari(u.getCodi());
+		tasque.setUsuari(ue.getCodi());
 		getTasqueEntityDao().create(tasque);
 	}
 
@@ -520,8 +521,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			getAccountAccessEntityDao().remove(aae);
 		}
-		getAccountEntityDao().update(ae);
 		createAccountTask(ae);
+		getAccountEntityDao().remove(ae);
 	}
 
 	private void createAccountTask(AccountEntity ae)

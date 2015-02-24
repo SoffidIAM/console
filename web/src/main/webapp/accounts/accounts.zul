@@ -57,6 +57,7 @@
 				// Autoritzacions d'usuari;
 				import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 				canCreateAccounts = AutoritzacionsUsuari.hasCreateAccount();
+				canDeleteAccounts = AutoritzacionsUsuari.hasDeleteAccount();
 				canQueryAccounts = AutoritzacionsUsuari.hasQueryAccount();
 				canModifyAccounts = AutoritzacionsUsuari.hasUpdateAccount();
 				canCreateUserRole = AutoritzacionsUsuari.hasCreateUserRole();
@@ -298,6 +299,7 @@
 							}
 						}
 					} else {
+						form = page.getFellow("esquema").getFellow("dades");
 						for (String s: new String [] {"userAcl", "ownerAcl", "managerAcl"})
 						{
 							form.getFellow(s).getFellow("btnGrantUser").setDisabled(true);
@@ -357,6 +359,26 @@
 					} catch (Exception e) {
 						// Ignore error when no account is selected
 					}
+				}
+				
+				void confirmDelete ()
+				{
+					es.caib.zkib.component.DataListbox lb = (es.caib.zkib.component.DataListbox) 
+							esquema.getFellow("lista").getFellow("listbox");
+					es.caib.zkib.binder.BindContext ctx =
+							XPathUtils.getComponentContext(esquema.getFellow("dades").getFellow("form"));
+					String name = XPathUtils.getValue(ctx, "name");
+					String dispatcher = XPathUtils.getValue(ctx, "dispatcher");
+					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(
+							org.zkoss.util.resource.Labels.getLabel("accounts.deleteConfirm", new String [] { name, dispatcher}),
+							new org.zkoss.zk.ui.event.EventListener() {
+								public void onEvent(Event evt) {
+									if ("onOK".equals(evt.getName())) {
+										lb.delete();
+									}
+								}
+							}
+							);
 				}
 			]]>
 		</zscript>
@@ -421,6 +443,9 @@
 				<toolbar>
 					<insertbutton acces="${canCreateAccounts}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
+					<deletebutton acces="${canDeleteAccounts}"
+						listbox="/esquema/lista/listbox"
+						onClick="confirmDelete(); event.stopPropagation();"/>
 					<commitbutton datamodel="/model" />
 					<undobutton datamodel="/model"
 						listbox="/esquema/lista/listbox" />

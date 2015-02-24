@@ -1,10 +1,21 @@
 // Copyright (c) 2000 Govern  de les Illes Balears
 package es.caib.seycon.ng.comu;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Clase que permite serializar de forma segura una contraseña. Utiliza un
@@ -51,6 +62,8 @@ import java.security.NoSuchAlgorithmException;
 // Revision 1.2 2004/03/15 11:57:48 u07286
 // Agregada documentacion JavaDoc
 //
+@JsonDeserialize(using=PasswordDeserializer.class)
+@JsonSerialize(using=PasswordSerializer.class)
 public class Password extends Object implements Serializable {
     /**
      * 
@@ -279,4 +292,31 @@ public class Password extends Object implements Serializable {
             return "**??**"; //$NON-NLS-1$
         }
     }
+}
+
+
+class PasswordSerializer extends JsonSerializer<Password>
+{
+
+	@Override
+	public void serialize(Password password, JsonGenerator generator,
+			SerializerProvider provider) throws IOException,
+			JsonProcessingException
+	{
+		generator.writeString(password.getPassword());
+	}
+
+}
+
+class PasswordDeserializer extends JsonDeserializer<Password>
+{
+
+	@Override
+	public Password deserialize(JsonParser parser, DeserializationContext ctx)
+			throws IOException, JsonProcessingException
+	{
+		String s = parser.getText();
+		return new Password(s);
+	}
+
 }

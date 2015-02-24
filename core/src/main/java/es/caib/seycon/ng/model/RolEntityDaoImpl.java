@@ -21,6 +21,8 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.soffid.iam.model.MailListRoleMemberEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -133,6 +135,27 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         }
     }
 
+    @Override
+	protected void handleUpdateMailLists (RolEntity role) throws InternalErrorException
+    {
+        updateMailLists (role, 10);
+    }
+    
+    private void updateMailLists (RolEntity role, int depth) throws InternalErrorException
+    {
+    	for ( MailListRoleMemberEntity lce: role.getMailLists())
+    	{
+    		getLlistaCorreuEntityDao().generateUpdateTasks(lce.getMailList());
+    	}
+    	if (depth > 0)
+    	{
+    		for (RolAssociacioRolEntity child: role.getRolAssociacioRolSocContenidor())
+    		{
+    			updateMailLists(child.getRolContingut(), depth - 1 );
+    		}
+    	}
+    }
+    
     public void update(es.caib.seycon.ng.model.RolEntity rol)
             throws RuntimeException {
         try {
@@ -335,6 +358,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             }
             getSession(false).flush();
 
+            updateMailLists (rol);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.2"), rol.getNom(), message));  //$NON-NLS-1$
@@ -344,6 +368,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
     public void remove(es.caib.seycon.ng.model.RolEntity rol)
             throws RuntimeException {
         try {
+            updateMailLists (rol);
             // NO SE PUEDE BORRAR UN ROL SI TIENE RELACIONES EXTERNAS
             // SE DA UN AVISO Y NO SE DEJA BORRAR EL ROL
 

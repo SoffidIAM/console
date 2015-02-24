@@ -5,24 +5,36 @@
  */
 package es.caib.seycon.ng.servei;
 
+import java.rmi.activation.UnknownGroupException;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
+
+import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.model.MailListGroupMemberEntity;
+import com.soffid.iam.model.MailListRoleMemberEntity;
 
 import es.caib.seycon.ng.comu.CorreuExtern;
 import es.caib.seycon.ng.comu.DominiCorreu;
+import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.comu.RelacioLlistaCorreu;
+import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownApplicationException;
+import es.caib.seycon.ng.exception.UnknownMailListException;
+import es.caib.seycon.ng.exception.UnknownRoleException;
 import es.caib.seycon.ng.model.CorreuExternEntity;
 import es.caib.seycon.ng.model.DominiCorreuEntity;
 import es.caib.seycon.ng.model.LlistaCorreuEntity;
 import es.caib.seycon.ng.model.LlistaCorreuUsuariEntity;
 import es.caib.seycon.ng.model.RelacioLlistaCorreuEntity;
+import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.servei.Messages;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
@@ -515,6 +527,151 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 		// Esborrem la relació entre llistes
 		getRelacioLlistaCorreuEntityDao().remove(relacioLlistaCorreuEntity);
+	}
+
+	@Override
+	protected Collection<Grup> handleFindGroupMembers(String nomLlistaCorreu,
+			String codiDomini) throws Exception {
+		
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(nomLlistaCorreu, codiDomini);
+		List<Grup> grups = new LinkedList<Grup>();
+		for ( MailListGroupMemberEntity member: list.getGroups())
+		{
+			grups.add ( getGrupEntityDao().toGrup(member.getGroup()));
+		}
+		return grups;
+	}
+
+	@Override
+	protected Collection<MailListRoleMember> handleFindRoleMembers(
+			String nomLlistaCorreu, String codiDomini) throws Exception {
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(nomLlistaCorreu, codiDomini);
+		return getMailListRoleMemberEntityDao().toMailListRoleMemberList(list.getRoles());
+	}
+
+	@Override
+	protected void handleSubscribeGroup(String mailListName,
+			String mailListDomain, String groupName) throws Exception {
+		MailListGroupMemberEntity entity = getMailListGroupMemberEntityDao().newMailListGroupMemberEntity();
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(mailListName, mailListDomain);
+		if (list == null)
+			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
+		entity.setMailList(list);
+		entity.setGroup(getGrupEntityDao().findByCodi(groupName));
+		if (entity.getGroup() == null)
+			throw new UnknownGroupException(groupName);
+		getMailListGroupMemberEntityDao().create(entity);
+	}
+
+	@Override
+	protected void handleUnsubscribeGroup(String mailListName,
+			String mailListDomain, String groupName) throws Exception {
+		
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(mailListName, mailListDomain);
+		if (list == null)
+			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
+		for ( MailListGroupMemberEntity group: list.getGroups())
+		{
+			if (group.getGroup().getCodi().equals(groupName))
+				getMailListGroupMemberEntityDao().remove(group);
+		}	
+		
+	}
+
+	@Override
+	protected MailListRoleMember handleSubscribeRole(String mailListName,
+			String mailListDomain, MailListRoleMember roleMember)
+			throws Exception {
+		MailListRoleMemberEntity entity = getMailListRoleMemberEntityDao().newMailListRoleMemberEntity();
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(mailListName, mailListDomain);
+		if (list == null)
+			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
+		entity.setMailList(list);
+		RolEntity role = getRolEntityDao().findByNameAndDispatcher(roleMember.getRoleName(), roleMember.getDispatcherName());
+		if (role == null)
+			throw new UnknownRoleException(roleMember.getRoleName()+"@"+roleMember.getDispatcherName());
+		entity.setRole(role);
+		if (roleMember.getScope() != null && roleMember.getScope().length() > 0)
+		{
+			if (TipusDomini.APLICACIONS.equals(role.getTipusDomini()))
+			{
+				entity.setInformationSystemScope(getAplicacioEntityDao().findByCodi(roleMember.getScope()));
+				if (entity.getInformationSystemScope() == null)
+					throw new UnknownApplicationException(roleMember.getScope());
+			}
+			else if (TipusDomini.GRUPS.equals(role.getTipusDomini()) ||
+					TipusDomini.GRUPS_USUARI.equals(role.getTipusDomini()))
+			{
+				entity.setGroupScope(getGrupEntityDao().findByCodi(roleMember.getScope()));
+				if (entity.getInformationSystemScope() == null)
+					throw new UnknownGroupException(roleMember.getScope());
+			}
+			if (TipusDomini.DOMINI_APLICACIO.equals(role.getTipusDomini()))
+			{
+				entity.setDomainValueScope(getValorDominiAplicacioEntityDao().findByApplicationDomainValue(
+						role.getAplicacio().getCodi(), 
+						role.getDominiAplicacio().getNom(), 
+						roleMember.getScope()));
+				if (entity.getDomainValueScope() == null)
+					throw new IllegalArgumentException(roleMember.getScope());
+			}
+			
+		}
+		entity.setRole(role);
+		getMailListRoleMemberEntityDao().create(entity);
+		return getMailListRoleMemberEntityDao().toMailListRoleMember(entity);
+	}
+
+	@Override
+	protected void handleUnsubscribeRole(String mailListName,
+			String mailListDomain, MailListRoleMember roleMember)
+			throws Exception {
+		MailListRoleMemberEntity entity = getMailListRoleMemberEntityDao().newMailListRoleMemberEntity();
+		LlistaCorreuEntity list = getLlistaCorreuEntityDao().findByNomAndCodiDomini(mailListName, mailListDomain);
+		if (list == null)
+			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
+		for (MailListRoleMemberEntity member: list.getRoles())
+		{
+			entity.setMailList(list);
+			RolEntity role = member.getRole();
+			if (role.getNom().equals (roleMember.getRoleName()) &&
+					role.getBaseDeDades().getCodi().equals(roleMember.getDispatcherName()))
+			{
+				if (roleMember.getScope() == null || roleMember.getScope().length() == 0)
+				{
+					if (member.getDomainValueScope() == null &&
+							member.getGroupScope() == null &&
+							member.getInformationSystemScope() == null)
+					{
+						getMailListRoleMemberEntityDao().remove(member);
+					}
+				}
+				else
+				{
+					if (TipusDomini.APLICACIONS.equals(role.getTipusDomini()) &&
+							member.getInformationSystemScope() != null &&
+							member.getInformationSystemScope().getCodi().equals(roleMember.getScope()))
+					{
+						getMailListRoleMemberEntityDao().remove(member);
+					}
+					else if ( (TipusDomini.GRUPS.equals(role.getTipusDomini()) ||
+							  TipusDomini.GRUPS_USUARI.equals(role.getTipusDomini())) &&
+							  member.getGroupScope() != null &&
+							  member.getGroupScope().getCodi().equals(roleMember.getScope()))
+					{
+						getMailListRoleMemberEntityDao().remove(member);
+					}
+					else if (TipusDomini.DOMINI_APLICACIO.equals(role.getTipusDomini()) &&
+							  member.getDomainValueScope() != null &&
+							  member.getDomainValueScope().getValor().equals(roleMember.getScope()))
+					{
+						getMailListRoleMemberEntityDao().remove(member);
+					}
+					
+				}
+				
+			}
+		}
 	}
 
 }

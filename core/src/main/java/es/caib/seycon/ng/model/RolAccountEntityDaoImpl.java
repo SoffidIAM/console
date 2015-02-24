@@ -50,6 +50,7 @@ import es.caib.seycon.ng.utils.TipusContenidorRol;
  */
 public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountEntityDaoBase {
 
+	
     private void auditarRolAccount(String accio, RolAccountEntity grant) {
         String codiUsuari = Security.getCurrentAccount();
         if (grant.getAccount().getType().equals (AccountType.USER))
@@ -201,7 +202,6 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
 
             generateTasks(rolsUsuaris);
             generateTasks(old);
-
             
             auditarRolAccount("U", rolsUsuaris); //$NON-NLS-1$
         } catch (Throwable e) {
@@ -212,7 +212,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         }
     }
 
-    private void generateTasks(RolAccountEntity grant) {
+    private void generateTasks(RolAccountEntity grant) throws InternalErrorException {
 		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
 		tasque.setData(new Timestamp(System.currentTimeMillis()));
 		tasque.setTransa(TaskHandler.UPDATE_ROLE);
@@ -241,6 +241,9 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
 	        tasque.setUsuari(grant.getAccount().getName());
 	        getTasqueEntityDao().create(tasque);
         }
+
+		getRolEntityDao().updateMailLists(grant.getRol());
+
     }
 
     public void create(es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris)

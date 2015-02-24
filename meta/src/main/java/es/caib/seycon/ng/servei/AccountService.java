@@ -12,7 +12,7 @@ import es.caib.seycon.ng.comu.Usuari;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service (translatedName="AccountService", serverPath="/accountService", serverRole="agent",
+@Service (translatedName="AccountService", serverPath="/seycon/accountService", serverRole="agent",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,

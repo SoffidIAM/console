@@ -23,6 +23,9 @@
 package es.caib.seycon.util;
 import java.io.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 
 
@@ -162,6 +165,7 @@ class InputStreamThread extends Thread
 
 public class TimedProcess extends Object
 {
+	Log log = LogFactory.getLog(getClass());
   /** tiempo máximo en milisegundos */
   long timeout;
   /** resultado de la ejecución del proceso */
@@ -273,7 +277,7 @@ private String[] environment;
     output = ""; //$NON-NLS-1$
 
     if (debug)
-      System.out.println (String.format(Messages.getString("TimedProcess.RunningCommand"), command));  //$NON-NLS-1$
+      log.info(String.format(Messages.getString("TimedProcess.RunningCommand"), command));  //$NON-NLS-1$
     if (environment == null)
     	process = java.lang.Runtime.getRuntime ().
               exec (command);
@@ -311,10 +315,11 @@ private String[] environment;
 
     if (debug )
     {
-      System.out.print (Messages.getString("TimedProcess.Running")); //$NON-NLS-1$
+      StringBuffer b = new StringBuffer();
+   	  b.append (Messages.getString("TimedProcess.Running")); //$NON-NLS-1$
       for ( i = 0 ; i < command.length; i++)
-        System.out.print (command[i]+" "); //$NON-NLS-1$
-      System.out.println ();
+        b.append (command[i]+" "); //$NON-NLS-1$
+      log.info(b.toString());
     }
     if (environment == null)
     	process = java.lang.Runtime.getRuntime ().

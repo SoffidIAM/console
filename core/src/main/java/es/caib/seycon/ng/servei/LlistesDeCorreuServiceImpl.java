@@ -603,7 +603,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 					TipusDomini.GRUPS_USUARI.equals(role.getTipusDomini()))
 			{
 				entity.setGroupScope(getGrupEntityDao().findByCodi(roleMember.getScope()));
-				if (entity.getInformationSystemScope() == null)
+				if (entity.getGroupScope() == null)
 					throw new UnknownGroupException(roleMember.getScope());
 			}
 			if (TipusDomini.DOMINI_APLICACIO.equals(role.getTipusDomini()))

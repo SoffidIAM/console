@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
@@ -38,6 +40,7 @@ import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Password;
@@ -63,6 +66,7 @@ import es.caib.seycon.ng.model.AccountAccessEntity;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AccountEntityDao;
 import es.caib.seycon.ng.model.AuditoriaEntity;
+import es.caib.seycon.ng.model.DadaUsuariEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.DispatcherEntityDao;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
@@ -709,6 +713,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 	}
 
+	private void addGroups (HashMap<String, Group> groups, GrupEntity grup)
+	{
+		if (!groups.containsKey(grup.getCodi()))
+		{
+			Grup grupVO = getGrupEntityDao().toGrup (grup);
+			groups.put (grup.getCodi(), Group.toGroup( grupVO));
+			if (grup.getPare() != null)
+				addGroups (groups, grup.getPare());	
+		}
+	}
+
 	@Override
 	protected String handleGessAccountName(String userName, String dispatcherName)
 			throws Exception
@@ -728,16 +743,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			return userName;
 		else if (du.getTipus().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
-			Interpreter interpreter = new Interpreter();
-			DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
-			interpreter.set("usuariEntity", ue); //$NON-NLS-1$
-			interpreter.set("user", User.toUser(getUsuariEntityDao().toUsuari(ue))); //$NON-NLS-1$
-			interpreter.set("dominiEntity", du); //$NON-NLS-1$
-			interpreter.set("userDomain", UserDomain.toUserDomain(getDominiUsuariEntityDao().toDominiUsuari(du))); //$NON-NLS-1$
-			interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
-			interpreter.set("system", com.soffid.iam.api.System.toSystem(getDispatcherEntityDao().toDispatcher(de))); //$NON-NLS-1$
-			interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
-			return (String) interpreter.eval(du.getBshExpr());
+			return evalExpression(du, ue, dispatcherName);
 		}
 		else if (du.getTipus().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
 		{
@@ -752,6 +758,41 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		else
 			return null;
+	}
+
+	private String evalExpression(DominiUsuariEntity du, UsuariEntity ue,
+			String dispatcherName) throws EvalError {
+		User userVO =  User.toUser(getUsuariEntityDao().toUsuari(ue));
+		Interpreter interpreter = new Interpreter();
+		DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
+		
+		HashMap<String, String> attributes;
+		HashMap<String, Group> groups;
+			
+		attributes = new HashMap<String, String>();
+		for (DadaUsuariEntity dada: ue.getDadaUsuari())
+		{
+			attributes.put(dada.getTipusDada().getCodi(), dada.getValorDada());
+		}
+				
+		groups = new HashMap<String, Group>();
+		addGroups (groups, ue.getGrupPrimari());
+		for (UsuariGrupEntity grup: ue.getGrupsSecundaris())
+			addGroups (groups, grup.getGrup());
+			
+		interpreter.set("attributes", attributes); //$NON-NLS-1$
+		interpreter.set("groups", groups); //$NON-NLS-1$
+		interpreter.set("groupsList", groups.keySet()); //$NON-NLS-1$
+		interpreter.set("applicationContext", applicationContext); //$NON-NLS-1$
+		interpreter.set("usuariEntity", ue); //$NON-NLS-1$
+		interpreter.set("user", userVO); //$NON-NLS-1$
+		interpreter.set("dominiEntity", du); //$NON-NLS-1$
+		interpreter.set("userDomain", UserDomain.toUserDomain(getDominiUsuariEntityDao().toDominiUsuari(du))); //$NON-NLS-1$
+		interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
+		interpreter.set("system", com.soffid.iam.api.System.toSystem(getDispatcherEntityDao().toDispatcher(de))); //$NON-NLS-1$
+		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
+				
+		return (String) interpreter.eval(du.getBshExpr());
 	}
 
 	@Override
@@ -1202,6 +1243,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		uae.setUntilDate(date);
 		dao.create(uae);
 		// Now, audit
+		audit("H", ae); //$NON-NLS-1$
 		audit("P", ae); //$NON-NLS-1$
 	}
 	
@@ -1539,6 +1581,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			if (currentUser.getId().equals (callerUe.getId()))
 			{
 				getUserAccountEntityDao().remove(uae);
+				audit("R", ae); //$NON-NLS-1$
+				Password p = ips.generateFakeAccountPassword(ae);
+				ips.storeAndForwardAccountPassword(ae, p, false, null);
 			}
 			else
 			{

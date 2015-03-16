@@ -84,20 +84,22 @@
 		
 		void acceptaDada()
 		{ // Retornem valorDomini, descripcioValor, tipusDomini
-			ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
-			ctx = ds.getJXPathContext(); 
-			xpath = esquemaLlista.getFellow("lista").getFellow("listbox").getXPath();
-			index = esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedIndex();
-			pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
-			ctx2 = ctx.getRelativeContext(pointer);
-			valor = (String)ctx2.getPointer("@valor").getValue();			
-			descripcio = (String)ctx2.getPointer("@descripcio").getValue();			
-			pointer.invalidate ();
+			Listbox lb = esquemaLlista.getFellow("lista").getFellow("listbox");
+			es.caib.zkib.datasource.DataSource ds = lb.getDataSource();
+			String xpath = lb.getXPath();
+			LinkedList list = new LinkedList ();
+			for (Listitem item: lb.getSelectedItems())
+			{
+				lb.renderItem(item);
+				es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(item);
+				String value = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@valor");				
+				list.addLast(  value );
+			}
 			String tipusDomini = (String) model.getVariables().getVariable("tipusDomini");
-			String [] dades = {valor, descripcio, tipusDomini};
+			
 			Component formComponent = (Component) pageScope.get("contextComponent");
 			String eventName = (String) pageScope.get("eventName");
-			Events.postEvent (eventName, formComponent, dades);							
+			Events.postEvent (eventName, formComponent, list);							
 			cleanWindow();
 		}
 		
@@ -170,10 +172,11 @@
 		</criteris>		
 		
 		<navegador id="lista" width="790px">
-			<listbox autocommit="false" dataPath="/model:/valor" fixedLayout="true" id="listbox" rows="${fileres}">
-				<attribute name="onSelect">
-					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
-				</attribute>
+			<listbox autocommit="false" dataPath="/model:/valor" fixedLayout="true" id="listbox" rows="${fileres}"
+				checkmark="true" multiple="true">
+				<attribute name="onSelect"><![CDATA[
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.getSelectedItems().isEmpty());
+				]]></attribute>
 				<listhead>
 					<listheader label="${c:l('aplica_rol_valorDomini.zul.Valor')}" width="250px"/>
 					<listheader label="${c:l('aplica_rol_valorDomini.zul.Descripcia-2')}" width="350px"/>

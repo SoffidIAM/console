@@ -10,6 +10,8 @@
 	<zscript>
 		<![CDATA[
 			import es.caib.zkib.zkiblaf.Missatgebox;
+			import es.caib.zkib.datasource.XPathUtils;
+			
 			String[] dadesDomini = { "", "" };
 			ArrayList c_paresRol = new ArrayList();
 			ArrayList c_fillsRol = new ArrayList();
@@ -151,7 +153,42 @@
 				</attribute>
 				<zscript>
 					<![CDATA[
-						void afegirRolPare (es.caib.seycon.ng.comu.Rol grantedRol)
+					         
+					    String duplicateGrantedRol (String path)
+					    {
+							String newPath = XPathUtils.createPath(dsAgents, "/rol[1]/ownerRoles", new es.caib.seycon.ng.comu.RolGrant());
+							XPathUtils.setValue(dsAgents,newPath+"/@ownerRol", 
+									XPathUtils.getValue(dsAgents, path+"/@ownerRol"));
+							XPathUtils.setValue(dsAgents,newPath+"/@ownerDispatcher", 
+									XPathUtils.getValue(dsAgents, path+"/@ownerDispatcher"));
+							XPathUtils.setValue(dsAgents,newPath+"/@ownerRolName", 
+									XPathUtils.getValue(dsAgents, path+"/@ownerRolName"));
+							XPathUtils.setValue(dsAgents,newPath+"/@dispatcher", 
+									XPathUtils.getValue(dsAgents, path+"/@dispatcher"));
+							XPathUtils.setValue(dsAgents,newPath+"/@rolName", 
+									XPathUtils.getValue(dsAgents, path+"/@rolName"));
+							XPathUtils.setValue(dsAgents,newPath+"/@idRol", 
+									XPathUtils.getValue(dsAgents, path+"/@idRol"));
+							XPathUtils.setValue(dsAgents,newPath+"/@ownerRolDomainValue", 
+									XPathUtils.getValue(dsAgents, path+"/@ownerRolDomainValue"));
+							return newPath;
+					    }
+					    
+					    String duplicateGrantedGroup (String path)
+					    {
+							String newPath = XPathUtils.createPath(dsAgents, "/rol[1]/granteeGroups", new es.caib.seycon.ng.comu.RolGrant());
+							XPathUtils.setValue(dsAgents,newPath+"/@ownerGroup", 
+									XPathUtils.getValue(dsAgents, path+"/@ownerGroup"));
+							XPathUtils.setValue(dsAgents,newPath+"/@dispatcher", 
+									XPathUtils.getValue(dsAgents, path+"/@dispatcher"));
+							XPathUtils.setValue(dsAgents,newPath+"/@rolName", 
+									XPathUtils.getValue(dsAgents, path+"/@rolName"));
+							XPathUtils.setValue(dsAgents,newPath+"/@idRol", 
+									XPathUtils.getValue(dsAgents, path+"/@idRol"));
+							return newPath;
+					    }
+
+					    void afegirRolPare (es.caib.seycon.ng.comu.Rol grantedRol)
 						{
 							es.caib.seycon.ng.comu.RolGrant rg = new es.caib.seycon.ng.comu.RolGrant();
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
@@ -192,13 +229,26 @@
 									
 						}
 						
-						void onSelectedDomainValue (String[] dades)
+						void onSelectedDomainValue (List dades)
 						{
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
 							String path = desktop.getPage("valorsDominisRol").getAttribute("newElement");
-							if (dades != null)
+							if (dades != null && dades.size() > 0)
 							{
-								es.caib.zkib.datasource.XPathUtils.setValue(dsAgents, path+"/@ownerRolDomainValue", dades[0]);
+								es.caib.zkib.datasource.XPathUtils.setValue(dsAgents, path+"/@ownerRolDomainValue", dades.get(0));
+								List pathList = new LinkedList();
+								pathList.add(path);
+								for (int i = 1; i < dades.size(); i++)
+								{
+									String newPath = duplicateGrantedRol(path);
+									XPathUtils.setValue(dsAgents, newPath+"/@ownerRolDomainValue", dades.get(i));
+									pathList.add(newPath);
+								}
+								if (pathList.size() > 1)
+								{
+									Page p = desktop.getPage("valorsDominisRol");
+									p.setAttribute("newElement", pathList);
+								}
 							}
 							es.caib.seycon.ng.comu.Domini d = form.getJXPathContext().getValue("/domini");
 							String s_valor_domini = d.getNom();
@@ -207,25 +257,52 @@
 								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
 								p.setAttribute("domini", d);
 								p.setAttribute("senseDomini", "N");
-								p.setAttribute("newElement", path);
 								p.setAttribute("eventName", "onSelectedDomainValue2");
 								Events.postEvent ("onInicia", p.getFellow("esquemaLlista"),form);
 							}
 							else
 							{
-								dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, path));
+								dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/ownerRoles"));
 							}
 						}
 
-						void onSelectedDomainValue2 (String[] dades)
+						void onSelectedDomainValue2 (List dades)
 						{
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
-							String path = desktop.getPage("valorsDominisRol").getAttribute("newElement");
+							Object p = desktop.getPage("valorsDominisRol").getAttribute("newElement");
+							List pathList ;
+							if (p instanceof List)
+							{
+								pathList = (List)p;
+							} else {
+								pathList = new LinkedList ();
+								pathList.add ((String)p);
+							}
 							if (dades != null)
 							{
-								es.caib.zkib.datasource.XPathUtils.setValue(dsAgents, path+"/@domainValue", dades[0]);
+								for (int i = 0; i < dades.size(); i++)
+								{
+									if (i == 0)
+									{
+										for (String path: pathList)
+										{
+											XPathUtils.setValue(dsAgents, path+"/@domainValue", dades.get(i));										
+										}
+									} else {
+										for (String path: pathList)
+										{
+											String newPath;
+											if (path.startsWith("/rol[1]/ownerRoles"))
+												newPath = duplicateGrantedRol(path);
+											else
+												newPath = duplicateGrantedGroup(path);
+											XPathUtils.setValue(dsAgents, newPath+"/@domainValue", dades.get(i));										
+										}
+									}
+								}
 							}
-							dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, path));
+							dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/ownerRoles"));
+							dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/granteeGroups"));
 						}
 
 						void afegirGrupPare (es.caib.seycon.ng.comu.Grup grantedGroup)

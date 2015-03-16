@@ -36,7 +36,7 @@ public class MouseCommand extends Command {
 			throw new UiException(MZk.ILLEGAL_REQUEST_WRONG_DATA,
 				new Object[] {Objects.toString(data), this});
 
-		if (data.length > 1)
+		if (data != null && data.length > 1)
 		{
 			int x = data[0].indexOf('.');
 			if (x >= 0) data[0] = data[0].substring(0,  x);

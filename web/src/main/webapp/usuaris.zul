@@ -61,9 +61,9 @@
 				// Autoritzacions d'usuari;
 				import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 				import es.caib.zkib.datasource.XPathUtils;
-				canCreateUser = AutoritzacionsUsuari.hasCreateUser();
-				canUpdateUser = AutoritzacionsUsuari.hasUpdateUser();
-				canUpdateCustomUser = AutoritzacionsUsuari.hasUpdateCustomUser();
+				canCreateUser = !readOnly && AutoritzacionsUsuari.hasCreateUser();
+				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
+				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
 				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
 				canQueryUser = AutoritzacionsUsuari.hasQueryUser();
 				canRefreshUser = AutoritzacionsUsuari.hasRefreshUser();
@@ -72,13 +72,13 @@
 				//canQueryUserGroup = AutoritzacionsUsuari.canQueryUserGroup();
 				//canQueryUserPrinter = AutoritzacionsUsuari.canQueryUserPrinter();
 				//canCreateUserMetadata = AutoritzacionsUsuari.canCreateUserMetadata();
-				canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
-				canCreateUserRole = AutoritzacionsUsuari.hasCreateUserRole();
-				canDeleteUserRole = AutoritzacionsUsuari.hasDeleteUserRole();
-				canCreateUserGroup = AutoritzacionsUsuari.hasCreateUserGroup();
-				canDeleteUserGroup = AutoritzacionsUsuari.hasDeleteUserGroup();
-				canCreateUserPrinter = AutoritzacionsUsuari.hasCreateUserPrinter();
-				canDeleteUserPrinter = AutoritzacionsUsuari.hasDeleteUserPrinter();
+				canUpdateUserMetadata = !readOnly && AutoritzacionsUsuari.hasUpdateUserMetadata();
+				canCreateUserRole = !readOnly && AutoritzacionsUsuari.hasCreateUserRole();
+				canDeleteUserRole = !readOnly && AutoritzacionsUsuari.hasDeleteUserRole();
+				canCreateUserGroup = !readOnly && AutoritzacionsUsuari.hasCreateUserGroup();
+				canDeleteUserGroup = !readOnly && AutoritzacionsUsuari.hasDeleteUserGroup();
+				canCreateUserPrinter = !readOnly && AutoritzacionsUsuari.hasCreateUserPrinter();
+				canDeleteUserPrinter = !readOnly && AutoritzacionsUsuari.hasDeleteUserPrinter();
 				canViewRegistresAccesUsuari = AutoritzacionsUsuari
 						.hasQueryUserAccessRegister();
 				canViewMazingerUsuari = AutoritzacionsUsuari.hasQueryUserMazinger();

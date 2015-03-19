@@ -8,7 +8,6 @@
 <?component name="input_password" macro-uri="comu/input_password.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<style src="~./styles/estil.css"/>
 	<style>
 		.tcoth div {text-align:center !important;}
 		tr.seld td div.cell-inner input.text {
@@ -1160,7 +1159,7 @@
 										</image>
 										
 										<div id="propertiesLabel" style="height: 20px;" >
-											<label value="Properties" sclass="titol_capsa"/>
+											<label value="Properties" />
 										</div>
 																					
 										<div style="" id="propertiesDiv"  visible="false" >																				
@@ -1231,7 +1230,7 @@
 										</image>
 	
 										<div id="attributesLabel" style="height: 20px;" >
-											<label value="Attributes" sclass="titol_capsa"/>
+											<label value="Attributes" sclass=""/>
 										</div>
 																					
 																															

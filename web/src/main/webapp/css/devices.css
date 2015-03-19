@@ -3,23 +3,30 @@
 img, video, canvas { max-width: 100%;}
 /****** TOP LINE ******/
 .topline{height:35px !important; background-color: #22B9D8 !important; border-bottom: 0.1em solid #7f9fc2 !important; padding: 0 !important; margin: 0 !important; box-shadow: 0px 1px 7px #888888;}
-.startmenu, .startmenu:hover{border: 0px !important; float: left; width: 65px; border: 0; height: 22px; border-radius: 0; background-color: #22B9D8 !important; padding: 7px !important; margin: 0 !important;}
-#logo{float: left; height:30px; margin: 3px 0px 0px 5px;}
-.startmenu img{width:15px;}
+.startmenu {
+	height: 35px;
+	border: 0px !important; float: left; border: 0; border-radius: 0; background-color: #22B9D8 !important; padding: 0px !important; margin: 0 !important;
+	}
+
+#logo{ margin: 7px 10px 0px 5px; vertical-align: -45%; background: transparent; height: 25px; }
+.col_cen {margin-top: 7px;}
+
+.startmenu:hover {background:  #70a3cc !important;}
+
+/*.startmenu img{width:15px;}*/
 .benvingutmsg{padding:7px 5px 0px 0px;}
 .topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{font-family: "Avenir LT Std", Calibri, Arial !important; font-size:18px !important; color: white; font-weight: normal !important;}
-.col_cen, .benvingut, .titol_tanca{display:none;}
 
 /****** MENU PRINCIPAL/PERFIL Y VENTANAS ******/
 .shadow-window{ box-shadow: 0px 1px 7px #888888; }
-.col_izq{width:160px;}
+.col_izq{width:auto; margin-right: 1em; }
 .menu-display .tree{border:0px;}
 .menu-display div.tree-body td{padding:0;}
 .tree-body td .cell-inner{padding:5px 0px 5px 10px;}	
 span.tree-root-close, span.tree-tee-close, span.tree-last-close,
-span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 0px 10px 0px 0px; background-repeat: no-repeat; width: 20px; min-height: 20px;}
-span.tree-root-close, span.tree-tee-close, span.tree-last-close{ background-image: url(/icons/collapse.png); background-size: 20px 20px; }
-span.tree-root-open, span.tree-tee-open, span.tree-last-open{ background-image: url(/icons/expand.png); background-size: 20px 20px;}	
+span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 0px 10px 0px 0px; background-repeat: no-repeat; width: 16px; min-height: 16px;}
+span.tree-root-close, span.tree-tee-close, span.tree-last-close{ background-image: url(/icons/collapse.png); background-size: 16px 16px; }
+span.tree-root-open, span.tree-tee-open, span.tree-last-open{ background-image: url(/icons/expand.png); background-size: 16px 16px;}	
 span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ background-color:white !important; font-family: "Avenir LT Std", Calibri, Arial; font-size:18px; color:#22B9D8; font-weight: normal;line-height: 40px; border-top: 1px solid #eee; cursor:pointer; }
 .mwt-menuprincipal, .rwt-menuprincipal{ box-shadow:none; }
 .menuperfil{ padding-right:10px; z-index: 1;}
@@ -50,7 +57,7 @@ span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ back
 
 /* Texto de las tablas */
 div.listbox-head{width:100% !important;}
-div.listbox-head th div.head-cell-inner, div.cell-inner, div.cell-inner span {font-family: "Avenir LT Std", Calibri, Arial; font-size:15px;}
+/* div.listbox-head th div.head-cell-inner, div.cell-inner, div.cell-inner span {font-family: "Avenir LT Std", Calibri, Arial; font-size:11px;} */
 div.listbox-head th, div.listbox-head th div{white-space:pre-line; word-wrap:break-word;}
 
 /*****  USER-INFO | PESTA�AS IDENTIFICACION/PERMISOS *****/
@@ -59,7 +66,13 @@ div.listbox-head th, div.listbox-head th div{white-space:pre-line; word-wrap:bre
 .user-info td.tab-3d-ml-uns,
 .user-info td[class^='tab-3d-']{background-image:none;}
 .user-info [class^='tab-3d-mm'] a {white-space:pre;}
-.tab, .tab a, .tabsel, .tabsel a{font-size:15px; font-weight:bold;}
+
+td.tab-3d-ml-sel, 
+td.tab-3d-ml-uns,
+td[class^='tab-3d-']{background-image:none;}
+.tab-3d-mm' a {white-space:pre;}
+
+.tab, .tab a, .tabsel, .tabsel a{font-size:13px; font-weight:bold;}
 .tab a{color:#7F9FC2}
 .tabsel a{color: #9EC73C;}
 .tabsel, .tab{border:1px solid #7F9FC2; }
@@ -70,9 +83,6 @@ td.tab-3d-first2, td.tab-3d-last2{width:auto;}
 
 /* Tabla */
 div.tabpanel{border-left:1px solid #7F9FC2;border-right:1px solid #7F9FC2;border-bottom:1px solid #7F9FC2;}
-
-/*Tabla: Mis Tareas*/
-.classTree, .classFour, .classFive{display:none;}
 
 /* Sidebar: Aplicaciones*/
 .aplications img{margin-top:-2px;}
@@ -117,3 +127,17 @@ div.tabpanel{border-left:1px solid #7F9FC2;border-right:1px solid #7F9FC2;border
 	div.listbox-head th div, div.listbox-head th, div.listbox-head th.sort div.head-cell-inner{padding:1px; white-space: nowrap;}
 	.aplications img { margin-top: -6px;}
 }
+
+/* Barra de botons */
+.toolbar {
+	padding: 2px; border: 1px; border-top:0.1px solid white; background: #637792; 
+}
+
+.toolbar a, .toolbar a:visited, .toolbar a:hover {
+	font-family: Arial;	font-size: 11px; font-weight: bold; color: #FFF;
+	border: 0px; text-decoration: none; background: #637792;
+	white-space:nowrap; 
+}
+
+
+

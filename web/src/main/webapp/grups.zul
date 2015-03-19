@@ -6,7 +6,6 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml">
-	
 	<style src="~./styles/estil.css"/>
 	
 	<datamodel id="model" rootNode="grups" src="descriptorGrup.xml"

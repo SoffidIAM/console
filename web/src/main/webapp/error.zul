@@ -4,7 +4,7 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
     
 		
-    <style src="~./styles/estil.css"/>
+    <style src="/styles/estil.css"/>
  
  	<window border="normal" closable="true" id="errorWindow" mode="highlighted" position="center,center" title="${c:l('error.Titol')}" width="720px">
 

@@ -2,7 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="Soffid Identity and Access Manager" ?>
-<?meta http-equiv="X-UA-Compatible" content="IE=8" ?>
+<?meta http-equiv="X-UA-Compatible" content="IE=9" ?>
 
 <vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: visible">
@@ -36,26 +36,36 @@
 	    <zscript><![CDATA[
 			void find ( Treechildren treechildren, String target)
 			{
-				Treeitem item  = it.next();
-				Treerow row = item.getTreerow();
-				Collection grandchildren = row.getChildren();
-				for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
+				String page;
+				int i = target.indexOf('?');
+				if ( i < 0)
+					page = target;
+				else
+					page = target.substring(0, i);
+				Collection children = treechildren.getItems();
+				for (Iterator it = children.iterator(); it.hasNext();)
 				{
-					Component c = it2.next();
-					log.info ("Found treecel " +item.getId());
-					if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
+					Treeitem item  = it.next();
+					Treerow row = item.getTreerow();
+					Collection grandchildren = row.getChildren();
+					for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
 					{
-						es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-						if (page.equals(atc.getPagina()))
+						Component c = it2.next();
+						log.info ("Found treecel " +item.getId());
+						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 						{
-							app.setInitialPage(target);
+							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
+							if (page.equals(atc.getPagina()))
+							{
+								app.setInitialPage(target);
+							}
 						}
 					}
-				}
-				if (item.getTreechildren() != null)
-					find (item.getTreechildren(), target);
-					
+					if (item.getTreechildren() != null)
+						find (item.getTreechildren(), target);
 						
+							
+				}
 			}
 			
 		

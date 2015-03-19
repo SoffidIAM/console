@@ -6,19 +6,32 @@
 package es.caib.seycon.ng.model;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
+import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.model.MailListGroupMemberEntity;
+import com.soffid.iam.model.MailListRoleMemberEntity;
 
 import es.caib.seycon.ng.PrincipalStore;
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.CorreuExtern;
 import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.comu.RelacioLlistaCorreu;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.servei.LlistesDeCorreuService;
+import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 
@@ -55,6 +68,7 @@ public class LlistaCorreuEntityDaoImpl extends
 			String domini = llistaCorreu.getDomini() == null ? null
 					: llistaCorreu.getDomini().getCodi();
 			auditarLlistaDeCorreu("C", llistaCorreu.getNom(), domini); //$NON-NLS-1$
+			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.4"),  //$NON-NLS-1$
@@ -71,6 +85,7 @@ public class LlistaCorreuEntityDaoImpl extends
 			String domini = llistaCorreu.getDomini() == null ? null
 					: llistaCorreu.getDomini().getCodi();
 			auditarLlistaDeCorreu("U", llistaCorreu.getNom(), domini); //$NON-NLS-1$
+			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.6"), //$NON-NLS-1$
@@ -88,6 +103,7 @@ public class LlistaCorreuEntityDaoImpl extends
 			super.remove(llistaCorreu);
 			getSession(false).flush();
 			auditarLlistaDeCorreu("D", nomLlistaDeCorreu, domini); //$NON-NLS-1$
+			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.8"),  //$NON-NLS-1$
@@ -189,12 +205,18 @@ public class LlistaCorreuEntityDaoImpl extends
 		targetVO
 				.setLlistaLlistes(findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
 						nomLlista, codiDomini));
-		targetVO
-				.setLlistaUsuaris(findLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini(
-						nomLlista, codiDomini));
+		
 		targetVO
 				.setLlistaExterns(findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(
 						nomLlista, codiDomini));
+
+		Set<String> explodedUsers = new HashSet<String>();
+		findUserMembers (sourceEntity, targetVO, explodedUsers); 
+		findGroupMembers (sourceEntity, targetVO, explodedUsers); 
+		findRoleMembers (sourceEntity, targetVO, explodedUsers); 
+
+		targetVO.setExplodedUsersList(flatten (explodedUsers));
+		
 		Collection col_llistesPertany = sourceEntity.getRelacioLlistaCorreuFromPertany();
 		String llistesPertany = ""; //$NON-NLS-1$
 		if (col_llistesPertany != null) for (Iterator it = col_llistesPertany.iterator(); it.hasNext(); ) {
@@ -209,6 +231,101 @@ public class LlistaCorreuEntityDaoImpl extends
 			targetVO.setLlistaLlistesOnPertany(llistesPertany.substring(0, llistesPertany.length() - 2));
 		}
 
+	}
+
+	private void findRoleMembers(LlistaCorreuEntity sourceEntity,
+			LlistaCorreu targetVO, Set<String> explodedUsers)  {
+		LinkedList<String> roles = new LinkedList<String>();
+		for (MailListRoleMemberEntity rm: sourceEntity.getRoles())
+		{
+			MailListRoleMember r = getMailListRoleMemberEntityDao().toMailListRoleMember(rm);
+			String c = r.getRoleName()+"@"+r.getDispatcherName();
+			if (r.getScope() != null && r.getScope().trim().length() > 0 )
+				c = c + "/" + r.getScope();
+			roles.add (c);
+			
+			// Primary group members
+			Collection<RolGrant> grants;
+			try {
+				grants = getAplicacioService().findEffectiveRolGrantsByRolId(rm.getRole().getId());
+			} catch (InternalErrorException e) {
+				throw new RuntimeException(e);
+			}
+			 
+			for (RolGrant grant: grants)
+			{
+				if (grant.getUser() != null)
+				{
+					if (r.getScope() == null 
+							|| r.getScope().trim().length() == 0 
+							|| r.getScope().equals(grant.getDomainValue()))
+					{
+						UsuariEntity ue = getUsuariEntityDao().findByCodi(grant.getUser());
+						if (ue != null && "S".equals (ue.getActiu()))
+						{
+							explodedUsers.add(grant.getUser());
+						}
+					}
+				}
+			}
+		}
+		targetVO.setRoleMembers(flatten (roles));
+		
+	}
+
+	private void findGroupMembers(LlistaCorreuEntity sourceEntity,
+			LlistaCorreu targetVO, Set<String> explodedUsers) {
+		LinkedList<String> groups = new LinkedList<String>();
+		for (MailListGroupMemberEntity ue: sourceEntity.getGroups())
+		{
+			String c = ue.getGroup().getCodi();
+			groups.add (c);
+			
+			// Primary group members
+			for ( UsuariEntity user: ue.getGroup().getUsuarisGrupPrimari())
+			{
+				if ("S".equals(user.getActiu()))
+					explodedUsers.add(user.getCodi());
+			}
+			// Secondary group membes
+			for ( UsuariGrupEntity userGroup: ue.getGroup().getUsuarisGrupSecundari())
+			{
+				UsuariEntity user = userGroup.getUsuari();
+				if ("S".equals(user.getActiu()))
+					explodedUsers.add(user.getCodi());
+			}
+			
+		}
+		targetVO.setGroupMembers(flatten (groups));
+		
+		
+	}
+
+	private void findUserMembers(LlistaCorreuEntity sourceEntity,
+			LlistaCorreu targetVO, Set<String> explodedUsers) {
+		LinkedList<String> users = new LinkedList<String>();
+		for (LlistaCorreuUsuariEntity ue: sourceEntity.getLlistaDeCorreuUsuari())
+		{
+			users.add (ue.getUsuari().getCodi());
+			explodedUsers.add(ue.getUsuari().getCodi());
+		}
+		targetVO.setLlistaUsuaris(flatten (users));
+	}
+
+	private String flatten(Collection<String> users) {
+		if (users == null || users.isEmpty())
+			return "";
+		else
+		{
+			StringBuffer sb = new StringBuffer();
+			for (String s: users)
+			{
+				if (sb.length() > 0)
+					sb.append (", ");
+				sb.append (s);
+			}
+			return sb.toString();
+		}
 	}
 
 	/**
@@ -386,6 +503,19 @@ public class LlistaCorreuEntityDaoImpl extends
 				this.remove(entity);// cridem al mètode 1 per 1
 			}
 		}
+	}
+
+
+	@Override
+	protected void handleGenerateUpdateTasks(LlistaCorreuEntity entity)
+			throws Exception {
+        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+        tasque.setData(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
+        tasque.setAlies(entity.getNom());
+        if (entity.getDomini() != null)
+            tasque.setDomcor(entity.getDomini().getCodi());
+        getTasqueEntityDao().create(tasque);
 	}
 
 }

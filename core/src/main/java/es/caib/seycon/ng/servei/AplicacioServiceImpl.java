@@ -1994,7 +1994,7 @@ public class AplicacioServiceImpl extends
 		{
 			return ra.getGranteeApplicationDomain() == null ||
 					currentRol.qualifierAplicacio == null ||
-					ra.getGrantedApplicationDomain().getId().equals (currentRol.qualifierAplicacio.getId()); 
+					ra.getGranteeApplicationDomain().getId().equals (currentRol.qualifierAplicacio.getId()); 
 		}
 		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS) ||
 				ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS_USUARI) )
@@ -2077,10 +2077,13 @@ public class AplicacioServiceImpl extends
 	protected Collection<RolAccount> handleFindRolAccountByAccount(long accountId)
 			throws Exception
 	{
+		LinkedList<RolAccount> rg = new LinkedList<RolAccount>();
 		AccountEntity account = getAccountEntityDao().load(accountId);
+		if (account == null)
+			return rg;
+		
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateAccountRoles(radSet, DIRECT, account, null);
-		LinkedList<RolAccount> rg = new LinkedList<RolAccount>();
 		for (RolAccountDetail rad: radSet)
 		{
 			if (rad.granted.getBaseDeDades().getId().equals (account.getDispatcher().getId()))
@@ -2204,6 +2207,9 @@ public class AplicacioServiceImpl extends
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		
 		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
+		if (rol == null)
+			return rg;
+		
 		populateParentGrantsForRol(radSet, rol, null);
 		for (RolAccountDetail rad: radSet)
 		{

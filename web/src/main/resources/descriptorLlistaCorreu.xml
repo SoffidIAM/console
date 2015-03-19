@@ -55,32 +55,26 @@
 				className="es.caib.seycon.ng.comu.CorreuExtern">
 			</new-instance-bean>
 		</finder>
-		<!-- 
-		<finder name="llistaCompactaUsuaris"
-			type="llistaCompactaUsuaris">
+		<finder name="role" type="role" refreshAfterCommit="true">
 			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
-				method="findLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini">
+				method="findRoleMembers">   <!-- mail:query -->
 				<parameter value="${instance.nom}" />
 				<parameter value="${instance.codiDomini}" />
 			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.MailListRoleMember">
+			</new-instance-bean>
 		</finder>
-		<finder name="llistaCompactaLlistes"
-			type="llistaCompactaLlistes">
+		<finder name="group" type="group"  refreshAfterCommit="true">
 			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
-				method="findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini">
+				method="findGroupMembers">   <!-- mail:query -->
 				<parameter value="${instance.nom}" />
 				<parameter value="${instance.codiDomini}" />
 			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.Grup">
+			</new-instance-bean>
 		</finder>
-		<finder name="llistaCompactaExterns"
-			type="llistaCompactaExterns">
-			<ejb-finder jndi="java:comp/env/ejb/LlistesDeCorreuEJB"
-				method="findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini">
-				<parameter value="${instance.nom}" />
-				<parameter value="${instance.codiDomini}" />
-			</ejb-finder>
-		</finder>
-		 -->
 		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
 			<insert-method method="create" returnBean="true">  <!-- mail:create -->
 				<parameter value="${instance}" />
@@ -97,17 +91,6 @@
 		</validator>
 	</datanode>
 
-<!-- 
-	<datanode name="llistaCompactaUsuaris">
-	</datanode>
-	
-	<datanode name="llistaCompactaLlistes">
-	</datanode>
-
-	<datanode name="llistaCompactaExterns">
-	</datanode>
- -->
- 
 	<datanode name="usuari">
 		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
 			<insert-method method="create" returnBean="true">
@@ -141,4 +124,33 @@
 		</ejb-handler>
 	</datanode>
 
+	<datanode name="role">
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="subscribeRole" returnBean="true">
+				<parameter value="${parent.instance.nom}" />
+				<parameter value="${parent.instance.codiDomini}" />
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="unsubscribeRole">
+				<parameter value="${parent.instance.nom}" />
+				<parameter value="${parent.instance.codiDomini}" />
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="group">
+		<ejb-handler jndi="java:comp/env/ejb/LlistesDeCorreuEJB">
+			<insert-method method="subscribeGroup" returnBean="false">
+				<parameter value="${parent.instance.nom}" />
+				<parameter value="${parent.instance.codiDomini}" />
+				<parameter value="${instance.codi}" />
+			</insert-method>
+			<delete-method method="unsubscribeGroup">
+				<parameter value="${parent.instance.nom}" />
+				<parameter value="${parent.instance.codiDomini}" />
+				<parameter value="${instance.codi}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
 </zkib-model>

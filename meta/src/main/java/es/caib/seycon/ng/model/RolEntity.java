@@ -28,7 +28,8 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
 	es.caib.seycon.ng.model.AccountAccessEntity.class,
 	com.soffid.iam.model.RuleAssignedRoleEntity.class,
-	es.caib.seycon.ng.model.SoDRoleEntity.class})
+	es.caib.seycon.ng.model.SoDRoleEntity.class,
+	LlistaCorreuEntity.class})
 public abstract class RolEntity {
 
 	@Column (name="ROL_ID")
@@ -160,5 +161,12 @@ public abstract class RolEntity {
 		java.lang.String nomRol, 
 		java.lang.String codiDispatcher) {
 	 return null;
+	}
+	
+	@Description ("Creates update mail tasks for each mail list affected by the role")
+	@DaoOperation
+	public void updateMailLists (RolEntity role)
+	{
+		
 	}
 }

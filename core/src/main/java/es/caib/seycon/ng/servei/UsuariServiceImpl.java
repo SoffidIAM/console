@@ -1598,7 +1598,8 @@ public class UsuariServiceImpl extends
 				UsuariEntity usu = getUsuariEntityDao().findById(usuari.getId());
 				if (usu!=null) {
 					Usuari usuTrobat = getUsuariEntityDao().toUsuari(usu);
-					if (!usuTrobat.getTelefon().equals(usuari.getTelefon())) {
+					if (usuTrobat.getTelefon() == null && usuari.getTelefon() != null ||
+						!usuTrobat.getTelefon().equals(usuari.getTelefon())) {
 						// Només si ha canviat el número de telèfon
 						usuTrobat.setUsuariDarreraModificacio(Security.getCurrentAccount());
 						usuTrobat.setDataDarreraModificacioUsuari(GregorianCalendar.getInstance());
@@ -1606,10 +1607,13 @@ public class UsuariServiceImpl extends
 						UsuariEntity entity = getUsuariEntityDao().usuariToEntity(usuTrobat);
 						if (entity != null) {
 							getUsuariEntityDao().update(entity);
+							getUsuariEntityDao().createUpdateTasks(entity, usuTrobat);
+
 							return getUsuariEntityDao().toUsuari(entity);
 						}
 					} // Si no ha canviat el telèfon: donem error... no ha de tindre permis per canviar res més
-					else if (!usuTrobat.getComentari().equals(usuari.getComentari())) {
+					else if (usuTrobat.getComentari() == null && usuari.getComentari() != null ||
+							!usuTrobat.getComentari().equals(usuari.getComentari())) {
 						// Deixem que s'actualitzen les observacions (!!)
 						usuTrobat.setUsuariDarreraModificacio(Security.getCurrentAccount());
 						usuTrobat.setDataDarreraModificacioUsuari(GregorianCalendar.getInstance());
@@ -1617,6 +1621,7 @@ public class UsuariServiceImpl extends
 						UsuariEntity entity = getUsuariEntityDao().usuariToEntity(usuTrobat);
 						if (entity != null) {
 							getUsuariEntityDao().update(entity);
+							getUsuariEntityDao().createUpdateTasks(entity, usuTrobat);
 							return getUsuariEntityDao().toUsuari(entity);
 						}						
 					}
@@ -1655,6 +1660,7 @@ public class UsuariServiceImpl extends
 		UsuariEntity usuariAbans = usuari.getId() != null ?  
 			getUsuariEntityDao().load(usuari.getId()) : 
 			getUsuariEntityDao().findByCodi(usuari.getCodi());
+		Usuari previousUser = getUsuariEntityDao().toUsuari(usuariAbans);
 		// Verifiquem si hem de fer la comprovació de la identitat:
 		// s'ha modifcat el nif de l'usuari??
 		DadaUsuariEntity nifAnterior = getDadaUsuariEntityDao().findDadaByCodiTipusDada(usuari.getCodi(), "NIF"); //$NON-NLS-1$
@@ -1668,6 +1674,7 @@ public class UsuariServiceImpl extends
 			}
 			usuariAbans.setCodi(usuari.getCodi());
 			getUsuariEntityDao().update(usuariAbans);
+			getUsuariEntityDao().createUpdateTasks(usuariAbans, previousUser);
 		}
 		// verifiquem canvis al nom, llinatges i nif de l'usuari
 		if (usuariAbans != null
@@ -1736,6 +1743,9 @@ public class UsuariServiceImpl extends
 				getAplicacioService().revokeRolesHoldedOnGroup(usuariAbans.getId(), groupHolderToRemove);
 			
 			getRuleEvaluatorService().applyRules(entity);
+
+			getUsuariEntityDao().createUpdateTasks(usuariAbans, previousUser);
+
 			return getUsuariEntityDao().toUsuari(entity);
 		}
 		
@@ -2465,7 +2475,7 @@ public class UsuariServiceImpl extends
 		if (usuari == null) return new ArrayList(); //usuari nobody
 	
 		List<Rol> roles = new LinkedList<Rol>();
-		for (RolGrant rg: getAplicacioService().findEffectiveRolGrantsByRolId(usuari.getId()))
+		for (RolGrant rg: getAplicacioService().findEffectiveRolGrantByUser(usuari.getId()))
 		{
 			if ( incloureRolsDirectes.booleanValue() ||
 					rg.getOwnerGroup() != null ||

@@ -204,6 +204,14 @@
 						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
 							.getFellow("detall_llista_externs");
 						break;
+					case 4:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_roles");
+						break;
+					case 5:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_groups");
+						break;
 				}
 				
 				llistaMembres = camp.getValue();
@@ -279,6 +287,25 @@
 				}
 			}
 			
+			void afegeixRole(String role, String dispatcher, String domain, String desc)
+			{
+				com.soffid.iam.api.MailListRoleMember mlrm = new com.soffid.iam.api.MailListRoleMember ();
+				mlrm.setDispatcherName(dispatcher);
+				mlrm.setRoleDescription(desc);
+				mlrm.setRoleName(role);
+				mlrm.setScope(domain);
+				String path = es.caib.zkib.datasource.XPathUtils.createPath(gridRoles.getDataSource(), "/role", mlrm);
+			}
+
+			void afegeixGroup(String group, String description, Long id)
+			{
+				es.caib.seycon.ng.comu.Grup g = new es.caib.seycon.ng.comu.Grup();
+				g.setCodi(group);
+				g.setDescripcio(description);
+				g.setId(id);
+				String path = es.caib.zkib.datasource.XPathUtils.createPath(gridGroups.getDataSource(), "/group", g);
+			}
+
 			void esborraUsuari(String codi)
 			{
 				if (!codi.equals("")) 
@@ -439,6 +466,30 @@
 				}
 			}
 			
+			void esborraRole(String role, String dispatcher, String domain, String desc)
+			{
+				if (!role.equals("")) 
+				{
+					grid = esquema.getFellow("dades").getFellow("form").getFellow("gridRoles");
+					ds = grid.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = grid.getXPath() + "[@roleName = '" + role + "' and @dispatcherName = '"+dispatcher+"' and @scope='"+domain+"']";
+					ctx.removePath(xpath);
+				}
+			}
+
+			void esborraGroup(String group, String description, Long id)
+			{
+				if (!group.equals("")) 
+				{
+					grid = esquema.getFellow("dades").getFellow("form").getFellow("gridGroups");
+					ds = grid.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = grid.getXPath() + "[@codi = '" + group + "']";
+					ctx.removePath(xpath);
+				}
+			}
+
 			String nomUsuari (String codiUsuari)
 			{
 				if (!codiUsuari.equals("")) 
@@ -456,7 +507,7 @@
 				}
 			}
 					
-			void changeLlista(tipus, membres_antic)
+			void changeLlista(int tipus, String membres_antic)
 			{
 				// Desactivem la modificació del nom
 				form.getFellow("detall_nom").setDisabled(true);
@@ -484,14 +535,20 @@
 		  			case 3:
 		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_externs");
 		  				break;
+		  			case 4:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_roles");
+		  				break;
+		  			case 5:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_groups");
+		  				break;
 		  		}			
 	
 				membres = (String) camp.getValue();
 				if (!"".equals(membres)) {
-					String[] now = membres.split(",");
+					String[] now = membres.split(" *, *");
 					longitud_now = now.length;
 					membres_now = new String[longitud_now];
-					membres_now = membres.split(",");
+					membres_now = membres.split(" *, *");
 				} else {
 					longitud_now = 0;
 					membres_now = null;
@@ -536,6 +593,28 @@
 							String extern = (String) it1.next();
 							afegeixExtern(extern);
 	  						break;
+		  				case 4:
+							String roleName = (String) it1.next();
+							String dispatcher = "";
+							String scope = "";
+							int i = roleName.indexOf('@');
+							if ( i >= 0 )
+							{
+								dispatcher = roleName.substring (i+1);
+								roleName = roleName.substring (0, i);
+							}
+							int j = dispatcher.lastIndexOf('/');
+							if (j >= 0)
+							{
+								scope = dispatcher.substring(j+1);
+								dispatcher =  dispatcher.substring(0,j);
+							}
+							afegeixRole(roleName, dispatcher, scope, "");
+	  						break;
+		  				case 5:
+							String group = (String) it1.next();
+							afegeixGroup(group, null, null);
+	  						break;
 	  				}
 				}
 			
@@ -575,6 +654,28 @@
 		  				case 3:
 							String extern = (String) it2.next();
 							esborraExtern(extern);
+	  						break;
+		  				case 4:
+							String roleName = (String) it2.next();
+							String dispatcher = "";
+							String scope = "";
+							int i = roleName.indexOf('@');
+							if ( i >= 0 )
+							{
+								dispatcher = roleName.substring (i+1);
+								roleName = roleName.substring (0, i);
+							}
+							int j = dispatcher.lastIndexOf('/');
+							if (j >= 0)
+							{
+								scope = dispatcher.substring(j+1);
+								dispatcher =  dispatcher.substring(0,j);
+							}
+							esborraRole(roleName, dispatcher, scope, "");
+	  						break;
+		  				case 5:
+							String group = (String) it2.next();
+							esborraGroup(group, null, null);
 	  						break;
 	  				}
 				}
@@ -857,6 +958,157 @@
 											</vbox>
 										</row>
 										
+									<row>
+										<input_etiqueta value="${c:l('aplicacions.zul.Rols')}"/>
+											<vbox width="100%">
+												<grid dataPath="/role" fixedLayout="true" id="gridRoles" width="99%">
+													<attribute name="onActualitza">
+														if (event.getData()[3] != null) {
+															valorDomini = (event.getData()[3])[0];
+														} else {
+															valorDomini = "";
+														}
+														desc = (String)(event.getData()[2]);
+														bbdd = (String)(event.getData()[5]);
+														role = (String)(event.getData()[0]);
+				
+
+														afegeixRole(role, bbdd, valorDomini, desc);
+														<!--  A l'afegir un nou usuari, s'ha de copiar a la llista de membres reduida -->
+														Textbox tb = form.getFellow("detall_llista_roles");
+														llistaActual = tb.getValue();
+														String tag = role+"@"+bbdd;
+														if (valorDomini.length()>0)
+															tag = tag + "/"+valorDomini;
+														if (llistaActual.equals("")) {
+															tb.setValue(tag);
+														} else {
+															tb.setValue(llistaActual + ", " + tag);
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('aplicacions.zul.Rol')}" width="15em"/>
+														<column label="${c:l('aplicacions.zul.BD')}" width="15em"/>
+														<column label="${c:l('aplicacions.zul.NomRol-2')}" width="*"/>
+														<column label="${c:l('aplicacions.zul.Domini')}" width="15em"/>
+														<column label="-" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@roleName"/>
+														<label bind="@dispatcherName"/>
+														<label bind="@roleDescription"/>
+														<label bind="@scope"/>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick"><![CDATA[
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridUsuaris.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	roleName = context.getValue(xpath+"/@roleName");
+																	dispatcher = context.getValue(xpath+"/@dispatcherName");
+																	scope = context.getValue(xpath+"/@scope");
+																	String tag = roleName+"@"+dispatcher;
+																	if (scope != null && scope.length() > 0)
+																		tag = tag + "/" + scope;
+																	if (Missatgebox.confirmaOK_CANCEL(
+																		String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurEsborrar"), 
+																				new Object [] {tag}),
+																				org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(4,tag);
+																		context.removePath(xpath);
+																	}
+																}
+															]]></attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+															desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF", "true");
+															desktop.getPage("rolsLlista").setAttribute("tipus", "wizard");
+															desktop.getPage("rolsLlista").setAttribute("usuari", "");
+															Events.postEvent("onInicia",
+																	desktop.getPage("rolsLlista").getFellow("esquemaLlista"), gridRoles);
+														</attribute>
+													</button>
+												<hbox style="float:right">
+												<gridexportbutton acces="${canQueryCorreu}" grid="gridUsuaris"/>
+												</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+									<row>
+										<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+											<vbox width="100%">
+												<grid dataPath="/group" fixedLayout="true" id="gridGroups" width="99%">
+													<attribute name="onActualitza">
+														String codi = event.getData()[0];
+														String description = event.getData()[1];
+														Long id = Long.parseLong(event.getData()[2]);
+
+														afegeixGroup(codi, description, id);
+														<!--  A l'afegir un nou usuari, s'ha de copiar a la llista de membres reduida -->
+														Textbox tb = form.getFellow("detall_llista_groups");
+														llistaActual = tb.getValue();
+														if (llistaActual.equals("")) {
+															tb.setValue((String)(event.getData()[0]));
+														} else {
+															tb.setValue(llistaActual + ", " + (String)(event.getData()[0]));
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('aplicacions.zul.Grup')}" width="15em"/>
+														<column label="${c:l('valorDomini.zul.Descripcia')}" width="*"/>
+														<column label="-" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@codi"/>
+														<label bind="@descripcio"/>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridUsuaris.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	membre = context.getValue(xpath+"/@codi");
+																	if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurEsborrar"), new Object [] {membre}),
+																									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(5,membre);
+																		context.removePath(xpath);
+																	}
+																}
+															</attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+																	desktop.getPage("grupsLlista")
+																		.setAttribute("tipus", "");
+																	desktop.getPage("grupsLlista")
+																		.setAttribute("llistaObsolets", false);
+																	Events.postEvent("onInicia",
+																			desktop.getPage("grupsLlista")
+																				.getFellow("esquemaLlista"), gridGroups);
+														</attribute>
+													</button>
+												<hbox style="float:right">
+												<gridexportbutton acces="${canQueryCorreu}" grid="gridUsuaris"/>
+												</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+
 										<row>
 											<input_etiqueta value="${c:l('llistesCorreu.zul.Llistesdecorreuconti')}"/>
 											<vbox width="100%">
@@ -880,7 +1132,7 @@
 														<label bind="@nomLlistaCorreuPertany"/>
 														<label bind="@codiDominiCorreuPertany"/>
 														<imageclic align="center" src="~./img/list-remove.gif">
-															<attribute name="onClick">
+															<attribute name="onClick"><![CDATA[
 																if (canUpdateCorreu || canDeleteCorreu) {
 																	dataRow = self.getParent();
 																	xpath = dataRow.getXPath();
@@ -889,13 +1141,15 @@
 																	membre1 = context.getValue(xpath+"/@nomLlistaCorreuPertany");
 																	membre2 = context.getValue(xpath+"/@codiDominiCorreuPertany");
 																	membre = membre1 + "@" + membre2;
-																	if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurBorrar"), new Object [] {membre}),
-																										org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																	if (Missatgebox.confirmaOK_CANCEL(
+																		String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurBorrar"),
+																			 new Object [] {membre}),
+																		org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
 																		esborraMembre(2,membre);
 																		context.removePath(xpath);
 																	}
 																}
-															</attribute>
+															]]></attribute>
 														</imageclic>
 													</datarow>
 												</grid>
@@ -1021,6 +1275,30 @@
 										</textbox>
 									</row>
 									<row>
+										<input_etiqueta value="${c:l('aplicacions.zul.Rols')}"/>
+										<textbox id="detall_llista_roles" bind="roleMembers"
+											readonly="${!canModifyCorreu}" sclass="textbox" width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(4,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+										<textbox id="detall_llista_groups" bind="@groupMembers"
+											readonly="${!canModifyCorreu}" sclass="textbox" width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(5,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
 										<input_etiqueta value="${c:l('llistesCorreu.zul.Llistesdecorreuconti')}"/>
 										<textbox id="detall_llista_llistes" bind="@llistaLlistes"
 											readonly="${!canModifyCorreu}" sclass="textbox"
@@ -1060,4 +1338,6 @@
 	<include src="llistesCorreullista.zul"/>
 	<include src="correusExterns.zul"/>
 	<include src="finestres/finestra_valorGeneric.zul"/>	
+	<include src="rolsllista.zul" />
+	<include src="grupsllista.zul" />
 </zk>

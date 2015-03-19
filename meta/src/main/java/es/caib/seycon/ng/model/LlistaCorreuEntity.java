@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.AplicacioService;
+import es.caib.seycon.ng.servei.GrupService;
+
 @Entity (table="SC_LLICOR" )
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.DominiCorreuEntity.class,
@@ -15,8 +18,9 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.RelacioLlistaCorreuEntity.class,
 	es.caib.seycon.ng.model.LlistaCorreuUsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
-	es.caib.seycon.ng.servei.LlistesDeCorreuService.class,
-	es.caib.seycon.ng.model.TasqueEntity.class})
+	es.caib.seycon.ng.model.TasqueEntity.class,
+	GrupService.class,
+	AplicacioService.class})
 public abstract class LlistaCorreuEntity {
 
 	@Column (name="LCO_ID")
@@ -74,5 +78,11 @@ public abstract class LlistaCorreuEntity {
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuEntity> find(
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
+	}
+	
+	@DaoOperation
+	public void generateUpdateTasks (LlistaCorreuEntity entity)
+	{
+		
 	}
 }

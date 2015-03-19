@@ -325,7 +325,9 @@
 				<hbox>
 					<input_criteri_data etiqueta="${c:l('auditoria.zul.Data/Horafi')}" id="queryDataFi"/>
 					<div width="250px">
-						<listbox disabled="${!canQueryAuditoria}" id="queryObjecteAuditat" mold="select" onSelect="" style="font-size: 12px" width="99px">
+						<listbox disabled="${!canQueryAuditoria}" id="queryObjecteAuditat" mold="select" onSelect="" 
+							style="font-size: 12px; margin-right: 3px" width="100px"
+			>
 							<listitem label="${c:l('auditoria.zul.')}" selected="true" value=""/>
 							<listitem label="${c:l('auditoria.zul.account')}" value="account"/>
 							<listitem label="${c:l('auditoria.zul.aplicacia')}" value="aplicacio"/>
@@ -349,7 +351,7 @@
 						<textbox disabled="${!canQueryAuditoria}" id="queryValorOA" onChange="" sclass="textbox" width="125px"/>
 					</div>
 					<input_criteri etiqueta="${c:l('auditoria.zul.Objecte')}" 
-						lectura="${!canQueryAuditoria}" id="queryObject"/>
+						lectura="${!canQueryAuditoria}" id="queryObject" visible="false"/>
 				</hbox>
 			</criteris>
 			

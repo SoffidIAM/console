@@ -34,6 +34,10 @@ public abstract class ReconcileAssignmentEntity {
 	@Column (name="RAS_DISPAT")
 	public java.lang.String dispatcher;
 
+	@Column (name="RAS_DOMVAL")
+	@Nullable
+	public java.lang.String domainValue;
+
 	@DaoFinder
 	public java.util.List<com.soffid.iam.reconcile.model.ReconcileAssignmentEntity> findByProcessId(
 		java.lang.Long processId) {

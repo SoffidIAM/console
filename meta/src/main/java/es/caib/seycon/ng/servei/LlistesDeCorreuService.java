@@ -5,7 +5,15 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.model.MailListGroupMemberEntity;
+import com.soffid.iam.model.MailListRoleMemberEntity;
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.model.AplicacioEntity;
+import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.LlistaCorreuUsuariEntity.class,
-	es.caib.seycon.ng.model.RelacioLlistaCorreuEntity.class})
+	es.caib.seycon.ng.model.RelacioLlistaCorreuEntity.class,
+	MailListRoleMemberEntity.class, 
+	MailListGroupMemberEntity.class,
+	AplicacioEntity.class,
+	ValorDominiAplicacioEntity.class,
+	RolEntity.class,
+	GrupEntity.class})
 public abstract class LlistesDeCorreuService {
 
 	@Operation ( grantees={roles.mail_query.class},
@@ -27,6 +41,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation ( grantees={roles.mail_query.class,roles.user_delete.class},
 			translated="findUsersByMailListNameAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -36,6 +51,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation ( grantees={roles.mail_query.class,roles.user_update.class},
 			translated="findExternalMailsByNameListAndDomainName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -45,6 +61,25 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={roles.mail_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupMembers(
+		java.lang.String nomLlistaCorreu, 
+		@Nullable java.lang.String codiDomini)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( grantees={roles.mail_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<MailListRoleMember> findRoleMembers(
+		java.lang.String nomLlistaCorreu, 
+		@Nullable java.lang.String codiDomini)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.mail_query.class},
 			translated="findMailListsByData")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -194,6 +229,7 @@ public abstract class LlistesDeCorreuService {
 		es.caib.seycon.ng.comu.RelacioLlistaCorreu relacioLlistaCorreu)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
 	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -202,6 +238,32 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void subscribeGroup ( String mailListName, String mailListDomain, String groupName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void unsubscribeGroup ( String mailListName, String mailListDomain, String groupName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public MailListRoleMember subscribeRole ( String mailListName, String mailListDomain, MailListRoleMember roleMember)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+	
+	@Operation ( grantees={roles.mail_create.class,roles.mail_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void unsubscribeRole ( String mailListName, String mailListDomain, MailListRoleMember roleMember)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
 	@Operation ( grantees={roles.mail_query.class},
 			translated="findRelationsMailListByNameAndBelongsMailListNameAndNameAndContainsMailListName")
 	@Transactional(rollbackFor={java.lang.Exception.class})

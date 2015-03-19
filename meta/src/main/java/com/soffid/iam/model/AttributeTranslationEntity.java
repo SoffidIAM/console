@@ -71,7 +71,7 @@ class AttributeTranslationColumn1Index
 	
 }
 
-@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL1_NDX", unique=false, columns = { "ATT_DOMAIN", "ATT_COLUMN2" })
+@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL2_NDX", unique=false, columns = { "ATT_DOMAIN", "ATT_COLUMN2" })
 class AttributeTranslationColumn2Index 
 {
 	

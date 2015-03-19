@@ -186,13 +186,15 @@ public class RolsGrupEntityDaoImpl extends
         if (TipusDomini.SENSE_DOMINI.equals(tipus)) {
             target.setHasDomain(false);
             target.setDomainValue(null);
-        } else if (TipusDomini.APLICACIONS.equals(tipus)) {
+        } else if (TipusDomini.APLICACIONS.equals(tipus) && 
+        		source.getGrantedApplicationDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedApplicationDomain().getCodi());
-        } else if (TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) {
+        } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) &&
+        		source.getGrantedGroupDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedGroupDomain().getCodi());
-        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus)) {
+        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) && source.getGrantedDomainValue() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedDomainValue().getValor());
         } else {

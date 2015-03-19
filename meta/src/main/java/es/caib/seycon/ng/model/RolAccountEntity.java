@@ -27,7 +27,8 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.comu.RolGrant.class,
 	es.caib.seycon.ng.comu.ContenidorRol.class,
 	es.caib.seycon.ng.comu.RolAccount.class,
-	es.caib.seycon.ng.comu.AdministracioAplicacio.class
+	es.caib.seycon.ng.comu.AdministracioAplicacio.class,
+	LlistaCorreuEntity.class
 	})
 public abstract class RolAccountEntity {
 

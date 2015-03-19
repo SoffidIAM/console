@@ -21,6 +21,8 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.soffid.iam.model.MailListRoleMemberEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -133,6 +135,27 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         }
     }
 
+    @Override
+	protected void handleUpdateMailLists (RolEntity role) throws InternalErrorException
+    {
+        updateMailLists (role, 10);
+    }
+    
+    private void updateMailLists (RolEntity role, int depth) throws InternalErrorException
+    {
+    	for ( MailListRoleMemberEntity lce: role.getMailLists())
+    	{
+    		getLlistaCorreuEntityDao().generateUpdateTasks(lce.getMailList());
+    	}
+    	if (depth > 0)
+    	{
+    		for (RolAssociacioRolEntity child: role.getRolAssociacioRolSocContenidor())
+    		{
+    			updateMailLists(child.getRolContingut(), depth - 1 );
+    		}
+    	}
+    }
+    
     public void update(es.caib.seycon.ng.model.RolEntity rol)
             throws RuntimeException {
         try {
@@ -335,6 +358,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             }
             getSession(false).flush();
 
+            updateMailLists (rol);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.2"), rol.getNom(), message));  //$NON-NLS-1$
@@ -344,6 +368,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
     public void remove(es.caib.seycon.ng.model.RolEntity rol)
             throws RuntimeException {
         try {
+            updateMailLists (rol);
             // NO SE PUEDE BORRAR UN ROL SI TIENE RELACIONES EXTERNAS
             // SE DA UN AVISO Y NO SE DEJA BORRAR EL ROL
 
@@ -647,9 +672,111 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         // Transformación a nivel de Objeto (NO ACCESO BBDD)
         // targetEntity puede estar vacía (CREATE) o tener referencias (UPDATE)
         // [importante]
-        // GRUPOS POSEEDORES DEL ROL: NUEVO
+
+        updateEntityDomainType(sourceVO, targetEntity);
+        updateEntityApplication(sourceVO, targetEntity);
+        upateEntityOthers(sourceVO, targetEntity);
+
+    	// GRUPOS POSEEDORES DEL ROL: NUEVO
         // Collección de Grups posseidors (VO)
-        Collection<Grup> grupsPosseidors = sourceVO.getOwnerGroups();
+        updateEntityGranteeGroups(sourceVO, targetEntity);
+
+        // JERARQUÍA DE ROLES PADRES DEL ROL: NUEVO
+        // Creamos una nueva (luego en el update - si corresponde - se verifican
+        // los existentes)
+        // Eliminamos referencias existentes
+        updateEntityGranteeRoles(sourceVO, targetEntity);
+
+
+    }
+
+	private void upateEntityOthers(es.caib.seycon.ng.comu.Rol sourceVO,
+			es.caib.seycon.ng.model.RolEntity targetEntity) {
+		Boolean perDefecte = sourceVO.getDefecte();
+        if (perDefecte != null) {
+            targetEntity.setDefecte(sourceVO.getDefecte().booleanValue() ? "S" //$NON-NLS-1$
+                    : "N"); //$NON-NLS-1$
+        } else {
+            targetEntity.setDefecte("N"); //$NON-NLS-1$
+        }
+        Boolean contrasenya = sourceVO.getContrasenya();
+        if (contrasenya != null) {
+            targetEntity.setContrasenya(sourceVO.getContrasenya()
+                    .booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        } else {
+            targetEntity.setContrasenya("N"); //$NON-NLS-1$
+        }
+        Boolean gestionableWF = sourceVO.getGestionableWF();
+        if (gestionableWF != null) {
+            targetEntity.setGestionableWF(sourceVO.getGestionableWF()
+                    .booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        } else
+            targetEntity.setGestionableWF("N"); //$NON-NLS-1$
+        String codiDispatcher = sourceVO.getBaseDeDades();
+        if (codiDispatcher != null && codiDispatcher.trim().compareTo("") != 0) { //$NON-NLS-1$
+            DispatcherEntity dispatcherEntity = this.getDispatcherEntityDao()
+                    .findByCodi(codiDispatcher);
+            if (dispatcherEntity != null) {
+                targetEntity.setBaseDeDades(dispatcherEntity);
+            } else {
+				throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.18"),   //$NON-NLS-1$
+						codiDispatcher));
+            }
+        } else {
+            targetEntity.setBaseDeDades(null);
+        }
+	}
+
+	private void updateEntityApplication(es.caib.seycon.ng.comu.Rol sourceVO,
+			es.caib.seycon.ng.model.RolEntity targetEntity) {
+		String codiAplicacio = sourceVO.getCodiAplicacio();
+        if (codiAplicacio != null) {
+            AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
+                    .findByCodi(codiAplicacio);
+            targetEntity.setAplicacio(aplicacioEntity);
+        } else {
+            targetEntity.setAplicacio(null);
+        }
+	}
+
+	private void updateEntityGranteeRoles(es.caib.seycon.ng.comu.Rol sourceVO,
+			es.caib.seycon.ng.model.RolEntity targetEntity) {
+		Collection<RolAssociacioRolEntity> rolAssociacioRolSocContingut = new HashSet<RolAssociacioRolEntity>();
+        // Los que somos el contenedor (socContenidor) no aparece en el VO
+        if (sourceVO.getOwnerRoles() != null) {
+            // Creamos las relaciones nuevas
+            for (Iterator<RolGrant> iterator = sourceVO.getOwnerRoles().iterator(); iterator
+                    .hasNext();) {
+                // Los pares son una cadena
+                // nomrol@dispatcher>aplicacio{tipusdomini:valor[descripcio]}
+                // (la part del domini és opcional)
+                RolGrant currentGrant = iterator.next();
+                if (currentGrant != null) { //$NON-NLS-1$
+                    // Obtenemos la entidad Rol padre desde la BBDD
+                    RolEntity rolEntityFound = load (currentGrant.getOwnerRol()); 
+    		        RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
+    		        
+    		        rare.setRolContingut(targetEntity);
+    		        rare.setRolContenidor(rolEntityFound);
+
+    		        assignDomainValue(rare, currentGrant, targetEntity,
+                    		rolEntityFound);
+
+                    assignGranteeDomainValue(rare, currentGrant, targetEntity,
+                    		rolEntityFound);
+
+    		        rolAssociacioRolSocContingut.add(rare);
+                }
+
+            }
+            targetEntity
+                    .setRolAssociacioRolSocContingut(rolAssociacioRolSocContingut);
+        }
+	}
+
+	private void updateEntityGranteeGroups(es.caib.seycon.ng.comu.Rol sourceVO,
+			es.caib.seycon.ng.model.RolEntity targetEntity) {
+		Collection<Grup> grupsPosseidors = sourceVO.getOwnerGroups();
         Collection<RolGrant> granteeGroups = sourceVO.getGranteeGroups();
         // Eliminamos las referencias existentes
         Collection<RolsGrupEntity> grupsPosseidorsRolEntity = new HashSet<RolsGrupEntity>();
@@ -679,7 +806,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 rge.setRolOtorgat(targetEntity);
                 rge.setGrupPosseidor(grupEntity);
                 Domini domini = sourceVO.getDomini();
-                String nomDomini = domini.getNom();
+                String nomDomini = targetEntity.getTipusDomini();
                 if (TipusDomini.APLICACIONS.equals(nomDomini))
                 {
                 	rge.setGrantedApplicationDomain(getAplicacioEntityDao().findByCodi(grant.getDomainValue()));
@@ -693,8 +820,8 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 	rge.setGrantedDomainValue(
                 			getValorDominiAplicacioEntityDao()
                 				.findByApplicationDomainValue(
-                						sourceVO.getCodiAplicacio(), 
-                						sourceVO.getDomini().getCodiExtern(), 
+                						targetEntity.getAplicacio().getCodi(), 
+                						targetEntity.getDominiAplicacio().getNom(), 
                 						grant.getDomainValue()));
                 }
                 grupsPosseidorsRolEntity.add(rge);
@@ -702,8 +829,11 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         	
         }
         targetEntity.setGrupsPosseidorsRol(grupsPosseidorsRolEntity);
+	}
 
-        Domini domini = sourceVO.getDomini();
+	private void updateEntityDomainType(es.caib.seycon.ng.comu.Rol sourceVO,
+			es.caib.seycon.ng.model.RolEntity targetEntity) {
+		Domini domini = sourceVO.getDomini();
         String nomDomini = domini.getNom();
         if (nomDomini == null || nomDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
             nomDomini = TipusDomini.SENSE_DOMINI;
@@ -740,85 +870,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 }
             }
         }
-        // JERARQUÍA DE ROLES PADRES DEL ROL: NUEVO
-        // Creamos una nueva (luego en el update - si corresponde - se verifican
-        // los existentes)
-        // Eliminamos referencias existentes
-        Collection<RolAssociacioRolEntity> rolAssociacioRolSocContingut = new HashSet<RolAssociacioRolEntity>();
-        // Los que somos el contenedor (socContenidor) no aparece en el VO
-        if (sourceVO.getOwnerRoles() != null) {
-            // Creamos las relaciones nuevas
-            for (Iterator<RolGrant> iterator = sourceVO.getOwnerRoles().iterator(); iterator
-                    .hasNext();) {
-                // Los pares son una cadena
-                // nomrol@dispatcher>aplicacio{tipusdomini:valor[descripcio]}
-                // (la part del domini és opcional)
-                RolGrant currentGrant = iterator.next();
-                if (currentGrant != null) { //$NON-NLS-1$
-                    // Obtenemos la entidad Rol padre desde la BBDD
-                    RolEntity rolEntityFound = load (currentGrant.getOwnerRol()); 
-    		        RolAssociacioRolEntity rare = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
-    		        
-    		        rare.setRolContingut(targetEntity);
-    		        rare.setRolContenidor(rolEntityFound);
-
-    		        assignDomainValue(rare, currentGrant, targetEntity,
-                    		rolEntityFound);
-
-                    assignGranteeDomainValue(rare, currentGrant, targetEntity,
-                    		rolEntityFound);
-
-    		        rolAssociacioRolSocContingut.add(rare);
-                }
-
-            }
-            targetEntity
-                    .setRolAssociacioRolSocContingut(rolAssociacioRolSocContingut);
-        }
-
-        String codiAplicacio = sourceVO.getCodiAplicacio();
-        if (codiAplicacio != null) {
-            AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
-                    .findByCodi(codiAplicacio);
-            targetEntity.setAplicacio(aplicacioEntity);
-        } else {
-            targetEntity.setAplicacio(null);
-        }
-        Boolean perDefecte = sourceVO.getDefecte();
-        if (perDefecte != null) {
-            targetEntity.setDefecte(sourceVO.getDefecte().booleanValue() ? "S" //$NON-NLS-1$
-                    : "N"); //$NON-NLS-1$
-        } else {
-            targetEntity.setDefecte("N"); //$NON-NLS-1$
-        }
-        Boolean contrasenya = sourceVO.getContrasenya();
-        if (contrasenya != null) {
-            targetEntity.setContrasenya(sourceVO.getContrasenya()
-                    .booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
-        } else {
-            targetEntity.setContrasenya("N"); //$NON-NLS-1$
-        }
-        Boolean gestionableWF = sourceVO.getGestionableWF();
-        if (gestionableWF != null) {
-            targetEntity.setGestionableWF(sourceVO.getGestionableWF()
-                    .booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
-        } else
-            targetEntity.setGestionableWF("N"); //$NON-NLS-1$
-        String codiDispatcher = sourceVO.getBaseDeDades();
-        if (codiDispatcher != null && codiDispatcher.trim().compareTo("") != 0) { //$NON-NLS-1$
-            DispatcherEntity dispatcherEntity = this.getDispatcherEntityDao()
-                    .findByCodi(codiDispatcher);
-            if (dispatcherEntity != null) {
-                targetEntity.setBaseDeDades(dispatcherEntity);
-            } else {
-				throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.18"),   //$NON-NLS-1$
-						codiDispatcher));
-            }
-        } else {
-            targetEntity.setBaseDeDades(null);
-        }
-
-    }
+	}
 
 	private void assignDomainValue(
 			RolAssociacioRolEntity rare,

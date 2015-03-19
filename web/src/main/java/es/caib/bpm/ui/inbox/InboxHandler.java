@@ -102,7 +102,7 @@ public class InboxHandler extends Frame {
 		TaskInstance task = null;
 
 		try {
-			tareas = engine.findMyTasks();
+			tareas = getTasks(engine);
 
 			if (listbox.getItems() != null) {
 				listbox.getItems().clear();
@@ -145,6 +145,12 @@ public class InboxHandler extends Frame {
 			}
 		} finally {
 		}
+	}
+
+
+	protected List getTasks(BpmEngine engine) throws InternalErrorException,
+			BPMException {
+		return engine.findMyTasks();
 	}
 
 	

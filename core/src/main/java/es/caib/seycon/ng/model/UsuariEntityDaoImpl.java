@@ -25,6 +25,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.hibernate.Hibernate;
+
+import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.model.MailListGroupMemberEntity;
+
 import es.caib.bpm.vo.BPMUser;
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
@@ -41,6 +46,7 @@ import es.caib.seycon.ng.comu.TipusUsuari;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariAnonim;
 import es.caib.seycon.ng.comu.UsuariSEU;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
@@ -102,6 +108,8 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 
             getSession(false).flush();
             auditarUsuari("C", usuari.getCodi(), usuari.getGrupPrimari()); //$NON-NLS-1$
+            createMailTask(usuari);
+
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
             throw new SeyconException(String.format(Messages.getString("UsuariEntityDaoImpl.errorCreating"), //$NON-NLS-1$
@@ -109,7 +117,42 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         }
     }
 
-    private void createTask(es.caib.seycon.ng.model.UsuariEntity usuari) {
+    private void createMailTask(UsuariEntity usuari) throws InternalErrorException
+    {
+        //  Now, updates any mail lists the users belongs
+        //  First, directly
+        for ( LlistaCorreuUsuariEntity lce: usuari.getLlistaDeCorreuUsuari())
+        {
+        	getLlistaCorreuEntityDao().generateUpdateTasks(lce.getLlistaDeCorreu());
+        }
+        // Second, primary group
+        for ( MailListGroupMemberEntity mlge: usuari.getGrupPrimari().getMailLists())
+        {
+        	getLlistaCorreuEntityDao().generateUpdateTasks(mlge.getMailList());
+        }
+        // Next, secondary groups
+        for ( UsuariGrupEntity uge: usuari.getGrupsSecundaris())
+        {
+	        for ( MailListGroupMemberEntity mlge: uge.getGrup().getMailLists())
+	        {
+	        	getLlistaCorreuEntityDao().generateUpdateTasks(mlge.getMailList());
+	        }
+        }
+        // Finally roles
+        for (UserAccountEntity uae: usuari.getAccounts())
+        {
+        	if (uae.getAccount().getType().equals (AccountType.USER))
+        	{
+		        for ( RolAccountEntity rae: uae.getAccount().getRoles())
+		        {
+		        	getRolEntityDao().updateMailLists(rae.getRol());
+		        }
+        	}
+        }
+    }
+    
+    
+    private void createTask(es.caib.seycon.ng.model.UsuariEntity usuari) throws InternalErrorException {
         TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
         tasque.setData(new Timestamp(System.currentTimeMillis()));
         tasque.setTransa(TaskHandler.UPDATE_USER);
@@ -133,6 +176,7 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
             tasque.setTransa(TaskHandler.UPDATE_USER_ALIAS);
             tasque.setUsuari(usuari.getCodi());
             getTasqueEntityDao().create(tasque);
+
         }
     }
 
@@ -140,106 +184,14 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         try {
             UsuariEntity actualUsuari = load (usuari.getId());
 
-            if (usuari.getDominiCorreu() != null
-                    && (actualUsuari.getDominiCorreu() == null || actualUsuari.getDominiCorreu()
-                            .getCodi().compareTo(usuari.getDominiCorreu().getCodi()) != 0)
-                    && usuari.getDominiCorreu().getObsolet() != null
-                    && usuari.getDominiCorreu().getObsolet().compareTo("S") == 0) { //$NON-NLS-1$
-                throw new SeyconException(String.format(
-                        Messages.getString("UsuariEntityDaoImpl.mailDomainNotFound"), usuari.getDominiCorreu()  //$NON-NLS-1$
-                                .getCodi()));
-            }
-            // HERÈNCIA DE ROLS: Atorgació de rfindByCodi(usuari.getCodi())ols a grups
-            // Obtenemos los roles otorgados al grupo primario
-            // ANTES DE HACER LOS CAMBIOS EN EL USUARIO
-            HashSet totGrup = new HashSet();
-            GrupEntity grupPrimariAbans = getGrupEntityDao().findGrupPrimariByCodiUsuari(
-                    usuari.getCodi());
-            if (grupPrimariAbans != null)
-                totGrup.add(grupPrimariAbans);
-            usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
-            super.update(usuari);
-            getSession(false).flush();
-
-            // HERÈNCIA DE ROLS: Atorgació de rols a grups
-            // Només propaguem si es canvia el grup primari (codi es UK)
-            if (usuari.getGrupPrimari() != null && grupPrimariAbans != null
-                    && (!usuari.getGrupPrimari().getCodi().equals(grupPrimariAbans.getCodi()))) {
-
-                // Obtenemos los roles otorgadfindByCodi(usuari.getCodi())os al grupo primario
-                // TRAS EL CAMBIO (si se ha cambiado el grupo primario)
-                GrupEntity grupPrimariU = usuari.getGrupPrimari();
-
-                if (grupPrimariU != null)
-                    totGrup.add(grupPrimariU);
-
-                // Ara tenim tots els grups (d'abans del canvi i de després)
-                // Podem propagar els rols dels grups anteriors i els nous
-                HashSet rolsAPropagar = new HashSet();
-                for (Iterator it = totGrup.iterator(); it.hasNext();) {
-                    Object obj = it.next();
-                    if (obj != null) {
-                        GrupEntity g = (GrupEntity) obj;
-                        Collection rolsAtorgatsGrupIPare = getRolsAtorgatsGrupIParesGrup(g);
-                        if (rolsAtorgatsGrupIPare != null)
-                            rolsAPropagar.addAll(rolsAtorgatsGrupIPare);
-                    }
-                }
-                // Propagamos los roles de los grupos anteriores y los actuales:
-                // (creamos las tareas)
-                propagarRolsAtorgatsGrups(rolsAPropagar);
-            }
-
-            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_USER);
-            tasque.setUsuari(usuari.getCodi());
-            getTasqueEntityDao().create(tasque);
-            if (! actualUsuari.getServidorOfimatic().getId().equals(usuari.getServidorOfimatic().getId()))
-            {
-                tasque = getTasqueEntityDao().newTasqueEntity();
-                tasque.setData(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransa(TaskHandler.CREATE_FOLDER);
-                tasque.setCarpet(usuari.getCodi());
-                tasque.setTipcar("U"); //$NON-NLS-1$
-                getTasqueEntityDao().create(tasque);
-            }
-            if ( !actualUsuari.getGrupPrimari().getId().equals (usuari.getGrupPrimari().getId())) {
-                tasque = getTasqueEntityDao().newTasqueEntity();
-                tasque.setData(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransa(TaskHandler.UPDATE_GROUP);
-                tasque.setUsuari(usuari.getGrupPrimari().getCodi());
-                getTasqueEntityDao().create(tasque);
-                tasque = getTasqueEntityDao().newTasqueEntity();
-                tasque.setData(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransa(TaskHandler.UPDATE_GROUP);
-                tasque.setUsuari(actualUsuari.getGrupPrimari().getCodi());
-                getTasqueEntityDao().create(tasque);
-            }
-            tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_USER_ALIAS);
-            tasque.setUsuari(usuari.getCodi());
-            getTasqueEntityDao().create(tasque);
-            if ( (usuari.getNomCurt() == null ? 
-                        actualUsuari.getNomCurt() != null: 
-                        ! usuari.getNomCurt().equals(actualUsuari.getNomCurt())) ||
-                  (usuari.getDominiCorreu() == null ? 
-                          actualUsuari.getDominiCorreu() != null: 
-                          actualUsuari.getDominiCorreu() == null || 
-                              ! usuari.getDominiCorreu().getId().equals(actualUsuari.getDominiCorreu().getId())))  
-            {
-                tasque = getTasqueEntityDao().newTasqueEntity();
-                tasque.setData(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
-                tasque.setAlies(usuari.getNom());
-                if (usuari.getDominiCorreu() != null)
-                    tasque.setDomcor(usuari.getDominiCorreu().getCodi());
-                getTasqueEntityDao().create(tasque);
-            }
-
-            getSession(false).flush();
             auditarUsuari("U", usuari.getCodi(), usuari.getGrupPrimari()); //$NON-NLS-1$
+
+    		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+    		tasque.setData(new Timestamp(System.currentTimeMillis()));
+    		tasque.setTransa(TaskHandler.UPDATE_USER);
+    		tasque.setUsuari(usuari.getCodi());
+    		getTasqueEntityDao().create(tasque);
+
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
@@ -250,6 +202,8 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 
     public void remove(es.caib.seycon.ng.model.UsuariEntity usuari) throws RuntimeException {
         try {// ¿Esto se utiliza?.. en teoría NO
+            createMailTask(usuari);
+
             String codiUsuari = usuari.getCodi();
             
             if (usuari.getCodi().equals(Security.getCurrentUser()))
@@ -413,26 +367,13 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 
     }
 
-    /*
-     * public String canviPassword(String codiUsuari) { String nouPassword = "";
-     * try { CallableStatement stproc_stmt = super.getSession(false)
-     * .connection().prepareCall("{? = call SC_ASIGNA_CONTRA(?)}");
-     * stproc_stmt.registerOutParameter(1, Types.VARCHAR);
-     * stproc_stmt.setString(2, codiUsuari); stproc_stmt.execute(); nouPassword
-     * = stproc_stmt.getString(1); } catch (org.hibernate.HibernateException ex)
-     * { throw super.convertHibernateAccessException(ex); } catch
-     * (java.sql.SQLException e) { throw new
-     * org.springframework.dao.InvalidDataAccessResourceUsageException(
-     * e.getMessage()); } refresh(codiUsuari); //no fa res (és una query).. però
-     * el deixem return nouPassword;
-     * 
-     * }
-     */
 
-    public String refreshCanvis(String codiUsuari) {
+    @Override
+    public String handleRefreshCanvis(String codiUsuari) throws InternalErrorException {
         String tasquesPendents = ""; //$NON-NLS-1$
         UsuariEntity usuari = findByCodi(codiUsuari);
         createTask(usuari);
+        createMailTask(usuari);
         // tasquesPendents = refresh(codiUsuari);
         String[] tasques = getTasques(codiUsuari);
         if (tasques != null)
@@ -1337,6 +1278,115 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
     	target.setGroup(source.getGrupPrimari().getCodi());
     	target.setSurName(source.getPrimerLlinatge()+ (source.getSegonLlinatge() == null? "" : " "+source.getSegonLlinatge())); //$NON-NLS-1$ //$NON-NLS-2$
     }
+
+	@Override
+	protected void handleCreateUpdateTasks(UsuariEntity usuari, Usuari oldValue)
+			throws Exception {
+		if (usuari.getDominiCorreu() != null
+		        && (oldValue.getDominiCorreu() == null || !oldValue.getDominiCorreu().equals(usuari.getDominiCorreu().getCodi()))
+		        && usuari.getDominiCorreu().getObsolet() != null
+		        && usuari.getDominiCorreu().getObsolet().compareTo("S") == 0) { //$NON-NLS-1$
+		    throw new SeyconException(String.format(
+		            Messages.getString("UsuariEntityDaoImpl.mailDomainNotFound"), usuari.getDominiCorreu()  //$NON-NLS-1$
+		                    .getCodi()));
+		}
+		
+		String mailBefore = oldValue.getNomCurt()+"@" + ( oldValue.getDominiCorreu() == null ? "": oldValue.getDominiCorreu()); 
+		String mailAfter = usuari.getNomCurt()+"@" + ( usuari.getDominiCorreu() == null ? "": usuari.getDominiCorreu().getCodi());
+		if (! mailBefore.equals(mailAfter))
+		{
+			createMailTask(usuari);
+
+			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+		    tasque.setData(new Timestamp(System.currentTimeMillis()));
+		    tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
+		    tasque.setAlies(oldValue.getNomCurt());
+		    if (oldValue.getDominiCorreu() != null)
+		        tasque.setDomcor(oldValue.getDominiCorreu());
+		    getTasqueEntityDao().create(tasque);
+
+			tasque = getTasqueEntityDao().newTasqueEntity();
+		    tasque.setData(new Timestamp(System.currentTimeMillis()));
+		    tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
+		    tasque.setAlies(usuari.getNomCurt());
+		    if (usuari.getDominiCorreu() != null)
+		        tasque.setDomcor(usuari.getDominiCorreu().getCodi());
+		    getTasqueEntityDao().create(tasque);
+
+			tasque = getTasqueEntityDao().newTasqueEntity();
+			tasque.setData(new Timestamp(System.currentTimeMillis()));
+			tasque.setTransa(TaskHandler.UPDATE_USER_ALIAS);
+			tasque.setUsuari(usuari.getCodi());
+			getTasqueEntityDao().create(tasque);
+		}
+		// HERÈNCIA DE ROLS: Atorgació de rfindByCodi(usuari.getCodi())ols a grups
+		// Obtenemos los roles otorgados al grupo primario
+		// ANTES DE HACER LOS CAMBIOS EN EL USUARIO
+		HashSet totGrup = new HashSet();
+		GrupEntity grupPrimariAbans = getGrupEntityDao().findGrupPrimariByCodiUsuari(
+		        usuari.getCodi());
+		if (grupPrimariAbans != null)
+		    totGrup.add(grupPrimariAbans);
+		usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
+		super.update(usuari);
+		getSession(false).flush();
+
+		// HERÈNCIA DE ROLS: Atorgació de rols a grups
+		// Només propaguem si es canvia el grup primari (codi es UK)
+		if (usuari.getGrupPrimari() != null && grupPrimariAbans != null
+		        && (!usuari.getGrupPrimari().getCodi().equals(grupPrimariAbans.getCodi()))) {
+
+		    // Obtenemos los roles otorgadfindByCodi(usuari.getCodi())os al grupo primario
+		    // TRAS EL CAMBIO (si se ha cambiado el grupo primario)
+		    GrupEntity grupPrimariU = usuari.getGrupPrimari();
+
+		    if (grupPrimariU != null)
+		        totGrup.add(grupPrimariU);
+
+		    // Ara tenim tots els grups (d'abans del canvi i de després)
+		    // Podem propagar els rols dels grups anteriors i els nous
+		    HashSet rolsAPropagar = new HashSet();
+		    for (Iterator it = totGrup.iterator(); it.hasNext();) {
+		        Object obj = it.next();
+		        if (obj != null) {
+		            GrupEntity g = (GrupEntity) obj;
+		            Collection rolsAtorgatsGrupIPare = getRolsAtorgatsGrupIParesGrup(g);
+		            if (rolsAtorgatsGrupIPare != null)
+		                rolsAPropagar.addAll(rolsAtorgatsGrupIPare);
+		        }
+		    }
+		    // Propagamos los roles de los grupos anteriores y los actuales:
+		    // (creamos las tareas)
+		    propagarRolsAtorgatsGrups(rolsAPropagar);
+		}
+
+		TasqueEntity tasque ;
+		if (! oldValue.getServidorHome().equals(usuari.getServidorOfimatic().getNom()))
+		{
+		    tasque = getTasqueEntityDao().newTasqueEntity();
+		    tasque.setData(new Timestamp(System.currentTimeMillis()));
+		    tasque.setTransa(TaskHandler.CREATE_FOLDER);
+		    tasque.setCarpet(usuari.getCodi());
+		    tasque.setTipcar("U"); //$NON-NLS-1$
+		    getTasqueEntityDao().create(tasque);
+		}
+		if ( !oldValue.getCodiGrupPrimari().equals (usuari.getGrupPrimari().getCodi())) {
+		    tasque = getTasqueEntityDao().newTasqueEntity();
+		    tasque.setData(new Timestamp(System.currentTimeMillis()));
+		    tasque.setTransa(TaskHandler.UPDATE_GROUP);
+		    tasque.setUsuari(usuari.getGrupPrimari().getCodi());
+		    getTasqueEntityDao().create(tasque);
+		    if (oldValue.getCodiGrupPrimari() != null)
+		    {
+			    tasque = getTasqueEntityDao().newTasqueEntity();
+			    tasque.setData(new Timestamp(System.currentTimeMillis()));
+			    tasque.setTransa(TaskHandler.UPDATE_GROUP);
+			    tasque.setUsuari(oldValue.getCodiGrupPrimari());
+			    getTasqueEntityDao().create(tasque);
+		    }
+		}
+		
+	}
     
     
 }

@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Usuari;
+
 @Entity (table="SC_USUARI" )
 @Depends ({es.caib.seycon.ng.model.ScTarget.class,
 	es.caib.seycon.ng.model.RolsGrupEntity.class,
@@ -39,7 +41,8 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.NotificacioEntity.class,
 	es.caib.seycon.ng.model.SecretEntity.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,
-	es.caib.seycon.ng.model.AccountAccessEntity.class})
+	es.caib.seycon.ng.model.AccountAccessEntity.class,
+	RolEntity.class})
 public abstract class UsuariEntity {
 
 	@Column (name="USU_ID")
@@ -218,7 +221,13 @@ public abstract class UsuariEntity {
 		java.lang.String hqlQuery) {
 	 return null;
 	}
-	@DaoFinder
+	
+	@DaoOperation
+	@Description ("Generates UPDATE_MAIL_LIST tasks for any affected mail list")
+	void createUpdateTasks (UsuariEntity user, Usuari oldValue) {
+		
+	}
+	@DaoOperation
 	public java.lang.String refreshCanvis(
 		java.lang.String codiUsuari) {
 	 return null;

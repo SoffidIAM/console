@@ -102,10 +102,11 @@ public class RolAssociacioRolEntityImpl
 				return false;
 			
 			// Valor de domini
-			if ( (getGranteeDomainValue()!=null && rare.getGranteeDomainValue()==null) || (getGranteeDomainValue()==null && rare.getGranteeDomainValue()!=null))
+			if ( (getGrantedDomainValue()!=null && rare.getGrantedDomainValue()==null) || 
+					(getGrantedDomainValue()==null && rare.getGrantedDomainValue()!=null))
 				return false;
-			if (getGranteeDomainValue() != null && rare.getGranteeDomainValue() != null
-					&& !getGranteeDomainValue().getId().equals(rare.getGranteeDomainValue().getId()))
+			if (getGrantedDomainValue() != null && rare.getGrantedDomainValue() != null
+					&& !getGrantedDomainValue().getId().equals(rare.getGrantedDomainValue().getId()))
 				return false;
 			
 			// The same for grantee domains

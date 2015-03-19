@@ -13,12 +13,14 @@ public class RunningTasksHandler extends InboxHandler {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public void onCreate () throws Exception
 	{
 		Application.setTitle(org.zkoss.util.resource.Labels.getLabel("inbox.lblFiltroTareas2")); //$NON-NLS-1$
 		super.onCreate();
 	}
 	
+	@Override
 	public List getTasks(BpmEngine engine) throws BPMException, InternalErrorException {
 		List tareas;
 		tareas = engine.findGroupTasks();

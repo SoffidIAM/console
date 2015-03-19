@@ -4,6 +4,8 @@
 package com.soffid.iam.service;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -119,7 +121,42 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	@Override
 	protected List<ScheduledTask> handleListTasks () throws Exception
 	{
-		return getScheduledTaskEntityDao().toScheduledTaskList(getScheduledTaskEntityDao().loadAll());
+		List<ScheduledTask> tasks = getScheduledTaskEntityDao().toScheduledTaskList(getScheduledTaskEntityDao().loadAll());
+		Collections.sort(tasks, new Comparator<ScheduledTask>() {
+			public int compare(ScheduledTask o1, ScheduledTask o2) {
+				if (o1.getLastEnd() == null)
+				{
+					if (o2.getLastEnd() != null)
+						return +1;
+					else
+					{
+						if (o1.getLastExecution() == null)
+						{
+							if (o2.getLastExecution() == null)
+							{
+								return o1.getName().compareTo(o2.getName());
+							}
+							else
+								return +1;
+						}
+						else if (o2.getLastExecution() == null)
+							return -1;
+						else
+							return -o1.getLastExecution().compareTo(o2.getLastExecution());
+							
+					}
+				}
+				else
+				{
+					if (o2.getLastEnd() == null)
+						return -1;
+					else
+						return -o1.getLastEnd().compareTo(o2.getLastEnd());
+				}
+			}
+			
+		});
+		return tasks;
 	}
 
 	/* (non-Javadoc)

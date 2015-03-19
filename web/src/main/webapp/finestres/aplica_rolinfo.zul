@@ -511,7 +511,7 @@
 													es.caib.zkib.binder.BindContext ctx = es.caib.zkib
 														.datasource.XPathUtils.getComponentContext(self);
 													dada = ctx.getDataSource()
-															.getValue(ctx.getXPath() + "/@codi");
+															.getValue(ctx.getXPath() + "/@ownerGroup");
 													String xpath = ctx.getXPath();
 													Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 															.util.resource.Labels

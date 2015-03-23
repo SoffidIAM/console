@@ -2207,12 +2207,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	@Override
 	protected JbpmContext handleGetContext() throws Exception {
-		Principal p = getPrincipal();
-		String user = null;
-		if (p != null)
-			user = Security.getCurrentUser();
 		JbpmContext myContext = Configuration.getConfig().createJbpmContext();
-		myContext.setActorId(user);
+		Principal p = getPrincipal();
+		if ( p == null)
+			myContext.setActorId(null);
+		else
+			myContext.setActorId(Security.getCurrentUser());
 		return myContext;
 	}
 

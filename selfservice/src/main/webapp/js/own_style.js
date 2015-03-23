@@ -14,14 +14,12 @@ bj(document).ready(function() {
 	if (bj(window).width() <= 480){
 		if(!(bj('#logo').length > 0)){
 			bj('.startmenu').before('<img alt="Logo" id="logo" src="icons/logo-30x30.png" />');
-		} else {
-			bj('#logo').attr('src',"icons/logo-30x30.png");
 		}
 				
 	} else {
-//		if(!(bj('#logo').length > 0)){
-//			bj('.startmenu').before('<img alt="Logo" id="logo" src="icons/logo-letras.png" />');
-//		}
+		if(!(bj('#logo').length > 0)){
+			bj('.startmenu').before('<img alt="Logo" id="logo" src="icons/logo-letras.png" />');
+		}
 		
 		//Click Menu Start
 		bj(".startmenu").click(function(){

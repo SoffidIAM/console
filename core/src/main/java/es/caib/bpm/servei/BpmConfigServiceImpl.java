@@ -17,41 +17,26 @@ import es.caib.bpm.config.Configuration;
 import es.caib.bpm.entity.DBProperty;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.vo.ConfigParameterVO;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class BpmConfigServiceImpl extends BpmConfigServiceBase {
-	ThreadLocal<Stack<JbpmContext>> jbpmContextStacks = new ThreadLocal<Stack<JbpmContext>>();
+	Stack<Object> jbpmContextStack = new Stack<Object>();
 	Log log = LogFactory.getLog(getClass());
 
-	private Stack<JbpmContext> getCurrentStackContext()
-	{
-		Stack<JbpmContext> stack = jbpmContextStacks.get();
-		if (stack == null)
-		{
-			stack = new Stack<JbpmContext> ();
-			jbpmContextStacks.set(stack);
-		}
-		return stack;
-	}
-	
 	private JbpmContext getContext() {
 		JbpmContext jbpmContext = null;
-		
-		Stack<JbpmContext> stack = getCurrentStackContext();
-		
-		if (stack.isEmpty()) {
+		if (jbpmContextStack.isEmpty()) {
 			jbpmContext = Configuration.getConfig().createJbpmContext();
-			stack.push(jbpmContext);
+			jbpmContextStack.push(jbpmContext);
 		} else {
-			jbpmContext = stack.peek();
-			stack.push(jbpmContext);
+			jbpmContext = (JbpmContext) jbpmContextStack.peek();
+			jbpmContextStack.push(jbpmContext);
 		}
 		return jbpmContext;
 
 	}
 
 	private void flushContext() {
-		Stack<JbpmContext> jbpmContextStack = getCurrentStackContext();
-
 		if (jbpmContextStack.isEmpty())
 			return;
 		Object stackElement = jbpmContextStack.pop();

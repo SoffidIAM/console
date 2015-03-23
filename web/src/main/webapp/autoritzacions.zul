@@ -216,7 +216,7 @@
 		<attribute name="onCreate">
 			carregaDescripcionsXML();
 		</attribute> 
-		<criteris id="queryWindow" onOK="search()"
+		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
 			width="${amplaria}">
 			<vbox width="100%">
 				<separator/>

@@ -7,6 +7,8 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
+	<style src="~./styles/estil.css"/>
+
 	<datamodel id="model" rootNode="dadesAddicionals" src="descriptorDadaAddicional.xml"/>
 	
 	<zscript src="comu/netejaCriteris.zul"/>
@@ -184,7 +186,7 @@
 	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
 		focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}"
+		<criteris id="queryWindow" height="${queryWindowMin}" width="100%"
 			onOK="search()">
 		
 			<hbox width="100%">
@@ -200,14 +202,16 @@
 				<deletebutton acces="${canDeleteMetadata}" listbox="/esquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>
 				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
-			</toolbar> 
-			<listbox visible="true" id="listbox" autocommit="false" dataPath="/model:/dadaAddicional"
-				fixedLayout="true" width="100%" onClick="showDetall()"
+			</toolbar>
+			<listbox id="listbox" autocommit="false" dataPath="/model:/dadaAddicional"
+				fixedLayout="true" height="96%" onClick="showDetall()"
 				onSelect="select()" rows="${fileres}"
 				 onCreate="checkTruncatedList(self)">
 				<listhead>
-					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto" width="20%"/>
-					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" width="80%"/>
+					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto"
+						width="5%"/>
+					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto"
+						width="95%"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">
@@ -248,7 +252,7 @@
 				}
 			</zscript>		
 			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
-				<grid width="100%">
+				<grid width="99%">
 					<columns>
 						<column width="15%"></column>
 						<column width="85%"/>

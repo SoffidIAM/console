@@ -8,7 +8,7 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
 	<style src="~./styles/estil.css"/>
-	
+
 	<datamodel id="model" rootNode="tipusUnitatsOrganitzatives"
 		src="descriptorTipusUnitatOrganitzativa.xml"/>
 	
@@ -190,10 +190,10 @@
 		]]>
 	</zscript>
 
-	<esquema id="esquema" datamodel="/model"
+	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
 		focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}"
+		<criteris id="queryWindow" height="${queryWindowMin}" width="${amplaria}"
 			onOK="search()">
 			<hbox>
 				<input_criteri id="queryCodi"
@@ -204,7 +204,7 @@
 				etiqueta="${c:l('tipusUnitatsOrganitzatives.zul.Descripcia')}" />
 		</criteris>
 		
-		<navegador id="lista">
+		<navegador id="lista" width="${amplaria}">
 			<toolbar>
 				<insertbutton acces="${canCreateOrganizationalUnit}"
 					listbox="/esquema/lista/listbox" onClick="showDetall()"/>
@@ -214,17 +214,17 @@
 				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
 			</toolbar>
 			<listbox id="listbox" autocommit="false" fixedLayout="true" height="96%"
-				dataPath="/model:/tipusUnitatOrganitzativa" onClick="showDetall()" width="100%"
+				dataPath="/model:/tipusUnitatOrganitzativa" onClick="showDetall()"
 				onSelect="select()" rows="${fileres}" onCreate="checkTruncatedList(self)">
 				<listhead>
 					<listheader label="${c:l('tipusUnitatsOrganitzatives.zul.Codi-2')}"
-						sort="auto" width="20%"/>
+						sort="auto" width="200"/>
 					<listheader
 						label="${c:l('tipusUnitatsOrganitzatives.zul.Descripcia-2')}"
-						sort="auto" width="40%"/>
+						sort="auto"/>
 				</listhead>
 				<listfoot>
-					<listfooter span="2">
+					<listfooter span="3">
 						<label id="listboxFoot" style="margin-left: 10px;" />
 					</listfooter>
 				</listfoot>
@@ -256,7 +256,7 @@
 			</zscript>
 			<form id="form" dataPath="/esquema/lista/listbox:/."
 				onChangeXPath="onChangeDades()" width="100%">
-				<grid width="100%">
+				<grid>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('tipusUnitatsOrganitzatives.zul.Codi-2')}"/>

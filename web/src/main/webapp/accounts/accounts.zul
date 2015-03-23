@@ -385,10 +385,10 @@
 
 		<esquemavertical datamodel="/model" focusCriteri="queryName"
 			id="esquema" onHideFormulari="showLista()">
-			<form dataPath="/model:/query" width="100%">
+			<form dataPath="/model:/query">
 				<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()"
 					width="${amplaria}">
-					<vbox>
+					<vbox width="60%">
 						<hbox>
 							<input_criteri id="queryName" etiqueta="${c:l('accounts.name')}"
 								bind="name" />

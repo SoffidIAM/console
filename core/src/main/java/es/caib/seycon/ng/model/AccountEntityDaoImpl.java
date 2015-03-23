@@ -59,13 +59,13 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	@Override
 	public void remove (AccountEntity entity)
 	{
-		getAccountAccessEntityDao().remove(new LinkedList<AccountAccessEntity>(entity.getAcl()));
+		getAccountAccessEntityDao().remove(entity.getAcl());
 		entity.getAcl().clear();
-		getUserAccountEntityDao().remove(new LinkedList<UserAccountEntity>(entity.getUsers()));
+		getUserAccountEntityDao().remove(entity.getUsers());
 		entity.getUsers().clear();
-		getAccountPasswordEntityDao().remove(new LinkedList<AccountPasswordEntity>(entity.getPasswords()));
+		getAccountPasswordEntityDao().remove(entity.getPasswords());
 		entity.getPasswords().clear();
-		getRolAccountEntityDao().remove(new LinkedList<RolAccountEntity>(entity.getRoles()));
+		getRolAccountEntityDao().remove(entity.getRoles());
 		entity.getRoles().clear();
 		for (AuditoriaEntity aud: getAuditoriaEntityDao().query(
 						"select aud from es.caib.seycon.ng.model.AuditoriaEntity as aud where aud.accountAssoc.id=:id" //$NON-NLS-1$
@@ -205,7 +205,7 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 				queryObject.setMaxResults (criteria.getMaximumResultSize ().intValue()); 
 			}
 			@SuppressWarnings("rawtypes")
-			java.util.List<AccountEntity> results = queryObject.list();
+			java.util.List results = queryObject.list();
 			return (java.util.List<es.caib.seycon.ng.model.AccountEntity>) results;
 		}
 		catch (org.hibernate.HibernateException ex) 

@@ -4,14 +4,14 @@ img, video, canvas { max-width: 100%;}
 /****** TOP LINE ******/
 .topline{height:35px !important; background-color: #22B9D8 !important; border-bottom: 0.1em solid #7f9fc2 !important; padding: 0 !important; margin: 0 !important; box-shadow: 0px 1px 7px #888888;}
 .startmenu, .startmenu:hover{border: 0px !important; float: left; width: 65px; border: 0; height: 22px; border-radius: 0; background-color: #22B9D8 !important; padding: 7px !important; margin: 0 !important;}
-#logo{ margin: 0px 10px 0px 5px; vertical-align: -45%; background: transparent}
+#logo{float: left; height:30px; margin: 3px 0px 0px 5px;}
+.startmenu img{width:15px;}
 .benvingutmsg{padding:7px 5px 0px 0px;}
 .topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{font-family: "Avenir LT Std", Calibri, Arial !important; font-size:18px !important; color: white; font-weight: normal !important;}
 .col_cen, .benvingut, .titol_tanca{display:none;}
 .codiusuari:hover{
 	text-decoration: underline;
 }
-.col_cen {margin-top: 7px}
 
 /****** MENU PRINCIPAL/PERFIL Y VENTANAS ******/
 .shadow-window{ box-shadow: 0px 1px 7px #888888; }

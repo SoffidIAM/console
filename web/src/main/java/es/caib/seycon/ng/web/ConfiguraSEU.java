@@ -128,14 +128,16 @@ public class ConfiguraSEU extends Vbox {
 			 	amplediv2_98 = 392;
 			 	amplefinestra = 750;
 			}
+			String amplaria = (ample - 50)+"px";  //$NON-NLS-1$
+			String amplaria2 = (ample - 70)+"px"; //$NON-NLS-1$
 			String hPantalla = (hPantalla2)+""; //$NON-NLS-1$
 			//String wPantalla = (widthPantalla * 0.94)+"px";
 			
 			sessio.setAttribute("ample", new Integer(ample)); //$NON-NLS-1$
 			sessio.setAttribute("amplediv2", new Integer(amplediv2)); //$NON-NLS-1$
 			sessio.setAttribute("amplediv2_98",  new Integer(amplediv2_98)); //$NON-NLS-1$
-			sessio.setAttribute("amplaria", "100%"); //$NON-NLS-1$
-			sessio.setAttribute("amplaria2", "100%"); //$NON-NLS-1$
+			sessio.setAttribute("amplaria", amplaria); //$NON-NLS-1$
+			sessio.setAttribute("amplaria2", amplaria2); //$NON-NLS-1$
 			sessio.setAttribute("amplefinestra", amplefinestra+"px"); //$NON-NLS-1$ //$NON-NLS-2$
 			//sessio.setAttribute("widthPantalla", wPantalla);
 			sessio.setAttribute("heigthPantalla", hPantalla); //$NON-NLS-1$

@@ -10,7 +10,8 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<frame id="p_usuaris" saveContent="true"
 		title="${c:l('usuaris.lblGestionUsuarios1')}" width="99%">
-		<style src="~.s/tyles/estil.css" />
+		<style src="~./styles/estil.css" />
+		<style src="/css/localSEU.css" />
 		<style>
 			span.etiqueta {white-space:nowrap !important;}
 			.dataListcelldestacada div { background-color: #FF0000; }
@@ -26,8 +27,6 @@
 
 		<zscript>
 			<![CDATA[
-				String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
-				boolean readOnly = requestedUser != null;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
 				
@@ -60,9 +59,9 @@
 				// Autoritzacions d'usuari;
 				import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 				import es.caib.zkib.datasource.XPathUtils;
-				canCreateUser = !readOnly && AutoritzacionsUsuari.hasCreateUser();
-				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
-				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
+				canCreateUser = AutoritzacionsUsuari.hasCreateUser();
+				canUpdateUser = AutoritzacionsUsuari.hasUpdateUser();
+				canUpdateCustomUser = AutoritzacionsUsuari.hasUpdateCustomUser();
 				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
 				canQueryUser = AutoritzacionsUsuari.hasQueryUser();
 				canRefreshUser = AutoritzacionsUsuari.hasRefreshUser();
@@ -71,13 +70,13 @@
 				//canQueryUserGroup = AutoritzacionsUsuari.canQueryUserGroup();
 				//canQueryUserPrinter = AutoritzacionsUsuari.canQueryUserPrinter();
 				//canCreateUserMetadata = AutoritzacionsUsuari.canCreateUserMetadata();
-				canUpdateUserMetadata = !readOnly && AutoritzacionsUsuari.hasUpdateUserMetadata();
-				canCreateUserRole = !readOnly && AutoritzacionsUsuari.hasCreateUserRole();
-				canDeleteUserRole = !readOnly && AutoritzacionsUsuari.hasDeleteUserRole();
-				canCreateUserGroup = !readOnly && AutoritzacionsUsuari.hasCreateUserGroup();
-				canDeleteUserGroup = !readOnly && AutoritzacionsUsuari.hasDeleteUserGroup();
-				canCreateUserPrinter = !readOnly && AutoritzacionsUsuari.hasCreateUserPrinter();
-				canDeleteUserPrinter = !readOnly && AutoritzacionsUsuari.hasDeleteUserPrinter();
+				canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+				canCreateUserRole = AutoritzacionsUsuari.hasCreateUserRole();
+				canDeleteUserRole = AutoritzacionsUsuari.hasDeleteUserRole();
+				canCreateUserGroup = AutoritzacionsUsuari.hasCreateUserGroup();
+				canDeleteUserGroup = AutoritzacionsUsuari.hasDeleteUserGroup();
+				canCreateUserPrinter = AutoritzacionsUsuari.hasCreateUserPrinter();
+				canDeleteUserPrinter = AutoritzacionsUsuari.hasDeleteUserPrinter();
 				canViewRegistresAccesUsuari = AutoritzacionsUsuari
 						.hasQueryUserAccessRegister();
 				canViewMazingerUsuari = AutoritzacionsUsuari.hasQueryUserMazinger();
@@ -2998,6 +2997,7 @@ String nomRolsBorrar = "";
 	</frame>
 	<zscript>
 	<![CDATA[
+			String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
 			if (requestedUser != null)
 			{
 				qw = esquema.getFellow("queryWindow");

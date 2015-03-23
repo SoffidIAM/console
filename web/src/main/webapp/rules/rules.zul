@@ -243,18 +243,20 @@
 
 		<esquemavertical id="esquema" datamodel="/model"
 			focusCriteri="queryDescription" onHideFormulari="showLista()">
-			<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
-				width="${amplaria}">
-				<vbox width="60%">
-					<hbox>
-						<input_criteri id="queryDescription"
-							etiqueta="${c:l('rules.description')}" />
-						<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
-					</hbox>
-				</vbox>
-				<separator spacing="9px" />
-			</criteris>
-	
+			<form dataPath="/model:/query">
+				<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
+					width="${amplaria}">
+					<vbox width="60%">
+						<hbox>
+							<input_criteri id="queryDescription"
+								etiqueta="${c:l('rules.description')}" />
+							<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
+						</hbox>
+					</vbox>
+					<separator spacing="9px" />
+				</criteris>
+			</form>
+
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
 					<insertbutton acces="${canCreateRules}"
@@ -287,7 +289,7 @@
 			<detalls id="dades" width="${amplaria}">
 				
 				<form id="form" dataPath="/esquema/lista/listbox:/" 
-					onChangeXPath="updateFormFields()" width="100%">
+					onChangeXPath="updateFormFields()" width="880px">
 				<div style="width: 100%;">
  					<div style="width: 48%; float: left;">
 						<div style="width: 30%; float:left; ">
@@ -337,7 +339,7 @@
 							</button>
 						</div>
  					</div>
-					<div style="margin-left: 52%; width: 48%">
+					<div style="margin-left: 52%; ">
 						<div>
 							<label value="${c:l('rules.roles')}" />
 						</div>
@@ -348,7 +350,7 @@
 									visible="${canCreateRules}" onClick="addGrantedRole()"
 									onActualitza="grantRole(event.data)" />
 							</toolbar>
-							<grid dataPath="/ruleAssignedRole" id="rolesGrid" width="100%" fixedLayout="true">
+							<grid dataPath="/ruleAssignedRole" id="rolesGrid">
 								<attribute name="onNewRow"><![CDATA[
 								   Row row = event.data;
 								   activateButton(row);

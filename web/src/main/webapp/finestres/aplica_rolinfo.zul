@@ -63,7 +63,7 @@
 	
 	<window id="esquemaRol" closable="true" position="center, center"
 		sizable="true" title="${c:l('aplica_rolinfo.Titol')}" visible="false"
-		width="${amplefinestra}">
+		width="90%">
 
 		<datamodel id="dsAgents" rootNode="root" src="descriptorRol.xml"/>
 		
@@ -141,8 +141,8 @@
 			onWindowClose(event);
 		</attribute>
 	
-		<detalls id="dades" width="99%">
-			<form id="form" width="100%" dataPath="/esquemaRol/dsAgents:/rol[1]"
+		<detalls id="dades">
+			<form id="form" dataPath="/esquemaRol/dsAgents:/rol[1]"
 				onAfegirRolPare="afegirRolPare(event.data)"
 				onSelectedDomainValue="onSelectedDomainValue(event.data)"
 				onSelectedDomainValueGroup="onSelectedDomainValueGroup(event.data)"
@@ -337,7 +337,7 @@
 						}
 					]]>
 				</zscript>
-				<grid width="99%" >
+				<grid >
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>

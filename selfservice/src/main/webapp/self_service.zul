@@ -328,7 +328,7 @@
 			<div class="wrap">
 				<div class="tasks accounts">
 					<div class="tasks">
-						<vbox use="es.caib.bpm.ui.inbox.InboxHandler" id="inboxhandler">
+						<vbox use="es.caib.bpm.ui.inbox.InboxHandler" id="inboxhandler" sclass="">
 							<label value="${c:l('selfService.MyTasks')}" sclass="titolSelf"/>
 							<listbox fixedLayout="true" id="listadoTareas" mold="paging" pageSize="15" sclass="senseBorder">
 								<listhead>

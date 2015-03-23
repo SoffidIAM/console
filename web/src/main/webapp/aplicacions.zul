@@ -5,7 +5,7 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml">
+<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('aplicacions.lblGestioAplicacions') }">
 	<style src="~./styles/estil.css"/>
 	
 	<style>
@@ -1118,272 +1118,260 @@
 						</zscript>
 						
 						<tabpanel fulfill="tabrols.onSelect" id="rols" onFulfill="doitright()">
-							<grid>
-								<rows>
-									<row>
-										<vbox width="100%">
-											<listbox fixedLayout="true" id="gridRols" mold="paging" pageSize="15" 
-												sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)">
-												<listhead>
-													<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%"/>
-													<listheader label="${c:l('aplicacions.zul.Descripcia')}" sort="auto" width="32%"/>
-													<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="14%"/>
-													<listheader label="${c:l('aplicacions.zul.Defecte')}" sort="auto" tooltiptext="Defecte" width="40px"/>
-													<listheader label="${c:l('aplicacions.zul.Contrasenya')}" sort="auto" tooltiptext="Contrasenya" width="40px"/>
-													<listheader label="${c:l('aplicacions.zul.Ind')}" sort="auto" tooltiptext="Assignació Indirecta" width="30px"/>
-													<listheader label="${c:l('aplicacions.zul.gWF')}" tooltiptext="Gestionable per Workflow" width="30px"/>												
-													<listheader label="${c:l('aplicacions.zul.Domini')}" sort="auto" width="14%"/>
-													<listheader id="c_gestionaRol" label="${c:l('aplicacions.zul.*')}" sclass="tcoth" visible="${canModifyAplicacio}" width="30px"/>
-													<listheader id="c_eliminaRol" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
-													<listheader id="c_eliminaRols" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
-													<listheader id="c_usuariosRol" label="${c:l('aplicacions.zul.·')}" sclass="tcoth" visible="${canQueryAplicacio}" width="30px"/>
-													<listheader id="c_permisosRol" label="${c:l('aplicacions.zul.·')}" sclass="tcoth" visible="${canQueryAplicacio}" width="30px"/>
-												</listhead>
-												<dataitem bind=".">
-													<listcell bind="@nom" tooltip="tnomRol"/>
-													<listcell bind="@descripcio"/>
-													<listcell bind="@baseDeDades"/>
-													<listcell bind="@defecte"/>
-													<listcell bind="@contrasenya"/>
-													<listcell bind="@assignacioIndirecta"/>
-													<listcell>
-														<checkbox bind="@gestionableWF" disabled="${!canModifyAplicacio}" onCheck=""/>
-													</listcell>
-													<listcell bind="domini/@nom"/>
-													<listcell sclass="tcoth">
-													<imageclic src="~./img/vincula.gif" tooltip="vincula">
-														<attribute name="onClick">
-														<![CDATA[
-															if (canModifyAplicacio)
-															{
-																rol = self.parent.parent.value.instance;
-																Page rolPage = desktop.getPage("rol");
-																// Grupos poseedores del rol
-																codiAplicacio = form.getJXPathContext().getValue("@codi");
-																rolPage.setAttribute("aplicacio", codiAplicacio);
-																rolPage.setAttribute("modifica", true);
-																rolPage.setAttribute("contextComponent", gridRols);
-																es.caib.zkib.binder.BindContext ctx =
-																	es.caib.zkib.datasource
-																	.XPathUtils.getComponentContext(self);
-																rolPage.setAttribute("rolPath", ctx);
-																rolPage.setAttribute("rol",
-																	new es.caib.seycon.ng.comu.Rol(rol));
-																
-																// Append new roles added
-																rolPage.setAttribute("newRole", newRoles);
-																
-																Events.postEvent ("onInicia",
-																		rolPage.getFellow("esquemaRol"),
-																		null);
-															}
-															]]>
-														</attribute>
-													</imageclic>
-													</listcell>
-													<listcell sclass="tcoth">
-														<imageclic src="~./img/list-remove.gif" tooltip="esborraRol">
-															<attribute name="onClick">
-																if (canModifyAplicacio || canDeleteAplicacio) {
-																	listCell = self.getParent(); 
-																	dlistbox = listCell.getListbox(); 
-																	modelo = dlistbox.getModel();
-																	listItem = listCell.getParent(); 
-																	posicio = listItem.getIndex(); 
-																	elemPos = modelo.getElementAt(posicio); 
-																	xpath = elemPos.getDataContext().getXPath(); 
-																	dataSource = gridRols.getDataSource();
-																	context = dataSource.getJXPathContext();
-																	dada = context.getValue(xpath+"/@nom") + "@" + context.getValue(xpath+"/@baseDeDades"); 														
-																	Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRol"), new Object [] {dada}),
-																		org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRol2"),
-																		new EventListener() {
-																			public void onEvent(Event evt) {
-																				if ("onOK".equals(evt.getName())) { 
-																						context.removePath(xpath);
-														   						}
-														   				    }
-														   			});
-																}
-															</attribute>
-														</imageclic>
-													</listcell>
-													<listcell sclass="tcoth">
-														<checkbox/>
-													</listcell>
-													<listcell sclass="tcoth">
-														<imageclic src="~./img/grup.gif" tooltip="llistausuaris">
-															<attribute name="onClick">
-																if (canQueryAplicacio) {
-																	codiAplicacio = esquema.getFellow("dades").getFellow("form").getFellow("detall_codi").value;
-																	desktop.getPage("usuarisRolLlista").setAttribute("apl",codiAplicacio);
-																	//dataRow = self.getParent();
-																	//xpath = dataRow.getXPath();
-																	listCell = self.getParent(); 
-																	dlistbox = listCell.getListbox(); 
-																	modelo = dlistbox.getModel();
-																	listItem = listCell.getParent(); 
-																	posicio = listItem.getIndex(); 
-																	elemPos = modelo.getElementAt(posicio); 
-																	xpath = elemPos.getDataContext().getXPath();
-																		
-																	ds = gridRols.getDataSource();
-																	ctx = ds.getJXPathContext();
-																	actualRol = ctx.getValue(xpath+"/@nom");
-																	actualBbdd = ctx.getValue(xpath+"/@baseDeDades");
-																	tipusDominiRol = ctx.getValue(xpath+"/domini/@nom");
-																	desktop.getPage("usuarisRolLlista").setAttribute("rol",actualRol);
-																	desktop.getPage("usuarisRolLlista").setAttribute("bbdd",actualBbdd);
-																	desktop.getPage("usuarisRolLlista").setAttribute("tipusDominiRol",tipusDominiRol);
-																	Events.postEvent	("onInicia",desktop.getPage("usuarisRolLlista").getFellow("esquemaLlista"),gridRols);
-																}
-															</attribute>
-														</imageclic>
-													</listcell>
-													<listcell>
-														<imageclic src="img/info.png" tooltiptext="Permisos del rol">
-															<attribute name="onClick">
-																if (canQueryAplicacio) {
-																	codiAplicacio = esquema.getFellow("dades").getFellow("form").getFellow("detall_codi").value;
-																	desktop.getPage("aplica_permisosRol").setAttribute("apl",codiAplicacio);
-																	listCell = self.getParent(); 
-																	dlistbox = listCell.getListbox(); 
-																	modelo = dlistbox.getModel();
-																	listItem = listCell.getParent(); 
-																	posicio = listItem.getIndex(); 
-																	elemPos = modelo.getElementAt(posicio); 
-																	xpath = elemPos.getDataContext().getXPath();
-																		
-																	ds = gridRols.getDataSource();
-																	ctx = ds.getJXPathContext();
-																	actualRol = ctx.getValue(xpath+"/@nom");
-																	actualBbdd = ctx.getValue(xpath+"/@baseDeDades");
-																	tipusDominiRol = ctx.getValue(xpath+"/domini/@nom");
-																	desktop.getPage("aplica_permisosRol").setAttribute("rol",actualRol);
-																	desktop.getPage("aplica_permisosRol").setAttribute("bbdd",actualBbdd);
-																	desktop.getPage("aplica_permisosRol").setAttribute("tipusDominiRol",tipusDominiRol);
-																	Events.postEvent	("onInicia",desktop.getPage("aplica_permisosRol").getFellow("esquemaLlista"),gridRols);
-																}
-															</attribute>
-														</imageclic>
-													</listcell>
-												</dataitem>	
-											</listbox>
-											<popup id="tnomRol" width="200px">
-												<attribute name="onOpen">
-													if (event.getReference() instanceof DataListcell) {
-														listCell = event.getReference(); 
-														dlistbox = listCell.getListbox(); 
-														modelo = dlistbox.getModel(); 
-														listItem = listCell.getParent(); 
-														posicio = listItem.getIndex(); 
-														elemPos = modelo.getElementAt(posicio); 
-														xpath = elemPos.getDataContext().getXPath(); 
-														dataSource = gridRols.getDataSource(); 
-														context = dataSource.getJXPathContext();  
-														dada = context.getValue(xpath+"/@nom");
-														rolsNomTooltipLabel.value = dada;
+							<listbox fixedLayout="true" id="gridRols" mold="paging" pageSize="15" width="100%"
+								sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)">
+								<listhead>
+									<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%"/>
+									<listheader label="${c:l('aplicacions.zul.Descripcia')}" sort="auto" width="32%"/>
+									<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="14%"/>
+									<listheader label="${c:l('aplicacions.zul.Defecte')}" sort="auto" tooltiptext="Defecte" width="40px"/>
+									<listheader label="${c:l('aplicacions.zul.Contrasenya')}" sort="auto" tooltiptext="Contrasenya" width="40px"/>
+									<listheader label="${c:l('aplicacions.zul.Ind')}" sort="auto" tooltiptext="Assignació Indirecta" width="30px"/>
+									<listheader label="${c:l('aplicacions.zul.gWF')}" tooltiptext="Gestionable per Workflow" width="30px"/>												
+									<listheader label="${c:l('aplicacions.zul.Domini')}" sort="auto" width="14%"/>
+									<listheader id="c_gestionaRol" label="${c:l('aplicacions.zul.*')}" sclass="tcoth" visible="${canModifyAplicacio}" width="30px"/>
+									<listheader id="c_eliminaRol" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
+									<listheader id="c_eliminaRols" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
+									<listheader id="c_usuariosRol" label="${c:l('aplicacions.zul.·')}" sclass="tcoth" visible="${canQueryAplicacio}" width="30px"/>
+									<listheader id="c_permisosRol" label="${c:l('aplicacions.zul.·')}" sclass="tcoth" visible="${canQueryAplicacio}" width="30px"/>
+								</listhead>
+								<dataitem bind=".">
+									<listcell bind="@nom" tooltip="tnomRol"/>
+									<listcell bind="@descripcio"/>
+									<listcell bind="@baseDeDades"/>
+									<listcell bind="@defecte"/>
+									<listcell bind="@contrasenya"/>
+									<listcell bind="@assignacioIndirecta"/>
+									<listcell>
+										<checkbox bind="@gestionableWF" disabled="${!canModifyAplicacio}" onCheck=""/>
+									</listcell>
+									<listcell bind="domini/@nom"/>
+									<listcell sclass="tcoth">
+									<imageclic src="~./img/vincula.gif" tooltip="vincula">
+										<attribute name="onClick">
+										<![CDATA[
+											if (canModifyAplicacio)
+											{
+												rol = self.parent.parent.value.instance;
+												Page rolPage = desktop.getPage("rol");
+												// Grupos poseedores del rol
+												codiAplicacio = form.getJXPathContext().getValue("@codi");
+												rolPage.setAttribute("aplicacio", codiAplicacio);
+												rolPage.setAttribute("modifica", true);
+												rolPage.setAttribute("contextComponent", gridRols);
+												es.caib.zkib.binder.BindContext ctx =
+													es.caib.zkib.datasource
+													.XPathUtils.getComponentContext(self);
+												rolPage.setAttribute("rolPath", ctx);
+												rolPage.setAttribute("rol",
+													new es.caib.seycon.ng.comu.Rol(rol));
+												
+												// Append new roles added
+												rolPage.setAttribute("newRole", newRoles);
+												
+												Events.postEvent ("onInicia",
+														rolPage.getFellow("esquemaRol"),
+														null);
+											}
+											]]>
+										</attribute>
+									</imageclic>
+									</listcell>
+									<listcell sclass="tcoth">
+										<imageclic src="~./img/list-remove.gif" tooltip="esborraRol">
+											<attribute name="onClick">
+												if (canModifyAplicacio || canDeleteAplicacio) {
+													listCell = self.getParent(); 
+													dlistbox = listCell.getListbox(); 
+													modelo = dlistbox.getModel();
+													listItem = listCell.getParent(); 
+													posicio = listItem.getIndex(); 
+													elemPos = modelo.getElementAt(posicio); 
+													xpath = elemPos.getDataContext().getXPath(); 
+													dataSource = gridRols.getDataSource();
+													context = dataSource.getJXPathContext();
+													dada = context.getValue(xpath+"/@nom") + "@" + context.getValue(xpath+"/@baseDeDades"); 														
+													Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRol"), new Object [] {dada}),
+														org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRol2"),
+														new EventListener() {
+															public void onEvent(Event evt) {
+																if ("onOK".equals(evt.getName())) { 
+																		context.removePath(xpath);
+										   						}
+										   				    }
+										   			});
+												}
+											</attribute>
+										</imageclic>
+									</listcell>
+									<listcell sclass="tcoth">
+										<checkbox/>
+									</listcell>
+									<listcell sclass="tcoth">
+										<imageclic src="~./img/grup.gif" tooltip="llistausuaris">
+											<attribute name="onClick">
+												if (canQueryAplicacio) {
+													codiAplicacio = esquema.getFellow("dades").getFellow("form").getFellow("detall_codi").value;
+													desktop.getPage("usuarisRolLlista").setAttribute("apl",codiAplicacio);
+													//dataRow = self.getParent();
+													//xpath = dataRow.getXPath();
+													listCell = self.getParent(); 
+													dlistbox = listCell.getListbox(); 
+													modelo = dlistbox.getModel();
+													listItem = listCell.getParent(); 
+													posicio = listItem.getIndex(); 
+													elemPos = modelo.getElementAt(posicio); 
+													xpath = elemPos.getDataContext().getXPath();
+														
+													ds = gridRols.getDataSource();
+													ctx = ds.getJXPathContext();
+													actualRol = ctx.getValue(xpath+"/@nom");
+													actualBbdd = ctx.getValue(xpath+"/@baseDeDades");
+													tipusDominiRol = ctx.getValue(xpath+"/domini/@nom");
+													desktop.getPage("usuarisRolLlista").setAttribute("rol",actualRol);
+													desktop.getPage("usuarisRolLlista").setAttribute("bbdd",actualBbdd);
+													desktop.getPage("usuarisRolLlista").setAttribute("tipusDominiRol",tipusDominiRol);
+													Events.postEvent	("onInicia",desktop.getPage("usuarisRolLlista").getFellow("esquemaLlista"),gridRols);
+												}
+											</attribute>
+										</imageclic>
+									</listcell>
+									<listcell>
+										<imageclic src="img/info.png" tooltiptext="Permisos del rol">
+											<attribute name="onClick">
+												if (canQueryAplicacio) {
+													codiAplicacio = esquema.getFellow("dades").getFellow("form").getFellow("detall_codi").value;
+													desktop.getPage("aplica_permisosRol").setAttribute("apl",codiAplicacio);
+													listCell = self.getParent(); 
+													dlistbox = listCell.getListbox(); 
+													modelo = dlistbox.getModel();
+													listItem = listCell.getParent(); 
+													posicio = listItem.getIndex(); 
+													elemPos = modelo.getElementAt(posicio); 
+													xpath = elemPos.getDataContext().getXPath();
+														
+													ds = gridRols.getDataSource();
+													ctx = ds.getJXPathContext();
+													actualRol = ctx.getValue(xpath+"/@nom");
+													actualBbdd = ctx.getValue(xpath+"/@baseDeDades");
+													tipusDominiRol = ctx.getValue(xpath+"/domini/@nom");
+													desktop.getPage("aplica_permisosRol").setAttribute("rol",actualRol);
+													desktop.getPage("aplica_permisosRol").setAttribute("bbdd",actualBbdd);
+													desktop.getPage("aplica_permisosRol").setAttribute("tipusDominiRol",tipusDominiRol);
+													Events.postEvent	("onInicia",desktop.getPage("aplica_permisosRol").getFellow("esquemaLlista"),gridRols);
+												}
+											</attribute>
+										</imageclic>
+									</listcell>
+								</dataitem>	
+							</listbox>
+							<popup id="tnomRol" width="200px">
+								<attribute name="onOpen">
+									if (event.getReference() instanceof DataListcell) {
+										listCell = event.getReference(); 
+										dlistbox = listCell.getListbox(); 
+										modelo = dlistbox.getModel(); 
+										listItem = listCell.getParent(); 
+										posicio = listItem.getIndex(); 
+										elemPos = modelo.getElementAt(posicio); 
+										xpath = elemPos.getDataContext().getXPath(); 
+										dataSource = gridRols.getDataSource(); 
+										context = dataSource.getJXPathContext();  
+										dada = context.getValue(xpath+"/@nom");
+										rolsNomTooltipLabel.value = dada;
+									}
+								</attribute>
+								<label id="rolsNomTooltipLabel" value=""/>
+							</popup>
+							<div width="100%" style="margin-top: 10px">
+								<button id="btAfegirRol" image="~./img/list-add.gif"
+									label="${c:l('aplicacions.zul.Afegeixrol')}"
+									visible="${canModifyAplicacio}">
+									<attribute name="onClick">
+										<![CDATA[
+											Page rolPage = desktop.getPage("rol");
+											// Grupos poseedores del rol
+											codiAplicacio = form.getJXPathContext().getValue("@codi");
+											rolPage.setAttribute("aplicacio", codiAplicacio);
+											rolPage.setAttribute("modifica", false);
+											rolPage.setAttribute("contextComponent", gridRols);
+											rolPage.setAttribute("rolPath", null);
+											rolPage.setAttribute("rol",
+												new es.caib.seycon.ng.comu.Rol());
+											rolPage.setAttribute("newRole", null);
+											Events.postEvent("onInicia",
+												rolPage.getFellow("esquemaRol"), null);
+											Events.postEvent("onInicia",
+												desktop.getPage("rol").getFellow("esquemaRol"),
+												gridRols);
+										]]>
+									</attribute>
+								</button>
+								<button image="~./img/list-remove.gif" label="${c:l('aplicacions.zul.Esborrarolsseleccion')}" visible="${canModifyAplicacio or canDeleteAplicacio}">
+									<attribute name="onClick">
+										String nomRolsBorrar = "";
+										ArrayList rolsBorrar = new ArrayList();
+										Collection items = gridRols.getItems(); 
+										for (Iterator it = items.iterator(); it.hasNext();) {
+											Listitem item = (Listitem) it.next();
+											Collection cells = item.getChildren(); 
+											int pos = 0;
+											String nomRol ="";
+											DataCheckbox cbox = null;
+											Listcell celdaBorrar = null;
+											for (Iterator itcell = cells.iterator(); itcell
+													.hasNext();) {
+												Listcell cell = (Listcell) itcell.next(); 
+												if (pos==0) {nomRol = cell.getLabel(); celdaBorrar = cell;} 
+												else if (pos==2) {nomRol += "@"+cell.getLabel(); } 
+												else
+													if (pos==10) {
+														Iterator itcb = cell.getChildren().iterator();
+														if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
 													}
-												</attribute>
-												<label id="rolsNomTooltipLabel" value=""/>
-											</popup>
-											<hbox width="100%" widths="50%,50%">
-												<hbox>
-													<button id="btAfegirRol" image="~./img/list-add.gif"
-														label="${c:l('aplicacions.zul.Afegeixrol')}"
-														visible="${canModifyAplicacio}">
-														<attribute name="onClick">
-															<![CDATA[
-																Page rolPage = desktop.getPage("rol");
-																// Grupos poseedores del rol
-																codiAplicacio = form.getJXPathContext().getValue("@codi");
-																rolPage.setAttribute("aplicacio", codiAplicacio);
-																rolPage.setAttribute("modifica", false);
-																rolPage.setAttribute("contextComponent", gridRols);
-																rolPage.setAttribute("rolPath", null);
-																rolPage.setAttribute("rol",
-																	new es.caib.seycon.ng.comu.Rol());
-																rolPage.setAttribute("newRole", null);
-																Events.postEvent("onInicia",
-																	rolPage.getFellow("esquemaRol"), null);
-																Events.postEvent("onInicia",
-																	desktop.getPage("rol").getFellow("esquemaRol"),
-																	gridRols);
-															]]>
-														</attribute>
-													</button>
-													<button image="~./img/list-remove.gif" label="${c:l('aplicacions.zul.Esborrarolsseleccion')}" visible="${canModifyAplicacio or canDeleteAplicacio}">
-														<attribute name="onClick">
-															String nomRolsBorrar = "";
-															ArrayList rolsBorrar = new ArrayList();
-															Collection items = gridRols.getItems(); 
-															for (Iterator it = items.iterator(); it.hasNext();) {
-																Listitem item = (Listitem) it.next();
-																Collection cells = item.getChildren(); 
-																int pos = 0;
-																String nomRol ="";
-																DataCheckbox cbox = null;
-																Listcell celdaBorrar = null;
-																for (Iterator itcell = cells.iterator(); itcell
-																		.hasNext();) {
-																	Listcell cell = (Listcell) itcell.next(); 
-																	if (pos==0) {nomRol = cell.getLabel(); celdaBorrar = cell;} 
-																	else if (pos==2) {nomRol += "@"+cell.getLabel(); } 
-																	else
-																		if (pos==10) {
-																			Iterator itcb = cell.getChildren().iterator();
-																			if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
+												pos++; 
+											}
+											if (cbox!=null @and cbox.isChecked()) {
+												nomRolsBorrar += nomRol+", ";
+												rolsBorrar.add(celdaBorrar);
+											}
+										}
+										if (!"".equals(nomRolsBorrar)) {
+											nomRolsBorrar = nomRolsBorrar.substring(0,nomRolsBorrar.length()-2);
+											Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRolllista"), new Object [] {nomRolsBorrar}),
+														org.zkoss.util.resource.Labels.getLabel("aplicacions.Esborra"),
+														new EventListener() {
+															public void onEvent(Event evt) {
+																if ("onOK".equals(evt.getName())) { 
+																		for (i = 0; i @lt rolsBorrar.size(); i++) {
+																			listCell = rolsBorrar.get(i);
+																			dlistbox = listCell.getListbox(); 
+																			modelo = dlistbox.getModel();
+																			listItem = listCell.getParent(); 
+																			posicio = listItem.getIndex(); 
+																			elemPos = modelo.getElementAt(posicio); 
+																			xpath = elemPos.getDataContext().getXPath(); 
+																			dataSource = gridRols.getDataSource();
+																			context = dataSource.getJXPathContext(); 
+																			context.removePath(xpath);
 																		}
-																	pos++; 
-																}
-																if (cbox!=null @and cbox.isChecked()) {
-																	nomRolsBorrar += nomRol+", ";
-																	rolsBorrar.add(celdaBorrar);
-																}
-															}
-															if (!"".equals(nomRolsBorrar)) {
-																nomRolsBorrar = nomRolsBorrar.substring(0,nomRolsBorrar.length()-2);
-																Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRolllista"), new Object [] {nomRolsBorrar}),
-																			org.zkoss.util.resource.Labels.getLabel("aplicacions.Esborra"),
-																			new EventListener() {
-																				public void onEvent(Event evt) {
-																					if ("onOK".equals(evt.getName())) { 
-																							for (i = 0; i @lt rolsBorrar.size(); i++) {
-																								listCell = rolsBorrar.get(i);
-																								dlistbox = listCell.getListbox(); 
-																								modelo = dlistbox.getModel();
-																								listItem = listCell.getParent(); 
-																								posicio = listItem.getIndex(); 
-																								elemPos = modelo.getElementAt(posicio); 
-																								xpath = elemPos.getDataContext().getXPath(); 
-																								dataSource = gridRols.getDataSource();
-																								context = dataSource.getJXPathContext(); 
-																								context.removePath(xpath);
-																							}
-															   						}
-															   				    }
-															   		});
-															}
-														</attribute>
-													</button>
-												</hbox>
-												<hbox style="float:right;">
-													<listexportbutton acces="${canQueryAplicacio}" listbox="gridRols"/>
-												</hbox>
-											</hbox>
-											<popup id="vincula">
-												<label value="${c:l('aplicacions.zul.Modificaunrol')}"/>
-											</popup>
-											<popup id="esborraRol">
-												<label value="${c:l('aplicacions.zul.Esborrarelrol')}"/>
-											</popup>
-											<popup id="llistausuaris">
-												<label value="${c:l('aplicacions.zul.Llistadusuarisambel')}"/>
-											</popup>
-										</vbox>
-									</row>
-								</rows>
-							</grid>
+										   						}
+										   				    }
+										   		});
+										}
+									</attribute>
+								</button>
+								<listexportbutton acces="${canQueryAplicacio}" listbox="gridRols" style="float:right"/>
+							</div>
+							<popup id="vincula">
+								<label value="${c:l('aplicacions.zul.Modificaunrol')}"/>
+							</popup>
+							<popup id="esborraRol">
+								<label value="${c:l('aplicacions.zul.Esborrarelrol')}"/>
+							</popup>
+							<popup id="llistausuaris">
+								<label value="${c:l('aplicacions.zul.Llistadusuarisambel')}"/>
+							</popup>
 						</tabpanel>
 						
 						<tabpanel id="sodrules">
@@ -1581,4 +1569,4 @@ void removeSodRule (Component button)
 	<include src="dominisllista.zul"/>
 	<include src="finestres/aplica_usuarisRolllista.zul"/>
 	<include src="finestres/aplica_permisosRol.zul"/>
-</zk>
+</frame>

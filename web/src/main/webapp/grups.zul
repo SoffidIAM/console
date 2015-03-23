@@ -6,7 +6,7 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
-	
+
 	<style src="~./styles/estil.css"/>
 	
 	<datamodel id="model" rootNode="grups" src="descriptorGrup.xml"
@@ -279,8 +279,7 @@
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 		onCreate="search()" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
-			width="${amplaria}">
+		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()">
 			<hbox>
 				<input_criteri id="queryCodi" etiqueta="${c:l('grups.zul.Codi')}"
 					value="World"/>

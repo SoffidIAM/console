@@ -6,16 +6,23 @@ public class UsuariEntityImpl extends UsuariEntity
 	@Override
 	public String getFullName()
 	{
-		StringBuffer b = new StringBuffer ();
-		b.append (getNom());
-		b.append (" "); //$NON-NLS-1$
-		b.append (getPrimerLlinatge());
-		if (getSegonLlinatge() != null && ! getSegonLlinatge().isEmpty())
+		String nameFormat = System.getProperty("soffid.nameformat");
+		
+		if (nameFormat == null)
 		{
-			b.append(" "); //$NON-NLS-1$
-			b.append (getSegonLlinatge());
+			StringBuffer b = new StringBuffer ();
+			b.append (getNom());
+			b.append (" "); //$NON-NLS-1$
+			b.append (getPrimerLlinatge());
+			if (getSegonLlinatge() != null && ! getSegonLlinatge().isEmpty())
+			{
+				b.append(" "); //$NON-NLS-1$
+				b.append (getSegonLlinatge());
+			}
+			return b.toString();
+		} else {
+			return String.format(nameFormat, getNom(), getSegonLlinatge(), getPrimerLlinatge());
 		}
-		return b.toString();
 	}
 
 }

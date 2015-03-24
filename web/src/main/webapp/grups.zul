@@ -17,6 +17,9 @@
 
 	<zscript>
 		<![CDATA[
+			String requestedGroup = Executions.getCurrent().getNativeRequest().getParameter("group");
+			pageScope{"requestedGroup"} = requestedGroup;
+			
 			import es.caib.zkib.zkiblaf.Missatgebox;
 			try
 			{
@@ -44,7 +47,6 @@
 			boolean canDeleteGroupPrinter = AutoritzacionsUsuari.hasDeleteGroupPrinter();
 			
 			model.getVariables().declareVariable("queryEnabled", canQueryGroup);
-			model.getVariables().declareVariable("codi", "CAIB");
 			
 			model.getVariables().declareVariable("pare", "%");
 			
@@ -57,9 +59,16 @@
 			model.getVariables().declareVariable("canQueryGroupRoles", canQueryGroupRoles);
 			model.getVariables().declareVariable("canQueryGroupUsers", canQueryGroupUsers);
 			
+			
 			retrySearch = false;
 			boolean queryEnabled = false;
 			boolean retrySearch = false;
+			String initialGrup="World";
+			if (requestedGroup != null)
+			{
+				initialGrup = requestedGroup;
+				
+			}
 			
 			void populateDetails ()
 			{
@@ -176,6 +185,10 @@
 				}
 				
 				checkTruncatedTree(treebox);
+				if (requestedGroup != null)
+				{
+					Events.postEvent(new Event("onAutoQuery", esquema));
+				}
 			}
 	
 			void showAltres () 
@@ -228,6 +241,9 @@
 			
 			void onRefrescaArbreIntern(boolean checkCommit)
 			{
+				String rg = pageScope{"requestedGroup"};
+				if (rg != null)
+					return;
 				String xpath_arbre  = null;
 				String xpath_arbre_intern = null;
 				
@@ -278,11 +294,25 @@
 
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 		onCreate="search()" onHideFormulari="showLista()">
+		<attribute name="onAutoQuery">
+		<![CDATA[
+			esquema.getFellow("queryWindow").parent.parent.setVisible(false);
+			Tree treebox = esquema.getFellow("lista").getFellow("treebox");
+			Collection items = treebox.getTreechildren ().getItems();
+			if (items.size() == 1)
+			{
+				Treeitem ti = items.iterator().next();
+				treebox.setSelectedItem(ti);
+				select ();
+				esquema.removeList();
+			}
+			esquema.removeCriteria();
+		]]></attribute>
 	
 		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()">
 			<hbox>
 				<input_criteri id="queryCodi" etiqueta="${c:l('grups.zul.Codi')}"
-					value="World"/>
+					value="${initialGrup}"/>
 				<input_criteri id="queryDescripcio"
 					etiqueta="${c:l('grups.zul.Descripcia')}" />
 				<input_criteri id="queryPare" etiqueta="${c:l('grups.zul.Pare')}" />
@@ -358,6 +388,10 @@
 		</navegador>
 	
 		<detalls id="dades" width="${amplaria}">
+			<toolbar if="${requestedGroup != null }"  height="20px">
+				<commitbutton id="b_commit" datamodel="/model"/>
+				<toolbarbutton label="" ></toolbarbutton>
+			</toolbar>
 			<zscript>
 				<![CDATA[
 					void onChangeDades()
@@ -604,8 +638,22 @@
 									<listheader label="${c:l('grups.zul.Tipus')}" sort="auto" width="120px"/>
 								</listhead>
 								<dataitem bind=".">
-									<listcell bind="@codiUsuari"/>
-									<listcell bind="@nomComplet"/>
+									<listcell bind="@codiUsuari" />
+									<listcell>
+										<label bind="@nomComplet" style="margin-right: 1em"/>
+										<imageclic src="/img/link.png">
+											<attribute name="onClick"><![CDATA[
+                                                if (esquema.canClose())
+					                           		Executions.getCurrent().sendRedirect(
+					                           			"index.zul?embed&target=/usuaris.zul?user="+
+					                           				es.caib.zkib.datasource.XPathUtils.getValue(
+				                           						es.caib.zkib.datasource.XPathUtils.getComponentContext(self),
+				                           						"@codiUsuari"),
+				                           				"soffid_popup");
+											]]>
+											</attribute>
+										</imageclic>
+									</listcell>
 									<listcell bind="@info"/>
 								</dataitem>
 							</listbox>
@@ -810,4 +858,6 @@
 	<include src="finestres/maquinesllistaUsuari.zul"/>
 	<include src="impressoresllista.zul"/>
 	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
+	
+	
 </zk>

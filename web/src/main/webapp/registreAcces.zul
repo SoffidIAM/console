@@ -217,7 +217,26 @@
 					<listcell bind="@idSessio"/>
 					<listcell bind="@nomServidor"/>
 					<listcell bind="@nomClinet"/>
-					<listcell bind="@codiUsuari"/>
+					<listcell>
+						<label bind="@codiUsuari" style="margin-right: 1em"/>
+						<listener bind="@codiUsuari">
+							<attribute name="onUpdate"><![CDATA[
+								self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
+							]]>
+							</attribute>
+						</listener>
+						<imageclic src="/img/link.png">
+								<attribute name="onClick"><![CDATA[
+									String usuari = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self,
+		                          						"@codiUsuari");
+	                           		Executions.getCurrent().sendRedirect(
+		                           			"index.zul?embed&target=/usuaris.zul?user="+usuari,
+		                          				"soffid_popup");
+								]]>
+								</attribute>
+							</imageclic>
+					</listcell>
 					<listcell bind="@codeAge"/>
 					<listcell bind="@informacio"/>
 				</dataitem>

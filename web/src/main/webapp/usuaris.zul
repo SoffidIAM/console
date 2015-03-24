@@ -10,7 +10,7 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<frame id="p_usuaris" saveContent="true"
 		title="${c:l('usuaris.lblGestionUsuarios1')}" width="99%">
-		<style src="~.s/tyles/estil.css" />
+		<style src="~./styles/estil.css" />
 		<style>
 			span.etiqueta {white-space:nowrap !important;}
 			.dataListcelldestacada div { background-color: #FF0000; }
@@ -26,8 +26,9 @@
 
 		<zscript>
 			<![CDATA[
-				String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
-				boolean readOnly = requestedUser != null;
+			    String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
+				pageScope{"requestedUser"} = requestedUser;
+				boolean readOnly = false;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
 				
@@ -380,7 +381,7 @@
 				{
 					model.commit();
 					es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(
-							listbox.getSelectedItem());
+							esquema.getFellow("lista").getFellow("listbox").getSelectedItem());
 					Long idUsuari = (Long) es.caib.zkib.datasource.XPathUtils.getValue(bindCtx, "@id");
 					
 					if(idUsuari != null)
@@ -904,6 +905,7 @@
 
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
+					<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="user"/>
 					<insertbutton acces="${canCreateUser}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
 					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
@@ -912,11 +914,14 @@
 						listbox="/esquema/lista/listbox" />
 				</toolbar>
 				<listbox id="listbox" autocommit="false" dataPath="/model:/usuari"
+					use="com.soffid.web.UsersListbox"
 					fixedLayout="true" height="96%" onClick="showDetall()"
 					onSelect="select()" rows="${fileres}">
 					<listhead>
 						<listheader label="${c:l('usuaris.zul.Codi-2')}" sort="auto"
 							width="12%" />
+						<listheader label="${c:l('grups.zul.Nomcomplert') }" sort="auto"
+							width="12%" visible="false"/>
 						<listheader label="${c:l('usuaris.zul.Nom-2')}" sort="auto"
 							width="13%" />
 						<listheader label="${c:l('usuaris.zul.Primerllinatge-2')}"
@@ -925,11 +930,23 @@
 							sort="auto" width="13%" />
 						<listheader label="${c:l('usuaris.zul.Grup')}" sort="auto"
 							width="13%" />
-						<listheader label="${c:l('usuaris.zul.NIF-2')}" sort="auto"
+						<listheader label="${c:l('usuaris.zul.NIF-2')}" sort="auto" visible="false"
 							width="12%" />
 						<listheader label="${c:l('usuaris.zul.Nomcurt-2')}" sort="auto"
 							width="12%" />
 						<listheader label="${c:l('usuaris.zul.DominiCorreu')}" sort="auto"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.Tipus')}" sort="auto" visible="false"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.Servidorhome')}" sort="auto" visible="false"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.ServidorPerfil')}" sort="auto" visible="false"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.ServidorCorreu')}" sort="auto" visible="false"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.Aliesdecorreu')}" sort="auto" visible="false"
+							width="12%" />
+						<listheader label="${c:l('usuaris.zul.Telafon')}" sort="auto" visible="false"
 							width="12%" />
 					</listhead>
 					<listfoot>
@@ -939,6 +956,7 @@
 					</listfoot>
 					<dataitem bind=".">
 						<listcell bind="@codi" />
+						<listcell bind="@fullName" />
 						<listcell bind="@nom" />
 						<listcell bind="@primerLlinatge" />
 						<listcell bind="@segonLlinatge" />
@@ -946,11 +964,20 @@
 						<listcell bind="@NIF" />
 						<listcell bind="@nomCurt" />
 						<listcell bind="@dominiCorreu" />
+						<listcell bind="@tipusUsuari" />
+						<listcell bind="@servidorHome" />
+						<listcell bind="@servidorPerfil" />
+						<listcell bind="@servidorCorreu" />
+						<listcell bind="@aliesCorreu" />
+						<listcell bind="@telefon" />
 					</dataitem>
 				</listbox>
 			</navegador>
 
-			<detalls id="dades" width="${amplaria}">
+			<detalls id="dades" width="${amplaria}" >
+				<toolbar if="${requestedUser != null }" height="22px">
+					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
+				</toolbar>
 				<zscript>
 				<![CDATA[
 					void onChangeTipus (Listbox listbox)
@@ -975,6 +1002,7 @@
 							ctx = ds.getJXPathContext();
 							registre = ctx.getValue("/");
 							form.getFellow("codi").setDisabled(!registre.isNew());
+							form.getFellow("edit_codi_button").setVisible (!registre.isNew() && canCreateUser);
 							// <!-- Si el registre és nou (Afegeix nou), s'inicalitzen uns valors -->
 							if (registre.isNew()) {
 								inicialitzaValors();
@@ -1038,6 +1066,9 @@
 																	}
 																</attribute>
 															</textbox>
+
+															<imageclic src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '
+																id ="edit_codi_button" visible="${canCreateUser}"/>
 
 															<label value="*" />
 														</hbox>
@@ -1173,6 +1204,15 @@
 																</attribute>
 															</imageclic>
 															<label bind="primaryGroup[1]/descripcio" style="display: inline; padding-left: 4px;"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+				                                                if (esquema.canClose())
+									                           		Executions.getCurrent().sendRedirect(
+									                           			"index.zul?embed&target=/grups.zul?group="+
+																		codiGrupPrimari.getFellow("dada").getValue(), "soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
 														</div>
 													</row>
 													<row>
@@ -1305,15 +1345,20 @@
 											</grid>
 										</hbox>
 										<separator height="1px" />
-										<hbox width="100%">
-											<grid width="99.5%">
+										<grid width="100%">
+											<columns>
+												<column width="12em"/>
+												<column width="*"/>
+											</columns>
 												<rows>
 													<row>
 														<input_etiqueta
-															value="${c:l('usuaris.zul.Aliesdecorreu')}" />
+															value="${c:l('usuaris.zul.Aliesdecorreu')}"
+															width_custom="1em" />
 														<textbox id="aliesCorreu" bind="@aliesCorreu"
 															readonly="${!canModifyUser}"
-															sclass="textbox" width="${ample-250}px">
+															sclass="textbox" 
+															width="100%">
 															<attribute name="onChange">
 																self.value = self.value.toLowerCase();
 															</attribute>
@@ -1321,14 +1366,14 @@
 													</row>
 													<row>
 														<input_etiqueta
-															value="${c:l('usuaris.zul.Telafon')}" />
+															value="${c:l('usuaris.zul.Telafon')}" 
+															width_custom="1em" />
 														<input_dada id="telefon" bind="@telefon" 
 															lectura="${!canUpdateCustomUser}"
-															width_custom="${ample-250}px" />
+															width_custom="100%" />
 													</row>
 												</rows>
 											</grid>
-										</hbox>
 									</vbox>
 									<vbox align="center" width="100%"
 										style="border:1px solid #7F9196;padding:2px;background-color:#EEEEEE">
@@ -1628,8 +1673,19 @@
 													visible="${canDeleteUserGroup}" width="30px" />
 											</columns>
 											<datarow>
-												<label bind="@codiGrup"
-													tooltip="grupsTooltip" />
+												<div>
+													<label bind="@codiGrup" tooltip="grupsTooltip" style="margin-right:1em"/>
+														<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																String group = self.getPreviousSibling().getValue();
+				                                                if (esquema.canClose())
+									                           		Executions.getCurrent().sendRedirect(
+									                           			"index.zul?embed&target=/grups.zul?group="+group, 
+									                           			"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+												</div>
 												<imageclic align="right"
 													src="~./img/list-remove.gif">
 													<attribute name="onClick">
@@ -1673,7 +1729,7 @@
 											<attribute name="onOpen">
 	if (event.getReference() instanceof DataLabel) {
 		dataLab = event.getReference();
-		dataRow = dataLab.getParent();
+		dataRow = dataLab.getParent().getParent();
 		xpath = dataRow.getXPath();
 		dataSource = gridGrups.getDataSource();
 		context = dataSource.getJXPathContext();
@@ -1923,8 +1979,7 @@
 													<hbox widths="*, 3px, 16px">
 														<label bind="@name" width="90%" />
 														<separator></separator>
-														<image src="~./img/exclamacio.gif" visible="false"
-															width="16px" height="16px">
+														<image src="~./img/exclamacio.gif" visible="false">
 														</image>
 													</hbox>
 												</treecell>
@@ -2106,10 +2161,14 @@ void actualitza (event) {
 										if (rule != null)
 										{
 											Listcell cell = event.data.getChildren().get(8);
-											cell.getChildren().get(0).visible = false;
-											cell.getChildren().get(1).visible = true;
+											if (cell.getChildren().size() > 0 )
+											{
+												cell.getChildren().get(0).visible = false;
+												cell.getChildren().get(1).visible = true;
+											}
 											cell = event.data.getChildren().get(9);
-											cell.getChildren().get(0).visible = false;
+											if (cell.getChildren().size() > 0 )
+												cell.getChildren().get(0).visible = false;
 										}
 										Listcell cellImage = event.data.getChildren().get(0);
 										Image image = cellImage.getChildren().get(0);
@@ -2998,13 +3057,13 @@ String nomRolsBorrar = "";
 	</frame>
 	<zscript>
 	<![CDATA[
-			if (requestedUser != null)
+			if (pageScope{"requestedUser"} != null)
 			{
 				qw = esquema.getFellow("queryWindow");
 				qw.getFellow("queryCodi").getFellow("textbox").setValue (requestedUser);
 				Events.postEvent ("onOK", qw, null );				
-				esquema.getFellow("queryWindow").parent.parent.setVisible(false);
-				esquema.getFellow("lista").parent.setVisible(false);
+				esquema.removeCriteria();
+				esquema.removeList();
 			}
 	]]>
 	</zscript>

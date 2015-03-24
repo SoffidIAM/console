@@ -24,6 +24,7 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #22B9D8; backgrou
 div.head-cell-inner {text-align:left;}
 .dateboxinp  {font-size:11px;}
 .dateboxread input {border: 0px !important; font-size:11px; width: 14em !important;}
+.dateboxreadnoborder input {border: 0px !important; font-size:11px; width: 12em !important;}
 span.nomesdata input.nomesdatainp {color:black !important; font-size:11px;border:none;background:transparent;}
 
 .titolperfil {font-size:18px !important;color:#8A4700;}

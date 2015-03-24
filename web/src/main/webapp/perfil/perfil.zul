@@ -98,8 +98,12 @@
 				</grid>
 				<button label="${c:l('perfil.zul.Guardaidioma')}" width="200px">
 					<attribute name="onClick">
+						String lang = (String) idioma.getSelectedItem().getValue();
 						es.caib.seycon.ng.web.Custom.actualitzaPreferenciaUsuari(
-							es.caib.seycon.ng.web.ConfiguraSEU.SEU_LANG, (String) idioma.getSelectedItem().getValue());
+							es.caib.seycon.ng.web.ConfiguraSEU.SEU_LANG, lang);
+						org.zkoss.util.Locales.setThreadLocal(new Locale (lang));
+						session.setAttribute(es.caib.seycon.ng.web.ConfiguraSEU.SEU_LANG, lang);
+						session.setAttribute("px_preferred_locale", new Locale(lang)); 
 						Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("perfil.Efecte"),org.zkoss.util.resource.Labels.getLabel("perfil.CanviIdioma"));
 					</attribute>
 				</button>

@@ -196,6 +196,7 @@
 		
 		<navegador id="lista" width="100%">
 			<toolbar style="border-top:0.1px solid white;">
+				<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="metadata"/>
 				<insertbutton acces="${canCreateMetadata}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
 				<deletebutton acces="${canDeleteMetadata}" listbox="/esquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>

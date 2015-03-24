@@ -963,8 +963,23 @@
 													</listhead>
 													
 													<dataitem bind=".">
-														<listcell bind="@codiUsuari"
-															tooltip="p_nomComplertUsuari"/>
+														<listcell>
+															<label bind="@codiUsuari"
+																tooltip="p_nomComplertUsuari" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String user = es.caib.zkib.datasource.XPathUtils.getValue(
+									                           						self,
+									                           						"@codiUsuari");
+					                                                if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+									                           				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+																					
+														</listcell>
 														<listcell bind="@nomMaquinaServidora"/>
 														<listcell bind="@nomMaquinaClient"/>
 														<listcell bind="@port"/>

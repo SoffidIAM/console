@@ -72,6 +72,7 @@ import es.caib.seycon.ng.model.DispatcherEntityDao;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.ServerEntity;
 import es.caib.seycon.ng.model.ServerEntityDao;
@@ -481,6 +482,16 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 				createUserTask(ue);
 
+			} else {
+				// Remove rules from granted roles
+				for (RolAccountEntity ra: ae.getRoles())
+				{
+					if (ra.getRule() != null)
+					{
+						ra.setRule(null);
+						getRolAccountEntityDao().update(ra);
+					}
+				}
 			}
 			ae.setType(account.getType());
 		}

@@ -125,11 +125,7 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         {
         	getLlistaCorreuEntityDao().generateUpdateTasks(lce.getLlistaDeCorreu());
         }
-        // Second, primary group
-        for ( MailListGroupMemberEntity mlge: usuari.getGrupPrimari().getMailLists())
-        {
-        	getLlistaCorreuEntityDao().generateUpdateTasks(mlge.getMailList());
-        }
+        createGroupMailListTaks(usuari.getGrupPrimari());
         // Next, secondary groups
         for ( UsuariGrupEntity uge: usuari.getGrupsSecundaris())
         {
@@ -150,6 +146,15 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
         	}
         }
     }
+
+	private void createGroupMailListTaks(GrupEntity grupEntity)
+			throws InternalErrorException {
+		// Second, primary group
+        for ( MailListGroupMemberEntity mlge: grupEntity.getMailLists())
+        {
+        	getLlistaCorreuEntityDao().generateUpdateTasks(mlge.getMailList());
+        }
+	}
     
     
     private void createTask(es.caib.seycon.ng.model.UsuariEntity usuari) throws InternalErrorException {
@@ -191,6 +196,7 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
     		tasque.setTransa(TaskHandler.UPDATE_USER);
     		tasque.setUsuari(usuari.getCodi());
     		getTasqueEntityDao().create(tasque);
+
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
@@ -1293,10 +1299,11 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 		
 		String mailBefore = oldValue.getNomCurt()+"@" + ( oldValue.getDominiCorreu() == null ? "": oldValue.getDominiCorreu()); 
 		String mailAfter = usuari.getNomCurt()+"@" + ( usuari.getDominiCorreu() == null ? "": usuari.getDominiCorreu().getCodi());
+
+
 		if (! mailBefore.equals(mailAfter))
 		{
 			createMailTask(usuari);
-
 			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
 		    tasque.setData(new Timestamp(System.currentTimeMillis()));
 		    tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
@@ -1374,15 +1381,23 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 		    tasque = getTasqueEntityDao().newTasqueEntity();
 		    tasque.setData(new Timestamp(System.currentTimeMillis()));
 		    tasque.setTransa(TaskHandler.UPDATE_GROUP);
-		    tasque.setUsuari(usuari.getGrupPrimari().getCodi());
+		    tasque.setGrup(usuari.getGrupPrimari().getCodi());
 		    getTasqueEntityDao().create(tasque);
-		    if (oldValue.getCodiGrupPrimari() != null)
+		    
+			createGroupMailListTaks(usuari.getGrupPrimari());
+
+			if (oldValue.getCodiGrupPrimari() != null)
 		    {
 			    tasque = getTasqueEntityDao().newTasqueEntity();
 			    tasque.setData(new Timestamp(System.currentTimeMillis()));
 			    tasque.setTransa(TaskHandler.UPDATE_GROUP);
-			    tasque.setUsuari(oldValue.getCodiGrupPrimari());
+			    tasque.setGrup(oldValue.getCodiGrupPrimari());
 			    getTasqueEntityDao().create(tasque);
+			    
+			    GrupEntity ge = getGrupEntityDao().findByCodi(oldValue.getCodiGrupPrimari());
+			    
+			    if (ge != null)
+			    	createGroupMailListTaks(ge);
 		    }
 		}
 		

@@ -17,6 +17,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.model.MailListGroupMemberEntity;
+import com.soffid.iam.model.MailListRoleMemberEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.ContenidorRol;
@@ -24,6 +27,7 @@ import es.caib.seycon.ng.comu.Identitat;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.ValorDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
@@ -67,6 +71,7 @@ public class GrupEntityDaoImpl extends
 				// Propagamos los roles: (creamos las tareas)
 				propagarRolsAtorgatsGrups(rolsAPropagar);						
 			}
+			
 			
                         TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
                         tasque.setData(new Timestamp(System.currentTimeMillis()));
@@ -598,6 +603,18 @@ public class GrupEntityDaoImpl extends
 		return new ArrayList(rolsPropagar);		
 	}
 	
+    private void updateMailLists (GrupEntity group) throws InternalErrorException
+    {
+    	while (group != null)
+    	{
+	    	for ( MailListGroupMemberEntity lce: group.getMailLists())
+	    	{
+	    		getLlistaCorreuEntityDao().generateUpdateTasks(lce.getMailList());
+	    	}
+	    	group = group.getPare();
+    	}
+    }
+    
 	/**
 	 * Atorgació de rols: Propaga els rols indicats 
 	 * @param rolsPropagar

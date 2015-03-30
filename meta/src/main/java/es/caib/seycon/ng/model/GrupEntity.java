@@ -24,7 +24,8 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.model.GrupDispatcherEntity.class,
-	es.caib.seycon.ng.model.AccountAccessEntity.class})
+	es.caib.seycon.ng.model.AccountAccessEntity.class,
+	LlistaCorreuEntity.class})
 public abstract class GrupEntity {
 
 	@Column (name="GRU_ID")

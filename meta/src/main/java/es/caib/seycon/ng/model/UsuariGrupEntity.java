@@ -9,6 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_USUGRU" )
 @Depends ({es.caib.seycon.ng.model.RolsGrupEntity.class,
+	LlistaCorreuEntity.class,
 	es.caib.seycon.ng.comu.UsuariGrup.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,

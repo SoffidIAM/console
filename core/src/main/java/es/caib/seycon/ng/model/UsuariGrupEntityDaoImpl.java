@@ -18,10 +18,14 @@ import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.model.MailListGroupMemberEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
@@ -59,6 +63,8 @@ public class UsuariGrupEntityDaoImpl extends es.caib.seycon.ng.model.UsuariGrupE
             if (usuariGrup.getUsuari().getCodi().equals(Security.getCurrentUser())) {
                 throw new SeyconException(Messages.getString("UsuariGrupEntityDaoImpl.1")); //$NON-NLS-1$
             }
+
+            createMailTask(usuariGrup);
 
             super.update(usuariGrup);
             TasqueEntity         tasque = getTasqueEntityDao().newTasqueEntity();
@@ -112,6 +118,7 @@ public class UsuariGrupEntityDaoImpl extends es.caib.seycon.ng.model.UsuariGrupE
             super.create(usuariGrup);
             getSession(false).flush();
 
+            createMailTask(usuariGrup);
             // Herencia de Roles: propagamos los roles heredados por el grupo (y
             // de sus padres)
             HashSet rolsAPropagar = new HashSet();
@@ -148,6 +155,8 @@ public class UsuariGrupEntityDaoImpl extends es.caib.seycon.ng.model.UsuariGrupE
             if (usuariGrup.getUsuari().getCodi().equals(Security.getCurrentUser())) {
                 throw new SeyconException(Messages.getString("UsuariGrupEntityDaoImpl.6")); //$NON-NLS-1$
             }
+            
+            createMailTask(usuariGrup);
             
             super.remove(usuariGrup);
             getSession(false).flush();
@@ -446,4 +455,14 @@ public class UsuariGrupEntityDaoImpl extends es.caib.seycon.ng.model.UsuariGrupE
             }
     }
 
+
+    private void createMailTask(UsuariGrupEntity ug) throws InternalErrorException
+    {
+        //  Now, updates any mail lists the users belongs
+        for ( MailListGroupMemberEntity lce: ug.getGrup().getMailLists())
+        {
+        	getLlistaCorreuEntityDao().generateUpdateTasks(lce.getMailList());
+        }
+    }
+    
 }

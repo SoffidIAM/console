@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SERPLU" )
+@Entity (table="SC_SERPLU" , translatedName="ServerPluginEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.ServerPlugin.class,
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class,
 	es.caib.seycon.ng.model.ServerPluginModuleEntity.class})
@@ -41,11 +41,13 @@ public abstract class ServerPluginEntity {
 		java.lang.String name) {
 	 return null;
 	}
+	@Operation(translated="findAgentsBasicDataByServerPluginID")
 	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\nagent.enableAttributeMapping\nfrom es.caib.seycon.ng.model.AgentDescriptorEntity agent \nleft join agent.plugin as p \nwhere p.id=:id")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findDadesBasiquesAgentsByServerPluginId(
 		java.lang.Long id) {
 	 return null;
 	}
+	@Operation(translated="findAllBasicData")
 	@DaoFinder("select id, version, name, enabled from es.caib.seycon.ng.model.ServerPluginEntity as serverPluginEntity")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findAllOnlyDadesBasiques() {
 	 return null;

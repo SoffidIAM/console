@@ -35,6 +35,7 @@ public abstract class RolGrant {
 	public java.lang.String ownerAccountName;
 
 	@Nullable
+	@Attribute(translated="ownerSystem")
 	public java.lang.String ownerDispatcher;
 
 	@Description ("Owner group, if any. Applies to roles granted to groups")

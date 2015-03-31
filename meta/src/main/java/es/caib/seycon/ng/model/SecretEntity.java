@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SECRET" )
+@Entity (table="SC_SECRET", translatedName="SecretEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.ServerEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class})
 public abstract class SecretEntity {
@@ -15,7 +15,7 @@ public abstract class SecretEntity {
 	@Column (name="SEC_IDSRV")
 	public es.caib.seycon.ng.model.ServerEntity server;
 
-	@Column (name="SEC_IDUSU")
+	@Column (name="SEC_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
 	@Column (name="SEC_ID")

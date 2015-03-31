@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_REPLDB" )
+@Entity (table="SC_REPLDB", translatedName="ReplicaDatabaseEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.ReplicaDatabase.class,
 	es.caib.seycon.ng.model.ServerEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class})
@@ -31,7 +31,7 @@ public abstract class ReplicaDatabaseEntity {
 	@ForeignKey (foreignColumn="SRV_DBA_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.ServerEntity> servers;
 
-	@Column (name="RPL_DIS_ID")
+	@Column (name="RPL_DIS_ID", translated="system")
 	@Nullable
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 

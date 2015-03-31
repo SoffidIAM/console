@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_OSTYPE" )
+@Entity (table="SC_OSTYPE", translatedName="OsTypeEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.OsType.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class})
 public abstract class OsTypeEntity {

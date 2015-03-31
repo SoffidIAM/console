@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DOMCON" )
+@Entity (table="SC_DOMCON", translatedName="PasswordDomainEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.PoliticaContrasenyaEntity.class,
 	es.caib.seycon.ng.comu.DominiContrasenya.class,
 	es.caib.seycon.ng.model.DominiUsuariEntity.class,
@@ -19,19 +19,20 @@ public abstract class DominiContrasenyaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DCN_CODI", length=50)
+	@Column (name="DCN_CODI", length=50, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="DCN_DESC", length=100)
+	@Column (name="DCN_DESC", length=100, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@ForeignKey (foreignColumn="PCD_DCN_ID")
+	@ForeignKey (foreignColumn="PCD_DCN_ID", translated="passwordPolicies")
 	public java.util.Collection<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> politicaContrasenyes;
 
-	@ForeignKey (foreignColumn="DIS_DCN_ID")
+	@ForeignKey (foreignColumn="DIS_DCN_ID", translated="systems")
 	public java.util.Collection<es.caib.seycon.ng.model.DispatcherEntity> dispatchers;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findByCodi(
 		java.lang.String codi) {
@@ -42,6 +43,7 @@ public abstract class DominiContrasenyaEntity {
 		long userId) {
 	 return null;
 	}
+	@Operation(translated="findBySystem")
 	@DaoFinder("select de.domini\nfrom es.caib.seycon.ng.model.DispatcherEntity as de\nwhere de.codi=:dispatcher")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findByDispatcher(
 		java.lang.String dispatcher) {

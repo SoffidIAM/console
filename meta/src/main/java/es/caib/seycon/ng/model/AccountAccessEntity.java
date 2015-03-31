@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 
-@Entity (table="SC_ACCACC" )
+@Entity (table="SC_ACCACC", translatedName="AccountAccessEntity", translatedPackage="com.soffid.iam.model")
 @Description ("Contains the access control list for an account")
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.RolEntity.class,

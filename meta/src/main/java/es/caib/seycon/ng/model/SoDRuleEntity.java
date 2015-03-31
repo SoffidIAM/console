@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SODRUL" )
+@Entity (table="SC_SODRUL", translatedName="SoDRuleEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.SoDRule.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
 	es.caib.seycon.ng.model.SoDRoleEntity.class})

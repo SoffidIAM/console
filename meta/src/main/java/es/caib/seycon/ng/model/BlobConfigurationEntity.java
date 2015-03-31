@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_BLOCON" )
+@Entity (table="SC_BLOCON" , translatedName="BlobConfigurationEntity", translatedPackage="com.soffid.iam.model")
 public abstract class BlobConfigurationEntity {
 
 	@Column (name="BCO_ID")
@@ -20,7 +20,7 @@ public abstract class BlobConfigurationEntity {
 	@Column (name="BCO_VALUE", length=10240000)
 	public byte[] value;
 
-	@Column (name="BCO_VERSIO", length=50)
+	@Column (name="BCO_VERSIO", length=50, translated="version")
 	@Nullable
 	public java.lang.String versio;
 

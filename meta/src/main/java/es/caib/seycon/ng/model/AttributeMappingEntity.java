@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ATRMAP" )
+@Entity (table="SC_ATRMAP" , translatedName="AttributeMappingEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.AttributeMapping.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class})
 public abstract class AttributeMappingEntity {

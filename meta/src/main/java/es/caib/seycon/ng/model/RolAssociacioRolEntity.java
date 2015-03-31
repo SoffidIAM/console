@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ROLROL" )
+@Entity (table="SC_ROLROL", translatedName="RoleDependencyEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.RolGrant.class,
 	es.caib.seycon.ng.comu.ContenidorRol.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
@@ -18,10 +18,10 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.TasqueEntity.class})
 public abstract class RolAssociacioRolEntity {
 
-	@Column (name="RRL_CONTINGUT")
+	@Column (name="RRL_CONTINGUT", translated="roleContent")
 	public es.caib.seycon.ng.model.RolEntity rolContingut;
 
-	@Column (name="RRL_CONTENIDOR")
+	@Column (name="RRL_CONTENIDOR", translated="roleContainer")
 	public es.caib.seycon.ng.model.RolEntity rolContenidor;
 
 	@Column (name="RRL_ID")
@@ -42,18 +42,19 @@ public abstract class RolAssociacioRolEntity {
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity granteeDomainValue;
 
 
-	@Column (name="RRL_APLICA")
+	@Column (name="RRL_APLICA", translated="domainApplication")
 	@Nullable
 	public es.caib.seycon.ng.model.AplicacioEntity grantedApplicationDomain;
 
-	@Column (name="RRL_GRUP")
+	@Column (name="RRL_GRUP", translated="domainGroup")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grantedGroupDomain;
 
-	@Column (name="RRL_VALDOM")
+	@Column (name="RRL_VALDOM", translated="domainApplicationValue")
 	@Nullable
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity grantedDomainValue;
 
+	@Operation(translated="findContainerByRoleNameAndApplicationCodeAndDBCode")
 	@DaoFinder("select rolAssociacioRol.rolContenidor\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut.nom = :nomRol and\nrolAssociacioRol.rolContingut.aplicacio.codi = :codiAplicacio and\nrolAssociacioRol.rolContingut.baseDeDades.codi = :codiBBDD\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findContenidorsByNomRolCodiAplicacioCodiBBDD(
 		java.lang.String nomRol, 
@@ -66,12 +67,14 @@ public abstract class RolAssociacioRolEntity {
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
 	}
+	@Operation(translated="findRolesAssociationRole")
 	@DaoFinder("select rolAssociacioRol\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut = :rolContingut\nand rolAssociacioRol.rolContenidor = :rolContenidor\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findRolAssociacioRol(
 		es.caib.seycon.ng.model.RolEntity rolContingut, 
 		es.caib.seycon.ng.model.RolEntity rolContenidor) {
 	 return null;
 	}
+	@Operation(translated="findRolesAssociationContainerRole")
 	@DaoFinder("select rolAssociacioRol\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut = :rolContingut\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findRolAssociacioRolEsContingut(
 		es.caib.seycon.ng.model.RolEntity rolContingut) {

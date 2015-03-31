@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DOMCOR" )
+@Entity (table="SC_DOMCOR", translatedName="EmailDomainEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.DominiCorreu.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -18,27 +18,29 @@ public abstract class DominiCorreuEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DCO_DESCRI", length=50)
+	@Column (name="DCO_DESCRI", length=50, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="DCO_CODI", length=50)
+	@Column (name="DCO_CODI", length=50, translated="code")
 	public java.lang.String codi;
 
-	@ForeignKey (foreignColumn="USU_IDDCO")
+	@ForeignKey (foreignColumn="USU_IDDCO", translated="users")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariEntity> usuaris;
 
-	@ForeignKey (foreignColumn="LCO_IDDCO")
+	@ForeignKey (foreignColumn="LCO_IDDCO", translated="mailLists")
 	public java.util.Collection<es.caib.seycon.ng.model.LlistaCorreuEntity> llistesCorreu;
 
-	@Column (name="DCO_OBSOLET", length=5)
+	@Column (name="DCO_OBSOLET", length=5, translated="obsolete")
 	public java.lang.String obsolet;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiCorreuEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findByCriteria")
 	@DaoFinder("from \nes.caib.seycon.ng.model.DominiCorreuEntity dominiCorreu \nwhere \n(:codi is null or dominiCorreu.codi like :codi) and \n(:descripcio is null or dominiCorreu.descripcio like :descripcio) and \n(:obsolet is null or dominiCorreu.obsolet = :obsolet) \norder by dominiCorreu.codi")
 	public java.util.List<es.caib.seycon.ng.model.DominiCorreuEntity> findByFiltre(
 		java.lang.String codi, 

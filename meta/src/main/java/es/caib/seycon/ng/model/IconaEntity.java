@@ -7,14 +7,14 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ICONES" )
+@Entity (table="SC_ICONES" , translatedName="EntryPointIconEntity", translatedPackage="com.soffid.iam.model")
 public abstract class IconaEntity {
 
 	@Column (name="ICO_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="ICO_ICONA", length=20000)
+	@Column (name="ICO_ICONA", length=20000, translated="icon")
 	public byte[] icona;
 
 	@DaoFinder

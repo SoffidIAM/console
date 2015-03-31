@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_NOTIFICA" )
+@Entity (table="SC_NOTIFICA", translatedName="NoticeEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.RolEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
@@ -18,22 +18,23 @@ public abstract class NotificacioEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="NTF_DATA")
+	@Column (name="NTF_DATA", translated="modificationDate")
 	public java.util.Date dataModificacio;
 
-	@Column (name="NTF_INFO", length=512)
+	@Column (name="NTF_INFO", length=512, translated="information")
 	public java.lang.String informacio;
 
-	@Column (name="NTF_USU")
+	@Column (name="NTF_USU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
-	@Column (name="NTF_ROL")
+	@Column (name="NTF_ROL", translated="role")
 	@Nullable
 	public es.caib.seycon.ng.model.RolEntity rol;
 
-	@Column (name="NTF_APL")
+	@Column (name="NTF_APL", translated="application")
 	public es.caib.seycon.ng.model.AplicacioEntity aplicacio;
 
+	@Operation(translated="findByApplicationCode")
 	@DaoFinder("from es.caib.seycon.ng.model.NotificacioEntity notifica where notifica.aplicacio.codi = :codiAplicacio order by notifica.dataModificacio asc")
 	public java.util.List<es.caib.seycon.ng.model.NotificacioEntity> findByCodiAplicacio(
 		java.lang.String codiAplicacio) {

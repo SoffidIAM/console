@@ -7,32 +7,32 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_TASKLOG" )
+@Entity (table="SC_TASKLOG" , translatedName="TaskLogEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class})
 public abstract class TaskLogEntity {
 
-	@Column (name="TLO_COMPLETE", length=1)
+	@Column (name="TLO_COMPLETE", length=1, translated="completed")
 	@Nullable
 	public java.lang.String complet;
 
-	@Column (name="TLO_MISSAT", length=1024)
+	@Column (name="TLO_MISSAT", length=1024, translated="message")
 	@Nullable
 	public java.lang.String missatge;
 
-	@Column (name="TLO_DATCREA")
+	@Column (name="TLO_DATCREA", translated="creationDate")
 	@Nullable
 	public java.util.Date dataCreacio;
 
-	@Column (name="TLO_DADAEX")
+	@Column (name="TLO_DADAEX", translated="lastExecution")
 	@Nullable
 	public java.lang.Long darreraExecucio;
 
-	@Column (name="TLO_PRDAEX")
+	@Column (name="TLO_PRDAEX", translated="nextExecution")
 	@Nullable
 	public java.lang.Long proximaExecucio;
 
-	@Column (name="TLO_NUMEXE")
+	@Column (name="TLO_NUMEXE", translated="executionsNumber")
 	@Nullable
 	public java.lang.Long numExecucions;
 
@@ -40,20 +40,22 @@ public abstract class TaskLogEntity {
 	@Nullable
 	public java.lang.String stackTrace;
 
-	@Column (name="TLO_IDTASQUE")
+	@Column (name="TLO_IDTASQUE", translated="task")
 	public es.caib.seycon.ng.model.TasqueEntity tasca;
 
 	@Column (name="TLO_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="TLO_DIS_ID")
+	@Column (name="TLO_DIS_ID", translated="system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
+	@Operation(translated="findByAgentCode")
 	@DaoFinder("from es.caib.seycon.ng.model.TaskLogEntity tlog left join tlog.dispatcher agent where agent.codi=:codiAgent order by tlog.tasca.id")
 	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByCodiAgent() {
 	 return null;
 	}
+	@Operation(translated="findByTaskID")
 	@DaoFinder("from es.caib.seycon.ng.model.TaskLogEntity tlog\nwhere tlog.tasca.id=:idTasca")
 	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByIdTasca(
 		java.lang.Long idTasca) {

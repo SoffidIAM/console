@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.XarxaService.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.model.ContrasenyaEntity.class,
-	es.caib.seycon.ng.model.RenovacioEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.UsuariGrupEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class,
@@ -650,6 +649,7 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation ( grantees={roles.user_query.class},
 			translated="findUserByCriteria")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -658,5 +658,6 @@ public abstract class UsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	
 }

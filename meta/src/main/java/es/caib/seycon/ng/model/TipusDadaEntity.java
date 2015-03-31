@@ -8,19 +8,19 @@ package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_TIPDAD" )
+@Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.TipusDada.class,
 	es.caib.seycon.ng.model.DadaUsuariEntity.class})
 public abstract class TipusDadaEntity {
 
-	@Column (name="TDA_CODI", length=25)
+	@Column (name="TDA_CODI", length=25, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="TDA_ORDRE")
+	@Column (name="TDA_ORDRE", translated="order")
 	public java.lang.Long ordre;
 
-	@ForeignKey (foreignColumn="DUS_TDAID")
+	@ForeignKey (foreignColumn="DUS_TDAID", translated="data")
 	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> datos;
 
 	@Column (name="TDA_ID")
@@ -67,11 +67,13 @@ public abstract class TipusDadaEntity {
 	
 
 	/********************** DAOS ************************/
+	@Operation(translated="findDataTypeByCode")
 	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findDataTypesByCode")
 	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity tipusDada where (:codi is null or tipusDada.codi like :codi)")
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByCodi(
 		java.lang.String codi) {

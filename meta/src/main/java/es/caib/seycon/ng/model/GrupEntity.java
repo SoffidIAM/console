@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_GRUPS" )
+@Entity (table="SC_GRUPS", translatedName="GroupEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.Grup.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.UsuariGrupEntity.class,
@@ -32,66 +32,66 @@ public abstract class GrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="GRU_CODI", length=20)
+	@Column (name="GRU_CODI", length=20, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="GRU_UNIOFI", length=2)
+	@Column (name="GRU_UNIOFI", length=2, translated="officeUnit")
 	@Nullable
 	public java.lang.String unitatOfimatica;
 
-	@Column (name="GRU_DESCRI", length=100)
+	@Column (name="GRU_DESCRI", length=100, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@ForeignKey (foreignColumn="GIM_IDGRU")
+	@ForeignKey (foreignColumn="GIM_IDGRU", translated="printers")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupImpressoraEntity> impressores;
 
-	@ForeignKey (foreignColumn="UGR_IDGRU")
+	@ForeignKey (foreignColumn="UGR_IDGRU", translated="secondaryGroupUsers")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> usuarisGrupSecundari;
 
-	@Column (name="GRU_IDMAQ")
+	@Column (name="GRU_IDMAQ", translated="officeServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorOfimatic;
 
-	@ForeignKey (foreignColumn="AXA_IDGRU")
+	@ForeignKey (foreignColumn="AXA_IDGRU", translated="networkAuthorization")
 	public java.util.Collection<es.caib.seycon.ng.model.XarxaACEntity> autoritzacionsXarxa;
 
-	@Column (name="GRU_QUOTA")
+	@Column (name="GRU_QUOTA", translated="quotaGroup")
 	@Nullable
 	public java.lang.Long quotaGrup;
 
-	@ForeignKey (foreignColumn="GRU_PARE")
+	@ForeignKey (foreignColumn="GRU_PARE", translated="childrens")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupEntity> fills;
 
-	@Column (name="GRU_PARE")
+	@Column (name="GRU_PARE", translated="parent")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity pare;
 
-	@ForeignKey (foreignColumn="RLU_ROLUSU_GRU")
+	@ForeignKey (foreignColumn="RLU_ROLUSU_GRU", translated="usersRoles")
 	public java.util.Collection<es.caib.seycon.ng.model.RolAccountEntity> rolsUsuaris;
 
-	@Column (name="GRU_TIPUS")
+	@Column (name="GRU_TIPUS", translated="organizatinalUnitType")
 	@Nullable
 	public es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity tipusUnitatOrganizativa;
 
-	@Column (name="GRU_OBSOLET", length=5)
+	@Column (name="GRU_OBSOLET", length=5, translated="obsolete")
 	public java.lang.String obsolet;
 
-	@Column (name="GRU_ORGANITZATIU", length=300)
+	@Column (name="GRU_ORGANITZATIU", length=300, translated="organizational")
 	@Nullable
 	public java.lang.String organitzatiu;
 
-	@ForeignKey (foreignColumn="GRD_IDGRUP")
+	@ForeignKey (foreignColumn="GRD_IDGRUP", translated="systemGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> grupDispatcher;
 
-	@ForeignKey (foreignColumn="RLG_GRUP")
+	@ForeignKey (foreignColumn="RLG_GRUP", translated="allowedRolesToGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.RolsGrupEntity> rolsOtorgatsGrup;
 
-	@Column (name="GRU_SECPRE", length=50)
+	@Column (name="GRU_SECPRE", length=50, translated="budgetSection")
 	@Nullable
 	public java.lang.String seccioPressupostaria;
 
-	@ForeignKey (foreignColumn="USU_IDGRU")
+	@ForeignKey (foreignColumn="USU_IDGRU", translated="primaryGroupUsers")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariEntity> usuarisGrupPrimari;
 
 	@ForeignKey (foreignColumn="AAC_GRU_ID")
@@ -109,6 +109,7 @@ public abstract class GrupEntity {
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findGroupsByType")
 	@DaoFinder("from es.caib.seycon.ng.model.GrupEntity where tipusUnitatOrganizativa = :tipus")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsByTipus(
 		java.lang.String tipus) {
@@ -125,11 +126,13 @@ public abstract class GrupEntity {
 		java.lang.Long id) {
 	 return null;
 	}
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.GrupEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findByCriteria")
 	@DaoFinder("select grup\nfrom\nes.caib.seycon.ng.model.GrupEntity grup\nleft join grup.pare pare\nleft join grup.tipusUnitatOrganizativa tipus \nwhere\n(:codi is null or grup.codi like :codi) and\n(:descripcio is null or grup.descripcio like :descripcio) and\n(:tipus is null or tipus.codi like :tipus) and\n(:unitatOfimatica is null or grup.unitatOfimatica like :unitatOfimatica) and\n(:pare is null or (:pare is not null and pare.codi like :pare)) and \n(:obsolet is null or grup.obsolet = :obsolet)")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
 		java.lang.String codi, 
@@ -140,16 +143,19 @@ public abstract class GrupEntity {
 		java.lang.String obsolet) {
 	 return null;
 	}
+	@Operation(translated="findPrimaryGroupByUserCode")
 	@DaoFinder("select usuari.grupPrimari from es.caib.seycon.ng.model.UsuariEntity usuari where usuari.codi = :codiUsuari")
 	public es.caib.seycon.ng.model.GrupEntity findGrupPrimariByCodiUsuari(
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+	@Operation(translated="findGroupsFromUsersByUserCode")
 	@DaoFinder("select  usuariGrup.grup from es.caib.seycon.ng.model.UsuariGrupEntity usuariGrup where usuariGrup.usuari.codi = :codiUsuari")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromUsuarisByCodiUsuari(
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+	@Operation(translated="findGroupsFromRolesByUserCode")
 	@DaoFinder("select grup\nfrom es.caib.seycon.ng.model.UsuariEntity usu\njoin usu.accounts as accounts\njoin accounts.account as account with account.type='U'\njoin account.roles as roles\njoin roles.grup as grup\nwhere usu.codi=:codiUsuari\n")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromRolsByCodiUsuari(
 		java.lang.String codiUsuari) {
@@ -167,6 +173,7 @@ public abstract class GrupEntity {
 	public java.lang.String toString() {
 	 return null;
 	}
+	@Operation(translated="findByCriteria")
 	@DaoFinder("select grup\nfrom\nes.caib.seycon.ng.model.GrupEntity grup\nleft join grup.pare pare\nleft join grup.tipusUnitatOrganizativa tipus\nleft join grup.servidorOfimatic servofim  \nwhere\n(:codi is null or upper(grup.codi) like upper(:codi)) and\n(:descripcio is null or grup.descripcio like :descripcio) and\n(:tipus is null or tipus.codi like :tipus) and\n(:unitatOfimatica is null or grup.unitatOfimatica like :unitatOfimatica) and\n(:pare is null or (:pare is not null and pare.codi like :pare)) and \n(:obsolet is null or grup.obsolet = :obsolet) and \n(:servidorOfimatic is null or servofim.nom like :servidorOfimatic) and \n(:seccioPressupostaria is null or grup.seccioPressupostaria like :seccioPressupostaria)")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
 		java.lang.String codi, 

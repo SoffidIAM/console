@@ -9,7 +9,7 @@ import java.util.Date;
 
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ROLUSU" )
+@Entity (table="SC_ROLUSU", translatedName="RoleAccountEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({
 	// Other entties
 	es.caib.seycon.ng.model.TasqueEntity.class,
@@ -32,26 +32,26 @@ import com.soffid.mda.annotation.*;
 	})
 public abstract class RolAccountEntity {
 
-	@Column (name="RLU_ROLUSU_GRU")
+	@Column (name="RLU_ROLUSU_GRU", translated="group")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grup;
 
-	@Column (name="RLU_IDROL")
+	@Column (name="RLU_IDROL", translated="role")
 	public es.caib.seycon.ng.model.RolEntity rol;
 
 	@Column (name="RLU_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RLU_VALDOM")
+	@Column (name="RLU_VALDOM", translated="domainApplicationValue")
 	@Nullable
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio;
 
-	@Column (name="RLU_TIPDOM", length=20)
+	@Column (name="RLU_TIPDOM", length=20, translated="domainTypes")
 	@Nullable
 	public java.lang.String tipusDomini;
 
-	@Column (name="RLU_ADMAPP")
+	@Column (name="RLU_ADMAPP", translated="managedApplication")
 	@Nullable
 	public es.caib.seycon.ng.model.AplicacioEntity aplicacioAdministrada;
 
@@ -112,11 +112,13 @@ public abstract class RolAccountEntity {
 	public java.lang.String toString() {
 	 return null;
 	}
+	@Operation(translated="findByGroupCode")
 	@DaoFinder("select rolsUsuaris\nfrom es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris\nwhere (rolsUsuaris.tipusDomini='GRUPS' or rolsUsuaris.tipusDomini='GRUPS_USUARI')\nand rolsUsuaris.grup.codi=:codiGrup")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiGrup(
 		java.lang.String codiGrup) {
 	 return null;
 	}
+	@Operation(translated="findByRoleAndDomainValue")
 	@DaoFinder("select rolsUsuaris from es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris \nleft join rolsUsuaris.rol role \nleft join rolsUsuaris.grup grup left join rolsUsuaris.aplicacioAdministrada aplicacio \nleft join rolsUsuaris.valorDominiAplicacio valorDominiAplicacio \nwhere (role.nom = :nomRol and role.baseDeDades.codi = :baseDadesRol and \nrole.aplicacio.codi = :codiAplicacioRol) and rolsUsuaris.tipusDomini=:tipusDomini and \n( ( (:tipusDomini='GRUPS' or :tipusDomini='GRUPS_USUARI') and grup is not null \nand (:codiGrupDomini is not null and grup.codi=:codiGrupDomini)) or (:tipusDomini='APLICACIONS' and \naplicacio is not null and (:codiAplicacioDomini is not null and aplicacio.codi=:codiAplicacioDomini)) \nor (:tipusDomini='DOMINI_APLICACIO' and valorDominiAplicacio is not null \nand (valorDominiAplicacio.id=:idValorDominiAplicacioDomini)) or \n( (:tipusDomini='SENSE_DOMINI' or :tipusDomini is null) and aplicacio IS NULL \nAND grup IS NULL AND valorDominiAplicacio IS NULL) )")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByRolAndValorDomini(
 		java.lang.String nomRol, 
@@ -128,6 +130,7 @@ public abstract class RolAccountEntity {
 		java.lang.Long idValorDominiAplicacioDomini) {
 	 return null;
 	}
+	@Operation(translated="findByRoleAndDomainType")
 	@DaoFinder("select ra from es.caib.seycon.ng.model.RolAccountEntity ra\nleft join ra.rol role \nwhere (role.nom = :nomRol and role.baseDeDades.codi = :baseDadesRol and \nrole.aplicacio.codi = :codiAplicacioRol) and ra.tipusDomini=:tipusDomini")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByRolAndTipusDomini(
 		java.lang.String nomRol, 
@@ -136,11 +139,13 @@ public abstract class RolAccountEntity {
 		java.lang.String tipusDomini) {
 	 return null;
 	}
+	@Operation(translated="findByUserCode")
 	@DaoFinder("select ra\nfrom \nes.caib.seycon.ng.model.RolAccountEntity as ra\njoin ra.account as account\njoin account.users as users\njoin users.user as user\nleft join ra.rol as rol\nleft join rol.baseDeDades as dispatcher\nwhere  user.codi = :codiUsuari \norder by dispatcher.codi, rol.nom")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllByCodiUsuari(
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+	@Operation(translated="findByQualifierGroup")
 	@DaoFinder("select ra \nfrom es.caib.seycon.ng.model.RolAccountEntity as ra\nwhere ra.grup.codi=:groupName\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByGrupQualifier(
 		java.lang.String groupName) {

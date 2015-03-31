@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ACCOUN" )
+@Entity (table="SC_ACCOUN", translatedName="AccountEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.comu.Account.class,
 	es.caib.seycon.ng.model.RolEntity.class,
@@ -39,7 +39,7 @@ public abstract class AccountEntity {
 	@Nullable
 	public java.lang.String name;
 
-	@Column (name="ACC_DIS_ID")
+	@Column (name="ACC_DIS_ID", translated="system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
 	@ForeignKey (foreignColumn="AAC_ACC_ID")
@@ -75,12 +75,14 @@ public abstract class AccountEntity {
 	@Column (name="ACC_TUS_ID")
 	public es.caib.seycon.ng.model.TipusUsuariEntity passwordPolicy;
 
+	@Operation(translated="findByNameAndSystem")
 	@DaoFinder("from es.caib.seycon.ng.model.AccountEntity acc\nwhere acc.name = :name and acc.dispatcher.codi=:dispatcher")
 	public es.caib.seycon.ng.model.AccountEntity findByNameAndDispatcher(
 		java.lang.String name, 
 		java.lang.String dispatcher) {
 	 return null;
 	}
+	@Operation(translated="findByUserAndSystem")
 	@DaoFinder("select acc\nfrom   es.caib.seycon.ng.model.AccountEntity acc\nleft join     acc.users as users\nleft join     users.user as user\nleft join     acc.dispatcher as dispatcher\nwhere acc.type='U' and user.codi = :user and dispatcher.codi = :dispatcher")
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByUsuariAndDispatcher(
 		java.lang.String user, 

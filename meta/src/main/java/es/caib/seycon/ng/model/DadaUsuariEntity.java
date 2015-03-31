@@ -7,21 +7,21 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DADUSU" )
+@Entity (table="SC_DADUSU", translatedName="UserDataEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.DadaUsuari.class,
 	es.caib.seycon.ng.model.TipusDadaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class})
 public abstract class DadaUsuariEntity {
 
-	@Column (name="DUS_VALOR", length=1024)
+	@Column (name="DUS_VALOR", length=1024, translated="dataValue")
 	@Nullable
 	public java.lang.String valorDada;
 
-	@Column (name="DUS_IDUSU")
+	@Column (name="DUS_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
-	@Column (name="DUS_TDAID")
+	@Column (name="DUS_TDAID", translated="dataType")
 	public es.caib.seycon.ng.model.TipusDadaEntity tipusDada;
 
 	@Column (name="DUS_ID")
@@ -32,12 +32,14 @@ public abstract class DadaUsuariEntity {
 	@Nullable
 	public byte[] blobDataValue;
 
+	@Operation(translated="findDataByDataTypeCode")
 	@DaoFinder("select dadaUsuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari,\nes.caib.seycon.ng.model.TipusDadaEntity tipusDada where usuari.codi = :codiUsuari and dadaUsuari.usuari = usuari and dadaUsuari.tipusDada = tipusDada and tipusDada.codi = :codiTipusDada")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiTipusDada(
 		java.lang.String codiUsuari, 
 		java.lang.String codiTipusDada) {
 	 return null;
 	}
+	@Operation(translated="findDataByUserCodeAndDataTypeCode")
 	@DaoFinder("select dadaUsuari from es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari, es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.TipusDadaEntity tipusDada where dadaUsuari.usuari = usuari and usuari.codi = :codiUsuari and tipusDada.codi = :codiTipusDada and dadaUsuari.tipusDada = tipusDada")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiUsuariAndCodiTipusDada(
 		java.lang.String codiUsuari, 

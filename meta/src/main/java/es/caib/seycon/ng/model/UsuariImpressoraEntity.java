@@ -15,31 +15,34 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.TasqueEntity.class})
 public abstract class UsuariImpressoraEntity {
 
-	@Column (name="UIM_ORDRE")
+	@Column (name="UIM_ORDRE", translated="userPrinterOrder")
 	@Nullable
 	public java.lang.Long uimOrdre;
 
-	@Column (name="UIM_IDIMP")
+	@Column (name="UIM_IDIMP", translated="printer")
 	public es.caib.seycon.ng.model.ImpressoraEntity impressora;
 
-	@Column (name="UIM_IDUSU")
+	@Column (name="UIM_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
 	@Column (name="UIM_ID")
 	@Identifier
 	public java.lang.Long id;
 
+	@Operation(translated="findUserPrinterByUserCodeAndPrinterCode")
 	@DaoFinder("select usuariImpressora\nfrom es.caib.seycon.ng.model.ImpressoraEntity impressora, es.caib.seycon.ng.model.UsuariEntity usuari,  es.caib.seycon.ng.model.UsuariImpressoraEntity usuariImpressora where usuariImpressora.usuari = usuari and usuariImpressora.impressora = impressora and usuari.codi = :codiUsuari and impressora.codi = :codiImpressora \norder by usuariImpressora.usuari.codi, usuariImpressora.impressora.codi")
 	public es.caib.seycon.ng.model.UsuariImpressoraEntity findUsuariImpressoraByCodiUsuariAndCodiImpressora(
 		java.lang.String codiUsuari, 
 		java.lang.String codiImpressora) {
 	 return null;
 	}
+	@Operation(translated="findUserPrintersByPrinterCode")
 	@DaoFinder("select usuariImpressora\nfrom es.caib.seycon.ng.model.UsuariImpressoraEntity usuariImpressora where usuariImpressora.impressora.codi = :codiImpressora \norder by usuariImpressora.usuari.codi, usuariImpressora.impressora.codi")
 	public java.util.List<es.caib.seycon.ng.model.UsuariImpressoraEntity> findUsuariImpressoresByCodiImpressora(
 		java.lang.String codiImpressora) {
 	 return null;
 	}
+	@Operation(translated="findUserPrintersByUserCode")
 	@DaoFinder("select usuariImpressora\nfrom es.caib.seycon.ng.model.UsuariImpressoraEntity usuariImpressora where usuariImpressora.usuari.codi = :codiUsuari \norder by usuariImpressora.usuari.codi, usuariImpressora.impressora.codi")
 	public java.util.List<es.caib.seycon.ng.model.UsuariImpressoraEntity> findUsuariImpressoresByCodiUsuari(
 		java.lang.String codiUsuari) {

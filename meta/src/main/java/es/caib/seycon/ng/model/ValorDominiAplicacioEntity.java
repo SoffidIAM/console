@@ -14,19 +14,20 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.RolAccountEntity.class})
 public abstract class ValorDominiAplicacioEntity {
 
-	@Column (name="VDO_VALOR", length=30)
+	@Column (name="VDO_VALOR", length=30, translated="value")
 	public java.lang.String valor;
 
-	@Column (name="VDO_DOM")
+	@Column (name="VDO_DOM", translated="domain")
 	public es.caib.seycon.ng.model.DominiAplicacioEntity domini;
 
 	@Column (name="VDO_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="VDO_DESC", length=50)
+	@Column (name="VDO_DESC", length=50, translated="description")
 	public java.lang.String descripcio;
 
+	@Operation(translated="findDomainValueAndDomainNameAndDomainRoleNameAndDomainValue")
 	@DaoFinder("select valorDominiAplicacio from \nes.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio \n"
 			+ "left join valorDominiAplicacio.domini domini\n"
 			+ "left join valorDominiAplicacio.domini.rols rol\n"

@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_GRUPUE" )
+@Entity (table="SC_GRUPUE" , translatedName="EntryPointGroupEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.AutoritzacioPuntEntrada.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
@@ -18,13 +18,13 @@ public abstract class AutoritzacioPUEGrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="GPE_NIVAUT", length=1)
+	@Column (name="GPE_NIVAUT", length=1, translated="auhtorizationLevel")
 	public java.lang.String nivellAutoritzacio;
 
-	@Column (name="GPE_IDPUE")
+	@Column (name="GPE_IDPUE", translated="entryPoint")
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
-	@Column (name="GPE_IDGRU")
+	@Column (name="GPE_IDGRU", translated="groupID")
 	public java.lang.Long idGrup;
 
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity")

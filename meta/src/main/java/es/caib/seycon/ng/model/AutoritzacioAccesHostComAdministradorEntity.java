@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ADMMAQ" )
+@Entity (table="SC_ADMMAQ", translatedName="HostAdminEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -18,22 +18,23 @@ public abstract class AutoritzacioAccesHostComAdministradorEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="ADM_DATCAD")
+	@Column (name="ADM_DATCAD", translated="expirationDateAhtorizationAccess")
 	public java.util.Date dataCaducitatAutoritzacioAcces;
 
-	@Column (name="ADM_USUID")
+	@Column (name="ADM_USUID", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
 	@Column (name="ADM_MAQID")
 	public es.caib.seycon.ng.model.MaquinaEntity host;
 
-	@Column (name="ADM_IDWF")
+	@Column (name="ADM_IDWF", translated="processWFID")
 	public java.lang.Long idProcesWorkflow;
 
-	@Column (name="ADM_DATINI")
+	@Column (name="ADM_DATINI", translated="requestDate")
 	@Nullable
 	public java.util.Date dataPeticio;
 
+	@Operation(translated="findByHostNameAndRequestDate")
 	@DaoFinder("select autoriza from es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity autoriza where autoriza.host.nom = :nomHost and (:dataPeticio = :nullDate or autoriza.dataPeticio >= :dataPeticio) and (:dataCaducitat = :nullDate or autoriza.dataCaducitatAutoritzacioAcces >= :dataCaducitat) order by autoriza.dataPeticio")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity> findByNomHostIDataPeticio(
 		java.lang.String nomHost, 

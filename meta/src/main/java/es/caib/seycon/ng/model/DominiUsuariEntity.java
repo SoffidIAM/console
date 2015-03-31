@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DOMUSU" )
+@Entity (table="SC_DOMUSU", translatedName="UserDomainEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.DominiUsuari.class,
@@ -19,18 +19,18 @@ public abstract class DominiUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DOU_CODI", length=50)
+	@Column (name="DOU_CODI", length=50, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="DOU_DESC", length=100)
+	@Column (name="DOU_DESC", length=100, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="DOU_TIPUS", length=1)
+	@Column (name="DOU_TIPUS", length=1, translated="type")
 	@Nullable
 	public es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration tipus;
 
-	@ForeignKey (foreignColumn="DIS_DOU_ID")
+	@ForeignKey (foreignColumn="DIS_DOU_ID", translated="systems")
 	public java.util.Collection<es.caib.seycon.ng.model.DispatcherEntity> dispatchers;
 
 	@Column (name="DOU_EXPRES", length=1024)
@@ -41,11 +41,13 @@ public abstract class DominiUsuariEntity {
 	@Nullable
 	public java.lang.String beanGenerator;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findBySytem")
 	@DaoFinder("select du\nfrom es.caib.seycon.ng.model.DispatcherEntity as dispatcher\nleft join dispatcher.dominiUsuari as du\nwhere dispatcher.codi=:dispatcher")
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByDispatcher(
 		java.lang.String dispatcher) {

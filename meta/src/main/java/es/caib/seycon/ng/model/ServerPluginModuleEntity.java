@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SEPLMO" )
+@Entity (table="SC_SEPLMO", translatedName="ServerPluginModuleEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ServerPluginModule.class,
 	es.caib.seycon.ng.model.ServerPluginEntity.class,
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class})

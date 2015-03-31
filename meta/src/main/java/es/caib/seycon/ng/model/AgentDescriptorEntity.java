@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_AGEDES" )
+@Entity (table="SC_AGEDES", translatedName="AgentDescriptorEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.AgentDescriptor.class,
 	es.caib.seycon.ng.model.ServerPluginEntity.class,
 	es.caib.seycon.ng.model.ServerPluginModuleEntity.class,
@@ -58,6 +58,7 @@ public abstract class AgentDescriptorEntity {
 		java.lang.String description) {
 	 return null;
 	}
+	@Operation(translated="findAllOnlyBasicData")
 	@DaoFinder("select agentDescriptorEntity\nfrom es.caib.seycon.ng.model.AgentDescriptorEntity as agentDescriptorEntity\norder by agentDescriptorEntity.description")
 	public java.util.List<es.caib.seycon.ng.model.AgentDescriptorEntity> findAllOnlyDadesBasiques() {
 	 return null;

@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SERVER" )
+@Entity (table="SC_SERVER", translatedName="ServerEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.Server.class,
 	es.caib.seycon.ng.model.ReplicaDatabaseEntity.class,
 	es.caib.seycon.ng.model.SecretEntity.class,
@@ -18,7 +18,7 @@ public abstract class ServerEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="SRV_NOM", length=100)
+	@Column (name="SRV_NOM", length=100, translated="name")
 	public java.lang.String nom;
 
 	@Column (name="SRV_PK")
@@ -51,6 +51,7 @@ public abstract class ServerEntity {
 	@ForeignKey (foreignColumn="SCT_SERVER")
 	public java.util.Collection<com.soffid.iam.model.ScheduledTaskEntity> scheduledTasks;
 
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.ServerEntity findByNom(
 		java.lang.String nom) {

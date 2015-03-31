@@ -20,49 +20,54 @@ public abstract class XarxaACEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="AXA_NIVELL")
+	@Column (name="AXA_NIVELL", translated="level")
 	public java.lang.Integer nivell;
 
-	@Column (name="AXA_MASMAQ", length=50)
+	@Column (name="AXA_MASMAQ", length=50, translated="hostsName")
 	@Nullable
 	public java.lang.String nomMaquines;
 
-	@Column (name="AXA_IDXAR")
+	@Column (name="AXA_IDXAR", translated="network")
 	public es.caib.seycon.ng.model.XarxaEntity xarxa;
 
 	@Column (name="AXA_IDROL")
 	@Nullable
 	public es.caib.seycon.ng.model.RolEntity role;
 
-	@Column (name="AXA_IDGRU")
+	@Column (name="AXA_IDGRU", translated="group")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grup;
 
-	@Column (name="AXA_IDUSU")
+	@Column (name="AXA_IDUSU", translated="user")
 	@Nullable
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
+	@Operation(translated="findByNetwork")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByXarxa(
 		es.caib.seycon.ng.model.XarxaEntity xarxa) {
 	 return null;
 	}
+	@Operation(translated="findByNetworkCodeAndIdentityCode")
 	@DaoFinder("select xarxaAC \nfrom \nes.caib.seycon.ng.model.XarxaACEntity xarxaAC \nleft join xarxaAC.usuari usuari \nleft join xarxaAC.role rol \nleft join xarxaAC.grup grup \nwhere \n(\n(grup is not null and grup.codi = :codiIdentitat) or \n(usuari is not null and usuari.codi = :codiIdentitat) or \n(rol is not null and rol.nom = :codiIdentitat) \n) \nand xarxaAC.xarxa.codi = :codiXarxa")
 	public es.caib.seycon.ng.model.XarxaACEntity findByCodiXarxaAndCodiIdentiat(
 		java.lang.String codiXarxa, 
 		java.lang.String codiIdentitat) {
 	 return null;
 	}
+	@Operation(translated="findByRoleName")
 	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.role.nom = :nomRol")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRol(
 		java.lang.String nomRol) {
 	 return null;
 	}
+	@Operation(translated="findByUserCode")
 	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.usuari.codi = :codiUsuari")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiUsuari(
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+	@Operation(translated="findByGroupCode")
 	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.grup.codi = :codiGrup")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiGrup(
 		java.lang.String codiGrup) {
@@ -73,6 +78,7 @@ public abstract class XarxaACEntity {
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
 	}
+	@Operation(translated="findByRoleNameAndApplicationCodeAndSystemCode")
 	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nleft join xarxaAC.role as elrol\nleft join elrol.aplicacio as aplica\nleft join elrol.baseDeDades as agent\nwhere elrol.nom = :nomRol \nand aplica.codi = :codiAplica\nand agent.codi = :codiDispat\norder by xarxaAC.xarxa.codi")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRolAndCodiAplicacioRolAndCodiDispatcher(
 		java.lang.String nomRol, 

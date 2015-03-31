@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_IMPRES" )
+@Entity (table="SC_IMPRES", translatedName="PrinterEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.comu.Impressora.class,
@@ -24,27 +24,29 @@ public abstract class ImpressoraEntity {
 	@Nullable
 	public java.lang.String model;
 
-	@Column (name="IMP_CODI", length=12)
+	@Column (name="IMP_CODI", length=12, translated="code")
 	public java.lang.String codi;
 
 	@Column (name="IMP_LOCAL", length=1)
 	@Nullable
 	public java.lang.String local;
 
-	@Column (name="IMP_IDMAQ")
+	@Column (name="IMP_IDMAQ", translated="server")
 	public es.caib.seycon.ng.model.MaquinaEntity servidor;
 
-	@ForeignKey (foreignColumn="GIM_IDIMP")
+	@ForeignKey (foreignColumn="GIM_IDIMP", translated="groups")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupImpressoraEntity> grups;
 
-	@ForeignKey (foreignColumn="UIM_IDIMP")
+	@ForeignKey (foreignColumn="UIM_IDIMP", translated="users")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariImpressoraEntity> usuaris;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.ImpressoraEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findPrintersByCriteria")
 	@DaoFinder("select impressora \nfrom \nes.caib.seycon.ng.model.ImpressoraEntity impressora \nwhere \n(:codi is null or impressora.codi like :codi) and \n(:model is null or impressora.model like :model) and \n(:local is null or impressora.local = :local) and \n(:maquina is null or  impressora.servidor.nom like :maquina) \norder by impressora.codi")
 	public java.util.List<es.caib.seycon.ng.model.ImpressoraEntity> findImpressoresByCriteri(
 		java.lang.String model, 

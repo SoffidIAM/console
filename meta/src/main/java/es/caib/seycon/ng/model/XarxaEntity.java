@@ -20,58 +20,63 @@ public abstract class XarxaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="XAR_CODI", length=10)
+	@Column (name="XAR_CODI", length=10, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="XAR_ADRIP", length=25)
+	@Column (name="XAR_ADRIP", length=25, translated="address")
 	public java.lang.String adreca;
 
-	@Column (name="XAR_DESCRI", length=50)
+	@Column (name="XAR_DESCRI", length=50, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="XAR_MASIP", length=25)
+	@Column (name="XAR_MASIP", length=25, translated="mask")
 	@Nullable
 	public java.lang.String mascara;
 
-	@Column (name="XAR_NORM", length=1)
+	@Column (name="XAR_NORM", length=1, translated="normalized")
 	public java.lang.String normalitzada;
 
 	@Column (name="XAR_PARDHC", length=50)
 	@Nullable
 	public java.lang.String dhcp;
 
-	@ForeignKey (foreignColumn="AXA_IDXAR")
+	@ForeignKey (foreignColumn="AXA_IDXAR", translated="authorizations")
 	public java.util.Collection<es.caib.seycon.ng.model.XarxaACEntity> autoritzacions;
 
-	@ForeignKey (foreignColumn="MAQ_IDXAR")
+	@ForeignKey (foreignColumn="MAQ_IDXAR", translated="hosts")
 	public java.util.Collection<es.caib.seycon.ng.model.MaquinaEntity> maquines;
 
 	@Column (name="XAR_DHCPSUP")
 	public boolean dchpSupport;
 
+	@Operation (translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findByFilter")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.XarxaEntity> findByFiltre(
 		es.caib.seycon.ng.comu.XarxaSearchCriteria filtre) {
 	 return null;
 	}
+	@Operation(translated="getFirstFreeIP")
 	@DaoFinder
 	public java.lang.String getPrimeraIPLliure(
 		java.lang.String ipXarxa, 
 		java.lang.String mascara) {
 	 return null;
 	}
+	@Operation(translated="getVoidIPs")
 	@DaoFinder
 	public java.lang.Long getIPsBuides(
 		java.lang.String ipXarxa, 
 		java.lang.String mascara) {
 	 return null;
 	}
+	@Operation(translated="getUsedIPs")
 	@DaoFinder
 	public java.lang.Long getIPsOcupades(
 		java.lang.String ipXarxa, 
@@ -83,6 +88,7 @@ public abstract class XarxaEntity {
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
 	}
+	@Operation(translated="findByAddress")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByAdreca(
 		java.lang.String adreca) {

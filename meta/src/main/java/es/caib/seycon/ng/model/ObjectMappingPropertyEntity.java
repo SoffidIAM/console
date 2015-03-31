@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_OBMAPR" )
+@Entity (table="SC_OBMAPR", translatedName="ObjectMappingPropertyEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ObjectMappingProperty.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class})
 public abstract class ObjectMappingPropertyEntity {

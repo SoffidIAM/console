@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_USUACC" )
+@Entity (table="SC_USUACC" , translatedName="UserAccountEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.UserAccount.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -28,6 +28,7 @@ public abstract class UserAccountEntity {
 	@Nullable
 	public java.util.Date untilDate;
 
+	@Operation(translated="findByAccountSystemAndName")
 	@DaoFinder("select uae\nfrom  es.caib.seycon.ng.model.UserAccountEntity as uae\nwhere uae.user.codi=:user and uae.account.name=:account and uae.account.dispatcher.codi=:dispatcher")
 	public es.caib.seycon.ng.model.UserAccountEntity findByAccountDispatcherAndName(
 		java.lang.String account, 
@@ -35,6 +36,7 @@ public abstract class UserAccountEntity {
 		java.lang.String user) {
 	 return null;
 	}
+	@Operation(translated="findByUserAndDispatcher")
 	@DaoFinder("select uae\nfrom  es.caib.seycon.ng.model.UserAccountEntity uae\nwhere uae.user.codi=:user and uae.account.dispatcher.codi=:dispatcher and uae.account.type = 'U'")
 	public java.util.List<es.caib.seycon.ng.model.UserAccountEntity> findByUserAndDispatcher(
 		java.lang.String user, 

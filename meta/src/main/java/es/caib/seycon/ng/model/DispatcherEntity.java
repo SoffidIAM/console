@@ -10,7 +10,8 @@ import java.util.Collection;
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DISPAT" )
+@Entity (table="SC_DISPAT",
+	translatedName="SystemEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.model.PoliticaContrasenyaEntity.class,
 	es.caib.seycon.ng.model.TipusUsuariEntity.class,
@@ -32,11 +33,11 @@ public abstract class DispatcherEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DIS_CODI", length=50)
+	@Column (name="DIS_CODI", length=50, translated="code")
 	@Nullable
 	public java.lang.String codi;
 
-	@Column (name="DIS_NOMCLA", length=100)
+	@Column (name="DIS_NOMCLA", length=100, translated="className")
 	@Nullable
 	public java.lang.String nomCla;
 
@@ -84,47 +85,46 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String param9;
 
-	@Column (name="DIS_BASROL", length=1)
+	@Column (name="DIS_BASROL", length=1, translated="baseRole")
 	@Nullable
 	public java.lang.String basRol;
 
-	@Column (name="DIS_SEGUR", length=1)
+	@Column (name="DIS_SEGUR", length=1, translated="safe")
 	@Nullable
 	public java.lang.String segur;
-
+	
 	@Description("Manual account creation")
 	@Column (name="DIS_MAACCR", length=1)
 	@Nullable
 	public Boolean manualAccountCreation;
 
-	@ForeignKey (foreignColumn="ROL_IDDISPAT")
+	@ForeignKey (foreignColumn="ROL_IDDISPAT", translated="role")
 	public java.util.Collection<es.caib.seycon.ng.model.RolEntity> rol;
 
-	@ForeignKey (foreignColumn="TPD_IDDIS")
+	@ForeignKey (foreignColumn="TPD_IDDIS", translated="userType")
 	public java.util.Collection<es.caib.seycon.ng.model.TipusUsuariDispatcherEntity> tipusUsuari;
 
-	@ForeignKey (foreignColumn="GRD_IDDIS")
+	@ForeignKey (foreignColumn="GRD_IDDIS", translated="systemGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> grupDispatcher;
 
-	@Column (name="DIS_CONAC", length=1)
+	@Column (name="DIS_CONAC", length=1, translated="accessControl")
 	@Nullable
 	public java.lang.String controlAcces;
 
-	@ForeignKey (foreignColumn="CAC_DIS_ID")
+	@ForeignKey (foreignColumn="CAC_DIS_ID", translated="accessControl")
 	public java.util.Collection<es.caib.seycon.ng.model.ControlAccessEntity> controlAccess;
 
-	@Column (name="DIS_DCN_ID")
+	@Column (name="DIS_DCN_ID", translated="domain")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity domini;
 
-	@Column (name="DIS_DOU_ID")
+	@Column (name="DIS_DOU_ID", translated="userDomain")
 	@Nullable
 	public es.caib.seycon.ng.model.DominiUsuariEntity dominiUsuari;
 
 	@ForeignKey (foreignColumn="ACC_DIS_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountEntity> accounts;
 
-	@Column (name="DIS_MAIN",
-		defaultValue="false")
+	@Column (name="DIS_MAIN", defaultValue="false", translated="mainSystem")
 	public boolean mainDispatcher;
 
 	@Column (name="DIS_RDONLY",
@@ -174,6 +174,7 @@ public abstract class DispatcherEntity {
 		java.lang.String actiu) {
 	 return null;
 	}
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DispatcherEntity findByCodi(
 		java.lang.String codi) {
@@ -184,10 +185,12 @@ public abstract class DispatcherEntity {
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
 	}
+	@Operation(translated="findActives")
 	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity agent\nwhere agent.url is not null order by agent.codi")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findActius() {
 	 return null;
 	}
+	@Operation(translated="findSoffidSystem")
 	@DaoFinder("select dis\nfrom es.caib.seycon.ng.model.DispatcherEntity as dis\nwhere dis.mainDispatcher = true")
 	public es.caib.seycon.ng.model.DispatcherEntity findSoffidDispatcher() {
 	 return null;

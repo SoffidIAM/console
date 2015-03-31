@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_SESSIO" )
+@Entity (table="SC_SESSIO", translatedName="SessionEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.Sessio.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
@@ -22,21 +22,21 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.Long port;
 
-	@Column (name="SES_IDUSU")
+	@Column (name="SES_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
-	@Column (name="SES_IDMACL")
+	@Column (name="SES_IDMACL", translated="clientHost")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity maquinaClient;
 
-	@Column (name="SES_IDMAQ")
+	@Column (name="SES_IDMAQ", translated="host")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity maquina;
 
-	@Column (name="SES_DATA")
+	@Column (name="SES_DATA", translated="startDate")
 	public java.util.Date dataInici;
 
-	@Column (name="SES_DAKEAL")
+	@Column (name="SES_DAKEAL", translated="keepAliveDate")
 	@Nullable
 	public java.util.Date dataKeepAlive;
 
@@ -44,11 +44,11 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.String externalClientIp;
 
-	@Column (name="SES_KEY2", length=50)
+	@Column (name="SES_KEY2", length=50, translated="newKey")
 	@Nullable
 	public java.lang.String novaClau;
 
-	@Column (name="SES_TIPUS")
+	@Column (name="SES_TIPUS", translated="type")
 	@Nullable
 	public es.caib.seycon.ng.comu.TipusSessio tipus;
 
@@ -56,11 +56,11 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.String webHandler;
 
-	@Column (name="SES_KEY", length=50)
+	@Column (name="SES_KEY", length=50, translated="key")
 	@Nullable
 	public java.lang.String clau;
 
-	@Column (name="SES_IDRAC")
+	@Column (name="SES_IDRAC", translated="loginLogInfo")
 	@Nullable
 	public es.caib.seycon.ng.model.RegistreAccesEntity regIstreLogin;
 
@@ -80,11 +80,13 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.String hostAddress;
 
+	@Operation(translated="findSessionByUserCode")
 	@DaoFinder("select sessio\nfrom es.caib.seycon.ng.model.SessioEntity sessio, es.caib.seycon.ng.model.UsuariEntity usuari where  usuari.codi = :codiUsuari and sessio.usuari = usuari")
 	public java.util.List<es.caib.seycon.ng.model.SessioEntity> findSessionsByCodiUsuari(
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+	@Operation(translated="findSessionByCriteria")
 	@DaoFinder("select sessio \nfrom \nes.caib.seycon.ng.model.SessioEntity sessio \nwhere (:port is null or sessio.port like :port) \nand (:nomMaquinaClient is null \n         or (sessio.clientHostName like :nomMaquinaClient)) \nand (:nomMaquinaServidora is null \n  or (sessio.hostName like :nomMaquinaServidora)) \nand (:codiUsuari is null or sessio.usuari.codi like :codiUsuari)\n")
 	public java.util.List<es.caib.seycon.ng.model.SessioEntity> findSessionsByCriteri(
 		java.lang.Long port, 
@@ -93,6 +95,7 @@ public abstract class SessioEntity {
 		java.lang.String nomMaquinaClient) {
 	 return null;
 	}
+	@Operation(translated="findSessionByCriteria")
 	@DaoFinder("from es.caib.seycon.ng.model.SessioEntity sessio \nwhere sessio.port = :port and sessio.clientHostName = :nomMaquinaClient and sessio.hostName = :nomMaquinaServidora and sessio.usuari.codi = :codiUsuari")
 	public es.caib.seycon.ng.model.SessioEntity findSessioByCriteri(
 		java.lang.Long port, 

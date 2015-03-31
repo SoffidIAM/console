@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_TIPEXE" )
+@Entity (table="SC_TIPEXE", translatedName="EntryPointExecutionTypeEntity", translatedPackage="com.soffid.iam.model")
 @Depends ({es.caib.seycon.ng.comu.TipusExecucioPuntEntrada.class})
 public abstract class TipusExecucioPuntEntradaEntity {
 
@@ -15,16 +15,17 @@ public abstract class TipusExecucioPuntEntradaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="EXE_CODI", length=10)
+	@Column (name="EXE_CODI", length=10, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="EXE_MIME", length=50)
+	@Column (name="EXE_MIME", length=50, translated="mimeType")
 	public java.lang.String tipusMime;
 
-	@Column (name="EXE_PLANTI", length=2000)
+	@Column (name="EXE_PLANTI", length=2000, translated="template")
 	@Nullable
 	public java.lang.String plantilla;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusExecucioPuntEntradaEntity findByCodi(
 		java.lang.String codi) {

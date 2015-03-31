@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_ACCPWD" )
+@Entity (table="SC_ACCPWD", translatedName="AccountPasswordEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.EstatContrasenya.class,
 	es.caib.seycon.ng.model.AccountEntity.class})
 public abstract class AccountPasswordEntity {

@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
 
-@Entity (table="SC_APLICA" )
+@Entity (table="SC_APLICA", translatedName="InformationSystemEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ValorDomini.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
@@ -26,36 +26,36 @@ public abstract class AplicacioEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="APL_CODI", length=20)
+	@Column (name="APL_CODI", length=20, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="APL_NOM", length=50)
+	@Column (name="APL_NOM", length=50, translated="name")
 	public java.lang.String nom;
 
-	@Column (name="APL_DIRFON", length=50)
+	@Column (name="APL_DIRFON", length=50, translated="directoryFonts")
 	@Nullable
 	public java.lang.String directoriFonts;
 
-	@Column (name="APL_DIRECT", length=50)
+	@Column (name="APL_DIRECT", length=50, translated="executableDirectory")
 	@Nullable
 	public java.lang.String directoriExecutable;
 
-	@Column (name="APL_BD", length=25)
+	@Column (name="APL_BD", length=25, translated="DB")
 	@Nullable
 	public java.lang.String bd;
 
-	@ForeignKey (foreignColumn="ROL_IDAPL")
+	@ForeignKey (foreignColumn="ROL_IDAPL", translated="roles")
 	public java.util.Collection<es.caib.seycon.ng.model.RolEntity> rols;
 
-	@Column (name="APL_IDCONTACT")
+	@Column (name="APL_IDCONTACT", translated="contactPerson")
 	@Nullable
 	public es.caib.seycon.ng.model.UsuariEntity personaContacte;
 
-	@Column (name="APL_GESTIONABLEWF", length=1)
+	@Column (name="APL_GESTIONABLEWF", length=1, translated="manageableWF")
 	@Nullable
 	public java.lang.String gestionableWF;
 
-	@Column (name="APL_MAILNOTIF", length=512)
+	@Column (name="APL_MAILNOTIF", length=512, translated="notificationMail")
 	@Nullable
 	public java.lang.String correusNotificacions;
 	
@@ -69,11 +69,13 @@ public abstract class AplicacioEntity {
 	@ForeignKey (foreignColumn="SOD_APL_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.SoDRuleEntity> sodRules;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.AplicacioEntity findByCodi(
 		java.lang.String codi) {
 	 return null;
 	}
+	@Operation(translated="findApplicationByCriteria")
 	@DaoFinder("select aplicacioEntity \nfrom \nes.caib.seycon.ng.model.AplicacioEntity aplicacioEntity \nleft join aplicacioEntity.personaContacte personaContacte \nwhere \n(:codi is null or aplicacioEntity.codi like :codi) and \n(:nom is null or aplicacioEntity.nom like :nom) and \n(:directoriFonts is null or aplicacioEntity.directoriFonts like :directoriFonts) and\n(:responsable is null or personaContacte.codi like :responsable) and\n(:directoriExecutable is null or aplicacioEntity.directoriExecutable like :directoriExecutable) and\n(:bd is null or aplicacioEntity.bd like :bd)  and (:gestionableWF is null or aplicacioEntity.gestionableWF like :gestionableWF)\norder by aplicacioEntity.codi")
 	public java.util.List<es.caib.seycon.ng.model.AplicacioEntity> findAplicacioByCriteri(
 		java.lang.String codi, 

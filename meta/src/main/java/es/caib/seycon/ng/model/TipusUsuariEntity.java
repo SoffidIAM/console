@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_TIPUSU" )
+@Entity (table="SC_TIPUSU", translatedName="PasswordPolicyEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.TipusUsuari.class,
@@ -19,19 +19,20 @@ public abstract class TipusUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="TUS_CODI", length=1)
+	@Column (name="TUS_CODI", length=1, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="TUS_DESC", length=50)
+	@Column (name="TUS_DESC", length=50, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@ForeignKey (foreignColumn="PCD_TUS_ID")
+	@ForeignKey (foreignColumn="PCD_TUS_ID", translated="policies")
 	public java.util.Collection<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> politiques;
 
 	@ForeignKey (foreignColumn="ACC_TUS_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountEntity> accounts;
 
+	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusUsuariEntity findByCodi(
 		java.lang.String codi) {

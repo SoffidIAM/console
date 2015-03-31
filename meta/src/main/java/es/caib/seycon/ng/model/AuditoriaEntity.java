@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_AUDITO" )
+@Entity (table="SC_AUDITO", translatedName="AuditEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.Auditoria.class,
 	es.caib.seycon.ng.model.LlistaCorreuEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
@@ -27,85 +27,85 @@ public abstract class AuditoriaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="AUD_DATA")
+	@Column (name="AUD_DATA", translated="date")
 	public java.util.Date data;
 
-	@Column (name="AUD_USUAUD", length=100)
+	@Column (name="AUD_USUAUD", length=100, translated="user")
 	@Nullable
 	public java.lang.String usuari;
 
-	@Column (name="AUD_ACCIO", length=1)
+	@Column (name="AUD_ACCIO", length=1, translated="action")
 	public java.lang.String accio;
 
-	@Column (name="AUD_INFO", length=1024)
+	@Column (name="AUD_INFO", length=1024, translated="object")
 	@Nullable
 	public java.lang.String objecte;
 
-	@Column (name="AUD_IDGRU")
+	@Column (name="AUD_IDGRU", translated="group")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grup;
 
-	@Column (name="AUD_DOMRLU", length=100)
+	@Column (name="AUD_DOMRLU", length=100, translated="domain")
 	@Nullable
 	public java.lang.String domini;
 
-	@Column (name="AUD_VALDOMRLU", length=100)
+	@Column (name="AUD_VALDOMRLU", length=100, translated="domainValue")
 	@Nullable
 	public java.lang.String valorDomini;
 
-	@Column (name="AUD_CON", length=100)
+	@Column (name="AUD_CON", length=100, translated="configurationParameter")
 	@Nullable
 	public java.lang.String parametreConfiguracio;
 
-	@Column (name="AUD_DIS", length=150)
+	@Column (name="AUD_DIS", length=150, translated="db")
 	@Nullable
 	public java.lang.String bbdd;
 
-	@Column (name="AUD_IMP", length=100)
+	@Column (name="AUD_IMP", length=100, translated="printer")
 	@Nullable
 	public java.lang.String impressora;
 
-	@Column (name="AUD_APL", length=100)
+	@Column (name="AUD_APL", length=100, translated="application")
 	@Nullable
 	public java.lang.String aplicacio;
 
-	@Column (name="AUD_DCO", length=100)
+	@Column (name="AUD_DCO", length=100, translated="mailDomain")
 	@Nullable
 	public java.lang.String dominiCorreu;
 
-	@Column (name="AUD_LCO", length=100)
+	@Column (name="AUD_LCO", length=100, translated="mailList")
 	@Nullable
 	public java.lang.String llistaCorreu;
 
-	@Column (name="AUD_XAR", length=100)
+	@Column (name="AUD_XAR", length=100, translated="network")
 	@Nullable
 	public java.lang.String xarxa;
 
-	@Column (name="AUD_ROL", length=100)
+	@Column (name="AUD_ROL", length=100, translated="role")
 	@Nullable
 	public java.lang.String rol;
 
-	@Column (name="AUD_MAQ", length=100)
+	@Column (name="AUD_MAQ", length=100, translated="host")
 	@Nullable
 	public java.lang.String maquina;
 
-	@Column (name="AUD_AUT", length=100)
+	@Column (name="AUD_AUT", length=100, translated="authorization")
 	@Nullable
 	public java.lang.String autoritzacio;
 
-	@Column (name="AUD_FITXER")
+	@Column (name="AUD_FITXER", translated="fileID")
 	@Nullable
 	public java.lang.Long fitxerId;
 
-	@Column (name="AUD_FED", length=100)
+	@Column (name="AUD_FED", length=100, translated="identityFederation")
 	@Nullable
 	public java.lang.String federacioIdentitats;
 
-	@Column (name="AUD_LCO2", length=100)
+	@Column (name="AUD_LCO2", length=100, translated="belongsMailList")
 	@Nullable
 	public java.lang.String llistaCorreuPertany;
 
-	@Column (name="AUD_DCO2", length=100)
+	@Column (name="AUD_DCO2", length=100, translated="belongsmailDomain")
 	@Nullable
 	public java.lang.String dominiCorreuPertany;
 
@@ -156,6 +156,7 @@ public abstract class AuditoriaEntity {
 		java.lang.String sqlQuery) {
 	 return null;
 	}
+	@Operation(translated="findAuditByCriteria1")
 	@DaoFinder("select auditoria from es.caib.seycon.ng.model.AuditoriaEntity auditoria\n left join auditoria.accountAssoc accountAssoc \nwhere \n  (:usuari is null or auditoria.usuari like :usuari) and \n (:objecte is null or auditoria.objecte like :objecte) and \n (:autor is null or accountAssoc.name like :autor)  and\n (:accio is null or auditoria.accio=:accio)  \norder by auditoria.data asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri1(
 		java.lang.String autor, 
@@ -164,6 +165,7 @@ public abstract class AuditoriaEntity {
 		java.lang.String accio) {
 	 return null;
 	}
+	@Operation(translated="findAuditByCriteria2")
 	@DaoFinder("select auditoria \nfrom es.caib.seycon.ng.model.AuditoriaEntity auditoria \nleft join auditoria.accountAssoc accountAssoc\nleft join auditoria.grup grupAssoc \nwhere \n (:usuari is null or auditoria.usuari like :usuari) \nand (:objecte is null or auditoria.objecte like :objecte) \nand (:autor is null or accountAssoc.name like :autor)  \nand (:accio is null or auditoria.accio=:accio)  \nand (:objecteAuditat is null or \n   (:objecteAuditat is not null  and  \n    ( \n      (:objecteAuditat='domini' and auditoria.domini like :valorOA) \n      or (:objecteAuditat='valorDomini' and auditoria.valorDomini like :valorOA) \n      or (:objecteAuditat='parametreConfiguracio' and auditoria.parametreConfiguracio like :valorOA) \n      or (:objecteAuditat='bbdd' and auditoria.bbdd like :valorOA) \n      or (:objecteAuditat='impressora' and auditoria.impressora like :valorOA) \n      or (:objecteAuditat='aplicacio' and auditoria.aplicacio like :valorOA) \n      or (:objecteAuditat='dominiCorreu' and auditoria.dominiCorreu like :valorOA) \n      or (:objecteAuditat='llistaCorreu' and auditoria.llistaCorreu like :valorOA) \n      or (:objecteAuditat='fitxer' and auditoria.fitxerId like :valorOA) \n      or (:objecteAuditat='xarxa' and auditoria.xarxa like :valorOA) \n      or (:objecteAuditat='rol' and auditoria.rol like :valorOA) \n      or (:objecteAuditat='maquina' and auditoria.maquina like :valorOA) \n      or (:objecteAuditat='autoritzacio' and auditoria.autoritzacio like :valorOA) \n      or (:objecteAuditat='grup' and grupAssoc is not null and grupAssoc.codi like :valorOA)\n      or (:objecteAuditat='userType' and auditoria.userType like :valorOA)\n      or (:objecteAuditat='passwordDomain' and auditoria.passwordDomain like :valorOA)\n      or (:objecteAuditat='userDomain' and auditoria.userDomain like :valorOA)\n    )\n   )\n)\norder by auditoria.data asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri2(
 		java.lang.String autor, 
@@ -174,6 +176,7 @@ public abstract class AuditoriaEntity {
 		java.lang.String accio) {
 	 return null;
 	}
+	@Operation(translated="findAuditByCriteria3")
 	@DaoFinder("select auditoria \nfrom\nes.caib.seycon.ng.model.AuditoriaEntity auditoria left join\nauditoria.accountAssoc accountAssoc\nwhere\n(:dataMax = :nullDate or auditoria.data < :dataMax ) and\n(:dataMin = :nullDate or auditoria.data > :dataMin ) and\n (:usuari is null or auditoria.usuari like :usuari) \nand (:objecte is null or auditoria.objecte like :objecte) \nand (:autor is null or accountAssoc.name like :autor)  and\n(:accio is null or auditoria.accio=:accio)  \norder by auditoria.data asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri3(
 		java.util.Date nullDate, 
@@ -185,6 +188,7 @@ public abstract class AuditoriaEntity {
 		java.lang.String accio) {
 	 return null;
 	}
+	@Operation(translated="findAuditByCriteria4")
 	@DaoFinder("select auditoria \nfrom\nes.caib.seycon.ng.model.AuditoriaEntity auditoria \nleft join auditoria.accountAssoc accountAssoc\nleft join auditoria.grup grupAssoc \nwhere\n (:dataMax = :nullDate or auditoria.data < :dataMax ) and\n (:dataMin = :nullDate or auditoria.data > :dataMin ) and\n (:usuari is null or auditoria.usuari like :usuari) and \n (:objecte is null or auditoria.objecte like :objecte) and \n (:autor is null or accountAssoc.name like :autor)  and\n (:accio is null or auditoria.accio=:accio)  and\n (:objecteAuditat is null or \n   (:objecteAuditat is not null  and  \n    ( \n      (:objecteAuditat='domini' and auditoria.domini like :valorOA) \n      or (:objecteAuditat='valorDomini' and auditoria.valorDomini like :valorOA) \n      or (:objecteAuditat='parametreConfiguracio' and auditoria.parametreConfiguracio like :valorOA) \n      or (:objecteAuditat='bbdd' and auditoria.bbdd like :valorOA) \n      or (:objecteAuditat='impressora' and auditoria.impressora like :valorOA) \n      or (:objecteAuditat='aplicacio' and auditoria.aplicacio like :valorOA) \n      or (:objecteAuditat='dominiCorreu' and auditoria.dominiCorreu like :valorOA) \n      or (:objecteAuditat='llistaCorreu' and auditoria.llistaCorreu like :valorOA) \n      or (:objecteAuditat='fitxer' and auditoria.fitxerId like :valorOA) \n      or (:objecteAuditat='xarxa' and auditoria.xarxa like :valorOA) \n      or (:objecteAuditat='rol' and auditoria.rol like :valorOA) \n      or (:objecteAuditat='maquina' and auditoria.maquina like :valorOA) \n      or (:objecteAuditat='autoritzacio' and auditoria.autoritzacio like :valorOA) \n      or (:objecteAuditat='grup' and grupAssoc is not null and grupAssoc.codi like :valorOA)\n      or (:objecteAuditat='userType' and auditoria.userType like :valorOA)\n      or (:objecteAuditat='passwordDomain' and auditoria.passwordDomain like :valorOA)\n      or (:objecteAuditat='userDomain' and auditoria.userDomain like :valorOA)\n      or (:objecteAuditat='account' and auditoria.account like :valorOA)\n    )\n   )\n)\norder by auditoria.data asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri4(
 		java.util.Date nullDate, 

@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_OBJMAP" )
+@Entity (table="SC_OBJMAP", translatedName="ObjectMappingEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ObjectMapping.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
@@ -32,7 +32,7 @@ public abstract class ObjectMappingEntity {
 	@ForeignKey (foreignColumn="OMP_OBM_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.ObjectMappingPropertyEntity> properties;
 
-	@Column (name="OBM_DIS_ID")
+	@Column (name="OBM_DIS_ID", translated="system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
 	@ForeignKey (foreignColumn="ATM_OBM_ID")

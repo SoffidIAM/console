@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_AUTROL" )
+@Entity (table="SC_AUTROL", translatedName="AuthorizationEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.AutoritzacioRol.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.model.RolEntity.class,
@@ -20,17 +20,19 @@ public abstract class AutoritzacioRolEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="AUR_AUTCOD", length=100)
+	@Column (name="AUR_AUTCOD", length=100, translated="authorization")
 	public java.lang.String autoritzacio;
 
-	@Column (name="AUR_ROL")
+	@Column (name="AUR_ROL", translated="role")
 	public es.caib.seycon.ng.model.RolEntity rol;
 
+	@Operation(translated="findByAuthorization")
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioRolEntity as autoritzacioRolEntity \nwhere autoritzacioRolEntity.autoritzacio = :autoritzacio \norder by autoritzacioRolEntity.rol.nom")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioRolEntity> findByAutoritzacio(
 		java.lang.String autoritzacio) {
 	 return null;
 	}
+	@Operation(translated="findByRoleID")
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioRolEntity as autoritzacioRolEntity \nwhere autoritzacioRolEntity.rol.id = :idRol\norder by autoritzacioRolEntity.autoritzacio")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioRolEntity> findByIdRol(
 		java.lang.Long idRol) {

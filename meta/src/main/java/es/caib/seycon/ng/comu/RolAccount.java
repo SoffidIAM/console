@@ -22,6 +22,7 @@ public abstract class RolAccount {
 	public java.lang.String accountName;
 
 	@Nullable
+	@Attribute(translated="accountSystem")
 	public java.lang.String accountDispatcher;
 
 	@Nullable

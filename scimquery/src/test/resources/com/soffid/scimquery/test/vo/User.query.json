@@ -1,0 +1,7 @@
+{
+   hibernateClass: "com.soffid.scimquery.test.entity.UserEntity",
+   attributes: [
+   	 {name:"name", hibernateName: "nameColumn"},
+   	 {name:"columns", hibernateName: "columns"}
+   ]
+}

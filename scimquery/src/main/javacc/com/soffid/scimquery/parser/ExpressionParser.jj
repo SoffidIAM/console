@@ -1,0 +1,179 @@
+options
+{
+	STATIC = false ;
+}
+PARSER_BEGIN(ExpressionParser)
+package com.soffid.scimquery.parser;
+
+import com.soffid.scimquery.expr.*;
+
+public class ExpressionParser
+{
+	static public AbstractExpression parse (String s)
+	throws ParseException, TokenMgrError
+	{
+	    
+		java.io.StringReader reader = new java.io.StringReader (s);
+		ExpressionParser p = new ExpressionParser (reader);
+		return p.Expression() ;
+	}
+}
+PARSER_END(ExpressionParser)
+
+SKIP : { " " }
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < EQ : ["E","e"]["Q","q"] > }
+TOKEN : { < GT : ["G","g"]["T","t"] > }
+TOKEN : { < GE : ["G","g"]["e","e"] > }
+TOKEN : { < LT : ["L","l"]["t","t"] > }
+TOKEN : { < LE : ["L","l"]["E","e"] > }
+TOKEN : { < NE : ["N","n"]["E","e"] > }
+TOKEN : { < CO : ["C","c"]["O","o"] > }
+TOKEN : { < SW : ["S","s"]["W","w"] > }
+TOKEN : { < EW : ["E","e"]["W","w"] > }
+TOKEN : { < PR : ["P","p"]["R","r"] > }
+TOKEN : { < OPENPAR : ["("] > }
+TOKEN : { < CLOSEPAR : [")"] > }
+TOKEN : { < OR : ["O","o"]["R","r"] > }
+TOKEN : { < AND : ["A","a"]["N","n"]["D","d"] > }
+TOKEN : { < NOT : ["N","n"]["O","o"]["T","t"] > }
+TOKEN : { < NUMBER : (["0"-"9"])+ > }
+TOKEN : { < DOUBLE : (["0"-"9"])*"."(["0"-"9"])+ > }
+TOKEN : { < TRUE : "true" > }
+TOKEN : { < FALSE : "false" > }
+TOKEN : { < IDENTIFIER : ["A"-"Z","a"-"z",".","_"](["A"-"Z","a"-"z",".","_","0"-"9"])* > }
+TOKEN : { < QUOTEDTEXT : ["\""](~["\""])*["\""] > }
+
+Object Constant ():
+{
+	Token t; 
+	StringBuffer sb ;
+	boolean slash = false;
+}
+{
+	(t = <QUOTEDTEXT> {
+	    sb = new StringBuffer();
+	    for (int i = 0; i < t.image.length(); i++)
+	    {
+	       char ch = t.image.charAt(i);
+	       if (slash) {
+	          switch (ch)
+	          {
+		          case 'n': sb.append ('\n'); break;
+		          case 'r': sb.append ('\r'); break;
+		          case 't': sb.append ('\t'); break;
+		          case '0': sb.append ('\0'); break;
+		          default: sb.append (ch); 
+	          }
+	          slash = false; 
+	       }
+	       else if (ch == '\\') slash = true;
+	       else if (ch != '\"') sb.append (ch);
+	    } 
+		return sb.toString(); 
+	} ) |
+	(t = <NUMBER>  { return Long.parseLong(t.image); } ) |
+	(t = <DOUBLE>  { return Double.parseDouble(t.image); } ) |
+	(t = <TRUE> {return Boolean.TRUE;} ) |
+	(t = <FALSE> {return Boolean.FALSE;})
+}
+
+ComparisonExpression Comparison () : 
+{
+	Token i1 = null;
+	Object i2;
+	Token operator = null;
+	ComparisonExpression ce = new ComparisonExpression ();
+}
+{
+	i1 = <IDENTIFIER>
+	(
+		( operator = <EQ> |
+		  operator = <GT> |
+		  operator = <GE> |
+		  operator = <LT> |
+		  operator = <SW> |
+		  operator = <EW> |
+		  operator = <CO> |
+		  operator = <NE> |
+		  operator = <LE>)
+		i2 = Constant ()
+		{
+			ce.setAttribute (i1.image);
+			ce.setValue (i2);
+			ce.setOperator (operator.image);
+			
+			return ce;
+		}
+	) | (
+		<PR> 
+		{
+			ce.setAttribute (i1.image);
+			ce.setOperator (operator.image);
+			
+			return ce;
+		}
+	)
+	
+}
+
+AbstractExpression Or () : 
+{
+	OrExpression o = new OrExpression();
+	AbstractExpression i1, i2;
+}
+{
+	i1 = And () { o.getMembers().add (i1); }
+	( <OR> 
+	  i2 = And () { o.getMembers().add (i2); }
+	) *
+	{
+		return o;
+	}
+}
+
+AbstractExpression And () : 
+{
+	AndExpression o = new AndExpression();
+	AbstractExpression i1, i2;
+}
+{
+	i1 = Not () { o.getMembers().add (i1); }
+	( <AND> 
+	  i2 = Not () { o.getMembers().add (i2); }
+	) *
+	{
+		return o;
+	}
+}
+
+AbstractExpression Not () : 
+{
+	NotExpression o = new NotExpression();
+	AbstractExpression i1;
+}
+{
+	( <NOT> i1 = ParenthesisExpression () { o.setSubExpression (i1); return o; }
+	 | i1 = ParenthesisExpression () { return i1; } 
+	)
+}
+
+AbstractExpression ParenthesisExpression () : 
+{
+	AbstractExpression e;
+}
+{
+	( e = Comparison () { return e;}
+	 | <OPENPAR> e = Or () <CLOSEPAR> { return e;}
+	)
+}
+
+AbstractExpression Expression () :
+{
+	AbstractExpression e;
+}
+{
+	e = Or () { return e;}
+}
+

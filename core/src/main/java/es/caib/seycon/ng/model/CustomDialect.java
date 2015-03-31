@@ -100,7 +100,10 @@ public class CustomDialect extends Dialect {
     }
 
     public Class getNativeIdentifierGeneratorClass() {
-        return es.caib.seycon.ng.model.identity.IdentityGenerator.class;
+//    	if (proxyDialect instanceof SQLServerDialect)
+//    		return proxyDialect.getNativeIdentifierGeneratorClass();
+//    	else
+    		return es.caib.seycon.ng.model.identity.IdentityGenerator.class;
     }
 
     public boolean supportsIdentityColumns() {

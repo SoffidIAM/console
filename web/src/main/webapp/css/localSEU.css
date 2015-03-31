@@ -441,3 +441,5 @@ body
     color: black;
     text-indent: 20px;
 }
+
+.text, .textbox { box-sizing: content-box; padding: 2px;}

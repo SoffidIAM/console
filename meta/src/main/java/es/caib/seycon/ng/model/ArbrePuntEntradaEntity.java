@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_PUEPUE", translatedName="EntryPointEntity", translatedPackage="com.soffid.iam.model" )
+@Entity (table="SC_PUEPUE", translatedName="EntryPointTreeEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ArbrePuntEntrada.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.PuntEntradaEntity.class})

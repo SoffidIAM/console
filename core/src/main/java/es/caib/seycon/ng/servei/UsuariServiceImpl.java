@@ -97,7 +97,6 @@ import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.GrupEntityDao;
 import es.caib.seycon.ng.model.MaquinaEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.RenovacioEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolAssociacioRolEntityDao;
@@ -690,27 +689,6 @@ public class UsuariServiceImpl extends
 	}
 
 	public void handleDesarRenovacio(Long idUsuari, Date dataRenovacio) {
-		UsuariEntity usuariEntity = getUsuariEntityDao().findById(idUsuari);
-		Collection renovacioEntities = getRenovacioEntityDao().findByUsuari(
-				usuariEntity);
-		Iterator i = renovacioEntities.iterator();
-		Renovacio renovacio = new Renovacio();
-		while (i.hasNext()) {
-			RenovacioEntity renovacioEnity = (RenovacioEntity) i.next();
-			renovacioEnity.setActiu("N"); //$NON-NLS-1$
-			getRenovacioEntityDao().update(renovacioEnity);
-		}
-		renovacio = new Renovacio();
-		renovacio.setCodiUsuari(usuariEntity.getCodi());
-		renovacio.setActiu("S"); //$NON-NLS-1$
-		Calendar calRenovacio = Calendar.getInstance();
-		calRenovacio.setTime(dataRenovacio);
-		renovacio.setDataRenovacio(calRenovacio);
-		Calendar data = GregorianCalendar.getInstance();
-		renovacio.setData(data);
-		RenovacioEntity renovacioEntity = getRenovacioEntityDao()
-				.renovacioToEntity(renovacio);
-		getRenovacioEntityDao().create(renovacioEntity);
 	}
 	
 	/**

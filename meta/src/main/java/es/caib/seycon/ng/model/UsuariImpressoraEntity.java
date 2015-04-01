@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_USUIMP" )
+@Entity (table="SC_USUIMP", translatedName="UserPrinterEntity", translatedPackage="com.soffid.iam.model"  )
 @Depends ({es.caib.seycon.ng.comu.UsuariImpressora.class,
 	es.caib.seycon.ng.model.ImpressoraEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,

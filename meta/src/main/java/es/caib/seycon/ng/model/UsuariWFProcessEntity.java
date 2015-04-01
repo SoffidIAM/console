@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_USUPRO" )
+@Entity (table="SC_USUPRO", translatedName="UserProcessEntity", translatedPackage="com.soffid.iam.model"  )
 @Depends ({es.caib.seycon.ng.comu.UsuariWFProcess.class})
 public abstract class UsuariWFProcessEntity {
 

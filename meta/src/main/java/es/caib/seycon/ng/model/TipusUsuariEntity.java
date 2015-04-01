@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_TIPUSU", translatedName="PasswordPolicyEntity", translatedPackage="com.soffid.iam.model" )
+@Entity (table="SC_TIPUSU", translatedName="UserTypeEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.TipusUsuari.class,

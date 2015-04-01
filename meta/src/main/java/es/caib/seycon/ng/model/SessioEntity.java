@@ -86,7 +86,7 @@ public abstract class SessioEntity {
 		java.lang.String codiUsuari) {
 	 return null;
 	}
-	@Operation(translated="findSessionByCriteria")
+	@Operation(translated="findSessionsByCriteria")
 	@DaoFinder("select sessio \nfrom \nes.caib.seycon.ng.model.SessioEntity sessio \nwhere (:port is null or sessio.port like :port) \nand (:nomMaquinaClient is null \n         or (sessio.clientHostName like :nomMaquinaClient)) \nand (:nomMaquinaServidora is null \n  or (sessio.hostName like :nomMaquinaServidora)) \nand (:codiUsuari is null or sessio.usuari.codi like :codiUsuari)\n")
 	public java.util.List<es.caib.seycon.ng.model.SessioEntity> findSessionsByCriteri(
 		java.lang.Long port, 

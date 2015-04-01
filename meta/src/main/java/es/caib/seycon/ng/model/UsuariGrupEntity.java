@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_USUGRU" )
+@Entity (table="SC_USUGRU", translatedName="UserGroupEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.RolsGrupEntity.class,
 	LlistaCorreuEntity.class,
 	es.caib.seycon.ng.comu.UsuariGrup.class,

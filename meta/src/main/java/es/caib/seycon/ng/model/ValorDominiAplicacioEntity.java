@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_VALOR_DOMINI" )
+@Entity (table="SC_VALOR_DOMINI", translatedName="DomainValueEntity", translatedPackage="com.soffid.iam.model"  )
 @Depends ({es.caib.seycon.ng.comu.ValorDomini.class,
 	es.caib.seycon.ng.model.DominiAplicacioEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,

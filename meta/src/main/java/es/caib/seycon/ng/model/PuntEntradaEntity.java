@@ -40,7 +40,7 @@ public abstract class PuntEntradaEntity {
 	@Nullable
 	public java.lang.Long numcolumnes;
 
-	@Column (name="PUE_PUBLIC", length=1, translated="public")
+	@Column (name="PUE_PUBLIC", length=1, translated="publicAccess")
 	@Nullable
 	public java.lang.String esPublic;
 

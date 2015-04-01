@@ -20,7 +20,7 @@ public abstract class ParaulesProhibidesEntity {
 	@Column (name="BDW_WORD", length=200, translated="forbiddenWord")
 	public java.lang.String paraulaProhibida;
 
-	@ForeignKey (foreignColumn="BDC_BDW_ID", translated="forbiddenWord")
+	@ForeignKey (foreignColumn="BDC_BDW_ID", translated="policies")
 	public java.util.Collection<es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity> paraulaProhibidaContrasenya;
 
 }

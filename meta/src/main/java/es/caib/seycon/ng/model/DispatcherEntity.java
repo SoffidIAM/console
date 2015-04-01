@@ -107,11 +107,11 @@ public abstract class DispatcherEntity {
 	@ForeignKey (foreignColumn="GRD_IDDIS", translated="systemGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> grupDispatcher;
 
-	@Column (name="DIS_CONAC", length=1, translated="accessControl")
+	@Column (name="DIS_CONAC", length=1, translated="enableAccessControl")
 	@Nullable
 	public java.lang.String controlAcces;
 
-	@ForeignKey (foreignColumn="CAC_DIS_ID", translated="accessControl")
+	@ForeignKey (foreignColumn="CAC_DIS_ID", translated="accessControls")
 	public java.util.Collection<es.caib.seycon.ng.model.ControlAccessEntity> controlAccess;
 
 	@Column (name="DIS_DCN_ID", translated="domain")

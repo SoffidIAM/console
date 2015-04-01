@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_AUTXAR" )
+@Entity (table="SC_AUTXAR" , translatedName="NetworkAuthorizationEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.XarxaEntity.class,
 	es.caib.seycon.ng.comu.NetworkAuthorization.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,

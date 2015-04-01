@@ -5,7 +5,6 @@
  */
 package es.caib.seycon.ng.servei;
 
-import java.nio.file.attribute.AttributeView;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;

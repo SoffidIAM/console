@@ -1,5 +1,10 @@
 package es.caib.seycon.ng.servei.impl;
 
+import com.soffid.iam.model.BlobConfigurationEntity;
+import com.soffid.iam.model.BlobConfigurationEntityDao;
+import com.soffid.iam.model.ServerPluginEntityDao;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.ConfiguracioService;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,16 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
 import org.apache.axis.utils.ByteArrayOutputStream;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AgentDescriptorEntityDao;
-import es.caib.seycon.ng.model.BlobConfigurationEntity;
-import es.caib.seycon.ng.model.BlobConfigurationEntityDao;
-import es.caib.seycon.ng.model.ServerPluginEntity;
-import es.caib.seycon.ng.model.ServerPluginEntityDao;
-import es.caib.seycon.ng.servei.ConfiguracioService;
 
 public class PluginMerger {
     ServerPluginEntityDao pluginDao;

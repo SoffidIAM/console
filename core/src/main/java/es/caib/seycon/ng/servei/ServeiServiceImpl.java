@@ -3,18 +3,20 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-
+import com.soffid.iam.model.ServiceEntity;
 import es.caib.seycon.ng.comu.Servei;
 import es.caib.seycon.ng.comu.ServeiSearchCriteria;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.ServeiEntity;
-import es.caib.seycon.ng.model.ServeiEntityDao;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @see es.caib.seycon.ng.servei.ServeiService
@@ -27,14 +29,14 @@ public class ServeiServiceImpl extends
 	 */
 	protected es.caib.seycon.ng.comu.Servei handleCreate(
 			es.caib.seycon.ng.comu.Servei servei) throws java.lang.Exception {
-		ServeiEntity servicesSameCode = getServeiEntityDao().findByCodi(servei.getCodi());
+		ServiceEntity servicesSameCode = getServiceEntityDao().findByCode(servei.getCodi());
 		if(servicesSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("ServeiServiceImpl.CodeServiceExists"),  //$NON-NLS-1$
 							servei.getCodi())); 
-		ServeiEntity serveiEntity = getServeiEntityDao().serveiToEntity(servei);
-		getServeiEntityDao().create(serveiEntity);
+		ServiceEntity serveiEntity = getServiceEntityDao().serveiToEntity(servei);
+		getServiceEntityDao().create(serveiEntity);
 		servei.setId(serveiEntity.getId());
-		return getServeiEntityDao().toServei(serveiEntity);
+		return getServiceEntityDao().toServei(serveiEntity);
 	}
 
 	/**
@@ -42,10 +44,9 @@ public class ServeiServiceImpl extends
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.Servei servei)
 			throws java.lang.Exception {
-		ServeiEntity serveiEntity = getServeiEntityDao().findByCodi(
-				servei.getCodi());
+		ServiceEntity serveiEntity = getServiceEntityDao().findByCode(servei.getCodi());
 		if(serveiEntity != null){
-			getServeiEntityDao().remove(serveiEntity);
+			getServiceEntityDao().remove(serveiEntity);
 		}
 	}
 
@@ -54,9 +55,9 @@ public class ServeiServiceImpl extends
 	 */
 	protected es.caib.seycon.ng.comu.Servei handleUpdate(
 			es.caib.seycon.ng.comu.Servei servei) throws java.lang.Exception {
-		ServeiEntity entity = getServeiEntityDao().serveiToEntity(servei);
-		getServeiEntityDao().update(entity);
-		return getServeiEntityDao().toServei(entity);
+		ServiceEntity entity = getServiceEntityDao().serveiToEntity(servei);
+		getServiceEntityDao().update(entity);
+		return getServiceEntityDao().toServei(entity);
 	}
 
 	protected Collection<Servei> handleFindServeisByCriteri(String codi,
@@ -85,33 +86,32 @@ public class ServeiServiceImpl extends
 			criteri.setDescripcio(descripcio);
 		}
 		
-		Collection<ServeiEntity> serveis = getServeiEntityDao().findByCriteri(criteri);
+		Collection<ServiceEntity> serveis = getServiceEntityDao().findByCriteria(criteri);
 		if(serveis != null)
 		{
 			// Check maximum number of results
 			if (serveis.size() > limitResults)
 			{
-				return getServeiEntityDao().toServeiList(serveis)
-					.subList(0, limitResults);
+				return getServiceEntityDao().toServeiList(serveis).subList(0, limitResults);
 			}
 			
-			return getServeiEntityDao().toServeiList(serveis);
+			return getServiceEntityDao().toServeiList(serveis);
 		}
 		
 		return new Vector();
 	}
 
 	protected Servei handleFindServeiByCodi(String codi) throws Exception {
-		ServeiEntity serveiEntity = getServeiEntityDao().findByCodi(codi);
+		ServiceEntity serveiEntity = getServiceEntityDao().findByCode(codi);
 		if(serveiEntity != null){
-			Servei servei = getServeiEntityDao().toServei(serveiEntity);
+			Servei servei = getServiceEntityDao().toServei(serveiEntity);
 			return servei;
 		}
 		return null;
 	}
 
 	protected Collection<Servei> handleGetServeis() throws Exception {
-		List<ServeiEntity> col = getServeiEntityDao().loadAll();
-		return getServeiEntityDao().toServeiList(col);
+		List<ServiceEntity> col = getServiceEntityDao().loadAll();
+		return getServiceEntityDao().toServeiList(col);
 	}
 }

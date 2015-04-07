@@ -1,8 +1,35 @@
 /**
  * Modificación de la clase org.jbpm.Mail para que se pueda extender sus funcionalidades.
  */
+/**
+ * Modificación de la clase org.jbpm.Mail para que se pueda extender sus funcionalidades.
+ */
 package es.caib.bpm.mail;
 
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
+import es.caib.bpm.servei.BpmConfigService;
+import es.caib.bpm.toolkit.EJBContainer;
+import es.caib.bpm.vo.ConfigParameterVO;
+import es.caib.seycon.ng.ServiceLocator;
+import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Dispatcher;
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.comu.lang.MessageFactory;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.AplicacioService;
+import es.caib.seycon.ng.servei.AutoritzacioService;
+import es.caib.seycon.ng.servei.ConfiguracioService;
+import es.caib.seycon.ng.servei.GrupService;
+import es.caib.seycon.ng.servei.SeyconServiceLocator;
+import es.caib.seycon.ng.utils.MailUtils;
+import es.caib.seycon.ng.utils.Security;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,7 +47,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -28,7 +54,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.properties.GetContentLengthProperty;
@@ -48,31 +73,6 @@ import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.jbpm.util.ClassLoaderUtil;
 import org.jbpm.util.XmlUtil;
-
-import es.caib.bpm.servei.BpmConfigService;
-import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.vo.ConfigParameterVO;
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Dispatcher;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariGrup;
-import es.caib.seycon.ng.comu.lang.MessageFactory;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.DispatcherEntityDao;
-import es.caib.seycon.ng.servei.AplicacioService;
-import es.caib.seycon.ng.servei.AutoritzacioService;
-import es.caib.seycon.ng.servei.ConfiguracioService;
-import es.caib.seycon.ng.servei.GrupService;
-import es.caib.seycon.ng.servei.SeyconServiceLocator;
-import es.caib.seycon.ng.utils.MailUtils;
-import es.caib.seycon.ng.utils.Security;
 
 public class Mail implements ActionHandler {
 	private static final long serialVersionUID = 1L;
@@ -418,9 +418,9 @@ public class Mail implements ActionHandler {
     				else
     				{
     					roleName = actorId;
-    					DispatcherEntityDao dao = (DispatcherEntityDao) ServiceLocator.instance().getService("dispatcherEntityDao");
-						DispatcherEntity defaultDispatcher = dao.findSoffidDispatcher();
-    					dispatcher = defaultDispatcher.getCodi();
+    					SystemEntityDao dao = (SystemEntityDao) ServiceLocator.instance().getService("dispatcherEntityDao");
+						SystemEntity defaultDispatcher = dao.findSoffidSystem();
+    					dispatcher = defaultDispatcher.getCode();
     				}
     				i = roleName.lastIndexOf('/');
     				if (i >= 0)

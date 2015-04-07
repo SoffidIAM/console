@@ -41,7 +41,7 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 		if (source.getServer() == null)
 			target.setServerName("*"); //$NON-NLS-1$
 		else
-			target.setServerName(source.getServer().getNom());
+			target.setServerName(source.getServer().getName());
 		target.setHandlerName(source.getHandler().getName());
 	}
 
@@ -70,6 +70,6 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 		if (source.getServerName() == null || "*".equals(source.getServerName())) //$NON-NLS-1$
 			target.setServer(null);
 		else
-			target.setServer(getServerEntityDao().findByNom(source.getServerName()));
+			target.setServer(getServerEntityDao().findByName(source.getServerName()));
 	}
 }

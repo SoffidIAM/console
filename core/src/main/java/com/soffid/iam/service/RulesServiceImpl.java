@@ -1,24 +1,22 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.model.RuleAssignedRoleEntity;
 import com.soffid.iam.model.RuleEntity;
-
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.utils.Security;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author bubu
@@ -147,7 +145,7 @@ public class RulesServiceImpl extends RulesServiceBase
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_RULE"); //$NON-NLS-1$
-        getAuditoriaEntityDao().create(getAuditoriaEntityDao().auditoriaToEntity(auditoria));
+        getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(auditoria));
     }
 
     private void auditRuleRole(String accio, RuleAssignedRoleEntity role) {
@@ -155,12 +153,12 @@ public class RulesServiceImpl extends RulesServiceBase
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(accio);
         auditoria.setRule(role.getRule().getDescription());
-        auditoria.setRol(role.getRole().getNom());
-        auditoria.setBbdd(role.getRole().getBaseDeDades().getCodi());
+        auditoria.setRol(role.getRole().getName());
+        auditoria.setBbdd(role.getRole().getDatabases().getCode());
         auditoria.setAutor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_RULROL"); //$NON-NLS-1$
-        getAuditoriaEntityDao().create(getAuditoriaEntityDao().auditoriaToEntity(auditoria));
+        getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(auditoria));
     }
 }

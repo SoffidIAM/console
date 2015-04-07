@@ -3,16 +3,18 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
+import com.soffid.iam.model.ForbiddenWordEntity;
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.PolicyForbiddenWordEntity;
+import com.soffid.iam.model.UserDomainEntity;
+import com.soffid.iam.model.UserTypeEntity;
 import es.caib.seycon.ng.comu.DominiContrasenya;
 import es.caib.seycon.ng.comu.DominiUsuari;
 import es.caib.seycon.ng.comu.ParaulaProhibida;
@@ -20,13 +22,13 @@ import es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.comu.TipusUsuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.DominiContrasenyaEntity;
-import es.caib.seycon.ng.model.DominiUsuariEntity;
-import es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.ParaulesProhibidesEntity;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntity;
 import es.caib.seycon.ng.servei.account.AccountNameGenerator;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiUsuariService
@@ -49,9 +51,9 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 			throw new Exception(Messages.getString("DominiUsuariServiceImpl.1")); //$NON-NLS-1$
 		}
 
-		DominiUsuariEntity entity = getDominiUsuariEntityDao().dominiUsuariToEntity(dominiUsuari);
-		getDominiUsuariEntityDao().create(entity);
-		return getDominiUsuariEntityDao().toDominiUsuari(entity);
+		UserDomainEntity entity = getUserDomainEntityDao().dominiUsuariToEntity(dominiUsuari);
+		getUserDomainEntityDao().create(entity);
+		return getUserDomainEntityDao().toDominiUsuari(entity);
 	}
 
 	/**
@@ -68,17 +70,17 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 			throw new Exception(Messages.getString("DominiUsuariServiceImpl.3")); //$NON-NLS-1$
 		}
 
-		DominiUsuariEntity entity = getDominiUsuariEntityDao().dominiUsuariToEntity(dominiUsuari);
-		getDominiUsuariEntityDao().update(entity);
-		return getDominiUsuariEntityDao().toDominiUsuari(entity);
+		UserDomainEntity entity = getUserDomainEntityDao().dominiUsuariToEntity(dominiUsuari);
+		getUserDomainEntityDao().update(entity);
+		return getUserDomainEntityDao().toDominiUsuari(entity);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.servei.DominiUsuariService#delete(es.caib.seycon.ng.comu.DominiUsuari)
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.DominiUsuari dominiUsuari) throws java.lang.Exception {
-		DominiUsuariEntity entity = getDominiUsuariEntityDao().dominiUsuariToEntity(dominiUsuari);
-		getDominiUsuariEntityDao().remove(entity);
+		UserDomainEntity entity = getUserDomainEntityDao().dominiUsuariToEntity(dominiUsuari);
+		getUserDomainEntityDao().remove(entity);
 	}
 
 	/**
@@ -86,9 +88,9 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 	 */
 	protected es.caib.seycon.ng.comu.TipusUsuari handleCreate(es.caib.seycon.ng.comu.TipusUsuari tipusUsuari)
 			throws java.lang.Exception {
-		TipusUsuariEntity entity = getTipusUsuariEntityDao().tipusUsuariToEntity(tipusUsuari);
-		getTipusUsuariEntityDao().create(entity);
-		return getTipusUsuariEntityDao().toTipusUsuari(entity);
+		UserTypeEntity entity = getUserTypeEntityDao().tipusUsuariToEntity(tipusUsuari);
+		getUserTypeEntityDao().create(entity);
+		return getUserTypeEntityDao().toTipusUsuari(entity);
 
 	}
 
@@ -97,69 +99,69 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 	 */
 	protected es.caib.seycon.ng.comu.TipusUsuari handleUpdate(es.caib.seycon.ng.comu.TipusUsuari tipusUsuari)
 			throws java.lang.Exception {
-		TipusUsuariEntity entity = getTipusUsuariEntityDao().tipusUsuariToEntity(tipusUsuari);
-		getTipusUsuariEntityDao().update(entity);
-		return getTipusUsuariEntityDao().toTipusUsuari(entity);
+		UserTypeEntity entity = getUserTypeEntityDao().tipusUsuariToEntity(tipusUsuari);
+		getUserTypeEntityDao().update(entity);
+		return getUserTypeEntityDao().toTipusUsuari(entity);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.servei.DominiUsuariService#delete(es.caib.seycon.ng.comu.TipusUsuari)
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.TipusUsuari tipusUsuari) throws java.lang.Exception {
-		TipusUsuariEntity entity = getTipusUsuariEntityDao().tipusUsuariToEntity(tipusUsuari);
+		UserTypeEntity entity = getUserTypeEntityDao().tipusUsuariToEntity(tipusUsuari);
 		if(entity.getAccounts() != null && !entity.getAccounts().isEmpty())
 			throw new InternalErrorException(Messages.getString("DominiUsuariServiceImpl.UserTypeWithAccounts")); //$NON-NLS-1$
-		if(entity.getPolitiques() != null && !entity.getPolitiques().isEmpty())
+		if(entity.getPolicies() != null && !entity.getPolicies().isEmpty())
 			throw new InternalErrorException(Messages.getString("DominiUsuariServiceImpl.UserTypeWithPolicy")); //$NON-NLS-1$
-		getTipusUsuariEntityDao().remove(entity);
+		getUserTypeEntityDao().remove(entity);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.servei.DominiUsuariService#findAllDominiUsuari()
 	 */
 	protected java.util.Collection<DominiUsuari> handleFindAllDominiUsuari() throws java.lang.Exception {
-		Collection<DominiUsuariEntity> dominisUsuari = getDominiUsuariEntityDao().loadAll();
-		return getDominiUsuariEntityDao().toDominiUsuariList(dominisUsuari);
+		Collection<UserDomainEntity> dominisUsuari = getUserDomainEntityDao().loadAll();
+		return getUserDomainEntityDao().toDominiUsuariList(dominisUsuari);
 	}
 	
 	/**
 	 * @see es.caib.seycon.ng.servei.DominiUsuariService#findAllTipusUsuari()
 	 */
 	protected java.util.Collection<TipusUsuari> handleFindAllTipusUsuari() throws java.lang.Exception {
-		Collection tipusUsuari = getTipusUsuariEntityDao().loadAll();
-		return getTipusUsuariEntityDao().toTipusUsuariList(tipusUsuari);
+		Collection tipusUsuari = getUserTypeEntityDao().loadAll();
+		return getUserTypeEntityDao().toTipusUsuariList(tipusUsuari);
 	}
 
 	@Override
 	protected Collection<PoliticaContrasenya> handleFindAllPolitiquesContrasenyaDomini(String codiDomini) throws Exception {
-		Collection politiques = getPoliticaContrasenyaEntityDao().findByDominiContrasenya(codiDomini);
-		return getPoliticaContrasenyaEntityDao().toPoliticaContrasenyaList(politiques);
+		Collection politiques = getPasswordPolicyEntityDao().findByPasswordDomain(codiDomini);
+		return getPasswordPolicyEntityDao().toPoliticaContrasenyaList(politiques);
 	}
 
 	@Override
 	protected Collection<ParaulaProhibida> handleFindAllParaulesProhibides() throws Exception {
-		Collection forbidden = getParaulesProhibidesEntityDao().loadAll();
-		return getParaulesProhibidesEntityDao().toParaulaProhibidaList(forbidden);
+		Collection forbidden = getForbiddenWordEntityDao().loadAll();
+		return getForbiddenWordEntityDao().toParaulaProhibidaList(forbidden);
 	}
 
 	@Override
 	protected ParaulaProhibida handleCreate(ParaulaProhibida paraulaProhibida) throws Exception {
-		ParaulesProhibidesEntity entity = getParaulesProhibidesEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
-		getParaulesProhibidesEntityDao().create(entity);
-		return getParaulesProhibidesEntityDao().toParaulaProhibida(entity);
+		ForbiddenWordEntity entity = getForbiddenWordEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
+		getForbiddenWordEntityDao().create(entity);
+		return getForbiddenWordEntityDao().toParaulaProhibida(entity);
 	}
 
 	@Override
 	protected ParaulaProhibida handleUpdate(ParaulaProhibida paraulaProhibida) throws Exception {
-		ParaulesProhibidesEntity entity = getParaulesProhibidesEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
-		getParaulesProhibidesEntityDao().update(entity);
-		return getParaulesProhibidesEntityDao().toParaulaProhibida(entity);
+		ForbiddenWordEntity entity = getForbiddenWordEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
+		getForbiddenWordEntityDao().update(entity);
+		return getForbiddenWordEntityDao().toParaulaProhibida(entity);
 	}
 
 	@Override
 	protected void handleDelete(ParaulaProhibida paraulaProhibida) throws Exception {
-		ParaulesProhibidesEntity entity = getParaulesProhibidesEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
-		getParaulesProhibidesEntityDao().remove(entity);
+		ForbiddenWordEntity entity = getForbiddenWordEntityDao().paraulaProhibidaToEntity(paraulaProhibida);
+		getForbiddenWordEntityDao().remove(entity);
 
 	}
 
@@ -175,28 +177,21 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 
 		// Mirem que no existisca una altra amb el mateix tipus d'usuari i
 		// domini de contrasenyes
-		Collection altres = getPoliticaContrasenyaEntityDao().findByDominiContrasenya(
-				politicaContrasenyaDomini.getCodiDominiContrasenya());
+		Collection altres = getPasswordPolicyEntityDao().findByPasswordDomain(politicaContrasenyaDomini.getCodiDominiContrasenya());
 		if (altres != null)
-			for (Iterator<PoliticaContrasenyaEntity> it = altres.iterator(); it.hasNext();)
-			{
-				PoliticaContrasenyaEntity pcd = it.next();
-				if (pcd.getTipusUsuariDomini() != null 	&&
-					pcd.getTipusUsuariDomini().getCodi()
-						.equals(politicaContrasenyaDomini.getTipusUsuari()))
-				{
-					TipusUsuariEntity tipusu = getTipusUsuariEntityDao().findByCodi(politicaContrasenyaDomini.getTipusUsuari());
-					throw new Exception(String.format(Messages.getString("DominiUsuariServiceImpl.6"),  //$NON-NLS-1$
-							tipusu.getDescripcio(),
-							politicaContrasenyaDomini.getCodiDominiContrasenya()));
-				}
-			}
+			for (Iterator<PasswordPolicyEntity> it = altres.iterator(); it.hasNext(); ) {
+            PasswordPolicyEntity pcd = it.next();
+            if (pcd.getUserDomainType() != null && pcd.getUserDomainType().getCode().equals(politicaContrasenyaDomini.getTipusUsuari())) {
+                UserTypeEntity tipusu = getUserTypeEntityDao().findByCode(politicaContrasenyaDomini.getTipusUsuari());
+                throw new Exception(String.format(Messages.getString("DominiUsuariServiceImpl.6"), tipusu.getDescription(), politicaContrasenyaDomini.getCodiDominiContrasenya()));
+            }
+        }
 		
 		checkpoliticaContrasenyaDominiValues(politicaContrasenyaDomini);
 
-		PoliticaContrasenyaEntity entity = getPoliticaContrasenyaEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
-		getPoliticaContrasenyaEntityDao().create(entity);
-		return getPoliticaContrasenyaEntityDao().toPoliticaContrasenya(entity);
+		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
+		getPasswordPolicyEntityDao().create(entity);
+		return getPasswordPolicyEntityDao().toPoliticaContrasenya(entity);
 
 	}
 
@@ -364,41 +359,38 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 			throw new Exception(Messages.getString("DominiUsuariServiceImpl.8")); //$NON-NLS-1$
 		}
 
-		PoliticaContrasenyaEntity entity = getPoliticaContrasenyaEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
+		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
 
-		getPoliticaContrasenyaEntityDao().update(entity);
-		return getPoliticaContrasenyaEntityDao().toPoliticaContrasenya(entity);
+		getPasswordPolicyEntityDao().update(entity);
+		return getPasswordPolicyEntityDao().toPoliticaContrasenya(entity);
 	}
 
 	@Override
 	protected void handleDelete(PoliticaContrasenya politicaContrasenyaDomini) throws Exception {
-		PoliticaContrasenyaEntity entity = getPoliticaContrasenyaEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
-		getPoliticaContrasenyaEntityDao().remove(entity);
+		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().politicaContrasenyaToEntity(politicaContrasenyaDomini);
+		getPasswordPolicyEntityDao().remove(entity);
 	}
 
 	@Override
 	protected ParaulaProhibidaPoliticaContrasenya handleCreate(ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenyaDomini)
 			throws Exception {
-		ParaulaProhibidaPoliticaContrasenyaEntity entity = getParaulaProhibidaPoliticaContrasenyaEntityDao()
-				.paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
-		getParaulaProhibidaPoliticaContrasenyaEntityDao().create(entity);
-		return getParaulaProhibidaPoliticaContrasenyaEntityDao().toParaulaProhibidaPoliticaContrasenya(entity);
+		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
+		getPolicyForbiddenWordEntityDao().create(entity);
+		return getPolicyForbiddenWordEntityDao().toParaulaProhibidaPoliticaContrasenya(entity);
 	}
 
 	@Override
 	protected ParaulaProhibidaPoliticaContrasenya handleUpdate(ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenyaDomini)
 			throws Exception {
-		ParaulaProhibidaPoliticaContrasenyaEntity entity = getParaulaProhibidaPoliticaContrasenyaEntityDao()
-				.paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
-		getParaulaProhibidaPoliticaContrasenyaEntityDao().update(entity);
-		return getParaulaProhibidaPoliticaContrasenyaEntityDao().toParaulaProhibidaPoliticaContrasenya(entity);
+		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
+		getPolicyForbiddenWordEntityDao().update(entity);
+		return getPolicyForbiddenWordEntityDao().toParaulaProhibidaPoliticaContrasenya(entity);
 	}
 
 	@Override
 	protected void handleDelete(ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenyaDomini) throws Exception {
-		ParaulaProhibidaPoliticaContrasenyaEntity entity = getParaulaProhibidaPoliticaContrasenyaEntityDao()
-				.paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
-		getParaulaProhibidaPoliticaContrasenyaEntityDao().remove(entity);
+		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini);
+		getPolicyForbiddenWordEntityDao().remove(entity);
 	}
 
 	@Override
@@ -406,10 +398,10 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 		if (dominiContrasenya.getCodi() == null || "".equals(dominiContrasenya.getCodi().trim())) { //$NON-NLS-1$
 			throw new Exception(Messages.getString("DominiUsuariServiceImpl.9")); //$NON-NLS-1$
 		}
-		DominiContrasenyaEntity contrasenyaDominiEntity = getDominiContrasenyaEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
+		PasswordDomainEntity contrasenyaDominiEntity = getPasswordDomainEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
 		
-		getDominiContrasenyaEntityDao().create(contrasenyaDominiEntity);
-		return getDominiContrasenyaEntityDao().toDominiContrasenya(contrasenyaDominiEntity);
+		getPasswordDomainEntityDao().create(contrasenyaDominiEntity);
+		return getPasswordDomainEntityDao().toDominiContrasenya(contrasenyaDominiEntity);
 	}
 
 	@Override
@@ -417,17 +409,17 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 		if (dominiContrasenya.getCodi() == null || "".equals(dominiContrasenya.getCodi().trim())) { //$NON-NLS-1$
 			throw new Exception(Messages.getString("DominiUsuariServiceImpl.11")); //$NON-NLS-1$
 		}
-		DominiContrasenyaEntity contrasenyaDominiEntity = getDominiContrasenyaEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
+		PasswordDomainEntity contrasenyaDominiEntity = getPasswordDomainEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
 
-		getDominiContrasenyaEntityDao().update(contrasenyaDominiEntity);
-		return getDominiContrasenyaEntityDao().toDominiContrasenya(contrasenyaDominiEntity);
+		getPasswordDomainEntityDao().update(contrasenyaDominiEntity);
+		return getPasswordDomainEntityDao().toDominiContrasenya(contrasenyaDominiEntity);
 	}
 
 	@Override
 	protected void handleDelete(DominiContrasenya dominiContrasenya) throws Exception {
-		DominiContrasenyaEntity contrasenyaDominiEntity = getDominiContrasenyaEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
+		PasswordDomainEntity contrasenyaDominiEntity = getPasswordDomainEntityDao().dominiContrasenyaToEntity(dominiContrasenya);
 
-		getDominiContrasenyaEntityDao().remove(contrasenyaDominiEntity);
+		getPasswordDomainEntityDao().remove(contrasenyaDominiEntity);
 	}
 
 	final static String DU_DU = "DU"; // Domini d'usuaris //$NON-NLS-1$
@@ -441,51 +433,50 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 
 	@Override
 	protected DominiUsuari handleFindDominiUsuariByCodi(String codiDominiUsuari) throws Exception {
-		DominiUsuariEntity d = getDominiUsuariEntityDao().findByCodi(codiDominiUsuari);
+		UserDomainEntity d = getUserDomainEntityDao().findByCode(codiDominiUsuari);
 		if (d == null)
 			return null;
 		else
-			return getDominiUsuariEntityDao().toDominiUsuari(d);
+			return getUserDomainEntityDao().toDominiUsuari(d);
 	}
 
 	@Override
 	protected Collection<ParaulaProhibidaPoliticaContrasenya> handleFindParaulesProhibidesPoliticaContrasenya(
 			PoliticaContrasenya politicaContrasenya) throws Exception {
-		PoliticaContrasenyaEntity entity = getPoliticaContrasenyaEntityDao().politicaContrasenyaToEntity(politicaContrasenya);
+		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().politicaContrasenyaToEntity(politicaContrasenya);
 		// relació entre ParaulesProhibidesEntity i PoliticaContrasenyaEntity
-		Collection<ParaulaProhibidaPoliticaContrasenyaEntity> paraulesContrasenya = new LinkedList(entity.getParaulaProhibidaContrasenya());
+		Collection<PolicyForbiddenWordEntity> paraulesContrasenya = new LinkedList(entity.getForbiddenWords());
 		// Tornem les relacions ParaulaProhibidaPoliticaContrasenya
-		return getParaulaProhibidaPoliticaContrasenyaEntityDao().toParaulaProhibidaPoliticaContrasenyaList(paraulesContrasenya);
+		return getPolicyForbiddenWordEntityDao().toParaulaProhibidaPoliticaContrasenyaList(paraulesContrasenya);
 	}
 
 	@Override
 	protected DominiContrasenya handleFindDominiContrasenyaByCodi(String codi)
 			throws Exception
 	{
-		DominiContrasenyaEntity dce = getDominiContrasenyaEntityDao().findByCodi(codi);
+		PasswordDomainEntity dce = getPasswordDomainEntityDao().findByCode(codi);
 		if (dce == null)
 			return null;
 		else
-			return getDominiContrasenyaEntityDao().toDominiContrasenya(dce);
+			return getPasswordDomainEntityDao().toDominiContrasenya(dce);
 	}
 
 	@Override
 	protected PoliticaContrasenya handleFindPoliticaByTipusAndDominiContrasenyas(
 			String tipus, String domini) throws Exception
 	{
-		PoliticaContrasenyaEntity pce = getPoliticaContrasenyaEntityDao().findByDominiContrasenyaTipusUsuari(domini, tipus);
+		PasswordPolicyEntity pce = getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(domini, tipus);
 		if (pce == null)
 			return null;
 		else
-			return getPoliticaContrasenyaEntityDao().toPoliticaContrasenya(pce);
+			return getPasswordPolicyEntityDao().toPoliticaContrasenya(pce);
 	}
 
 	@Override
 	protected Collection<DominiContrasenya> handleFindAllDominiContrasenya()
 			throws Exception
 	{
-		return getDominiContrasenyaEntityDao().toDominiContrasenyaList(
-				getDominiContrasenyaEntityDao().loadAll());
+		return getPasswordDomainEntityDao().toDominiContrasenyaList(getPasswordDomainEntityDao().loadAll());
 	}
 
 	public void setApplicationContext(ApplicationContext applicationContext)

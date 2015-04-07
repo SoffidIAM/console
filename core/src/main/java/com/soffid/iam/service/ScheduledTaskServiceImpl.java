@@ -1,24 +1,24 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
 
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
-
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.utils.Security;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author bubu
@@ -213,7 +213,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		aud.setScheduledTask(task);
 		aud.setAutor(Security.getCurrentAccount());
 		aud.setCalendar(Calendar.getInstance());
-		getAuditoriaEntityDao().create(getAuditoriaEntityDao().auditoriaToEntity(aud));
+		getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(aud));
 	}
 
 	/* (non-Javadoc)

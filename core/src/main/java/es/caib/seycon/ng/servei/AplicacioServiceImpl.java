@@ -3,27 +3,30 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Vector;
-
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.exe.ProcessInstance;
-import org.jbpm.taskmgmt.exe.TaskInstance;
-
 import com.soffid.iam.api.RoleAccount;
-
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AuthorizationEntity;
+import com.soffid.iam.model.DomainValueEntity;
+import com.soffid.iam.model.EntryPointRoleEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.NetworkAuthorizationEntity;
+import com.soffid.iam.model.NoticeEntity;
+import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleDependencyEntity;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.RoleGroupEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
@@ -48,28 +51,26 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.AutoritzacioPUERolEntity;
-import es.caib.seycon.ng.model.AutoritzacioRolEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.NotificacioEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.RolAssociacioRolEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.RolsGrupEntity;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariGrupEntity;
-import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
-import es.caib.seycon.ng.model.XarxaACEntity;
-import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.Security;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Vector;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.taskmgmt.exe.TaskInstance;
 
 /**
  * @see es.caib.seycon.ng.servei.AplicacioService Versió remixed, remade &
@@ -88,10 +89,8 @@ public class AplicacioServiceImpl extends
      */
     protected java.util.Collection<Aplicacio> handleGetAplicacions()
             throws java.lang.Exception {
-        Collection<AplicacioEntity> apps = AutoritzacionsUsuari
-                .filtraAplicationsCanQuery(getAplicacioEntityDao().loadAll());
-        List<Aplicacio> aplicacions = getAplicacioEntityDao().toAplicacioList(
-                apps);
+        Collection<InformationSystemEntity> apps = AutoritzacionsUsuari.filtraAplicationsCanQuery(getInformationSystemEntityDao().loadAll());
+        List<Aplicacio> aplicacions = getInformationSystemEntityDao().toAplicacioList(apps);
         return aplicacions;
     }
 
@@ -104,15 +103,14 @@ public class AplicacioServiceImpl extends
         // Aquí l'autorització no te domini, aixina que amb tindre
         // application:create val
         if (AutoritzacionsUsuari.canCreateAplicacio(aplicacio.getCodi())) {
-    		AplicacioEntity aplicationsSameCode = getAplicacioEntityDao().findByCodi(aplicacio.getCodi());
+    		InformationSystemEntity aplicationsSameCode = getInformationSystemEntityDao().findByCode(aplicacio.getCodi());
     		if(aplicationsSameCode != null)
     			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.CodeAplicationExists"),  //$NON-NLS-1$
     							aplicacio.getCodi())); 
-            AplicacioEntity apl = getAplicacioEntityDao().aplicacioToEntity(
-                    aplicacio);
-            getAplicacioEntityDao().create(apl);
+            InformationSystemEntity apl = getInformationSystemEntityDao().aplicacioToEntity(aplicacio);
+            getInformationSystemEntityDao().create(apl);
             aplicacio.setId(apl.getId());
-            return (getAplicacioEntityDao().toAplicacio(apl));
+            return (getInformationSystemEntityDao().toAplicacio(apl));
         }
 		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoUserPermission"), //$NON-NLS-1$
 				getPrincipal().getName())); //$NON-NLS-1$
@@ -134,11 +132,10 @@ public class AplicacioServiceImpl extends
                         .next();
                 delete(administracioAplicacio);
             }
-            AplicacioEntity aplEntity = getAplicacioEntityDao().aplicacioToEntity(aplicacio);
-            if(!aplEntity.getRols().isEmpty())
-            	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.IntegrityExceptionRol"),  //$NON-NLS-1$
-    							aplEntity.getCodi()));
-            getAplicacioEntityDao().remove(aplEntity);
+            InformationSystemEntity aplEntity = getInformationSystemEntityDao().aplicacioToEntity(aplicacio);
+            if(!aplEntity.getRoles().isEmpty())
+            	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.IntegrityExceptionRol"), aplEntity.getCode()));
+            getInformationSystemEntityDao().remove(aplEntity);
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "delete (Aplicacio)", "application:delete", //$NON-NLS-1$ //$NON-NLS-2$
@@ -158,8 +155,7 @@ public class AplicacioServiceImpl extends
             throws java.lang.Exception {
 
         if (AutoritzacionsUsuari.canUpdateAplicacio(aplicacio.getCodi())) {
-            getAplicacioEntityDao().update(
-                    getAplicacioEntityDao().aplicacioToEntity(aplicacio));
+            getInformationSystemEntityDao().update(getInformationSystemEntityDao().aplicacioToEntity(aplicacio));
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "update (Aplicacio)", "application:update", //$NON-NLS-1$ //$NON-NLS-2$
@@ -174,11 +170,9 @@ public class AplicacioServiceImpl extends
             java.lang.String codiAplicacio) throws java.lang.Exception {
 
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
-                    .findByCodi(codiAplicacio);
+            InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao().findByCode(codiAplicacio);
             if (aplicacioEntity != null) {
-                Aplicacio aplicacio = getAplicacioEntityDao().toAplicacio(
-                        aplicacioEntity);
+                Aplicacio aplicacio = getInformationSystemEntityDao().toAplicacio(aplicacioEntity);
                 return aplicacio;
             }
         }
@@ -194,11 +188,9 @@ public class AplicacioServiceImpl extends
      */
     protected Aplicacio handleFindAplicacioByCodiAplicacioSenseRestriccions(
             String codiAplicacio) throws Exception {
-        AplicacioEntity aplicacioEntity = getAplicacioEntityDao().findByCodi(
-                codiAplicacio);
+        InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao().findByCode(codiAplicacio);
         if (aplicacioEntity != null) {
-            Aplicacio aplicacio = getAplicacioEntityDao().toAplicacio(
-                    aplicacioEntity);
+            Aplicacio aplicacio = getInformationSystemEntityDao().toAplicacio(aplicacioEntity);
             return aplicacio;
         }
 
@@ -214,17 +206,16 @@ public class AplicacioServiceImpl extends
         // NO n'hi ha restricció per veure els rols de l'aplicació
         // si l'usuari pot veure l'aplicació
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            Collection rols = getRolEntityDao().findByCodiAplicacio(
-                    codiAplicacio);
-            return getRolEntityDao().toRolList(rols);
+            Collection rols = getRoleEntityDao().findByApplicationCode(codiAplicacio);
+            return getRoleEntityDao().toRolList(rols);
         }
         return new Vector();
     }
 
     protected Collection<Rol> handleFindRolsByCodiAplicacioSenseRestriccions(
             String codiAplicacio) throws Exception {
-        Collection rols = getRolEntityDao().findByCodiAplicacio(codiAplicacio);
-        return getRolEntityDao().toRolList(rols);
+        Collection rols = getRoleEntityDao().findByApplicationCode(codiAplicacio);
+        return getRoleEntityDao().toRolList(rols);
     }
 
     protected Collection<Aplicacio> handleFindAplicacioByCriteri(String codi, String nom,
@@ -275,14 +266,10 @@ public class AplicacioServiceImpl extends
                         .trim().compareTo("%") == 0)) { //$NON-NLS-1$
             gestionableWF = null;
         }
-        Collection aplicacions = getAplicacioEntityDao()
-                .findAplicacioByCriteri(codi, nom, directoriFonts, responsable,
-                        directoriExecutable, bd, gestionableWF);
+        Collection aplicacions = getInformationSystemEntityDao().findApplicationByCriteria(codi, nom, directoriFonts, responsable, directoriExecutable, bd, gestionableWF);
         // Aplicamos las restricciones correspondientes
         if (aplicacions != null) {
-            Collection<Aplicacio> aplicacionsTrobades = AutoritzacionsUsuari
-                    .filtraAplicationsVOCanQuery(getAplicacioEntityDao()
-                            .toAplicacioList(aplicacions)); // VO
+            Collection<Aplicacio> aplicacionsTrobades = AutoritzacionsUsuari.filtraAplicationsVOCanQuery(getInformationSystemEntityDao().toAplicacioList(aplicacions)); // VO
 
 			// filtrem per cercar aplicacions per rol
             Collection<Aplicacio> res = filtraPerRol(aplicacionsTrobades, rol); 
@@ -343,14 +330,11 @@ public class AplicacioServiceImpl extends
             gestionableWF = null;
         }
 
-        Collection<AplicacioEntity> aplicacions = getAplicacioEntityDao()
-                .findAplicacioByCriteri(codi, nom, directoriFonts, responsable,
-                        directoriExecutable, bd, gestionableWF);
+        Collection<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().findApplicationByCriteria(codi, nom, directoriFonts, responsable, directoriExecutable, bd, gestionableWF);
 
         if (aplicacions != null) {
             // Filtrem per rol (si fa falta)
-            Collection<Aplicacio> filtraPerRol = filtraPerRol(getAplicacioEntityDao()
-                    .toAplicacioList(aplicacions), rol);
+            Collection<Aplicacio> filtraPerRol = filtraPerRol(getInformationSystemEntityDao().toAplicacioList(aplicacions), rol);
             // Mirem el número de registres després de filtar per rol (movem el
             // filtre de máx files)
             /*
@@ -386,9 +370,8 @@ public class AplicacioServiceImpl extends
                     + "rol.nom like :rol and " + "rol.aplicacio.codi in (" //$NON-NLS-1$ //$NON-NLS-2$
                     + aplicacions + ")"; //$NON-NLS-1$
             Parameter parametres[] = { new Parameter("rol", rol) }; //$NON-NLS-1$
-            Collection<AplicacioEntity> aplicacionsTrobadesE = getAplicacioEntityDao().query(query,
-                    parametres);
-            return getAplicacioEntityDao().toAplicacioList(aplicacionsTrobadesE);
+            Collection<InformationSystemEntity> aplicacionsTrobadesE = getInformationSystemEntityDao().query(query, parametres);
+            return getInformationSystemEntityDao().toAplicacioList(aplicacionsTrobadesE);
         }
         return aplicacionsTrobades;
     }
@@ -412,12 +395,10 @@ public class AplicacioServiceImpl extends
                 || AutoritzacionsUsuari
                         .canUpdateAplicacio(administracioAplicacio
                                 .getCodiAplicacio())) {
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
-            getRolAccountEntityDao().create(administracioAplicacioEntity);
+            RoleAccountEntity administracioAplicacioEntity = getRoleAccountEntityDao().administracioAplicacioToEntity(administracioAplicacio);
+            getRoleAccountEntityDao().create(administracioAplicacioEntity);
             administracioAplicacio.setId(administracioAplicacioEntity.getId());
-            administracioAplicacio = getRolAccountEntityDao()
-                    .toAdministracioAplicacio(administracioAplicacioEntity);
+            administracioAplicacio = getRoleAccountEntityDao().toAdministracioAplicacio(administracioAplicacioEntity);
             return administracioAplicacio;
         }
 		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoPermissionToAsign"), //$NON-NLS-1$
@@ -438,9 +419,8 @@ public class AplicacioServiceImpl extends
                 || AutoritzacionsUsuari
                         .canDeleteAplicacio(administracioAplicacio
                                 .getCodiAplicacio())) {
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
-            getRolAccountEntityDao().remove(administracioAplicacioEntity);
+            RoleAccountEntity administracioAplicacioEntity = getRoleAccountEntityDao().administracioAplicacioToEntity(administracioAplicacio);
+            getRoleAccountEntityDao().remove(administracioAplicacioEntity);
 
         } else {
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoPermissionToDelete"), //$NON-NLS-1$
@@ -463,14 +443,11 @@ public class AplicacioServiceImpl extends
         Parameter nomRolParameter = new Parameter("nomRol", nomRol); //$NON-NLS-1$
         Parameter[] parameters = { codiAplicacioAdministradaParameter,
                 codiUsuariParameter, nomRolParameter };
-        Collection rolsUsuarisEntity = getRolAccountEntityDao().query(query,
-                parameters);
+        Collection rolsUsuarisEntity = getRoleAccountEntityDao().query(query, parameters);
         if (rolsUsuarisEntity != null) {
             if (rolsUsuarisEntity.size() == 1) {
-                RolAccountEntity rolUsuariEntity = (RolAccountEntity) rolsUsuarisEntity
-                        .iterator().next();
-                AdministracioAplicacio administracioAplicacio = getRolAccountEntityDao()
-                        .toAdministracioAplicacio(rolUsuariEntity);
+                RoleAccountEntity rolUsuariEntity = (RoleAccountEntity) rolsUsuarisEntity.iterator().next();
+                AdministracioAplicacio administracioAplicacio = getRoleAccountEntityDao().toAdministracioAplicacio(rolUsuariEntity);
                 return administracioAplicacio;
             } else {
                 throw new SeyconException(
@@ -493,10 +470,9 @@ public class AplicacioServiceImpl extends
         Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
                 codiAplicacio);
         Parameter[] parameters = { nomRolParameter, codiAplicacioParameter };
-        List<UsuariEntity> usuaris = getUsuariEntityDao().query(query,
-                parameters);
+        List<UserEntity> usuaris = getUserEntityDao().query(query, parameters);
         if (usuaris != null) {
-            return getUsuariEntityDao().toUsuariList(usuaris);
+            return getUserEntityDao().toUsuariList(usuaris);
         }
         return new Vector();
     }
@@ -511,11 +487,9 @@ public class AplicacioServiceImpl extends
             Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
                     codiAplicacio);
             Parameter[] parameters = { codiAplicacioParameter };
-            Collection aplicacions = getRolAccountEntityDao().query(query,
-                    parameters);
+            Collection aplicacions = getRoleAccountEntityDao().query(query, parameters);
             if (aplicacions != null) {
-                return getRolAccountEntityDao().toAdministracioAplicacioList(
-                        aplicacions);
+                return getRoleAccountEntityDao().toAdministracioAplicacioList(aplicacions);
             }
         }
         return new Vector();
@@ -533,10 +507,9 @@ public class AplicacioServiceImpl extends
         Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
                 codiAplicacio);
         Parameter[] parameters = { codiAplicacioParameter };
-        List<UsuariEntity> usuaris = getUsuariEntityDao().query(query,
-                parameters);
+        List<UserEntity> usuaris = getUserEntityDao().query(query, parameters);
         if (usuaris != null) {
-            return getUsuariEntityDao().toUsuariList(usuaris);
+            return getUserEntityDao().toUsuariList(usuaris);
         }
         return new Vector();
     }
@@ -552,10 +525,9 @@ public class AplicacioServiceImpl extends
                 + "(rolusu.usuari.codi = :codiUsuari)"; //$NON-NLS-1$
         Parameter codiUsuariParameter = new Parameter("codiUsuari", codiUsuari); //$NON-NLS-1$
         Parameter[] parameters = { codiUsuariParameter };
-        List<AplicacioEntity> aplicacions = getAplicacioEntityDao().query(query,
-                parameters);
+        List<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().query(query, parameters);
         if (aplicacions != null) {
-            return getAplicacioEntityDao().toAplicacioList(aplicacions);
+            return getInformationSystemEntityDao().toAplicacioList(aplicacions);
         }
         return new Vector();
     }
@@ -573,10 +545,9 @@ public class AplicacioServiceImpl extends
                 + " rolusu.aplicacioAdministrada.gestionableWF='S')"; //$NON-NLS-1$
         Parameter codiUsuariParameter = new Parameter("codiUsuari", codiUsuari); //$NON-NLS-1$
         Parameter[] parameters = { codiUsuariParameter };
-        List<AplicacioEntity> aplicacions = getAplicacioEntityDao().query(query,
-                parameters);
+        List<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().query(query, parameters);
         if (aplicacions != null) {
-            return getAplicacioEntityDao().toAplicacioList(aplicacions);
+            return getInformationSystemEntityDao().toAplicacioList(aplicacions);
         }
         return new Vector();
 
@@ -614,14 +585,12 @@ public class AplicacioServiceImpl extends
                         .trim().compareTo("%") == 0)) { //$NON-NLS-1$
             codiAplicacio = null;
         }
-        Collection<RolEntity> rols = getRolEntityDao().findRolsByFiltre(nom, descripcio,
-                defecte, baseDeDades, contrasenya, codiAplicacio);
+        Collection<RoleEntity> rols = getRoleEntityDao().findRolesByCriteria(nom, descripcio, defecte, baseDeDades, contrasenya, codiAplicacio);
         if (rols != null) {
             // Filtrem els rols per l'aplicació
             // rol application:query [SENSE_DOMINI, APLICACIONS]
 
-            Collection<RolEntity> rolsPermis = AutoritzacionsUsuari
-                    .filtraRolsAplicationsCanQuery(rols);
+            Collection<RoleEntity> rolsPermis = AutoritzacionsUsuari.filtraRolsAplicationsCanQuery(rols);
 
             // Mirem si la cerca filtrada obté massa resultats
             if (rolsPermis.size() >= 201) {
@@ -629,7 +598,7 @@ public class AplicacioServiceImpl extends
                         Messages.getString("AplicacioServiceImpl.VeryRegFinded")); //$NON-NLS-1$
             }
 
-            return getRolEntityDao().toRolList(rolsPermis);
+            return getRoleEntityDao().toRolList(rolsPermis);
         }
         return new Vector();
     }
@@ -674,9 +643,7 @@ public class AplicacioServiceImpl extends
                         .trim().compareTo("%") == 0)) { //$NON-NLS-1$
             gestionableWF = null;
         }
-        Collection rols = getRolEntityDao().findRolsByFiltreGestionablesWF(nom,
-                descripcio, defecte, baseDeDades, contrasenya, codiAplicacio,
-                gestionableWF);
+        Collection rols = getRoleEntityDao().findRolesByManageableWFCriteria(nom, descripcio, defecte, baseDeDades, contrasenya, codiAplicacio, gestionableWF);
         if (rols != null) {
             Collection rolsFiltrats = AutoritzacionsUsuari
                     .filtraRolsAplicationsCanQuery(rols);
@@ -684,11 +651,10 @@ public class AplicacioServiceImpl extends
         	// Check maximum number of results
             if (rolsFiltrats.size() > limitResults)
             {
-            	return getRolEntityDao().toRolList(rolsFiltrats)
-					.subList(0, limitResults);
+            	return getRoleEntityDao().toRolList(rolsFiltrats).subList(0, limitResults);
             }
             
-            return getRolEntityDao().toRolList(rolsFiltrats);
+            return getRoleEntityDao().toRolList(rolsFiltrats);
         }
         
         return new Vector();
@@ -701,11 +667,9 @@ public class AplicacioServiceImpl extends
         // Mirem l'autorització de l'aplicació (fer query als rols de la app
         // no requereixen tindre una autorització específica)
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
-                            codiAplicacio, codiDispatcher);
+            RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRol, codiAplicacio, codiDispatcher);
             if (rolEntity != null) {
-                return getRolEntityDao().toRol(rolEntity);
+                return getRoleEntityDao().toRol(rolEntity);
             } else
                 return null;
         } else {
@@ -720,11 +684,11 @@ public class AplicacioServiceImpl extends
      */
     protected java.util.Collection<Rol> handleFindRolsByCodiUsuari(
             java.lang.String codiUsuari) throws java.lang.Exception {
-        Collection rols = getRolEntityDao().findRolsByCodiUsuari(codiUsuari);// RolEntity
+        Collection rols = getRoleEntityDao().findRolesByUserCode(codiUsuari);// RolEntity
         if (rols != null) {
             // Si l'usuari peticionari es l'usuari on se demanen, no filtrem
             // (!!)
-            Collection<RolEntity> rolsFiltrats = new ArrayList();
+            Collection<RoleEntity> rolsFiltrats = new ArrayList();
             if (getPrincipal().getName().compareTo(codiUsuari) != 0) {// altre
                                                                       // usuari
                 // rolsFiltrats: són rolsEntity
@@ -734,15 +698,15 @@ public class AplicacioServiceImpl extends
                 rolsFiltrats = rols;
             }
             // Passem a VO:
-            return getRolEntityDao().toRolList(rolsFiltrats);
+            return getRoleEntityDao().toRolList(rolsFiltrats);
         }
         return new Vector();
     }
 
     protected java.util.Collection<Rol> handleGetRols() throws java.lang.Exception {
-        Collection<RolEntity> col = getRolEntityDao().loadAll();// RolEntity
+        Collection<RoleEntity> col = getRoleEntityDao().loadAll();// RolEntity
         col = AutoritzacionsUsuari.filtraRolsAplicationsCanQuery(col);
-        return getRolEntityDao().toRolList(col);
+        return getRoleEntityDao().toRolList(col);
     }
 
     protected Collection<Usuari> handleFindUsuarisByNomRolAndCodiAplicacioRolAndCodiDispatcher(
@@ -753,16 +717,14 @@ public class AplicacioServiceImpl extends
 
         // NOTA: l'autorització ja s'ha verificat en el find
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+            RoleEntity rolEntity = getRoleEntityDao().rolToEntity(rol);
             Collection<Usuari> toReturn = new LinkedList<Usuari>();
-            for (RolAccountEntity ra: rolEntity.getAccounts()) {
-            	AccountEntity acc = ra.getAccount();
-            	if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1) 
-            	{
-            		UsuariEntity user = acc.getUsers().iterator().next().getUser();
-            		toReturn.add (getUsuariEntityDao().toUsuari(user));
-            			
-            	}
+            for (RoleAccountEntity ra : rolEntity.getAccounts()) {
+                AccountEntity acc = ra.getAccount();
+                if (acc.getType().equals(AccountType.USER) && acc.getUsers().size() == 1) {
+                    UserEntity user = acc.getUsers().iterator().next().getUser();
+                    toReturn.add(getUserEntityDao().toUsuari(user));
+                }
             }
             return toReturn;
         } else {
@@ -774,16 +736,14 @@ public class AplicacioServiceImpl extends
     protected Collection<RolAccount> handleFindRolsUsuariByNomRolAndCodiAplicacioRolAndCodiDispatcher(
             String nomRol, String codiAplicacio, String codiDispatcher) throws InternalErrorException {
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-        	RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
-                            codiAplicacio, codiDispatcher);
-        	if (!AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getAplicacio().getCodi()))
+        	RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRol, codiAplicacio, codiDispatcher);
+        	if (!AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getApplication().getCode()))
         		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					getPrincipal().getName(), nomRol));
 
             List<RolAccount> toReturn = new LinkedList<RolAccount>();
-            for (RolAccountEntity ra: rolEntity.getAccounts()) {
-            	toReturn.add (getRolAccountEntityDao().toRolAccount(ra));
+            for (RoleAccountEntity ra : rolEntity.getAccounts()) {
+                toReturn.add(getRoleAccountEntityDao().toRolAccount(ra));
             }
     		getSoDRuleService().qualifyRolAccountList(toReturn);
             return toReturn;
@@ -800,17 +760,14 @@ public class AplicacioServiceImpl extends
                 || AutoritzacionsUsuari.canUpdateAplicacio(rol
                         .getCodiAplicacio())) {
 
-            Collection rolsMateixNomMateixDispatcher = getRolEntityDao()
-                    .findRolsByFiltre(rol.getNom(), null, null,
-                            rol.getBaseDeDades(), null, null);
+            Collection rolsMateixNomMateixDispatcher = getRoleEntityDao().findRolesByCriteria(rol.getNom(), null, null, rol.getBaseDeDades(), null, null);
 
             // No permitim crear un rol amb el mateix nom y base de dades si ja
             // existeix un altre
             if (rolsMateixNomMateixDispatcher.size() != 0) {
                 Iterator it = rolsMateixNomMateixDispatcher.iterator();
                 if (it.hasNext()) {
-                    String aplicacio = ((RolEntity) it.next()).getAplicacio()
-                            .getCodi();
+                    String aplicacio = ((RoleEntity) it.next()).getApplication().getCode();
 
 					throw new SeyconException(
 							String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
@@ -819,11 +776,11 @@ public class AplicacioServiceImpl extends
             }
 
             // Obtenemos la entidad asociada al VO
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+            RoleEntity rolEntity = getRoleEntityDao().rolToEntity(rol);
             // Creamos la entidad asociada al VO Rol
-            getRolEntityDao().create(rolEntity);
+            getRoleEntityDao().create(rolEntity);
 
-            return getRolEntityDao().toRol(rolEntity);
+            return getRoleEntityDao().toRol(rolEntity);
         }
         /*
          * throw new SeyconException("Usuari amb codi '" +
@@ -845,13 +802,10 @@ public class AplicacioServiceImpl extends
                 || AutoritzacionsUsuari.canDeleteAplicacio(rol
                         .getCodiAplicacio())) {
 
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(
-                            rol.getNom(), rol.getCodiAplicacio(),
-                            rol.getBaseDeDades());
+            RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(rol.getNom(), rol.getCodiAplicacio(), rol.getBaseDeDades());
             
         	getSoDRuleService().internalRemovingRole(rolEntity.getId());
-            getRolEntityDao().remove(rolEntity);
+            getRoleEntityDao().remove(rolEntity);
         } else {
             throw new SeyconAccessLocalException(
                     "AplicacioService", //$NON-NLS-1$
@@ -873,10 +827,10 @@ public class AplicacioServiceImpl extends
                         .getCodiAplicacio())) {
 
             // Realizamos las operaciones necesarias a nivel de aplicación
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
-            getRolEntityDao().update(rolEntity); // actualizamos cambios del rol
+            RoleEntity rolEntity = getRoleEntityDao().rolToEntity(rol);
+            getRoleEntityDao().update(rolEntity); // actualizamos cambios del rol
 
-            return getRolEntityDao().toRol(rolEntity);
+            return getRoleEntityDao().toRol(rolEntity);
         }
 
 		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
@@ -887,11 +841,10 @@ public class AplicacioServiceImpl extends
             throws Exception {
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         
-        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
+        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris, getGroupEntityDao())) {
         	if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
         	{
-        		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(rolsUsuaris.getAccountName(), rolsUsuaris.getBaseDeDades());
+        		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(rolsUsuaris.getAccountName(), rolsUsuaris.getBaseDeDades());
         		if (acc != null)
         			rolsUsuaris.setAccountId(acc.getId());
         	}
@@ -914,12 +867,12 @@ public class AplicacioServiceImpl extends
             		else if (accounts.size() == 0)
             		{
             			Usuari usu = getUsuariService().findUsuariByCodiUsuari(rolsUsuaris.getCodiUsuari());
-            			DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi (rolsUsuaris.getBaseDeDades());
+            			SystemEntity dispatcher = getSystemEntityDao().findByCode(rolsUsuaris.getBaseDeDades());
             			if (dispatcher == null)
             				throw new InternalErrorException(
     							String.format(Messages.getString("AplicacioServiceImpl.UnknownSystem"), //$NON-NLS-1$
     								rolsUsuaris.getBaseDeDades()));
-            			account = getAccountService().createAccount(usu, getDispatcherEntityDao().toDispatcher(dispatcher), null);
+            			account = getAccountService().createAccount(usu, getSystemEntityDao().toDispatcher(dispatcher), null);
             		}
             		else
             		{
@@ -934,16 +887,12 @@ public class AplicacioServiceImpl extends
             // Check group holder
         	checkGroupHolder (rolsUsuaris);
         	
-            RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
+            RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().rolAccountToEntity(rolsUsuaris);
             // Disable assigning roles to himself
-            for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())
-            {
-            	if (ua.getUser().getCodi().equals(getPrincipal().getName()))
-            	{
-                    throw new SeyconException(
-                            Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
-            	}
+            for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
+                if (ua.getUser().getUserName().equals(getPrincipal().getName())) {
+                    throw new SeyconException(Messages.getString("AplicacioServiceImpl.UserAddRolError"));
+                }
             }
             // Enable or disable on dates
             rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
@@ -959,10 +908,10 @@ public class AplicacioServiceImpl extends
             
            	rolsUsuarisEntity.setApprovalPending(nwap);
            	
-            getRolAccountEntityDao().create(rolsUsuarisEntity);
+            getRoleAccountEntityDao().create(rolsUsuarisEntity);
             AccountEntity account = rolsUsuarisEntity.getAccount();
             account.getRoles().add(rolsUsuarisEntity);
-            rolsUsuaris = getRolAccountEntityDao().toRolAccount(rolsUsuarisEntity);
+            rolsUsuaris = getRoleAccountEntityDao().toRolAccount(rolsUsuarisEntity);
         	
             if (nwap)
             	launchWorkflowApprovalProcess(rolsUsuarisEntity);
@@ -982,12 +931,11 @@ public class AplicacioServiceImpl extends
      * @param rolAccountEntity
      * @throws InternalErrorException 
 	 */
-	private boolean needsWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
-	{
-		RolEntity role = rolAccountEntity.getRol();
-		if (role != null && "S".equals(role.getGestionableWF()))
+	private boolean needsWorkflowApprovalProcess(RoleAccountEntity rolAccountEntity) throws InternalErrorException {
+		RoleEntity role = rolAccountEntity.getRole();
+		if (role != null && "S".equals(role.getManageableWF()))
 		{
-			AplicacioEntity app = role.getAplicacio();
+			InformationSystemEntity app = role.getApplication();
 			if (app != null && app.getApprovalProcess() != null)
 			{
 				return true;
@@ -1000,22 +948,20 @@ public class AplicacioServiceImpl extends
      * @param rolAccountEntity
      * @throws InternalErrorException 
 	 */
-	private void launchWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
-	{
-		RolEntity role = rolAccountEntity.getRol();
-		if (role != null && "S".equals(role.getGestionableWF()))
+	private void launchWorkflowApprovalProcess(RoleAccountEntity rolAccountEntity) throws InternalErrorException {
+		RoleEntity role = rolAccountEntity.getRole();
+		if (role != null && "S".equals(role.getManageableWF()))
 		{
-			AplicacioEntity app = role.getAplicacio();
+			InformationSystemEntity app = role.getApplication();
 			if (app != null && app.getApprovalProcess() != null)
 			{
 				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
 				if (def.isEmpty())
-					throw new InternalErrorException ("Approval process %s for application %s is not available",
-									app.getApprovalProcess(), app.getCodi());
+					throw new InternalErrorException("Approval process %s for application %s is not available", app.getApprovalProcess(), app.getCode());
 				JbpmContext ctx = getBpmEngine().getContext();
 				try {
 					ProcessInstance pi = ctx.newProcessInstance(app.getApprovalProcess());
-					RolAccount ra = getRolAccountEntityDao().toRolAccount(rolAccountEntity);
+					RolAccount ra = getRoleAccountEntityDao().toRolAccount(rolAccountEntity);
 		            SoDRule rule = getSoDRuleService().isAllowed(ra);
 		            if (rule != null)
 		            	ra.setSodRisk(rule.getRisk());
@@ -1026,25 +972,23 @@ public class AplicacioServiceImpl extends
 					pi.signal();
 					ctx.save(pi);
 					
-					for (UserAccountEntity ua: rolAccountEntity.getAccount().getUsers())
-					{
-    					UsuariWFProcess uwp = new UsuariWFProcess();
-    					uwp.setCodiUsuari(ua.getUser().getCodi());
-    					uwp.setIdProces(pi.getId());
-    					uwp.setFinalitzat(false);
-    					getUsuariService().create(uwp);
-					}
+					for (UserAccountEntity ua : rolAccountEntity.getAccount().getUsers()) {
+                        UsuariWFProcess uwp = new UsuariWFProcess();
+                        uwp.setCodiUsuari(ua.getUser().getUserName());
+                        uwp.setIdProces(pi.getId());
+                        uwp.setFinalitzat(false);
+                        getUsuariService().create(uwp);
+                    }
 					rolAccountEntity.setApprovalProcess(pi.getId());
 				} finally {
 					ctx.close();
 				}
-				getRolAccountEntityDao().update(rolAccountEntity);
+				getRoleAccountEntityDao().update(rolAccountEntity);
 			}
 		}
 	}
 
-	UsuariEntity getAccountUser (Long accountId)
-    {
+	UserEntity getAccountUser(Long accountId) {
     	// Guess usuari
     	AccountEntity acc = getAccountEntityDao().load(accountId);
     	if (acc.getType().equals(AccountType.USER))
@@ -1069,17 +1013,16 @@ public class AplicacioServiceImpl extends
 			rolsUsuaris.setHolderGroup(null);
 		else
 		{
-			UsuariEntity ue = getAccountUser(rolsUsuaris.getAccountId());
+			UserEntity ue = getAccountUser(rolsUsuaris.getAccountId());
             if (ue == null)
     			rolsUsuaris.setHolderGroup(null);
             else
             {
             	if (rolsUsuaris.getHolderGroup() == null)
             	{
-    				GrupEntity primaryGroup = ue.getGrupPrimari();
-    				if (primaryGroup.getTipusUnitatOrganizativa() != null && 
-    								primaryGroup.getTipusUnitatOrganizativa().isRoleHolder())
-    					rolsUsuaris.setHolderGroup(primaryGroup.getCodi());
+    				GroupEntity primaryGroup = ue.getPrimaryGroup();
+    				if (primaryGroup.getOrganizatinalUnitType() != null && primaryGroup.getOrganizatinalUnitType().isRoleHolder())
+    					rolsUsuaris.setHolderGroup(primaryGroup.getCode());
     			}
             	else if (rolsUsuaris.getHolderGroup().length () == 0 && "optional".equals(System.getProperty("soffid.entitlement.group.holder")))
             	{
@@ -1097,7 +1040,7 @@ public class AplicacioServiceImpl extends
             			}
             		}
             		if (! found)
-            			throw new InternalErrorException (String.format ("User %s is not member of '%s' group", ue.getCodi(), rolsUsuaris.getHolderGroup()));
+            			throw new InternalErrorException(String.format("User %s is not member of \'%s\' group", ue.getUserName(), rolsUsuaris.getHolderGroup()));
             	}
             }
 		}
@@ -1107,23 +1050,18 @@ public class AplicacioServiceImpl extends
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
         // {
-        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
+        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris, getGroupEntityDao())) {
 
-        	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .load(rolsUsuaris.getId());
+        	RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().load(rolsUsuaris.getId());
         	if (rolsUsuarisEntity.getRule() != null)
                 throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
             // Disable assigning roles to himself
-        	UsuariEntity user = null;
-            for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())
-            {
-            	if (ua.getUser().getCodi().equals(getPrincipal().getName()))
-            	{
-                    throw new SeyconException(
-                            Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
-            	}
-            	user = ua.getUser();
+        	UserEntity user = null;
+            for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
+                if (ua.getUser().getUserName().equals(getPrincipal().getName())) {
+                    throw new SeyconException(Messages.getString("AplicacioServiceImpl.UserAddRolError"));
+                }
+                user = ua.getUser();
             }
             
             deleteRolAccountEntity(rolsUsuarisEntity, user);
@@ -1133,9 +1071,7 @@ public class AplicacioServiceImpl extends
 				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
     }
 
-	private void deleteRolAccountEntity (RolAccountEntity rolsUsuarisEntity,
-					UsuariEntity user) throws InternalErrorException
-	{
+	private void deleteRolAccountEntity(RoleAccountEntity rolsUsuarisEntity, UserEntity user) throws InternalErrorException {
 		if (rolsUsuarisEntity.isApprovalPending() && rolsUsuarisEntity.getApprovalProcess() != null)
 		{
 			JbpmContext ctx = getBpmEngine().getContext();
@@ -1158,7 +1094,7 @@ public class AplicacioServiceImpl extends
 				ctx.close();
 			}
 		}
-		getRolAccountEntityDao().remove(rolsUsuarisEntity);
+		getRoleAccountEntityDao().remove(rolsUsuarisEntity);
 		
 		if (user != null)
 			getRuleEvaluatorService().applyRules(user);
@@ -1170,24 +1106,19 @@ public class AplicacioServiceImpl extends
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
         // {
-        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
+        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris, getGroupEntityDao())) {
 
-        	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
+        	RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().rolAccountToEntity(rolsUsuaris);
         	if (rolsUsuarisEntity.getRule() != null)
                 throw new InternalErrorException("This role cannot be manually revoked. It's granted by a rule.");
             // Disable assigning roles to himself
-            for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())
-            {
-            	if (ua.getUser().getCodi().equals(getPrincipal().getName()))
-            	{
-                    throw new SeyconException(
-                            Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
-            	}
+            for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
+                if (ua.getUser().getUserName().equals(getPrincipal().getName())) {
+                    throw new SeyconException(Messages.getString("AplicacioServiceImpl.UserAddRolError"));
+                }
             }
             
-            getRolAccountEntityDao().remove(rolsUsuarisEntity);
+            getRoleAccountEntityDao().remove(rolsUsuarisEntity);
             
             return;
         } 
@@ -1197,15 +1128,11 @@ public class AplicacioServiceImpl extends
 
 	protected RolAccount handleUpdate(RolAccount rolsUsuaris)
             throws Exception {
-        RolAccount oldRolsUsuaris = getRolAccountEntityDao().toRolAccount(
-        		getRolAccountEntityDao().load(rolsUsuaris.getId()));
+        RolAccount oldRolsUsuaris = getRoleAccountEntityDao().toRolAccount(getRoleAccountEntityDao().load(rolsUsuaris.getId()));
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         // Ho fem emprant autoritzacions (user:role:create [SENSE_DOMINI o
         // GRUPS]
-        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris, 
-        		getGrupEntityDao()) &&
-        	AutoritzacionsUsuari.canCreateUserRole(oldRolsUsuaris, 
-        			getGrupEntityDao()))
+        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris, getGroupEntityDao()) && AutoritzacionsUsuari.canCreateUserRole(oldRolsUsuaris, getGroupEntityDao()))
         {
         	if (! rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName() ) ||
         			! rolsUsuaris.getAccountDispatcher().equals(oldRolsUsuaris.getAccountDispatcher()) ||
@@ -1215,12 +1142,11 @@ public class AplicacioServiceImpl extends
         		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         				"Invalid rol grant change. Cannot change rol or account")); //$NON-NLS-1$
         	}
-            RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
+            RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().rolAccountToEntity(rolsUsuaris);
 
         	rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
         	
-        	getRolAccountEntityDao().update(rolsUsuarisEntity);
+        	getRoleAccountEntityDao().update(rolsUsuarisEntity);
         	
             // Actualitzem darrera actualització de l'usuari
             getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
@@ -1235,14 +1161,12 @@ public class AplicacioServiceImpl extends
     protected Collection<RolAccount> handleFindRolsUsuarisByCodiUsuari(String codiUsuari)
             throws Exception {// desde usuaris.zul para ver qué roles puede
                               // mostrar
-        List<RolAccountEntity> rolusus = getRolAccountEntityDao().findByCodiUsuari(
-                codiUsuari);
+        List<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByCodiUsuari(codiUsuari);
 
         if (rolusus != null) {
             // Filtrem per autoritzacions
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusus);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            Collection<RoleAccountEntity> rolsFiltrats = AutoritzacionsUsuari.filtraRolsUsuariAplicationsCanQuery(rolusus);
+            List<RolAccount> ra = getRoleAccountEntityDao().toRolAccountList(rolsFiltrats);
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
        }
@@ -1259,57 +1183,38 @@ public class AplicacioServiceImpl extends
     protected Collection<ContenidorRol> handleFindInformacioTextualJerarquiaRolsUsuariByCodiUsuari(
             String codiUsuari, String filtraResultats) throws Exception {
         // Obtenemos el usuario
-        UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
+        UserEntity usuari = getUserEntityDao().findByCode(codiUsuari);
 
-		UsuariEntity user = getUsuariEntityDao().load(usuari.getId());
+		UserEntity user = getUserEntityDao().load(usuari.getId());
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateRoles(radSet, ALL, user);
 		LinkedList<ContenidorRol> rgl = new LinkedList<ContenidorRol>();
-		for (RolAccountDetail rad: radSet)
-		{
-			RolGrant rg = null;
-			if (rad.rolRol != null)
-			{
-				RolAssociacioRolEntity rar = rad.rolRol;
-                ContenidorRol cContingut = getRolAssociacioRolEntityDao()
-                        .toContenidorRol(rar);
-                // Y la información del rol contingut
-                ContenidorRol crol = getRolEntityDao()
-                        .toContenidorRol(rar.getRolContingut());
-                if (rad.qualifier != null)
-                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifier.getValor());
-                if (rad.qualifierGroup != null)
-                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifierGroup.getCodi());
-                if (rad.qualifierAplicacio != null)
-                	crol.setInfoContenidor(crol.getInfoContenidor()+" / "+rad.qualifierAplicacio.getCodi());
-				// mostrem rol q el té atorgat
-                crol.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol"),  //$NON-NLS-1$
-                        cContingut.getInfoContenidor()));
-                rgl.add(crol); // Añadimos el
-                                                 // contenedor
-
-			}
-			if (rad.rolGrup != null)
-			{
-                ContenidorRol cr = getRolEntityDao().toContenidorRol(rad.rolGrup.getRolOtorgat());
-                if (rad.qualifier != null)
-                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifier.getValor());
-                if (rad.qualifierGroup != null)
-                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifierGroup.getCodi());
-                if (rad.qualifierAplicacio != null)
-                	cr.setInfoContenidor(cr.getInfoContenidor()+" / "+rad.qualifierAplicacio.getCodi());
-                cr.setMetaInfo(
-                		String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToGroup"), //$NON-NLS-1$
-                				rad.rolGrup.getGrupPosseidor().getCodi() ));
-                rgl.add(cr); // Añadimos el contenedor
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            RolGrant rg = null;
+            if (rad.rolRol != null) {
+                RoleDependencyEntity rar = rad.rolRol;
+                ContenidorRol cContingut = getRoleDependencyEntityDao().toContenidorRol(rar);
+                ContenidorRol crol = getRoleEntityDao().toContenidorRol(rar.getRoleContent());
+                if (rad.qualifier != null) crol.setInfoContenidor(crol.getInfoContenidor() + " / " + rad.qualifier.getValue());
+                if (rad.qualifierGroup != null) crol.setInfoContenidor(crol.getInfoContenidor() + " / " + rad.qualifierGroup.getCode());
+                if (rad.qualifierAplicacio != null) crol.setInfoContenidor(crol.getInfoContenidor() + " / " + rad.qualifierAplicacio.getCode());
+                crol.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol"), cContingut.getInfoContenidor()));
+                rgl.add(crol);
+            }
+            if (rad.rolGrup != null) {
+                ContenidorRol cr = getRoleEntityDao().toContenidorRol(rad.rolGrup.getAssignedRole());
+                if (rad.qualifier != null) cr.setInfoContenidor(cr.getInfoContenidor() + " / " + rad.qualifier.getValue());
+                if (rad.qualifierGroup != null) cr.setInfoContenidor(cr.getInfoContenidor() + " / " + rad.qualifierGroup.getCode());
+                if (rad.qualifierAplicacio != null) cr.setInfoContenidor(cr.getInfoContenidor() + " / " + rad.qualifierAplicacio.getCode());
+                cr.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToGroup"), rad.rolGrup.getOwnerGroup().getCode()));
+                rgl.add(cr);
+            }
+        }
 
         // Filtrado de roles (si se requiere) - per autoritzacions
         if ("S".equals(filtraResultats)) { //$NON-NLS-1$
             // user:role:query [SENSE_DOMINI, GRUPS, APLICACIONS]
-            return AutoritzacionsUsuari.filtraContenidorRolCanQuery(codiUsuari,
-                    rgl, getGrupEntityDao());
+            return AutoritzacionsUsuari.filtraContenidorRolCanQuery(codiUsuari, rgl, getGroupEntityDao());
         }
 
 		return rgl;
@@ -1317,13 +1222,11 @@ public class AplicacioServiceImpl extends
 
     protected Collection<RolAccount> handleFindRolsUsuarisByCodiUsuariAndNomRol(
             String codiUsuari, String nomRol) throws Exception {
-        Collection<RolAccountEntity> rolusuEntity = getRolAccountEntityDao()
-                .findByCodiUsuariAndNomRol(codiUsuari, nomRol);
+        Collection<RoleAccountEntity> rolusuEntity = getRoleAccountEntityDao().findByCodiUsuariAndNomRol(codiUsuari, nomRol);
         if (rolusuEntity != null) {
 
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusuEntity);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            Collection<RoleAccountEntity> rolsFiltrats = AutoritzacionsUsuari.filtraRolsUsuariAplicationsCanQuery(rolusuEntity);
+            List<RolAccount> ra = getRoleAccountEntityDao().toRolAccountList(rolsFiltrats);
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
 
@@ -1342,11 +1245,10 @@ public class AplicacioServiceImpl extends
 
     protected Collection<RolAccount> handleFindRolsUsuarisByNomRol(String nomRol)
             throws Exception {
-        Collection rolusus = getRolAccountEntityDao().findByNomRol(nomRol);
+        Collection rolusus = getRoleAccountEntityDao().findByNomRol(nomRol);
         if (rolusus != null) {
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusus);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            Collection<RoleAccountEntity> rolsFiltrats = AutoritzacionsUsuari.filtraRolsUsuariAplicationsCanQuery(rolusus);
+            List<RolAccount> ra = getRoleAccountEntityDao().toRolAccountList(rolsFiltrats);
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
         }
@@ -1365,12 +1267,10 @@ public class AplicacioServiceImpl extends
         Parameter nomRolParameter = new Parameter("nomRol", nomRol); //$NON-NLS-1$
         Parameter[] parameters = { codiAplicacioAdministradaParameter,
                 nomRolParameter };
-        Collection rolsUsuarisEntity = getRolAccountEntityDao().query(query,
-                parameters);
+        Collection rolsUsuarisEntity = getRoleAccountEntityDao().query(query, parameters);
         if (rolsUsuarisEntity != null) {
             if (rolsUsuarisEntity.size() > 0) {
-                return getRolAccountEntityDao().toAdministracioAplicacioList(
-                        rolsUsuarisEntity);
+                return getRoleAccountEntityDao().toAdministracioAplicacioList(rolsUsuarisEntity);
             }
         }
         return new ArrayList<AdministracioAplicacio>();
@@ -1393,9 +1293,9 @@ public class AplicacioServiceImpl extends
                 codiAplicacio);
         Parameter[] parametres = { nomDominiParameter, nomRolParameter };
 
-        Collection rols = getRolEntityDao().query(query, parametres);
+        Collection rols = getRoleEntityDao().query(query, parametres);
         if (rols != null) {
-            return getRolEntityDao().toRolList(rols);
+            return getRoleEntityDao().toRolList(rols);
         }
         return new Vector();
 
@@ -1409,12 +1309,10 @@ public class AplicacioServiceImpl extends
                         .canUpdateAplicacio(administracioAplicacio
                                 .getCodiAplicacio())) {
 
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
-            getRolAccountEntityDao().update(administracioAplicacioEntity);
+            RoleAccountEntity administracioAplicacioEntity = getRoleAccountEntityDao().administracioAplicacioToEntity(administracioAplicacio);
+            getRoleAccountEntityDao().update(administracioAplicacioEntity);
             administracioAplicacio.setId(administracioAplicacio.getId());
-            administracioAplicacio = getRolAccountEntityDao()
-                    .toAdministracioAplicacio(administracioAplicacioEntity);
+            administracioAplicacio = getRoleAccountEntityDao().toAdministracioAplicacio(administracioAplicacioEntity);
             return administracioAplicacio;
         }
 		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NotPermisionToUpdate"), //$NON-NLS-1$
@@ -1422,9 +1320,9 @@ public class AplicacioServiceImpl extends
     }
 
     protected Rol handleFindRolById(Long rolId) throws Exception {
-        RolEntity rolEntity = getRolEntityDao().findById(rolId);
+        RoleEntity rolEntity = getRoleEntityDao().findById(rolId);
         if (rolEntity != null) {
-            return getRolEntityDao().toRol(rolEntity);
+            return getRoleEntityDao().toRol(rolEntity);
         }
         return null;
     }
@@ -1445,10 +1343,9 @@ public class AplicacioServiceImpl extends
                 contenidor.getBaseDeDades());
         Parameter parameters[] = { nomContenidor, aplicacioContenidor,
                 dispatcherContenidor };
-        Collection rolCollection = getRolAssociacioRolEntityDao().query(query,
-                parameters);
+        Collection rolCollection = getRoleDependencyEntityDao().query(query, parameters);
         if (rolCollection != null) {
-            return getRolEntityDao().toRolList(rolCollection);
+            return getRoleEntityDao().toRolList(rolCollection);
         } else {
             return new Vector();
         }
@@ -1456,27 +1353,27 @@ public class AplicacioServiceImpl extends
 
     protected Collection<Grup> handleFindGrupsPosseidorsdelRolByRol(Rol rol)
             throws Exception {
-        RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
-        Collection<RolsGrupEntity> rolsGrups = rolEntity.getGrupsPosseidorsRol();
-        Collection<GrupEntity> grups = new ArrayList();
-        for (Iterator<RolsGrupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
-        	RolsGrupEntity rge = it.next();
-        	grups.add(rge.getGrupPosseidor());
+        RoleEntity rolEntity = getRoleEntityDao().rolToEntity(rol);
+        Collection<RoleGroupEntity> rolsGrups = rolEntity.getGroupsOwnerRole();
+        Collection<GroupEntity> grups = new ArrayList();
+        for (Iterator<RoleGroupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
+            RoleGroupEntity rge = it.next();
+            grups.add(rge.getOwnerGroup());
         }
-        return getGrupEntityDao().toGrupList(grups);
+        return getGroupEntityDao().toGrupList(grups);
         
     }
 
     protected Collection<Rol> handleFindRolsOtorgatsalGrupByGrup(Grup grup)
             throws Exception {
-        GrupEntity grupEntity = getGrupEntityDao().grupToEntity(grup);
-        Collection<RolsGrupEntity>  rolsGrups = grupEntity.getRolsOtorgatsGrup();
-        Collection<RolEntity> rols = new ArrayList();
-        for (Iterator<RolsGrupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
-        	RolsGrupEntity rge = it.next();
-        	rols.add(rge.getRolOtorgat());
+        GroupEntity grupEntity = getGroupEntityDao().grupToEntity(grup);
+        Collection<RoleGroupEntity> rolsGrups = grupEntity.getAllowedRolesToGroup();
+        Collection<RoleEntity> rols = new ArrayList();
+        for (Iterator<RoleGroupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
+            RoleGroupEntity rge = it.next();
+            rols.add(rge.getAssignedRole());
         }
-        return getRolEntityDao().toRolList(rols);
+        return getRoleEntityDao().toRolList(rols);
         
         
     }
@@ -1503,63 +1400,49 @@ public class AplicacioServiceImpl extends
 
         
         // Obtenemos el ROL
-        RolEntity theRol = getRolEntityDao()
-                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                        codiAplicacioRol, codiDispatcher);
+        RoleEntity theRol = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRole, codiAplicacioRol, codiDispatcher);
 
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		
 		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
 		populateParentGrantsForRol(radSet, theRol, null);
-		for (RolAccountDetail rad: radSet)
-		{
-			if (rad.granteeRol != null)
-			{
-				if (rad.account.getType().equals(AccountType.USER) )
-				{
-					for (UserAccountEntity uae: rad.account.getUsers())
-					{
-		                ContenidorRol cr = new ContenidorRol();
-		                UsuariEntity ue = uae.getUser();
-		                cr.setTipus(ue.getCodi()); // codi d'usuari
-		                cr.setInfoContenidor(ue.getFullName());
-		                cr.setMetaInfo(rad.granteeRol.toDescripcioRol());
-		                resultat.add(cr);
-					}
-				}
-				else
-				{
-	                ContenidorRol cr = new ContenidorRol();
-	                cr.setTipus(rad.account.getName()); // codi d'usuari
-	                cr.setInfoContenidor(rad.account.getDescription());
-	                cr.setMetaInfo(rad.granteeRol.toDescripcioRol());
-	                resultat.add(cr);
-				}
-			}
-			else if (rad.granteeGrup != null)
-			{
-				if (rad.account.getType().equals(AccountType.USER) )
-				{
-					for (UserAccountEntity uae: rad.account.getUsers())
-					{
-		                ContenidorRol cr = new ContenidorRol();
-		                UsuariEntity ue = uae.getUser();
-		                cr.setTipus(ue.getCodi()); // codi d'usuari
-		                cr.setInfoContenidor(ue.getFullName());
-		                cr.setMetaInfo(rad.granteeGrup.getCodi()+" - "+rad.granteeGrup.getDescripcio());
-		                resultat.add(cr);
-					}
-				}
-				else
-				{
-	                ContenidorRol cr = new ContenidorRol();
-	                cr.setTipus(rad.account.getName()); // codi d'usuari
-	                cr.setInfoContenidor(rad.account.getDescription());
-	                cr.setMetaInfo(rad.granteeGrup.getCodi()+" - "+rad.granteeGrup.getDescripcio());
-	                resultat.add(cr);
-				}
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            if (rad.granteeRol != null) {
+                if (rad.account.getType().equals(AccountType.USER)) {
+                    for (UserAccountEntity uae : rad.account.getUsers()) {
+                        ContenidorRol cr = new ContenidorRol();
+                        UserEntity ue = uae.getUser();
+                        cr.setTipus(ue.getUserName());
+                        cr.setInfoContenidor(ue.getFullName());
+                        cr.setMetaInfo(rad.granteeRol.toRoleDescription());
+                        resultat.add(cr);
+                    }
+                } else {
+                    ContenidorRol cr = new ContenidorRol();
+                    cr.setTipus(rad.account.getName());
+                    cr.setInfoContenidor(rad.account.getDescription());
+                    cr.setMetaInfo(rad.granteeRol.toRoleDescription());
+                    resultat.add(cr);
+                }
+            } else if (rad.granteeGrup != null) {
+                if (rad.account.getType().equals(AccountType.USER)) {
+                    for (UserAccountEntity uae : rad.account.getUsers()) {
+                        ContenidorRol cr = new ContenidorRol();
+                        UserEntity ue = uae.getUser();
+                        cr.setTipus(ue.getUserName());
+                        cr.setInfoContenidor(ue.getFullName());
+                        cr.setMetaInfo(rad.granteeGrup.getCode() + " - " + rad.granteeGrup.getDescription());
+                        resultat.add(cr);
+                    }
+                } else {
+                    ContenidorRol cr = new ContenidorRol();
+                    cr.setTipus(rad.account.getName());
+                    cr.setInfoContenidor(rad.account.getDescription());
+                    cr.setMetaInfo(rad.granteeGrup.getCode() + " - " + rad.granteeGrup.getDescription());
+                    resultat.add(cr);
+                }
+            }
+        }
 		return resultat;
 
     }
@@ -1570,10 +1453,9 @@ public class AplicacioServiceImpl extends
         // Carreguem totes
         Collection notificacions = null;
         if (codiAplicacio == null)
-            notificacions = getNotificacioEntityDao().loadAll();
+            notificacions = getNoticeEntityDao().loadAll();
         else
-            notificacions = getNotificacioEntityDao().findByCodiAplicacio(
-                    codiAplicacio);
+            notificacions = getNoticeEntityDao().findByApplicationCode(codiAplicacio);
 
         HashMap<Aplicacio,ArrayList<String>> hNotifica = new HashMap();
         // guardem les aplicacioEntity i la seua Aplicacio(VO) corresponent:
@@ -1581,56 +1463,22 @@ public class AplicacioServiceImpl extends
 
         if (notificacions != null && notificacions.size() > 0) {
         	// van per aplicació
-            for (Iterator it = notificacions.iterator(); it.hasNext();) { 
-                // Obtenim els components de la notificació:
-                NotificacioEntity notif = (NotificacioEntity) it.next();
-                AplicacioEntity aplicacio = notif.getAplicacio();
+            for (Iterator it = notificacions.iterator(); it.hasNext(); ) {
+                NoticeEntity notif = (NoticeEntity) it.next();
+                InformationSystemEntity aplicacio = notif.getApplication();
                 Aplicacio aplic = null;
-                // Fem xanxullo per obtindre l'aplicació només una vegada: per
-                // no obtindre claus diferents
                 if ((aplic = (Aplicacio) aplicacions.get(aplicacio)) == null) {
-                	// Pasem a VO
-                    aplic = getAplicacioEntityDao().toAplicacio(aplicacio); 
+                    aplic = getInformationSystemEntityDao().toAplicacio(aplicacio);
                     aplicacions.put(aplicacio, aplic);
                 }
-                RolEntity rol = notif.getRol();
-                UsuariEntity usu = notif.getUsuari();
-
-                // Les guardem per codi d'aplicació
-                String modif = notif.getInformacio() != null ? notif
-                        .getInformacio().indexOf("atorga") != -1 ? "d'atorgació: "   //$NON-NLS-1$ //$NON-NLS-2$
-                        : "de revocació: "  //$NON-NLS-1$
-                        : "de modificació: ";  //$NON-NLS-1$
-                String missatge = notif.getInformacio()
-                        + ": " //$NON-NLS-1$
-                        + // ":\n     Aplicació: "+aplic.getCodi()+" ["+aplic.getNom()+"]"
-                          // +
-                        "\n     Usuari: "  //$NON-NLS-1$
-                        + usu.getCodi()
-                        + " [" //$NON-NLS-1$
-                        + usu.getNom()
-                        + " " //$NON-NLS-1$
-                        + usu.getPrimerLlinatge()
-                        + " " //$NON-NLS-1$
-                        + usu.getSegonLlinatge()
-                        + "]" //$NON-NLS-1$
-                        + "\n     Rol: "  //$NON-NLS-1$
-                        + rol.getNom()
-                        + " [" //$NON-NLS-1$
-                        + rol.getDescripcio()
-                        + "]" //$NON-NLS-1$
-                        + (notif.getDataModificacio() != null ? "\n     Data "  //$NON-NLS-1$
-                                + modif
-                                + DateUtils.dataToStringFull(notif
-                                        .getDataModificacio()) : ""); //$NON-NLS-1$
-
+                RoleEntity rol = notif.getRole();
+                UserEntity usu = notif.getUser();
+                String modif = notif.getInformation() != null ? notif.getInformation().indexOf("atorga") != -1 ? "d\'atorgaci\u00f3: " : "de revocaci\u00f3: " : "de modificaci\u00f3: ";
+                String missatge = notif.getInformation() + ": " + "\n     Usuari: " + usu.getUserName() + " [" + usu.getFirstName() + " " + usu.getLastName() + " " + usu.getMiddleName() + "]" + "\n     Rol: " + rol.getName() + " [" + rol.getDescription() + "]" + (notif.getModificationDate() != null ? "\n     Data " + modif + DateUtils.dataToStringFull(notif.getModificationDate()) : "");
                 ArrayList<String> msg = null;
-                // Si es la primera vez, creamos el arrayList
-                if ((msg = hNotifica.get(aplic)) == null)
-                    msg = new ArrayList<String>();
+                if ((msg = hNotifica.get(aplic)) == null) msg = new ArrayList<String>();
                 msg.add(missatge);
-                // Guardem la notificació d'aquesta aplicació
-                hNotifica.put(aplic, msg); // cua de missatges de l'aplicació
+                hNotifica.put(aplic, msg);
             }
 
         }
@@ -1644,25 +1492,21 @@ public class AplicacioServiceImpl extends
         Collection notificacions = null;
 
         if (codiAplicacio != null) // ordenades per data caducitat
-            notificacions = getNotificacioEntityDao().findByCodiAplicacio(
-                    codiAplicacio);
+            notificacions = getNoticeEntityDao().findByApplicationCode(codiAplicacio);
         else
         	// ordenades per data caducitat
-            notificacions = getNotificacioEntityDao().findAll(); 
+            notificacions = getNoticeEntityDao().findAll(); 
 
         if (notificacions != null) {
             Collection notifBorrar = new ArrayList();
-            for (Iterator it = notificacions.iterator(); it.hasNext();) {
-                NotificacioEntity notif = (NotificacioEntity) it.next();
-                // Sólo borramos los anteriores a la fecha
-
-                if (notif.getDataModificacio().getTime() <= dataDelete
-                        .getTime()) {
+            for (Iterator it = notificacions.iterator(); it.hasNext(); ) {
+                NoticeEntity notif = (NoticeEntity) it.next();
+                if (notif.getModificationDate().getTime() <= dataDelete.getTime()) {
                     notifBorrar.add(notif);
                 }
             }
             if (notifBorrar.size() > 0) {// Las boramos todos juntas
-                getNotificacioEntityDao().remove(notifBorrar);
+                getNoticeEntityDao().remove(notifBorrar);
             }
         }
     }
@@ -1672,44 +1516,31 @@ public class AplicacioServiceImpl extends
             String nomRole, String codiAplicacioRol, String codiDispatcher)
             throws Exception {
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
+            RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRole, codiAplicacioRol, codiDispatcher);
 
             LinkedList<AutoritzacioRol> totPermis = new LinkedList();
 
             if (rolEntity != null) {
                 // Obtenim tota la jerarquía de rols que té heretats
-                Collection<RolEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
+                Collection<RoleEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
 
                 if (totRol != null) {
-                    for (Iterator<RolEntity> rit = totRol.iterator(); rit
-                            .hasNext();) {
-                        RolEntity r = rit.next();
-
-                        // Obtenim les autoritzacions (modifiquem select)
-                        Collection autos = getAutoritzacioRolEntityDao()
-                                .findByIdRol(r.getId());
-                        // a VO
-                        if (autos != null)
-                            for (Iterator it = autos.iterator(); it.hasNext();) {
-                                AutoritzacioRolEntity auto = (AutoritzacioRolEntity) it
-                                        .next();
-                                Collection desc = getAutoritzacioService()
-                                        .getInformacioAutoritzacio(
-                                                auto.getAutoritzacio());
-                                AutoritzacioRol autoVO = getAutoritzacioRolEntityDao()
-                                        .toAutoritzacioRol(auto);
-                                if (desc != null && desc.iterator().hasNext()) {
-                                    AutoritzacioSEU a = (AutoritzacioSEU) desc
-                                            .iterator().next();
-                                    autoVO.setDescripcio(a.getDescripcio());
-                                    autoVO.setAmbit(a.getAmbit());
-                                    autoVO.setHereta(a.getHereta());
-                                    autoVO.setScope(a.getScope());
-                                }
-                                totPermis.add(autoVO);
+                    for (Iterator<RoleEntity> rit = totRol.iterator(); rit.hasNext(); ) {
+                        RoleEntity r = rit.next();
+                        Collection autos = getAuthorizationEntityDao().findByRoleID(r.getId());
+                        if (autos != null) for (Iterator it = autos.iterator(); it.hasNext(); ) {
+                            AuthorizationEntity auto = (AuthorizationEntity) it.next();
+                            Collection desc = getAutoritzacioService().getInformacioAutoritzacio(auto.getAuthorization());
+                            AutoritzacioRol autoVO = getAuthorizationEntityDao().toAutoritzacioRol(auto);
+                            if (desc != null && desc.iterator().hasNext()) {
+                                AutoritzacioSEU a = (AutoritzacioSEU) desc.iterator().next();
+                                autoVO.setDescripcio(a.getDescripcio());
+                                autoVO.setAmbit(a.getAmbit());
+                                autoVO.setHereta(a.getHereta());
+                                autoVO.setScope(a.getScope());
                             }
+                            totPermis.add(autoVO);
+                        }
                     }
                 }
             }
@@ -1721,41 +1552,37 @@ public class AplicacioServiceImpl extends
 
     }
 
-    private Collection<RolEntity> getRolsHeretatsDirectes(RolEntity rolEntity) {
-        HashMap<Long, RolEntity> fills = new HashMap();
-        Collection rolsAsocHeretats = rolEntity
-                .getRolAssociacioRolSocContenidor();
+    private Collection<RoleEntity> getRolsHeretatsDirectes(RoleEntity rolEntity) {
+        HashMap<Long, RoleEntity> fills = new HashMap();
+        Collection rolsAsocHeretats = rolEntity.getRolAssociationContainer();
         if (rolsAsocHeretats != null) {
-            for (Iterator it = rolsAsocHeretats.iterator(); it.hasNext();) {
-                RolAssociacioRolEntity rar = (RolAssociacioRolEntity) it.next();
-                RolEntity r = rar.getRolContingut();
+            for (Iterator it = rolsAsocHeretats.iterator(); it.hasNext(); ) {
+                RoleDependencyEntity rar = (RoleDependencyEntity) it.next();
+                RoleEntity r = rar.getRoleContent();
                 fills.put(r.getId(), r);
             }
         }
         return fills.values();
     }
 
-    private Collection<RolEntity> getRolEntityHeretatsByRol(RolEntity rolEntity) {
+    private Collection<RoleEntity> getRolEntityHeretatsByRol(RoleEntity rolEntity) {
 
-        HashMap<Long, RolEntity> totRol = new HashMap<Long, RolEntity>();
+        HashMap<Long, RoleEntity> totRol = new HashMap<Long, RoleEntity>();
         // Llista de rols a analitzar
-        LinkedList<RolEntity> rolsAnalitzar = new LinkedList();
+        LinkedList<RoleEntity> rolsAnalitzar = new LinkedList();
 
         if (rolEntity != null) {
             rolsAnalitzar.add(rolEntity);
             // Cerquem els rols que tinc heretats (continguts)
-            RolEntity fill = null;
+            RoleEntity fill = null;
             while ((fill = rolsAnalitzar.poll()) != null) {
                 totRol.put(fill.getId(), fill); // L'afegim
-                Collection<RolEntity> hereta = getRolsHeretatsDirectes(fill);
+                Collection<RoleEntity> hereta = getRolsHeretatsDirectes(fill);
                 if (hereta != null)
-                    for (Iterator<RolEntity> it = hereta.iterator(); it
-                            .hasNext();) {
-                        // Si no l'hem analitzat abans
-                        RolEntity r = it.next();
-                        if (!totRol.containsKey(r.getId()))
-                            rolsAnalitzar.add(r);
-                    }
+                    for (Iterator<RoleEntity> it = hereta.iterator(); it.hasNext(); ) {
+                    RoleEntity r = it.next();
+                    if (!totRol.containsKey(r.getId())) rolsAnalitzar.add(r);
+                }
 
             }
 
@@ -1770,41 +1597,24 @@ public class AplicacioServiceImpl extends
             throws Exception {
 
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
+            RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRole, codiAplicacioRol, codiDispatcher);
 
             LinkedList<AutoritzacioPuntEntrada> totPermis = new LinkedList();
 
             if (rolEntity != null) {
                 // Obtenim tota la jerarquía de rols que té heretats
-                Collection<RolEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
+                Collection<RoleEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
 
                 if (totRol != null) {
-                    for (Iterator<RolEntity> rit = totRol.iterator(); rit
-                            .hasNext();) {
-                        RolEntity r = rit.next();
-
-                        // Obtenim les autoritzacions (modifiquem select)
-                        Collection autos = getAutoritzacioPUERolEntityDao()
-                                .query(
-                                        "select autor from es.caib.seycon.ng.model.AutoritzacioPUERolEntity " //$NON-NLS-1$
-                                                + "autor where autor.idRol=:idRol", //$NON-NLS-1$
-                                  new Parameter[] {
-                                      new Parameter("idRol", r.getId()) //$NON-NLS-1$
-                                 });
-                        if (autos != null)
-                            for (Iterator it = autos.iterator(); it.hasNext();) {
-                                AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it
-                                        .next();
-                                AutoritzacioPuntEntrada autoVO = getAutoritzacioPUERolEntityDao()
-                                        .toAutoritzacioPuntEntrada(auto);
-                                // Li canviem la descripció del rol per la
-                                // descripció del PUE (!!)
-                                autoVO.setCodiEntitatAutoritzada(auto
-                                        .getPuntEntrada().getNom());
-                                totPermis.add(autoVO);
-                            }
+                    for (Iterator<RoleEntity> rit = totRol.iterator(); rit.hasNext(); ) {
+                        RoleEntity r = rit.next();
+                        Collection autos = getEntryPointRoleEntityDao().query("select autor from es.caib.seycon.ng.model.AutoritzacioPUERolEntity autor where autor.idRol=:idRol", new Parameter[]{new Parameter("idRol", r.getId())});
+                        if (autos != null) for (Iterator it = autos.iterator(); it.hasNext(); ) {
+                            EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
+                            AutoritzacioPuntEntrada autoVO = getEntryPointRoleEntityDao().toAutoritzacioPuntEntrada(auto);
+                            autoVO.setCodiEntitatAutoritzada(auto.getEntryPoint().getName());
+                            totPermis.add(autoVO);
+                        }
                     }
                 }
             }
@@ -1822,32 +1632,21 @@ public class AplicacioServiceImpl extends
             throws Exception {
         if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
             // Cerquem el rol
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
+            RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRole, codiAplicacioRol, codiDispatcher);
 
             LinkedList<NetworkAuthorization> totPermis = new LinkedList<NetworkAuthorization>();
 
             if (rolEntity != null) {
                 // Obtenim tota la jerarquía de rols que té heretats
-                Collection<RolEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
+                Collection<RoleEntity> totRol = getRolEntityHeretatsByRol(rolEntity);
 
                 if (totRol != null) {
-                    for (Iterator<RolEntity> rit = totRol.iterator(); rit
-                            .hasNext();) {
-                        RolEntity r = rit.next();
-
-                        // Obtenim les autoritzacions del rol
-                        List<XarxaACEntity> autosXarxa = getXarxaACEntityDao()
-                                .findByNomRolAndCodiAplicacioRolAndCodiDispatcher(
-                                        r.getNom(), r.getAplicacio().getCodi(),
-                                        r.getBaseDeDades().getCodi()); // XarxaACEntity
+                    for (Iterator<RoleEntity> rit = totRol.iterator(); rit.hasNext(); ) {
+                        RoleEntity r = rit.next();
+                        List<NetworkAuthorizationEntity> autosXarxa = getNetworkAuthorizationEntityDao().findByRoleNameAndApplicationCodeAndSystemCode(r.getName(), r.getApplication().getCode(), r.getDatabases().getCode());
                         if (autosXarxa != null && autosXarxa.size() > 0) {
-                            
-                            totPermis.addAll(getXarxaACEntityDao()
-                                    .toNetworkAuthorizationList(autosXarxa));
+                            totPermis.addAll(getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(autosXarxa));
                         }
-
                     }
                 }
             }
@@ -1861,8 +1660,7 @@ public class AplicacioServiceImpl extends
         }
     }
     
-    private void populateRoles (Set<RolAccountDetail> rad, int type, UsuariEntity user)
-    {
+    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user) {
     	if (type == NONE)
     		return;
     	
@@ -1876,74 +1674,58 @@ public class AplicacioServiceImpl extends
     	
     	if (type == INDIRECT || type == ALL)
     	{
-    		populateGroupRoles (rad, ALL, user.getGrupPrimari(), user);
-    		for (UsuariGrupEntity ug: user.getGrupsSecundaris())
-    		{
-    			populateGroupRoles (rad, ALL, ug.getGrup(), user);
-    		}
+    		populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user);
+    		for (UserGroupEntity ug : user.getSecondaryGroups()) {
+                populateGroupRoles(rad, ALL, ug.getGroup(), user);
+            }
     	}
     	
     }
     
-	private void populateGroupRoles(Set<RolAccountDetail> rad, int type, GrupEntity grup, UsuariEntity originUser)
-	{
+	private void populateGroupRoles(Set<RolAccountDetail> rad, int type, GroupEntity grup, UserEntity originUser) {
 		if (type == NONE)
 			return;
 		
-		for (RolsGrupEntity rg: grup.getRolsOtorgatsGrup())
-		{
-			for (AccountEntity ae: getAccountsForDispatcher(originUser, null, rg.getRolOtorgat().getBaseDeDades()))
-			{
-				RolAccountDetail n = new RolAccountDetail(rg, ae);
-				n.granteeGrup = grup;
-				if ( ! rad.contains(n))
-				{
-					if (type == DIRECT || type == ALL) 
-						rad.add(n);
-					if (type == INDIRECT || type == ALL)
-					{
-						for (AccountEntity acc: getAccountsForDispatcher(originUser, null, rg.getRolOtorgat().getBaseDeDades()))
-							populateRoleRoles (rad, ALL, n, originUser, acc);
-					}
-				}
-			}
-		}
-		if (grup.getPare() != null)
-			populateGroupRoles(rad, type, grup.getPare(), originUser);
+		for (RoleGroupEntity rg : grup.getAllowedRolesToGroup()) {
+            for (AccountEntity ae : getAccountsForDispatcher(originUser, null, rg.getAssignedRole().getDatabases())) {
+                RolAccountDetail n = new RolAccountDetail(rg, ae);
+                n.granteeGrup = grup;
+                if (!rad.contains(n)) {
+                    if (type == DIRECT || type == ALL) rad.add(n);
+                    if (type == INDIRECT || type == ALL) {
+                        for (AccountEntity acc : getAccountsForDispatcher(originUser, null, rg.getAssignedRole().getDatabases())) populateRoleRoles(rad, ALL, n, originUser, acc);
+                    }
+                }
+            }
+        }
+		if (grup.getParent() != null)
+			populateGroupRoles(rad, type, grup.getParent(), originUser);
 	}
 
-	private List<AccountEntity> getAccountsForDispatcher (UsuariEntity usuari, 
-			AccountEntity account, DispatcherEntity dispatcher)
-	{
+	private List<AccountEntity> getAccountsForDispatcher(UserEntity usuari, AccountEntity account, SystemEntity dispatcher) {
 		List<AccountEntity> accounts = new LinkedList<AccountEntity>();
 		if (account == null)
 		{
 			if (usuari != null)
 			{
-				for (UserAccountEntity ua2: usuari.getAccounts())
-				{
-					if (ua2.getAccount().getDispatcher().getId().equals(dispatcher.getId()) &&
-						ua2.getAccount().getType().equals(AccountType.USER))
-					{
-						accounts.add(ua2.getAccount());
-					}
-				}
+				for (UserAccountEntity ua2 : usuari.getAccounts()) {
+                    if (ua2.getAccount().getSystem().getId().equals(dispatcher.getId()) && ua2.getAccount().getType().equals(AccountType.USER)) {
+                        accounts.add(ua2.getAccount());
+                    }
+                }
 			}
 		}
-		else if (account.getDispatcher().getId().equals(dispatcher.getId()))
+		else if (account.getSystem().getId().equals(dispatcher.getId()))
 		{
 			accounts.add(account);
 		}
 		else if (account.getType().equals(AccountType.USER))
 		{
-			for (UserAccountEntity ua2: usuari.getAccounts())
-			{
-				if (ua2.getAccount().getDispatcher().getId().equals(dispatcher.getId()) &&
-					ua2.getAccount().getType().equals(AccountType.USER))
-				{
-					accounts.add(ua2.getAccount());
-				}
-			}
+			for (UserAccountEntity ua2 : usuari.getAccounts()) {
+                if (ua2.getAccount().getSystem().getId().equals(dispatcher.getId()) && ua2.getAccount().getType().equals(AccountType.USER)) {
+                    accounts.add(ua2.getAccount());
+                }
+            }
 		}
 		if (accounts.isEmpty())
 			accounts.add(null);
@@ -1951,59 +1733,44 @@ public class AplicacioServiceImpl extends
 		return accounts;
 	}
 	
-	private void populateRoleRoles(Set<RolAccountDetail> rad, int type,
-			RolAccountDetail currentRol, UsuariEntity originUser, AccountEntity originAccount)
-	{
+	private void populateRoleRoles(Set<RolAccountDetail> rad, int type, RolAccountDetail currentRol, UserEntity originUser, AccountEntity originAccount) {
 		if (type == NONE)
 			return;
 		
-		RolEntity rol = currentRol.granted;
+		RoleEntity rol = currentRol.granted;
 		
-		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContenidor())
-		{
-			// Only propagate if domain value matches
-			if (matchesGranteeDomainValue (currentRol, ra))
-			{
-				for (AccountEntity ae: getAccountsForDispatcher(originUser,
-						originAccount, ra.getRolContingut().getBaseDeDades()))
-				{
-					RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
-					n.granteeRol = rol;
-					n.generateHash();
-						
-					
-					if ( ! rad.contains(n))
-					{
-						if (type == DIRECT || type == ALL) 
-							rad.add(n);
-						if (type == INDIRECT || type == ALL)
-							populateRoleRoles(rad, ALL, n, originUser, originAccount);
-					}
-				}
-			}
-		}
+		for (RoleDependencyEntity ra : rol.getRolAssociationContainer()) {
+            if (matchesGranteeDomainValue(currentRol, ra)) {
+                for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getRoleContent().getDatabases())) {
+                    RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
+                    n.granteeRol = rol;
+                    n.generateHash();
+                    if (!rad.contains(n)) {
+                        if (type == DIRECT || type == ALL) rad.add(n);
+                        if (type == INDIRECT || type == ALL) populateRoleRoles(rad, ALL, n, originUser, originAccount);
+                    }
+                }
+            }
+        }
 	}
 
 	
-	private boolean matchesGranteeDomainValue(RolAccountDetail currentRol,
-			RolAssociacioRolEntity ra) {
-		if (ra.getRolContenidor().getTipusDomini() == null ||
-				ra.getRolContenidor().getTipusDomini().equals (TipusDomini.SENSE_DOMINI))
+	private boolean matchesGranteeDomainValue(RolAccountDetail currentRol, RoleDependencyEntity ra) {
+		if (ra.getRoleContainer().getDomainType() == null || ra.getRoleContainer().getDomainType().equals(TipusDomini.SENSE_DOMINI))
 			return true;
-		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.APLICACIONS))
+		else if (ra.getRoleContainer().getDomainType().equals(TipusDomini.APLICACIONS))
 		{
 			return ra.getGranteeApplicationDomain() == null ||
 					currentRol.qualifierAplicacio == null ||
 					ra.getGranteeApplicationDomain().getId().equals (currentRol.qualifierAplicacio.getId()); 
 		}
-		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS) ||
-				ra.getRolContenidor().getTipusDomini().equals(TipusDomini.GRUPS_USUARI) )
+		else if (ra.getRoleContainer().getDomainType().equals(TipusDomini.GRUPS) || ra.getRoleContainer().getDomainType().equals(TipusDomini.GRUPS_USUARI))
 		{
 			return ra.getGranteeGroupDomain() == null ||
 					currentRol.qualifierGroup == null || 
 					ra.getGranteeGroupDomain().getId().equals (currentRol.qualifierGroup.getId()); 
 		}
-		else if (ra.getRolContenidor().getTipusDomini().equals(TipusDomini.DOMINI_APLICACIO))
+		else if (ra.getRoleContainer().getDomainType().equals(TipusDomini.DOMINI_APLICACIO))
 		{
 			return ra.getGranteeDomainValue() == null ||
 					currentRol.qualifier == null || 
@@ -2011,12 +1778,11 @@ public class AplicacioServiceImpl extends
 		}
 		else
 		{
-			throw new RuntimeException ("Unexpected domain value " +ra.getRolContenidor().getTipusDomini());
+			throw new RuntimeException("Unexpected domain value " + ra.getRoleContainer().getDomainType());
 		}
 	}
 
-	private boolean shouldBeEnabled (RolAccountEntity e)
-	{
+	private boolean shouldBeEnabled(RoleAccountEntity e) {
 		if (e.isApprovalPending())
 			return false;
 		if (e.getStartDate() == null && e.getEndDate() == null)
@@ -2035,19 +1801,14 @@ public class AplicacioServiceImpl extends
 				(e.getEndDate() == null  || today.equals(e.getEndDate()) || today.before(e.getEndDate()));
 	}
 	
-	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UsuariEntity user)
-	{
-		for (RolAccountEntity ra: account.getRoles())
-		{
-			RolAccountDetail n = new RolAccountDetail(ra, account);
-			if ( ! rad.contains(n))
-			{
-				if (type == DIRECT || type == ALL) 
-					rad.add(n);
-				if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra))
-					populateRoleRoles(rad, ALL, n, user, account);
-			}
-		}
+	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user) {
+		for (RoleAccountEntity ra : account.getRoles()) {
+            RolAccountDetail n = new RolAccountDetail(ra, account);
+            if (!rad.contains(n)) {
+                if (type == DIRECT || type == ALL) rad.add(n);
+                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
+            }
+        }
 	}
 
 	@Override
@@ -2058,18 +1819,13 @@ public class AplicacioServiceImpl extends
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateAccountRoles(radSet, DIRECT, account, null);
 		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
-		for (RolAccountDetail rad: radSet)
-		{
-			if (rad.granted.getBaseDeDades().getId().equals (account.getDispatcher().getId()))
-			{
-				if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
-					rg.add (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
-				if (rad.rolRol != null)
-					rg.add (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
-				if (rad.rolGrup != null)
-					rg.add (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            if (rad.granted.getDatabases().getId().equals(account.getSystem().getId())) {
+                if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg.add(getRoleAccountEntityDao().toRolGrant(rad.rolAccount));
+                if (rad.rolRol != null) rg.add(getRoleDependencyEntityDao().toRolGrant(rad.rolRol));
+                if (rad.rolGrup != null) rg.add(getRoleGroupEntityDao().toRolGrant(rad.rolGrup));
+            }
+        }
 		return rg;
 	}
 
@@ -2084,14 +1840,11 @@ public class AplicacioServiceImpl extends
 		
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateAccountRoles(radSet, DIRECT, account, null);
-		for (RolAccountDetail rad: radSet)
-		{
-			if (rad.granted.getBaseDeDades().getId().equals (account.getDispatcher().getId()))
-			{
-				if (rad.rolAccount != null)
-					rg.add (getRolAccountEntityDao().toRolAccount(rad.rolAccount));
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            if (rad.granted.getDatabases().getId().equals(account.getSystem().getId())) {
+                if (rad.rolAccount != null) rg.add(getRoleAccountEntityDao().toRolAccount(rad.rolAccount));
+            }
+        }
 		getSoDRuleService().qualifyRolAccountList(rg);
 		return rg;
 	}
@@ -2100,34 +1853,23 @@ public class AplicacioServiceImpl extends
 	protected Collection<RolGrant> handleFindEffectiveRolGrantByUser(long userId)
 			throws Exception
 	{
-		UsuariEntity user = getUsuariEntityDao().load(userId);
+		UserEntity user = getUserEntityDao().load(userId);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateRoles(radSet, ALL, user);
 		LinkedList<RolGrant> rgl = new LinkedList<RolGrant>();
-		for (RolAccountDetail rad: radSet)
-		{
-			RolGrant rg = null;
-			if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
-				rg = (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
-			if (rad.rolRol != null)
-			{
-				rg = (getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol));
-				if (rad.qualifier != null)
-					rg.setDomainValue(rad.qualifier.getValor());
-				else if (rad.qualifierAplicacio != null)
-					rg.setDomainValue(rad.qualifierAplicacio.getCodi());
-				else if (rad.qualifierGroup != null)
-					rg.setDomainValue(rad.qualifierGroup.getCodi());
-			}
-			if (rad.rolGrup != null)
-				rg = (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
-			if (rg != null)
-			{
-    			if (rad.account != null)
-    				rg.setOwnerAccountName(rad.account.getName());
-    			rgl.add(rg);
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            RolGrant rg = null;
+            if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg = (getRoleAccountEntityDao().toRolGrant(rad.rolAccount));
+            if (rad.rolRol != null) {
+                rg = (getRoleDependencyEntityDao().toRolGrant(rad.rolRol));
+                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getCode()); else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getCode());
+            }
+            if (rad.rolGrup != null) rg = (getRoleGroupEntityDao().toRolGrant(rad.rolGrup));
+            if (rg != null) {
+                if (rad.account != null) rg.setOwnerAccountName(rad.account.getName());
+                rgl.add(rg);
+            }
+        }
 		return rgl;
 	}
 
@@ -2148,27 +1890,17 @@ public class AplicacioServiceImpl extends
 		else
 			populateAccountRoles(radSet, ALL, account, null);
 		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
-		for (RolAccountDetail rad: radSet)
-		{
-			if (rad.account != null && rad.account.getId().longValue() == accountId)
-			{
-				if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount))
-					rg.add (getRolAccountEntityDao().toRolGrant(rad.rolAccount));
-				if (rad.rolRol != null)
-				{
-					RolGrant r = getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol);
-					if (rad.qualifier != null)
-						r.setDomainValue(rad.qualifier.getValor());
-					else if (rad.qualifierAplicacio != null)
-						r.setDomainValue(rad.qualifierAplicacio.getCodi());
-					else if (rad.qualifierGroup != null)
-						r.setDomainValue(rad.qualifierGroup.getCodi());
-					rg.add(r);
-				}
-				if (rad.rolGrup != null)
-					rg.add (getRolsGrupEntityDao().toRolGrant(rad.rolGrup));
-			}
-		}
+		for (RolAccountDetail rad : radSet) {
+            if (rad.account != null && rad.account.getId().longValue() == accountId) {
+                if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg.add(getRoleAccountEntityDao().toRolGrant(rad.rolAccount));
+                if (rad.rolRol != null) {
+                    RolGrant r = getRoleDependencyEntityDao().toRolGrant(rad.rolRol);
+                    if (rad.qualifier != null) r.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) r.setDomainValue(rad.qualifierAplicacio.getCode()); else if (rad.qualifierGroup != null) r.setDomainValue(rad.qualifierGroup.getCode());
+                    rg.add(r);
+                }
+                if (rad.rolGrup != null) rg.add(getRoleGroupEntityDao().toRolGrant(rad.rolGrup));
+            }
+        }
 		return rg;
 	}
 
@@ -2181,29 +1913,21 @@ public class AplicacioServiceImpl extends
     	if (numRegistres != null)
     		config.setMaximumResultSize(new Integer(numRegistres.intValue()));
 
-    	Collection<RolAccountEntity> usuaris = getRolAccountEntityDao().query(
-                        "select account from es.caib.seycon.ng.model.RolEntity rol join rol.accounts as account " //$NON-NLS-1$
-                                + "where rol.id = :rolId", //$NON-NLS-1$ 
-                          new Parameter[] {
-                                new Parameter("rolId", rolId)//$NON-NLS-1$
-                                },
-                          config);
+    	Collection<RoleAccountEntity> usuaris = getRoleAccountEntityDao().query("select account from es.caib.seycon.ng.model.RolEntity rol join rol.accounts as account where rol.id = :rolId", new Parameter[]{new Parameter("rolId", rolId)}, config);
     	// Remove inactive grants
-    	for (Iterator<RolAccountEntity> it = usuaris.iterator(); it.hasNext();)
-    	{
-    		RolAccountEntity rae = it.next();
-    		if (! shouldBeEnabled(rae))
-    			it.remove();
-    	}
+    	for (Iterator<RoleAccountEntity> it = usuaris.iterator(); it.hasNext(); ) {
+            RoleAccountEntity rae = it.next();
+            if (!shouldBeEnabled(rae)) it.remove();
+        }
     	// Convert to VO
-        return getRolAccountEntityDao().toRolGrantList(usuaris);
+        return getRoleAccountEntityDao().toRolGrantList(usuaris);
 	}
 
 	@Override
 	protected Collection<RolGrant> handleFindEffectiveRolGrantsByRolId(Long rolId)
 			throws Exception
 	{
-		RolEntity rol = getRolEntityDao().load(rolId);
+		RoleEntity rol = getRoleEntityDao().load(rolId);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		
 		LinkedList<RolGrant> rg = new LinkedList<RolGrant>();
@@ -2211,120 +1935,81 @@ public class AplicacioServiceImpl extends
 			return rg;
 		
 		populateParentGrantsForRol(radSet, rol, null);
-		for (RolAccountDetail rad: radSet)
-		{
-			RolGrant grant;
-			if (rad.rolAccount != null)
-				grant = getRolAccountEntityDao().toRolGrant(rad.rolAccount);
-			else if (rad.rolRol != null)
-			{
-				grant = getRolAssociacioRolEntityDao().toRolGrant(rad.rolRol);
-				if (rad.qualifier != null)
-					grant.setDomainValue(rad.qualifier.getValor());
-				else if (rad.qualifierAplicacio != null)
-					grant.setDomainValue(rad.qualifierAplicacio.getCodi());
-				else if (rad.qualifierGroup != null)
-					grant.setDomainValue(rad.qualifierGroup.getCodi());
-			}
-			else
-				grant = getRolsGrupEntityDao().toRolGrant(rad.rolGrup);
-			if (rad.account != null)
-			{
-				grant.setOwnerAccountName(rad.account.getName());
-				grant.setOwnerDispatcher(rad.account.getDispatcher().getCodi());
-				if (rad.account.getType().equals (AccountType.USER))
-				{
-					for (UserAccountEntity ua: rad.account.getUsers())
-					{
-						grant.setUser (ua.getUser().getCodi());
-					}
-				}
-			}
-			rg.add(grant);
-		}
+		for (RolAccountDetail rad : radSet) {
+            RolGrant grant;
+            if (rad.rolAccount != null) grant = getRoleAccountEntityDao().toRolGrant(rad.rolAccount); else if (rad.rolRol != null) {
+                grant = getRoleDependencyEntityDao().toRolGrant(rad.rolRol);
+                if (rad.qualifier != null) grant.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) grant.setDomainValue(rad.qualifierAplicacio.getCode()); else if (rad.qualifierGroup != null) grant.setDomainValue(rad.qualifierGroup.getCode());
+            } else grant = getRoleGroupEntityDao().toRolGrant(rad.rolGrup);
+            if (rad.account != null) {
+                grant.setOwnerAccountName(rad.account.getName());
+                grant.setOwnerDispatcher(rad.account.getSystem().getCode());
+                if (rad.account.getType().equals(AccountType.USER)) {
+                    for (UserAccountEntity ua : rad.account.getUsers()) {
+                        grant.setUser(ua.getUser().getUserName());
+                    }
+                }
+            }
+            rg.add(grant);
+        }
 		return rg;
 	}
 
-	private void populateParentGrantsForRol(HashSet<RolAccountDetail> radSet, RolEntity rol, 
-			RolAssociacioRolEntity originalGrant)
-	{
-		for (RolAccountEntity rac: rol.getAccounts())
-		{
-			if (shouldBeEnabled(rac))
-			{
-    			RolAccountDetail rad;
-    			if (originalGrant == null)
-    				rad = new RolAccountDetail(rac, rac.getAccount());
-    			else 
-    			{
-    				RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount());
-    				rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, rac.getAccount(), previousRad);
-    			}
-    			if (! radSet.contains(rad))
-    			{
-    				if (originalGrant == null ||
-    					matchesGranteeDomainValue(rad, originalGrant))
-    				{
-    					radSet.add(rad);
-    				}
-    			}
-			}
-		}
+	private void populateParentGrantsForRol(HashSet<RolAccountDetail> radSet, RoleEntity rol, RoleDependencyEntity originalGrant) {
+		for (RoleAccountEntity rac : rol.getAccounts()) {
+            if (shouldBeEnabled(rac)) {
+                RolAccountDetail rad;
+                if (originalGrant == null) rad = new RolAccountDetail(rac, rac.getAccount()); else {
+                    RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount());
+                    rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, rac.getAccount(), previousRad);
+                }
+                if (!radSet.contains(rad)) {
+                    if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
+                        radSet.add(rad);
+                    }
+                }
+            }
+        }
 		
-		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContingut())
-		{
-			populateParentGrantsForRol(radSet, ra.getRolContenidor(), originalGrant == null? ra: originalGrant);
-		}
+		for (RoleDependencyEntity ra : rol.getRoleAssociationContent()) {
+            populateParentGrantsForRol(radSet, ra.getRoleContainer(), originalGrant == null ? ra : originalGrant);
+        }
 
-		for (RolsGrupEntity rg: rol.getGrupsPosseidorsRol())
-		{
-			populateParentGrantsForGroup(radSet, rg.getGrupPosseidor(), originalGrant == null ? rg: originalGrant);
-		}
+		for (RoleGroupEntity rg : rol.getGroupsOwnerRole()) {
+            populateParentGrantsForGroup(radSet, rg.getOwnerGroup(), originalGrant == null ? rg : originalGrant);
+        }
 	}
 
-	private void populateParentGrantsForGroup(HashSet<RolAccountDetail> radSet,
-			GrupEntity grup, Object originalGrant)
-	{
-		for (UsuariEntity u: grup.getUsuarisGrupPrimari())
-		{
-			populateParentGrantsForUser(radSet, u, originalGrant);
-		}
+	private void populateParentGrantsForGroup(HashSet<RolAccountDetail> radSet, GroupEntity grup, Object originalGrant) {
+		for (UserEntity u : grup.getPrimaryGroupUsers()) {
+            populateParentGrantsForUser(radSet, u, originalGrant);
+        }
 		
-		for ( UsuariGrupEntity sg: grup.getUsuarisGrupSecundari())
-		{
-			populateParentGrantsForUser(radSet, sg.getUsuari(), originalGrant);
-		}
+		for (UserGroupEntity sg : grup.getSecondaryGroupUsers()) {
+            populateParentGrantsForUser(radSet, sg.getUser(), originalGrant);
+        }
 
-		for ( GrupEntity fill: grup.getFills())
-		{
-			populateParentGrantsForGroup(radSet, fill, originalGrant);
-		}
+		for (GroupEntity fill : grup.getChildrens()) {
+            populateParentGrantsForGroup(radSet, fill, originalGrant);
+        }
 	}
 
-	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet,
-			UsuariEntity u, Object originalGrant)
-	{
-		DispatcherEntity de ;
-		if (originalGrant instanceof RolAssociacioRolEntity)
-			de = ((RolAssociacioRolEntity)originalGrant).getRolContingut().getBaseDeDades();
+	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, UserEntity u, Object originalGrant) {
+		SystemEntity de;
+		if (originalGrant instanceof RoleDependencyEntity)
+			de = ((RoleDependencyEntity) originalGrant).getRoleContent().getDatabases();
 		else
-			de = ((RolsGrupEntity)originalGrant).getRolOtorgat().getBaseDeDades();
+			de = ((RoleGroupEntity) originalGrant).getAssignedRole().getDatabases();
 			
-		for (AccountEntity acc: getAccountsForDispatcher(u, null, de))
-		{
-			if (acc != null)
-			{
-				RolAccountDetail rad;
-				if (originalGrant instanceof RolAccountEntity)
-					rad = new RolAccountDetail((RolAccountEntity) originalGrant, acc);
-				else
-					rad = new RolAccountDetail((RolsGrupEntity) originalGrant, acc);
-				if ( ! radSet.contains(rad))
-				{
-					radSet.add(rad);
-				}
-			}
-		}
+		for (AccountEntity acc : getAccountsForDispatcher(u, null, de)) {
+            if (acc != null) {
+                RolAccountDetail rad;
+                if (originalGrant instanceof RoleAccountEntity) rad = new RolAccountDetail((RoleAccountEntity) originalGrant, acc); else rad = new RolAccountDetail((RoleGroupEntity) originalGrant, acc);
+                if (!radSet.contains(rad)) {
+                    radSet.add(rad);
+                }
+            }
+        }
 	}
 
 	/* (non-Javadoc)
@@ -2334,27 +2019,24 @@ public class AplicacioServiceImpl extends
 	protected RolAccount handleEnableOrDisableOnDates (RolAccount rolAccount)
 					throws Exception
 	{
-		RolAccountEntity entity = getRolAccountEntityDao().load(rolAccount.getId());
+		RoleAccountEntity entity = getRoleAccountEntityDao().load(rolAccount.getId());
 		enableOrDisableOnDates(rolAccount, entity);
 		return rolAccount;
 		
 	}
 
-	private void enableOrDisableOnDates (RolAccount rolAccount, RolAccountEntity entity)
-					throws InternalErrorException
-	{
+	private void enableOrDisableOnDates(RolAccount rolAccount, RoleAccountEntity entity) throws InternalErrorException {
 		rolAccount.setEnabled(getEnableState(entity));
 
 		if (entity.isEnabled() != rolAccount.isEnabled())
 		{
     		entity.setEnabled(rolAccount.isEnabled());
-    		getRolAccountEntityDao().update(entity);
+    		getRoleAccountEntityDao().update(entity);
     		getAccountEntityDao().propagateChanges(entity.getAccount());
 		}
 	}
 
-	private boolean getEnableState (RolAccountEntity entity)
-	{
+	private boolean getEnableState(RoleAccountEntity entity) {
 		Date now = new Date ();
 		if (entity.getEndDate() != null && entity.getEndDate().before(now))
 		{
@@ -2377,19 +2059,17 @@ public class AplicacioServiceImpl extends
 	protected void handleEnableOrDisableAllOnDates () throws Exception
 	{
 		Date now = new Date();
-		for (RolAccountEntity toEnable: getRolAccountEntityDao().findRolAccountToEnable(now))
-		{
-			toEnable.setEnabled(true);
-    		getRolAccountEntityDao().update(toEnable);
-    		getAccountEntityDao().propagateChanges(toEnable.getAccount());
-		}
+		for (RoleAccountEntity toEnable : getRoleAccountEntityDao().findRolAccountToEnable(now)) {
+            toEnable.setEnabled(true);
+            getRoleAccountEntityDao().update(toEnable);
+            getAccountEntityDao().propagateChanges(toEnable.getAccount());
+        }
 
-		for (RolAccountEntity toDisable: getRolAccountEntityDao().findRolAccountToDisable(now))
-		{
-			toDisable.setEnabled(false);
-    		getRolAccountEntityDao().update(toDisable);
-    		getAccountEntityDao().propagateChanges(toDisable.getAccount());
-		}
+		for (RoleAccountEntity toDisable : getRoleAccountEntityDao().findRolAccountToDisable(now)) {
+            toDisable.setEnabled(false);
+            getRoleAccountEntityDao().update(toDisable);
+            getAccountEntityDao().propagateChanges(toDisable.getAccount());
+        }
 
 	}
 
@@ -2401,43 +2081,36 @@ public class AplicacioServiceImpl extends
 					throws Exception
 	{
 		// Check that the group is not assigned as primary or secondary group
-		UsuariEntity user = getUsuariEntityDao().load(userId);
-		if (user.getGrupPrimari().getId().equals(groupId))
+		UserEntity user = getUserEntityDao().load(userId);
+		if (user.getPrimaryGroup().getId().equals(groupId))
 			return;
 		
-		for (UsuariGrupEntity uge: user.getGrupsSecundaris())
-		{
-			if (uge.getGrup().getId().equals(groupId))
-				return;
-		}
+		for (UserGroupEntity uge : user.getSecondaryGroups()) {
+            if (uge.getGroup().getId().equals(groupId)) return;
+        }
 		
-		GrupEntity ge = getGrupEntityDao().load(groupId);
-		for (UserAccountEntity uae: user.getAccounts())
-		{
-			AccountEntity acc = uae.getAccount();
-			
-			for (RolAccountEntity rae: new LinkedList<RolAccountEntity>(acc.getRoles()))
-			{
-				if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals (groupId))
-				{
-					deleteRolAccountEntity(rae, user);
-				}
-			}
-		}
+		GroupEntity ge = getGroupEntityDao().load(groupId);
+		for (UserAccountEntity uae : user.getAccounts()) {
+            AccountEntity acc = uae.getAccount();
+            for (RoleAccountEntity rae : new LinkedList<RoleAccountEntity>(acc.getRoles())) {
+                if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals(groupId)) {
+                    deleteRolAccountEntity(rae, user);
+                }
+            }
+        }
 	}
 
 	@Override
 	protected Rol handleFindRoleByNameAndSystem(String name, String system)
 			throws Exception {
-        RolEntity rolEntity = getRolEntityDao()
-                .findByNameAndDispatcher(name, system);
+        RoleEntity rolEntity = getRoleEntityDao().findByNameAndSystem(name, system);
         if (rolEntity == null)
         	return null;
         // Cap dels tres paràmetres pot ésser null
         // Mirem l'autorització de l'aplicació (fer query als rols de la app
         // no requereixen tindre una autorització específica)
-        if (AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getAplicacio().getCodi())) {
-            return getRolEntityDao().toRol(rolEntity);
+        if (AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getApplication().getCode())) {
+            return getRoleEntityDao().toRol(rolEntity);
         } else {
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					getPrincipal().getName(), name));
@@ -2449,22 +2122,21 @@ public class AplicacioServiceImpl extends
 
 class RolAccountDetail
 {
-	RolEntity granted;
-	GrupEntity qualifierGroup;
-	AplicacioEntity qualifierAplicacio;
-	ValorDominiAplicacioEntity qualifier;
-	RolEntity granteeRol;
-	GrupEntity granteeGrup;
-	RolAccountEntity rolAccount;
-	RolsGrupEntity rolGrup;
-	RolAssociacioRolEntity rolRol;
+	RoleEntity granted;
+	GroupEntity qualifierGroup;
+	InformationSystemEntity qualifierAplicacio;
+	DomainValueEntity qualifier;
+	RoleEntity granteeRol;
+	GroupEntity granteeGrup;
+	RoleAccountEntity rolAccount;
+	RoleGroupEntity rolGrup;
+	RoleDependencyEntity rolRol;
 	AccountEntity account;
 	
 	String hash;
-	public RolAccountDetail(RolsGrupEntity rg, AccountEntity account)
-	{
+	public RolAccountDetail(RoleGroupEntity rg, AccountEntity account) {
 		this.account = account; 
-		granted = rg.getRolOtorgat();
+		granted = rg.getAssignedRole();
 		qualifier = rg.getGrantedDomainValue();
 		qualifierAplicacio = rg.getGrantedApplicationDomain();
 		qualifierGroup = rg.getGrantedGroupDomain();
@@ -2472,13 +2144,12 @@ class RolAccountDetail
 		generateHash();
 	}
 	
-	public RolAccountDetail(RolAssociacioRolEntity ra, AccountEntity account, RolAccountDetail previous)
-	{
+	public RolAccountDetail(RoleDependencyEntity ra, AccountEntity account, RolAccountDetail previous) {
 		this.account = account; 
-		granted = ra.getRolContingut();
-		qualifier = ra.getGrantedDomainValue();
-		qualifierAplicacio = ra.getGrantedApplicationDomain();
-		qualifierGroup = ra.getGrantedGroupDomain();
+		granted = ra.getRoleContent();
+		qualifier = ra.getDomainApplicationValue();
+		qualifierAplicacio = ra.getDomainApplication();
+		qualifierGroup = ra.getDomainGroup();
 		if (qualifier == null && previous != null)
 			qualifier = previous.qualifier;
 		if (qualifierAplicacio == null && previous != null)
@@ -2491,13 +2162,12 @@ class RolAccountDetail
 		generateHash();
 	}
 	
-	public RolAccountDetail(RolAccountEntity ra, AccountEntity account)
-	{
+	public RolAccountDetail(RoleAccountEntity ra, AccountEntity account) {
 		this.account = account; 
-		granted = ra.getRol();
-		qualifier = ra.getValorDominiAplicacio();
-		qualifierAplicacio = ra.getAplicacioAdministrada();
-		qualifierGroup = ra.getGrup();
+		granted = ra.getRole();
+		qualifier = ra.getDomainApplicationValue();
+		qualifierAplicacio = ra.getManagedApplication();
+		qualifierGroup = ra.getGroup();
 		rolAccount = ra;
 		generateHash();
 	}
@@ -2510,15 +2180,15 @@ class RolAccountDetail
 		else
 			b.append(account.getId());
 		b.append(":"); //$NON-NLS-1$
-		b.append(granted.getNom());
+		b.append(granted.getName());
 		b.append("@"); //$NON-NLS-1$
-		b.append(granted.getBaseDeDades().getCodi());
+		b.append(granted.getDatabases().getCode());
 		if ( qualifierGroup != null)
-			b.append("/").append(qualifierGroup.getCodi()); //$NON-NLS-1$
+			b.append("/").append(qualifierGroup.getCode()); //$NON-NLS-1$
 		if ( qualifierAplicacio != null)
-			b.append("/").append(qualifierAplicacio.getCodi()); //$NON-NLS-1$
+			b.append("/").append(qualifierAplicacio.getCode()); //$NON-NLS-1$
 		if ( qualifier != null)
-			b.append("/").append(qualifier.getValor()); //$NON-NLS-1$
+			b.append("/").append(qualifier.getValue()); //$NON-NLS-1$
 		hash = b.toString();
 	}
 	

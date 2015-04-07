@@ -1,15 +1,15 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package es.caib.seycon.ng.servei;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
@@ -27,11 +27,13 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.DominiContrasenyaEntity;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.utils.Security;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * @author bubu
@@ -256,12 +258,11 @@ public class SelfServiceImpl extends SelfServiceBase
 			AccountEntity ae = getAccountEntityDao().accountToEntity(account);
 			if (account instanceof UserAccount)
 			{
-				for (UserAccountEntity uae: ae.getUsers())
-				{
-					UsuariEntity user= uae.getUser();
-					DominiContrasenyaEntity domain = ae.getDispatcher().getDomini();
-					return ips.getPasswordsStatus(user, domain);
-				}
+				for (UserAccountEntity uae : ae.getUsers()) {
+                    UserEntity user = uae.getUser();
+                    PasswordDomainEntity domain = ae.getSystem().getDomain();
+                    return ips.getPasswordsStatus(user, domain);
+                }
 				return null;
 			}
 			else
@@ -282,26 +283,22 @@ public class SelfServiceImpl extends SelfServiceBase
 	protected String handleQueryOtherAffectedAccounts (Account account) throws Exception
 	{
 		AccountEntity acce = getAccountEntityDao().accountToEntity(account);
-		DominiContrasenyaEntity domini = acce.getDispatcher().getDomini();
+		PasswordDomainEntity domini = acce.getSystem().getDomain();
 		Collection<Account> others = new LinkedList<Account>();
 		Collection<Account> othersDef = new LinkedList<Account>();
 		String o = new String();
 		others = getUserAccounts();
-		for(Account other: others)
-		{
-			if(other.getType().equals(AccountType.USER))
-	    	{
-				AccountEntity acceOther = getAccountEntityDao().accountToEntity(other);
-				DominiContrasenyaEntity dominiOther = acceOther.getDispatcher().getDomini();
-				if(domini.equals(dominiOther))
-				{
-    	    		if(!account.getDispatcher().equals(other.getDispatcher()))
-    	   			{
-    	   				othersDef.add(other);
-    	   			}
-				}
-	   		}
-		}
+		for (Account other : others) {
+            if (other.getType().equals(AccountType.USER)) {
+                AccountEntity acceOther = getAccountEntityDao().accountToEntity(other);
+                PasswordDomainEntity dominiOther = acceOther.getSystem().getDomain();
+                if (domini.equals(dominiOther)) {
+                    if (!account.getDispatcher().equals(other.getDispatcher())) {
+                        othersDef.add(other);
+                    }
+                }
+            }
+        }
 		for(Account oa: othersDef)
 		{
 			o = o + oa.getName() + " (" + oa.getDispatcher() + ")" + ", "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

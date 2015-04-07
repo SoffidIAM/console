@@ -2,8 +2,32 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.TaskLogEntity;
+import es.caib.seycon.ng.comu.AgentStatusInfo;
+import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
+import es.caib.seycon.ng.comu.SeyconServerInfo;
+import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.remote.RemoteInvokerFactory;
+import es.caib.seycon.ng.remote.RemoteServiceLocator;
+import es.caib.seycon.ng.remote.URLManager;
+import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.sync.servei.SyncStatusService;
+import es.caib.seycon.ng.ui.SeyconTask;
+import es.caib.seycon.ssl.ConnectionFactory;
+import es.caib.seycon.util.Base64;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,30 +39,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.comu.AgentStatusInfo;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
-import es.caib.seycon.ng.comu.SeyconServerInfo;
-import es.caib.seycon.ng.config.Config;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.ServerEntity;
-import es.caib.seycon.ng.model.TaskLogEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.remote.RemoteInvokerFactory;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.remote.URLManager;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
-import es.caib.seycon.ng.sync.servei.SyncStatusService;
-import es.caib.seycon.ng.ui.SeyconTask;
-import es.caib.seycon.ssl.ConnectionFactory;
-import es.caib.seycon.util.Base64;
 
 /**
  * @see es.caib.seycon.ng.servei.SeyconServerService
@@ -64,13 +66,8 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                 // Afegim un SeyconServerInfo amb error
                 for (int i = 0; i < serv.length; i++) {
                     URLManager m = new URLManager(serv[i]);
-
-                    Long numTasquesPendents = 0l;
-
-                    // Cerquem les tasques pendents d'aquest server
-                    // (ha donat error, per tindre més info)
-                    Collection tPendents = getTasqueEntityDao().findDadesTasquesPendentsServer(
-                            m.getServerURL().getHost());
+                    Long numTasquesPendents = 0L;
+                    Collection tPendents = getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost());
                     if (tPendents != null) {
                         Iterator it = tPendents.iterator();
                         if (it.hasNext()) {
@@ -80,20 +77,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                             }
                         }
                     }
-                    // JUST IN CASE OF ACCIDENT
-                    // url, versio, estat, numAgents,
-                    // numTasquesPendents, sso, jetty, ssoDaemon, taskGenerator,
-                    // caducitatRootCertificate,
-                    // caducitatMainCertificate, dataActualServer,
-                    // databaseConnections
-                    // SeyconServerInfo(url, descripcio, versio, estat,
-                    // numAgents, numTasquesPendents, sso, jetty, ssoDaemon,
-                    // taskGenerator, caducitatRootCertificate,
-                    // caducitatMainCertificate, dataActualServer,
-                    // databaseConnections)
-                    serversInfo.add(new SeyconServerInfo(m.getServerURL().toString(), "", "-", //$NON-NLS-1$ //$NON-NLS-2$
-                            "ERROR", "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-                            null, null, null, null, "ERROR")); //$NON-NLS-1$
+                    serversInfo.add(new SeyconServerInfo(m.getServerURL().toString(), "", "-", "ERROR", "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR"));
                 }
             }
             return serversInfo;
@@ -102,13 +86,8 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
         for (int i = 0; i < serv.length; i++) {
             RemoteServiceLocator rsl = createRemoteServiceLocator(serv[i]);
             URLManager m = new URLManager(serv[i]);
-            // Obtenim les tasques pendents de la bbdd
-            // és més correcte que el que ens informa el server (!!)
             Long numTasquesPendents = 0L;
-
-            // Cerquem les tasques pendents d'aquest server
-            Collection tPendents = getTasqueEntityDao().findDadesTasquesPendentsServer(
-                    m.getServerURL().getHost());
+            Collection tPendents = getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost());
             if (tPendents != null) {
                 Iterator it = tPendents.iterator();
                 if (it.hasNext()) {
@@ -118,26 +97,13 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                     }
                 }
             }
-
             try {
                 SyncStatusService status = rsl.getSyncStatusService();
-
-                // Obtenim informació del servidor
                 SeyconServerInfo info = status.getSeyconServerStatus();
-                info.setNumTasquesPendents("" + numTasquesPendents); //$NON-NLS-1$
+                info.setNumTasquesPendents("" + numTasquesPendents);
                 serversInfo.add(info);
-
             } catch (Throwable e) {
-                // Ha ocorregut un error (!!)
-
-                // url, versio, estat, numAgents,
-                // numTasquesPendents, sso, jetty, ssoDaemon, taskGenerator,
-                // caducitatRootCertificate,
-                // caducitatMainCertificate, dataActualServer,
-                // databaseConnections
-                serversInfo.add(new SeyconServerInfo(m.getServerURL().toString(), "", "-", "ERROR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                        null, null, "ERROR")); //$NON-NLS-1$
+                serversInfo.add(new SeyconServerInfo(m.getServerURL().toString(), "", "-", "ERROR", "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR"));
             }
         }
 
@@ -148,7 +114,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
     private RemoteServiceLocator createRemoteServiceLocator(String string) throws IOException, InternalErrorException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(string);
         URLManager um = new URLManager(string);
-        ServerEntity server = getServerEntityDao().findByNom(um.getServerURL().getHost());
+        ServerEntity server = getServerEntityDao().findByName(um.getServerURL().getHost());
         if (server != null)
             rsl.setAuthToken(server.getAuth());
         return rsl;
@@ -204,26 +170,22 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
             if (host != null) {
 
                 // Obtenim el llistat d'agents (capçalera)
-                Collection agentsActius = getDispatcherEntityDao().findActius();
+                Collection agentsActius = getSystemEntityDao().findActives();
                 HashMap<String, Integer> agentsPos = new HashMap(agentsActius.size());
 
                 if (agentsActius != null) {
 
                     Integer index = 0;
-                    for (Iterator it = agentsActius.iterator(); it.hasNext();) {
-                        DispatcherEntity ag = (DispatcherEntity) it.next();
-                        agentsPos.put(ag.getCodi(), index++);
-                        nomAgentsActius.add(ag.getCodi());// per guardar l'ordre
+                    for (Iterator it = agentsActius.iterator(); it.hasNext(); ) {
+                        SystemEntity ag = (SystemEntity) it.next();
+                        agentsPos.put(ag.getCode(), index++);
+                        nomAgentsActius.add(ag.getCode());
                     }
                 }
 
                 // Obtenim les tasques pendents D'AQUEST SERVER
                 // Ordenades per data i id
-                Collection tasques = getTasqueEntityDao()
-                        .query(
-                                "select tasqueEntity from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity " //$NON-NLS-1$
-                                        + "where tasqueEntity.server = :server order by tasqueEntity.data, tasqueEntity.id", //$NON-NLS-1$
-                                new Parameter[]{new Parameter("server", host)}); //$NON-NLS-1$
+                Collection tasques = getTaskEntityDao().query("select tasqueEntity from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity where tasqueEntity.server = :server order by tasqueEntity.data, tasqueEntity.id", new Parameter[]{new Parameter("server", host)}); //$NON-NLS-1$
 
                 if (tasques != null) {
                     // Si n'hi ha cap tasca pendent obtenim tots els TASKLOGs
@@ -232,62 +194,36 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                     Collection allTaskLog = getTaskLogEntityDao().findAllHavingTasqueByServer(host);
                     HashMap<Long, String[]> estatAllTasks = new HashMap<Long, String[]>();
 
-                    for (Iterator tit = allTaskLog.iterator(); tit.hasNext();) {
+                    for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
                         TaskLogEntity tl = (TaskLogEntity) tit.next();
-                        String[] estatsTL = estatAllTasks.get(tl.getTasca().getId());
+                        String[] estatsTL = estatAllTasks.get(tl.getTask().getId());
                         if (estatsTL == null) {
-                            // Creem un de nou
                             estatsTL = new String[nomAgentsActius.size()];
-                            // No l'inicialitzem (!!) es farà a nivell de tasca
                         }
-                        Integer estatAgentTascaActual = agentsPos.get(tl.getDispatcher().getCodi());
-                        // Posem l'estat del tasklog actual
-                        // NOTA: pot ser que l'agent no estiga actiu (tornarà
-                        // null)
+                        Integer estatAgentTascaActual = agentsPos.get(tl.getSystem().getCode());
                         if (estatAgentTascaActual != null) {
-                            estatsTL[estatAgentTascaActual] = "S".equals(tl.getComplet()) ? SeyconTask.Estat.DONE //$NON-NLS-1$
-                                    : "N".equals(tl.getComplet()) ? SeyconTask.Estat.ERROR //$NON-NLS-1$
-                                            : SeyconTask.Estat.PENDING;
-                            // guardem l'estat a estatAllTask
-                            estatAllTasks.put(tl.getTasca().getId(), estatsTL);
+                            estatsTL[estatAgentTascaActual] = "S".equals(tl.getCompleted()) ? SeyconTask.Estat.DONE : "N".equals(tl.getCompleted()) ? SeyconTask.Estat.ERROR : SeyconTask.Estat.PENDING;
+                            estatAllTasks.put(tl.getTask().getId(), estatsTL);
                         }
                     }
 
                     // Ara tenim carregats els estats dels agents (per a totes
                     // les tasques), obtenim les tasques
 
-                    for (Iterator it = tasques.iterator(); it.hasNext();) {
-                        TasqueEntity t = (TasqueEntity) it.next();
-                        // la tenim ja
+                    for (Iterator it = tasques.iterator(); it.hasNext(); ) {
+                        TaskEntity t = (TaskEntity) it.next();
                         String[] estats = estatAllTasks.get(t.getId());
-
-                        // Si és null (tot és posible..) creem els estats
-                        if (estats == null)
-                            estats = new String[nomAgentsActius.size()];
-
-                        // Si la tasca no té agent atorgat, posem tots encara no
-                        // inicialitzats com a PENDING
-                        if (t.getCoddis() == null) {// Tasques per a tothom:
-                                                    // estat inicial = PENDING
-                            for (int i = 0; i < estats.length; i++)
-                                if (estats[i] == null)
-                                    estats[i] = SeyconTask.Estat.PENDING;
-
+                        if (estats == null) estats = new String[nomAgentsActius.size()];
+                        if (t.getSystemCode() == null) {
+                            for (int i = 0; i < estats.length; i++) if (estats[i] == null) estats[i] = SeyconTask.Estat.PENDING;
                         } else {
-                            // Si en té agent atorgat, posem a la resta com a
-                            // DONE (si son buits)
-                            int estatAgentTascaActual = agentsPos.get(t.getCoddis());
+                            int estatAgentTascaActual = agentsPos.get(t.getSystemCode());
                             for (int i = 0; i < estats.length; i++) {
-                                if (estats[i] == null) {// només si és buit
-                                    if (i != estatAgentTascaActual)
-                                        estats[i] = SeyconTask.Estat.DONE;
-                                    else
-                                        estats[i] = SeyconTask.Estat.PENDING;
+                                if (estats[i] == null) {
+                                    if (i != estatAgentTascaActual) estats[i] = SeyconTask.Estat.DONE; else estats[i] = SeyconTask.Estat.PENDING;
                                 }
                             }
-                        }// else
-
-                        // Afegim la tasca
+                        }
                         SeyconTask st = new SeyconTask(t.getId(), tascaToString(t), estats);
                         tasquesPendents.add(st);
                     }
@@ -321,15 +257,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
         // Obtenim les tasques pendents (ordentades per id desc) D'AQUEST SERVER
         // Tipus TasqueEntity: ordenats per prioritat, data e id
         // Emprem un mètode existent canviant la select...
-        Collection<TasqueEntity> tasques = getTasqueEntityDao()
-                .query(
-                        "select tasqueEntity from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity " //$NON-NLS-1$
-                                + "where tasqueEntity.server = :server and (tasqueEntity.coddis is null or tasqueEntity.coddis=:tasca) " //$NON-NLS-1$
-                                + "order by tasqueEntity.prioritat,tasqueEntity.data,tasqueEntity.id", //$NON-NLS-1$
-                 new Parameter[] {
-                      new Parameter ("server", host), //$NON-NLS-1$
-                      new Parameter ("tasca", agentCodi)  //$NON-NLS-1$
-                                });
+        Collection<TaskEntity> tasques = getTaskEntityDao().query("select tasqueEntity from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity where tasqueEntity.server = :server and (tasqueEntity.coddis is null or tasqueEntity.coddis=:tasca) order by tasqueEntity.prioritat,tasqueEntity.data,tasqueEntity.id", new Parameter[]{new Parameter("server", host), new Parameter("tasca", agentCodi)});
 
         // Construim el resultat
         LinkedList<SeyconAgentTaskLog> tasquesAgent = new LinkedList();
@@ -357,59 +285,37 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                                     });
             HashMap<Long, TaskLogEntity> allTaskLogs = new HashMap<Long, TaskLogEntity>();
 
-            for (Iterator tit = allTaskLog.iterator(); tit.hasNext();) {
+            for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
                 TaskLogEntity tl = (TaskLogEntity) tit.next();
-                // guardem l'estat a estatAllTask per id
-                allTaskLogs.put(tl.getTasca().getId(), tl);
+                allTaskLogs.put(tl.getTask().getId(), tl);
             }
 
             // Ara tenim carregats els estat de l'agent (per a totes
             // les tasques), obtenim les tasques
 
-            for (Iterator it = tasques.iterator(); it.hasNext();) {
-                TasqueEntity t = (TasqueEntity) it.next();
+            for (Iterator it = tasques.iterator(); it.hasNext(); ) {
+                TaskEntity t = (TaskEntity) it.next();
                 TaskLogEntity tl = allTaskLogs.get(t.getId());
-
-                // Les que ja són completades no les mostrem
-                if (tl != null && "S".equals(tl.getComplet())) //$NON-NLS-1$
-                    continue;
-
-                // Ara tenim les que ténen error o estàn pendents
-                if (tl == null) {// No té tasklog: pendent
-                    // new SeyconAgentTaskLog(idTasca, descripcioTasca,
-                    // codiAgent, complet, missatge, dataCreacio,
-                    // darreraExecucio, dataDarreraExecucio, proximaExecucio,
-                    // dataProximaExecucio, numExecucions, prioritat,
-                    // stackTrace)
-                    tasquesAgent.add(new SeyconAgentTaskLog(t.getId(), tascaToString(t), agentCodi,
-                            "PENDING", "", null, null, null, null, null, null, t.getPrioritat(), //$NON-NLS-1$ //$NON-NLS-2$
-                            null));
-                } else {// amb error (les completes ja les hem trobades)
+                if (tl != null && "S".equals(tl.getCompleted())) continue;
+                if (tl == null) {
+                    tasquesAgent.add(new SeyconAgentTaskLog(t.getId(), tascaToString(t), agentCodi, "PENDING", "", null, null, null, null, null, null, t.getPriority(), null));
+                } else {
                     Calendar dataDarreraExecucio = null;
-                    if (tl.getDarreraExecucio() != null) {
+                    if (tl.getLastExecution() != null) {
                         dataDarreraExecucio = Calendar.getInstance();
-                        dataDarreraExecucio.setTimeInMillis(tl.getDarreraExecucio());
+                        dataDarreraExecucio.setTimeInMillis(tl.getLastExecution());
                     }
                     Calendar dataProximaExecucio = null;
-                    if (tl.getProximaExecucio() != null) {
+                    if (tl.getNextExecution() != null) {
                         dataProximaExecucio = Calendar.getInstance();
-                        dataProximaExecucio.setTimeInMillis(tl.getProximaExecucio());
+                        dataProximaExecucio.setTimeInMillis(tl.getNextExecution());
                     }
-                    // new SeyconAgentTaskLog(idTasca, descripcioTasca,
-                    // codiAgent, complet, missatge, dataCreacio,
-                    // darreraExecucio, dataDarreraExecucio, proximaExecucio,
-                    // dataProximaExecucio, numExecucions, prioritat,
-                    // stackTrace)
                     Calendar dataCreacio = null;
-                    if (tl.getDataCreacio() != null) {
+                    if (tl.getCreationDate() != null) {
                         dataCreacio = Calendar.getInstance();
-                        dataCreacio.setTime(tl.getDataCreacio());
+                        dataCreacio.setTime(tl.getCreationDate());
                     }
-                    tasquesAgent.add(new SeyconAgentTaskLog(t.getId(), tascaToString(t), agentCodi,
-                            tl.getComplet(), tl.getMissatge(), dataCreacio,
-                            tl.getDarreraExecucio(), dataDarreraExecucio, tl.getProximaExecucio(),
-                            dataProximaExecucio, tl.getNumExecucions(), t.getPrioritat(), tl
-                                    .getStackTrace()));
+                    tasquesAgent.add(new SeyconAgentTaskLog(t.getId(), tascaToString(t), agentCodi, tl.getCompleted(), tl.getMessage(), dataCreacio, tl.getLastExecution(), dataDarreraExecucio, tl.getNextExecution(), dataProximaExecucio, tl.getExecutionsNumber(), t.getPriority(), tl.getStackTrace()));
                 }
             }
 
@@ -431,7 +337,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
             c.setDoInput(true);
             c.setDoOutput(false);
             c.setAllowUserInteraction(false);
-            ServerEntity server = getServerEntityDao().findByNom(url.getHost());
+            ServerEntity server = getServerEntityDao().findByName(url.getHost());
             if (server == null || server.getAuth() == null)
                 throw new InternalErrorException(
                         Messages.getString("SeyconServerServiceImpl.AuthenticationNoObtained") //$NON-NLS-1$
@@ -477,9 +383,9 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
         return parametre.getValor();
     }
 
-    private String tascaToString(TasqueEntity tasca) {
-        String result = tasca.getTransa();
-        String transactionCode = tasca.getTransa();
+    private String tascaToString(TaskEntity tasca) {
+        String result = tasca.getTransaction();
+        String transactionCode = tasca.getTransaction();
 
         if (transactionCode.equals(TaskHandler.UPDATE_USER) || transactionCode.equals(TaskHandler.UPDATE_USER_PASSWORD)
                 || transactionCode.equals(TaskHandler.PROPAGATE_PASSWORD)
@@ -491,31 +397,31 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                 || transactionCode.equals(TaskHandler.EXPIRE_USER_PASSWORD)
                 || transactionCode.equals(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD) 
                 || transactionCode.equals(TaskHandler.RECONCILE_USER))
-            result = result + " " + tasca.getUsuari(); //$NON-NLS-1$
+            result = result + " " + tasca.getUser(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_ACCOUNT) ||
         	transactionCode.equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD)) //$NON-NLS-1$
-            result = result + "@" + tasca.getCoddis(); //$NON-NLS-1$
+            result = result + "@" + tasca.getSystemCode(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_HOST)) //$NON-NLS-1$
-            result = result + " " + tasca.getMaquin(); //$NON-NLS-1$
+            result = result + " " + tasca.getHost(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_GROUP)) //$NON-NLS-1$
-            result = result + " " + tasca.getGrup(); //$NON-NLS-1$
+            result = result + " " + tasca.getGroup(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_ROLE)  
         		|| transactionCode.equals(TaskHandler.RECONCILE_ROLE)) //$NON-NLS-1$
             result = result + " " + tasca.getRole(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.CREATE_FOLDER)) //$NON-NLS-1$
-            result = result + " " + tasca.getCarpet(); //$NON-NLS-1$
+            result = result + " " + tasca.getFolder(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_OBJECT )
         				|| transactionCode.equals(TaskHandler.DELETE_OBJECT)) //$NON-NLS-1$
             result = result + " " + tasca.getEntity()+"#"+tasca.getPrimaryKeyValue(); //$NON-NLS-1$ //$NON-NLS-2$
 
         if (transactionCode.equals(TaskHandler.UPDATE_LIST_ALIAS)) //$NON-NLS-1$
-            result = result + " " + tasca.getAlies() + "@" + tasca.getDomcor(); //$NON-NLS-1$ //$NON-NLS-2$
+            result = result + " " + tasca.getAlias() + "@" + tasca.getMailDomain(); //$NON-NLS-1$ //$NON-NLS-2$
 
         return result;
 
@@ -538,12 +444,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
             // posem url ficticia TASQUES_SENSE_PLANIFICAR
 
             // Obtenim el número de tasques
-            Collection<TasqueEntity> tasquesPlanning = getTasqueEntityDao()
-                    .query(
-                            "select count(*),min(tasqueEntity.data) " //$NON-NLS-1$
-                            + "from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity " //$NON-NLS-1$
-                            + "where tasqueEntity.server is null",  //$NON-NLS-1$
-                            new Parameter[0]);
+            Collection<TaskEntity> tasquesPlanning = getTaskEntityDao().query("select count(*),min(tasqueEntity.data) from es.caib.seycon.ng.model.TasqueEntity as tasqueEntity where tasqueEntity.server is null", new Parameter[0]);
 
             if (tasquesPlanning != null) {
                 Iterator it = tasquesPlanning.iterator();

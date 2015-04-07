@@ -3,15 +3,17 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-
-import org.apache.webdav.lib.properties.GetContentLengthProperty;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Password;
@@ -21,17 +23,12 @@ import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InvalidPasswordException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.AuditoriaEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.DominiContrasenyaEntity;
-import es.caib.seycon.ng.model.DominiUsuariEntityDao;
-import es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntityDao;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.utils.Security;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import org.apache.webdav.lib.properties.GetContentLengthProperty;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * @see es.caib.seycon.ng.servei.PasswordService
@@ -47,7 +44,7 @@ public class PasswordServiceImpl
     protected PolicyCheckResult handleCheckPolicy(java.lang.String user, java.lang.String passwordDomain, es.caib.seycon.ng.comu.Password password)
         throws java.lang.Exception
     {
-       	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(user, passwordDomain);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, passwordDomain);
        	if (acc == null)
        		return null;
        	else
@@ -61,7 +58,7 @@ public class PasswordServiceImpl
             es.caib.seycon.ng.comu.Password password, boolean checkTrusted, boolean checkExpired)
         throws java.lang.Exception
     {
-       	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(user, passwordDomain);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, passwordDomain);
 
        	return getInternalPasswordService().checkAccountPassword(acc, password, checkTrusted, checkExpired) != PasswordValidation.PASSWORD_WRONG;
     }
@@ -72,7 +69,7 @@ public class PasswordServiceImpl
     protected boolean handleCheckPin(java.lang.String user, java.lang.String pin)
         throws java.lang.Exception
     {
-        UsuariEntity ue = getUsuariEntityDao().findByCodi(user);
+        UserEntity ue = getUserEntityDao().findByCode(user);
         if (ue == null)
             throw new InternalErrorException(String.format(Messages.getString("PasswordServiceImpl.5"), user)); //$NON-NLS-1$
         return getInternalPasswordService().checkPin(ue, pin);
@@ -91,16 +88,15 @@ public class PasswordServiceImpl
 		auditoria.setObjecte("SC_USUARI"); //$NON-NLS-1$
 		auditoria.setPasswordDomain(codiDominiContrasenyes);
 
-		AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao()
-				.auditoriaToEntity(auditoria);
-		getAuditoriaEntityDao().create(auditoriaEntity);
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		getAuditEntityDao().create(auditoriaEntity);
 	}
 
 
 	@Override
     protected void handleChangePassword(String user, String passwordDomain,
             Password oldPassword, Password newPassword) throws Exception {
-       	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(user, passwordDomain);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, passwordDomain);
  
        	InternalPasswordService ips = getInternalPasswordService();
         
@@ -119,7 +115,7 @@ public class PasswordServiceImpl
     @Override
     protected boolean handleCheckPasswordExpired(String account, String dispatcher)
             throws Exception {
-       	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(account, dispatcher);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account, dispatcher);
 
        	return getInternalPasswordService().isAccountPasswordExpired(acc);
     }
@@ -133,23 +129,20 @@ public class PasswordServiceImpl
 	@Override
 	protected String handleGetPolicyDescription (String account, String dispatcher) throws InternalErrorException
 	{
-       	AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(account, dispatcher);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account, dispatcher);
 
        	if (acc == null)
        		return ""; //$NON-NLS-1$
        	
-       	String type = acc.getPasswordPolicy().getCodi();
+       	String type = acc.getPasswordPolicy().getCode();
        	if (acc.getType().equals(AccountType.USER))
        	{
-       		for (UserAccountEntity ua: acc.getUsers())
-       		{
-       			type = ua.getUser().getTipusUsuari().getCodi();
-       		}
+       		for (UserAccountEntity ua : acc.getUsers()) {
+                type = ua.getUser().getUserType().getCode();
+            }
        	} 
        	
-       	PoliticaContrasenyaEntity politica = getPoliticaContrasenyaEntityDao().findByDominiContrasenyaTipusUsuari(
-       					acc.getDispatcher().getDomini().getCodi(), 
-       					type);
+       	PasswordPolicyEntity politica = getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(acc.getSystem().getDomain().getCode(), type);
        	if (politica != null)
        	{
        		return getInternalPasswordService().getPolicyDescription(politica);

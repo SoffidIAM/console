@@ -1,5 +1,17 @@
 package es.caib.seycon.ng.servei.workflow;
 
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.UserEntity;
+import es.caib.seycon.ng.PrincipalStore;
+import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.servei.GrupService;
+import es.caib.seycon.ng.servei.UsuariService;
+import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,23 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
-
-import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.GrupEntityDaoImpl;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.servei.GrupService;
 
 /**
  * @author u89559
@@ -194,7 +189,7 @@ public class AltaBaixaUsuariServiceImpl extends es.caib.seycon.ng.servei.workflo
 	}
 
 	protected Collection<Grup> handleGetManagedGroups(String user) throws Exception {
-		UsuariEntity usuari = getUsuariEntityDao().findByCodi(user);
+		UserEntity usuari = getUserEntityDao().findByCode(user);
 		
 		String auts[] = getAutoritzacioService().getUserAuthorizationString(Security.AUTO_USER_CREATE, user);
 		LinkedList<Grup> groups = new LinkedList<Grup>();
@@ -236,14 +231,14 @@ public class AltaBaixaUsuariServiceImpl extends es.caib.seycon.ng.servei.workflo
 		return usuariService.findByNomCurt(nomCurt);
 	}
 
-	private void addGroupAndDescendants(Collection<Grup> grups, GrupEntity grup) {
+	private void addGroupAndDescendants(Collection<Grup> grups, GroupEntity grup) {
 		if (grup != null) {
-			Grup grupVO = getGrupEntityDao().toGrup(grup);
+			Grup grupVO = getGroupEntityDao().toGrup(grup);
 			if (!grupsContainsGrup(grups, grupVO)) {
 				grups.add(grupVO);
-				Iterator it = grup.getFills().iterator();
+				Iterator it = grup.getChildrens().iterator();
 				while (it.hasNext()) {
-					addGroupAndDescendants(grups, (GrupEntity) it.next());
+					addGroupAndDescendants(grups, (GroupEntity) it.next());
 				}
 			}
 		}
@@ -265,8 +260,8 @@ public class AltaBaixaUsuariServiceImpl extends es.caib.seycon.ng.servei.workflo
 	}
 
 	protected Collection<Usuari> handleGetUsuarisByNIFSenseRestriccions(String nif) throws Exception {
-		Collection<UsuariEntity> usuaris = getUsuariEntityDao().findUsuarisByNIF(nif);
-		return getUsuariEntityDao().toUsuariList(usuaris);
+		Collection<UserEntity> usuaris = getUserEntityDao().findUsersByNationalID(nif);
+		return getUserEntityDao().toUsuariList(usuaris);
 	}
 
 	protected Collection<Grup> handleFindGrupsByFiltreSenseRestriccions(String codi, String pare, String unitatOfimatica, String descripcio,
@@ -295,12 +290,12 @@ public class AltaBaixaUsuariServiceImpl extends es.caib.seycon.ng.servei.workflo
 		if (principal == null) {
 			return new Vector();
 		}
-		Collection<GrupEntity> grups = getGrupEntityDao().findByFiltre(codi, pare, unitatOfimatica, descripcio, tipus, obsolet);
+		Collection<GroupEntity> grups = getGroupEntityDao().findByCriteria(codi, pare, unitatOfimatica, descripcio, tipus, obsolet);
 		if (grups != null) {
 			if (grups.size() >= 201) { // PJR: poso >= en comptes de ==
 				throw new SeyconException(Messages.getString("AltaBaixaUsuariServiceImpl.BigSearchResults")); //$NON-NLS-1$
 			}
-			return getGrupEntityDao().toGrupList(grups);
+			return getGroupEntityDao().toGrupList(grups);
 		}
 		return new LinkedList<Grup>();
 	}

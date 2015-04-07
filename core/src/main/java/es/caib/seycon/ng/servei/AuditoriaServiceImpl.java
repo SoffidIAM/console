@@ -3,23 +3,26 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import es.caib.seycon.ng.comu.Auditoria;
+import es.caib.seycon.ng.comu.lang.MessageFactory;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.utils.DateUtils;
+import es.caib.seycon.ng.utils.LimitDates;
+import es.caib.seycon.ng.utils.Security;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.MissingResourceException;
 import java.util.Vector;
-
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.lang.MessageFactory;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AuditoriaEntity;
-import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.AuditoriaService
@@ -34,10 +37,9 @@ public class AuditoriaServiceImpl extends
 	}
 
 	protected Auditoria handleFindAuditoriaById(Long id) throws Exception {
-		AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().findById(id);
+		AuditEntity auditoriaEntity = getAuditEntityDao().findById(id);
 		if (auditoriaEntity != null) {
-			Auditoria auditoria = getAuditoriaEntityDao().toAuditoria(
-					auditoriaEntity);
+			Auditoria auditoria = getAuditEntityDao().toAuditoria(auditoriaEntity);
 			return auditoria;
 		}
 		return null;
@@ -45,7 +47,7 @@ public class AuditoriaServiceImpl extends
 
 	public String[] handleFind(String sqlQuery) {
 		if (sqlQuery != null) {
-			String[] sqlQueryResult = getAuditoriaEntityDao().find(sqlQuery);
+			String[] sqlQueryResult = getAuditEntityDao().find(sqlQuery);
 			return sqlQueryResult;
 		}
 		return new String[0];
@@ -61,8 +63,8 @@ public class AuditoriaServiceImpl extends
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
     }
 
 	// Reemplacem anterior
@@ -139,13 +141,9 @@ public class AuditoriaServiceImpl extends
 
 		Collection auditories = new Vector();
 		if (objecteAuditat == null ) { // Mètode antic
-			auditories = getAuditoriaEntityDao().findAuditoriesByCriteri3(DateUtils.nullDate, d_dataFi, d_dataIni, autor, objecte,
-					usuari, accio);
+			auditories = getAuditEntityDao().findAuditByCriteria3(DateUtils.nullDate, d_dataFi, d_dataIni, autor, objecte, usuari, accio);
 		} else {
-			auditories = getAuditoriaEntityDao()
-				.findAuditoriesByCriteri4(DateUtils.nullDate, d_dataFi,
-						d_dataIni, autor, objecte, usuari, 
-						objecteAuditat, valorOA, accio); //afegim objecteAuditat i el seu valor
+			auditories = getAuditEntityDao().findAuditByCriteria4(DateUtils.nullDate, d_dataFi, d_dataIni, autor, objecte, usuari, objecteAuditat, valorOA, accio); //afegim objecteAuditat i el seu valor
 		}
 		
 		auditaQuery(msg.toString());
@@ -154,11 +152,10 @@ public class AuditoriaServiceImpl extends
 			// Check maximum number of results
 			if (auditories.size() > limitResults)
 			{
-				return getAuditoriaEntityDao().toAuditoriaList(auditories)
-					.subList(0, limitResults);
+				return getAuditEntityDao().toAuditoriaList(auditories).subList(0, limitResults);
 			}
 			
-			return getAuditoriaEntityDao().toAuditoriaList(auditories);
+			return getAuditEntityDao().toAuditoriaList(auditories);
 		}
 		
 		return new Vector();
@@ -229,21 +226,15 @@ public class AuditoriaServiceImpl extends
 		auditaQuery(msg.toString());
 		if (objecteAuditat != null ) { 
 			if (limitDates != null) {
-				auditories = getAuditoriaEntityDao().findAuditoriesByCriteri4(csc,
-						DateUtils.nullDate, limitDates.getMaximum(),
-						limitDates.getMinimum(), autor, objecte, usuari, objecteAuditat, valorOA, accio);
+				auditories = getAuditEntityDao().findAuditByCriteria4(csc, DateUtils.nullDate, limitDates.getMaximum(), limitDates.getMinimum(), autor, objecte, usuari, objecteAuditat, valorOA, accio);
 			} else {
-				auditories = getAuditoriaEntityDao().findAuditoriesByCriteri2(csc, 
-						autor, objecte, usuari, objecteAuditat, valorOA, accio);
+				auditories = getAuditEntityDao().findAuditByCriteria2(csc, autor, objecte, usuari, objecteAuditat, valorOA, accio);
 			}			
 		} else { // Mètode antic		
 			if (limitDates != null) {
-				auditories = getAuditoriaEntityDao().findAuditoriesByCriteri3(csc, 
-						DateUtils.nullDate, limitDates.getMaximum(),
-						limitDates.getMinimum(), autor, objecte, usuari, accio);
+				auditories = getAuditEntityDao().findAuditByCriteria3(csc, DateUtils.nullDate, limitDates.getMaximum(), limitDates.getMinimum(), autor, objecte, usuari, accio);
 			} else {
-				auditories = getAuditoriaEntityDao().findAuditoriesByCriteri1(csc,
-						autor, objecte, usuari, accio);
+				auditories = getAuditEntityDao().findAuditByCriteria1(csc, autor, objecte, usuari, accio);
 			}
 		}
 		if (auditories != null)
@@ -251,11 +242,10 @@ public class AuditoriaServiceImpl extends
 			// Check maximum number of results
 			if (auditories.size() > limitResults)
 			{
-				return getAuditoriaEntityDao().toAuditoriaList(auditories)
-					.subList(0, limitResults);
+				return getAuditEntityDao().toAuditoriaList(auditories).subList(0, limitResults);
 			}
 			
-			return getAuditoriaEntityDao().toAuditoriaList(auditories);
+			return getAuditEntityDao().toAuditoriaList(auditories);
 		}
 		
 		return new Vector();
@@ -264,8 +254,8 @@ public class AuditoriaServiceImpl extends
 	@Override
 	protected Auditoria handleCreate(Auditoria auditoria) throws Exception {
 		
-		AuditoriaEntity entity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-		getAuditoriaEntityDao().create(entity);
-		return getAuditoriaEntityDao().toAuditoria(entity);
+		AuditEntity entity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		getAuditEntityDao().create(entity);
+		return getAuditEntityDao().toAuditoria(entity);
 	}
 }

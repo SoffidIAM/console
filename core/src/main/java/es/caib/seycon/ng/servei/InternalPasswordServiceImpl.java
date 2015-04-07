@@ -3,8 +3,41 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
+import com.soffid.iam.model.AccountPasswordEntity;
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.PolicyForbiddenWordEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserTypeEntity;
+import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.EstatContrasenya;
+import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PasswordValidation;
+import es.caib.seycon.ng.comu.PolicyCheckResult;
+import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.remote.RemoteServiceLocator;
+import es.caib.seycon.ng.sync.engine.ReplicaConnection;
+import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
+import es.caib.seycon.ng.sync.servei.LogonService;
+import es.caib.seycon.ng.sync.servei.TaskQueue;
+import es.caib.seycon.util.Base64;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
@@ -25,7 +58,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.collection.AbstractPersistentCollection;
 import org.hibernate.collection.PersistentSet;
@@ -38,37 +70,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.EstatContrasenya;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.PasswordValidation;
-import es.caib.seycon.ng.comu.PolicyCheckResult;
-import es.caib.seycon.ng.comu.Tasca;
-import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.AccountEntityDao;
-import es.caib.seycon.ng.model.AccountPasswordEntity;
-import es.caib.seycon.ng.model.ContrasenyaEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.DispatcherEntityDao;
-import es.caib.seycon.ng.model.DominiContrasenyaEntity;
-import es.caib.seycon.ng.model.DominiUsuariEntity;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntity;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.sync.engine.ReplicaConnection;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
-import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
-import es.caib.seycon.ng.sync.servei.LogonService;
-import es.caib.seycon.ng.sync.servei.TaskQueue;
-import es.caib.seycon.util.Base64;
 
 /**
  * @see es.caib.seycon.ng.servei.InternalPasswordService
@@ -85,16 +86,14 @@ public class InternalPasswordServiceImpl extends
      *      es.caib.seycon.ng.model.PoliticaContrasenyaDominiEntity,
      *      es.caib.seycon.ng.comu.Password)
      */
-    @SuppressWarnings("rawtypes")
-    protected PolicyCheckResult handleCheckPolicy(es.caib.seycon.ng.model.UsuariEntity user,
-            es.caib.seycon.ng.model.PoliticaContrasenyaEntity politica,
-            es.caib.seycon.ng.comu.Password password) throws InternalErrorException {
+    @SuppressWarnings(value = "rawtypes")
+    protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user, com.soffid.iam.model.PasswordPolicyEntity politica, es.caib.seycon.ng.comu.Password password) throws InternalErrorException {
         PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password);
         
         if (pcr != PolicyCheckResult.VALID)
         	return pcr;
 
-        if (user != null && isOldPassword(user, politica.getDominiContrasenya(), password))
+        if (user != null && isOldPassword(user, politica.getPasswordDomain(), password))
             return PolicyCheckResult.OLD_PASSWORD;
 
         return PolicyCheckResult.VALID;
@@ -106,26 +105,19 @@ public class InternalPasswordServiceImpl extends
      *      es.caib.seycon.ng.model.PoliticaContrasenyaDominiEntity,
      *      es.caib.seycon.ng.comu.Password)
      */
-    @SuppressWarnings("rawtypes")
-    protected PolicyCheckResult handleCheckPolicy(es.caib.seycon.ng.model.UsuariEntity user,
-            es.caib.seycon.ng.model.DominiContrasenyaEntity passwordDomain,
-            es.caib.seycon.ng.comu.Password password) throws InternalErrorException {
-    	PoliticaContrasenyaEntity politica = getUserPolicy(user, passwordDomain);
+    @SuppressWarnings(value = "rawtypes")
+    protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user, com.soffid.iam.model.PasswordDomainEntity passwordDomain, es.caib.seycon.ng.comu.Password password) throws InternalErrorException {
+    	PasswordPolicyEntity politica = getUserPolicy(user, passwordDomain);
     	
     	return handleCheckPolicy (user, politica, password);
     }
 
-	private PolicyCheckResult internalCheckBasicPolicy(
-			es.caib.seycon.ng.model.PoliticaContrasenyaEntity politica,
-			es.caib.seycon.ng.comu.Password password)
-	{
+	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica, es.caib.seycon.ng.comu.Password password) {
 		String uncrypted = password.getPassword();
-        if (politica.getMaxLongitud() != null
-                && uncrypted.length() > politica.getMaxLongitud().longValue()) {
+        if (politica.getMaxLength() != null && uncrypted.length() > politica.getMaxLength().longValue()) {
             return PolicyCheckResult.TOO_LONG;
         }
-        if (politica.getMinLongitud() != null
-                && uncrypted.length() < politica.getMinLongitud().longValue()) {
+        if (politica.getMinLength() != null && uncrypted.length() < politica.getMinLength().longValue()) {
             return PolicyCheckResult.TOO_SHORT;
         }
         int majs = 0;
@@ -144,43 +136,41 @@ public class InternalPasswordServiceImpl extends
                 others++;
         }
 
-        if (politica.getMinMinuscules() != null && mins < politica.getMinMinuscules().longValue()) {
+        if (politica.getMinLowerCase() != null && mins < politica.getMinLowerCase().longValue()) {
             return PolicyCheckResult.TOO_FEW_SMALLS;
         }
 
-        if (politica.getMaxMinuscules() != null && mins > politica.getMaxMinuscules().longValue()) {
+        if (politica.getMaxLowerCase() != null && mins > politica.getMaxLowerCase().longValue()) {
             return PolicyCheckResult.TOO_MANY_SMALLS;
         }
 
-        if (politica.getMinMajuscules() != null && majs < politica.getMinMajuscules().longValue()) {
+        if (politica.getMinUpperCase() != null && majs < politica.getMinUpperCase().longValue()) {
             return PolicyCheckResult.TOO_FEW_CAPS;
         }
 
-        if (politica.getMaxMajuscules() != null && majs > politica.getMaxMajuscules().longValue()) {
+        if (politica.getMaxUpperCase() != null && majs > politica.getMaxUpperCase().longValue()) {
             return PolicyCheckResult.TOO_MANY_CAPS;
         }
 
-        if (politica.getMinNumeros() != null && numb < politica.getMinNumeros().longValue()) {
+        if (politica.getMinNumbers() != null && numb < politica.getMinNumbers().longValue()) {
             return PolicyCheckResult.TOO_FEW_NUMBERS;
         }
 
-        if (politica.getMaxNumeros() != null && numb > politica.getMaxNumeros().longValue()) {
+        if (politica.getMaxNumbers() != null && numb > politica.getMaxNumbers().longValue()) {
             return PolicyCheckResult.TOO_MANY_NUMBERS;
         }
 
-        if (politica.getMinSignesPuntuacio() != null
-                && others < politica.getMinSignesPuntuacio().longValue()) {
+        if (politica.getMinSymbols() != null && others < politica.getMinSymbols().longValue()) {
             return PolicyCheckResult.TOO_FEW_SIGNS;
         }
 
-        if (politica.getMaxSignesPuntuacio() != null
-                && others > politica.getMaxSignesPuntuacio().longValue()) {
+        if (politica.getMaxSymbols() != null && others > politica.getMaxSymbols().longValue()) {
             return PolicyCheckResult.TOO_MANY_SIGNS;
         }
 
-        if (politica.getExpressioRegular() != null && politica.getExpressioRegular().length() > 0) {
+        if (politica.getRegularExpression() != null && politica.getRegularExpression().length() > 0) {
             try {
-                if (!Pattern.matches(politica.getExpressioRegular(), uncrypted)) {
+                if (!Pattern.matches(politica.getRegularExpression(), uncrypted)) {
                     return PolicyCheckResult.REGEXP_NOT_MATCH;
                 }
             } catch (PatternSyntaxException e) {
@@ -189,13 +179,11 @@ public class InternalPasswordServiceImpl extends
 
         }
 
-        if (politica.getParaulaProhibidaContrasenya() != null) {
-            for (Iterator it = politica.getParaulaProhibidaContrasenya().iterator(); it.hasNext();) {
-                ParaulaProhibidaPoliticaContrasenyaEntity ppce = (ParaulaProhibidaPoliticaContrasenyaEntity) it
-                        .next();
-                if (uncrypted.contains(ppce.getParaulaProhibida().getParaulaProhibida())) {
-                    return new PolicyCheckResult(PolicyCheckResult.FORBIDDEN_WORD.getReasonCode(),
-                            ppce.getParaulaProhibida().getParaulaProhibida());
+        if (politica.getForbiddenWords() != null) {
+            for (Iterator it = politica.getForbiddenWords().iterator(); it.hasNext(); ) {
+                PolicyForbiddenWordEntity ppce = (PolicyForbiddenWordEntity) it.next();
+                if (uncrypted.contains(ppce.getForbiddenWord().getForbiddenWord())) {
+                    return new PolicyCheckResult(PolicyCheckResult.FORBIDDEN_WORD.getReasonCode(), ppce.getForbiddenWord().getForbiddenWord());
                 }
             }
         }
@@ -207,14 +195,11 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#storePassword(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String, es.caib.seycon.ng.comu.Password, boolean)
      */
-    protected void handleStorePassword(es.caib.seycon.ng.model.UsuariEntity user,
-            DominiContrasenyaEntity dce, es.caib.seycon.ng.comu.Password password,
-            boolean mustChange) throws java.lang.Exception {
-        PoliticaContrasenyaEntity pcd = null;
+    protected void handleStorePassword(com.soffid.iam.model.UserEntity user, PasswordDomainEntity dce, es.caib.seycon.ng.comu.Password password, boolean mustChange) throws java.lang.Exception {
+        PasswordPolicyEntity pcd = null;
         pcd = getUserPolicy(user, dce);
         if (pcd == null)
-            throw new InternalErrorException(String.format(
-                    "Policy not found for password domain %s", dce.getCodi())); //$NON-NLS-1$
+            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getCode())); //$NON-NLS-1$
 
         doStorePassword(user, dce, pcd, password, mustChange? "E": "N", mustChange); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -223,27 +208,22 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#storePassword(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String, es.caib.seycon.ng.comu.Password, boolean)
      */
-    protected void handleStoreAndForwardPassword(es.caib.seycon.ng.model.UsuariEntity user,
-            DominiContrasenyaEntity dce, es.caib.seycon.ng.comu.Password password,
-            boolean mustChange) throws java.lang.Exception {
+    protected void handleStoreAndForwardPassword(com.soffid.iam.model.UserEntity user, PasswordDomainEntity dce, es.caib.seycon.ng.comu.Password password, boolean mustChange) throws java.lang.Exception {
 
         handleStorePassword(user, dce, password, mustChange);
 
-        createTask(TaskHandler.UPDATE_USER_PASSWORD, 
-                dce.getCodi(), user.getCodi(), password, mustChange);
+        createTask(TaskHandler.UPDATE_USER_PASSWORD, dce.getCode(), user.getUserName(), password, mustChange);
     }
 
-    private void doStorePassword(UsuariEntity usuari, DominiContrasenyaEntity dce,
-            PoliticaContrasenyaEntity pcd, es.caib.seycon.ng.comu.Password password, String estat,
-            boolean mustChange) throws InternalErrorException {
+    private void doStorePassword(UserEntity usuari, PasswordDomainEntity dce, PasswordPolicyEntity pcd, es.caib.seycon.ng.comu.Password password, String estat, boolean mustChange) throws InternalErrorException {
         reorderOldPasswords(usuari, dce, pcd);
 
-        ContrasenyaEntity ce = getContrasenyaEntityDao().newContrasenyaEntity();
-        ce.setDomini(dce);
-        ce.setOrdre(new Long(0));
-        ce.setUsuari(usuari);
+        PasswordEntity ce = getPasswordEntityDao().newPasswordEntity();
+        ce.setDomain(dce);
+        ce.setOrder(new Long(0));
+        ce.setUser(usuari);
         Date d = new Date();
-        ce.setData(d);
+        ce.setDate(d);
         Calendar c = new GregorianCalendar();
         c.setTime(d);
         if (!mustChange) {
@@ -251,26 +231,23 @@ public class InternalPasswordServiceImpl extends
             c.set(Calendar.MINUTE, 0);
             c.set(Calendar.SECOND, 0);
             c.set(Calendar.MILLISECOND, 0);
-            if (pcd.getDuradaMaxima() != null && pcd.getTipus().equals("M")) //$NON-NLS-1$
-                c.add(Calendar.DAY_OF_MONTH, pcd.getDuradaMaxima().intValue());
-            else if (pcd.getTempsRenovacio() != null && pcd.getTipus().equals("A")) //$NON-NLS-1$
-                c.add(Calendar.DAY_OF_MONTH, pcd.getTempsRenovacio().intValue());
+            if (pcd.getAvailableTime() != null && pcd.getType().equals("M")) //$NON-NLS-1$
+                c.add(Calendar.DAY_OF_MONTH, pcd.getAvailableTime().intValue());
+            else if (pcd.getRenewalTime() != null && pcd.getType().equals("A")) //$NON-NLS-1$
+                c.add(Calendar.DAY_OF_MONTH, pcd.getRenewalTime().intValue());
             else
                 c.add(Calendar.DAY_OF_MONTH, 3650);
         }
-        ce.setDataCaducitat(c.getTime());
-        ce.setContrasenya(getDigest(password));
-        ce.setActiu(estat);
-        getContrasenyaEntityDao().create(ce);
-        for (UserAccountEntity ua: usuari.getAccounts())
-        {
-        	AccountEntity acc = ua.getAccount();
-        	if (acc.getType().equals(AccountType.USER) && 
-        		(acc.getDispatcher().getUrl() == null || acc.getDispatcher().getUrl().isEmpty()))
-            {
-            	acc.setLastPasswordSet(new Date());
-            	acc.setPasswordExpiration(c.getTime());
-            	getAccountEntityDao().update(acc);
+        ce.setExpirationDate(c.getTime());
+        ce.setPassword(getDigest(password));
+        ce.setActive(estat);
+        getPasswordEntityDao().create(ce);
+        for (UserAccountEntity ua : usuari.getAccounts()) {
+            AccountEntity acc = ua.getAccount();
+            if (acc.getType().equals(AccountType.USER) && (acc.getSystem().getUrl() == null || acc.getSystem().getUrl().isEmpty())) {
+                acc.setLastPasswordSet(new Date());
+                acc.setPasswordExpiration(c.getTime());
+                getAccountEntityDao().update(acc);
             }
         }
     }
@@ -300,33 +277,24 @@ public class InternalPasswordServiceImpl extends
 
     private static MessageDigest digest;
 
-    private void reorderOldPasswords(UsuariEntity user, DominiContrasenyaEntity dce,
-            PoliticaContrasenyaEntity pcd) {
+    private void reorderOldPasswords(UserEntity user, PasswordDomainEntity dce, PasswordPolicyEntity pcd) {
     	
-    	LinkedList<ContrasenyaEntity> passwords = new LinkedList<ContrasenyaEntity>(getContrasenyaEntityDao().findByUsuariDomini(user, dce));
-    	Collections.sort(passwords, new Comparator<ContrasenyaEntity>()
-		{
+    	LinkedList<PasswordEntity> passwords = new LinkedList<PasswordEntity>(getPasswordEntityDao().findByUserDomain(user, dce));
+    	Collections.sort(passwords, new Comparator<PasswordEntity>(){
+            
+            
+            public int compare(PasswordEntity o1, PasswordEntity o2) {
+                if (o1.getOrder().longValue() == o2.getOrder().longValue()) return 0;
+                if (o1.getOrder().longValue() > o2.getOrder().longValue()) return -1; else return +1;
+            }
+        });
 
-			public int compare (ContrasenyaEntity o1, ContrasenyaEntity o2)
-			{
-				if (o1.getOrdre().longValue() == o2.getOrdre().longValue())
-					return 0;
-				if (o1.getOrdre().longValue() > o2.getOrdre().longValue())
-					return -1;
-				else
-					return +1;
-			}
-		});
-
-    	for (ContrasenyaEntity contrasenya : passwords){
-
-            if (pcd == null || pcd.getMaxHistoric() == null
-                    || contrasenya.getOrdre() + 1 >= pcd.getMaxHistoric().longValue()) {
-                getContrasenyaEntityDao().remove(contrasenya);
-
+    	for (PasswordEntity contrasenya : passwords) {
+            if (pcd == null || pcd.getRememberedPasswords() == null || contrasenya.getOrder() + 1 >= pcd.getRememberedPasswords().longValue()) {
+                getPasswordEntityDao().remove(contrasenya);
             } else {
-                contrasenya.setOrdre(contrasenya.getOrdre() + 1);
-                getContrasenyaEntityDao().update(contrasenya);
+                contrasenya.setOrder(contrasenya.getOrder() + 1);
+                getPasswordEntityDao().update(contrasenya);
             }
         }
     }
@@ -336,29 +304,23 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#confirmPassword(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String, es.caib.seycon.ng.comu.Password)
      */
-    protected void handleConfirmPassword(es.caib.seycon.ng.model.UsuariEntity user,
-            DominiContrasenyaEntity dce, es.caib.seycon.ng.comu.Password password)
-            throws java.lang.Exception {
+    protected void handleConfirmPassword(com.soffid.iam.model.UserEntity user, PasswordDomainEntity dce, es.caib.seycon.ng.comu.Password password) throws java.lang.Exception {
 
-        PoliticaContrasenyaEntity pcd = null;
+        PasswordPolicyEntity pcd = null;
         pcd = getUserPolicy(user, dce);
         if (pcd == null)
-            throw new InternalErrorException(String.format(
-                    "Policy not found for password domain %s", dce.getCodi())); //$NON-NLS-1$
+            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getCode())); //$NON-NLS-1$
 
         String digest = getDigest(password);
-        ContrasenyaEntity contra = getContrasenyaEntityDao().findLastByUsuariDomini(user, dce);
-        if (contra != null && contra.getContrasenya().equals(digest)
-                && contra.getActiu().equals("N")) { //$NON-NLS-1$
-            contra.setActiu("S"); //$NON-NLS-1$
-            getContrasenyaEntityDao().update(contra);
+        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, dce);
+        if (contra != null && contra.getPassword().equals(digest) && contra.getActive().equals("N")) { //$NON-NLS-1$
+            contra.setActive("S"); //$NON-NLS-1$
+            getPasswordEntityDao().update(contra);
         }
     }
 
-    private PoliticaContrasenyaEntity getUserPolicy(es.caib.seycon.ng.model.UsuariEntity user,
-            DominiContrasenyaEntity dce) {
-    	return getPoliticaContrasenyaEntityDao().
-    					findByDominiContrasenyaTipusUsuari(dce.getCodi(), user.getTipusUsuari().getCodi());
+    private PasswordPolicyEntity getUserPolicy(com.soffid.iam.model.UserEntity user, PasswordDomainEntity dce) {
+    	return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(dce.getCode(), user.getUserType().getCode());
     }
 
     /**
@@ -367,13 +329,11 @@ public class InternalPasswordServiceImpl extends
     @SuppressWarnings("unchecked")
     protected void handleDisableUntrustedPasswords() throws java.lang.Exception {
 
-        for (Iterator<DominiContrasenyaEntity> dcIterator = getDominiContrasenyaEntityDao()
-                .loadAll().iterator(); dcIterator.hasNext();) {
-            DominiContrasenyaEntity dc = dcIterator.next();
-            for (Iterator<PoliticaContrasenyaEntity> tuIterator = dc.getPoliticaContrasenyes()
-                    .iterator(); tuIterator.hasNext();) {
-                PoliticaContrasenyaEntity pc = tuIterator.next();
-                if (pc.getTipus().equals("M")) { //$NON-NLS-1$
+        for (Iterator<PasswordDomainEntity> dcIterator = getPasswordDomainEntityDao().loadAll().iterator(); dcIterator.hasNext(); ) {
+            PasswordDomainEntity dc = dcIterator.next();
+            for (Iterator<PasswordPolicyEntity> tuIterator = dc.getPasswordPolicies().iterator(); tuIterator.hasNext(); ) {
+                PasswordPolicyEntity pc = tuIterator.next();
+                if (pc.getType().equals("M")) {
                     disableUntrustedManualPasswords(dc, pc);
                 } else {
                     renewAutomaticPasswords(dc, pc);
@@ -382,8 +342,7 @@ public class InternalPasswordServiceImpl extends
         }
     }
 
-    private void renewAutomaticPasswords(DominiContrasenyaEntity dc, PoliticaContrasenyaEntity pc)
-            throws InternalErrorException {
+    private void renewAutomaticPasswords(PasswordDomainEntity dc, PasswordPolicyEntity pc) throws InternalErrorException {
         Calendar c = new GregorianCalendar();
 //        c.set(Calendar.HOUR_OF_DAY, 0);
 //        c.set(Calendar.MINUTE, 0);
@@ -391,46 +350,24 @@ public class InternalPasswordServiceImpl extends
 //        c.set(Calendar.MILLISECOND, 0);
 //        c.add(Calendar.DAY_OF_MONTH, -1);
 
-        Collection expired = getContrasenyaEntityDao().query(
-                "from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity " //$NON-NLS-1$
-                        + "where contrasenya.domini = :domini and " //$NON-NLS-1$
-                        + "contrasenya.usuari.tipusUsuari = :tipusUsuari and " //$NON-NLS-1$
-                        + "contrasenya.usuari.actiu='S' and " //$NON-NLS-1$
-                        + "contrasenya.dataCaducitat <= :caducitat and " //$NON-NLS-1$
-                        + "contrasenya.actiu in ('S', 'N') ", //$NON-NLS-1$
-                new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                        new Parameter("tipusUsuari", pc.getTipusUsuariDomini()), //$NON-NLS-1$
-                        new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-        for (Iterator<ContrasenyaEntity> it = expired.iterator(); it.hasNext();) {
-            ContrasenyaEntity contra = it.next();
-            Password password = generateRandomPassword(contra.getUsuari(), dc, pc, false, true);
-            doStorePassword(contra.getUsuari(), dc, pc, password, "N", false); //$NON-NLS-1$
-            createTask(TaskHandler.UPDATE_USER_PASSWORD, 
-                    dc.getCodi(), contra.getUsuari().getCodi(), password, false);
+        Collection expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari = :tipusUsuari and contrasenya.usuari.actiu=\'S\' and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu in (\'S\', \'N\') ", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
+            PasswordEntity contra = it.next();
+            Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
+            doStorePassword(contra.getUser(), dc, pc, password, "N", false);
+            createTask(TaskHandler.UPDATE_USER_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
         }
 
-        expired = getAccountPasswordEntityDao().query(
-                        "select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass " //$NON-NLS-1$
-        						+ "join pass.account as account " //$NON-NLS-1$
-                                + "where account.dispatcher.domini = :domini and " //$NON-NLS-1$
-                                + "account.passwordPolicy = :tipusUsuari and " //$NON-NLS-1$
-                                + "account.disabled = false and " //$NON-NLS-1$
-                                + "pass.expirationDate <= :caducitat and " //$NON-NLS-1$
-                                + "pass.active in ('S', 'N') and pass.order = 0", //$NON-NLS-1$
-         new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                                new Parameter("tipusUsuari", pc.getTipusUsuariDomini()), //$NON-NLS-1$
-                                new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-         for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext();) {
-        	 AccountPasswordEntity contra = it.next();
-                    Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
-                    doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null); //$NON-NLS-1$
-                    createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
-                            contra.getAccount().getName(), contra.getAccount().getDispatcher().getCodi(), password, false, null);
-         }
+        expired = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active in (\'S\', \'N\') and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+         for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext(); ) {
+            AccountPasswordEntity contra = it.next();
+            Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
+            doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
+            createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
+        }
     }
 
-    private void disableUntrustedManualPasswords(DominiContrasenyaEntity dc,
-            PoliticaContrasenyaEntity pc) throws InternalErrorException {
+    private void disableUntrustedManualPasswords(PasswordDomainEntity dc, PasswordPolicyEntity pc) throws InternalErrorException {
         Calendar c = new GregorianCalendar();
 //        c.set(Calendar.HOUR_OF_DAY, 0);
 //        c.set(Calendar.MINUTE, 0);
@@ -438,76 +375,46 @@ public class InternalPasswordServiceImpl extends
 //        c.set(Calendar.MILLISECOND, 0);
 
         
-        Collection expired = getContrasenyaEntityDao().query(
-                "from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity " //$NON-NLS-1$
-                        + "where contrasenya.domini = :domini and " //$NON-NLS-1$
-                        + "contrasenya.usuari.tipusUsuari = :tipusUsuari and " //$NON-NLS-1$
-                        + "contrasenya.dataCaducitat <= :caducitat and " //$NON-NLS-1$
-                        + "contrasenya.actiu in ('S', 'N') and contrasenya.ordre=0", //$NON-NLS-1$
-                new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                        new Parameter("tipusUsuari", pc.getTipusUsuariDomini()), //$NON-NLS-1$
-                        new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-        for (Iterator<ContrasenyaEntity> it = expired.iterator(); it.hasNext();) {
-            ContrasenyaEntity contra = it.next();
-            Password password = generateRandomPassword(contra.getUsuari(), dc, pc, false, true);
-            contra.setActiu("E"); //$NON-NLS-1$
-            getContrasenyaEntityDao().update(contra);
-            createTask(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD,
-                    dc.getCodi(), contra.getUsuari().getCodi(), password, false);
+        Collection expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari = :tipusUsuari and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu in (\'S\', \'N\') and contrasenya.ordre=0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
+            PasswordEntity contra = it.next();
+            Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
+            contra.setActive("E");
+            getPasswordEntityDao().update(contra);
+            createTask(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
         }
 
-        expired = getAccountPasswordEntityDao().query(
-                        "select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass " //$NON-NLS-1$
-        						+ "join pass.account as account " //$NON-NLS-1$
-                                + "where account.dispatcher.domini = :domini and " //$NON-NLS-1$
-                                + "account.passwordPolicy = :tipusUsuari and " //$NON-NLS-1$
-                                + "account.disabled = false and " //$NON-NLS-1$
-                                + "pass.expirationDate <= :caducitat and " //$NON-NLS-1$
-                                + "pass.active in ('S', 'N') and pass.order = 0", //$NON-NLS-1$
-         new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                                new Parameter("tipusUsuari", pc.getTipusUsuariDomini()), //$NON-NLS-1$
-                                new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-         for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext();) {
-        	 AccountPasswordEntity contra = it.next();
-        	 AccountEntity acc = contra.getAccount();
-        	 // Reset password when
-        	 // a - Password is High privileged
-        	 // b - Domain is not trusted
-        	 //
-        	 // For normal passwords on trusted systems, do nothing. Mark for expiration when needed.
-        	 //
-        	 if (acc.getType().equals (AccountType.PRIVILEGED) ||
-        					 acc.getDispatcher().getSegur().equals("N")) //$NON-NLS-1$
-        	 {
-                    Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
-                    doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null); //$NON-NLS-1$
-                    createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
-                            contra.getAccount().getName(), contra.getAccount().getDispatcher().getCodi(), password, false, null);
-        	 }
-        	 else
-        	 {
-        		 contra.setActive("E"); //$NON-NLS-1$
-        		 getAccountPasswordEntityDao().update(contra);
-        	 }
-         }
+        expired = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active in (\'S\', \'N\') and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+         for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext(); ) {
+            AccountPasswordEntity contra = it.next();
+            AccountEntity acc = contra.getAccount();
+            if (acc.getType().equals(AccountType.PRIVILEGED) || acc.getSystem().getSafe().equals("N")) {
+                Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
+                doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
+                createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
+            } else {
+                contra.setActive("E");
+                getAccountPasswordEntityDao().update(contra);
+            }
+        }
     }
 
     private TaskHandler createTask(String transa, String dominiContrasenyes,
             String user, Password password, boolean mustChange) throws InternalErrorException {
-        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-        tasque.setData(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransa(transa);
-        tasque.setDominiContrasenyes(dominiContrasenyes);
-        tasque.setUsuari(user);
-        tasque.setContra(password.toString());
-        tasque.setCancon(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransaction(transa);
+        tasque.setPasswordsDomain(dominiContrasenyes);
+        tasque.setUser(user);
+        tasque.setPassword(password.toString());
+        tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         tasque.setStatus("P"); //$NON-NLS-1$
         try {
        		return getTaskQueue().addTask(tasque);
         } 
         catch (NoSuchBeanDefinitionException e) 
         {
-            getTasqueEntityDao().createNoFlush(tasque);
+            getTaskEntityDao().createNoFlush(tasque);
             return null;
         }
     }
@@ -537,55 +444,47 @@ public class InternalPasswordServiceImpl extends
     
 
 
-    private Password generateRandomPassword(UsuariEntity usuariEntity,
-            DominiContrasenyaEntity dc, PoliticaContrasenyaEntity pc, boolean minLength,
-            boolean maxLength) throws InternalErrorException {
+    private Password generateRandomPassword(UserEntity usuariEntity, PasswordDomainEntity dc, PasswordPolicyEntity pc, boolean minLength, boolean maxLength) throws InternalErrorException {
         Random r = new Random(System.currentTimeMillis() + hashCode());
         Password password;
         int retries = 0;
         do {
             retries++;
             if (retries > 100)
-                throw new InternalErrorException(String.format(
-                        "Cannot generate valid password for domain %s, user type %s", dc.getCodi(), //$NON-NLS-1$
-                        pc.getTipusUsuariDomini().getCodi()));
+                throw new InternalErrorException(String.format("Cannot generate valid password for domain %s, user type %s", dc.getCode(), pc.getUserDomainType().getCode()));
             password = generatePasswordCandidate(pc, minLength, maxLength, r);
 
         } while (!handleCheckPolicy(usuariEntity, pc, password).isValid());
         return password;
     }
 
-	private Password generatePasswordCandidate(PoliticaContrasenyaEntity pc,
-			boolean minLength, boolean maxLength, Random r)
-	{
+	private Password generatePasswordCandidate(PasswordPolicyEntity pc, boolean minLength, boolean maxLength, Random r) {
 		Password password;
 		StringBuffer sb;
 		sb = new StringBuffer();
 		int length;
-		if (pc.getMinLongitud() == null)
-		    if (pc.getMaxLongitud() == null)
+		if (pc.getMinLength() == null)
+		    if (pc.getMaxLength() == null)
 		        length = 6;
-		    else if (minLength && pc.getMaxLongitud() > 6)
+		    else if (minLength && pc.getMaxLength() > 6)
 		        length = 6;
 		    else
-		        length = pc.getMaxLongitud().intValue();
-		else if (pc.getMaxLongitud() == null || pc.getMaxLongitud().equals(pc.getMinLongitud()))
-		    length = pc.getMinLongitud().intValue();
+		        length = pc.getMaxLength().intValue();
+		else if (pc.getMaxLength() == null || pc.getMaxLength().equals(pc.getMinLength()))
+		    length = pc.getMinLength().intValue();
 		else if (minLength)
-		    length = pc.getMinLongitud().intValue();
+		    length = pc.getMinLength().intValue();
 		else if (maxLength)
-		    length = pc.getMaxLongitud().intValue();
+		    length = pc.getMaxLength().intValue();
 		else
-		    length = pc.getMinLongitud().intValue()
-		            + r.nextInt(pc.getMaxLongitud().intValue() - pc.getMinLongitud().intValue());
+		    length = pc.getMinLength().intValue() + r.nextInt(pc.getMaxLength().intValue() - pc.getMinLength().intValue());
 
-		int minMays = pc.getMinMajuscules() == null ? 0: pc.getMinMajuscules().intValue();
-		int minMins = pc.getMinMinuscules() == null ? 0: pc.getMinMinuscules().intValue();
-		int minNums = pc.getMinNumeros() == null ? 0: pc.getMinNumeros().intValue();
-		int minSims = pc.getMinSignesPuntuacio() == null ? 0: pc.getMinSignesPuntuacio().intValue();
+		int minMays = pc.getMinUpperCase() == null ? 0 : pc.getMinUpperCase().intValue();
+		int minMins = pc.getMinLowerCase() == null ? 0 : pc.getMinLowerCase().intValue();
+		int minNums = pc.getMinNumbers() == null ? 0 : pc.getMinNumbers().intValue();
+		int minSims = pc.getMinSymbols() == null ? 0 : pc.getMinSymbols().intValue();
 		int maxMays, maxMins, maxNums, maxSims;
-		maxMins = pc.getMaxMinuscules() == null ? length - minMays - minNums - minSims: 
-			pc.getMaxMinuscules().intValue();
+		maxMins = pc.getMaxLowerCase() == null ? length - minMays - minNums - minSims : pc.getMaxLowerCase().intValue();
 		if (maxMins > length)
 			maxMins = length;
 		if (minLength && maxMins >= length - minMays - minNums - minSims) {
@@ -603,14 +502,14 @@ public class InternalPasswordServiceImpl extends
 		    
 		} else {
 		    maxMays = length - minNums - minMins - minSims;
-		    if (pc.getMaxMajuscules() != null && pc.getMaxMajuscules().intValue() < maxMays)
-		    	maxMays = pc.getMaxMajuscules().intValue();
+		    if (pc.getMaxUpperCase() != null && pc.getMaxUpperCase().intValue() < maxMays)
+		    	maxMays = pc.getMaxUpperCase().intValue();
 		    maxNums = length - minMays - minMins - minSims;
-		    if (pc.getMaxNumeros() != null && pc.getMaxNumeros().intValue() < maxNums)
-		    	maxNums = pc.getMaxNumeros().intValue();
+		    if (pc.getMaxNumbers() != null && pc.getMaxNumbers().intValue() < maxNums)
+		    	maxNums = pc.getMaxNumbers().intValue();
 		    maxSims = length - minMays - minMins - minNums;
-		    if (pc.getMaxSignesPuntuacio() != null && pc.getMaxSignesPuntuacio().intValue() < maxSims)
-		    	maxSims = pc.getMaxSignesPuntuacio().intValue();
+		    if (pc.getMaxSymbols() != null && pc.getMaxSymbols().intValue() < maxSims)
+		    	maxSims = pc.getMaxSymbols().intValue();
 		}
 		while (sb.length() < length) {
 			int remaining = length-sb.length();
@@ -671,8 +570,7 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#isLastPassword(es.caib.seycon.ng.model.UsuariEntity,
      *      es.caib.seycon.ng.comu.Password)
      */
-    protected boolean handleIsLastPassword(es.caib.seycon.ng.model.UsuariEntity user,
-            es.caib.seycon.ng.comu.Password password) throws java.lang.Exception {
+    protected boolean handleIsLastPassword(com.soffid.iam.model.UserEntity user, es.caib.seycon.ng.comu.Password password) throws java.lang.Exception {
         return false;
     }
 
@@ -681,21 +579,15 @@ public class InternalPasswordServiceImpl extends
      *      es.caib.seycon.ng.model.DominiContrasenyaEntity,
      *      es.caib.seycon.ng.comu.Password, boolean, boolean)
      */
-    protected PasswordValidation handleCheckPassword(es.caib.seycon.ng.model.UsuariEntity user,
-            es.caib.seycon.ng.model.DominiContrasenyaEntity passwordDomain,
-            es.caib.seycon.ng.comu.Password password, boolean checkTrusted, boolean checkExpired)
-            throws java.lang.Exception {
+    protected PasswordValidation handleCheckPassword(com.soffid.iam.model.UserEntity user, com.soffid.iam.model.PasswordDomainEntity passwordDomain, es.caib.seycon.ng.comu.Password password, boolean checkTrusted, boolean checkExpired) throws java.lang.Exception {
         String digest = getDigest(password);
 
-        if (user.getActiu().equals("N")) //$NON-NLS-1$
+        if (user.getActive().equals("N")) //$NON-NLS-1$
         	return PasswordValidation.PASSWORD_WRONG;
-        ContrasenyaEntity contra = getContrasenyaEntityDao().findLastByUsuariDomini(user,
-                passwordDomain);
-        if (contra != null
-                && (contra.getActiu().equals("S") || contra.getActiu().equals("N") || contra //$NON-NLS-1$ //$NON-NLS-2$
-                        .getActiu().equals("E"))) { //$NON-NLS-1$
-            if (digest.equals(contra.getContrasenya())) {
-                if (new Date().before(contra.getDataCaducitat())) {
+        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, passwordDomain);
+        if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") || contra.getActive().equals("E"))) { //$NON-NLS-1$
+            if (digest.equals(contra.getPassword())) {
+                if (new Date().before(contra.getExpirationDate())) {
                     return PasswordValidation.PASSWORD_GOOD;
                 } else if (checkExpired) {
                     return PasswordValidation.PASSWORD_GOOD_EXPIRED;
@@ -711,8 +603,7 @@ public class InternalPasswordServiceImpl extends
     		{
     			taskQueue = true;
 	            final long timeToWait = 60000; // 1 minute
-	            TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getCodi(), user.getCodi(),
-	                    password, false);
+	            TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getCode(), user.getUserName(), password, false);
 	
 	            th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
 	            synchronized (th) {
@@ -730,16 +621,13 @@ public class InternalPasswordServiceImpl extends
         }
 		if (checkTrusted && ! taskQueue && "true".equals(System.getProperty("soffid.auth.trustedLogin")))
 		{
-			for (UserAccountEntity userAccount: user.getAccounts())
-			{
-				AccountEntity ae = userAccount.getAccount();
-				if (!ae.isDisabled() && ae.getDispatcher().getDomini() == passwordDomain)
-				{
-					PasswordValidation status = validatePasswordOnServer(ae, password);
-					if (status.equals (PasswordValidation.PASSWORD_GOOD))
-						return status;
-				}
-			}
+			for (UserAccountEntity userAccount : user.getAccounts()) {
+                AccountEntity ae = userAccount.getAccount();
+                if (!ae.isDisabled() && ae.getSystem().getDomain() == passwordDomain) {
+                    PasswordValidation status = validatePasswordOnServer(ae, password);
+                    if (status.equals(PasswordValidation.PASSWORD_GOOD)) return status;
+                }
+            }
 		}
 
         return PasswordValidation.PASSWORD_WRONG;
@@ -749,8 +637,7 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPin(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String)
      */
-    protected boolean handleCheckPin(es.caib.seycon.ng.model.UsuariEntity user, java.lang.String pin)
-            throws java.lang.Exception {
+    protected boolean handleCheckPin(com.soffid.iam.model.UserEntity user, java.lang.String pin) throws java.lang.Exception {
         // @todo implement protected boolean
         // handleCheckPin(es.caib.seycon.ng.model.UsuariEntity user,
         // java.lang.String pin)
@@ -762,66 +649,32 @@ public class InternalPasswordServiceImpl extends
      */
     @SuppressWarnings("unchecked")
     protected void handleDisableExpiredPasswords() throws java.lang.Exception {
-        for (Iterator<DominiContrasenyaEntity> dcIterator = getDominiContrasenyaEntityDao()
-                .loadAll().iterator(); dcIterator.hasNext();) {
-            DominiContrasenyaEntity dc = dcIterator.next();
-            for (Iterator<PoliticaContrasenyaEntity> tuIterator = dc.getPoliticaContrasenyes()
-                    .iterator(); tuIterator.hasNext();) 
-            {
-                PoliticaContrasenyaEntity pc = tuIterator.next();
-                if (pc.getDuradaMaxima() != null && pc.getDuradaMaximaCaducada() != null)
-                {
+        for (Iterator<PasswordDomainEntity> dcIterator = getPasswordDomainEntityDao().loadAll().iterator(); dcIterator.hasNext(); ) {
+            PasswordDomainEntity dc = dcIterator.next();
+            for (Iterator<PasswordPolicyEntity> tuIterator = dc.getPasswordPolicies().iterator(); tuIterator.hasNext(); ) {
+                PasswordPolicyEntity pc = tuIterator.next();
+                if (pc.getAvailableTime() != null && pc.getGracePeriodTime() != null) {
                     Calendar c = new GregorianCalendar();
                     c.set(Calendar.HOUR_OF_DAY, 0);
                     c.set(Calendar.MINUTE, 0);
                     c.set(Calendar.SECOND, 0);
                     c.set(Calendar.MILLISECOND, 0);
-                    
-                    c.add(Calendar.DAY_OF_YEAR, - pc.getDuradaMaximaCaducada().intValue());
-    
-                    Collection<ContrasenyaEntity> expired = getContrasenyaEntityDao().query(
-                            "from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity " //$NON-NLS-1$
-                                    + "where contrasenya.domini = :domini and " //$NON-NLS-1$
-                                    + "contrasenya.usuari.tipusUsuari.codi = :tipusUsuari and " //$NON-NLS-1$
-                                    + "contrasenya.dataCaducitat <= :caducitat and " //$NON-NLS-1$
-                                    + "contrasenya.actiu = 'E' and contrasenya.ordre = 0", //$NON-NLS-1$
-                            new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                                    new Parameter("tipusUsuari", pc.getTipusUsuariDomini().getCodi()), //$NON-NLS-1$
-                                    new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-                    for (Iterator<ContrasenyaEntity> it = expired.iterator(); it.hasNext();) {
-                        ContrasenyaEntity contra = it.next();
-                        Password password = generateRandomPassword(contra.getUsuari(), dc, pc, false,
-                                true);
-                        contra.setActiu("D"); //$NON-NLS-1$
-                        getContrasenyaEntityDao().update(contra);
-                        createTask(TaskHandler.EXPIRE_USER_PASSWORD,
-                                dc.getCodi(), contra.getUsuari().getCodi(), password, false);
+                    c.add(Calendar.DAY_OF_YEAR, -pc.getGracePeriodTime().intValue());
+                    Collection<PasswordEntity> expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari.codi = :tipusUsuari and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu = \'E\' and contrasenya.ordre = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType().getCode()), new Parameter("caducitat", c.getTime())});
+                    for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
+                        PasswordEntity contra = it.next();
+                        Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
+                        contra.setActive("D");
+                        getPasswordEntityDao().update(contra);
+                        createTask(TaskHandler.EXPIRE_USER_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
                     }
-    
-                    List<AccountPasswordEntity> expiredAccount = getAccountPasswordEntityDao().query(
-                        "select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass " //$NON-NLS-1$
-        						+ "join pass.account as account " //$NON-NLS-1$
-                                + "where account.dispatcher.domini = :domini and " //$NON-NLS-1$
-                                + "account.passwordPolicy = :tipusUsuari and " //$NON-NLS-1$
-                                + "account.disabled = false and " //$NON-NLS-1$
-                                + "pass.expirationDate <= :caducitat and " //$NON-NLS-1$
-                                + "pass.active = 'E' and pass.order = 0", //$NON-NLS-1$
-                     new Parameter[] { new Parameter("domini", dc), //$NON-NLS-1$
-                                            new Parameter("tipusUsuari", pc.getTipusUsuariDomini()), //$NON-NLS-1$
-                                            new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
-                     for (Iterator<AccountPasswordEntity> it = expiredAccount.iterator(); it.hasNext();) {
-                    	 AccountPasswordEntity contra = it.next();
-                    	 AccountEntity acc = contra.getAccount();
-                    	 // Reset password when
-                    	 // a - Password is High privileged
-                    	 // b - Domain is not trusted
-                    	 //
-                    	 // For normal passwords on trusted systems, do nothing. Mark for expiration when needed.
-                    	 //
+                    List<AccountPasswordEntity> expiredAccount = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active = \'E\' and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())});
+                    for (Iterator<AccountPasswordEntity> it = expiredAccount.iterator(); it.hasNext(); ) {
+                        AccountPasswordEntity contra = it.next();
+                        AccountEntity acc = contra.getAccount();
                         Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
-                        doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null); //$NON-NLS-1$
-                        createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
-                                contra.getAccount().getName(), contra.getAccount().getDispatcher().getCodi(), password, false, null);
+                        doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
+                        createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
                     }
                 }
             }
@@ -832,15 +685,11 @@ public class InternalPasswordServiceImpl extends
      * @see es.caib.seycon.ng.servei.InternalPasswordService#isOldPassword(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String, es.caib.seycon.ng.comu.Password)
      */
-    protected boolean handleIsOldPassword(UsuariEntity user,
-            DominiContrasenyaEntity passwordDomain, es.caib.seycon.ng.comu.Password password)
-            throws java.lang.Exception {
+    protected boolean handleIsOldPassword(UserEntity user, PasswordDomainEntity passwordDomain, es.caib.seycon.ng.comu.Password password) throws java.lang.Exception {
         String digest = getDigest(password);
-        for (Iterator it = getContrasenyaEntityDao().findByUsuariDomini(user, passwordDomain)
-                .iterator(); it.hasNext();) {
-            ContrasenyaEntity contrasenya = (ContrasenyaEntity) it.next();
-            if (contrasenya.getContrasenya().equals(digest))
-                return true;
+        for (Iterator it = getPasswordEntityDao().findByUserDomain(user, passwordDomain).iterator(); it.hasNext(); ) {
+            PasswordEntity contrasenya = (PasswordEntity) it.next();
+            if (contrasenya.getPassword().equals(digest)) return true;
         }
         return false;
     }
@@ -849,20 +698,16 @@ public class InternalPasswordServiceImpl extends
      * Generates a new password
      */
 
-    protected Password randomPassword(UsuariEntity user,
-            es.caib.seycon.ng.model.DominiContrasenyaEntity passDomain, boolean mustChange, boolean fake)
-            throws Exception {
+    protected Password randomPassword(UserEntity user, com.soffid.iam.model.PasswordDomainEntity passDomain, boolean mustChange, boolean fake) throws Exception {
         Password password = null;
         boolean found = false;
 
-        PoliticaContrasenyaEntity pcd = getUserPolicy(user, passDomain);
+        PasswordPolicyEntity pcd = getUserPolicy(user, passDomain);
         if (pcd != null) {
             password = generateRandomPassword(user, passDomain, pcd, true, false);
             if (!fake) {
                 doStorePassword(user, passDomain, pcd, password, mustChange ? "E": "N", mustChange); //$NON-NLS-1$ //$NON-NLS-2$
-                createTask(TaskHandler.UPDATE_USER_PASSWORD,
-                        passDomain.getCodi(),
-                        user.getCodi(), password, mustChange);
+                createTask(TaskHandler.UPDATE_USER_PASSWORD, passDomain.getCode(), user.getUserName(), password, mustChange);
             }
             return password;
         } else
@@ -872,38 +717,33 @@ public class InternalPasswordServiceImpl extends
     /**
      * @see es.caib.seycon.ng.servei.InternalPasswordService#genrateNewPassword(es.caib.seycon.ng.model.UsuariEntity)
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(value = "unchecked")
     @Override
-    protected Password handleGenerateNewPassword(UsuariEntity user,
-            es.caib.seycon.ng.model.DominiContrasenyaEntity passDomain, boolean mustChange) throws Exception {
+    protected Password handleGenerateNewPassword(UserEntity user, com.soffid.iam.model.PasswordDomainEntity passDomain, boolean mustChange) throws Exception {
         return randomPassword(user, passDomain, mustChange, false);
 
     }
 
     @Override
-    protected EstatContrasenya handleGetPasswordsStatus(UsuariEntity user,
-            DominiContrasenyaEntity domini) throws Exception {
-		ContrasenyaEntity last = getContrasenyaEntityDao().findLastByUsuariDomini(user, domini);
+    protected EstatContrasenya handleGetPasswordsStatus(UserEntity user, PasswordDomainEntity domini) throws Exception {
+		PasswordEntity last = getPasswordEntityDao().findLastByUserDomain(user, domini);
 		if (last == null)
 			return null;
 		else
-			return getContrasenyaEntityDao().toEstatContrasenya(last);
+			return getPasswordEntityDao().toEstatContrasenya(last);
     }
 
     @Override
-    protected Collection<EstatContrasenya> handleGetExpiredPasswords(Date desde, Date finsa,
-            TipusUsuariEntity tipusUsuari) throws Exception {
+    protected Collection<EstatContrasenya> handleGetExpiredPasswords(Date desde, Date finsa, UserTypeEntity tipusUsuari) throws Exception {
         return null;
     }
 
     @Override
-    protected Password handleGenerateFakePassword(UsuariEntity user,
-            DominiContrasenyaEntity passDomain) throws Exception {
+    protected Password handleGenerateFakePassword(UserEntity user, PasswordDomainEntity passDomain) throws Exception {
         if (user == null) {
             Password pass = null;
             int len = 0;
-            for (PoliticaContrasenyaEntity politica : getPoliticaContrasenyaEntityDao()
-                    .findByDominiContrasenya(passDomain.getCodi())) {
+            for (PasswordPolicyEntity politica : getPasswordPolicyEntityDao().findByPasswordDomain(passDomain.getCode())) {
                 Password newPass = generateRandomPassword(null, passDomain, politica, false, true);
                 if (len < newPass.getPassword().length()) {
                     len = newPass.getPassword().length();
@@ -916,13 +756,11 @@ public class InternalPasswordServiceImpl extends
     }
 
     @Override
-    protected boolean handleIsPasswordExpired(UsuariEntity user,
-            DominiContrasenyaEntity passwordDomain) throws Exception {
+    protected boolean handleIsPasswordExpired(UserEntity user, PasswordDomainEntity passwordDomain) throws Exception {
 
-        ContrasenyaEntity contra = getContrasenyaEntityDao().findLastByUsuariDomini(user,
-                passwordDomain);
+        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, passwordDomain);
 
-        if (contra.getDataCaducitat().before(new Date())) {
+        if (contra.getExpirationDate().before(new Date())) {
             return true;
         }
 
@@ -932,25 +770,21 @@ public class InternalPasswordServiceImpl extends
     @Override
     protected void handleStorePassword(String user, String passwordDomain, String password,
             boolean mustChange) throws Exception {
-        UsuariEntity usuari = getUsuariEntityDao().findByCodi(user);
-        DominiContrasenyaEntity dc = getDominiContrasenyaEntityDao().findByCodi(passwordDomain);
+        UserEntity usuari = getUserEntityDao().findByCode(user);
+        PasswordDomainEntity dc = getPasswordDomainEntityDao().findByCode(passwordDomain);
         storePassword(usuari, dc, new Password(password), mustChange);
     }
 
 
 	@Override
-	protected boolean handleExistsPassword(UsuariEntity user,
-			DominiContrasenyaEntity passwordDomain) throws Exception
-	{
-		return getContrasenyaEntityDao().findByUsuariDomini(user, passwordDomain).size() == 0;
+    protected boolean handleExistsPassword(UserEntity user, PasswordDomainEntity passwordDomain) throws Exception {
+		return getPasswordEntityDao().findByUserDomain(user, passwordDomain).size() == 0;
 	}
 
-	private PoliticaContrasenyaEntity getAccountPolicy (AccountEntity account)
-	{
-		DominiContrasenyaEntity domini = account.getDispatcher().getDomini();
-		TipusUsuariEntity tipusUsuari = account.getPasswordPolicy();
-		return getPoliticaContrasenyaEntityDao().
-			findByDominiContrasenyaTipusUsuari(domini.getCodi(), tipusUsuari.getCodi());
+	private PasswordPolicyEntity getAccountPolicy(AccountEntity account) {
+		PasswordDomainEntity domini = account.getSystem().getDomain();
+		UserTypeEntity tipusUsuari = account.getPasswordPolicy();
+		return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(domini.getCode(), tipusUsuari.getCode());
 		
 	}
 	@Override
@@ -959,12 +793,12 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			
 			return handleCheckPolicy(user, getUserPolicy(user, passwordDomain), password);
 		} else {
-			PoliticaContrasenyaEntity politica = getAccountPolicy(account);
+			PasswordPolicyEntity politica = getAccountPolicy(account);
 			
 			if (politica == null)
 			{
@@ -983,8 +817,7 @@ public class InternalPasswordServiceImpl extends
 		}
 	}
 	
-    private void reorderOldAccountPasswords(AccountEntity account,
-            PoliticaContrasenyaEntity pcd) {
+    private void reorderOldAccountPasswords(AccountEntity account, PasswordPolicyEntity pcd) {
 
     	LinkedList<AccountPasswordEntity> passwords = new LinkedList<AccountPasswordEntity>(account.getPasswords());
     	Collections.sort(passwords, new Comparator<AccountPasswordEntity>()
@@ -1001,12 +834,9 @@ public class InternalPasswordServiceImpl extends
 			}
 		});
     	
-    	for (AccountPasswordEntity ap: passwords)
-    	{
-            if (pcd == null || pcd.getMaxHistoric() == null
-                    || ap.getOrder() + 1 >= pcd.getMaxHistoric().longValue()) {
+    	for (AccountPasswordEntity ap : passwords) {
+            if (pcd == null || pcd.getRememberedPasswords() == null || ap.getOrder() + 1 >= pcd.getRememberedPasswords().longValue()) {
                 getAccountPasswordEntityDao().remove(ap);
-
             } else {
                 ap.setOrder(ap.getOrder() + 1);
                 getAccountPasswordEntityDao().update(ap);
@@ -1016,10 +846,7 @@ public class InternalPasswordServiceImpl extends
 
 
 	
-    private void doStoreAccountPassword(AccountEntity account,
-    		PoliticaContrasenyaEntity pcd,
-            es.caib.seycon.ng.comu.Password password, String estat,
-            boolean mustChange, Date untilDate) throws InternalErrorException {
+    private void doStoreAccountPassword(AccountEntity account, PasswordPolicyEntity pcd, es.caib.seycon.ng.comu.Password password, String estat, boolean mustChange, Date untilDate) throws InternalErrorException {
         reorderOldAccountPasswords(account, pcd);
 
         AccountPasswordEntity ce = getAccountPasswordEntityDao().newAccountPasswordEntity();
@@ -1034,10 +861,10 @@ public class InternalPasswordServiceImpl extends
             c.set(Calendar.MINUTE, 0);
             c.set(Calendar.SECOND, 0);
             c.set(Calendar.MILLISECOND, 0);
-            if (pcd.getDuradaMaxima() != null && pcd.getTipus().equals("M")) //$NON-NLS-1$
-                c.add(Calendar.DAY_OF_MONTH, pcd.getDuradaMaxima().intValue());
-            else if (pcd.getTempsRenovacio() != null && pcd.getTipus().equals("A")) //$NON-NLS-1$
-                c.add(Calendar.DAY_OF_MONTH, pcd.getTempsRenovacio().intValue());
+            if (pcd.getAvailableTime() != null && pcd.getType().equals("M")) //$NON-NLS-1$
+                c.add(Calendar.DAY_OF_MONTH, pcd.getAvailableTime().intValue());
+            else if (pcd.getRenewalTime() != null && pcd.getType().equals("A")) //$NON-NLS-1$
+                c.add(Calendar.DAY_OF_MONTH, pcd.getRenewalTime().intValue());
             else
                 c.add(Calendar.DAY_OF_MONTH, 3650);
         }
@@ -1048,7 +875,7 @@ public class InternalPasswordServiceImpl extends
         ce.setActive(estat);
         getAccountPasswordEntityDao().create(ce);
 
-        if (account.getDispatcher().getUrl() == null || account.getDispatcher().getUrl().isEmpty())
+        if (account.getSystem().getUrl() == null || account.getSystem().getUrl().isEmpty())
         {
         	account.setLastPasswordSet(new Date());
         	account.setPasswordExpiration(c.getTime());
@@ -1063,18 +890,18 @@ public class InternalPasswordServiceImpl extends
 			String password, boolean mustChange, Date untilDate) throws Exception
 	{
 		AccountEntityDao accDao = getAccountEntityDao ();
-		AccountEntity acc = accDao.findByNameAndDispatcher(account, dispatcher);
+		AccountEntity acc = accDao.findByNameAndSystem(account, dispatcher);
 		if (acc.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (acc);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(acc);
+			UserEntity user = getUsuari(acc);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(acc);
 			handleStorePassword(user, passwordDomain, new Password(password), mustChange);
 		} else {
 			if (acc == null)
 	            throw new IllegalArgumentException(String.format(
 	                    Messages.getString("InternalPasswordServiceImpl.PolicyNotFound"), account));  //$NON-NLS-1$
 	
-	        PoliticaContrasenyaEntity pcd = null;
+	        PasswordPolicyEntity pcd = null;
 	        pcd = getAccountPolicy(acc);
 	        if (pcd == null)
 	            throw new InternalErrorException(String.format(
@@ -1090,11 +917,11 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			handleStorePassword(user, passwordDomain, password, mustChange);
 		} else {
-	        PoliticaContrasenyaEntity pcd = null;
+	        PasswordPolicyEntity pcd = null;
 	        pcd = getAccountPolicy(account);
 	        if (pcd == null)
 	            throw new InternalErrorException(String.format(
@@ -1115,8 +942,8 @@ public class InternalPasswordServiceImpl extends
 		
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			return handleCheckPassword(user, passwordDomain, password, checkTrusted, checkExpired);
 		}
 		else
@@ -1143,9 +970,7 @@ public class InternalPasswordServiceImpl extends
 	    		if (checkTrusted && getTaskQueue() != null)
 	    		{
 		            final long timeToWait = 60000; // 1 minute
-		            TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, 
-		            		account.getName(), account.getDispatcher().getCodi(),
-		                    password, false, null);
+		            TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, false, null);
 		
 		            th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
 		            synchronized (th) {
@@ -1172,40 +997,38 @@ public class InternalPasswordServiceImpl extends
 
     private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password) throws InternalErrorException, IOException {
     	
-    	if ( "S".equals(account.getDispatcher().getSegur()))
+    	if ("S".equals(account.getSystem().getSafe()))
     	{
     		ConsoleLogonService ls = (ConsoleLogonService) getSeyconServerService().getServerService(ConsoleLogonService.REMOTE_PATH);
     		if (ls != null)
-    			return ls.validatePassword(account.getName(), account.getDispatcher().getCodi(), password.getPassword());
+    			return ls.validatePassword(account.getName(), account.getSystem().getCode(), password.getPassword());
     	}
 
     	return PasswordValidation.PASSWORD_WRONG;
 	}
 
-	private DominiContrasenyaEntity getPasswordDomain(AccountEntity account)
-	{
-		return account.getDispatcher().getDomini();
+	private PasswordDomainEntity getPasswordDomain(AccountEntity account) {
+		return account.getSystem().getDomain();
 	}
 
-	private UsuariEntity getUsuari(AccountEntity account) throws InternalErrorException
-	{
+	private UserEntity getUsuari(AccountEntity account) throws InternalErrorException {
 		for (UserAccountEntity uae: account.getUsers())
 			return uae.getUser();
-		throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), account.getName(), account.getDispatcher().getCodi())); //$NON-NLS-1$
+		throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), account.getName(), account.getSystem().getCode())); //$NON-NLS-1$
 	}
 
 	private TaskHandler createAccountTask(String transa, String account,
             String dispatcher, Password password, boolean mustChange, Date untilDate) throws InternalErrorException {
-        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-        tasque.setData(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransa(transa);
-        tasque.setCoddis(dispatcher);
-        tasque.setUsuari(account);
-        tasque.setContra(password.toString());
-        tasque.setCancon(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransaction(transa);
+        tasque.setSystemCode(dispatcher);
+        tasque.setUser(account);
+        tasque.setPassword(password.toString());
+        tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         tasque.setStatus("P"); //$NON-NLS-1$
         tasque.setExpirationDate(untilDate);
-        getTasqueEntityDao().create(tasque);
+        getTaskEntityDao().create(tasque);
         try {
         	return getTaskQueue().addTask(tasque);
         } 
@@ -1235,8 +1058,8 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			return handleIsOldPassword(user, passwordDomain, password);
 		}
 		else
@@ -1252,17 +1075,14 @@ public class InternalPasswordServiceImpl extends
 	}
 
 
-    private Password generateRandomPassword(AccountEntity account, PoliticaContrasenyaEntity pc, boolean minLength,
-            boolean maxLength) throws InternalErrorException {
+    private Password generateRandomPassword(AccountEntity account, PasswordPolicyEntity pc, boolean minLength, boolean maxLength) throws InternalErrorException {
         Random r = new Random(System.currentTimeMillis() + hashCode());
         Password password;
         int retries = 0;
         do {
             retries++;
             if (retries > 100)
-                throw new InternalErrorException(String.format(
-                        Messages.getString("InternalPasswordServiceImpl.CannotGeneratePassword"),  //$NON-NLS-1$
-                        account.getName(), account.getDispatcher().getCodi()));
+                throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.CannotGeneratePassword"), account.getName(), account.getSystem().getCode()));
             password = generatePasswordCandidate(pc, minLength, maxLength, r);
 
         } while (!handleCheckAccountPolicy(account, password).isValid());
@@ -1278,16 +1098,13 @@ public class InternalPasswordServiceImpl extends
             throws Exception {
         Password password = null;
 
-        PoliticaContrasenyaEntity pcd = getAccountPolicy(account);
+        PasswordPolicyEntity pcd = getAccountPolicy(account);
         if (pcd != null) {
             password = generateRandomPassword(account, pcd, true, false);
             if (!fake) {
                 doStoreAccountPassword(account, pcd, password, "N", mustChange, null); //$NON-NLS-1$
-                if (account.getDispatcher().getUrl() != null && !account.getDispatcher().getUrl().isEmpty())
-                	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD,
-                        account.getName(),
-                        account.getDispatcher().getCodi(), 
-                        password, mustChange, null);
+                if (account.getSystem().getUrl() != null && !account.getSystem().getUrl().isEmpty())
+                	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange, null);
             }
             return password;
         } else
@@ -1326,17 +1143,15 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			handleStoreAndForwardPassword(user, passwordDomain, password, mustChange);
 		}
 		else
 		{
             handleStoreAccountPassword(account, password, mustChange, untilDate);
     
-        	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD,
-        		account.getName(), account.getDispatcher().getCodi(),
-                password, mustChange, untilDate);
+        	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange, untilDate);
 		}
 	}
 
@@ -1346,10 +1161,9 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			for (UserAccountEntity uae:account.getUsers())
-			{
-				return handleIsPasswordExpired(uae.getUser(), account.getDispatcher().getDomini());
-			}
+			for (UserAccountEntity uae : account.getUsers()) {
+                return handleIsPasswordExpired(uae.getUser(), account.getSystem().getDomain());
+            }
 		}
 		else
 		{
@@ -1376,35 +1190,33 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (defaultDispatcher == null)
 		{
-			DispatcherEntityDao dao = getDispatcherEntityDao();
+			SystemEntityDao dao = getSystemEntityDao();
 			String defaultName = System.getProperty("soffid.auth.system");
 			if (defaultName != null)
 			{
-				DispatcherEntity dispatcher = dao.findByCodi(defaultName); //$NON-NLS-1$
+				SystemEntity dispatcher = dao.findByCode(defaultName); //$NON-NLS-1$
 				if (dispatcher != null)
 					return defaultName;
 			}
 			
-			for (DispatcherEntity dispatcher: dao.loadAll())
-			{
-				if (dispatcher.isMainDispatcher())
-				{
-					defaultDispatcher = dispatcher.getCodi();
-					return defaultDispatcher;
-				}
-			}
-			DispatcherEntity dispatcher = dao.findByCodi("Soffid"); //$NON-NLS-1$
+			for (SystemEntity dispatcher : dao.loadAll()) {
+                if (dispatcher.isMainSystem()) {
+                    defaultDispatcher = dispatcher.getCode();
+                    return defaultDispatcher;
+                }
+            }
+			SystemEntity dispatcher = dao.findByCode("Soffid"); //$NON-NLS-1$
 			if (dispatcher == null) 
-				dispatcher = dao.findByCodi("soffid"); //$NON-NLS-1$
+				dispatcher = dao.findByCode("soffid"); //$NON-NLS-1$
 			if (dispatcher == null)
-				dispatcher = dao.findByCodi("seu"); //$NON-NLS-1$
+				dispatcher = dao.findByCode("seu"); //$NON-NLS-1$
 			if (dispatcher == null)
 				defaultDispatcher = "soffid"; //$NON-NLS-1$
 			else
 			{
-				dispatcher.setMainDispatcher(true);
-				getDispatcherEntityDao().update(dispatcher);
-				defaultDispatcher = dispatcher.getCodi();
+				dispatcher.setMainSystem(true);
+				getSystemEntityDao().update(dispatcher);
+				defaultDispatcher = dispatcher.getCode();
 			}
 		}
 		return defaultDispatcher;
@@ -1430,34 +1242,29 @@ public class InternalPasswordServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.InternalPasswordServiceBase#handleGetPolicyDescription(es.caib.seycon.ng.model.PoliticaContrasenyaEntity)
 	 */
 	@Override
-	protected String handleGetPolicyDescription (PoliticaContrasenyaEntity politica)
-					throws Exception
-	{
+    protected String handleGetPolicyDescription(PasswordPolicyEntity politica) throws Exception {
 		StringBuffer b = new StringBuffer ();
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MinLongCondition"), politica.getMinLongitud()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxLongCondition"), politica.getMaxLongitud()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MinMinusculesCondition"), politica.getMinMinuscules()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxMinusculesCondition"), politica.getMaxMinuscules()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MinCapitalsCondition"), politica.getMinMajuscules()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxCapitalCondition"), politica.getMaxMajuscules()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MinNumbersCondition"), politica.getMinNumeros()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxNumbersCondition"), politica.getMaxNumeros()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MinSignsCondition"), politica.getMinSignesPuntuacio()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxSignsCondition"), politica.getMaxSignesPuntuacio()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.PatternCondition"), politica.getExpressioRegular()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.MaxHistoricCondition"), politica.getMaxHistoric()); //$NON-NLS-1$
-   		if (politica.getParaulaProhibidaContrasenya() != null && ! politica.getParaulaProhibidaContrasenya().isEmpty())
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MinLongCondition"), politica.getMinLength()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxLongCondition"), politica.getMaxLength()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MinMinusculesCondition"), politica.getMinLowerCase()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxMinusculesCondition"), politica.getMaxLowerCase()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MinCapitalsCondition"), politica.getMinUpperCase()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxCapitalCondition"), politica.getMaxUpperCase()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MinNumbersCondition"), politica.getMinNumbers()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxNumbersCondition"), politica.getMaxNumbers()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MinSignsCondition"), politica.getMinSymbols()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxSignsCondition"), politica.getMaxSymbols()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.PatternCondition"), politica.getRegularExpression()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.MaxHistoricCondition"), politica.getRememberedPasswords()); //$NON-NLS-1$
+   		if (politica.getForbiddenWords() != null && !politica.getForbiddenWords().isEmpty())
    		{
    			b.append (Messages.getString("PasswordServiceImpl.WordNotAllowedCondition")); //$NON-NLS-1$
-   			for (ParaulaProhibidaPoliticaContrasenyaEntity o: politica.getParaulaProhibidaContrasenya())
-   			{
-   				b.append ("- ") //$NON-NLS-1$
-   					.append(o.getParaulaProhibida().getParaulaProhibida())
-   					.append('\n');
-   			}
+   			for (PolicyForbiddenWordEntity o : politica.getForbiddenWords()) {
+                b.append("- ").append(o.getForbiddenWord().getForbiddenWord()).append('\n');
+            }
    		}
-   		addCondition (b, Messages.getString("PasswordServiceImpl.PasswordMaxDurationCondition"), politica.getDuradaMaxima()); //$NON-NLS-1$
-   		addCondition (b, Messages.getString("PasswordServiceImpl.ExpiredPasswordMaxDurationCondition"), politica.getDuradaMaximaCaducada()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.PasswordMaxDurationCondition"), politica.getAvailableTime()); //$NON-NLS-1$
+   		addCondition(b, Messages.getString("PasswordServiceImpl.ExpiredPasswordMaxDurationCondition"), politica.getGracePeriodTime()); //$NON-NLS-1$
        	return b.toString();
 	}
 
@@ -1465,9 +1272,7 @@ public class InternalPasswordServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.InternalPasswordServiceBase#handleCheckPolicy(es.caib.seycon.ng.model.PoliticaContrasenyaEntity, es.caib.seycon.ng.comu.Password)
 	 */
 	@Override
-	protected PolicyCheckResult handleCheckPolicy (PoliticaContrasenyaEntity policy,
-					Password password) throws Exception
-	{
+    protected PolicyCheckResult handleCheckPolicy(PasswordPolicyEntity policy, Password password) throws Exception {
 		return 	internalCheckBasicPolicy( policy, password);
 	}
 
@@ -1475,49 +1280,38 @@ public class InternalPasswordServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.InternalPasswordServiceBase#handleUpdateExpiredPasswords(es.caib.seycon.ng.model.UsuariEntity, boolean)
 	 */
 	@Override
-	protected boolean handleUpdateExpiredPasswords (final UsuariEntity usuari,
-					boolean externalAuth) throws Exception
-	{
+    protected boolean handleUpdateExpiredPasswords(final UserEntity usuari, boolean externalAuth) throws Exception {
 		boolean anyChange = false;
-		for (final DominiContrasenyaEntity dce: getDominiContrasenyaEntityDao().loadAll())
-		{
-			EstatContrasenya status = getPasswordsStatus(usuari, dce);
-			if (status == null || status.getCaducada().booleanValue())
-			{
-				final PoliticaContrasenyaEntity pce = getUserPolicy(usuari, dce);
-				if (pce != null)
-				{
-					if (pce.getTipus().equals("A") || externalAuth) //$NON-NLS-1$
-					{
-						final Password p = generateFakePassword(usuari, dce);
-
-						PlatformTransactionManager txMgr = (PlatformTransactionManager) ctx.getBean("transactionManager"); //$NON-NLS-1$
-						TransactionTemplate txTemplate = new TransactionTemplate(txMgr);
-						txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-						InternalErrorException e = (InternalErrorException) txTemplate.execute(new TransactionCallback()
-						{
-							
-							public Object doInTransaction (TransactionStatus status)
-							{
-								try {	
-									InternalPasswordService svc = (InternalPasswordService) ctx.getBean(InternalPasswordService.SERVICE_NAME);
-									svc.storePassword(usuari.getCodi(), dce.getCodi(), p.getPassword(), false);
-								} catch (InternalErrorException e) {
-									return e;
-								}
-								return null;
-							}
-						});
-						
-						if (e != null)
-							throw e;
-						
-						executeOB(TaskHandler.UPDATE_USER_PASSWORD, dce.getCodi(), usuari.getCodi(), p, false);
-						anyChange = true;
-					}
-				}
-			}
-		}
+		for (final PasswordDomainEntity dce : getPasswordDomainEntityDao().loadAll()) {
+            EstatContrasenya status = getPasswordsStatus(usuari, dce);
+            if (status == null || status.getCaducada().booleanValue()) {
+                final PasswordPolicyEntity pce = getUserPolicy(usuari, dce);
+                if (pce != null) {
+                    if (pce.getType().equals("A") || externalAuth) {
+                        final Password p = generateFakePassword(usuari, dce);
+                        PlatformTransactionManager txMgr = (PlatformTransactionManager) ctx.getBean("transactionManager");
+                        TransactionTemplate txTemplate = new TransactionTemplate(txMgr);
+                        txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                        InternalErrorException e = (InternalErrorException) txTemplate.execute(new TransactionCallback(){
+                            
+                            
+                            public Object doInTransaction(TransactionStatus status) {
+                                try {
+                                    InternalPasswordService svc = (InternalPasswordService) ctx.getBean(InternalPasswordService.SERVICE_NAME);
+                                    svc.storePassword(usuari.getUserName(), dce.getCode(), p.getPassword(), false);
+                                } catch (InternalErrorException e) {
+                                    return e;
+                                }
+                                return null;
+                            }
+                        });
+                        if (e != null) throw e;
+                        executeOB(TaskHandler.UPDATE_USER_PASSWORD, dce.getCode(), usuari.getUserName(), p, false);
+                        anyChange = true;
+                    }
+                }
+            }
+        }
 		return anyChange;
 	}
 
@@ -1525,25 +1319,19 @@ public class InternalPasswordServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.InternalPasswordServiceBase#handleEnumExpiredPasswords(es.caib.seycon.ng.model.UsuariEntity)
 	 */
 	@Override
-	protected Collection<DominiContrasenyaEntity> handleEnumExpiredPasswords (UsuariEntity usuari)
-					throws Exception
-	{
-		Collection<DominiContrasenyaEntity> list = new LinkedList<DominiContrasenyaEntity>();
-		for (DominiContrasenyaEntity dce: getDominiContrasenyaEntityDao().loadAll())
-		{
-			EstatContrasenya status = getPasswordsStatus(usuari, dce);
-			if (status == null || status.getCaducada().booleanValue())
-			{
-				PoliticaContrasenyaEntity pce = getUserPolicy(usuari, dce);
-				if (pce != null)
-				{
-					if (pce.getTipus().equals("M")) //$NON-NLS-1$
-					{
-						list.add(dce);
-					}
-				}
-			}
-		}
+    protected Collection<PasswordDomainEntity> handleEnumExpiredPasswords(UserEntity usuari) throws Exception {
+		Collection<PasswordDomainEntity> list = new LinkedList<PasswordDomainEntity>();
+		for (PasswordDomainEntity dce : getPasswordDomainEntityDao().loadAll()) {
+            EstatContrasenya status = getPasswordsStatus(usuari, dce);
+            if (status == null || status.getCaducada().booleanValue()) {
+                PasswordPolicyEntity pce = getUserPolicy(usuari, dce);
+                if (pce != null) {
+                    if (pce.getType().equals("M")) {
+                        list.add(dce);
+                    }
+                }
+            }
+        }
 		return list;
 	}
 
@@ -1551,14 +1339,10 @@ public class InternalPasswordServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.InternalPasswordServiceBase#handleStoreAndSynchronizePassword(es.caib.seycon.ng.model.UsuariEntity, es.caib.seycon.ng.model.DominiContrasenyaEntity, es.caib.seycon.ng.comu.Password, boolean)
 	 */
 	@Override
-	protected void handleStoreAndSynchronizePassword (UsuariEntity user,
-					DominiContrasenyaEntity passwordDomain, Password password,
-					boolean mustChange) throws Exception
-	{
+    protected void handleStoreAndSynchronizePassword(UserEntity user, PasswordDomainEntity passwordDomain, Password password, boolean mustChange) throws Exception {
         handleStorePassword(user, passwordDomain, password, mustChange);
 
-        executeOB(TaskHandler.UPDATE_USER_PASSWORD, 
-        				passwordDomain.getCodi(), user.getCodi(), password, mustChange);
+        executeOB(TaskHandler.UPDATE_USER_PASSWORD, passwordDomain.getCode(), user.getUserName(), password, mustChange);
 	}
 
 	/* (non-Javadoc)
@@ -1571,17 +1355,15 @@ public class InternalPasswordServiceImpl extends
 	{
 		if (account.getType().equals(AccountType.USER))
 		{
-			UsuariEntity user = getUsuari (account);
-			DominiContrasenyaEntity passwordDomain = getPasswordDomain(account);
+			UserEntity user = getUsuari(account);
+			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			handleStoreAndSynchronizePassword(user, passwordDomain, password, mustChange);
 		}
 		else
 		{
             handleStoreAccountPassword(account, password, mustChange, expirationDate);
     
-        	executeOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD,
-        		account.getName(), account.getDispatcher().getCodi(),
-                password, mustChange);
+        	executeOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange);
 		}
 	}
 
@@ -1602,8 +1384,8 @@ public class InternalPasswordServiceImpl extends
 	protected void handleStoreAndForwardPasswordById (long user, long passwordDomain,
 					Password password, boolean mustChange) throws Exception
 	{
-		UsuariEntity usuari = getUsuariEntityDao().load(user);
-		DominiContrasenyaEntity domini = getDominiContrasenyaEntityDao().load(passwordDomain);
+		UserEntity usuari = getUserEntityDao().load(user);
+		PasswordDomainEntity domini = getPasswordDomainEntityDao().load(passwordDomain);
 		storeAndForwardPassword(usuari, domini, password, mustChange);
 	}
 
@@ -1626,8 +1408,8 @@ public class InternalPasswordServiceImpl extends
 	protected EstatContrasenya handleGetPasswordsStatusById (long user, long domini)
 					throws Exception
 	{
-		UsuariEntity usuari = getUsuariEntityDao().load(user);
-		DominiContrasenyaEntity dominiEntity = getDominiContrasenyaEntityDao().load(domini);
+		UserEntity usuari = getUserEntityDao().load(user);
+		PasswordDomainEntity dominiEntity = getPasswordDomainEntityDao().load(domini);
 		return getPasswordsStatus(usuari, dominiEntity);
 	}
 	

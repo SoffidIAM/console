@@ -3,30 +3,37 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-
-import org.apache.axis.components.logger.LogFactory;
-import org.hibernate.Hibernate;
-import org.mortbay.log.Log;
-
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.model.AccessControlEntity;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AgentDescriptorEntity;
+import com.soffid.iam.model.AttributeMappingEntity;
+import com.soffid.iam.model.DefaultAttributeMappingEntity;
+import com.soffid.iam.model.DefaultObjectMappingEntity;
+import com.soffid.iam.model.DefaultObjectMappingPropertyEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.GroupEntityDao;
+import com.soffid.iam.model.ObjectMappingEntity;
+import com.soffid.iam.model.ObjectMappingPropertyEntity;
+import com.soffid.iam.model.ReplicaDatabaseEntity;
+import com.soffid.iam.model.ReplicaDatabaseEntityDao;
+import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemGroupEntity;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.model.UserTypeEntityDao;
+import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.service.SystemScheduledTasks;
-
-import es.caib.seycon.ng.comu.ReplicaDatabase;
-import es.caib.seycon.ng.model.ReplicaDatabaseEntity;
-import es.caib.seycon.ng.model.ReplicaDatabaseEntityDao;
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.ContenidorRol;
@@ -45,33 +52,24 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.AgentDescriptorEntity;
-import es.caib.seycon.ng.model.AttributeMappingEntity;
-import es.caib.seycon.ng.model.ControlAccessEntity;
-import es.caib.seycon.ng.model.DefaultAttributeMappingEntity;
-import es.caib.seycon.ng.model.DefaultObjectMappingEntity;
-import es.caib.seycon.ng.model.DefaultObjectMappingPropertyEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.GrupDispatcherEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.GrupEntityDao;
-import es.caib.seycon.ng.model.ObjectMappingEntity;
-import es.caib.seycon.ng.model.ObjectMappingPropertyEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.ServeiEntity;
-import es.caib.seycon.ng.model.ServerEntity;
-import es.caib.seycon.ng.model.ServerEntityDao;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.TipusUsuariDispatcherEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntityDao;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.intf.DatabaseReplicaMgr;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+import org.apache.axis.components.logger.LogFactory;
+import org.hibernate.Hibernate;
+import org.mortbay.log.Log;
 
 /**
  * @see es.caib.seycon.ng.servei.DispatcherService
@@ -108,15 +106,15 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         	dispatcher.setRelacioLaboral(""); //$NON-NLS-1$
         }
         
-		DispatcherEntity dispatchersSameCode = getDispatcherEntityDao().findByCodi(dispatcher.getCodi());
+		SystemEntity dispatchersSameCode = getSystemEntityDao().findByCode(dispatcher.getCodi());
 		if(dispatchersSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("DipatcherServiceImpl.CodeDispatcherExists"),  //$NON-NLS-1$
 							dispatcher.getCodi())); 
         
-        DispatcherEntity dispatcherEntity = getDispatcherEntityDao().dispatcherToEntity(dispatcher);
-        dispatcherEntity.setMainDispatcher ( getDispatcherEntityDao().loadAll().isEmpty());
+        SystemEntity dispatcherEntity = getSystemEntityDao().dispatcherToEntity(dispatcher);
+        dispatcherEntity.setMainSystem(getSystemEntityDao().loadAll().isEmpty());
         dispatcherEntity.setTimeStamp(new Date());
-        getDispatcherEntityDao().create(dispatcherEntity);
+        getSystemEntityDao().create(dispatcherEntity);
         dispatcher.setId(dispatcherEntity.getId());
         
         updateAutomaticTasks (dispatcher, false);
@@ -125,7 +123,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         
         updateTipusAndGrups(dispatcher, dispatcherEntity);
         
-        dispatcher = getDispatcherEntityDao().toDispatcher(dispatcherEntity);
+        dispatcher = getSystemEntityDao().toDispatcher(dispatcherEntity);
         
         updateServers();
         
@@ -199,16 +197,14 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     protected es.caib.seycon.ng.comu.Dispatcher handleUpdate(
             es.caib.seycon.ng.comu.Dispatcher dispatcher) throws java.lang.Exception {
         // Obtenim el anterior per comparar els grups i els tipus d'usuari
-        DispatcherEntity entityOld = getDispatcherEntityDao().findByCodi(dispatcher.getCodi());
+        SystemEntity entityOld = getSystemEntityDao().findByCode(dispatcher.getCodi());
 
         // fem còpia dels antics per comparar
-        Collection<TipusUsuariDispatcherEntity> tipusUsuariOld = new java.util.HashSet<es.caib.seycon.ng.model.TipusUsuariDispatcherEntity>(
-                entityOld.getTipusUsuari());
-        HashSet<GrupDispatcherEntity> grupsOld = new HashSet<GrupDispatcherEntity>(
-                entityOld.getGrupDispatcher());
+        Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(entityOld.getUserType());
+        HashSet<SystemGroupEntity> grupsOld = new HashSet<SystemGroupEntity>(entityOld.getSystemGroup());
 
         // Obtenim el nou entity
-        DispatcherEntity entity = getDispatcherEntityDao().dispatcherToEntity(dispatcher);
+        SystemEntity entity = getSystemEntityDao().dispatcherToEntity(dispatcher);
         entity.setTimeStamp(new Date());
 
         updateAutomaticTasks (dispatcher, false);
@@ -217,91 +213,77 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
         updateServers();
 
-        return getDispatcherEntityDao().toDispatcher(entity);
+        return getSystemEntityDao().toDispatcher(entity);
     }
 
-    private void updateTipusAndGrups(Dispatcher dispatcher, DispatcherEntity entity) throws InternalErrorException, Exception {
+    private void updateTipusAndGrups(Dispatcher dispatcher, SystemEntity entity) throws InternalErrorException, Exception {
         updateTipus(dispatcher, entity);
         updateGrups(dispatcher, entity);
     }
 
-    private void updateTipus(Dispatcher dispatcher, DispatcherEntity entity) throws InternalErrorException, Exception {
-        TipusUsuariEntityDao tipusDao = getTipusUsuariEntityDao ();
+    private void updateTipus(Dispatcher dispatcher, SystemEntity entity) throws InternalErrorException, Exception {
+        UserTypeEntityDao tipusDao = getUserTypeEntityDao();
         AccountService accService = getAccountService();
         String tipus[] = dispatcher.getRelacioLaboral().split(","); //$NON-NLS-1$
-        Collection<TipusUsuariEntity> tipusUsuariToGenerateAccounts = new LinkedList<TipusUsuariEntity>();
+        Collection<UserTypeEntity> tipusUsuariToGenerateAccounts = new LinkedList<UserTypeEntity>();
         for (int i = 0; i < tipus.length; i++) {
             String t = tipus[i].trim();
             boolean found = false;
-            for (TipusUsuariDispatcherEntity td: entity.getTipusUsuari()) {
-                if (td.getTipusUsuari().getCodi().equals(t))
-                {
+            for (UserTypeSystemEntity td : entity.getUserType()) {
+                if (td.getUserType().getCode().equals(t)) {
                     found = true;
                     break;
                 }
             }
-            if (! found && t.length() > 0) {
-                TipusUsuariEntity tu = tipusDao.findByCodi(t);
-                if (tu == null)
-                    throw new InternalErrorException (String.format(Messages.getString("DispatcherServiceImpl.0"),t)); //$NON-NLS-1$
-                TipusUsuariDispatcherEntity td = getTipusUsuariDispatcherEntityDao().newTipusUsuariDispatcherEntity();
-                td.setDispatcher(entity);
-                td.setTipusUsuari(tu);
-                getTipusUsuariDispatcherEntityDao().create(td);
-                entity.getTipusUsuari().add(td);
+            if (!found && t.length() > 0) {
+                UserTypeEntity tu = tipusDao.findByCode(t);
+                if (tu == null) throw new InternalErrorException(String.format(Messages.getString("DispatcherServiceImpl.0"), t));
+                UserTypeSystemEntity td = getUserTypeSystemEntityDao().newUserTypeSystemEntity();
+                td.setSystem(entity);
+                td.setUserType(tu);
+                getUserTypeSystemEntityDao().create(td);
+                entity.getUserType().add(td);
                 tipusUsuariToGenerateAccounts.add(tu);
             }
         }
-        for (Iterator<TipusUsuariDispatcherEntity> it=entity.getTipusUsuari().iterator(); it.hasNext();) {
-        	TipusUsuariDispatcherEntity td = it.next();
+        for (Iterator<UserTypeSystemEntity> it = entity.getUserType().iterator(); it.hasNext(); ) {
+            UserTypeSystemEntity td = it.next();
             boolean found = false;
             for (int i = 0; i < tipus.length; i++) {
-                if (tipus[i].trim().equals (td.getTipusUsuari().getCodi())) {
+                if (tipus[i].trim().equals(td.getUserType().getCode())) {
                     found = true;
                     break;
                 }
             }
-            if (! found)
-            {
-            	tipusUsuariToGenerateAccounts.add(td.getTipusUsuari());
-                getTipusUsuariDispatcherEntityDao().remove(td);
+            if (!found) {
+                tipusUsuariToGenerateAccounts.add(td.getUserType());
+                getUserTypeSystemEntityDao().remove(td);
                 it.remove();
-                //Aquí cridar handleGenerateUserAccounts
                 UsuariService usuService = getUsuariService();
-                Collection<Usuari> usuaris= usuService.findUsuariByCriteri("","","","","","","","","","",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-                				td.getTipusUsuari().getCodi(),"","","","","","","",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+                Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", td.getUserType().getCode(), "", "", "", "", "", "", "", false);
                 accService = getAccountService();
                 long l = usuaris.size();
                 int i = 0;
-                for(Usuari usuari: usuaris)
-                {
-                	i ++;
-                	if (i % 100 == 1)
-                		log.info ("Updating user "+i+" of "+l); //$NON-NLS-1$ //$NON-NLS-2$
-                	generateUpdateUser (usuari.getCodi(), entity.getCodi());
+                for (Usuari usuari : usuaris) {
+                    i++;
+                    if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
+                    generateUpdateUser(usuari.getCodi(), entity.getCode());
                 }
-                log.info("Updated "+l+" users"); //$NON-NLS-1$ //$NON-NLS-2$
-                //Aquí acaba 
+                log.info("Updated " + l + " users");
             }
         }
-        for (TipusUsuariEntity tu: tipusUsuariToGenerateAccounts)
-        {
-            //Comença
-        	UsuariService usuService = getUsuariService();
-            Collection<Usuari> usuaris= usuService.findUsuariByCriteri("","","","","","","","","","",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-            				tu.getCodi(),"","","","","","","",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        for (UserTypeEntity tu : tipusUsuariToGenerateAccounts) {
+            UsuariService usuService = getUsuariService();
+            Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", tu.getCode(), "", "", "", "", "", "", "", false);
             accService = getAccountService();
             long l = usuaris.size();
             int i = 0;
-            for(Usuari usuari: usuaris)
-            {
-            	i ++;
-            	if (i % 100 == 1)
-            		log.info ("Updating user "+i+" of "+l); //$NON-NLS-1$ //$NON-NLS-2$
-            	generateUpdateUser (usuari.getCodi(), entity.getCodi());
+            for (Usuari usuari : usuaris) {
+                i++;
+                if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
+                generateUpdateUser(usuari.getCodi(), entity.getCode());
             }
-            log.info("Updated "+l+" users"); //$NON-NLS-1$ //$NON-NLS-2$
-            //Aquí acaba 
+            log.info("Updated " + l + " users");
         }
         if(tipusUsuariToGenerateAccounts != null && !tipusUsuariToGenerateAccounts.isEmpty())
         	if(dispatcher.getUrl() != null)
@@ -310,102 +292,87 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
     private void generateUpdateUser ( String usuari, String dispatcher ) throws InternalErrorException
     {
-    	TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-    	tasque.setTransa(TaskHandler.UPDATE_USER);// Actualització de l'usuari a //$NON-NLS-1$
+    	TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+    	tasque.setTransaction(TaskHandler.UPDATE_USER);// Actualització de l'usuari a //$NON-NLS-1$
                                            // l'agent
-    	tasque.setData(new Timestamp(System.currentTimeMillis()));
-    	tasque.setUsuari(usuari);
-    	tasque.setCoddis(dispatcher); // Només es genera la tasca al
+    	tasque.setDate(new Timestamp(System.currentTimeMillis()));
+    	tasque.setUser(usuari);
+    	tasque.setSystemCode(dispatcher); // Només es genera la tasca al
                                          // dispatcher actual
     	tasque.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-        getTasqueEntityDao().createNoFlush(tasque);
+        getTaskEntityDao().createNoFlush(tasque);
     }
-    private void updateGrups(Dispatcher dispatcher, DispatcherEntity entity) throws InternalErrorException, Exception {
-        GrupEntityDao grupDao = getGrupEntityDao ();
+    private void updateGrups(Dispatcher dispatcher, SystemEntity entity) throws InternalErrorException, Exception {
+        GroupEntityDao grupDao = getGroupEntityDao();
         AccountService accService = getAccountService();
         String grups[] = dispatcher.getGrups() == null ? new String[0]: dispatcher.getGrups().split(","); //$NON-NLS-1$
         	
-        Collection<GrupEntity> groupsToGenerateAccounts = new HashSet<GrupEntity>();
+        Collection<GroupEntity> groupsToGenerateAccounts = new HashSet<GroupEntity>();
         boolean emptyGrups = grups.length == 0 ||
         				grups.length == 1 && grups[0].length() == 0;
-        if((emptyGrups && !entity.getGrupDispatcher().isEmpty()) || (! emptyGrups && entity.getGrupDispatcher().isEmpty())){
-        	List<GrupEntity> tots = grupDao.loadAll();
-        	for(GrupEntity g: tots)
-        	{
-        		groupsToGenerateAccounts.add(g);
-        	}
+        if((emptyGrups && !entity.getSystemGroup().isEmpty()) || (!emptyGrups && entity.getSystemGroup().isEmpty())){
+        	List<GroupEntity> tots = grupDao.loadAll();
+        	for (GroupEntity g : tots) {
+                groupsToGenerateAccounts.add(g);
+            }
         }
         
         for (int i = 0; i < grups.length; i++) {
             String t = grups[i].trim();
             boolean found = false;
-            for (GrupDispatcherEntity gd: entity.getGrupDispatcher()) {
-                if (gd.getGrup().getCodi().equals(t))
-                {
+            for (SystemGroupEntity gd : entity.getSystemGroup()) {
+                if (gd.getGroup().getCode().equals(t)) {
                     found = true;
                     break;
                 }
             }
-            if (! found && t.length() > 0) {
-                GrupEntity gr = grupDao.findByCodi(t);
-                if (gr == null)
-                    throw new InternalErrorException (String.format(Messages.getString("DispatcherServiceImpl.1"),t)); //$NON-NLS-1$
-                GrupDispatcherEntity gd = getGrupDispatcherEntityDao().newGrupDispatcherEntity(); 
-                gd.setDispatcher(entity);
-                gd.setGrup(gr);
-                getGrupDispatcherEntityDao().create(gd);
-                entity.getGrupDispatcher().add(gd);
+            if (!found && t.length() > 0) {
+                GroupEntity gr = grupDao.findByCode(t);
+                if (gr == null) throw new InternalErrorException(String.format(Messages.getString("DispatcherServiceImpl.1"), t));
+                SystemGroupEntity gd = getSystemGroupEntityDao().newSystemGroupEntity();
+                gd.setSystem(entity);
+                gd.setGroup(gr);
+                getSystemGroupEntityDao().create(gd);
+                entity.getSystemGroup().add(gd);
                 groupsToGenerateAccounts.add(gr);
-            }	
+            }
         }
 
-        for (Iterator<GrupDispatcherEntity> it=entity.getGrupDispatcher().iterator(); it.hasNext();) {
-        	GrupDispatcherEntity gd = it.next();
+        for (Iterator<SystemGroupEntity> it = entity.getSystemGroup().iterator(); it.hasNext(); ) {
+            SystemGroupEntity gd = it.next();
             boolean found = false;
             for (int i = 0; i < grups.length; i++) {
-                if (grups[i].trim().equals (gd.getGrup().getCodi())) {
+                if (grups[i].trim().equals(gd.getGroup().getCode())) {
                     found = true;
                     break;
                 }
             }
-            if (! found)
-            {
-            	groupsToGenerateAccounts.add(gd.getGrup());
-                getGrupDispatcherEntityDao().remove(gd);
+            if (!found) {
+                groupsToGenerateAccounts.add(gd.getGroup());
+                getSystemGroupEntityDao().remove(gd);
                 it.remove();
-                //Comença
-            	List<UsuariEntity> usuaris = getUsuariEntityDao().findUsuarisGrupISubgrupsByCodiGrup(gd.getGrup().getCodi());
-
-            	accService = getAccountService();
-
+                List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gd.getGroup().getCode());
+                accService = getAccountService();
                 long l = usuaris.size();
                 int i = 0;
-                for(UsuariEntity usuari: usuaris)
-                {
-                	i ++;
-                	if (i % 100 == 1)
-                		log.info ("Updating user "+i+" of "+l); //$NON-NLS-1$ //$NON-NLS-2$
-                	generateUpdateUser (usuari.getCodi(), entity.getCodi());
+                for (UserEntity usuari : usuaris) {
+                    i++;
+                    if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
+                    generateUpdateUser(usuari.getUserName(), entity.getCode());
                 }
-                log.info("Updated "+l+" users"); //$NON-NLS-1$ //$NON-NLS-2$
-                //Aquí acaba
+                log.info("Updated " + l + " users");
             }
         }
-        for (GrupEntity gr: groupsToGenerateAccounts)
-        {
-            //Comença
-            List<UsuariEntity> usuaris = getUsuariEntityDao().findUsuarisGrupISubgrupsByCodiGrup(gr.getCodi());
+        for (GroupEntity gr : groupsToGenerateAccounts) {
+            List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gr.getCode());
             long l = usuaris.size();
             int i = 0;
-            for(UsuariEntity usuari: usuaris)
-            {
-            	i ++;
-            	if (i % 100 == 1)
-            		log.info ("Updating user "+i+" of "+l); //$NON-NLS-1$ //$NON-NLS-2$
-            	generateUpdateUser (usuari.getCodi(), entity.getCodi());
+            for (UserEntity usuari : usuaris) {
+                i++;
+                if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
+                generateUpdateUser(usuari.getUserName(), entity.getCode());
             }
-            log.info("Updated "+l+" users"); //$NON-NLS-1$ //$NON-NLS-2$
-            //Aquí cridar handleGenerateUserAccounts
+            log.info("Updated " + l + " users");
         }
         if(groupsToGenerateAccounts != null && !groupsToGenerateAccounts.isEmpty())
         	 if(dispatcher.getUrl() != null)
@@ -418,12 +385,11 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (es.caib.seycon.ng.comu.Dispatcher dispatcher)
 					throws java.lang.Exception
 	{
-		DispatcherEntity dispatcherEntity = getDispatcherEntityDao().findByCodi(
-						dispatcher.getCodi());
+		SystemEntity dispatcherEntity = getSystemEntityDao().findByCode(dispatcher.getCodi());
 		// Esborrem les relacions existents amb d'altres taules
-		getGrupDispatcherEntityDao().remove(dispatcherEntity.getGrupDispatcher());
-		getTipusUsuariDispatcherEntityDao().remove(dispatcherEntity.getTipusUsuari());
-		getControlAccessEntityDao().remove(dispatcherEntity.getControlAccess());
+		getSystemGroupEntityDao().remove(dispatcherEntity.getSystemGroup());
+		getUserTypeSystemEntityDao().remove(dispatcherEntity.getUserType());
+		getAccessControlEntityDao().remove(dispatcherEntity.getAccessControls());
 
 		for (ObjectMappingEntity om : dispatcherEntity.getObjectMappings())
 		{
@@ -437,15 +403,15 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 			}
 			getObjectMappingEntityDao().remove(om);
 		}
-		getDispatcherEntityDao().remove(dispatcherEntity);
+		getSystemEntityDao().remove(dispatcherEntity);
         updateAutomaticTasks (dispatcher, true);
         updateServers();
 	}
 
     protected Dispatcher handleFindDispatcherByCodi(String codi) throws Exception {
-        DispatcherEntity dispatcherEntity = getDispatcherEntityDao().findByCodi(codi);
+        SystemEntity dispatcherEntity = getSystemEntityDao().findByCode(codi);
         if (dispatcherEntity != null) {
-            Dispatcher dispatcher = getDispatcherEntityDao().toDispatcher(dispatcherEntity);
+            Dispatcher dispatcher = getSystemEntityDao().toDispatcher(dispatcherEntity);
             return dispatcher;
         }
         return null;
@@ -483,30 +449,16 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             esActiu = "S"; //$NON-NLS-1$
         }
         
-        Collection dispatchers = getDispatcherEntityDao()
-                .query(
-                        "from es.caib.seycon.ng.model.DispatcherEntity " //$NON-NLS-1$
-                                + "where (:codi is null or upper(codi) like upper(:codi)) and (:nomCla is null or upper(nomCla) like upper(:nomCla)) " //$NON-NLS-1$
-                                + "and (:url is null or upper(url) like upper(:url)) and (:basRol is null or upper(basRol) = upper(:basRol)) and " //$NON-NLS-1$
-                                + "(:segur is null or segur = :segur) and (:actiu is null or url is not null) order by codi", //$NON-NLS-1$
-                    new Parameter[] {
-                        new Parameter ("codi", codi), //$NON-NLS-1$
-                        new Parameter ("nomCla", nomCla), //$NON-NLS-1$
-                        new Parameter ("url", url), //$NON-NLS-1$
-                        new Parameter ("basRol", basRol), //$NON-NLS-1$
-                        new Parameter ("segur", segur), //$NON-NLS-1$
-                        new Parameter ("actiu", esActiu) //$NON-NLS-1$
-        });
+        Collection dispatchers = getSystemEntityDao().query("from es.caib.seycon.ng.model.DispatcherEntity where (:codi is null or upper(codi) like upper(:codi)) and (:nomCla is null or upper(nomCla) like upper(:nomCla)) and (:url is null or upper(url) like upper(:url)) and (:basRol is null or upper(basRol) = upper(:basRol)) and (:segur is null or segur = :segur) and (:actiu is null or url is not null) order by codi", new Parameter[]{new Parameter("codi", codi), new Parameter("nomCla", nomCla), new Parameter("url", url), new Parameter("basRol", basRol), new Parameter("segur", segur), new Parameter("actiu", esActiu)});
         if (dispatchers != null)
         {
         	// Check maximum number of results
         	if (dispatchers.size() > limitResults)
         	{
-        		return getDispatcherEntityDao().toDispatcherList(dispatchers)
-					.subList(0, limitResults);
+        		return getSystemEntityDao().toDispatcherList(dispatchers).subList(0, limitResults);
         	}
         	
-            return getDispatcherEntityDao().toDispatcherList(dispatchers);
+            return getSystemEntityDao().toDispatcherList(dispatchers);
         }
         
         return new Vector();
@@ -514,11 +466,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
     protected ControlAcces handleCreate(ControlAcces controlAcces) throws Exception {
         if (AutoritzacionsUsuari.canCreateAccessControlAgent()) {
-            ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(
-                    controlAcces);
-            getControlAccessEntityDao().create(entity);
+            AccessControlEntity entity = getAccessControlEntityDao().controlAccesToEntity(controlAcces);
+            getAccessControlEntityDao().create(entity);
             controlAcces.setId(entity.getId());
-            controlAcces = getControlAccessEntityDao().toControlAcces(entity);
+            controlAcces = getAccessControlEntityDao().toControlAcces(entity);
             updateServers();
             return controlAcces;
         }
@@ -530,11 +481,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
     protected ControlAcces handleUpdate(ControlAcces controlAcces) throws Exception {
         if (AutoritzacionsUsuari.canUpdateAccessControlAgent()) {
-            ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(
-                    controlAcces);
-            getControlAccessEntityDao().update(entity);
+            AccessControlEntity entity = getAccessControlEntityDao().controlAccesToEntity(controlAcces);
+            getAccessControlEntityDao().update(entity);
             controlAcces.setId(entity.getId());
-            controlAcces = getControlAccessEntityDao().toControlAcces(entity);
+            controlAcces = getAccessControlEntityDao().toControlAcces(entity);
 
             // Ací hem de crear la tasca de UpdateAccessControl
             Tasca updateAccessControl = new Tasca();
@@ -552,8 +502,8 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                                                                        // dispatcher
                                                                        // actual
             updateAccessControl.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-            TasqueEntity tasca = getTasqueEntityDao().tascaToEntity(updateAccessControl);
-            getTasqueEntityDao().create(tasca);
+            TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateAccessControl);
+            getTaskEntityDao().create(tasca);
 
             updateServers();
 
@@ -565,9 +515,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     }
 
     protected void handleDelete(ControlAcces controlAcces) throws Exception {
-        ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(controlAcces);
+        AccessControlEntity entity = getAccessControlEntityDao().controlAccesToEntity(controlAcces);
         if (entity != null)
-            getControlAccessEntityDao().remove(entity);
+            getAccessControlEntityDao().remove(entity);
 
         updateServers();
     }
@@ -575,8 +525,8 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     protected Collection<ControlAcces> handleFindControlAccesByCodiAgent(String codiAgent)
             throws Exception {
         if (!"%".equals(codiAgent)) { //$NON-NLS-1$
-            Collection control = getControlAccessEntityDao().findByCodiAgent(codiAgent);
-            return getControlAccessEntityDao().toControlAccesList(control);
+            Collection control = getAccessControlEntityDao().findByAgentCode(codiAgent);
+            return getAccessControlEntityDao().toControlAccesList(control);
         }
         return new Vector();
     }
@@ -591,26 +541,23 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                     Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
         // Obtenim tots els codis d'usuari:
-        Collection<AccountEntity> col = getDispatcherEntityDao().findByCodi(codiAgent).getAccounts();
+        Collection<AccountEntity> col = getSystemEntityDao().findByCode(codiAgent).getAccounts();
         /*Collection col = getUsuariEntityDao().query(
                 "select usuari.codi from es.caib.seycon.ng.model.UsuariEntity usuari", //$NON-NLS-1$
                 new Parameter[] {});*/
         // col = new Vector(col);
         // Creem les tasques per a cadascun dels usuaris
-        for (Iterator it = col.iterator(); it.hasNext();) {
-        	AccountEntity ae = (AccountEntity) it.next();
-        	String codiUsuari = ae.getName();
-            //String codiUsuari = (String) it.next();
+        for (Iterator it = col.iterator(); it.hasNext(); ) {
+            AccountEntity ae = (AccountEntity) it.next();
+            String codiUsuari = ae.getName();
             Tasca updateUser = new Tasca();
-            updateUser.setTransa(TaskHandler.UPDATE_ACCOUNT);// Actualització de l'usuari a //$NON-NLS-1$
-                                               // l'agent
+            updateUser.setTransa(TaskHandler.UPDATE_ACCOUNT);
             updateUser.setDataTasca(Calendar.getInstance());
             updateUser.setUsuari(codiUsuari);
-            updateUser.setCoddis(codiAgent); // Només es genera la tasca al
-                                             // dispatcher actual
-            updateUser.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-            TasqueEntity tasca = getTasqueEntityDao().tascaToEntity(updateUser);
-            getTasqueEntityDao().createNoFlush(tasca);
+            updateUser.setCoddis(codiAgent);
+            updateUser.setStatus("P");
+            TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateUser);
+            getTaskEntityDao().createNoFlush(tasca);
         }
 
     }
@@ -625,25 +572,20 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                     Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
         // Obtenim tots els rols de l'agent:
-        Collection col = getRolEntityDao()
-                .query("select distinct rol.nom from es.caib.seycon.ng.model.RolEntity rol " //$NON-NLS-1$
-                        + " left join rol.baseDeDades baseDeDades where baseDeDades.codi=:codiAgent", //$NON-NLS-1$
-                        new Parameter[] { new Parameter("codiAgent", codiAgent) }); //$NON-NLS-1$
+        Collection col = getRoleEntityDao().query("select distinct rol.nom from es.caib.seycon.ng.model.RolEntity rol  left join rol.baseDeDades baseDeDades where baseDeDades.codi=:codiAgent", new Parameter[]{new Parameter("codiAgent", codiAgent)}); //$NON-NLS-1$
         // col = new Vector(col);
         // Creem les tasques per a cadascun dels usuaris
-        for (Iterator it = col.iterator(); it.hasNext();) {
+        for (Iterator it = col.iterator(); it.hasNext(); ) {
             String nomRole = (String) it.next();
             Tasca updateRole = new Tasca();
-            updateRole.setTransa("UpdateRole");// Actualització de l'usuari a //$NON-NLS-1$
-                                               // l'agent
+            updateRole.setTransa("UpdateRole");
             updateRole.setRole(nomRole);
             updateRole.setDataTasca(Calendar.getInstance());
             updateRole.setBd(codiAgent);
-            updateRole.setCoddis(codiAgent); // Només es genera la tasca al
-                                             // dispatcher actual
-            updateRole.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-            TasqueEntity tasca = getTasqueEntityDao().tascaToEntity(updateRole);
-            getTasqueEntityDao().createNoFlush(tasca);
+            updateRole.setCoddis(codiAgent);
+            updateRole.setStatus("P");
+            TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
+            getTaskEntityDao().createNoFlush(tasca);
         }
 
     }
@@ -688,25 +630,22 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
     @Override
     protected Collection<ControlAcces> handleGetControlAcces(Dispatcher agent) throws Exception {
-        Collection<ControlAccessEntity> cace = getControlAccessEntityDao().findByCodiAgent(
-                agent.getCodi());
-        return getControlAccessEntityDao().toControlAccesList(cace);
+        Collection<AccessControlEntity> cace = getAccessControlEntityDao().findByAgentCode(agent.getCodi());
+        return getAccessControlEntityDao().toControlAccesList(cace);
     }
 
     @Override
     protected Collection<GrupDispatcher> handleGetGrupsDispatcher(Dispatcher agent)
             throws Exception {
-        Collection<GrupDispatcherEntity> grupsE = getGrupDispatcherEntityDao().findByCodiAgent(
-                agent.getCodi());
-        return getGrupDispatcherEntityDao().toGrupDispatcherList(grupsE);
+        Collection<SystemGroupEntity> grupsE = getSystemGroupEntityDao().findByAgentCode(agent.getCodi());
+        return getSystemGroupEntityDao().toGrupDispatcherList(grupsE);
     }
 
     @Override
     protected Collection<TipusUsuariDispatcher> handleGetTipusUsuariDispatcher(Dispatcher agent)
             throws Exception {
-        Collection<TipusUsuariDispatcherEntity> tipusUsuariE = getTipusUsuariDispatcherEntityDao()
-                .findByCodiAgent(agent.getCodi());
-        return getTipusUsuariDispatcherEntityDao().toTipusUsuariDispatcherList(tipusUsuariE);
+        Collection<UserTypeSystemEntity> tipusUsuariE = getUserTypeSystemEntityDao().findByAgentCode(agent.getCodi());
+        return getUserTypeSystemEntityDao().toTipusUsuariDispatcherList(tipusUsuariE);
 
     }
 
@@ -714,66 +653,57 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected boolean handleIsUserAllowed(Dispatcher dispatcher, String user)
 			throws Exception
 	{
-		DispatcherEntity de = getDispatcherEntityDao().load(dispatcher.getId());
+		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
 		if (de == null)
 			return false;
-		UsuariEntity ue = getUsuariEntityDao().findByCodi(user);
+		UserEntity ue = getUserEntityDao().findByCode(user);
         // Test user types
         boolean found = false;
-        for (Iterator<TipusUsuariDispatcherEntity> it = de.getTipusUsuari()
-                .iterator(); !found && it.hasNext();) {
-            TipusUsuariDispatcherEntity tu = it.next();
-            if (tu.getTipusUsuari().getId().equals(ue.getTipusUsuari().getId()))
-                found = true;
+        for (Iterator<UserTypeSystemEntity> it = de.getUserType().iterator(); !found && it.hasNext(); ) {
+            UserTypeSystemEntity tu = it.next();
+            if (tu.getUserType().getId().equals(ue.getUserType().getId())) found = true;
         }
         if (!found)
         	return false;
 
         // Test dispatcher groups
-        if (!de.getGrupDispatcher().isEmpty()) {
+        if (!de.getSystemGroup().isEmpty()) {
             found = false;
-            for (Iterator<GrupDispatcherEntity> it = de.getGrupDispatcher()
-                    .iterator(); it.hasNext() && !found;) {
-                GrupDispatcherEntity gde = it.next();
-                // Verify if user belongs to such a group
-                if (userBelongsToGroup(ue, gde.getGrup()))
-                    found = true;
+            for (Iterator<SystemGroupEntity> it = de.getSystemGroup().iterator(); it.hasNext() && !found; ) {
+                SystemGroupEntity gde = it.next();
+                if (userBelongsToGroup(ue, gde.getGroup())) found = true;
             }
             if (!found)
             	return false;
         }
 
         // Test role-based condition
-        if (de.getBasRol().equals("S")) { //$NON-NLS-1$
+        if (de.getBaseRole().equals("S")) { //$NON-NLS-1$
         	Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantByUser(ue.getId());
-        	for (RolGrant grant: grants)
-        	{
-        		if (grant.getDispatcher().equals(de.getCodi()))
-        			return true;
-        	}
+        	for (RolGrant grant : grants) {
+                if (grant.getDispatcher().equals(de.getCode())) return true;
+            }
         	return false;
         }
         return true;
 
 	}
 
-    private boolean userBelongsToGroup(UsuariEntity userEntity, GrupEntity grup) {
-        if (isChildGroup(userEntity.getGrupPrimari(), grup))
+    private boolean userBelongsToGroup(UserEntity userEntity, GroupEntity grup) {
+        if (isChildGroup(userEntity.getPrimaryGroup(), grup))
             return true;
-        for (Iterator<UsuariGrupEntity> it = userEntity.getGrupsSecundaris().iterator(); it
-                .hasNext();) {
-            if (isChildGroup(it.next().getGrup(), grup))
-                return true;
+        for (Iterator<UserGroupEntity> it = userEntity.getSecondaryGroups().iterator(); it.hasNext(); ) {
+            if (isChildGroup(it.next().getGroup(), grup)) return true;
         }
         return false;
     }
 
-    private boolean isChildGroup(GrupEntity child, GrupEntity grup) {
+    private boolean isChildGroup(GroupEntity child, GroupEntity grup) {
         while (child != null) {
             if (child.getId().equals(grup.getId()))
                 return true;
             else
-                child = child.getPare();
+                child = child.getParent();
         }
         return false;
     }
@@ -782,31 +712,27 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected Collection<Dispatcher> handleFindAllActiveDispatchers()
 			throws Exception
 	{
-		return getDispatcherEntityDao().toDispatcherList(
-				getDispatcherEntityDao().findActius());
+		return getSystemEntityDao().toDispatcherList(getSystemEntityDao().findActives());
 	}
 
 	@Override
 	protected boolean handleIsGroupAllowed(Dispatcher dispatcher, String group)
 			throws Exception
 	{
-		DispatcherEntity de = getDispatcherEntityDao().load(dispatcher.getId());
+		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
 		if (de == null)
 			return false;
 
         // Test dispatcher groups
-        if (de.getGrupDispatcher().isEmpty()) {
+        if (de.getSystemGroup().isEmpty()) {
         	return true;
         } else {
-            for (GrupDispatcherEntity gde: de.getGrupDispatcher())
-            {
-            	GrupEntity ge = gde.getGrup();
-            	do
-            	{
-                	if (ge.getCodi().equals(group))
-                		return true;
-                	ge = ge.getPare();
-            	} while (ge != null);
+            for (SystemGroupEntity gde : de.getSystemGroup()) {
+                GroupEntity ge = gde.getGroup();
+                do {
+                    if (ge.getCode().equals(group)) return true;
+                    ge = ge.getParent();
+                }                 while (ge != null);
             }
            	return false;
         }
@@ -941,9 +867,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (ReplicaDatabase database) throws Exception
 	{
 		ReplicaDatabaseEntity dbEntity = getReplicaDatabaseEntityDao().load(database.getId());
-		DispatcherEntity dispatcher = dbEntity.getDispatcher();
+		SystemEntity dispatcher = dbEntity.getSystem();
 		getReplicaDatabaseEntityDao().remove(dbEntity);
-		getDispatcherEntityDao().remove(dispatcher);
+		getSystemEntityDao().remove(dispatcher);
 	}
 	
 	protected void updateSeyconServerList () throws InternalErrorException
@@ -992,28 +918,28 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
 	protected void updateReplicaAgent (ReplicaDatabaseEntity db) throws InternalErrorException
 	{
-		if (db.getDispatcher() == null)
+		if (db.getSystem() == null)
 		{
-			DispatcherEntity mainDispatcher = getDispatcherEntityDao().findSoffidDispatcher();
-			DispatcherEntity dispatcher = getDispatcherEntityDao().newDispatcherEntity();
-			dispatcher.setNomCla("com.soffid.iam.addons.replica.agent.ReplicaAgent"); //$NON-NLS-1$
-			dispatcher.setBasRol("N"); //$NON-NLS-1$
-			dispatcher.setCodi(db.getName());
+			SystemEntity mainDispatcher = getSystemEntityDao().findSoffidSystem();
+			SystemEntity dispatcher = getSystemEntityDao().newSystemEntity();
+			dispatcher.setClassName("com.soffid.iam.addons.replica.agent.ReplicaAgent"); //$NON-NLS-1$
+			dispatcher.setBaseRole("N"); //$NON-NLS-1$
+			dispatcher.setCode(db.getName());
 			dispatcher.setReadOnly(false);
-			dispatcher.setSegur("S"); //$NON-NLS-1$
+			dispatcher.setSafe("S"); //$NON-NLS-1$
 			dispatcher.setUrl("local"); //$NON-NLS-1$
-			dispatcher.setDominiUsuari(mainDispatcher.getDominiUsuari());
-			dispatcher.setDomini(mainDispatcher.getDomini());
-			dispatcher.setControlAcces("N"); //$NON-NLS-1$
-			getDispatcherEntityDao().create(dispatcher);
+			dispatcher.setUserDomain(mainDispatcher.getUserDomain());
+			dispatcher.setDomain(mainDispatcher.getDomain());
+			dispatcher.setEnableAccessControl("N"); //$NON-NLS-1$
+			getSystemEntityDao().create(dispatcher);
 			dispatcher.getReplicaDatabases().add(db);
-			db.setDispatcher( dispatcher );
+			db.setSystem(dispatcher);
 			getReplicaDatabaseEntityDao().update(db);
 		}
 		else
 		{
-			db.getDispatcher().setCodi(db.getName());
-			getDispatcherEntityDao().update(db.getDispatcher());
+			db.getSystem().setCode(db.getName());
+			getSystemEntityDao().update(db.getSystem());
 		}
 	}
 
@@ -1051,10 +977,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
 		getAttributeMappingEntityDao().create(ame);
-		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
 		{
-			ame.getObject().getDispatcher().setTimeStamp(new Date());
-			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
 		}
         updateServers();
 		return getAttributeMappingEntityDao().toAttributeMapping(ame);
@@ -1068,10 +994,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
 		getAttributeMappingEntityDao().update(ame);
-		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
 		{
-			ame.getObject().getDispatcher().setTimeStamp(new Date());
-			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
 		}
         updateServers();
 		return getAttributeMappingEntityDao().toAttributeMapping(ame);
@@ -1084,10 +1010,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (AttributeMapping mapping) throws Exception
 	{
 		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
-		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
 		{
-			ame.getObject().getDispatcher().setTimeStamp(new Date());
-			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
 		}
         updateServers();
 		getAttributeMappingEntityDao().remove(ame);
@@ -1120,7 +1046,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleSetDefaultMappingsByDispatcher (Long dispatcherId)
 					throws Exception
 	{
-		DispatcherEntity de = getDispatcherEntityDao().load(dispatcherId);
+		SystemEntity de = getSystemEntityDao().load(dispatcherId);
 		
 		for (ObjectMappingEntity ome: de.getObjectMappings())
 		{
@@ -1131,37 +1057,34 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		
 		de.getObjectMappings().clear();
 		
-		AgentDescriptorEntity ad = getAgentDescriptorEntityDao().findByClass(de.getNomCla());
+		AgentDescriptorEntity ad = getAgentDescriptorEntityDao().findByClass(de.getClassName());
 		if (ad != null)
 		{
-			for (DefaultObjectMappingEntity dom: ad.getDefaultObjectMappings())
-			{
-				ObjectMappingEntity ome = getObjectMappingEntityDao().newObjectMappingEntity();
-				ome.setCondition(dom.getCondition());
-				ome.setDispatcher(de);
-				ome.setSoffidObject(dom.getSoffidObject());
-				ome.setSystemObject(dom.getSystemObject());
-				getObjectMappingEntityDao().create(ome);
-				for (DefaultObjectMappingPropertyEntity domp: dom.getProperties())
-				{
-					ObjectMappingPropertyEntity ompe = getObjectMappingPropertyEntityDao().newObjectMappingPropertyEntity();
-					ompe.setObject(ome);
-					ompe.setProperty(domp.getProperty());
-					ompe.setValue(domp.getValue());
-					getObjectMappingPropertyEntityDao().create(ompe);
-					ome.getProperties().add(ompe);
-				}
-				for (DefaultAttributeMappingEntity dam: dom.getDefaultAttributeMappings())
-				{
-					AttributeMappingEntity am = getAttributeMappingEntityDao().newAttributeMappingEntity();
-					am.setObject(ome);
-					am.setDirection(dam.getDirection());
-					am.setSoffidAttribute(dam.getSoffidAttribute());
-					am.setSystemAttribute(dam.getSystemAttribute());
-					getAttributeMappingEntityDao().create(am);
-					ome.getAttributeMappings().add(am);
-				}
-			}
+			for (DefaultObjectMappingEntity dom : ad.getDefaultObjectMappings()) {
+                ObjectMappingEntity ome = getObjectMappingEntityDao().newObjectMappingEntity();
+                ome.setCondition(dom.getCondition());
+                ome.setSystem(de);
+                ome.setSoffidObject(dom.getSoffidObject());
+                ome.setSystemObject(dom.getSystemObject());
+                getObjectMappingEntityDao().create(ome);
+                for (DefaultObjectMappingPropertyEntity domp : dom.getProperties()) {
+                    ObjectMappingPropertyEntity ompe = getObjectMappingPropertyEntityDao().newObjectMappingPropertyEntity();
+                    ompe.setObject(ome);
+                    ompe.setProperty(domp.getProperty());
+                    ompe.setValue(domp.getValue());
+                    getObjectMappingPropertyEntityDao().create(ompe);
+                    ome.getProperties().add(ompe);
+                }
+                for (DefaultAttributeMappingEntity dam : dom.getDefaultAttributeMappings()) {
+                    AttributeMappingEntity am = getAttributeMappingEntityDao().newAttributeMappingEntity();
+                    am.setObject(ome);
+                    am.setDirection(dam.getDirection());
+                    am.setSoffidAttribute(dam.getSoffidAttribute());
+                    am.setSystemAttribute(dam.getSystemAttribute());
+                    getAttributeMappingEntityDao().create(am);
+                    ome.getAttributeMappings().add(am);
+                }
+            }
 		}
         updateServers();
 	}
@@ -1174,12 +1097,12 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
 		getObjectMappingEntityDao().create(ome);
-        ome.getDispatcher().setTimeStamp(new Date());
-        if (Hibernate.isPropertyInitialized(ome.getDispatcher(), "objectMappings")) //$NON-NLS-1$
+        ome.getSystem().setTimeStamp(new Date());
+        if (Hibernate.isPropertyInitialized(ome.getSystem(), "objectMappings")) //$NON-NLS-1$
         {
-        	ome.getDispatcher().getObjectMappings().add(ome);
+        	ome.getSystem().getObjectMappings().add(ome);
         }
-        getDispatcherEntityDao().update(ome.getDispatcher());
+        getSystemEntityDao().update(ome.getSystem());
         updateServers();
 		return getObjectMappingEntityDao().toObjectMapping(ome);
 	}
@@ -1192,12 +1115,12 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
 		getObjectMappingEntityDao().update(ome);
-        ome.getDispatcher().setTimeStamp(new Date());
-        if (Hibernate.isPropertyInitialized(ome.getDispatcher(), "objectMappings")) //$NON-NLS-1$
+        ome.getSystem().setTimeStamp(new Date());
+        if (Hibernate.isPropertyInitialized(ome.getSystem(), "objectMappings")) //$NON-NLS-1$
         {
-        	ome.getDispatcher().getObjectMappings().add(ome);
+        	ome.getSystem().getObjectMappings().add(ome);
         }
-        getDispatcherEntityDao().update(ome.getDispatcher());
+        getSystemEntityDao().update(ome.getSystem());
         updateServers();
 		return getObjectMappingEntityDao().toObjectMapping(ome);
 	}
@@ -1220,17 +1143,17 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		}
 
 
-		DispatcherEntity de = ome.getDispatcher();
+		SystemEntity de = ome.getSystem();
 		getObjectMappingEntityDao().remove(ome);
 		
 		de.setTimeStamp(new Date());
-        if (Hibernate.isPropertyInitialized(ome.getDispatcher(), "objectMappings")) //$NON-NLS-1$
+        if (Hibernate.isPropertyInitialized(ome.getSystem(), "objectMappings")) //$NON-NLS-1$
         {
         	de.getObjectMappings().remove(ome);
         }
         
 
-        getDispatcherEntityDao().update(de);
+        getSystemEntityDao().update(de);
         updateServers();
 	}
 
@@ -1243,12 +1166,12 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
 		getObjectMappingPropertyEntityDao().create(ome);
-        ome.getObject().getDispatcher().setTimeStamp(new Date());
+        ome.getObject().getSystem().setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
         {
         	ome.getObject().getProperties().add(ome);
         }
-        getDispatcherEntityDao().update(ome.getObject().getDispatcher());
+        getSystemEntityDao().update(ome.getObject().getSystem());
         updateServers();
 		return getObjectMappingPropertyEntityDao().toObjectMappingProperty(ome);
 	}
@@ -1262,12 +1185,12 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	{
 		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
 		getObjectMappingPropertyEntityDao().update(ome);
-        ome.getObject().getDispatcher().setTimeStamp(new Date());
+        ome.getObject().getSystem().setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
         {
         	ome.getObject().getProperties().add(ome);
         }
-        getDispatcherEntityDao().update(ome.getObject().getDispatcher());
+        getSystemEntityDao().update(ome.getObject().getSystem());
         updateServers();
 		return getObjectMappingPropertyEntityDao().toObjectMappingProperty(ome);
 	}
@@ -1279,8 +1202,8 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (ObjectMappingProperty omp) throws Exception
 	{
 		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
-        ome.getObject().getDispatcher().setTimeStamp(new Date());
-        getDispatcherEntityDao().update(ome.getObject().getDispatcher());
+        ome.getObject().getSystem().setTimeStamp(new Date());
+        getSystemEntityDao().update(ome.getObject().getSystem());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
         {
         	ome.getObject().getProperties().remove(ome);
@@ -1296,7 +1219,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected Collection<ObjectMapping> handleFindObjectMappingsByDispatcher (
 					Long dispatcherId) throws Exception
 	{
-		DispatcherEntity de = getDispatcherEntityDao().load(dispatcherId);
+		SystemEntity de = getSystemEntityDao().load(dispatcherId);
 		if (de == null)
 			return Collections.emptyList();
 		else
@@ -1334,21 +1257,19 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                     Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
         // Obtenim tots els rols de l'agent:
-        Collection col = getGrupEntityDao().loadAll(); 
+        Collection col = getGroupEntityDao().loadAll(); 
         // col = new Vector(col);
         // Creem les tasques per a cadascun dels usuaris
-        for (Iterator it = col.iterator(); it.hasNext();) {
-            GrupEntity g = (GrupEntity) it.next();
+        for (Iterator it = col.iterator(); it.hasNext(); ) {
+            GroupEntity g = (GroupEntity) it.next();
             Tasca updateRole = new Tasca();
-            updateRole.setTransa("UpdateGroup");// Actualització de l'usuari a //$NON-NLS-1$
-                                               // l'agent
-            updateRole.setGrup(g.getCodi());
+            updateRole.setTransa("UpdateGroup");
+            updateRole.setGrup(g.getCode());
             updateRole.setDataTasca(Calendar.getInstance());
-            updateRole.setCoddis(codiAgent); // Només es genera la tasca al
-                                             // dispatcher actual
-            updateRole.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-            TasqueEntity tasca = getTasqueEntityDao().tascaToEntity(updateRole);
-            getTasqueEntityDao().createNoFlush(tasca);
+            updateRole.setCoddis(codiAgent);
+            updateRole.setStatus("P");
+            TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
+            getTaskEntityDao().createNoFlush(tasca);
         }
 
 	}

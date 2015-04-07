@@ -15,15 +15,12 @@ import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
+import com.soffid.iam.model.UserEntityImpl;
+
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.DominiContrasenyaEntityImpl;
-import es.caib.seycon.ng.model.DominiUsuariEntityImpl;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntityImpl;
-import es.caib.seycon.ng.model.TipusUsuariEntityImpl;
-import es.caib.seycon.ng.model.UsuariEntityImpl;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.utils.Security;
 
@@ -113,7 +110,7 @@ public class PasswordTest extends AbstractTest
 				throw new InternalErrorException (String.format("Entity %s should have one and only one primary key column", entity));
 			String tableName = aep.getTableName();
 
-			List list = session.createCriteria(UsuariEntityImpl.class)
+			List list = session.createCriteria(UserEntityImpl.class)
 							.add(Restrictions.eq("codi", "admin"))
 							.list();
 			Object obj = list.get(0);

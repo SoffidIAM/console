@@ -1,9 +1,12 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.model.UsuariEntity;
+import com.soffid.iam.model.UserEntity;
 
 /**
  * @author bubu
@@ -23,8 +26,7 @@ public class SoffidEventListenerImpl extends SoffidEventListenerBase
 	 * @see com.soffid.iam.service.SoffidEventListenerBase#handleOnUserChange(es.caib.seycon.ng.model.UsuariEntity)
 	 */
 	@Override
-	protected void handleOnUserChange (UsuariEntity user) throws Exception
-	{
+    protected void handleOnUserChange(UserEntity user) throws Exception {
 
 	}
 

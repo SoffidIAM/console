@@ -3,8 +3,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.UserDataEntity;
+import com.soffid.iam.model.UserEntity;
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconAccessLocalException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.Security;
 import java.nio.file.attribute.AttributeView;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,21 +27,6 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
-
-import com.soffid.iam.api.AttributeVisibilityEnum;
-
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.TipusDada;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.DadaUsuariEntity;
-import es.caib.seycon.ng.model.RolEntityDao;
-import es.caib.seycon.ng.model.TipusDadaEntity;
-import es.caib.seycon.ng.model.TipusDadaEntityDao;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.DadesAddicionalsService
@@ -39,8 +39,8 @@ public class DadesAddicionalsServiceImpl extends
 	 */
 	protected java.util.Collection<TipusDada> handleGetTipusDades()
 			throws java.lang.Exception {
-		List<TipusDadaEntity> col = this.getTipusDadaEntityDao().loadAll();
-		return getTipusDadaEntityDao().toTipusDadaList(col);
+		List<MetaDataEntity> col = this.getMetaDataEntityDao().loadAll();
+		return getMetaDataEntityDao().toTipusDadaList(col);
 	}
 
 	/**
@@ -59,29 +59,28 @@ public class DadesAddicionalsServiceImpl extends
 		Long order = tipusDada.getOrdre();
 		String code = new String();
 		boolean found = false;
-		List<TipusDadaEntity> tipusDadaEntityList = getTipusDadaEntityDao().loadAll();
-		for(TipusDadaEntity tipusDadaEntity: tipusDadaEntityList){
-			Long orderDins = tipusDadaEntity.getOrdre();
-			if(orderDins.compareTo(order) == 0){
-				found = true;
-				code = tipusDadaEntity.getCodi();
-				break;
-			}
-		}
+		List<MetaDataEntity> tipusDadaEntityList = getMetaDataEntityDao().loadAll();
+		for (MetaDataEntity tipusDadaEntity : tipusDadaEntityList) {
+            Long orderDins = tipusDadaEntity.getOrder();
+            if (orderDins.compareTo(order) == 0) {
+                found = true;
+                code = tipusDadaEntity.getCode();
+                break;
+            }
+        }
 		if(found)
 			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
 							new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
 		
-		Collection tipusDadaMateixCodi = getTipusDadaEntityDao().findTipusDadesByCodi(tipusDada.getCodi());
+		Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByCode(tipusDada.getCodi());
 		if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
 							new Object[]{tipusDada.getCodi()}));
-		TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao()
-				.tipusDadaToEntity(tipusDada);
+		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
 		if (tipusDadaEntity != null) {
-			getTipusDadaEntityDao().create(tipusDadaEntity);
+			getMetaDataEntityDao().create(tipusDadaEntity);
 			tipusDada.setId(tipusDadaEntity.getId());
-			return getTipusDadaEntityDao().toTipusDada(tipusDadaEntity);
+			return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
 		}
 		return null;
 	}
@@ -91,8 +90,8 @@ public class DadesAddicionalsServiceImpl extends
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.TipusDada tipusDada)
 			throws java.lang.Exception {
-		TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao().load(tipusDada.getId());
-		getTipusDadaEntityDao().remove(tipusDadaEntity);
+		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
+		getMetaDataEntityDao().remove(tipusDadaEntity);
 	}
 
 	/**
@@ -101,8 +100,7 @@ public class DadesAddicionalsServiceImpl extends
 	protected es.caib.seycon.ng.comu.TipusDada handleUpdate(
 			es.caib.seycon.ng.comu.TipusDada tipusDada)
 			throws java.lang.Exception {
-		TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao()
-				.tipusDadaToEntity(tipusDada);
+		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
 		
 		if (tipusDadaEntity.getAdminVisibility() == null)
 			tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
@@ -111,8 +109,8 @@ public class DadesAddicionalsServiceImpl extends
 		if (tipusDadaEntity.getAdminVisibility() == null)
 			tipusDadaEntity.setUserVisibility(AttributeVisibilityEnum.READONLY);
 
-		getTipusDadaEntityDao().update(tipusDadaEntity);
-		return getTipusDadaEntityDao().toTipusDada(tipusDadaEntity);
+		getMetaDataEntityDao().update(tipusDadaEntity);
+		return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
 	}
 
 	/**
@@ -129,24 +127,25 @@ public class DadesAddicionalsServiceImpl extends
 			codi = null;
 		}
 		
-		List<TipusDadaEntity> dades = getTipusDadaEntityDao().findTipusDadesByCodi(codi);
+		List<MetaDataEntity> dades = getMetaDataEntityDao().findDataTypesByCode(codi);
 		
-		Collections.sort(dades, new Comparator<TipusDadaEntity>(){
-			public int compare(TipusDadaEntity o1, TipusDadaEntity o2) {
-				return o1.getOrdre().compareTo(o2.getOrdre());
-			}	
-		});
+		Collections.sort(dades, new Comparator<MetaDataEntity>(){
+            
+            
+            public int compare(MetaDataEntity o1, MetaDataEntity o2) {
+                return o1.getOrder().compareTo(o2.getOrder());
+            }
+        });
 		
 		if (dades != null)
 		{
 			// Check maximum number of results
 			if (dades.size() > limitResults)
 			{
-				return getTipusDadaEntityDao().toTipusDadaList(dades)
-					.subList(0, limitResults);
+				return getMetaDataEntityDao().toTipusDadaList(dades).subList(0, limitResults);
 			}
 			
-			return getTipusDadaEntityDao().toTipusDadaList(dades);
+			return getMetaDataEntityDao().toTipusDadaList(dades);
 		}
 		
 		return new Vector();
@@ -154,11 +153,9 @@ public class DadesAddicionalsServiceImpl extends
 
 	protected TipusDada handleFindTipusDadaByCodi(java.lang.String codi)
 			throws java.lang.Exception {
-		TipusDadaEntity tipusDadaEntity = getTipusDadaEntityDao()
-				.findTipusDadaByCodi(codi);
+		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByCode(codi);
 		if (tipusDadaEntity != null) {
-			TipusDada tipusDada = getTipusDadaEntityDao().toTipusDada(
-					tipusDadaEntity);
+			TipusDada tipusDada = getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
 			return tipusDada;
 		}
 		return null;
@@ -166,41 +163,37 @@ public class DadesAddicionalsServiceImpl extends
 
 	public DadaUsuari handleCreate(DadaUsuari dadaUsuari) throws InternalErrorException {
 		
-		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
-				.dadaUsuariToEntity(dadaUsuari);
+		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
 		
-		UsuariEntity usuari = dadaUsuariEntity.getUsuari();
-		usuari.setDataDarreraModificacio(GregorianCalendar.getInstance()
-				.getTime());
-		usuari.setUsuariDarreraModificacio(Security.getCurrentAccount());
-		getUsuariEntityDao().update(usuari);
+		UserEntity usuari = dadaUsuariEntity.getUser();
+		usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+		usuari.setLastUserModification(Security.getCurrentAccount());
+		getUserEntityDao().update(usuari);
 
-		getDadaUsuariEntityDao().create(dadaUsuariEntity);
+		getUserDataEntityDao().create(dadaUsuariEntity);
 		getRuleEvaluatorService().applyRules(usuari);
-		return getDadaUsuariEntityDao().toDadaUsuari(dadaUsuariEntity);
+		return getUserDataEntityDao().toDadaUsuari(dadaUsuariEntity);
 	}
 
 	public void handleDelete(DadaUsuari dadaUsuari) throws InternalErrorException {
-		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
-				.dadaUsuariToEntity(dadaUsuari);
+		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
 
-		UsuariEntity usuari = dadaUsuariEntity.getUsuari();
-		usuari.setDataDarreraModificacio(GregorianCalendar.getInstance()
-				.getTime());
-		usuari.setUsuariDarreraModificacio(Security.getCurrentAccount());
-		getUsuariEntityDao().update(usuari);
+		UserEntity usuari = dadaUsuariEntity.getUser();
+		usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+		usuari.setLastUserModification(Security.getCurrentAccount());
+		getUserEntityDao().update(usuari);
 
-		getDadaUsuariEntityDao().remove(dadaUsuariEntity);
+		getUserDataEntityDao().remove(dadaUsuariEntity);
 		getRuleEvaluatorService().applyRules(usuari);
 	}
 
@@ -214,24 +207,21 @@ public class DadesAddicionalsServiceImpl extends
 			} else {
 				// Aquí comprovem si pot actualitzar totes les dades addicionals
 				// o només el telèfon
-				DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
-						.dadaUsuariToEntity(dadaUsuari);
+				UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 				
-				AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+				AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
 
 				if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 					throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
 				
-				UsuariEntity usuari = dadaUsuariEntity.getUsuari();
-				usuari.setDataDarreraModificacio(GregorianCalendar
-						.getInstance().getTime());
-				usuari.setUsuariDarreraModificacio(Security.getCurrentAccount());
-				getUsuariEntityDao().update(usuari);
+				UserEntity usuari = dadaUsuariEntity.getUser();
+				usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+				usuari.setLastUserModification(Security.getCurrentAccount());
+				getUserEntityDao().update(usuari);
 
-				getDadaUsuariEntityDao().update(dadaUsuariEntity);
+				getUserDataEntityDao().update(dadaUsuariEntity);
 				getRuleEvaluatorService().applyRules(usuari);
-				return getDadaUsuariEntityDao().toDadaUsuari(
-						dadaUsuariEntity);
+				return getUserDataEntityDao().toDadaUsuari(dadaUsuariEntity);
 			}
 		} else {
 			return create(dadaUsuari);

@@ -3,27 +3,27 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.doc.nas.NASManager;
+import com.soffid.iam.model.BlobConfigurationEntity;
+import com.soffid.iam.model.BlobConfigurationEntityDao;
+import com.soffid.iam.model.ConfigEntity;
+import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.model.Parameter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.soffid.iam.doc.exception.NASException;
-import com.soffid.iam.doc.nas.NASManager;
-
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.config.Config;
-import es.caib.seycon.ng.model.BlobConfigurationEntity;
-import es.caib.seycon.ng.model.BlobConfigurationEntityDao;
-import es.caib.seycon.ng.model.ConfiguracioEntity;
-import es.caib.seycon.ng.model.ConfiguracioEntityDao;
-import es.caib.seycon.ng.model.TipusDadaEntityDao;
-import es.caib.seycon.ng.model.Parameter;
 /**
  * @see es.caib.seycon.ng.servei.ConfiguracioService
  */
@@ -32,8 +32,8 @@ public class ConfiguracioServiceImpl
 {
 
 	protected Collection<Configuracio> handleGetParametres() throws Exception {
-		List<ConfiguracioEntity> col = this.getConfiguracioEntityDao().loadAll();
-		return getConfiguracioEntityDao().toConfiguracioList(col);
+		List<ConfigEntity> col = this.getConfigEntityDao().loadAll();
+		return getConfigEntityDao().toConfiguracioList(col);
 	}
 
 	/**
@@ -109,15 +109,14 @@ public class ConfiguracioServiceImpl
 	protected Configuracio handleCreate(Configuracio configuracio)
 		throws Exception
 	{
-		ConfiguracioEntity configuracioEntity = getConfiguracioEntityDao()
-						.configuracioToEntity(configuracio);
+		ConfigEntity configuracioEntity = getConfigEntityDao().configuracioToEntity(configuracio);
 		
 		// Check configuration parameter
 		System.setProperty(configuracio.getCodi(), configuracio.getValor()); //$NON-NLS-1$
 		
 		reconfigureNAS(configuracio);
 		
-		getConfiguracioEntityDao().create(configuracioEntity);
+		getConfigEntityDao().create(configuracioEntity);
 		configuracio.setId(new Long(configuracioEntity.getId().longValue()));
 		
 		if (configuracio.getCodiXarxa() == null)
@@ -125,14 +124,14 @@ public class ConfiguracioServiceImpl
 			System.setProperty(configuracio.getCodi(), configuracio.getValor());
 		}
 
-		return getConfiguracioEntityDao().toConfiguracio(configuracioEntity);
+		return getConfigEntityDao().toConfiguracio(configuracioEntity);
 	}
 
 	protected void handleDelete(Configuracio configuracio) throws Exception {
-		ConfiguracioEntity configuracioEntity = getConfiguracioEntityDao().configuracioToEntity(configuracio);
-		boolean toRemove = configuracioEntity.getXarxa() == null;
-		String codi = configuracioEntity.getCodi();
-		getConfiguracioEntityDao().remove(configuracioEntity);
+		ConfigEntity configuracioEntity = getConfigEntityDao().configuracioToEntity(configuracio);
+		boolean toRemove = configuracioEntity.getNetwork() == null;
+		String codi = configuracioEntity.getCode();
+		getConfigEntityDao().remove(configuracioEntity);
 		if (toRemove) {
 			System.getProperties().remove(codi);
 		}
@@ -141,15 +140,13 @@ public class ConfiguracioServiceImpl
 	protected Configuracio handleUpdate(Configuracio configuracio)
 		throws Exception
 	{
-		ConfiguracioEntity configuracioEntity = getConfiguracioEntityDao()
-						.configuracioToEntity(configuracio);
+		ConfigEntity configuracioEntity = getConfigEntityDao().configuracioToEntity(configuracio);
 		
 		System.setProperty(configuracio.getCodi(), configuracio.getValor()); //$NON-NLS-1$
 		reconfigureNAS(configuracio);
 		
-		getConfiguracioEntityDao().update(configuracioEntity);
-		configuracio = getConfiguracioEntityDao()
-						.toConfiguracio(configuracioEntity);
+		getConfigEntityDao().update(configuracioEntity);
+		configuracio = getConfigEntityDao().toConfiguracio(configuracioEntity);
 		
 		if (configuracio.getCodiXarxa() == null)
 		{
@@ -158,8 +155,7 @@ public class ConfiguracioServiceImpl
 		return configuracio;
 	}
 	
-	private Collection<ConfiguracioEntity> localFindConfiguracioByFiltre(String codi,
-			String valor, String descripcio, String codiXarxa){
+	private Collection<ConfigEntity> localFindConfiguracioByFiltre(String codi, String valor, String descripcio, String codiXarxa) {
 		String query = 
 			"select configuracio " + //$NON-NLS-1$
 				"from " + //$NON-NLS-1$
@@ -175,7 +171,7 @@ public class ConfiguracioServiceImpl
 		Parameter valorParameter = new Parameter("valor", valor); //$NON-NLS-1$
 		Parameter descripcioParameter = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 		Parameter[] parameters = {codiParameter, codiXarxaParameter, valorParameter, descripcioParameter};
-		return getConfiguracioEntityDao().query(query, parameters);		
+		return getConfigEntityDao().query(query, parameters);		
 	}
 
 	protected Collection<Configuracio> handleFindConfiguracioByFiltre(
@@ -203,17 +199,15 @@ public class ConfiguracioServiceImpl
 			codiXarxa = null;
 		}
 		
-		Collection<ConfiguracioEntity> configuracions = 
-			localFindConfiguracioByFiltre(codi, valor, descripcio, codiXarxa);
+		Collection<ConfigEntity> configuracions = localFindConfiguracioByFiltre(codi, valor, descripcio, codiXarxa);
 		if (configuracions != null)
 		{
 			if ((limitResults != 0) && (configuracions.size() > limitResults))
 			{
-				return getConfiguracioEntityDao()
-					.toConfiguracioList(configuracions).subList(0, limitResults);
+				return getConfigEntityDao().toConfiguracioList(configuracions).subList(0, limitResults);
 			}
 			
-			return getConfiguracioEntityDao().toConfiguracioList(configuracions);
+			return getConfigEntityDao().toConfiguracioList(configuracions);
 		}
 		
 		return new Vector();
@@ -221,11 +215,9 @@ public class ConfiguracioServiceImpl
 
 	protected Configuracio handleFindParametreByCodiAndCodiXarxa(
 			String codiParametre, String codiXarxa) throws Exception {
-		ConfiguracioEntity configuracioEntity = 
-			getConfiguracioEntityDao().findByCodiAndCodiXarxa(codiParametre, codiXarxa);
+		ConfigEntity configuracioEntity = getConfigEntityDao().findByCodeAndNetworkCode(codiParametre, codiXarxa);
 		if(configuracioEntity != null){
-			Configuracio configuracio = 
-				getConfiguracioEntityDao().toConfiguracio(configuracioEntity);
+			Configuracio configuracio = getConfigEntityDao().toConfiguracio(configuracioEntity);
 			return configuracio;
 		}
 		return null;		
@@ -255,7 +247,7 @@ public class ConfiguracioServiceImpl
 			BlobConfigurationEntity entity = dao.newBlobConfigurationEntity();
 			entity.setName(name);
 			entity.setValue(data);
-			entity.setVersio("<unknown>"); //$NON-NLS-1$
+			entity.setVersion("<unknown>"); //$NON-NLS-1$
 			dao.create(entity);
 		} else {
 			BlobConfigurationEntity entry = (BlobConfigurationEntity) result.iterator().next();
@@ -288,12 +280,12 @@ public class ConfiguracioServiceImpl
 			BlobConfigurationEntity entity = dao.newBlobConfigurationEntity();
 			entity.setName(name);
 			entity.setValue(data);
-			entity.setVersio(version); //$NON-NLS-1$
+			entity.setVersion(version); //$NON-NLS-1$
 			dao.create(entity);
 		} else {
 			BlobConfigurationEntity entry = (BlobConfigurationEntity) result.iterator().next();
 			entry.setValue(data);
-			entry.setVersio(version);
+			entry.setVersion(version);
 			dao.update(entry);
 		}
 	}
@@ -310,7 +302,7 @@ public class ConfiguracioServiceImpl
 		else
 		{
 			BlobConfigurationEntity entity = (BlobConfigurationEntity) result.iterator().next();
-			return entity.getVersio ();
+			return entity.getVersion();
 		}
 	}
 	

@@ -36,7 +36,7 @@ public class RuleAssignedRoleEntityDaoImpl extends RuleAssignedRoleEntityDaoBase
 		if (source.getRoleId() == null)
 			target.setRole(null);
 		else
-			target.setRole(getRolEntityDao().load(source.getRoleId()));
+			target.setRole(getRoleEntityDao().load(source.getRoleId()));
 		
 		if (source.getRuleId() == null)
 			target.setRule(null);

@@ -1,19 +1,14 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.reconcile.service;
 
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.TaskEntityDao;
+import com.soffid.iam.model.UserEntityDao;
 import com.soffid.iam.reconcile.common.AccountProposedAction;
 import com.soffid.iam.reconcile.common.ProposedAction;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
@@ -25,7 +20,6 @@ import com.soffid.iam.reconcile.model.ReconcileAssignmentEntity;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntity;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntityDao;
-
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.seycon.ng.comu.Account;
@@ -43,17 +37,22 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.TasqueEntityDao;
-import es.caib.seycon.ng.model.UsuariEntityDao;
 import es.caib.seycon.ng.servei.AccountService;
 import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.DispatcherService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author (C) Soffid 2013
@@ -128,14 +127,14 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	protected void handleCreateReconcileTask (Long processID, String dispatcher)
 					throws Exception
 	{
-		TasqueEntity entity = getTasqueEntityDao().newTasqueEntity();
+		TaskEntity entity = getTaskEntityDao().newTaskEntity();
 
-		entity.setCoddis(dispatcher);
-		entity.setMaquin(processID.toString());
-		entity.setData(new Timestamp(new Date().getTime()));
-		entity.setTransa(TaskHandler.RECONCILE_USERS);
+		entity.setSystemCode(dispatcher);
+		entity.setHost(processID.toString());
+		entity.setDate(new Timestamp(new Date().getTime()));
+		entity.setTransaction(TaskHandler.RECONCILE_USERS);
 
-		getTasqueEntityDao().create(entity);
+		getTaskEntityDao().create(entity);
 	}
 
 	/*
@@ -148,8 +147,8 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	protected boolean handleIsPendingTasks (Long processId, Long taskId)
 					throws Exception
 	{
-		TasqueEntityDao entityDAO = getTasqueEntityDao();
-		List<TasqueEntity> tasksList;
+		TaskEntityDao entityDAO = getTaskEntityDao();
+		List<TaskEntity> tasksList;
 		boolean isPendingTask = false;
 
 		TaskQueue tq = null;
@@ -167,23 +166,16 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 														.toString(processId)) });
 
 		// Analyze tasks
-		for (TasqueEntity tasqueEntity : tasksList)
-		{
-			// Check pending task
-			if (!tasqueEntity.getId().equals(taskId)
-							&& !tasqueEntity.getStatus().equals("C")) //$NON-NLS-1$
-			{
-				if (tq == null)
-					isPendingTask = true;
-				else {
-					TaskHandler th = tq.findTaskHandlerById(tasqueEntity.getId());
-					if (th == null || ! th.isComplete())
-					{
-						isPendingTask = true;
-					}
-				}
-			}
-		}
+		for (TaskEntity tasqueEntity : tasksList) {
+            if (!tasqueEntity.getId().equals(taskId) && !tasqueEntity.getStatus().equals("C")) {
+                if (tq == null) isPendingTask = true; else {
+                    TaskHandler th = tq.findTaskHandlerById(tasqueEntity.getId());
+                    if (th == null || !th.isComplete()) {
+                        isPendingTask = true;
+                    }
+                }
+            }
+        }
 
 		return isPendingTask;
 	}
@@ -420,9 +412,9 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		DispatcherService dispService = getDispatcherService(); // Dispatcher handler
 		Usuari user = null; // User data
 		Dispatcher disp = null; // Dispatcher data
-		UsuariEntityDao entity = getUsuariEntityDao(); // Get user data from DB handler
+		UserEntityDao entity = getUserEntityDao(); // Get user data from DB handler
 
-		user = getUsuariEntityDao().toUsuari(entity.findByCodi(account.getUserCode()));
+		user = getUserEntityDao().toUsuari(entity.findByCode(account.getUserCode()));
 		disp = dispService.findDispatcherByCodi(account.getDispatcher());
 
 		// Check valid obtained user

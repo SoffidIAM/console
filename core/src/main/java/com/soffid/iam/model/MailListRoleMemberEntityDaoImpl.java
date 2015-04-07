@@ -5,13 +5,11 @@
 
 package com.soffid.iam.model;
 
-import java.sql.Timestamp;
-
 import com.soffid.iam.api.MailListRoleMember;
-
+import com.soffid.iam.model.TaskEntity;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
+import java.sql.Timestamp;
 
 /**
  * DAO MailListRoleMemberEntity implementation
@@ -22,18 +20,18 @@ public class MailListRoleMemberEntityDaoImpl extends MailListRoleMemberEntityDao
 	@Override
 	public void toMailListRoleMember(MailListRoleMemberEntity source,
 			MailListRoleMember target) {
-		target.setDispatcherName(source.getRole().getBaseDeDades().getCodi());
-		target.setRoleDescription(source.getRole().getDescripcio());
-		target.setRoleName(source.getRole().getNom());
+		target.setDispatcherName(source.getRole().getDatabases().getCode());
+		target.setRoleDescription(source.getRole().getDescription());
+		target.setRoleName(source.getRole().getName());
 		target.setScope("");
 		if (source.getDomainValueScope() != null)
-			target.setScope(source.getDomainValueScope().getValor());
+			target.setScope(source.getDomainValueScope().getValue());
 			
 		if (source.getGroupScope() != null)
-			target.setScope(source.getGroupScope().getCodi());
+			target.setScope(source.getGroupScope().getCode());
 		
 		if (source.getInformationSystemScope() != null)
-			target.setScope(source.getInformationSystemScope().getCodi());
+			target.setScope(source.getInformationSystemScope().getCode());
 
 	}
 
@@ -55,16 +53,14 @@ public class MailListRoleMemberEntityDaoImpl extends MailListRoleMemberEntityDao
 	}
 
 	private void createUpdateTask(MailListRoleMemberEntity entity) {
-		if (entity.getMailList() != null &&
-				entity.getMailList().getDomini() != null &&
-				entity.getMailList().getNom() != null)
+		if (entity.getMailList() != null && entity.getMailList().getDomain() != null && entity.getMailList().getName() != null)
 		{
-	        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-	        tasque.setData(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
-	        tasque.setAlies(entity.getMailList().getNom());
-            tasque.setDomcor(entity.getMailList().getDomini().getCodi());
-	        getTasqueEntityDao().create(tasque);
+	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
+	        tasque.setAlias(entity.getMailList().getName());
+            tasque.setMailDomain(entity.getMailList().getDomain().getCode());
+	        getTaskEntityDao().create(tasque);
 		}
 	}
 }

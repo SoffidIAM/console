@@ -1,40 +1,34 @@
 package es.caib.seycon.ng.servei;
 
-import java.security.Principal;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.naming.NamingException;
-
-import org.apache.commons.logging.LogFactory;
-import org.jboss.invocation.pooled.server.ServerThread;
-import org.mortbay.log.Log;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
+import bsh.EvalError;
+import bsh.Interpreter;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserDomain;
+import com.soffid.iam.model.AccountAccessEntity;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
+import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.TaskLogEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserAccountEntityDao;
+import com.soffid.iam.model.UserDataEntity;
+import com.soffid.iam.model.UserDomainEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
@@ -57,33 +51,13 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.NotAllowedException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.AccountAccessEntity;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.AccountEntityDao;
-import es.caib.seycon.ng.model.AuditoriaEntity;
-import es.caib.seycon.ng.model.DadaUsuariEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.DispatcherEntityDao;
-import es.caib.seycon.ng.model.DominiUsuariEntity;
-import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.ServerEntity;
-import es.caib.seycon.ng.model.ServerEntityDao;
-import es.caib.seycon.ng.model.TaskLogEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntity;
-import es.caib.seycon.ng.model.TipusUsuariEntityDao;
-import es.caib.seycon.ng.model.UserAccountEntity;
-import es.caib.seycon.ng.model.UserAccountEntityDao;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.remote.URLManager;
 import es.caib.seycon.ng.servei.account.AccountNameGenerator;
@@ -92,19 +66,39 @@ import es.caib.seycon.ng.sync.servei.SecretStoreService;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
+import java.security.Principal;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+import javax.naming.NamingException;
+import org.apache.commons.logging.LogFactory;
+import org.jboss.invocation.pooled.server.ServerThread;
+import org.mortbay.log.Log;
+import org.omg.PortableInterceptor.USER_EXCEPTION;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class AccountServiceImpl extends AccountServiceBase implements ApplicationContextAware
 {
 
 	private ApplicationContext applicationContext;
 
-	private UsuariEntity getUser(String usuari)
-	{
-		UsuariEntity ue = getUsuariEntityDao().findByCodi(usuari);
+	private UserEntity getUser(String usuari) {
+		UserEntity ue = getUserEntityDao().findByCode(usuari);
 		if (ue != null)
 		{
-			Collection<UsuariEntity> filtrat = 
-				AutoritzacionsUsuari.filtraUsuariEntityCanQuery(Collections.singleton(ue));
+			Collection<UserEntity> filtrat = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(Collections.singleton(ue));
 			if (filtrat.isEmpty())
 				ue = null;
 		}
@@ -116,7 +110,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throws Exception
 	{
 		LinkedList<UserAccount> result = new LinkedList<UserAccount> ();
-		UsuariEntity ue = getUser(usuari.getCodi());
+		UserEntity ue = getUser(usuari.getCodi());
 		if (ue != null)
 		{
 			for (UserAccountEntity ua: ue.getAccounts())
@@ -132,32 +126,28 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected UserAccount handleCreateAccount(Usuari usuari, Dispatcher dispatcher,
 			String name) throws Exception
 	{
-		UsuariEntity ue = getUser(usuari.getCodi());
-		DispatcherEntity de = getDispatcherEntityDao ().load(dispatcher.getId());
+		UserEntity ue = getUser(usuari.getCodi());
+		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
 		UserAccountEntity uae = generateAccount(name, ue, de);
 		return getUserAccountEntityDao().toUserAccount(uae);
 	}
 
-	private UserAccountEntity generateAccount(String name,
-			UsuariEntity ue, DispatcherEntity de) throws NeedsAccountNameException,
-			EvalError, InternalErrorException, AccountAlreadyExistsException
-	{
+	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de) throws NeedsAccountNameException, EvalError, InternalErrorException, AccountAlreadyExistsException {
 		boolean nullName = false;
 		if (name == null)
 		{
 			nullName = true;
-			List<AccountEntity> existing = getAccountEntityDao().findByUsuariAndDispatcher(ue.getCodi(), de.getCodi());
+			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getCode());
 			if (! existing.isEmpty())
-				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"),  //$NON-NLS-1$
-						ue.getCodi(), de.getCodi()));
+				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getCode()));
 			// Search if already has a user name for this user domain
 			
-			name = gessAccountName(ue.getCodi(), de.getCodi());
+			name = gessAccountName(ue.getUserName(), de.getCode());
 							
 			if (name == null)
 				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")); //$NON-NLS-1$
 		}
-		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(name, de.getCodi());
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(name, de.getCode());
 		if (acc != null)
 		{
 			if (acc.getType().equals (AccountType.IGNORED) && acc.getAcl().isEmpty() &&
@@ -165,20 +155,18 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			{
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
-	    		acc.setPasswordPolicy( ue.getTipusUsuari() );
+	    		acc.setPasswordPolicy(ue.getUserType());
 	    		getAccountEntityDao().update(acc);
 			}
 			else
-				throw new AccountAlreadyExistsException(
-						String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
-						name+"@"+de.getCodi()));
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getCode()));
 		} else {
     		acc = getAccountEntityDao().newAccountEntity();
     		acc.setDescription(ue.getFullName());
-    		acc.setDispatcher(de);
+    		acc.setSystem(de);
     		acc.setName(name);
     		acc.setType(AccountType.USER);
-    		acc.setPasswordPolicy( ue.getTipusUsuari() );
+    		acc.setPasswordPolicy(ue.getUserType());
     		getAccountEntityDao().create(acc);
 		}
 
@@ -195,7 +183,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	@Override
 	protected void handleRemoveAccount(UserAccount account) throws Exception
 	{
-		UsuariEntity ue = getUser(account.getUser());
+		UserEntity ue = getUser(account.getUser());
 		if (ue != null)
 		{
 			AccountEntity acc = getAccountEntityDao().load(account.getId());
@@ -232,7 +220,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected Account handleCreateAccount(es.caib.seycon.ng.comu.Account account)
 			throws Exception
 	{
-		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(account.getName(), account.getDispatcher());
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account.getName(), account.getDispatcher());
 		if (acc != null)
 		{
 			throw new AccountAlreadyExistsException(
@@ -245,10 +233,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			acc = getAccountEntityDao().newAccountEntity();
 			acc.setAcl(new HashSet<AccountAccessEntity>());
 			acc.setDescription(account.getDescription());
-			acc.setDispatcher(getDispatcherEntityDao().findByCodi(account.getDispatcher()));
+			acc.setSystem(getSystemEntityDao().findByCode(account.getDispatcher()));
 			acc.setName(account.getName());
 			acc.setType(account.getType());
-			TipusUsuariEntity tu = getTipusUsuariEntityDao().findByCodi(account.getPasswordPolicy());
+			UserTypeEntity tu = getUserTypeEntityDao().findByCode(account.getPasswordPolicy());
 			if (tu == null)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
 			acc.setPasswordPolicy( tu );
@@ -390,53 +378,44 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			}
 		}
 		// Add new groups
-		for (int index = 0 ; index < levels.length; index++)
-		{
-			for (Grup g: newgrups[index]) {
-				GrupEntity ge = getGrupEntityDao().load(g.getId());
-				if (ge != null)
-				{
-					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-					access.setGroup(ge);
-					access.setAccount(acc);
-					access.setLevel(levels[index]);
-					getAccountAccessEntityDao().create(access);
-					acc.getAcl().add(access);
-					
-					notifyAccountPasswordChange(acc, ge, null, null);
-				}
-			}
-			// Add new roles
-			for (Rol r: newroles[index]) {
-				RolEntity re = getRolEntityDao().load(r.getId());
-				if (re != null)
-				{
-					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-					access.setRol(re);
-					access.setAccount(acc);
-					access.setLevel(levels[index]);
-					getAccountAccessEntityDao().create(access);
-					acc.getAcl().add(access);
-					
-					notifyAccountPasswordChange(acc, null, re, null);
-				}
-			}
-			// Add new users
-			for (Usuari u: newusers[index]) {
-				UsuariEntity ue = getUsuariEntityDao().load(u.getId());
-				if (ue != null)
-				{
-					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-					access.setUser(ue);
-					access.setAccount(acc);
-					access.setLevel(levels[index]);
-					getAccountAccessEntityDao().create(access);
-					acc.getAcl().add(access);
-					
-					notifyAccountPasswordChange(acc, null, null, ue);
-				}
-			}
-		}
+		for (int index = 0; index < levels.length; index++) {
+            for (Grup g : newgrups[index]) {
+                GroupEntity ge = getGroupEntityDao().load(g.getId());
+                if (ge != null) {
+                    AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+                    access.setGroup(ge);
+                    access.setAccount(acc);
+                    access.setLevel(levels[index]);
+                    getAccountAccessEntityDao().create(access);
+                    acc.getAcl().add(access);
+                    notifyAccountPasswordChange(acc, ge, null, null);
+                }
+            }
+            for (Rol r : newroles[index]) {
+                RoleEntity re = getRoleEntityDao().load(r.getId());
+                if (re != null) {
+                    AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+                    access.setRol(re);
+                    access.setAccount(acc);
+                    access.setLevel(levels[index]);
+                    getAccountAccessEntityDao().create(access);
+                    acc.getAcl().add(access);
+                    notifyAccountPasswordChange(acc, null, re, null);
+                }
+            }
+            for (Usuari u : newusers[index]) {
+                UserEntity ue = getUserEntityDao().load(u.getId());
+                if (ue != null) {
+                    AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
+                    access.setUser(ue);
+                    access.setAccount(acc);
+                    access.setLevel(levels[index]);
+                    getAccountAccessEntityDao().create(access);
+                    acc.getAcl().add(access);
+                    notifyAccountPasswordChange(acc, null, null, ue);
+                }
+            }
+        }
 	}
 
 	@Override
@@ -450,12 +429,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			if (ae.getType().equals(AccountType.USER))
 			{
 				account.setOwnerUsers(new LinkedList<Usuari>());
-				for (UserAccountEntity ua: ae.getUsers())
-				{
-					Usuari u = getUsuariService().getUserInfo(ua.getUser().getCodi());
-					getUserAccountEntityDao().remove(ua);
-					account.getOwnerUsers().add(u);
-				}
+				for (UserAccountEntity ua : ae.getUsers()) {
+                    Usuari u = getUsuariService().getUserInfo(ua.getUser().getUserName());
+                    getUserAccountEntityDao().remove(ua);
+                    account.getOwnerUsers().add(u);
+                }
 				
 			}
 			if (account.getType().equals(AccountType.USER))
@@ -473,7 +451,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				
 				Usuari owner = account.getOwnerUsers().iterator().next();
 				
-				UsuariEntity ue = getUsuariEntityDao().load(owner.getId());
+				UserEntity ue = getUserEntityDao().load(owner.getId());
 				UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
 				uae.setAccount(ae);
 				uae.setUser(ue);
@@ -484,24 +462,20 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 			} else {
 				// Remove rules from granted roles
-				for (RolAccountEntity ra: ae.getRoles())
-				{
-					if (ra.getRule() != null)
-					{
-						ra.setRule(null);
-						getRolAccountEntityDao().update(ra);
-					}
-				}
+				for (RoleAccountEntity ra : ae.getRoles()) {
+                    if (ra.getRule() != null) {
+                        ra.setRule(null);
+                        getRoleAccountEntityDao().update(ra);
+                    }
+                }
 			}
 			ae.setType(account.getType());
 		}
 
 		if (! account.getName().equals(ae.getName()))
 		{
-			if (getAccountEntityDao().findByNameAndDispatcher(account.getName(), ae.getDispatcher().getCodi()) != null)
-				throw new AccountAlreadyExistsException(
-						String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
-						account.getName()+"@"+ae.getDispatcher().getCodi()));
+			if (getAccountEntityDao().findByNameAndSystem(account.getName(), ae.getSystem().getCode()) != null)
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getCode()));
 		}
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
@@ -513,11 +487,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		createAccountTask(ae);
 	}
 
-	private void createUserTask(UsuariEntity ue) {
-		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-		tasque.setTransa(TaskHandler.UPDATE_USER);
-		tasque.setUsuari(ue.getCodi());
-		getTasqueEntityDao().create(tasque);
+	private void createUserTask(UserEntity ue) {
+		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+		tasque.setTransaction(TaskHandler.UPDATE_USER);
+		tasque.setUser(ue.getUserName());
+		getTaskEntityDao().create(tasque);
 	}
 
 	private void removeAcl(AccountEntity ae) {
@@ -544,26 +518,24 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	{
 		if (! ae.getType().equals(AccountType.IGNORED))
 		{
-			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-			tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
-			tasque.setUsuari(ae.getName());
-			tasque.setCoddis(ae.getDispatcher().getCodi());
-			getTasqueEntityDao().create(tasque);
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
+			tasque.setUser(ae.getName());
+			tasque.setSystemCode(ae.getSystem().getCode());
+			getTaskEntityDao().create(tasque);
 		}
 	}
 	
-	private void notifyAccountPasswordChange(AccountEntity ae, GrupEntity ge,
-		RolEntity rolEntity, UsuariEntity usuariEntity)
-	{
+	private void notifyAccountPasswordChange(AccountEntity ae, GroupEntity ge, RoleEntity rolEntity, UserEntity usuariEntity) {
 		if (! ae.getType().equals(AccountType.IGNORED))
 		{
-			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-			tasque.setTransa(TaskHandler.NOTIFY_PASSWORD_CHANGE);
-			tasque.setCoddis(ae.getDispatcher().getCodi());
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setTransaction(TaskHandler.NOTIFY_PASSWORD_CHANGE);
+			tasque.setSystemCode(ae.getSystem().getCode());
 			
 			// Check notify to group
 			if (ge != null)
-				tasque.setGrup(ge.getId().toString());
+				tasque.setGroup(ge.getId().toString());
 			
 			// Check notify to role
 			if (rolEntity != null)
@@ -571,9 +543,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			
 			// Check notify to user
 			if (usuariEntity != null)
-				tasque.setUsuari(usuariEntity.getCodi());
+				tasque.setUser(usuariEntity.getUserName());
 			
-			getTasqueEntityDao().create(tasque);
+			getTaskEntityDao().create(tasque);
 		}
 	}
 
@@ -587,7 +559,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected Account handleFindAccount(String accountName, String dispatcherName)
 			throws Exception
 	{
-		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(accountName, dispatcherName);
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, dispatcherName);
 		if (acc == null)
 			return null;
 		
@@ -617,74 +589,52 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	@Override
 	protected void handleGenerateUserAccounts(String user) throws Exception
 	{
-		UsuariEntity ue = getUsuariEntityDao().findByCodi(user);
+		UserEntity ue = getUserEntityDao().findByCode(user);
 		if (ue == null)
 			return;
 		
-		DispatcherEntityDao disDao = getDispatcherEntityDao();
-		for (DispatcherEntity disEntity: disDao.loadAll())
-		{
-			if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue())
-			{
-    			List<AccountEntity> accs = getAccountEntityDao().findByUsuariAndDispatcher(user, disEntity.getCodi());
-				for (AccountEntity acc : accs)
-				{
-					if (acc.isDisabled() )
-					{
-						acc.setDisabled(false);
-						getAccountEntityDao().update(acc);
-					}
-				}
-			}
-			else if (disEntity.isMainDispatcher() || disEntity.getUrl() != null)
-			{
-    			Dispatcher dis = disDao.toDispatcher(disEntity);
-    			List<AccountEntity> accs = getAccountEntityDao().findByUsuariAndDispatcher(user, dis.getCodi());
-    			String description = ue.getCodi()+" - "+ue.getFullName(); //$NON-NLS-1$
-    			if (description.length() > 50)
-    				description = description.substring(0, 47) + "..."; //$NON-NLS-1$
-    			if ("S".equals(ue.getActiu()) && getDispatcherService().isUserAllowed(dis, user)) //$NON-NLS-1$
-    			{
-    				if (accs.isEmpty())
-    				{
-    					try
-    					{
-    						generateAccount(null, ue, disEntity);
-    					}
-    					catch (Exception e)
-    					{
-    						LogFactory.getLog(getClass()).warn(
-    								String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getCodi()),  //$NON-NLS-1$
-    								e);
-    					}
-    				} 
-    				else
-    				{
-    					for (AccountEntity acc : accs)
-    					{
-    						if (acc.isDisabled() || ! description.equals (acc.getDescription()))
-    						{
-    							acc.setDisabled(false);
-    							acc.setDescription(description);
-    							getAccountEntityDao().update(acc);
-    						}
-    					}
-    				}
-    			}
-    			else if (! accs.isEmpty())
-    			{
-    				for (AccountEntity acc : accs)
-    				{
-    					if (! acc.isDisabled() || ! description.equals (acc.getDescription()))
-    					{
-    						acc.setDisabled(true);
-    						acc.setDescription(description);
-    						getAccountEntityDao().update(acc);
-    					}
-    				}
-    			}
-			}
-		}
+		SystemEntityDao disDao = getSystemEntityDao();
+		for (SystemEntity disEntity : disDao.loadAll()) {
+            if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
+                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getCode());
+                for (AccountEntity acc : accs) {
+                    if (acc.isDisabled()) {
+                        acc.setDisabled(false);
+                        getAccountEntityDao().update(acc);
+                    }
+                }
+            } else if (disEntity.isMainSystem() || disEntity.getUrl() != null) {
+                Dispatcher dis = disDao.toDispatcher(disEntity);
+                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, dis.getCodi());
+                String description = ue.getUserName() + " - " + ue.getFullName();
+                if (description.length() > 50) description = description.substring(0, 47) + "...";
+                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user)) {
+                    if (accs.isEmpty()) {
+                        try {
+                            generateAccount(null, ue, disEntity);
+                        } catch (Exception e) {
+                            LogFactory.getLog(getClass()).warn(String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getCodi()), e);
+                        }
+                    } else {
+                        for (AccountEntity acc : accs) {
+                            if (acc.isDisabled() || !description.equals(acc.getDescription())) {
+                                acc.setDisabled(false);
+                                acc.setDescription(description);
+                                getAccountEntityDao().update(acc);
+                            }
+                        }
+                    }
+                } else if (!accs.isEmpty()) {
+                    for (AccountEntity acc : accs) {
+                        if (!acc.isDisabled() || !description.equals(acc.getDescription())) {
+                            acc.setDisabled(true);
+                            acc.setDescription(description);
+                            getAccountEntityDao().update(acc);
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	@Override
@@ -710,7 +660,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 		AccountEntity accountEntity = dao.load(account.getId());
 		
-		AccountEntity oldAccount = dao.findByNameAndDispatcher(account.getName(), accountEntity.getDispatcher().getCodi());
+		AccountEntity oldAccount = dao.findByNameAndSystem(account.getName(), accountEntity.getSystem().getCode());
 		if (oldAccount == null)
 		{
 			createAccountTask(accountEntity);
@@ -724,14 +674,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 	}
 
-	private void addGroups (HashMap<String, Group> groups, GrupEntity grup)
-	{
-		if (!groups.containsKey(grup.getCodi()))
+	private void addGroups(HashMap<String, Group> groups, GroupEntity grup) {
+		if (!groups.containsKey(grup.getCode()))
 		{
-			Grup grupVO = getGrupEntityDao().toGrup (grup);
-			groups.put (grup.getCodi(), Group.toGroup( grupVO));
-			if (grup.getPare() != null)
-				addGroups (groups, grup.getPare());	
+			Grup grupVO = getGroupEntityDao().toGrup(grup);
+			groups.put(grup.getCode(), Group.toGroup(grupVO));
+			if (grup.getParent() != null)
+				addGroups(groups, grup.getParent());	
 		}
 	}
 
@@ -739,57 +688,54 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected String handleGessAccountName(String userName, String dispatcherName)
 			throws Exception
 	{
-		DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi(dispatcherName);
+		SystemEntity dispatcher = getSystemEntityDao().findByCode(dispatcherName);
 		if (dispatcher.getManualAccountCreation() != null && dispatcher.getManualAccountCreation().booleanValue())
 			return null;
 		
-		DominiUsuariEntity du = getDominiUsuariEntityDao().findByDispatcher (dispatcherName);
+		UserDomainEntity du = getUserDomainEntityDao().findBySytem(dispatcherName);
 		// Search if already has a user name for this user domain
 		
-		UsuariEntity ue = getUsuariEntityDao().findByCodi(userName);
+		UserEntity ue = getUserEntityDao().findByCode(userName);
 		if (ue == null)
 			return null;
 
-		if (du.getTipus().equals (TipusDominiUsuariEnumeration.PRINCIPAL))
+		if (du.getType().equals(TipusDominiUsuariEnumeration.PRINCIPAL))
 			return userName;
-		else if (du.getTipus().equals(TipusDominiUsuariEnumeration.SHELL))
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
 			return evalExpression(du, ue, dispatcherName);
 		}
-		else if (du.getTipus().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
 		{
 			Object obj = applicationContext.getBean(du.getBeanGenerator());
 			if (obj == null)
-				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getCodi())); //$NON-NLS-1$
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getCode())); //$NON-NLS-1$
 			if (! (obj instanceof AccountNameGenerator))
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
 			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
+			SystemEntity de = getSystemEntityDao().findByCode(dispatcherName);
 			return generator.getAccountName(ue, de);
 		}
 		else
 			return null;
 	}
 
-	private String evalExpression(DominiUsuariEntity du, UsuariEntity ue,
-			String dispatcherName) throws EvalError {
-		User userVO =  User.toUser(getUsuariEntityDao().toUsuari(ue));
+	private String evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName) throws EvalError {
+		User userVO = User.toUser(getUserEntityDao().toUsuari(ue));
 		Interpreter interpreter = new Interpreter();
-		DispatcherEntity de = getDispatcherEntityDao().findByCodi(dispatcherName);
+		SystemEntity de = getSystemEntityDao().findByCode(dispatcherName);
 		
 		HashMap<String, String> attributes;
 		HashMap<String, Group> groups;
 			
 		attributes = new HashMap<String, String>();
-		for (DadaUsuariEntity dada: ue.getDadaUsuari())
-		{
-			attributes.put(dada.getTipusDada().getCodi(), dada.getValorDada());
-		}
+		for (UserDataEntity dada : ue.getUserData()) {
+            attributes.put(dada.getDataType().getCode(), dada.getDataValue());
+        }
 				
 		groups = new HashMap<String, Group>();
-		addGroups (groups, ue.getGrupPrimari());
-		for (UsuariGrupEntity grup: ue.getGrupsSecundaris())
-			addGroups (groups, grup.getGrup());
+		addGroups(groups, ue.getPrimaryGroup());
+		for (UserGroupEntity grup : ue.getSecondaryGroups()) addGroups(groups, grup.getGroup());
 			
 		interpreter.set("attributes", attributes); //$NON-NLS-1$
 		interpreter.set("groups", groups); //$NON-NLS-1$
@@ -798,9 +744,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		interpreter.set("usuariEntity", ue); //$NON-NLS-1$
 		interpreter.set("user", userVO); //$NON-NLS-1$
 		interpreter.set("dominiEntity", du); //$NON-NLS-1$
-		interpreter.set("userDomain", UserDomain.toUserDomain(getDominiUsuariEntityDao().toDominiUsuari(du))); //$NON-NLS-1$
+		interpreter.set("userDomain", UserDomain.toUserDomain(getUserDomainEntityDao().toDominiUsuari(du))); //$NON-NLS-1$
 		interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
-		interpreter.set("system", com.soffid.iam.api.System.toSystem(getDispatcherEntityDao().toDispatcher(de))); //$NON-NLS-1$
+		interpreter.set("system", com.soffid.iam.api.System.toSystem(getSystemEntityDao().toDispatcher(de))); //$NON-NLS-1$
 		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
 				
 		return (String) interpreter.eval(du.getBshExpr());
@@ -882,26 +828,21 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		AccountEntity acc = getAccountEntityDao().load(account.getId());
 		if (acc.getType().equals(AccountType.USER))
 		{
-			for (UserAccountEntity uae: acc.getUsers())
-			{
-				users.add(uae.getUser().getCodi());
-			}
+			for (UserAccountEntity uae : acc.getUsers()) {
+                users.add(uae.getUser().getUserName());
+            }
 		} else {
-			for (AccountAccessEntity aae: acc.getAcl())
-			{
-				if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level))
-				{
-					addGroupMembers(aae.getGroup(), users);
-				}
-				if (aae.getRol() != null && isGreaterOrIqualThan(aae.getLevel(), level))
-				{
-					addRolMembers (aae.getRol(), users);
-				}
-				if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level))
-				{
-					users.add(aae.getUser().getCodi());
-				}
-			}
+			for (AccountAccessEntity aae : acc.getAcl()) {
+                if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+                    addGroupMembers(aae.getGroup(), users);
+                }
+                if (aae.getRol() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+                    addRolMembers(aae.getRol(), users);
+                }
+                if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+                    users.add(aae.getUser().getUserName());
+                }
+            }
 		}
 		
 		return users;
@@ -912,8 +853,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 * @param users
 	 * @throws InternalErrorException 
 	 */
-	private void addRolMembers (RolEntity rol, Set<String> users) throws InternalErrorException
-	{
+	private void addRolMembers(RoleEntity rol, Set<String> users) throws InternalErrorException {
 		Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantsByRolId(rol.getId());
 		for (RolGrant grant: grants)
 		{
@@ -926,20 +866,16 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 * @param group
 	 * @param users
 	 */
-	private void addGroupMembers (GrupEntity group, Set<String> users)
-	{
-		for (UsuariEntity u: group.getUsuarisGrupPrimari())
-		{
-			users.add(u.getCodi());
-		}
-		for (UsuariGrupEntity ug: group.getUsuarisGrupSecundari())
-		{
-			users.add (ug.getUsuari().getCodi());
-		}
-		for (GrupEntity child: group.getFills())
-		{
-			addGroupMembers(child, users);
-		}
+	private void addGroupMembers(GroupEntity group, Set<String> users) {
+		for (UserEntity u : group.getPrimaryGroupUsers()) {
+            users.add(u.getUserName());
+        }
+		for (UserGroupEntity ug : group.getSecondaryGroupUsers()) {
+            users.add(ug.getUser().getUserName());
+        }
+		for (GroupEntity child : group.getChildrens()) {
+            addGroupMembers(child, users);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -956,8 +892,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 * @param grupPrimari
 	 * @param accounts
 	 */
-	private void addGrantedAccounts (GrupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level)
-	{
+	private void addGrantedAccounts(GroupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level) {
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
 			if (isGreaterOrIqualThan(aae.getLevel(), level))
@@ -965,8 +900,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				accounts.add(aae.getAccount());
 			}
 		}
-		if (grup.getPare() != null)
-			addGrantedAccounts(grup.getPare(), accounts, level);
+		if (grup.getParent() != null)
+			addGrantedAccounts(grup.getParent(), accounts, level);
 	}
 
 	/* (non-Javadoc)
@@ -1033,9 +968,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		// Check if policy allows user change
 		DominiUsuariService dominiUsuariService = getDominiUsuariService();
-		PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(
-						ae.getPasswordPolicy().getCodi(), 
-						ae.getDispatcher().getDomini().getCodi());
+		PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
 		if (politica == null)
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 		if (!politica.isAllowPasswordQuery())
@@ -1047,24 +980,19 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		
 		ServerEntityDao dao = getServerEntityDao();
 		Exception lastException = null;
-		for (ServerEntity se: dao.loadAll())
-		{
-			if (se.getType().equals(ServerType.MASTERSERVER))
-			{
-    			try {
-    		        RemoteServiceLocator rsl = new RemoteServiceLocator(se.getNom());
-    	            rsl.setAuthToken(se.getAuth());
-    	            
-    	            SyncStatusService sss = rsl.getSyncStatusService();
-    	            Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
-    	            if (p != null)
-    	            	return p;
-    			} catch (Exception e)
-    			{
-    				lastException = e;
-    			}
-			}
-		}
+		for (ServerEntity se : dao.loadAll()) {
+            if (se.getType().equals(ServerType.MASTERSERVER)) {
+                try {
+                    RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
+                    rsl.setAuthToken(se.getAuth());
+                    SyncStatusService sss = rsl.getSyncStatusService();
+                    Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
+                    if (p != null) return p;
+                } catch (Exception e) {
+                    lastException = e;
+                }
+            }
+        }
 		if (lastException != null)
 			throw lastException;
 		return null;
@@ -1089,22 +1017,21 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
 		{
 			String dispatcher = ips.getDefaultDispatcher();
-			AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+			AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
 			if (caller == null)
 				throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
 			if (caller.getId() != ae.getId())
 			{
-				UsuariEntity callerUe = getUserForAccount(caller);
+				UserEntity callerUe = getUserForAccount(caller);
 				if (ae.getType().equals(AccountType.USER))
 				{
-					UsuariEntity ue2 = getUserForAccount(ae);
+					UserEntity ue2 = getUserForAccount(ae);
 					if (ue2 != null)
 					{
 						if (callerUe == null)
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 						
-						if (! callerUe.getId().equals(ue2.getId()) &&
-							!AutoritzacionsUsuari.canUpdateUserPassword(ue2.getGrupPrimari().getCodi()))
+						if (!callerUe.getId().equals(ue2.getId()) && !AutoritzacionsUsuari.canUpdateUserPassword(ue2.getPrimaryGroup().getCode()))
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					}
 					else
@@ -1120,14 +1047,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
-					for ( String user: users)
-					{
-						if (user.equals(callerUe.getCodi()))
-						{
-							found = true;
-							break;
-						}
-					}
+					for (String user : users) {
+                        if (user.equals(callerUe.getUserName())) {
+                            found = true;
+                            break;
+                        }
+                    }
 
 					if (!found)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
@@ -1135,9 +1060,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			}
 			// Check if policy allows user change
 			DominiUsuariService dominiUsuariService = getDominiUsuariService();
-			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(
-							ae.getPasswordPolicy().getCodi(), 
-							ae.getDispatcher().getDomini().getCodi());
+			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
 			if (politica == null)
 				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 			if (!politica.isAllowPasswordChange())
@@ -1172,10 +1095,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		String principal = Security.getPrincipal().getName();
 		InternalPasswordService ips = getInternalPasswordService ();
 		String dispatcher = ips.getDefaultDispatcher();
-		AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
 		if (caller == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
-		UsuariEntity callerUe = getUserForAccount(caller);
+		UserEntity callerUe = getUserForAccount(caller);
 		if (callerUe == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
 
@@ -1197,14 +1120,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
-					for ( String user: users)
-					{
-						if (user.equals(callerUe.getCodi()))
-						{
-							found = true;
-							break;
-						}
-					}
+					for (String user : users) {
+                        if (user.equals(callerUe.getUserName())) {
+                            found = true;
+                            break;
+                        }
+                    }
 					if (!found)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
 				}
@@ -1215,9 +1136,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			}
 			// Check if policy allows user change
 			DominiUsuariService dominiUsuariService = getDominiUsuariService();
-			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(
-							ae.getPasswordPolicy().getCodi(), 
-							ae.getDispatcher().getDomini().getCodi());
+			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
 			if (politica == null)
 				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 			if (!politica.isAllowPasswordChange())
@@ -1228,9 +1147,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			if ( ! ae.getUsers().isEmpty())
 			{
-				UsuariEntity currentUser = ae.getUsers().iterator().next().getUser();
+				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
 				if (! currentUser.getId().equals(callerUe.getId()))
-					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getCodi()));
+					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
 			}
 		}
 		/// Now, do the job
@@ -1258,9 +1177,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		audit("P", ae); //$NON-NLS-1$
 	}
 	
-	private UsuariEntity getUserForAccount (AccountEntity acc)
-	{
-		UsuariEntity ue = null;
+	private UserEntity getUserForAccount(AccountEntity acc) {
+		UserEntity ue = null;
 		if (acc.getType().equals(AccountType.USER))
 		{
 			for (UserAccountEntity uae: acc.getUsers())
@@ -1283,7 +1201,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			if (caller.getId() != usuari.getId())
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
-		UsuariEntity ue = getUsuariEntityDao().load(usuari.getId());
+		UserEntity ue = getUserEntityDao().load(usuari.getId());
 		Collection<UserAccount> list = new LinkedList<UserAccount>();
 		UserAccountEntityDao ueaDao = getUserAccountEntityDao();
 		for (UserAccountEntity uae: ue.getAccounts())
@@ -1330,44 +1248,28 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		account.setLastUpdated(account2.getLastUpdated());
 		account.setPasswordExpiration(account2.getPasswordExpiration());
 
-		List<TasqueEntity> coll = getTasqueEntityDao().findByAccount (accEntity.getName(), accEntity.getDispatcher().getCodi());
-		for (TasqueEntity tasque: coll)
-		{
-			if (tasque.getTransa().equals (TaskHandler.UPDATE_ACCOUNT) ||
-				tasque.getTransa().equals (TaskHandler.UPDATE_ACCOUNT_PASSWORD) ||
-				tasque.getTransa().equals (TaskHandler.PROPAGATE_ACCOUNT_PASSWORD))
-				return true;
-		}
+		List<TaskEntity> coll = getTaskEntityDao().findByAccount(accEntity.getName(), accEntity.getSystem().getCode());
+		for (TaskEntity tasque : coll) {
+            if (tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT) || tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_ACCOUNT_PASSWORD)) return true;
+        }
 
 		if (accEntity.getType().equals(AccountType.USER))
 		{
-			for (UserAccountEntity ua: accEntity.getUsers())
-			{
-				coll = getTasqueEntityDao().findByUser(ua.getUser().getCodi());
-				for (TasqueEntity tasque: coll)
-				{
-					if ( tasque.getTransa().equals (TaskHandler.UPDATE_USER)  
-						 || accEntity.getDispatcher().getDomini().getCodi().equals(tasque.getDominiContrasenyes()) &&
-						 		(tasque.getTransa().equals (TaskHandler.UPDATE_USER_PASSWORD) ||
-								 tasque.getTransa().equals (TaskHandler.PROPAGATE_PASSWORD))
-						 )
-					{
-						// Check tasklog => If not found or is not complete
-						boolean found = false;
-						for (TaskLogEntity tl: tasque.getLogs())
-						{
-							if (tl.getDispatcher().getId().equals (accEntity.getDispatcher().getId()))
-							{
-								found = true;
-								if (! "S".equals(tl.getComplet())) //$NON-NLS-1$
-									return true;
-							}
-						}
-						if (!found)
-							return true;
-					}
-				}
-			}
+			for (UserAccountEntity ua : accEntity.getUsers()) {
+                coll = getTaskEntityDao().findByUser(ua.getUser().getUserName());
+                for (TaskEntity tasque : coll) {
+                    if (tasque.getTransaction().equals(TaskHandler.UPDATE_USER) || accEntity.getSystem().getDomain().getCode().equals(tasque.getPasswordsDomain()) && (tasque.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD))) {
+                        boolean found = false;
+                        for (TaskLogEntity tl : tasque.getLogs()) {
+                            if (tl.getSystem().getId().equals(accEntity.getSystem().getId())) {
+                                found = true;
+                                if (!"S".equals(tl.getCompleted())) return true;
+                            }
+                        }
+                        if (!found) return true;
+                    }
+                }
+            }
 		}
 		return false;
 		
@@ -1381,19 +1283,18 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(action); //$NON-NLS-1$
         auditoria.setAccount(account.getName());
-        auditoria.setBbdd(account.getDispatcher().getCodi());
+        auditoria.setBbdd(account.getSystem().getCode());
         auditoria.setAutor(codiUsuariCanvi);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
         if (account.getType().equals (AccountType.USER))
         {
-        	for (UserAccountEntity ua: account.getUsers())
-        		auditoria.setUsuari(ua.getUser().getCodi());
+        	for (UserAccountEntity ua : account.getUsers()) auditoria.setUsuari(ua.getUser().getUserName());
         }
 
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
     }
 
     /* (non-Javadoc)
@@ -1486,16 +1387,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 */
 	private List<Account> SetAccountUserTypes (List<Account> accountList)
 	{
-		TipusUsuariEntityDao userTypeDAO = getTipusUsuariEntityDao();
+		UserTypeEntityDao userTypeDAO = getUserTypeEntityDao();
 		List<Account> accounts = new LinkedList<Account>();
 		
-		for (Account account : accountList)
-		{
-			account.setPasswordPolicy(userTypeDAO
-				.findByCodi(account.getPasswordPolicy()).getDescripcio());
-			
-			accounts.add(account);
-		}
+		for (Account account : accountList) {
+            account.setPasswordPolicy(userTypeDAO.findByCode(account.getPasswordPolicy()).getDescription());
+            accounts.add(account);
+        }
 
 		return accounts;
 	}
@@ -1513,10 +1411,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		String principal = Security.getPrincipal().getName();
 		InternalPasswordService ips = getInternalPasswordService ();
 		String dispatcher = ips.getDefaultDispatcher();
-		AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
 		if (caller == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
-		UsuariEntity callerUe = getUserForAccount(caller);
+		UserEntity callerUe = getUserForAccount(caller);
 		if (callerUe == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
 
@@ -1538,14 +1436,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
-					for ( String user: users)
-					{
-						if (user.equals(callerUe.getCodi()))
-						{
-							found = true;
-							break;
-						}
-					}
+					for (String user : users) {
+                        if (user.equals(callerUe.getUserName())) {
+                            found = true;
+                            break;
+                        }
+                    }
 					if (!found)
 						return null;
 				}
@@ -1560,8 +1456,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			return null;
 		else
 		{
-			UsuariEntity currentUser = ae.getUsers().iterator().next().getUser();
-			return getUsuariEntityDao().toUsuari(currentUser);
+			UserEntity currentUser = ae.getUsers().iterator().next().getUser();
+			return getUserEntityDao().toUsuari(currentUser);
 		}
 	}
 
@@ -1578,17 +1474,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		String principal = Security.getPrincipal().getName();
 		InternalPasswordService ips = getInternalPasswordService ();
 		String dispatcher = ips.getDefaultDispatcher();
-		AccountEntity caller = getAccountEntityDao().findByNameAndDispatcher(principal, dispatcher);
+		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
 		if (caller == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
-		UsuariEntity callerUe = getUserForAccount(caller);
+		UserEntity callerUe = getUserForAccount(caller);
 		if (callerUe == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
 
 		if ( ! ae.getUsers().isEmpty())
 		{
 			UserAccountEntity uae = ae.getUsers().iterator().next();
-			UsuariEntity currentUser = uae.getUser();
+			UserEntity currentUser = uae.getUser();
 			if (currentUser.getId().equals (callerUe.getId()))
 			{
 				getUserAccountEntityDao().remove(uae);
@@ -1626,21 +1522,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantByUser(usuari.getId());
 		Set<AccountEntity> accounts = new HashSet<AccountEntity>();
-		for (RolGrant rg: grants)
-		{
-			RolEntity r = getRolEntityDao().load(rg.getIdRol());
-			for (AccountAccessEntity aae: r.getAccountAccess())
-			{
-				if (isGreaterOrIqualThan(aae.getLevel(), level))
-						accounts.add(aae.getAccount());
-			}
-		}
-		UsuariEntity ue = getUsuariEntityDao().load(usuari.getId());
-		addGrantedAccounts (ue.getGrupPrimari(), accounts, level);
-		for (UsuariGrupEntity ug: ue.getGrupsSecundaris())
-		{
-			addGrantedAccounts (ug.getGrup(), accounts, level);
-		}
+		for (RolGrant rg : grants) {
+            RoleEntity r = getRoleEntityDao().load(rg.getIdRol());
+            for (AccountAccessEntity aae : r.getAccountAccess()) {
+                if (isGreaterOrIqualThan(aae.getLevel(), level)) accounts.add(aae.getAccount());
+            }
+        }
+		UserEntity ue = getUserEntityDao().load(usuari.getId());
+		addGrantedAccounts(ue.getPrimaryGroup(), accounts, level);
+		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
+            addGrantedAccounts(ug.getGroup(), accounts, level);
+        }
 		
 		for (AccountAccessEntity aae: ue.getAccountAccess())
 		{

@@ -3,30 +3,33 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AccessLogEntity;
+import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.HostEntityDao;
+import com.soffid.iam.model.ServiceEntity;
+import com.soffid.iam.model.ServiceEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import es.caib.seycon.ng.comu.RegistreAcces;
+import es.caib.seycon.ng.exception.SeyconAccessLocalException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownHostException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.DateUtils;
+import es.caib.seycon.ng.utils.LimitDates;
+import es.caib.seycon.ng.utils.Security;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
-import java.util.ArrayList;
-
-import es.caib.seycon.ng.comu.RegistreAcces;
-import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.exception.UnknownHostException;
-import es.caib.seycon.ng.model.MaquinaEntity;
-import es.caib.seycon.ng.model.MaquinaEntityDao;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.RegistreAccesEntity;
-import es.caib.seycon.ng.model.ServeiEntity;
-import es.caib.seycon.ng.model.ServeiEntityDao;
-import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.RegistreAccesService
@@ -79,22 +82,17 @@ public class RegistreAccesServiceImpl extends
 
 		Collection registresAcces = new Vector();
 		if (limitDates != null) {
-			registresAcces = this.getRegistreAccesEntityDao()
-					.findRegistreByFiltre(DateUtils.nullDate,
-							limitDates.getMaximum(), limitDates.getMinimum(),
-							nomClient, nomServidor, codiUsuari);
+			registresAcces = this.getAccessLogEntityDao().findAccessLogByCriteria(DateUtils.nullDate, limitDates.getMaximum(), limitDates.getMinimum(), nomClient, nomServidor, codiUsuari);
 		} else {
 			//NOTA: se restringe el número de resultados a <=201
-			registresAcces = getRegistreAccesEntityDao().findRegistreByFiltre(
-					nomClient, nomServidor, codiUsuari);
+			registresAcces = getAccessLogEntityDao().findAccessLogByCriteria(nomClient, nomServidor, codiUsuari);
 		}
 		if (registresAcces != null) {
 			if (registresAcces.size() >= 201) {
 				throw new SeyconException(
 						Messages.getString("RegistreAccesServiceImpl.8")); //$NON-NLS-1$
 			}
-			return getRegistreAccesEntityDao().toRegistreAccesList(
-					registresAcces);
+			return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 		}
 		return new Vector();
 	}
@@ -144,17 +142,14 @@ public class RegistreAccesServiceImpl extends
 		}
 		*/		
 
-		Collection<RegistreAccesEntity> registresAcces = new LinkedList<RegistreAccesEntity>();
+		Collection<AccessLogEntity> registresAcces = new LinkedList<AccessLogEntity>();
 		if (d_dataIni == null && d_dataFi == null) { // Sin fechas
-			registresAcces = getRegistreAccesEntityDao().findRegistreByFiltre(
-					nomClient, nomServidor, codiUsuari);
+			registresAcces = getAccessLogEntityDao().findAccessLogByCriteria(nomClient, nomServidor, codiUsuari);
 		} else { // Con fechas (cualquiera de las dos)
 			Date fechaIni = d_dataIni != null ? d_dataIni : DateUtils.nullDate;
 			Date fechaFin = d_dataFi != null ? d_dataFi : DateUtils.nullDate;
 			//Nota: se restringen los resultados a <=201 filas
-			registresAcces = this.getRegistreAccesEntityDao()
-					.findRegistreByFiltre2Datas(DateUtils.nullDate, fechaIni,
-							fechaFin, nomClient, nomServidor, codiUsuari);
+			registresAcces = this.getAccessLogEntityDao().findAccessLogByCriteria2Dates(DateUtils.nullDate, fechaIni, fechaFin, nomClient, nomServidor, codiUsuari);
 		}
 
 		if (registresAcces != null) { // Restringit en la cerca a <=201 (com a molt serà 201)
@@ -162,8 +157,7 @@ public class RegistreAccesServiceImpl extends
 				throw new SeyconException(
 						Messages.getString("RegistreAccesServiceImpl.19")); //$NON-NLS-1$
 			}
-			return getRegistreAccesEntityDao().toRegistreAccesList(
-					registresAcces);
+			return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 		}
 		return new LinkedList<RegistreAcces> ();
 
@@ -172,7 +166,7 @@ public class RegistreAccesServiceImpl extends
 	@Deprecated
 	protected Collection<RegistreAcces> handleFindRegistresAccesByMaquina(String dataIni,
 			String nomServidor, String numRegistres, String protocolAcces) throws Exception {
-		Collection<RegistreAccesEntity> registresAcces=null;
+		Collection<AccessLogEntity> registresAcces = null;
 		Date d_dataIni = null;
 		if (dataIni != null && dataIni.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& dataIni.trim().compareTo("%") != 0) { //$NON-NLS-1$
@@ -192,11 +186,11 @@ public class RegistreAccesServiceImpl extends
 			{
 				CriteriaSearchConfiguration config  = new CriteriaSearchConfiguration();
 				config.setMaximumResultSize(Integer.decode(numRegistres));
-				registresAcces = getRegistreAccesEntityDao().findRegistreByMaquina(config, DateUtils.nullDate, fechaIni, nomServidor, protocolAcces);
+				registresAcces = getAccessLogEntityDao().findAccessLogByHost(config, DateUtils.nullDate, fechaIni, nomServidor, protocolAcces);
 			} else {
-				registresAcces = getRegistreAccesEntityDao().findRegistreByMaquina(DateUtils.nullDate, fechaIni, nomServidor, protocolAcces);
+				registresAcces = getAccessLogEntityDao().findAccessLogByHost(DateUtils.nullDate, fechaIni, nomServidor, protocolAcces);
 			}
-			return getRegistreAccesEntityDao().toRegistreAccesList(registresAcces); //Convertim a VO
+			return getAccessLogEntityDao().toRegistreAccesList(registresAcces); //Convertim a VO
 		}		
 		return new LinkedList<RegistreAcces>();
 	}
@@ -204,7 +198,7 @@ public class RegistreAccesServiceImpl extends
 	@Deprecated
 	protected Collection<RegistreAcces>  handleFindRegistresAccesByMaquinaAccesSSO(String dataIni,
 			String nomServidor, String numRegistres) throws Exception {
-		Collection<RegistreAccesEntity> registresAcces=null;
+		Collection<AccessLogEntity> registresAcces = null;
 		Date d_dataIni = null;
 		if (dataIni != null && dataIni.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& dataIni.trim().compareTo("%") != 0) { //$NON-NLS-1$
@@ -225,7 +219,7 @@ public class RegistreAccesServiceImpl extends
 		if (nomServidor!=null && !"".equals(nomServidor.trim()) && !("%").equals(nomServidor.trim()) ) { //$NON-NLS-1$ //$NON-NLS-2$
 			Date fechaIni = d_dataIni != null ? d_dataIni : DateUtils.nullDate;
 
-			registresAcces = getRegistreAccesEntityDao().findRegistreByMaquinaDataIniDesc(DateUtils.nullDate, fechaIni, nomServidor, "sso"); //$NON-NLS-1$
+			registresAcces = getAccessLogEntityDao().findAccessLogByHostAndStartDateAndProtocol(DateUtils.nullDate, fechaIni, nomServidor, "sso"); //$NON-NLS-1$
 			Collection res = null;
 			if (numRegs>0) {
 				res = new Vector(numRegs); int pos = 0;
@@ -234,7 +228,7 @@ public class RegistreAccesServiceImpl extends
 					res.add(it.next());
 				}
 			} else res = registresAcces;
-			return getRegistreAccesEntityDao().toRegistreAccesList(res); //Convertim a VO
+			return getAccessLogEntityDao().toRegistreAccesList(res); //Convertim a VO
 		}		
 		return new LinkedList<RegistreAcces>();
 	}
@@ -243,7 +237,7 @@ public class RegistreAccesServiceImpl extends
 	protected Collection<RegistreAcces> handleFindRegistreByDataIniAndCodiUsuari(
 			String dataIni, String codiUsuari, String numRegistres)
 			throws Exception {
-		Collection<RegistreAccesEntity> registresAcces=null;
+		Collection<AccessLogEntity> registresAcces = null;
 		Date d_dataIni = null;
 		if (dataIni != null && dataIni.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& dataIni.trim().compareTo("%") != 0) { //$NON-NLS-1$
@@ -263,19 +257,18 @@ public class RegistreAccesServiceImpl extends
 		
 		if (d_dataIni!=null) {
 			
-			registresAcces = getRegistreAccesEntityDao().findRegistreByDataIniAndCodiUsuari(DateUtils.nullDate, fechaIni, codiUsuari);
+			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserCode(DateUtils.nullDate, fechaIni, codiUsuari);
 			if (registresAcces != null) { 
 				if (registresAcces.size() >= 201) {
 					throw new SeyconException(
 						Messages.getString("RegistreAccesServiceImpl.38")); //$NON-NLS-1$
 				}
-				return getRegistreAccesEntityDao().toRegistreAccesList(
-					registresAcces);
+				return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 			}
 		} else if (numRegs!=-1 && numRegs < 201) {//com a molt 200 registres
 			// Los obtenemos ordenados por fecha inicio sesión descendentemente
 			// Obtenemos sólo los registros de acceso de tipo SSO
-			registresAcces = getRegistreAccesEntityDao().findRegistreByDataIniDescAndCodiUsuari(DateUtils.nullDate, fechaIni, codiUsuari,"sso"); //$NON-NLS-1$
+			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserCodeAndProtocol(DateUtils.nullDate, fechaIni, codiUsuari, "sso"); //$NON-NLS-1$
 			Collection res = null;
 			if (numRegs>0) {
 				res = new Vector(numRegs); int pos = 0;
@@ -284,7 +277,7 @@ public class RegistreAccesServiceImpl extends
 					res.add(it.next());
 				}
 			} else res = registresAcces;
-			return getRegistreAccesEntityDao().toRegistreAccesList(res); //Convertim a VO
+			return getAccessLogEntityDao().toRegistreAccesList(res); //Convertim a VO
 		} else 
 			throw new SeyconException (Messages.getString("RegistreAccesServiceImpl.40")); //$NON-NLS-1$
 		
@@ -298,17 +291,15 @@ public class RegistreAccesServiceImpl extends
 			throws Exception {
 		
 		// Mirem les autoritzacions del peticionari sobre l'usuari on es fa la petició
-		if (AutoritzacionsUsuari.canQueryUserAccessRegister(codiUsuari,getGrupEntityDao())) {
+		if (AutoritzacionsUsuari.canQueryUserAccessRegister(codiUsuari, getGroupEntityDao())) {
 			CriteriaSearchConfiguration config  = new CriteriaSearchConfiguration();
 			if (numRegistres != null && ! numRegistres.isEmpty())
 			{
 				config.setMaximumResultSize(Integer.decode(numRegistres));
 			}
-			Collection<RegistreAccesEntity> registresAcces = getRegistreAccesEntityDao()
-					.findDarrersRegistresByCodiUsuari(config, codiUsuari,
-							codiProtocolAcces);
+			Collection<AccessLogEntity> registresAcces = getAccessLogEntityDao().findLastAccessLogByUserCode(config, codiUsuari, codiProtocolAcces);
 			if (registresAcces != null) {
-				return getRegistreAccesEntityDao().toRegistreAccesList(registresAcces);
+				return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 			}
 			return new LinkedList<RegistreAcces>();
 		} 
@@ -329,13 +320,11 @@ public class RegistreAccesServiceImpl extends
 		{
 			config.setMaximumResultSize(Integer.decode(numRegistres));
 		}
-		Collection<RegistreAccesEntity> registresAcces = getRegistreAccesEntityDao()
-				.findDarrersRegistresAccesMaquinaProtocol(config, nomServidor, "sso"); //$NON-NLS-1$
+		Collection<AccessLogEntity> registresAcces = getAccessLogEntityDao().findLastAccessLogByServerAndProtocol(config, nomServidor, "sso"); //$NON-NLS-1$
 		
 		if (registresAcces != null) {
 			
-			return getRegistreAccesEntityDao().toRegistreAccesList(
-					registresAcces);
+			return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 		}
 		return new ArrayList();
 
@@ -384,20 +373,16 @@ public class RegistreAccesServiceImpl extends
 		
 
 		// Query optimitzada segons els paràmetres d'entrada
-		Collection<RegistreAccesEntity>  registresAcces = getRegistreAccesEntityDao()
-				.findRegistreByFiltreNou(DateUtils.nullDate, d_dataIni, d_dataFi, nomClient,
-						nomServidor, codiUsuari);
+		Collection<AccessLogEntity> registresAcces = getAccessLogEntityDao().findAccessLogByCriteria2(DateUtils.nullDate, d_dataIni, d_dataFi, nomClient, nomServidor, codiUsuari);
 		if (registresAcces != null)
 		{
 			// Check maximum number of results
 			if (registresAcces.size() > limitResults)
 			{
-				return getRegistreAccesEntityDao()
-					.toRegistreAccesList(registresAcces).subList(0, limitResults);
+				return getAccessLogEntityDao().toRegistreAccesList(registresAcces).subList(0, limitResults);
 			}
 
-			return getRegistreAccesEntityDao()
-				.toRegistreAccesList(registresAcces);
+			return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 		}
 		
 		return new LinkedList<RegistreAcces>();
@@ -405,14 +390,13 @@ public class RegistreAccesServiceImpl extends
 
     @Override
     protected RegistreAcces handleCreate(RegistreAcces registre) throws Exception {
-        RegistreAccesEntity entity =
-        		getRegistreAccesEntityDao().newRegistreAccesEntity();
-        MaquinaEntityDao maquinaDao = getMaquinaEntityDao();
-        ServeiEntityDao serveiDao = getServeiEntityDao();
+        AccessLogEntity entity = getAccessLogEntityDao().newAccessLogEntity();
+        HostEntityDao maquinaDao = getHostEntityDao();
+        ServiceEntityDao serveiDao = getServiceEntityDao();
         if (registre.getNomClinet() != null && registre.getNomClinet().length() > 0) {
-            MaquinaEntity maquina = maquinaDao.findByNom(registre.getNomClinet());
+            HostEntity maquina = maquinaDao.findByName(registre.getNomClinet());
             if (maquina == null)
-                maquina = maquinaDao.findByAdreca(registre.getNomClinet());
+                maquina = maquinaDao.findByIP(registre.getNomClinet());
             if (maquina == null) {
                 if (registre.getInformacio() == null)
                     registre.setInformacio(Messages.getString("RegistreAccesServiceImpl.57") + registre.getNomClinet()); //$NON-NLS-1$
@@ -422,25 +406,25 @@ public class RegistreAccesServiceImpl extends
                 entity.setClient(maquina);
             }
         }
-        MaquinaEntity maquina = maquinaDao.findByNom(registre.getNomServidor());
-        entity.setServidor(maquina);
+        HostEntity maquina = maquinaDao.findByName(registre.getNomServidor());
+        entity.setServer(maquina);
         
-        ServeiEntity servei = serveiDao.findByCodi(registre.getProtocolAcces());
+        ServiceEntity servei = serveiDao.findByCode(registre.getProtocolAcces());
         if (servei == null) {
-            servei =  getServeiEntityDao().newServeiEntity();
-            servei.setCodi(registre.getProtocolAcces());
+            servei = getServiceEntityDao().newServiceEntity();
+            servei.setCode(registre.getProtocolAcces());
             serveiDao.create(servei);
         }
         entity.setCodeAge(registre.getCodeAge());
-        entity.setDataInici(registre.getDataInici().getTime());
-        entity.setDataFi(registre.getDataFi().getTime());
-        entity.setInformacio(registre.getInformacio());
-        entity.setIdSessio(registre.getIdSessio());
+        entity.setStartDate(registre.getDataInici().getTime());
+        entity.setEndDate(registre.getDataFi().getTime());
+        entity.setInformation(registre.getInformacio());
+        entity.setSessionID(registre.getIdSessio());
         entity.setProtocol(servei);
-        entity.setTipusAcces(registre.getTipusAcces());
-        entity.setUsuari(getUsuariEntityDao().findByCodi(registre.getCodiUsuari()));
-        getRegistreAccesEntityDao().create(entity);
-        return getRegistreAccesEntityDao().toRegistreAcces(entity);
+        entity.setAccessType(registre.getTipusAcces());
+        entity.setUser(getUserEntityDao().findByCode(registre.getCodiUsuari()));
+        getAccessLogEntityDao().create(entity);
+        return getAccessLogEntityDao().toRegistreAcces(entity);
     }
 	
 

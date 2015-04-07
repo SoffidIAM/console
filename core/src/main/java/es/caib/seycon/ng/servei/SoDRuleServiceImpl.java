@@ -1,24 +1,26 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package es.caib.seycon.ng.servei;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.SoDRoleEntity;
+import com.soffid.iam.model.SoDRuleEntity;
+import com.soffid.iam.model.UserEntity;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRole;
 import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.SoDRoleEntity;
-import es.caib.seycon.ng.model.SoDRuleEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author bubu
@@ -41,7 +43,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 	protected Collection<SoDRule> handleFindRuleByApplication (Long applicationId)
 					throws Exception
 	{
-		AplicacioEntity app = getAplicacioEntityDao().load(applicationId);
+		InformationSystemEntity app = getInformationSystemEntityDao().load(applicationId);
 		return getSoDRuleEntityDao().toSoDRuleList(app.getSodRules());
 	}
 
@@ -170,31 +172,24 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 	protected void handleQualifyRolAccountList (List<RolAccount> ra) throws Exception
 	{
 		LinkedList<RolGrant> targetList = null;
-		for (RolAccount rolAccount: ra)
-		{
-			RolEntity role = getRolEntityDao().findByNameAndDispatcher(rolAccount.getNomRol(), rolAccount.getBaseDeDades());
-			if (role != null  && !role.getSodRules().isEmpty())
-			{
-				if (targetList == null)
-				{
-					targetList = generateTargetList(ra, rolAccount);
-				}
-				SoDRisk risk = null;
-				Collection<SoDRuleEntity> rules = doFindSodNonCompliances(role, targetList);
-				for ( SoDRuleEntity rule: rules)
-				{
-					if ( risk == null || isGreater(rule.getRisk(), risk))
-						risk = rule.getRisk();
-				}
-				rolAccount.setSodRisk(risk);
-				rolAccount.setSodRules(getSoDRuleEntityDao().toSoDRuleList(rules));
-			}
-			else
-			{
-				rolAccount.setSodRisk(null);
-				rolAccount.setSodRules(null);
-			}
-		}
+		for (RolAccount rolAccount : ra) {
+            RoleEntity role = getRoleEntityDao().findByNameAndSystem(rolAccount.getNomRol(), rolAccount.getBaseDeDades());
+            if (role != null && !role.getSodRules().isEmpty()) {
+                if (targetList == null) {
+                    targetList = generateTargetList(ra, rolAccount);
+                }
+                SoDRisk risk = null;
+                Collection<SoDRuleEntity> rules = doFindSodNonCompliances(role, targetList);
+                for (SoDRuleEntity rule : rules) {
+                    if (risk == null || isGreater(rule.getRisk(), risk)) risk = rule.getRisk();
+                }
+                rolAccount.setSodRisk(risk);
+                rolAccount.setSodRules(getSoDRuleEntityDao().toSoDRuleList(rules));
+            } else {
+                rolAccount.setSodRisk(null);
+                rolAccount.setSodRules(null);
+            }
+        }
 	}
 
 	private LinkedList<RolGrant> generateTargetList (List<RolAccount> ra,
@@ -208,7 +203,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 		}
 		else
 		{
-			UsuariEntity usuari = getUsuariEntityDao().findByCodi(rolAccount.getCodiUsuari());
+			UserEntity usuari = getUserEntityDao().findByCode(rolAccount.getCodiUsuari());
 			targetList. addAll (getAplicacioService().findEffectiveRolGrantByUser(usuari.getId()));
 		}
 		for (RolAccount rolAccount2: ra)
@@ -239,7 +234,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 	protected Collection<SoDRuleEntity> doFindAffectingRulesByRolAccount (RolAccount ra)
 					throws Exception
 	{
-		RolEntity role = getRolEntityDao().findByNameAndDispatcher(ra.getNomRol(), ra.getBaseDeDades());
+		RoleEntity role = getRoleEntityDao().findByNameAndSystem(ra.getNomRol(), ra.getBaseDeDades());
 		if (role == null)
 			return Collections.emptyList();
 		else if (role.getSodRules().isEmpty())
@@ -253,7 +248,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 			}
 			else
 			{
-    			UsuariEntity usuari = getUsuariEntityDao().findByCodi(ra.getCodiUsuari());
+    			UserEntity usuari = getUserEntityDao().findByCode(ra.getCodiUsuari());
     			if (usuari == null)
     				rols = new LinkedList<RolGrant>();
     			else
@@ -277,49 +272,33 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 	 * @param rols
 	 * @return
 	 */
-	private Collection<SoDRuleEntity> doFindSodNonCompliances (RolEntity role,
-					Collection<RolGrant> rols)
-	{
+	private Collection<SoDRuleEntity> doFindSodNonCompliances(RoleEntity role, Collection<RolGrant> rols) {
 		List<SoDRuleEntity> rules = new LinkedList<SoDRuleEntity>();
-		for (SoDRoleEntity sourceSodRole: role.getSodRules())
-		{
-			SoDRuleEntity rule = sourceSodRole.getRule();
-			if (!rule.getRoles().isEmpty())
-			{
-				boolean add = true;
-				for (SoDRoleEntity targetSodRole: rule.getRoles())
-				{
-					// Search for role
-					if (targetSodRole.getId().equals (sourceSodRole.getId()))
-					{
-						// Found
-					}
-					else
-					{
-						// Search on granted roles
-						boolean found = false;
-						for (RolGrant rolGrant: rols)
-						{
-							if (rolGrant.getRolName().equals(targetSodRole.getRole().getNom()) &&
-								rolGrant.getDispatcher().equals(targetSodRole.getRole().getBaseDeDades().getCodi()))
-							{
-								found = true; 
-								break;
-							}
-						}
-						if (!found)
-						{
-							add = false;
-							break;
-						}
-					}
-				}
-				if (add)
-				{
-					rules.add(rule);
-				}
-			}
-		}
+		for (SoDRoleEntity sourceSodRole : role.getSodRules()) {
+            SoDRuleEntity rule = sourceSodRole.getRule();
+            if (!rule.getRoles().isEmpty()) {
+                boolean add = true;
+                for (SoDRoleEntity targetSodRole : rule.getRoles()) {
+                    if (targetSodRole.getId().equals(sourceSodRole.getId())) {
+                    } else {
+                        boolean found = false;
+                        for (RolGrant rolGrant : rols) {
+                            if (rolGrant.getRolName().equals(targetSodRole.getRole().getName()) && rolGrant.getDispatcher().equals(targetSodRole.getRole().getDatabases().getCode())) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            add = false;
+                            break;
+                        }
+                    }
+                }
+                if (add) {
+                    rules.add(rule);
+                }
+            }
+        }
 		return rules;
 	}
 
@@ -342,7 +321,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 	@Override
 	protected void handleInternalRemovingRole (Long roleId) throws Exception
 	{
-		RolEntity role = getRolEntityDao().load(roleId);
+		RoleEntity role = getRoleEntityDao().load(roleId);
         for (SoDRoleEntity sodRole: role.getSodRules())
         {
         	SoDRuleEntity sodRule = sodRole.getRule();

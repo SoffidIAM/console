@@ -3,8 +3,39 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AgentDescriptorEntity;
+import com.soffid.iam.model.AgentDescriptorEntityDao;
+import com.soffid.iam.model.DefaultAttributeMappingEntity;
+import com.soffid.iam.model.DefaultAttributeMappingEntityDao;
+import com.soffid.iam.model.DefaultObjectMappingEntity;
+import com.soffid.iam.model.DefaultObjectMappingEntityDao;
+import com.soffid.iam.model.DefaultObjectMappingPropertyEntity;
+import com.soffid.iam.model.DefaultObjectMappingPropertyEntityDao;
+import com.soffid.iam.model.ServerPluginEntity;
+import com.soffid.iam.model.ServerPluginEntityDao;
+import com.soffid.iam.model.ServerPluginModuleEntity;
+import com.soffid.iam.model.ServerPluginModuleEntityDao;
+import es.caib.seycon.ng.comu.AgentDescriptor;
+import es.caib.seycon.ng.comu.AttributeMapping;
+import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import es.caib.seycon.ng.comu.ServerPlugin;
+import es.caib.seycon.ng.comu.ServerPluginModule;
+import es.caib.seycon.ng.comu.ServerPluginModuleType;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.servei.impl.InternalAgentDescriptor;
+import es.caib.seycon.ng.servei.impl.InternalObjectMapping;
+import es.caib.seycon.ng.servei.impl.InternalServerPluginModule;
+import es.caib.seycon.ng.servei.impl.PluginMerger;
+import es.caib.seycon.ng.servei.impl.ServerBaseParser;
+import es.caib.seycon.ng.servei.impl.ServerPluginParser;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,35 +45,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
-import es.caib.seycon.ng.comu.ServerPluginModule;
-import es.caib.seycon.ng.comu.AgentDescriptor;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.comu.ServerPlugin;
-import es.caib.seycon.ng.comu.ServerPluginModuleType;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AgentDescriptorEntity;
-import es.caib.seycon.ng.model.AgentDescriptorEntityDao;
-import es.caib.seycon.ng.model.DefaultAttributeMappingEntity;
-import es.caib.seycon.ng.model.DefaultAttributeMappingEntityDao;
-import es.caib.seycon.ng.model.DefaultObjectMappingEntity;
-import es.caib.seycon.ng.model.DefaultObjectMappingEntityDao;
-import es.caib.seycon.ng.model.DefaultObjectMappingPropertyEntity;
-import es.caib.seycon.ng.model.DefaultObjectMappingPropertyEntityDao;
-import es.caib.seycon.ng.model.ObjectMappingPropertyEntity;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.ServerPluginEntity;
-import es.caib.seycon.ng.model.ServerPluginEntityDao;
-import es.caib.seycon.ng.model.ServerPluginModuleEntity;
-import es.caib.seycon.ng.model.ServerPluginModuleEntityDao;
-import es.caib.seycon.ng.servei.impl.InternalAgentDescriptor;
-import es.caib.seycon.ng.servei.impl.InternalObjectMapping;
-import es.caib.seycon.ng.servei.impl.InternalServerPluginModule;
-import es.caib.seycon.ng.servei.impl.PluginMerger;
-import es.caib.seycon.ng.servei.impl.ServerBaseParser;
-import es.caib.seycon.ng.servei.impl.ServerPluginParser;
 
 /**
  * @see es.caib.seycon.ng.servei.ServerPluginServer
@@ -286,8 +288,7 @@ public class ServerPluginServiceImpl extends es.caib.seycon.ng.servei.ServerPlug
     @SuppressWarnings({ "rawtypes" })
     protected java.util.Collection<AgentDescriptor> handleGetPluginAgentDescriptors(
             es.caib.seycon.ng.comu.ServerPlugin plugin) throws java.lang.Exception {
-        Collection<ServerPluginEntity> agentsBasics = getServerPluginEntityDao()
-                .findDadesBasiquesAgentsByServerPluginId(plugin.getId());
+        Collection<ServerPluginEntity> agentsBasics = getServerPluginEntityDao().findAgentsBasicDataByServerPluginID(plugin.getId());
         Collection<AgentDescriptor> res = new LinkedList<AgentDescriptor>();
         if (agentsBasics != null)
             for (Iterator it = agentsBasics.iterator(); it.hasNext();) {
@@ -348,8 +349,7 @@ public class ServerPluginServiceImpl extends es.caib.seycon.ng.servei.ServerPlug
             throws java.lang.Exception {
         // Carreguem tots els descriptor d'agents (no importa si estan actius o
         // no)
-        List<AgentDescriptorEntity> v = getAgentDescriptorEntityDao()
-                .findAllOnlyDadesBasiques();
+        List<AgentDescriptorEntity> v = getAgentDescriptorEntityDao().findAllOnlyBasicData();
 
         List<AgentDescriptor> v2 = new LinkedList<AgentDescriptor>();
         // Afegim un descriptor d'agents buit (per la cerca per descripcio)

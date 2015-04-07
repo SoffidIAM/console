@@ -3,8 +3,39 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.EntryPointEntity;
+import com.soffid.iam.model.EntryPointExecutableEntity;
+import com.soffid.iam.model.EntryPointExecutionTypeEntity;
+import com.soffid.iam.model.EntryPointGroupEntity;
+import com.soffid.iam.model.EntryPointIconEntity;
+import com.soffid.iam.model.EntryPointRoleEntity;
+import com.soffid.iam.model.EntryPointTreeEntity;
+import com.soffid.iam.model.EntryPointUserEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupEntity;
+import es.caib.seycon.ng.comu.Aplicacio;
+import es.caib.seycon.ng.comu.ArbrePuntEntrada;
+import es.caib.seycon.ng.comu.Auditoria;
+import es.caib.seycon.ng.comu.AutoritzacioPuntEntrada;
+import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
+import es.caib.seycon.ng.comu.PuntEntrada;
+import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.TipusExecucioPuntEntrada;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.Security;
+import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.Principal;
@@ -23,44 +54,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
-
 import org.apache.commons.collections.map.LRUMap;
 import org.dom4j.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.ArbrePuntEntrada;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.AutoritzacioPuntEntrada;
-import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
-import es.caib.seycon.ng.comu.PuntEntrada;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.TipusExecucioPuntEntrada;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.ArbrePuntEntradaEntity;
-import es.caib.seycon.ng.model.AuditoriaEntity;
-import es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity;
-import es.caib.seycon.ng.model.AutoritzacioPUERolEntity;
-import es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity;
-import es.caib.seycon.ng.model.ExecucioPuntEntradaEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.IconaEntity;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.PuntEntradaEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.TipusExecucioPuntEntradaEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariGrupEntity;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
 
 /**
  * @see es.caib.seycon.ng.servei.PuntEntradaService
@@ -92,7 +92,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         if (puntEntrada.getIdPare() == null)
             throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.ObtaintParentPointEntryError")); //$NON-NLS-1$
 
-        PuntEntradaEntity pareE = getPuntEntradaEntityDao().findById(puntEntrada.getIdPare());
+        EntryPointEntity pareE = getEntryPointEntityDao().findById(puntEntrada.getIdPare());
 
         if (pareE == null)
             throw new CreateException(Messages.getString("PuntEntradaServiceImpl.ParentMenuNotFounded")); //$NON-NLS-1$
@@ -100,7 +100,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             throw new CreateException(Messages.getString("PuntEntradaServiceImpl.ParentNotAMenu")); //$NON-NLS-1$
         }
         // Verificamos autorización del padre
-        PuntEntrada pare = getPuntEntradaEntityDao().toPuntEntrada(pareE);
+        PuntEntrada pare = getEntryPointEntityDao().toPuntEntrada(pareE);
         if (!canAdmin(pare)) {
             throw new SecurityException(Messages.getString("PuntEntradaServiceImpl.UnauthorizedtForAdminParentMenu")); //$NON-NLS-1$
         }
@@ -127,74 +127,74 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         //
         // OBTENIM L'ENTITAT
         //
-        PuntEntradaEntity entity = getPuntEntradaEntityDao().puntEntradaToEntity(puntEntrada);
+        EntryPointEntity entity = getEntryPointEntityDao().puntEntradaToEntity(puntEntrada);
 
         // CREEM L'ENTITAT (!!)
-        getPuntEntradaEntityDao().create(entity);
+        getEntryPointEntityDao().create(entity);
 
         // Creem l'ARBRE del punt d'entrada
         int ordre = 0; //$NON-NLS-1$	//String ordre = "0";
         // Obtenim L'ORDRE DE L'ARBRE des dels fills del pare (estan ordenats
         // per ordre ascendent)
-        List fills = (List) getArbrePuntEntradaEntityDao().findByPare(puntEntrada.getIdPare());
+        List fills = (List) getEntryPointTreeEntityDao().findByParent(puntEntrada.getIdPare());
         if (fills != null) {// Ens quedem en el fill de major ordre
             if (fills.size() == 0) // Para nodes menú sense fills
                 ordre = 0; //$NON-NLS-1$	//ordre = "0";
             else { // Obtenim el seu fill "major"
-                ArbrePuntEntradaEntity fill = (ArbrePuntEntradaEntity) fills.get(fills.size() - 1);
-                int ordreFillMajor = fill.getOrdre();	//Integer.parseInt(fill.getOrdre());
+                EntryPointTreeEntity fill = (EntryPointTreeEntity) fills.get(fills.size() - 1);
+                int ordreFillMajor = fill.getOrder();	//Integer.parseInt(fill.getOrdre());
                 ordre = ordreFillMajor + 1; //$NON-NLS-1$	//"" + (ordreFillMajor + 1);
             }
         }
-        ArbrePuntEntradaEntity arbre = getArbrePuntEntradaEntityDao().newArbrePuntEntradaEntity();
-        arbre.setOrdre(ordre);
-        arbre.setFill(entity);
-        arbre.setPare(pareE);
-        HashSet<ArbrePuntEntradaEntity> monArbre = new HashSet<ArbrePuntEntradaEntity>();
+        EntryPointTreeEntity arbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+        arbre.setOrder(ordre);
+        arbre.setChildren(entity);
+        arbre.setParent(pareE);
+        HashSet<EntryPointTreeEntity> monArbre = new HashSet<EntryPointTreeEntity>();
         monArbre.add(arbre);
         // Establim l'arbre
-        entity.setArbrePuntEntradaSocFill(monArbre);
+        entity.setChildrenEntryPointTree(monArbre);
 
         // Creem les relacions del punt d'entrada
         // Arbre
-        getArbrePuntEntradaEntityDao().create(arbre);
+        getEntryPointTreeEntityDao().create(arbre);
 
         // Creem les icones
-        IconaEntity icona1 = null;
+        EntryPointIconEntity icona1 = null;
         if (puntEntrada.getImgIcona1() != null && puntEntrada.getImgIcona1().length != 0) {
             // Creem l'icona
             icona1 = createIcona(puntEntrada.getImgIcona1());
-            entity.setIcona1(icona1.getId());
+            entity.setIcon1(icona1.getId());
         }
-        IconaEntity icona2 = null;
+        EntryPointIconEntity icona2 = null;
         if (puntEntrada.getImgIcona2() != null && puntEntrada.getImgIcona2().length != 0) {
             // S'ha actualitzat l'icona: creem una nova
             icona2 = createIcona(puntEntrada.getImgIcona2());
-            entity.setIcona2(icona2.getId());
+            entity.setIcon2(icona2.getId());
         }
 
         // Actualitzem l'entitat (amb les relacions)
-        getPuntEntradaEntityDao().update(entity);
+        getEntryPointEntityDao().update(entity);
 
         // Afegim id del pare (per poder moure'l ara mateix)
-        PuntEntrada res = getPuntEntradaEntityDao().toPuntEntrada(entity);
+        PuntEntrada res = getEntryPointEntityDao().toPuntEntrada(entity);
         res.setIdPare(idPare);
 
         // Assignem iconas (en el toVO encara no poden estar en la BD)
         if (icona1 != null) {
             res.setIdIcona1(icona1.getId());
-            res.setImgIcona1(icona1.getIcona());
+            res.setImgIcona1(icona1.getIcon());
         }
         if (icona2 != null) {
             res.setIdIcona2(icona2.getId());
-            res.setImgIcona2(icona2.getIcona());
+            res.setImgIcona2(icona2.getIcon());
         }
 
         // Posem la ruta que s'ha obtingut en el ZUL a partir del pare
         if (puntEntrada.getRutaArbre() != null)
             res.setRutaArbre(puntEntrada.getRutaArbre());
 
-        auditarPuntEntrada("C", res.getNom() + Messages.getString("PuntEntradaServiceImpl.15") + pareE.getNom()); //$NON-NLS-1$ //$NON-NLS-2$
+        auditarPuntEntrada("C", res.getNom() + Messages.getString("PuntEntradaServiceImpl.15") + pareE.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 
         return res;
     }
@@ -218,73 +218,69 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         }
 
         // Transformem a Entity
-        PuntEntradaEntity entity = getPuntEntradaEntityDao().load(puntEntrada.getId());
-        boolean updatingRoot = entity != null && ROOT_TAG.equals(entity.getCodi()); 
-        getPuntEntradaEntityDao().puntEntradaToEntity(puntEntrada, entity, true);
+        EntryPointEntity entity = getEntryPointEntityDao().load(puntEntrada.getId());
+        boolean updatingRoot = entity != null && ROOT_TAG.equals(entity.getCode()); 
+        getEntryPointEntityDao().puntEntradaToEntity(puntEntrada, entity, true);
         if (updatingRoot) {
-            entity.setCodi(ROOT_TAG);
+            entity.setCode(ROOT_TAG);
         } else {
             if (ROOT_TAG.equals(puntEntrada.getCodi())) {
-                entity.setCodi(null);
+                entity.setCode(null);
             }
         }
 
         // Si és e tipus menú, esborrem execucions:
         if ("S".equals(puntEntrada.getMenu())) { //$NON-NLS-1$
-            entity.setMetodesExecucio(new HashSet<ExecucioPuntEntradaEntity>()); // esborrem
+            entity.setExecutionMethod(new HashSet<EntryPointExecutableEntity>()); // esborrem
                                                                                  // execucions
         }
 
         // Verifiquem les icones:
         // ACTUALITZACIONS
         // UPDATE: Ja té icona, i s'ha posta una nova
-        if (entity.getIcona1() != null && puntEntrada.getImgIcona1() != null
-                && puntEntrada.getImgIcona1().length != 0 && puntEntrada.getIdIcona1() == null) {
+        if (entity.getIcon1() != null && puntEntrada.getImgIcona1() != null && puntEntrada.getImgIcona1().length != 0 && puntEntrada.getIdIcona1() == null) {
             // Esborrem l'icona anterior
-            getIconaEntityDao().remove(entity.getIcona1()); // Per id
+            getEntryPointIconEntityDao().remove(entity.getIcon1()); // Per id
             // S'ha actualitzat l'icona: creem una nova
-            IconaEntity icona1 = createIcona(puntEntrada.getImgIcona1());
-            entity.setIcona1(icona1.getId());
+            EntryPointIconEntity icona1 = createIcona(puntEntrada.getImgIcona1());
+            entity.setIcon1(icona1.getId());
         }
-        if (entity.getIcona2() != null && puntEntrada.getImgIcona2() != null
-                && puntEntrada.getImgIcona2().length != 0 && puntEntrada.getIdIcona2() == null) {
+        if (entity.getIcon2() != null && puntEntrada.getImgIcona2() != null && puntEntrada.getImgIcona2().length != 0 && puntEntrada.getIdIcona2() == null) {
             // Esborrem l'icona anterior
-            getIconaEntityDao().remove(entity.getIcona2()); // Per id
+            getEntryPointIconEntityDao().remove(entity.getIcon2()); // Per id
             // S'ha actualitzat l'icona: creem una nova
-            IconaEntity icona2 = createIcona(puntEntrada.getImgIcona2());
-            entity.setIcona2(icona2.getId());
+            EntryPointIconEntity icona2 = createIcona(puntEntrada.getImgIcona2());
+            entity.setIcon2(icona2.getId());
         }
         // ADD: NOVES ICONES (no existien abans)
-        if (entity.getIcona1() == null && puntEntrada.getImgIcona1() != null
-                && puntEntrada.getImgIcona1().length != 0) {
+        if (entity.getIcon1() == null && puntEntrada.getImgIcona1() != null && puntEntrada.getImgIcona1().length != 0) {
             // Creem l'icona
-            IconaEntity icona1 = createIcona(puntEntrada.getImgIcona1());
-            entity.setIcona1(icona1.getId());
+            EntryPointIconEntity icona1 = createIcona(puntEntrada.getImgIcona1());
+            entity.setIcon1(icona1.getId());
         }
-        if (entity.getIcona2() == null && puntEntrada.getImgIcona2() != null
-                && puntEntrada.getImgIcona2().length != 0) {
+        if (entity.getIcon2() == null && puntEntrada.getImgIcona2() != null && puntEntrada.getImgIcona2().length != 0) {
             // S'ha actualitzat l'icona: creem una nova
-            IconaEntity icona2 = createIcona(puntEntrada.getImgIcona2());
-            entity.setIcona2(icona2.getId());
+            EntryPointIconEntity icona2 = createIcona(puntEntrada.getImgIcona2());
+            entity.setIcon2(icona2.getId());
         }
         // DELETE: Esborrem l'icona assignada
-        if (entity.getIcona1() != null && puntEntrada.getImgIcona1() == null) {
+        if (entity.getIcon1() != null && puntEntrada.getImgIcona1() == null) {
             // Esborrem l'icona anterior
-            getIconaEntityDao().remove(entity.getIcona1()); // Per id
-            entity.setIcona1(null);
+            getEntryPointIconEntityDao().remove(entity.getIcon1()); // Per id
+            entity.setIcon1(null);
         }
-        if (entity.getIcona2() != null && puntEntrada.getImgIcona2() == null) {
+        if (entity.getIcon2() != null && puntEntrada.getImgIcona2() == null) {
             // Esborrem l'icona anterior
-            getIconaEntityDao().remove(entity.getIcona2()); // Per id
-            entity.setIcona2(null);
+            getEntryPointIconEntityDao().remove(entity.getIcon2()); // Per id
+            entity.setIcon2(null);
         }
 
         
-        getPuntEntradaEntityDao().update(entity);
+        getEntryPointEntityDao().update(entity);
 
-        auditarPuntEntrada("U", entity.getNom()); //$NON-NLS-1$
+        auditarPuntEntrada("U", entity.getName()); //$NON-NLS-1$
 
-        return getPuntEntradaEntityDao().toPuntEntrada(entity);
+        return getEntryPointEntityDao().toPuntEntrada(entity);
     }
 
     /**
@@ -302,12 +298,12 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     Messages.getString("PuntEntradaServiceImpl.NotIDEntryPoint")); //$NON-NLS-1$
 
         // OBTENIM L'ENTITAT
-        PuntEntradaEntity entity = getPuntEntradaEntityDao().puntEntradaToEntity(puntEntrada);
+        EntryPointEntity entity = getEntryPointEntityDao().puntEntradaToEntity(puntEntrada);
 
         // Analizamos los "enlaces" para saber si sólo tenemos un padre o varios
         // Si sólo hay uno, se borra el punt d'entrada, si hay varios: se borra
         // en enlace(link)
-        Collection mosPares = entity.getArbrePuntEntradaSocFill();
+        Collection mosPares = entity.getChildrenEntryPointTree();
 
         // Par saber si hem de esborrar el punt d'entrada o només el link
         // (l'arbre)
@@ -327,7 +323,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         // ARBRE DE PUE: si no estamos enlazados, no permitimos borrarnos si
         // tenemos hijos
         if (!enlazado) {
-            Collection mosFills = entity.getArbrePuntEntradaSocPare();
+            Collection mosFills = entity.getParentEntryPointTree();
             if (mosFills.size() != 0) {
                 throw new RemoveException(String.format(Messages.getString("PuntEntradaServiceImpl.ChildEntryPointError"), //$NON-NLS-1$
                         puntEntrada.getNom()));
@@ -337,19 +333,16 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         // Ajustem l'ordre de l'arbre del pare
         boolean mhetrobat = false;
         // Trobem els fills (estan ordenats pel camp ordre) (!!)
-        Collection<ArbrePuntEntradaEntity> arbrePare = getArbrePuntEntradaEntityDao().findByPare(
-                idPare);
-        ArbrePuntEntradaEntity arbreEsborrar = null;
-        for (Iterator<ArbrePuntEntradaEntity> it = arbrePare.iterator(); it.hasNext();) {
-            ArbrePuntEntradaEntity actual = it.next();
+        Collection<EntryPointTreeEntity> arbrePare = getEntryPointTreeEntityDao().findByParent(idPare);
+        EntryPointTreeEntity arbreEsborrar = null;
+        for (Iterator<EntryPointTreeEntity> it = arbrePare.iterator(); it.hasNext(); ) {
+            EntryPointTreeEntity actual = it.next();
             if (mhetrobat) {
-                int ordre = actual.getOrdre() - 1; // restem //Integer.parseInt(actual.getOrdre()) - 1;
-                                                                     // una
-                                                                     // posicio
-                actual.setOrdre(ordre); //$NON-NLS-1$	//actual.setOrdre("" + ordre);
-            } else if (actual.getFill().getId().equals(entity.getId())) {
+                int ordre = actual.getOrder() - 1;
+                actual.setOrder(ordre);
+            } else if (actual.getChildren().getId().equals(entity.getId())) {
                 mhetrobat = true;
-                it.remove(); // Ens esborrem
+                it.remove();
                 arbreEsborrar = actual;
             }
         }
@@ -357,49 +350,49 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         // Actualiztem l'arbre del pare (reordenació de nodes i esborrat del pue
         // actual)
         if (arbreEsborrar != null)
-            getArbrePuntEntradaEntityDao().remove(arbreEsborrar);
-        getArbrePuntEntradaEntityDao().update(arbrePare);
+            getEntryPointTreeEntityDao().remove(arbreEsborrar);
+        getEntryPointTreeEntityDao().update(arbrePare);
 
         if (!enlazado) {
             // Ens esborrem de l'arbre
             // getArbrePuntEntradaEntityDao().remove(entity.getArbrePuntEntradaSocFill()); // només
                                                                                         // serà
                                                                                         // 1
-            entity.setArbrePuntEntradaSocFill(new HashSet<ArbrePuntEntradaEntity>());
+            entity.setChildrenEntryPointTree(new HashSet<EntryPointTreeEntity>());
             // Actualitzem l'arbre del pare
             // getArbrePuntEntradaEntityDao().update(arbrePare);
 
             // AUTORITZACIONS
-            Collection autoUsu = entity.getAutoritzaUsuari();
-            Collection autoRol = entity.getAutoritzaRol();
-            Collection autoGrup = entity.getAutoritzaGrup();
+            Collection autoUsu = entity.getAuthorizedUsers();
+            Collection autoRol = entity.getAuthorizedRoles();
+            Collection autoGrup = entity.getAuthorizedGroups();
             // les esborrem
-            getAutoritzacioPUEUsuariEntityDao().remove(autoUsu);
-            getAutoritzacioPUERolEntityDao().remove(autoRol);
-            getAutoritzacioPUEGrupEntityDao().remove(autoGrup);
-            entity.setAutoritzaUsuari(null);
-            entity.setAutoritzaRol(null);
-            entity.setAutoritzaGrup(null);
+            getEntryPointUserEntityDao().remove(autoUsu);
+            getEntryPointRoleEntityDao().remove(autoRol);
+            getEntryPointGroupEntityDao().remove(autoGrup);
+            entity.setAuthorizedUsers(null);
+            entity.setAuthorizedRoles(null);
+            entity.setAuthorizedGroups(null);
 
             // EJECUCIONS
-            Collection<ExecucioPuntEntradaEntity> execucions = entity.getMetodesExecucio();
-            getExecucioPuntEntradaEntityDao().remove(execucions);
-            entity.setMetodesExecucio(null);
+            Collection<EntryPointExecutableEntity> execucions = entity.getExecutionMethod();
+            getEntryPointExecutableEntityDao().remove(execucions);
+            entity.setExecutionMethod(null);
 
             // ICONAS
-            if (entity.getIcona1() != null) {
-                getIconaEntityDao().remove(entity.getIcona1());
-                entity.setIcona1(null);
+            if (entity.getIcon1() != null) {
+                getEntryPointIconEntityDao().remove(entity.getIcon1());
+                entity.setIcon1(null);
             }
-            if (entity.getIcona2() != null) {
-                getIconaEntityDao().remove(entity.getIcona2());
-                entity.setIcona2(null);
+            if (entity.getIcon2() != null) {
+                getEntryPointIconEntityDao().remove(entity.getIcon2());
+                entity.setIcon2(null);
             }
 
-            getPuntEntradaEntityDao().remove(entity);
-            auditarPuntEntrada("D", "Esborrat punt d'entrada '" + entity.getNom() + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            getEntryPointEntityDao().remove(entity);
+            auditarPuntEntrada("D", "Esborrat punt d\'entrada \'" + entity.getName() + "\'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } else {
-            auditarPuntEntrada("D", "Esborrat enllaç del punt d'entrada '" + entity.getNom() + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            auditarPuntEntrada("D", "Esborrat enlla\u00e7 del punt d\'entrada \'" + entity.getName() + "\'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
     }
@@ -409,30 +402,30 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
      */
     protected es.caib.seycon.ng.comu.PuntEntrada handleFindRoot() throws java.lang.Exception {
 
-        PuntEntradaEntity entity = getPuntEntradaEntityDao().findById(ROOT_ID);
+        EntryPointEntity entity = getEntryPointEntityDao().findById(ROOT_ID);
         if (entity == null) {
-            List<PuntEntradaEntity> entities = getPuntEntradaEntityDao().findByCriteris("%", ROOT_TAG); //$NON-NLS-1$
+            List<EntryPointEntity> entities = getEntryPointEntityDao().findByCriteria("%", ROOT_TAG); //$NON-NLS-1$
             if (entities.size() > 0)
                 entity = entities.get(0);
         }
         if (entity == null) {
-            PuntEntradaEntity root = getPuntEntradaEntityDao().newPuntEntradaEntity(); 
+            EntryPointEntity root = getEntryPointEntityDao().newEntryPointEntity(); 
             root.setId(ROOT_ID);
-            root.setCodi(ROOT_TAG);
-            root.setEsPublic("S"); //$NON-NLS-1$
-            AplicacioEntity app = getAplicacioEntityDao().findByCodi("SEU"); //$NON-NLS-1$
+            root.setCode(ROOT_TAG);
+            root.setPublicAccess("S"); //$NON-NLS-1$
+            InformationSystemEntity app = getInformationSystemEntityDao().findByCode("SEU"); //$NON-NLS-1$
             if (app == null)
-                root.setIdAplicacio(new Long(0)); 
+                root.setApplicationID(new Long(0)); 
             else
-                root.setIdAplicacio(app.getId());
+                root.setApplicationID(app.getId());
             root.setMenu("S"); //$NON-NLS-1$
-            root.setNom("Acme Company"); //$NON-NLS-1$
-            root.setTipusMenu("L"); //$NON-NLS-1$
+            root.setName("Acme Company"); //$NON-NLS-1$
+            root.setMenuType("L"); //$NON-NLS-1$
             root.setVisible("S"); //$NON-NLS-1$
-            getPuntEntradaEntityDao().create(root);
-            return getPuntEntradaEntityDao().toPuntEntrada(root);
+            getEntryPointEntityDao().create(root);
+            return getEntryPointEntityDao().toPuntEntrada(root);
         } else
-            return getPuntEntradaEntityDao().toPuntEntrada(entity);
+            return getEntryPointEntityDao().toPuntEntrada(entity);
     }
 
     /**
@@ -445,24 +438,17 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return new LinkedList<PuntEntrada>();// throw new
                                                  // SeyconException("no autoritzat");
 
-        Collection<ArbrePuntEntradaEntity> arbre = getArbrePuntEntradaEntityDao().findByPare(
-                puntEntrada.getId());
+        Collection<EntryPointTreeEntity> arbre = getEntryPointTreeEntityDao().findByParent(puntEntrada.getId());
         if (arbre != null && arbre.size() != 0) {// Verificamos permisos
             Collection<PuntEntrada> fills = new LinkedList<PuntEntrada>();
-            for (Iterator<ArbrePuntEntradaEntity> it = arbre.iterator(); it.hasNext();) {
-                ArbrePuntEntradaEntity a = it.next();
-                // Només si tenim permis
-                PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(a.getFill());
-                // Establim la posició a l'arbre del punt d'entrada (per poder
-                // moure'l)
-                pue.setIdPare(a.getPare().getId());
-                pue.setOrdre("" + a.getOrdre());		//pue.setOrdre(a.getOrdre()); //$NON-NLS-1$
-                // Formen la ruta a partir del pare
-                String rutaPare = puntEntrada.getRutaArbre() != null ? puntEntrada.getRutaArbre()
-                        + " > " : ""; //$NON-NLS-1$ //$NON-NLS-2$
+            for (Iterator<EntryPointTreeEntity> it = arbre.iterator(); it.hasNext(); ) {
+                EntryPointTreeEntity a = it.next();
+                PuntEntrada pue = getEntryPointEntityDao().toPuntEntrada(a.getChildren());
+                pue.setIdPare(a.getParent().getId());
+                pue.setOrdre("" + a.getOrder());
+                String rutaPare = puntEntrada.getRutaArbre() != null ? puntEntrada.getRutaArbre() + " > " : "";
                 pue.setRutaArbre(rutaPare + puntEntrada.getNom());
-                if (canView(pue))
-                    fills.add(pue);
+                if (canView(pue)) fills.add(pue);
             }
             return fills;
 
@@ -471,34 +457,28 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
 
     protected Collection<TipusExecucioPuntEntrada> handleGetAllTipusMimeExecucio() throws Exception {
-        List<TipusExecucioPuntEntradaEntity> tipusMime = getTipusExecucioPuntEntradaEntityDao()
-                .loadAll();
+        List<EntryPointExecutionTypeEntity> tipusMime = getEntryPointExecutionTypeEntityDao().loadAll();
         if (tipusMime.isEmpty()) {
-            TipusExecucioPuntEntradaEntity punt =
-            		getTipusExecucioPuntEntradaEntityDao().
-            			newTipusExecucioPuntEntradaEntity();
-            punt.setCodi("URL"); //$NON-NLS-1$
-            punt.setPlantilla("http://"); //$NON-NLS-1$
-            punt.setTipusMime("text/html"); //$NON-NLS-1$
-            getTipusExecucioPuntEntradaEntityDao().create(punt);
+            EntryPointExecutionTypeEntity punt = getEntryPointExecutionTypeEntityDao().newEntryPointExecutionTypeEntity();
+            punt.setCode("URL"); //$NON-NLS-1$
+            punt.setTemplate("http://"); //$NON-NLS-1$
+            punt.setMimeType("text/html"); //$NON-NLS-1$
+            getEntryPointExecutionTypeEntityDao().create(punt);
             tipusMime.add(punt);
-            punt = getTipusExecucioPuntEntradaEntityDao().
-            		newTipusExecucioPuntEntradaEntity();
-            punt.setCodi("MZN"); //$NON-NLS-1$
-            punt.setPlantilla("exec ( ... );"); //$NON-NLS-1$
-            punt.setTipusMime("x-application/x-mazinger-script"); //$NON-NLS-1$
-            getTipusExecucioPuntEntradaEntityDao().create(punt);
+            punt = getEntryPointExecutionTypeEntityDao().newEntryPointExecutionTypeEntity();
+            punt.setCode("MZN"); //$NON-NLS-1$
+            punt.setTemplate("exec ( ... );"); //$NON-NLS-1$
+            punt.setMimeType("x-application/x-mazinger-script"); //$NON-NLS-1$
+            getEntryPointExecutionTypeEntityDao().create(punt);
             tipusMime.add(punt);
         }
-        return getTipusExecucioPuntEntradaEntityDao().toTipusExecucioPuntEntradaList(tipusMime); // toVO
+        return getEntryPointExecutionTypeEntityDao().toTipusExecucioPuntEntradaList(tipusMime); // toVO
     }
 
     protected Collection<Aplicacio> handleGetAllAplicacions(Boolean aplicacioBuida)
             throws Exception {
         // D'aquesta manera estan ordenades per nom
-        Collection<AplicacioEntity> aplicacions = getAplicacioEntityDao()
-                .query("select aplicacioEntity from es.caib.seycon.ng.model.AplicacioEntity aplicacioEntity order by aplicacioEntity.codi, aplicacioEntity.nom", //$NON-NLS-1$
-                        new Parameter[] {});
+        Collection<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().query("select aplicacioEntity from es.caib.seycon.ng.model.AplicacioEntity aplicacioEntity order by aplicacioEntity.codi, aplicacioEntity.nom", new Parameter[]{});
         // getAplicacioEntityDao().toAplicacioCollection(aplicacions);//toVO
         // Les transformem "manualment"
         Collection<Aplicacio> appsVO = new LinkedList<Aplicacio>();
@@ -511,11 +491,10 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             buida.setCodi(null); // Sense codi d'aplicació
             appsVO.add(buida);
         }
-        for (Iterator<AplicacioEntity> it = aplicacions.iterator(); it.hasNext();) {
-            AplicacioEntity ap = it.next();
-            Aplicacio apvo = getAplicacioEntityDao().toAplicacio(ap);
-            apvo.setNom(apvo.getCodi() + " - " + apvo.getNom()); // transformació //$NON-NLS-1$
-                                                                 // específica..
+        for (Iterator<InformationSystemEntity> it = aplicacions.iterator(); it.hasNext(); ) {
+            InformationSystemEntity ap = it.next();
+            Aplicacio apvo = getInformationSystemEntityDao().toAplicacio(ap);
+            apvo.setNom(apvo.getCodi() + " - " + apvo.getNom());
             appsVO.add(apvo);
         }
         return appsVO;
@@ -630,22 +609,21 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     private PermissionsCache calculateAuthorizations(String user) throws InternalErrorException {
 
-        UsuariEntity usuari = getUsuariEntityDao().findByCodi(user);
+        UserEntity usuari = getUserEntityDao().findByCode(user);
         if (usuari != null) {
             PermissionsCache entry = new PermissionsCache();
 
             // Grups de l'usuari
-            GrupEntity gprimari = usuari.getGrupPrimari();
-            Collection<UsuariGrupEntity> grups = usuari.getGrupsSecundaris();
+            GroupEntity gprimari = usuari.getPrimaryGroup();
+            Collection<UserGroupEntity> grups = usuari.getSecondaryGroups();
             if (gprimari != null) {
-                entry.getGrupsUsuariPUE().add(gprimari.getCodi());// ,gprimari);
+                entry.getGrupsUsuariPUE().add(gprimari.getCode());// ,gprimari);
             }
             if (grups != null) {
-                for (Iterator<UsuariGrupEntity> it = grups.iterator(); it.hasNext();) {
-                    UsuariGrupEntity uge = it.next();
-                    GrupEntity g = uge.getGrup();
-                    // getCodi ens dóna un identificador únic del grup
-                    entry.getGrupsUsuariPUE().add(g.getCodi());// ,g);
+                for (Iterator<UserGroupEntity> it = grups.iterator(); it.hasNext(); ) {
+                    UserGroupEntity uge = it.next();
+                    GroupEntity g = uge.getGroup();
+                    entry.getGrupsUsuariPUE().add(g.getCode());
                 }
             }
 
@@ -671,13 +649,12 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
         if (origenId.equals(destiId))
             return true;
-        List<ArbrePuntEntradaEntity> paresDesti = getArbrePuntEntradaEntityDao()
-                .findByFill(destiId);
+        List<EntryPointTreeEntity> paresDesti = getEntryPointTreeEntityDao().findByChildren(destiId);
 
         if (paresDesti != null) {
-            for (Iterator<ArbrePuntEntradaEntity> it = paresDesti.iterator(); it.hasNext();) {
-                ArbrePuntEntradaEntity arbreDesti = it.next();
-                Long p = arbreDesti.getPare().getId();
+            for (Iterator<EntryPointTreeEntity> it = paresDesti.iterator(); it.hasNext(); ) {
+                EntryPointTreeEntity arbreDesti = it.next();
+                Long p = arbreDesti.getParent().getId();
                 return isOrigenAncestorDesti(origenId, p);
             }
         } else
@@ -716,8 +693,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         // (mateix pare = ordenar l'arbre destí)
         if (idPareArbreOrigen.equals(idPareArbreDesti)) {
             // Mateixa branca, només hem de reordenar
-            List<ArbrePuntEntradaEntity> branca = getArbrePuntEntradaEntityDao().findByPare(
-                    idPareArbreOrigen);
+            List<EntryPointTreeEntity> branca = getEntryPointTreeEntityDao().findByParent(idPareArbreOrigen);
             // Ja està ordenada pel camp ordre (SEMPRE tindrá fills)
             if (branca != null && branca.size() != 0) {
                 // És l'arbre de fills del mateix pare ordenat per Ordre
@@ -726,12 +702,12 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 int pos = -1;
                 // Obtenim la posició de l'element a moure i la nova posició
                 // (destí)
-                for (Iterator<ArbrePuntEntradaEntity> it = branca.iterator(); it.hasNext();) {
+                for (Iterator<EntryPointTreeEntity> it = branca.iterator(); it.hasNext(); ) {
                     pos++;
-                    ArbrePuntEntradaEntity actual = it.next();
-                    if (actual.getFill().getId().equals(idPueOrigen)) {
+                    EntryPointTreeEntity actual = it.next();
+                    if (actual.getChildren().getId().equals(idPueOrigen)) {
                         posOrigen = pos;
-                    } else if (actual.getFill().getId().equals(idPueDesti)) {
+                    } else if (actual.getChildren().getId().equals(idPueDesti)) {
                         posDesti = pos;
                     }
                 }
@@ -740,81 +716,66 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 // Reordenem
                 if (posOrigen < posDesti) { // pugem l'aplicació
                     int i = -1;
-                    for (Iterator<ArbrePuntEntradaEntity> it = branca.iterator(); it.hasNext();) {
+                    for (Iterator<EntryPointTreeEntity> it = branca.iterator(); it.hasNext(); ) {
                         i++;
-                        ArbrePuntEntradaEntity actual = it.next();
-
-                        // Modifiquem l'ordre
+                        EntryPointTreeEntity actual = it.next();
                         if (i == posOrigen) {
-                            actual.setOrdre(posDesti - 1); //$NON-NLS-1$	// actual.setOrdre("" + (posDesti - 1)); 
-                        } else if (i < posDesti) { // Abans de l'origen,
-                            // retrocedim 1 posició
-                            int posActual = (i - 1);// Integer.parseInt(actual.getOrdre())
-                                                    // - 1;
-                            actual.setOrdre(posActual); //$NON-NLS-1$	//actual.setOrdre("" + posActual); 
-                        } /*
-                           * else { // >= destí, es manté ; }
-                           */
+                            actual.setOrder(posDesti - 1);
+                        } else if (i < posDesti) {
+                            int posActual = (i - 1);
+                            actual.setOrder(posActual);
+                        }
                     }
                 } else { // posOrigen > posDesti : baixem l'aplicació
                     int i = -1;
-                    for (Iterator<ArbrePuntEntradaEntity> it = branca.iterator(); it.hasNext();) {
+                    for (Iterator<EntryPointTreeEntity> it = branca.iterator(); it.hasNext(); ) {
                         i++;
-                        ArbrePuntEntradaEntity actual = it.next();
-                        // Modifiquem l'ordre
+                        EntryPointTreeEntity actual = it.next();
                         if (i == posOrigen) {
-                            actual.setOrdre(posDesti); //$NON-NLS-1$ actual.setOrdre("" + posDesti);
-                        } else if (i > posOrigen) { // Després de l'origen ,
-                                                    // mantenim l'arbre
+                            actual.setOrder(posDesti);
+                        } else if (i > posOrigen) {
                             ;
-                        } else { // < origen, els avancem una posició
-                            int posActual = (i + 1);// Integer.parseInt(actual.getOrdre())
-                                                    // + 1;
-                            actual.setOrdre(posActual); //$NON-NLS-1$  actual.setOrdre("" + posActual);
+                        } else {
+                            int posActual = (i + 1);
+                            actual.setOrder(posActual);
                         }
                     }
                 }
-                getArbrePuntEntradaEntityDao().update(branca);
+                getEntryPointTreeEntityDao().update(branca);
                 return true;
             } else
                 return false; // cas no possible (origen i desti mateixa branca
                               // = té fills el pare)
 
         } else { // són de branques diferents
-            List<ArbrePuntEntradaEntity> brancaDesti = getArbrePuntEntradaEntityDao().findByPare(
-                    idPareArbreDesti);
+            List<EntryPointTreeEntity> brancaDesti = getEntryPointTreeEntityDao().findByParent(idPareArbreDesti);
 
             // Hem de verificar que en la branca destí no existisca ja el node
             // actual [cas de que siga un enllaç]
             if (brancaDesti != null)
-                for (Iterator<ArbrePuntEntradaEntity> it = brancaDesti.iterator(); it.hasNext();) {
-                    ArbrePuntEntradaEntity arbreActual = it.next();
-                    if (arbreActual.getFill().getId().equals(idPueOrigen))
-                        throw new SeyconException(
-                                Messages.getString("PuntEntradaServiceImpl.EntryPointDuplicated")); //$NON-NLS-1$
-                }
+                for (Iterator<EntryPointTreeEntity> it = brancaDesti.iterator(); it.hasNext(); ) {
+                EntryPointTreeEntity arbreActual = it.next();
+                if (arbreActual.getChildren().getId().equals(idPueOrigen)) throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.EntryPointDuplicated"));
+            }
 
             // Creen la nova entrada a l'arbre
-            PuntEntradaEntity nouPare = getPuntEntradaEntityDao().findById(idPareArbreDesti);
-            PuntEntradaEntity pueMogut = getPuntEntradaEntityDao().findById(idPueOrigen);
+            EntryPointEntity nouPare = getEntryPointEntityDao().findById(idPareArbreDesti);
+            EntryPointEntity pueMogut = getEntryPointEntityDao().findById(idPueOrigen);
 
-            ArbrePuntEntradaEntity nouArbre = getArbrePuntEntradaEntityDao().newArbrePuntEntradaEntity();
-            nouArbre.setOrdre(Integer.parseInt(puntEntradaSeguent.getOrdre())); //nouArbre.setOrdre(puntEntradaSeguent.getOrdre());
-            nouArbre.setFill(pueMogut);
-            nouArbre.setPare(nouPare);
+            EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+            nouArbre.setOrder(Integer.parseInt(puntEntradaSeguent.getOrdre())); //nouArbre.setOrdre(puntEntradaSeguent.getOrdre());
+            nouArbre.setChildren(pueMogut);
+            nouArbre.setParent(nouPare);
 
             // Obtenim la branca origen on estava el node a moure (el pare del
             // node mogut)
-            List<ArbrePuntEntradaEntity> brancaOrigen = getArbrePuntEntradaEntityDao().findByPare(
-                    idPareArbreOrigen);
-            ArbrePuntEntradaEntity arbreAntic = null;
+            List<EntryPointTreeEntity> brancaOrigen = getEntryPointTreeEntityDao().findByParent(idPareArbreOrigen);
+            EntryPointTreeEntity arbreAntic = null;
             boolean trobat = false;
-            for (Iterator<ArbrePuntEntradaEntity> it = brancaOrigen.iterator(); !trobat
-                    && it.hasNext();) {
-                ArbrePuntEntradaEntity a = it.next();
-                if (a.getFill().getId().equals(idPueOrigen)) { // En principi
-                    // it.remove(); // ja l'eliminem després (!!)
-                    arbreAntic = a; // l'eliminem després
+            for (Iterator<EntryPointTreeEntity> it = brancaOrigen.iterator(); !trobat && it.hasNext(); ) {
+                EntryPointTreeEntity a = it.next();
+                if (a.getChildren().getId().equals(idPueOrigen)) {
+                    arbreAntic = a;
                     trobat = true;
                 }
             }
@@ -826,36 +787,35 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 // Si la seua posició es >= posDesti, sumem 1 a l'ordre
                 boolean reordenar = false;
                 int i = -1;
-                for (Iterator<ArbrePuntEntradaEntity> it = brancaDesti.iterator(); it.hasNext();) { // Reordenem
-                    ArbrePuntEntradaEntity actual = it.next();
+                for (Iterator<EntryPointTreeEntity> it = brancaDesti.iterator(); it.hasNext(); ) {
+                    EntryPointTreeEntity actual = it.next();
                     i++;
-                    if (reordenar) { // després de destí
-                        int posActual = i + 1;// Integer.parseInt(actual.getOrdre())
-                                              // + 1;
-                        actual.setOrdre(posActual); //$NON-NLS-1$ actual.setOrdre("" + posActual); 
-                    } else if (actual.getFill().getId().equals(idPueDesti)) {
-                        reordenar = true; // movem destí una posició
-                        int posActual = actual.getOrdre() + 1; //Integer.parseInt(actual.getOrdre()) + 1;
-                        actual.setOrdre(posActual); //$NON-NLS-1$ actual.setOrdre("" + posActual); 
+                    if (reordenar) {
+                        int posActual = i + 1;
+                        actual.setOrder(posActual);
+                    } else if (actual.getChildren().getId().equals(idPueDesti)) {
+                        reordenar = true;
+                        int posActual = actual.getOrder() + 1;
+                        actual.setOrder(posActual);
                     }
                 }
             }
             if (brancaDesti == null)
-                brancaDesti = new LinkedList<ArbrePuntEntradaEntity>();
+                brancaDesti = new LinkedList<EntryPointTreeEntity>();
 
             // Fem els canvis
             // 1) Esborrem l'arbre antic
             if (arbreAntic != null)
-                getArbrePuntEntradaEntityDao().remove(arbreAntic);
+                getEntryPointTreeEntityDao().remove(arbreAntic);
             // 2) Creem l'accés a la nova branca
-            getArbrePuntEntradaEntityDao().create(nouArbre);
+            getEntryPointTreeEntityDao().create(nouArbre);
             brancaDesti.add(nouArbre);
             // 3) Actualitzem la branca destí (hem reordenat els fills de la
             // branca)
-            getArbrePuntEntradaEntityDao().update(brancaDesti);
+            getEntryPointTreeEntityDao().update(brancaDesti);
             // 4) Actualitzcem el menú destí
-            nouPare.setArbrePuntEntradaSocPare(brancaDesti);
-            getPuntEntradaEntityDao().update(nouPare);
+            nouPare.setParentEntryPointTree(brancaDesti);
+            getEntryPointEntityDao().update(nouPare);
 
             return true;
         }
@@ -894,8 +854,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         if (isOrigenAncestorDesti(idPueOrigen, idPueDesti))
             throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.NotNodeMoviment")); //$NON-NLS-1$
 
-        PuntEntradaEntity pareOrigenE = getPuntEntradaEntityDao().findById(idParePuntEntradaMoure);
-        PuntEntrada pareOrigen = getPuntEntradaEntityDao().toPuntEntrada(pareOrigenE);
+        EntryPointEntity pareOrigenE = getEntryPointEntityDao().findById(idParePuntEntradaMoure);
+        PuntEntrada pareOrigen = getEntryPointEntityDao().toPuntEntrada(pareOrigenE);
         // PuntEntradaEntity pareDestiE =
         // getPuntEntradaEntityDao().findById(idParePuntEntradaDesti);
         // PuntEntrada pareDesti =
@@ -912,76 +872,72 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     Messages.getString("PuntEntradaServiceImpl.NotAuthorizedToMoveEntryPointNoPermission")); //$NON-NLS-1$
 
         // Obtenim l'arbre del punt d'entrada origen i destí
-        List<ArbrePuntEntradaEntity> brancaOrigen = getArbrePuntEntradaEntityDao().findByPare(
-                idParePuntEntradaMoure);
-        ArbrePuntEntradaEntity arbreAntic = null;
+        List<EntryPointTreeEntity> brancaOrigen = getEntryPointTreeEntityDao().findByParent(idParePuntEntradaMoure);
+        EntryPointTreeEntity arbreAntic = null;
         int pos = 0; // per reindexar elements (ja estàn ordenats pel camp
                      // ordre)
-        for (Iterator<ArbrePuntEntradaEntity> it = brancaOrigen.iterator(); it.hasNext();) {
-            ArbrePuntEntradaEntity a = it.next();
-            if (a.getFill().getId().equals(idPueOrigen)) {
+        for (Iterator<EntryPointTreeEntity> it = brancaOrigen.iterator(); it.hasNext(); ) {
+            EntryPointTreeEntity a = it.next();
+            if (a.getChildren().getId().equals(idPueOrigen)) {
                 arbreAntic = a;
                 it.remove();
             } else {
-                a.setOrdre(pos); // Establim nova posició (reindexem tots //$NON-NLS-1$ a.setOrdre("" + pos); 
-                                      // els elements)
-                pos++; // Si el trobem no augmentem la posició origen
+                a.setOrder(pos);
+                pos++;
             }
         }
         // Creen la nova entrada a l'arbre destí
-        PuntEntradaEntity nouPare = getPuntEntradaEntityDao().findById(idPueDesti);
-        PuntEntradaEntity pueMogut = getPuntEntradaEntityDao().findById(idPueOrigen);
+        EntryPointEntity nouPare = getEntryPointEntityDao().findById(idPueDesti);
+        EntryPointEntity pueMogut = getEntryPointEntityDao().findById(idPueOrigen);
 
         // Obtenim L'ORDRE DE L'ARBRE destí
         String ordre = "0"; //$NON-NLS-1$
-        Collection<ArbrePuntEntradaEntity> fillsDesti = getArbrePuntEntradaEntityDao().findByPare(
-                idPueDesti);
+        Collection<EntryPointTreeEntity> fillsDesti = getEntryPointTreeEntityDao().findByParent(idPueDesti);
         if (fillsDesti != null) {// Ens quedem en el fill de major ordre
             if (fillsDesti.size() == 0) // Para nodes menú sense fills
                 ordre = "0"; //$NON-NLS-1$
             else { // Obtenim el seu fill "major" (de tipus List i estan
                    // ordenats per query en ordre ascendent)
-                ArbrePuntEntradaEntity fill = ((List<ArbrePuntEntradaEntity>) fillsDesti)
-                        .get(fillsDesti.size() - 1);
-                int ordreFillMajor = fill.getOrdre(); //int ordreFillMajor = Integer.parseInt(fill.getOrdre());
+                EntryPointTreeEntity fill = ((List<EntryPointTreeEntity>) fillsDesti).get(fillsDesti.size() - 1);
+                int ordreFillMajor = fill.getOrder(); //int ordreFillMajor = Integer.parseInt(fill.getOrdre());
                 ordre = "" + (ordreFillMajor + 1); //$NON-NLS-1$
             }
         }
 
         // Creem el accés al punt d'entrada mogut
-        ArbrePuntEntradaEntity nouArbre = getArbrePuntEntradaEntityDao().newArbrePuntEntradaEntity();
-        nouArbre.setOrdre(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
-        nouArbre.setFill(pueMogut);
-        nouArbre.setPare(nouPare);
+        EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+        nouArbre.setOrder(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
+        nouArbre.setChildren(pueMogut);
+        nouArbre.setParent(nouPare);
 
         // 1) Esborrem l'arbre antic
         if (arbreAntic != null)
-            getArbrePuntEntradaEntityDao().remove(arbreAntic);
+            getEntryPointTreeEntityDao().remove(arbreAntic);
         // 2) Creem l'accés a la nova branca
-        getArbrePuntEntradaEntityDao().create(nouArbre);
+        getEntryPointTreeEntityDao().create(nouArbre);
         if (fillsDesti == null) {
-            fillsDesti = new HashSet<ArbrePuntEntradaEntity>();
+            fillsDesti = new HashSet<EntryPointTreeEntity>();
         }
         fillsDesti.add(nouArbre);
-        nouPare.setArbrePuntEntradaSocPare(new HashSet<ArbrePuntEntradaEntity>(fillsDesti));
+        nouPare.setParentEntryPointTree(new HashSet<EntryPointTreeEntity>(fillsDesti));
         // 3) Actualitzem la branca destí (hem afegit un fill)
-        getPuntEntradaEntityDao().update(nouPare);
+        getEntryPointEntityDao().update(nouPare);
 
         // 4) Actualitzem la branca origen (hem mogut un fill)
-        getArbrePuntEntradaEntityDao().update(brancaOrigen);
+        getEntryPointTreeEntityDao().update(brancaOrigen);
         return true;
     }
 
-    private PuntEntradaEntity clonaPuntEntrada(PuntEntradaEntity pueClonar) throws InternalErrorException {
-        PuntEntradaEntity nouPUEClonat = null;
+    private EntryPointEntity clonaPuntEntrada(EntryPointEntity pueClonar) throws InternalErrorException {
+        EntryPointEntity nouPUEClonat = null;
 
         // Copiamos iconos
         Long icona1 = null;
         Long icona2 = null;
 
         // Creamos la copia y obtenemos el id de la misma
-        if (pueClonar.getIcona1() != null) {
-            IconaEntity ie = getIconaEntityDao().findById(pueClonar.getIcona1()); // se
+        if (pueClonar.getIcon1() != null) {
+            EntryPointIconEntity ie = getEntryPointIconEntityDao().findById(pueClonar.getIcon1()); // se
                                                                                   // guarda
                                                                                   // id
                                                                                   // del
@@ -990,12 +946,12 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                                                                                   // el
                                                                                   // pue
             if (ie != null) {
-                IconaEntity icona = createIcona(ie.getIcona());
+                EntryPointIconEntity icona = createIcona(ie.getIcon());
                 icona1 = icona.getId();
             }
         }
-        if (pueClonar.getIcona2() != null) {
-            IconaEntity ie = getIconaEntityDao().findById(pueClonar.getIcona2()); // se
+        if (pueClonar.getIcon2() != null) {
+            EntryPointIconEntity ie = getEntryPointIconEntityDao().findById(pueClonar.getIcon2()); // se
                                                                                   // guarda
                                                                                   // id
                                                                                   // del
@@ -1004,116 +960,106 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                                                                                   // el
                                                                                   // pue
             if (ie != null) {
-                IconaEntity icona = createIcona(ie.getIcona());
+                EntryPointIconEntity icona = createIcona(ie.getIcon());
                 icona2 = icona.getId();
             }
         }
         // Creamos el nuevo punto de entrada
-        nouPUEClonat = getPuntEntradaEntityDao().newPuntEntradaEntity();
-        nouPUEClonat.setCodi(pueClonar.getCodi());
-        nouPUEClonat.setNom(pueClonar.getNom());
+        nouPUEClonat = getEntryPointEntityDao().newEntryPointEntity();
+        nouPUEClonat.setCode(pueClonar.getCode());
+        nouPUEClonat.setName(pueClonar.getName());
         nouPUEClonat.setVisible(pueClonar.getVisible());
         nouPUEClonat.setMenu(pueClonar.getMenu());
-        nouPUEClonat.setNumcolumnes(pueClonar.getNumcolumnes());
-        nouPUEClonat.setEsPublic(pueClonar.getEsPublic());
-        nouPUEClonat.setTipusMenu(pueClonar.getTipusMenu());
-        nouPUEClonat.setEsPublic(pueClonar.getEsPublic());
-        nouPUEClonat.setIcona1(icona1);
-        nouPUEClonat.setIcona2(icona2);
-        nouPUEClonat.setIdAplicacio(pueClonar.getIdAplicacio());
-        nouPUEClonat.setXmlPUE(pueClonar.getXmlPUE());
-        getPuntEntradaEntityDao().create(nouPUEClonat);
+        nouPUEClonat.setNumberOfColumns(pueClonar.getNumberOfColumns());
+        nouPUEClonat.setPublicAccess(pueClonar.getPublicAccess());
+        nouPUEClonat.setMenuType(pueClonar.getMenuType());
+        nouPUEClonat.setPublicAccess(pueClonar.getPublicAccess());
+        nouPUEClonat.setIcon1(icona1);
+        nouPUEClonat.setIcon2(icona2);
+        nouPUEClonat.setApplicationID(pueClonar.getApplicationID());
+        nouPUEClonat.setXmlEntryPoint(pueClonar.getXmlEntryPoint());
+        getEntryPointEntityDao().create(nouPUEClonat);
 
         // Clonamos sus AUTORIZACIONES
-        Collection<AutoritzacioPUERolEntity> _autoRol = pueClonar.getAutoritzaRol();
-        Collection<AutoritzacioPUEGrupEntity> _autoGrup = pueClonar.getAutoritzaGrup();
-        Collection<AutoritzacioPUEUsuariEntity> _autoUsu = pueClonar.getAutoritzaUsuari();
+        Collection<EntryPointRoleEntity> _autoRol = pueClonar.getAuthorizedRoles();
+        Collection<EntryPointGroupEntity> _autoGrup = pueClonar.getAuthorizedGroups();
+        Collection<EntryPointUserEntity> _autoUsu = pueClonar.getAuthorizedUsers();
         Collection autoRol = new HashSet(), autoGrup = new HashSet(), autoUsu = new HashSet();
         // ROL
         if (_autoRol != null && _autoRol.size() != 0) {
-            for (Iterator<AutoritzacioPUERolEntity> it = _autoRol.iterator(); it.hasNext();) {
-                AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it.next();
-                AutoritzacioPUERolEntity apu = 
-                		getAutoritzacioPUERolEntityDao().newAutoritzacioPUERolEntity();
-                apu.setIdRol(auto.getIdRol());
-                apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
-                apu.setPuntEntrada(nouPUEClonat);
-                getAutoritzacioPUERolEntityDao().create(apu);
+            for (Iterator<EntryPointRoleEntity> it = _autoRol.iterator(); it.hasNext(); ) {
+                EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
+                EntryPointRoleEntity apu = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
+                apu.setRoleID(auto.getRoleID());
+                apu.setAuthorizationLevel(auto.getAuthorizationLevel());
+                apu.setEntryPoint(nouPUEClonat);
+                getEntryPointRoleEntityDao().create(apu);
                 autoRol.add(apu);
             }
         }
-        nouPUEClonat.setAutoritzaRol(autoRol);
+        nouPUEClonat.setAuthorizedRoles(autoRol);
         // GRUP
         if (_autoGrup != null && _autoGrup.size() != 0) {
-            for (Iterator<AutoritzacioPUEGrupEntity> it = _autoGrup.iterator(); it.hasNext();) {
-                AutoritzacioPUEGrupEntity auto = (AutoritzacioPUEGrupEntity) it.next();
-                AutoritzacioPUEGrupEntity apu = 
-                		getAutoritzacioPUEGrupEntityDao().newAutoritzacioPUEGrupEntity();
-                apu.setIdGrup(auto.getIdGrup());
-                apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
-                apu.setPuntEntrada(nouPUEClonat);
-                getAutoritzacioPUEGrupEntityDao().create(apu);
+            for (Iterator<EntryPointGroupEntity> it = _autoGrup.iterator(); it.hasNext(); ) {
+                EntryPointGroupEntity auto = (EntryPointGroupEntity) it.next();
+                EntryPointGroupEntity apu = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
+                apu.setGroupID(auto.getGroupID());
+                apu.setAuhtorizationLevel(auto.getAuhtorizationLevel());
+                apu.setEntryPoint(nouPUEClonat);
+                getEntryPointGroupEntityDao().create(apu);
                 autoGrup.add(apu);
-
             }
         }
-        nouPUEClonat.setAutoritzaGrup(autoGrup);
+        nouPUEClonat.setAuthorizedGroups(autoGrup);
         // USUARI
         if (_autoUsu != null && _autoUsu.size() != 0) {
-            for (Iterator<AutoritzacioPUEUsuariEntity> it = _autoUsu.iterator(); it.hasNext();) {
-                AutoritzacioPUEUsuariEntity auto = (AutoritzacioPUEUsuariEntity) it.next();
-                AutoritzacioPUEUsuariEntity apu = 
-                		getAutoritzacioPUEUsuariEntityDao().newAutoritzacioPUEUsuariEntity();
-                apu.setIdUsuari(auto.getIdUsuari());
-                apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
-                apu.setPuntEntrada(nouPUEClonat);
-                getAutoritzacioPUEUsuariEntityDao().create(apu);
+            for (Iterator<EntryPointUserEntity> it = _autoUsu.iterator(); it.hasNext(); ) {
+                EntryPointUserEntity auto = (EntryPointUserEntity) it.next();
+                EntryPointUserEntity apu = getEntryPointUserEntityDao().newEntryPointUserEntity();
+                apu.setUserID(auto.getUserID());
+                apu.setAuthorizationLevel(auto.getAuthorizationLevel());
+                apu.setEntryPoint(nouPUEClonat);
+                getEntryPointUserEntityDao().create(apu);
                 autoUsu.add(apu);
             }
         }
-        nouPUEClonat.setAutoritzaUsuari(autoUsu);
+        nouPUEClonat.setAuthorizedUsers(autoUsu);
         // Clonamos sus EJECUCIONES:
-        Collection _execs = pueClonar.getMetodesExecucio();
-        Collection<ExecucioPuntEntradaEntity> execs = new HashSet<ExecucioPuntEntradaEntity>();
+        Collection _execs = pueClonar.getExecutionMethod();
+        Collection<EntryPointExecutableEntity> execs = new HashSet<EntryPointExecutableEntity>();
 
         if (_execs != null && _execs.size() != 0) {
-            for (Iterator it = _execs.iterator(); it.hasNext();) {
-                ExecucioPuntEntradaEntity exe = (ExecucioPuntEntradaEntity) it.next();
-                // Tenemos que crear la nueva instancia (para indicar el pue)
-                
-                ExecucioPuntEntradaEntity nou = getExecucioPuntEntradaEntityDao(). 
-                		newExecucioPuntEntradaEntity();
-                nou.setAmbit(exe.getAmbit());
-                nou.setCodiExecucio(exe.getCodiExecucio());
-                nou.setContingut(exe.getContingut());
-                nou.setPuntEntrada(nouPUEClonat);
-                getExecucioPuntEntradaEntityDao().create(nou);
+            for (Iterator it = _execs.iterator(); it.hasNext(); ) {
+                EntryPointExecutableEntity exe = (EntryPointExecutableEntity) it.next();
+                EntryPointExecutableEntity nou = getEntryPointExecutableEntityDao().newEntryPointExecutableEntity();
+                nou.setScope(exe.getScope());
+                nou.setExecutionCode(exe.getExecutionCode());
+                nou.setContent(exe.getContent());
+                nou.setEntryPoint(nouPUEClonat);
+                getEntryPointExecutableEntityDao().create(nou);
                 execs.add(nou);
             }
         }
-        nouPUEClonat.setMetodesExecucio(execs);
+        nouPUEClonat.setExecutionMethod(execs);
 
         // Clonamos los HIJOS si los tiene:
-        Collection _fills = pueClonar.getArbrePuntEntradaSocPare();
-        Collection<ArbrePuntEntradaEntity> fills = new HashSet<ArbrePuntEntradaEntity>();
+        Collection _fills = pueClonar.getParentEntryPointTree();
+        Collection<EntryPointTreeEntity> fills = new HashSet<EntryPointTreeEntity>();
         if (_fills != null && _fills.size() != 0) {
-            for (Iterator it = _fills.iterator(); it.hasNext();) {
-                ArbrePuntEntradaEntity actual = (ArbrePuntEntradaEntity) it.next();
-                // Clonamos nuestro hijo
-                PuntEntradaEntity monFill = clonaPuntEntrada(actual.getFill());
-                // Y lo añadimos al árbol
-                ArbrePuntEntradaEntity arbre = getArbrePuntEntradaEntityDao().
-                		newArbrePuntEntradaEntity();
-                arbre.setFill(monFill);
-                arbre.setOrdre(actual.getOrdre());
-                arbre.setPare(nouPUEClonat);
-                getArbrePuntEntradaEntityDao().create(arbre);
+            for (Iterator it = _fills.iterator(); it.hasNext(); ) {
+                EntryPointTreeEntity actual = (EntryPointTreeEntity) it.next();
+                EntryPointEntity monFill = clonaPuntEntrada(actual.getChildren());
+                EntryPointTreeEntity arbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+                arbre.setChildren(monFill);
+                arbre.setOrder(actual.getOrder());
+                arbre.setParent(nouPUEClonat);
+                getEntryPointTreeEntityDao().create(arbre);
                 fills.add(arbre);
             }
         }
-        nouPUEClonat.setArbrePuntEntradaSocPare(fills);
+        nouPUEClonat.setParentEntryPointTree(fills);
         // Actualizamos los cambios (árbol, ejecuciones, autorizaciones)
-        getPuntEntradaEntityDao().update(nouPUEClonat);
+        getEntryPointEntityDao().update(nouPUEClonat);
 
         return nouPUEClonat;
     }
@@ -1142,38 +1088,36 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.NodeCopyError")); //$NON-NLS-1$
 
         // Obtenim l'entitat a clonar
-        PuntEntradaEntity pueClonar = getPuntEntradaEntityDao().puntEntradaToEntity(
-                puntEntradaCopiar);
+        EntryPointEntity pueClonar = getEntryPointEntityDao().puntEntradaToEntity(puntEntradaCopiar);
         // Fem una còpia (iconas, autoritzacions, execucions, fills)
-        PuntEntradaEntity nouPUEClonat = clonaPuntEntrada(pueClonar);
+        EntryPointEntity nouPUEClonat = clonaPuntEntrada(pueClonar);
 
         // Hem d'afegir el nou fill clonat al pue destí
         String ordre = "0"; //$NON-NLS-1$
-        Collection fillsDesti = getArbrePuntEntradaEntityDao().findByPare(idPueDesti);
+        Collection fillsDesti = getEntryPointTreeEntityDao().findByParent(idPueDesti);
         if (fillsDesti != null) {// Ens quedem en el fill de major ordre
             if (fillsDesti.size() == 0) // Para nodes menú sense fills
                 ordre = "0"; //$NON-NLS-1$
             else { // Obtenim el seu fill "major" (de tipus List i estan
                    // ordenats per query en ordre ascendent)
-                ArbrePuntEntradaEntity fill = (ArbrePuntEntradaEntity) ((List) fillsDesti)
-                        .get(fillsDesti.size() - 1);
-                int ordreFillMajor = fill.getOrdre(); //Integer.parseInt(fill.getOrdre());
+                EntryPointTreeEntity fill = (EntryPointTreeEntity) ((List) fillsDesti).get(fillsDesti.size() - 1);
+                int ordreFillMajor = fill.getOrder(); //Integer.parseInt(fill.getOrdre());
                 ordre = "" + (ordreFillMajor + 1); //$NON-NLS-1$
             }
         }
         // Obtenim el pare
-        PuntEntradaEntity pueDesti = getPuntEntradaEntityDao().findById(idPueDesti);
-        Collection<ArbrePuntEntradaEntity> fillsNouPare = pueDesti.getArbrePuntEntradaSocPare();
+        EntryPointEntity pueDesti = getEntryPointEntityDao().findById(idPueDesti);
+        Collection<EntryPointTreeEntity> fillsNouPare = pueDesti.getParentEntryPointTree();
         
-        ArbrePuntEntradaEntity nouArbre = getArbrePuntEntradaEntityDao().newArbrePuntEntradaEntity();
-        nouArbre.setFill(nouPUEClonat);
-        nouArbre.setOrdre(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
-        nouArbre.setPare(pueDesti);
-        getArbrePuntEntradaEntityDao().create(nouArbre);
+        EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+        nouArbre.setChildren(nouPUEClonat);
+        nouArbre.setOrder(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
+        nouArbre.setParent(pueDesti);
+        getEntryPointTreeEntityDao().create(nouArbre);
         fillsNouPare.add(nouArbre);
-        pueDesti.setArbrePuntEntradaSocPare(fillsNouPare);
+        pueDesti.setParentEntryPointTree(fillsNouPare);
         // Actualitzem el pare (hem modificat el seu arbre)
-        getPuntEntradaEntityDao().update(pueDesti);
+        getEntryPointEntityDao().update(pueDesti);
 
         return true;
     }
@@ -1209,8 +1153,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         if (!canAdmin(puntEntradaCopiar) || !canAdmin(puntEntradaMenuDesti))
             throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.NoAuthorizedToCopyEntryPoint")); //$NON-NLS-1$
 
-        PuntEntradaEntity pareOrigenE = getPuntEntradaEntityDao().findById(idParePuntEntradaCopiar);
-        PuntEntrada pareOrigen = getPuntEntradaEntityDao().toPuntEntrada(pareOrigenE);
+        EntryPointEntity pareOrigenE = getEntryPointEntityDao().findById(idParePuntEntradaCopiar);
+        PuntEntrada pareOrigen = getEntryPointEntityDao().toPuntEntrada(pareOrigenE);
         // Si el origen NO es menú tiene que tener permisos en el menú
         // contenedor padre del origen (para copiar)
         if (!"S".equals(puntEntradaCopiar.getMenu()) && !canAdmin(pareOrigen)) //$NON-NLS-1$
@@ -1218,16 +1162,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     Messages.getString("PuntEntradaServiceImpl.NoAuthorizedToCopyEntryPointNoPermission")); //$NON-NLS-1$
 
         // Verificamos que no exista ya en el destino una copia del mismo
-        Collection<ArbrePuntEntradaEntity> fillsDesti = getArbrePuntEntradaEntityDao().findByPare(
-                idPueDesti);
+        Collection<EntryPointTreeEntity> fillsDesti = getEntryPointTreeEntityDao().findByParent(idPueDesti);
 
         if (fillsDesti != null)
-            for (Iterator<ArbrePuntEntradaEntity> it = fillsDesti.iterator(); it.hasNext();) {
-                ArbrePuntEntradaEntity arbreActual = it.next();
-                if (arbreActual.getFill().getId().equals(idPueOrigen))
-                    throw new SeyconException(
-                            Messages.getString("PuntEntradaServiceImpl.EntryPointDuplicated")); //$NON-NLS-1$
-            }
+            for (Iterator<EntryPointTreeEntity> it = fillsDesti.iterator(); it.hasNext(); ) {
+            EntryPointTreeEntity arbreActual = it.next();
+            if (arbreActual.getChildren().getId().equals(idPueOrigen)) throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.EntryPointDuplicated"));
+        }
 
         // Obtenim L'ORDRE DE L'ARBRE destí (estan ordenats per ordre ascendent)
         String ordre = "0"; //$NON-NLS-1$
@@ -1235,33 +1176,32 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             if (fillsDesti.size() == 0) // Para nodes menú sense fills
                 ordre = "0"; //$NON-NLS-1$
             else { // Obtenim el seu fill "major" (es de tipus List ordenat)
-                ArbrePuntEntradaEntity fill = ((List<ArbrePuntEntradaEntity>) fillsDesti)
-                        .get(fillsDesti.size() - 1);
-                int ordreFillMajor = fill.getOrdre(); //int ordreFillMajor = Integer.parseInt(fill.getOrdre());
+                EntryPointTreeEntity fill = ((List<EntryPointTreeEntity>) fillsDesti).get(fillsDesti.size() - 1);
+                int ordreFillMajor = fill.getOrder(); //int ordreFillMajor = Integer.parseInt(fill.getOrdre());
                 ordre = "" + (ordreFillMajor + 1); //$NON-NLS-1$
             }
         }
 
         // Creamos una copia del árbol en el menú destino:
-        PuntEntradaEntity nouPare = getPuntEntradaEntityDao().findById(idPueDesti);
-        PuntEntradaEntity pueCopiat = getPuntEntradaEntityDao().findById(idPueOrigen);
+        EntryPointEntity nouPare = getEntryPointEntityDao().findById(idPueDesti);
+        EntryPointEntity pueCopiat = getEntryPointEntityDao().findById(idPueOrigen);
 
         // Creen la nova entrada a l'arbre destí
-        ArbrePuntEntradaEntity nouArbre = getArbrePuntEntradaEntityDao().newArbrePuntEntradaEntity();
-        nouArbre.setFill(pueCopiat);
-        nouArbre.setOrdre(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
-        nouArbre.setPare(nouPare);
-        getArbrePuntEntradaEntityDao().create(nouArbre);
+        EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao().newEntryPointTreeEntity();
+        nouArbre.setChildren(pueCopiat);
+        nouArbre.setOrder(Integer.parseInt(ordre)); //nouArbre.setOrdre(ordre);
+        nouArbre.setParent(nouPare);
+        getEntryPointTreeEntityDao().create(nouArbre);
 
         // 1) Creem l'accés a la branca destí
         if (fillsDesti == null) {
-            fillsDesti = new HashSet<ArbrePuntEntradaEntity>();
+            fillsDesti = new HashSet<EntryPointTreeEntity>();
         }
         fillsDesti.add(nouArbre);
-        nouPare.setArbrePuntEntradaSocPare(new HashSet<ArbrePuntEntradaEntity>(fillsDesti));
+        nouPare.setParentEntryPointTree(new HashSet<EntryPointTreeEntity>(fillsDesti));
 
         // 2) Actualitzem el menú destí (hem afegit un fill)
-        getPuntEntradaEntityDao().update(nouPare);
+        getEntryPointEntityDao().update(nouPare);
 
         return true;
     }
@@ -1269,13 +1209,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     protected AutoritzacioPuntEntrada handleCreateAutoritzacio(PuntEntrada puntEntrada,
             AutoritzacioPuntEntrada autoritzacio) throws Exception {
 
-        PuntEntradaEntity puntEntradaE = null;
+        EntryPointEntity puntEntradaE = null;
         Long idEntitat = null;
 
         if (puntEntrada == null || puntEntrada.getId() == null)
             throw new SeyconException(Messages.getString("PuntEntradaServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
         else {
-            puntEntradaE = getPuntEntradaEntityDao().puntEntradaToEntity(puntEntrada);
+            puntEntradaE = getEntryPointEntityDao().puntEntradaToEntity(puntEntrada);
         }
 
         if (autoritzacio.getIdEntitatAutoritzada() == null)
@@ -1300,13 +1240,11 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         String tipusAutoritzacio = autoritzacio.getTipusEntitatAutoritzada();
         if (TipusAutoritzacioPuntEntrada.ROL.equals(tipusAutoritzacio)) {
             // ROL: Creamos autorización
-            AutoritzacioPUERolEntity autoRol =
-            		getAutoritzacioPUERolEntityDao(). 
-            			newAutoritzacioPUERolEntity();
-            autoRol.setNivellAutoritzacio(nivell);
-            autoRol.setIdRol(idEntitat);
-            autoRol.setPuntEntrada(puntEntradaE);
-            getAutoritzacioPUERolEntityDao().create(autoRol);
+            EntryPointRoleEntity autoRol = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
+            autoRol.setAuthorizationLevel(nivell);
+            autoRol.setRoleID(idEntitat);
+            autoRol.setEntryPoint(puntEntradaE);
+            getEntryPointRoleEntityDao().create(autoRol);
 
             auditarAutoritzacioPuntEntrada(
                     "C", //$NON-NLS-1$
@@ -1315,16 +1253,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                             + autoritzacio.getDescripcioEntitatAutoritzada() + " - " //$NON-NLS-1$
                             + puntEntrada.getNom());
 
-            return getAutoritzacioPUERolEntityDao().toAutoritzacioPuntEntrada(autoRol);
+            return getEntryPointRoleEntityDao().toAutoritzacioPuntEntrada(autoRol);
         } else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipusAutoritzacio)) {
             // GRUP: Creamos autorización
-        	AutoritzacioPUEGrupEntity autoGrup =
-            		getAutoritzacioPUEGrupEntityDao(). 
-            			newAutoritzacioPUEGrupEntity();
-        	autoGrup.setNivellAutoritzacio(nivell);
-        	autoGrup.setIdGrup(idEntitat);
-        	autoGrup.setPuntEntrada(puntEntradaE);
-            getAutoritzacioPUEGrupEntityDao().create(autoGrup);
+        	EntryPointGroupEntity autoGrup = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
+        	autoGrup.setAuhtorizationLevel(nivell);
+        	autoGrup.setGroupID(idEntitat);
+        	autoGrup.setEntryPoint(puntEntradaE);
+            getEntryPointGroupEntityDao().create(autoGrup);
 
             auditarAutoritzacioPuntEntrada(
                     "C", //$NON-NLS-1$
@@ -1333,16 +1269,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                             + autoritzacio.getDescripcioEntitatAutoritzada() + " - " //$NON-NLS-1$
                             + puntEntrada.getNom());
 
-            return getAutoritzacioPUEGrupEntityDao().toAutoritzacioPuntEntrada(autoGrup);
+            return getEntryPointGroupEntityDao().toAutoritzacioPuntEntrada(autoGrup);
         } else if (TipusAutoritzacioPuntEntrada.USUARI.equals(tipusAutoritzacio)) {
             // USUARI: Creamos autorización
-        	AutoritzacioPUEUsuariEntity autoUsu =
-            		getAutoritzacioPUEUsuariEntityDao(). 
-            			newAutoritzacioPUEUsuariEntity();
-        	autoUsu.setNivellAutoritzacio(nivell);
-        	autoUsu.setIdUsuari(idEntitat);
-        	autoUsu.setPuntEntrada(puntEntradaE);
-            getAutoritzacioPUEUsuariEntityDao().create(autoUsu);
+        	EntryPointUserEntity autoUsu = getEntryPointUserEntityDao().newEntryPointUserEntity();
+        	autoUsu.setAuthorizationLevel(nivell);
+        	autoUsu.setUserID(idEntitat);
+        	autoUsu.setEntryPoint(puntEntradaE);
+            getEntryPointUserEntityDao().create(autoUsu);
 
             auditarAutoritzacioPuntEntrada(
                     "C", //$NON-NLS-1$
@@ -1351,7 +1285,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                             + autoritzacio.getDescripcioEntitatAutoritzada() + " - " //$NON-NLS-1$
                             + puntEntrada.getNom());
 
-            return getAutoritzacioPUEUsuariEntityDao().toAutoritzacioPuntEntrada(autoUsu);
+            return getEntryPointUserEntityDao().toAutoritzacioPuntEntrada(autoUsu);
         }
 
         return null;
@@ -1378,13 +1312,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         String tipusAutoritzacio = autoritzacio.getTipusEntitatAutoritzada();
         if (TipusAutoritzacioPuntEntrada.ROL.equals(tipusAutoritzacio)) {
             // ROL: Borramos autorización
-            getAutoritzacioPUERolEntityDao().remove(autoritzacio.getId());
+            getEntryPointRoleEntityDao().remove(autoritzacio.getId());
         } else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipusAutoritzacio)) {
             // GRUP: Borramos autorización
-            getAutoritzacioPUEGrupEntityDao().remove(autoritzacio.getId());
+            getEntryPointGroupEntityDao().remove(autoritzacio.getId());
         } else if (TipusAutoritzacioPuntEntrada.USUARI.equals(tipusAutoritzacio)) {
             // USUARI: Borramos autorización
-            getAutoritzacioPUEUsuariEntityDao().remove(autoritzacio.getId());
+            getEntryPointUserEntityDao().remove(autoritzacio.getId());
         }
 
         auditarAutoritzacioPuntEntrada(
@@ -1413,15 +1347,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return execucio; // No la creem
         }
 
-        ExecucioPuntEntradaEntity entity = getExecucioPuntEntradaEntityDao()
-                .execucioPuntEntradaToEntity(execucio);
-        getExecucioPuntEntradaEntityDao().create(entity);
+        EntryPointExecutableEntity entity = getEntryPointExecutableEntityDao().execucioPuntEntradaToEntity(execucio);
+        getEntryPointExecutableEntityDao().create(entity);
 
         auditarExecucioPuntEntrada("C", //$NON-NLS-1$
                 puntEntrada.getNom() + " tipus " + execucio.getTipusMimeExecucio() + " ambit " //$NON-NLS-1$ //$NON-NLS-2$
                         + execucio.getAmbit());
 
-        return getExecucioPuntEntradaEntityDao().toExecucioPuntEntrada(entity);
+        return getEntryPointExecutableEntityDao().toExecucioPuntEntrada(entity);
     }
 
     protected void handleDeleteExecucio(PuntEntrada puntEntrada, ExecucioPuntEntrada execucio)
@@ -1441,9 +1374,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                                                                              // noves??
 
         // Transformem a Entity
-        ExecucioPuntEntradaEntity entity = getExecucioPuntEntradaEntityDao()
-                .execucioPuntEntradaToEntity(execucio);
-        getExecucioPuntEntradaEntityDao().remove(entity);
+        EntryPointExecutableEntity entity = getEntryPointExecutableEntityDao().execucioPuntEntradaToEntity(execucio);
+        getEntryPointExecutableEntityDao().remove(entity);
 
         auditarExecucioPuntEntrada("D", //$NON-NLS-1$
                 puntEntrada.getNom() + " tipus " + execucio.getTipusMimeExecucio() + " ambit " //$NON-NLS-1$ //$NON-NLS-2$
@@ -1468,15 +1400,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                                                                               // noves??
 
         // Transformem a Entity
-        ExecucioPuntEntradaEntity entity = getExecucioPuntEntradaEntityDao()
-                .execucioPuntEntradaToEntity(execucio);
-        getExecucioPuntEntradaEntityDao().update(entity);
+        EntryPointExecutableEntity entity = getEntryPointExecutableEntityDao().execucioPuntEntradaToEntity(execucio);
+        getEntryPointExecutableEntityDao().update(entity);
 
         auditarExecucioPuntEntrada("U", //$NON-NLS-1$
                 puntEntrada.getNom() + " tipus " + execucio.getTipusMimeExecucio() + " ambit " //$NON-NLS-1$ //$NON-NLS-2$
                         + execucio.getAmbit());
 
-        return getExecucioPuntEntradaEntityDao().toExecucioPuntEntrada(entity);
+        return getEntryPointExecutableEntityDao().toExecucioPuntEntrada(entity);
     }
 
     protected Collection<ExecucioPuntEntrada> handleGetExecucions(PuntEntrada puntEntrada)
@@ -1496,8 +1427,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObjecte("SC_PUNENT"); //$NON-NLS-1$
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
     }
 
     private void auditarExecucioPuntEntrada(String accio, String execucio) {
@@ -1509,8 +1440,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObjecte("SC_EXEPUE"); //$NON-NLS-1$
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
     }
 
     private void auditarAutoritzacioPuntEntrada(String accio, String tipus, String autoritzacio) {
@@ -1530,8 +1461,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         else if (tipus.equals(TipusAutoritzacioPuntEntrada.GRUP))
             taula = "SC_GRUPUE"; //$NON-NLS-1$
         auditoria.setObjecte(taula);
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
     }
 
     protected java.util.Collection<PuntEntrada> handleFindMenuChildren(
@@ -1541,25 +1472,15 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return new LinkedList<PuntEntrada>();// throw new
                                                  // SeyconException("no autoritzat");
 
-        Collection<ArbrePuntEntradaEntity> arbre = getArbrePuntEntradaEntityDao().findByPare(
-                puntEntrada.getId());
+        Collection<EntryPointTreeEntity> arbre = getEntryPointTreeEntityDao().findByParent(puntEntrada.getId());
         if (arbre != null && arbre.size() != 0) {// Verificamos permisos
             Collection<PuntEntrada> fills = new LinkedList<PuntEntrada>();
-            for (Iterator<ArbrePuntEntradaEntity> it = arbre.iterator(); it.hasNext();) {
-                ArbrePuntEntradaEntity a = it.next();
-                // Només si tenim permis
-                PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(a.getFill());
-                // Establim la posició a l'arbre del punt d'entrada (per poder
-                // moure'l)
-                pue.setIdPare(a.getPare().getId());
-                pue.setOrdre(""+a.getOrdre()); // pue.setOrdre(a.getOrdre()); //$NON-NLS-1$
-                if ("S".equals(pue.getMenu()) && canAdmin(pue)) // Només de //$NON-NLS-1$
-                                                                // tipus menú i
-                                                                // som
-                                                                // administradors
-                                                                // del punt menú
-                                                                // desti
-                    fills.add(pue);
+            for (Iterator<EntryPointTreeEntity> it = arbre.iterator(); it.hasNext(); ) {
+                EntryPointTreeEntity a = it.next();
+                PuntEntrada pue = getEntryPointEntityDao().toPuntEntrada(a.getChildren());
+                pue.setIdPare(a.getParent().getId());
+                pue.setOrdre("" + a.getOrder());
+                if ("S".equals(pue.getMenu()) && canAdmin(pue)) fills.add(pue);
             }
             return fills;
 
@@ -1642,27 +1563,25 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 codiUsuari = null;
 
             // Ara filtrem
-            AplicacioEntity aplicacio = null;
+            InformationSystemEntity aplicacio = null;
             if (codiAplicacio != null) {
-                aplicacio = getAplicacioEntityDao().findByCodi(codiAplicacio);
+                aplicacio = getInformationSystemEntityDao().findByCode(codiAplicacio);
                 if (aplicacio == null) {
                     throw new SeyconException(String.format(
                             Messages.getString("PuntEntradaServiceImpl.ApplicationNotFounded"), codiAplicacio)); //$NON-NLS-1$
                 }
             }
-            Collection<PuntEntradaEntity> cerca = getPuntEntradaEntityDao().findByCriteris(nomPUE,
-                    codiPUE);
+            Collection<EntryPointEntity> cerca = getEntryPointEntityDao().findByCriteria(nomPUE, codiPUE);
             if (aplicacio != null) {
-                Collection<PuntEntradaEntity> resFiltrats = new LinkedList<PuntEntradaEntity>();
-                for (Iterator<PuntEntradaEntity> it = cerca.iterator(); it.hasNext();) {
-                    PuntEntradaEntity pue = it.next();
-                    if (pue.getIdAplicacio().equals(aplicacio.getId()))
-                        resFiltrats.add(pue);
+                Collection<EntryPointEntity> resFiltrats = new LinkedList<EntryPointEntity>();
+                for (Iterator<EntryPointEntity> it = cerca.iterator(); it.hasNext(); ) {
+                    EntryPointEntity pue = it.next();
+                    if (pue.getApplicationID().equals(aplicacio.getId())) resFiltrats.add(pue);
                 }
                 cerca = resFiltrats; // Filtrem
             }
 
-            List<PuntEntrada> cercaVO = getPuntEntradaEntityDao().toPuntEntradaList(cerca);
+            List<PuntEntrada> cercaVO = getEntryPointEntityDao().toPuntEntradaList(cerca);
 
             // Mirem les autoritzacions dels resultats de la cerca
             for (Iterator<PuntEntrada> it = cercaVO.iterator(); it.hasNext();) {
@@ -1675,23 +1594,23 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
 
     class Graph {
-        private Map<PuntEntradaEntity, LinkedHashSet<PuntEntradaEntity>> map = new HashMap<PuntEntradaEntity, LinkedHashSet<PuntEntradaEntity>>();
+        private Map<EntryPointEntity, LinkedHashSet<EntryPointEntity>> map = new HashMap<EntryPointEntity, LinkedHashSet<EntryPointEntity>>();
 
-        public void addEdge(PuntEntradaEntity node1, PuntEntradaEntity node2) {
-            LinkedHashSet<PuntEntradaEntity> adjacent = map.get(node1);
+        public void addEdge(EntryPointEntity node1, EntryPointEntity node2) {
+            LinkedHashSet<EntryPointEntity> adjacent = map.get(node1);
             if (adjacent == null) {
-                adjacent = new LinkedHashSet<PuntEntradaEntity>();
+                adjacent = new LinkedHashSet<EntryPointEntity>();
                 map.put(node1, adjacent);
             }
             adjacent.add(node2);
         }
 
-        public void addTwoWayVertex(PuntEntradaEntity node1, PuntEntradaEntity node2) {
+        public void addTwoWayVertex(EntryPointEntity node1, EntryPointEntity node2) {
             addEdge(node1, node2);
             addEdge(node2, node1);
         }
 
-        public boolean isConnected(PuntEntradaEntity node1, PuntEntradaEntity node2) {
+        public boolean isConnected(EntryPointEntity node1, EntryPointEntity node2) {
             Set adjacent = map.get(node1);
             if (adjacent == null) {
                 return false;
@@ -1699,22 +1618,21 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return adjacent.contains(node2);
         }
 
-        public LinkedList<PuntEntradaEntity> adjacentNodes(PuntEntradaEntity last) {
-            LinkedHashSet<PuntEntradaEntity> adjacent = map.get(last);
+        public LinkedList<EntryPointEntity> adjacentNodes(EntryPointEntity last) {
+            LinkedHashSet<EntryPointEntity> adjacent = map.get(last);
             if (adjacent == null) {
-                return new LinkedList<PuntEntradaEntity>();
+                return new LinkedList<EntryPointEntity>();
             }
-            return new LinkedList<PuntEntradaEntity>(adjacent);
+            return new LinkedList<EntryPointEntity>(adjacent);
         }
     }
 
     class Search {
 
-        private void breadthFirst(Graph graph, LinkedList<PuntEntradaEntity> visited,
-                LinkedList<String> rutes) {
-            LinkedList<PuntEntradaEntity> nodes = graph.adjacentNodes(visited.getLast());
+        private void breadthFirst(Graph graph, LinkedList<EntryPointEntity> visited, LinkedList<String> rutes) {
+            LinkedList<EntryPointEntity> nodes = graph.adjacentNodes(visited.getLast());
             // examine adjacent nodes
-            for (PuntEntradaEntity node : nodes) {
+            for (EntryPointEntity node : nodes) {
                 if (visited.contains(node)) {
                     continue;
                 }
@@ -1727,7 +1645,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             }
             // in breadth-first, recursion needs to come after visiting adjacent
             // nodes
-            for (PuntEntradaEntity node : nodes) {
+            for (EntryPointEntity node : nodes) {
                 if (visited.contains(node) || node.getId().equals(ROOT_ID)) {
                     continue;
                 }
@@ -1737,7 +1655,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             }
         }
 
-        public String printPath(LinkedList<PuntEntradaEntity> visited) {
+        public String printPath(LinkedList<EntryPointEntity> visited) {
             String res = ""; //$NON-NLS-1$
 
             // Fem el cami invers
@@ -1747,7 +1665,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
              * res.substring(0,res.lastIndexOf(" < "));
              */
             for (int i = (visited.size() - 1); i >= 0; i--) {
-                res += visited.get(i).getNom() + " > "; //$NON-NLS-1$
+                res += visited.get(i).getName() + " > ";
             }
             if (res.endsWith(" > ")) //$NON-NLS-1$
                 res = res.substring(0, res.lastIndexOf(" > ")); //$NON-NLS-1$
@@ -1756,13 +1674,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     }
 
-    private void getGraphInversPUE(PuntEntradaEntity pue, Graph arbre) {
+    private void getGraphInversPUE(EntryPointEntity pue, Graph arbre) {
 
-        Collection pares = getArbrePuntEntradaEntityDao().findByFill(pue.getId());
+        Collection pares = getEntryPointTreeEntityDao().findByChildren(pue.getId());
 
-        for (Iterator it = pares.iterator(); it.hasNext();) {
-            ArbrePuntEntradaEntity a = (ArbrePuntEntradaEntity) it.next();
-            PuntEntradaEntity pare = a.getPare();
+        for (Iterator it = pares.iterator(); it.hasNext(); ) {
+            EntryPointTreeEntity a = (EntryPointTreeEntity) it.next();
+            EntryPointEntity pare = a.getParent();
             arbre.addEdge(pue, pare);
             getGraphInversPUE(pare, arbre);
         }
@@ -1773,10 +1691,10 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             throws Exception {
 
         Graph arbreInvers = new Graph();
-        PuntEntradaEntity pue = getPuntEntradaEntityDao().puntEntradaToEntity(puntEntrada);
+        EntryPointEntity pue = getEntryPointEntityDao().puntEntradaToEntity(puntEntrada);
         getGraphInversPUE(pue, arbreInvers);
 
-        LinkedList<PuntEntradaEntity> visited = new LinkedList<PuntEntradaEntity>();
+        LinkedList<EntryPointEntity> visited = new LinkedList<EntryPointEntity>();
         visited.add(pue);
         LinkedList<String> rutes = new LinkedList<String>();
         new Search().breadthFirst(arbreInvers, visited, rutes);
@@ -1796,10 +1714,10 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             throws Exception {
 
         // Carreguem el punt d'entrada
-        PuntEntradaEntity puntEntradaE = getPuntEntradaEntityDao().findById(idPuntEntrada);
+        EntryPointEntity puntEntradaE = getEntryPointEntityDao().findById(idPuntEntrada);
         if (puntEntradaE == null)
             return false;
-        PuntEntrada puntEntrada = getPuntEntradaEntityDao().toPuntEntrada(puntEntradaE);
+        PuntEntrada puntEntrada = getEntryPointEntityDao().toPuntEntrada(puntEntradaE);
 
         String user = getPrincipal().getName();
         Collection<AutoritzacioPuntEntrada> autoritzacions = puntEntrada.getAutoritzacions();
@@ -1853,28 +1771,17 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         PermissionsCache permisos = getCurrentAuthorizations();
 
         // ROL: només els de permís d'aministrador (!!)
-        Collection autoRol = getAutoritzacioPUERolEntityDao()
-                .query(
-                        "from es.caib.seycon.ng.model.AutoritzacioPUERolEntity where nivellAutoritzacio='A'", //$NON-NLS-1$
-                        new Parameter[0]); //$NON-NLS-1$
-        for (Iterator it = autoRol.iterator(); it.hasNext();) {
-            // ho mirem per entity (per reduir les cerques): només als rols
-            AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it.next();
-            if (permisos.getRolsUsuariPUE().contains(auto.getIdRol())) {
-                // Només administradors. NOTA: al entity pot ésser A o C
-                // (!!)
-                if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(auto.getNivellAutoritzacio()))
-                    return true;
+        Collection autoRol = getEntryPointRoleEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUERolEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        for (Iterator it = autoRol.iterator(); it.hasNext(); ) {
+            EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
+            if (permisos.getRolsUsuariPUE().contains(auto.getRoleID())) {
+                if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(auto.getAuthorizationLevel())) return true;
             }
         }
 
         // GRUP: només els de permís d'aministrador (!!)
-        List<AutoritzacioPUEGrupEntity> autoGrup = getAutoritzacioPUEGrupEntityDao()
-                .query(
-                        "from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity where nivellAutoritzacio='A'", //$NON-NLS-1$
-                        new Parameter[0]); //$NON-NLS-1$
-        List<AutoritzacioPuntEntrada> autoGrupVO = getAutoritzacioPUEGrupEntityDao()
-                .toAutoritzacioPuntEntradaList(autoGrup);
+        List<EntryPointGroupEntity> autoGrup = getEntryPointGroupEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        List<AutoritzacioPuntEntrada> autoGrupVO = getEntryPointGroupEntityDao().toAutoritzacioPuntEntradaList(autoGrup);
         for (Iterator<AutoritzacioPuntEntrada> it = autoGrupVO.iterator(); it.hasNext();) {
             // ho mirem per entity (per optimitzar)
             AutoritzacioPuntEntrada auto = it.next();
@@ -1887,12 +1794,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         }
 
         // USUARI: només els de permís d'aministrador (!!)
-        List<AutoritzacioPUEUsuariEntity> autoUsu = getAutoritzacioPUEUsuariEntityDao()
-                .query(
-                        "from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity where nivellAutoritzacio='A'", //$NON-NLS-1$
-                        new Parameter[0]); //$NON-NLS-1$
-        List<AutoritzacioPuntEntrada> autoUsuVO = getAutoritzacioPUEUsuariEntityDao()
-                .toAutoritzacioPuntEntradaList(autoUsu);
+        List<EntryPointUserEntity> autoUsu = getEntryPointUserEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        List<AutoritzacioPuntEntrada> autoUsuVO = getEntryPointUserEntityDao().toAutoritzacioPuntEntradaList(autoUsu);
         for (Iterator<AutoritzacioPuntEntrada> it = autoUsuVO.iterator(); it.hasNext();) {
             AutoritzacioPuntEntrada auto = it.next();
             if (codiUsuari.equals(auto.getCodiEntitatAutoritzada())) {
@@ -1909,8 +1812,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     @Override
     protected PuntEntrada handleFindPuntEntradaById(long id) throws Exception {
-        PuntEntradaEntity pueEntity = getPuntEntradaEntityDao().findById(id);
-        PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(pueEntity);
+        EntryPointEntity pueEntity = getEntryPointEntityDao().findById(id);
+        PuntEntrada pue = getEntryPointEntityDao().toPuntEntrada(pueEntity);
 
         if (canView(pue))
             return pue;
@@ -1918,13 +1821,12 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return null;
     }
 
-	protected IconaEntity createIcona (byte b[]) throws InternalErrorException
-	{
+	protected EntryPointIconEntity createIcona(byte[] b) throws InternalErrorException {
 		try
 		{
-			IconaEntity icona = getIconaEntityDao().newIconaEntity();
-			icona.setIcona(b);
-			getIconaEntityDao().create(icona);
+			EntryPointIconEntity icona = getEntryPointIconEntityDao().newEntryPointIconEntity();
+			icona.setIcon(b);
+			getEntryPointIconEntityDao().create(icona);
 			return icona;
 		}
 

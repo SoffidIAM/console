@@ -1,5 +1,46 @@
 package es.caib.bpm.servei;
 
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.UserEntity;
+import es.caib.bpm.business.ProcessDefinitionRolesBusiness;
+import es.caib.bpm.business.UserInterfaceBusiness;
+import es.caib.bpm.business.VOFactory;
+import es.caib.bpm.config.BpmServiceLocator;
+import es.caib.bpm.config.Configuration;
+import es.caib.bpm.dal.ProcessDefinitionPropertyDal;
+import es.caib.bpm.entity.AuthenticationLog;
+import es.caib.bpm.entity.DBProperty;
+import es.caib.bpm.entity.ProcessDefinitionProperty;
+import es.caib.bpm.entity.UserInterface;
+import es.caib.bpm.exception.BPMErrorCodes;
+import es.caib.bpm.exception.BPMException;
+import es.caib.bpm.exception.InvalidConfigurationException;
+import es.caib.bpm.exception.InvalidParameterException;
+import es.caib.bpm.index.DirectoryFactory;
+import es.caib.bpm.index.Indexer;
+import es.caib.bpm.servei.impl.UserContextCache;
+import es.caib.bpm.util.Timer;
+import es.caib.bpm.utils.ColeccionesUtils;
+import es.caib.bpm.utils.FechaUtils;
+import es.caib.bpm.vo.BPMUser;
+import es.caib.bpm.vo.Job;
+import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.bpm.vo.PredefinedProcessTypeEnum;
+import es.caib.bpm.vo.ProcessDefinition;
+import es.caib.bpm.vo.ProcessInstance;
+import es.caib.bpm.vo.ProcessLog;
+import es.caib.bpm.vo.TaskDefinition;
+import es.caib.bpm.vo.TaskInstance;
+import es.caib.bpm.vo.Token;
+import es.caib.seycon.ng.comu.Dispatcher;
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.UnknownUserException;
+import es.caib.seycon.ng.model.Parameter;
+import es.caib.seycon.ng.servei.UsuariService;
+import es.caib.seycon.ng.utils.Security;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,7 +72,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipInputStream;
-
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.naming.NamingException;
@@ -40,7 +80,6 @@ import javax.security.auth.login.LoginException;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,48 +131,6 @@ import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.Sessions;
-
-import es.caib.bpm.business.ProcessDefinitionRolesBusiness;
-import es.caib.bpm.business.UserInterfaceBusiness;
-import es.caib.bpm.business.VOFactory;
-import es.caib.bpm.config.BpmServiceLocator;
-import es.caib.bpm.config.Configuration;
-import es.caib.bpm.dal.ProcessDefinitionPropertyDal;
-import es.caib.bpm.entity.AuthenticationLog;
-import es.caib.bpm.entity.DBProperty;
-import es.caib.bpm.entity.ProcessDefinitionProperty;
-import es.caib.bpm.entity.UserInterface;
-import es.caib.bpm.exception.BPMErrorCodes;
-import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.exception.InvalidConfigurationException;
-import es.caib.bpm.exception.InvalidParameterException;
-import es.caib.bpm.index.DirectoryFactory;
-import es.caib.bpm.index.Indexer;
-import es.caib.bpm.servei.impl.UserContextCache;
-import es.caib.bpm.util.Timer;
-import es.caib.bpm.utils.ColeccionesUtils;
-import es.caib.bpm.utils.FechaUtils;
-import es.caib.bpm.vo.BPMUser;
-import es.caib.bpm.vo.Job;
-import es.caib.bpm.vo.PredefinedProcessType;
-import es.caib.bpm.vo.PredefinedProcessTypeEnum;
-import es.caib.bpm.vo.ProcessDefinition;
-import es.caib.bpm.vo.ProcessInstance;
-import es.caib.bpm.vo.ProcessLog;
-import es.caib.bpm.vo.TaskDefinition;
-import es.caib.bpm.vo.TaskInstance;
-import es.caib.bpm.vo.Token;
-import es.caib.seycon.ng.comu.Dispatcher;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.utils.Security;
 
 public class BpmEngineImpl extends BpmEngineBase {
 	/**
@@ -193,7 +190,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 					LinkedList<String> userGroups = new LinkedList<String>();
 					if (userData != null) {
-						DispatcherEntity defaultDispatcher = getDispatcherEntityDao().findSoffidDispatcher();
+						SystemEntity defaultDispatcher = getSystemEntityDao().findSoffidSystem();
 						userGroups.add(user);
 						Collection<Grup> grups = usuariService
 								.getUserGroupsHierarchy(userData.getId());
@@ -203,20 +200,16 @@ public class BpmEngineImpl extends BpmEngineBase {
 						
 						Collection<RolGrant> roles = getAplicacioService().findEffectiveRolGrantByUser(userData.getId());
 						for (RolGrant role : roles) {
-							String name = role.getRolName();
-							if (!role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
-								name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
-							userGroups.add(name);
-							// Now without domain
-							if (role.getDomainValue() != null)
-							{
-								name = role.getRolName();
-								name = name + "/" + role.getDomainValue(); //$NON-NLS-1$
-								if (!role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
-									name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
-								userGroups.add(name);
-							}
-						}
+                    String name = role.getRolName();
+                    if (!role.getDispatcher().equals(defaultDispatcher.getCode())) name = name + "@" + role.getDispatcher();
+                    userGroups.add(name);
+                    if (role.getDomainValue() != null) {
+                        name = role.getRolName();
+                        name = name + "/" + role.getDomainValue();
+                        if (!role.getDispatcher().equals(defaultDispatcher.getCode())) name = name + "@" + role.getDispatcher();
+                        userGroups.add(name);
+                    }
+                }
 						
 						for (String auth: Security.getAuthorizations())
 						{
@@ -2595,8 +2588,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 				clause.append (" and "); //$NON-NLS-1$
 			clause.append (subClause);
 		}
-		List<UsuariEntity> result = getUsuariEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
-		return getUsuariEntityDao().toBPMUserList(result);
+		List<UserEntity> result = getUserEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
+		return getUserEntityDao().toBPMUserList(result);
 	}
 
 	/* (non-Javadoc)

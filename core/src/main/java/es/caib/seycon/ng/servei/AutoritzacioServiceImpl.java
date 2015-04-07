@@ -3,8 +3,25 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.AuthorizationEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.RoleEntity;
+import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.UserAccount;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.ValorDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.utils.AutoritzacioSEU;
+import es.caib.seycon.ng.utils.Security;
+import es.caib.seycon.util.TipusDomini;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,30 +38,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.ValorDomini;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AutoritzacioRolEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.RolAssociacioRolEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.utils.AutoritzacioSEU;
-import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.util.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.servei.AutoritzacioService
@@ -130,17 +129,16 @@ public class AutoritzacioServiceImpl extends
 
     protected AutoritzacioRol handleCreate(AutoritzacioRol autoritzacio)
             throws Exception {
-        AutoritzacioRolEntity auto = getAutoritzacioRolEntityDao()
-                .autoritzacioRolToEntity(autoritzacio);
-        getAutoritzacioRolEntityDao().create(auto);
+        AuthorizationEntity auto = getAuthorizationEntityDao().autoritzacioRolToEntity(autoritzacio);
+        getAuthorizationEntityDao().create(auto);
 
-        return getAutoritzacioRolEntityDao().toAutoritzacioRol(auto);
+        return getAuthorizationEntityDao().toAutoritzacioRol(auto);
     }
 
     protected void handleDelete(AutoritzacioRol autoritzacio) throws Exception {
         // si ya tiene id, la borramos
         if (autoritzacio.getId() != null) {
-            getAutoritzacioRolEntityDao().remove(autoritzacio.getId());
+            getAuthorizationEntityDao().remove(autoritzacio.getId());
         }
     }
 
@@ -156,11 +154,9 @@ public class AutoritzacioServiceImpl extends
     protected Collection<AutoritzacioRol> handleGetRolsAutoritzacio(String autoritzacio)
             throws Exception {
         if (autoritzacio != null) {
-            List<AutoritzacioRolEntity> autoritzacions = getAutoritzacioRolEntityDao()
-                    .findByAutoritzacio(autoritzacio);
+            List<AuthorizationEntity> autoritzacions = getAuthorizationEntityDao().findByAuthorization(autoritzacio);
             if (autoritzacions != null && autoritzacions.size() != 0) {
-                return getAutoritzacioRolEntityDao().toAutoritzacioRolList(
-                        autoritzacions);
+                return getAuthorizationEntityDao().toAutoritzacioRolList(autoritzacions);
             }
         }
         return new ArrayList();
@@ -177,15 +173,12 @@ public class AutoritzacioServiceImpl extends
             if (!grupsFills.contains(codiGrupAnalitzat)) { // si no l'hem
                                                            // analitzat ja
                 grupsFills.add(codiGrupAnalitzat);
-                Collection fills = getGrupEntityDao().findSubGrupsByCodi(
-                        codiGrupAnalitzat);
+                Collection fills = getGroupEntityDao().findSubGrupsByCodi(codiGrupAnalitzat);
                 if (fills != null)
-                    for (Iterator git = fills.iterator(); git.hasNext();) {
-                        GrupEntity fg = (GrupEntity) git.next();
-                        if (!grupsFills.contains(fg.getCodi())) // si no és ja
-                                                                // analitzat
-                            l_grupsUsuari.add(fg.getCodi());
-                    }
+                    for (Iterator git = fills.iterator(); git.hasNext(); ) {
+                    GroupEntity fg = (GroupEntity) git.next();
+                    if (!grupsFills.contains(fg.getCode())) l_grupsUsuari.add(fg.getCode());
+                }
             }
         }
 
@@ -194,13 +187,13 @@ public class AutoritzacioServiceImpl extends
 
     private Collection getCodiGrupsParesGrup(String codiGrup) {
 
-        GrupEntity grupAnalitzar = getGrupEntityDao().findByCodi(codiGrup);
+        GroupEntity grupAnalitzar = getGroupEntityDao().findByCode(codiGrup);
 
         Collection totsPares = new HashSet();
-        GrupEntity pare = grupAnalitzar.getPare();
+        GroupEntity pare = grupAnalitzar.getParent();
         while (pare != null) {
-            totsPares.add(pare.getCodi());
-            pare = pare.getPare();
+            totsPares.add(pare.getCode());
+            pare = pare.getParent();
         }
 
         return totsPares;
@@ -252,99 +245,49 @@ public class AutoritzacioServiceImpl extends
 
         // guardem les autoritzacions (per id)
         if (autoritzacionsRolVO != null && autoritzacionsRolVO.size() != 0) {
-            for (Iterator it = autoritzacionsRolVO.iterator(); it.hasNext();) {
-                // Una fila per cada rol que té atorgat aquesta autorització
+            for (Iterator it = autoritzacionsRolVO.iterator(); it.hasNext(); ) {
                 AutoritzacioRol autoRolVO = (AutoritzacioRol) it.next();
-                AutoritzacioSEU autoSEU = (AutoritzacioSEU) getAuthorizations()
-                        .get(autoRolVO.getAutoritzacio());
-                // pot ésser que aquesta auto no existisca en el XML (antigues)
-                // scope dels grups
+                AutoritzacioSEU autoSEU = (AutoritzacioSEU) getAuthorizations().get(autoRolVO.getAutoritzacio());
                 String scope = autoSEU != null ? autoSEU.getScope() : null;
-                // si no té scope: ONE per defecte
-                autoRolVO.setScope(scope != null ? scope
-                        : Security.AUTO_SCOPE_ONE);
+                autoRolVO.setScope(scope != null ? scope : Security.AUTO_SCOPE_ONE);
                 if (autoRolVO.getValorDominiRolUsuari() == null) {
-                    // si l'autorització no en té cap vdom creem el
-                    // contenidor perquè no es  repetixquen
-					autoRolVO.setValorDominiRolUsuari(new HashSet()); 
+                    autoRolVO.setValorDominiRolUsuari(new HashSet());
                 }
                 Long idRol = autoRolVO.getRol().getId();
                 if (rols.containsKey(idRol)) {
-                	for (RolGrant rg: rols.get(idRol))
-                	{
-                    	String tipusDomini = null;
-                   		RolEntity role = getRolEntityDao().load(idRol);
-                   		if (role != null)
-                    		tipusDomini = role.getTipusDomini();
-                    	if (rg.getDomainValue() != null && tipusDomini != null)
-                		{
-                    		
-                            autoRolVO.getValorDominiRolUsuari().add(
-                            	new ValorDomini(rg.getDomainValue(),tipusDomini));
-                            
-                            if (TipusDomini.GRUPS.equals(tipusDomini) ||
-                            	TipusDomini.GRUPS_USUARI.equals(tipusDomini))
-                            {
-                                // Obtenim els grups segons el scope de
-                                // l'autorització:
+                    for (RolGrant rg : rols.get(idRol)) {
+                        String tipusDomini = null;
+                        RoleEntity role = getRoleEntityDao().load(idRol);
+                        if (role != null) tipusDomini = role.getDomainType();
+                        if (rg.getDomainValue() != null && tipusDomini != null) {
+                            autoRolVO.getValorDominiRolUsuari().add(new ValorDomini(rg.getDomainValue(), tipusDomini));
+                            if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
                                 Collection grupsAutoritzacio = null;
-                                if (Security.AUTO_SCOPE_PARES
-                                        .equals(autoRolVO.getScope())) {
-                                    // Obtenim el codi dels grups pare
+                                if (Security.AUTO_SCOPE_PARES.equals(autoRolVO.getScope())) {
                                     grupsAutoritzacio = getCodiGrupsParesGrup(rg.getDomainValue());
-
-                                } else if (Security.AUTO_SCOPE_FILLS
-                                        .equals(autoRolVO.getScope())) {
-                                    // Obtenim el codi dels grups fills
+                                } else if (Security.AUTO_SCOPE_FILLS.equals(autoRolVO.getScope())) {
                                     grupsAutoritzacio = getCodiGrupsFillsGrup(rg.getDomainValue());
-                                } else if (Security.AUTO_SCOPE_BOTH
-                                        .equals(autoRolVO.getScope())) {
-                                    // OBtenim els pares i els fills del
-                                    // grup
+                                } else if (Security.AUTO_SCOPE_BOTH.equals(autoRolVO.getScope())) {
                                     Collection pares = getCodiGrupsParesGrup(rg.getDomainValue());
                                     Collection fills = getCodiGrupsFillsGrup(rg.getDomainValue());
                                     grupsAutoritzacio = new HashSet();
                                     grupsAutoritzacio.addAll(pares);
                                     grupsAutoritzacio.addAll(fills);
-                                } else { // Per defecte (només el grup)
+                                } else {
                                     grupsAutoritzacio = new ArrayList();
                                     grupsAutoritzacio.add(rg.getDomainValue());
                                 }
-
-                                // Afegim un valor de domini per cada
-                                // grup on corresponga l'autorització
-                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext();) 
-                                {
+                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext(); ) {
                                     String codiGrup = (String) git.next();
-                                    autoRolVO.getValorDominiRolUsuari()
-                                            .add(new ValorDomini(
-                                                    codiGrup,
-                                                    tipusDomini));
+                                    autoRolVO.getValorDominiRolUsuari().add(new ValorDomini(codiGrup, tipusDomini));
                                 }
-
                             }
-                            
-                		} else {
-                            ValorDomini estrelleta = new ValorDomini(
-                                            "*", TIPUS_DOMINI_ESTRELLETA); //$NON-NLS-1$
-                                    autoRolVO.getValorDominiRolUsuari().add(
-                                            estrelleta);
-                		}
-                		
-                	}
-
-                    // L'usuari té el rol (amb o sense domini, l'afegim a la
-                    // llista d'autoritzacio-rol)
-                    // VO amb els valors de domini i el rol
+                        } else {
+                            ValorDomini estrelleta = new ValorDomini("*", TIPUS_DOMINI_ESTRELLETA);
+                            autoRolVO.getValorDominiRolUsuari().add(estrelleta);
+                        }
+                    }
                     autoritzacionsUsuari.add(autoRolVO);
-
-                    // Analitzem l'HERÈNCIA de d'altres autoritzacions i les
-                    // afegim:
-                    // NOTA: l'herència NO és transitiva (només primer nivell)
-                    // [IMPORTANT]
-                    // Només hem de copiar els valors de domini del mateix tipus
-                    // de DOMINI
-
                     addInheriedAuthorizations(autoritzacionsUsuari, autoRolVO, autoSEU);
                 }
             }
@@ -504,7 +447,7 @@ public class AutoritzacioServiceImpl extends
 
         // Obtenim totes les autoritzacions (Entities)
         // amb els diferents rols que inclou
-        List<AutoritzacioRolEntity> autoritzacionsRol = getAutoritzacioRolEntityDao().loadAll();
+        List<AuthorizationEntity> autoritzacionsRol = getAuthorizationEntityDao().loadAll();
 
         // Si no es troba cap autorització: sortim
         if (autoritzacionsRol == null || autoritzacionsRol.size() == 0)
@@ -512,8 +455,7 @@ public class AutoritzacioServiceImpl extends
 
         // Pasem a VO
 
-        List<AutoritzacioRol> auts = getAutoritzacionsUsuari(getAutoritzacioRolEntityDao()
-                .toAutoritzacioRolList(autoritzacionsRol), codiUsuari);
+        List<AutoritzacioRol> auts = getAutoritzacionsUsuari(getAuthorizationEntityDao().toAutoritzacioRolList(autoritzacionsRol), codiUsuari);
         autoritzacions = new AutoritzacioCache (auts);
         getSessionCacheService().putObject(AUTORITZACIO_CACHE, autoritzacions);
         return auts;

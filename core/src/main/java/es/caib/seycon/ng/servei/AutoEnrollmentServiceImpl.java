@@ -3,8 +3,35 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordDomainEntityDao;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.UserDataEntity;
+import com.soffid.iam.model.UserEntity;
+import es.caib.seycon.ng.ServiceLocator;
+import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PasswordValidation;
+import es.caib.seycon.ng.comu.PolicyCheckResult;
+import es.caib.seycon.ng.comu.Tasca;
+import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariAnonim;
+import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.BadPasswordException;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.InvalidPasswordException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownUserException;
+import es.caib.seycon.ng.remote.RemoteInvokerFactory;
+import es.caib.seycon.ng.remote.URLManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +46,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Properties;
-
 import javax.ejb.CreateException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -32,33 +58,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.PasswordValidation;
-import es.caib.seycon.ng.comu.PolicyCheckResult;
-import es.caib.seycon.ng.comu.Tasca;
-import es.caib.seycon.ng.comu.TipusDada;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariAnonim;
-import es.caib.seycon.ng.config.Config;
-import es.caib.seycon.ng.exception.BadPasswordException;
-import es.caib.seycon.ng.exception.InvalidPasswordException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.DadaUsuariEntity;
-import es.caib.seycon.ng.model.DadaUsuariEntityImpl;
-import es.caib.seycon.ng.model.DominiContrasenyaEntity;
-import es.caib.seycon.ng.model.DominiContrasenyaEntityDao;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariEntityDao;
-import es.caib.seycon.ng.remote.RemoteInvokerFactory;
-import es.caib.seycon.ng.remote.URLManager;
 
 /**
  * @see es.caib.seycon.ng.servei.AutoEnrollmentService
@@ -81,7 +80,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             String llinatge2, java.lang.String correuElectronic, String urlServidor)
             throws SeyconException {
 
-        UsuariEntity usuari = null;
+        UserEntity usuari = null;
 
         try {
             usuari = findUsuariExistent(correuElectronic);
@@ -118,9 +117,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         return new Boolean(true);
     }
 
-    private void crearPINiEnviarPerCorreuElectronic(Session session, UsuariEntity usuari,
-            String correuElectronic, String urlServidor) throws IOException, NamingException,
-            CreateException, MessagingException, SeyconException {
+    private void crearPINiEnviarPerCorreuElectronic(Session session, UserEntity usuari, String correuElectronic, String urlServidor) throws IOException, NamingException, CreateException, MessagingException, SeyconException {
         // mirem que no tingui assignat ja una dada addicional de tipus PIN per
         // a evitar el PrimaryKey constraint
 
@@ -137,20 +134,20 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
 
         DadaUsuari dadaUsuariPIN = new DadaUsuari();
         dadaUsuariPIN.setCodiDada(SeyconLogon_PIN_ADD_CODE);
-        dadaUsuariPIN.setCodiUsuari(usuari.getCodi());
+        dadaUsuariPIN.setCodiUsuari(usuari.getUserName());
         dadaUsuariPIN.setValorDada(PINEncriptat);
 
         // si ja te PIN, fem un update, sinó un insert
         // obtenim l'EJBObject
         boolean hasPIN = false;
 
-        Collection dades = getUsuariEntityDao().findDadesByCodi(usuari.getCodi());
+        Collection dades = getUserEntityDao().findBataByCode(usuari.getUserName());
         Iterator it = dades.iterator();
         while (it.hasNext()) {
-            DadaUsuariEntity dada = (DadaUsuariEntity) it.next();
-            if (SeyconLogon_PIN_ADD_CODE.equals(dada.getTipusDada().getCodi())) {
+            UserDataEntity dada = (UserDataEntity) it.next();
+            if (SeyconLogon_PIN_ADD_CODE.equals(dada.getDataType().getCode())) {
                 hasPIN = true;
-                dadaUsuariPIN = getDadaUsuariEntityDao().toDadaUsuari(dada);
+                dadaUsuariPIN = getUserDataEntityDao().toDadaUsuari(dada);
                 dadaUsuariPIN.setValorDada(PINEncriptat);
                 break;
             }
@@ -158,14 +155,12 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
 
         if (!hasPIN) {
             // cridem al ejb per a crear la dada adicional
-            DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao().dadaUsuariToEntity(
-                    dadaUsuariPIN);
-            getDadaUsuariEntityDao().create(dadaUsuariEntity);
+            UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuariPIN);
+            getUserDataEntityDao().create(dadaUsuariEntity);
         } else {
             // cridem al ejb per a actualitzar la dada adicional
-            DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao().dadaUsuariToEntity(
-                    dadaUsuariPIN);
-            getDadaUsuariEntityDao().update(dadaUsuariEntity);
+            UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuariPIN);
+            getUserDataEntityDao().update(dadaUsuariEntity);
         }
 
         // Enviament del correu Electrònic de notificació del PIN
@@ -208,13 +203,12 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
 
     }
 
-    private UsuariEntity crearUsuari(String nom, String llinatge1, String llinatge2,
-            String correuElectronic) throws RemoteException, CreateException, NamingException {
+    private UserEntity crearUsuari(String nom, String llinatge1, String llinatge2, String correuElectronic) throws RemoteException, CreateException, NamingException {
 
         // creem el VO
         Usuari usuari = new Usuari();
 
-        usuari.setCodi(getUsuariEntityDao().getSeguentCodiAnonim());
+        usuari.setCodi(getUserEntityDao().getFollowingAnonymousCode());
         usuari.setActiu(new Boolean(false));
         //usuari.setContrasenyaCaducada(new Boolean(true));//no en té efecte
         usuari.setDataCreacioUsuari(GregorianCalendar.getInstance());
@@ -234,8 +228,8 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
                                                            // creació
 
         // cridem l'EJB per a que crei l'usuari
-        UsuariEntity usuariEntity = getUsuariEntityDao().usuariToEntity(usuari);
-        getUsuariEntityDao().create(usuariEntity);
+        UserEntity usuariEntity = getUserEntityDao().usuariToEntity(usuari);
+        getUserEntityDao().create(usuariEntity);
 
         // creem el correuElectronic com a dada addicional
         DadaUsuari dadaUsuariCorreu = new DadaUsuari();
@@ -246,21 +240,19 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
 
         // cridem al ejb per a crear la dada adicional
 
-        DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao().dadaUsuariToEntity(
-                dadaUsuariCorreu);
-        getDadaUsuariEntityDao().create(dadaUsuariEntity);
+        UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuariCorreu);
+        getUserDataEntityDao().create(dadaUsuariEntity);
 
         // retornem el nou usuari
-        UsuariEntity usuariOut = getUsuariEntityDao().findByCodi(usuari.getCodi());
+        UserEntity usuariOut = getUserEntityDao().findByCode(usuari.getCodi());
 
         return usuariOut;
     }
 
-    private UsuariEntity findUsuariExistent(String correuElectronic) {
+    private UserEntity findUsuariExistent(String correuElectronic) {
         // obtenim el codi d'usuari a partir del correu electrònic
 
-        UsuariEntity usuariExistent = getUsuariEntityDao().findUsuariByCodiTipusDadaIValorDada(
-                SeyconLogon_EMAIL_ADD_CODE, correuElectronic);
+        UserEntity usuariExistent = getUserEntityDao().findUserByDataTypeCodeAndDataValue(SeyconLogon_EMAIL_ADD_CODE, correuElectronic);
 
         return usuariExistent;
     }
@@ -276,7 +268,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             java.lang.String PIN, java.lang.String newPassword) throws UnknownUserException,
             BadPasswordException, InvalidPasswordException, SeyconException {
         try {
-            UsuariEntity usuari = findUsuariExistent(correuElectronic);
+            UserEntity usuari = findUsuariExistent(correuElectronic);
 
             if (usuari == null)
                 throw new UnknownUserException();
@@ -284,19 +276,17 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             Context context = new InitialContext();
 
             // establim l'estat de l'usuari a actiu
-            usuari.setActiu("S"); //$NON-NLS-1$
-            getUsuariEntityDao().update(usuari);
+            usuari.setActive("S"); //$NON-NLS-1$
+            getUserEntityDao().update(usuari);
 
             InternalPasswordService ips = getInternalPasswordService();
             if (ips.checkPin(usuari, PIN)) {
-                DominiContrasenyaEntityDao dceDao = getDominiContrasenyaEntityDao();
-                DominiContrasenyaEntity dc = dceDao.findDefaultDomain(usuari.getId());
-                for (PoliticaContrasenyaEntity politica : dc.getPoliticaContrasenyes()) {
-                    if (politica.getTipusUsuariDomini().equals(usuari.getTipusUsuari())) {
-                        PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(
-                                newPassword));
-                        if (!result.isValid())
-                            throw new BadPasswordException(result.getReason());
+                PasswordDomainEntityDao dceDao = getPasswordDomainEntityDao();
+                PasswordDomainEntity dc = dceDao.findDefaultDomain(usuari.getId());
+                for (PasswordPolicyEntity politica : dc.getPasswordPolicies()) {
+                    if (politica.getUserDomainType().equals(usuari.getUserType())) {
+                        PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(newPassword));
+                        if (!result.isValid()) throw new BadPasswordException(result.getReason());
                     }
                 }
                 ips.storeAndForwardPassword(usuari, dc, new Password(newPassword), false);
@@ -329,18 +319,16 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             java.lang.String oldPassword, java.lang.String newPassword)
             throws UnknownUserException, BadPasswordException, InvalidPasswordException,
             SeyconException, InternalErrorException {
-        UsuariEntity usuari = findUsuariExistent(correuElectronic);
+        UserEntity usuari = findUsuariExistent(correuElectronic);
 
-        DominiContrasenyaEntityDao dceDao = getDominiContrasenyaEntityDao();
-        DominiContrasenyaEntity dc = dceDao.findDefaultDomain(usuari.getId());
+        PasswordDomainEntityDao dceDao = getPasswordDomainEntityDao();
+        PasswordDomainEntity dc = dceDao.findDefaultDomain(usuari.getId());
         InternalPasswordService ips = getInternalPasswordService();
         if (ips.checkPassword(usuari, dc, new Password(oldPassword), false, true) != PasswordValidation.PASSWORD_WRONG) {
-            for (PoliticaContrasenyaEntity politica : dc.getPoliticaContrasenyes()) {
-                if (politica.getTipusUsuariDomini().equals(usuari.getTipusUsuari())) {
-                    PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(
-                            newPassword));
-                    if (!result.isValid())
-                        throw new BadPasswordException(result.getReason());
+            for (PasswordPolicyEntity politica : dc.getPasswordPolicies()) {
+                if (politica.getUserDomainType().equals(usuari.getUserType())) {
+                    PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(newPassword));
+                    if (!result.isValid()) throw new BadPasswordException(result.getReason());
                 }
             }
             ips.storeAndForwardPassword(usuari, dc, new Password(newPassword), false);
@@ -378,8 +366,8 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             usuari.setNom(nom);
             usuari.setPrimerLlinatge(llinatge1);
             usuari.setSegonLlinatge(llinatge2);
-            UsuariEntity usuariEntity = getUsuariEntityDao().usuariToEntity(usuari);
-            getUsuariEntityDao().update(usuariEntity);
+            UserEntity usuariEntity = getUserEntityDao().usuariToEntity(usuari);
+            getUserEntityDao().update(usuariEntity);
 
             // No se pot actualitzar el email de contacte (!!)
             /*
@@ -450,7 +438,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
             throws SeyconException, UnknownUserException {
 
         try {
-            UsuariEntity usuari = findUsuariExistent(correuElectronic);
+            UserEntity usuari = findUsuariExistent(correuElectronic);
 
             if (usuari == null) {
                 throw new UnknownUserException();
@@ -489,14 +477,13 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         // usuariLoguejat=es.caib.loginModule.client.SeyconPrincipal.getCurrent()
 
         // obtenim les dades que es soliciten
-        UsuariEntity usuari = null;
+        UserEntity usuari = null;
         UsuariAnonim usuariAnonim = null;
         try {
-            usuari = (UsuariEntity) getUsuariEntityDao().findUsuariByCodiTipusDadaIValorDada(
-                    SeyconLogon_EMAIL_ADD_CODE, codiUsuari);
+            usuari = (UserEntity) getUserEntityDao().findUserByDataTypeCodeAndDataValue(SeyconLogon_EMAIL_ADD_CODE, codiUsuari);
             if (usuari == null)
                 throw new UnknownUserException();
-            usuariAnonim = getUsuariEntityDao().toUsuariAnonim(usuari);
+            usuariAnonim = getUserEntityDao().toUsuariAnonim(usuari);
         } catch (Throwable sex) {
             sex.printStackTrace();
             SeyconException ex = new SeyconException(Messages.getString("AutoEnrollmentServiceImpl.2")); //$NON-NLS-1$

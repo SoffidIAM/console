@@ -1,8 +1,24 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.authoritative.service;
 
+import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
+import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.UserEntity;
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
+import es.caib.seycon.ng.sync.intf.AuthoritativeChangeIdentifier;
+import es.caib.seycon.ng.utils.Security;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
@@ -13,27 +29,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
-
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
-
-import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
-
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.TipusDada;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariGrup;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.AuditoriaEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
-import es.caib.seycon.ng.sync.intf.AuthoritativeChangeIdentifier;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * @author gbuades
@@ -82,7 +82,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	protected boolean handleStartAuthoritativeChange (AuthoritativeChange change)
 					throws Exception
 	{
-		DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi(change.getSourceSystem());
+		SystemEntity dispatcher = getSystemEntityDao().findByCode(change.getSourceSystem());
 		if (dispatcher == null)
 			throw new InternalErrorException(String.format("Invalid source change %s", change.getSourceSystem()));
 		
@@ -97,11 +97,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		else
 		{
 			AuthoritativeChangeIdentifier changeId = change.getId();
-			UsuariEntity ue = null;
+			UserEntity ue = null;
 			// Cancels any pending workflow
 			if (change.getUser() != null && change.getUser().getCodi() != null)
 			{
-				ue = getUsuariEntityDao().findByCodi(change.getUser().getCodi());
+				ue = getUserEntityDao().findByCode(change.getUser().getCodi());
 				if (ue != null)
 				{
 					for ( AuthoritativeChangeEntity ch: ue.getPendingAuthoritativeChanges())
@@ -188,9 +188,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		}
 	}
 
-	private long createProcessInstance (AuthoritativeChange change,
-					DispatcherEntity dispatcher) throws InternalErrorException
-	{
+	private long createProcessInstance(AuthoritativeChange change, SystemEntity dispatcher) throws InternalErrorException {
 		JbpmContext ctx = getBpmEngine().getContext();
 		try {
 			ProcessDefinition def = ctx.getGraphSession().findLatestProcessDefinition(dispatcher.getAuthoritativeProcess());
@@ -414,13 +412,13 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	{
 		if (!tracker.auditGenerated)
 		{
-            AuditoriaEntity auditoria = getAuditoriaEntityDao().newAuditoriaEntity();
-            auditoria.setAccio("U");
-            auditoria.setData(new Date());
-            auditoria.setUsuari(user);
-            auditoria.setObjecte("AUTH_IDENT");
-            auditoria.setBbdd(tracker.change.getSourceSystem());
-            getAuditoriaEntityDao().create(auditoria);
+            AuditEntity auditoria = getAuditEntityDao().newAuditEntity();
+            auditoria.setAction("U");
+            auditoria.setDate(new Date());
+            auditoria.setUser(user);
+            auditoria.setObject("AUTH_IDENT");
+            auditoria.setDb(tracker.change.getSourceSystem());
+            getAuditEntityDao().create(auditoria);
             tracker.auditGenerated = true;
 		}
 	}

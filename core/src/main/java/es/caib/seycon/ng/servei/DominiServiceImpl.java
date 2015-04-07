@@ -3,24 +3,27 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package es.caib.seycon.ng.servei;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
+import com.soffid.iam.model.ApplicationDomainEntity;
+import com.soffid.iam.model.DomainValueEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.InformationSystemEntity;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.DominiAplicacioEntity;
-import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.Parameter;
-import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiService
@@ -41,11 +44,10 @@ public class DominiServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("DominiServiceImpl.0")); //$NON-NLS-1$
 		}
-		DominiAplicacioEntity dominiEntity = getDominiAplicacioEntityDao()
-				.dominiToEntity(domini);
-		getDominiAplicacioEntityDao().create(dominiEntity);
+		ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().dominiToEntity(domini);
+		getApplicationDomainEntityDao().create(dominiEntity);
 		domini.setId(dominiEntity.getId());
-		domini = getDominiAplicacioEntityDao().toDomini(dominiEntity);
+		domini = getApplicationDomainEntityDao().toDomini(dominiEntity);
 		return domini;
 	}
 
@@ -65,9 +67,8 @@ public class DominiServiceImpl extends
 		
 		// codiExtern en dominis de tipus d'aplicació és el codi de l'aplicacio
 		if (AutoritzacionsUsuari.canDeleteAplicacio(domini.getCodiExtern())) {
-			DominiAplicacioEntity dominiEntity = getDominiAplicacioEntityDao()
-					.dominiToEntity(domini);
-			getDominiAplicacioEntityDao().remove(dominiEntity);
+			ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().dominiToEntity(domini);
+			getApplicationDomainEntityDao().remove(dominiEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$
 					"delete (Domini)", "application:delete", //$NON-NLS-1$ //$NON-NLS-2$
@@ -89,13 +90,10 @@ public class DominiServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("DominiServiceImpl.3")); //$NON-NLS-1$
 		}
-		ValorDominiAplicacioEntity valorDominiAplicacioEntity = getValorDominiAplicacioEntityDao()
-				.valorDominiToEntity(valorDomini);
-		getValorDominiAplicacioEntityDao().create(
-				valorDominiAplicacioEntity);
+		DomainValueEntity valorDominiAplicacioEntity = getDomainValueEntityDao().valorDominiToEntity(valorDomini);
+		getDomainValueEntityDao().create(valorDominiAplicacioEntity);
 		valorDomini.setId(valorDominiAplicacioEntity.getId());
-		valorDomini = getValorDominiAplicacioEntityDao().toValorDomini(
-				valorDominiAplicacioEntity);
+		valorDomini = getDomainValueEntityDao().toValorDomini(valorDominiAplicacioEntity);
 		return valorDomini;
 	}
 
@@ -117,9 +115,8 @@ public class DominiServiceImpl extends
 		if (AutoritzacionsUsuari.canCreateAplicacio(valorDomini.getCodiExternDomini()) ||
 				AutoritzacionsUsuari.canUpdateAplicacio(valorDomini.getCodiExternDomini()) ||
 				AutoritzacionsUsuari.canDeleteAplicacio(valorDomini.getCodiExternDomini())) {
-			ValorDominiAplicacioEntity valorDominiAplicacioEntity = getValorDominiAplicacioEntityDao()
-					.valorDominiToEntity(valorDomini);
-			getValorDominiAplicacioEntityDao().remove(valorDominiAplicacioEntity);
+			DomainValueEntity valorDominiAplicacioEntity = getDomainValueEntityDao().valorDominiToEntity(valorDomini);
+			getDomainValueEntityDao().remove(valorDominiAplicacioEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$
 					"delete (ValorDomini)", "application:delete", //$NON-NLS-1$ //$NON-NLS-2$
@@ -160,17 +157,14 @@ public class DominiServiceImpl extends
 		Parameter nomRolParameter = new Parameter("nomRol", nomRol); //$NON-NLS-1$
 		Parameter[] parametres = { nomRolParameter };
 
-		List<DominiAplicacioEntity> dominisAplicacio = getDominiAplicacioEntityDao().query(query,
-				parametres);
+		List<ApplicationDomainEntity> dominisAplicacio = getApplicationDomainEntityDao().query(query, parametres);
 		if (dominisAplicacio != null) {
-			Iterator<DominiAplicacioEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
+			Iterator<ApplicationDomainEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
 			if (dominiAplicacioIterator != null) {
 				if (dominiAplicacioIterator.hasNext()) {
-					DominiAplicacioEntity dominiAplicacio = (DominiAplicacioEntity) dominiAplicacioIterator
-							.next();
+					ApplicationDomainEntity dominiAplicacio = (ApplicationDomainEntity) dominiAplicacioIterator.next();
 					if (dominiAplicacio != null) {
-						return getDominiAplicacioEntityDao().toDomini(
-								dominiAplicacio);
+						return getApplicationDomainEntityDao().toDomini(dominiAplicacio);
 					}
 				}
 			}
@@ -194,17 +188,14 @@ public class DominiServiceImpl extends
 				codiAplicacio);
 		Parameter[] parametres = { nomDominiParameter, nomRolParameter };
 
-		List<DominiAplicacioEntity> dominisAplicacio = getDominiAplicacioEntityDao().query(query,
-				parametres);
+		List<ApplicationDomainEntity> dominisAplicacio = getApplicationDomainEntityDao().query(query, parametres);
 		if (dominisAplicacio != null) {
-			Iterator<DominiAplicacioEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
+			Iterator<ApplicationDomainEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
 			if (dominiAplicacioIterator != null) {
 				if (dominiAplicacioIterator.hasNext()) {
-					DominiAplicacioEntity dominiAplicacio = (DominiAplicacioEntity) dominiAplicacioIterator
-							.next();
+					ApplicationDomainEntity dominiAplicacio = (ApplicationDomainEntity) dominiAplicacioIterator.next();
 					if (dominiAplicacio != null) {
-						return getDominiAplicacioEntityDao().toDomini(
-								dominiAplicacio);
+						return getApplicationDomainEntityDao().toDomini(dominiAplicacio);
 					}
 				}
 			}
@@ -236,10 +227,9 @@ public class DominiServiceImpl extends
 					codiUsuari);
 			Parameter[] parameters = { codiParameter, codiDescripcio,
 					codiUsuariParameter };
-			List<GrupEntity> valorsDomini = getGrupEntityDao()
-					.query(query, parameters);
+			List<GroupEntity> valorsDomini = getGroupEntityDao().query(query, parameters);
 			if (valorsDomini == null) {
-				valorsDomini = new Vector<GrupEntity>();
+				valorsDomini = new Vector<GroupEntity>();
 			}
 
 			String queryGrupPrimari = "select grup " //$NON-NLS-1$
@@ -256,13 +246,12 @@ public class DominiServiceImpl extends
 			codiUsuariParameter = new Parameter("codiUsuari", codiUsuari); //$NON-NLS-1$
 			Parameter[] parametersGrupPrimari = { codiParameter,
 					codiDescripcio, codiUsuariParameter };
-			List<GrupEntity> grupPrimari = getGrupEntityDao().query(queryGrupPrimari,
-					parametersGrupPrimari);
+			List<GroupEntity> grupPrimari = getGroupEntityDao().query(queryGrupPrimari, parametersGrupPrimari);
 			if (grupPrimari != null) {
 				valorsDomini.addAll(grupPrimari);
 			}
 			if (valorsDomini != null) {
-				List<ValorDomini> vdl = getGrupEntityDao().toValorDominiList(valorsDomini);
+				List<ValorDomini> vdl = getGroupEntityDao().toValorDominiList(valorsDomini);
 				Iterator<ValorDomini> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					ValorDomini valorDomini = iterator.next();
@@ -282,10 +271,9 @@ public class DominiServiceImpl extends
 			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			Parameter[] parameters = { codiParameter, codiDescripcio };
-			Collection valorsDomini = getGrupEntityDao()
-					.query(query, parameters);
+			Collection valorsDomini = getGroupEntityDao().query(query, parameters);
 			if (valorsDomini != null) {
-				List<ValorDomini> vdl = getGrupEntityDao().toValorDominiList(valorsDomini);
+				List<ValorDomini> vdl = getGroupEntityDao().toValorDominiList(valorsDomini);
 				Iterator<ValorDomini> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					ValorDomini valorDomini = (ValorDomini) iterator.next();
@@ -305,10 +293,9 @@ public class DominiServiceImpl extends
 			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			Parameter[] parameters = { codiParameter, codiDescripcio };
-			Collection<AplicacioEntity> valorsDomini = getAplicacioEntityDao().query(query,
-					parameters);
+			Collection<InformationSystemEntity> valorsDomini = getInformationSystemEntityDao().query(query, parameters);
 			if (valorsDomini != null) {
-				List<ValorDomini> vdl = getAplicacioEntityDao().toValorDominiList(valorsDomini);
+				List<ValorDomini> vdl = getInformationSystemEntityDao().toValorDominiList(valorsDomini);
 				Iterator<ValorDomini> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					ValorDomini valorDomini = (ValorDomini) iterator.next();
@@ -338,11 +325,9 @@ public class DominiServiceImpl extends
 				codiAplicacio);
 		Parameter[] parametres = { nomDominiParameter, nomRolParameter };
 
-		Collection<ValorDominiAplicacioEntity> valorsDomini = getValorDominiAplicacioEntityDao().query(
-				query, parametres);
+		Collection<DomainValueEntity> valorsDomini = getDomainValueEntityDao().query(query, parametres);
 		if (valorsDomini != null) {
-			return getValorDominiAplicacioEntityDao().toValorDominiList(
-					valorsDomini);
+			return getDomainValueEntityDao().toValorDominiList(valorsDomini);
 		}
 		return new Vector();
 	}
@@ -368,17 +353,14 @@ public class DominiServiceImpl extends
 		Parameter[] parametres = { nomDominiParameter, codiAplicacioParameter,
 				valorParameter };
 
-		List<ValorDominiAplicacioEntity> valorsDomini = getValorDominiAplicacioEntityDao().query(
-				query, parametres);
+		List<DomainValueEntity> valorsDomini = getDomainValueEntityDao().query(query, parametres);
 		if (valorsDomini != null) {
-			Iterator<ValorDominiAplicacioEntity> valorsDominiIterator = valorsDomini.iterator();
+			Iterator<DomainValueEntity> valorsDominiIterator = valorsDomini.iterator();
 			if (valorsDominiIterator != null) {
 				if (valorsDominiIterator.hasNext()) {
-					ValorDominiAplicacioEntity valorDominiEntity = (ValorDominiAplicacioEntity) valorsDominiIterator
-							.next();
+					DomainValueEntity valorDominiEntity = (DomainValueEntity) valorsDominiIterator.next();
 					if (valorDominiEntity != null) {
-						return getValorDominiAplicacioEntityDao()
-								.toValorDomini(valorDominiEntity);
+						return getDomainValueEntityDao().toValorDomini(valorDominiEntity);
 					}
 				}
 			}
@@ -388,19 +370,17 @@ public class DominiServiceImpl extends
 
 	protected Collection<Domini> handleFindDominisAplicacioByCodiAplicacio(
 			String codiAplicacio) throws Exception {
-		List<DominiAplicacioEntity> dominiAplicacions = getDominiAplicacioEntityDao()
-				.findByCodiAplicacio(codiAplicacio);
+		List<ApplicationDomainEntity> dominiAplicacions = getApplicationDomainEntityDao().findByApplicationCode(codiAplicacio);
 		if (dominiAplicacions != null) {
-			return getDominiAplicacioEntityDao().toDominiList(dominiAplicacions);
+			return getApplicationDomainEntityDao().toDominiList(dominiAplicacions);
 		}
 		return new Vector();
 	}
 
 	protected Domini handleUpdate(Domini domini) throws Exception {
-		DominiAplicacioEntity dominiEntity = getDominiAplicacioEntityDao()
-				.dominiToEntity(domini);
-		getDominiAplicacioEntityDao().update(dominiEntity);
-		return this.getDominiAplicacioEntityDao().toDomini(dominiEntity);
+		ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().dominiToEntity(domini);
+		getApplicationDomainEntityDao().update(dominiEntity);
+		return this.getApplicationDomainEntityDao().toDomini(dominiEntity);
 	}
 
 	private Domini getDominiSenseDomini() {
@@ -417,10 +397,9 @@ public class DominiServiceImpl extends
 
 	protected Collection<Domini> handleFindDominisByCodiAplicacio(String codiAplicacio)
 			throws Exception {
-		List<DominiAplicacioEntity> dominis = getDominiAplicacioEntityDao()
-				.findByCodisAplicacions(codiAplicacio);
+		List<ApplicationDomainEntity> dominis = getApplicationDomainEntityDao().findByApplicationCodes(codiAplicacio);
 		if (dominis != null) {
-			List<Domini> dominisVO = getDominiAplicacioEntityDao().toDominiList(dominis);
+			List<Domini> dominisVO = getApplicationDomainEntityDao().toDominiList(dominis);
 			dominisVO.add(findDominiGrups());
 			dominisVO.add(findDominiGrupsUsuari());
 			dominisVO.add(getDominiSenseDomini());

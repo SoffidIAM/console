@@ -1,7 +1,5 @@
 package es.caib.seycon.ng.sync.engine;
 
-import es.caib.seycon.ng.model.TaskLogEntity;
-
 public class TaskHandlerLog {
     DispatcherHandler dispatcher;
     /** primera vez que se ejecutó */

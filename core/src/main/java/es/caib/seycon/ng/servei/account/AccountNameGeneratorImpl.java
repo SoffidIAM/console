@@ -1,16 +1,14 @@
 package es.caib.seycon.ng.servei.account;
 
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.UserEntity;
 
 public class AccountNameGeneratorImpl extends AccountNameGeneratorBase
 {
 
 	@Override
-	protected String handleGetAccountName(UsuariEntity user,
-			DispatcherEntity dispatcher) throws Exception
-	{
-		return user.getCodi();
+    protected String handleGetAccountName(UserEntity user, SystemEntity dispatcher) throws Exception {
+		return user.getUserName();
 	}
 
 }

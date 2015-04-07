@@ -5,10 +5,9 @@
 
 package com.soffid.iam.model;
 
-import java.sql.Timestamp;
-
-import es.caib.seycon.ng.model.TasqueEntity;
+import com.soffid.iam.model.TaskEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
+import java.sql.Timestamp;
 
 /**
  * DAO MailListGroupMemberEntity implementation
@@ -16,16 +15,14 @@ import es.caib.seycon.ng.sync.engine.TaskHandler;
 public class MailListGroupMemberEntityDaoImpl extends MailListGroupMemberEntityDaoBase
 {
 	private void createUpdateTask(MailListGroupMemberEntity entity) {
-		if (entity.getMailList() != null &&
-				entity.getMailList().getDomini() != null &&
-				entity.getMailList().getNom() != null)
+		if (entity.getMailList() != null && entity.getMailList().getDomain() != null && entity.getMailList().getName() != null)
 		{
-	        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-	        tasque.setData(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransa(TaskHandler.UPDATE_LIST_ALIAS);
-	        tasque.setAlies(entity.getMailList().getNom());
-            tasque.setDomcor(entity.getMailList().getDomini().getCodi());
-	        getTasqueEntityDao().create(tasque);
+	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
+	        tasque.setAlias(entity.getMailList().getName());
+            tasque.setMailDomain(entity.getMailList().getDomain().getCode());
+	        getTaskEntityDao().create(tasque);
 		}
 	}
 

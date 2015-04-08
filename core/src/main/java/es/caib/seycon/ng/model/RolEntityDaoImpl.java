@@ -785,7 +785,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             for (Iterator<Grup> it = grupsPosseidors.iterator(); it.hasNext();) {
                 // El VO grup siempre tendrá ID (!!)
                 Grup grup = it.next();
-                GrupEntity grupEntity = getGrupEntityDao().findById(
+                GrupEntity grupEntity = getGrupEntityDao().load(
                         grup.getId());
                 // creamos la instancia A NIVEL DE OBJETO
                 RolsGrupEntity rge = getRolsGrupEntityDao().newRolsGrupEntity();
@@ -1281,7 +1281,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
 
         for (Iterator<RolsGrupEntity> it = grupsPosseidors.iterator(); it.hasNext();) {
             RolsGrupEntity rolsgrup = it.next();
-            GrupEntity grupPosseidor = getGrupEntityDao().findById(
+            GrupEntity grupPosseidor = getGrupEntityDao().load(
                     rolsgrup.getGrupPosseidor().getId());
             // Guardamos el grupo
             grupsPropagar.add(grupPosseidor);

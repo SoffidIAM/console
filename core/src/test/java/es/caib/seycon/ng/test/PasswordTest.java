@@ -2,27 +2,19 @@ package es.caib.seycon.ng.test;
 
 
 
-import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
-import org.hibernate.type.EntityType;
 import org.hibernate.type.Type;
 
 import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.DominiContrasenyaEntityImpl;
-import es.caib.seycon.ng.model.DominiUsuariEntityImpl;
-import es.caib.seycon.ng.model.PoliticaContrasenyaEntityImpl;
-import es.caib.seycon.ng.model.TipusUsuariEntityImpl;
 import es.caib.seycon.ng.model.UsuariEntityImpl;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.utils.Security;

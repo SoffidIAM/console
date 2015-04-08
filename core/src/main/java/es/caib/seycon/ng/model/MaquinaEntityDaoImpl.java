@@ -5,28 +5,23 @@
  */
 package es.caib.seycon.ng.model;
 
-import java.security.Principal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Maquina;
-import es.caib.seycon.ng.comu.OsType;
 import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
-import es.caib.seycon.ng.utils.*;
+import es.caib.seycon.ng.utils.ExceptionTranslator;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.model.MaquinaEntity

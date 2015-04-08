@@ -591,7 +591,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Grup handleFindGrupById(Long grupId) throws Exception {
-		GrupEntity grupEntity = getGrupEntityDao().findById(grupId);
+		GrupEntity grupEntity = getGrupEntityDao().load(grupId);
 		if (grupEntity != null) {
 			return getGrupEntityDao().toGrup(grupEntity);
 		}

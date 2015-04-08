@@ -98,7 +98,7 @@ public class AutoritzacioPUEGrupEntityDaoImpl
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.GRUP);
 		target.setIdEntitatAutoritzada(source.getIdGrup());
-		GrupEntity grup = getGrupEntityDao().findById(source.getIdGrup());
+		GrupEntity grup = getGrupEntityDao().load(source.getIdGrup());
 		target.setDescripcioEntitatAutoritzada(grup.getDescripcio()+" ["+grup.getCodi()+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 		target.setCodiEntitatAutoritzada(grup.getCodi());
 	}

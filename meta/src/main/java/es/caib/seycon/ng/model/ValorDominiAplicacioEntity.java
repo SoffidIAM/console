@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_VALOR_DOMINI", translatedName="DomainValueEntity", translatedPackage="com.soffid.iam.model"  )
@@ -27,29 +29,28 @@ public abstract class ValorDominiAplicacioEntity {
 	@Column (name="VDO_DESC", length=50, translated="description")
 	public java.lang.String descripcio;
 
-	@Operation(translated="findDomainValueAndDomainNameAndDomainRoleNameAndDomainValue")
-	@DaoFinder("select valorDominiAplicacio from \nes.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio \n"
-			+ "left join valorDominiAplicacio.domini domini\n"
-			+ "left join valorDominiAplicacio.domini.rols rol\n"
+	@Operation(translated="findByRoleAndValue")
+	@DaoFinder("select valorDominiAplicacio "
+			+ "from com.soffid.iam.model.DomainValueEntity valorDominiAplicacio \n"
+			+ "join valorDominiAplicacio.domain domini\n"
+			+ "join valorDominiAplicacio.domain.roles rol\n"
 			+ "where \n"
-				+ "domini.nom = :nomDomini and\n"
-				+ "rol.nom = :nomRol and \n"
-				+ "valorDominiAplicacio.valor = :valor")
+				+ "rol.id = :roleId and \n"
+				+ "valorDominiAplicacio.value = :value")
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity findValorDominiByNomDominiAndNomRolDominiAndValorDomini(
-		java.lang.String nomDomini, 
-		java.lang.String nomRol, 
-		java.lang.String valor) {
+		java.lang.Long roleId, 
+		java.lang.String value) {
 	 return null;
 	}
 	
-	@DaoFinder("select value from \n"
-			+ "es.caib.seycon.ng.model.ValorDominiAplicacioEntity as value \n"
-			+ "left join value.domini as domain\n"
-			+ "left join domain.aplicacio as app\n"
+	@DaoFinder("select value "
+			+ "from com.soffid.iam.model.DomainValueEntity as value \n"
+			+ "left join value.domain as domain\n"
+			+ "left join domain.informationSystem as app\n"
 			+ "where \n"
-				+ "app.codi = :app and\n"
-				+ "domain.nom = :domain and\n"
-				+ "value.valor = :value")
+				+ "app.name = :app and\n"
+				+ "domain.name = :domain and\n"
+				+ "value.value = :value")
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity findByApplicationDomainValue(
 		java.lang.String app, 
 		java.lang.String domain, 
@@ -57,15 +58,16 @@ public abstract class ValorDominiAplicacioEntity {
 	 return null;
 	}
 	
-	@DaoFinder("select valorDominiAplicacio\nfrom\nes.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio \nleft join valorDominiAplicacio.domini domini\nleft join valorDominiAplicacio.domini.rols rol\nwhere\ndomini.nom = :nomDomini and\nrol.nom = :nomRol")
-	public java.util.List<es.caib.seycon.ng.model.ValorDominiAplicacioEntity> findValorsDominisByNomDominiAndNomRolDomini(
-		java.lang.String nomDomini, 
-		java.lang.String nomRol) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.ValorDominiAplicacioEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+	@DaoFinder("select value "
+			+ "from com.soffid.iam.model.DomainValueEntity as value \n"
+			+ "left join value.domain as domain\n"
+			+ "left join domain.informationSystem as app\n"
+			+ "where \n"
+				+ "app.name = :informationSystem and\n"
+				+ "domain.name = :domain")
+	public List<ValorDominiAplicacioEntity> findByInformationSystem(
+		java.lang.String informationSystem, 
+		java.lang.String domain) {
 	 return null;
 	}
 }

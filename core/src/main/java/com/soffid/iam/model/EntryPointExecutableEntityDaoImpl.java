@@ -96,8 +96,8 @@ public class EntryPointExecutableEntityDaoImpl
 		// id, ambit y contingut ens vénen donats en la transformació
 		// Assignem tipus d'execució
 		if (source.getExecutionCode() != null) {
-			EntryPointExecutionTypeEntity tipusExe = getEntryPointExecutionTypeEntityDao().findByCode(source.getExecutionCode());
-			target.setCodiTipusExecucio(tipusExe.getCode());
+			EntryPointExecutionTypeEntity tipusExe = getEntryPointExecutionTypeEntityDao().findByName(source.getExecutionCode());
+			target.setCodiTipusExecucio(tipusExe.getName());
 			target.setTipusMimeExecucio(tipusExe.getMimeType());
 		}
 		else {

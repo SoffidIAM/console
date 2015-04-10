@@ -14,6 +14,7 @@ import es.caib.seycon.ng.model.*;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -22,6 +23,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -55,8 +57,8 @@ public class ApplicationDomainEntityDaoImpl extends
         try {
             super.create(dominiAplicacio);
             getSession(false).flush();
-            InformationSystemEntity aplicacioEntity = dominiAplicacio.getApplicationDomain();
-            auditarDominiAplicacio("C", dominiAplicacio.getName(), aplicacioEntity == null ? null : aplicacioEntity.getCode());
+            InformationSystemEntity aplicacioEntity = dominiAplicacio.getInformationSystem();
+            auditarDominiAplicacio("C", dominiAplicacio.getName(), aplicacioEntity == null ? null : aplicacioEntity.getName());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
@@ -67,8 +69,8 @@ public class ApplicationDomainEntityDaoImpl extends
     public void remove(com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio) throws RuntimeException {
         try {
             String nomDominiAplicacio = dominiAplicacio.getName();
-            InformationSystemEntity aplicacioEntity = dominiAplicacio.getApplicationDomain();
-            String codiAplicacio = aplicacioEntity == null ? null : aplicacioEntity.getCode();
+            InformationSystemEntity aplicacioEntity = dominiAplicacio.getInformationSystem();
+            String codiAplicacio = aplicacioEntity == null ? null : aplicacioEntity.getName();
             super.remove(dominiAplicacio);
             getSession(false).flush();
             auditarDominiAplicacio("D", nomDominiAplicacio, codiAplicacio); //$NON-NLS-1$
@@ -82,8 +84,8 @@ public class ApplicationDomainEntityDaoImpl extends
         try {
             super.update(dominiAplicacio);
             getSession(false).flush();
-            InformationSystemEntity aplicacioEntity = dominiAplicacio.getApplicationDomain();
-            auditarDominiAplicacio("U", dominiAplicacio.getName(), aplicacioEntity == null ? null : aplicacioEntity.getCode());
+            InformationSystemEntity aplicacioEntity = dominiAplicacio.getInformationSystem();
+            auditarDominiAplicacio("U", dominiAplicacio.getName(), aplicacioEntity == null ? null : aplicacioEntity.getName());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
@@ -98,9 +100,9 @@ public class ApplicationDomainEntityDaoImpl extends
 
     private void toDominiCustom(com.soffid.iam.model.ApplicationDomainEntity source, es.caib.seycon.ng.comu.Domini target) {
         target.setNom(source.getName());
-        InformationSystemEntity aplicacioEntity = source.getApplicationDomain();
+        InformationSystemEntity aplicacioEntity = source.getInformationSystem();
         if (aplicacioEntity != null) {
-            target.setCodiExtern(aplicacioEntity.getCode());
+            target.setCodiExtern(aplicacioEntity.getName());
         }
         target.setDescripcio(source.getDescription());
     }
@@ -153,7 +155,7 @@ public class ApplicationDomainEntityDaoImpl extends
             //throw new SeyconException("Aplicacio amb codi '" + codiExtern //$NON-NLS-1$
             //      + "' no trobada."); //$NON-NLS-1$
         }
-        target.setApplicationDomain(aplicacioEntity);
+        target.setInformationSystem(aplicacioEntity);
 
         target.setName(source.getNom());
 
@@ -186,7 +188,7 @@ public class ApplicationDomainEntityDaoImpl extends
      */
     public java.util.List find(
             final java.lang.String queryString,
-            final es.caib.seycon.ng.model.Parameter[] parameters) {
+            final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);

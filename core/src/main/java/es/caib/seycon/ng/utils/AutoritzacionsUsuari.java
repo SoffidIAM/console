@@ -24,7 +24,6 @@ import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.Messages;
 import es.caib.seycon.ng.servei.AccountService;
 import es.caib.seycon.ng.servei.InternalPasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
@@ -81,10 +80,10 @@ public class AutoritzacionsUsuari
 			return true;
 		if (!trobat)
 		{ // mirem grups secundaris
-			Collection grupsSecundaris = grupEntityDao.findGroupsFromUsersByUserCode(usuari.getCodi()); // GrupEntity
+			Collection grupsSecundaris = grupEntityDao.findGroupsByUser(usuari.getCodi()); // GrupEntity
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 GroupEntity grupS = (GroupEntity) itGS.next();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_CREATE + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_CREATE + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -130,10 +129,10 @@ public class AutoritzacionsUsuari
 		if (!trobat)
 		{ // mirem grups secundaris
 			// Retorna grupEntitys:
-			Collection grupsSecundaris = grupEntityDao.findGroupsFromUsersByUserCode(usuari.getCodi());
+			Collection grupsSecundaris = grupEntityDao.findGroupsByUser(usuari.getCodi());
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 GroupEntity grupS = (GroupEntity) itGS.next();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -155,10 +154,10 @@ public class AutoritzacionsUsuari
 		if (!trobat)
 		{ // mirem grups secundaris
 			// retorna grupEntity
-			Collection grupsSecundaris = grupEntityDao.findGroupsFromUsersByUserCode(usuari.getCodi());
+			Collection grupsSecundaris = grupEntityDao.findGroupsByUser(usuari.getCodi());
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 GroupEntity grupS = (GroupEntity) itGS.next();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_DELETE + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_DELETE + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -182,7 +181,7 @@ public class AutoritzacionsUsuari
 		if (Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + Security.AUTO_ALL))
 			return true;
 
-		if (userEntity.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + userEntity.getPrimaryGroup().getCode()))
+		if (userEntity.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + userEntity.getPrimaryGroup().getName()))
 			return true;
 
 		Collection grupsSecundaris = userEntity.getSecondaryGroups();
@@ -190,7 +189,7 @@ public class AutoritzacionsUsuari
 			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext(); ) {
             UserGroupEntity ug = (UserGroupEntity) itGS.next();
             GroupEntity grupS = ug.getGroup();
-            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + grupS.getCode())) return true;
+            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + grupS.getName())) return true;
         }
 		return false;
 	}
@@ -209,10 +208,10 @@ public class AutoritzacionsUsuari
 		if (!trobat)
 		{ // mirem grups secundaris
 			// retorna grupEntity
-			Collection grupsSecundaris = grupEntityDao.findGroupsFromUsersByUserCode(usuari.getCodi());
+			Collection grupsSecundaris = grupEntityDao.findGroupsByUser(usuari.getCodi());
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 GroupEntity grupS = (GroupEntity) itGS.next();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" + grupS.getName())) return true;
             }
 		}
 		return false;
@@ -254,18 +253,18 @@ public class AutoritzacionsUsuari
 
 		// GRUPS: si te un rol dels grups de l'usuari, pot veure TOTS els seus
 		// rols heretats
-		GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUserCode(codiUsuari);
+		GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUser(codiUsuari);
 		if (grupPrimari != null)
 		{
-			if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + grupPrimari.getCode()))
+			if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + grupPrimari.getName()))
 				return contenidorsRol;
 		}
 		// Grupos secundarios
 		// retorna grupentity
-		Collection grupsFromUsuaris = grupEntityDao.findGroupsFromUsersByUserCode(codiUsuari);
+		Collection grupsFromUsuaris = grupEntityDao.findGroupsByUser(codiUsuari);
 		for (Iterator it = grupsFromUsuaris.iterator(); it.hasNext(); ) {
             GroupEntity g = (GroupEntity) it.next();
-            if (g != null && Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + g.getCode())) return contenidorsRol;
+            if (g != null && Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + g.getName())) return contenidorsRol;
         }
 
 		// APLICACIONS: només els rols de les aplicacions on té l'autorització
@@ -313,10 +312,10 @@ public class AutoritzacionsUsuari
 		if (!trobat)
 		{ // mirem grups secundaris
 			// Retorna grupEntitys:
-			Collection grupsSecundaris = grupEntityDao.findGroupsFromUsersByUserCode(usuari.getCodi());
+			Collection grupsSecundaris = grupEntityDao.findGroupsByUser(usuari.getCodi());
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 GroupEntity grupS = (GroupEntity) itGS.next();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_SESSION_QUERY + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_SESSION_QUERY + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -344,7 +343,7 @@ public class AutoritzacionsUsuari
 			return true;
 
 		boolean trobat = false;
-		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + "/" + usuari.getPrimaryGroup().getCode())) //$NON-NLS-1$
+		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + "/" + usuari.getPrimaryGroup().getName())) //$NON-NLS-1$
 			return true;
 		if (!trobat)
 		{ // mirem grups secundaris
@@ -354,7 +353,7 @@ public class AutoritzacionsUsuari
 				for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 UserGroupEntity ug = (UserGroupEntity) itGS.next();
                 GroupEntity grupS = ug.getGroup();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -396,14 +395,14 @@ public class AutoritzacionsUsuari
 		if (canCreateAllUserGroup())
 			return true;
 
-		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + "/" + usuari.getPrimaryGroup().getCode()))
+		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + "/" + usuari.getPrimaryGroup().getName()))
 			return true;
 		Collection grupsSecundaris = usuari.getSecondaryGroups(); // UsuariGrupEntity
 		if (grupsSecundaris != null)
 			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext(); ) {
             UserGroupEntity usuGrupActual = (UserGroupEntity) itGS.next();
             GroupEntity grupS = usuGrupActual.getGroup();
-            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + "/" + grupS.getCode())) return true;
+            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + "/" + grupS.getName())) return true;
         }
 		return false;
 	}
@@ -426,14 +425,14 @@ public class AutoritzacionsUsuari
 		if (canDeleteAllUserGroup())
 			return true;
 
-		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + "/" + usuari.getPrimaryGroup().getCode()))
+		if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + "/" + usuari.getPrimaryGroup().getName()))
 			return true;
 		Collection grupsSecundaris = usuari.getSecondaryGroups(); // UsuariGrupEntity
 		if (grupsSecundaris != null)
 			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext(); ) {
             UserGroupEntity usuGrupActual = (UserGroupEntity) itGS.next();
             GroupEntity grupS = usuGrupActual.getGroup();
-            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + "/" + grupS.getCode())) return true;
+            if (grupS != null && Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + "/" + grupS.getName())) return true;
         }
 
 		return false;
@@ -465,14 +464,14 @@ public class AutoritzacionsUsuari
 		// Només ho comprovem si en té l'autorització
 		if (usuari != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE))
 		{
-			if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE + "/" + usuari.getPrimaryGroup().getCode())) //$NON-NLS-1$
+			if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE + "/" + usuari.getPrimaryGroup().getName())) //$NON-NLS-1$
 				return true;
 			Collection grupsSecundaris = usuari.getSecondaryGroups(); // UsuariGrupEntity
 			if (grupsSecundaris != null)
 				for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext(); ) {
                 UserGroupEntity usuGrupActual = (UserGroupEntity) itGS.next();
                 GroupEntity grupS = usuGrupActual.getGroup();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE + "/" + grupS.getCode())) return true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE + "/" + grupS.getName())) return true;
             }
 		}
 
@@ -483,7 +482,7 @@ public class AutoritzacionsUsuari
 		{
 			// Obtenim el nivell d'accés a la màquina servidora d'impressores
 			HostEntity serverImp = usuariImpressoraEntity.getPrinter().getServer();
-			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(serverImp.getName(), serverImp.getNetwork().getCode());
+			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(serverImp.getName(), serverImp.getNetwork().getName());
 
 			// Nivell mínim: suport
 			if (nivell >= XarxaServiceImpl.SUPORT)
@@ -522,7 +521,7 @@ public class AutoritzacionsUsuari
 			UserEntity usuari = usuariImpressoraEntity.getUser();
 			if (usuari != null)
 			{
-				if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE + "/" + usuari.getPrimaryGroup().getCode()))
+				if (usuari.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE + "/" + usuari.getPrimaryGroup().getName()))
 					return true;
 
 				Collection grupsSecundaris = usuari.getSecondaryGroups(); // UsuariGrupEntity
@@ -530,7 +529,7 @@ public class AutoritzacionsUsuari
 					for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext(); ) {
                     UserGroupEntity usuGrupActual = (UserGroupEntity) itGS.next();
                     GroupEntity grupS = usuGrupActual.getGroup();
-                    if (grupS != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE + "/" + grupS.getCode())) return true;
+                    if (grupS != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE + "/" + grupS.getName())) return true;
                 }
 			}
 		}
@@ -542,7 +541,7 @@ public class AutoritzacionsUsuari
 		{
 			// Obtenim el nivell d'accés a la màquina servidora d'impressores
 			HostEntity serverImp = usuariImpressoraEntity.getPrinter().getServer();
-			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(serverImp.getName(), serverImp.getNetwork().getCode());
+			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(serverImp.getName(), serverImp.getNetwork().getName());
 
 			// Nivell mínim: suport
 			if (nivell >= XarxaServiceImpl.SUPORT)
@@ -578,19 +577,19 @@ public class AutoritzacionsUsuari
 			return true;
 
 		// Grupo Primario
-		GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUserCode(codiUsuari);
+		GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUser(codiUsuari);
 		if (grupPrimari != null)
 		{
-			if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY + "/" + grupPrimari.getCode())) //$NON-NLS-1$
+			if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY + "/" + grupPrimari.getName())) //$NON-NLS-1$
 				return true;
 		}
 		// Grupos secundarios
 		// retorna grupentity
-		Collection grupsFromUsuaris = grupEntityDao.findGroupsFromUsersByUserCode(codiUsuari);
+		Collection grupsFromUsuaris = grupEntityDao.findGroupsByUser(codiUsuari);
 		if (grupsFromUsuaris != null)
 			for (Iterator it = grupsFromUsuaris.iterator(); it.hasNext(); ) {
             GroupEntity g = (GroupEntity) it.next();
-            if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY + "/" + g.getCode())) return true;
+            if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY + "/" + g.getName())) return true;
         }
 
 		return false;
@@ -739,7 +738,7 @@ public class AutoritzacionsUsuari
 			// filtrem
 			for (Iterator<GroupEntity> it = groupsEntity.iterator(); it.hasNext(); ) {
                 GroupEntity g = it.next();
-                if (g != null && Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" + g.getCode())) {
+                if (g != null && Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" + g.getName())) {
                     grupsPermis.add(g);
                 }
             }
@@ -1382,7 +1381,7 @@ public class AutoritzacionsUsuari
 		// Sinó filtrem per autorització d'aplicació
 		for (Iterator<InformationSystemEntity> it = aplicacionsEntity.iterator(); it.hasNext(); ) {
             InformationSystemEntity app = it.next();
-            if (app != null && Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + "/" + app.getCode())) {
+            if (app != null && Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + "/" + app.getName())) {
                 appsCanQuery.add(app);
             }
         }
@@ -1473,7 +1472,7 @@ public class AutoritzacionsUsuari
 			// application:query l'usuari
 			for (Iterator<RoleEntity> it = rolsEntity.iterator(); it.hasNext(); ) {
                 RoleEntity r = it.next();
-                if (r != null && r.getApplication() != null && (Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + "/" + r.getApplication().getCode()) || Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + r.getApplication().getCode()))) {
+                if (r != null && r.getInformationSystem() != null && (Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + "/" + r.getInformationSystem().getName()) || Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + r.getInformationSystem().getName()))) {
                     rolsPermis.add(r);
                 }
             }
@@ -1507,18 +1506,18 @@ public class AutoritzacionsUsuari
 		// Grupo Primario
 		if (rolAccount.getCodiUsuari() != null)
 		{
-			GroupEntity grupPrimari = getGrupEntityDao.findPrimaryGroupByUserCode(rolAccount.getCodiUsuari());
+			GroupEntity grupPrimari = getGrupEntityDao.findPrimaryGroupByUser(rolAccount.getCodiUsuari());
 			if (grupPrimari != null)
 			{
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" + grupPrimari.getCode()))
+				if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" + grupPrimari.getName()))
 					return true;
 			}
 			// Grupos secundarios
 			// retorna grupentity
-			List<GroupEntity> grupsFromUsuaris = getGrupEntityDao.findGroupsFromUsersByUserCode(rolAccount.getCodiUsuari());
+			List<GroupEntity> grupsFromUsuaris = getGrupEntityDao.findGroupsByUser(rolAccount.getCodiUsuari());
 			for (Iterator<GroupEntity> it = grupsFromUsuaris.iterator(); it.hasNext(); ) {
                 GroupEntity g = (GroupEntity) it.next();
-                if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" + g.getCode())) return true;
+                if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" + g.getName())) return true;
             }
 		}
 
@@ -1542,17 +1541,17 @@ public class AutoritzacionsUsuari
 		// Grupo Primario
 		if (rolsUsuaris.getCodiUsuari() != null)
 		{
-			GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUserCode(rolsUsuaris.getCodiUsuari());
+			GroupEntity grupPrimari = grupEntityDao.findPrimaryGroupByUser(rolsUsuaris.getCodiUsuari());
 			if (grupPrimari != null)
 			{
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" + grupPrimari.getCode()))
+				if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" + grupPrimari.getName()))
 					return true;
 			}
 			// Grupos secundarios
-			List<GroupEntity> grupsFromUsuaris = grupEntityDao.findGroupsFromUsersByUserCode(rolsUsuaris.getCodiUsuari());
+			List<GroupEntity> grupsFromUsuaris = grupEntityDao.findGroupsByUser(rolsUsuaris.getCodiUsuari());
 			for (Iterator<GroupEntity> it = grupsFromUsuaris.iterator(); it.hasNext(); ) {
                 GroupEntity g = it.next();
-                if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" + g.getCode())) return true;
+                if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" + g.getName())) return true;
             }
 		}
 
@@ -1582,20 +1581,20 @@ public class AutoritzacionsUsuari
                 RoleAccountEntity rue = rit.next();
                 AccountEntity account = rue.getAccount();
                 boolean tienePermisoGrupoUsuario = false;
-                if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + rue.getRole().getApplication().getCode())) {
+                if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + rue.getRole().getInformationSystem().getName())) {
                     rolsPermis.add(rue);
                 } else {
                     for (UserAccountEntity ua : account.getUsers()) {
                         UserEntity usuari = ua.getUser();
                         GroupEntity grupPrimari = usuari.getPrimaryGroup();
                         if (grupPrimari != null) {
-                            if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + grupPrimari.getCode())) tienePermisoGrupoUsuario = true;
+                            if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + grupPrimari.getName())) tienePermisoGrupoUsuario = true;
                         }
                         if (!tienePermisoGrupoUsuario) {
                             Collection grupsFromUsuaris = usuari.getSecondaryGroups();
                             for (Iterator it = grupsFromUsuaris.iterator(); !tienePermisoGrupoUsuario && it.hasNext(); ) {
                                 UserGroupEntity g = (UserGroupEntity) it.next();
-                                if (g != null && Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + g.getGroup().getCode())) tienePermisoGrupoUsuario = true;
+                                if (g != null && Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" + g.getGroup().getName())) tienePermisoGrupoUsuario = true;
                             }
                         }
                         if (tienePermisoGrupoUsuario) {
@@ -1631,7 +1630,7 @@ public class AutoritzacionsUsuari
 		Collection<GroupEntity> grupsCanQuery = new ArrayList<GroupEntity>();
 		for (Iterator<GroupEntity> it = grupsEntity.iterator(); it.hasNext(); ) {
             GroupEntity grup = it.next();
-            if (grup != null && Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" + grup.getCode())) {
+            if (grup != null && Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" + grup.getName())) {
                 grupsCanQuery.add(grup);
             }
         }
@@ -1693,7 +1692,7 @@ public class AutoritzacionsUsuari
 		if (Security.isUserInRole(Security.AUTO_USER_QUERY + Security.AUTO_ALL))
 			return true;
 
-		if (user.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_QUERY + "/" + user.getPrimaryGroup().getCode()))
+		if (user.getPrimaryGroup() != null && Security.isUserInRole(Security.AUTO_USER_QUERY + "/" + user.getPrimaryGroup().getName()))
 			trobat = true;
 		if (!trobat)
 		{ // mirem grups secundaris
@@ -1701,7 +1700,7 @@ public class AutoritzacionsUsuari
 			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext(); ) {
                 UserGroupEntity usuGrupActual = (UserGroupEntity) itGS.next();
                 GroupEntity grupS = usuGrupActual.getGroup();
-                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_QUERY + "/" + grupS.getCode())) trobat = true;
+                if (grupS != null && Security.isUserInRole(Security.AUTO_USER_QUERY + "/" + grupS.getName())) trobat = true;
             }
 		}
 		return trobat;

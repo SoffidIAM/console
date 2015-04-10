@@ -38,7 +38,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
             tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
             tasque.setAlias(correuExtern.getMailList().getName());
             if (correuExtern.getMailList().getDomain() != null)
-                tasque.setMailDomain(correuExtern.getMailList().getDomain().getCode());
+                tasque.setMailDomain(correuExtern.getMailList().getDomain().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
         } catch (Throwable e) {
@@ -56,7 +56,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
             tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
             tasque.setAlias(correuExtern.getMailList().getName());
             if (correuExtern.getMailList().getDomain() != null)
-                tasque.setMailDomain(correuExtern.getMailList().getDomain().getCode());
+                tasque.setMailDomain(correuExtern.getMailList().getDomain().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
         } catch (Throwable e) {
@@ -77,7 +77,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
             targetVO.setLlistaCorreuNom(llistaCorreu.getName());
             EmailDomainEntity dominiCorreu = llistaCorreu.getDomain();
             if (dominiCorreu != null) {
-                targetVO.setCodiDomini(dominiCorreu.getCode());
+                targetVO.setCodiDomini(dominiCorreu.getName());
             }
         }
     }
@@ -120,7 +120,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
         String nomLlistaCorreu = sourceVO.getLlistaCorreuNom();
         String codiDomini = sourceVO.getCodiDomini();
         if (nomLlistaCorreu != null && nomLlistaCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
-            EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+            EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
             if (llistaCorreuEntity != null) {
                 targetEntity.setMailList(llistaCorreuEntity);
             } else {

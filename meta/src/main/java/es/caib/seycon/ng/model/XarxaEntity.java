@@ -20,7 +20,7 @@ public abstract class XarxaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="XAR_CODI", length=10, translated="code")
+	@Column (name="XAR_CODI", length=10, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="XAR_ADRIP", length=25, translated="address")
@@ -50,10 +50,10 @@ public abstract class XarxaEntity {
 	@Column (name="XAR_DHCPSUP")
 	public boolean dchpSupport;
 
-	@Operation (translated="findByCode")
+	@Operation (translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findByFilter")
@@ -63,35 +63,30 @@ public abstract class XarxaEntity {
 	 return null;
 	}
 	@Operation(translated="getFirstFreeIP")
-	@DaoFinder
+	@DaoFinder("- CUSTOM -")
 	public java.lang.String getPrimeraIPLliure(
 		java.lang.String ipXarxa, 
 		java.lang.String mascara) {
 	 return null;
 	}
 	@Operation(translated="getVoidIPs")
-	@DaoFinder
+	@DaoFinder("- CUSTOM -")
 	public java.lang.Long getIPsBuides(
 		java.lang.String ipXarxa, 
 		java.lang.String mascara) {
 	 return null;
 	}
 	@Operation(translated="getUsedIPs")
-	@DaoFinder
+	@DaoFinder("- CUSTOM -")
 	public java.lang.Long getIPsOcupades(
 		java.lang.String ipXarxa, 
 		java.lang.String mascara) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.XarxaEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
 	@Operation(translated="findByAddress")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByAdreca(
-		java.lang.String adreca) {
+		java.lang.String address) {
 	 return null;
 	}
 }

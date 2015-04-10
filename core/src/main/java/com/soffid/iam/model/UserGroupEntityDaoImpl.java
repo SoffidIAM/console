@@ -66,7 +66,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         try {
 
             if (usuariGrup.getGroup().getObsolete() != null && usuariGrup.getGroup().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
-                throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.0"), usuariGrup.getGroup().getCode()));
+                throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.0"), usuariGrup.getGroup().getName()));
             }
             if (usuariGrup.getUser().getUserName().equals(Security.getCurrentUser())) {
                 throw new SeyconException(Messages.getString("UserGroupEntityDaoImpl.1")); //$NON-NLS-1$
@@ -83,7 +83,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-            tasque.setGroup(usuariGrup.getGroup().getCode());
+            tasque.setGroup(usuariGrup.getGroup().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
 
@@ -98,10 +98,10 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             propagarRolsAtorgatsGrups(rolsAPropagar);
 
             getSession(false).flush();
-            auditarUsuariGrup("U", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getCode()); //$NON-NLS-1$
+            auditarUsuariGrup("U", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
         }
     }
 
@@ -109,7 +109,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         try {
 
             if (usuariGrup.getGroup().getObsolete() != null && usuariGrup.getGroup().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
-                throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.3"), usuariGrup.getGroup().getCode())); //$NON-NLS-1$
+                throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.3"), usuariGrup.getGroup().getName())); //$NON-NLS-1$
             }
 
             if (usuariGrup.getUser().getUserName().equals(Security.getCurrentUser())) {
@@ -137,13 +137,13 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-            tasque.setGroup(usuariGrup.getGroup().getCode());
+            tasque.setGroup(usuariGrup.getGroup().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
-            auditarUsuariGrup("C", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getCode()); //$NON-NLS-1$
+            auditarUsuariGrup("C", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
         }
     }
 
@@ -171,7 +171,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             }
 
             String codiUsuari = usuariGrup.getUser().getUserName();
-            String codiGrup = usuariGrup.getGroup().getCode();
+            String codiGrup = usuariGrup.getGroup().getName();
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_USER);
@@ -180,7 +180,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-            tasque.setGroup(usuariGrup.getGroup().getCode());
+            tasque.setGroup(usuariGrup.getGroup().getName());
             getTaskEntityDao().create(tasque);
 
             // Herencia de Roles: propagamos los roles heredados por el grupo (y
@@ -196,7 +196,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("D", codiUsuari, codiGrup); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
         }
     }
 
@@ -212,7 +212,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param targetVO
      */
     private void toUsuariGrupCustom(com.soffid.iam.model.UserGroupEntity sourceEntity, es.caib.seycon.ng.comu.UsuariGrup targetVO) {
-        targetVO.setCodiGrup(sourceEntity.getGroup().getCode());
+        targetVO.setCodiGrup(sourceEntity.getGroup().getName());
         targetVO.setCodiUsuari(sourceEntity.getUser().getUserName());
         targetVO.setDescripcioGrup(sourceEntity.getGroup().getDescription());
         UserEntity user = sourceEntity.getUser();
@@ -265,13 +265,13 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param targetEntity
      */
     private void usuariGrupToEntityCustom(es.caib.seycon.ng.comu.UsuariGrup sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity) {
-        UserEntity usuari = getUserEntityDao().findByCode(sourceVO.getCodiUsuari());
+        UserEntity usuari = getUserEntityDao().findByUserName(sourceVO.getCodiUsuari());
         if (usuari == null) {
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.8"), //$NON-NLS-1$
                     sourceVO.getCodiUsuari()));
         }
         targetEntity.setUser(usuari);
-        GroupEntity grup = getGroupEntityDao().findByCode(sourceVO.getCodiGrup());
+        GroupEntity grup = getGroupEntityDao().findByName(sourceVO.getCodiGrup());
         if (grup == null) {
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.9"), //$NON-NLS-1$
                     sourceVO.getCodiGrup()));
@@ -316,12 +316,12 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         rolsAnalitzar.add(rol);
         RoleEntity rolActual = null;
         while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-            Collection socContenidor = rolActual.getRolAssociationContainer();
+            Collection socContenidor = rolActual.getContainedRole();
 
             if (socContenidor != null)
                 for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContingut = associacio.getRoleContent();
+                RoleEntity rolContingut = associacio.getContained();
                 rolsPropagar.add(rolContingut);
                 rolsAnalitzar.add(rolContingut);
             }
@@ -382,7 +382,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
                     updateRole.setDataTasca(Calendar.getInstance());
                     updateRole.setStatus("P");
                     updateRole.setRole(role.getName());
-                    updateRole.setBd(role.getDatabases().getCode());
+                    updateRole.setBd(role.getSystem().getName());
                     TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
                 }

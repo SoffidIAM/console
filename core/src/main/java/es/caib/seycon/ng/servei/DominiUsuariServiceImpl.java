@@ -181,8 +181,8 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 		if (altres != null)
 			for (Iterator<PasswordPolicyEntity> it = altres.iterator(); it.hasNext(); ) {
             PasswordPolicyEntity pcd = it.next();
-            if (pcd.getUserDomainType() != null && pcd.getUserDomainType().getCode().equals(politicaContrasenyaDomini.getTipusUsuari())) {
-                UserTypeEntity tipusu = getUserTypeEntityDao().findByCode(politicaContrasenyaDomini.getTipusUsuari());
+            if (pcd.getUserType() != null && pcd.getUserType().getName().equals(politicaContrasenyaDomini.getTipusUsuari())) {
+                UserTypeEntity tipusu = getUserTypeEntityDao().findByName(politicaContrasenyaDomini.getTipusUsuari());
                 throw new Exception(String.format(Messages.getString("DominiUsuariServiceImpl.6"), tipusu.getDescription(), politicaContrasenyaDomini.getCodiDominiContrasenya()));
             }
         }
@@ -433,7 +433,7 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 
 	@Override
 	protected DominiUsuari handleFindDominiUsuariByCodi(String codiDominiUsuari) throws Exception {
-		UserDomainEntity d = getUserDomainEntityDao().findByCode(codiDominiUsuari);
+		UserDomainEntity d = getUserDomainEntityDao().findByName(codiDominiUsuari);
 		if (d == null)
 			return null;
 		else
@@ -454,7 +454,7 @@ public class DominiUsuariServiceImpl extends es.caib.seycon.ng.servei.DominiUsua
 	protected DominiContrasenya handleFindDominiContrasenyaByCodi(String codi)
 			throws Exception
 	{
-		PasswordDomainEntity dce = getPasswordDomainEntityDao().findByCode(codi);
+		PasswordDomainEntity dce = getPasswordDomainEntityDao().findByName(codi);
 		if (dce == null)
 			return null;
 		else

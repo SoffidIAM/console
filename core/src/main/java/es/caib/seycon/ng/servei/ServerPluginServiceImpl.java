@@ -29,7 +29,7 @@ import es.caib.seycon.ng.comu.ServerPlugin;
 import es.caib.seycon.ng.comu.ServerPluginModule;
 import es.caib.seycon.ng.comu.ServerPluginModuleType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.servei.impl.InternalAgentDescriptor;
 import es.caib.seycon.ng.servei.impl.InternalObjectMapping;
 import es.caib.seycon.ng.servei.impl.InternalServerPluginModule;

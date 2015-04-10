@@ -15,14 +15,18 @@ import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.TaskEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Xarxa;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.IPAddress;
+import es.caib.seycon.ng.utils.InvalidIPException;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,30 +65,30 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_NETWORKS);
-            tasque.setSubnet(xarxa.getCode());
+            tasque.setSubnet(xarxa.getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
-            auditarXarxa("C", xarxa.getCode()); //$NON-NLS-1$
+            auditarXarxa("C", xarxa.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.0"), xarxa.getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.0"), xarxa.getName(), message));
         }
     }
 
     public void remove(com.soffid.iam.model.NetworkEntity xarxa) throws RuntimeException {
         try {
-            String codiXarxa = xarxa.getCode();
+            String codiXarxa = xarxa.getName();
             super.remove(xarxa);
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_NETWORKS);
-            tasque.setSubnet(xarxa.getCode());
+            tasque.setSubnet(xarxa.getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
             auditarXarxa("D", codiXarxa); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.1"), xarxa.getCode(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.1"), xarxa.getName(), message)); //$NON-NLS-1$
         }
     }
 
@@ -94,13 +98,13 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_NETWORKS);
-            tasque.setSubnet(xarxa.getCode());
+            tasque.setSubnet(xarxa.getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
-            auditarXarxa("U", xarxa.getCode()); //$NON-NLS-1$
+            auditarXarxa("U", xarxa.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.2"), xarxa.getCode(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.2"), xarxa.getName(), message)); //$NON-NLS-1$
         }
     }
 
@@ -332,50 +336,31 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         ResultSet rset = null;
         Connection conn = null;
         long contador = 0;
-        try {
-            // Prepara el cursor
-            conn = super.getSession(false).connection();
-            stmt = conn.prepareStatement("SELECT 1 FROM SC_MAQUIN WHERE MAQ_ADRIP=?"); //$NON-NLS-1$
-            // Prepara las IPs de la red y del host
-            IPAddress ip = new IPAddress(ipXarxa, netmask);
-            IPAddress ip2 = new IPAddress(ipXarxa);
-            ip2.incrementa();
-            // Prueba cada una de las redes
-            while (ip.esHostValid(ip2)) {
-                stmt.setString(1, ip2.toString());
-                rset = stmt.executeQuery();
-                if (rset.next()) {
-                    if (!buides)
-                        contador++;
-                } else {
-                    if (buides)
-                        contador++;
-                }
-                rset.close();
-                rset = null;
-                ip2.incrementa();
-            }
-            return new Long(contador);
-        } catch (Exception e) {
-            throw new SeyconException(e.toString());
-        } finally {
-            if (rset != null)
-                try {
-                    rset.close();
-                } catch (SQLException e2) {
-                }
-            if (stmt != null)
-                try {
-                    stmt.close();
-                } catch (SQLException e2) {
-                }
-            if (conn != null)
-                try {
-                    conn.close();
-                } catch (SQLException e2) {
-                    e2.printStackTrace();
-                }
-        }
+        // Prepara el cursor
+        // Prepara las IPs de la red y del host
+        try 
+        {
+	        IPAddress ip = new IPAddress(ipXarxa, netmask);
+	        IPAddress ip2 = new IPAddress(ipXarxa);
+	        ip2.incrementa();
+	        // Prueba cada una de las redes
+	        while (ip.esHostValid(ip2)) {
+	        	if ( getHostEntityDao().findByIP(ip2.toString()) == null)
+	        	{
+	                if (buides)
+	                    contador++;
+	        	}
+	        	else
+	        	{
+	                if (!buides)
+	                    contador++;
+	        	}
+	            ip2.incrementa();
+	        }
+	        return new Long(contador);
+		} catch (InvalidIPException e) {
+			throw new RuntimeException("Invalid IP", e);
+		}
     }
 
     /**
@@ -412,7 +397,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
     }
 
     public java.util.List find(final java.lang.String queryString,
-            final es.caib.seycon.ng.model.Parameter[] parameters) {
+            final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this, queryString, parameters);
             return results;

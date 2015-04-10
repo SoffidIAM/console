@@ -34,16 +34,16 @@ public class RoleDependencyEntityImpl
      */
 	public java.lang.String toString() {
 		StringBuffer b = new StringBuffer();
-		b.append(getRoleContainer().toString());
-		String tipusDomini = getRoleContainer().getDomainType();
+		b.append(getContainer().toString());
+		String tipusDomini = getContainer().getDomainType();
 		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
 			GroupEntity grup = getGranteeGroupDomain();
 			if (grup != null)
-				b.append(" / ").append(grup.getCode());
+				b.append(" / ").append(grup.getName());
 		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
 			InformationSystemEntity app = getGranteeApplicationDomain();
 			if (app != null)
-				b.append(" / ").append(app.getCode());
+				b.append(" / ").append(app.getName());
 		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
 			DomainValueEntity vd = getGranteeDomainValue();
 			if (vd != null)
@@ -51,17 +51,17 @@ public class RoleDependencyEntityImpl
 		}
 
 		b.append (" => ");
-		b.append(getRoleContent().toString());
+		b.append(getContained().toString());
 
-		tipusDomini = getRoleContainer().getDomainType();
+		tipusDomini = getContainer().getDomainType();
 		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
 			GroupEntity grup = getDomainGroup();
 			if (grup != null)
-				b.append(" / ").append(grup.getCode());
+				b.append(" / ").append(grup.getName());
 		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
 			InformationSystemEntity app = getDomainApplication();
 			if (app != null)
-				b.append(" / ").append(app.getCode());
+				b.append(" / ").append(app.getName());
 		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
 			DomainValueEntity vd = getDomainApplicationValue();
 			if (vd != null)
@@ -80,9 +80,9 @@ public class RoleDependencyEntityImpl
 			RoleDependencyEntity rare = (RoleDependencyEntity) object;
 			
 			// Comparamos roles
-			if (getRoleContainer() != null && (rare.getRoleContainer() == null) || !getRoleContainer().getId().equals(rare.getRoleContainer().getId()))
+			if (getContainer() != null && (rare.getContainer() == null) || !getContainer().getId().equals(rare.getContainer().getId()))
 				return false;
-			if (getRoleContent() != null && ((rare.getRoleContent() == null) || !getRoleContent().getId().equals(rare.getRoleContent().getId())))
+			if (getContained() != null && ((rare.getContained() == null) || !getContained().getId().equals(rare.getContained().getId())))
 				return false;
 			
 			// Caso sense valor de domini (el grup, aplicacio, valor_domini_app será nulo )

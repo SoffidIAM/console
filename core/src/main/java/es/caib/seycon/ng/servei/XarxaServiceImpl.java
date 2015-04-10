@@ -25,6 +25,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
+
 import es.caib.seycon.ng.comu.AliasMaquina;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -39,16 +40,18 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.Sessio;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.Xarxa;
+import es.caib.seycon.ng.comu.XarxaSearchCriteria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownHostException;
 import es.caib.seycon.ng.exception.UnknownNetworkException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TimedOutException;
 import es.caib.seycon.util.TimedProcess;
+
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -64,6 +67,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 
@@ -162,14 +166,12 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             throws java.lang.Exception {
         // network:create [SENSE_DOMINI]
         if (AutoritzacionsUsuari.canCreateAllNetworks()) {
-        	Parameter parameters[] = new Parameter[]{new Parameter("code", xarxa.getCodi())}; //$NON-NLS-1$
-        	Parameter param[] = new Parameter[]{new Parameter("adrip", xarxa.getAdreca())}; //$NON-NLS-1$
-    		Collection networksSameCode = getNetworkEntityDao().query("select codi from es.caib.seycon.ng.model.XarxaEntity where codi=:code", parameters); //$NON-NLS-1$
-    		if(networksSameCode != null && !networksSameCode.isEmpty())
+        	NetworkEntity sameName = getNetworkEntityDao().findByName(xarxa.getCodi());
+    		if(sameName != null )
     			throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.CodeNetworkExists"),  //$NON-NLS-1$
-    							xarxa.getCodi())); 
-    		networksSameCode = getNetworkEntityDao().query("select adreca from es.caib.seycon.ng.model.XarxaEntity where adreca=:adrip", param); //$NON-NLS-1$
-    		if(networksSameCode != null && !networksSameCode.isEmpty())
+    							xarxa.getCodi()));
+    		NetworkEntity sameIp = getNetworkEntityDao().findByAddress(xarxa.getAdreca());
+    		if(sameIp != null)
     			throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IpNetworkExists"),  //$NON-NLS-1$
     							xarxa.getAdreca())); 
             NetworkEntity entity = getNetworkEntityDao().xarxaToEntity(xarxa);
@@ -223,7 +225,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                                                          */) {
         	NetworkEntity xarxaEntity = getNetworkEntityDao().xarxaToEntity(xarxa);
         	if(!xarxaEntity.getHosts().isEmpty() || xarxaEntity.getAuthorizations().isEmpty())
-        		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"), new Object[]{xarxaEntity.getCode()}));
+        		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"), new Object[]{xarxaEntity.getName()}));
             getNetworkEntityDao().remove(xarxaEntity);
         } else {
             throw new SeyconException(Messages.getString("XarxaServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$
@@ -274,7 +276,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
      * @see es.caib.seycon.ng.servei.XarxaService#findXarxaByCodi(String)
      */
     protected Xarxa handleFindXarxaByCodi(String codi) throws java.lang.Exception {
-        NetworkEntity xarxaEntity = getNetworkEntityDao().findByCode(codi);
+        NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codi);
         if (xarxaEntity != null) {
             Xarxa xarxa = getNetworkEntityDao().toXarxa(xarxaEntity);
             // if (teAccesLecturaXarxa(xarxa)) {
@@ -362,7 +364,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     		csc.setMaximumResultSize(1);
     		
     		// Check access logs
-        	if (getAccessLogEntityDao().query("from es.caib.seycon.ng.model.RegistreAccesEntity rac where rac.servidor.id=:id or rac.client.id=:id", new Parameter[]{new Parameter("id", maquina.getId())}, csc).isEmpty())
+        	if (getAccessLogEntityDao().findByHostId(csc, maquina.getId()).isEmpty())
         	{
         		// Check associated printers
         		if (getImpressoraService().findImpressoresByCriteri(null, null,
@@ -517,12 +519,12 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         LinkedList<Parameter> params = new LinkedList<Parameter>();
         // Realizamos la siguiente consulta (sin tener cuenta el alias)
         String query = "select distinct maquina from " //$NON-NLS-1$
-                + " es.caib.seycon.ng.model.SessioEntity sessio " //$NON-NLS-1$
-                + " right outer join sessio.maquina as maquina " //$NON-NLS-1$
-                + " left outer join sessio.usuari as usuari" + //$NON-NLS-1$
+                + " com.soffid.iam.model.SessionEntity sessio " //$NON-NLS-1$
+                + " right outer join session.host as maquina " //$NON-NLS-1$
+                + " left outer join sessio.user as usuari" + //$NON-NLS-1$
                 " where maquina.deleted = false "; //$NON-NLS-1$
         if (nom != null ) {
-            query = query + "and maquina.nom like :nom "; //$NON-NLS-1$
+            query = query + "and maquina.name like :nom "; //$NON-NLS-1$
             params.add(new Parameter("nom", nom)); //$NON-NLS-1$
         }
         if (sistemaOperatiu != null) {
@@ -533,7 +535,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             params.add(new Parameter("operatingSystem", sistemaOperatiu)); //$NON-NLS-1$
         }
         if (adreca != null) {
-            query = query + "and maquina.adreca like :adreca "; //$NON-NLS-1$
+            query = query + "and maquina.adress like :adreca "; //$NON-NLS-1$
             params.add(new Parameter("adreca", adreca)); //$NON-NLS-1$
         }
         if (dhcp != null) {
@@ -541,11 +543,11 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             params.add(new Parameter("adreca", adreca)); //$NON-NLS-1$
         }
         if (correu != null) {
-            query = query + "and maquina.correu like :correu "; //$NON-NLS-1$
+            query = query + "and maquina.mail like :correu "; //$NON-NLS-1$
             params.add(new Parameter("correu", correu)); //$NON-NLS-1$
         }
         if (ofimatica != null) {
-            query = query + "and maquina.ofimatica like :ofimatica) "; //$NON-NLS-1$
+            query = query + "and maquina.folders like :ofimatica) "; //$NON-NLS-1$
             params.add(new Parameter("ofimatica", ofimatica)); //$NON-NLS-1$
         }
         if (mac != null) {
@@ -553,18 +555,18 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             params.add(new Parameter("mac", mac)); //$NON-NLS-1$
         }
         if (descripcio != null) {
-            query = query + "and maquina.descripcio like :descripcio "; //$NON-NLS-1$
+            query = query + "and maquina.description like :descripcio "; //$NON-NLS-1$
             params.add(new Parameter("descripcio", descripcio)); //$NON-NLS-1$
         }
         if (xarxa != null) {
-            query = query + "and maquina.xarxa.codi like :xarxa "; //$NON-NLS-1$
+            query = query + "and maquina.network.name like :xarxa "; //$NON-NLS-1$
             params.add(new Parameter("xarxa", xarxa)); //$NON-NLS-1$
         }
         if (codiUsuari != null) {
-            query = query + "and usuari.codi like :codiUsuari "; //$NON-NLS-1$
+            query = query + "and usuari.userName like :codiUsuari "; //$NON-NLS-1$
             params.add(new Parameter("codiUsuari", codiUsuari)); //$NON-NLS-1$
         }
-        query = query + "order by maquina.nom "; //$NON-NLS-1$
+        query = query + "order by maquina.name "; //$NON-NLS-1$
 
         maquines = getHostEntityDao().query(query, params.toArray(new Parameter[0]));
 
@@ -640,7 +642,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             if(identity.getCodiIdentitat() != null && !identity.getCodiIdentitat().isEmpty())
             	getNetworkAuthorizationEntityDao().create(entity);
             else
-            	throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IdentityValidation"), entity.getNetwork().getCode())); //$NON-NLS-1$
+            	throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IdentityValidation"), entity.getNetwork().getName())); //$NON-NLS-1$
             return getNetworkAuthorizationEntityDao().toNetworkAuthorization(entity);
         }
         throw new SeyconException(Messages.getString("XarxaServiceImpl.NotAuthorizedAdminNet")); //$NON-NLS-1$
@@ -715,7 +717,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 return null;
             }
 
-            UserEntity usuari = getUserEntityDao().findByCode(codi);
+            UserEntity usuari = getUserEntityDao().findByUserName(codi);
             if (usuari != null) {
                 Identitat identitat = getUserEntityDao().toIdentitat(usuari);
                 return identitat;
@@ -724,13 +726,13 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             RoleEntity rol = null;
             String[] partsCodi = codi.split("@"); //$NON-NLS-1$
             String[] partsCodi2 = partsCodi[1].split(">"); //$NON-NLS-1$
-            rol = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(partsCodi[0], partsCodi2[1], partsCodi2[0]);
+            rol = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(partsCodi[0], partsCodi2[1], partsCodi2[0]);
             if (rol != null) {
                 Identitat identitat = getRoleEntityDao().toIdentitat(rol);
                 return identitat;
             }
 
-            GroupEntity grup = getGroupEntityDao().findByCode(codi);
+            GroupEntity grup = getGroupEntityDao().findByName(codi);
             if (grup != null) {
                 Identitat identitat = getGroupEntityDao().toIdentitat(grup);
                 return identitat;
@@ -747,7 +749,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         if (AutoritzacionsUsuari.canQueryAllNetworks()
                 || AutoritzacionsUsuari.canCreateAllNetworks()
                 || AutoritzacionsUsuari.canUpdateAllNetworks()) {
-            NetworkAuthorizationEntity xarxaACEntity = getNetworkAuthorizationEntityDao().findByNetworkCodeAndIdentityCode(codiXarxa, codiIdentitat);
+            NetworkAuthorizationEntity xarxaACEntity = getNetworkAuthorizationEntityDao().findByNetworkAndIdentity(codiXarxa, codiIdentitat);
             if (xarxaACEntity != null) {
                 NetworkAuthorization networkAuthorization = getNetworkAuthorizationEntityDao().toNetworkAuthorization(xarxaACEntity);
                 return networkAuthorization;
@@ -765,7 +767,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
      */
     protected Collection<NetworkAuthorization> handleFindNetworkAuthorizationsByCodiGrup(
             String codiGrup) throws Exception {
-        Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByGroupCode(codiGrup);
+        Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByGroupName(codiGrup);
         if (xarxesAC != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxesAC);
         }
@@ -777,7 +779,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             String codiUsuari) throws Exception {
         Collection<NetworkAuthorization> xarxes = new LinkedList();
         // acces list per codi d'usuari
-        UserEntity usuariEntity = getUserEntityDao().findByCode(codiUsuari);
+        UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
         if (usuariEntity != null) {
             Collection<NetworkAuthorization> networkAuthorizations = findNetworkAuthorizationsByCodiUsuari(codiUsuari);
             Iterator iterator = networkAuthorizations.iterator();
@@ -825,7 +827,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
      */
     protected Collection<NetworkAuthorization> handleFindNetworkAuthorizationsByCodiUsuari(
             String codiUsuari) throws Exception {
-        Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByUserCode(codiUsuari);
+        Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByUserName(codiUsuari);
         if (xarxesAC != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxesAC);
         }
@@ -848,7 +850,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     }
 
     protected String handleGetPrimeraIPLliure(String codiXarxa) throws Exception {
-        NetworkEntity xarxa = getNetworkEntityDao().findByCode(codiXarxa);
+        NetworkEntity xarxa = getNetworkEntityDao().findByName(codiXarxa);
         if (xarxa != null) {
             String ipLliure = getNetworkEntityDao().getFirstFreeIP(xarxa.getAddress(), xarxa.getMask());
             return ipLliure;
@@ -857,7 +859,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     }
 
     protected Long handleGetIPsOcupades(String codiXarxa) throws Exception {
-        NetworkEntity xarxaEntity = getNetworkEntityDao().findByCode(codiXarxa);
+        NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
         if (xarxaEntity != null) {
             Xarxa xarxa = getNetworkEntityDao().toXarxa(xarxaEntity);
             if (teAccesLecturaXarxa(xarxa)) {
@@ -871,7 +873,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     }
 
     protected Long handleGetIPsBuides(String codiXarxa) throws Exception {
-        NetworkEntity xarxaEntity = getNetworkEntityDao().findByCode(codiXarxa);
+        NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
         if (xarxaEntity != null) {
             Xarxa xarxa = getNetworkEntityDao().toXarxa(xarxaEntity);
             if (teAccesLecturaXarxa(xarxa)) {
@@ -893,12 +895,11 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     }
 
     protected Maquina handleFindMaquinaByIp(String ip) throws Exception {
-        Collection coll = getHostEntityDao().query("select maquina from es.caib.seycon.ng.model.MaquinaEntity as maquina where maquina.adreca=:adreca", new Parameter[]{new Parameter("adreca", ip)}); //$NON-NLS-1$
-        if (coll == null || coll.size() == 0)
+        HostEntity host = getHostEntityDao().findByIP(ip);
+        if (host == null)
             return null;
         else {
-            HostEntity maq = (HostEntity) coll.iterator().next();
-            return getHostEntityDao().toMaquina(maq);
+            return getHostEntityDao().toMaquina(host);
         }
     }
 
@@ -1173,7 +1174,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         // la lista
         // acces list per codi d'usuari
         com.soffid.iam.model.UserEntityDao usuariEntityDao = getUserEntityDao();
-        UserEntity usuariEntity = usuariEntityDao.findByCode(codiUsuari);
+        UserEntity usuariEntity = usuariEntityDao.findByUserName(codiUsuari);
         if (usuariEntity != null) {
             Collection networkAuthorizations = findNetworkAuthorizationsByCodiUsuari(codiUsuari);
             Iterator iterator = networkAuthorizations.iterator();
@@ -1357,44 +1358,16 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     }
 
     private Collection<NetworkEntity> localFindXarxaByFiltre(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
-        if (codi != null && (codi.trim().compareTo("") == 0 || codi.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            codi = null;
-        }
-        if (adreca != null
-                && (adreca.trim().compareTo("") == 0 || adreca.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            adreca = null;
-        }
-        if (descripcio != null
-                && (descripcio.trim().compareTo("") == 0 || descripcio.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            descripcio = null;
-        }
-        if (mascara != null
-                && (mascara.trim().compareTo("") == 0 || mascara.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            mascara = null;
-        }
-        if (normalitzada != null
-                && (normalitzada.trim().compareTo("") == 0 || normalitzada.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            normalitzada = null;
-        }
-        if (dhcp != null && (dhcp.trim().compareTo("") == 0 || dhcp.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
-            dhcp = null;
-        }
-        String query = "select xarxa " + "from es.caib.seycon.ng.model.XarxaEntity xarxa " //$NON-NLS-1$ //$NON-NLS-2$
-                + "where " + "(:codi is null or xarxa.codi like :codi) and " //$NON-NLS-1$ //$NON-NLS-2$
-                + "(:adreca is null or xarxa.adreca like :adreca) and " //$NON-NLS-1$
-                + "(:descripcio is null or xarxa.descripcio like :descripcio) and " //$NON-NLS-1$
-                + "(:mascara is null or xarxa.mascara like :mascara) and " //$NON-NLS-1$
-                + "(:normalitzada is null or xarxa.normalitzada = :normalitzada) and " //$NON-NLS-1$
-                + "(:dhcp is null or xarxa.dhcp like :dhcp) " + "order by xarxa.codi"; //$NON-NLS-1$ //$NON-NLS-2$
-        Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
-        Parameter adrecaParameter = new Parameter("adreca", adreca); //$NON-NLS-1$
-        Parameter descripcioParameter = new Parameter("descripcio", descripcio); //$NON-NLS-1$
-        Parameter normalitzadaParameter = new Parameter("normalitzada", normalitzada); //$NON-NLS-1$
-        Parameter mascaraParameter = new Parameter("mascara", mascara); //$NON-NLS-1$
-        Parameter dhcpParameter = new Parameter("dhcp", dhcp); //$NON-NLS-1$
-        Parameter parametres[] = { codiParameter, adrecaParameter, mascaraParameter,
-                descripcioParameter, normalitzadaParameter, dhcpParameter };
-        Collection<NetworkEntity> xarxesTrobades = getNetworkEntityDao().query(query, parametres);
+        XarxaSearchCriteria c = new XarxaSearchCriteria();
+        c.setCodi(codi);
+        c.setAdreca(adreca);
+        c.setDescripcio(descripcio);
+        c.setNormalitzada(normalitzada);
+        c.setMascara(mascara);
+        c.setDhcp(dhcp);
+        
+        Collection<NetworkEntity> xarxesTrobades = getNetworkEntityDao().findByFilter(c);
+        
         return xarxesTrobades;
     }
 
@@ -1407,10 +1380,12 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 Xarxa xarxa = (Xarxa) xarxesIterator.next();
                 xarxes += "'" + xarxa.getCodi() + "'" + (xarxesIterator.hasNext() ? "," : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             }
-            String query = "select distinct maquina.xarxa " //$NON-NLS-1$
-                    + "from es.caib.seycon.ng.model.MaquinaEntity maquina " + "where " //$NON-NLS-1$ //$NON-NLS-2$
-                    + "maquina.nom like :maquina and " + "maquina.xarxa.codi in (" + xarxes + ") " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    + "order by maquina.xarxa.codi"; //$NON-NLS-1$
+            String query = "select distinct maquina.network " //$NON-NLS-1$
+                    + "from com.soffid.iam.model.HostEntity maquina " //$NON-NLS-1$
+            		+ "where " //$NON-NLS-1$ 
+                    + "maquina.name like :maquina and "
+            		+ "maquina.network.name in (" + xarxes + ") " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    + "order by maquina.network.name"; //$NON-NLS-1$
             Parameter parametres[] = { new Parameter("maquina", maquina) }; //$NON-NLS-1$
             List<NetworkEntity> xarxesList = getNetworkEntityDao().query(query, parametres);
             return getNetworkEntityDao().toXarxaList(xarxesList);
@@ -1620,7 +1595,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 return false;
 
             // Mirem si és autoritzat (autorització o acls)
-            if (internalGetAccessLevel(sessio.getHost().getName(), sessio.getHost().getNetwork().getCode()) < SUPORT)
+            if (internalGetAccessLevel(sessio.getHost().getName(), sessio.getHost().getNetwork().getName()) < SUPORT)
                 throw new java.lang.SecurityException(Messages.getString("XarxaServiceImpl.NoPermissionMessage")); //$NON-NLS-1$
 
             InetAddress addr = InetAddress.getLocalHost();
@@ -1839,7 +1814,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                 maquina.setDescription(Messages.getString("XarxaServiceImpl.AutocreatedMessage") + " " + df.format(new Date())); //$NON-NLS-1$
                 maquina.setDynamicIP(new Boolean(true));
                 maquina.setName(nomMaquina);
-                maquina.setOffice("N"); //$NON-NLS-1$
+                maquina.setFolders("N"); //$NON-NLS-1$
                 maquina.setSerialNumber(serialNumber);
                 maquina.setPrintersServer("N"); //$NON-NLS-1$
                 maquina.setOperatingSystem(getOsTypeEntityDao().findOSTypeByName("ALT")); //$NON-NLS-1$
@@ -1863,7 +1838,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
     	                maquina.setHostIP(ip);
     	                maquina.setNetwork(x);
                 	} else {
-                        throw new UnknownNetworkException(String.format(Messages.getString("XarxaServiceImpl.RequestWithoutDHCP"), nomMaquina, ip, x.getCode()));
+                        throw new UnknownNetworkException(String.format(Messages.getString("XarxaServiceImpl.RequestWithoutDHCP"), nomMaquina, ip, x.getName()));
                 	}
                 } else {
                     throw new UnknownNetworkException(String.format(
@@ -1909,11 +1884,11 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         	String defaultNetwork = System.getProperty("soffid.network.internet"); //$NON-NLS-1$
         	if (defaultNetwork != null)
         	{
-        		xarxa = dao.findByCode(defaultNetwork);
+        		xarxa = dao.findByName(defaultNetwork);
         		if (xarxa == null)
         		{
         			xarxa = dao.newNetworkEntity();
-        			xarxa.setCode(defaultNetwork);
+        			xarxa.setName(defaultNetwork);
         			xarxa.setAddress("0.0.0.0"); //$NON-NLS-1$
         			xarxa.setMask("255.255.255.255"); //$NON-NLS-1$
         			xarxa.setDchpSupport(true);

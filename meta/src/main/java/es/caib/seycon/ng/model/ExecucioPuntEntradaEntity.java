@@ -35,7 +35,7 @@ public abstract class ExecucioPuntEntradaEntity {
 	@Operation(translated="findByEntryPoint")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.ExecucioPuntEntradaEntity> findByPuntEntrada(
-		es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada) {
+		es.caib.seycon.ng.model.PuntEntradaEntity entryPoint) {
 	 return null;
 	}
 }

@@ -126,8 +126,8 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
 
     }
 
-    public CardEntity createExtranetCard(String codiUsuari) {
-        UserEntity usuari = getUserEntityDao().findByCode(codiUsuari);
+    public CardEntity handleCreateExtranetCard(String codiUsuari) {
+        UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
         if (usuari == null || usuari.getId() == null)
             throw new SeyconException(String.format(Messages.getString("CardEntityDaoImpl.userNotFound"), //$NON-NLS-1$
                     codiUsuari));
@@ -136,7 +136,12 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
             Long idUsuari = usuari.getId();
 
             // Busca la última tarjeta activa
-            List<CardEntity> list = query("select t from es.caib.seycon.ng.ScTarget as t join on t.usuari at u with u.codi = :codiUsuari where t.actiu in (\'S\', \'N\') order by t.dataCaducitat desc", new Parameter[]{new Parameter("codiUsuari", codiUsuari)}); //$NON-NLS-1$
+            List<CardEntity> list = query("select t "
+            		+ "from com.soffid.iam.model.CardEntity as t "
+            		+ "join on t.user at u with u.userName = :codiUsuari "
+            		+ "where t.active in (\'S\', \'N\') "
+            		+ "order by t.expirationDate desc", 
+            		new Parameter[]{new Parameter("codiUsuari", codiUsuari)}); //$NON-NLS-1$
             Date date;
             String status;
             if (list.isEmpty()) {

@@ -84,10 +84,10 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
                 }
                 dispatcherEntity.setUserType(tipusUsuari);
             }
-            auditarDispatcher("C", dispatcherEntity.getCode()); //$NON-NLS-1$
+            auditarDispatcher("C", dispatcherEntity.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.0"), dispatcherEntity.getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.0"), dispatcherEntity.getName(), message));
         }
     }
 
@@ -95,17 +95,17 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         try {
             super.update(dispatcherEntity);
             getSession(false).flush();
-            auditarDispatcher("U", dispatcherEntity.getCode()); //$NON-NLS-1$
+            auditarDispatcher("U", dispatcherEntity.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.1"), dispatcherEntity.getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.1"), dispatcherEntity.getName(), message));
         }
     }
 
 	public void remove(com.soffid.iam.model.SystemEntity dispatcherEntity) throws RuntimeException {
 		try
 		{
-			String codiDispatcher = dispatcherEntity.getCode();
+			String codiDispatcher = dispatcherEntity.getName();
 			getAccountEntityDao().remove(dispatcherEntity.getAccounts());
 			dispatcherEntity.getAccounts().clear();
 
@@ -119,7 +119,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 		catch (Throwable e)
 		{
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.2"), dispatcherEntity.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.2"), dispatcherEntity.getName(), message));
 		}
 	}
 
@@ -127,8 +127,8 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         super.toDispatcher(sourceEntity, targetVO);
 
         // Fem les transformacions necessàries
-        targetVO.setSegur(new Boolean(sourceEntity.getSafe().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setBasRol(new Boolean(sourceEntity.getBaseRole().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setSegur(new Boolean(sourceEntity.getTrusted().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setBasRol(new Boolean(sourceEntity.getRoleBased().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setControlAccess(new Boolean(sourceEntity.getEnableAccessControl().compareTo("S") == 0)); //$NON-NLS-1$
 
         // Tipus d'usuari
@@ -136,28 +136,28 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
             // convertim els tipus d'usuari a string separada per comes
             String tipus = ""; //$NON-NLS-1$
             for (Iterator it = sourceEntity.getUserType().iterator(); it.hasNext(); ) {
-                tipus += ((UserTypeSystemEntity) it.next()).getUserType().getCode();
+                tipus += ((UserTypeSystemEntity) it.next()).getUserType().getName();
                 if (it.hasNext()) tipus += ",";
             }
             targetVO.setRelacioLaboral(tipus);
         }
 
         // Domini de contrasenyes (i d'usuaris per transitivitat)
-        if (sourceEntity.getDomain() != null) {// de contrasenyes
-            PasswordDomainEntity domini = sourceEntity.getDomain();
+        if (sourceEntity.getPasswordDomain() != null) {// de contrasenyes
+            PasswordDomainEntity domini = sourceEntity.getPasswordDomain();
             targetVO.setIdDominiContrasenyes(domini.getId());
-            targetVO.setDominiContrasenyes(domini.getCode());
+            targetVO.setDominiContrasenyes(domini.getName());
         }
         if (sourceEntity.getUserDomain() != null)
         {
-            targetVO.setDominiUsuaris(sourceEntity.getUserDomain().getCode());
+            targetVO.setDominiUsuaris(sourceEntity.getUserDomain().getName());
         }
         
         // convertim els grups a string separada per comes
         if (sourceEntity.getSystemGroup() != null) {
             String grups = ""; //$NON-NLS-1$
             for (Iterator it = sourceEntity.getSystemGroup().iterator(); it.hasNext(); ) {
-                grups += ((SystemGroupEntity) it.next()).getGroup().getCode();
+                grups += ((SystemGroupEntity) it.next()).getGroup().getName();
                 if (it.hasNext()) grups += ",";
             }
             targetVO.setGrups(grups);
@@ -210,15 +210,15 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         // Fem les transformacions de VO A Entity
         Boolean esSegur = sourceVO.getSegur();
         if (esSegur != null) {
-            targetEntity.setSafe(esSegur.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+            targetEntity.setTrusted(esSegur.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
-            targetEntity.setSafe("N"); //$NON-NLS-1$
+            targetEntity.setTrusted("N"); //$NON-NLS-1$
         }
         Boolean basatEnRol = sourceVO.getBasRol();
         if (basatEnRol != null) {
-            targetEntity.setBaseRole(basatEnRol.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+            targetEntity.setRoleBased(basatEnRol.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
-            targetEntity.setBaseRole("N"); //$NON-NLS-1$
+            targetEntity.setRoleBased("N"); //$NON-NLS-1$
         }
 
         Boolean controlAcces = sourceVO.getControlAccess();
@@ -230,18 +230,18 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 
         if (sourceVO.getDominiContrasenyes() == null) {
             if (sourceVO.getIdDominiContrasenyes() == null)
-                targetEntity.setDomain(null);
+                targetEntity.setPasswordDomain(null);
             else
-                targetEntity.setDomain(getPasswordDomainEntityDao().load(sourceVO.getIdDominiContrasenyes()));
+                targetEntity.setPasswordDomain(getPasswordDomainEntityDao().load(sourceVO.getIdDominiContrasenyes()));
         } else
-            targetEntity.setDomain(getPasswordDomainEntityDao().findByCode(sourceVO.getDominiContrasenyes()));
+            targetEntity.setPasswordDomain(getPasswordDomainEntityDao().findByName(sourceVO.getDominiContrasenyes()));
         
         UserDomainEntity du;
 		if (sourceVO.getDominiUsuaris() == null)
         	targetEntity.setUserDomain(null);
         else
         {
-        	du = getUserDomainEntityDao().findByCode(sourceVO.getDominiUsuaris());
+        	du = getUserDomainEntityDao().findByName(sourceVO.getDominiUsuaris());
         	if (du == null)
         		throw new IllegalArgumentException(
         				String.format("service.dominiUsuaris[%s]",  //$NON-NLS-1$

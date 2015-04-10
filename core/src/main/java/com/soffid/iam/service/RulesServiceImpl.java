@@ -154,7 +154,7 @@ public class RulesServiceImpl extends RulesServiceBase
         auditoria.setAccio(accio);
         auditoria.setRule(role.getRule().getDescription());
         auditoria.setRol(role.getRole().getName());
-        auditoria.setBbdd(role.getRole().getDatabases().getCode());
+        auditoria.setBbdd(role.getRole().getSystem().getName());
         auditoria.setAutor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));

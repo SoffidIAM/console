@@ -203,7 +203,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 		}
 		else
 		{
-			UserEntity usuari = getUserEntityDao().findByCode(rolAccount.getCodiUsuari());
+			UserEntity usuari = getUserEntityDao().findByUserName(rolAccount.getCodiUsuari());
 			targetList. addAll (getAplicacioService().findEffectiveRolGrantByUser(usuari.getId()));
 		}
 		for (RolAccount rolAccount2: ra)
@@ -248,7 +248,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 			}
 			else
 			{
-    			UserEntity usuari = getUserEntityDao().findByCode(ra.getCodiUsuari());
+    			UserEntity usuari = getUserEntityDao().findByUserName(ra.getCodiUsuari());
     			if (usuari == null)
     				rols = new LinkedList<RolGrant>();
     			else
@@ -283,7 +283,7 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
                     } else {
                         boolean found = false;
                         for (RolGrant rolGrant : rols) {
-                            if (rolGrant.getRolName().equals(targetSodRole.getRole().getName()) && rolGrant.getDispatcher().equals(targetSodRole.getRole().getDatabases().getCode())) {
+                            if (rolGrant.getRolName().equals(targetSodRole.getRole().getName()) && rolGrant.getDispatcher().equals(targetSodRole.getRole().getSystem().getName())) {
                                 found = true;
                                 break;
                             }

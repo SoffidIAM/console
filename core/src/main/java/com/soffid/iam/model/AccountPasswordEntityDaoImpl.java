@@ -19,7 +19,7 @@ public class AccountPasswordEntityDaoImpl extends com.soffid.iam.model.AccountPa
 		target.getData().setTime(source.getDate());
 		// NOTA: aquí usuari es de tipus CodiUsuariEntity
 		target.setAccountName(source.getAccount().getName());
-		target.setDispatcher(source.getAccount().getSystem().getCode());
+		target.setDispatcher(source.getAccount().getSystem().getName());
 		// Indicador de si és caducada
 		target.setCaducada(new Boolean(source.getExpirationDate().before(
 				GregorianCalendar.getInstance().getTime())));
@@ -28,13 +28,13 @@ public class AccountPasswordEntityDaoImpl extends com.soffid.iam.model.AccountPa
 		UserTypeEntity tipusUsuari = source.getAccount().getPasswordPolicy();
 		Iterator<PasswordPolicyEntity> it;
 		boolean trobat = false;
-		PasswordDomainEntity dominiContrasenyes = source.getAccount().getSystem().getDomain();
+		PasswordDomainEntity dominiContrasenyes = source.getAccount().getSystem().getPasswordDomain();
 		// cerquem la política de contrasenyes per al tipus d'usuari
 		if (dominiContrasenyes.getPasswordPolicies() != null)
 		{
 			for (it = dominiContrasenyes.getPasswordPolicies().iterator(); !trobat && it.hasNext(); ) {
                 PasswordPolicyEntity politica = it.next();
-                if (tipusUsuari.getCode().equals(politica.getUserDomainType().getCode())) {
+                if (tipusUsuari.getName().equals(politica.getUserType().getName())) {
                     target.setTipusPoliticaContrasenya(politica.getType());
                     trobat = true;
                 }

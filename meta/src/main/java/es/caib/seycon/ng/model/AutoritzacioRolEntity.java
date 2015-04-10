@@ -27,15 +27,18 @@ public abstract class AutoritzacioRolEntity {
 	public es.caib.seycon.ng.model.RolEntity rol;
 
 	@Operation(translated="findByAuthorization")
-	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioRolEntity as autoritzacioRolEntity \nwhere autoritzacioRolEntity.autoritzacio = :autoritzacio \norder by autoritzacioRolEntity.rol.nom")
+	@DaoFinder("from com.soffid.iam.model.AuthorizationEntity as autoritzacioRolEntity \n"
+			+ "where autoritzacioRolEntity.authorization = :authorization \norder by autoritzacioRolEntity.role.name")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioRolEntity> findByAutoritzacio(
-		java.lang.String autoritzacio) {
+		java.lang.String authorization) {
 	 return null;
 	}
 	@Operation(translated="findByRoleID")
-	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioRolEntity as autoritzacioRolEntity \nwhere autoritzacioRolEntity.rol.id = :idRol\norder by autoritzacioRolEntity.autoritzacio")
+	@DaoFinder("from com.soffid.iam.model.AuthorizationEntity as autoritzacioRolEntity \n"
+			+ "where autoritzacioRolEntity.role.id = :roleId\n"
+			+ "order by autoritzacioRolEntity.authorization")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioRolEntity> findByIdRol(
-		java.lang.Long idRol) {
+		java.lang.Long roleId) {
 	 return null;
 	}
 }

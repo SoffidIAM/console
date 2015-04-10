@@ -27,8 +27,4 @@ public abstract class AutoritzacioPUEGrupEntity {
 	@Column (name="GPE_IDGRU", translated="groupID")
 	public java.lang.Long idGrup;
 
-	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity")
-	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity> findAll() {
-	 return null;
-	}
 }

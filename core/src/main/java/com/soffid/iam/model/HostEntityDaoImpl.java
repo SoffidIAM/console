@@ -16,6 +16,7 @@ import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.TaskEntity;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Xarxa;
@@ -23,6 +24,7 @@ import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,11 +49,11 @@ public class HostEntityDaoImpl extends
     private void toMaquinaCustom(com.soffid.iam.model.HostEntity sourceEntity, es.caib.seycon.ng.comu.Maquina targetVO) {
         NetworkEntity xarxa = sourceEntity.getNetwork();
         if (xarxa != null) {
-            targetVO.setCodiXarxa(sourceEntity.getNetwork().getCode());
+            targetVO.setCodiXarxa(sourceEntity.getNetwork().getName());
         } else {
             targetVO.setCodiXarxa(null);
         }
-        targetVO.setOfimatica(new Boolean(sourceEntity.getOffice().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setOfimatica(new Boolean(sourceEntity.getFolders().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setCorreu(new Boolean(sourceEntity.getMail().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setServidorImpressores(new Boolean(sourceEntity.getPrintersServer().compareTo("S") == 0)); //$NON-NLS-1$
 
@@ -113,9 +115,9 @@ public class HostEntityDaoImpl extends
 
     private void maquinaToEntityCustom(es.caib.seycon.ng.comu.Maquina sourceVO, com.soffid.iam.model.HostEntity targetEntity) {
         if (sourceVO.getOfimatica() != null) {
-            targetEntity.setOffice(sourceVO.getOfimatica().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+            targetEntity.setFolders(sourceVO.getOfimatica().booleanValue() ? "S" : "N"); //$NON-NLS-1$
         } else {
-            targetEntity.setOffice("N"); //$NON-NLS-1$
+            targetEntity.setFolders("N"); //$NON-NLS-1$
         }
 
         if (sourceVO.getCorreu() != null) {
@@ -141,7 +143,7 @@ public class HostEntityDaoImpl extends
 
         String codiXarxa = sourceVO.getCodiXarxa();
         if (codiXarxa != null && codiXarxa.trim().compareTo("") != 0) { //$NON-NLS-1$
-            NetworkEntity xarxaEntity = getNetworkEntityDao().findByCode(codiXarxa);
+            NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
             if (xarxaEntity != null) {
                 /* comprova que la ip és compatible amb la xarxa */
                 Xarxa xarxa = this.getNetworkEntityDao().toXarxa(xarxaEntity);
@@ -294,7 +296,7 @@ public class HostEntityDaoImpl extends
         try {
             HostEntity oldMaquina = load(maquina.getId());
             super.update(maquina);
-            if (areDifferent(oldMaquina.getHostIP(), maquina.getHostIP()) || areDifferent(oldMaquina.getMail(), maquina.getMail()) || areDifferent(oldMaquina.getDescription(), maquina.getDescription()) || areDifferent(oldMaquina.getOffice(), maquina.getOffice()) || areDifferent(oldMaquina.getMac(), maquina.getMac()) || areDifferent(oldMaquina.getDhcp(), maquina.getDhcp()) || areDifferent(oldMaquina.getSerialNumber(), maquina.getSerialNumber()) || areDifferent(oldMaquina.getPrintersServer(), maquina.getPrintersServer()) || areDifferent(oldMaquina.getOperatingSystem(), maquina.getOperatingSystem()) || areDifferent(oldMaquina.getDeleted(), maquina.getDeleted()) || areDifferent(oldMaquina.getDynamicIP(), maquina.getDynamicIP()) || areDifferent(oldMaquina.getName(), maquina.getName())) 
+            if (areDifferent(oldMaquina.getHostIP(), maquina.getHostIP()) || areDifferent(oldMaquina.getMail(), maquina.getMail()) || areDifferent(oldMaquina.getDescription(), maquina.getDescription()) || areDifferent(oldMaquina.getFolders(), maquina.getFolders()) || areDifferent(oldMaquina.getMac(), maquina.getMac()) || areDifferent(oldMaquina.getDhcp(), maquina.getDhcp()) || areDifferent(oldMaquina.getSerialNumber(), maquina.getSerialNumber()) || areDifferent(oldMaquina.getPrintersServer(), maquina.getPrintersServer()) || areDifferent(oldMaquina.getOperatingSystem(), maquina.getOperatingSystem()) || areDifferent(oldMaquina.getDeleted(), maquina.getDeleted()) || areDifferent(oldMaquina.getDynamicIP(), maquina.getDynamicIP()) || areDifferent(oldMaquina.getName(), maquina.getName())) 
             {
                 TaskEntity tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -320,7 +322,12 @@ public class HostEntityDaoImpl extends
 
     public String[] getTasks(String nomMaquina) {
         LinkedList<String> lista = new LinkedList<String>();
-    	for (TaskEntity t : getTaskEntityDao().query("select tasca from es.caib.seycon.ng.model.TasqueEntity as tasca where tasca.maquin=:maquina", new Parameter[]{new Parameter("maquina", nomMaquina)})) {
+    	for (TaskEntity t : getTaskEntityDao().query(
+    			"select tasca from com.soffid.iam.model.TaskEntity as tasca "
+    			+ "where tasca.host=:maquina", 
+    			new Parameter[]{
+    					new Parameter("maquina", nomMaquina
+    			)})) {
             String transaccion = t.getTransaction();
             Timestamp datatime = t.getDate();
             Date data = new Date();
@@ -333,7 +340,7 @@ public class HostEntityDaoImpl extends
             for (com.soffid.iam.model.TaskLogEntity tl : t.getLogs()) {
                 if ("N".equals(tl.getCompleted())) {
                     if (agentsPendents.length() > 0) agentsPendents.append(", ");
-                    agentsPendents.append(tl.getSystem().getCode());
+                    agentsPendents.append(tl.getSystem().getName());
                 }
             }
             lista.add(transaccion + " # " + dataString + " # " + missatge + " # " + rol + " # " + agentsPendents);
@@ -348,7 +355,7 @@ public class HostEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.MaquinaEntityDaoBase#find(int,
      * java.lang.String, es.caib.seycon.ng.model.Parameter[])
      */
-    public List<HostEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<HostEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);

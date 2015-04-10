@@ -14,7 +14,7 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.AuditoriaEntity.class})
 public abstract class DadaUsuariEntity {
 
-	@Column (name="DUS_VALOR", length=1024, translated="dataValue")
+	@Column (name="DUS_VALOR", length=1024, translated="value")
 	@Nullable
 	public java.lang.String valorDada;
 
@@ -32,28 +32,33 @@ public abstract class DadaUsuariEntity {
 	@Nullable
 	public byte[] blobDataValue;
 
-	@Operation(translated="findDataByDataTypeCode")
-	@DaoFinder("select dadaUsuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari,\nes.caib.seycon.ng.model.TipusDadaEntity tipusDada where usuari.codi = :codiUsuari and dadaUsuari.usuari = usuari and dadaUsuari.tipusDada = tipusDada and tipusDada.codi = :codiTipusDada")
+	@Operation(translated="findByDataType")
+	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
+			+ "left join dadaUsuari.user as user "
+			+ "left join dadaUsuari.dataType as type "
+			+ "where user.userName = :userName and type.name=:dataType")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiTipusDada(
-		java.lang.String codiUsuari, 
-		java.lang.String codiTipusDada) {
+		java.lang.String userName, 
+		java.lang.String dataType) {
 	 return null;
 	}
-	@Operation(translated="findDataByUserCodeAndDataTypeCode")
-	@DaoFinder("select dadaUsuari from es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari, es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.TipusDadaEntity tipusDada where dadaUsuari.usuari = usuari and usuari.codi = :codiUsuari and tipusDada.codi = :codiTipusDada and dadaUsuari.tipusDada = tipusDada")
+	
+	@Operation(translated="findByDataType2")
+	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
+			+ "left join dadaUsuari.user as user "
+			+ "left join dadaUsuari.dataType as type "
+			+ "where user.userName = :userName and type.name=:dataType")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiUsuariAndCodiTipusDada(
-		java.lang.String codiUsuari, 
-		java.lang.String codiTipusDada) {
+		java.lang.String userName, 
+		java.lang.String dataType) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.DadaUsuariEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
-	@DaoFinder("select dada\nfrom es.caib.seycon.ng.model.DadaUsuariEntity as dada\nwhere dada.valorDada = :value and\ndada.tipusDada.codi=:type")
+
+	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
+			+ "left join dadaUsuari.dataType as type "
+			+ "where dadaUsuari.value = :value and type.name=:dataType")
 	public java.util.List<es.caib.seycon.ng.model.DadaUsuariEntity> findByTypeAndValue(
-		java.lang.String type, 
+		java.lang.String dataType, 
 		java.lang.String value) {
 	 return null;
 	}

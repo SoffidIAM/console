@@ -90,16 +90,16 @@ public class HostAdminEntityDaoImpl
 		HostEntity maq = source.getHost();
 		target.setCodiUsuari(usu.getUserName());
 		if (usu.getShortName() != null && usu.getMailDomain() != null) 
-			target.setCorreuUsuari(usu.getShortName() + "@" + usu.getMailDomain().getCode()); //$NON-NLS-1$
+			target.setCorreuUsuari(usu.getShortName() + "@" + usu.getMailDomain().getName()); //$NON-NLS-1$
 		
 		Calendar data = GregorianCalendar.getInstance();
-		data.setTime(source.getExpirationDateAhtorizationAccess());
+		data.setTime(source.getExpirationDate());
 		target.setDataCaducitatAutoritzacioAcces(data);
 		target.setDescripcioHost(maq.getDescription());
 		target.setIpHost(maq.getHostIP());
 		target.setNomHost(maq.getName());
 		target.setNomUsuari(usu.getFirstName() + " " + usu.getLastName() + " " + usu.getMiddleName()); //$NON-NLS-1$ //$NON-NLS-2$
-		target.setXarxaHost(maq.getNetwork().getCode());
+		target.setXarxaHost(maq.getNetwork().getName());
 		Calendar dataPeticio = GregorianCalendar.getInstance();
 		if (source.getRequestDate() != null) dataPeticio.setTime(source.getRequestDate());
 		target.setDataPeticio(dataPeticio);
@@ -109,13 +109,13 @@ public class HostAdminEntityDaoImpl
 	public void autoritzacioAccesHostComAdministradorToEntityCustom(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador source, com.soffid.iam.model.HostAdminEntity target) {
 		
 		// Hem de cercar: usuari i màquina
-		UserEntity usuari = getUserEntityDao().findByCode(source.getCodiUsuari());
+		UserEntity usuari = getUserEntityDao().findByUserName(source.getCodiUsuari());
 		HostEntity host = getHostEntityDao().findByName(source.getNomHost());
 		
 		if (source.getDataPeticio() !=null) {
 			target.setRequestDate(source.getDataPeticio().getTime());
 		}
-		target.setExpirationDateAhtorizationAccess(source.getDataCaducitatAutoritzacioAcces().getTime());
+		target.setExpirationDate(source.getDataCaducitatAutoritzacioAcces().getTime());
 		target.setUser(usuari);
 		target.setHost(host);
 		target.setProcessWFID(source.getIdProcesWorkflow());

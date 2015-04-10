@@ -108,7 +108,7 @@ public class PolicyForbiddenWordEntityDaoImpl
         		boolean trobat = false;
         		if (pcdc!=null) for (Iterator<PasswordPolicyEntity> it = pcdc.iterator(); !trobat && it.hasNext(); ) {
                     PasswordPolicyEntity p = it.next();
-                    if (p.getUserDomainType().getCode().equals(pcd.getTipusUsuari())) {
+                    if (p.getUserType().getName().equals(pcd.getTipusUsuari())) {
                         trobat = true;
                         pc = p;
                     }

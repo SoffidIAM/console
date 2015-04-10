@@ -37,19 +37,19 @@ public class EmailListContainerEntityDaoImpl extends
 
     public void create(com.soffid.iam.model.EmailListContainerEntity relacioLlistaCorreu) throws RuntimeException {
         try {
-            EmailDomainEntity dominiCorreuEntity = relacioLlistaCorreu.getContain().getDomain();
+            EmailDomainEntity dominiCorreuEntity = relacioLlistaCorreu.getContains().getDomain();
             if (dominiCorreuEntity != null) {
                 String obsolet = dominiCorreuEntity.getObsolete();
                 if (obsolet != null && obsolet.compareTo("S") == 0) { //$NON-NLS-1$
-					throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.0"), relacioLlistaCorreu.getContain().getName(), dominiCorreuEntity.getCode()));
+					throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.0"), relacioLlistaCorreu.getContains().getName(), dominiCorreuEntity.getName()));
                 }
             }
 
-            dominiCorreuEntity = relacioLlistaCorreu.getPertain().getDomain();
+            dominiCorreuEntity = relacioLlistaCorreu.getPertains().getDomain();
             if (dominiCorreuEntity != null) {
                 String obsolet = dominiCorreuEntity.getObsolete();
                 if (obsolet != null && obsolet.compareTo("S") == 0) { //$NON-NLS-1$
-					throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.1"), relacioLlistaCorreu.getPertain().getName(), dominiCorreuEntity.getCode()));
+					throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.1"), relacioLlistaCorreu.getPertains().getName(), dominiCorreuEntity.getName()));
                 }
             }
 
@@ -57,35 +57,35 @@ public class EmailListContainerEntityDaoImpl extends
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(relacioLlistaCorreu.getContain().getName());
-            if (relacioLlistaCorreu.getContain().getDomain() != null)
-                tasque.setMailDomain(relacioLlistaCorreu.getContain().getDomain().getCode());
+            tasque.setAlias(relacioLlistaCorreu.getContains().getName());
+            if (relacioLlistaCorreu.getContains().getDomain() != null)
+                tasque.setMailDomain(relacioLlistaCorreu.getContains().getDomain().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
 
             // Creem auditoria
-            auditarLlistaDeCorreu("C", relacioLlistaCorreu.getContain().getName(), relacioLlistaCorreu.getContain().getDomain() != null ? relacioLlistaCorreu.getContain().getDomain().getCode() : "", relacioLlistaCorreu.getPertain().getName(), relacioLlistaCorreu.getPertain().getDomain() != null ? relacioLlistaCorreu.getPertain().getDomain().getCode() : ""); //$NON-NLS-1$
+            auditarLlistaDeCorreu("C", relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getContains().getDomain() != null ? relacioLlistaCorreu.getContains().getDomain().getName() : "", relacioLlistaCorreu.getPertains().getName(), relacioLlistaCorreu.getPertains().getDomain() != null ? relacioLlistaCorreu.getPertains().getDomain().getName() : ""); //$NON-NLS-1$
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.2"), relacioLlistaCorreu.getContain().getName(), relacioLlistaCorreu.getPertain().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.2"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message));
         }
     }
 
     public void remove(com.soffid.iam.model.EmailListContainerEntity relacioLlistaCorreu) throws RuntimeException {
         try {
-            String nomLListaConte = relacioLlistaCorreu.getContain().getName();
-            String dominiLlistaConte = relacioLlistaCorreu.getContain().getDomain() != null ? relacioLlistaCorreu.getContain().getDomain().getCode() : ""; //$NON-NLS-1$
-            String nomLlistaPertany = relacioLlistaCorreu.getPertain().getName();
-            String dominiLlistaPertany = relacioLlistaCorreu.getPertain().getDomain() != null ? relacioLlistaCorreu.getPertain().getDomain().getCode() : ""; //$NON-NLS-1$
+            String nomLListaConte = relacioLlistaCorreu.getContains().getName();
+            String dominiLlistaConte = relacioLlistaCorreu.getContains().getDomain() != null ? relacioLlistaCorreu.getContains().getDomain().getName() : ""; //$NON-NLS-1$
+            String nomLlistaPertany = relacioLlistaCorreu.getPertains().getName();
+            String dominiLlistaPertany = relacioLlistaCorreu.getPertains().getDomain() != null ? relacioLlistaCorreu.getPertains().getDomain().getName() : ""; //$NON-NLS-1$
 
             super.remove(relacioLlistaCorreu);
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(relacioLlistaCorreu.getContain().getName());
-            if (relacioLlistaCorreu.getContain().getDomain() != null)
-                tasque.setMailDomain(relacioLlistaCorreu.getContain().getDomain().getCode());
+            tasque.setAlias(relacioLlistaCorreu.getContains().getName());
+            if (relacioLlistaCorreu.getContains().getDomain() != null)
+                tasque.setMailDomain(relacioLlistaCorreu.getContains().getDomain().getName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
 
@@ -94,7 +94,7 @@ public class EmailListContainerEntityDaoImpl extends
                     nomLlistaPertany, dominiLlistaPertany);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.3"), relacioLlistaCorreu.getContain().getName(), relacioLlistaCorreu.getPertain().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.3"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message));
         }
     }
 
@@ -104,15 +104,15 @@ public class EmailListContainerEntityDaoImpl extends
     }
 
     public void toRelacioLlistaCorreuCustom(com.soffid.iam.model.EmailListContainerEntity source, es.caib.seycon.ng.comu.RelacioLlistaCorreu target) {
-        target.setNomLlistaCorreuConte(source.getContain().getName());
-        target.setNomLlistaCorreuPertany(source.getPertain().getName());
-        EmailDomainEntity dominiCorreuConte = source.getContain().getDomain();
-        EmailDomainEntity dominiCorreuPertany = source.getPertain().getDomain();
+        target.setNomLlistaCorreuConte(source.getContains().getName());
+        target.setNomLlistaCorreuPertany(source.getPertains().getName());
+        EmailDomainEntity dominiCorreuConte = source.getContains().getDomain();
+        EmailDomainEntity dominiCorreuPertany = source.getPertains().getDomain();
         if (dominiCorreuConte != null) {
-            target.setCodiDominiCorreuConte(dominiCorreuConte.getCode());
+            target.setCodiDominiCorreuConte(dominiCorreuConte.getName());
         }
         if (dominiCorreuPertany != null) {
-            target.setCodiDominiCorreuPertany(dominiCorreuPertany.getCode());
+            target.setCodiDominiCorreuPertany(dominiCorreuPertany.getName());
         }
     }
 
@@ -154,9 +154,9 @@ public class EmailListContainerEntityDaoImpl extends
     public void relacioLlistaCorreuToEntityCustom(es.caib.seycon.ng.comu.RelacioLlistaCorreu source, com.soffid.iam.model.EmailListContainerEntity target) {
         String nomLlistaCorreuConte = source.getNomLlistaCorreuConte();
         String codiDominiConte = source.getCodiDominiCorreuConte();
-        EmailListEntity llistaCorreuEntityConte = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreuConte, codiDominiConte);
+        EmailListEntity llistaCorreuEntityConte = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreuConte, codiDominiConte);
         if (llistaCorreuEntityConte != null) {
-            target.setContain(llistaCorreuEntityConte);
+            target.setContains(llistaCorreuEntityConte);
         } else {
 			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.4"), //$NON-NLS-1$
 					nomLlistaCorreuConte, 
@@ -165,9 +165,9 @@ public class EmailListContainerEntityDaoImpl extends
 
         String nomLlistaCorreuPertany = source.getNomLlistaCorreuPertany();
         String codiDominiPertany = source.getCodiDominiCorreuPertany();
-        EmailListEntity llistaCorreuEntityPertany = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreuPertany, "null".equals(codiDominiPertany) ? null : codiDominiPertany);
+        EmailListEntity llistaCorreuEntityPertany = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreuPertany, "null".equals(codiDominiPertany) ? null : codiDominiPertany);
         if (llistaCorreuEntityPertany != null) {
-            target.setPertain(llistaCorreuEntityPertany);
+            target.setPertains(llistaCorreuEntityPertany);
         } else {
 			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.5"),  //$NON-NLS-1$
 					nomLlistaCorreuPertany));
@@ -241,10 +241,10 @@ public class EmailListContainerEntityDaoImpl extends
     }
 
     public void update(EmailListContainerEntity relacioLlistaCorreuEntity) {
-        String nomLListaConte = relacioLlistaCorreuEntity.getContain().getName();
-        String dominiLlistaConte = relacioLlistaCorreuEntity.getContain().getDomain() != null ? relacioLlistaCorreuEntity.getContain().getDomain().getCode() : ""; //$NON-NLS-1$
-        String nomLlistaPertany = relacioLlistaCorreuEntity.getPertain().getName();
-        String dominiLlistaPertany = relacioLlistaCorreuEntity.getPertain().getDomain() != null ? relacioLlistaCorreuEntity.getPertain().getDomain().getCode() : ""; //$NON-NLS-1$
+        String nomLListaConte = relacioLlistaCorreuEntity.getContains().getName();
+        String dominiLlistaConte = relacioLlistaCorreuEntity.getContains().getDomain() != null ? relacioLlistaCorreuEntity.getContains().getDomain().getName() : ""; //$NON-NLS-1$
+        String nomLlistaPertany = relacioLlistaCorreuEntity.getPertains().getName();
+        String dominiLlistaPertany = relacioLlistaCorreuEntity.getPertains().getDomain() != null ? relacioLlistaCorreuEntity.getPertains().getDomain().getName() : ""; //$NON-NLS-1$
 
         try {
             super.update(relacioLlistaCorreuEntity);

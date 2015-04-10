@@ -19,7 +19,7 @@ public abstract class TipusUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="TUS_CODI", length=1, translated="code")
+	@Column (name="TUS_CODI", length=1, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="TUS_DESC", length=50, translated="description")
@@ -32,10 +32,10 @@ public abstract class TipusUsuariEntity {
 	@ForeignKey (foreignColumn="ACC_TUS_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountEntity> accounts;
 
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusUsuariEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 }

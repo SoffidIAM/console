@@ -27,8 +27,4 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	@Column (name="UPE_IDUSU", translated="userID")
 	public java.lang.Long idUsuari;
 
-	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity")
-	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity> findAll() {
-	 return null;
-	}
 }

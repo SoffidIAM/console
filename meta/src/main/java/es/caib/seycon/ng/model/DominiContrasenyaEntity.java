@@ -19,7 +19,7 @@ public abstract class DominiContrasenyaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DCN_CODI", length=50, translated="code")
+	@Column (name="DCN_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="DCN_DESC", length=100, translated="description")
@@ -32,21 +32,29 @@ public abstract class DominiContrasenyaEntity {
 	@ForeignKey (foreignColumn="DIS_DCN_ID", translated="systems")
 	public java.util.Collection<es.caib.seycon.ng.model.DispatcherEntity> dispatchers;
 
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
-	@DaoFinder("select dominiContrasenya \nfrom es.caib.seycon.ng.model.UsuariEntity as usuari \ninner join usuari.tipusUsuari as tipus \ninner join tipus.politiques as politica  with politica.tipus='M'  \ninner join politica.dominiContrasenya as dominiContrasenya\nwhere usuari.id= :userId")
+	@DaoFinder("select pd "
+			+ "from com.soffid.iam.model.UserEntity as usuari "
+			+ "inner join usuari.userType as tipus "
+			+ "inner join tipus.policies as politica  with politica.type='M'  "
+			+ "inner join politica.passwordDomain pd "
+			+ "where usuari.id= :userId")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findDefaultDomain(
 		long userId) {
 	 return null;
 	}
+	
 	@Operation(translated="findBySystem")
-	@DaoFinder("select de.domini\nfrom es.caib.seycon.ng.model.DispatcherEntity as de\nwhere de.codi=:dispatcher")
+	@DaoFinder("select de.passwordDomain "
+			+ "from com.soffid.iam.model.SystemEntity as de "
+			+ "where de.name=:systemName")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findByDispatcher(
-		java.lang.String dispatcher) {
+		java.lang.String systemName) {
 	 return null;
 	}
 }

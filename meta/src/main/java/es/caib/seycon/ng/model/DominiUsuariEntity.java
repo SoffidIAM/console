@@ -19,7 +19,7 @@ public abstract class DominiUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DOU_CODI", length=50, translated="code")
+	@Column (name="DOU_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="DOU_DESC", length=100, translated="description")
@@ -41,16 +41,19 @@ public abstract class DominiUsuariEntity {
 	@Nullable
 	public java.lang.String beanGenerator;
 
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findBySytem")
-	@DaoFinder("select du\nfrom es.caib.seycon.ng.model.DispatcherEntity as dispatcher\nleft join dispatcher.dominiUsuari as du\nwhere dispatcher.codi=:dispatcher")
+	@DaoFinder("select du "
+			+ "from com.soffid.iam.model.SystemEntity as dispatcher "
+			+ "left join dispatcher.userDomain as du "
+			+ "where dispatcher.name=:system")
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByDispatcher(
-		java.lang.String dispatcher) {
+		java.lang.String system) {
 	 return null;
 	}
 }

@@ -82,7 +82,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	protected boolean handleStartAuthoritativeChange (AuthoritativeChange change)
 					throws Exception
 	{
-		SystemEntity dispatcher = getSystemEntityDao().findByCode(change.getSourceSystem());
+		SystemEntity dispatcher = getSystemEntityDao().findByName(change.getSourceSystem());
 		if (dispatcher == null)
 			throw new InternalErrorException(String.format("Invalid source change %s", change.getSourceSystem()));
 		
@@ -101,7 +101,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			// Cancels any pending workflow
 			if (change.getUser() != null && change.getUser().getCodi() != null)
 			{
-				ue = getUserEntityDao().findByCode(change.getUser().getCodi());
+				ue = getUserEntityDao().findByUserName(change.getUser().getCodi());
 				if (ue != null)
 				{
 					for ( AuthoritativeChangeEntity ch: ue.getPendingAuthoritativeChanges())

@@ -53,17 +53,25 @@ public abstract class LlistaCorreuEntity {
 	@Operation(translated="findByName")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuEntity> findByNom(
-		java.lang.String nom) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findByData")
-	@DaoFinder("select llistaCorreu \nfrom \nes.caib.seycon.ng.model.LlistaCorreuEntity llistaCorreu \nleft join llistaCorreu.domini as domini \nwhere \n(:domini is null or domini.codi like :domini) and \n(:descripcio is null or llistaCorreu.descripcio like :descripcio) and \n(:nom is null or llistaCorreu.nom like :nom) \norder by llistaCorreu.nom, llistaCorreu.domini.codi")
+	@DaoFinder("select llistaCorreu "
+			+ "from com.soffid.iam.model.EmailListEntity llistaCorreu "
+			+ "left join llistaCorreu.domain as domini "
+			+ "where (:domain is null or domini.name like :domain) and "
+			+ "(:description is null or llistaCorreu.description like :description) and "
+			+ "(:name is null or llistaCorreu.name like :name) "
+			+ "order by llistaCorreu.name, llistaCorreu.domain.name")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuEntity> findByDades(
-		java.lang.String nom, 
-		java.lang.String domini, 
-		java.lang.String descripcio) {
+		java.lang.String name, 
+		java.lang.String domain, 
+		java.lang.String description) {
 	 return null;
 	}
+	
+	/*
 	@Operation(translated="findUsersByNameAndDomainCode")
 	@DaoFinder("select llistaCorreuUsuari.usuari from es.caib.seycon.ng.model.LlistaCorreuUsuariEntity as llistaCorreuUsuari left join llistaCorreuUsuari.llistaDeCorreu as llistaCorreu left join llistaCorreu.domini as dominiCorreu where llistaCorreu.nom = :nomLlistaCorreu and (( :codiDomini is null and dominiCorreu is null) or ( :codiDomini is not null and dominiCorreu.codi = :codiDomini))")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuEntity> findUsuarisByNomAndCodiDomini(
@@ -71,18 +79,22 @@ public abstract class LlistaCorreuEntity {
 		java.lang.String codiDomini) {
 	 return null;
 	}
-	@Operation(translated="findByNameAndDomainCode")
-	@DaoFinder("select llistaCorreu \nfrom \nes.caib.seycon.ng.model.LlistaCorreuEntity as llistaCorreu \nleft join  llistaCorreu.domini as dominiCorreu \nwhere \nllistaCorreu.nom = :nom and \n(( :codiDomini is null and dominiCorreu is null) or \n ( :codiDomini is not null and  dominiCorreu is not null and  dominiCorreu.codi = :codiDomini))")
+	*/
+	
+	
+	@Operation(translated="findByNameAndDomain")
+	@DaoFinder("select llistaCorreu "
+			+ "from com.soffid.iam.model.EmailListEntity llistaCorreu "
+			+ "left join llistaCorreu.domain as dominiCorreu "
+			+ "where llistaCorreu.name = :name and "
+			+ "(( :domain is null and dominiCorreu is null) or "
+			+ " ( :domain is not null and  dominiCorreu is not null and  dominiCorreu.name = :domain))")
 	public es.caib.seycon.ng.model.LlistaCorreuEntity findByNomAndCodiDomini(
-		java.lang.String nom, 
-		java.lang.String codiDomini) {
+		java.lang.String name, 
+		java.lang.String domain) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
+	
 	
 	@DaoOperation
 	public void generateUpdateTasks (LlistaCorreuEntity entity)

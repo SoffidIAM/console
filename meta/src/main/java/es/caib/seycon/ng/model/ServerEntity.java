@@ -54,7 +54,7 @@ public abstract class ServerEntity {
 	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.ServerEntity findByNom(
-		java.lang.String nom) {
+		java.lang.String name) {
 	 return null;
 	}
 }

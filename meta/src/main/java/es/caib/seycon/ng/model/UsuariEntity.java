@@ -5,327 +5,307 @@
 //
 
 package es.caib.seycon.ng.model;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Usuari;
 
-@Entity (table="SC_USUARI", translatedName="UserEntity", translatedPackage="com.soffid.iam.model" )
-@Depends ({es.caib.seycon.ng.model.ScTarget.class,
-	es.caib.seycon.ng.model.RolsGrupEntity.class,
-	es.caib.seycon.ng.model.UsuariSEUEntity.class,
-	es.caib.seycon.ng.model.TipusUsuariEntity.class,
-	es.caib.seycon.ng.model.ContrasenyaEntity.class,
-	es.caib.seycon.ng.model.DominiUsuariEntity.class,
-	es.caib.seycon.ng.comu.Usuari.class,
-	es.caib.seycon.ng.model.DadaUsuariEntity.class,
-	es.caib.seycon.ng.model.TipusDadaEntity.class,
-	es.caib.seycon.ng.model.MaquinaEntity.class,
-	es.caib.seycon.ng.comu.Identitat.class,
-	es.caib.seycon.ng.model.UsuariGrupEntity.class,
-	es.caib.seycon.ng.model.GrupEntity.class,
-	es.caib.seycon.ng.model.DominiCorreuEntity.class,
-	es.caib.seycon.ng.model.RolAccountEntity.class,
-	es.caib.seycon.ng.model.AuditoriaEntity.class,
-	es.caib.seycon.ng.model.LlistaCorreuEntity.class,
-	es.caib.seycon.ng.model.LlistaCorreuUsuariEntity.class,
-	es.caib.seycon.ng.model.TasqueEntity.class,
-	es.caib.bpm.vo.BPMUser.class,
-	es.caib.seycon.ng.comu.UsuariAnonim.class,
-	es.caib.seycon.ng.model.XarxaACEntity.class,
-	es.caib.seycon.ng.model.SsoEntity.class,
-	es.caib.seycon.ng.model.UsuariImpressoraEntity.class,
-	es.caib.seycon.ng.model.SessioEntity.class,
-	es.caib.seycon.ng.model.AplicacioEntity.class,
-	es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity.class,
-	es.caib.seycon.ng.model.NotificacioEntity.class,
-	es.caib.seycon.ng.model.SecretEntity.class,
-	es.caib.seycon.ng.model.UserAccountEntity.class,
-	es.caib.seycon.ng.model.AccountAccessEntity.class,
-	RolEntity.class})
+@Entity(table = "SC_USUARI", translatedName = "UserEntity", translatedPackage = "com.soffid.iam.model")
+@Depends({
+		es.caib.seycon.ng.model.ScTarget.class,
+		es.caib.seycon.ng.model.RolsGrupEntity.class,
+		es.caib.seycon.ng.model.UsuariSEUEntity.class,
+		es.caib.seycon.ng.model.TipusUsuariEntity.class,
+		es.caib.seycon.ng.model.ContrasenyaEntity.class,
+		es.caib.seycon.ng.model.DominiUsuariEntity.class,
+		es.caib.seycon.ng.comu.Usuari.class,
+		es.caib.seycon.ng.model.DadaUsuariEntity.class,
+		es.caib.seycon.ng.model.TipusDadaEntity.class,
+		es.caib.seycon.ng.model.MaquinaEntity.class,
+		es.caib.seycon.ng.comu.Identitat.class,
+		es.caib.seycon.ng.model.UsuariGrupEntity.class,
+		es.caib.seycon.ng.model.GrupEntity.class,
+		es.caib.seycon.ng.model.DominiCorreuEntity.class,
+		es.caib.seycon.ng.model.RolAccountEntity.class,
+		es.caib.seycon.ng.model.AuditoriaEntity.class,
+		es.caib.seycon.ng.model.LlistaCorreuEntity.class,
+		es.caib.seycon.ng.model.LlistaCorreuUsuariEntity.class,
+		es.caib.seycon.ng.model.TasqueEntity.class,
+		DispatcherEntity.class,
+		es.caib.bpm.vo.BPMUser.class,
+		es.caib.seycon.ng.comu.UsuariAnonim.class,
+		es.caib.seycon.ng.model.XarxaACEntity.class,
+		es.caib.seycon.ng.model.SsoEntity.class,
+		es.caib.seycon.ng.model.UsuariImpressoraEntity.class,
+		es.caib.seycon.ng.model.SessioEntity.class,
+		es.caib.seycon.ng.model.AplicacioEntity.class,
+		es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity.class,
+		es.caib.seycon.ng.model.NotificacioEntity.class,
+		es.caib.seycon.ng.model.SecretEntity.class,
+		es.caib.seycon.ng.model.UserAccountEntity.class,
+		es.caib.seycon.ng.model.AccountAccessEntity.class, RolEntity.class })
 public abstract class UsuariEntity {
 
-	@Column (name="USU_ID")
+	@Column(name = "USU_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="USU_CODI", length=150, translated="userName")
+	@Column(name = "USU_CODI", length = 150, translated = "userName")
 	public java.lang.String codi;
 
-	@Column (name="USU_NOM", length=50, translated="firstName")
+	@Column(name = "USU_NOM", length = 50, translated = "firstName")
 	public java.lang.String nom;
 
-	@Column (name="USU_PRILLI", length=50, translated="lastName")
+	@Column(name = "USU_PRILLI", length = 50, translated = "lastName")
 	public java.lang.String primerLlinatge;
 
-	@Column (name="USU_NOMCUR", length=25, translated="shortName")
+	@Column(name = "USU_NOMCUR", length = 25, translated = "shortName")
 	@Nullable
 	public java.lang.String nomCurt;
 
-	@Column (name="USU_USUMOD", length=50, translated="lastUserModification")
+	@Column(name = "USU_USUMOD", length = 50, translated = "lastUserModification")
 	@Nullable
 	public java.lang.String usuariDarreraModificacio;
 
-	@Column (name="USU_DATMOD", translated="lastModificationDate")
+	@Column(name = "USU_DATMOD", translated = "lastModificationDate")
 	@Nullable
 	public java.util.Date dataDarreraModificacio;
 
-	@Column (name="USU_DATCRE", translated="creationDate")
+	@Column(name = "USU_DATCRE", translated = "creationDate")
 	public java.util.Date dataCreacio;
 
-	@Column (name="USU_USUCRE", length=50, translated="creationUser")
+	@Column(name = "USU_USUCRE", length = 50, translated = "creationUser")
 	@Nullable
 	public java.lang.String usuariCreacio;
 
-	@Column (name="USU_ACTIU", length=1, translated="active")
+	@Column(name = "USU_ACTIU", length = 1, translated = "active")
 	public java.lang.String actiu;
 
-	@Column (name="USU_SEGLLI", length=50, translated="middleName")
+	@Column(name = "USU_SEGLLI", length = 50, translated = "middleName")
 	@Nullable
 	public java.lang.String segonLlinatge;
 
-	@Column (name="USU_COMENT", length=1024, translated="comment")
+	@Column(name = "USU_COMENT", length = 1024, translated = "comment")
 	@Nullable
 	public java.lang.String comentari;
 
-	@ForeignKey (foreignColumn="AXA_IDUSU", translated="ACNetwork")
+	@ForeignKey(foreignColumn = "AXA_IDUSU", translated = "ACNetwork")
 	public java.util.Collection<es.caib.seycon.ng.model.XarxaACEntity> xarxesAC;
 
-	@Column (name="USU_IDMACO", translated="mailServer")
+	@Column(name = "USU_IDMACO", translated = "mailServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorCorreu;
 
-	@Column (name="USU_IDMAQ", translated="homeServer")
+	@Column(name = "USU_IDMAQ", translated = "homeServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorOfimatic;
 
-	@Column (name="USU_IDDCO", translated="mailDomain")
+	@Column(name = "USU_IDDCO", translated = "mailDomain")
 	@Nullable
 	public es.caib.seycon.ng.model.DominiCorreuEntity dominiCorreu;
 
-	@Column (name="USU_IDMAPR", translated="profileServer")
+	@Column(name = "USU_IDMAPR", translated = "profileServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorPerfil;
 
-	@Column (name="USU_IDGRU", translated="primaryGroup")
+	@Column(name = "USU_IDGRU", translated = "primaryGroup")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grupPrimari;
 
-	@ForeignKey (foreignColumn="TAR_IDUSU", translated="extranetCard")
+	@ForeignKey(foreignColumn = "TAR_IDUSU", translated = "extranetCard")
 	public java.util.Collection<es.caib.seycon.ng.model.ScTarget> targetesExtranet;
 
-	@ForeignKey (foreignColumn="DUS_IDUSU", translated="userData")
+	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "userData")
 	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> dadaUsuari;
 
-	@ForeignKey (foreignColumn="UGR_IDUSU", translated="secondaryGroups")
+	@ForeignKey(foreignColumn = "UGR_IDUSU", translated = "secondaryGroups")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> grupsSecundaris;
 
-	@ForeignKey (foreignColumn="UIM_IDUSU", translated="printers")
+	@ForeignKey(foreignColumn = "UIM_IDUSU", translated = "printers")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariImpressoraEntity> impressores;
 
-	@ForeignKey (foreignColumn="SES_IDUSU", translated="sessions")
+	@ForeignKey(foreignColumn = "SES_IDUSU", translated = "sessions")
 	public java.util.Collection<es.caib.seycon.ng.model.SessioEntity> sessions;
 
-	@ForeignKey (foreignColumn="ULC_IDUSU", translated="userMailList")
+	@ForeignKey(foreignColumn = "ULC_IDUSU", translated = "userMailList")
 	public java.util.Collection<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> llistaDeCorreuUsuari;
 
-	@Column (name="USU_MULSES", length=1)
+	@Column(name = "USU_MULSES", length = 1)
 	@Nullable
 	public java.lang.String multiSessio;
 
 	/**
 	 * @Column (name="USU_ALCOAN", length=240)
-	 * 	@Nullable
-	 * Not used
-	 * public java.lang.String aliesCorreu;
+	 * @Nullable Not used public java.lang.String aliesCorreu;
 	 */
 
-	@ForeignKey (foreignColumn="APL_IDCONTACT", translated="ApplicationResponsible")
+	@ForeignKey(foreignColumn = "APL_IDCONTACT", translated = "ApplicationResponsible")
 	public java.util.Collection<es.caib.seycon.ng.model.AplicacioEntity> aplicacioSocPersonaResponsable;
 
-	@ForeignKey (foreignColumn="ADM_USUID", translated="accessHostAsAdministratorAuthorization")
+	@ForeignKey(foreignColumn = "ADM_USUID", translated = "accessHostAsAdministratorAuthorization")
 	public java.util.Collection<es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity> autoritzacioAccesHostComAdministrador;
 
-	@ForeignKey (foreignColumn="USE_USUID", translated="SEUInformation")
+	@ForeignKey(foreignColumn = "USE_USUID", translated = "SEUInformation")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariSEUEntity> informacioSEU;
 
-	@Column (name="USU_TUS_ID", translated="userType")
+	@Column(name = "USU_TUS_ID", translated = "userType")
 	public es.caib.seycon.ng.model.TipusUsuariEntity tipusUsuari;
 
-	@ForeignKey (foreignColumn="SEC_IDUSU", translated="secrets")
+	@ForeignKey(foreignColumn = "SEC_IDUSU", translated = "secrets")
 	public java.util.Collection<es.caib.seycon.ng.model.SecretEntity> secrets;
 
-	@ForeignKey (foreignColumn="UAC_USU_ID", translated="accounts")
+	@ForeignKey(foreignColumn = "UAC_USU_ID", translated = "accounts")
 	public java.util.Collection<es.caib.seycon.ng.model.UserAccountEntity> accounts;
 
-	@ForeignKey (foreignColumn="AAC_USU_ID", translated="accountAccess")
+	@ForeignKey(foreignColumn = "AAC_USU_ID", translated = "accountAccess")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountAccessEntity> accountAccess;
 
-	@ForeignKey (foreignColumn="CTR_IDUSU", translated="passwords")
+	@ForeignKey(foreignColumn = "CTR_IDUSU", translated = "passwords")
 	public java.util.Collection<es.caib.seycon.ng.model.ContrasenyaEntity> contrasenyes;
 
-	@ForeignKey (foreignColumn="PAU_USU_ID")
+	@ForeignKey(foreignColumn = "PAU_USU_ID")
 	public java.util.Collection<com.soffid.iam.authoritative.model.AuthoritativeChangeEntity> pendingAuthoritativeChanges;
 
-	
 	/************************ DAOs **********************************/
-	@Operation(translated="findByCode")
-	@DaoFinder("from es.caib.seycon.ng.model.UsuariEntity  where codi = :codi")
+	@Operation(translated = "findByUserName")
+	@DaoFinder("from com.soffid.iam.model.UserEntity  where userName = :userName")
 	public es.caib.seycon.ng.model.UsuariEntity findByCodi(
-		java.lang.String codi) {
-	 return null;
+			java.lang.String userName) {
+		return null;
 	}
-	@Operation(translated="generateUserName")
+
+	@Operation(translated = "generateUserName")
 	@DaoFinder
 	public String generaCodiUsuari() {
-	 return null;
+		return null;
 	}
-	@DaoFinder("from es.caib.seycon.ng.model.UsuariEntity where id = :id")
-	public es.caib.seycon.ng.model.UsuariEntity findById(
-		java.lang.Long id) {
-	 return null;
+
+	@DaoFinder("from com.soffid.iam.model.UserEntity where id = :id")
+	public es.caib.seycon.ng.model.UsuariEntity findById(java.lang.Long id) {
+		return null;
 	}
-	@Operation(translated="findByNationalID")
-	@DaoFinder("select usuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari where usuari = dadaUsuari.usuari and dadaUsuari.tipusDada.codi = 'NIF' and dadaUsuari.valorDada = :nif")
-	public es.caib.seycon.ng.model.UsuariEntity findByNIF(
-		java.lang.String nif) {
-	 return null;
+
+	@Operation(translated = "findByNationalID")
+	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
+			+ "join usuari.userData as dadaUsuari "
+			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif")
+	public es.caib.seycon.ng.model.UsuariEntity findByNIF(java.lang.String nif) {
+		return null;
 	}
-	@Operation(translated="findGroupByCode")
-	@DaoFinder("select usuariGrupEntity.grup\nfrom es.caib.seycon.ng.model.UsuariGrupEntity usuariGrupEntity, es.caib.seycon.ng.model.UsuariEntity usuariEntity where usuariGrupEntity.usuari = usuariEntity and usuariEntity.codi = :codiUsuari")
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findGrupsByCodi(
-		java.lang.String codiUsuari) {
-	 return null;
-	}
-	@Operation(translated="findBataByCode")
-	@DaoFinder("select dadaUsuari from es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari, es.caib.seycon.ng.model.UsuariEntity usuari where dadaUsuari.usuari = usuari and usuari.codi = :codiUsuari")
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findDadesByCodi(
-		java.lang.String codiUsuari) {
-	 return null;
-	}
-	@Operation(translated="findUserPrinterByCode")
-	@DaoFinder("select usuariImpressora\nfrom es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.UsuariImpressoraEntity usuariImpressora\nwhere usuariImpressora.usuari = usuari and usuari.codi = :codiUsuari")
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuariImpressoraByCodi(
-		java.lang.String codiUsuari) {
-	 return null;
-	}
-	@DaoFinder
-	public java.lang.Boolean updateUser(
-		java.lang.String codiUsuari) {
-	 return null;
-	}
-	@Operation(translated="findByShortName")
+
+	@Operation(translated = "findByShortName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.UsuariEntity findByNomCurt(
-		java.lang.String nomCurt) {
-	 return null;
+			java.lang.String shortName) {
+		return null;
 	}
-	@DaoFinder
-	public java.lang.Integer executeQuery(
-		java.lang.String hqlQuery) {
-	 return null;
-	}
-	
+
 	@DaoOperation
-	@Description ("Generates UPDATE_MAIL_LIST tasks for any affected mail list")
-	void createUpdateTasks (UsuariEntity user, Usuari oldValue) {
-		
+	@Description("Generates UPDATE_MAIL_LIST tasks for any affected mail list")
+	void createUpdateTasks(UsuariEntity user, Usuari oldValue) {
+
 	}
+
 	@DaoOperation
-	public java.lang.String refreshCanvis(
-		java.lang.String codiUsuari) {
-	 return null;
+	public java.lang.String refreshCanvis(java.lang.String codiUsuari) {
+		return null;
 	}
-	@DaoFinder
-	public java.lang.String[] getTasques(
-		java.lang.String codiUsuari) {
-	 return null;
+
+	@Operation(translated = "getTasks")
+	@DaoFinder("- CUSTOM -")
+	public java.lang.String[] getTasques(java.lang.String codiUsuari) {
+		return null;
 	}
+
 	@DaoFinder
+	@Operation(translated = "getNextUserName")
 	public java.lang.String getSeguentCodi() {
-	 return null;
+		return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
-	@Operation(translated="findUserByDataTypeCodeAndDataValue")
-	@DaoFinder("SELECT distinct usu \nFROM es.caib.seycon.ng.model.UsuariEntity usu, es.caib.seycon.ng.model.DadaUsuariEntity dada \nWHERE \nusu.codi=dada.usuari.codi and\n dada.tipusDada.codi = :codiTipusDada  and \ndada.valorDada = :valorDada")
+
+	@Operation(translated = "findUserByDataValue")
+	@DaoFinder("SELECT distinct usu \n"
+			+ "FROM com.soffid.iam.model.UserEntity usu "
+			+ "join usu.userData as dada \n" 
+			+ "WHERE \n"
+			+ "   dada.dataType.name = :dataType  and \n"
+			+ "   dada.value = :value")
 	public es.caib.seycon.ng.model.UsuariEntity findUsuariByCodiTipusDadaIValorDada(
-		java.lang.String codiTipusDada, 
-		java.lang.String valorDada) {
-	 return null;
+			java.lang.String dataType, java.lang.String value) {
+		return null;
 	}
-	@Operation(translated="getFollowingAnonymousCode")
+
+	@Operation(translated = "getNextAnonimUser")
 	@DaoFinder
 	public java.lang.String getSeguentCodiAnonim() {
-	 return null;
+		return null;
 	}
-	@Operation(translated="findbyPrimaryGroup")
-	@DaoFinder("select usuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.GrupEntity grup where usuari.grupPrimari=grup and grup.codi=:codiGrupPrimari")
+
+	@Operation(translated = "findByPrimaryGroup")
+	@DaoFinder("select usuari "
+			+ "from com.soffid.iam.model.UserEntity as usuari "
+			+ "join usuari.primaryGroup as grup "
+			+ "where grup.name=:primaryGroupName")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findByGrupPrimari(
-		java.lang.String codiGrupPrimari) {
-	 return null;
+			java.lang.String primaryGroupName) {
+		return null;
 	}
-	@Operation(translated="findUsersByNationalID")
-	@DaoFinder("select usuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari where usuari = dadaUsuari.usuari and dadaUsuari.tipusDada.codi = 'NIF' and dadaUsuari.valorDada = :nif")
+
+	@Operation(translated = "findUsersByNationalID")
+	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
+			+ "join usuari.userData as dadaUsuari "
+			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisByNIF(
-		java.lang.String nif) {
-	 return null;
+			java.lang.String nif) {
+		return null;
 	}
-	@Operation(translated="findFollowingAlumnCode")
-	@DaoFinder
+
+	@Operation(translated = "findFollowingAlumnCode")
+	@DaoFinder("- CUSTOM -")
 	public java.lang.String getSeguentCodiAlumne() {
-	 return null;
+		return null;
 	}
-	@Operation(translated="findExtranetCardsByCode")
-	@DaoFinder("select targetes from es.caib.seycon.ng.model.ScTarget targetes\nwhere targetes.usuari.codi = :codiUsuari and\n (:activa is  not null and targetes.actiu like :activa) order by targetes.dataCaducitat")
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findTargetesExtranetByCodi(
-		java.lang.String codiUsuari, 
-		@Nullable java.lang.String activa) {
-	 return null;
-	}
-	@Operation(translated="findUsersGroupAndSubgroupsByGroupCode")
-	@DaoFinder
+
+	@Operation(translated = "findUsersGroupAndSubgroupsByGroupCode")
+	@DaoFinder("- CUSTOM -")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisGrupISubgrupsByCodiGrup(
-		java.lang.String codiGrup) {
-	 return null;
+			java.lang.String codiGrup) {
+		return null;
 	}
-	@Operation(translated="findUsersByAssignedUserRole")
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisByRolUsuariAtorgat(
-		java.lang.String nomRolAtorgat, 
-		java.lang.String baseDeDadesRolAtorgat, 
-		java.lang.String codiAplicacioRolAtorgat, 
-		java.lang.String tipusDomini, 
-		java.lang.String codiGrupDominiRolAtorgat, 
-		java.lang.String codiAplicacioDominiRolAtorgat, 
-		java.lang.Long idValorDominiAplicacioDominiRolAtorgat) {
-	 return null;
-	}
-	@Operation(translated="getFollowingUserIDRequest")
-	@DaoFinder
+
+	@Operation(translated = "getNextUserIDRequest")
+	@DaoFinder("- CUSTOM -")
 	public java.lang.String getSeguentNumSolicitudVerificarIdentitatUsuari() {
-	 return null;
+		return null;
 	}
-	@Operation(translated="getFollowingHostCode")
-	@DaoFinder
+
+	@Operation(translated = "getNextHostUserName")
+	@DaoFinder("- CUSTOM -")
 	public java.lang.String getSeguentCodiMaquina() {
-	 return null;
+		return null;
 	}
-	@DaoFinder
+
+	@DaoFinder("- CUSTOM -")
 	public es.caib.seycon.ng.comu.EstatContrasenya getPasswordsStatus(
-		es.caib.seycon.ng.model.UsuariEntity usuariEntity, 
-		es.caib.seycon.ng.model.DominiContrasenyaEntity dominiContrasenyes) {
-	 return null;
+			es.caib.seycon.ng.model.UsuariEntity usuariEntity,
+			es.caib.seycon.ng.model.DominiContrasenyaEntity dominiContrasenyes) {
+		return null;
 	}
-	@DaoFinder("select ue\nfrom es.caib.seycon.ng.model.UsuariEntity ue\njoin ue.accounts as accounts\njoin accounts.account as acc\njoin acc.dispatcher as dispatcher\nwhere acc.type='U' and dispatcher.codi=:dispatcher and acc.name=:account\n")
+
+	@DaoFinder("select ue\n"
+			+ "from com.soffid.iam.model.UserEntity ue\n"
+			+ "join ue.accounts as accounts\n"
+			+ "join accounts.account as acc\n"
+			+ "join acc.system as dispatcher\n"
+			+ "where acc.type='U' and "
+			+ "dispatcher.name=:system and "
+			+ "acc.name=:account\n")
 	public es.caib.seycon.ng.model.UsuariEntity findByAccount(
-		java.lang.String account, 
-		java.lang.String dispatcher) {
-	 return null;
+			java.lang.String account, java.lang.String system) {
+		return null;
 	}
+
 	public java.lang.String getFullName() {
-	 return null;
+		return null;
 	}
 }

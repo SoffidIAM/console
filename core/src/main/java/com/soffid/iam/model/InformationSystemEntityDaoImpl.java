@@ -57,10 +57,10 @@ public class InformationSystemEntityDaoImpl
 		try {						
 			super.create(aplicacio);
 			getSession(false).flush();
-			auditarAplicacions("C", aplicacio.getCode()); //$NON-NLS-1$
+			auditarAplicacions("C", aplicacio.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.0"), aplicacio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.0"), aplicacio.getName(), message));
 		}
 	}
 	
@@ -68,22 +68,22 @@ public class InformationSystemEntityDaoImpl
 		try {
 			super.update(aplicacio);
 			getSession(false).flush();
-			auditarAplicacions("U", aplicacio.getCode()); //$NON-NLS-1$
+			auditarAplicacions("U", aplicacio.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.1"), aplicacio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.1"), aplicacio.getName(), message));
 		}
 	}
 	
 	public void remove(com.soffid.iam.model.InformationSystemEntity aplicacio) throws RuntimeException {
 		try {
-			String codiAplicacio = aplicacio.getCode();
+			String codiAplicacio = aplicacio.getName();
 			super.remove(aplicacio);
 			getSession(false).flush();
 			auditarAplicacions("D", codiAplicacio);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.2"), aplicacio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.2"), aplicacio.getName(), message));
 		}
 	}
 
@@ -94,9 +94,9 @@ public class InformationSystemEntityDaoImpl
     public es.caib.seycon.ng.comu.ValorDomini toValorDomini(final com.soffid.iam.model.InformationSystemEntity entity) {
     	ValorDomini valorDomini = new ValorDomini();
     	valorDomini.setCodiExternDomini(null);
-    	valorDomini.setDescripcio(entity.getName());
+    	valorDomini.setDescripcio(entity.getDescription());
     	valorDomini.setNomDomini(TipusDomini.APLICACIONS);
-    	valorDomini.setValor(entity.getCode());
+    	valorDomini.setValor(entity.getName());
     	return valorDomini;
     }
 	
@@ -123,7 +123,7 @@ public class InformationSystemEntityDaoImpl
     
     
     private void toAplicacioCustom(com.soffid.iam.model.InformationSystemEntity sourceEntity, es.caib.seycon.ng.comu.Aplicacio targetVO) {
-		targetVO.setGestionableWF(new Boolean(sourceEntity.getManageableWF().compareTo("S") == 0)); //$NON-NLS-1$
+		targetVO.setGestionableWF(new Boolean(sourceEntity.getWfManagement().compareTo("S") == 0)); //$NON-NLS-1$
     }
 
 
@@ -184,7 +184,7 @@ public class InformationSystemEntityDaoImpl
             	targetEntity.setContactPerson(null);
             	
             }else{	        	
-	        	UserEntity usuariEntity = getUserEntityDao().findByCode(codiPersonaContacte);
+	        	UserEntity usuariEntity = getUserEntityDao().findByUserName(codiPersonaContacte);
 	        	if(usuariEntity != null){
 	        		targetEntity.setContactPerson(usuariEntity);
 	        	}else{
@@ -199,9 +199,9 @@ public class InformationSystemEntityDaoImpl
 	private void aplicacioToEntityCustom(es.caib.seycon.ng.comu.Aplicacio sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity) {
 		Boolean gestionableWF = sourceVO.getGestionableWF();
 		if (gestionableWF != null) {
-			targetEntity.setManageableWF(sourceVO.getGestionableWF().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+			targetEntity.setWfManagement(sourceVO.getGestionableWF().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
-			targetEntity.setManageableWF("N"); //$NON-NLS-1$
+			targetEntity.setWfManagement("N"); //$NON-NLS-1$
 		}
 		// Verifiquem les adreces de correu per rebre les notificacions
 		if (sourceVO.getCorreusNotificacions()!=null && !"".equals(sourceVO.getCorreusNotificacions())) { //$NON-NLS-1$

@@ -20,7 +20,7 @@ public class MailListRoleMemberEntityDaoImpl extends MailListRoleMemberEntityDao
 	@Override
 	public void toMailListRoleMember(MailListRoleMemberEntity source,
 			MailListRoleMember target) {
-		target.setDispatcherName(source.getRole().getDatabases().getCode());
+		target.setDispatcherName(source.getRole().getSystem().getName());
 		target.setRoleDescription(source.getRole().getDescription());
 		target.setRoleName(source.getRole().getName());
 		target.setScope("");
@@ -28,10 +28,10 @@ public class MailListRoleMemberEntityDaoImpl extends MailListRoleMemberEntityDao
 			target.setScope(source.getDomainValueScope().getValue());
 			
 		if (source.getGroupScope() != null)
-			target.setScope(source.getGroupScope().getCode());
+			target.setScope(source.getGroupScope().getName());
 		
 		if (source.getInformationSystemScope() != null)
-			target.setScope(source.getInformationSystemScope().getCode());
+			target.setScope(source.getInformationSystemScope().getName());
 
 	}
 
@@ -59,7 +59,7 @@ public class MailListRoleMemberEntityDaoImpl extends MailListRoleMemberEntityDao
 	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
 	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
 	        tasque.setAlias(entity.getMailList().getName());
-            tasque.setMailDomain(entity.getMailList().getDomain().getCode());
+            tasque.setMailDomain(entity.getMailList().getDomain().getName());
 	        getTaskEntityDao().create(tasque);
 		}
 	}

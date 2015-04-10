@@ -5,85 +5,105 @@
 //
 
 package es.caib.seycon.ng.model;
+
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_AUTXAR" , translatedName="NetworkAuthorizationEntity", translatedPackage="com.soffid.iam.model" )
-@Depends ({es.caib.seycon.ng.model.XarxaEntity.class,
-	es.caib.seycon.ng.comu.NetworkAuthorization.class,
-	es.caib.seycon.ng.model.UsuariEntity.class,
-	es.caib.seycon.ng.model.GrupEntity.class,
-	es.caib.seycon.ng.model.RolEntity.class,
-	es.caib.seycon.ng.model.AuditoriaEntity.class})
+@Entity(table = "SC_AUTXAR", translatedName = "NetworkAuthorizationEntity", translatedPackage = "com.soffid.iam.model")
+@Depends({ es.caib.seycon.ng.model.XarxaEntity.class,
+		es.caib.seycon.ng.comu.NetworkAuthorization.class,
+		es.caib.seycon.ng.model.UsuariEntity.class,
+		es.caib.seycon.ng.model.GrupEntity.class,
+		es.caib.seycon.ng.model.RolEntity.class,
+		es.caib.seycon.ng.model.AuditoriaEntity.class })
 public abstract class XarxaACEntity {
 
-	@Column (name="AXA_ID")
+	@Column(name = "AXA_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="AXA_NIVELL", translated="level")
+	@Column(name = "AXA_NIVELL", translated = "level")
 	public java.lang.Integer nivell;
 
-	@Column (name="AXA_MASMAQ", length=50, translated="hostsName")
+	@Column(name = "AXA_MASMAQ", length = 50, translated = "hostsName")
 	@Nullable
 	public java.lang.String nomMaquines;
 
-	@Column (name="AXA_IDXAR", translated="network")
+	@Column(name = "AXA_IDXAR", translated = "network")
 	public es.caib.seycon.ng.model.XarxaEntity xarxa;
 
-	@Column (name="AXA_IDROL")
+	@Column(name = "AXA_IDROL")
 	@Nullable
 	public es.caib.seycon.ng.model.RolEntity role;
 
-	@Column (name="AXA_IDGRU", translated="group")
+	@Column(name = "AXA_IDGRU", translated = "group")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grup;
 
-	@Column (name="AXA_IDUSU", translated="user")
+	@Column(name = "AXA_IDUSU", translated = "user")
 	@Nullable
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
-	@Operation(translated="findByNetwork")
+	@Operation(translated = "findByNetwork")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByXarxa(
-		es.caib.seycon.ng.model.XarxaEntity xarxa) {
-	 return null;
+			es.caib.seycon.ng.model.XarxaEntity network) {
+		return null;
 	}
-	@Operation(translated="findByNetworkCodeAndIdentityCode")
-	@DaoFinder("select xarxaAC \nfrom \nes.caib.seycon.ng.model.XarxaACEntity xarxaAC \nleft join xarxaAC.usuari usuari \nleft join xarxaAC.role rol \nleft join xarxaAC.grup grup \nwhere \n(\n(grup is not null and grup.codi = :codiIdentitat) or \n(usuari is not null and usuari.codi = :codiIdentitat) or \n(rol is not null and rol.nom = :codiIdentitat) \n) \nand xarxaAC.xarxa.codi = :codiXarxa")
+
+	@Operation(translated = "findByNetworkAndIdentity")
+	@DaoFinder("select xarxaAC \n"
+			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC \n"
+			+ "left join xarxaAC.user user \n"
+			+ "left join xarxaAC.role rol \n"
+			+ "left join xarxaAC.group grup \n" + "where \n" + "(\n"
+			+ "  (grup is not null and grup.name = :identity) or \n"
+			+ "  (user is not null and user.userName = :identity) or \n"
+			+ "  (rol is not null and rol.name = :identity) \n" + ") \n"
+			+ "and xarxaAC.network.name = :networkName")
 	public es.caib.seycon.ng.model.XarxaACEntity findByCodiXarxaAndCodiIdentiat(
-		java.lang.String codiXarxa, 
-		java.lang.String codiIdentitat) {
-	 return null;
+			java.lang.String networkName, java.lang.String identity) {
+		return null;
 	}
-	@Operation(translated="findByRoleName")
-	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.role.nom = :nomRol")
+
+	@Operation(translated = "findByRoleName")
+	@DaoFinder("select xarxaAC\n"
+			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
+			+ "where xarxaAC.role.name = :roleName")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRol(
-		java.lang.String nomRol) {
-	 return null;
+			java.lang.String roleName) {
+		return null;
 	}
-	@Operation(translated="findByUserCode")
-	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.usuari.codi = :codiUsuari")
+
+	@Operation(translated = "findByUserName")
+	@DaoFinder("select xarxaAC\n"
+			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
+			+ "where xarxaAC.user.userName = :userName")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiUsuari(
-		java.lang.String codiUsuari) {
-	 return null;
+			java.lang.String userName) {
+		return null;
 	}
-	@Operation(translated="findByGroupCode")
-	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nwhere xarxaAC.grup.codi = :codiGrup")
+
+	@Operation(translated = "findByGroupName")
+	@DaoFinder("select xarxaAC\n"
+			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
+			+ "where xarxaAC.group.name = :groupName")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiGrup(
-		java.lang.String codiGrup) {
-	 return null;
+			java.lang.String groupName) {
+		return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
-	@Operation(translated="findByRoleNameAndApplicationCodeAndSystemCode")
-	@DaoFinder("select xarxaAC\nfrom es.caib.seycon.ng.model.XarxaACEntity xarxaAC\nleft join xarxaAC.role as elrol\nleft join elrol.aplicacio as aplica\nleft join elrol.baseDeDades as agent\nwhere elrol.nom = :nomRol \nand aplica.codi = :codiAplica\nand agent.codi = :codiDispat\norder by xarxaAC.xarxa.codi")
+
+	@Operation(translated = "findByRole")
+	@DaoFinder("select xarxaAC\n"
+			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
+			+ "left join xarxaAC.role as elrol\n"
+			+ "left join elrol.informationSystem as aplica\n"
+			+ "left join elrol.system as agent\n"
+			+ "where elrol.name = :roleName \n"
+			+ "and aplica.name = :informationSystem\n"
+			+ "and agent.name = :system\n" + "order by xarxaAC.network.name")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRolAndCodiAplicacioRolAndCodiDispatcher(
-		java.lang.String nomRol, 
-		java.lang.String codiAplica, 
-		java.lang.String codiDispat) {
-	 return null;
+			java.lang.String roleName, java.lang.String informationSystem,
+			java.lang.String system) {
+		return null;
 	}
 }

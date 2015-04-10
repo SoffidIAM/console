@@ -32,10 +32,10 @@ public abstract class GrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="GRU_CODI", length=20, translated="code")
+	@Column (name="GRU_CODI", length=20, translated="name")
 	public java.lang.String codi;
 
-	@Column (name="GRU_UNIOFI", length=2, translated="officeUnit")
+	@Column (name="GRU_UNIOFI", length=2, translated="homeDrive")
 	@Nullable
 	public java.lang.String unitatOfimatica;
 
@@ -49,7 +49,7 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="UGR_IDGRU", translated="secondaryGroupUsers")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> usuarisGrupSecundari;
 
-	@Column (name="GRU_IDMAQ", translated="officeServer")
+	@Column (name="GRU_IDMAQ", translated="homeServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorOfimatic;
 
@@ -70,7 +70,7 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="RLU_ROLUSU_GRU", translated="usersRoles")
 	public java.util.Collection<es.caib.seycon.ng.model.RolAccountEntity> rolsUsuaris;
 
-	@Column (name="GRU_TIPUS", translated="organizatinalUnitType")
+	@Column (name="GRU_TIPUS", translated="unitType")
 	@Nullable
 	public es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity tipusUnitatOrganizativa;
 
@@ -104,86 +104,114 @@ public abstract class GrupEntity {
 	/*********************************************************** METHODS **************************************/
 	
 	
-	@DaoFinder("from es.caib.seycon.ng.model.GrupEntity grup where grup.pare.codi = :codi")
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent")
+	@Operation(translated="findByParent")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findSubGrupsByCodi(
-		java.lang.String codi) {
+		java.lang.String parent) {
 	 return null;
 	}
-	@Operation(translated="findGroupsByType")
-	@DaoFinder("from es.caib.seycon.ng.model.GrupEntity where tipusUnitatOrganizativa = :tipus")
+	@Operation(translated="findByType")
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.unitType.name = :unitType")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsByTipus(
-		java.lang.String tipus) {
+		java.lang.String unitType) {
 	 return null;
 	}
 	@DaoOperation
+	@Operation(translated="setParentGroup")
 	public void setSuperGrup(
 		java.lang.String codiSubGrup, 
 		java.lang.String codiSuperGrup)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@DaoFinder
-	public es.caib.seycon.ng.model.GrupEntity findById(
-		java.lang.Long id) {
-	 return null;
-	}
-	@Operation(translated="findByCode")
+
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.GrupEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findByCriteria")
-	@DaoFinder("select grup\nfrom\nes.caib.seycon.ng.model.GrupEntity grup\nleft join grup.pare pare\nleft join grup.tipusUnitatOrganizativa tipus \nwhere\n(:codi is null or grup.codi like :codi) and\n(:descripcio is null or grup.descripcio like :descripcio) and\n(:tipus is null or tipus.codi like :tipus) and\n(:unitatOfimatica is null or grup.unitatOfimatica like :unitatOfimatica) and\n(:pare is null or (:pare is not null and pare.codi like :pare)) and \n(:obsolet is null or grup.obsolet = :obsolet)")
+	@DaoFinder("select grup "
+			+ "from com.soffid.iam.model.GroupEntity grup "
+			+ "left join grup.parent parent "
+			+ "left join grup.unitType tipus "
+			+ "where (:name is null or grup.name like :name) and "
+			+ "(:description is null or grup.description like :description) and "
+			+ "(:tipus is null or tipus.name like :type) and "
+			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
+			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
+			+ "(:obsolete is null or grup.obsolete = :obsolete)")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
-		java.lang.String codi, 
-		java.lang.String pare, 
-		java.lang.String unitatOfimatica, 
-		java.lang.String descripcio, 
-		java.lang.String tipus, 
-		java.lang.String obsolet) {
+		java.lang.String name, 
+		java.lang.String parent, 
+		java.lang.String homeDrive, 
+		java.lang.String description, 
+		java.lang.String type, 
+		java.lang.String obsolete) {
 	 return null;
 	}
-	@Operation(translated="findPrimaryGroupByUserCode")
-	@DaoFinder("select usuari.grupPrimari from es.caib.seycon.ng.model.UsuariEntity usuari where usuari.codi = :codiUsuari")
+	@Operation(translated="findPrimaryGroupByUser")
+	@DaoFinder("select usuari.primaryGroup from com.soffid.iam.model.UserEntity usuari where usuari.userName = :userName")
 	public es.caib.seycon.ng.model.GrupEntity findGrupPrimariByCodiUsuari(
-		java.lang.String codiUsuari) {
+		java.lang.String userName) {
 	 return null;
 	}
-	@Operation(translated="findGroupsFromUsersByUserCode")
-	@DaoFinder("select  usuariGrup.grup from es.caib.seycon.ng.model.UsuariGrupEntity usuariGrup where usuariGrup.usuari.codi = :codiUsuari")
+	@Operation(translated="findGroupsByUser")
+	@DaoFinder("select  usuariGrup.group "
+			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
+			+ "where usuariGrup.user.userName = :userName")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromUsuarisByCodiUsuari(
-		java.lang.String codiUsuari) {
+		java.lang.String userName) {
 	 return null;
 	}
-	@Operation(translated="findGroupsFromRolesByUserCode")
-	@DaoFinder("select grup\nfrom es.caib.seycon.ng.model.UsuariEntity usu\njoin usu.accounts as accounts\njoin accounts.account as account with account.type='U'\njoin account.roles as roles\njoin roles.grup as grup\nwhere usu.codi=:codiUsuari\n")
+
+	@Operation(translated="findByGrantedRolesToUser")
+	@DaoFinder("select grup "
+			+ "from com.soffid.iam.model.UserEntity usu "
+			+ "join usu.accounts as accounts "
+			+ "join accounts.account as account with account.type='U' "
+			+ "join account.roles as roles "
+			+ "join roles.group as grup "
+			+ "where usu.userName=:userName\n")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromRolsByCodiUsuari(
-		java.lang.String codiUsuari) {
+		java.lang.String userName) {
 	 return null;
 	}
-	@DaoFinder("select grup.pare from es.caib.seycon.ng.model.GrupEntity grup where grup.codi = :codiGrup")
+
+	@DaoFinder("select grup.parent from com.soffid.iam.model.GroupEntity grup where grup.name = :groupName")
+	@Operation(translated="findByChild")
 	public es.caib.seycon.ng.model.GrupEntity getSuperGrup(
-		java.lang.String codiGrup) {
+		java.lang.String groupName) {
 	 return null;
 	}
-	@DaoFinder("select conselleria from es.caib.seycon.ng.model.GrupEntity conselleria, es.caib.seycon.ng.model.GrupEntity direccioGeneral where conselleria.tipusUnitatOrganizativa = 'CONSELLERIA' and direccioGeneral.pare = conselleria")
-	public java.util.List<es.caib.seycon.ng.model.GrupEntity> getConselleriesAmbDireccionsGenerals() {
-	 return null;
-	}
+
 	public java.lang.String toString() {
 	 return null;
 	}
+
 	@Operation(translated="findByCriteria")
-	@DaoFinder("select grup\nfrom\nes.caib.seycon.ng.model.GrupEntity grup\nleft join grup.pare pare\nleft join grup.tipusUnitatOrganizativa tipus\nleft join grup.servidorOfimatic servofim  \nwhere\n(:codi is null or upper(grup.codi) like upper(:codi)) and\n(:descripcio is null or grup.descripcio like :descripcio) and\n(:tipus is null or tipus.codi like :tipus) and\n(:unitatOfimatica is null or grup.unitatOfimatica like :unitatOfimatica) and\n(:pare is null or (:pare is not null and pare.codi like :pare)) and \n(:obsolet is null or grup.obsolet = :obsolet) and \n(:servidorOfimatic is null or servofim.nom like :servidorOfimatic) and \n(:seccioPressupostaria is null or grup.seccioPressupostaria like :seccioPressupostaria)")
+	@DaoFinder("select grup "
+			+ "from com.soffid.iam.model.GroupEntity grup "
+			+ "left join grup.parent parent "
+			+ "left join grup.unitType tipus "
+			+ "left join grup.homeServer servofim  "
+			+ "where (:name is null or grup.name like :codi) and "
+			+ "(:description is null or grup.description like :description) and "
+			+ "(:tipus is null or tipus.name like :tipus) and "
+			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
+			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
+			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
+			+ "(:homeServer is null or servofim.name like :homeServer) and "
+			+ "(:budgetSection is null or grup.budgetSection like :budgetSection)")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
-		java.lang.String codi, 
-		java.lang.String pare, 
-		java.lang.String unitatOfimatica, 
-		java.lang.String descripcio, 
+		java.lang.String name, 
+		java.lang.String parent, 
+		java.lang.String homeDrive, 
+		java.lang.String description, 
 		java.lang.String tipus, 
-		java.lang.String obsolet, 
-		java.lang.String servidorOfimatic, 
-		java.lang.String seccioPressupostaria) {
+		java.lang.String obsolete, 
+		java.lang.String homeServer, 
+		java.lang.String budgetSection) {
 	 return null;
 	}
 }

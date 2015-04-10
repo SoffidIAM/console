@@ -39,8 +39,8 @@ public class AuthorizationEntityDaoImpl
 		// Obtenim les dades per auditar
 		RoleEntity rol = autoritzacioEntity.getRole();
 		String nomRol = rol.getName();
-		String bbdd = rol.getDatabases().getCode();
-		String codiAplicacio = rol.getApplication().getCode();
+		String bbdd = rol.getSystem().getName();
+		String codiAplicacio = rol.getInformationSystem().getName();
 		String domini = rol.getDomainType();
 
 		String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$

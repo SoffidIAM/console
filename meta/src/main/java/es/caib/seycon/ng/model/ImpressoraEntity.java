@@ -24,7 +24,7 @@ public abstract class ImpressoraEntity {
 	@Nullable
 	public java.lang.String model;
 
-	@Column (name="IMP_CODI", length=12, translated="code")
+	@Column (name="IMP_CODI", length=12, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="IMP_LOCAL", length=1)
@@ -40,19 +40,25 @@ public abstract class ImpressoraEntity {
 	@ForeignKey (foreignColumn="UIM_IDIMP", translated="users")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariImpressoraEntity> usuaris;
 
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.ImpressoraEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findPrintersByCriteria")
-	@DaoFinder("select impressora \nfrom \nes.caib.seycon.ng.model.ImpressoraEntity impressora \nwhere \n(:codi is null or impressora.codi like :codi) and \n(:model is null or impressora.model like :model) and \n(:local is null or impressora.local = :local) and \n(:maquina is null or  impressora.servidor.nom like :maquina) \norder by impressora.codi")
+	@DaoFinder("select impressora "
+			+ "from com.soffid.iam.model.PrinterEntity impressora "
+			+ "where (:name is null or impressora.name like :name) and "
+			+ "(:model is null or impressora.model like :model) and "
+			+ "(:local is null or impressora.local = :local) and "
+			+ "(:host is null or  impressora.server.name like :host) "
+			+ "order by impressora.name")
 	public java.util.List<es.caib.seycon.ng.model.ImpressoraEntity> findImpressoresByCriteri(
 		java.lang.String model, 
-		java.lang.String codi, 
+		java.lang.String name, 
 		java.lang.String local, 
-		java.lang.String maquina) {
+		java.lang.String host) {
 	 return null;
 	}
 }

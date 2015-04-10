@@ -28,7 +28,7 @@ public class UserDomainEntityDaoImpl
         String codiUsuari = Security.getCurrentAccount();
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(accio);
-        auditoria.setUserDomain(domain.getCode());
+        auditoria.setUserDomain(domain.getName());
         auditoria.setAutor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$

@@ -56,7 +56,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected Collection<CorreuExtern> handleFindCorreusExternsByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
-		Collection<ExternEmailEntity> externs = getExternEmailEntityDao().findByOListNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		Collection<ExternEmailEntity> externs = getExternEmailEntityDao().findByList(nomLlistaCorreu, codiDomini);
 		if (externs != null) {
 			return getExternEmailEntityDao().toCorreuExternList(externs);
 		}
@@ -65,7 +65,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected DominiCorreu handleFindDominiCorreuByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
-		EmailListEntity llistaCorreu = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreu = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		if (llistaCorreu != null) {
 			EmailDomainEntity dominiCorreu = llistaCorreu.getDomain();
 			if (dominiCorreu != null) {
@@ -78,7 +78,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected Collection<Usuari> handleFindUsuarisByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
-		EmailListEntity llista = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llista = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection<UserEntity> usuaris = new LinkedList<UserEntity>();
 		for (Iterator<UserEmailEntity> it = llista.getUserMailLists().iterator(); it.hasNext(); ) {
             usuaris.add(it.next().getUser());
@@ -142,7 +142,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected Collection<LlistaCorreuUsuari> handleFindLlistaCorreuUsuariByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu,
 			String codiDomini) throws Exception {
-		Collection<UserEmailEntity> llistaCorreuUsuari = getUserEmailEntityDao().findByMailListNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		Collection<UserEmailEntity> llistaCorreuUsuari = getUserEmailEntityDao().findByMailList(nomLlistaCorreu, codiDomini);
 		if (llistaCorreuUsuari != null) {
 			return getUserEmailEntityDao().toLlistaCorreuUsuariList(llistaCorreuUsuari);
 		}
@@ -227,7 +227,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected LlistaCorreuUsuari handleFindLlistaCorreuUsuariByNomLlistaCorreuAndCodiDominiAndCodiUsuari(String nomLlistaCorreu,
 			String codiDomini, String codiUsuari) throws Exception {
-		UserEmailEntity llistaCorreuUsuari = getUserEmailEntityDao().findByMailListNameAndDomainCodeAndUserCode(nomLlistaCorreu, codiDomini, codiUsuari);
+		UserEmailEntity llistaCorreuUsuari = getUserEmailEntityDao().findByListAndUser(nomLlistaCorreu, codiDomini, codiUsuari);
 		if (llistaCorreuUsuari != null) {
 			return getUserEmailEntityDao().toLlistaCorreuUsuari(llistaCorreuUsuari);
 		}
@@ -295,7 +295,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	}
 
 	protected LlistaCorreu handleFindLlistaCorreuByNomAndCodiDomini(String nomLlistaCorreu, String codiDomini) throws Exception {
-		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		if (llistaCorreuEntity != null) {
 			LlistaCorreu llistaCorreu = getEmailListEntityDao().toLlistaCorreu(llistaCorreuEntity);
 			return llistaCorreu;
@@ -313,10 +313,10 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected void handleDelete(RelacioLlistaCorreu relacioLlistaCorreu) throws Exception {
 		EmailListContainerEntity relacioLlistaCorreuEntity = getEmailListContainerEntityDao().relacioLlistaCorreuToEntity(relacioLlistaCorreu);
-		EmailListEntity llistaConte = relacioLlistaCorreuEntity.getContain();
+		EmailListEntity llistaConte = relacioLlistaCorreuEntity.getContains();
 		// Per procesar després la baixa de llistes buides (de la contenidora)
 		String alies = llistaConte.getName();
-		String domini = llistaConte.getDomain() != null ? llistaConte.getDomain().getCode() : ""; //$NON-NLS-1$
+		String domini = llistaConte.getDomain() != null ? llistaConte.getDomain().getName() : ""; //$NON-NLS-1$
 
 		// Esborrem la relació entre llistes
 		getEmailListContainerEntityDao().remove(relacioLlistaCorreuEntity);
@@ -327,7 +327,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected RelacioLlistaCorreu handleFindRelacioLlistaCorreuByNomAndCodiLlistaCorreuPertanyAndNomAndCodiLlistaCorreuConte(
 			String nomPertany, String dominiCorreuPertany, String nomConte, String dominiCorreuConte) throws Exception {
-		EmailListContainerEntity relacioLlistaCorreuEntity = getEmailListContainerEntityDao().findByPertainNameAndPertainDomainAndContainNameAndContainDomain(nomPertany, dominiCorreuPertany, nomConte, dominiCorreuConte);
+		EmailListContainerEntity relacioLlistaCorreuEntity = getEmailListContainerEntityDao().findByContainerAndContained(nomPertany, dominiCorreuPertany, nomConte, dominiCorreuConte);
 		if (relacioLlistaCorreuEntity != null) {
 			RelacioLlistaCorreu relacioLlistaCorreu = getEmailListContainerEntityDao().toRelacioLlistaCorreu(relacioLlistaCorreuEntity);
 			return relacioLlistaCorreu;
@@ -337,7 +337,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected Collection<RelacioLlistaCorreu> handleFindRelacionsLlistaCorreuByNomLlistaCorreuConteAndCodiDomini(String nomLlistaCorreuConte,
 			String codiDomini) throws Exception {
-		Collection<EmailListContainerEntity> relacionsLlistaCorreu = getEmailListContainerEntityDao().findCollectionByContainNameAndDomainCode(nomLlistaCorreuConte, codiDomini);
+		Collection<EmailListContainerEntity> relacionsLlistaCorreu = getEmailListContainerEntityDao().findByContained(nomLlistaCorreuConte, codiDomini);
 		if (relacionsLlistaCorreu != null) {
 			return getEmailListContainerEntityDao().toRelacioLlistaCorreuList(relacionsLlistaCorreu);
 		}
@@ -346,7 +346,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 
 	protected Collection<RelacioLlistaCorreu> handleFindRelacionsLlistaCorreuByNomLlistaCorreuPertanyAndCodiDomini(
 			String nomLlistaCorreuPertany, String codiDomini) throws Exception {
-		Collection<EmailListContainerEntity> relacionsLlistaCorreu = getEmailListContainerEntityDao().findCollectionByPertainNameAndDomainCode(nomLlistaCorreuPertany, codiDomini);
+		Collection<EmailListContainerEntity> relacionsLlistaCorreu = getEmailListContainerEntityDao().findByContainer(nomLlistaCorreuPertany, codiDomini);
 		if (relacionsLlistaCorreu != null) {
 			return getEmailListContainerEntityDao().toRelacioLlistaCorreuList(relacionsLlistaCorreu);
 		}
@@ -393,7 +393,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	}
 
 	protected Collection<LlistaCorreuUsuari> handleFindLlistaCorreuUsuariByCodiUsuari(String codiUsuari) throws Exception {
-		Collection<UserEmailEntity> llistaCorreuUsuaris = getUserEmailEntityDao().findByUserCode(codiUsuari);
+		Collection<UserEmailEntity> llistaCorreuUsuaris = getUserEmailEntityDao().findByUser(codiUsuari);
 		if (llistaCorreuUsuaris != null) {
 			return getUserEmailEntityDao().toLlistaCorreuUsuariList(llistaCorreuUsuaris);
 		}
@@ -403,7 +403,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected String handleFindLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
 		String llistat = ""; //$NON-NLS-1$
-		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection correusExterns = llistaCorreuEntity.getExternals();
 		if (correusExterns != null) {
 			Iterator iterator = correusExterns.iterator();
@@ -422,12 +422,12 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected String handleFindLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
 		String llistat = ""; //$NON-NLS-1$
-		Collection llistesCorreuEntities = getEmailListContainerEntityDao().findCollectionByContainNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		Collection llistesCorreuEntities = getEmailListContainerEntityDao().findByContained(nomLlistaCorreu, codiDomini);
 		if (llistesCorreuEntities != null) {
 			Iterator iterator = llistesCorreuEntities.iterator();
 			while (iterator.hasNext()) {
 				EmailListContainerEntity relacioLlistaCorreuEntity = (EmailListContainerEntity) iterator.next();
-				EmailListEntity llistaCorreuEntityPertany = relacioLlistaCorreuEntity.getPertain();
+				EmailListEntity llistaCorreuEntityPertany = relacioLlistaCorreuEntity.getPertains();
 				llistat += llistaCorreuEntityPertany.getName() + "@" + llistaCorreuEntityPertany.getDomain() + ", "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
@@ -441,7 +441,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected String handleFindLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
 		String llistat = ""; //$NON-NLS-1$
-		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection llistaCorreuUsuaris = llistaCorreuEntity.getUserMailLists();
 		if (llistaCorreuUsuaris != null) {
 			Iterator iterator = llistaCorreuUsuaris.iterator();
@@ -467,7 +467,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 		Collection llistesDeCorreuPertany = findRelacionsLlistaCorreuByNomLlistaCorreuPertanyAndCodiDomini(nomLlistaCorreu, codiDomini);
 		if (correusExterns.size() == 0 && usuaris.size() == 0 && llistesDeCorreuConte.size() == 0
 				&& llistesDeCorreuPertany.size() == 0) {
-			EmailListEntity llistaEsborrar = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+			EmailListEntity llistaEsborrar = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 			if (llistaEsborrar != null)
 				getEmailListEntityDao().remove(llistaEsborrar);
 		}
@@ -514,7 +514,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected Collection<Grup> handleFindGroupMembers(String nomLlistaCorreu,
 			String codiDomini) throws Exception {
 		
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		List<Grup> grups = new LinkedList<Grup>();
 		for (MailListGroupMemberEntity member : list.getGroups()) {
             grups.add(getGroupEntityDao().toGrup(member.getGroup()));
@@ -525,7 +525,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	@Override
 	protected Collection<MailListRoleMember> handleFindRoleMembers(
 			String nomLlistaCorreu, String codiDomini) throws Exception {
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		return getMailListRoleMemberEntityDao().toMailListRoleMemberList(list.getRoles());
 	}
 
@@ -533,11 +533,11 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected void handleSubscribeGroup(String mailListName,
 			String mailListDomain, String groupName) throws Exception {
 		MailListGroupMemberEntity entity = getMailListGroupMemberEntityDao().newMailListGroupMemberEntity();
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(mailListName, mailListDomain);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(mailListName, mailListDomain);
 		if (list == null)
 			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
 		entity.setMailList(list);
-		entity.setGroup(getGroupEntityDao().findByCode(groupName));
+		entity.setGroup(getGroupEntityDao().findByName(groupName));
 		if (entity.getGroup() == null)
 			throw new UnknownGroupException(groupName);
 		getMailListGroupMemberEntityDao().create(entity);
@@ -547,11 +547,11 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 	protected void handleUnsubscribeGroup(String mailListName,
 			String mailListDomain, String groupName) throws Exception {
 		
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(mailListName, mailListDomain);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(mailListName, mailListDomain);
 		if (list == null)
 			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
 		for (MailListGroupMemberEntity group : list.getGroups()) {
-            if (group.getGroup().getCode().equals(groupName)) getMailListGroupMemberEntityDao().remove(group);
+            if (group.getGroup().getName().equals(groupName)) getMailListGroupMemberEntityDao().remove(group);
         }	
 		
 	}
@@ -561,7 +561,7 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 			String mailListDomain, MailListRoleMember roleMember)
 			throws Exception {
 		MailListRoleMemberEntity entity = getMailListRoleMemberEntityDao().newMailListRoleMemberEntity();
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(mailListName, mailListDomain);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(mailListName, mailListDomain);
 		if (list == null)
 			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
 		entity.setMailList(list);
@@ -579,13 +579,13 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 			}
 			else if (TipusDomini.GRUPS.equals(role.getDomainType()) || TipusDomini.GRUPS_USUARI.equals(role.getDomainType()))
 			{
-				entity.setGroupScope(getGroupEntityDao().findByCode(roleMember.getScope()));
+				entity.setGroupScope(getGroupEntityDao().findByName(roleMember.getScope()));
 				if (entity.getGroupScope() == null)
 					throw new UnknownGroupException(roleMember.getScope());
 			}
 			if (TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()))
 			{
-				entity.setDomainValueScope(getDomainValueEntityDao().findByApplicationDomainValue(role.getApplication().getCode(), role.getApplicationDomain().getName(), roleMember.getScope()));
+				entity.setDomainValueScope(getDomainValueEntityDao().findByApplicationDomainValue(role.getInformationSystem().getName(), role.getApplicationDomain().getName(), roleMember.getScope()));
 				if (entity.getDomainValueScope() == null)
 					throw new IllegalArgumentException(roleMember.getScope());
 			}
@@ -601,21 +601,21 @@ public class LlistesDeCorreuServiceImpl extends es.caib.seycon.ng.servei.Llistes
 			String mailListDomain, MailListRoleMember roleMember)
 			throws Exception {
 		MailListRoleMemberEntity entity = getMailListRoleMemberEntityDao().newMailListRoleMemberEntity();
-		EmailListEntity list = getEmailListEntityDao().findByNameAndDomainCode(mailListName, mailListDomain);
+		EmailListEntity list = getEmailListEntityDao().findByNameAndDomain(mailListName, mailListDomain);
 		if (list == null)
 			throw new UnknownMailListException(mailListName+"@"+mailListDomain);
 		for (MailListRoleMemberEntity member : list.getRoles()) {
             entity.setMailList(list);
             RoleEntity role = member.getRole();
-            if (role.getName().equals(roleMember.getRoleName()) && role.getDatabases().getCode().equals(roleMember.getDispatcherName())) {
+            if (role.getName().equals(roleMember.getRoleName()) && role.getSystem().getName().equals(roleMember.getDispatcherName())) {
                 if (roleMember.getScope() == null || roleMember.getScope().length() == 0) {
                     if (member.getDomainValueScope() == null && member.getGroupScope() == null && member.getInformationSystemScope() == null) {
                         getMailListRoleMemberEntityDao().remove(member);
                     }
                 } else {
-                    if (TipusDomini.APLICACIONS.equals(role.getDomainType()) && member.getInformationSystemScope() != null && member.getInformationSystemScope().getCode().equals(roleMember.getScope())) {
+                    if (TipusDomini.APLICACIONS.equals(role.getDomainType()) && member.getInformationSystemScope() != null && member.getInformationSystemScope().getName().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);
-                    } else if ((TipusDomini.GRUPS.equals(role.getDomainType()) || TipusDomini.GRUPS_USUARI.equals(role.getDomainType())) && member.getGroupScope() != null && member.getGroupScope().getCode().equals(roleMember.getScope())) {
+                    } else if ((TipusDomini.GRUPS.equals(role.getDomainType()) || TipusDomini.GRUPS_USUARI.equals(role.getDomainType())) && member.getGroupScope() != null && member.getGroupScope().getName().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);
                     } else if (TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()) && member.getDomainValueScope() != null && member.getDomainValueScope().getValue().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);

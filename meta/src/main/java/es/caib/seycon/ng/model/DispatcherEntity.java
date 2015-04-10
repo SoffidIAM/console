@@ -33,7 +33,7 @@ public abstract class DispatcherEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DIS_CODI", length=50, translated="code")
+	@Column (name="DIS_CODI", length=50, translated="name")
 	@Nullable
 	public java.lang.String codi;
 
@@ -85,11 +85,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String param9;
 
-	@Column (name="DIS_BASROL", length=1, translated="baseRole")
+	@Column (name="DIS_BASROL", length=1, translated="roleBased")
 	@Nullable
 	public java.lang.String basRol;
 
-	@Column (name="DIS_SEGUR", length=1, translated="safe")
+	@Column (name="DIS_SEGUR", length=1, translated="trusted")
 	@Nullable
 	public java.lang.String segur;
 	
@@ -114,7 +114,7 @@ public abstract class DispatcherEntity {
 	@ForeignKey (foreignColumn="CAC_DIS_ID", translated="accessControls")
 	public java.util.Collection<es.caib.seycon.ng.model.ControlAccessEntity> controlAccess;
 
-	@Column (name="DIS_DCN_ID", translated="domain")
+	@Column (name="DIS_DCN_ID", translated="passwordDomain")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity domini;
 
 	@Column (name="DIS_DOU_ID", translated="userDomain")
@@ -164,34 +164,39 @@ public abstract class DispatcherEntity {
 	public Collection<AuthoritativeChangeEntity> pendingChanges;
 	
 	/************************ DAOS *******************************/
-	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity\nwhere\n(:codi is null or upper(codi) like upper(:codi)) and\n(:nomCla is null or upper(nomCla) like upper(:nomCla)) and\n(:url is null or upper(url) like upper(:url)) and\n(:basRol is null or upper(basRol) = upper(:basRol)) and\n(:segur is null or segur = :segur) and\n(:actiu is null or url is not null)")
-	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findDispatchersByFiltre(
-		java.lang.String codi, 
-		java.lang.String nomCla, 
+	@DaoFinder("from com.soffid.iam.model.SystemEntity se "
+			+ "where (:name is null or se.name like :name) and "
+			+ "(:className is null or se.className like :className) and "
+			+ "(:url is null or se.url like :url) and "
+			+ "(:roleBased is null or se.roleBased = :roleBased) and "
+			+ "(:trusted is null or se.trusted = :trusted) and "
+			+ "(:active is null or se.url is not null)")
+	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findByFilter(
+		java.lang.String name, 
+		java.lang.String className, 
 		java.lang.String url, 
-		java.lang.String basRol, 
-		java.lang.String segur, 
-		java.lang.String actiu) {
+		java.lang.String roleBased, 
+		java.lang.String trusted, 
+		java.lang.String active) {
 	 return null;
 	}
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DispatcherEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
+	
 	@Operation(translated="findActives")
-	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity agent\nwhere agent.url is not null order by agent.codi")
+	@DaoFinder("from com.soffid.iam.model.SystemEntity agent "
+			+ "where agent.url is not null order by agent.name")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findActius() {
 	 return null;
 	}
 	@Operation(translated="findSoffidSystem")
-	@DaoFinder("select dis\nfrom es.caib.seycon.ng.model.DispatcherEntity as dis\nwhere dis.mainDispatcher = true")
+	@DaoFinder("select dis "
+			+ "from com.soffid.iam.model.SystemEntity as dis "
+			+ "where dis.mainSystem = true")
 	public es.caib.seycon.ng.model.DispatcherEntity findSoffidDispatcher() {
 	 return null;
 	}

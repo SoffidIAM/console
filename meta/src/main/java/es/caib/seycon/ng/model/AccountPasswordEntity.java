@@ -34,7 +34,10 @@ public abstract class AccountPasswordEntity {
 	@Column (name="APW_ACC_ID")
 	public es.caib.seycon.ng.model.AccountEntity account;
 
-	@DaoFinder("select pwd\nfrom es.caib.seycon.ng.model.AccountPasswordEntity as pwd\nwhere pwd.account.id = :accountId\nand pwd.order=0")
+	@DaoFinder("select pwd\n"
+			+ "from com.soffid.iam.model.AccountPasswordEntity as pwd\n"
+			+ "where pwd.account.id = :accountId\n"
+			+ "and pwd.order=0")
 	public es.caib.seycon.ng.model.AccountPasswordEntity findLastByAccount(
 		long accountId) {
 	 return null;

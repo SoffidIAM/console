@@ -25,10 +25,11 @@ public abstract class GrupDispatcherEntity {
 	@Column (name="GRD_IDDIS", translated="system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
-	@Operation(translated="findByAgentCode")
-	@DaoFinder("select gd from es.caib.seycon.ng.model.GrupDispatcherEntity gd where gd.dispatcher.codi=:codiAgent")
+	@Operation(translated="findBySystem")
+	@DaoFinder("select gd from com.soffid.iam.model.SystemGroupEntity gd "
+			+ "where gd.system.name=:systemName")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> findByCodiAgent(
-		java.lang.String codiAgent) {
+		java.lang.String systemName) {
 	 return null;
 	}
 }

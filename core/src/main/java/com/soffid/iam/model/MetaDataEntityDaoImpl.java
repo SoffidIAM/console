@@ -34,7 +34,7 @@ public class MetaDataEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.0"), tipusDada.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.0"), tipusDada.getName(), message));
 		}
 	}
 
@@ -44,14 +44,14 @@ public class MetaDataEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.1"), tipusDada.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.1"), tipusDada.getName(), message));
 		}
 	}
 
 	public void toTipusDada(com.soffid.iam.model.MetaDataEntity sourceEntity, es.caib.seycon.ng.comu.TipusDada targetVO) {
 		super.toTipusDada(sourceEntity, targetVO);
 		if (sourceEntity.getLabel() == null)
-			targetVO.setLabel(sourceEntity.getCode());
+			targetVO.setLabel(sourceEntity.getName());
 		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)
 			targetVO.setValues ( new LinkedList<String>() );
 		else

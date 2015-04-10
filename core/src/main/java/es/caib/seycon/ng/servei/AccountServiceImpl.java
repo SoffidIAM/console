@@ -57,7 +57,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.NotAllowedException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.remote.URLManager;
 import es.caib.seycon.ng.servei.account.AccountNameGenerator;
@@ -95,7 +95,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	private ApplicationContext applicationContext;
 
 	private UserEntity getUser(String usuari) {
-		UserEntity ue = getUserEntityDao().findByCode(usuari);
+		UserEntity ue = getUserEntityDao().findByUserName(usuari);
 		if (ue != null)
 		{
 			Collection<UserEntity> filtrat = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(Collections.singleton(ue));
@@ -137,17 +137,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (name == null)
 		{
 			nullName = true;
-			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getCode());
+			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getName());
 			if (! existing.isEmpty())
-				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getCode()));
+				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
 			// Search if already has a user name for this user domain
 			
-			name = gessAccountName(ue.getUserName(), de.getCode());
+			name = gessAccountName(ue.getUserName(), de.getName());
 							
 			if (name == null)
 				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")); //$NON-NLS-1$
 		}
-		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(name, de.getCode());
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(name, de.getName());
 		if (acc != null)
 		{
 			if (acc.getType().equals (AccountType.IGNORED) && acc.getAcl().isEmpty() &&
@@ -159,7 +159,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	    		getAccountEntityDao().update(acc);
 			}
 			else
-				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getCode()));
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getName()));
 		} else {
     		acc = getAccountEntityDao().newAccountEntity();
     		acc.setDescription(ue.getFullName());
@@ -233,10 +233,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			acc = getAccountEntityDao().newAccountEntity();
 			acc.setAcl(new HashSet<AccountAccessEntity>());
 			acc.setDescription(account.getDescription());
-			acc.setSystem(getSystemEntityDao().findByCode(account.getDispatcher()));
+			acc.setSystem(getSystemEntityDao().findByName(account.getDispatcher()));
 			acc.setName(account.getName());
 			acc.setType(account.getType());
-			UserTypeEntity tu = getUserTypeEntityDao().findByCode(account.getPasswordPolicy());
+			UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
 			if (tu == null)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
 			acc.setPasswordPolicy( tu );
@@ -474,8 +474,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 		if (! account.getName().equals(ae.getName()))
 		{
-			if (getAccountEntityDao().findByNameAndSystem(account.getName(), ae.getSystem().getCode()) != null)
-				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getCode()));
+			if (getAccountEntityDao().findByNameAndSystem(account.getName(), ae.getSystem().getName()) != null)
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName()));
 		}
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
@@ -506,10 +506,6 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
-		for (AccountAccessEntity aae: ae.getAcl())
-		{
-			getAccountAccessEntityDao().remove(aae);
-		}
 		createAccountTask(ae);
 		getAccountEntityDao().remove(ae);
 	}
@@ -521,7 +517,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
 			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
 			tasque.setUser(ae.getName());
-			tasque.setSystemCode(ae.getSystem().getCode());
+			tasque.setSystemName(ae.getSystem().getName());
 			getTaskEntityDao().create(tasque);
 		}
 	}
@@ -531,7 +527,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
 			tasque.setTransaction(TaskHandler.NOTIFY_PASSWORD_CHANGE);
-			tasque.setSystemCode(ae.getSystem().getCode());
+			tasque.setSystemName(ae.getSystem().getName());
 			
 			// Check notify to group
 			if (ge != null)
@@ -589,14 +585,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	@Override
 	protected void handleGenerateUserAccounts(String user) throws Exception
 	{
-		UserEntity ue = getUserEntityDao().findByCode(user);
+		UserEntity ue = getUserEntityDao().findByUserName(user);
 		if (ue == null)
 			return;
 		
 		SystemEntityDao disDao = getSystemEntityDao();
 		for (SystemEntity disEntity : disDao.loadAll()) {
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
-                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getCode());
+                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getName());
                 for (AccountEntity acc : accs) {
                     if (acc.isDisabled()) {
                         acc.setDisabled(false);
@@ -660,7 +656,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 		AccountEntity accountEntity = dao.load(account.getId());
 		
-		AccountEntity oldAccount = dao.findByNameAndSystem(account.getName(), accountEntity.getSystem().getCode());
+		AccountEntity oldAccount = dao.findByNameAndSystem(account.getName(), accountEntity.getSystem().getName());
 		if (oldAccount == null)
 		{
 			createAccountTask(accountEntity);
@@ -675,10 +671,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	}
 
 	private void addGroups(HashMap<String, Group> groups, GroupEntity grup) {
-		if (!groups.containsKey(grup.getCode()))
+		if (!groups.containsKey(grup.getName()))
 		{
 			Grup grupVO = getGroupEntityDao().toGrup(grup);
-			groups.put(grup.getCode(), Group.toGroup(grupVO));
+			groups.put(grup.getName(), Group.toGroup(grupVO));
 			if (grup.getParent() != null)
 				addGroups(groups, grup.getParent());	
 		}
@@ -688,14 +684,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected String handleGessAccountName(String userName, String dispatcherName)
 			throws Exception
 	{
-		SystemEntity dispatcher = getSystemEntityDao().findByCode(dispatcherName);
+		SystemEntity dispatcher = getSystemEntityDao().findByName(dispatcherName);
 		if (dispatcher.getManualAccountCreation() != null && dispatcher.getManualAccountCreation().booleanValue())
 			return null;
 		
 		UserDomainEntity du = getUserDomainEntityDao().findBySytem(dispatcherName);
 		// Search if already has a user name for this user domain
 		
-		UserEntity ue = getUserEntityDao().findByCode(userName);
+		UserEntity ue = getUserEntityDao().findByUserName(userName);
 		if (ue == null)
 			return null;
 
@@ -709,11 +705,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		{
 			Object obj = applicationContext.getBean(du.getBeanGenerator());
 			if (obj == null)
-				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getCode())); //$NON-NLS-1$
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getName())); //$NON-NLS-1$
 			if (! (obj instanceof AccountNameGenerator))
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
 			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			SystemEntity de = getSystemEntityDao().findByCode(dispatcherName);
+			SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
 			return generator.getAccountName(ue, de);
 		}
 		else
@@ -723,14 +719,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	private String evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName) throws EvalError {
 		User userVO = User.toUser(getUserEntityDao().toUsuari(ue));
 		Interpreter interpreter = new Interpreter();
-		SystemEntity de = getSystemEntityDao().findByCode(dispatcherName);
+		SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
 		
 		HashMap<String, String> attributes;
 		HashMap<String, Group> groups;
 			
 		attributes = new HashMap<String, String>();
 		for (UserDataEntity dada : ue.getUserData()) {
-            attributes.put(dada.getDataType().getCode(), dada.getDataValue());
+            attributes.put(dada.getDataType().getName(), dada.getValue());
         }
 				
 		groups = new HashMap<String, Group>();
@@ -968,7 +964,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		// Check if policy allows user change
 		DominiUsuariService dominiUsuariService = getDominiUsuariService();
-		PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
+		PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
 		if (politica == null)
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 		if (!politica.isAllowPasswordQuery())
@@ -1031,7 +1027,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						if (callerUe == null)
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 						
-						if (!callerUe.getId().equals(ue2.getId()) && !AutoritzacionsUsuari.canUpdateUserPassword(ue2.getPrimaryGroup().getCode()))
+						if (!callerUe.getId().equals(ue2.getId()) && !AutoritzacionsUsuari.canUpdateUserPassword(ue2.getPrimaryGroup().getName()))
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					}
 					else
@@ -1060,7 +1056,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			}
 			// Check if policy allows user change
 			DominiUsuariService dominiUsuariService = getDominiUsuariService();
-			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
+			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
 			if (politica == null)
 				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 			if (!politica.isAllowPasswordChange())
@@ -1136,7 +1132,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			}
 			// Check if policy allows user change
 			DominiUsuariService dominiUsuariService = getDominiUsuariService();
-			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getCode(), ae.getSystem().getDomain().getCode());
+			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
 			if (politica == null)
 				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
 			if (!politica.isAllowPasswordChange())
@@ -1248,7 +1244,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		account.setLastUpdated(account2.getLastUpdated());
 		account.setPasswordExpiration(account2.getPasswordExpiration());
 
-		List<TaskEntity> coll = getTaskEntityDao().findByAccount(accEntity.getName(), accEntity.getSystem().getCode());
+		List<TaskEntity> coll = getTaskEntityDao().findByAccount(accEntity.getName(), accEntity.getSystem().getName());
 		for (TaskEntity tasque : coll) {
             if (tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT) || tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_ACCOUNT_PASSWORD)) return true;
         }
@@ -1258,7 +1254,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			for (UserAccountEntity ua : accEntity.getUsers()) {
                 coll = getTaskEntityDao().findByUser(ua.getUser().getUserName());
                 for (TaskEntity tasque : coll) {
-                    if (tasque.getTransaction().equals(TaskHandler.UPDATE_USER) || accEntity.getSystem().getDomain().getCode().equals(tasque.getPasswordsDomain()) && (tasque.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD))) {
+                    if (tasque.getTransaction().equals(TaskHandler.UPDATE_USER) || accEntity.getSystem().getPasswordDomain().getName().equals(tasque.getPasswordsDomain()) && (tasque.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD))) {
                         boolean found = false;
                         for (TaskLogEntity tl : tasque.getLogs()) {
                             if (tl.getSystem().getId().equals(accEntity.getSystem().getId())) {
@@ -1283,7 +1279,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(action); //$NON-NLS-1$
         auditoria.setAccount(account.getName());
-        auditoria.setBbdd(account.getSystem().getCode());
+        auditoria.setBbdd(account.getSystem().getName());
         auditoria.setAutor(codiUsuariCanvi);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
@@ -1313,7 +1309,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		Iterator it = null;											// Iterator to manage list
 		
 		query = "select account " + //$NON-NLS-1$
-			"from es.caib.seycon.ng.model.AccountEntity as account " + //$NON-NLS-1$
+			"from com.soffid.iam.model.AccountEntity as account " + //$NON-NLS-1$
 			"where account.passwordExpiration between :currentDate and :limitDate"; //$NON-NLS-1$
 		
 		paramsList.add(new Parameter("currentDate", currentDate)); //$NON-NLS-1$
@@ -1391,7 +1387,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		List<Account> accounts = new LinkedList<Account>();
 		
 		for (Account account : accountList) {
-            account.setPasswordPolicy(userTypeDAO.findByCode(account.getPasswordPolicy()).getDescription());
+            account.setPasswordPolicy(userTypeDAO.findByName(account.getPasswordPolicy()).getDescription());
             accounts.add(account);
         }
 

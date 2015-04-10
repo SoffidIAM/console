@@ -45,14 +45,6 @@ public class AuditoriaServiceImpl extends
 		return null;
 	}
 
-	public String[] handleFind(String sqlQuery) {
-		if (sqlQuery != null) {
-			String[] sqlQueryResult = getAuditEntityDao().find(sqlQuery);
-			return sqlQueryResult;
-		}
-		return new String[0];
-	}
-
 	private void auditaQuery(String query) {
         String codiUsuari = Security.getCurrentAccount();
         Auditoria auditoria = new Auditoria();

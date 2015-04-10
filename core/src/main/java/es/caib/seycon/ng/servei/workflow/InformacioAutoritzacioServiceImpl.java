@@ -10,19 +10,25 @@
 package es.caib.seycon.ng.servei.workflow;
 
 import com.soffid.iam.model.RoleAccountEntity;
+
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Aplicacio;
+import es.caib.seycon.ng.comu.AutoritzacioRol;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
+import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.servei.AplicacioService;
+import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.servei.workflow.AltaBaixaUsuariServiceImpl.ComparaGrups;
 import es.caib.seycon.ng.utils.Security;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -116,11 +122,27 @@ public class InformacioAutoritzacioServiceImpl extends
 	 * @throws Exception
 	 */
 	protected Collection<Usuari> handleFindAdministradorsAplicacioByCodiAplicacio(
-			String codiAplicacio) throws Exception {
+			String codiAplicacio) throws Exception 
+	{
+		
+		AutoritzacioService autService = getAutoritzacioService();
 		AplicacioService aplicacioService = getAplicacioService();
-		Collection administradors = aplicacioService
-				.findUsuarisAmbPermisosActualitzacioByCodiAplicacio(codiAplicacio);
-		return administradors;
+		
+		HashSet<Usuari> users = new HashSet<Usuari>();
+		for (AutoritzacioRol ar: autService.getRolsAutoritzacio(Security.AUTO_USER_ROLE_CREATE))
+		{
+			for (RolGrant rg: aplicacioService.findEffectiveRolGrantsByRolId(ar.getRol().getId()))
+			{
+				if (rg.getUser() != null)
+				{
+					if (rg.getDomainValue() == null  || rg.getDomainValue().equals(codiAplicacio))
+					{
+						users.add(getUsuariService().findUsuariByCodiUsuari(rg.getUser()));
+					}
+				}
+			}
+		}
+		return users;
 	}
 
 	/**
@@ -178,19 +200,24 @@ public class InformacioAutoritzacioServiceImpl extends
 	 */
 	protected Boolean handleIsAdministradorAplicacio(String codiUsuari,
 			String codiAplicacio) throws Exception {
+		AutoritzacioService autService = getAutoritzacioService();
 		AplicacioService aplicacioService = getAplicacioService();
-		Collection administradors = aplicacioService
-				.findUsuarisAmbPermisosActualitzacioByCodiAplicacio(codiAplicacio);
-		if (administradors != null) {
-			Iterator administradorIterator = administradors.iterator();
-			boolean isAdministrador = false;
-			while (administradorIterator.hasNext() && (!isAdministrador)) {
-				Usuari administrador = (Usuari) administradorIterator.next();
-				isAdministrador = administrador.getCodi().compareTo(codiUsuari) == 0;
+		
+		HashSet<Usuari> users = new HashSet<Usuari>();
+		for (AutoritzacioRol ar: autService.getRolsAutoritzacio(Security.AUTO_USER_ROLE_CREATE))
+		{
+			for (RolGrant rg: aplicacioService.findEffectiveRolGrantsByRolId(ar.getRol().getId()))
+			{
+				if (rg.getUser() != null && codiUsuari.equals(rg.getUser()))
+				{
+					if (rg.getDomainValue() == null  || rg.getDomainValue().equals(codiAplicacio))
+					{
+						return true;
+					}
+				}
 			}
-			return new Boolean(isAdministrador);
 		}
-		return new Boolean(false);
+		return false;
 	}
 
 	protected Collection<Aplicacio> handleFindAplicacioByCriteri(String codi, String nom,
@@ -221,19 +248,38 @@ public class InformacioAutoritzacioServiceImpl extends
 
 	protected Collection<Aplicacio> handleFindAplicacionsAdministradesByCodiUsuari(
 			String codiUsuari) throws Exception {
+		AutoritzacioService autService = getAutoritzacioService();
 		AplicacioService aplicacioService = getAplicacioService();
-		Collection<Aplicacio> aplicacions = aplicacioService
-				.findAplicacionsGestionablesWFAdministradesByCodiUsuari(codiUsuari);
-
-		if (aplicacions != null) {
-			return aplicacions;
+		
+		HashSet<Aplicacio> apps = new HashSet<Aplicacio>();
+		for (AutoritzacioRol ar: autService.getRolsAutoritzacio(Security.AUTO_USER_ROLE_CREATE))
+		{
+			for (RolGrant rg: aplicacioService.findEffectiveRolGrantsByRolId(ar.getRol().getId()))
+			{
+				if (rg.getUser() != null && rg.getUser().equals(codiUsuari))
+				{
+					if (rg.getDomainValue() == null)
+					{
+						
+						for (Aplicacio app: aplicacioService.findAplicacioByCriteri(null, null, null, null, null, null, null, null))
+						{
+							apps.add(app);
+							break;
+						}
+					}
+					else 
+					{
+						apps.add(getAplicacioService().findAplicacioByCodiAplicacio(rg.getDomainValue()));
+					}
+				}
+			}
 		}
-		return new LinkedList<Aplicacio>();
+		return apps;
 	}
 
 	protected Collection<RolAccount> handleFindRolsUsuarisByCodiUsuariAndNomRolSenseRestriccions(
 			String codiUsuari, String nomRol) throws Exception {
-		Collection<RoleAccountEntity> rolsUsu = getRoleAccountEntityDao().findByCodiUsuariAndNomRol(codiUsuari, nomRol);
+		Collection<RoleAccountEntity> rolsUsu = getRoleAccountEntityDao().findByUserAndRole(codiUsuari, nomRol);
 		if (rolsUsu != null) {
 			return getRoleAccountEntityDao().toRolAccountList(rolsUsu);
 		}

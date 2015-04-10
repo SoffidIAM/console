@@ -35,7 +35,8 @@ import org.apache.commons.beanutils.BeanUtils;
  */
 public class AuditEntityDaoImpl extends
 		com.soffid.iam.model.AuditEntityDaoBase {
-	private static final String BUNDLE_NAME = "es.caib.seycon.ng.model.audit.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.soffid.iam.model.audit.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME2 = "es.caib.seycon.ng.model.audit.messages"; //$NON-NLS-1$
 
 
 	@Override
@@ -91,7 +92,7 @@ public class AuditEntityDaoImpl extends
 
 		GroupEntity grup = sourceEntity.getGroup();
 		if (grup != null) {
-			targetVO.setGrup(grup.getCode());
+			targetVO.setGrup(grup.getName());
 		}
 
 		com.soffid.iam.model.AccountEntity usuari = sourceEntity.getAccountAssoc();
@@ -102,14 +103,14 @@ public class AuditEntityDaoImpl extends
 			if (usuari.getType().equals (AccountType.USER))
 			{
 				for (com.soffid.iam.model.UserAccountEntity ua : usuari.getUsers()) {
-                    targetVO.setAutorGrupPrimari(ua.getUser().getPrimaryGroup().getCode());
+                    targetVO.setAutorGrupPrimari(ua.getUser().getPrimaryGroup().getName());
                 }
 			}
 		}
 		
 		targetVO.setValorDomini(sourceEntity.getDomainValue());
 		
-		if (sourceEntity.getFileID() != null) {
+		if (sourceEntity.getFileId() != null) {
 			// Atenció: els fitxers es poden esborrar... per això no n'hi ha una
 			// relació amb els fitxers.. la que havia era amb el seu ID
 			try {
@@ -117,9 +118,9 @@ public class AuditEntityDaoImpl extends
 //				targetVO.setNomFitxer(f.getNom());
 			} catch (Throwable th) {
 				//Marquem el seu id
-				targetVO.setNomFitxer(sourceEntity.getFileID() + " (id)"); //$NON-NLS-1$
+				targetVO.setNomFitxer(sourceEntity.getFileId() + " (id)"); //$NON-NLS-1$
 			}
-			targetVO.setFitxer(sourceEntity.getFileID());
+			targetVO.setFitxer(sourceEntity.getFileId());
 		}
 		
 		StringBuffer key = new StringBuffer(50);
@@ -132,7 +133,19 @@ public class AuditEntityDaoImpl extends
 			} 
 			catch (MissingResourceException e) 
 			{
-				msg = MessageFactory.getString(BUNDLE_NAME+"_"+targetVO.getObjecte(), targetVO.getAccio()); //$NON-NLS-1$
+				try {
+					msg = MessageFactory.getString(BUNDLE_NAME2, key.toString());
+				} 
+				catch (MissingResourceException e2) 
+				{
+					try {
+						msg = MessageFactory.getString(BUNDLE_NAME+"_"+targetVO.getObjecte(), targetVO.getAccio()); //$NON-NLS-1$
+					} 
+					catch (MissingResourceException e3) 
+					{
+						msg = MessageFactory.getString(BUNDLE_NAME2+"_"+targetVO.getObjecte(), targetVO.getAccio()); //$NON-NLS-1$
+					}
+				}
 			}
 			StringBuffer result = new StringBuffer();
 			int processed = 0;
@@ -208,7 +221,7 @@ public class AuditEntityDaoImpl extends
 		
 		String grup = sourceVO.getGrup();
 		if (grup != null && grup.trim().length() > 0) {
-			GroupEntity grupEntity = getGroupEntityDao().findByCode(grup);
+			GroupEntity grupEntity = getGroupEntityDao().findByName(grup);
 			targetEntity.setGroup(grupEntity);
 		}
 

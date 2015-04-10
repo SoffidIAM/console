@@ -27,7 +27,7 @@ public abstract class ParaulaProhibidaPoliticaContrasenyaEntity {
 	@Operation(translated="findByPasswordPolicy")
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity> findByPoliticaContrasenya(
-		es.caib.seycon.ng.comu.PoliticaContrasenya politicaContrasenya) {
+		es.caib.seycon.ng.comu.PoliticaContrasenya passwordPolicy) {
 	 return null;
 	}
 }

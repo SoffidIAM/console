@@ -260,7 +260,7 @@ public class SelfServiceImpl extends SelfServiceBase
 			{
 				for (UserAccountEntity uae : ae.getUsers()) {
                     UserEntity user = uae.getUser();
-                    PasswordDomainEntity domain = ae.getSystem().getDomain();
+                    PasswordDomainEntity domain = ae.getSystem().getPasswordDomain();
                     return ips.getPasswordsStatus(user, domain);
                 }
 				return null;
@@ -283,7 +283,7 @@ public class SelfServiceImpl extends SelfServiceBase
 	protected String handleQueryOtherAffectedAccounts (Account account) throws Exception
 	{
 		AccountEntity acce = getAccountEntityDao().accountToEntity(account);
-		PasswordDomainEntity domini = acce.getSystem().getDomain();
+		PasswordDomainEntity domini = acce.getSystem().getPasswordDomain();
 		Collection<Account> others = new LinkedList<Account>();
 		Collection<Account> othersDef = new LinkedList<Account>();
 		String o = new String();
@@ -291,7 +291,7 @@ public class SelfServiceImpl extends SelfServiceBase
 		for (Account other : others) {
             if (other.getType().equals(AccountType.USER)) {
                 AccountEntity acceOther = getAccountEntityDao().accountToEntity(other);
-                PasswordDomainEntity dominiOther = acceOther.getSystem().getDomain();
+                PasswordDomainEntity dominiOther = acceOther.getSystem().getPasswordDomain();
                 if (domini.equals(dominiOther)) {
                     if (!account.getDispatcher().equals(other.getDispatcher())) {
                         othersDef.add(other);

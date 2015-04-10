@@ -14,6 +14,7 @@ import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import org.hibernate.Hibernate;
 
 /**
  * DAO UserAccountAccessEntity implementation
@@ -26,10 +27,10 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 		Auditoria auditoria = new Auditoria();
 		auditoria.setAccio(accio);
 		auditoria.setAccount(entity.getAccount().getName());
-		auditoria.setBbdd(entity.getAccount().getSystem().getCode());
+		auditoria.setBbdd(entity.getAccount().getSystem().getName());
 		auditoria.setAutor(codiUsuari);
 		if (entity.getGroup() != null)
-			auditoria.setGrup(entity.getGroup().getCode());
+			auditoria.setGrup(entity.getGroup().getName());
 		if (entity.getRol() != null)
 			auditoria.setRol(entity.getRol().getName());
 		if (entity.getUser() != null)
@@ -56,6 +57,11 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 
 	@Override
     public void remove(com.soffid.iam.model.AccountAccessEntity entity) {
+		if (Hibernate.isInitialized(entity.getAccount()) &&
+				Hibernate.isInitialized(entity.getAccount().getAcl()))
+		{
+			entity.getAccount().getAcl().remove(entity);
+		}
 		super.remove(entity);
 		auditar("D", entity); //$NON-NLS-1$
 	}

@@ -173,11 +173,11 @@ public class AutoritzacioServiceImpl extends
             if (!grupsFills.contains(codiGrupAnalitzat)) { // si no l'hem
                                                            // analitzat ja
                 grupsFills.add(codiGrupAnalitzat);
-                Collection fills = getGroupEntityDao().findSubGrupsByCodi(codiGrupAnalitzat);
+                Collection fills = getGroupEntityDao().findByParent(codiGrupAnalitzat);
                 if (fills != null)
                     for (Iterator git = fills.iterator(); git.hasNext(); ) {
                     GroupEntity fg = (GroupEntity) git.next();
-                    if (!grupsFills.contains(fg.getCode())) l_grupsUsuari.add(fg.getCode());
+                    if (!grupsFills.contains(fg.getName())) l_grupsUsuari.add(fg.getName());
                 }
             }
         }
@@ -187,12 +187,12 @@ public class AutoritzacioServiceImpl extends
 
     private Collection getCodiGrupsParesGrup(String codiGrup) {
 
-        GroupEntity grupAnalitzar = getGroupEntityDao().findByCode(codiGrup);
+        GroupEntity grupAnalitzar = getGroupEntityDao().findByName(codiGrup);
 
         Collection totsPares = new HashSet();
         GroupEntity pare = grupAnalitzar.getParent();
         while (pare != null) {
-            totsPares.add(pare.getCode());
+            totsPares.add(pare.getName());
             pare = pare.getParent();
         }
 

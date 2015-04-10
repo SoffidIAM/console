@@ -27,15 +27,15 @@ public abstract class ArbrePuntEntradaEntity {
 	public es.caib.seycon.ng.model.PuntEntradaEntity fill;
 
 	@Operation(translated="findByChildren")
-	@DaoFinder("select arbre from es.caib.seycon.ng.model.ArbrePuntEntradaEntity arbre where arbre.fill.id=:idFill order by arbre.ordre")
+	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.children.id=:childId order by arbre.order")
 	public java.util.List<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> findByFill(
-		java.lang.Long idFill) {
+		java.lang.Long childId) {
 	 return null;
 	}
 	@Operation(translated="findByParent")
-	@DaoFinder("select arbre from es.caib.seycon.ng.model.ArbrePuntEntradaEntity arbre where arbre.pare.id=:idPare order by arbre.ordre")
+	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.children.id=:parentId order by arbre.order")
 	public java.util.List<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> findByPare(
-		java.lang.Long idPare) {
+		java.lang.Long parentId) {
 	 return null;
 	}
 }

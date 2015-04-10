@@ -13,7 +13,7 @@ import com.soffid.iam.model.ServiceEntity;
 import es.caib.seycon.ng.comu.Servei;
 import es.caib.seycon.ng.comu.ServeiSearchCriteria;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
@@ -29,7 +29,7 @@ public class ServeiServiceImpl extends
 	 */
 	protected es.caib.seycon.ng.comu.Servei handleCreate(
 			es.caib.seycon.ng.comu.Servei servei) throws java.lang.Exception {
-		ServiceEntity servicesSameCode = getServiceEntityDao().findByCode(servei.getCodi());
+		ServiceEntity servicesSameCode = getServiceEntityDao().findByName(servei.getCodi());
 		if(servicesSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("ServeiServiceImpl.CodeServiceExists"),  //$NON-NLS-1$
 							servei.getCodi())); 
@@ -44,7 +44,7 @@ public class ServeiServiceImpl extends
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.Servei servei)
 			throws java.lang.Exception {
-		ServiceEntity serveiEntity = getServiceEntityDao().findByCode(servei.getCodi());
+		ServiceEntity serveiEntity = getServiceEntityDao().findByName(servei.getCodi());
 		if(serveiEntity != null){
 			getServiceEntityDao().remove(serveiEntity);
 		}
@@ -102,7 +102,7 @@ public class ServeiServiceImpl extends
 	}
 
 	protected Servei handleFindServeiByCodi(String codi) throws Exception {
-		ServiceEntity serveiEntity = getServiceEntityDao().findByCode(codi);
+		ServiceEntity serveiEntity = getServiceEntityDao().findByName(codi);
 		if(serveiEntity != null){
 			Servei servei = getServiceEntityDao().toServei(serveiEntity);
 			return servei;

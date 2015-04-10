@@ -122,7 +122,7 @@ public class UserPreferencesEntityDaoImpl extends
 
 	private void usuariSEUToEntityCustom(es.caib.seycon.ng.comu.UsuariSEU source, com.soffid.iam.model.UserPreferencesEntity target) {
 
-		UserEntity usuari = getUserEntityDao().findByCode(source.getCodiUsuari());
+		UserEntity usuari = getUserEntityDao().findByUserName(source.getCodiUsuari());
 		
 		target.setUser(usuari);
 

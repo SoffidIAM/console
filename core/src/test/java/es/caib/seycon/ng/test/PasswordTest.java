@@ -98,7 +98,7 @@ public class PasswordTest extends AbstractTest
 	public void testMetadata() throws InternalErrorException 
 	{
 		Session session = getSessionFactory().openSession();
-		String entity = "es.caib.seycon.ng.model.UsuariEntityImpl";
+		String entity = "com.soffid.iam.model.UserEntityImpl";
 		Long id = new Long(1);
 		try {
 			ClassMetadata md = getSessionFactory().getClassMetadata(entity);
@@ -111,7 +111,7 @@ public class PasswordTest extends AbstractTest
 			String tableName = aep.getTableName();
 
 			List list = session.createCriteria(UserEntityImpl.class)
-							.add(Restrictions.eq("codi", "admin"))
+							.add(Restrictions.eq("userName", "admin"))
 							.list();
 			Object obj = list.get(0);
 			

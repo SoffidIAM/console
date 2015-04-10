@@ -38,7 +38,7 @@ import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.utils.Security;
 import java.io.ByteArrayInputStream;
@@ -201,12 +201,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 						Collection<RolGrant> roles = getAplicacioService().findEffectiveRolGrantByUser(userData.getId());
 						for (RolGrant role : roles) {
                     String name = role.getRolName();
-                    if (!role.getDispatcher().equals(defaultDispatcher.getCode())) name = name + "@" + role.getDispatcher();
+                    if (!role.getDispatcher().equals(defaultDispatcher.getName())) name = name + "@" + role.getDispatcher();
                     userGroups.add(name);
                     if (role.getDomainValue() != null) {
                         name = role.getRolName();
                         name = name + "/" + role.getDomainValue();
-                        if (!role.getDispatcher().equals(defaultDispatcher.getCode())) name = name + "@" + role.getDispatcher();
+                        if (!role.getDispatcher().equals(defaultDispatcher.getName())) name = name + "@" + role.getDispatcher();
                         userGroups.add(name);
                     }
                 }
@@ -2560,24 +2560,24 @@ public class BpmEngineImpl extends BpmEngineBase {
 		List<String> clauses = new LinkedList<String>();
 		StringBuffer query = new StringBuffer(); 
 		if (userName != null) {
-			clauses.add ("usuari.codi like :userName"); //$NON-NLS-1$
+			clauses.add ("usuari.userName like :userName"); //$NON-NLS-1$
 			p.add(new Parameter("userName", userName)); //$NON-NLS-1$
 		}
 		if (givenName != null) {
-			clauses.add ("usuari.nom like :givenName"); //$NON-NLS-1$
+			clauses.add ("usuari.fistName like :givenName"); //$NON-NLS-1$
 			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add ("(usuari.primerLlinatge+' '+usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
+			clauses.add ("(usuari.lastName+' '+usuari.middleName) like :surName"); //$NON-NLS-1$
 			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
 		}
 		if (group != null) {
-			clauses.add ("usuari.grupPimari.codi like :group"); //$NON-NLS-1$
+			clauses.add ("usuari.primaryGroup.name like :group"); //$NON-NLS-1$
 			p.add(new Parameter("group", group)); //$NON-NLS-1$
 		}
 		StringBuffer clause = new StringBuffer ();
 		clause.append("select usuari " + //$NON-NLS-1$
-				"from es.caib.seycon.ng.model.UsuariEntity usuari"); //$NON-NLS-1$
+				"from com.soffid.iam.model.UserEntity usuari"); //$NON-NLS-1$
 		boolean first = true;
 		for (String subClause : clauses) {
 			if (first)  {

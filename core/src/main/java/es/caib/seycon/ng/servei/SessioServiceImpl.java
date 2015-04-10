@@ -86,7 +86,7 @@ public class SessioServiceImpl extends es.caib.seycon.ng.servei.SessioServiceBas
         HostEntity me = findMaquina(nomMaquina);
         HostEntity meClient = null;
         
-        UserEntity ue = getUserEntityDao().findByCode(codiUsuari);
+        UserEntity ue = getUserEntityDao().findByUserName(codiUsuari);
         if (ue == null)
             throw new UnknownUserException(codiUsuari);
         
@@ -141,10 +141,10 @@ public class SessioServiceImpl extends es.caib.seycon.ng.servei.SessioServiceBas
         getSessionEntityDao().create(sessio);
         
         ServiceEntityDao seDao = getServiceEntityDao(); 
-        ServiceEntity se = seDao.findByCode("sso"); //$NON-NLS-1$
+        ServiceEntity se = seDao.findByName("sso"); //$NON-NLS-1$
         if (se == null) {
             se = getServiceEntityDao().newServiceEntity();
-            se.setCode("sso"); //$NON-NLS-1$
+            se.setName("sso"); //$NON-NLS-1$
             se.setDescription("SEU Single Sign On"); //$NON-NLS-1$
             seDao.create(se);
         }
@@ -152,10 +152,10 @@ public class SessioServiceImpl extends es.caib.seycon.ng.servei.SessioServiceBas
         AccessLogEntityDao raDao = getAccessLogEntityDao();
         AccessLogEntity ra = getAccessLogEntityDao().newAccessLogEntity();
         ra.setClient(meClient);
-        ra.setCodeAge(hostName);
+        ra.setSystem(hostName);
         ra.setStartDate(new Date());
         ra.setEndDate(null);
-        ra.setSessionID(sessio.getId().toString());
+        ra.setSessionId(sessio.getId().toString());
         ra.setProtocol(se);
         ra.setServer(me);
         ra.setAccessType("L"); //$NON-NLS-1$

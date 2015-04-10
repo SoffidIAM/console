@@ -25,7 +25,7 @@ public class EntryPointExecutionTypeEntityDaoImpl
 	public EntryPointExecutionTypeEntity tipusExecucioPuntEntradaToEntity(TipusExecucioPuntEntrada tipusExecucioPuntEntrada) {
 		EntryPointExecutionTypeEntity tipusExe = null;
 		if (tipusExecucioPuntEntrada.getCodi()!=null) {
-			tipusExe = super.findByCode(tipusExecucioPuntEntrada.getCodi());
+			tipusExe = super.findByName(tipusExecucioPuntEntrada.getCodi());
 			super.tipusExecucioPuntEntradaToEntity(tipusExecucioPuntEntrada, tipusExe, true);
 			return tipusExe;
 		} else 

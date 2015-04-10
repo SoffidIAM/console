@@ -80,33 +80,41 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.String hostAddress;
 
-	@Operation(translated="findSessionByUserCode")
-	@DaoFinder("select sessio\nfrom es.caib.seycon.ng.model.SessioEntity sessio, es.caib.seycon.ng.model.UsuariEntity usuari where  usuari.codi = :codiUsuari and sessio.usuari = usuari")
+	@Operation(translated="findSessionByUserName")
+	@DaoFinder("select session\n"
+			+ "from com.soffid.iam.model.SessionEntity session "
+			+ "where session.user.userName=:userName")
 	public java.util.List<es.caib.seycon.ng.model.SessioEntity> findSessionsByCodiUsuari(
-		java.lang.String codiUsuari) {
+		java.lang.String userName) {
 	 return null;
 	}
 	@Operation(translated="findSessionsByCriteria")
-	@DaoFinder("select sessio \nfrom \nes.caib.seycon.ng.model.SessioEntity sessio \nwhere (:port is null or sessio.port like :port) \nand (:nomMaquinaClient is null \n         or (sessio.clientHostName like :nomMaquinaClient)) \nand (:nomMaquinaServidora is null \n  or (sessio.hostName like :nomMaquinaServidora)) \nand (:codiUsuari is null or sessio.usuari.codi like :codiUsuari)\n")
+	@DaoFinder("select session \n"
+			+ "from com.soffid.iam.model.SessionEntity session \n"
+			+ "where (:port is null or session.port like :port) \n"
+			+ "and (:clientHostName is null \n"
+			+ "         or (session.clientHostName like :clientHostName)) \n"
+			+ "and (:serverHostName is null \n  or (session.hostName like :serverHostName)) \n"
+			+ "and (:userName is null or session.user.userName like :userName)\n")
 	public java.util.List<es.caib.seycon.ng.model.SessioEntity> findSessionsByCriteri(
 		java.lang.Long port, 
-		java.lang.String codiUsuari, 
-		java.lang.String nomMaquinaServidora, 
-		java.lang.String nomMaquinaClient) {
+		java.lang.String userName, 
+		java.lang.String serverHostName, 
+		java.lang.String clientHostName) {
 	 return null;
 	}
 	@Operation(translated="findSessionByCriteria")
-	@DaoFinder("from es.caib.seycon.ng.model.SessioEntity sessio \nwhere sessio.port = :port and sessio.clientHostName = :nomMaquinaClient and sessio.hostName = :nomMaquinaServidora and sessio.usuari.codi = :codiUsuari")
+	@DaoFinder("select session \n"
+			+ "from com.soffid.iam.model.SessionEntity session \n"
+			+ "where session.port = :port and "
+			+ " session.clientHostName = :clientHostName and "
+			+ " session.hostName = :serverHostName and "
+			+ " session.user.userName = :userName")
 	public es.caib.seycon.ng.model.SessioEntity findSessioByCriteri(
 		java.lang.Long port, 
-		java.lang.String codiUsuari, 
-		java.lang.String nomMaquinaServidora, 
-		java.lang.String nomMaquinaClient) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.SessioEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+		java.lang.String userName, 
+		java.lang.String serverHostName, 
+		java.lang.String clientHostName) {
 	 return null;
 	}
 	@DaoFinder

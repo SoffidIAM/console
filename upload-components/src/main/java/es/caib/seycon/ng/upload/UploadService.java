@@ -51,7 +51,7 @@ import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.identity.IdentityGeneratorBean;
+import com.soffid.iam.model.identity.IdentityGeneratorBean;
 import es.caib.seycon.ng.servei.ApplicationBootService;
 import es.caib.seycon.ng.servei.ApplicationShutdownService;
 import es.caib.seycon.ng.servei.ConfiguracioService;

@@ -32,8 +32,8 @@ public class PasswordPolicyEntityDaoImpl
         String codiUsuari = Security.getCurrentAccount();
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(accio);
-        auditoria.setPasswordDomain(politica.getPasswordDomain().getCode());
-        auditoria.setUserType(politica.getUserDomainType().getCode());
+        auditoria.setPasswordDomain(politica.getPasswordDomain().getName());
+        auditoria.setUserType(politica.getUserType().getName());
         auditoria.setAutor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
@@ -75,14 +75,14 @@ public class PasswordPolicyEntityDaoImpl
         target.setAllowPasswordChange(source.getAllowPasswordChange() == null ? true: source.getAllowPasswordChange().booleanValue());
         target.setAllowPasswordQuery(source.getAllowPasswordQuery() == null ? true: source.getAllowPasswordQuery().booleanValue());
         // Fem les conversions 
-        if (source.getUserDomainType() != null) {
-        	UserTypeEntity tipusUsuariE = source.getUserDomainType();
-        	target.setTipusUsuari(tipusUsuariE.getCode());
+        if (source.getUserType() != null) {
+        	UserTypeEntity tipusUsuariE = source.getUserType();
+        	target.setTipusUsuari(tipusUsuariE.getName());
         	target.setDecripcioTipusUsuari(tipusUsuariE.getDescription());
         }
         if (source.getPasswordDomain() != null)
         {
-        	target.setCodiDominiContrasenya(source.getPasswordDomain().getCode());
+        	target.setCodiDominiContrasenya(source.getPasswordDomain().getName());
         }
     }
 
@@ -138,16 +138,16 @@ public class PasswordPolicyEntityDaoImpl
         // Tipus d'usuari
         if (source.getTipusUsuari() !=null) {
         	String codiTipusUsuari = source.getTipusUsuari();
-        	UserTypeEntity tipusUsuE = getUserTypeEntityDao().findByCode(codiTipusUsuari);
+        	UserTypeEntity tipusUsuE = getUserTypeEntityDao().findByName(codiTipusUsuari);
         	if (tipusUsuE!=null) {
-        		target.setUserDomainType(tipusUsuE);
+        		target.setUserType(tipusUsuE);
         	} 
         }
         
         // Domini de contrasenya i d'usuaris
         if (source.getCodiDominiContrasenya()!=null) {
         	String codiDominiContrasenya = source.getCodiDominiContrasenya();
-        	PasswordDomainEntity dominiContraE = getPasswordDomainEntityDao().findByCode(codiDominiContrasenya);
+        	PasswordDomainEntity dominiContraE = getPasswordDomainEntityDao().findByName(codiDominiContrasenya);
        		target.setPasswordDomain(dominiContraE);
         }
         

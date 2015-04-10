@@ -32,7 +32,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.TipusExecucioPuntEntrada;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
@@ -460,13 +460,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         List<EntryPointExecutionTypeEntity> tipusMime = getEntryPointExecutionTypeEntityDao().loadAll();
         if (tipusMime.isEmpty()) {
             EntryPointExecutionTypeEntity punt = getEntryPointExecutionTypeEntityDao().newEntryPointExecutionTypeEntity();
-            punt.setCode("URL"); //$NON-NLS-1$
+            punt.setName("URL"); //$NON-NLS-1$
             punt.setTemplate("http://"); //$NON-NLS-1$
             punt.setMimeType("text/html"); //$NON-NLS-1$
             getEntryPointExecutionTypeEntityDao().create(punt);
             tipusMime.add(punt);
             punt = getEntryPointExecutionTypeEntityDao().newEntryPointExecutionTypeEntity();
-            punt.setCode("MZN"); //$NON-NLS-1$
+            punt.setName("MZN"); //$NON-NLS-1$
             punt.setTemplate("exec ( ... );"); //$NON-NLS-1$
             punt.setMimeType("x-application/x-mazinger-script"); //$NON-NLS-1$
             getEntryPointExecutionTypeEntityDao().create(punt);
@@ -478,7 +478,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     protected Collection<Aplicacio> handleGetAllAplicacions(Boolean aplicacioBuida)
             throws Exception {
         // D'aquesta manera estan ordenades per nom
-        Collection<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().query("select aplicacioEntity from es.caib.seycon.ng.model.AplicacioEntity aplicacioEntity order by aplicacioEntity.codi, aplicacioEntity.nom", new Parameter[]{});
+        Collection<InformationSystemEntity> aplicacions = getInformationSystemEntityDao().
+        		findByFilter(null, null, null, null, null, null, null);
         // getAplicacioEntityDao().toAplicacioCollection(aplicacions);//toVO
         // Les transformem "manualment"
         Collection<Aplicacio> appsVO = new LinkedList<Aplicacio>();
@@ -609,7 +610,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     private PermissionsCache calculateAuthorizations(String user) throws InternalErrorException {
 
-        UserEntity usuari = getUserEntityDao().findByCode(user);
+        UserEntity usuari = getUserEntityDao().findByUserName(user);
         if (usuari != null) {
             PermissionsCache entry = new PermissionsCache();
 
@@ -617,13 +618,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             GroupEntity gprimari = usuari.getPrimaryGroup();
             Collection<UserGroupEntity> grups = usuari.getSecondaryGroups();
             if (gprimari != null) {
-                entry.getGrupsUsuariPUE().add(gprimari.getCode());// ,gprimari);
+                entry.getGrupsUsuariPUE().add(gprimari.getName());// ,gprimari);
             }
             if (grups != null) {
                 for (Iterator<UserGroupEntity> it = grups.iterator(); it.hasNext(); ) {
                     UserGroupEntity uge = it.next();
                     GroupEntity g = uge.getGroup();
-                    entry.getGrupsUsuariPUE().add(g.getCode());
+                    entry.getGrupsUsuariPUE().add(g.getName());
                 }
             }
 
@@ -990,7 +991,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             for (Iterator<EntryPointRoleEntity> it = _autoRol.iterator(); it.hasNext(); ) {
                 EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
                 EntryPointRoleEntity apu = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
-                apu.setRoleID(auto.getRoleID());
+                apu.setRoleId(auto.getRoleId());
                 apu.setAuthorizationLevel(auto.getAuthorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointRoleEntityDao().create(apu);
@@ -1242,7 +1243,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             // ROL: Creamos autorización
             EntryPointRoleEntity autoRol = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
             autoRol.setAuthorizationLevel(nivell);
-            autoRol.setRoleID(idEntitat);
+            autoRol.setRoleId(idEntitat);
             autoRol.setEntryPoint(puntEntradaE);
             getEntryPointRoleEntityDao().create(autoRol);
 
@@ -1771,16 +1772,18 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         PermissionsCache permisos = getCurrentAuthorizations();
 
         // ROL: només els de permís d'aministrador (!!)
-        Collection autoRol = getEntryPointRoleEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUERolEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        Collection autoRol = getEntryPointRoleEntityDao().
+        		query("from com.soffid.iam.model.EntryPointRoleEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
         for (Iterator it = autoRol.iterator(); it.hasNext(); ) {
             EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
-            if (permisos.getRolsUsuariPUE().contains(auto.getRoleID())) {
+            if (permisos.getRolsUsuariPUE().contains(auto.getRoleId())) {
                 if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(auto.getAuthorizationLevel())) return true;
             }
         }
 
         // GRUP: només els de permís d'aministrador (!!)
-        List<EntryPointGroupEntity> autoGrup = getEntryPointGroupEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        List<EntryPointGroupEntity> autoGrup = getEntryPointGroupEntityDao().
+        		query("from com.soffid.iam.model.EntryPointGroupEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
         List<AutoritzacioPuntEntrada> autoGrupVO = getEntryPointGroupEntityDao().toAutoritzacioPuntEntradaList(autoGrup);
         for (Iterator<AutoritzacioPuntEntrada> it = autoGrupVO.iterator(); it.hasNext();) {
             // ho mirem per entity (per optimitzar)
@@ -1794,7 +1797,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         }
 
         // USUARI: només els de permís d'aministrador (!!)
-        List<EntryPointUserEntity> autoUsu = getEntryPointUserEntityDao().query("from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity where nivellAutoritzacio=\'A\'", new Parameter[0]); //$NON-NLS-1$
+        List<EntryPointUserEntity> autoUsu = getEntryPointUserEntityDao().
+        		query("from com.soffid.iam.model.EntryPointUserEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
         List<AutoritzacioPuntEntrada> autoUsuVO = getEntryPointUserEntityDao().toAutoritzacioPuntEntradaList(autoUsu);
         for (Iterator<AutoritzacioPuntEntrada> it = autoUsuVO.iterator(); it.hasNext();) {
             AutoritzacioPuntEntrada auto = it.next();

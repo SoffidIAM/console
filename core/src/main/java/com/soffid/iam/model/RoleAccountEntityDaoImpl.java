@@ -21,6 +21,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.AdministracioAplicacio;
@@ -42,6 +43,7 @@ import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.MailUtils;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.Principal;
@@ -57,6 +59,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.hibernate.Hibernate;
 
 /**
@@ -75,21 +78,21 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 auditoria.setRol(grant.getRole().getName());
                 auditoria.setUsuari(ua.getUser().getUserName());
                 auditoria.setAccount(grant.getAccount().getName());
-                auditoria.setBbdd(grant.getRole().getDatabases().getCode());
-                auditoria.setAplicacio(grant.getRole().getApplication().getCode());
+                auditoria.setBbdd(grant.getRole().getSystem().getName());
+                auditoria.setAplicacio(grant.getRole().getInformationSystem().getName());
                 auditoria.setAutor(codiUsuari);
                 if (grant.getRule() != null) {
                     auditoria.setRule(grant.getRule().getDescription());
                     auditoria.setAccio(accio.toLowerCase());
                 }
-                if (grant.getDomainApplicationValue() != null) {
-                    auditoria.setValorDomini(grant.getDomainApplicationValue().getValue());
-                    auditoria.setDomini(grant.getDomainApplicationValue().getDescription());
-                } else if (grant.getManagedApplication() != null) {
-                    auditoria.setValorDomini(grant.getManagedApplication().getCode());
-                    auditoria.setDomini(grant.getManagedApplication().getName());
+                if (grant.getDomainValue() != null) {
+                    auditoria.setValorDomini(grant.getDomainValue().getValue());
+                    auditoria.setDomini(grant.getDomainValue().getDescription());
+                } else if (grant.getInformationSystem() != null) {
+                    auditoria.setValorDomini(grant.getInformationSystem().getName());
+                    auditoria.setDomini(grant.getInformationSystem().getDescription());
                 } else if (grant.getGroup() != null) {
-                    auditoria.setValorDomini(grant.getGroup().getCode());
+                    auditoria.setValorDomini(grant.getGroup().getName());
                     auditoria.setDomini(grant.getGroup().getDescription());
                 } else {
                     auditoria.setValorDomini(null);
@@ -106,28 +109,28 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
             Auditoria auditoria = new Auditoria();
             auditoria.setAccio(accio);
             auditoria.setRol(grant.getRole().getName());
-            auditoria.setBbdd(grant.getRole().getDatabases().getCode());
+            auditoria.setBbdd(grant.getRole().getSystem().getName());
             auditoria.setAccount(grant.getAccount().getName());
-            auditoria.setAplicacio(grant.getRole().getApplication().getCode());
+            auditoria.setAplicacio(grant.getRole().getInformationSystem().getName());
             auditoria.setAutor(codiUsuari);
             if (grant.getRule() != null)
             {
                 auditoria.setRule(grant.getRule().getDescription());
             	auditoria.setAccio(accio.toLowerCase());
             }
-            if (grant.getDomainApplicationValue() != null)
+            if (grant.getDomainValue() != null)
             {
-            	auditoria.setValorDomini(grant.getDomainApplicationValue().getValue());
-            	auditoria.setDomini(grant.getDomainApplicationValue().getDescription());
+            	auditoria.setValorDomini(grant.getDomainValue().getValue());
+            	auditoria.setDomini(grant.getDomainValue().getDescription());
             }
-            else if (grant.getManagedApplication() != null)
+            else if (grant.getInformationSystem() != null)
             {
-            	auditoria.setValorDomini(grant.getManagedApplication().getCode());
-            	auditoria.setDomini(grant.getManagedApplication().getName());
+            	auditoria.setValorDomini(grant.getInformationSystem().getName());
+            	auditoria.setDomini(grant.getInformationSystem().getDescription());
             }
             else if (grant.getGroup() != null)
             {
-            	auditoria.setValorDomini(grant.getGroup().getCode());
+            	auditoria.setValorDomini(grant.getGroup().getName());
             	auditoria.setDomini(grant.getGroup().getDescription());
             }
             else
@@ -182,8 +185,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 propagarRols(rolsPropagar);
 
             // Enviem les notificacions de l'aplicació (si estan activades)
-            if (rolsUsuaris.getRole().getApplication() != null) {
-                InformationSystemEntity aplic = rolsUsuaris.getRole().getApplication();
+            if (rolsUsuaris.getRole().getInformationSystem() != null) {
+                InformationSystemEntity aplic = rolsUsuaris.getRole().getInformationSystem();
                 String correusNotificacio = aplic.getNotificationMail();
                 if (correusNotificacio != null) {
                     String correus[] = correusNotificacio.split(","); //$NON-NLS-1$
@@ -218,7 +221,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
 		tasque.setDate(new Timestamp(System.currentTimeMillis()));
 		tasque.setTransaction(TaskHandler.UPDATE_ROLE);
 		tasque.setRole(grant.getRole().getName());
-		tasque.setDb(grant.getRole().getDatabases().getCode());
+		tasque.setDb(grant.getRole().getSystem().getName());
 		getTaskEntityDao().create(tasque);
 		
         if (grant.getAccount().getType().equals (AccountType.USER))
@@ -236,8 +239,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
 	        tasque = getTaskEntityDao().newTaskEntity();
 	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
 	        tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
-	        tasque.setSystemCode(grant.getAccount().getSystem().getCode());
-	        tasque.setDb(grant.getAccount().getSystem().getCode());
+	        tasque.setSystemName(grant.getAccount().getSystem().getName());
+	        tasque.setDb(grant.getAccount().getSystem().getName());
 	        tasque.setUser(grant.getAccount().getName());
 	        getTaskEntityDao().create(tasque);
         }
@@ -281,8 +284,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                     propagarRols(rolsPropagar);
 
                 // Enviem les notificacions de l'aplicació (si estan activades)
-                if (rolsUsuaris.getRole().getApplication() != null) {
-                    InformationSystemEntity aplic = rolsUsuaris.getRole().getApplication();
+                if (rolsUsuaris.getRole().getInformationSystem() != null) {
+                    InformationSystemEntity aplic = rolsUsuaris.getRole().getInformationSystem();
                     String correusNotificacio = aplic.getNotificationMail();
                     if (correusNotificacio != null) {
                         String correus[] = correusNotificacio.split(","); //$NON-NLS-1$
@@ -340,8 +343,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 propagarRols(rolsPropagar);
 
             // Enviem les notificacions de l'aplicació (si estan activades)
-            if (rolsUsuaris.getRole().getApplication() != null) {
-                InformationSystemEntity aplic = rolsUsuaris.getRole().getApplication();
+            if (rolsUsuaris.getRole().getInformationSystem() != null) {
+                InformationSystemEntity aplic = rolsUsuaris.getRole().getInformationSystem();
                 String correusNotificacio = aplic.getNotificationMail();
                 if (correusNotificacio != null) {
                     String correus[] = correusNotificacio.split(","); //$NON-NLS-1$
@@ -391,12 +394,12 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
             }
     	}
 
-        String tipusDomini = sourceEntity.getDomainTypes();
+        String tipusDomini = sourceEntity.getDomainType();
         if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
         if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
-            DomainValueEntity valorDominiEntity = sourceEntity.getDomainApplicationValue();
+            DomainValueEntity valorDominiEntity = sourceEntity.getDomainValue();
             ValorDomini valorDomini = getDomainValueEntityDao().toValorDomini(valorDominiEntity);
             targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
@@ -410,14 +413,14 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 valorDomini.setCodiExternDomini(null);
                 valorDomini.setNomDomini(TipusDomini.GRUPS);
             }
-            valorDomini.setValor(sourceEntity.getGroup().getCode());
+            valorDomini.setValor(sourceEntity.getGroup().getName());
             targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
             ValorDomini valorDomini = new ValorDomini();
             valorDomini.setCodiExternDomini(null);
-            valorDomini.setDescripcio(sourceEntity.getManagedApplication().getName());
+            valorDomini.setDescripcio(sourceEntity.getInformationSystem().getDescription());
             valorDomini.setNomDomini(TipusDomini.APLICACIONS);
-            valorDomini.setValor(sourceEntity.getManagedApplication().getCode());
+            valorDomini.setValor(sourceEntity.getInformationSystem().getName());
             targetVO.setValorDomini(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
             ValorDomini valorDomini = new ValorDomini();
@@ -432,7 +435,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         if (sourceEntity.getHolderGroup() == null)
         	targetVO.setHolderGroup(null);
         else
-        	targetVO.setHolderGroup(sourceEntity.getHolderGroup().getCode());
+        	targetVO.setHolderGroup(sourceEntity.getHolderGroup().getName());
 
         
         
@@ -456,19 +459,19 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         }
         
         targetVO.setAccountName(sourceEntity.getAccount().getName());        
-        targetVO.setAccountDispatcher(sourceEntity.getAccount().getSystem().getCode());
+        targetVO.setAccountDispatcher(sourceEntity.getAccount().getSystem().getName());
         targetVO.setDescripcioRol(sourceEntity.getRole().getDescription());
         targetVO.setAccountId(sourceEntity.getAccount().getId());
-        SystemEntity dispatcher = sourceEntity.getRole().getDatabases();
-        targetVO.setBaseDeDades(dispatcher == null ? null : dispatcher.getCode());
+        SystemEntity dispatcher = sourceEntity.getRole().getSystem();
+        targetVO.setBaseDeDades(dispatcher == null ? null : dispatcher.getName());
 
-        InformationSystemEntity aplicacio = sourceEntity.getRole().getApplication();
+        InformationSystemEntity aplicacio = sourceEntity.getRole().getInformationSystem();
         if (aplicacio != null) {
-            targetVO.setCodiAplicacio(aplicacio.getCode());
+            targetVO.setCodiAplicacio(aplicacio.getName());
         }
 
         if (usuariEntity != null && usuariEntity.getPrimaryGroup() != null) {
-            targetVO.setCodiGrupUsuari(usuariEntity.getPrimaryGroup().getCode());
+            targetVO.setCodiGrupUsuari(usuariEntity.getPrimaryGroup().getName());
         }
 
         targetVO.setGestionableWF(sourceEntity.getRole().getManageableWF());
@@ -520,18 +523,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
     }
 
     private RoleEntity findRolByNomAndCodiApliacio(String nom, String codiAplicacio, String bbdd) {
-        String query = "select rol " //$NON-NLS-1$
-                + "from es.caib.seycon.ng.model.RolEntity rol " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "rol.nom = :nom and " + " rol.baseDeDades.codi = :bbdd"; //$NON-NLS-1$ //$NON-NLS-2$
-        Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
-        Parameter bbddParameter = new Parameter("bbdd", bbdd); //$NON-NLS-1$
-        Parameter[] parameters = { nomParameter, bbddParameter };
-        Collection rols = getRoleEntityDao().query(query, parameters);
-        if (rols != null && !rols.isEmpty()) {
-            return (RoleEntity) rols.iterator().next();
-        }
-        return null;
+        return getRoleEntityDao().findByNameAndSystem(nom, bbdd);
     }
 
     private void rolsUsuarisToEntityCustom(es.caib.seycon.ng.comu.RolAccount sourceVO, com.soffid.iam.model.RoleAccountEntity targetEntity) {
@@ -596,7 +588,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 String codiGrup = valorDomini.getValor();
                 GroupEntity grup = null;
                 if (codiGrup != null && codiGrup.trim().compareTo("") != 0) { //$NON-NLS-1$
-                    grup = getGroupEntityDao().findByCode(codiGrup);
+                    grup = getGroupEntityDao().findByName(codiGrup);
                     if (grup != null) {
                         if (nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
                             String codiUsuari = sourceVO.getCodiUsuari();
@@ -618,38 +610,38 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
 
                 }
                 targetEntity.setGroup(grup);
-                targetEntity.setDomainApplicationValue(null);
-                targetEntity.setDomainTypes(nomDomini);
-                targetEntity.setManagedApplication(null);
+                targetEntity.setDomainValue(null);
+                targetEntity.setDomainType(nomDomini);
+                targetEntity.setInformationSystem(null);
             } else if (nomDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
                 String valor = valorDomini.getValor();
                 InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao().findByCode(valor);
                 if (aplicacioEntity == null) {
                     throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.13"),valor)); //"Aplicació amb codi '" + valor + "' no trobada."); //$NON-NLS-1$
                 }
-                targetEntity.setManagedApplication(aplicacioEntity);
+                targetEntity.setInformationSystem(aplicacioEntity);
                 targetEntity.setGroup(null);
-                targetEntity.setDomainApplicationValue(null);
-                targetEntity.setDomainTypes(TipusDomini.APLICACIONS);
+                targetEntity.setDomainValue(null);
+                targetEntity.setDomainType(TipusDomini.APLICACIONS);
             } else if (nomDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
-                targetEntity.setManagedApplication(null);
+                targetEntity.setInformationSystem(null);
                 targetEntity.setGroup(null);
-                targetEntity.setDomainApplicationValue(null);
-                targetEntity.setDomainTypes(TipusDomini.SENSE_DOMINI);
+                targetEntity.setDomainValue(null);
+                targetEntity.setDomainType(TipusDomini.SENSE_DOMINI);
             }
         } else if (rol.getApplicationDomain() != null){
             /*
              * Domini d'aplicació
              */
             nomDomini = rol.getApplicationDomain().getName();
-            String codiAplicacio = rol.getApplication().getCode();
+            String codiAplicacio = rol.getInformationSystem().getName();
             String valor = valorDomini.getValor();
             DomainValueEntity valorDominiAplicacioEntity = findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(nomDomini, codiAplicacio, valor);
             if (valorDominiAplicacioEntity != null) {
-                targetEntity.setDomainApplicationValue(valorDominiAplicacioEntity);
-                targetEntity.setDomainTypes(TipusDomini.DOMINI_APLICACIO);
+                targetEntity.setDomainValue(valorDominiAplicacioEntity);
+                targetEntity.setDomainType(TipusDomini.DOMINI_APLICACIO);
                 targetEntity.setGroup(null);
-                targetEntity.setManagedApplication(null);
+                targetEntity.setInformationSystem(null);
             } else {
                 throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valor )); //$NON-NLS-1$
             }
@@ -664,7 +656,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         	targetEntity.setHolderGroup(null);
         else
         {
-        	GroupEntity grup = getGroupEntityDao().findByCode(sourceVO.getHolderGroup());
+        	GroupEntity grup = getGroupEntityDao().findByName(sourceVO.getHolderGroup());
         	if (grup == null)
         		throw new SeyconException (String.format("Unknown group %s", sourceVO.getHolderGroup()));
         	targetEntity.setHolderGroup(grup);
@@ -672,84 +664,39 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
     }
 
     private DomainValueEntity findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(String nomDomini, String codiAplicacio, String valor) {
-        String query = "select valorDominiAplicacio " //$NON-NLS-1$
-                + "from " //$NON-NLS-1$
-                + "es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio " //$NON-NLS-1$
-                + "left join valorDominiAplicacio.domini domini " //$NON-NLS-1$
-                + "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "domini.nom = :nomDomini and " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-                + "valorDominiAplicacio.valor = :valor"; //$NON-NLS-1$
-
-        Parameter nomDominiParameter = new Parameter("nomDomini", nomDomini); //$NON-NLS-1$
-        Parameter codiAplicacioParameter = new Parameter("codiAplicacio", codiAplicacio); //$NON-NLS-1$
-        Parameter valorParameter = new Parameter("valor", valor); //$NON-NLS-1$
-        Parameter[] parametres = { nomDominiParameter, codiAplicacioParameter, valorParameter };
-
-        Collection valorsDomini = getDomainValueEntityDao().query(query, parametres);
-        if (valorsDomini != null) {
-            Iterator valorsDominiIterator = valorsDomini.iterator();
-            if (valorsDominiIterator != null) {
-                if (valorsDominiIterator.hasNext()) {
-                    DomainValueEntity valorDominiEntity = (DomainValueEntity) valorsDominiIterator.next();
-                    return valorDominiEntity;
-                }
-            }
-        }
-        return null;
+    	
+    	return getDomainValueEntityDao().findByApplicationDomainValue(codiAplicacio, nomDomini, valor);
     }
 
     private RoleAccountEntity findExisteixRolUsuari(RoleAccountEntity rolUsuari) {
-        String query = "select rolsUsuaris " //$NON-NLS-1$
-                + "from " //$NON-NLS-1$
-                + "es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris " //$NON-NLS-1$
-                + "left join rolsUsuaris.grup grup " //$NON-NLS-1$
-                + "left join rolsUsuaris.aplicacioAdministrada aplicacio " //$NON-NLS-1$
-                + "left join rolsUsuaris.valorDominiAplicacio valorDominiAplicacio " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "rolsUsuaris.account.id = :usuID and " //$NON-NLS-1$
-                + "rolsUsuaris.rol.id = :rolID and " //$NON-NLS-1$
-                + "(rolsUsuaris.tipusDomini = :tipusDomini) and " //$NON-NLS-1$
-                + "((:grupCodi is null and grup is null) or (grup.codi = :grupCodi)) and " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-                + "((:valorDomini is null and valorDominiAplicacio is null) or (valorDominiAplicacio.valor = :valorDomini)) "; //$NON-NLS-1$
-
-        // Comparamos el usuario y el rol por ID (siempre tiene ambos)
-        Parameter p_usuID = new Parameter("usuID", rolUsuari.getAccount().getId()); //$NON-NLS-1$
-        Parameter p_rolID = new Parameter("rolID", rolUsuari.getRole().getId()); //$NON-NLS-1$
-        Parameter p_tipusDomini = new Parameter("tipusDomini", rolUsuari.getDomainTypes()); //$NON-NLS-1$
-        // Estos pueden ser nulos
-        String grupCodi = rolUsuari.getGroup() != null ? rolUsuari.getGroup().getCode() : null;
-        Parameter p_grupCodi = new Parameter("grupCodi", grupCodi); //$NON-NLS-1$
-        String aplicacioAdministrada = rolUsuari.getManagedApplication() != null ? rolUsuari.getManagedApplication().getCode() : null;
-        Parameter p_codiAplicacio = new Parameter("codiAplicacio", aplicacioAdministrada); //$NON-NLS-1$
-        String valorDomini = rolUsuari.getDomainApplicationValue() != null ? rolUsuari.getDomainApplicationValue().getValue() : null;
-        Parameter p_valorDomini = new Parameter("valorDomini", valorDomini); //$NON-NLS-1$
-
-        Collection rolsUsu = find(query, new Parameter[] { p_usuID, p_rolID, p_tipusDomini,
-                p_grupCodi, p_codiAplicacio, p_valorDomini });
+    	
+    	List<RoleAccountEntity> rolsUsu = findMatching(rolUsuari.getAccount().getId(), 
+    			rolUsuari.getRole().getId(), 
+    			rolUsuari.getDomainType(), 
+    			rolUsuari.getGroup() == null ? null: rolUsuari.getGroup().getName(), 
+    			rolUsuari.getInformationSystem() == null ? null : rolUsuari.getInformationSystem().getName(), 
+    			rolUsuari.getDomainValue() == null ? null: rolUsuari.getDomainValue().getValue());
 
         if (rolsUsu != null && rolsUsu.size() != 0) {
-            return (RoleAccountEntity) ((java.util.List) rolsUsu).get(0);
+            return rolsUsu.get(0);
         }
 
         return null;
     }
 
     private boolean grupPertanyAUsuari(String codiGrup, String codiUsuari) {
-        Collection grups = getUserEntityDao().findGroupByCode(codiUsuari);
-        Iterator iterator = grups.iterator();
+        Collection<GroupEntity> grups = getGroupEntityDao().findGroupsByUser(codiUsuari);
+        Iterator<GroupEntity> iterator = grups.iterator();
         while (iterator.hasNext()) {
             GroupEntity grupEntity = (GroupEntity) iterator.next();
-            if (grupEntity.getCode().compareTo(codiGrup) == 0) {
+            if (grupEntity.getName().compareTo(codiGrup) == 0) {
                 return true;
             }
         }
-        UserEntity usuari = getUserEntityDao().findByCode(codiUsuari);
+        UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
         GroupEntity grupPrimariEntity = usuari.getPrimaryGroup();
         if (grupPrimariEntity != null) {
-            return grupPrimariEntity.getCode().compareTo(codiGrup) == 0;
+            return grupPrimariEntity.getName().compareTo(codiGrup) == 0;
         }
         return false;
     }
@@ -778,7 +725,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
      * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
      *      es.caib.seycon.ng.model.Parameter[])
      */
-    public List<RoleAccountEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<RoleAccountEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this, queryString, parameters);
             return results;
@@ -806,7 +753,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
 
     public void toAdministracioAplicacio(RoleAccountEntity source, AdministracioAplicacio target) {
         super.toAdministracioAplicacio(source, target);
-        target.setCodiAplicacio(source.getManagedApplication().getCode());
+        target.setCodiAplicacio(source.getInformationSystem().getName());
         UserEntity usuariEntity = source.getAccount().getUsers().iterator().next().getUser();
         target.setCodiUsuari(usuariEntity.getUserName());
         String nom = usuariEntity.getFirstName();
@@ -817,8 +764,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         segonCognom = segonCognom != null ? segonCognom : ""; //$NON-NLS-1$
         target.setNomComplertUsuari(nom + " " + primerCognom + " " + segonCognom); //$NON-NLS-1$ //$NON-NLS-2$
         target.setNomRol(source.getRole().getName());
-        target.setCodiAplicacioRol(source.getRole().getApplication().getCode());
-        target.setCodiBaseDeDadesRol(source.getRole().getDatabases().getCode());
+        target.setCodiAplicacioRol(source.getRole().getInformationSystem().getName());
+        target.setCodiBaseDeDadesRol(source.getRole().getSystem().getName());
     }
 
     public AdministracioAplicacio toAdministracioAplicacio(final RoleAccountEntity entity) {
@@ -831,12 +778,12 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         if (aplicacioEntity == null) {
             throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.15"), aplicacioAdministrada)); //$NON-NLS-1$
         }
-        targetEntity.setManagedApplication(aplicacioEntity);
+        targetEntity.setInformationSystem(aplicacioEntity);
         targetEntity.setGroup(null);
-        targetEntity.setDomainApplicationValue(null);
-        targetEntity.setDomainTypes(TipusDomini.APLICACIONS);
+        targetEntity.setDomainValue(null);
+        targetEntity.setDomainType(TipusDomini.APLICACIONS);
 
-        RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(administracioAplicacio.getNomRol(), administracioAplicacio.getCodiAplicacioRol(), administracioAplicacio.getCodiBaseDeDadesRol());
+        RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(administracioAplicacio.getNomRol(), administracioAplicacio.getCodiAplicacioRol(), administracioAplicacio.getCodiBaseDeDadesRol());
         if (rolEntity == null) {
             throw new SeyconException(String.format(Messages.getString("RolsUsuarisEntityDaoImpl.16"), administracioAplicacio.getNomRol())); //$NON-NLS-1$
         }
@@ -867,7 +814,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
         if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
-            DomainValueEntity valorDominiEntity = entity.getDomainApplicationValue();
+            DomainValueEntity valorDominiEntity = entity.getDomainValue();
             valorDomini = getDomainValueEntityDao().toValorDomini(valorDominiEntity);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
                 || tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
@@ -880,13 +827,13 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 valorDomini.setCodiExternDomini(null);
                 valorDomini.setNomDomini(TipusDomini.GRUPS);
             }
-            valorDomini.setValor(entity.getGroup().getCode());
+            valorDomini.setValor(entity.getGroup().getName());
         } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
             valorDomini = new ValorDomini();
             valorDomini.setCodiExternDomini(null);
-            valorDomini.setDescripcio(entity.getManagedApplication().getName());
+            valorDomini.setDescripcio(entity.getInformationSystem().getDescription());
             valorDomini.setNomDomini(TipusDomini.APLICACIONS);
-            valorDomini.setValor(entity.getManagedApplication().getCode());
+            valorDomini.setValor(entity.getInformationSystem().getName());
         } else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
             /*
              * valorDomini = new ValorDomini();
@@ -904,7 +851,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
             sValorDomini = " {" + valorDomini.getNomDomini() + "  -  " //$NON-NLS-1$ //$NON-NLS-2$
                     + valorDomini.getDescripcio() + "}"; //$NON-NLS-1$
         }
-        contenidorRol.setInfoContenidor(rol.getName() + "@" + rol.getDatabases().getCode() + ">" + rol.getApplication().getCode() + sValorDomini);
+        contenidorRol.setInfoContenidor(rol.getName() + "@" + rol.getSystem().getName() + ">" + rol.getInformationSystem().getName() + sValorDomini);
 
         return contenidorRol;
     }
@@ -930,12 +877,12 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         rolsAnalitzar.add(rol);
         RoleEntity rolActual = null;
         while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-            Collection socContenidor = rolActual.getRolAssociationContainer();
+            Collection socContenidor = rolActual.getContainedRole();
 
             if (socContenidor != null)
                 for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContingut = associacio.getRoleContent();
+                RoleEntity rolContingut = associacio.getContained();
                 rolsPropagar.add(rolContingut);
                 rolsAnalitzar.add(rolContingut);
             }
@@ -955,7 +902,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
                 updateRole.setDataTasca(Calendar.getInstance());
                 updateRole.setStatus("P");
                 updateRole.setRole(role.getName());
-                updateRole.setBd(role.getDatabases().getCode());
+                updateRole.setBd(role.getSystem().getName());
                 TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
                 getTaskEntityDao().create(tasca);
             }
@@ -1002,14 +949,14 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
     @Override
     public void toRolGrant(RoleAccountEntity source, RolGrant target) {
         String tipus = source.getRole().getDomainType();
-        if (TipusDomini.APLICACIONS.equals(tipus) && source.getManagedApplication() != null) {
-            target.setDomainValue(source.getManagedApplication().getCode());
+        if (TipusDomini.APLICACIONS.equals(tipus) && source.getInformationSystem() != null) {
+            target.setDomainValue(source.getInformationSystem().getName());
             target.setHasDomain(true);
         } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) && source.getGroup() != null) {
-            target.setDomainValue(source.getGroup().getCode());
+            target.setDomainValue(source.getGroup().getName());
             target.setHasDomain(true);
-        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) && source.getDomainApplicationValue() != null) {
-            target.setDomainValue(source.getDomainApplicationValue().getValue());
+        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) && source.getDomainValue() != null) {
+            target.setDomainValue(source.getDomainValue().getValue());
             target.setHasDomain(true);
         } else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus)) {
             target.setHasDomain(true);
@@ -1022,18 +969,18 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         target.setOwnerRolName(null);
         target.setOwnerGroup(null);
         target.setOwnerAccountName(source.getAccount().getName());
-        target.setOwnerDispatcher(source.getAccount().getSystem().getCode());
+        target.setOwnerDispatcher(source.getAccount().getSystem().getName());
         target.setId(source.getId());
         target.setIdRol(source.getRole().getId());
         target.setRolName(source.getRole().getName());
-        target.setDispatcher(source.getRole().getDatabases().getCode());
+        target.setDispatcher(source.getRole().getSystem().getName());
 		for (com.soffid.iam.model.UserAccountEntity ua : source.getAccount().getUsers()) {
             target.setUser(ua.getUser().getUserName());
         }
 		if (source.getHolderGroup() == null)
 			target.setHolderGroup(null);
 		else
-			target.setHolderGroup(source.getHolderGroup().getCode());
+			target.setHolderGroup(source.getHolderGroup().getName());
     }
 
 }

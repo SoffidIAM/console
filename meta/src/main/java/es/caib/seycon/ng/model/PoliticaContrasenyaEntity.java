@@ -25,7 +25,7 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="PCD_TUS_ID", translated="userDomainType")
+	@Column (name="PCD_TUS_ID", translated="userType")
 	@Nullable
 	public es.caib.seycon.ng.model.TipusUsuariEntity tipusUsuariDomini;
 
@@ -109,16 +109,25 @@ public abstract class PoliticaContrasenyaEntity {
 	public java.lang.Boolean allowPasswordChange;
 
 	@Operation(translated="findByPasswordDomain")
-	@DaoFinder("select pol from \nes.caib.seycon.ng.model.PoliticaContrasenyaEntity pol\nleft join pol.dominiContrasenya  con\nwhere (:codiDomini is null or con.codi=:codiDomini) \norder by con.codi")
+	@DaoFinder("select pol from \n"
+			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"
+			+ "left join pol.passwordDomain con\n"
+			+ "where (:passwordDomain is null or con.name=:passwordDomain) \n"
+			+ "order by con.name")
 	public java.util.List<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> findByDominiContrasenya(
-		java.lang.String codiDomini) {
+		java.lang.String passwordDomain) {
 	 return null;
 	}
 	@Operation(translated="findByPasswordDomainAndUserType")
-	@DaoFinder("select pol from\nes.caib.seycon.ng.model.PoliticaContrasenyaEntity pol \nleft join pol.dominiContrasenya domini\nleft join pol.tipusUsuariDomini tus\nwhere domini.codi=:codiDomini and\n           tus.codi=:tipusUsuari ")
+	@DaoFinder("select pol from \n"
+			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"
+			+ "left join pol.passwordDomain domini\n"
+			+ "left join pol.userType tus\n"
+			+ "where domini.name=:passwordDomain and\n"
+			+ "           tus.name=:userType ")
 	public es.caib.seycon.ng.model.PoliticaContrasenyaEntity findByDominiContrasenyaTipusUsuari(
-		java.lang.String codiDomini, 
-		java.lang.String tipusUsuari) {
-	 return null;
+		java.lang.String passwordDomain, 
+		java.lang.String userType) {
+		return null;
 	}
 }

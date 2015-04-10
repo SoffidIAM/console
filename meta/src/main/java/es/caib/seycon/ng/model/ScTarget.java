@@ -36,7 +36,7 @@ public abstract class ScTarget {
 	public java.util.Collection<es.caib.seycon.ng.model.ScContar> contingut;
 
 	@Operation(translated="createExtranetCard")
-	@DaoFinder
+	@DaoOperation
 	public es.caib.seycon.ng.model.ScTarget creaTargetaExtranet(
 		java.lang.String codiUsuari) {
 	 return null;
@@ -47,10 +47,13 @@ public abstract class ScTarget {
 	 return null;
 	}
 	@Operation(translated="findByCardCodeAndUserCode")
-	@DaoFinder("from es.caib.seycon.ng.model.ScTarget targeta, es.caib.seycon.ng.model.UsuariEntity usuari where targeta.codi = :codiTargeta and targeta.usuari=usuari and usuari.codi = :codiUsuari")
+	@DaoFinder("select targeta \n"
+			+ "from com.soffid.iam.model.CardEntity targeta, \n"
+			+ "com.soffid.iam.model.UserEntity usuari \n"
+			+ "where targeta.code = :cardNumber and targeta.user=user and usuari.userName = :userName")
 	public es.caib.seycon.ng.model.ScTarget findByCodiTargetaAndCodiUsuari(
-		java.lang.String codiTargeta, 
-		java.lang.String codiUsuari) {
+		java.lang.String cardNumber, 
+		java.lang.String userName) {
 	 return null;
 	}
 }

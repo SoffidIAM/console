@@ -56,10 +56,10 @@ public class PrinterGroupEntityDaoImpl extends
 		try {
 			super.update(grupImpressora);
 			getSession(false).flush();
-			auditarGrupImpressora("U", grupImpressora.getGroup().getCode(), grupImpressora.getPrinter().getCode());
+			auditarGrupImpressora("U", grupImpressora.getGroup().getName(), grupImpressora.getPrinter().getName());
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.0"), grupImpressora.getPrinter().getCode(), grupImpressora.getGroup().getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.0"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
 		}
 	}
 
@@ -67,35 +67,35 @@ public class PrinterGroupEntityDaoImpl extends
 		try {
 			super.create(grupImpressora);
 			getSession(false).flush();
-			auditarGrupImpressora("C", grupImpressora.getGroup().getCode(), grupImpressora.getPrinter().getCode());
+			auditarGrupImpressora("C", grupImpressora.getGroup().getName(), grupImpressora.getPrinter().getName());
                         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
                         tasque.setDate(new Timestamp(System.currentTimeMillis()));
                         tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-                        tasque.setPrinter(grupImpressora.getPrinter().getCode());
+                        tasque.setPrinter(grupImpressora.getPrinter().getName());
                         getTaskEntityDao().create(tasque);
                         getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.1"), grupImpressora.getPrinter().getCode(), grupImpressora.getGroup().getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.1"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
 		}
 	}
 
 	public void remove(com.soffid.iam.model.PrinterGroupEntity grupImpressora) throws RuntimeException {
 		try {
-			String codiGrup = grupImpressora.getGroup().getCode();
-			String codiImpressora = grupImpressora.getPrinter().getCode();
+			String codiGrup = grupImpressora.getGroup().getName();
+			String codiImpressora = grupImpressora.getPrinter().getName();
 			super.remove(grupImpressora);
 			getSession(false).flush();
 			auditarGrupImpressora("D", codiGrup, codiImpressora); //$NON-NLS-1$
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-			tasque.setPrinter(grupImpressora.getPrinter().getCode());
+			tasque.setPrinter(grupImpressora.getPrinter().getName());
 			getTaskEntityDao().create(tasque);
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.2"), grupImpressora.getPrinter().getCode(), grupImpressora.getGroup().getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.2"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
 		}
 	}
 
@@ -108,8 +108,8 @@ public class PrinterGroupEntityDaoImpl extends
 		PrinterEntity impressora = source.getPrinter();
 		GroupEntity grup = source.getGroup();
 
-		target.setCodiImpressora(impressora.getCode());
-		target.setCodiGrup(grup.getCode());
+		target.setCodiImpressora(impressora.getName());
+		target.setCodiGrup(grup.getName());
 		Long ordre = source.getOrder();
 		if (ordre != null && ordre.equals(new Long(1))) {
 			target.setPerDefecte(new Boolean(true));
@@ -155,14 +155,14 @@ public class PrinterGroupEntityDaoImpl extends
 
 	public void grupImpressoraToEntityCustom(es.caib.seycon.ng.comu.GrupImpressora source, com.soffid.iam.model.PrinterGroupEntity target) {
 		String codiGrup = source.getCodiGrup();
-		PrinterEntity impressora = getPrinterEntityDao().findByCode(source.getCodiImpressora());
+		PrinterEntity impressora = getPrinterEntityDao().findByName(source.getCodiImpressora());
 		if (impressora != null) {
 			target.setPrinter(impressora);
 		} else {
 			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.3"),  //$NON-NLS-1$
 					source.getCodiImpressora()));
 		}
-		GroupEntity grup = getGroupEntityDao().findByCode(source.getCodiGrup());
+		GroupEntity grup = getGroupEntityDao().findByName(source.getCodiGrup());
 		if (grup != null) {
 			target.setGroup(grup);
 		} else {

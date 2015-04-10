@@ -65,7 +65,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String impressora;
 
-	@Column (name="AUD_APL", length=100, translated="application")
+	@Column (name="AUD_APL", length=100, translated="informationSystem")
 	@Nullable
 	public java.lang.String aplicacio;
 
@@ -93,7 +93,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String autoritzacio;
 
-	@Column (name="AUD_FITXER", translated="fileID")
+	@Column (name="AUD_FITXER", translated="fileId")
 	@Nullable
 	public java.lang.Long fitxerId;
 
@@ -146,60 +146,124 @@ public abstract class AuditoriaEntity {
 		java.lang.Long id) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
-	@DaoFinder
-	public java.lang.String[] find(
-		java.lang.String sqlQuery) {
-	 return null;
-	}
 	@Operation(translated="findAuditByCriteria1")
-	@DaoFinder("select auditoria from es.caib.seycon.ng.model.AuditoriaEntity auditoria\n left join auditoria.accountAssoc accountAssoc \nwhere \n  (:usuari is null or auditoria.usuari like :usuari) and \n (:objecte is null or auditoria.objecte like :objecte) and \n (:autor is null or accountAssoc.name like :autor)  and\n (:accio is null or auditoria.accio=:accio)  \norder by auditoria.data asc")
+	@DaoFinder("select audit from com.soffid.iam.model.AuditEntity audit\n "
+			+ "left join audit.accountAssoc accountAssoc \n"
+			+ "where  (:user is null or audit.user like :user) and \n"
+			+ " (:object is null or audit.object like :object) and \n"
+			+ " (:author is null or accountAssoc.name like :author)  and\n"
+			+ " (:action is null or audit.action=:action)  \n"
+			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri1(
-		java.lang.String autor, 
-		java.lang.String objecte, 
-		java.lang.String usuari, 
-		java.lang.String accio) {
+		java.lang.String author, 
+		java.lang.String object, 
+		java.lang.String user, 
+		java.lang.String action) {
 	 return null;
 	}
 	@Operation(translated="findAuditByCriteria2")
-	@DaoFinder("select auditoria \nfrom es.caib.seycon.ng.model.AuditoriaEntity auditoria \nleft join auditoria.accountAssoc accountAssoc\nleft join auditoria.grup grupAssoc \nwhere \n (:usuari is null or auditoria.usuari like :usuari) \nand (:objecte is null or auditoria.objecte like :objecte) \nand (:autor is null or accountAssoc.name like :autor)  \nand (:accio is null or auditoria.accio=:accio)  \nand (:objecteAuditat is null or \n   (:objecteAuditat is not null  and  \n    ( \n      (:objecteAuditat='domini' and auditoria.domini like :valorOA) \n      or (:objecteAuditat='valorDomini' and auditoria.valorDomini like :valorOA) \n      or (:objecteAuditat='parametreConfiguracio' and auditoria.parametreConfiguracio like :valorOA) \n      or (:objecteAuditat='bbdd' and auditoria.bbdd like :valorOA) \n      or (:objecteAuditat='impressora' and auditoria.impressora like :valorOA) \n      or (:objecteAuditat='aplicacio' and auditoria.aplicacio like :valorOA) \n      or (:objecteAuditat='dominiCorreu' and auditoria.dominiCorreu like :valorOA) \n      or (:objecteAuditat='llistaCorreu' and auditoria.llistaCorreu like :valorOA) \n      or (:objecteAuditat='fitxer' and auditoria.fitxerId like :valorOA) \n      or (:objecteAuditat='xarxa' and auditoria.xarxa like :valorOA) \n      or (:objecteAuditat='rol' and auditoria.rol like :valorOA) \n      or (:objecteAuditat='maquina' and auditoria.maquina like :valorOA) \n      or (:objecteAuditat='autoritzacio' and auditoria.autoritzacio like :valorOA) \n      or (:objecteAuditat='grup' and grupAssoc is not null and grupAssoc.codi like :valorOA)\n      or (:objecteAuditat='userType' and auditoria.userType like :valorOA)\n      or (:objecteAuditat='passwordDomain' and auditoria.passwordDomain like :valorOA)\n      or (:objecteAuditat='userDomain' and auditoria.userDomain like :valorOA)\n    )\n   )\n)\norder by auditoria.data asc")
+	@DaoFinder("select audit from com.soffid.iam.model.AuditEntity audit\n "
+			+ "left join audit.accountAssoc accountAssoc \n"
+			+ "where  (:user is null or audit.user like :user) and \n"
+			+ " (:object is null or audit.object like :object) and \n"
+			+ " (:author is null or accountAssoc.name like :author)  and\n"
+			+ " (:action is null or audit.action=:action)  \n"
+			+ "and (:column is null or \n"
+			+ "   (:column is not null  and  \n"
+			+ "    ( \n"
+			+ "      ((:column='domini' or :column='domain') and audit.domain like :value) \n"
+			+ "      or ((:column='valorDomini' or :column='domainValue') and audit.domainValue like :value) \n"
+			+ "      or ((:column='parametreConfiguracio' or :column='configurationParameter') and audit.configurationParameter like :value) \n"
+			+ "      or ((:column='bbdd' or :column='database') and audit.db like :value) \n"
+			+ "      or ((:column='impressora' or :column='printer') and audit.printer like :value) \n"
+			+ "      or ((:column='aplicacio' or :column='informatinSystem') and audit.informationSystem like :value) \n"
+			+ "      or ((:column='dominiCorreu' or :column='mailDomain') and audit.mailDomain like :value) \n"
+			+ "      or ((:column='llistaCorreu' or :column='mailList') and audit.mailList like :value) \n"
+			+ "      or ((:column='fitxer' or :column='file') and audit.fileId like :value) \n"
+			+ "      or ((:column='xarxa' or :column='network') and audit.network like :value) \n"
+			+ "      or ((:column='rol' or :column='role') and audit.role like :value) \n"
+			+ "      or ((:column='maquina' or :column='host') and audit.host like :value) \n"
+			+ "      or ((:column='autoritzacio' or :column='authorization') and audit.authorization like :value) \n"
+			+ "      or ((:column='grup' or :column='group') and audit.group is not null and audit.group.name like :value)\n"
+			+ "      or (:column='userType' and audit.userType like :value)\n"
+			+ "      or (:column='passwordDomain' and audit.passwordDomain like :value)\n"
+			+ "      or (:column='userDomain' and audit.userDomain like :value)\n"
+			+ "    )\n"
+			+ "   )\n"
+			+ ")\n"
+			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri2(
-		java.lang.String autor, 
-		java.lang.String objecte, 
-		java.lang.String usuari, 
-		java.lang.String objecteAuditat, 
-		java.lang.String valorOA, 
-		java.lang.String accio) {
+		java.lang.String author, 
+		java.lang.String object, 
+		java.lang.String user, 
+		java.lang.String column, 
+		java.lang.String value, 
+		java.lang.String action) {
 	 return null;
 	}
 	@Operation(translated="findAuditByCriteria3")
-	@DaoFinder("select auditoria \nfrom\nes.caib.seycon.ng.model.AuditoriaEntity auditoria left join\nauditoria.accountAssoc accountAssoc\nwhere\n(:dataMax = :nullDate or auditoria.data < :dataMax ) and\n(:dataMin = :nullDate or auditoria.data > :dataMin ) and\n (:usuari is null or auditoria.usuari like :usuari) \nand (:objecte is null or auditoria.objecte like :objecte) \nand (:autor is null or accountAssoc.name like :autor)  and\n(:accio is null or auditoria.accio=:accio)  \norder by auditoria.data asc")
+	@DaoFinder("select audit from com.soffid.iam.model.AuditEntity audit\n "
+			+ "left join audit.accountAssoc accountAssoc \n"
+			+ "where  (:user is null or audit.user like :user) and \n"
+			+ " (:until = :nullDate or audit.date < :until ) and\n"
+			+ " (:since = :nullDate or audit.date > :since ) and\n "
+			+ " (:object is null or audit.object like :object) and \n"
+			+ " (:author is null or accountAssoc.name like :author)  and\n"
+			+ " (:action is null or audit.action=:action)  \n"
+			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri3(
 		java.util.Date nullDate, 
-		java.util.Date dataMax, 
-		java.util.Date dataMin, 
-		java.lang.String autor, 
-		java.lang.String objecte, 
-		java.lang.String usuari, 
-		java.lang.String accio) {
+		java.util.Date until, 
+		java.util.Date since, 
+		java.lang.String author, 
+		java.lang.String object, 
+		java.lang.String user, 
+		java.lang.String action) {
 	 return null;
 	}
 	@Operation(translated="findAuditByCriteria4")
-	@DaoFinder("select auditoria \nfrom\nes.caib.seycon.ng.model.AuditoriaEntity auditoria \nleft join auditoria.accountAssoc accountAssoc\nleft join auditoria.grup grupAssoc \nwhere\n (:dataMax = :nullDate or auditoria.data < :dataMax ) and\n (:dataMin = :nullDate or auditoria.data > :dataMin ) and\n (:usuari is null or auditoria.usuari like :usuari) and \n (:objecte is null or auditoria.objecte like :objecte) and \n (:autor is null or accountAssoc.name like :autor)  and\n (:accio is null or auditoria.accio=:accio)  and\n (:objecteAuditat is null or \n   (:objecteAuditat is not null  and  \n    ( \n      (:objecteAuditat='domini' and auditoria.domini like :valorOA) \n      or (:objecteAuditat='valorDomini' and auditoria.valorDomini like :valorOA) \n      or (:objecteAuditat='parametreConfiguracio' and auditoria.parametreConfiguracio like :valorOA) \n      or (:objecteAuditat='bbdd' and auditoria.bbdd like :valorOA) \n      or (:objecteAuditat='impressora' and auditoria.impressora like :valorOA) \n      or (:objecteAuditat='aplicacio' and auditoria.aplicacio like :valorOA) \n      or (:objecteAuditat='dominiCorreu' and auditoria.dominiCorreu like :valorOA) \n      or (:objecteAuditat='llistaCorreu' and auditoria.llistaCorreu like :valorOA) \n      or (:objecteAuditat='fitxer' and auditoria.fitxerId like :valorOA) \n      or (:objecteAuditat='xarxa' and auditoria.xarxa like :valorOA) \n      or (:objecteAuditat='rol' and auditoria.rol like :valorOA) \n      or (:objecteAuditat='maquina' and auditoria.maquina like :valorOA) \n      or (:objecteAuditat='autoritzacio' and auditoria.autoritzacio like :valorOA) \n      or (:objecteAuditat='grup' and grupAssoc is not null and grupAssoc.codi like :valorOA)\n      or (:objecteAuditat='userType' and auditoria.userType like :valorOA)\n      or (:objecteAuditat='passwordDomain' and auditoria.passwordDomain like :valorOA)\n      or (:objecteAuditat='userDomain' and auditoria.userDomain like :valorOA)\n      or (:objecteAuditat='account' and auditoria.account like :valorOA)\n    )\n   )\n)\norder by auditoria.data asc")
+	@DaoFinder("select audit from com.soffid.iam.model.AuditEntity audit\n "
+			+ "left join audit.accountAssoc accountAssoc \n"
+			+ "where  (:user is null or audit.user like :user) and \n"
+			+ " (:until = :nullDate or audit.date < :until ) and\n"
+			+ " (:since = :nullDate or audit.date > :since ) and\n "
+			+ " (:object is null or audit.object like :object) and \n"
+			+ " (:author is null or accountAssoc.name like :author)  and\n"
+			+ " (:action is null or audit.action=:action) and \n"
+			+ " (:column is null or \n"
+			+ "   (:column is not null  and  \n"
+			+ "    ( \n"
+			+ "      ((:column='domini' or :column='domain') and audit.domain like :value) \n"
+			+ "      or ((:column='valorDomini' or :column='domainValue') and audit.domainValue like :value) \n"
+			+ "      or ((:column='parametreConfiguracio' or :column='configurationParameter') and audit.configurationParameter like :value) \n"
+			+ "      or ((:column='bbdd' or :column='database') and audit.db like :value) \n"
+			+ "      or ((:column='impressora' or :column='printer') and audit.printer like :value) \n"
+			+ "      or ((:column='aplicacio' or :column='informatinSystem') and audit.informationSystem like :value) \n"
+			+ "      or ((:column='dominiCorreu' or :column='mailDomain') and audit.mailDomain like :value) \n"
+			+ "      or ((:column='llistaCorreu' or :column='mailList') and audit.mailList like :value) \n"
+			+ "      or ((:column='fitxer' or :column='file') and audit.fileId like :value) \n"
+			+ "      or ((:column='xarxa' or :column='network') and audit.network like :value) \n"
+			+ "      or ((:column='rol' or :column='role') and audit.role like :value) \n"
+			+ "      or ((:column='maquina' or :column='host') and audit.host like :value) \n"
+			+ "      or ((:column='autoritzacio' or :column='authorization') and audit.authorization like :value) \n"
+			+ "      or ((:column='grup' or :column='group') and audit.group is not null and audit.group.name like :value)\n"
+			+ "      or (:column='userType' and audit.userType like :value)\n"
+			+ "      or (:column='passwordDomain' and audit.passwordDomain like :value)\n"
+			+ "      or (:column='userDomain' and audit.userDomain like :value)\n"
+			+ "    )\n"
+			+ "   )\n"
+			+ ")\n"
+			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri4(
 		java.util.Date nullDate, 
-		java.util.Date dataMax, 
-		java.util.Date dataMin, 
-		java.lang.String autor, 
-		java.lang.String objecte, 
-		java.lang.String usuari, 
-		java.lang.String objecteAuditat, 
-		java.lang.String valorOA, 
-		java.lang.String accio) {
+		java.util.Date until, 
+		java.util.Date since, 
+		java.lang.String author, 
+		java.lang.String object, 
+		java.lang.String user, 
+		java.lang.String column, 
+		java.lang.String value, 
+		java.lang.String action) {
 	 return null;
 	}
 }

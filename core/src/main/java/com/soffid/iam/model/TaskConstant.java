@@ -1,4 +1,4 @@
-package es.caib.seycon.ng.model;
+package com.soffid.iam.model;
 
 public class TaskConstant {
     public static final String PROPAGATE_PASSWORD = "PropagatePassword"; //$NON-NLS-1$

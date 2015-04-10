@@ -141,11 +141,11 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         // obtenim l'EJBObject
         boolean hasPIN = false;
 
-        Collection dades = getUserEntityDao().findBataByCode(usuari.getUserName());
-        Iterator it = dades.iterator();
+        UserEntity ue = getUserEntityDao().findByUserName(usuari.getUserName());
+        Iterator<UserDataEntity> it = ue.getUserData().iterator();
         while (it.hasNext()) {
             UserDataEntity dada = (UserDataEntity) it.next();
-            if (SeyconLogon_PIN_ADD_CODE.equals(dada.getDataType().getCode())) {
+            if (SeyconLogon_PIN_ADD_CODE.equals(dada.getDataType().getName())) {
                 hasPIN = true;
                 dadaUsuariPIN = getUserDataEntityDao().toDadaUsuari(dada);
                 dadaUsuariPIN.setValorDada(PINEncriptat);
@@ -208,7 +208,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         // creem el VO
         Usuari usuari = new Usuari();
 
-        usuari.setCodi(getUserEntityDao().getFollowingAnonymousCode());
+        usuari.setCodi(getUserEntityDao().getNextAnonimUser());
         usuari.setActiu(new Boolean(false));
         //usuari.setContrasenyaCaducada(new Boolean(true));//no en té efecte
         usuari.setDataCreacioUsuari(GregorianCalendar.getInstance());
@@ -244,7 +244,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         getUserDataEntityDao().create(dadaUsuariEntity);
 
         // retornem el nou usuari
-        UserEntity usuariOut = getUserEntityDao().findByCode(usuari.getCodi());
+        UserEntity usuariOut = getUserEntityDao().findByUserName(usuari.getCodi());
 
         return usuariOut;
     }
@@ -252,7 +252,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
     private UserEntity findUsuariExistent(String correuElectronic) {
         // obtenim el codi d'usuari a partir del correu electrònic
 
-        UserEntity usuariExistent = getUserEntityDao().findUserByDataTypeCodeAndDataValue(SeyconLogon_EMAIL_ADD_CODE, correuElectronic);
+        UserEntity usuariExistent = getUserEntityDao().findUserByDataValue(SeyconLogon_EMAIL_ADD_CODE, correuElectronic);
 
         return usuariExistent;
     }
@@ -284,7 +284,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
                 PasswordDomainEntityDao dceDao = getPasswordDomainEntityDao();
                 PasswordDomainEntity dc = dceDao.findDefaultDomain(usuari.getId());
                 for (PasswordPolicyEntity politica : dc.getPasswordPolicies()) {
-                    if (politica.getUserDomainType().equals(usuari.getUserType())) {
+                    if (politica.getUserType().equals(usuari.getUserType())) {
                         PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(newPassword));
                         if (!result.isValid()) throw new BadPasswordException(result.getReason());
                     }
@@ -326,7 +326,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         InternalPasswordService ips = getInternalPasswordService();
         if (ips.checkPassword(usuari, dc, new Password(oldPassword), false, true) != PasswordValidation.PASSWORD_WRONG) {
             for (PasswordPolicyEntity politica : dc.getPasswordPolicies()) {
-                if (politica.getUserDomainType().equals(usuari.getUserType())) {
+                if (politica.getUserType().equals(usuari.getUserType())) {
                     PolicyCheckResult result = ips.checkPolicy(usuari, politica, new Password(newPassword));
                     if (!result.isValid()) throw new BadPasswordException(result.getReason());
                 }
@@ -480,7 +480,7 @@ public class AutoEnrollmentServiceImpl extends es.caib.seycon.ng.servei.AutoEnro
         UserEntity usuari = null;
         UsuariAnonim usuariAnonim = null;
         try {
-            usuari = (UserEntity) getUserEntityDao().findUserByDataTypeCodeAndDataValue(SeyconLogon_EMAIL_ADD_CODE, codiUsuari);
+            usuari = (UserEntity) getUserEntityDao().findUserByDataValue(SeyconLogon_EMAIL_ADD_CODE, codiUsuari);
             if (usuari == null)
                 throw new UnknownUserException();
             usuariAnonim = getUserEntityDao().toUsuariAnonim(usuari);

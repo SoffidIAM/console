@@ -76,7 +76,7 @@ public class PasswordEntityDaoImpl extends
 		// NOTA: aquí usuari es de tipus CodiUsuariEntity
 		target.setUsuari(source.getUser().getUserName());
 		PasswordDomainEntity dominiContrasenyes = source.getDomain();
-		target.setDominiContrasenyes(dominiContrasenyes.getCode());
+		target.setDominiContrasenyes(dominiContrasenyes.getName());
 		// Indicador de si és caducada
 		target.setCaducada(new Boolean(source.getExpirationDate().before(GregorianCalendar.getInstance().getTime())));
 		// Obtenim la política de contrasenyes
@@ -88,7 +88,7 @@ public class PasswordEntityDaoImpl extends
 		if (dominiContrasenyes.getPasswordPolicies() != null) {
 			for (it = dominiContrasenyes.getPasswordPolicies().iterator(); !trobat && it.hasNext(); ) {
                 PasswordPolicyEntity politica = it.next();
-                if (tipusUsuari.getCode().equals(politica.getUserDomainType().getCode())) {
+                if (tipusUsuari.getName().equals(politica.getUserType().getName())) {
                     target.setTipusPoliticaContrasenya(politica.getType());
                     trobat = true;
                 }

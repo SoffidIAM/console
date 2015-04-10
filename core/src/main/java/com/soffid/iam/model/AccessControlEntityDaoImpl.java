@@ -53,7 +53,7 @@ public class AccessControlEntityDaoImpl
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ACESS_CONTROL);
-        tasque.setSystemCode(control.getAgent().getCode());
+        tasque.setSystemName(control.getAgent().getName());
         getTaskEntityDao().create(tasque);
     }
     /**
@@ -118,7 +118,7 @@ public class AccessControlEntityDaoImpl
 		// Ponemos el resto
 		target.setId(source.getId());
 		target.setIdAgent(source.getAgent().getId());
-		target.setNomAgent(source.getAgent().getCode()); 
+		target.setNomAgent(source.getAgent().getName()); 
 /*		if(source.getUsuari()!=null) {
 			target.setCodiUsuari(source.getUsuari().getCodi());
 			target.setIdUsuari(source.getUsuari().getId());
@@ -154,7 +154,7 @@ public class AccessControlEntityDaoImpl
 		if (source.getNomAgent()==null)
 			throw new SeyconException (Messages.getString("AccessControlEntityDaoImpl.0"));  //$NON-NLS-1$
 		else {
-			agent = getSystemEntityDao().findByCode(source.getNomAgent());
+			agent = getSystemEntityDao().findByName(source.getNomAgent());
 			if (agent!=null)
 				target.setAgent(agent);
 			else 

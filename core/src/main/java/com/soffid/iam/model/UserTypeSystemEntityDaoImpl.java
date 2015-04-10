@@ -28,10 +28,10 @@ public class UserTypeSystemEntityDaoImpl
         super.toTipusUsuariDispatcher(source, target);
         
         if (source.getSystem() != null) {
-        	target.setCodiDispatcher(source.getSystem().getCode());
+        	target.setCodiDispatcher(source.getSystem().getName());
         }
         if (source.getUserType() != null) {
-        	target.setTipus(source.getUserType().getCode());
+        	target.setTipus(source.getUserType().getName());
         }
     }
 
@@ -84,12 +84,12 @@ public class UserTypeSystemEntityDaoImpl
         if (source.getId()!=null) 
         	target.setId(source.getId());
         if (source.getTipus()!=null) {
-        	UserTypeEntity tipusu = getUserTypeEntityDao().findByCode(source.getTipus());
+        	UserTypeEntity tipusu = getUserTypeEntityDao().findByName(source.getTipus());
         	if (tipusu !=null)
         		target.setUserType(tipusu);
         }
         if (source.getCodiDispatcher() !=null) {
-        	SystemEntity agent = getSystemEntityDao().findByCode(source.getCodiDispatcher());
+        	SystemEntity agent = getSystemEntityDao().findByName(source.getCodiDispatcher());
         	if (agent !=null) 
         		target.setSystem(agent);
         }

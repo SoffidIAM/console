@@ -9,7 +9,7 @@
 
     <!-- jdbc connection properties -->
     
-    <property name="hibernate.dialect">es.caib.seycon.ng.model.CustomDialect</property>
+    <property name="hibernate.dialect">com.soffid.iam.model.CustomDialect</property>
     <property name="hibernate.connection.datasource">java:/jdbc/seycon</property>
 	<property name="hibernate.jdbc.batch_size">0</property>
 

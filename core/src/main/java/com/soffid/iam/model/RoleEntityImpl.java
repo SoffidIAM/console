@@ -31,7 +31,7 @@ public class RoleEntityImpl
     }
 
 	public String toRoleDescription() {//Imporante: CUIDADO AL CAMBIARLO, puede afectar a funcionalidad
-		return getName() + "@" + getDatabases().getCode() + " (" + getApplication().getCode() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ 
+		return getName() + "@" + getSystem().getName() + " (" + getInformationSystem().getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 
 }

@@ -4,7 +4,7 @@
 // This file is licensed by Soffid under GPL v3 license
 //
 
-package es.caib.seycon.ng.model;
+package com.soffid.iam.model;
 import com.soffid.mda.annotation.*;
 
 @ValueObject 
@@ -14,7 +14,7 @@ public abstract class Parameter {
 
 	public java.lang.Object value;
 
-	public es.caib.seycon.ng.model.Parameter Parameter(
+	public com.soffid.iam.model.Parameter Parameter(
 		java.lang.String name, 
 		java.lang.Object value) {
 	 return null;

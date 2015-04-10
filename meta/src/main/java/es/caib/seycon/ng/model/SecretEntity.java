@@ -25,7 +25,10 @@ public abstract class SecretEntity {
 	@Column (name="SEC_VALOR", length=64000)
 	public byte[] secrets;
 
-	@DaoFinder("select secret\nfrom es.caib.seycon.ng.model.SecretEntity as secret\nwhere secret.server.id=:serverId\nand     secret.usuari.id=:userId")
+	@DaoFinder("select secret\n"
+			+ "from com.soffid.iam.model.SecretEntity as secret\n"
+			+ "where secret.server.id=:serverId "
+			+ "and   secret.user.id=:userId")
 	public es.caib.seycon.ng.model.SecretEntity findByUserAndServer(
 		long userId, 
 		long serverId) {

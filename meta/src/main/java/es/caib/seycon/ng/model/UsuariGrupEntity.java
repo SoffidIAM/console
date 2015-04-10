@@ -29,28 +29,34 @@ public abstract class UsuariGrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Operation(translated="findByUserCodeAndGroupCode")
-	@DaoFinder("select usuariGrup from es.caib.seycon.ng.model.UsuariGrupEntity usuariGrup where usuariGrup.grup.codi = :codiGrup and usuariGrup.usuari.codi = :codiUsuari \norder by \nusuariGrup.usuari.codi, \nusuariGrup.grup.codi")
+	@Operation(translated="findByUserAndGroup")
+	@DaoFinder("select usuariGrup "
+			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
+			+ "where usuariGrup.group.name = :groupName and "
+			+ "usuariGrup.user.userName = :userName \n"
+			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public es.caib.seycon.ng.model.UsuariGrupEntity findByCodiUsuariAndCodiGrup(
-		java.lang.String codiUsuari, 
-		java.lang.String codiGrup) {
+		java.lang.String userName, 
+		java.lang.String groupName) {
 	 return null;
 	}
-	@Operation(translated="fidnByUserCode")
-	@DaoFinder("select usuariGrup from es.caib.seycon.ng.model.UsuariGrupEntity usuariGrup where usuariGrup.usuari.codi = :codiUsuari \norder by \nusuariGrup.usuari.codi, \nusuariGrup.grup.codi")
+	@Operation(translated="findByUserName")
+	@DaoFinder("select usuariGrup "
+			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
+			+ "where "
+			+ "usuariGrup.user.userName = :userName \n"
+			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> findByCodiUsuari(
-		java.lang.String codiUsuari) {
+		java.lang.String userName) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
-	@Operation(translated="findByGroupCode")
-	@DaoFinder("select usuGru from es.caib.seycon.ng.model.UsuariGrupEntity usuGru where usuGru.grup.codi=:codiGrup")
+	@Operation(translated="findByGroupName")
+	@DaoFinder("select usuariGrup "
+			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
+			+ "where usuariGrup.group.name = :groupName "
+			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> findByCodiGrup(
-		java.lang.String codiGrup) {
+		java.lang.String groupName) {
 	 return null;
 	}
 }

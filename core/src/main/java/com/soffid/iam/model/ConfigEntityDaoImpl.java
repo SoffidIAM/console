@@ -14,11 +14,13 @@ import es.caib.seycon.ng.model.*;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.NetworkEntity;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -53,11 +55,11 @@ public class ConfigEntityDaoImpl extends
 		try {
 			super.create(configuracio);
 			getSession(false).flush();
-			String parametre = configuracio.getCode();
+			String parametre = configuracio.getName();
 			auditarConfiguracio("C", parametre); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.0"), configuracio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.0"), configuracio.getName(), message));
 		}
 	}
 
@@ -65,23 +67,23 @@ public class ConfigEntityDaoImpl extends
 		try {
 			super.update(configuracio);
 			getSession(false).flush();
-			String parametre = configuracio.getCode();
+			String parametre = configuracio.getName();
 			auditarConfiguracio("U", parametre); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.1"), configuracio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.1"), configuracio.getName(), message));
 		}
 	}
 
 	public void remove(com.soffid.iam.model.ConfigEntity configuracio) throws RuntimeException {
 		try {
-			String parametre = configuracio.getCode();
+			String parametre = configuracio.getName();
 			super.remove(configuracio);
 			getSession(false).flush();
 			auditarConfiguracio("D", parametre);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.2"), configuracio.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.2"), configuracio.getName(), message));
 		}
 	}
 
@@ -93,7 +95,7 @@ public class ConfigEntityDaoImpl extends
 	public void toConfiguracioCustom(com.soffid.iam.model.ConfigEntity sourceEntity, es.caib.seycon.ng.comu.Configuracio targetVO) {
 		NetworkEntity xarxaEntity = sourceEntity.getNetwork();
 		if (xarxaEntity != null) {
-			targetVO.setCodiXarxa(xarxaEntity.getCode());
+			targetVO.setCodiXarxa(xarxaEntity.getName());
 		}
 	}
 
@@ -131,7 +133,7 @@ public class ConfigEntityDaoImpl extends
 	public void configuracioToEntityCustom(es.caib.seycon.ng.comu.Configuracio sourceVO, com.soffid.iam.model.ConfigEntity targetEntity) {
 		String codiXarxa = sourceVO.getCodiXarxa();
 		if (codiXarxa != null && codiXarxa.trim().compareTo("") != 0) { //$NON-NLS-1$
-			NetworkEntity xarxaEntity = getNetworkEntityDao().findByCode(codiXarxa);
+			NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
 			if (xarxaEntity != null) {
 				targetEntity.setNetwork(xarxaEntity);
 			} else {
@@ -155,16 +157,16 @@ public class ConfigEntityDaoImpl extends
 		if (codiXarxa != null) {
 			Object result = findByCodiAndCodiXarxa(
 					"select configuracio " //$NON-NLS-1$
-							+ "from es.caib.seycon.ng.model.ConfiguracioEntity configuracio " //$NON-NLS-1$
-							+ "left join configuracio.xarxa as xarxa " //$NON-NLS-1$
-							+ "where configuracio.codi = :codi and xarxa.codi = :codiXarxa)", //$NON-NLS-1$
+							+ "from com.soffid.iam.model.ConfigEntity configuracio " //$NON-NLS-1$
+							+ "left join configuracio.network as xarxa " //$NON-NLS-1$
+							+ "where configuracio.name = :codi and xarxa.name = :codiXarxa)", //$NON-NLS-1$
 					codi, codiXarxa);
 			return (ConfigEntity) result;
 		}
 		return findByCodiAndCodiXarxa(
 				"select configuracio " //$NON-NLS-1$
-						+ "from es.caib.seycon.ng.model.ConfiguracioEntity configuracio " //$NON-NLS-1$
-						+ "where configuracio.codi = :codi and configuracio.xarxa is null", //$NON-NLS-1$
+						+ "from com.soffid.iam.model.ConfigEntity configuracio " //$NON-NLS-1$
+						+ "where configuracio.name = :codi and configuracio.network is null", //$NON-NLS-1$
 				codi, null);
 	}
 
@@ -173,7 +175,7 @@ public class ConfigEntityDaoImpl extends
          *      es.caib.seycon.ng.model.Parameter[])
          */
         public List find(final java.lang.String queryString,
-                        final es.caib.seycon.ng.model.Parameter[] parameters) {
+                        final Parameter[] parameters) {
                 try {
                         java.util.List results = new QueryBuilder().query(this,
                                         queryString, parameters);

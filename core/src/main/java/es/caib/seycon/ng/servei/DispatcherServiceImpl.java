@@ -23,6 +23,7 @@ import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
 import com.soffid.iam.model.ReplicaDatabaseEntity;
 import com.soffid.iam.model.ReplicaDatabaseEntityDao;
+import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SystemEntity;
@@ -34,6 +35,7 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.service.SystemScheduledTasks;
+
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.ContenidorRol;
@@ -52,10 +54,11 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.intf.DatabaseReplicaMgr;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -67,6 +70,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
 import org.apache.axis.components.logger.LogFactory;
 import org.hibernate.Hibernate;
 import org.mortbay.log.Log;
@@ -106,7 +110,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         	dispatcher.setRelacioLaboral(""); //$NON-NLS-1$
         }
         
-		SystemEntity dispatchersSameCode = getSystemEntityDao().findByCode(dispatcher.getCodi());
+		SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(dispatcher.getCodi());
 		if(dispatchersSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("DipatcherServiceImpl.CodeDispatcherExists"),  //$NON-NLS-1$
 							dispatcher.getCodi())); 
@@ -197,7 +201,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     protected es.caib.seycon.ng.comu.Dispatcher handleUpdate(
             es.caib.seycon.ng.comu.Dispatcher dispatcher) throws java.lang.Exception {
         // Obtenim el anterior per comparar els grups i els tipus d'usuari
-        SystemEntity entityOld = getSystemEntityDao().findByCode(dispatcher.getCodi());
+        SystemEntity entityOld = getSystemEntityDao().findByName(dispatcher.getCodi());
 
         // fem còpia dels antics per comparar
         Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(entityOld.getUserType());
@@ -230,13 +234,13 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             String t = tipus[i].trim();
             boolean found = false;
             for (UserTypeSystemEntity td : entity.getUserType()) {
-                if (td.getUserType().getCode().equals(t)) {
+                if (td.getUserType().getName().equals(t)) {
                     found = true;
                     break;
                 }
             }
             if (!found && t.length() > 0) {
-                UserTypeEntity tu = tipusDao.findByCode(t);
+                UserTypeEntity tu = tipusDao.findByName(t);
                 if (tu == null) throw new InternalErrorException(String.format(Messages.getString("DispatcherServiceImpl.0"), t));
                 UserTypeSystemEntity td = getUserTypeSystemEntityDao().newUserTypeSystemEntity();
                 td.setSystem(entity);
@@ -250,7 +254,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             UserTypeSystemEntity td = it.next();
             boolean found = false;
             for (int i = 0; i < tipus.length; i++) {
-                if (tipus[i].trim().equals(td.getUserType().getCode())) {
+                if (tipus[i].trim().equals(td.getUserType().getName())) {
                     found = true;
                     break;
                 }
@@ -260,28 +264,28 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                 getUserTypeSystemEntityDao().remove(td);
                 it.remove();
                 UsuariService usuService = getUsuariService();
-                Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", td.getUserType().getCode(), "", "", "", "", "", "", "", false);
+                Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", td.getUserType().getName(), "", "", "", "", "", "", "", false);
                 accService = getAccountService();
                 long l = usuaris.size();
                 int i = 0;
                 for (Usuari usuari : usuaris) {
                     i++;
                     if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
-                    generateUpdateUser(usuari.getCodi(), entity.getCode());
+                    generateUpdateUser(usuari.getCodi(), entity.getName());
                 }
                 log.info("Updated " + l + " users");
             }
         }
         for (UserTypeEntity tu : tipusUsuariToGenerateAccounts) {
             UsuariService usuService = getUsuariService();
-            Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", tu.getCode(), "", "", "", "", "", "", "", false);
+            Collection<Usuari> usuaris = usuService.findUsuariByCriteri("", "", "", "", "", "", "", "", "", "", tu.getName(), "", "", "", "", "", "", "", false);
             accService = getAccountService();
             long l = usuaris.size();
             int i = 0;
             for (Usuari usuari : usuaris) {
                 i++;
                 if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
-                generateUpdateUser(usuari.getCodi(), entity.getCode());
+                generateUpdateUser(usuari.getCodi(), entity.getName());
             }
             log.info("Updated " + l + " users");
         }
@@ -297,7 +301,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                                            // l'agent
     	tasque.setDate(new Timestamp(System.currentTimeMillis()));
     	tasque.setUser(usuari);
-    	tasque.setSystemCode(dispatcher); // Només es genera la tasca al
+    	tasque.setSystemName(dispatcher); // Només es genera la tasca al
                                          // dispatcher actual
     	tasque.setStatus("P");// Posem com a pendent //$NON-NLS-1$
         getTaskEntityDao().createNoFlush(tasque);
@@ -321,13 +325,13 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             String t = grups[i].trim();
             boolean found = false;
             for (SystemGroupEntity gd : entity.getSystemGroup()) {
-                if (gd.getGroup().getCode().equals(t)) {
+                if (gd.getGroup().getName().equals(t)) {
                     found = true;
                     break;
                 }
             }
             if (!found && t.length() > 0) {
-                GroupEntity gr = grupDao.findByCode(t);
+                GroupEntity gr = grupDao.findByName(t);
                 if (gr == null) throw new InternalErrorException(String.format(Messages.getString("DispatcherServiceImpl.1"), t));
                 SystemGroupEntity gd = getSystemGroupEntityDao().newSystemGroupEntity();
                 gd.setSystem(entity);
@@ -342,7 +346,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             SystemGroupEntity gd = it.next();
             boolean found = false;
             for (int i = 0; i < grups.length; i++) {
-                if (grups[i].trim().equals(gd.getGroup().getCode())) {
+                if (grups[i].trim().equals(gd.getGroup().getName())) {
                     found = true;
                     break;
                 }
@@ -351,26 +355,26 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                 groupsToGenerateAccounts.add(gd.getGroup());
                 getSystemGroupEntityDao().remove(gd);
                 it.remove();
-                List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gd.getGroup().getCode());
+                List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gd.getGroup().getName());
                 accService = getAccountService();
                 long l = usuaris.size();
                 int i = 0;
                 for (UserEntity usuari : usuaris) {
                     i++;
                     if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
-                    generateUpdateUser(usuari.getUserName(), entity.getCode());
+                    generateUpdateUser(usuari.getUserName(), entity.getName());
                 }
                 log.info("Updated " + l + " users");
             }
         }
         for (GroupEntity gr : groupsToGenerateAccounts) {
-            List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gr.getCode());
+            List<UserEntity> usuaris = getUserEntityDao().findUsersGroupAndSubgroupsByGroupCode(gr.getName());
             long l = usuaris.size();
             int i = 0;
             for (UserEntity usuari : usuaris) {
                 i++;
                 if (i % 100 == 1) log.info("Updating user " + i + " of " + l);
-                generateUpdateUser(usuari.getUserName(), entity.getCode());
+                generateUpdateUser(usuari.getUserName(), entity.getName());
             }
             log.info("Updated " + l + " users");
         }
@@ -385,7 +389,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (es.caib.seycon.ng.comu.Dispatcher dispatcher)
 					throws java.lang.Exception
 	{
-		SystemEntity dispatcherEntity = getSystemEntityDao().findByCode(dispatcher.getCodi());
+		SystemEntity dispatcherEntity = getSystemEntityDao().findByName(dispatcher.getCodi());
 		// Esborrem les relacions existents amb d'altres taules
 		getSystemGroupEntityDao().remove(dispatcherEntity.getSystemGroup());
 		getUserTypeSystemEntityDao().remove(dispatcherEntity.getUserType());
@@ -409,7 +413,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	}
 
     protected Dispatcher handleFindDispatcherByCodi(String codi) throws Exception {
-        SystemEntity dispatcherEntity = getSystemEntityDao().findByCode(codi);
+        SystemEntity dispatcherEntity = getSystemEntityDao().findByName(codi);
         if (dispatcherEntity != null) {
             Dispatcher dispatcher = getSystemEntityDao().toDispatcher(dispatcherEntity);
             return dispatcher;
@@ -449,7 +453,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             esActiu = "S"; //$NON-NLS-1$
         }
         
-        Collection dispatchers = getSystemEntityDao().query("from es.caib.seycon.ng.model.DispatcherEntity where (:codi is null or upper(codi) like upper(:codi)) and (:nomCla is null or upper(nomCla) like upper(:nomCla)) and (:url is null or upper(url) like upper(:url)) and (:basRol is null or upper(basRol) = upper(:basRol)) and (:segur is null or segur = :segur) and (:actiu is null or url is not null) order by codi", new Parameter[]{new Parameter("codi", codi), new Parameter("nomCla", nomCla), new Parameter("url", url), new Parameter("basRol", basRol), new Parameter("segur", segur), new Parameter("actiu", esActiu)});
+        Collection dispatchers = getSystemEntityDao().findByFilter(codi, nomCla, url, basRol, segur, esActiu);
         if (dispatchers != null)
         {
         	// Check maximum number of results
@@ -541,11 +545,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
                     Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
         // Obtenim tots els codis d'usuari:
-        Collection<AccountEntity> col = getSystemEntityDao().findByCode(codiAgent).getAccounts();
-        /*Collection col = getUsuariEntityDao().query(
-                "select usuari.codi from es.caib.seycon.ng.model.UsuariEntity usuari", //$NON-NLS-1$
-                new Parameter[] {});*/
-        // col = new Vector(col);
+        Collection<AccountEntity> col = getSystemEntityDao().findByName(codiAgent).getAccounts();
         // Creem les tasques per a cadascun dels usuaris
         for (Iterator it = col.iterator(); it.hasNext(); ) {
             AccountEntity ae = (AccountEntity) it.next();
@@ -566,20 +566,17 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         // Verifiquem que l'agent siga actiu
         if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
             throw new SeyconException(Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
-        Dispatcher agent = findDispatcherByCodi(codiAgent);
-        if (agent == null || agent.getUrl() == null)
+        
+        SystemEntity system = getSystemEntityDao().findByName(codiAgent);
+        if (system == null || system.getUrl() == null)
             throw new SeyconException(
                     Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
-        // Obtenim tots els rols de l'agent:
-        Collection col = getRoleEntityDao().query("select distinct rol.nom from es.caib.seycon.ng.model.RolEntity rol  left join rol.baseDeDades baseDeDades where baseDeDades.codi=:codiAgent", new Parameter[]{new Parameter("codiAgent", codiAgent)}); //$NON-NLS-1$
-        // col = new Vector(col);
         // Creem les tasques per a cadascun dels usuaris
-        for (Iterator it = col.iterator(); it.hasNext(); ) {
-            String nomRole = (String) it.next();
+        for (RoleEntity role: system.getRole()) {
             Tasca updateRole = new Tasca();
             updateRole.setTransa("UpdateRole");
-            updateRole.setRole(nomRole);
+            updateRole.setRole(role.getName());
             updateRole.setDataTasca(Calendar.getInstance());
             updateRole.setBd(codiAgent);
             updateRole.setCoddis(codiAgent);
@@ -637,14 +634,14 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     @Override
     protected Collection<GrupDispatcher> handleGetGrupsDispatcher(Dispatcher agent)
             throws Exception {
-        Collection<SystemGroupEntity> grupsE = getSystemGroupEntityDao().findByAgentCode(agent.getCodi());
+        Collection<SystemGroupEntity> grupsE = getSystemGroupEntityDao().findBySystem(agent.getCodi());
         return getSystemGroupEntityDao().toGrupDispatcherList(grupsE);
     }
 
     @Override
     protected Collection<TipusUsuariDispatcher> handleGetTipusUsuariDispatcher(Dispatcher agent)
             throws Exception {
-        Collection<UserTypeSystemEntity> tipusUsuariE = getUserTypeSystemEntityDao().findByAgentCode(agent.getCodi());
+        Collection<UserTypeSystemEntity> tipusUsuariE = getUserTypeSystemEntityDao().findBySystem(agent.getCodi());
         return getUserTypeSystemEntityDao().toTipusUsuariDispatcherList(tipusUsuariE);
 
     }
@@ -656,7 +653,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
 		if (de == null)
 			return false;
-		UserEntity ue = getUserEntityDao().findByCode(user);
+		UserEntity ue = getUserEntityDao().findByUserName(user);
         // Test user types
         boolean found = false;
         for (Iterator<UserTypeSystemEntity> it = de.getUserType().iterator(); !found && it.hasNext(); ) {
@@ -678,10 +675,10 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         }
 
         // Test role-based condition
-        if (de.getBaseRole().equals("S")) { //$NON-NLS-1$
+        if (de.getRoleBased().equals("S")) { //$NON-NLS-1$
         	Collection<RolGrant> grants = getAplicacioService().findEffectiveRolGrantByUser(ue.getId());
         	for (RolGrant grant : grants) {
-                if (grant.getDispatcher().equals(de.getCode())) return true;
+                if (grant.getDispatcher().equals(de.getName())) return true;
             }
         	return false;
         }
@@ -730,7 +727,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             for (SystemGroupEntity gde : de.getSystemGroup()) {
                 GroupEntity ge = gde.getGroup();
                 do {
-                    if (ge.getCode().equals(group)) return true;
+                    if (ge.getName().equals(group)) return true;
                     ge = ge.getParent();
                 }                 while (ge != null);
             }
@@ -923,13 +920,13 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 			SystemEntity mainDispatcher = getSystemEntityDao().findSoffidSystem();
 			SystemEntity dispatcher = getSystemEntityDao().newSystemEntity();
 			dispatcher.setClassName("com.soffid.iam.addons.replica.agent.ReplicaAgent"); //$NON-NLS-1$
-			dispatcher.setBaseRole("N"); //$NON-NLS-1$
-			dispatcher.setCode(db.getName());
+			dispatcher.setRoleBased("N"); //$NON-NLS-1$
+			dispatcher.setName(db.getName());
 			dispatcher.setReadOnly(false);
-			dispatcher.setSafe("S"); //$NON-NLS-1$
+			dispatcher.setTrusted("S"); //$NON-NLS-1$
 			dispatcher.setUrl("local"); //$NON-NLS-1$
 			dispatcher.setUserDomain(mainDispatcher.getUserDomain());
-			dispatcher.setDomain(mainDispatcher.getDomain());
+			dispatcher.setPasswordDomain(mainDispatcher.getPasswordDomain());
 			dispatcher.setEnableAccessControl("N"); //$NON-NLS-1$
 			getSystemEntityDao().create(dispatcher);
 			dispatcher.getReplicaDatabases().add(db);
@@ -938,7 +935,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		}
 		else
 		{
-			db.getSystem().setCode(db.getName());
+			db.getSystem().setName(db.getName());
 			getSystemEntityDao().update(db.getSystem());
 		}
 	}
@@ -1264,7 +1261,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
             GroupEntity g = (GroupEntity) it.next();
             Tasca updateRole = new Tasca();
             updateRole.setTransa("UpdateGroup");
-            updateRole.setGrup(g.getCode());
+            updateRole.setGrup(g.getName());
             updateRole.setDataTasca(Calendar.getInstance());
             updateRole.setCoddis(codiAgent);
             updateRole.setStatus("P");

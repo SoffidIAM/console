@@ -18,7 +18,7 @@ public abstract class AutoritzacioAccesHostComAdministradorEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="ADM_DATCAD", translated="expirationDateAhtorizationAccess")
+	@Column (name="ADM_DATCAD", translated="expirationDate")
 	public java.util.Date dataCaducitatAutoritzacioAcces;
 
 	@Column (name="ADM_USUID", translated="user")
@@ -35,11 +35,17 @@ public abstract class AutoritzacioAccesHostComAdministradorEntity {
 	public java.util.Date dataPeticio;
 
 	@Operation(translated="findByHostNameAndRequestDate")
-	@DaoFinder("select autoriza from es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity autoriza where autoriza.host.nom = :nomHost and (:dataPeticio = :nullDate or autoriza.dataPeticio >= :dataPeticio) and (:dataCaducitat = :nullDate or autoriza.dataCaducitatAutoritzacioAcces >= :dataCaducitat) order by autoriza.dataPeticio")
+	@DaoFinder("select autoriza "
+			+ "from com.soffid.iam.model.HostAdminEntity autoriza "
+			+ "where "
+			+ "  autoriza.host.name = :nomHost and "
+			+ "  (:requestDate = :nullDate or autoriza.requestDate >= :requestDate) and "
+			+ "  (:expirationDate = :nullDate or autoriza.expirationDate >= :expirationDate) "
+			+ "order by autoriza.requestDate")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity> findByNomHostIDataPeticio(
 		java.lang.String nomHost, 
-		@Nullable java.util.Date dataPeticio, 
-		@Nullable java.util.Date dataCaducitat, 
+		@Nullable java.util.Date requestDate, 
+		@Nullable java.util.Date expirationDate, 
 		java.util.Date nullDate) {
 	 return null;
 	}

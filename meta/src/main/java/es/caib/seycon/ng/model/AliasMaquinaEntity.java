@@ -24,19 +24,23 @@ public abstract class AliasMaquinaEntity {
 	public es.caib.seycon.ng.model.MaquinaEntity maquina;
 
 	@Operation(translated="findAliasByHostName")
-	@DaoFinder("select alias\nfrom es.caib.seycon.ng.model.AliasMaquinaEntity alias where alias.maquina.nom = :nomMaquina\norder by alias.alias")
+	@DaoFinder("select alias\n"
+			+ "from com.soffid.iam.model.HostAliasEntity alias where alias.host.name = :nomMaquina\norder by alias.alias")
 	public java.util.List<es.caib.seycon.ng.model.AliasMaquinaEntity> findAliasByNomMaquina(
 		java.lang.String nomMaquina) {
 	 return null;
 	}
 	@Operation(translated="findHostByAlias")
-	@DaoFinder("select aliasM.maquina\nfrom es.caib.seycon.ng.model.AliasMaquinaEntity aliasM where aliasM.alias like :alias")
+	@DaoFinder("select aliasM\n"
+			+ "from com.soffid.iam.model.HostAliasEntity aliasM where aliasM.alias like :alias")
 	public java.util.List<es.caib.seycon.ng.model.AliasMaquinaEntity> findMaquinaByAlias(
 		java.lang.String alias) {
 	 return null;
 	}
 	@Operation(translated="findAliasByHostNameAndAlias")
-	@DaoFinder("select alias\nfrom es.caib.seycon.ng.model.AliasMaquinaEntity alias where alias.maquina.nom = :nomMaquina and alias.alias = :alias\norder by alias.alias")
+	@DaoFinder("select alias\n"
+			+ "from com.soffid.iam.model.HostAliasEntity alias where alias.host.name = :nomMaquina and alias.alias = :alias\n"
+			+ "order by alias.alias")
 	public java.util.List<es.caib.seycon.ng.model.AliasMaquinaEntity> findAliasByNomMaquinaAndAlias(
 		java.lang.String nomMaquina, 
 		java.lang.String alias) {

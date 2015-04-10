@@ -30,7 +30,7 @@ import es.caib.seycon.ng.comu.PolicyCheckResult;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.engine.ReplicaConnection;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
@@ -199,7 +199,7 @@ public class InternalPasswordServiceImpl extends
         PasswordPolicyEntity pcd = null;
         pcd = getUserPolicy(user, dce);
         if (pcd == null)
-            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getCode())); //$NON-NLS-1$
+            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getName())); //$NON-NLS-1$
 
         doStorePassword(user, dce, pcd, password, mustChange? "E": "N", mustChange); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -212,7 +212,7 @@ public class InternalPasswordServiceImpl extends
 
         handleStorePassword(user, dce, password, mustChange);
 
-        createTask(TaskHandler.UPDATE_USER_PASSWORD, dce.getCode(), user.getUserName(), password, mustChange);
+        createTask(TaskHandler.UPDATE_USER_PASSWORD, dce.getName(), user.getUserName(), password, mustChange);
     }
 
     private void doStorePassword(UserEntity usuari, PasswordDomainEntity dce, PasswordPolicyEntity pcd, es.caib.seycon.ng.comu.Password password, String estat, boolean mustChange) throws InternalErrorException {
@@ -309,7 +309,7 @@ public class InternalPasswordServiceImpl extends
         PasswordPolicyEntity pcd = null;
         pcd = getUserPolicy(user, dce);
         if (pcd == null)
-            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getCode())); //$NON-NLS-1$
+            throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getName())); //$NON-NLS-1$
 
         String digest = getDigest(password);
         PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, dce);
@@ -320,7 +320,7 @@ public class InternalPasswordServiceImpl extends
     }
 
     private PasswordPolicyEntity getUserPolicy(com.soffid.iam.model.UserEntity user, PasswordDomainEntity dce) {
-    	return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(dce.getCode(), user.getUserType().getCode());
+    	return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(dce.getName(), user.getUserType().getName());
     }
 
     /**
@@ -350,20 +350,42 @@ public class InternalPasswordServiceImpl extends
 //        c.set(Calendar.MILLISECOND, 0);
 //        c.add(Calendar.DAY_OF_MONTH, -1);
 
-        Collection expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari = :tipusUsuari and contrasenya.usuari.actiu=\'S\' and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu in (\'S\', \'N\') ", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        Collection expired = getPasswordEntityDao()
+        		.query("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity "
+        				+ "where contrasenya.domain = :domini and "
+        				+ "contrasenya.user.userType = :tipusUsuari and "
+        				+ "contrasenya.user.active=\'S\' and "
+        				+ "contrasenya.expirationDate <= :caducitat and "
+        				+ "contrasenya.active in (\'S\', \'N\') ", 
+        				new Parameter[]{
+        						new Parameter("domini", dc), 
+        						new Parameter("tipusUsuari", pc.getUserType()), 
+        						new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
         for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
             PasswordEntity contra = it.next();
             Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
             doStorePassword(contra.getUser(), dc, pc, password, "N", false);
-            createTask(TaskHandler.UPDATE_USER_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
+            createTask(TaskHandler.UPDATE_USER_PASSWORD, dc.getName(), contra.getUser().getUserName(), password, false);
         }
 
-        expired = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active in (\'S\', \'N\') and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        expired = getAccountPasswordEntityDao().query("select pass "
+        		+ "from com.soffid.iam.model.AccountPasswordEntity as pass "
+        		+ "join pass.account as account "
+        		+ "where account.system.passwordDomain = :domini and "
+        		+ "  account.passwordPolicy = :tipusUsuari and "
+        		+ "  account.disabled = false and "
+        		+ "  pass.expirationDate <= :caducitat and "
+        		+ "  pass.active in (\'S\', \'N\') and "
+        		+ "  pass.order = 0", 
+        		new Parameter[]{
+        				new Parameter("domini", dc), 
+        				new Parameter("tipusUsuari", pc.getUserType()), 
+        				new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
          for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext(); ) {
             AccountPasswordEntity contra = it.next();
             Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
             doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
-            createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
+            createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getName(), password, false, null);
         }
     }
 
@@ -375,23 +397,47 @@ public class InternalPasswordServiceImpl extends
 //        c.set(Calendar.MILLISECOND, 0);
 
         
-        Collection expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari = :tipusUsuari and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu in (\'S\', \'N\') and contrasenya.ordre=0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        Collection expired = getPasswordEntityDao()
+        		.query(
+        				"from com.soffid.iam.model.PasswordEneity as contrasenyaEntity "
+        				+ "where contrasenya.domain = :domini and "
+        				+ "contrasenya.user.userType = :tipusUsuari and "
+        				+ "contrasenya.expirationDate <= :caducitat and "
+        				+ "contrasenya.active in (\'S\', \'N\') and "
+        				+ "contrasenya.order=0", 
+        				new Parameter[]{
+        						new Parameter("domini", dc), 
+        						new Parameter("tipusUsuari", pc.getUserType()), 
+        						new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
         for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
             PasswordEntity contra = it.next();
             Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
             contra.setActive("E");
             getPasswordEntityDao().update(contra);
-            createTask(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
+            createTask(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD, dc.getName(), contra.getUser().getUserName(), password, false);
         }
 
-        expired = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active in (\'S\', \'N\') and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
+        expired = getAccountPasswordEntityDao()
+        		.query("select pass "
+        				+ "from com.soffid.iam.model.AccountPasswordEntity as pass "
+        				+ "join pass.account as account "
+        				+ "where account.system.passwordDomain = :domini and "
+        				+ "  account.passwordPolicy = :tipusUsuari and "
+        				+ "  account.disabled = false and "
+        				+ "  pass.expirationDate <= :caducitat and "
+        				+ "  pass.active in (\'S\', \'N\') and "
+        				+ "  pass.order = 0", 
+        				new Parameter[]{
+        						new Parameter("domini", dc), 
+        						new Parameter("tipusUsuari", pc.getUserType()), 
+        						new Parameter("caducitat", c.getTime())}); //$NON-NLS-1$
          for (Iterator<AccountPasswordEntity> it = expired.iterator(); it.hasNext(); ) {
             AccountPasswordEntity contra = it.next();
             AccountEntity acc = contra.getAccount();
-            if (acc.getType().equals(AccountType.PRIVILEGED) || acc.getSystem().getSafe().equals("N")) {
+            if (acc.getType().equals(AccountType.PRIVILEGED) || acc.getSystem().getTrusted().equals("N")) {
                 Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
                 doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
-                createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
+                createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getName(), password, false, null);
             } else {
                 contra.setActive("E");
                 getAccountPasswordEntityDao().update(contra);
@@ -451,7 +497,7 @@ public class InternalPasswordServiceImpl extends
         do {
             retries++;
             if (retries > 100)
-                throw new InternalErrorException(String.format("Cannot generate valid password for domain %s, user type %s", dc.getCode(), pc.getUserDomainType().getCode()));
+                throw new InternalErrorException(String.format("Cannot generate valid password for domain %s, user type %s", dc.getName(), pc.getUserType().getName()));
             password = generatePasswordCandidate(pc, minLength, maxLength, r);
 
         } while (!handleCheckPolicy(usuariEntity, pc, password).isValid());
@@ -603,7 +649,7 @@ public class InternalPasswordServiceImpl extends
     		{
     			taskQueue = true;
 	            final long timeToWait = 60000; // 1 minute
-	            TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getCode(), user.getUserName(), password, false);
+	            TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(), password, false);
 	
 	            th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
 	            synchronized (th) {
@@ -623,7 +669,7 @@ public class InternalPasswordServiceImpl extends
 		{
 			for (UserAccountEntity userAccount : user.getAccounts()) {
                 AccountEntity ae = userAccount.getAccount();
-                if (!ae.isDisabled() && ae.getSystem().getDomain() == passwordDomain) {
+                if (!ae.isDisabled() && ae.getSystem().getPasswordDomain() == passwordDomain) {
                     PasswordValidation status = validatePasswordOnServer(ae, password);
                     if (status.equals(PasswordValidation.PASSWORD_GOOD)) return status;
                 }
@@ -660,21 +706,44 @@ public class InternalPasswordServiceImpl extends
                     c.set(Calendar.SECOND, 0);
                     c.set(Calendar.MILLISECOND, 0);
                     c.add(Calendar.DAY_OF_YEAR, -pc.getGracePeriodTime().intValue());
-                    Collection<PasswordEntity> expired = getPasswordEntityDao().query("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity where contrasenya.domini = :domini and contrasenya.usuari.tipusUsuari.codi = :tipusUsuari and contrasenya.dataCaducitat <= :caducitat and contrasenya.actiu = \'E\' and contrasenya.ordre = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType().getCode()), new Parameter("caducitat", c.getTime())});
+                    Collection<PasswordEntity> expired = getPasswordEntityDao()
+                    		.query("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity "
+                    				+ "where contrasenya.domain = :domini and "
+                    				+ "contrasenya.user.userType.name = :tipusUsuari and "
+                    				+ "contrasenya.expirationDate <= :caducitat and "
+                    				+ "contrasenya.active = \'E\' and "
+                    				+ "contrasenya.order = 0", 
+                    				new Parameter[]{
+                    						new Parameter("domini", dc), 
+                    						new Parameter("tipusUsuari", pc.getUserType().getName()), 
+                    						new Parameter("caducitat", c.getTime())});
                     for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext(); ) {
                         PasswordEntity contra = it.next();
                         Password password = generateRandomPassword(contra.getUser(), dc, pc, false, true);
                         contra.setActive("D");
                         getPasswordEntityDao().update(contra);
-                        createTask(TaskHandler.EXPIRE_USER_PASSWORD, dc.getCode(), contra.getUser().getUserName(), password, false);
+                        createTask(TaskHandler.EXPIRE_USER_PASSWORD, dc.getName(), contra.getUser().getUserName(), password, false);
                     }
-                    List<AccountPasswordEntity> expiredAccount = getAccountPasswordEntityDao().query("select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass join pass.account as account where account.dispatcher.domini = :domini and account.passwordPolicy = :tipusUsuari and account.disabled = false and pass.expirationDate <= :caducitat and pass.active = \'E\' and pass.order = 0", new Parameter[]{new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserDomainType()), new Parameter("caducitat", c.getTime())});
+                    List<AccountPasswordEntity> expiredAccount = getAccountPasswordEntityDao()
+                    		.query("select pass "
+                    				+ "from com.soffid.iam.model.AccountPasswordEntity as pass "
+                    				+ "join pass.account as account "
+                    				+ "where account.system.passwordDomain = :domini and "
+                    				+ "account.passwordPolicy = :tipusUsuari and "
+                    				+ "account.disabled = false and "
+                    				+ "pass.expirationDate <= :caducitat and "
+                    				+ "pass.active = \'E\' and "
+                    				+ "pass.order = 0", 
+                    				new Parameter[]{
+                    						new Parameter("domini", dc), 
+                    						new Parameter("tipusUsuari", pc.getUserType()), 
+                    						new Parameter("caducitat", c.getTime())});
                     for (Iterator<AccountPasswordEntity> it = expiredAccount.iterator(); it.hasNext(); ) {
                         AccountPasswordEntity contra = it.next();
                         AccountEntity acc = contra.getAccount();
                         Password password = generateRandomPassword(contra.getAccount(), pc, false, true);
                         doStoreAccountPassword(contra.getAccount(), pc, password, "N", false, null);
-                        createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getCode(), password, false, null);
+                        createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, contra.getAccount().getName(), contra.getAccount().getSystem().getName(), password, false, null);
                     }
                 }
             }
@@ -707,7 +776,7 @@ public class InternalPasswordServiceImpl extends
             password = generateRandomPassword(user, passDomain, pcd, true, false);
             if (!fake) {
                 doStorePassword(user, passDomain, pcd, password, mustChange ? "E": "N", mustChange); //$NON-NLS-1$ //$NON-NLS-2$
-                createTask(TaskHandler.UPDATE_USER_PASSWORD, passDomain.getCode(), user.getUserName(), password, mustChange);
+                createTask(TaskHandler.UPDATE_USER_PASSWORD, passDomain.getName(), user.getUserName(), password, mustChange);
             }
             return password;
         } else
@@ -743,7 +812,7 @@ public class InternalPasswordServiceImpl extends
         if (user == null) {
             Password pass = null;
             int len = 0;
-            for (PasswordPolicyEntity politica : getPasswordPolicyEntityDao().findByPasswordDomain(passDomain.getCode())) {
+            for (PasswordPolicyEntity politica : getPasswordPolicyEntityDao().findByPasswordDomain(passDomain.getName())) {
                 Password newPass = generateRandomPassword(null, passDomain, politica, false, true);
                 if (len < newPass.getPassword().length()) {
                     len = newPass.getPassword().length();
@@ -770,8 +839,8 @@ public class InternalPasswordServiceImpl extends
     @Override
     protected void handleStorePassword(String user, String passwordDomain, String password,
             boolean mustChange) throws Exception {
-        UserEntity usuari = getUserEntityDao().findByCode(user);
-        PasswordDomainEntity dc = getPasswordDomainEntityDao().findByCode(passwordDomain);
+        UserEntity usuari = getUserEntityDao().findByUserName(user);
+        PasswordDomainEntity dc = getPasswordDomainEntityDao().findByName(passwordDomain);
         storePassword(usuari, dc, new Password(password), mustChange);
     }
 
@@ -782,9 +851,9 @@ public class InternalPasswordServiceImpl extends
 	}
 
 	private PasswordPolicyEntity getAccountPolicy(AccountEntity account) {
-		PasswordDomainEntity domini = account.getSystem().getDomain();
+		PasswordDomainEntity domini = account.getSystem().getPasswordDomain();
 		UserTypeEntity tipusUsuari = account.getPasswordPolicy();
-		return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(domini.getCode(), tipusUsuari.getCode());
+		return getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(domini.getName(), tipusUsuari.getName());
 		
 	}
 	@Override
@@ -970,7 +1039,7 @@ public class InternalPasswordServiceImpl extends
 	    		if (checkTrusted && getTaskQueue() != null)
 	    		{
 		            final long timeToWait = 60000; // 1 minute
-		            TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, false, null);
+		            TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(), password, false, null);
 		
 		            th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
 		            synchronized (th) {
@@ -997,24 +1066,24 @@ public class InternalPasswordServiceImpl extends
 
     private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password) throws InternalErrorException, IOException {
     	
-    	if ("S".equals(account.getSystem().getSafe()))
+    	if ("S".equals(account.getSystem().getTrusted()))
     	{
     		ConsoleLogonService ls = (ConsoleLogonService) getSeyconServerService().getServerService(ConsoleLogonService.REMOTE_PATH);
     		if (ls != null)
-    			return ls.validatePassword(account.getName(), account.getSystem().getCode(), password.getPassword());
+    			return ls.validatePassword(account.getName(), account.getSystem().getName(), password.getPassword());
     	}
 
     	return PasswordValidation.PASSWORD_WRONG;
 	}
 
 	private PasswordDomainEntity getPasswordDomain(AccountEntity account) {
-		return account.getSystem().getDomain();
+		return account.getSystem().getPasswordDomain();
 	}
 
 	private UserEntity getUsuari(AccountEntity account) throws InternalErrorException {
 		for (UserAccountEntity uae: account.getUsers())
 			return uae.getUser();
-		throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), account.getName(), account.getSystem().getCode())); //$NON-NLS-1$
+		throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), account.getName(), account.getSystem().getName())); //$NON-NLS-1$
 	}
 
 	private TaskHandler createAccountTask(String transa, String account,
@@ -1022,7 +1091,7 @@ public class InternalPasswordServiceImpl extends
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(transa);
-        tasque.setSystemCode(dispatcher);
+        tasque.setSystemName(dispatcher);
         tasque.setUser(account);
         tasque.setPassword(password.toString());
         tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1082,7 +1151,7 @@ public class InternalPasswordServiceImpl extends
         do {
             retries++;
             if (retries > 100)
-                throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.CannotGeneratePassword"), account.getName(), account.getSystem().getCode()));
+                throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.CannotGeneratePassword"), account.getName(), account.getSystem().getName()));
             password = generatePasswordCandidate(pc, minLength, maxLength, r);
 
         } while (!handleCheckAccountPolicy(account, password).isValid());
@@ -1104,7 +1173,7 @@ public class InternalPasswordServiceImpl extends
             if (!fake) {
                 doStoreAccountPassword(account, pcd, password, "N", mustChange, null); //$NON-NLS-1$
                 if (account.getSystem().getUrl() != null && !account.getSystem().getUrl().isEmpty())
-                	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange, null);
+                	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(), password, mustChange, null);
             }
             return password;
         } else
@@ -1151,7 +1220,7 @@ public class InternalPasswordServiceImpl extends
 		{
             handleStoreAccountPassword(account, password, mustChange, untilDate);
     
-        	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange, untilDate);
+        	createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(), password, mustChange, untilDate);
 		}
 	}
 
@@ -1162,7 +1231,7 @@ public class InternalPasswordServiceImpl extends
 		if (account.getType().equals(AccountType.USER))
 		{
 			for (UserAccountEntity uae : account.getUsers()) {
-                return handleIsPasswordExpired(uae.getUser(), account.getSystem().getDomain());
+                return handleIsPasswordExpired(uae.getUser(), account.getSystem().getPasswordDomain());
             }
 		}
 		else
@@ -1194,29 +1263,29 @@ public class InternalPasswordServiceImpl extends
 			String defaultName = System.getProperty("soffid.auth.system");
 			if (defaultName != null)
 			{
-				SystemEntity dispatcher = dao.findByCode(defaultName); //$NON-NLS-1$
+				SystemEntity dispatcher = dao.findByName(defaultName); //$NON-NLS-1$
 				if (dispatcher != null)
 					return defaultName;
 			}
 			
 			for (SystemEntity dispatcher : dao.loadAll()) {
                 if (dispatcher.isMainSystem()) {
-                    defaultDispatcher = dispatcher.getCode();
+                    defaultDispatcher = dispatcher.getName();
                     return defaultDispatcher;
                 }
             }
-			SystemEntity dispatcher = dao.findByCode("Soffid"); //$NON-NLS-1$
+			SystemEntity dispatcher = dao.findByName("Soffid"); //$NON-NLS-1$
 			if (dispatcher == null) 
-				dispatcher = dao.findByCode("soffid"); //$NON-NLS-1$
+				dispatcher = dao.findByName("soffid"); //$NON-NLS-1$
 			if (dispatcher == null)
-				dispatcher = dao.findByCode("seu"); //$NON-NLS-1$
+				dispatcher = dao.findByName("seu"); //$NON-NLS-1$
 			if (dispatcher == null)
 				defaultDispatcher = "soffid"; //$NON-NLS-1$
 			else
 			{
 				dispatcher.setMainSystem(true);
 				getSystemEntityDao().update(dispatcher);
-				defaultDispatcher = dispatcher.getCode();
+				defaultDispatcher = dispatcher.getName();
 			}
 		}
 		return defaultDispatcher;
@@ -1298,7 +1367,7 @@ public class InternalPasswordServiceImpl extends
                             public Object doInTransaction(TransactionStatus status) {
                                 try {
                                     InternalPasswordService svc = (InternalPasswordService) ctx.getBean(InternalPasswordService.SERVICE_NAME);
-                                    svc.storePassword(usuari.getUserName(), dce.getCode(), p.getPassword(), false);
+                                    svc.storePassword(usuari.getUserName(), dce.getName(), p.getPassword(), false);
                                 } catch (InternalErrorException e) {
                                     return e;
                                 }
@@ -1306,7 +1375,7 @@ public class InternalPasswordServiceImpl extends
                             }
                         });
                         if (e != null) throw e;
-                        executeOB(TaskHandler.UPDATE_USER_PASSWORD, dce.getCode(), usuari.getUserName(), p, false);
+                        executeOB(TaskHandler.UPDATE_USER_PASSWORD, dce.getName(), usuari.getUserName(), p, false);
                         anyChange = true;
                     }
                 }
@@ -1342,7 +1411,7 @@ public class InternalPasswordServiceImpl extends
     protected void handleStoreAndSynchronizePassword(UserEntity user, PasswordDomainEntity passwordDomain, Password password, boolean mustChange) throws Exception {
         handleStorePassword(user, passwordDomain, password, mustChange);
 
-        executeOB(TaskHandler.UPDATE_USER_PASSWORD, passwordDomain.getCode(), user.getUserName(), password, mustChange);
+        executeOB(TaskHandler.UPDATE_USER_PASSWORD, passwordDomain.getName(), user.getUserName(), password, mustChange);
 	}
 
 	/* (non-Javadoc)
@@ -1363,7 +1432,7 @@ public class InternalPasswordServiceImpl extends
 		{
             handleStoreAccountPassword(account, password, mustChange, expirationDate);
     
-        	executeOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getCode(), password, mustChange);
+        	executeOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(), password, mustChange);
 		}
 	}
 

@@ -80,7 +80,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			{
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
 			}
-			List<RoleAccountEntity> roles = raDao.findByUserCode(user.getUserName());
+			List<RoleAccountEntity> roles = raDao.findAllByUserName(user.getUserName());
 			if (result != null && ((Boolean) result).booleanValue())
 			{
 				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
@@ -150,12 +150,12 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
             RoleAccountEntity ra = it.next();
             boolean match = false;
             if (ra.getRole().getId().equals(role.getId())) {
-                if (ra.getDomainApplicationValue() != null) {
-                    if (ra.getDomainApplicationValue().getValue().equals(stringValue)) match = true;
+                if (ra.getDomainValue() != null) {
+                    if (ra.getDomainValue().getValue().equals(stringValue)) match = true;
                 } else if (ra.getGroup() != null) {
-                    if (ra.getGroup().getCode().equals(stringValue)) match = true;
-                } else if (ra.getManagedApplication() != null) {
-                    if (ra.getManagedApplication().getCode().equals(stringValue)) match = true;
+                    if (ra.getGroup().getName().equals(stringValue)) match = true;
+                } else if (ra.getInformationSystem() != null) {
+                    if (ra.getInformationSystem().getName().equals(stringValue)) match = true;
                 } else {
                     if (stringValue == null) match = true;
                 }
@@ -171,7 +171,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		RolAccount ra = generateRolAccount (rule, role, stringValue);
 		if (accounts.isEmpty())
 		{
-			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUsuari(user), getSystemEntityDao().toDispatcher(role.getDatabases()), null);
+			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUsuari(user), getSystemEntityDao().toDispatcher(role.getSystem()), null);
 			ra.setAccountId(account.getId());
 			ra.setAccountName(account.getName());
 			Security.nestedLogin(Security.getCurrentAccount(), new String[] {
@@ -201,9 +201,9 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 */
 	private RolAccount generateRolAccount(RuleEntity rule, RoleEntity role, String stringValue) {
 		RolAccount ra = new RolAccount();
-        ra.setAccountDispatcher(role.getDatabases().getCode());
-        ra.setBaseDeDades(role.getDatabases().getCode());
-        ra.setCodiAplicacio(role.getApplication().getCode());
+        ra.setAccountDispatcher(role.getSystem().getName());
+        ra.setBaseDeDades(role.getSystem().getName());
+        ra.setCodiAplicacio(role.getInformationSystem().getName());
         ra.setNomRol(role.getName());
         ra.setRuleId(rule.getId());
         ra.setRuleDescription(rule.getDescription());
@@ -236,7 +236,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
 		for (UserAccountEntity ua : user.getAccounts()) {
             AccountEntity account = ua.getAccount();
-            if (account.getType().equals(AccountType.USER) && account.getSystem().getId().equals(role.getDatabases().getId())) {
+            if (account.getType().equals(AccountType.USER) && account.getSystem().getId().equals(role.getSystem().getId())) {
                 accounts.add(ua.getAccount());
             }
         }
@@ -288,10 +288,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 * @param grup
 	 */
 	private void addGroups(HashMap<String, Group> groups, GroupEntity grup) {
-		if (!groups.containsKey(grup.getCode()))
+		if (!groups.containsKey(grup.getName()))
 		{
 			Grup grupVO = getGroupEntityDao().toGrup(grup);
-			groups.put(grup.getCode(), Group.toGroup(grupVO));
+			groups.put(grup.getName(), Group.toGroup(grupVO));
 			if (grup.getParent() != null)
 				addGroups(groups, grup.getParent());	
 		}
@@ -319,7 +319,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			
 			attributes = new HashMap<String, String>();
 			for (UserDataEntity dada : user.getUserData()) {
-                attributes.put(dada.getDataType().getCode(), dada.getDataValue());
+                attributes.put(dada.getDataType().getName(), dada.getValue());
             }
 			
 			groups = new HashMap<String, Group>();

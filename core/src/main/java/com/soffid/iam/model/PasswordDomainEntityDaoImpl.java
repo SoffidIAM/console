@@ -32,7 +32,7 @@ public class PasswordDomainEntityDaoImpl
         String codiUsuari = Security.getCurrentAccount();
         Auditoria auditoria = new Auditoria();
         auditoria.setAccio(accio);
-        auditoria.setPasswordDomain(domain.getCode());
+        auditoria.setPasswordDomain(domain.getName());
         auditoria.setAutor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
@@ -50,18 +50,18 @@ public class PasswordDomainEntityDaoImpl
     		return super.findDefaultDomain(queryString, criteria, userId);
 	    } catch (InvalidDataAccessResourceUsageException e) {
 	    	// More than one domain
-	        PasswordDomainEntity dcEntity = findByCode(criteria, "DEFAULT"); //$NON-NLS-1$
+	        PasswordDomainEntity dcEntity = findByName(criteria, "DEFAULT"); //$NON-NLS-1$
 	        if (dcEntity == null)
 	        {
-	        	SystemEntity dispatcher = getSystemEntityDao().findByCode("soffid"); //$NON-NLS-1$
+	        	SystemEntity dispatcher = getSystemEntityDao().findByName("soffid"); //$NON-NLS-1$
 	        	if (dispatcher != null)
-	        		dcEntity = dispatcher.getDomain();
+	        		dcEntity = dispatcher.getPasswordDomain();
 	        }
 	        if (dcEntity == null)
 	        {
-	        	SystemEntity dispatcher = getSystemEntityDao().findByCode("seu"); //$NON-NLS-1$
+	        	SystemEntity dispatcher = getSystemEntityDao().findByName("seu"); //$NON-NLS-1$
 	        	if (dispatcher != null)
-	        		dcEntity = dispatcher.getDomain();
+	        		dcEntity = dispatcher.getPasswordDomain();
 	        }
 	        if (dcEntity == null)
 	        	logger.warn(String.format(Messages.getString("PasswordDomainEntityDaoImpl.MoreThanOnePassword"), userId)); //$NON-NLS-1$

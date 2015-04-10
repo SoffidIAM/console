@@ -26,10 +26,10 @@ public abstract class TipusUsuariDispatcherEntity {
 	@Column (name="TPD_TUS_ID", translated="userType")
 	public es.caib.seycon.ng.model.TipusUsuariEntity tipusUsuari;
 
-	@Operation(translated="findByAgentCode")
-	@DaoFinder("select tu from es.caib.seycon.ng.model.TipusUsuariDispatcherEntity tu where tu.dispatcher.codi=:codiAgent")
+	@Operation(translated="findBySystem")
+	@DaoFinder("select tu from com.soffid.iam.model.UserTypeSystemEntity tu where tu.system.name=:systemName")
 	public java.util.Collection<es.caib.seycon.ng.model.TipusUsuariDispatcherEntity> findByCodiAgent(
-		java.lang.String codiAgent) {
+		java.lang.String systemName) {
 	 return null;
 	}
 }

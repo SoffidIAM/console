@@ -50,22 +50,22 @@ public class EmailDomainEntityDaoImpl
 		try {
 			super.create(dominiCorreu);
 			getSession(false).flush();
-			auditarDominiCorreu("C", dominiCorreu.getCode()); //$NON-NLS-1$
+			auditarDominiCorreu("C", dominiCorreu.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.0"), dominiCorreu.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.0"), dominiCorreu.getName(), message));
 		}
 	}
 	
 	public void remove(com.soffid.iam.model.EmailDomainEntity dominiCorreu) throws RuntimeException {
 		try {
-			String codiDominiCorreu = dominiCorreu.getCode();
+			String codiDominiCorreu = dominiCorreu.getName();
 			super.remove(dominiCorreu);
 			getSession(false).flush();
 			auditarDominiCorreu("D", codiDominiCorreu);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.6"), dominiCorreu.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.6"), dominiCorreu.getName(), message));
 		}
 	}
 	
@@ -73,10 +73,10 @@ public class EmailDomainEntityDaoImpl
 		try {
 			super.update(dominiCorreu);
 			getSession(false).flush();
-			auditarDominiCorreu("U", dominiCorreu.getCode()); //$NON-NLS-1$
+			auditarDominiCorreu("U", dominiCorreu.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.8"), dominiCorreu.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.8"), dominiCorreu.getName(), message));
 		}
 	}
 	

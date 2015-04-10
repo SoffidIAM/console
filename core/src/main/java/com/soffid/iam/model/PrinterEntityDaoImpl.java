@@ -53,7 +53,7 @@ public class PrinterEntityDaoImpl extends
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-        tasque.setPrinter(impressora.getCode());
+        tasque.setPrinter(impressora.getName());
         getTaskEntityDao().create(tasque);
     }
 
@@ -63,16 +63,16 @@ public class PrinterEntityDaoImpl extends
             super.create(impressora);
             generateTask(impressora);
             getSession(false).flush();
-            auditarImpressora("C", impressora.getCode()); //$NON-NLS-1$
+            auditarImpressora("C", impressora.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.0"), impressora.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.0"), impressora.getName(), message));
         }
     }
 
     public void remove(com.soffid.iam.model.PrinterEntity impressora) throws RuntimeException {
         try {
-            String codiImpressora = impressora.getCode();
+            String codiImpressora = impressora.getName();
             super.remove(impressora);
             generateTask(impressora);
             getSession(false).flush();
@@ -80,7 +80,7 @@ public class PrinterEntityDaoImpl extends
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.1"), impressora.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.1"), impressora.getName(), message));
         }
     }
 
@@ -89,14 +89,14 @@ public class PrinterEntityDaoImpl extends
             PrinterEntity old = load(impressora.getId());
             super.update(impressora);
             generateTask(impressora);
-            if (!old.getCode().equals(impressora.getCode()))
+            if (!old.getName().equals(impressora.getName()))
                 generateTask(impressora);
             getSession(false).flush();
-            auditarImpressora("U", impressora.getCode()); //$NON-NLS-1$
+            auditarImpressora("U", impressora.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.2"), impressora.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.2"), impressora.getName(), message));
         }
     }
 

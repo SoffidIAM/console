@@ -15,12 +15,14 @@ import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -59,9 +61,9 @@ public class DomainValueEntityDaoImpl extends
             String codiAplicacio = null;
             ApplicationDomainEntity domini = valorDomini.getDomain();
             if (domini != null) {
-                InformationSystemEntity aplicacio = domini.getApplicationDomain();
+                InformationSystemEntity aplicacio = domini.getInformationSystem();
                 if (aplicacio != null) {
-                    codiAplicacio = aplicacio.getCode();
+                    codiAplicacio = aplicacio.getName();
                 }
             }
             String nomDomini = valorDomini.getDomain().getName();
@@ -81,9 +83,9 @@ public class DomainValueEntityDaoImpl extends
             String codiAplicacio = null;
             ApplicationDomainEntity domini = valorDomini.getDomain();
             if (domini != null) {
-                InformationSystemEntity aplicacio = domini.getApplicationDomain();
+                InformationSystemEntity aplicacio = domini.getInformationSystem();
                 if (aplicacio != null) {
-                    codiAplicacio = aplicacio.getCode();
+                    codiAplicacio = aplicacio.getName();
                 }
             }
             String nomDomini = valorDomini.getDomain().getName();
@@ -101,9 +103,9 @@ public class DomainValueEntityDaoImpl extends
             String codiAplicacio = null;
             ApplicationDomainEntity domini = valorDomini.getDomain();
             if (domini != null) {
-                InformationSystemEntity aplicacio = domini.getApplicationDomain();
+                InformationSystemEntity aplicacio = domini.getInformationSystem();
                 if (aplicacio != null) {
-                    codiAplicacio = aplicacio.getCode();
+                    codiAplicacio = aplicacio.getName();
                 }
             }
             String nomDomini = valorDomini.getDomain().getName();
@@ -177,11 +179,11 @@ public class DomainValueEntityDaoImpl extends
         String nom = source.getNomDomini();
         String codiAplicacio = source.getCodiExternDomini();
         String query = "select domini " //$NON-NLS-1$
-                + "from es.caib.seycon.ng.model.DominiAplicacioEntity domini " //$NON-NLS-1$
-                + "left join domini.aplicacio aplicacio " //$NON-NLS-1$
+                + "from com.soffid.iam.model.ApplicationDomainEntity domini " //$NON-NLS-1$
+                + "left join domini.informationSystem aplicacio " //$NON-NLS-1$
                 + "where " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-                + "domini.nom = :nom"; //$NON-NLS-1$
+                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.name = :codiAplicacio)) and " //$NON-NLS-1$
+                + "domini.name = :nom"; //$NON-NLS-1$
         Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
                 codiAplicacio);
         Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
@@ -216,7 +218,7 @@ public class DomainValueEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
      *      es.caib.seycon.ng.model.Parameter[])
      */
-    public List<DomainValueEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<DomainValueEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);

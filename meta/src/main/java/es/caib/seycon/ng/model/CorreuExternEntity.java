@@ -27,19 +27,18 @@ public abstract class CorreuExternEntity {
 	@Operation(translated="findByAddress")
 	@DaoFinder
 	public es.caib.seycon.ng.model.CorreuExternEntity findByAdreca(
-		java.lang.String adreca) {
+		java.lang.String address) {
 	 return null;
 	}
-	@Operation(translated="findByOListNameAndDomainCode")
-	@DaoFinder("select llicor.externs as extern \nfrom es.caib.seycon.ng.model.LlistaCorreuEntity llicor left join llicor.domini as dominiCorreu where (:nomLlistaCorreu is null or llicor.nom = :nomLlistaCorreu) and  ( (:codiDomini is null and dominiCorreu is null) or (:codiDomini is not null and dominiCorreu is not null and dominiCorreu.codi = :codiDomini))")
+	@Operation(translated="findByList")
+	@DaoFinder("select llicor.externals as extern \n"
+			+ "from com.soffid.iam.model.EmailListEntity llicor "
+			+ "left join llicor.domain as dominiCorreu "
+			+ "where (:listName is null or llicor.name = :listName) and "
+			+ " ( (:listDomain is null and dominiCorreu is null) or (:listDomain is not null and dominiCorreu is not null and dominiCorreu.name = :listDomain))")
 	public java.util.List<es.caib.seycon.ng.model.CorreuExternEntity> findCorreusExternsByNomLlistaCorreuAndCodiDomini(
-		java.lang.String nomLlistaCorreu, 
-		java.lang.String codiDomini) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.CorreuExternEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+		java.lang.String listName, 
+		java.lang.String listDomain) {
 	 return null;
 	}
 }

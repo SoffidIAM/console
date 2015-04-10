@@ -17,6 +17,7 @@ import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Grup;
@@ -27,6 +28,7 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -67,18 +69,18 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		try {
 			super.update(xarxaAC);
 			getSession(false).flush();
-			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getCode();
+			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getName();
 			String codiUsuari = xarxaAC.getUser() == null ? null : xarxaAC.getUser().getUserName();
 			String nomRol = null;
 			String codiAplicacio = null;
 			String codiBbdd = null;
 			if (xarxaAC.getRole() != null) {
 				nomRol = xarxaAC.getRole().getName();
-				codiAplicacio = xarxaAC.getRole().getApplication().getCode();
-				codiBbdd = xarxaAC.getRole().getDatabases().getCode();
+				codiAplicacio = xarxaAC.getRole().getInformationSystem().getName();
+				codiBbdd = xarxaAC.getRole().getSystem().getName();
 			}
 			String maquines = xarxaAC.getHostsName();
-			auditarXarxaAC("U", xarxaAC.getNetwork().getCode(), codiGrup, codiUsuari, nomRol, codiAplicacio, codiBbdd, maquines);
+			auditarXarxaAC("U", xarxaAC.getNetwork().getName(), codiGrup, codiUsuari, nomRol, codiAplicacio, codiBbdd, maquines);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorUpdating"), xarxaAC.getHostsName(), message));
@@ -89,18 +91,18 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		try {
 			super.create(xarxaAC);
 			getSession(false).flush();
-			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getCode();
+			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getName();
 			String codiUsuari = xarxaAC.getUser() == null ? null : xarxaAC.getUser().getUserName();
 			String nomRol = null;
 			String codiAplicacio = null;
 			String codiBbdd = null;
 			if (xarxaAC.getRole() != null) {
 				nomRol = xarxaAC.getRole().getName();
-				codiAplicacio = xarxaAC.getRole().getApplication().getCode();
-				codiBbdd = xarxaAC.getRole().getDatabases().getCode();
+				codiAplicacio = xarxaAC.getRole().getInformationSystem().getName();
+				codiBbdd = xarxaAC.getRole().getSystem().getName();
 			}
 			String maquines = xarxaAC.getHostsName();
-			auditarXarxaAC("C", xarxaAC.getNetwork().getCode(), codiGrup, codiUsuari, nomRol, codiAplicacio, codiBbdd, maquines);
+			auditarXarxaAC("C", xarxaAC.getNetwork().getName(), codiGrup, codiUsuari, nomRol, codiAplicacio, codiBbdd, maquines);
 			xarxaAC.setId(xarxaAC.getId());
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
@@ -110,8 +112,8 @@ public class NetworkAuthorizationEntityDaoImpl extends
 
 	public void remove(com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC) throws RuntimeException {
 		try {
-			String codiXarxa = xarxaAC.getNetwork().getCode();
-			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getCode();
+			String codiXarxa = xarxaAC.getNetwork().getName();
+			String codiGrup = xarxaAC.getGroup() == null ? null : xarxaAC.getGroup().getName();
 			String codiUsuari = xarxaAC.getUser() == null ? null : xarxaAC.getUser().getUserName();
 			String maquines = xarxaAC.getHostsName();
 			String nomRol = null;
@@ -119,8 +121,8 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			String codiBbdd = null;
 			if (xarxaAC.getRole() != null) {
 				nomRol = xarxaAC.getRole().getName();
-				codiAplicacio = xarxaAC.getRole().getApplication().getCode();
-				codiBbdd = xarxaAC.getRole().getDatabases().getCode();
+				codiAplicacio = xarxaAC.getRole().getInformationSystem().getName();
+				codiBbdd = xarxaAC.getRole().getSystem().getName();
 			}
 			super.remove(xarxaAC);
 			getSession(false).flush();
@@ -140,7 +142,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 	private void toNetworkAuthorizationCustom(com.soffid.iam.model.NetworkAuthorizationEntity source, es.caib.seycon.ng.comu.NetworkAuthorization target) {
 		NetworkEntity xarxa = source.getNetwork();
 		if (xarxa != null) {
-			target.setCodiXarxa(xarxa.getCode());
+			target.setCodiXarxa(xarxa.getName());
 		}
 		GroupEntity grup = source.getGroup();
 		RoleEntity rol = source.getRole();
@@ -194,7 +196,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 	}
 
 	public void networkAuthorizationToEntityCustom(es.caib.seycon.ng.comu.NetworkAuthorization source, com.soffid.iam.model.NetworkAuthorizationEntity target) {
-		NetworkEntity xarxa = getNetworkEntityDao().findByCode(source.getCodiXarxa());
+		NetworkEntity xarxa = getNetworkEntityDao().findByName(source.getCodiXarxa());
 		if (xarxa != null) {
 			target.setNetwork(xarxa);
 		} else {
@@ -240,7 +242,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 				if (esRol) {
 					codiBbdd = partsDeAplicacio[0];
 					codiAplicacio = partsDeAplicacio[1];
-					RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRolReal, codiAplicacio, codiBbdd);
+					RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(nomRolReal, codiAplicacio, codiBbdd);
 					esRol = rolEntity != null;
 					if (esRol) {
 						nomRol = codiIdentitat;
@@ -251,7 +253,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			// USUARI
 			boolean esUsuari = false;
 			if (!esRol) {
-				UserEntity usuariEntity = getUserEntityDao().findByCode(codiIdentitat);
+				UserEntity usuariEntity = getUserEntityDao().findByUserName(codiIdentitat);
 				esUsuari = usuariEntity != null;
 				if (esUsuari) {
 					codiUsuari = codiIdentitat;
@@ -261,7 +263,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			// GRUP
 			boolean esGrup = false;
 			if (!esRol && !esUsuari) {
-				GroupEntity grupEntity = getGroupEntityDao().findByCode(codiIdentitat);
+				GroupEntity grupEntity = getGroupEntityDao().findByName(codiIdentitat);
 				esGrup = grupEntity != null;
 				if (esGrup) {
 					codiGrup = codiIdentitat;
@@ -285,7 +287,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			codiBbdd = partsDeAplicacio[0];
 			codiAplicacio = partsDeAplicacio[1];
 
-			RoleEntity rolEntity = getRoleEntityDao().findRoleByRoleNameAndApplicationCodeAndSystemCode(nomRolReal, codiAplicacio, codiBbdd);
+			RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(nomRolReal, codiAplicacio, codiBbdd);
 			if (rolEntity == null) {
 				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.roleNotFound"), nomRol)); //$NON-NLS-1$
 			}
@@ -296,7 +298,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			}
 		}
 		if (codiUsuari != null) {
-			UserEntity usuariEntity = getUserEntityDao().findByCode(codiUsuari);
+			UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
 			if (usuariEntity == null) {
 				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.userNotFound"), codiUsuari)); //$NON-NLS-1$
 			}
@@ -307,7 +309,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			}
 		}
 		if (codiGrup != null) {
-			GroupEntity grupEntity = getGroupEntityDao().findByCode(codiGrup);
+			GroupEntity grupEntity = getGroupEntityDao().findByName(codiGrup);
 			if (grupEntity == null) {
 				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.groupNotFound"), codiGrup)); //$NON-NLS-1$
 			}
@@ -328,7 +330,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		networkAuthorizationToEntityCustom(source, target);
 	}
 
-	public List<NetworkAuthorizationEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+	public List<NetworkAuthorizationEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
 		try {
 			java.util.List results = new QueryBuilder().query(this,
 					queryString, parameters);

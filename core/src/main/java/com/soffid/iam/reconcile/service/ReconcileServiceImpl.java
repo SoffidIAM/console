@@ -6,6 +6,17 @@
  */
 package com.soffid.iam.reconcile.service;
 
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TaskEntityDao;
 import com.soffid.iam.model.UserEntityDao;
@@ -20,8 +31,8 @@ import com.soffid.iam.reconcile.model.ReconcileAssignmentEntity;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntity;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntityDao;
+
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
-import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Aplicacio;
@@ -36,23 +47,12 @@ import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.servei.AccountService;
 import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.DispatcherService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author (C) Soffid 2013
@@ -129,7 +129,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	{
 		TaskEntity entity = getTaskEntityDao().newTaskEntity();
 
-		entity.setSystemCode(dispatcher);
+		entity.setSystemName(dispatcher);
 		entity.setHost(processID.toString());
 		entity.setDate(new Timestamp(new Date().getTime()));
 		entity.setTransaction(TaskHandler.RECONCILE_USERS);
@@ -160,10 +160,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		{
 		}
 		
-		tasksList = entityDAO
-						.query("select tas from es.caib.seycon.ng.model.TasqueEntity as tas where tas.maquin=:process", //$NON-NLS-1$
-										new Parameter[] { new Parameter("process", Long //$NON-NLS-1$
-														.toString(processId)) });
+		tasksList = entityDAO.findByHost(Long.toString(processId)) ;
 
 		// Analyze tasks
 		for (TaskEntity tasqueEntity : tasksList) {
@@ -414,7 +411,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		Dispatcher disp = null; // Dispatcher data
 		UserEntityDao entity = getUserEntityDao(); // Get user data from DB handler
 
-		user = getUserEntityDao().toUsuari(entity.findByCode(account.getUserCode()));
+		user = getUserEntityDao().toUsuari(entity.findByUserName(account.getUserCode()));
 		disp = dispService.findDispatcherByCodi(account.getDispatcher());
 
 		// Check valid obtained user

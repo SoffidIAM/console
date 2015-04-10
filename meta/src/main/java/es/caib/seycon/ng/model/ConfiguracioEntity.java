@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_CONFIG", translatedName="ConfigEntity", translatedPackage="com.soffid.iam.model" )
@@ -17,7 +19,7 @@ public abstract class ConfiguracioEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="CON_CODI", length=50, translated="code")
+	@Column (name="CON_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="CON_VALOR", length=250, translated="value")
@@ -32,15 +34,29 @@ public abstract class ConfiguracioEntity {
 	public java.lang.String descripcio;
 
 	@Operation(translated="findByCodeAndNetworkCode")
-	@DaoFinder("select configuracio  \nfrom \nes.caib.seycon.ng.model.ConfiguracioEntity configuracio \nleft join configuracio.xarxa as xarxa \nwhere \nconfiguracio.codi = :codi and \n((:codiXarxa is null and xarxa is null) or (xarxa.codi = :codiXarxa))")
+	@DaoFinder("select configuracio  \n"
+			+ "from com.soffid.iam.model.ConfigEntity as configuracio \n"
+			+ "left join configuracio.network as network \n"
+			+ "where \n"
+			+ "  configuracio.name = :name and \n((:networkName is null and network is null) or (network.name = :networkName))")
 	public es.caib.seycon.ng.model.ConfiguracioEntity findByCodiAndCodiXarxa(
-		java.lang.String codi, 
-		java.lang.String codiXarxa) {
+		java.lang.String name, 
+		java.lang.String networkName) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.ConfiguracioEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
+
+	@DaoFinder(	"select config " + //$NON-NLS-1$
+				"from com.soffid.iam.model.ConfigEntity config " + //$NON-NLS-1$
+				"left join config.network network "+ //$NON-NLS-1$
+				"where " + //$NON-NLS-1$
+				"(:name is null or config.name like :name) and " + //$NON-NLS-1$
+				"(:network is null or network.name like :network) and " + //$NON-NLS-1$
+				"(:value is null or config.value like :value) and " + //$NON-NLS-1$
+				"(:description is null or config.description like :description)")
+	public List<ConfiguracioEntity> findByFilter(
+			java.lang.String name, 
+			java.lang.String network,
+			String value, String description) {
+		 return null;
 	}
 }

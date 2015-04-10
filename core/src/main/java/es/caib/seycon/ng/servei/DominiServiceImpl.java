@@ -18,7 +18,7 @@ import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import java.util.Collection;
 import java.util.Iterator;
@@ -145,62 +145,15 @@ public class DominiServiceImpl extends
 		return domini;
 	}
 
-	/**
-	 * @see es.caib.seycon.ng.servei.DominiService#findDominiAplicacioByCodiAplicacio(java.lang.String)
-	 */
-	protected Domini handleFindDominiAplicacioByNomRol(java.lang.String nomRol)
-			throws java.lang.Exception {
-		String query = "select rol.dominiAplicacio " + "from " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "es.caib.seycon.ng.model.RolEntity rol " + "where " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "rol.nom = :nomRol " + "order by rol.dominiAplicacio.nom"; //$NON-NLS-1$ //$NON-NLS-2$
-
-		Parameter nomRolParameter = new Parameter("nomRol", nomRol); //$NON-NLS-1$
-		Parameter[] parametres = { nomRolParameter };
-
-		List<ApplicationDomainEntity> dominisAplicacio = getApplicationDomainEntityDao().query(query, parametres);
-		if (dominisAplicacio != null) {
-			Iterator<ApplicationDomainEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
-			if (dominiAplicacioIterator != null) {
-				if (dominiAplicacioIterator.hasNext()) {
-					ApplicationDomainEntity dominiAplicacio = (ApplicationDomainEntity) dominiAplicacioIterator.next();
-					if (dominiAplicacio != null) {
-						return getApplicationDomainEntityDao().toDomini(dominiAplicacio);
-					}
-				}
-			}
-		}
-		return null;
-	}
-
 	protected Domini handleFindDominiAplicacioByNomDominiAndCodiAplicacio(
 			String nomDomini, String codiAplicacio) throws Exception {
-		String query = "select domini " //$NON-NLS-1$
-				+ "from " //$NON-NLS-1$
-				+ "es.caib.seycon.ng.model.DominiAplicacioEntity domini " //$NON-NLS-1$
-				+ "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-				+ "where " //$NON-NLS-1$
-				+ "domini.nom = :nomDomini and " //$NON-NLS-1$
-				+ "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) " //$NON-NLS-1$
-				+ "order by domini.nom"; //$NON-NLS-1$
-
-		Parameter nomDominiParameter = new Parameter("nomDomini", nomDomini); //$NON-NLS-1$
-		Parameter nomRolParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-				codiAplicacio);
-		Parameter[] parametres = { nomDominiParameter, nomRolParameter };
-
-		List<ApplicationDomainEntity> dominisAplicacio = getApplicationDomainEntityDao().query(query, parametres);
-		if (dominisAplicacio != null) {
-			Iterator<ApplicationDomainEntity> dominiAplicacioIterator = dominisAplicacio.iterator();
-			if (dominiAplicacioIterator != null) {
-				if (dominiAplicacioIterator.hasNext()) {
-					ApplicationDomainEntity dominiAplicacio = (ApplicationDomainEntity) dominiAplicacioIterator.next();
-					if (dominiAplicacio != null) {
-						return getApplicationDomainEntityDao().toDomini(dominiAplicacio);
-					}
-				}
-			}
-		}
-		return null;
+		
+		ApplicationDomainEntity ad = getApplicationDomainEntityDao().findByName(nomDomini, codiAplicacio);
+		
+		if (ad == null)
+			return null;
+		else
+			return getApplicationDomainEntityDao().toDomini(ad);
 	}
 
 	/**
@@ -210,17 +163,14 @@ public class DominiServiceImpl extends
 			es.caib.seycon.ng.comu.Domini domini, String codi,
 			String descripcio, String codiUsuari) throws java.lang.Exception {
 		if (domini.getNom().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) {
-			String query = "select grup " //$NON-NLS-1$
-					+ "from " //$NON-NLS-1$
-					+ "es.caib.seycon.ng.model.UsuariGrupEntity usuariGrup, " //$NON-NLS-1$
-					+ "es.caib.seycon.ng.model.GrupEntity grup, " //$NON-NLS-1$
-					+ "es.caib.seycon.ng.model.UsuariEntity usuari " //$NON-NLS-1$
+			String query = "select group " //$NON-NLS-1$
+					+ "from com.soffid.iam.model.GroupEntity group " //$NON-NLS-1$
+					+ "join group.secondaryGroupUsers as sg " //$NON-NLS-1$
+					+ "join sg.user as user " //$NON-NLS-1$
 					+ "where " //$NON-NLS-1$
-					+ "usuari.codi = :codiUsuari and " //$NON-NLS-1$
-					+ "usuariGrup.usuari = usuari and " //$NON-NLS-1$
-					+ "usuariGrup.grup = grup and " //$NON-NLS-1$
-					+ "(:codi is null or grup.codi like :codi) and " //$NON-NLS-1$
-					+ "(:descripcio is null or grup.descripcio like :descripcio)"; //$NON-NLS-1$
+					+ "user.userName = :codiUsuari and " //$NON-NLS-1$
+					+ "(:codi is null or group.name like :codi) and " //$NON-NLS-1$
+					+ "(:descripcio is null or group.description like :descripcio)"; //$NON-NLS-1$
 			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			Parameter codiUsuariParameter = new Parameter("codiUsuari", //$NON-NLS-1$
@@ -232,15 +182,13 @@ public class DominiServiceImpl extends
 				valorsDomini = new Vector<GroupEntity>();
 			}
 
-			String queryGrupPrimari = "select grup " //$NON-NLS-1$
-					+ "from " //$NON-NLS-1$
-					+ "es.caib.seycon.ng.model.GrupEntity grup, " //$NON-NLS-1$
-					+ "es.caib.seycon.ng.model.UsuariEntity usuari " //$NON-NLS-1$
+			String queryGrupPrimari = "select group " //$NON-NLS-1$
+					+ "from com.soffid.iam.model.GroupEntity group " //$NON-NLS-1$
+					+ "join group.primaryGroupUsers as user " //$NON-NLS-1$
 					+ "where " //$NON-NLS-1$
-					+ "usuari.codi = :codiUsuari and " //$NON-NLS-1$
-					+ "usuari.grupPrimari = grup and " //$NON-NLS-1$
-					+ "(:codi is null or grup.codi like :codi) and " //$NON-NLS-1$
-					+ "(:descripcio is null or grup.descripcio like :descripcio)"; //$NON-NLS-1$
+					+ "user.userName = :codiUsuari and " //$NON-NLS-1$
+					+ "(:codi is null or group.name like :codi) and " //$NON-NLS-1$
+					+ "(:descripcio is null or group.description like :descripcio)"; //$NON-NLS-1$
 			codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			codiUsuariParameter = new Parameter("codiUsuari", codiUsuari); //$NON-NLS-1$
@@ -263,15 +211,8 @@ public class DominiServiceImpl extends
 			return new Vector();
 		}
 		if (domini.getNom().compareToIgnoreCase(TipusDomini.GRUPS) == 0) {
-			String query = "select grup " //$NON-NLS-1$
-					+ "from es.caib.seycon.ng.model.GrupEntity grup " //$NON-NLS-1$
-					+ "where " //$NON-NLS-1$
-					+ "(:codi is null or grup.codi like :codi) and " //$NON-NLS-1$
-					+ "(:descripcio is null or grup.descripcio like :descripcio)"; //$NON-NLS-1$
-			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
-			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
-			Parameter[] parameters = { codiParameter, codiDescripcio };
-			Collection valorsDomini = getGroupEntityDao().query(query, parameters);
+			List<GroupEntity> valorsDomini = getGroupEntityDao()
+					.findByCriteria(codi, null, null, descripcio, null, null);
 			if (valorsDomini != null) {
 				List<ValorDomini> vdl = getGroupEntityDao().toValorDominiList(valorsDomini);
 				Iterator<ValorDomini> iterator = vdl.iterator();
@@ -285,15 +226,9 @@ public class DominiServiceImpl extends
 			return new Vector();
 		}
 		if (domini.getNom().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0) {
-			String query = "select aplicacio " //$NON-NLS-1$
-					+ "from es.caib.seycon.ng.model.AplicacioEntity aplicacio " //$NON-NLS-1$
-					+ "where " //$NON-NLS-1$
-					+ "(:codi is null or upper(aplicacio.codi) like upper(:codi)) and " //$NON-NLS-1$
-					+ "(:descripcio is null or aplicacio.nom like :descripcio)"; //$NON-NLS-1$
-			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
-			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
-			Parameter[] parameters = { codiParameter, codiDescripcio };
-			Collection<InformationSystemEntity> valorsDomini = getInformationSystemEntityDao().query(query, parameters);
+			Collection<InformationSystemEntity> valorsDomini =
+					getInformationSystemEntityDao().findByFilter(
+							codi, descripcio, null, null, null, null, null);
 			if (valorsDomini != null) {
 				List<ValorDomini> vdl = getInformationSystemEntityDao().toValorDominiList(valorsDomini);
 				Iterator<ValorDomini> iterator = vdl.iterator();
@@ -306,26 +241,13 @@ public class DominiServiceImpl extends
 			}
 			return new Vector();
 		}
+		
 		// domini d'aplicació
-		String query = "select valorDominiAplicacio " //$NON-NLS-1$
-				+ "from " //$NON-NLS-1$
-				+ "es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio " //$NON-NLS-1$
-				+ "left join valorDominiAplicacio.domini domini " //$NON-NLS-1$
-				+ "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-				+ "where " //$NON-NLS-1$
-				+ "domini.nom = :nomDomini and " //$NON-NLS-1$
-				+ "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) " //$NON-NLS-1$
-				+ "order by valorDominiAplicacio.domini.nom, valorDominiAplicacio.valor "; //$NON-NLS-1$
-
 		String nomDomini = domini.getNom();
 		String codiAplicacio = domini.getCodiExtern();
+		Collection<DomainValueEntity> valorsDomini = 
+			getDomainValueEntityDao().findByInformationSystem(codiAplicacio, nomDomini);
 
-		Parameter nomDominiParameter = new Parameter("nomDomini", nomDomini); //$NON-NLS-1$
-		Parameter nomRolParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-				codiAplicacio);
-		Parameter[] parametres = { nomDominiParameter, nomRolParameter };
-
-		Collection<DomainValueEntity> valorsDomini = getDomainValueEntityDao().query(query, parametres);
 		if (valorsDomini != null) {
 			return getDomainValueEntityDao().toValorDominiList(valorsDomini);
 		}
@@ -335,42 +257,19 @@ public class DominiServiceImpl extends
 	protected ValorDomini handleFindValorDominiAplicacioByNomDominiAndCodiAplicacioDominiAndValor(
 			String nomDomini, String codiAplicacio, String valor)
 			throws Exception {
-		String query = "select valorDominiAplicacio " //$NON-NLS-1$
-				+ "from " //$NON-NLS-1$
-				+ "es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio " //$NON-NLS-1$
-				+ "left join valorDominiAplicacio.domini domini " //$NON-NLS-1$
-				+ "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-				+ "where " //$NON-NLS-1$
-				+ "domini.nom = :nomDomini and " //$NON-NLS-1$
-				+ "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-				+ "valorDominiAplicacio.valor = :valor " //$NON-NLS-1$
-				+ "order by valorDominiAplicacio.domini.nom, valorDominiAplicacio.valor "; //$NON-NLS-1$
-
-		Parameter nomDominiParameter = new Parameter("nomDomini", nomDomini); //$NON-NLS-1$
-		Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-				codiAplicacio);
-		Parameter valorParameter = new Parameter("valor", valor); //$NON-NLS-1$
-		Parameter[] parametres = { nomDominiParameter, codiAplicacioParameter,
-				valorParameter };
-
-		List<DomainValueEntity> valorsDomini = getDomainValueEntityDao().query(query, parametres);
-		if (valorsDomini != null) {
-			Iterator<DomainValueEntity> valorsDominiIterator = valorsDomini.iterator();
-			if (valorsDominiIterator != null) {
-				if (valorsDominiIterator.hasNext()) {
-					DomainValueEntity valorDominiEntity = (DomainValueEntity) valorsDominiIterator.next();
-					if (valorDominiEntity != null) {
-						return getDomainValueEntityDao().toValorDomini(valorDominiEntity);
-					}
-				}
-			}
+		
+		DomainValueEntity valorDominiEntity = 
+				getDomainValueEntityDao()
+					.findByApplicationDomainValue(codiAplicacio, nomDomini, valor);
+		if (valorDominiEntity != null) {
+			return getDomainValueEntityDao().toValorDomini(valorDominiEntity);
 		}
 		return null;
 	}
 
 	protected Collection<Domini> handleFindDominisAplicacioByCodiAplicacio(
 			String codiAplicacio) throws Exception {
-		List<ApplicationDomainEntity> dominiAplicacions = getApplicationDomainEntityDao().findByApplicationCode(codiAplicacio);
+		List<ApplicationDomainEntity> dominiAplicacions = getApplicationDomainEntityDao().findByInformationSystem(codiAplicacio);
 		if (dominiAplicacions != null) {
 			return getApplicationDomainEntityDao().toDominiList(dominiAplicacions);
 		}
@@ -397,7 +296,7 @@ public class DominiServiceImpl extends
 
 	protected Collection<Domini> handleFindDominisByCodiAplicacio(String codiAplicacio)
 			throws Exception {
-		List<ApplicationDomainEntity> dominis = getApplicationDomainEntityDao().findByApplicationCodes(codiAplicacio);
+		List<ApplicationDomainEntity> dominis = getApplicationDomainEntityDao().findByInformationSystemPattern(codiAplicacio);
 		if (dominis != null) {
 			List<Domini> dominisVO = getApplicationDomainEntityDao().toDominiList(dominis);
 			dominisVO.add(findDominiGrups());

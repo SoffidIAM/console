@@ -30,6 +30,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserTypeEntity;
+
 import es.caib.bpm.vo.BPMUser;
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
@@ -51,6 +52,7 @@ import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -70,6 +72,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
 import org.hibernate.Hibernate;
 
 /**
@@ -91,7 +94,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         SimpleDateFormat dateFormat = new SimpleDateFormat(Messages.getString("UserEntityDaoImpl.dateFormat")); //$NON-NLS-1$
         // Afegim auditoria del grup primari de l'usuari
         if (grupPrimari != null)
-            auditoria.setGrup(grupPrimari.getCode());
+            auditoria.setGrup(grupPrimari.getName());
         auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObjecte("SC_USUARI"); //$NON-NLS-1$
 
@@ -103,7 +106,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         try {
 
             if (usuari.getMailDomain() != null && usuari.getMailDomain().getObsolete() != null && usuari.getMailDomain().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
-                throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.deletedDomain"), usuari.getMailDomain().getCode()));
+                throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.deletedDomain"), usuari.getMailDomain().getName()));
             }
 
             usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
@@ -180,7 +183,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-        tasque.setGroup(usuari.getPrimaryGroup().getCode());
+        tasque.setGroup(usuari.getPrimaryGroup().getName());
         getTaskEntityDao().create(tasque);
         if (usuari.getShortName() != null)
         {
@@ -271,17 +274,17 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         targetVO.setAliesCorreu(aliesDeCorreu);
 
         // OBTENIM EL NIF
-        UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(targetVO.getCodi(), "NIF"); //$NON-NLS-1$
+        UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(targetVO.getCodi(), "NIF"); //$NON-NLS-1$
         if (dadaUsuariEntity != null) {
-            targetVO.setNIF(dadaUsuariEntity.getDataValue());
+            targetVO.setNIF(dadaUsuariEntity.getValue());
         } else {
             targetVO.setNIF(""); //$NON-NLS-1$
         }
 
         // TELÈFON
-        dadaUsuariEntity = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(targetVO.getCodi(), "PHONE"); //$NON-NLS-1$
+        dadaUsuariEntity = getUserDataEntityDao().findByDataType2(targetVO.getCodi(), "PHONE"); //$NON-NLS-1$
         if (dadaUsuariEntity != null) {
-            targetVO.setTelefon(dadaUsuariEntity.getDataValue());
+            targetVO.setTelefon(dadaUsuariEntity.getValue());
         } else {
             targetVO.setTelefon(""); //$NON-NLS-1$
         }
@@ -323,7 +326,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         // GRUP PRIMARI
         GroupEntity grupPrimariEntity = sourceEntity.getPrimaryGroup();
         if (grupPrimariEntity != null) {
-            String codiGrupPrimari = grupPrimariEntity.getCode();
+            String codiGrupPrimari = grupPrimariEntity.getName();
             targetVO.setCodiGrupPrimari(codiGrupPrimari);
             // A nivell descriptiu només:
             targetVO.setDescripcioGrupPrimari(grupPrimariEntity.getDescription());
@@ -335,7 +338,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         // DOMINI DE CORREU
         EmailDomainEntity dominiCorreu = sourceEntity.getMailDomain();
         if (dominiCorreu != null) {
-            targetVO.setDominiCorreu(dominiCorreu.getCode());
+            targetVO.setDominiCorreu(dominiCorreu.getName());
         }
 
         // INFORMACIÓ DE SEU
@@ -371,11 +374,11 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     @Override
     public String handleRefreshCanvis(String codiUsuari) throws InternalErrorException {
         String tasquesPendents = ""; //$NON-NLS-1$
-        UserEntity usuari = findByCode(codiUsuari);
+        UserEntity usuari = findByUserName(codiUsuari);
         createTask(usuari);
         createMailTask(usuari);
         // tasquesPendents = refresh(codiUsuari);
-        String[] tasques = getTasques(codiUsuari);
+        String[] tasques = getTasks(codiUsuari);
         if (tasques != null)
             for (int i = 0; i < tasques.length; i++) {
                 tasquesPendents += tasques[i] + "\n"; // separador //$NON-NLS-1$
@@ -428,15 +431,15 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         if (codiGrupPrimari == null) {
             return true;
         }
-        List<RoleAccountEntity> rolsUsuaris = getRoleAccountEntityDao().findByCodiUsuari(codiUsuari);
+        List<RoleAccountEntity> rolsUsuaris = getRoleAccountEntityDao().findByUserName(codiUsuari);
         // Obtenim els grups secundaris de l'usuari
-        List<UserGroupEntity> grupsSecundarisEntity = getUserGroupEntityDao().fidnByUserCode(codiUsuari);
+        List<UserGroupEntity> grupsSecundarisEntity = getUserGroupEntityDao().findByUserName(codiUsuari);
         HashSet<String> grupsSec = new HashSet<String>();
         // Els afegim en un set
         if (grupsSecundarisEntity != null) {
             for (Iterator<UserGroupEntity> it = grupsSecundarisEntity.iterator(); it.hasNext(); ) {
                 UserGroupEntity uge = (UserGroupEntity) it.next();
-                if (uge.getGroup() != null) grupsSec.add(uge.getGroup().getCode());
+                if (uge.getGroup() != null) grupsSec.add(uge.getGroup().getName());
             }
         }
 
@@ -444,8 +447,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             Iterator<RoleAccountEntity> iterator = rolsUsuaris.iterator();
             while (iterator.hasNext()) {
                 RoleAccountEntity rolUsuari = iterator.next();
-                if (rolUsuari.getDomainTypes().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-                    String codiGrupValorDomini = rolUsuari.getGroup().getCode();
+                if (rolUsuari.getDomainType().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+                    String codiGrupValorDomini = rolUsuari.getGroup().getName();
                     // Mirem que no el tinga com a grup secundari
                     if (codiGrupValorDomini.compareTo(codiGrupPrimari) == 0
                             && !grupsSec.contains(codiGrupValorDomini)) {
@@ -476,7 +479,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         else if (dominiCorreu != null && dominiCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
             EmailDomainEntity dominiCorreuEntity = getEmailDomainEntityDao().findByCode(dominiCorreu);
             if (dominiCorreuEntity != null) {
-                EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(sourceVO.getNomCurt(), sourceVO.getDominiCorreu());
+                EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(sourceVO.getNomCurt(), sourceVO.getDominiCorreu());
                 if (llistaCorreuEntity != null) {
                     throw new SeyconException(
                             String.format(
@@ -489,7 +492,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                         Messages.getString("UserEntityDaoImpl.emailNotFound"), dominiCorreu)); //$NON-NLS-1$
             }
         } else {
-            EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomainCode(sourceVO.getNomCurt(), null);
+            EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(sourceVO.getNomCurt(), null);
             if (llistaCorreuEntity != null) {
                 throw new SeyconException(String.format(
                         Messages.getString("UserEntityDaoImpl.mailListCollission"), //$NON-NLS-1$
@@ -507,7 +510,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         if (sourceVO.getTipusUsuari() == null || "".equals(sourceVO.getTipusUsuari().trim())) { //$NON-NLS-1$
             throw new SeyconException(Messages.getString("UserEntityDaoImpl.needsUserType")); //$NON-NLS-1$
         } else {
-            UserTypeEntity tipusUsuari = getUserTypeEntityDao().findByCode(sourceVO.getTipusUsuari());
+            UserTypeEntity tipusUsuari = getUserTypeEntityDao().findByName(sourceVO.getTipusUsuari());
             if (tipusUsuari == null) {
                 throw new SeyconException(String.format(
                         Messages.getString("UserEntityDaoImpl.wrongUserType"), //$NON-NLS-1$
@@ -572,7 +575,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
         String codiGrupPrimari = sourceVO.getCodiGrupPrimari();
         GroupEntity grupPrimariAnticEntity = targetEntity.getPrimaryGroup();
-        String codiGrupPrimariAntic = grupPrimariAnticEntity == null ? null : grupPrimariAnticEntity.getCode();
+        String codiGrupPrimariAntic = grupPrimariAnticEntity == null ? null : grupPrimariAnticEntity.getName();
         if (codiGrupPrimari == null || codiGrupPrimariAntic == null
                 || codiGrupPrimariAntic.compareTo(codiGrupPrimari) != 0) {
             if (!esPotCanviarGrupPrimari(sourceVO.getCodi(), codiGrupPrimariAntic)) {
@@ -581,7 +584,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                         codiGrupPrimariAntic, sourceVO.getCodi(), codiGrupPrimariAntic));
             } else {
                 if (codiGrupPrimari != null && codiGrupPrimari.trim().compareTo("") != 0) { //$NON-NLS-1$
-                    GroupEntity grupPrimariEntity = getGroupEntityDao().findByCode(codiGrupPrimari);
+                    GroupEntity grupPrimariEntity = getGroupEntityDao().findByName(codiGrupPrimari);
                     if (grupPrimariEntity != null) {
                         if (grupPrimariEntity.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
                             throw new SeyconException(
@@ -608,7 +611,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                  * Solo se le inserta directamente el telefono si el usuario ya
                  * existe dado que el codigo de usuario aun es temporal
                  */
-                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(sourceVO.getCodi(), TELEFON);
+                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(sourceVO.getCodi(), TELEFON);
                 if (dadaUsuariEntity == null) {
                     /*
                      * El usuario no tiene telefono, se crea uno nuevo
@@ -623,11 +626,11 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     /*
                      * El usuario ya teía un teléfono, se actualiza
                      */
-                    dadaUsuariEntity.setDataValue(sourceVO.getTelefon());
+                    dadaUsuariEntity.setValue(sourceVO.getTelefon());
                     getUserDataEntityDao().update(dadaUsuariEntity);
                 }
             } else {
-                UserDataEntity dadaUsuari = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(sourceVO.getCodi(), TELEFON);
+                UserDataEntity dadaUsuari = getUserDataEntityDao().findByDataType2(sourceVO.getCodi(), TELEFON);
                 if (dadaUsuari != null) {
                     getUserDataEntityDao().remove(dadaUsuari);
                 }
@@ -639,14 +642,14 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                  * El nif no es nulo, hay que actualizarlo o añadirlo si no
                  * tenía
                  */
-                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(sourceVO.getCodi(), NIF);
+                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(sourceVO.getCodi(), NIF);
                 if (dadaUsuariEntity != null) {
                     /* Actualizar el nif */
-                    dadaUsuariEntity.setDataValue(nif);
+                    dadaUsuariEntity.setValue(nif);
                 } else {
                     /* Añadir un nif */
                     /* Si el usuario ya existe... */
-                    MetaDataEntity tipusDada = getMetaDataEntityDao().findDataTypeByCode(NIF);
+                    MetaDataEntity tipusDada = getMetaDataEntityDao().findDataTypeByName(NIF);
                     DadaUsuari dadaUsuari = new DadaUsuari();
                     dadaUsuari.setCodiDada(NIF);
                     dadaUsuari.setCodiUsuari(sourceVO.getCodi());
@@ -655,7 +658,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     getUserDataEntityDao().create(dadaUsuariEntity);
                 }
             } else {
-                UserDataEntity dadaUsuari = getUserDataEntityDao().findDataByUserCodeAndDataTypeCode(sourceVO.getCodi(), NIF);
+                UserDataEntity dadaUsuari = getUserDataEntityDao().findByDataType2(sourceVO.getCodi(), NIF);
                 if (dadaUsuari != null) {
                     getUserDataEntityDao().remove(dadaUsuari);
                 }
@@ -688,24 +691,18 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         usuariToEntityCustom(sourceVO, targetEntity);
     }
 
-    public String[] getTasques(String codiUsuari) {
-        LinkedList lista = new LinkedList();
-        List rsAgentsActius = null;
-        List rsAgents = null;
-        HashSet agentsActius = new HashSet();
+    public String[] getTasks(String codiUsuari) {
+        LinkedList<String> lista = new LinkedList<String>();
+        HashSet<String> agentsActius = new HashSet<String>();
         try {
             /* Obtenim el llistat dels agents actius en aquest moment: */
-        	org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                            .createQuery("SELECT tda.codi FROM es.caib.seycon.ng.model.DispatcherEntity as tda " + //$NON-NLS-1$
-                            		"where tda.url is not null order by tda.codi"); //$NON-NLS-1$
-            rsAgentsActius = queryObject.list();
- 
-            for (Iterator it = rsAgentsActius.iterator(); it.hasNext();){
-            	String codiAgent = (String) it.next();
+        	for (SystemEntity system: getSystemEntityDao().findActives())
+        	{
+            	String codiAgent = system.getName();
             	agentsActius.add(codiAgent);
             }
 
-            for (TaskEntity t : getTaskEntityDao().query("select tasca from es.caib.seycon.ng.model.TasqueEntity as tasca where tasca.usuari=:usuari", new Parameter[]{new Parameter("usuari", codiUsuari)})) {
+            for (TaskEntity t : getTaskEntityDao().findByUser(codiUsuari)) {
                 String transaccion = t.getTransaction();
                 Timestamp datatime = t.getDate();
                 Date data = new Date();
@@ -714,10 +711,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                 String dataString = dateFormat.format(data);
                 String missatge = t.getMessage();
                 String rol = t.getRole() + "@" + t.getDb();
-                HashSet hAgentsPendents = new HashSet(agentsActius);
+                HashSet<String> hAgentsPendents = new HashSet<String>(agentsActius);
                 String agentsPendents = "";
                 for (com.soffid.iam.model.TaskLogEntity tl : t.getLogs()) {
-                    String codiAgentActual = tl.getSystem().getCode();
+                    String codiAgentActual = tl.getSystem().getName();
                     String esComplet = tl.getCompleted();
                     if ("S".equals(esComplet)) hAgentsPendents.remove(codiAgentActual);
                 }
@@ -755,19 +752,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     }
 
     private boolean existeixCodi(String codiUsuari) {
-        try {
-        	org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                            .createQuery("SELECT tda.codi FROM es.caib.seycon.ng.model.UsuariEntity as tda " + //$NON-NLS-1$
-                            		"where tda.codi="+codiUsuari); //$NON-NLS-1$
-            List rs = queryObject.list();
-            
-            if (!rs.isEmpty()) {
-                return true;
-            }
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-        return false;
+       	return findByUserName(codiUsuari) != null;
     }
 
     private String toStringCodiUsuari(long value) {
@@ -832,7 +817,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         return "h" + codiUsuari; //$NON-NLS-1$
     }
 
-    public String getSeguentCodi() {
+    public String getNextUserName() {
         String valor = ""; //$NON-NLS-1$
         boolean continua = true;
         long valorActual;
@@ -856,7 +841,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         return valor;
     }
 
-    public String getFollowingAnonymousCode() {
+    public String getNextAnonimUser() {
         String valor = ""; //$NON-NLS-1$
         boolean continua = true;
         long valorActual;
@@ -880,7 +865,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         return valor;
     }
 
-    public String getFollowingHostCode() {
+    public String getNextHostUserName() {
         String valor = ""; //$NON-NLS-1$
         boolean continua = true;
         long valorActual;
@@ -929,7 +914,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
          */
         String codiUsuari = identitat.getCodiUsuari();
         if (codiUsuari != null) {
-            UserEntity usuariEntity = findByCode(codiUsuari);
+            UserEntity usuariEntity = findByUserName(codiUsuari);
             if (usuariEntity != null) {
                 return usuariEntity;
             } else {
@@ -961,7 +946,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
      * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
      *      es.caib.seycon.ng.model.Parameter[])
      */
-    public List<UserEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<UserEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this, queryString, parameters);
             return results;
@@ -978,15 +963,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     public void toUsuariAnonim(UserEntity source, UsuariAnonim target) {
         String correu = null;
         // busquem l'email a les dades addicionals
-        Collection dades = findBataByCode(source.getUserName());
-        Iterator it = dades.iterator();
-        while (it.hasNext()) {
-            UserDataEntity dada = (UserDataEntity) it.next();
-            if (SeyconLogon_EMAIL_ADD_CODE.equals(dada.getDataType().getCode())) {
-                correu = dada.getDataValue();
-
-                break;
-            }
+        UserDataEntity dada = getUserDataEntityDao().findByDataType2(source.getUserName(), SeyconLogon_EMAIL_ADD_CODE);
+        if (dada != null)
+        {
+            correu = dada.getValue();
         }
         if (correu == null) {
             target = null;
@@ -1004,14 +984,14 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
     public List<UserEntity> findUsersGroupAndSubgroupsByGroupCode(String codiGrup) {// Correcto??
         // Obtenim els subgrups del grup (GrupEntity) [directes]
-        Collection grupsISubgrups = getGroupEntityDao().findSubGrupsByCodi(codiGrup);
+        Collection grupsISubgrups = getGroupEntityDao().findByParent(codiGrup);
 
         // Caso de que no tenga subgrupos
         if (grupsISubgrups == null)
             grupsISubgrups = new ArrayList();
 
         // Añadimos el grupo Inicial
-        GroupEntity grup = getGroupEntityDao().findByCode(codiGrup);
+        GroupEntity grup = getGroupEntityDao().findByName(codiGrup);
         if (grup != null)
             grupsISubgrups.add(grup);
 
@@ -1023,12 +1003,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         for (Iterator it = grupsISubgrups.iterator(); it.hasNext(); ) {
             GroupEntity g = (GroupEntity) it.next();
             Collection usuGPrim = null;
-            usuGPrim = findbyPrimaryGroup(g.getCode());
+            usuGPrim = findByPrimaryGroup(g.getName());
             if (usuGPrim != null) for (Iterator gpr_it = usuGPrim.iterator(); gpr_it.hasNext(); ) {
                 UserEntity usu = (UserEntity) gpr_it.next();
                 usuarisPropagar.add(usu);
             }
-            Collection usuSec = getUserGroupEntityDao().findByGroupCode(g.getCode());
+            Collection usuSec = getUserGroupEntityDao().findByGroupName(g.getName());
             if (usuSec != null) for (Iterator gps_it = usuSec.iterator(); gps_it.hasNext(); ) {
                 UserGroupEntity usugru = (UserGroupEntity) gps_it.next();
                 usuarisPropagar.add(usugru.getUser());
@@ -1084,12 +1064,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         rolsAnalitzar.add(rol);
         RoleEntity rolActual = null;
         while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-            Collection socContenidor = rolActual.getRolAssociationContainer();
+            Collection socContenidor = rolActual.getContainedRole();
 
             if (socContenidor != null)
                 for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContingut = associacio.getRoleContent();
+                RoleEntity rolContingut = associacio.getContained();
                 rolsPropagar.add(rolContingut);
                 rolsAnalitzar.add(rolContingut);
             }
@@ -1150,7 +1130,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     updateRole.setDataTasca(Calendar.getInstance());
                     updateRole.setStatus("P");
                     updateRole.setRole(role.getName());
-                    updateRole.setBd(role.getDatabases().getCode());
+                    updateRole.setBd(role.getSystem().getName());
                     TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
                 }
@@ -1160,7 +1140,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
     private static long requestNumber = System.currentTimeMillis();
     private static String requestNumberLock = new String();
-    public String getFollowingUserIDRequest() {
+    public String getNextUserIDRequest() {
     	synchronized (requestNumberLock)
     	{
     		return Long.toString(requestNumber++);
@@ -1207,18 +1187,18 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     public void toBPMUser(com.soffid.iam.model.UserEntity source, es.caib.bpm.vo.BPMUser target) {
     	target.setUserName(source.getUserName());
     	target.setGivenName(source.getFirstName());
-    	target.setGroup(source.getPrimaryGroup().getCode());
+    	target.setGroup(source.getPrimaryGroup().getName());
     	target.setSurName(source.getLastName() + (source.getMiddleName() == null ? "" : " " + source.getMiddleName())); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 	@Override
     protected void handleCreateUpdateTasks(UserEntity usuari, Usuari oldValue) throws Exception {
-		if (usuari.getMailDomain() != null && (oldValue.getDominiCorreu() == null || !oldValue.getDominiCorreu().equals(usuari.getMailDomain().getCode())) && usuari.getMailDomain().getObsolete() != null && usuari.getMailDomain().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
-		    throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.mailDomainNotFound"), usuari.getMailDomain().getCode()));
+		if (usuari.getMailDomain() != null && (oldValue.getDominiCorreu() == null || !oldValue.getDominiCorreu().equals(usuari.getMailDomain().getName())) && usuari.getMailDomain().getObsolete() != null && usuari.getMailDomain().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
+		    throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.mailDomainNotFound"), usuari.getMailDomain().getName()));
 		}
 		
 		String mailBefore = oldValue.getNomCurt()+"@" + ( oldValue.getDominiCorreu() == null ? "": oldValue.getDominiCorreu()); 
-		String mailAfter = usuari.getShortName() + "@" + (usuari.getMailDomain() == null ? "" : usuari.getMailDomain().getCode());
+		String mailAfter = usuari.getShortName() + "@" + (usuari.getMailDomain() == null ? "" : usuari.getMailDomain().getName());
 
 
 		if (! mailBefore.equals(mailAfter))
@@ -1237,7 +1217,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		    tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
 		    tasque.setAlias(usuari.getShortName());
 		    if (usuari.getMailDomain() != null)
-		        tasque.setMailDomain(usuari.getMailDomain().getCode());
+		        tasque.setMailDomain(usuari.getMailDomain().getName());
 		    getTaskEntityDao().create(tasque);
 
 			tasque = getTaskEntityDao().newTaskEntity();
@@ -1250,7 +1230,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		// Obtenemos los roles otorgados al grupo primario
 		// ANTES DE HACER LOS CAMBIOS EN EL USUARIO
 		HashSet totGrup = new HashSet();
-		GroupEntity grupPrimariAbans = getGroupEntityDao().findPrimaryGroupByUserCode(usuari.getUserName());
+		GroupEntity grupPrimariAbans = getGroupEntityDao().findPrimaryGroupByUser(usuari.getUserName());
 		if (grupPrimariAbans != null)
 		    totGrup.add(grupPrimariAbans);
 		usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
@@ -1259,7 +1239,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
 		// HERÈNCIA DE ROLS: Atorgació de rols a grups
 		// Només propaguem si es canvia el grup primari (codi es UK)
-		if (usuari.getPrimaryGroup() != null && grupPrimariAbans != null && (!usuari.getPrimaryGroup().getCode().equals(grupPrimariAbans.getCode()))) {
+		if (usuari.getPrimaryGroup() != null && grupPrimariAbans != null && (!usuari.getPrimaryGroup().getName().equals(grupPrimariAbans.getName()))) {
 
 		    // Obtenemos los roles otorgadfindByCodi(usuari.getCodi())os al grupo primario
 		    // TRAS EL CAMBIO (si se ha cambiado el grupo primario)
@@ -1294,11 +1274,11 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		    tasque.setFolderType("U"); //$NON-NLS-1$
 		    getTaskEntityDao().create(tasque);
 		}
-		if (!oldValue.getCodiGrupPrimari().equals(usuari.getPrimaryGroup().getCode())) {
+		if (!oldValue.getCodiGrupPrimari().equals(usuari.getPrimaryGroup().getName())) {
 		    tasque = getTaskEntityDao().newTaskEntity();
 		    tasque.setDate(new Timestamp(System.currentTimeMillis()));
 		    tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-		    tasque.setGroup(usuari.getPrimaryGroup().getCode());
+		    tasque.setGroup(usuari.getPrimaryGroup().getName());
 		    getTaskEntityDao().create(tasque);
 		    
 			createGroupMailListTaks(usuari.getPrimaryGroup());
@@ -1311,7 +1291,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 			    tasque.setGroup(oldValue.getCodiGrupPrimari());
 			    getTaskEntityDao().create(tasque);
 			    
-			    GroupEntity ge = getGroupEntityDao().findByCode(oldValue.getCodiGrupPrimari());
+			    GroupEntity ge = getGroupEntityDao().findByName(oldValue.getCodiGrupPrimari());
 			    
 			    if (ge != null)
 			    	createGroupMailListTaks(ge);

@@ -35,7 +35,7 @@ public class ServiceEntityDaoImpl extends
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.0"), servei.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.0"), servei.getName(), message));
 		}
 	}
 
@@ -45,7 +45,7 @@ public class ServiceEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.1"), servei.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.1"), servei.getName(), message));
 		}
 	}
 
@@ -55,7 +55,7 @@ public class ServiceEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.2"), servei.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("ServiceEntityDaoImpl.2"), servei.getName(), message));
 		}
 	}
 

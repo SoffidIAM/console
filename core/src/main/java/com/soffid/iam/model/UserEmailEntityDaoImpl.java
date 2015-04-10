@@ -17,17 +17,20 @@ import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+
 import org.hibernate.Hibernate;
 import org.jbpm.db.hibernate.HibernateHelper;
 
@@ -53,7 +56,7 @@ public class UserEmailEntityDaoImpl extends
             auditoria.setLlistaCorreu(llista.getName());
             EmailDomainEntity domini = llista.getDomain();
             if (domini != null)
-                auditoria.setDominiCorreu(domini.getCode());
+                auditoria.setDominiCorreu(domini.getName());
         }
         if (llistaCorreuUsuari.getUser() != null)
             auditoria.setUsuari(llistaCorreuUsuari.getUser().getUserName());
@@ -101,7 +104,7 @@ public class UserEmailEntityDaoImpl extends
         tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
         tasque.setAlias(llistaCorreuUsuari.getMailList().getName());
         if (llistaCorreuUsuari.getMailList().getDomain() != null)
-            tasque.setMailDomain(llistaCorreuUsuari.getMailList().getDomain().getCode());
+            tasque.setMailDomain(llistaCorreuUsuari.getMailList().getDomain().getName());
         getTaskEntityDao().create(tasque);
     }
 
@@ -143,7 +146,7 @@ public class UserEmailEntityDaoImpl extends
         target.setNomLlistaCorreu(llistaCorreu.getName());
         EmailDomainEntity dominiCorreu = llistaCorreu.getDomain();
         if (dominiCorreu != null) {
-            target.setCodiDomini(dominiCorreu.getCode());
+            target.setCodiDomini(dominiCorreu.getName());
         }
         UserEntity usuari = source.getUser();
         target.setCodiUsuari(usuari.getUserName());
@@ -187,7 +190,7 @@ public class UserEmailEntityDaoImpl extends
 
     public void llistaCorreuUsuariToEntityCustom(es.caib.seycon.ng.comu.LlistaCorreuUsuari source, com.soffid.iam.model.UserEmailEntity target) {
         String codiUsuari = source.getCodiUsuari();
-        UserEntity usuari = getUserEntityDao().findByCode(codiUsuari);
+        UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
         if (usuari != null) {
             target.setUser(usuari);
         } else {
@@ -196,7 +199,7 @@ public class UserEmailEntityDaoImpl extends
 
         String nomLlistaCorreu = source.getNomLlistaCorreu();
         String codiDomini = source.getCodiDomini();
-        EmailListEntity llistaCorreu = getEmailListEntityDao().findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+        EmailListEntity llistaCorreu = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
         if (llistaCorreu != null) {
             target.setMailList(llistaCorreu);
         } else {
@@ -218,7 +221,7 @@ public class UserEmailEntityDaoImpl extends
 
     public java.util.List find(
             final java.lang.String queryString,
-            final es.caib.seycon.ng.model.Parameter[] parameters) {
+            final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);

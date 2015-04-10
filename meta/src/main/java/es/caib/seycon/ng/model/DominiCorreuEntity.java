@@ -22,7 +22,7 @@ public abstract class DominiCorreuEntity {
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="DCO_CODI", length=50, translated="code")
+	@Column (name="DCO_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@ForeignKey (foreignColumn="USU_IDDCO", translated="users")
@@ -37,20 +37,19 @@ public abstract class DominiCorreuEntity {
 	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiCorreuEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findByCriteria")
-	@DaoFinder("from \nes.caib.seycon.ng.model.DominiCorreuEntity dominiCorreu \nwhere \n(:codi is null or dominiCorreu.codi like :codi) and \n(:descripcio is null or dominiCorreu.descripcio like :descripcio) and \n(:obsolet is null or dominiCorreu.obsolet = :obsolet) \norder by dominiCorreu.codi")
+	@DaoFinder("from com.soffid.iam.model.EmailDomainEntity dominiCorreu "
+			+ "where (:name is null or dominiCorreu.name like :name) and "
+			+ "(:description is null or dominiCorreu.description like :description) and "
+			+ "(:obsolete is null or dominiCorreu.obsolete = :obsolete) "
+			+ "order by dominiCorreu.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiCorreuEntity> findByFiltre(
-		java.lang.String codi, 
-		java.lang.String descripcio, 
-		java.lang.String obsolet) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.DominiCorreuEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+		java.lang.String name, 
+		java.lang.String description, 
+		java.lang.String obsolete) {
 	 return null;
 	}
 }

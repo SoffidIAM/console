@@ -14,7 +14,7 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.DadaUsuariEntity.class})
 public abstract class TipusDadaEntity {
 
-	@Column (name="TDA_CODI", length=25, translated="code")
+	@Column (name="TDA_CODI", length=25, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="TDA_ORDRE", translated="order")
@@ -67,21 +67,16 @@ public abstract class TipusDadaEntity {
 	
 
 	/********************** DAOS ************************/
-	@Operation(translated="findDataTypeByCode")
-	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi")
+	@Operation(translated="findDataTypeByName")
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
-	@Operation(translated="findDataTypesByCode")
-	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity tipusDada where (:codi is null or tipusDada.codi like :codi)")
+	@Operation(translated="findDataTypesByName")
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity tipusDada where (:name is null or tipusDada.name like :name)")
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByCodi(
-		java.lang.String codi) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+		java.lang.String name) {
 	 return null;
 	}
 }

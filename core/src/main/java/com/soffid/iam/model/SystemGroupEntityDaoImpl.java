@@ -27,9 +27,9 @@ public class SystemGroupEntityDaoImpl
         // @todo verify behavior of toGrupDispatcher
         super.toGrupDispatcher(source, target);
         if (source.getSystem() != null)
-        	target.setCodiDispatcher(source.getSystem().getCode());
+        	target.setCodiDispatcher(source.getSystem().getName());
         if (source.getGroup() != null)
-        	target.setCodiGrup(source.getGroup().getCode());
+        	target.setCodiGrup(source.getGroup().getName());
     }
 
 
@@ -81,12 +81,12 @@ public class SystemGroupEntityDaoImpl
 		if (source.getId() != null)
 			target.setId(source.getId());
 		if (source.getCodiDispatcher() != null) {
-			SystemEntity agent = getSystemEntityDao().findByCode(source.getCodiDispatcher());
+			SystemEntity agent = getSystemEntityDao().findByName(source.getCodiDispatcher());
 			if (agent != null)
 				target.setSystem(agent);
 		}
 		if (source.getCodiGrup() != null) {
-			GroupEntity grup = getGroupEntityDao().findByCode(source.getCodiGrup());
+			GroupEntity grup = getGroupEntityDao().findByName(source.getCodiGrup());
 			if (grup != null)
 				target.setGroup(grup);
 		}

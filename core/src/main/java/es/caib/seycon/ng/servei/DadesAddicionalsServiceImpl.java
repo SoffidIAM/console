@@ -64,7 +64,7 @@ public class DadesAddicionalsServiceImpl extends
             Long orderDins = tipusDadaEntity.getOrder();
             if (orderDins.compareTo(order) == 0) {
                 found = true;
-                code = tipusDadaEntity.getCode();
+                code = tipusDadaEntity.getName();
                 break;
             }
         }
@@ -72,7 +72,7 @@ public class DadesAddicionalsServiceImpl extends
 			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
 							new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
 		
-		Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByCode(tipusDada.getCodi());
+		Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByName(tipusDada.getCodi());
 		if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
 							new Object[]{tipusDada.getCodi()}));
@@ -127,7 +127,7 @@ public class DadesAddicionalsServiceImpl extends
 			codi = null;
 		}
 		
-		List<MetaDataEntity> dades = getMetaDataEntityDao().findDataTypesByCode(codi);
+		List<MetaDataEntity> dades = getMetaDataEntityDao().findDataTypesByName(codi);
 		
 		Collections.sort(dades, new Comparator<MetaDataEntity>(){
             
@@ -153,7 +153,7 @@ public class DadesAddicionalsServiceImpl extends
 
 	protected TipusDada handleFindTipusDadaByCodi(java.lang.String codi)
 			throws java.lang.Exception {
-		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByCode(codi);
+		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByName(codi);
 		if (tipusDadaEntity != null) {
 			TipusDada tipusDada = getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
 			return tipusDada;

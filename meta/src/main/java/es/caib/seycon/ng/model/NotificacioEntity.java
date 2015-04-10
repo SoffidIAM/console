@@ -35,12 +35,16 @@ public abstract class NotificacioEntity {
 	public es.caib.seycon.ng.model.AplicacioEntity aplicacio;
 
 	@Operation(translated="findByApplicationCode")
-	@DaoFinder("from es.caib.seycon.ng.model.NotificacioEntity notifica where notifica.aplicacio.codi = :codiAplicacio order by notifica.dataModificacio asc")
+	@DaoFinder("from com.soffid.iam.model.NoticeEntity notifica where "
+			+ "notifica.application.name = :informationSystem "
+			+ "order by notifica.modificationDate asc")
 	public java.util.List<es.caib.seycon.ng.model.NotificacioEntity> findByCodiAplicacio(
-		java.lang.String codiAplicacio) {
+		java.lang.String informationSystem) {
 	 return null;
 	}
-	@DaoFinder("from es.caib.seycon.ng.model.NotificacioEntity notifica order by notifica.dataModificacio asc")
+	
+	@DaoFinder("from com.soffid.iam.model.NoticeEntity notifica "
+			+ "order by notifica.modificationDate asc")
 	public java.util.List<es.caib.seycon.ng.model.NotificacioEntity> findAll() {
 	 return null;
 	}

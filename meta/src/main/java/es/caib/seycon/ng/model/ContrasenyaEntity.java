@@ -44,17 +44,21 @@ public abstract class ContrasenyaEntity {
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
 
 	@Operation(translated="findByUserDomain")
-	@DaoFinder("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity \nwhere contrasenyaEntity.usuari = :usuari and contrasenyaEntity.domini = :domini\norder by contrasenyaEntity.ordre desc")
+	@DaoFinder("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity \n"
+			+ "where contrasenyaEntity.user = :user and contrasenyaEntity.domain = :domain\n"
+			+ "order by contrasenyaEntity.order desc")
 	public java.util.List<es.caib.seycon.ng.model.ContrasenyaEntity> findByUsuariDomini(
-		es.caib.seycon.ng.model.UsuariEntity usuari, 
-		es.caib.seycon.ng.model.DominiContrasenyaEntity domini) {
+		es.caib.seycon.ng.model.UsuariEntity user, 
+		es.caib.seycon.ng.model.DominiContrasenyaEntity domain) {
 	 return null;
 	}
 	@Operation(translated="findLastByUserDomain")
-	@DaoFinder("from es.caib.seycon.ng.model.ContrasenyaEntity as contrasenyaEntity \nwhere contrasenyaEntity.usuari = :usuari and contrasenyaEntity.domini = :domini\nand contrasenyaEntity.ordre = 0\n")
+	@DaoFinder("from  com.soffid.iam.model.PasswordEntity as contrasenyaEntity \n"
+			+ "where contrasenyaEntity.user = :user and contrasenyaEntity.domain = :domain\n"
+			+ "and contrasenyaEntity.order = 0\n")
 	public es.caib.seycon.ng.model.ContrasenyaEntity findLastByUsuariDomini(
-		es.caib.seycon.ng.model.UsuariEntity usuari, 
-		es.caib.seycon.ng.model.DominiContrasenyaEntity domini) {
+		es.caib.seycon.ng.model.UsuariEntity user, 
+		es.caib.seycon.ng.model.DominiContrasenyaEntity domain) {
 	 return null;
 	}
 }

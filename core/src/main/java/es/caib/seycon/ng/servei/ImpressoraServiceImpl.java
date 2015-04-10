@@ -21,7 +21,7 @@ import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import java.util.Calendar;
 import java.util.Collection;
@@ -53,7 +53,7 @@ public class ImpressoraServiceImpl extends
     protected es.caib.seycon.ng.comu.Impressora handleCreate(
             es.caib.seycon.ng.comu.Impressora impressora)
             throws java.lang.Exception {
-		PrinterEntity printersSameCode = getPrinterEntityDao().findByCode(impressora.getCodi());
+		PrinterEntity printersSameCode = getPrinterEntityDao().findByName(impressora.getCodi());
 		if(printersSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("ImpressoraServiceImpl.CodePrinterExists"),  //$NON-NLS-1$
 							impressora.getCodi())); 
@@ -71,7 +71,7 @@ public class ImpressoraServiceImpl extends
             throws java.lang.Exception {
         PrinterEntity entity = getPrinterEntityDao().impressoraToEntity(impressora);
         if(!entity.getGroups().isEmpty() || !entity.getUsers().isEmpty())
-        	throw new SeyconException(String.format(Messages.getString("ImpressoraService.IntegrityExceptionGrups"), new Object[]{entity.getCode()})); //$NON-NLS-1$
+        	throw new SeyconException(String.format(Messages.getString("ImpressoraService.IntegrityExceptionGrups"), new Object[]{entity.getName()})); //$NON-NLS-1$
         getPrinterEntityDao().remove(entity);
     }
 
@@ -135,7 +135,7 @@ public class ImpressoraServiceImpl extends
             return getPrinterEntityDao().toImpressoraList(impressores);
         } else if (AutoritzacionsUsuari.hasQueryACLPrinter()) {
             // Li llevem el rownum... (s'ha de filtrar)
-            Collection<PrinterEntity> impressores = getPrinterEntityDao().query("select impressora from es.caib.seycon.ng.model.ImpressoraEntity impressora where (:codi is null or impressora.codi like :codi) and (:model is null or impressora.model like :model) and (:local is null or impressora.local = :local) and (:maquina is null or impressora.servidor.nom like :maquina) order by impressora.codi", new Parameter[]{new Parameter("model", model), new Parameter("codi", codi), new Parameter("local", local), new Parameter("maquina", maquina)});
+            Collection<PrinterEntity> impressores = getPrinterEntityDao().findPrintersByCriteria(model, codi, local, maquina);
             // Les filtrem per ACL de l'usuari amb permis >= CONSULTA
             Collection<PrinterEntity> imp_permis = filtraImpressoresACL(impressores, XarxaServiceImpl.CONSULTA);
             
@@ -182,7 +182,7 @@ public class ImpressoraServiceImpl extends
         while (iterator.hasNext()) {
             NetworkAuthorization networkAuthorization = (NetworkAuthorization) iterator
                     .next();
-            if (maquina.getNetwork().getCode().compareTo(networkAuthorization.getCodiXarxa()) == 0) {
+            if (maquina.getNetwork().getName().compareTo(networkAuthorization.getCodiXarxa()) == 0) {
                 if (teAccesMaquina(maquina.getName(), networkAuthorization.getMascara())) {
                     // Cerquem qualque autorització >= accessLevel
                     if (networkAuthorization.getNivell() >= accessLevel)
@@ -207,7 +207,7 @@ public class ImpressoraServiceImpl extends
 
     protected Impressora handleFindImpressoraByCodiImpressora(
             String codiImpressora) throws Exception {
-        PrinterEntity impressoraEntity = getPrinterEntityDao().findByCode(codiImpressora);
+        PrinterEntity impressoraEntity = getPrinterEntityDao().findByName(codiImpressora);
         if (impressoraEntity != null) {
             Impressora impressora = getPrinterEntityDao().toImpressora(impressoraEntity);
             return impressora;
@@ -316,7 +316,7 @@ public class ImpressoraServiceImpl extends
 
     protected GrupImpressora handleFindGrupImpressoraByCodiGrupAndCodiImpressora(
             String codiGrup, String codiImpressora) throws Exception {
-        PrinterGroupEntity grupImpressoraEntity = getPrinterGroupEntityDao().findPrinterGroupByGroupCodeAndPrinterCode(codiGrup, codiImpressora);
+        PrinterGroupEntity grupImpressoraEntity = getPrinterGroupEntityDao().findByGroupAndPrinter(codiGrup, codiImpressora);
         if (grupImpressoraEntity != null) {
             GrupImpressora grupImpressora = getPrinterGroupEntityDao().toGrupImpressora(grupImpressoraEntity);
             return grupImpressora;
@@ -326,7 +326,7 @@ public class ImpressoraServiceImpl extends
 
     protected UsuariImpressora handleFindUsuariImpressoraByCodiUsuariAndCodiImpressora(
             String codiUsuari, String codiImpressora) throws Exception {
-        UserPrinterEntity usuariImpressoraEntity = this.getUserPrinterEntityDao().findUserPrinterByUserCodeAndPrinterCode(codiUsuari, codiImpressora);
+        UserPrinterEntity usuariImpressoraEntity = this.getUserPrinterEntityDao().findUserByUserAndPrinter(codiUsuari, codiImpressora);
         if (usuariImpressoraEntity != null) {
             UsuariImpressora usuariImpressora = this.getUserPrinterEntityDao().toUsuariImpressora(usuariImpressoraEntity);
             return usuariImpressora;
@@ -336,7 +336,7 @@ public class ImpressoraServiceImpl extends
 
     protected Collection<GrupImpressora> handleGetGrupImpressoresByCodiImpressora(
             String codiImpressora) throws Exception {
-        List<PrinterGroupEntity> grupImpressores = getPrinterGroupEntityDao().findPrinterGroupByPrinterCode(codiImpressora);
+        List<PrinterGroupEntity> grupImpressores = getPrinterGroupEntityDao().findByPrinter(codiImpressora);
         if (grupImpressores != null) {
             return getPrinterGroupEntityDao().toGrupImpressoraList(grupImpressores);
         }
@@ -345,7 +345,7 @@ public class ImpressoraServiceImpl extends
 
     protected Collection<UsuariImpressora> handleGetUsuariImpressoresByCodiImpressora(
             String codiImpressora) throws Exception {
-        List<UserPrinterEntity> usuariImpressores = getUserPrinterEntityDao().findUserPrintersByPrinterCode(codiImpressora);
+        List<UserPrinterEntity> usuariImpressores = getUserPrinterEntityDao().findByPrinter(codiImpressora);
         if (usuariImpressores != null) {
             return getUserPrinterEntityDao().toUsuariImpressoraList(usuariImpressores);
         }
@@ -384,7 +384,7 @@ public class ImpressoraServiceImpl extends
 
     protected Collection<GrupImpressora> handleFindGrupImpressoresByCodiGrup(String codiGrup)
             throws Exception {
-        List<PrinterGroupEntity> grupImpressores = getPrinterGroupEntityDao().findPrinterGroupByGroupCode(codiGrup);
+        List<PrinterGroupEntity> grupImpressores = getPrinterGroupEntityDao().findByGroup(codiGrup);
         if (grupImpressores != null) {
             return getPrinterGroupEntityDao().toGrupImpressoraList(grupImpressores);
         }

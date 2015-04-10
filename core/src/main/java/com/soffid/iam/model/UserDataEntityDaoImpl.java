@@ -48,7 +48,7 @@ public class UserDataEntityDaoImpl
 	private void assertPhoneExists ()
 	{
         org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                        .createQuery("select max (tda.ordre) from es.caib.seycon.ng.model.TipusDadaEntity as tda"); //$NON-NLS-1$
+                        .createQuery("select max (tda.order) from com.soffid.iam.model.MetaDataEntity as tda"); //$NON-NLS-1$
         java.util.List results = queryObject.list();
        
 		
@@ -60,11 +60,11 @@ public class UserDataEntityDaoImpl
         		nou = new Long(last.longValue()+1);
         }
 		//Trobar el major ordre existent
-        MetaDataEntity tda = getMetaDataEntityDao().findDataTypeByCode("PHONE"); //$NON-NLS-1$
+        MetaDataEntity tda = getMetaDataEntityDao().findDataTypeByName("PHONE"); //$NON-NLS-1$
     	if (tda == null)
     	{
     		tda = getMetaDataEntityDao().newMetaDataEntity();
-    		tda.setCode("PHONE"); //$NON-NLS-1$
+    		tda.setName("PHONE"); //$NON-NLS-1$
     		tda.setOrder(nou);
 
     		getMetaDataEntityDao().create(tda);
@@ -81,7 +81,7 @@ public class UserDataEntityDaoImpl
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			e.printStackTrace();
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.0"), dadaUsuari.getDataValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.0"), dadaUsuari.getValue(), message));
 		}
 	}
 	
@@ -92,7 +92,7 @@ public class UserDataEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.1"), dadaUsuariEntity.getDataValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.1"), dadaUsuariEntity.getValue(), message));
 		}		
 	}	
 	
@@ -102,7 +102,7 @@ public class UserDataEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.2"), dadaUsuari.getDataValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.2"), dadaUsuari.getValue(), message));
 		}
 	}
 	
@@ -112,16 +112,16 @@ public class UserDataEntityDaoImpl
     }
     
     private void toDadaUsuariCustom(com.soffid.iam.model.UserDataEntity sourceEntity, es.caib.seycon.ng.comu.DadaUsuari targetVO) {        
-        targetVO.setCodiDada(sourceEntity.getDataType().getCode());
+        targetVO.setCodiDada(sourceEntity.getDataType().getName());
         targetVO.setCodiUsuari(sourceEntity.getUser().getUserName());
     	targetVO.setDataLabel(sourceEntity.getDataType().getLabel());
     	if (targetVO.getDataLabel() == null || targetVO.getDataLabel().trim().length() == 0) 
-    		targetVO.setDataLabel(sourceEntity.getDataType().getCode());
-        if(sourceEntity.getDataType() != null && sourceEntity.getDataValue() != null){
+    		targetVO.setDataLabel(sourceEntity.getDataType().getName());
+        if(sourceEntity.getDataType() != null && sourceEntity.getValue() != null){
         	if(sourceEntity.getDataType().getType() != null){
         		if(sourceEntity.getDataType().getType().toString().equals("D")){ //$NON-NLS-1$
         			try{
-        				String data = sourceEntity.getDataValue().toString();
+        				String data = sourceEntity.getValue().toString();
         				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
         				Date dateObj = curFormater.parse(data);
         				Calendar calendar = Calendar.getInstance();
@@ -167,11 +167,11 @@ public class UserDataEntityDaoImpl
     
     private void dadaUsuariToEntityCustom(es.caib.seycon.ng.comu.DadaUsuari sourceVO, com.soffid.iam.model.UserDataEntity targetEntity) {    	
     		assertPhoneExists();
-            UserEntity usuariEntity = getUserEntityDao().findByCode(sourceVO.getCodiUsuari());
+            UserEntity usuariEntity = getUserEntityDao().findByUserName(sourceVO.getCodiUsuari());
             if(usuariEntity == null){
             	throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.3"), sourceVO.getCodiUsuari()));  //$NON-NLS-1$
             }
-            MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByCode(sourceVO.getCodiDada());
+            MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByName(sourceVO.getCodiDada());
 			if (tipusDadaEntity == null) {
 				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.4"), sourceVO.getCodiDada())); //$NON-NLS-1$
 			}
@@ -186,7 +186,7 @@ public class UserDataEntityDaoImpl
             	if (sourceVO.getValorDadaDate() != null)
 	            {
 					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
-	            	targetEntity.setDataValue(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+	            	targetEntity.setValue(curFormater.format(sourceVO.getValorDadaDate().getTime()));
 	            }
             }
         }

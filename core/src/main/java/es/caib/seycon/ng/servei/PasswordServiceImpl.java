@@ -69,7 +69,7 @@ public class PasswordServiceImpl
     protected boolean handleCheckPin(java.lang.String user, java.lang.String pin)
         throws java.lang.Exception
     {
-        UserEntity ue = getUserEntityDao().findByCode(user);
+        UserEntity ue = getUserEntityDao().findByUserName(user);
         if (ue == null)
             throw new InternalErrorException(String.format(Messages.getString("PasswordServiceImpl.5"), user)); //$NON-NLS-1$
         return getInternalPasswordService().checkPin(ue, pin);
@@ -134,15 +134,15 @@ public class PasswordServiceImpl
        	if (acc == null)
        		return ""; //$NON-NLS-1$
        	
-       	String type = acc.getPasswordPolicy().getCode();
+       	String type = acc.getPasswordPolicy().getName();
        	if (acc.getType().equals(AccountType.USER))
        	{
        		for (UserAccountEntity ua : acc.getUsers()) {
-                type = ua.getUser().getUserType().getCode();
+                type = ua.getUser().getUserType().getName();
             }
        	} 
        	
-       	PasswordPolicyEntity politica = getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(acc.getSystem().getDomain().getCode(), type);
+       	PasswordPolicyEntity politica = getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(acc.getSystem().getPasswordDomain().getName(), type);
        	if (politica != null)
        	{
        		return getInternalPasswordService().getPolicyDescription(politica);

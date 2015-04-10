@@ -36,17 +36,8 @@ public class NoticeEntityDaoImpl
      * a new, blank entity is created
      */
     private com.soffid.iam.model.NoticeEntity loadNotificacioEntityFromNotificacio(es.caib.seycon.ng.comu.Notificacio notificacio) {
-        // @todo implement loadNotificacioEntityFromNotificacio
-        throw new java.lang.UnsupportedOperationException("es.caib.seycon.ng.model.loadNotificacioEntityFromNotificacio(es.caib.seycon.ng.comu.Notificacio) not yet implemented."); //$NON-NLS-1$
+        throw new java.lang.UnsupportedOperationException("com.soffid.iam.model.NoticeEntityDao.loadNotificacioEntityFromNotificacio(es.caib.seycon.ng.comu.Notificacio) not yet implemented."); //$NON-NLS-1$
 
-        /* A typical implementation looks like this:
-        es.caib.seycon.ng.model.NotificacioEntity notificacioEntity = this.load(notificacio.getId());
-        if (notificacioEntity == null)
-        {
-            notificacioEntity = es.caib.seycon.ng.model.NotificacioEntity.Factory.newInstance();
-        }
-        return notificacioEntity;
-        */
     }
 
     

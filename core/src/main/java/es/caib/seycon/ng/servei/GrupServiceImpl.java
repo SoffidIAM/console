@@ -28,7 +28,7 @@ import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
@@ -85,7 +85,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	protected Collection<Grup> handleFindSubGrupsByCodiGrup(String codiGrup) {
 		// Si és administrador d'usuaris els pot llistar tots
 		if (AutoritzacionsUsuari.canQueryGrup(codiGrup)) {
-			Collection groups = getGroupEntityDao().findSubGrupsByCodi(codiGrup);
+			Collection groups = getGroupEntityDao().findByParent(codiGrup);
 			if (groups != null) {
 				return getGroupEntityDao().toGrupList(groups);
 			}
@@ -131,7 +131,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<Grup> handleFindGrupsByTipusGrup(String tipusGrup) {
-		Collection<GroupEntity> grupEntities = getGroupEntityDao().findGroupsByType(tipusGrup);
+		Collection<GroupEntity> grupEntities = getGroupEntityDao().findByType(tipusGrup);
 		if (grupEntities != null) {
 			Collection<GroupEntity> grupsPermis = AutoritzacionsUsuari.filtraGrupsEntityCanQuery(grupEntities);
 			return getGroupEntityDao().toGrupList(grupsPermis);
@@ -145,11 +145,11 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		String codi = grup.getCodi();
 		if (codi == null)
 			return null;
-		GroupEntity grupEntity = getGroupEntityDao().findByCode(codi);
+		GroupEntity grupEntity = getGroupEntityDao().findByName(codi);
 		if (grupEntity == null) {
 			return null;
 		}
-		HostEntity maquinaEntity = grupEntity.getOfficeServer();
+		HostEntity maquinaEntity = grupEntity.getHomeServer();
 		if (maquinaEntity == null) {
 			return null;
 		}
@@ -171,7 +171,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	 * @see es.caib.seycon.ng.servei.GrupService#findGrupByCodi(java.lang.String)
 	 */
 	protected Grup handleFindGrupByCodiGrup(java.lang.String codi) throws java.lang.Exception {
-		GroupEntity grupEntity = getGroupEntityDao().findByCode(codi);
+		GroupEntity grupEntity = getGroupEntityDao().findByName(codi);
 		if (grupEntity != null) {
 			Grup grup = getGroupEntityDao().toGrup(grupEntity);
 			return grup;
@@ -181,7 +181,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 	protected void handleSetSuperGrup(String codiSubGrup, String codiSuperGrup) throws java.lang.Exception {
 		if (AutoritzacionsUsuari.canCreateGroup(codiSubGrup) || AutoritzacionsUsuari.canUpdateGrup(codiSubGrup)) {
-			getGroupEntityDao().setSuperGrup(codiSubGrup, codiSuperGrup);
+			getGroupEntityDao().setParentGroup(codiSubGrup, codiSuperGrup);
 		} else {
 			throw new SeyconException(String.format(Messages.getString("GrupServiceImpl.1"), codiSuperGrup)); //$NON-NLS-1$
 		}
@@ -200,7 +200,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		if (!grup.getCodi().matches("[a-zA-Z0-9\\-]*")) //$NON-NLS-1$
 			throw new SeyconException(Messages.getString("GrupServiceImpl.4")); //$NON-NLS-1$
 		
-		GroupEntity groupsSameCode = getGroupEntityDao().findByCode(grup.getCodi());
+		GroupEntity groupsSameCode = getGroupEntityDao().findByName(grup.getCodi());
 		if(groupsSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("GrupServiceImpl.CodeGroupExists"),  //$NON-NLS-1$
 							grup.getCodi())); 
@@ -336,7 +336,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected void handleRemoveGrupFromUsuari(String codiUsuari, String codiGrup) throws Exception {
-		UserGroupEntity usuariGrup = getUserGroupEntityDao().findByUserCodeAndGroupCode(codiUsuari, codiGrup);
+		UserGroupEntity usuariGrup = getUserGroupEntityDao().findByUserAndGroup(codiUsuari, codiGrup);
 		long userId = usuariGrup.getUser().getId();
 		long groupId = usuariGrup.getGroup().getId();
 		getUserGroupEntityDao().remove(usuariGrup);
@@ -347,7 +347,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Grup handleFindGrupPrimariByCodiUsuari(String codiUsuari) throws Exception {
-		GroupEntity grupEntity = this.getGroupEntityDao().findPrimaryGroupByUserCode(codiUsuari);
+		GroupEntity grupEntity = this.getGroupEntityDao().findPrimaryGroupByUser(codiUsuari);
 		if (grupEntity != null) {
 			Grup grup = this.getGroupEntityDao().toGrup(grupEntity);
 			return grup;
@@ -373,7 +373,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<Grup> handleFindGrupsFromRolsByCodiUsuari(String codiUsuari) throws Exception {
-		Collection<GroupEntity> grups = getGroupEntityDao().findGroupsFromRolesByUserCode(codiUsuari);
+		Collection<GroupEntity> grups = getGroupEntityDao().findByGrantedRolesToUser(codiUsuari);
 		if (grups != null) {
 			return getGroupEntityDao().toGrupList(grups);
 		}
@@ -381,7 +381,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<Grup> handleFindGrupsFromUsuarisByCodiUsuari(String codiUsuari) throws Exception {
-		Collection<GroupEntity> grups = getGroupEntityDao().findGroupsFromUsersByUserCode(codiUsuari);
+		Collection<GroupEntity> grups = getGroupEntityDao().findGroupsByUser(codiUsuari);
 		if (grups != null) {
 			return getGroupEntityDao().toGrupList(grups);
 		}
@@ -418,11 +418,11 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	private boolean esPotEliminarUsuariGrup(UserGroupEntity usuariGrup) {
 		// Obtenim el grup primari de l'usuari
 		GroupEntity gp = usuariGrup.getUser().getPrimaryGroup();
-		String codiGrupPrimari = gp != null && gp.getCode() != null ? gp.getCode() : ""; //$NON-NLS-1$
-		for (RoleAccountEntity rolUsuari : getRoleAccountEntityDao().findByCodiUsuari(usuariGrup.getUser().getUserName())) {
-            if (rolUsuari.getDomainTypes().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-                String codiGrupValorDomini = rolUsuari.getGroup().getCode();
-                String codiGrupGrupUsuari = usuariGrup.getGroup().getCode();
+		String codiGrupPrimari = gp != null && gp.getName() != null ? gp.getName() : ""; //$NON-NLS-1$
+		for (RoleAccountEntity rolUsuari : getRoleAccountEntityDao().findByUserName(usuariGrup.getUser().getUserName())) {
+            if (rolUsuari.getDomainType().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+                String codiGrupValorDomini = rolUsuari.getGroup().getName();
+                String codiGrupGrupUsuari = usuariGrup.getGroup().getName();
                 if (codiGrupValorDomini.compareTo(codiGrupGrupUsuari) == 0) {
                     if (!codiGrupPrimari.equals(codiGrupValorDomini)) return false;
                 }
@@ -486,7 +486,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected UsuariGrup handleFindUsuariGrupByCodiUsuariAndCodiGrup(String codiUsuari, String codiGrup) throws Exception {
-		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().findByUserCodeAndGroupCode(codiUsuari, codiGrup);
+		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().findByUserAndGroup(codiUsuari, codiGrup);
 		if (usuariGrupEntity != null) {
 			UsuariGrup usuariGrup = getUserGroupEntityDao().toUsuariGrup(usuariGrupEntity);
 			return usuariGrup;
@@ -495,7 +495,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	private Collection<Grup> findSubGrupsWithoutSecurityRestrictionsByCodiGrup(String codiGrup) {
-		Collection<GroupEntity> groups = getGroupEntityDao().findSubGrupsByCodi(codiGrup);
+		Collection<GroupEntity> groups = getGroupEntityDao().findByParent(codiGrup);
 		if (groups != null) {
 			return getGroupEntityDao().toGrupList(groups);
 		}
@@ -522,7 +522,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Grup handleGetSuperGrup(String codiGrup) throws Exception {
-		GroupEntity grupEntity = getGroupEntityDao().getSuperGrup(codiGrup);
+		GroupEntity grupEntity = getGroupEntityDao().findByChild(codiGrup);
 		if (grupEntity != null) {
 			return getGroupEntityDao().toGrup(grupEntity);
 		}
@@ -532,14 +532,14 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	protected Collection<RolAccount> handleFindRolsUsuarisAmbGrupByCodiUsuari(String codiUsuari) throws Exception {
 		Collection<RolAccount> result = new LinkedList<RolAccount>();
 		
-		for (RoleAccountEntity ra : this.getRoleAccountEntityDao().findByCodiUsuari(codiUsuari)) {
+		for (RoleAccountEntity ra : this.getRoleAccountEntityDao().findByUserName(codiUsuari)) {
             if (ra.getGroup() != null) result.add(getRoleAccountEntityDao().toRolAccount(ra));
         }
 		return result;
 	}
 
 	protected Collection<UsuariGrup> handleFindUsuariGrupsByCodiUsuari(String codiUsuari) throws Exception {
-		Collection<UserGroupEntity> usuariGrups = getUserGroupEntityDao().fidnByUserCode(codiUsuari);
+		Collection<UserGroupEntity> usuariGrups = getUserGroupEntityDao().findByUserName(codiUsuari);
 		if (usuariGrups != null) {
 			return getUserGroupEntityDao().toUsuariGrupList(usuariGrups);
 		}
@@ -555,17 +555,17 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		// Mirem les autoritzacions a nivell de grup per group:user:query
 		if (AutoritzacionsUsuari.canQueryGroupUsers(codiGrup)) {
 			// Obtenemos los grupos primarios primero
-			Collection usuari = getUserEntityDao().findbyPrimaryGroup(codiGrup);
+			Collection usuari = getUserEntityDao().findByPrimaryGroup(codiGrup);
 			for (Iterator it = usuari.iterator(); it.hasNext(); ) {
                 UserEntity user = (UserEntity) it.next();
                 String nomComplet = user.getFirstName() + " " + user.getLastName() + (user.getMiddleName() != null ? " " + user.getMiddleName() : "");
-                UsuariGrup usugru = new UsuariGrup(user.getUserName(), user.getPrimaryGroup().getCode(), nomComplet);
+                UsuariGrup usugru = new UsuariGrup(user.getUserName(), user.getPrimaryGroup().getName(), nomComplet);
                 usugru.setInfo(Messages.getString("GrupServiceImpl.PrimaryGroupText"));
                 totsUsuarisGrup.add(usugru);
             }
 
 			// Esto obtiene los usuarios que tienen el grupo como secundario
-			Collection<UserGroupEntity> usuaris = getUserGroupEntityDao().findByGroupCode(codiGrup);
+			Collection<UserGroupEntity> usuaris = getUserGroupEntityDao().findByGroupName(codiGrup);
 			// Los añadimos al listado anterior
 			for (Iterator<UserGroupEntity> it = usuaris.iterator(); it.hasNext(); ) {
                 UsuariGrup ug = getUserGroupEntityDao().toUsuariGrup(it.next());
@@ -579,7 +579,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Grup handleFindGrupById(Long grupId) throws Exception {
-		GroupEntity grupEntity = getGroupEntityDao().findById(grupId);
+		GroupEntity grupEntity = getGroupEntityDao().load(grupId);
 		if (grupEntity != null) {
 			return getGroupEntityDao().toGrup(grupEntity);
 		}
@@ -587,7 +587,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<Rol> handleGetRolsFromGrup(Grup grup) throws Exception {
-		GroupEntity grupEntity = getGroupEntityDao().findByCode(grup.getCodi());
+		GroupEntity grupEntity = getGroupEntityDao().findByName(grup.getCodi());
 		Collection rolsGrupE = grupEntity.getAllowedRolesToGroup();
 		Vector rolsGrup = new Vector(rolsGrupE);// Lo activamos
 		// NOTA: Aquí obtenemos los roles, no los roles-grupo(!!) ¿Se utiliza?
@@ -595,7 +595,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<RolsGrup> handleGetRolsFromGrup(String codiGrup) throws Exception {
-		GroupEntity grupEntity = getGroupEntityDao().findByCode(codiGrup);
+		GroupEntity grupEntity = getGroupEntityDao().findByName(codiGrup);
 		Collection rolsGrupE = grupEntity.getAllowedRolesToGroup();
 		LinkedList rolsGrup = new LinkedList(rolsGrupE);// Lo activamos
 
@@ -607,12 +607,12 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected Collection<RolAccount> handleFindRolsUsuarisTipusDominiGrupsAndGrupsUsuari(String codiGrup) throws Exception {
-		Collection<RoleAccountEntity> rolsUsuGrup = getRoleAccountEntityDao().findByGroupCode(codiGrup);
+		Collection<RoleAccountEntity> rolsUsuGrup = getRoleAccountEntityDao().findByGroupName(codiGrup);
 		return getRoleAccountEntityDao().toRolAccountList(rolsUsuGrup);
 	}
 
 	protected Collection<RolsGrup> handleGetRolsFromGrupYParesGrup(Grup grup) throws Exception {
-		GroupEntity entity = getGroupEntityDao().findByCode(grup.getCodi());
+		GroupEntity entity = getGroupEntityDao().findByName(grup.getCodi());
 		Collection<RoleGroupEntity> rolsGrupE = entity.getAllowedRolesToGroup();
 		LinkedList<RoleGroupEntity> totsRolsGrup = new LinkedList(rolsGrupE);
 
@@ -629,7 +629,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 	/*IAM-318*/
 	protected void handlePropagateRolsChangesToDispatcher(String grup) throws InternalErrorException{
-		GroupEntity grupEntity = getGroupEntityDao().findByCode(grup);
+		GroupEntity grupEntity = getGroupEntityDao().findByName(grup);
 		if (grupEntity != null)
 		{
 							
@@ -639,7 +639,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
                 tasque.setTransaction(TaskHandler.UPDATE_ROLE);
                 tasque.setRole(rol.getName());
-                tasque.setDb(rol.getDatabases().getCode());
+                tasque.setDb(rol.getSystem().getName());
                 getTaskEntityDao().create(tasque);
             }
 		}

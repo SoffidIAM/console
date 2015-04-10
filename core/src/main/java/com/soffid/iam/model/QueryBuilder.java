@@ -1,4 +1,4 @@
-package es.caib.seycon.ng.model;
+package com.soffid.iam.model;
 
 import java.util.Collection;
 import java.util.List;

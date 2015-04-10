@@ -21,6 +21,6 @@ public class GroupEntityImpl extends com.soffid.iam.model.GroupEntity {
 	 */
 	public java.lang.String toString() {
 		// @todo implement public java.lang.String toString()
-		return String.format(Messages.getString("GroupEntityImpl.toString"), getId(), getCode(), getDescription(), getOrganizatinalUnitType());
+		return String.format(Messages.getString("GroupEntityImpl.toString"), getId(), getName(), getDescription(), getUnitType());
 	}
 }

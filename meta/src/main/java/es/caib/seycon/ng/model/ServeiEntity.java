@@ -18,7 +18,7 @@ public abstract class ServeiEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="SER_CODI", length=10, translated="code")
+	@Column (name="SER_CODI", length=10, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="SER_DESCRI", length=50, translated="description")
@@ -31,16 +31,16 @@ public abstract class ServeiEntity {
 		es.caib.seycon.ng.comu.ServeiSearchCriteria filtre) {
 	 return null;
 	}
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.ServeiEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
-	@Operation(translated="findAllByCode")
-	@DaoFinder("select servei from es.caib.seycon.ng.model.ServeiEntity servei where servei.codi like :codi order by servei.codi")
+	@Operation(translated="findAllByName")
+	@DaoFinder("select servei from com.soffid.iam.model.ServiceEntity servei where servei.name like :name order by servei.name")
 	public java.util.List<es.caib.seycon.ng.model.ServeiEntity> findAllByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 }

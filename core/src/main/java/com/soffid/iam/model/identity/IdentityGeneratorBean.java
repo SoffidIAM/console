@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.seycon.ng.model.identity;
+package com.soffid.iam.model.identity;
 
 import java.io.Serializable;
 import java.sql.Connection;

@@ -26,6 +26,7 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -46,6 +47,7 @@ import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -88,18 +90,18 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             // Creamos las relaciones con los roles padre (a qui sóc atorgat) y
             // con los grupos
             // Creamos la asociación con el rol (sóc contingut-atorgat)
-            if (rol.getRoleAssociationContent() != null)
-                for (Iterator it = rol.getRoleAssociationContent().iterator(); it.hasNext(); ) {
+            if (rol.getContainerRoles() != null)
+                for (Iterator it = rol.getContainerRoles().iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
                 StringBuffer cami = new StringBuffer("");
                 if (RoleDependencyEntityDaoImpl.verificaAssociacioSenseCicles(associacio, cami)) {
                     getRoleDependencyEntityDao().create(associacio);
                 } else {
-                    throw new Exception(String.format(Messages.getString("RoleEntityDaoImpl.0"), associacio.getRoleContent().toRoleDescription(), associacio.getRoleContainer().toRoleDescription(), cami));
+                    throw new Exception(String.format(Messages.getString("RoleEntityDaoImpl.0"), associacio.getContained().toRoleDescription(), associacio.getContainer().toRoleDescription(), cami));
                 }
             }
             // Creamos la asociación con los grupos (directamente)
-            Collection grupsPosseidors = rol.getGroupsOwnerRole();
+            Collection grupsPosseidors = rol.getContainerGroups();
             if (grupsPosseidors != null)
                 for (Iterator it = grupsPosseidors.iterator(); it.hasNext(); ) {
                 RoleGroupEntity rolsgrup = (RoleGroupEntity) it.next();
@@ -129,11 +131,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
             tasque.setRole(rol.getName());
-            tasque.setDb(rol.getDatabases().getCode());
+            tasque.setDb(rol.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
 
             getSession(false).flush();
-            auditarRol("C", rol.getName(), rol.getApplication().getCode(), rol.getDatabases().getCode());
+            auditarRol("C", rol.getName(), rol.getInformationSystem().getName(), rol.getSystem().getName());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.1"), rol.getName(), message));  //$NON-NLS-1$
@@ -151,8 +153,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         }
     	if (depth > 0)
     	{
-    		for (RoleDependencyEntity child : role.getRolAssociationContainer()) {
-                updateMailLists(child.getRoleContent(), depth - 1);
+    		for (RoleDependencyEntity child : role.getContainedRole()) {
+                updateMailLists(child.getContained(), depth - 1);
             }
     	}
     }
@@ -175,18 +177,18 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                     rolsPropagar, grupsPropagar, true);
 
             // Comprobamos los ciclos (antes de crearlos) en rol-rol
-            if (rol.getRoleAssociationContent() != null)
-                for (Iterator it = rol.getRoleAssociationContent().iterator(); it.hasNext(); ) {
+            if (rol.getContainerRoles() != null)
+                for (Iterator it = rol.getContainerRoles().iterator(); it.hasNext(); ) {
                 RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
                 StringBuffer cami = new StringBuffer("");
                 if (!RoleDependencyEntityDaoImpl.verificaAssociacioSenseCicles(relacio, cami)) {
-                    throw new Exception(String.format(Messages.getString("RoleEntityDaoImpl.0"), relacio.getRoleContent().toRoleDescription(), relacio.getRoleContainer().toRoleDescription(), cami));
+                    throw new Exception(String.format(Messages.getString("RoleEntityDaoImpl.0"), relacio.getContained().toRoleDescription(), relacio.getContainer().toRoleDescription(), cami));
                 }
             }
 
             // Relaciones Rol-Rol
             // 1) Obtenemos la lista actual de relaciones rol-rol
-            Collection rolAsocRolActual = rol.getRoleAssociationContent();
+            Collection rolAsocRolActual = rol.getContainerRoles();
             // 2) Hacemos una copia (para trabajar con ella)
             ArrayList copiaRolAsocRolActual = new ArrayList(rolAsocRolActual);
 
@@ -223,7 +225,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
             // Relació amb GRUPS
             // 1) Obtenemos la lista actual de atorgar rol-grup
-            Collection rolsGrupActual = rol.getGroupsOwnerRole();
+            Collection rolsGrupActual = rol.getContainerGroups();
             // 2) Hacemos una copia (para trabajar con ella)
             ArrayList copiaRolAsocGrupActual = new ArrayList(rolsGrupActual);
             // 3) Obtenemos las relaciones con otros grupos ya existentes
@@ -255,7 +257,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                 getRoleGroupEntityDao().create(copiaRolAsocGrupActual);
 
             getSession(false).flush();
-            auditarRol("U", rol.getName(), rol.getApplication().getCode(), rol.getDatabases().getCode());
+            auditarRol("U", rol.getName(), rol.getInformationSystem().getName(), rol.getSystem().getName());
 
             // Obtenim el rol una vegada s'hagi actualitzat (conté els afectats
             // abans del canvi)
@@ -332,15 +334,15 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
             tasque.setRole(rol.getName());
-            tasque.setDb(rol.getDatabases().getCode());
+            tasque.setDb(rol.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
-            if (!rol.getName().equals(oldRol.getName()) || !rol.getDatabases().getId().equals(oldRol.getDatabases().getId()))
+            if (!rol.getName().equals(oldRol.getName()) || !rol.getSystem().getId().equals(oldRol.getSystem().getId()))
             {
                 tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
                 tasque.setTransaction(TaskHandler.UPDATE_ROLE);
                 tasque.setRole(oldRol.getName());
-                tasque.setDb(oldRol.getDatabases().getCode());
+                tasque.setDb(oldRol.getSystem().getName());
                 getTaskEntityDao().createNoFlush(tasque);
             }
             getSession(false).flush();
@@ -360,9 +362,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
             // Obtenemos sus relaciones con otros roles (como contenedor o
             // contenido)
-            Collection rolAssociacioRolSocContenidor = rol.getRolAssociationContainer();
-            Collection rolAssociacioRolSocContingut = rol.getRoleAssociationContent();
-            Collection grupsPosseidors = rol.getGroupsOwnerRole();
+            Collection rolAssociacioRolSocContenidor = rol.getContainedRole();
+            Collection rolAssociacioRolSocContingut = rol.getContainerRoles();
+            Collection grupsPosseidors = rol.getContainerGroups();
 //            Collection rolFitxers = rol.getRolFitxers();
             Collection rolsUsuari = rol.getAccounts();
             Collection rolsAutoritzacioXarxa = rol.getNetworkAuthorization();
@@ -429,8 +431,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
              */
 
             String nomRol = rol.getName();
-            String codiBaseDeDades = rol.getDatabases().getCode();
-            String codiAplicacio = rol.getApplication().getCode();
+            String codiBaseDeDades = rol.getSystem().getName();
+            String codiAplicacio = rol.getInformationSystem().getName();
 
             // Abans d'eliminar el rol, obtenim els grups, rols i usuaris
             // afectats indirectament (per herència)
@@ -455,7 +457,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
             tasque.setRole(rol.getName());
-            tasque.setDb(rol.getDatabases().getCode());
+            tasque.setDb(rol.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
             auditarRol("D", nomRol, codiAplicacio, codiBaseDeDades); //$NON-NLS-1$
         } catch (Throwable e) {
@@ -472,7 +474,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
     private void toRolCustom(com.soffid.iam.model.RoleEntity sourceEntity, es.caib.seycon.ng.comu.Rol targetVO) {
 
         // Obtenemos la relación entre este rol y los grupos (1:N)
-        Collection grupsEntityPosseidors = sourceEntity.getGroupsOwnerRole(); // tipo
+        Collection grupsEntityPosseidors = sourceEntity.getContainerGroups(); // tipo
                                                                                  // RolsGrupEntity
         Collection<Grup> grupsPosseidors = new ArrayList<Grup>(); // tipo Grup
         Collection<RolGrant> granteeGroups = new ArrayList<RolGrant>(); // tipo Grup
@@ -522,9 +524,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             targetVO.setDomini(senseDomini);
         }
 
-        InformationSystemEntity aplicacioEntity = sourceEntity.getApplication();
+        InformationSystemEntity aplicacioEntity = sourceEntity.getInformationSystem();
         if (aplicacioEntity != null) {
-            targetVO.setCodiAplicacio(aplicacioEntity.getCode());
+            targetVO.setCodiAplicacio(aplicacioEntity.getName());
         }
         targetVO.setDefecte(new Boolean(sourceEntity.getDefaultRole().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setGestionableWF(new Boolean(sourceEntity.getManageableWF().compareTo("S") == 0)); //$NON-NLS-1$
@@ -532,14 +534,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         if (contrasenya != null && contrasenya.trim().compareTo("") != 0) { //$NON-NLS-1$
             targetVO.setContrasenya(new Boolean(sourceEntity.getPassword().compareTo("S") == 0)); //$NON-NLS-1$
         }
-        SystemEntity baseDeDades = sourceEntity.getDatabases();
+        SystemEntity baseDeDades = sourceEntity.getSystem();
         if (baseDeDades != null) {
-            targetVO.setBaseDeDades(baseDeDades.getCode());
+            targetVO.setBaseDeDades(baseDeDades.getName());
         }
 
         // Obtenemos los roles padres (en los que estamos contenidos) - somos
         // otorgados
-        Collection<RoleDependencyEntity> pares = sourceEntity.getRoleAssociationContent();
+        Collection<RoleDependencyEntity> pares = sourceEntity.getContainerRoles();
         Collection<RolGrant> rolsPosseidorsRol = new LinkedList<RolGrant>();
         if (pares != null) {
             for (Iterator<RoleDependencyEntity> iterator = pares.iterator(); iterator.hasNext(); ) {
@@ -551,7 +553,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         targetVO.setOwnerRoles(rolsPosseidorsRol);
 
         // Obtenim els rols que tinc atorgats com a "fills"
-        Collection<RoleDependencyEntity> fills = sourceEntity.getRolAssociationContainer();
+        Collection<RoleDependencyEntity> fills = sourceEntity.getContainedRole();
         Collection<RolGrant> rolsAtorgatsRol = new LinkedList<RolGrant>();
         if (fills != null) {
             for (Iterator<RoleDependencyEntity> iterator = fills.iterator(); iterator.hasNext(); ) {
@@ -600,34 +602,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
     }
 
     private DomainValueEntity findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(String nomDomini, String codiAplicacio, String valor) {
-        String query = "select valorDominiAplicacio " //$NON-NLS-1$
-                + "from " //$NON-NLS-1$
-                + "es.caib.seycon.ng.model.ValorDominiAplicacioEntity valorDominiAplicacio " //$NON-NLS-1$
-                + "left join valorDominiAplicacio.domini domini " //$NON-NLS-1$
-                + "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "domini.nom = :nomDomini and " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-                + "valorDominiAplicacio.valor = :valor"; //$NON-NLS-1$
-
-        Parameter nomDominiParameter = new Parameter("nomDomini", nomDomini); //$NON-NLS-1$
-        Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-                codiAplicacio);
-        Parameter valorParameter = new Parameter("valor", valor); //$NON-NLS-1$
-        Parameter[] parametres = { nomDominiParameter, codiAplicacioParameter,
-                valorParameter };
-
-        Collection valorsDomini = getDomainValueEntityDao().query(query, parametres);
-        if (valorsDomini != null) {
-            Iterator valorsDominiIterator = valorsDomini.iterator();
-            if (valorsDominiIterator != null) {
-                if (valorsDominiIterator.hasNext()) {
-                    DomainValueEntity valorDominiEntity = (DomainValueEntity) valorsDominiIterator.next();
-                    return valorDominiEntity;
-                }
-            }
-        }
-        return null;
+    	return getDomainValueEntityDao().findByApplicationDomainValue(codiAplicacio, nomDomini, valor);
     }
 
     private void rolToEntityCustom(es.caib.seycon.ng.comu.Rol sourceVO, com.soffid.iam.model.RoleEntity targetEntity) {// de VO a Entity
@@ -673,15 +648,15 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             targetEntity.setManageableWF("N"); //$NON-NLS-1$
         String codiDispatcher = sourceVO.getBaseDeDades();
         if (codiDispatcher != null && codiDispatcher.trim().compareTo("") != 0) { //$NON-NLS-1$
-            SystemEntity dispatcherEntity = this.getSystemEntityDao().findByCode(codiDispatcher);
+            SystemEntity dispatcherEntity = this.getSystemEntityDao().findByName(codiDispatcher);
             if (dispatcherEntity != null) {
-                targetEntity.setDatabases(dispatcherEntity);
+                targetEntity.setSystem(dispatcherEntity);
             } else {
 				throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.18"),   //$NON-NLS-1$
 						codiDispatcher));
             }
         } else {
-            targetEntity.setDatabases(null);
+            targetEntity.setSystem(null);
         }
 	}
 
@@ -689,9 +664,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		String codiAplicacio = sourceVO.getCodiAplicacio();
         if (codiAplicacio != null) {
             InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao().findByCode(codiAplicacio);
-            targetEntity.setApplication(aplicacioEntity);
+            targetEntity.setInformationSystem(aplicacioEntity);
         } else {
-            targetEntity.setApplication(null);
+            targetEntity.setInformationSystem(null);
         }
 	}
 
@@ -705,14 +680,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                 if (currentGrant != null) {
                     RoleEntity rolEntityFound = load(currentGrant.getOwnerRol());
                     RoleDependencyEntity rare = getRoleDependencyEntityDao().newRoleDependencyEntity();
-                    rare.setRoleContent(targetEntity);
-                    rare.setRoleContainer(rolEntityFound);
+                    rare.setContained(targetEntity);
+                    rare.setContainer(rolEntityFound);
                     assignDomainValue(rare, currentGrant, targetEntity, rolEntityFound);
                     assignGranteeDomainValue(rare, currentGrant, targetEntity, rolEntityFound);
                     rolAssociacioRolSocContingut.add(rare);
                 }
             }
-            targetEntity.setRoleAssociationContent(rolAssociacioRolSocContingut);
+            targetEntity.setContainerRoles(rolAssociacioRolSocContingut);
         }
 	}
 
@@ -725,7 +700,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             // Creamos las relaciones existentes con los grupos
             for (Iterator<Grup> it = grupsPosseidors.iterator(); it.hasNext(); ) {
                 Grup grup = it.next();
-                GroupEntity grupEntity = getGroupEntityDao().findById(grup.getId());
+                GroupEntity grupEntity = getGroupEntityDao().load(grup.getId());
                 RoleGroupEntity rge = getRoleGroupEntityDao().newRoleGroupEntity();
                 rge.setAssignedRole(targetEntity);
                 rge.setOwnerGroup(grupEntity);
@@ -735,7 +710,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             // Creamos las relaciones existentes con los grupos
             for (Iterator<RolGrant> it = granteeGroups.iterator(); it.hasNext(); ) {
                 RolGrant grant = it.next();
-                GroupEntity grupEntity = getGroupEntityDao().findByCode(grant.getOwnerGroup());
+                GroupEntity grupEntity = getGroupEntityDao().findByName(grant.getOwnerGroup());
                 if (grupEntity == null) throw new java.lang.IllegalArgumentException("group " + grant.getOwnerGroup());
                 RoleGroupEntity rge = getRoleGroupEntityDao().newRoleGroupEntity();
                 rge.setAssignedRole(targetEntity);
@@ -745,15 +720,15 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                 if (TipusDomini.APLICACIONS.equals(nomDomini)) {
                     rge.setGrantedApplicationDomain(getInformationSystemEntityDao().findByCode(grant.getDomainValue()));
                 } else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini)) {
-                    rge.setGrantedGroupDomain(getGroupEntityDao().findByCode(grant.getDomainValue()));
+                    rge.setGrantedGroupDomain(getGroupEntityDao().findByName(grant.getDomainValue()));
                 } else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini)) {
-                    rge.setGrantedDomainValue(getDomainValueEntityDao().findByApplicationDomainValue(targetEntity.getApplication().getCode(), targetEntity.getApplicationDomain().getName(), grant.getDomainValue()));
+                    rge.setGrantedDomainValue(getDomainValueEntityDao().findByApplicationDomainValue(targetEntity.getInformationSystem().getName(), targetEntity.getApplicationDomain().getName(), grant.getDomainValue()));
                 }
                 grupsPosseidorsRolEntity.add(rge);
             }
         	
         }
-        targetEntity.setGroupsOwnerRole(grupsPosseidorsRolEntity);
+        targetEntity.setContainerGroups(grupsPosseidorsRolEntity);
 	}
 
 	private void updateEntityDomainType(es.caib.seycon.ng.comu.Rol sourceVO, com.soffid.iam.model.RoleEntity targetEntity) {
@@ -811,7 +786,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		    } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
 		            || TipusDomini.GRUPS_USUARI
 		                    .equals(tipusDominiAsoc)) {
-		        GroupEntity grupAsoc = getGroupEntityDao().findByCode(currentPare.getDomainValue());
+		        GroupEntity grupAsoc = getGroupEntityDao().findByName(currentPare.getDomainValue());
 		        if (grupAsoc == null) {
 					throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.14"),   //$NON-NLS-1$
 							currentPare.getDomainValue()));
@@ -827,7 +802,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		        rare.setDomainApplication(appAsoc);
 		    } else if (TipusDomini.DOMINI_APLICACIO
 		            .equals(tipusDominiAsoc)) {
-		        DomainValueEntity valdomAsoc = getDomainValueEntityDao().findDomainValueAndDomainNameAndDomainRoleNameAndDomainValue(grantedRole.getApplicationDomain().getName(), grantedRole.getName(), currentPare.getDomainValue());
+		        DomainValueEntity valdomAsoc = getDomainValueEntityDao().findByRoleAndValue(grantedRole.getId(), currentPare.getDomainValue());
 		        if (valdomAsoc == null) {
 					throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.16"), granteeRole.getApplicationDomain().getName(), currentPare.getDomainValue()));
 		        }
@@ -857,7 +832,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		    } else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
 		            || TipusDomini.GRUPS_USUARI
 		                    .equals(tipusDominiAsoc)) {
-		        GroupEntity grupAsoc = getGroupEntityDao().findByCode(grant.getOwnerRolDomainValue());
+		        GroupEntity grupAsoc = getGroupEntityDao().findByName(grant.getOwnerRolDomainValue());
 		        if (grupAsoc == null) {
 					throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.14"),   //$NON-NLS-1$
 							grant.getDomainValue()));
@@ -873,7 +848,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		        rare.setGranteeApplicationDomain(appAsoc);
 		    } else if (TipusDomini.DOMINI_APLICACIO
 		            .equals(tipusDominiAsoc)) {
-		        DomainValueEntity valdomAsoc = getDomainValueEntityDao().findDomainValueAndDomainNameAndDomainRoleNameAndDomainValue(granteeRole.getApplicationDomain().getName(), granteeRole.getName(), grant.getOwnerRolDomainValue());
+		        DomainValueEntity valdomAsoc = getDomainValueEntityDao().findByRoleAndValue(granteeRole.getId(), grant.getOwnerRolDomainValue());
 		        if (valdomAsoc == null) {
 					throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.16"), granteeRole.getApplicationDomain().getName(), grant.getDomainValue()));
 		        }
@@ -888,21 +863,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	}
 
 	private ApplicationDomainEntity findDominiByNomAndCodiApliacio(String nom, String codiAplicacio) {
-        String query = "select domini " //$NON-NLS-1$
-                + "from es.caib.seycon.ng.model.DominiAplicacioEntity domini " //$NON-NLS-1$
-                + "left join domini.aplicacio aplicacio " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.codi = :codiAplicacio)) and " //$NON-NLS-1$
-                + "domini.nom = :nom"; //$NON-NLS-1$
-        Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-                codiAplicacio);
-        Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
-        Parameter[] parameters = { codiAplicacioParameter, nomParameter };
-        Collection dominis = getApplicationDomainEntityDao().query(query, parameters);
-        if (dominis != null) {
-            return (ApplicationDomainEntity) dominis.iterator().next();
-        }
-        return null;
+		
+		return getApplicationDomainEntityDao().findByName( nom, codiAplicacio );
     }
 
     public void rolToEntity(es.caib.seycon.ng.comu.Rol sourceVO, com.soffid.iam.model.RoleEntity targetEntity, boolean copyIfNull) {
@@ -921,10 +883,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
     public void toIdentitatCustom(com.soffid.iam.model.RoleEntity source, es.caib.seycon.ng.comu.Identitat target) {
         String nomRol = source.getName();
-        InformationSystemEntity aplicacio = source.getApplication();
-        SystemEntity dispatcher = source.getDatabases();
-        target.setNomRol(nomRol + "@" + dispatcher.getCode() + ">" + aplicacio.getCode());
-        target.setCodiIdentitat(nomRol + "@" + dispatcher.getCode() + ">" + aplicacio.getCode());
+        InformationSystemEntity aplicacio = source.getInformationSystem();
+        SystemEntity dispatcher = source.getSystem();
+        target.setNomRol(nomRol + "@" + dispatcher.getName() + ">" + aplicacio.getName());
+        target.setCodiIdentitat(nomRol + "@" + dispatcher.getName() + ">" + aplicacio.getName());
         String descripcio = source.getDescription();
         target.setDescripcio(descripcio);
     }
@@ -952,7 +914,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             RoleEntity rolEntity = null;
             String[] partsNomRol = nomRolComplert.split("@"); //$NON-NLS-1$
             String[] partsNomRol2 = partsNomRol[1].split(">"); //$NON-NLS-1$
-            rolEntity = findRoleByRoleNameAndApplicationCodeAndSystemCode(partsNomRol[0], partsNomRol2[1], partsNomRol2[0]);
+            rolEntity = findRoleByNameInformationSystemAndStystem(partsNomRol[0], partsNomRol2[1], partsNomRol2[0]);
             if (rolEntity != null) {
                 return rolEntity;
             } else {
@@ -979,7 +941,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         super.identitatToEntity(source, target, copyIfNull);
     }
 
-    public List<RoleEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<RoleEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List<RoleEntity> results = new QueryBuilder().query(this, queryString, parameters);
             return results;
@@ -998,7 +960,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                                                                      // el id
         contenidorRol.setTipus(TipusContenidorRol.ROL_ENTITY);
         // Información específica:
-        contenidorRol.setInfoContenidor(entity.getName() + "@" + entity.getDatabases().getCode() + " (" + entity.getApplication().getCode() + ")"); //$NON-NLS-1$
+        contenidorRol.setInfoContenidor(entity.getName() + "@" + entity.getSystem().getName() + " (" + entity.getInformationSystem().getName() + ")"); //$NON-NLS-1$
 
         return contenidorRol;
     }
@@ -1029,7 +991,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         for (Iterator<GroupEntity> it = grupsISubgrups.iterator(); it.hasNext(); ) {
             GroupEntity g = it.next();
             Collection<UserEntity> usuGPrim = null;
-            usuGPrim = getUserEntityDao().findbyPrimaryGroup(g.getCode());
+            usuGPrim = getUserEntityDao().findByPrimaryGroup(g.getName());
             if (usuGPrim != null) for (Iterator<UserEntity> gpr_it = usuGPrim.iterator(); gpr_it.hasNext(); ) {
                 UserEntity usu = gpr_it.next();
                 usuarisPropagar.add(usu);
@@ -1076,19 +1038,19 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                                     // abans)
                 socContingut = getRoleDependencyEntityDao().findRolesAssociationContainerRole(rolActual);
             else
-                socContingut = rolActual.getRoleAssociationContent();
+                socContingut = rolActual.getContainerRoles();
 
             if (socContingut != null)
                 for (Iterator<RoleDependencyEntity> it = socContingut.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContenidor = associacio.getRoleContainer();
+                RoleEntity rolContenidor = associacio.getContainer();
                 rolsPropagar.add(rolContenidor);
                 rolsAnalitzar.add(rolContenidor);
                 Collection<RoleAccountEntity> rolsUsuarisRolContenidor = new ArrayList<RoleAccountEntity>();
                 if (associacio.getDomainGroup() != null || associacio.getDomainApplication() != null || associacio.getDomainApplicationValue() != null) {
-                    rolsUsuarisRolContenidor = getRoleAccountEntityDao().findByRoleAndDomainValue(rolContenidor.getName(), rolContenidor.getDatabases().getCode(), rolContenidor.getApplication().getCode(), rolContenidor.getDomainType(), associacio.getDomainGroup() != null ? associacio.getDomainGroup().getCode() : null, associacio.getDomainApplication() != null ? associacio.getDomainApplication().getCode() : null, associacio.getDomainApplication() != null ? associacio.getDomainApplication().getId() : null);
+                    rolsUsuarisRolContenidor = getRoleAccountEntityDao().findByRoleAndDomainValue(rolContenidor.getName(), rolContenidor.getSystem().getName(), rolContenidor.getInformationSystem().getName(), rolContenidor.getDomainType(), associacio.getDomainGroup() != null ? associacio.getDomainGroup().getName() : null, associacio.getDomainApplication() != null ? associacio.getDomainApplication().getName() : null, associacio.getDomainApplication() != null ? associacio.getDomainApplication().getId() : null);
                 } else {
-                    rolsUsuarisRolContenidor = getRoleAccountEntityDao().findByRoleAndDomainType(rolContenidor.getName(), rolContenidor.getDatabases().getCode(), rolContenidor.getApplication().getCode(), rolContenidor.getDomainType());
+                    rolsUsuarisRolContenidor = getRoleAccountEntityDao().findByRoleAndDomainType(rolContenidor.getName(), rolContenidor.getSystem().getName(), rolContenidor.getInformationSystem().getName(), rolContenidor.getDomainType());
                 }
                 if (rolsUsuarisRolContenidor != null) for (Iterator ruit = rolsUsuarisRolContenidor.iterator(); ruit.hasNext(); ) {
                     RoleAccountEntity rui = (RoleAccountEntity) ruit.next();
@@ -1103,11 +1065,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         if (cercaRolABaseDades)
             grupsPosseidors = getRoleGroupEntityDao().findOwnerGroupsByRole(rol);
         else
-            grupsPosseidors = rol.getGroupsOwnerRole();
+            grupsPosseidors = rol.getContainerGroups();
 
         for (Iterator<RoleGroupEntity> it = grupsPosseidors.iterator(); it.hasNext(); ) {
             RoleGroupEntity rolsgrup = it.next();
-            GroupEntity grupPosseidor = getGroupEntityDao().findById(rolsgrup.getOwnerGroup().getId());
+            GroupEntity grupPosseidor = getGroupEntityDao().load(rolsgrup.getOwnerGroup().getId());
             grupsPropagar.add(grupPosseidor);
             Collection<GroupEntity> subgrups = getTotsFillsGrup(grupPosseidor);
             if (subgrups != null) grupsPropagar.addAll(subgrups);
@@ -1140,7 +1102,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             updateRole.setDataTasca(Calendar.getInstance());
             updateRole.setStatus("P");
             updateRole.setRole(role.getName());
-            updateRole.setBd(role.getDatabases().getCode());
+            updateRole.setBd(role.getSystem().getName());
             TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
             getTaskEntityDao().createNoFlush(tasca);
         }
@@ -1167,7 +1129,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             updateAccount.setDataTasca(Calendar.getInstance());
             updateAccount.setStatus("P");
             updateAccount.setUsuari(acc.getName());
-            updateAccount.setBd(acc.getSystem().getCode());
+            updateAccount.setBd(acc.getSystem().getName());
             TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateAccount);
             getTaskEntityDao().createNoFlush(tasca);
         }
@@ -1179,7 +1141,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             updateGrup.setTransa("UpdateGroup");
             updateGrup.setDataTasca(Calendar.getInstance());
             updateGrup.setStatus("P");
-            updateGrup.setGrup(grup.getCode());
+            updateGrup.setGrup(grup.getName());
             TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateGrup);
             getTaskEntityDao().createNoFlush(tasca);
         }

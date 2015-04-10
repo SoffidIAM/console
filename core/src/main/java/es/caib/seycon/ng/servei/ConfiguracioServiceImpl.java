@@ -16,7 +16,7 @@ import com.soffid.iam.model.BlobConfigurationEntityDao;
 import com.soffid.iam.model.ConfigEntity;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.config.Config;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -130,7 +130,7 @@ public class ConfiguracioServiceImpl
 	protected void handleDelete(Configuracio configuracio) throws Exception {
 		ConfigEntity configuracioEntity = getConfigEntityDao().configuracioToEntity(configuracio);
 		boolean toRemove = configuracioEntity.getNetwork() == null;
-		String codi = configuracioEntity.getCode();
+		String codi = configuracioEntity.getName();
 		getConfigEntityDao().remove(configuracioEntity);
 		if (toRemove) {
 			System.getProperties().remove(codi);
@@ -156,22 +156,7 @@ public class ConfiguracioServiceImpl
 	}
 	
 	private Collection<ConfigEntity> localFindConfiguracioByFiltre(String codi, String valor, String descripcio, String codiXarxa) {
-		String query = 
-			"select configuracio " + //$NON-NLS-1$
-				"from " + //$NON-NLS-1$
-				"es.caib.seycon.ng.model.ConfiguracioEntity configuracio " + //$NON-NLS-1$
-				"left join configuracio.xarxa xarxa "+ //$NON-NLS-1$
-				"where " + //$NON-NLS-1$
-				"(:codi is null or configuracio.codi like :codi) and " + //$NON-NLS-1$
-				"(:codiXarxa is null or xarxa.codi like :codiXarxa) and " + //$NON-NLS-1$
-				"(:valor is null or configuracio.valor like :valor) and " + //$NON-NLS-1$
-				"(:descripcio is null or configuracio.descripcio like :descripcio)"; //$NON-NLS-1$
-		Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
-		Parameter codiXarxaParameter = new Parameter("codiXarxa", codiXarxa); //$NON-NLS-1$
-		Parameter valorParameter = new Parameter("valor", valor); //$NON-NLS-1$
-		Parameter descripcioParameter = new Parameter("descripcio", descripcio); //$NON-NLS-1$
-		Parameter[] parameters = {codiParameter, codiXarxaParameter, valorParameter, descripcioParameter};
-		return getConfigEntityDao().query(query, parameters);		
+		return getConfigEntityDao().findByFilter (codi, codiXarxa, valor, descripcio);		
 	}
 
 	protected Collection<Configuracio> handleFindConfiguracioByFiltre(

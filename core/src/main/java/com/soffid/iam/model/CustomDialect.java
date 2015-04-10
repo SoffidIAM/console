@@ -1,4 +1,4 @@
-package es.caib.seycon.ng.model;
+package com.soffid.iam.model;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class CustomDialect extends Dialect {
     }
 
     public Class getNativeIdentifierGeneratorClass() {
-        return es.caib.seycon.ng.model.identity.IdentityGenerator.class;
+        return com.soffid.iam.model.identity.IdentityGenerator.class;
     }
 
     public boolean supportsIdentityColumns() {

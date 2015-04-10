@@ -23,6 +23,7 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.ContenidorRol;
@@ -35,6 +36,7 @@ import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -88,27 +90,27 @@ public class GroupEntityDaoImpl extends
                         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
                         tasque.setDate(new Timestamp(System.currentTimeMillis()));
                         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getCode());
+                        tasque.setGroup(grup.getName());
                         getTaskEntityDao().create(tasque);
-                        if (grup.getOfficeServer() != null) {
+                        if (grup.getHomeServer() != null) {
                             tasque = getTaskEntityDao().newTaskEntity();
                             tasque.setDate(new Timestamp(System.currentTimeMillis()));
                             tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getCode());
+                            tasque.setFolder(grup.getName());
                             tasque.setFolderType("G"); //$NON-NLS-1$
                             getTaskEntityDao().create(tasque);
                         }
-			auditarGrup("C", grup.getCode()); //$NON-NLS-1$
+			auditarGrup("C", grup.getName()); //$NON-NLS-1$
                         getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getName(), message));
 		}
 	}
 
 	public void remove(com.soffid.iam.model.GroupEntity grup) throws RuntimeException { //En principi NO ES FA MAI
 		try {
-			String codiGrup = grup.getCode();
+			String codiGrup = grup.getName();
 			super.remove(grup);
 			getSession(false).flush();
 			
@@ -123,13 +125,13 @@ public class GroupEntityDaoImpl extends
                         tasque = getTaskEntityDao().newTaskEntity();
                         tasque.setDate(new Timestamp(System.currentTimeMillis()));
                         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getCode());
+                        tasque.setGroup(grup.getName());
                         getTaskEntityDao().create(tasque);
-                        if (grup.getOfficeServer() != null) {
+                        if (grup.getHomeServer() != null) {
                             tasque = getTaskEntityDao().newTaskEntity();
                             tasque.setDate(new Timestamp(System.currentTimeMillis()));
                             tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getCode());
+                            tasque.setFolder(grup.getName());
                             tasque.setFolderType("G"); //$NON-NLS-1$
                             getTaskEntityDao().create(tasque);
                         }
@@ -138,7 +140,7 @@ public class GroupEntityDaoImpl extends
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getName(), message));
 		}
 	}
 
@@ -173,7 +175,7 @@ public class GroupEntityDaoImpl extends
 				// Propagamos los ROLES (del grupo padre antiguo y nuevo): (creamos las tareas)
 				propagarRolsAtorgatsGrups(rolsAPropagar);
 				// Propagamos LOS USUARIOS: de este grupo
-				Collection usuarisPropagar = getUsuarisPertanyenGrup(grup.getCode());
+				Collection usuarisPropagar = getUsuarisPertanyenGrup(grup.getName());
 				if (usuarisPropagar!=null) {
 					propagarUsuarisGrup(usuarisPropagar);
 				}
@@ -184,21 +186,21 @@ public class GroupEntityDaoImpl extends
                         tasque = getTaskEntityDao().newTaskEntity();
                         tasque.setDate(new Timestamp(System.currentTimeMillis()));
                         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getCode());
+                        tasque.setGroup(grup.getName());
                         getTaskEntityDao().create(tasque);
-                        if (grup.getOfficeServer() != null ? old.getOfficeServer() == null || !old.getOfficeServer().getId().equals(grup.getOfficeServer().getId()) : old.getOfficeServer() != null) {
+                        if (grup.getHomeServer() != null ? old.getHomeServer() == null || !old.getHomeServer().getId().equals(grup.getHomeServer().getId()) : old.getHomeServer() != null) {
                             tasque = getTaskEntityDao().newTaskEntity();
                             tasque.setDate(new Timestamp(System.currentTimeMillis()));
                             tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getCode());
+                            tasque.setFolder(grup.getName());
                             tasque.setFolderType("G"); //$NON-NLS-1$
                             getTaskEntityDao().create(tasque);
                         }
-			auditarGrup("U", grup.getCode()); //$NON-NLS-1$
+			auditarGrup("U", grup.getName()); //$NON-NLS-1$
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getCode(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getName(), message));
 		}
 	}
 
@@ -218,11 +220,11 @@ public class GroupEntityDaoImpl extends
 
 		GroupEntity grupPare = entity.getParent();
 		if (grupPare != null) {
-			String codiPare = grupPare.getCode();
+			String codiPare = grupPare.getName();
 			grup.setCodiPare(codiPare);
 		}
 
-		HostEntity servidorOfimatic = entity.getOfficeServer();
+		HostEntity servidorOfimatic = entity.getHomeServer();
 		if (servidorOfimatic != null) {
 			String nomServidorOfimatic = servidorOfimatic.getName();
 			grup.setNomServidorOfimatic(nomServidorOfimatic);
@@ -230,9 +232,9 @@ public class GroupEntityDaoImpl extends
 		
 
 		GroupEntity grupEntity = entity; //findByCodi(entity.getCodi()); //¿para qué lo cargamos si lo tenemos?
-		GroupTypeEntity tipusUnitatOrganitzativa = grupEntity.getOrganizatinalUnitType();
+		GroupTypeEntity tipusUnitatOrganitzativa = grupEntity.getUnitType();
 		if (tipusUnitatOrganitzativa != null) {
-			String codiTipus = tipusUnitatOrganitzativa.getCode();
+			String codiTipus = tipusUnitatOrganitzativa.getName();
 			grup.setTipus(codiTipus); // Unitat Organizativa
 		} else {
 			grup.setTipus(null); // Unitat Organizativa
@@ -297,7 +299,7 @@ public class GroupEntityDaoImpl extends
 
 		String codiPare = sourceVO.getCodiPare();
 		if (codiPare != null && codiPare.trim().compareTo("") != 0) { //$NON-NLS-1$
-			GroupEntity grupPare = findByCode(sourceVO.getCodiPare());
+			GroupEntity grupPare = findByName(sourceVO.getCodiPare());
 			if (grupPare == null) {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.3"), codiPare)); //$NON-NLS-1$
 			} else {
@@ -317,26 +319,26 @@ public class GroupEntityDaoImpl extends
 				&& nomServidorOfimatic.trim().compareTo("") != 0) { //$NON-NLS-1$
 			HostEntity servidorOfimatic = getHostEntityDao().findByName(nomServidorOfimatic);
 			if (servidorOfimatic != null) {
-				targetEntity.setOfficeServer(servidorOfimatic);
+				targetEntity.setHomeServer(servidorOfimatic);
 			} else {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.5"),  //$NON-NLS-1$
 						nomServidorOfimatic));
 			}
 		} else {
-			targetEntity.setOfficeServer(null);
+			targetEntity.setHomeServer(null);
 		}
 
 		String codiTipus = sourceVO.getTipus(); // Unitat Organizativa
 		if (codiTipus != null && codiTipus.trim().compareTo("") != 0) { //$NON-NLS-1$
-			GroupTypeEntity tipusEntity = getGroupTypeEntityDao().findByCode(codiTipus);
+			GroupTypeEntity tipusEntity = getGroupTypeEntityDao().findByName(codiTipus);
 			if (tipusEntity != null) {
-				targetEntity.setOrganizatinalUnitType(tipusEntity);
+				targetEntity.setUnitType(tipusEntity);
 			} else {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.6"),  //$NON-NLS-1$
 						codiTipus));
 			}
 		} else {
-			targetEntity.setOrganizatinalUnitType(null);
+			targetEntity.setUnitType(null);
 		}
 
 		if (sourceVO.getObsolet() != null) {
@@ -367,16 +369,15 @@ public class GroupEntityDaoImpl extends
 		grupToEntityCustom(sourceVO, targetEntity);
 	}
 
-	protected void handleSetSuperGrup(String codiSubGrup, String codiSuperGrup)
-			throws Exception {
-		GroupEntity superGrup = findByCode(codiSuperGrup);
-		GroupEntity subGrup = findByCode(codiSubGrup);
+	protected void handleSetParentGroup(String codiSubGrup, String codiSuperGrup) throws Exception {
+		GroupEntity superGrup = findByName(codiSuperGrup);
+		GroupEntity subGrup = findByName(codiSubGrup);
 		/*
 		 * No crea ciclo: desde el padre no se puede llegar al hijo
 		 */
 		GroupEntity pareGrup = superGrup; //comencem pel nou pare
 		while (pareGrup != null) {
-			if (pareGrup.getCode().compareTo(codiSubGrup) == 0) {
+			if (pareGrup.getName().compareTo(codiSubGrup) == 0) {
 				throw new Exception(String.format(Messages.getString("GroupEntityDaoImpl.8"),  //$NON-NLS-1$
 						codiSuperGrup, 
 						codiSubGrup));
@@ -398,7 +399,7 @@ public class GroupEntityDaoImpl extends
 	}
 
 	public void toIdentitatCustom(com.soffid.iam.model.GroupEntity source, es.caib.seycon.ng.comu.Identitat target) {
-		String codiGrup = source.getCode();
+		String codiGrup = source.getName();
 		target.setCodiGrup(codiGrup);
 		target.setCodiIdentitat(codiGrup);
 		String descripcio = source.getDescription();
@@ -425,7 +426,7 @@ public class GroupEntityDaoImpl extends
 		 */
 		String codiGrup = identitat.getCodiGrup();
 		if (codiGrup != null) {
-			GroupEntity grupEntity = findByCode(codiGrup);
+			GroupEntity grupEntity = findByName(codiGrup);
 			if (grupEntity != null) {
 				return grupEntity;
 			} else {
@@ -465,7 +466,7 @@ public class GroupEntityDaoImpl extends
 		// pot ser GRUPS o GRUPS_USUARI
 		// domini service ho emplena
 		valorDomini.setNomDomini(null);
-		valorDomini.setValor(entity.getCode());
+		valorDomini.setValor(entity.getName());
 		// encara no es sap l'usuari del grup si aquest és GRUPS_USUARI
 		valorDomini.setCodiExternDomini(null);
 		return valorDomini;
@@ -476,7 +477,7 @@ public class GroupEntityDaoImpl extends
 	 *      es.caib.seycon.ng.model.Parameter[])
 	 */
 	public List find(final java.lang.String queryString,
-			final es.caib.seycon.ng.model.Parameter[] parameters) {
+			final Parameter[] parameters) {
 		try {
 			java.util.List results = new QueryBuilder().query(this,
 					queryString, parameters);
@@ -523,11 +524,11 @@ public class GroupEntityDaoImpl extends
 		rolsAnalitzar.add(rol);
 		RoleEntity rolActual = null;
 		while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-			Collection socContenidor = rolActual.getRolAssociationContainer();
+			Collection socContenidor = rolActual.getContainedRole();
 				
 			if (socContenidor!=null) for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContingut = associacio.getRoleContent();
+                RoleEntity rolContingut = associacio.getContained();
                 rolsPropagar.add(rolContingut);
                 rolsAnalitzar.add(rolContingut);
             }
@@ -602,7 +603,7 @@ public class GroupEntityDaoImpl extends
                     updateRole.setDataTasca(Calendar.getInstance());
                     updateRole.setStatus("P");
                     updateRole.setRole(role.getName());
-                    updateRole.setBd(role.getDatabases().getCode());
+                    updateRole.setBd(role.getSystem().getName());
                     TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
                 }
@@ -613,14 +614,14 @@ public class GroupEntityDaoImpl extends
 	private Collection getUsuarisPertanyenGrup(String codiGrup) {
 		HashSet totsUsuaris = new HashSet();
 		// Obtenemos los grupos primarios primero
-		Collection usuarisGrupComGrupPrimari = getUserEntityDao().findbyPrimaryGroup(codiGrup);
+		Collection usuarisGrupComGrupPrimari = getUserEntityDao().findByPrimaryGroup(codiGrup);
 		for (Iterator it = usuarisGrupComGrupPrimari.iterator(); it.hasNext(); ) {
             UserEntity user = (UserEntity) it.next();
             totsUsuaris.add(user.getUserName());
         }
 		
 		// Esto obtiene los usuarios que tienen el grupo como secundario
-		Collection usuarisGrupComGrupSec = getUserGroupEntityDao().findByGroupCode(codiGrup);
+		Collection usuarisGrupComGrupSec = getUserGroupEntityDao().findByGroupName(codiGrup);
 		for (Iterator it = usuarisGrupComGrupSec.iterator(); it.hasNext(); ) {
             UserGroupEntity usugru = (UserGroupEntity) it.next();
             totsUsuaris.add(usugru.getUser().getUserName());

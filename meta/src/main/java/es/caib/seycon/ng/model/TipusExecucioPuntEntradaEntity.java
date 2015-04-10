@@ -15,7 +15,7 @@ public abstract class TipusExecucioPuntEntradaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="EXE_CODI", length=10, translated="code")
+	@Column (name="EXE_CODI", length=10, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="EXE_MIME", length=50, translated="mimeType")
@@ -25,10 +25,10 @@ public abstract class TipusExecucioPuntEntradaEntity {
 	@Nullable
 	public java.lang.String plantilla;
 
-	@Operation(translated="findByCode")
+	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusExecucioPuntEntradaEntity findByCodi(
-		java.lang.String codi) {
+		java.lang.String name) {
 	 return null;
 	}
 }

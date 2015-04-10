@@ -75,7 +75,7 @@ public class EmailListEntityDaoImpl extends
 		try {
 			super.create(llistaCorreu);
 			getSession(false).flush();
-			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getCode();
+			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getName();
 			auditarLlistaDeCorreu("C", llistaCorreu.getName(), domini); //$NON-NLS-1$
 			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
@@ -88,7 +88,7 @@ public class EmailListEntityDaoImpl extends
 		try {
 			super.update(llistaCorreu);
 			getSession(false).flush();
-			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getCode();
+			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getName();
 			auditarLlistaDeCorreu("U", llistaCorreu.getName(), domini); //$NON-NLS-1$
 			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
@@ -100,7 +100,7 @@ public class EmailListEntityDaoImpl extends
 	public void remove(com.soffid.iam.model.EmailListEntity llistaCorreu) throws RuntimeException {
 		try {
 			String nomLlistaDeCorreu = llistaCorreu.getName();
-			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getCode();
+			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getName();
 			super.remove(llistaCorreu);
 			getSession(false).flush();
 			auditarLlistaDeCorreu("D", nomLlistaDeCorreu, domini); //$NON-NLS-1$
@@ -114,7 +114,7 @@ public class EmailListEntityDaoImpl extends
 	private String findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(
 			String nomLlistaCorreu, String codiDomini) {
 		String llistat = ""; //$NON-NLS-1$
-		EmailListEntity llistaCorreuEntity = this.findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreuEntity = this.findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection correusExterns = llistaCorreuEntity.getExternals();
 		if (correusExterns != null) {
 			Iterator iterator = correusExterns.iterator();
@@ -133,13 +133,13 @@ public class EmailListEntityDaoImpl extends
 	private String findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
 			String nomLlistaCorreu, String codiDomini) {
 		String llistat = ""; //$NON-NLS-1$
-		Collection llistesCorreuEntities = getEmailListContainerEntityDao().findCollectionByContainNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		Collection llistesCorreuEntities = getEmailListContainerEntityDao().findByContained(nomLlistaCorreu, codiDomini);
 		if (llistesCorreuEntities != null) {
 			Iterator iterator = llistesCorreuEntities.iterator();
 			while (iterator.hasNext()) {
 				EmailListContainerEntity relacioLlistaCorreuEntity = (EmailListContainerEntity) iterator.next();
-				EmailListEntity llistaCorreuEntityPertany = relacioLlistaCorreuEntity.getPertain();
-				String codiDominiCurrent = llistaCorreuEntityPertany.getDomain() == null ? null : llistaCorreuEntityPertany.getDomain().getCode();
+				EmailListEntity llistaCorreuEntityPertany = relacioLlistaCorreuEntity.getPertains();
+				String codiDominiCurrent = llistaCorreuEntityPertany.getDomain() == null ? null : llistaCorreuEntityPertany.getDomain().getName();
 				llistat += llistaCorreuEntityPertany.getName() + "@" + codiDominiCurrent + ", "; //$NON-NLS-1$
 			}
 		}
@@ -153,7 +153,7 @@ public class EmailListEntityDaoImpl extends
 	private String findLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini(
 			String nomLlistaCorreu, String codiDomini) {
 		String llistat = ""; //$NON-NLS-1$
-		EmailListEntity llistaCorreuEntity = this.findByNameAndDomainCode(nomLlistaCorreu, codiDomini);
+		EmailListEntity llistaCorreuEntity = this.findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection llistaCorreuUsuaris = llistaCorreuEntity.getUserMailLists();
 		if (llistaCorreuUsuaris != null) {
 			Iterator iterator = llistaCorreuUsuaris.iterator();
@@ -179,11 +179,11 @@ public class EmailListEntityDaoImpl extends
 
 		EmailDomainEntity domini = sourceEntity.getDomain();
 		if (domini != null) {
-			targetVO.setCodiDomini(domini.getCode());
+			targetVO.setCodiDomini(domini.getName());
 		}
 
 		String nomLlista = sourceEntity.getName();
-		String codiDomini = sourceEntity.getDomain() == null ? null : sourceEntity.getDomain().getCode();
+		String codiDomini = sourceEntity.getDomain() == null ? null : sourceEntity.getDomain().getName();
 		targetVO
 				.setLlistaLlistes(findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
 						nomLlista, codiDomini));
@@ -203,8 +203,8 @@ public class EmailListEntityDaoImpl extends
 		String llistesPertany = ""; //$NON-NLS-1$
 		if (col_llistesPertany != null) for (Iterator it = col_llistesPertany.iterator(); it.hasNext(); ) {
             EmailListContainerEntity rel = (EmailListContainerEntity) it.next();
-            EmailListEntity pertanyA = rel.getContain();
-            String codiDominiCurrent = pertanyA.getDomain() == null ? null : pertanyA.getDomain().getCode();
+            EmailListEntity pertanyA = rel.getContains();
+            String codiDominiCurrent = pertanyA.getDomain() == null ? null : pertanyA.getDomain().getName();
             llistesPertany += pertanyA.getName() + "@" + codiDominiCurrent + ", ";
         }
 		if (llistesPertany == "") {//Llevem coma final //$NON-NLS-1$
@@ -231,7 +231,7 @@ public class EmailListEntityDaoImpl extends
             for (RolGrant grant : grants) {
                 if (grant.getUser() != null) {
                     if (r.getScope() == null || r.getScope().trim().length() == 0 || r.getScope().equals(grant.getDomainValue())) {
-                        UserEntity ue = getUserEntityDao().findByCode(grant.getUser());
+                        UserEntity ue = getUserEntityDao().findByUserName(grant.getUser());
                         if (ue != null && "S".equals(ue.getActive())) {
                             explodedUsers.add(grant.getUser());
                         }
@@ -246,7 +246,7 @@ public class EmailListEntityDaoImpl extends
 	private void findGroupMembers(EmailListEntity sourceEntity, LlistaCorreu targetVO, Set<String> explodedUsers) {
 		LinkedList<String> groups = new LinkedList<String>();
 		for (MailListGroupMemberEntity ue : sourceEntity.getGroups()) {
-            String c = ue.getGroup().getCode();
+            String c = ue.getGroup().getName();
             groups.add(c);
             for (UserEntity user : ue.getGroup().getPrimaryGroupUsers()) {
                 if ("S".equals(user.getActive())) explodedUsers.add(user.getUserName());
@@ -324,7 +324,7 @@ public class EmailListEntityDaoImpl extends
 		if (codiDomini != null && codiDomini.trim().compareTo("") != 0) { //$NON-NLS-1$
 			EmailDomainEntity dominiCorreu = getEmailDomainEntityDao().findByCode(codiDomini);
 			if (dominiCorreu != null) {
-				if (sourceVO.getCodiDomini() != null && (targetEntity.getDomain() == null || sourceVO.getCodiDomini().compareTo(targetEntity.getDomain().getCode()) != 0) && dominiCorreu.getObsolete() != null && dominiCorreu.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
+				if (sourceVO.getCodiDomini() != null && (targetEntity.getDomain() == null || sourceVO.getCodiDomini().compareTo(targetEntity.getDomain().getName()) != 0) && dominiCorreu.getObsolete() != null && dominiCorreu.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
 					throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.obsoleteError"),  //$NON-NLS-1$
 							sourceVO.getCodiDomini()));
 				}else{
@@ -456,7 +456,7 @@ public class EmailListEntityDaoImpl extends
         tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
         tasque.setAlias(entity.getName());
         if (entity.getDomain() != null)
-            tasque.setMailDomain(entity.getDomain().getCode());
+            tasque.setMailDomain(entity.getDomain().getName());
         getTaskEntityDao().create(tasque);
 	}
 

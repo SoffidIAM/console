@@ -93,9 +93,9 @@ public class EntryPointGroupEntityDaoImpl
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.GRUP);
 		target.setIdEntitatAutoritzada(source.getGroupID());
-		GroupEntity grup = getGroupEntityDao().findById(source.getGroupID());
-		target.setDescripcioEntitatAutoritzada(grup.getDescription() + " [" + grup.getCode() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-		target.setCodiEntitatAutoritzada(grup.getCode());
+		GroupEntity grup = getGroupEntityDao().load(source.getGroupID());
+		target.setDescripcioEntitatAutoritzada(grup.getDescription() + " [" + grup.getName() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+		target.setCodiEntitatAutoritzada(grup.getName());
 	}
     
     private void autoritzacioPuntEntradaToEntityCustom(es.caib.seycon.ng.comu.AutoritzacioPuntEntrada source, com.soffid.iam.model.EntryPointGroupEntity target) {

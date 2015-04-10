@@ -45,7 +45,7 @@ public abstract class MaquinaEntity {
 	@Column (name="MAQ_CORREU", length=1, translated="mail")
 	public java.lang.String correu;
 
-	@Column (name="MAQ_OFIMAT", length=1, translated="office")
+	@Column (name="MAQ_OFIMAT", length=1, translated="folders")
 	public java.lang.String ofimatica;
 
 	@ForeignKey (foreignColumn="USU_IDMAPR", translated="userProfiles")
@@ -104,9 +104,11 @@ public abstract class MaquinaEntity {
 	public es.caib.seycon.ng.model.OsTypeEntity operatingSystem;
 
 	@Operation(translated="findByName")
-	@DaoFinder("select maq\nfrom es.caib.seycon.ng.model.MaquinaEntity maq\nwhere maq.nom=:nom and maq.deleted = false")
+	@DaoFinder("select maq "
+			+ "from com.soffid.iam.model.HostEntity maq "
+			+ "where maq.name=:name and maq.deleted = false")
 	public es.caib.seycon.ng.model.MaquinaEntity findByNom(
-		@Nullable java.lang.String nom) {
+		@Nullable java.lang.String name) {
 	 return null;
 	}
 	@DaoFinder
@@ -115,35 +117,45 @@ public abstract class MaquinaEntity {
 	 return null;
 	}
 	@Operation(translated="findHostByCriteria")
-	@DaoFinder("select maquina from es.caib.seycon.ng.model.MaquinaEntity maquina, es.caib.seycon.ng.model.SessioEntity sessio \njoin maquina.operatingSystem as os\nwhere maquina.id=sessio.maquina.id and (:nom is null or maquina.nom like :nom) and (:oldSistemaOperatiu is null or os.name like :oldSistemaOperatiu) and (:adreca is null or maquina.adreca like :adreca) and (:dhcp is null or maquina.dhcp like :dhcp) and (:correu is null or maquina.correu like :correu) and (:ofimatica is null or maquina.ofimatica like :ofimatica) and (:mac is null or maquina.mac like :mac) and (:descripcio is null or maquina.descripcio like :descripcio) and (:xarxa is null or maquina.xarxa.codi like :xarxa) and (:codiUsuari is null or sessio.usuari.codi like :codiUsuari) and maquina.deleted=false\norder by maquina.nom \n")
+	@DaoFinder("select maquina from com.soffid.iam.model.HostEntity maquina, "
+			+ "com.soffid.iam.model.SessionEntity sessio "
+			+ "join maquina.operatingSystem as os "
+			+ "where maquina.id=sessio.host.id and "
+			+ " (:name is null or maquina.name like :name) and "
+			+ "(:operatingSystem is null or os.name like :operatingSystem) and "
+			+ "(:address is null or maquina.hostIP like :address) and "
+			+ "(:dhcp is null or maquina.dhcp like :dhcp) and "
+			+ "(:mailService is null or maquina.mail like :mailService) and "
+			+ "(:folders is null or maquina.folders like :folders) and \n"
+			+ "(:mac is null or maquina.mac like :mac) and \n"
+			+ "(:description is null or maquina.description like :description) and  \n"
+			+ "(:network is null or maquina.network.name like :network) and \n"
+			+ "(:codiUsuari is null or sessio.user.userName like :codiUsuari) and \n"
+			+ "maquina.deleted=false\n"
+			+ "order by maquina.name \n")
 	public java.util.List<es.caib.seycon.ng.model.MaquinaEntity> findMaquinaByFiltre(
-		java.lang.String nom, 
-		java.lang.String oldSistemaOperatiu, 
-		java.lang.String adreca, 
+		java.lang.String name, 
+		java.lang.String operatingSystem, 
+		java.lang.String address, 
 		java.lang.String dhcp, 
-		java.lang.String correu, 
-		java.lang.String ofimatica, 
+		java.lang.String mailService, 
+		java.lang.String folders, 
 		java.lang.String mac, 
-		java.lang.String descripcio, 
-		java.lang.String xarxa, 
+		java.lang.String description, 
+		java.lang.String network, 
 		java.lang.String codiUsuari) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.MaquinaEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
 	@Operation(translated="getTasks")
-	@DaoFinder
+	@DaoFinder("- CUSTOM -")
 	public java.lang.String[] getTasques(
-		java.lang.String nomMaquina) {
+		java.lang.String hostName) {
 	 return null;
 	}
 	@Operation(translated="findByIP")
 	@DaoFinder
 	public es.caib.seycon.ng.model.MaquinaEntity findByAdreca(
-		@Nullable java.lang.String adreca) {
+		@Nullable java.lang.String hostIP) {
 	 return null;
 	}
 	@DaoFinder

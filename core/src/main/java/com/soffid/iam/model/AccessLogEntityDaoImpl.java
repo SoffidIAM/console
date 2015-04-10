@@ -14,8 +14,10 @@ import es.caib.seycon.ng.model.*;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.UserEntity;
+
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -34,7 +36,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionID(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message));
         }
     }
 
@@ -44,7 +46,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionID(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionId(), message));
         }
     }
 
@@ -105,7 +107,7 @@ public class AccessLogEntityDaoImpl extends
 
         // Afegim informació del protocol d'accés
         if (source.getProtocol() != null) {
-            target.setProtocolAcces(source.getProtocol().getCode());
+            target.setProtocolAcces(source.getProtocol().getName());
         }
     }
 
@@ -150,7 +152,7 @@ public class AccessLogEntityDaoImpl extends
         // source.getDataFi():java.util.Date to java.util.Date
     }
 
-    public List<AccessLogEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<AccessLogEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);
@@ -190,11 +192,12 @@ public class AccessLogEntityDaoImpl extends
         }
 
         try {
-            String queryString = "select registreAcces from es.caib.seycon.ng.model.RegistreAccesEntity registreAcces " //$NON-NLS-1$
-                    + "left join registreAcces.usuari " //$NON-NLS-1$
+            String queryString = "select registreAcces "
+            		+ "from com.soffid.iam.model.AccessLogEntity registreAcces " //$NON-NLS-1$
+                    + "left join registreAcces.user " //$NON-NLS-1$
                     + "left join registreAcces.protocol where  " //$NON-NLS-1$
-                    + "(registreAcces.usuari is not null and registreAcces.usuari.codi = :codiUsuari) and " //$NON-NLS-1$
-                    + "(registreAcces.protocol is not null and registreAcces.protocol.codi= :codiProtocolAcces) " //$NON-NLS-1$
+                    + "(registreAcces.user is not null and registreAcces.user.name = :codiUsuari) and " //$NON-NLS-1$
+                    + "(registreAcces.protocol is not null and registreAcces.protocol.name= :codiProtocolAcces) " //$NON-NLS-1$
                     + "order by registreAcces.dataInici desc "; //$NON-NLS-1$
 
             org.hibernate.Query queryObject = super.getSession(false)
@@ -238,11 +241,12 @@ public class AccessLogEntityDaoImpl extends
         }
 
         try {
-            String queryString = "select registreAcces from es.caib.seycon.ng.model.RegistreAccesEntity registreAcces " //$NON-NLS-1$
-                    + "left join registreAcces.servidor servidor where " //$NON-NLS-1$
-                    + "(registreAcces.servidor is not null and  servidor.nom like :nomServidor) and " //$NON-NLS-1$
-                    + "(registreAcces.protocol is not null and registreAcces.protocol.codi = :protocolAcces) " //$NON-NLS-1$
-                    + "order by registreAcces.dataInici desc"; //$NON-NLS-1$
+            String queryString = "select registreAcces "
+            		+ "from com.soffid.iam.model.AccessLogEntity registreAcces " //$NON-NLS-1$
+                    + "left join registreAcces.server server where " //$NON-NLS-1$
+                    + "(registreAcces.server is not null and  server.nom like :nomServidor) and " //$NON-NLS-1$
+                    + "(registreAcces.protocol is not null and registreAcces.protocol.name = :protocolAcces) " //$NON-NLS-1$
+                    + "order by registreAcces.startDate desc"; //$NON-NLS-1$
 
             org.hibernate.Query queryObject = super.getSession(false)
                     .createQuery(queryString);
@@ -284,25 +288,26 @@ public class AccessLogEntityDaoImpl extends
                         Messages.getString("AccessLogEntityDaoImpl.missingParameter")); //$NON-NLS-1$
             }
 
-            String queryString = "select registreAcces from es.caib.seycon.ng.model.RegistreAccesEntity registreAcces " //$NON-NLS-1$
+            String queryString = "select registreAcces "
+            		+ "from com.soffid.iam.model.AccessLogEntity registreAcces " //$NON-NLS-1$
                     + (!senseClient ? "left join registreAcces.client client " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseServidor ? "left join registreAcces.servidor servidor " //$NON-NLS-1$
+                    + (!senseServidor ? "left join registreAcces.server server " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseUsuari ? "left join registreAcces.usuari usuari " //$NON-NLS-1$
+                    + (!senseUsuari ? "left join registreAcces.user user " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
                     + (!senseDataIni || !senseDataFi || !senseClient
                             || !senseServidor || !senseUsuari ? "where 1=1 " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseClient ? "and (client.nom like :nomClient) " : "") //$NON-NLS-1$ //$NON-NLS-2$
-                    + (!senseServidor ? "and (servidor.nom like :nomServidor) " //$NON-NLS-1$
+                    + (!senseClient ? "and (client.name like :nomClient) " : "") //$NON-NLS-1$ //$NON-NLS-2$
+                    + (!senseServidor ? "and (server.name like :nomServidor) " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseUsuari ? "and (:codiUsuari is null or usuari.codi like :codiUsuari) " //$NON-NLS-1$
+                    + (!senseUsuari ? "and (:codiUsuari is null or user.userName like :codiUsuari) " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseDataIni ? "and (registreAcces.dataInici >= :dataIni ) " //$NON-NLS-1$
+                    + (!senseDataIni ? "and (registreAcces.startDate >= :dataIni ) " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseDataFi ? "and (registreAcces.dataFi <= :dataFi ) " //$NON-NLS-1$
-                            : "") + "order by registreAcces.dataInici"; //$NON-NLS-1$ //$NON-NLS-2$
+                    + (!senseDataFi ? "and (registreAcces.endDate <= :dataFi ) " //$NON-NLS-1$
+                            : "") + "order by registreAcces.endDate"; //$NON-NLS-1$ //$NON-NLS-2$
 
             org.hibernate.Query queryObject = super.getSession(false)
                     .createQuery(queryString);

@@ -17,6 +17,7 @@ import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.TaskEntity;
+
 import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
@@ -24,6 +25,7 @@ import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -39,8 +41,8 @@ public class RoleDependencyEntityDaoImpl extends
     @Override
     public void create(RoleDependencyEntity rolAssociacioRolEntity) {
         super.create(rolAssociacioRolEntity);
-        generateTask(rolAssociacioRolEntity.getRoleContainer());
-        generateTask(rolAssociacioRolEntity.getRoleContent());
+        generateTask(rolAssociacioRolEntity.getContainer());
+        generateTask(rolAssociacioRolEntity.getContained());
         getSession().flush ();
     }
 
@@ -48,13 +50,13 @@ public class RoleDependencyEntityDaoImpl extends
     public void update(RoleDependencyEntity rolAssociacioRolEntity) {
         RoleDependencyEntity old = load(rolAssociacioRolEntity.getId());
         super.update(rolAssociacioRolEntity);
-        generateTask(rolAssociacioRolEntity.getRoleContainer());
-        generateTask(rolAssociacioRolEntity.getRoleContent());
-        if (!old.getRoleContainer().getId().equals(rolAssociacioRolEntity.getRoleContainer().getId())) {
-            generateTask(old.getRoleContainer());
+        generateTask(rolAssociacioRolEntity.getContainer());
+        generateTask(rolAssociacioRolEntity.getContained());
+        if (!old.getContainer().getId().equals(rolAssociacioRolEntity.getContainer().getId())) {
+            generateTask(old.getContainer());
         }
-        if (!old.getRoleContainer().getId().equals(rolAssociacioRolEntity.getRoleContent().getId())) {
-            generateTask(old.getRoleContent());
+        if (!old.getContainer().getId().equals(rolAssociacioRolEntity.getContained().getId())) {
+            generateTask(old.getContained());
         }
         getSession().flush ();
     }
@@ -62,8 +64,8 @@ public class RoleDependencyEntityDaoImpl extends
     @Override
     public void remove(RoleDependencyEntity rolAssociacioRolEntity) {
         super.remove(rolAssociacioRolEntity);
-        generateTask(rolAssociacioRolEntity.getRoleContainer());
-        generateTask(rolAssociacioRolEntity.getRoleContent());
+        generateTask(rolAssociacioRolEntity.getContainer());
+        generateTask(rolAssociacioRolEntity.getContained());
         getSession().flush ();
     }
 
@@ -72,11 +74,11 @@ public class RoleDependencyEntityDaoImpl extends
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
         tasque.setRole(rol.getName());
-        tasque.setDb(rol.getDatabases().getCode());
+        tasque.setDb(rol.getSystem().getName());
         getTaskEntityDao().create(tasque);
     }
 
-    public List<RoleDependencyEntity> find(final java.lang.String queryString, final es.caib.seycon.ng.model.Parameter[] parameters) {
+    public List<RoleDependencyEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
         try {
             java.util.List results = new QueryBuilder().query(this,
                     queryString, parameters);
@@ -87,8 +89,8 @@ public class RoleDependencyEntityDaoImpl extends
     }
 
     public static boolean verificaAssociacioSenseCicles(RoleDependencyEntity associacio, StringBuffer cami) {
-        RoleEntity contingut = associacio.getRoleContent();
-        RoleEntity pare = associacio.getRoleContainer();
+        RoleEntity contingut = associacio.getContained();
+        RoleEntity pare = associacio.getContainer();
 
         // Método: Para todo T,D / T & D son RolEntity
         // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
@@ -102,12 +104,12 @@ public class RoleDependencyEntityDaoImpl extends
     }
 
     public static boolean verificaAssociacioSenseCicles(RoleEntity fill, RoleEntity pare, StringBuffer cami) {
-        Collection pareEsContingut = pare.getRoleAssociationContent();
+        Collection pareEsContingut = pare.getContainerRoles();
         boolean senseCicles = true;
         cami.append(pare.getName() + " => "); //$NON-NLS-1$
         for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext(); ) {
             RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
-            RoleEntity parePare = relacio.getRoleContainer();
+            RoleEntity parePare = relacio.getContainer();
             if (parePare.equals(fill)) {
                 senseCicles = false;
                 cami.append(parePare.getName());
@@ -128,7 +130,7 @@ public class RoleDependencyEntityDaoImpl extends
                                                                                 // el
                                                                                 // id
         contenidorRol.setTipus(TipusContenidorRol.ROL_ROL);
-        RoleEntity rcontenidor = rolAssocRolEntity.getRoleContainer(); // rol
+        RoleEntity rcontenidor = rolAssocRolEntity.getContainer(); // rol
                                                                       // atorgat
                                                                       // (si lo
                                                                       // tienes
@@ -139,8 +141,8 @@ public class RoleDependencyEntityDaoImpl extends
         // Afegim informació del domini:
         String infoDomini = ""; //$NON-NLS-1$
         // Si es nulo o valor SENSE_DOMINI no ponemos valor de dominio
-        if (!TipusDomini.SENSE_DOMINI.equals(rolAssocRolEntity.getRoleContent().getDomainType())) {
-            String tipusDominiAsoc = rolAssocRolEntity.getRoleContent().getDomainType(); // Tipo
+        if (!TipusDomini.SENSE_DOMINI.equals(rolAssocRolEntity.getContained().getDomainType())) {
+            String tipusDominiAsoc = rolAssocRolEntity.getContained().getDomainType(); // Tipo
                                                                          // de
                                                                          // dominio
                                                                          // de
@@ -151,7 +153,7 @@ public class RoleDependencyEntityDaoImpl extends
             if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
                 InformationSystemEntity app = rolAssocRolEntity.getDomainApplication();
                 if (app != null) {
-                    infoDomini = "{" + tipusDominiAsoc + ":" + app.getCode() + "[" + app.getName() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
+                    infoDomini = "{" + tipusDominiAsoc + ":" + app.getName() + "[" + app.getDescription() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
                     infoDomini = "{" + tipusDominiAsoc + ":" //$NON-NLS-1$ //$NON-NLS-2$
                             + TipusDomini.QUALQUE_VALOR_DOMINI + "[" //$NON-NLS-1$
@@ -162,7 +164,7 @@ public class RoleDependencyEntityDaoImpl extends
                     || TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
                 GroupEntity gr = rolAssocRolEntity.getDomainGroup();
                 if (gr != null) {
-                    infoDomini = "{" + tipusDominiAsoc + ":" + gr.getCode() + "[" + gr.getDescription() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
+                    infoDomini = "{" + tipusDominiAsoc + ":" + gr.getName() + "[" + gr.getDescription() + "]}"; //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
                     infoDomini = "{" + tipusDominiAsoc + ":" //$NON-NLS-1$ //$NON-NLS-2$
                             + TipusDomini.QUALQUE_VALOR_DOMINI + "[" //$NON-NLS-1$
@@ -203,12 +205,12 @@ public class RoleDependencyEntityDaoImpl extends
     @Override
     public void toRolGrant(RoleDependencyEntity source, RolGrant target) {
     	// Translate granted domain
-        String tipus = source.getRoleContent().getDomainType();
+        String tipus = source.getContained().getDomainType();
         if (TipusDomini.APLICACIONS.equals(tipus) && source.getDomainApplication() != null) {
-            target.setDomainValue(source.getDomainApplication().getCode());
+            target.setDomainValue(source.getDomainApplication().getName());
             target.setHasDomain(true);
         } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) && source.getDomainGroup() != null) {
-            target.setDomainValue(source.getDomainGroup().getCode());
+            target.setDomainValue(source.getDomainGroup().getName());
             target.setHasDomain(true);
         } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) && source.getDomainApplicationValue() != null) {
             target.setDomainValue(source.getDomainApplicationValue().getValue());
@@ -221,14 +223,14 @@ public class RoleDependencyEntityDaoImpl extends
             target.setDomainValue(null);
         }
     	// Translate grantee domain
-        tipus = source.getRoleContainer().getDomainType();
+        tipus = source.getContainer().getDomainType();
         if (TipusDomini.APLICACIONS.equals(tipus) && 
                 source.getGranteeApplicationDomain() != null) {
-            target.setOwnerRolDomainValue(source.getGranteeApplicationDomain().getCode());
+            target.setOwnerRolDomainValue(source.getGranteeApplicationDomain().getName());
         } else if (( TipusDomini.GRUPS.equals(tipus)
                 || TipusDomini.GRUPS_USUARI.equals(tipus) ) &&
                 source.getGranteeGroupDomain() != null) {
-            target.setOwnerRolDomainValue(source.getGranteeGroupDomain().getCode());
+            target.setOwnerRolDomainValue(source.getGranteeGroupDomain().getName());
         } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) &&
                 source.getGranteeDomainValue() != null) {
             target.setOwnerRolDomainValue(source.getGranteeDomainValue().getValue());
@@ -237,15 +239,15 @@ public class RoleDependencyEntityDaoImpl extends
         } else {
             target.setOwnerRolDomainValue(null);
         }
-        target.setOwnerRol(source.getRoleContainer().getId());
-        target.setOwnerRolName(source.getRoleContainer().getName());
+        target.setOwnerRol(source.getContainer().getId());
+        target.setOwnerRolName(source.getContainer().getName());
         target.setOwnerGroup(null);
         target.setOwnerAccountName(null);
-        target.setOwnerDispatcher(source.getRoleContainer().getDatabases().getCode());
+        target.setOwnerDispatcher(source.getContainer().getSystem().getName());
         target.setId(source.getId());
-        target.setIdRol(source.getRoleContent().getId());
-        target.setRolName(source.getRoleContent().getName());
-        target.setDispatcher(source.getRoleContent().getDatabases().getCode());
+        target.setIdRol(source.getContained().getId());
+        target.setRolName(source.getContained().getName());
+        target.setDispatcher(source.getContained().getSystem().getName());
     }
 
 }

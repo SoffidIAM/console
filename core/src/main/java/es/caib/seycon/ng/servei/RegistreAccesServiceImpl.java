@@ -19,7 +19,7 @@ import es.caib.seycon.ng.comu.RegistreAcces;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownHostException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.LimitDates;
@@ -257,7 +257,7 @@ public class RegistreAccesServiceImpl extends
 		
 		if (d_dataIni!=null) {
 			
-			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserCode(DateUtils.nullDate, fechaIni, codiUsuari);
+			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserName(DateUtils.nullDate, fechaIni, codiUsuari);
 			if (registresAcces != null) { 
 				if (registresAcces.size() >= 201) {
 					throw new SeyconException(
@@ -268,7 +268,7 @@ public class RegistreAccesServiceImpl extends
 		} else if (numRegs!=-1 && numRegs < 201) {//com a molt 200 registres
 			// Los obtenemos ordenados por fecha inicio sesión descendentemente
 			// Obtenemos sólo los registros de acceso de tipo SSO
-			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserCodeAndProtocol(DateUtils.nullDate, fechaIni, codiUsuari, "sso"); //$NON-NLS-1$
+			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserNameAndProtocol(DateUtils.nullDate, fechaIni, codiUsuari, "sso"); //$NON-NLS-1$
 			Collection res = null;
 			if (numRegs>0) {
 				res = new Vector(numRegs); int pos = 0;
@@ -297,7 +297,7 @@ public class RegistreAccesServiceImpl extends
 			{
 				config.setMaximumResultSize(Integer.decode(numRegistres));
 			}
-			Collection<AccessLogEntity> registresAcces = getAccessLogEntityDao().findLastAccessLogByUserCode(config, codiUsuari, codiProtocolAcces);
+			Collection<AccessLogEntity> registresAcces = getAccessLogEntityDao().findLastAccessLogByUserName(config, codiUsuari, codiProtocolAcces);
 			if (registresAcces != null) {
 				return getAccessLogEntityDao().toRegistreAccesList(registresAcces);
 			}
@@ -409,20 +409,20 @@ public class RegistreAccesServiceImpl extends
         HostEntity maquina = maquinaDao.findByName(registre.getNomServidor());
         entity.setServer(maquina);
         
-        ServiceEntity servei = serveiDao.findByCode(registre.getProtocolAcces());
+        ServiceEntity servei = serveiDao.findByName(registre.getProtocolAcces());
         if (servei == null) {
             servei = getServiceEntityDao().newServiceEntity();
-            servei.setCode(registre.getProtocolAcces());
+            servei.setName(registre.getProtocolAcces());
             serveiDao.create(servei);
         }
-        entity.setCodeAge(registre.getCodeAge());
+        entity.setSystem(registre.getCodeAge());
         entity.setStartDate(registre.getDataInici().getTime());
         entity.setEndDate(registre.getDataFi().getTime());
         entity.setInformation(registre.getInformacio());
-        entity.setSessionID(registre.getIdSessio());
+        entity.setSessionId(registre.getIdSessio());
         entity.setProtocol(servei);
         entity.setAccessType(registre.getTipusAcces());
-        entity.setUser(getUserEntityDao().findByCode(registre.getCodiUsuari()));
+        entity.setUser(getUserEntityDao().findByUserName(registre.getCodiUsuari()));
         getAccessLogEntityDao().create(entity);
         return getAccessLogEntityDao().toRegistreAcces(entity);
     }

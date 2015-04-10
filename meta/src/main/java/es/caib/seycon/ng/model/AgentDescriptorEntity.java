@@ -59,7 +59,9 @@ public abstract class AgentDescriptorEntity {
 	 return null;
 	}
 	@Operation(translated="findAllOnlyBasicData")
-	@DaoFinder("select agentDescriptorEntity\nfrom es.caib.seycon.ng.model.AgentDescriptorEntity as agentDescriptorEntity\norder by agentDescriptorEntity.description")
+	@DaoFinder("select agentDescriptorEntity\n"
+			+ "from com.soffid.iam.model.AgentDescriptorEntity as agentDescriptorEntity\n"
+			+ "order by agentDescriptorEntity.description")
 	public java.util.List<es.caib.seycon.ng.model.AgentDescriptorEntity> findAllOnlyDadesBasiques() {
 	 return null;
 	}

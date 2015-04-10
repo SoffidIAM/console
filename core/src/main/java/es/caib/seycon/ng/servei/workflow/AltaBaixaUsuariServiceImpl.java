@@ -189,7 +189,7 @@ public class AltaBaixaUsuariServiceImpl extends es.caib.seycon.ng.servei.workflo
 	}
 
 	protected Collection<Grup> handleGetManagedGroups(String user) throws Exception {
-		UserEntity usuari = getUserEntityDao().findByCode(user);
+		UserEntity usuari = getUserEntityDao().findByUserName(user);
 		
 		String auts[] = getAutoritzacioService().getUserAuthorizationString(Security.AUTO_USER_CREATE, user);
 		LinkedList<Grup> groups = new LinkedList<Grup>();

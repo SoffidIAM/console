@@ -7,12 +7,15 @@
 package es.caib.seycon.ng.servei.workflow;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.AutoritzacioService;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="AuthorizationInformationService",
 	translatedPackage="com.soffid.iam.service.workflow")
 @Depends ({es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.servei.UsuariService.class,
+	AutoritzacioService.class,
 	es.caib.seycon.ng.servei.AplicacioService.class})
 public abstract class InformacioAutoritzacioService {
 

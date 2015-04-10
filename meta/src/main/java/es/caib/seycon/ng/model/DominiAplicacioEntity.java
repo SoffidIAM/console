@@ -5,67 +5,92 @@
 //
 
 package es.caib.seycon.ng.model;
+
 import com.soffid.mda.annotation.*;
 
-@Entity (table="SC_DOMAPP", translatedName="ApplicationDomainEntity", translatedPackage="com.soffid.iam.model" )
-@Depends ({es.caib.seycon.ng.comu.Domini.class,
-	es.caib.seycon.ng.model.GrupEntity.class,
-	es.caib.seycon.ng.model.AplicacioEntity.class,
-	es.caib.seycon.ng.model.UsuariEntity.class,
-	es.caib.seycon.ng.model.RolEntity.class,
-	es.caib.seycon.ng.model.AuditoriaEntity.class,
-	es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class})
+@Entity(table = "SC_DOMAPP", translatedName = "ApplicationDomainEntity", translatedPackage = "com.soffid.iam.model")
+@Depends({ es.caib.seycon.ng.comu.Domini.class,
+		es.caib.seycon.ng.model.GrupEntity.class,
+		es.caib.seycon.ng.model.AplicacioEntity.class,
+		es.caib.seycon.ng.model.UsuariEntity.class,
+		es.caib.seycon.ng.model.RolEntity.class,
+		es.caib.seycon.ng.model.AuditoriaEntity.class,
+		es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class })
 public abstract class DominiAplicacioEntity {
 
-	@Column (name="DOM_ID")
+	@Column(name = "DOM_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@ForeignKey (foreignColumn="VDO_DOM", translated="values")
+	@ForeignKey(foreignColumn = "VDO_DOM", translated = "values")
 	public java.util.Collection<es.caib.seycon.ng.model.ValorDominiAplicacioEntity> valors;
 
-	@ForeignKey (foreignColumn="ROL_DOMAPP", translated="roles")
+	@ForeignKey(foreignColumn = "ROL_DOMAPP", translated = "roles")
 	public java.util.Collection<es.caib.seycon.ng.model.RolEntity> rols;
 
-	@Column (name="DOM_NOM", length=30, translated="name")
+	@Column(name = "DOM_NOM", length = 30, translated = "name")
 	public java.lang.String nom;
 
-	@Column (name="DOM_APP", translated="applicationDomain")
+	@Column(name = "DOM_APP", translated = "informationSystem")
 	@Nullable
 	public es.caib.seycon.ng.model.AplicacioEntity aplicacio;
 
-	@Column (name="DOM_DESC", length=50, translated="description")
+	@Column(name = "DOM_DESC", length = 50, translated = "description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Operation(translated="findByDomainNameAndRoleName")
-	@DaoFinder("select dominiAplicacio from es.caib.seycon.ng.model.DominiAplicacioEntity as dominiAplicacio \nleft join dominiAplicacio.rols as rol \nwhere ((:nomRol is null and rol is null) or (:nomRol is not null and rol.nom = :nomRol)) and \ndominiAplicacio.nom = :nomDomini")
+	@Operation(translated = "findByDomainAndRole")
+	@DaoFinder("select dominiAplicacio from com.soffid.iam.model.ApplicationDomainEntity as dominiAplicacio \n"
+			+ "left join dominiAplicacio.roles as role "
+			+ "where ((:roleName is null and role is null) or "
+			+ "       (:roleName is not null and role.name = :roleName)) and "
+			+ "  dominiAplicacio.name = :domainName")
 	public es.caib.seycon.ng.model.DominiAplicacioEntity findByNomDominiAndNomRol(
-		java.lang.String nomDomini, 
-		java.lang.String nomRol) {
-	 return null;
+			java.lang.String domainName, java.lang.String roleName) {
+		return null;
 	}
-	@Operation(translated="findByRoleName")
-	@DaoFinder("select dominiAplicacio from es.caib.seycon.ng.model.DominiAplicacioEntity dominiAplicacio left join dominiAplicacio.rols rol where rol.nom = :nomRol")
+
+	@Operation(translated = "findByRoleName")
+	@DaoFinder("select dominiAplicacio from com.soffid.iam.model.ApplicationDomainEntity as dominiAplicacio \n"
+			+ "left join dominiAplicacio.roles as role "
+			+ "where role.name = :roleName")
 	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByNomRol(
-		java.lang.String nomRol) {
-	 return null;
+			java.lang.String roleName) {
+		return null;
 	}
-	@Operation(translated="findByApplicationCode")
-	@DaoFinder("select dominiAplicacio \nfrom es.caib.seycon.ng.model.DominiAplicacioEntity dominiAplicacio\n left join dominiAplicacio.aplicacio aplicacio \nwhere \naplicacio.codi = :codiAplicacio \norder by dominiAplicacio.nom")
+
+	@Operation(translated = "findByInformationSystem")
+	@DaoFinder("select dominiAplicacio "
+			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
+			+ "left join dominiAplicacio.informationSystem aplicacio "
+			+ "where aplicacio.name = :informationSystem "
+			+ "order by dominiAplicacio.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByCodiAplicacio(
-		java.lang.String codiAplicacio) {
-	 return null;
+			java.lang.String informationSystem) {
+		return null;
 	}
-	@Operation(translated="findByApplicationCodes")
-	@DaoFinder("select dominiAplicacio from es.caib.seycon.ng.model.DominiAplicacioEntity dominiAplicacio left join dominiAplicacio.aplicacio aplicacio where aplicacio.codi like :codisAplicacions")
+
+	@Operation(translated = "findByInformationSystemPattern")
+	@DaoFinder("select dominiAplicacio "
+			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
+			+ "left join dominiAplicacio.informationSystem aplicacio "
+			+ "where aplicacio.name like :informationSystem "
+			+ "order by dominiAplicacio.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByCodisAplicacions(
-		java.lang.String codisAplicacions) {
+			java.lang.String informationSystem) {
+		return null;
+	}
+	
+	@DaoFinder("select dominiAplicacio "
+			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
+			+ "left join dominiAplicacio.informationSystem aplicacio "
+			+ "where aplicacio.name = :informationSystem and "
+			+ "dominiAplicacio.name = :name "
+			+ "order by dominiAplicacio.name")
+	public es.caib.seycon.ng.model.DominiAplicacioEntity findByName(
+		String name,
+		String informationSystem) {
 	 return null;
 	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
-	 return null;
-	}
+
 }

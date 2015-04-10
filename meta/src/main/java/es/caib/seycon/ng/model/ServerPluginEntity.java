@@ -42,13 +42,17 @@ public abstract class ServerPluginEntity {
 	 return null;
 	}
 	@Operation(translated="findAgentsBasicDataByServerPluginID")
-	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\nagent.enableAttributeMapping\nfrom es.caib.seycon.ng.model.AgentDescriptorEntity agent \nleft join agent.plugin as p \nwhere p.id=:id")
+	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\n"
+			+ "agent.enableAttributeMapping\n"
+			+ "from com.soffid.iam.model.AgentDescriptorEntity agent \n"
+			+ "left join agent.plugin as p \n"
+			+ "where p.id=:id")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findDadesBasiquesAgentsByServerPluginId(
 		java.lang.Long id) {
 	 return null;
 	}
 	@Operation(translated="findAllBasicData")
-	@DaoFinder("select id, version, name, enabled from es.caib.seycon.ng.model.ServerPluginEntity as serverPluginEntity")
+	@DaoFinder("select id, version, name, enabled from com.soffid.iam.model.ServerPluginEntity as serverPluginEntity")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findAllOnlyDadesBasiques() {
 	 return null;
 	}

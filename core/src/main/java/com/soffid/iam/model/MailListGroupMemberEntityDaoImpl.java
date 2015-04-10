@@ -21,7 +21,7 @@ public class MailListGroupMemberEntityDaoImpl extends MailListGroupMemberEntityD
 	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
 	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
 	        tasque.setAlias(entity.getMailList().getName());
-            tasque.setMailDomain(entity.getMailList().getDomain().getCode());
+            tasque.setMailDomain(entity.getMailList().getDomain().getName());
 	        getTaskEntityDao().create(tasque);
 		}
 	}

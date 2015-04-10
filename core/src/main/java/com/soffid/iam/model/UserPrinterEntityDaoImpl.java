@@ -59,7 +59,7 @@ public class UserPrinterEntityDaoImpl extends
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-            tasque.setPrinter(old.getPrinter().getCode());
+            tasque.setPrinter(old.getPrinter().getName());
             getTaskEntityDao().create(tasque);
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -69,7 +69,7 @@ public class UserPrinterEntityDaoImpl extends
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-            tasque.setPrinter(usuariImpressora.getPrinter().getCode());
+            tasque.setPrinter(usuariImpressora.getPrinter().getName());
             getTaskEntityDao().create(tasque);
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -77,23 +77,23 @@ public class UserPrinterEntityDaoImpl extends
             tasque.setUser(usuariImpressora.getUser().getUserName());
             getTaskEntityDao().create(tasque);
             getSession(false).flush();
-            auditarUsuariImpressora("U", usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode());
+            auditarUsuariImpressora("U", usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.0"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.0"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
         }
     }
 
     public void create(com.soffid.iam.model.UserPrinterEntity usuariImpressora) throws RuntimeException {
         try {
-            UserPrinterEntity assignacioExistent = findUserPrinterByUserCodeAndPrinterCode(usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode());
+            UserPrinterEntity assignacioExistent = findUserByUserAndPrinter(usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName());
 
             if (assignacioExistent == null) {
                 super.create(usuariImpressora);
                 TaskEntity tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
                 tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-                tasque.setPrinter(usuariImpressora.getPrinter().getCode());
+                tasque.setPrinter(usuariImpressora.getPrinter().getName());
                 getTaskEntityDao().create(tasque);
                 tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -101,25 +101,25 @@ public class UserPrinterEntityDaoImpl extends
                 tasque.setUser(usuariImpressora.getUser().getUserName());
                 getTaskEntityDao().create(tasque);
                 getSession(false).flush();
-                auditarUsuariImpressora("C", usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode());
+                auditarUsuariImpressora("C", usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName());
             } else {
                 throw new SeyconException(Messages.getString("UserPrinterEntityDaoImpl.1")); //$NON-NLS-1$
             }
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.2"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.2"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
         }
     }
 
     public void remove(com.soffid.iam.model.UserPrinterEntity usuariImpressora) throws RuntimeException {
         try {
             String codiUsuari = usuariImpressora.getUser().getUserName();
-            String codiImpressora = usuariImpressora.getPrinter().getCode();
+            String codiImpressora = usuariImpressora.getPrinter().getName();
             super.remove(usuariImpressora);
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_PRINTER);
-            tasque.setPrinter(usuariImpressora.getPrinter().getCode());
+            tasque.setPrinter(usuariImpressora.getPrinter().getName());
             getTaskEntityDao().create(tasque);
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -130,7 +130,7 @@ public class UserPrinterEntityDaoImpl extends
             auditarUsuariImpressora("D", codiUsuari, codiImpressora); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.3"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getCode(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.3"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
         }
     }
 
@@ -143,8 +143,8 @@ public class UserPrinterEntityDaoImpl extends
 
     private void toUsuariImpressoraCustom(com.soffid.iam.model.UserPrinterEntity sourceEntity, es.caib.seycon.ng.comu.UsuariImpressora targetVO) {
         PrinterEntity impressoraEntity = sourceEntity.getPrinter();
-        String codiImpressora = impressoraEntity.getCode();
-        Long ordre = sourceEntity.getUserPrinterOrder();
+        String codiImpressora = impressoraEntity.getName();
+        Long ordre = sourceEntity.getOrder();
         if (ordre != null && ordre.equals(new Long(1))) {
             targetVO.setPerDefecte(new Boolean(true));
         } else {
@@ -207,7 +207,7 @@ public class UserPrinterEntityDaoImpl extends
     }
 
     private void usuariImpressoraToEntityCustom(es.caib.seycon.ng.comu.UsuariImpressora sourceVO, com.soffid.iam.model.UserPrinterEntity targetEntity) {
-        UserEntity usuari = getUserEntityDao().findByCode(sourceVO.getCodiUsuari());
+        UserEntity usuari = getUserEntityDao().findByUserName(sourceVO.getCodiUsuari());
         if (usuari != null) {
             targetEntity.setUser(usuari);
         } else {
@@ -215,7 +215,7 @@ public class UserPrinterEntityDaoImpl extends
                     sourceVO.getCodiUsuari()));
         }
 
-        PrinterEntity impressora = getPrinterEntityDao().findByCode(sourceVO.getCodiImpressora());
+        PrinterEntity impressora = getPrinterEntityDao().findByName(sourceVO.getCodiImpressora());
         if (impressora != null) {
             targetEntity.setPrinter(impressora);
         } else {
@@ -229,11 +229,11 @@ public class UserPrinterEntityDaoImpl extends
             Iterator iterator = impressores.iterator();
             while (iterator.hasNext()) {
                 UserPrinterEntity usuariImpressoraEntity = (UserPrinterEntity) iterator.next();
-                usuariImpressoraEntity.setUserPrinterOrder(new Long(2));
+                usuariImpressoraEntity.setOrder(new Long(2));
             }
-            targetEntity.setUserPrinterOrder(new Long(1));
+            targetEntity.setOrder(new Long(1));
         } else {
-            targetEntity.setUserPrinterOrder(new Long(2));
+            targetEntity.setOrder(new Long(2));
         }
 
     }

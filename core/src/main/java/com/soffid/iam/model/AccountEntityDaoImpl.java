@@ -47,14 +47,14 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
     @Override
     public void create(com.soffid.iam.model.AccountEntity entity) {
 		super.create(entity);
-		auditar("C", entity.getName(), entity.getSystem().getCode()); //$NON-NLS-1$
+		auditar("C", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
 
 
 	@Override
     public void update(com.soffid.iam.model.AccountEntity entity) {
 		super.update(entity);
-		auditar("U", entity.getName(), entity.getSystem().getCode()); //$NON-NLS-1$
+		auditar("U", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
 
 
@@ -68,12 +68,14 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 		entity.getPasswords().clear();
 		getRoleAccountEntityDao().remove(new LinkedList<RoleAccountEntity>(entity.getRoles()));
 		entity.getRoles().clear();
-		for (AuditEntity aud : getAuditEntityDao().query("select aud from es.caib.seycon.ng.model.AuditoriaEntity as aud where aud.accountAssoc.id=:id", new Parameter[]{new Parameter("id", entity.getId())})) {
+		for (AuditEntity aud : getAuditEntityDao().query(
+				"select aud from com.soffid.iam.model.AccountEntity as aud "
+				+ "where aud.accountAssoc.id=:id", new Parameter[]{new Parameter("id", entity.getId())})) {
             aud.setAccountAssoc(null);
             getAuditEntityDao().update(aud);
         }
 		super.remove(entity);
-		auditar("D", entity.getName(), entity.getSystem().getCode()); //$NON-NLS-1$
+		auditar("D", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
 
 
@@ -92,7 +94,7 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 		// Missing attribute grantedGroups on entity
 		// Missing attribute grantedUsers on entity
 		// Missing attribute grantedRoles on entity
-		target.setDispatcher(source.getSystem().getCode());
+		target.setDispatcher(source.getSystem().getName());
 		Collection<Grup> grups = new LinkedList<Grup>();
 		Collection<Rol> roles = new LinkedList<Rol>();
 		Collection<Usuari> usuaris = new LinkedList<Usuari>();
@@ -134,11 +136,11 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 		target.setOwnerRoles(ownerRoles);
 		target.setOwnerUsers(ownerUsers);
 
-		target.setPasswordPolicy(source.getPasswordPolicy().getCode());
+		target.setPasswordPolicy(source.getPasswordPolicy().getName());
 		if (source.getType() == AccountType.USER)
 		{
 			for (com.soffid.iam.model.UserAccountEntity uae : source.getUsers()) {
-                target.setPasswordPolicy(uae.getUser().getUserType().getCode());
+                target.setPasswordPolicy(uae.getUser().getUserType().getName());
             }
 		}
 	}
@@ -146,14 +148,14 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 	@Override
     public void accountToEntity(Account source, com.soffid.iam.model.AccountEntity target, boolean copyIfNull) {
 		super.accountToEntity(source, target, copyIfNull);
-		SystemEntity dispatcher = getSystemEntityDao().findByCode(source.getDispatcher());
+		SystemEntity dispatcher = getSystemEntityDao().findByName(source.getDispatcher());
 		if (dispatcher == null)
 			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongDispatcher"),  //$NON-NLS-1$
 					source.getDispatcher(),
 					source.getName(),
 					source.getDispatcher()));
 		target.setSystem(dispatcher);
-		UserTypeEntity tipus = getUserTypeEntityDao().findByCode(source.getPasswordPolicy());
+		UserTypeEntity tipus = getUserTypeEntityDao().findByName(source.getPasswordPolicy());
 		if (tipus == null)
 			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongPassword"),  //$NON-NLS-1$
 					source.getPasswordPolicy(),
@@ -168,11 +170,12 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 		try
 		{
 			StringBuffer where = new StringBuffer();
-			where.append("select ac from es.caib.seycon.nt.model.AccountEntityDaoImpl as ac where ac.type != '"+AccountType.USER+"' "); //$NON-NLS-1$ //$NON-NLS-2$
+			where.append("select ac from com.soffid.iam.model.AccountEntity as ac "
+					+ "where ac.type != '"+AccountType.USER+"' "); //$NON-NLS-1$ //$NON-NLS-2$
 			if (name != null && ! name.isEmpty())
 				where.append (" and ac.name like :name"); //$NON-NLS-1$
 			if (dispatcher != null && ! dispatcher.isEmpty())
-				where.append (" and ac.dispatcher.codi like :dispatcher"); //$NON-NLS-1$
+				where.append (" and ac.system.name like :dispatcher"); //$NON-NLS-1$
 			org.hibernate.Query queryObject = super.getSession(false).createQuery(where.toString());
 			if (name != null && ! name.isEmpty())
 				queryObject.setParameter("name", name); //$NON-NLS-1$
@@ -204,8 +207,8 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
     		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
     		tasque.setDate(new Timestamp(System.currentTimeMillis()));
 			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
-			tasque.setDb(account.getSystem().getCode());
-			tasque.setSystemCode(account.getSystem().getCode());
+			tasque.setDb(account.getSystem().getName());
+			tasque.setSystemName(account.getSystem().getName());
 			tasque.setUser(account.getName());
 			getTaskEntityDao().create(tasque);
     	}

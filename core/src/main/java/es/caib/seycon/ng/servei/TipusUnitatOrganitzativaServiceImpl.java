@@ -12,7 +12,7 @@ package es.caib.seycon.ng.servei;
 import com.soffid.iam.model.GroupTypeEntity;
 import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.Parameter;
+import com.soffid.iam.model.Parameter;
 import java.util.Collection;
 
 /**
@@ -28,7 +28,7 @@ public class TipusUnitatOrganitzativaServiceImpl extends es.caib.seycon.ng.serve
 	 */
 	protected es.caib.seycon.ng.comu.TipusUnitatOrganitzativa handleCreate(es.caib.seycon.ng.comu.TipusUnitatOrganitzativa tipus)
 			throws java.lang.Exception {
-		GroupTypeEntity tipusSameCode = getGroupTypeEntityDao().findByCode(tipus.getCodi());
+		GroupTypeEntity tipusSameCode = getGroupTypeEntityDao().findByName(tipus.getCodi());
 		if(tipusSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("TipusUnitatOrganitzativaServiceImpl.CodeTypeExists"),  //$NON-NLS-1$
 							tipus.getCodi())); 
@@ -62,7 +62,7 @@ public class TipusUnitatOrganitzativaServiceImpl extends es.caib.seycon.ng.serve
 	 * @see es.caib.seycon.ng.servei.TipusUnitatOrganitzativaService#findTipusUnitatOrganitzativaByCodi(java.lang.String)
 	 */
 	protected TipusUnitatOrganitzativa handleFindTipusUnitatOrganitzativaByCodi(String CodiTipusUnitatOrganitzativa) throws Exception {
-		GroupTypeEntity entity = getGroupTypeEntityDao().findByCode(CodiTipusUnitatOrganitzativa);
+		GroupTypeEntity entity = getGroupTypeEntityDao().findByName(CodiTipusUnitatOrganitzativa);
 		return getGroupTypeEntityDao().toTipusUnitatOrganitzativa(entity);
 	}
 

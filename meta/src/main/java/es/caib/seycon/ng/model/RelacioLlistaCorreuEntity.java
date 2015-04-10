@@ -14,42 +14,59 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.TasqueEntity.class})
 public abstract class RelacioLlistaCorreuEntity {
 
-	@Column (name="LLC_IDLCO1", translated="contain")
+	@Column (name="LLC_IDLCO1", translated="contains")
 	public es.caib.seycon.ng.model.LlistaCorreuEntity conte;
 
-	@Column (name="LLC_IDLCO2", translated="pertain")
+	@Column (name="LLC_IDLCO2", translated="pertains")
 	public es.caib.seycon.ng.model.LlistaCorreuEntity pertany;
 
 	@Column (name="LLC_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Operation(translated="findByPertainNameAndPertainDomainAndContainNameAndContainDomain")
-	@DaoFinder("select llistaCorreuR \nfrom es.caib.seycon.ng.model.RelacioLlistaCorreuEntity llistaCorreuR \nleft join llistaCorreuR.pertany.domini as correuDominiPertany \nleft join llistaCorreuR.conte.domini as correuDominiConte \nwhere \nllistaCorreuR.pertany.nom = :nomPertany and \nllistaCorreuR.conte.nom = :nomConte and \n((:dominiConte is null and correuDominiConte is null) or \n(:dominiConte is not null and correuDominiConte.codi = :dominiConte)) and \n((:dominiPertany is null and correuDominiPertany is null) or \n(:dominiPertany is not null and correuDominiPertany.codi = :dominiPertany))")
+	@Operation(translated="findByContainerAndContained")
+	@DaoFinder("select llistaCorreuR \n"
+			+ "from com.soffid.iam.model.EmailListContainerEntity llistaCorreuR \n"
+			+ "left join llistaCorreuR.pertains.domain as correuDominiPertany \n"
+			+ "left join llistaCorreuR.contains.domain as correuDominiConte \n"
+			+ "where \n"
+			+ " llistaCorreuR.pertains.name = :ownerName and \n"
+			+ "llistaCorreuR.contains.name = :ownedName and \n"
+			+ "((:ownedDomain is null and correuDominiConte is null) or \n"
+			+ " (:ownedDomain is not null and correuDominiConte.name = :ownedDomain)) and \n"
+			+ "((:ownerDomain is null and correuDominiPertany is null) or \n"
+			+ " (:ownerDomain is not null and correuDominiPertany.name = :ownerDomain))")
 	public es.caib.seycon.ng.model.RelacioLlistaCorreuEntity findByNomPertanyAndDominiPertanyAndNomConteAndDominiConte(
-		java.lang.String nomPertany, 
-		java.lang.String dominiPertany, 
-		java.lang.String nomConte, 
-		java.lang.String dominiConte) {
+		java.lang.String ownerName, 
+		java.lang.String ownerDomain, 
+		java.lang.String ownedName, 
+		java.lang.String ownedDomain) {
 	 return null;
 	}
-	@Operation(translated="findCollectionByPertainNameAndDomainCode")
-	@DaoFinder("select llistaCorreuR \nfrom es.caib.seycon.ng.model.RelacioLlistaCorreuEntity llistaCorreuR left join llistaCorreuR.pertany.domini as dominiCorreu where llistaCorreuR.pertany.nom = :nomPertany and ((:codiDomini is null and dominiCorreu is null ) or (:codiDomini is not null and dominiCorreu is not null and dominiCorreu.codi = :codiDomini))")
+	@Operation(translated="findByContainer")
+	@DaoFinder("select llistaCorreuR \n"
+			+ "from com.soffid.iam.model.EmailListContainerEntity llistaCorreuR \n"
+			+ "left join llistaCorreuR.pertains.domain as correuDominiPertany \n"
+			+ "where \n"
+			+ " llistaCorreuR.pertains.name = :ownerName and \n"
+			+ "((:ownerDomain is null and correuDominiPertany is null) or \n"
+			+ " (:ownerDomain is not null and correuDominiPertany.name = :ownerDomain))")
 	public java.util.List<es.caib.seycon.ng.model.RelacioLlistaCorreuEntity> findCollectionByNomPertanyAndCodiDomini(
-		java.lang.String nomPertany, 
-		java.lang.String codiDomini) {
+		java.lang.String ownerName, 
+		java.lang.String ownerDomain) {
 	 return null;
 	}
-	@Operation(translated="findCollectionByContainNameAndDomainCode")
-	@DaoFinder("select llistaCorreuR \nfrom es.caib.seycon.ng.model.RelacioLlistaCorreuEntity llistaCorreuR left join llistaCorreuR.conte.domini as dominiCorreu where llistaCorreuR.conte.nom = :nomConte and ((:codiDomini is null and dominiCorreu is null ) or (:codiDomini is not null and dominiCorreu is not null and dominiCorreu.codi = :codiDomini))")
+	@Operation(translated="findByContained")
+	@DaoFinder("select llistaCorreuR \n"
+			+ "from com.soffid.iam.model.EmailListContainerEntity llistaCorreuR \n"
+			+ "left join llistaCorreuR.contains.domain as mailDomain \n"
+			+ "where \n"
+			+ " llistaCorreuR.contains.name = :ownedName and \n"
+			+ "((:ownedDomain is null and mailDomain is null) or \n"
+			+ " (:ownedDomain is not null and mailDomain.name = :ownedDomain))")
 	public java.util.List<es.caib.seycon.ng.model.RelacioLlistaCorreuEntity> findCollectionByNomConteAndCodiDomini(
-		java.lang.String nomConte, 
-		java.lang.String codiDomini) {
-	 return null;
-	}
-	@DaoFinder
-	public java.util.List<es.caib.seycon.ng.model.RelacioLlistaCorreuEntity> find(
-		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+		java.lang.String ownedName, 
+		java.lang.String ownedDomain) {
 	 return null;
 	}
 }

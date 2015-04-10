@@ -1004,7 +1004,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             for (Iterator<EntryPointGroupEntity> it = _autoGrup.iterator(); it.hasNext(); ) {
                 EntryPointGroupEntity auto = (EntryPointGroupEntity) it.next();
                 EntryPointGroupEntity apu = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
-                apu.setGroupID(auto.getGroupID());
+                apu.setGroupId(auto.getGroupId());
                 apu.setAuhtorizationLevel(auto.getAuhtorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointGroupEntityDao().create(apu);
@@ -1259,7 +1259,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             // GRUP: Creamos autorización
         	EntryPointGroupEntity autoGrup = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
         	autoGrup.setAuhtorizationLevel(nivell);
-        	autoGrup.setGroupID(idEntitat);
+        	autoGrup.setGroupId(idEntitat);
         	autoGrup.setEntryPoint(puntEntradaE);
             getEntryPointGroupEntityDao().create(autoGrup);
 

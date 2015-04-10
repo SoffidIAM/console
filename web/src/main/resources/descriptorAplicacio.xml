@@ -90,8 +90,7 @@
 		</finder>
 		<finder name="responsable" type="responsable">  <!-- application:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
-				<parameter value='SC_RESPONSABLE' />
+				method="findAdministracioAplicacioByCodiAplicacio">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
@@ -99,8 +98,7 @@
 		</finder>
 		<finder name="respseg" type="respseg">  <!-- application:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
-				<parameter value='SC_RESPONSABLE_SEGURETAT' />
+				method="findAdministracioAplicacioByCodiAplicacio">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
@@ -108,8 +106,7 @@
 		</finder>
 		<finder name="admseg" type="admseg">  <!-- application:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
-				<parameter value='SC_ADMINISTRADOR_SEGURETAT' />
+				method="findAdministracioAplicacioByCodiAplicacio">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
@@ -117,8 +114,7 @@
 		</finder>
 		<finder name="consulta" type="consulta">  <!-- application:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findAdministracioAplicacioByNomRolAndCodiAplicacio">
-				<parameter value='SC_CON_APLICACIONS' />
+				method="findAdministracioAplicacioByCodiAplicacio">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.AdministracioAplicacio">
@@ -130,7 +126,7 @@
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Domini">
 			</new-instance-bean>
-		</finder>
+		</finder> 
 		<finder name="dominirols" type="domini">
 			<ejb-finder jndi="java:comp/env/ejb/DominiEJB" method="findDominisByCodiAplicacio">  <!-- application:query -->
 				<parameter value="${instance.codi}" />
@@ -138,8 +134,8 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.Domini" />
 		</finder>
 		<finder name="rolUsuari" type="rolUsuari">
-			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
-				method="findRolsUsuarisAmbRolsDAplicacioByCodiAplicacio">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findRolsUsuarisByInformationSystem">  <!-- application:query -->
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount">

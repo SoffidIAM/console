@@ -8,6 +8,8 @@ package es.caib.seycon.ng.model;
 
 import java.util.Date;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_ROLUSU", translatedName = "RoleAccountEntity", translatedPackage = "com.soffid.iam.model")
@@ -260,4 +262,21 @@ public abstract class RolAccountEntity {
 	 {
         	return null;
 	 }
+	
+	@Description("Gets all granted roles for an information system")
+	@DaoFinder(	"select rolusu " //$NON-NLS-1$
+				+ "from " //$NON-NLS-1$
+				+ "com.soffid.iam.model.RoleAccountEntity rolusu " //$NON-NLS-1$
+				+ "join rolusu.account.users as users "  //$NON-NLS-1$
+				+ "join users.user as user " //$NON-NLS-1$
+				+ "where " //$NON-NLS-1$
+				+ "rolusu.role.informationSystem.name = :informationSystem " //$NON-NLS-1$
+				+ "order by user.userName, rolusu.role.name, rolusu.role.system.name") //$NON-NLS-1$
+     public java.util.List<RolAccountEntity> findByInformationSystem (
+    		 String informationSystem
+    		 )
+	 {
+        	return null;
+	 }
+
 }

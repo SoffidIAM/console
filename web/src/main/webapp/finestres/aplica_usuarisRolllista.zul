@@ -60,7 +60,7 @@
 				
 	</zscript>
 	
- 	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('aplica_usuarisRolllista.Titol')}" visible="false" width="${amplefinestra}">
+ 	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('aplica_usuarisRolllista.Titol')}" visible="false" width="80%">
 		<attribute name="onInicia">
 			pageScope.put("contextComponent", event.data);
 

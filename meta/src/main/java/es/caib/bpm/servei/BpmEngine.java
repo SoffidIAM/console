@@ -12,7 +12,7 @@ import es.caib.seycon.ng.servei.AplicacioService;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={roles.Tothom.class})
+@Service ( grantees={roles.Tothom.class}, translatedName="BpmEngine", translatedPackage="com.soffid.iam.bpm")
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.seycon.ng.servei.UsuariService.class, AplicacioService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,

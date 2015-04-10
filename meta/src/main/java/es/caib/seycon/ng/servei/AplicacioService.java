@@ -6,9 +6,14 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
+import es.caib.seycon.ng.comu.RolAccount;
+import es.caib.seycon.ng.model.RolAccountEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -121,6 +126,8 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+
+	
 	@Operation(grantees = { roles.application_query.class }, translated = "findRolesByUserName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByCodiUsuari(
@@ -465,7 +472,7 @@ public abstract class AplicacioService {
 	}
 
 	@Operation(grantees = { roles.application_query.class,
-			roles.user_query.class }, translated = "findUsersRolesByUserName")
+			roles.user_query.class }, translated = "findUserRolesByUserName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuari(
 			java.lang.String codiUsuari)
@@ -473,8 +480,19 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class,
+			roles.user_query.class },
+			translated = "findUserRolesByInformationSystem")
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByInformationSystem(
+			java.lang.String informationSystem)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+	
+
 	@Operation
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void revokeRolesHoldedOnGroup(long userId, long groupId) {
 	}
+
 }

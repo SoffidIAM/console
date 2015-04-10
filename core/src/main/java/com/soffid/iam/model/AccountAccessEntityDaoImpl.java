@@ -8,6 +8,8 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.AuditEntity;
+import org.hibernate.Hibernate;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;

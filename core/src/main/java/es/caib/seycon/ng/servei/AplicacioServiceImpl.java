@@ -9,7 +9,6 @@
  */
 package es.caib.seycon.ng.servei;
 
-import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuthorizationEntity;
 import com.soffid.iam.model.DomainValueEntity;
@@ -27,6 +26,7 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
@@ -51,11 +51,14 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
+
 import com.soffid.iam.model.Parameter;
+
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
 import es.caib.seycon.ng.utils.Security;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -68,6 +71,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
@@ -1796,9 +1800,12 @@ public class AplicacioServiceImpl extends
 		for (RoleAccountEntity rac : rol.getAccounts()) {
             if (shouldBeEnabled(rac)) {
                 RolAccountDetail rad;
-                if (originalGrant == null) rad = new RolAccountDetail(rac, rac.getAccount()); else {
+                if (originalGrant == null) 
+                	rad = new RolAccountDetail(rac, rac.getAccount()); 
+                else {
                     RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount());
                     rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, rac.getAccount(), previousRad);
+                    rad.granteeRol = rol;
                 }
                 if (!radSet.contains(rad)) {
                     if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
@@ -1819,11 +1826,11 @@ public class AplicacioServiceImpl extends
 
 	private void populateParentGrantsForGroup(HashSet<RolAccountDetail> radSet, GroupEntity grup, Object originalGrant) {
 		for (UserEntity u : grup.getPrimaryGroupUsers()) {
-            populateParentGrantsForUser(radSet, u, originalGrant);
+            populateParentGrantsForUser(radSet, u, originalGrant, grup);
         }
 		
 		for (UserGroupEntity sg : grup.getSecondaryGroupUsers()) {
-            populateParentGrantsForUser(radSet, sg.getUser(), originalGrant);
+            populateParentGrantsForUser(radSet, sg.getUser(), originalGrant, grup);
         }
 
 		for (GroupEntity fill : grup.getChildrens()) {
@@ -1831,7 +1838,7 @@ public class AplicacioServiceImpl extends
         }
 	}
 
-	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, UserEntity u, Object originalGrant) {
+	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, UserEntity u, Object originalGrant, GroupEntity granteeGroup) {
 		SystemEntity de;
 		if (originalGrant instanceof RoleDependencyEntity)
 			de = ((RoleDependencyEntity) originalGrant).getContained().getSystem();
@@ -1841,7 +1848,15 @@ public class AplicacioServiceImpl extends
 		for (AccountEntity acc : getAccountsForDispatcher(u, null, de)) {
             if (acc != null) {
                 RolAccountDetail rad;
-                if (originalGrant instanceof RoleAccountEntity) rad = new RolAccountDetail((RoleAccountEntity) originalGrant, acc); else rad = new RolAccountDetail((RoleGroupEntity) originalGrant, acc);
+                if (originalGrant instanceof RoleAccountEntity) 
+                {
+                	rad = new RolAccountDetail((RoleAccountEntity) originalGrant, acc);
+                }
+                else
+                {
+                	rad = new RolAccountDetail((RoleGroupEntity) originalGrant, acc);
+                }
+                rad.granteeGrup = granteeGroup;
                 if (!radSet.contains(rad)) {
                     radSet.add(rad);
                 }
@@ -1952,6 +1967,13 @@ public class AplicacioServiceImpl extends
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					getPrincipal().getName(), name));
         }
+	}
+
+	@Override
+	protected Collection<RolAccount> handleFindRolsUsuarisByInformationSystem(
+			String informationSystem) throws Exception {
+		return getRoleAccountEntityDao().toRolAccountList(
+				getRoleAccountEntityDao().findByInformationSystem(informationSystem));
 	}
 
 

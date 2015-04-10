@@ -187,7 +187,7 @@ public abstract class RolEntity {
 	@DaoFinder("select rol "
 			+ "from com.soffid.iam.model.RoleEntity rol "
 			+ "left join rol.system system where \n"
-			+ "(:name is null or rol.name like :roleName) and "
+			+ "(:roleName is null or rol.name like :roleName) and "
 			+ "(:description is null or rol.description like :description) and "
 			+ "(:defaultRole is null or rol.defaultRole = :defaultRole) and "
 			+ "(:system is null or system.name like :system) and "

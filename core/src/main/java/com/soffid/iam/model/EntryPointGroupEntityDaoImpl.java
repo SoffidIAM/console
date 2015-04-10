@@ -92,9 +92,9 @@ public class EntryPointGroupEntityDaoImpl
 		target.setIdPuntEntrada(source.getEntryPoint().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.GRUP);
-		target.setIdEntitatAutoritzada(source.getGroupID());
-		GroupEntity grup = getGroupEntityDao().load(source.getGroupID());
-		target.setDescripcioEntitatAutoritzada(grup.getDescription() + " [" + grup.getName() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+		target.setIdEntitatAutoritzada(source.getGroupId());
+		GroupEntity grup = getGroupEntityDao().load(source.getGroupId());
+		target.setDescripcioEntitatAutoritzada(grup.getDescription()+" ["+grup.getName()+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 		target.setCodiEntitatAutoritzada(grup.getName());
 	}
     
@@ -109,7 +109,7 @@ public class EntryPointGroupEntityDaoImpl
 		else
 			target.setAuhtorizationLevel("C"); //$NON-NLS-1$
 		
-		target.setGroupID(source.getIdEntitatAutoritzada());
+		target.setGroupId(source.getIdEntitatAutoritzada());
 	}
 
 }

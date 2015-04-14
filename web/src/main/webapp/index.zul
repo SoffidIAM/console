@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="Soffid Identity and Access Manager" ?>
-<?meta http-equiv="X-UA-Compatible" content="IE=9" ?>
+<?meta http-equiv="X-UA-Compatible" content="IE=8" ?>
 
-<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
-	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
+      id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: visible">
     <div>
 		<zscript>
@@ -35,50 +35,49 @@
 		</zscript>
 		<div id="appletFirmaDiv"/>
 	    <zscript><![CDATA[
-			void find ( Treechildren treechildren, String target)
+		void find ( Treechildren treechildren, String target)
+		{
+			String page;
+			int i = target.indexOf('?');
+			if ( i < 0)
+				page = target;
+			else
+				page = target.substring(0, i);
+			Collection children = treechildren.getItems();
+			for (Iterator it = children.iterator(); it.hasNext();)
 			{
-				String page;
-				int i = target.indexOf('?');
-				if ( i < 0)
-					page = target;
-				else
-					page = target.substring(0, i);
-				Collection children = treechildren.getItems();
-				for (Iterator it = children.iterator(); it.hasNext();)
+				Treeitem item  = it.next();
+				Treerow row = item.getTreerow();
+				Collection grandchildren = row.getChildren();
+				for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
 				{
-					Treeitem item  = it.next();
-					Treerow row = item.getTreerow();
-					Collection grandchildren = row.getChildren();
-					for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
+					Component c = it2.next();
+					log.info ("Found treecel " +item.getId());
+					if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 					{
-						Component c = it2.next();
-						log.info ("Found treecel " +item.getId());
-						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
+						es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
+						if (page.equals(atc.getPagina()))
 						{
-							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-							if (page.equals(atc.getPagina()))
-							{
-								app.setInitialPage(target);
-							}
+							app.setInitialPage(target);
 						}
 					}
-					if (item.getTreechildren() != null)
-						find (item.getTreechildren(), target);
-						
-							
 				}
+				if (item.getTreechildren() != null)
+					find (item.getTreechildren(), target);
+					
+						
 			}
 			
-			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
-			System.out.println ("target="+target);
-			if (target != null)
-			{
-				Component menuPage = Executions.createComponents("/wf/menu.zul", self, new HashMap());                      
-				Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
-				find (children, target);
-				menuPage.setParent(null);
-			}
-	
-		]]></zscript>
-	</div>
+		}
+		
+		String target = Executions.getCurrent().getNativeRequest().getParameter("target");
+		if (target != null)
+		{
+			Component menuPage = Executions.createComponents("/wf/menu.zul", self, new HashMap());                      
+			Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
+			find (children, target);
+			menuPage.setParent(null);
+		}
+
+	]]></zscript>
 </vbox> 

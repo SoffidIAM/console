@@ -94,7 +94,19 @@ public class ErrorServlet extends HttpServlet {
 				} catch (Exception e) {
 
 				}
+			} else if (root instanceof NullPointerException && message.contains("z:redraw")) {
+				try {
+					resp.addHeader("Location", uri);
+					resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+					javax.servlet.http.HttpSession httpSession = req
+							.getSession();
+					httpSession.invalidate();
+					return;
+				} catch (Exception e) {
+
+				}
 			}
+				
 		}
 		ServletOutputStream out = resp.getOutputStream();
 		out.println("<html><link rel=\"stylesheet\" type=\"text/css\" href=\"/zkau/web/zul/css/normmoz.css.dsp\"/>"

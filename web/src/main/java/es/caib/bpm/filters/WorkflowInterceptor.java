@@ -7,7 +7,6 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -72,35 +71,12 @@ public class WorkflowInterceptor implements Filter
 					sesion.removeAttribute("principal"); //$NON-NLS-1$
 					sesion.removeAttribute("user"); //$NON-NLS-1$
 				}
-				
-				String uri = ((HttpServletRequest) request).getRequestURI();
-//				if (uri.endsWith("/js/zul/sel.js" ) || uri.endsWith("/js/zul/grid.js" ))
-//				{
-//					generateScript(request, response, uri);
-//					return;
-//				}
-				
 			} catch (Exception e) {
 				throw new ServletException (Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$
 			}
 			
 	    }
 		filter.doFilter(request, response);
-	}
-
-	private void generateScript(ServletRequest request,
-			ServletResponse response, String uri) throws ServletException,
-			IOException {
-		int i = uri.indexOf('-');
-		int j = uri.indexOf('/', i);
-		
-		response.setContentType("text/javascript");;
-		request.getRequestDispatcher(uri.substring(j)).include(request, response);
-		ServletOutputStream out = response.getOutputStream();
-		out.print("zk.ald(");
-		out.print(uri.substring(i+1, j));
-		out.println(");");
-		out.close();
 	}
 	
 	/**

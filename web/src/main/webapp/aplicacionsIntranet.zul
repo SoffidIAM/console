@@ -4,7 +4,9 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
-<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('aplicacionsIntranet.lblMenuAccesIntranet')}">
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<style src="~./styles/estil.css"/>
+	<style src="/css/localSEU.css"/>
 	<style>
 		.lruta {cursor: pointer; display: block;}
 		.lruta:hover {text-decoration:underline;}
@@ -1122,7 +1124,7 @@
 				return;
 			}*/	
 			DataTree arbre = esquema.getFellow("lista").getFellow("treebox");
-			Treerow droppedRow = (Treerow) evt.getDragged().parent.parent;
+			Treerow droppedRow = (Treerow) evt.getDragged();
 			Treerow targetRow = (Treerow) evt.getTarget();
 			
 			Treeitem droppedElem = (Treeitem) droppedRow.getTreeitem();
@@ -1609,11 +1611,8 @@
 			</toolbar>
 			<tree autocommit="false" dataPath="/model:/" fixedLayout="true" height="96%" id="treebox" onSelect="select()" pageSize="19" rows="${fileres}">
 				<treeitemfinder bind="." open="false" path="/app">
-					<treerow  droppable="true"  onDrop="onMoureTree(event)" >
-						<treecell> 
-							<label bind="@nom" />
-							<image src="/img/move_hint.png" draggable="true" style="margin-left: 8px"/>
- 						</treecell>
+					<treerow draggable="true" droppable="true" onDrop="onMoureTree(event)">
+						<treecell bind="@nom"/>
 					</treerow>
 				</treeitemfinder>
 			</tree>
@@ -1630,7 +1629,7 @@
 						<tab id="p_autoritzacions" label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
 						<tab id="p_execucions" label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
 						<tab id="p_moure" label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
-						<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/> 
+						<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/>
 					</tabs>
 					<tabpanels>
 						<tabpanel id="basica">
@@ -2033,4 +2032,4 @@
 	<include src="finestres/editorXML.zul"/>
 	<include src="finestres/editorJS.zul"/>
 	<include src="finestres/aplicaIntranet_autoritzacio.zul"/>
-</frame>
+</zk>

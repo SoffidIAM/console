@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="ui" title="${c:l('inbox.lblFiltroTareas2')}" use="es.caib.bpm.ui.inbox.RunningTasksHandler" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"> 
-	<div width="100%" sclass="frame-none">
+	<vbox width="100%">
 	<toolbar>
 			<toolbarbutton image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="ui.refresh()" sclass="reloadtasks"/>
 		</toolbar>
@@ -13,5 +13,5 @@
 					<listheader label="${c:l('inbox.lblIdentificador')}" sort="auto" width="15%"/>
 				</listhead>
 		</listbox>
-	</div>
+	</vbox>
 </frame>

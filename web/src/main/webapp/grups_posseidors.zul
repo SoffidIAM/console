@@ -220,7 +220,7 @@
 			]]>
 		</attribute>
 		
-		<criteris id="queryWindow" onOK="search(false)">
+		<criteris id="queryWindow" onOK="search(false)" width="790px">
 			<hbox>
 				<input_criteri id="queryCodi"
 					etiqueta="${c:l('grups_posseidors.zul.Codi')}"/>
@@ -249,7 +249,7 @@
 			</hbox>
 		</criteris>
 		
-		<navegador id="lista">
+		<navegador id="lista" width="790px">
 			<listbox id="listbox" autocommit="false" dataPath="/model:/grup"
 				fixedLayout="true" rows="${fileres}">
 				<attribute name="onSelect">

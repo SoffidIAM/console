@@ -9,6 +9,8 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import org.hibernate.Hibernate;
+
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
@@ -59,6 +61,11 @@ public class AccountAccessEntityDaoImpl extends AccountAccessEntityDaoBase
 	@Override
 	public void remove (AccountAccessEntity entity)
 	{
+		if (Hibernate.isInitialized(entity.getAccount()) &&
+				Hibernate.isInitialized(entity.getAccount().getAcl()))
+		{
+			entity.getAccount().getAcl().remove(entity);
+		}
 		super.remove(entity);
 		auditar("D", entity); //$NON-NLS-1$
 	}

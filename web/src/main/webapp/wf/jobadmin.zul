@@ -6,12 +6,12 @@
 	
 	<datamodel id="model" src="descriptorSchedule.xml" rootNode="root" ></datamodel>
 	
-	<div sclass="frame-none" width="100%">
-		<toolbar width="100%" height="20px">
+	<vbox width="100%">
+		<toolbar height="16px">
 			<toolbarbutton label="${c:l('job.oneTimeJob') }" />
 			<toolbarbutton style="float: right;" image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="ui.refresh()" sclass="reloadtasks"/>
 		</toolbar>
-		<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="20" width="100%">
+		<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="20">
 			<listhead>
 				<listheader label="${c:l('job.lblId')}" sort="auto"/>
 				<listheader label="${c:l('job.lbldefinicionTarea')}" sort="auto"/>
@@ -97,13 +97,13 @@ void showMessage (Image img)
 }
 		]]></zscript>
 		
-		<toolbar height="20px" width="100%">
+		<toolbar height="16px">
 			<toolbarbutton label="${c:l('job.cronJob') }" />
 			<toolbarbutton style="float: right" image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="model.refresh()" sclass="reloadtasks"/>
 			<commitbutton style="float: right" datamodel="/model" />
 			<undobutton style="float: right" datamodel="/model"/>
 		</toolbar>
-		<grid mold="paging" width="100%" pageSize="20" dataPath="/model:/task" onNewRow="onNewRow(event.data)">
+		<grid mold="paging"  pageSize="20" dataPath="/model:/task" onNewRow="onNewRow(event.data)">
 			<columns>
 				<column label="${c:l('jobadmin.enable') }" width="4em"/>
 				<column label="${c:l('jobadmin.task') }"/>
@@ -139,7 +139,7 @@ void showMessage (Image img)
 			</datarow>
 		</grid>
 		
-	</div>
+	</vbox>
 	
 	<window closable="true" width="80%" height="15em" id="logWindow"
 		title=""

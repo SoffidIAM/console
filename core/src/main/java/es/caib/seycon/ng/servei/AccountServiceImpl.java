@@ -532,10 +532,6 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
-		for (AccountAccessEntity aae: ae.getAcl())
-		{
-			getAccountAccessEntityDao().remove(aae);
-		}
 		createAccountTask(ae);
 		getAccountEntityDao().remove(ae);
 	}

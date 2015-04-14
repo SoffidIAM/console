@@ -2575,7 +2575,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add ("(usuari.primerLlinatge+' '+usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
+			clauses.add ("concat(usuari.primerLlinatge,' ',usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
 			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
 		}
 		if (group != null) {
@@ -2596,6 +2596,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 			clause.append (subClause);
 		}
 		List<UsuariEntity> result = getUsuariEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
+		if (result.isEmpty())
+		{
+			for (Parameter param: p)
+			{
+				param.setValue("%"+param.getValue()+"%");
+			}
+		}
+		result = getUsuariEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
 		return getUsuariEntityDao().toBPMUserList(result);
 	}
 

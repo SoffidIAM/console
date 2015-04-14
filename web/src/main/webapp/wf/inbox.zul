@@ -3,7 +3,7 @@
 
 
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="ui" title="${c:l('inbox.lblFiltroTareas1')}" use="es.caib.bpm.ui.inbox.InboxHandler" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-	<div width="100%" sclass="frame-none">
+	<vbox width="100%">
 		<toolbar>
 			<toolbarbutton image="~./img/reload-petit16b.png" label="${c:l('inbox.lblRecargar')}" onClick="ui.refresh()" sclass="reloadtasks"/>
 		</toolbar>
@@ -16,6 +16,6 @@
 				<listheader label="${c:l('inbox.lblIdentificador')}" sort="auto"/>
 			</listhead>
 		</listbox>
-	</div>
+	</vbox>
 </frame>
 </zk>

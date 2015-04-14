@@ -228,10 +228,11 @@
 		]]>
 	</zscript>
 	
-	<esquema id="esquema" datamodel="/model"
+	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
 		focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()">
+		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
+			width="${amplaria}">
 
 			<hbox>
 				<input_criteri etiqueta="${c:l('xarxes.zul.Codi')}" id="queryCodi"/>
@@ -242,10 +243,10 @@
 			<hbox>
 				<input_criteri etiqueta="${c:l('xarxes.zul.Descripcia')}" id="queryDescripcio"/>	
 				<input_criteri etiqueta="${c:l('xarxes.zul.Maquina')}" id="queryMaquina"/>
-			</hbox> 
+			</hbox>
 		</criteris>
 		
-		<navegador id="lista" >
+		<navegador id="lista" width="${amplaria}">
 			<toolbar>
 				<insertbutton acces="${canCreateNetwork}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
 				<deletebutton acces="${canDeleteNetwork}" listbox="/esquema/lista/listbox"/>
@@ -255,7 +256,7 @@
 			</toolbar>
 			
 			<listbox id="listbox" autocommit="false" dataPath="/model:/xarxa"
-				fixedLayout="true" height="96%" onClick="showDetall()" width="100%"
+				fixedLayout="true" height="96%" onClick="showDetall()"
 				onSelect="select()" rows="${fileres}">
 				<listhead>
 					<listheader label="${c:l('xarxes.zul.Codi-2')}" sort="auto"
@@ -318,11 +319,7 @@
 					} catch (Throwable th) {}
 				</attribute>
 				
-				<grid width="99%" fixedLayout="true">
-					<columns>
-						<column width="10em"></column>
-						<column width="*"></column>
-					</columns>
+				<grid>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('xarxes.zul.Codi-2')}"/>
@@ -384,7 +381,7 @@
 						<row>
 							<input_etiqueta value="${c:l('xarxes.zul.Controldaccas')}"/>
 							<vbox width="100%">
-								<grid dataPath="/xarxaACL" fixedLayout="true" id="listboxACL" width="95%">
+								<grid dataPath="/xarxaACL" fixedLayout="true" id="listboxACL" width="99%">
 									<attribute name="onActualitza">
 										dada = (Object[])event.getData();
 										nivell = dada[0];

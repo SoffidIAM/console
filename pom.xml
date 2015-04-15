@@ -429,8 +429,8 @@
     <document.manager.version>${pom.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.13</zkiblaf.version>
-    <zkdb.version>1.13</zkdb.version>
+    <zkiblaf.version>1.14-SNAPSHOT</zkiblaf.version>
+    <zkdb.version>1.14-SNAPSHOT</zkdb.version>
     <mda.reconcile.version>82</mda.reconcile.version>
   </properties>
   <pluginRepositories>

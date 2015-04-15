@@ -9,16 +9,37 @@
 <?component name="account_acl" macro-uri="/accounts/accountAcl.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<style dynamic="true">
-
 		<!-- Make Plain Grid -->
 		.GridLayoutNoBorder tr.z-row td.z-row-inner, tr.z-row
 		.z-cell,div.z-grid { border: none; overflow: hidden; zoom: 1;
 		background: white; border-top: none; border-left: none;
 		border-right: none; border-bottom: none; }
-
 	</style>
 	<frame id="p_accounts" saveContent="true"
 		title="${c:l('accounts.lblTitle')}" width="99%">
+		<attribute name="onCreate"><![CDATA[
+			if (pageScope{"requestedAccount"} != null)
+			{
+				esquema.getFellow("queryWindow").getFellow("queryName")
+						.getFellow("textbox").setValue(pageScope{"requestedAccount"});
+				Listbox dispatcher = esquema.getFellow("queryWindow")
+						.getFellow("queryDispatcher");
+				for (Listitem li: dispatcher.getItems())
+				{
+					if (li.getValue() != null && li.getValue().equals(pageScope{"requestedSystem"}))
+					{
+						dispatcher.setSelectedItem(li);
+					}
+				}
+				esquema.getFellow("queryWindow")
+						.getFellow("queryIgnore").setSelectedIndex(0);
+				search();
+				esquema.removeCriteria();
+				esquema.removeList();
+
+			}
+		]]>
+		</attribute>
 		<style src="~./styles/estil.css" />
 		<style src="/css/localSEU.css" />
 		<style>
@@ -39,6 +60,14 @@
 			<![CDATA[
 				import es.caib.zkib.datasource.XPathUtils;
 				import es.caib.seycon.ng.comu.*;
+				
+				model.getJXPathContext().getVariables().declareVariable("queryEnabled", false);
+
+				String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
+				pageScope{"requestedAccount"} = requestedAccount;
+			    String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
+				pageScope{"requestedSystem"} = requestedSystem;
+
 				boolean queryEnabled = true;
 				fileres = es.caib.seycon.ng.web.Custom.FILERES;
 				fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
@@ -111,6 +140,7 @@
 				
 				void search()
 				{
+					model.getJXPathContext().getVariables().declareVariable("queryEnabled", true);
 					java.util.Map lista = new java.util.HashMap();
 					AccountCriteria criteria = model.getJXPathContext().getValue("/query[1]").instance;
 					
@@ -385,10 +415,10 @@
 
 		<esquemavertical datamodel="/model" focusCriteri="queryName"
 			id="esquema" onHideFormulari="showLista()">
-			<form dataPath="/model:/query">
+			<form dataPath="/model:/query" width="100%">
 				<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()"
 					width="${amplaria}">
-					<vbox width="60%">
+					<vbox>
 						<hbox>
 							<input_criteri id="queryName" etiqueta="${c:l('accounts.name')}"
 								bind="name" />
@@ -441,6 +471,7 @@
 
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
+					<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="acc"/>
 					<insertbutton acces="${canCreateAccounts}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
 					<deletebutton acces="${canDeleteAccounts}"
@@ -459,6 +490,12 @@
 						<listheader label="${c:l('accounts.name')}" sort="auto" />
 						<listheader label="${c:l('accounts.dispatcher')}" sort="auto" />
 						<listheader label="${c:l('accounts.description')}" sort="auto" />
+						<listheader label="${c:l('accounts.type')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.policy')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.lastUpdated')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.lastPasswordSet')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.passwordExpiration')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.status')}" sort="auto" visible="false"/>
 					</listhead>
 					<listfoot>
 						<listfooter span="3">
@@ -469,11 +506,45 @@
 						<listcell bind="@name" />
 						<listcell bind="@dispatcher" />
 						<listcell bind="@description" />
+						<listcell >
+												<listbox bind="@type" mold="label"
+													dataPath="/model:/type" onSelect="alert('A');invalidate();">
+													<dataitem bind="@value">
+														<listcell bind="@literal" />
+													</dataitem>
+												</listbox>
+						</listcell>
+						<listcell>
+													<listbox bind="@passwordPolicy" mold="label"
+														dataPath="/model:/tipusUsuari">
+														<dataitem bind="@codi">
+															<listcell bind="@descripcio" />
+														</dataitem>
+													</listbox>
+													
+						</listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastUpdated" format="${c:l('usuaris.zul.dateFormat')}" /></listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastPasswordSet"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@passwordExpiration"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
+						<listcell>
+												<listbox bind="@disabled" disabled="true"
+													mold="label">
+													<listitem value="${false}">
+														<listcell label="${c:l('accounts.Enabled')}" />
+													</listitem>
+													<listitem value="${true}">
+														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+												</listbox>
+						</listcell>
 					</dataitem>
 				</listbox>
 			</navegador>
 
 			<detalls id="dades" width="${amplaria}">
+				<toolbar height="22px" if="${requestedAccount != null}">
+					<commitbutton datamodel="/model" />
+				</toolbar>
 				<form dataPath="/esquema/lista/listbox:/" id="form"
 					onChangeXPath="updateFormFields()">
 					<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();"/>

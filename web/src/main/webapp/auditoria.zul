@@ -356,53 +356,10 @@
 			</criteris>
 			
 			<navegador id="lista" width="${amplaria}">
-				<toolbar visible="false">
+				<toolbar>
+					<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="audit"/>
 					<listexporttoolbarbutton acces="true" id="exportbutton" listbox="/esquema/lista/listbox"/>
 				</toolbar>
-				<menubar id="menubar">
-					<zscript>
-						void mostra(Menuitem menu, Component c)
-						{
-							menu.setChecked(!menu.isChecked());
-							c.setVisible(menu.isChecked());
-						}
-					</zscript>
-					
-					<menu image="~./img/checked.gif" label="${c:l('auditoria.zul.Columnesvisibles')}">
-						<menupopup>
-							<menuitem checked="true" label="${c:l('auditoria.zul.Data/Hora')}" onClick="mostra(self, ldata)"/>
-							<menuitem checked="true" label="${c:l('auditoria.zul.Autor-2')}" onClick="mostra(self, lautor)"/>
-							<menuitem checked="true" label="${c:l('auditoria.zul.Accia-2')}" onClick="mostra(self, laccio)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Objecte-2')}" onClick="mostra(self, lobjecte)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Usuari')}" onClick="mostra(self, lusuari)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Aplicacia')}" onClick="mostra(self, laplicacio)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Rol')}" onClick="mostra(self, lrol)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Bbdd')}" onClick="mostra(self, lbbdd)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Grup')}" onClick="mostra(self, lgroup)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Xarxa')}" onClick="mostra(self, lxarxa)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Maquina')}" onClick="mostra(self, lmaquina)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Impressora')}" onClick="mostra(self, limpressora)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Domini')}" onClick="mostra(self, ldomini)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Valordomini')}" onClick="mostra(self, lvalordomini)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Dominicorreu')}" onClick="mostra(self, ldominicorreu)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Llistacorreu')}" onClick="mostra(self, lllistacorreu)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Dominicorreupertany')}" onClick="mostra(self, ldominicorreupertany)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Llistacorreupertany')}" onClick="mostra(self, lllistacorreupertany)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Parametre')}" onClick="mostra(self, lparametre)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Fitxer')}" onClick="mostra(self, lfitxer)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Autoritzacia')}" onClick="mostra(self, lautoritzacio)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Federacia')}" onClick="mostra(self, lfederacio)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Dominidusuaris')}" onClick="mostra(self, ldominiUsuaris)"/>
-							<menuitem checked="false" label="${c:l('auditoria.zul.Dominidecontrasenyes')}" onClick="mostra(self, ldominiContrasenyes)"/>
-						</menupopup>
-					</menu>
-					
-					<menuitem image="~./img/exporta.gif" label="${c:l('auditoria.zul.Exportaresultats')}">
-						<attribute name="onClick">
-							org.zkoss.zk.ui.event.Events.postEvent(event.name, exportbutton, event.data);
-						</attribute>
-					</menuitem>
-				</menubar>
 				
 				<listbox id="listbox" autocommit="false" dataPath="/model:/auditoria"
 					mold="paging" pageSize="${fileres}" rows="${fileres}">
@@ -411,11 +368,11 @@
 							sort="auto" width="12em"/>
 						<listheader id="lautor" label="${c:l('auditoria.zul.Autor-2')}"
 							sort="auto" width="10em"/>
-						<listheader id="laccio" label="${c:l('auditoria.zul.Accia-2')}" />
 						<listheader visible="false" id="lobjecte" label="${c:l('auditoria.zul.Objecte-2')}" width="50px"/>
 						<listheader visible="false" id="lusuari" label="${c:l('auditoria.zul.Usuari')}" width="80px"/>
 						<listheader visible="false" id="laplicacio" label="${c:l('auditoria.zul.Aplicacia')}" width="80px"/>
 						<listheader visible="false" id="lrol" label="${c:l('auditoria.zul.Rol')}" width="100px"/>
+						<listheader visible="false" label="${c:l('auditoria.zul.account')}" width="80px"/>
 						<listheader visible="false" id="lbbdd" label="${c:l('auditoria.zul.Bbdd')}" width="80px"/>
 						<listheader visible="false" id="lgroup" label="${c:l('auditoria.zul.Grup')}" width="80px"/>
 						<listheader visible="false" id="lxarxa" label="${c:l('auditoria.zul.Xarxa')}" width="80px"/>
@@ -433,6 +390,7 @@
 						<listheader visible="false" id="lfederacio" label="${c:l('auditoria.zul.Federacia')}" width="80px"/>
 						<listheader visible="false" id="ldominiUsuaris" label="${c:l('auditoria.zul.Dominiusuaris')}" tooltiptext="Domini d'usuaris" width="80px"/>
 						<listheader visible="false" id="ldominiContrasenyes" label="${c:l('auditoria.zul.Dominicontrasenyes')}" tooltiptext="Domini de contrasenyes" width="80px"/>
+						<listheader id="laccio" label="${c:l('auditoria.zul.Accia-2')}" />
 					</listhead>
 					
 					<listfoot>
@@ -443,14 +401,94 @@
 					
 					<dataitem bind=".">
 						<listcell bind="@data"/>
-						<listcell bind="@autor" tooltip="tooltipInfoAutor"/>
-						<listcell bind="@message"/>
+						<listcell>
+							<label bind="@autor" tooltip="tooltipInfoAutor" style="margin-right: 1em">
+							</label>
+							<listener bind="@autor">
+								<attribute name="onUpdate"><![CDATA[
+									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
+								]]>
+								</attribute>
+							</listener>
+							<imageclic src="/img/link.png">
+								<attribute name="onClick"><![CDATA[
+									String autor = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self,
+		                          						"@autor");
+	                           		Executions.getCurrent().sendRedirect(
+		                           			"index.zul?embed&target=/usuaris.zul?user="+autor,
+		                          				"soffid_popup");
+								]]>
+								</attribute>
+							</imageclic>
+						</listcell>
 						<listcell bind="@objecte"/>
-						<listcell bind="@usuari" tooltip="tooltipInfoUsuari"/>
+						<listcell>
+							<label bind="@usuari" tooltip="tooltipInfoUsuari" style="margin-right: 1em"/>
+							<listener bind="@usuari">
+								<attribute name="onUpdate"><![CDATA[
+									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
+								]]>
+								</attribute>
+							</listener>
+							<imageclic src="/img/link.png">
+								<attribute name="onClick"><![CDATA[
+									String usuari = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self,
+		                          						"@usuari");
+	                           		Executions.getCurrent().sendRedirect(
+		                           			"index.zul?embed&target=/usuaris.zul?user="+usuari,
+		                          				"soffid_popup");
+								]]>
+								</attribute>
+							</imageclic>
+						</listcell>
+							
 						<listcell bind="@aplicacio"/>
 						<listcell bind="@rol"/>
+						<listcell>
+							<label bind="@account" style="margin-right:1em"/>
+							<listener bind="@account">
+								<attribute name="onUpdate"><![CDATA[
+									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
+								]]>
+								</attribute>
+							</listener>
+							<imageclic src="/img/link.png">
+								<attribute name="onClick"><![CDATA[
+									String account = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self,
+		                          						"@account");
+									String system = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self,
+		                          						"@bbdd");
+	                           		Executions.getCurrent().sendRedirect(
+		                           			"index.zul?embed&target=/accounts/accounts.zul?account="+account+"&system="+system,
+		                          				"soffid_popup");
+								]]>
+								</attribute>
+							</imageclic>
+						</listcell>
 						<listcell bind="@bbdd"/>
-						<listcell bind="@grup"/>
+						<listcell>
+							<label bind="@grup" style="margin-right: 1em"/>
+							<listener bind="@grup">
+								<attribute name="onUpdate"><![CDATA[
+									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
+								]]>
+								</attribute>
+							</listener>
+							<imageclic src="/img/link.png">
+								<attribute name="onClick"><![CDATA[
+									String group = es.caib.zkib.datasource.XPathUtils.getValue(
+		                          						self, "@grup");
+	                           		Executions.getCurrent().sendRedirect(
+		                           			"index.zul?embed&target=/grups.zul?group="+group,
+		                          				"soffid_popup");
+								]]>
+								</attribute>
+							</imageclic>
+						</listcell>
 						<listcell bind="@xarxa"/>
 						<listcell bind="@maquina"/>
 						<listcell bind="@impressora"/>
@@ -466,6 +504,7 @@
 						<listcell bind="@federacioIdentitats"/>
 						<listcell bind="@dominiUsuaris"/>
 						<listcell bind="@dominiContrasenyes"/>
+						<listcell bind="@message"/>
 					</dataitem>
 				</listbox>
 				

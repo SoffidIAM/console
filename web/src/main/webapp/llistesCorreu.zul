@@ -6,7 +6,7 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?component name="input_finestra" macro-uri="comu/input_finestra.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+<frame xmlns:h="http://www.w3.org/1999/xhtml"> 
 	<style src="~./styles/estil.css"/>
 
 	<datamodel id="model" rootNode="llistesCorreu" src="descriptorLlistaCorreu.xml"/>
@@ -922,7 +922,21 @@
 													</columns>
 													<datarow>
 														<label bind="@codiUsuari"/>
-														<label bind="@nomComplert"/>
+														<div>
+															<label bind="@nomComplert" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String user = es.caib.zkib.datasource.XPathUtils.getValue(
+										                          						self,
+										                          						"@codiUsuari");
+										                            if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+										                          				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+														</div>
 														<imageclic align="center" src="~./img/list-remove.gif">
 															<attribute name="onClick">
 																if (canUpdateCorreu || canDeleteCorreu) {
@@ -1068,7 +1082,21 @@
 													</columns>
 													<datarow>
 														<label bind="@codi"/>
-														<label bind="@descripcio"/>
+														<div>
+															<label bind="@descripcio" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String group = es.caib.zkib.datasource.XPathUtils.getValue(
+										                          						self,
+										                          						"@codi");
+										                            if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/grups.zul?group="+group,
+										                          				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+														</div>
 														<imageclic align="center" src="~./img/list-remove.gif">
 															<attribute name="onClick">
 																if (canUpdateCorreu || canDeleteCorreu) {
@@ -1340,4 +1368,4 @@
 	<include src="finestres/finestra_valorGeneric.zul"/>	
 	<include src="rolsllista.zul" />
 	<include src="grupsllista.zul" />
-</zk>
+</frame>

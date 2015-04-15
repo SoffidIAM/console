@@ -98,13 +98,41 @@
 		<treeitemfinder bind="." open="true" path="/${arg.userList}">
 			<treerow>
 				<treecellimage bind="@codi" image="/img/user.png" />
-				<treecell bind="@fullName" />
+				<treecell>
+					<label bind="@fullName"  style="margin-right: 1em"/>
+					<imageclic src="/img/link.png">
+						<attribute name="onClick"><![CDATA[
+							String user = es.caib.zkib.datasource.XPathUtils.getValue(
+                          						self,
+                          						"@codi");
+                            if (esquema.canClose())
+                           		Executions.getCurrent().sendRedirect(
+                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+                          				"soffid_popup");
+						]]>
+						</attribute>
+					</imageclic>
+				</treecell>
 			</treerow>
 		</treeitemfinder>
 		<treeitemfinder bind="." open="true" path="/${arg.groupList}">
 			<treerow>
 				<treecellimage bind="@codi" image="/img/group.png" />
-				<treecell bind="@descripcio" />
+				<treecell >
+					<label bind="@descripcio" style="margin-right: 1em"/>
+					<imageclic src="/img/link.png">
+						<attribute name="onClick"><![CDATA[
+							String group = es.caib.zkib.datasource.XPathUtils.getValue(
+                          						self,
+                          						"@codi");
+                            if (esquema.canClose())
+                           		Executions.getCurrent().sendRedirect(
+                           			"index.zul?embed&target=/grups.zul?group="+group,
+                          				"soffid_popup");
+						]]>
+						</attribute>
+					</imageclic>
+				</treecell>
 			</treerow>
 		</treeitemfinder>
 		<treeitemfinder bind="." open="true" path="/${arg.roleList}">

@@ -88,9 +88,14 @@ zk.error = function (msg) {
 		new Draggable(box, {
 			handle: box, zindex: box.style.zIndex,
 			starteffect: zk.voidf, starteffect: zk.voidf, endeffect: zk.voidf, revert: true});
-	} catch (e) {}
-};
-amaga=function(){try {document.getElementById("timeout.mask"+ zk._errcnt).style.display = 'none';} catch (ee) {}}     
+		} catch (e) {}
+	};
+	amaga=function(){try {document.getElementById("timeout.mask"+ zk._errcnt).style.display = 'none';} catch (ee) {}}     
+	// Fix for new HTML5 pages, size can be a float number
+	function $int(v, b) {
+		v = v ? parseFloat(v, b || 10): 0;
+		return isNaN(v) ? 0: v;
+	};
  </script>
      ]]></embed>
 	</device-config>

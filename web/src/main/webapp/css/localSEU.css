@@ -11,7 +11,7 @@ button.vbuton {text-align:left;width:130px;margin:0 0 5px 0;padding:1px;}
 .noclick {}
 button.pue {padding: 1px !important;}
 div.modal_mask {background-color: white;}
-div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #0e5462; background: #FFF;}
+div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #22B9D8; background: #FFF;}
 .text-disd {color:#000 !important;}
 .titol_tancar_back {padding: 4px; float:right; border: 1px solid #BE6200; background-color:#EEEEEE;}
 .titol_tancar, .titol_tancar_fletxa {
@@ -24,6 +24,7 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #0e5462; backgrou
 div.head-cell-inner {text-align:left;}
 .dateboxinp  {font-size:11px;}
 .dateboxread input {border: 0px !important; font-size:11px; width: 14em !important;}
+.dateboxreadnoborder input {border: 0px !important; font-size:11px; width: 12em !important;}
 span.nomesdata input.nomesdatainp {color:black !important; font-size:11px;border:none;background:transparent;}
 
 .titolperfil {font-size:18px !important;color:#8A4700;}
@@ -282,6 +283,7 @@ tr.seld td.UNKNOWN {
 	font-size: 18px; 
 	font-weight: bold; 
 	color: #FFF;
+	
 }
 
 body
@@ -440,3 +442,5 @@ body
     color: black;
     text-indent: 20px;
 }
+
+.text, .textbox { box-sizing: content-box; padding: 2px;}

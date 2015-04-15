@@ -196,10 +196,10 @@
 		]]>
 	</zscript>
 
-	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
+	<esquema id="esquema" datamodel="/model"
 		 focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}" width="${amplaria}"
+		<criteris id="queryWindow" height="${queryWindowMin}" 
 			onOK="search()">
 			<hbox>
 				<input_criteri  id="queryCodi"
@@ -216,7 +216,7 @@
 			</hbox>
 		</criteris>
 		
-		<navegador id="lista" width="${amplaria}">
+		<navegador id="lista" >
 			<toolbar>
 				<insertbutton acces="${canCreateParameter}"
 					listbox="/esquema/lista/listbox" onClick="showDetall()"/>

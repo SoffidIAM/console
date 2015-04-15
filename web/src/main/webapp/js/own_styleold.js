@@ -17,9 +17,6 @@ bj(document).ready(function() {
 		}
 				
 	} else {
-		if(!(bj('#logo').length > 0)){
-			bj('.startmenu').before('<img alt="Logo" id="logo" src="/icons/logo-letras.png" />');
-		}
 		//Muestra menu pricipal
 		bj('.startmenu').mouseover(function () {
 			if(bj('.menuprincipal [style*="display:none"]')){

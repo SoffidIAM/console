@@ -166,6 +166,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
 	    		acc.setPasswordPolicy( ue.getTipusUsuari() );
+
+	    		Dispatcher dispatcher = getDispatcherService().findDispatcherByCodi(de.getCodi());
+	    		acc.setDisabled( ! getDispatcherService().isUserAllowed(dispatcher, ue.getCodi()));
+	    		
 	    		getAccountEntityDao().update(acc);
 			}
 			else
@@ -478,8 +482,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				uae.setAccount(ae);
 				uae.setUser(ue);
 				getUserAccountEntityDao().create(uae);
+				
 				account.setDescription(owner.getFullName());
-
+				
+				Dispatcher dispatcher = getDispatcherService().findDispatcherByCodi(account.getDispatcher());
+				account.setDisabled( !  getDispatcherService().isUserAllowed(dispatcher, owner.getCodi()) );
+				
 				createUserTask(ue);
 
 			} else {

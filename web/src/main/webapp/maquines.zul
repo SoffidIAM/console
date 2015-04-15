@@ -963,8 +963,23 @@
 													</listhead>
 													
 													<dataitem bind=".">
-														<listcell bind="@codiUsuari"
-															tooltip="p_nomComplertUsuari"/>
+														<listcell>
+															<label bind="@codiUsuari"
+																tooltip="p_nomComplertUsuari" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String user = es.caib.zkib.datasource.XPathUtils.getValue(
+									                           						self,
+									                           						"@codiUsuari");
+					                                                if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+									                           				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+																					
+														</listcell>
 														<listcell bind="@nomMaquinaServidora"/>
 														<listcell bind="@nomMaquinaClient"/>
 														<listcell bind="@port"/>
@@ -1080,7 +1095,7 @@
 																	<listheader label="${c:l('maquines.zul.Nom-2')}" sort="auto"/>
 																	<listheader label="${c:l('maquines.zul.DataPeticia')}" sort="auto" width="110px"/>
 																	<listheader label="${c:l('maquines.zul.DataCaducitat')}" sort="auto" width="110px"/>
-																	<listheader width="30px">
+																	<listheader width="30px" height="30px">
 																		<imageclic align="center" src="~./img/list-add.gif">
 																			<attribute name="onClick"><![CDATA[
 	if (canQueryHostsAdminAccess) {

@@ -718,6 +718,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		if (de == null)
 			return false;
 		UsuariEntity ue = getUsuariEntityDao().findByCodi(user);
+		if (ue.getActiu().equals("N"))
+			return false;
+		
         // Test user types
         boolean found = false;
         for (Iterator<TipusUsuariDispatcherEntity> it = de.getTipusUsuari()

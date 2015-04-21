@@ -61,7 +61,9 @@
 				import es.caib.zkib.datasource.XPathUtils;
 				import es.caib.seycon.ng.comu.*;
 				
-			    String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
+				model.getJXPathContext().getVariables().declareVariable("queryEnabled", false);
+
+				String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
 				pageScope{"requestedAccount"} = requestedAccount;
 			    String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
 				pageScope{"requestedSystem"} = requestedSystem;
@@ -138,6 +140,7 @@
 				
 				void search()
 				{
+					model.getJXPathContext().getVariables().declareVariable("queryEnabled", true);
 					java.util.Map lista = new java.util.HashMap();
 					AccountCriteria criteria = model.getJXPathContext().getValue("/query[1]").instance;
 					

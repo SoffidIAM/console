@@ -1536,7 +1536,34 @@ void removeSodRule (Component button)
 												</listhead>
 												<dataitem bind=".">
 													<listcell bind="@accountName"/>
-													<listcell bind="@nomComplertUsuari"/>
+													<listcell >
+														<label bind="@nomComplertUsuari"/>
+														<imageclic src="/img/link.png">
+															<attribute name="onClick"><![CDATA[
+																String user = es.caib.zkib.datasource.XPathUtils.getValue(
+									                          						self,
+									                          						"@codiUsuari");
+																String account = es.caib.zkib.datasource.XPathUtils.getValue(
+									                          						self,
+									                          						"@accountName");
+																String system = es.caib.zkib.datasource.XPathUtils.getValue(
+									                          						self,
+									                          						"@baseDeDades");
+									                          	
+								                            	if (user != null)
+									                           		Executions.getCurrent().sendRedirect(
+									                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+									                          				"soffid_popup");
+									                          	else
+									                           		Executions.getCurrent().sendRedirect(
+									                           			"index.zul?embed&target=/accounts/accounts.zul?account="+
+									                           				java.net.URLEncoder.encode(account)+"&system="+
+									                           				java.net.URLEncoder.encode(system),
+									                          				"soffid_popup");
+															]]>
+															</attribute>
+														</imageclic>
+													</listcell>
 													<listcell bind="@codiGrupUsuari"/>
 													<listcell bind="@nomRol"/>
 													<listcell bind="@baseDeDades"/>

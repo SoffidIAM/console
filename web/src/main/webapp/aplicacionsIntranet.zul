@@ -1742,8 +1742,6 @@
 									<columns>
 										<column label="${c:l('aplicacionsIntranet.zul.Nivell')}"
 											width="100px"/>
-										<column label="${c:l('aplicacionsIntranet.zul.Tipusdautoritzacia')}"
-											width="120px"/>
 										<column label="${c:l('aplicacionsIntranet.zul.Propietari')}"/>
 										<column id="oremoveautoritzacio"
 											label="${c:l('aplicacionsIntranet.zul.')}" visible="${true}"
@@ -1751,8 +1749,38 @@
 									</columns>
 									<datarow>
 										<label bind="@descripcioNivellAutoritzacio"/>
-										<label bind="@tipusEntitatAutoritzada"/>
-										<label bind="@descripcioEntitatAutoritzada"/>
+										<div>
+											<label bind="@descripcioEntitatAutoritzada" style="margin-right: 1em"/>
+											<imageclic src="/img/link.png">
+												<attribute name="onClick"><![CDATA[
+													String tipus = es.caib.zkib.datasource.XPathUtils.getValue(
+						                          						self,
+						                          						"@tipusEntitatAutoritzada");
+													String code = es.caib.zkib.datasource.XPathUtils.getValue(
+						                          						self,
+						                          						"@codiEntitatAutoritzada");
+						                          	if (tipus.equals("Grup"))
+						                          	{
+							                            if (esquema.canClose())
+							                           		Executions.getCurrent().sendRedirect(
+							                           			"index.zul?embed&target=/grups.zul?group="+code,
+							                          				"soffid_popup");
+						                          	}						
+						                          	else if (tipus.equals("Usuari"))
+						                          	{
+							                            if (esquema.canClose())
+							                           		Executions.getCurrent().sendRedirect(
+							                           			"index.zul?embed&target=/usuaris.zul?user="+code,
+							                          				"soffid_popup");
+						                          	}						
+						                          	else
+						                          	{
+						                          		self.setVisible ( false );
+						                          	}
+												]]>
+												</attribute>
+											</imageclic>
+										</div>
 										<imageclic align="center" src="~./img/list-remove.gif">
 											<attribute name="onClick">	
 												arbre = esquema.getFellow("lista").getFellow("treebox"); 

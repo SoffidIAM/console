@@ -1,11 +1,7 @@
 package es.caib.seycon.ng.upload;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,29 +10,17 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
-import org.hibernate.dialect.Oracle10gDialect;
-import org.hibernate.dialect.SQLServerDialect;
 import org.jboss.mx.util.MBeanProxyExt;
 import org.jboss.system.ServiceMBeanSupport;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.jmx.support.JmxUtils;
 
-import com.soffid.iam.deployer.DeployerService;
 import com.soffid.iam.deployer.DeployerServiceMBean;
 import com.soffid.tools.db.persistence.XmlReader;
 import com.soffid.tools.db.schema.Column;
@@ -49,7 +33,6 @@ import com.soffid.tools.db.updater.OracleUpdater;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.identity.IdentityGeneratorBean;
 import es.caib.seycon.ng.servei.ApplicationBootService;

@@ -66,8 +66,8 @@
 							parent.getFellow("rowServer").setVisible(true);
 							parent.getFellow("rowPath").setVisible(false);
 							parent.getFellow("rowtempPath").setVisible(true);
-							parent.getFellow("rowUsername").setVisible(false);
-							parent.getFellow("rowUserPassword").setVisible(false);
+							parent.getFellow("rowUsername").setVisible(true);
+							parent.getFellow("rowUserPassword").setVisible(true);
 							
 							parent.getFellow("rowServer").getChildren()
 								.get(0).setValue(org.zkoss.util.resource.Labels

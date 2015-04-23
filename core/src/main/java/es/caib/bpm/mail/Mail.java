@@ -8,11 +8,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -186,8 +188,8 @@ public class Mail implements ActionHandler {
 	}
 
 	public void send(String fromAddress,
-			String recipients, String subject, String text) {
-		if ((recipients == null) || (recipients.isEmpty())) {
+			Set<InternetAddress> targetAddresses, String subject, String text) {
+		if ((targetAddresses == null) || (targetAddresses.isEmpty())) {
 			debug(Messages.getString("Mail.SkippingMail")); //$NON-NLS-1$
 			return;
 		}
@@ -197,9 +199,9 @@ public class Mail implements ActionHandler {
 			while (0 < retries) {
 				retries--;
 				try {
-					log.info("Sending mail ["+subject+"] to "+recipients);
+					log.info("Sending mail ["+subject+"] to "+targetAddresses);
 					sendMailInternal(fromAddress,
-							recipients, subject, text);
+							targetAddresses, subject, text);
 					break;
 				} catch (MessagingException msgex) {
 					if (retries == 0)
@@ -216,12 +218,12 @@ public class Mail implements ActionHandler {
 		}
 	}
 
-	protected void sendMailInternal(String fromAddress, String recipients,
+	protected void sendMailInternal(String fromAddress, Set<InternetAddress> targetAddresses,
 			String subject, String text) throws Exception {
 		
-		debug(String.format(Messages.getString("Mail.SendingMailMessage"), recipients, subject)); //$NON-NLS-1$
+		debug(String.format(Messages.getString("Mail.SendingMailMessage"), targetAddresses, subject)); //$NON-NLS-1$
 
-		MailUtils.sendHtmlMail(mailHost, recipients, fromAddress, subject, text);
+		MailUtils.sendHtmlMail(mailHost, targetAddresses, fromAddress, subject, text);
 	}
 
 
@@ -282,7 +284,7 @@ public class Mail implements ActionHandler {
 	}
 
 	
-	public String getRecipients () throws InternalErrorException
+	public Set<InternetAddress> getRecipients () throws InternalErrorException, UnsupportedEncodingException
 	{
 		TaskInstance taskInstance = executionContext.getTaskInstance();
 		if (taskInstance != null)
@@ -302,7 +304,7 @@ public class Mail implements ActionHandler {
 		return null;
 	}
 
-	private String getSwimlaneRecipients (SwimlaneInstance swimlane) throws InternalErrorException
+	private Set<InternetAddress> getSwimlaneRecipients (SwimlaneInstance swimlane) throws InternalErrorException, UnsupportedEncodingException
 	{
 		if (swimlane.getActorId() != null)
 			return getAddress (swimlane.getActorId());
@@ -316,11 +318,13 @@ public class Mail implements ActionHandler {
 	 * @param actorId
 	 * @return
 	 * @throws InternalErrorException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	private String getAddress (String actorId) throws InternalErrorException
+	private Set<InternetAddress> getAddress (String actorId) throws InternalErrorException, UnsupportedEncodingException
 	{
+		HashSet<InternetAddress> result = new HashSet<InternetAddress>();
 		if (actorId == null)
-			return "";
+			return result;
 		debug ("Resolving address for "+actorId);
 		if (actorId.startsWith("auth:")) //$NON-NLS-1$
 		{
@@ -333,19 +337,16 @@ public class Mail implements ActionHandler {
 				autorization = autorization.substring(0,i);
 			}
 			AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
-			StringBuffer mailList = new StringBuffer();
 			debug ("Resolving address for AUTHORIZATION "+autorization);
 			for (AutoritzacioRol ar: autService.getRolsAutoritzacio(autorization))
 			{
-				if (mailList.length() > 0 )
-					mailList.append (", "); //$NON-NLS-1$
 				String rol = ar.getRol().getNom();
 				if (domain != null)
 					rol = rol + "/" + domain; //$NON-NLS-1$
 				rol = rol+"@"+ar.getRol().getBaseDeDades(); //$NON-NLS-1$
-				mailList.append (getAddress(rol));
+				result.addAll(getAddress(rol));
 			}
-			return mailList.toString();
+			return result;
 			
 		}
 		Security.nestedLogin("mail-server", new String[] { //$NON-NLS-1$
@@ -363,22 +364,18 @@ public class Mail implements ActionHandler {
     			{
         			if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
         			{
-        				String s = usuari.getFullName().replace('<', ' ')
-								.replace ('>', ' ')+
-								" <"+usuari.getNomCurt()+"@"+usuari.getDominiCorreu()+">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            			debug ("Resolved address "+s);
-            			return s;
+        				result.add(new InternetAddress(usuari.getFullName(), 
+        							usuari.getNomCurt()+"@"+usuari.getDominiCorreu())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            			return result;
         			}
         			else
         			{
         				DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(actorId, "EMAIL"); //$NON-NLS-1$
         				if (dada != null && dada.getValorDada() != null)
         				{
-        					String s = usuari.getFullName().replace('<', ' ')
-        									.replace ('>', ' ')+
-        									" <"+dada.getValorDada()+">"; //$NON-NLS-1$ //$NON-NLS-2$
-                			debug ("Resolved address "+s);
-                			return s;
+            				result.add(new InternetAddress(usuari.getFullName(), 
+            						dada.getValorDada())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            				return result;
         				}
         			}
     			}
@@ -393,19 +390,12 @@ public class Mail implements ActionHandler {
         			debug ("Resolving group members: "+grup.getCodi());
     				for (UsuariGrup ug: gs.findUsuarisPertanyenAlGrupByCodiGrup(actorId))
     				{
-    					String mail = getAddress(ug.getCodiUsuari());
-    					if (mail != null)
-    					{
-    						if (sb.length() > 0)
-    							sb.append(", "); //$NON-NLS-1$
-    						sb.append (mail);
-    					}
+    					result.addAll( getAddress(ug.getCodiUsuari()) );
     				}
-    				return sb.toString();
+    				return result;
     			}
     			else
     			{
-    				StringBuffer sb = new StringBuffer();
     				int i = actorId.indexOf('@');
     				String roleName;
     				String dispatcher;
@@ -437,17 +427,11 @@ public class Mail implements ActionHandler {
     					{
     						if (scope == null || scope.equals (grant.getDomainValue()))
     						{
-    	    					String mail = getAddress(grant.getUser());
-    	    					if (mail != null)
-    	    					{
-    	    						if (sb.length() > 0)
-    	    							sb.append(", "); //$NON-NLS-1$
-    	    						sb.append (mail);
-    	    					}
+    							result.addAll(getAddress(grant.getUser()));
     						}
     					}
     				}
-    				return sb.toString();
+    				return result;
     			}
     		}
 			debug ("Unable to resolve address for "+actorId);
@@ -462,28 +446,22 @@ public class Mail implements ActionHandler {
 	 * @param pooledActors
 	 * @return
 	 * @throws InternalErrorException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	private String getAddress (Set<PooledActor> pooledActors) throws InternalErrorException
+	private Set<InternetAddress> getAddress (Set<PooledActor> pooledActors) throws InternalErrorException, UnsupportedEncodingException
 	{
-		StringBuffer sb = new StringBuffer();
+		HashSet<InternetAddress> result = new HashSet<InternetAddress>();
 		debug ("Resolving addres for actor pool");
 		for (PooledActor actor: pooledActors)
 		{
-			String mail = null;
 			if (actor.getActorId() != null)
-				mail = getAddress(actor.getActorId());
+				result.addAll(getAddress(actor.getActorId()));
 			else if (actor.getSwimlaneInstance() != null)
 			{
 				debug ("Resolving addres for swimlane "+actor.getSwimlaneInstance().getName());
-				mail = getSwimlaneRecipients(actor.getSwimlaneInstance());
-			}
-			if (mail != null)
-			{
-				if (sb.length() > 0)
-					sb.append(", "); //$NON-NLS-1$
-				sb.append (mail);
+				result.addAll(getSwimlaneRecipients(actor.getSwimlaneInstance()));
 			}
 		}
-		return sb.toString();
+		return result;
 	}
 }

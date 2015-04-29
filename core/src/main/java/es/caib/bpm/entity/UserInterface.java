@@ -24,7 +24,7 @@ METODOS PUBLICOS
 	 * 
 	 * @return el idenfiticador �nico de la base de datos
 	 */
-	public Integer getId()
+	public Long getId()
 	{
 		return id;
 	}
@@ -34,7 +34,7 @@ METODOS PUBLICOS
 	 * 
 	 * @param id el idenfiticador �nico de la base de datos
 	 */
-	public void setId(Integer id)
+	public void setId(Long id)
 	{
 		this.id = id;
 	}
@@ -114,7 +114,7 @@ DECLARACIONES
 
 	// CAMPOS DE INSTANCIA
 	/**El identificador �nico de la base de datos*/
-	private Integer id= null;
+	private Long id= null;
 	/**El MIME Type del documento*/
 	private Long processDefinitionId= null;
 	/**El nombre externo del documento*/

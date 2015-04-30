@@ -435,7 +435,7 @@ public class Mail implements ActionHandler {
     			}
     		}
 			debug ("Unable to resolve address for "+actorId);
-    		return null;
+    		return result;
 		} finally {
 			Security.nestedLogoff();
 		}

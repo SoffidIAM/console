@@ -204,16 +204,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 						Collection<RolGrant> roles = getAplicacioService().findEffectiveRolGrantByUser(userData.getId());
 						for (RolGrant role : roles) {
 							String name = role.getRolName();
-							if (!role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
-								name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
+							if (role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
+								userGroups.add(name);
+							name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
 							userGroups.add(name);
 							// Now without domain
 							if (role.getDomainValue() != null)
 							{
 								name = role.getRolName();
 								name = name + "/" + role.getDomainValue(); //$NON-NLS-1$
-								if (!role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
-									name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
+								if (role.getDispatcher().equals(defaultDispatcher.getCodi())) //$NON-NLS-1$
+									userGroups.add(name);
+								name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
 								userGroups.add(name);
 							}
 						}

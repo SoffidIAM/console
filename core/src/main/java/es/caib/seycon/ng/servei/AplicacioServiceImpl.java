@@ -800,22 +800,19 @@ public class AplicacioServiceImpl extends
                 || AutoritzacionsUsuari.canUpdateAplicacio(rol
                         .getCodiAplicacio())) {
 
-            Collection rolsMateixNomMateixDispatcher = getRolEntityDao()
-                    .findRolsByFiltre(rol.getNom(), null, null,
-                            rol.getBaseDeDades(), null, null);
+            RolEntity existingRole = getRolEntityDao()
+                    .findByNameAndDispatcher(rol.getNom(),
+                            rol.getBaseDeDades());
 
             // No permitim crear un rol amb el mateix nom y base de dades si ja
             // existeix un altre
-            if (rolsMateixNomMateixDispatcher.size() != 0) {
-                Iterator it = rolsMateixNomMateixDispatcher.iterator();
-                if (it.hasNext()) {
-                    String aplicacio = ((RolEntity) it.next()).getAplicacio()
+            if (existingRole != null) {
+                    String aplicacio = existingRole.getAplicacio()
                             .getCodi();
 
 					throw new SeyconException(
 							String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
 									rol.getNom(), rol.getBaseDeDades(), aplicacio));
-                }
             }
 
             // Obtenemos la entidad asociada al VO

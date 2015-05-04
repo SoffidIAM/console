@@ -183,6 +183,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     		acc.setName(name);
     		acc.setType(AccountType.USER);
     		acc.setPasswordPolicy( ue.getTipusUsuari() );
+    		acc.setDisabled(! "S".equals(ue.getActiu()));
     		getAccountEntityDao().create(acc);
 		}
 

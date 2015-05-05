@@ -364,8 +364,9 @@ public class Mail implements ActionHandler {
     			{
         			if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
         			{
-        				result.add(new InternetAddress(usuari.getFullName(), 
-        							usuari.getNomCurt()+"@"+usuari.getDominiCorreu())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				result.add(new InternetAddress( 
+        							usuari.getNomCurt()+"@"+usuari.getDominiCorreu(),
+        							usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             			return result;
         			}
         			else
@@ -373,8 +374,8 @@ public class Mail implements ActionHandler {
         				DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(actorId, "EMAIL"); //$NON-NLS-1$
         				if (dada != null && dada.getValorDada() != null)
         				{
-            				result.add(new InternetAddress(usuari.getFullName(), 
-            						dada.getValorDada())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            				result.add(new InternetAddress(dada.getValorDada(),
+            						usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             				return result;
         				}
         			}

@@ -5,6 +5,7 @@ package es.caib.seycon.ng.servei;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.EstatContrasenya;
@@ -28,6 +30,7 @@ import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AccountEntity;
+import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.DominiContrasenyaEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
@@ -230,7 +233,8 @@ public class SelfServiceImpl extends SelfServiceBase
 	 */
 	public Password handleQueryAccountPassword (Account account) throws InternalErrorException
 	{
-		return getAccountService().queryAccountPassword(account);
+		Password p = getAccountService().queryAccountPassword(account);
+		return p;
 	}
 	
 	

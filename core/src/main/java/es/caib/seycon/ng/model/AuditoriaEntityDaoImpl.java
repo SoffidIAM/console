@@ -59,6 +59,12 @@ public class AuditoriaEntityDaoImpl extends
 			es.caib.seycon.ng.model.AuditoriaEntity auditoria)
 			throws RuntimeException {
 		try {
+			if (auditoria.getAccount() != null && auditoria.getBbdd() != null)
+			{
+				UsuariEntity ue = getUsuariEntityDao().findByAccount(auditoria.getAccount(), auditoria.getBbdd());
+				if (ue != null)
+					auditoria.setUsuari(ue.getCodi());
+			}
 			super.create(auditoria);
 			getSession(false).flush();
 			

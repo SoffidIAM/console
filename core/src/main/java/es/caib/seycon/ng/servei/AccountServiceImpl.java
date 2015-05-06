@@ -65,7 +65,6 @@ import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.model.AccountAccessEntity;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AccountEntityDao;
-import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.DadaUsuariEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.DispatcherEntityDao;
@@ -1063,7 +1062,18 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     	            SyncStatusService sss = rsl.getSyncStatusService();
     	            Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
     	            if (p != null)
+    	            {
+    	        		Auditoria audit = new Auditoria();
+    	        		audit.setAccio("S");
+    	        		audit.setObjecte("SSO");
+    	        		audit.setAutor(Security.getCurrentUser());
+    	        		audit.setCalendar(Calendar.getInstance());
+    	        		audit.setAccount(account.getName());
+    	        		audit.setBbdd(account.getDispatcher());
+    	        		audit.setData("-");
+    	        		getAuditoriaService().create(audit);
     	            	return p;
+    	            }
     			} catch (Exception e)
     			{
     				lastException = e;
@@ -1388,6 +1398,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         auditoria.setAccount(account.getName());
         auditoria.setBbdd(account.getDispatcher().getCodi());
         auditoria.setAutor(codiUsuariCanvi);
+        auditoria.setCalendar(Calendar.getInstance());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
@@ -1397,8 +1408,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         		auditoria.setUsuari(ua.getUser().getCodi());
         }
 
-        AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
-        getAuditoriaEntityDao().create(auditoriaEntity);
+        getAuditoriaService().create (auditoria);
     }
 
     /* (non-Javadoc)

@@ -106,9 +106,9 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
          * Boolean(false));
          */
 
-        if (source.getIssuanceDate() != null) {
+        if (source.getIssueDate() != null) {
             Calendar dataEmissio = Calendar.getInstance();
-            dataEmissio.setTime(source.getIssuanceDate());
+            dataEmissio.setTime(source.getIssueDate());
             target.setDataEmissio(dataEmissio);
         }
         if (source.getExpirationDate() != null) {
@@ -153,7 +153,7 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
             }
             CardEntity targeta = newCardEntity();
             targeta.setActive(status);
-            targeta.setIssuanceDate(date);
+            targeta.setIssueDate(date);
             Calendar caducitat = Calendar.getInstance();
             caducitat.setTime(date);
             caducitat.add(Calendar.YEAR, 1);
@@ -185,7 +185,7 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
                 StringBuffer filcol = new StringBuffer();
                 filcol.append((char) ('A' + j));
                 filcol.append(i);
-                cell.setFilcol(filcol.toString());
+                cell.setCell(filcol.toString());
                 cell.setValue("" + ch1 + ch2);
                 cell.setExpirationDate(new Date());
                 cell.setCard(targeta);

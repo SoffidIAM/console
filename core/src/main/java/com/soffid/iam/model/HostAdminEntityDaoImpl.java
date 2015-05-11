@@ -99,7 +99,8 @@ public class HostAdminEntityDaoImpl
 		target.setIpHost(maq.getHostIP());
 		target.setNomHost(maq.getName());
 		target.setNomUsuari(usu.getFirstName() + " " + usu.getLastName() + " " + usu.getMiddleName()); //$NON-NLS-1$ //$NON-NLS-2$
-		target.setXarxaHost(maq.getNetwork().getName());
+		if (maq.getNetwork() != null)
+			target.setXarxaHost(maq.getNetwork().getName());
 		Calendar dataPeticio = GregorianCalendar.getInstance();
 		if (source.getRequestDate() != null) dataPeticio.setTime(source.getRequestDate());
 		target.setDataPeticio(dataPeticio);

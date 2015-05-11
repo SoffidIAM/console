@@ -343,12 +343,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 							}
 						}
 					}
-					else if (access.getRol() != null)
+					else if (access.getRole() != null)
 					{
 						for (Iterator<Rol> it = newroles[index].iterator(); !found && it.hasNext();)
 						{
 							Rol r = it.next();
-							if (r.getId().equals (access.getRol().getId()))
+							if (r.getId().equals (access.getRole().getId()))
 							{
 								it.remove();
 								found = true;
@@ -371,7 +371,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					{
 						aclIterator.remove();
 						notifyAccountPasswordChange(access.getAccount(),
-							access.getGroup(), access.getRol(), access.getUser());
+							access.getGroup(), access.getRole(), access.getUser());
 						getAccountAccessEntityDao().remove(access);
 					}
 				}
@@ -395,7 +395,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
                 RoleEntity re = getRoleEntityDao().load(r.getId());
                 if (re != null) {
                     AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
-                    access.setRol(re);
+                    access.setRole(re);
                     access.setAccount(acc);
                     access.setLevel(levels[index]);
                     getAccountAccessEntityDao().create(access);
@@ -832,8 +832,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
                 if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
                     addGroupMembers(aae.getGroup(), users);
                 }
-                if (aae.getRol() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
-                    addRolMembers(aae.getRol(), users);
+                if (aae.getRole() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+                    addRolMembers(aae.getRole(), users);
                 }
                 if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
                     users.add(aae.getUser().getUserName());

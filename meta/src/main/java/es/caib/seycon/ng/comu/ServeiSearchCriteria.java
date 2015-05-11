@@ -10,8 +10,10 @@ import com.soffid.mda.annotation.*;
 @Criteria 
 public abstract class ServeiSearchCriteria {
 
+	@CriteriaColumn(parameter="name", comparator="LIKE_COMPARATOR")
 	public java.lang.String codi;
 
+	@CriteriaColumn(parameter="description", comparator="LIKE_COMPARATOR")
 	public java.lang.String descripcio;
 
 }

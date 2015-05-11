@@ -1838,7 +1838,9 @@ public class AplicacioServiceImpl extends
         }
 	}
 
-	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, UserEntity u, Object originalGrant, GroupEntity granteeGroup) {
+	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, 
+			UserEntity u, Object originalGrant, 
+			GroupEntity granteeGroup) {
 		SystemEntity de;
 		if (originalGrant instanceof RoleDependencyEntity)
 			de = ((RoleDependencyEntity) originalGrant).getContained().getSystem();
@@ -1852,9 +1854,13 @@ public class AplicacioServiceImpl extends
                 {
                 	rad = new RolAccountDetail((RoleAccountEntity) originalGrant, acc);
                 }
-                else
+                else if (originalGrant instanceof RoleGroupEntity)
                 {
                 	rad = new RolAccountDetail((RoleGroupEntity) originalGrant, acc);
+                }
+                else
+                {
+                	rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, acc, null);
                 }
                 rad.granteeGrup = granteeGroup;
                 if (!radSet.contains(rad)) {
@@ -2015,7 +2021,7 @@ class RolAccountDetail
 			qualifierAplicacio = previous.qualifierAplicacio;
 		if (qualifierGroup == null && previous != null)
 			qualifierGroup = previous.qualifierGroup;
-		if (previous.granted != null)
+		if (previous != null && previous.granted != null)
 			granteeRol = previous.granted;
 		rolRol = ra;
 		generateHash();

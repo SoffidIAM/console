@@ -243,7 +243,7 @@
 	event.stopPropagation();
 </attribute>
 
-		<criteris height="40px" id="queryWindow" onOK="search(true)"
+		<criteris height="60px" id="queryWindow" onOK="search(true)"
 			width="99.7%">
 			<hbox>
 				<input_criteri id="queryCodi"

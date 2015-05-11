@@ -815,7 +815,7 @@
 		<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 			onHideFormulari="showLista()">
 
-			<criteris id="queryWindow" style="min-height=${queryWindowMin}" onOK="search()"
+			<criteris id="queryWindow" style="margin-bottom:1em; margin-top:1em" onOK="search()"
 				width="${amplaria}">
 
 				<hbox>
@@ -2348,7 +2348,7 @@ void actualitza (event) {
 											<listcell >
 												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
 												<div style="display:inline" tooltip="domainTooltip">
-													<label value = "/"></label>
+													<label value = "/" style="margin-left:1em; margin-right: 1em;"></label>
 													<label  bind="valorDomini/@valor"/>
 												</div>
 											</listcell>

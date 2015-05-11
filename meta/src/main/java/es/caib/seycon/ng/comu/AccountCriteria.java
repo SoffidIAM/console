@@ -20,19 +20,19 @@ public abstract class AccountCriteria {
 	public es.caib.seycon.ng.comu.AccountType type;
 
 	@Nullable
-	@CriteriaColumn(parameter="acl.group.codi")
+	@CriteriaColumn(parameter="acl.group.name")
 	public java.lang.String grantedGroups;
 
 	@Nullable
-	@CriteriaColumn(parameter="acl.user.codi")
+	@CriteriaColumn(parameter="acl.user.userName")
 	public java.lang.String grantedUsers;
 
 	@Nullable
-	@CriteriaColumn(parameter="acl.rol.codi")
+	@CriteriaColumn(parameter="acl.role.name")
 	public java.lang.String grantedRoles;
 
 	@Nullable
-	@CriteriaColumn(parameter="dispatcher.codi")
+	@CriteriaColumn(parameter="system.name")
 	public java.lang.String dispatcher;
 
 	@Nullable

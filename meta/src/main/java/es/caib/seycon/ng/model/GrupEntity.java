@@ -137,7 +137,7 @@ public abstract class GrupEntity {
 			+ "left join grup.unitType tipus "
 			+ "where (:name is null or grup.name like :name) and "
 			+ "(:description is null or grup.description like :description) and "
-			+ "(:tipus is null or tipus.name like :type) and "
+			+ "(:type is null or tipus.name like :type) and "
 			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
 			+ "(:obsolete is null or grup.obsolete = :obsolete)")
@@ -195,9 +195,9 @@ public abstract class GrupEntity {
 			+ "left join grup.parent parent "
 			+ "left join grup.unitType tipus "
 			+ "left join grup.homeServer servofim  "
-			+ "where (:name is null or grup.name like :codi) and "
+			+ "where (:name is null or grup.name like :name) and "
 			+ "(:description is null or grup.description like :description) and "
-			+ "(:tipus is null or tipus.name like :tipus) and "
+			+ "(:type is null or tipus.name like :type) and "
 			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
 			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
@@ -208,7 +208,7 @@ public abstract class GrupEntity {
 		java.lang.String parent, 
 		java.lang.String homeDrive, 
 		java.lang.String description, 
-		java.lang.String tipus, 
+		java.lang.String type, 
 		java.lang.String obsolete, 
 		java.lang.String homeServer, 
 		java.lang.String budgetSection) {

@@ -86,7 +86,6 @@
 					t_agents.setVisible(true);
 					t_agents.setSelected(true);
 					titoltasques.setVisible(true);
-					if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else if ("tasques".equals(quin)) {
 					t_agents.setVisible(false);
@@ -107,7 +106,6 @@
 					t_agents.setVisible(true);
 					t_tasquesagent.setSelected(true);
 					titoltasques.setVisible(true);
-					if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else if ("tasquesAgentDesDeTasques".equals(quin)) {
 					t_seyconInfo.setVisible(false);
@@ -118,7 +116,6 @@
 					t_dbpool.setVisible(false);
 					t_tasquesagent.setSelected(true);
 					titoltasques.setVisible(true);
-					//if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else if ("serverInfo".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -129,7 +126,6 @@
 					t_seyconInfo.setVisible(true);
 					t_seyconInfo.setSelected(true);
 					titoltasques.setVisible(true);
-					if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else if ("serverReset".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -140,7 +136,6 @@
 					t_reset.setVisible(true);
 					t_reset.setSelected(true);
 					titoltasques.setVisible(true);
-					if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else if ("dbpool".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -151,7 +146,6 @@
 					t_dbpool.setVisible(true);
 					t_dbpool.setSelected(true);
 					titoltasques.setVisible(true);
-					if (amplaria_w!=null) panels.setWidth(amplaria_w);
 					panels.setVisible(true);
 				} else { // ALTRES...
 					panels.setVisible(false);
@@ -332,10 +326,10 @@
 					{
 						ampleActual = panels.getWidth();
 						try { //only when I dream..
-							ampleI = ampleActual.replaceAll("px", "").replaceAll("%", "");
-							int ami = Integer.parseInt(ampleI);
-							if ((ampleNou + 40) > ami)
-								panels.setWidth((ampleNou+40) + "px");
+//							ampleI = ampleActual.replaceAll("px", "").replaceAll("%", "");
+//							int ami = Integer.parseInt(ampleI);
+//							if ((ampleNou + 40) > ami)
+//								panels.setWidth((ampleNou+40) + "px");
 						}
 						
 						catch (Throwable th) {}
@@ -571,35 +565,15 @@
 			}
 			
 			// Functionality to show task erros in agent tasks grid
-			void showTaskErrors(data)
+			void showTaskErrors(Component c)
 			{
-				fillDiv = data.parent;
-				fillMas = fillDiv.children.get(0);
-				fillAmaga = fillDiv.children.get(1);
-				fillStack = fillDiv.children.get(2);
-				mostrat = fillStack.isVisible();
-				fillStack.setVisible(!mostrat);
-				fillMas.setValue((!mostrat ? 
-						org.zkoss.util.resource.Labels.getLabel("seyconserver.zul.[-]") :
-						org.zkoss.util.resource.Labels.getLabel("seyconserver.zul.[+]")));
-				fillAmaga.setValue((!mostrat ?
-					org.zkoss.util.resource
-						.Labels.getLabel("seyconserver.zul.amagastacktrace") :
-					org.zkoss.util.resource
-						.Labels.getLabel("seyconserver.zul.mostrastacktrace")));
-			}
-			
-			// Functionality to copy the agent task error
-			void copyTaskError(data)
-			{
-				fillDiv = data.parent;
-				fillStack = fillDiv.children.get(0);
+				String t = es.caib.zkib.datasource.XPathUtils.getValue(c, "@stackTrace");
 				//pareMsg = fillDiv.parent.parent.parent;
-				pareMsg = fillDiv.parent;
+				pareMsg = c.parent;
 				while(!(pareMsg instanceof Listcell))
 					pareMsg = pareMsg.parent;
 				
-				Missatgebox.info(pareMsg.getLabel() + "\n" + fillStack.getValue(), 600);
+				Missatgebox.info(pareMsg.getLabel() + "\n" + t, 600);
 			}
 			
 			void checkRefreshPage()
@@ -767,8 +741,8 @@
 		
 		<label id="urlservidor" style="color:#00000;" value=""/>
 	</div>
-	
-	<tabbox id="panels" visible="false" width="${amplaria2}">
+
+	<tabbox id="panels" visible="false" width="100%" >
 	<tabs>
 		<tab id="t_agents" label="${c:l('seyconserver.zul.Agents')}" visible="false"/>
 		<tab id="t_tasques" label="${c:l('seyconserver.zul.Tasques')}" visible="false"/>
@@ -778,7 +752,7 @@
 		<tab id="t_dbpool" label="${c:l('seyconserver.zul.ConsultesSQL')}" visible="false"/>
 	</tabs>
 	<tabpanels>
-		<tabpanel id="tagents">
+		<tabpanel id="tagents" width="100%">
 			<listbox id="gridAgents" dataPath="/model:/agentsserver"
 				fixedLayout="true" sclass="likeagrid headcentrat doscolors" width="100%">
 				<listhead>
@@ -786,7 +760,7 @@
 					<listheader label="${c:l('seyconserver.zul.Tasques')}" sort="auto" width="80px"/>
 					<listheader label="${c:l('seyconserver.zul.Estat')}" sort="auto" width="80px"/>
 					<listheader label="${c:l('seyconserver.zul.Tipus')}" sort="auto" width="*"/>
-					<listheader if="${canRestartAgent}" label="${c:l('seyconserver.zul.')}" sort="auto" width="60px"/>
+					<listheader if="${canRestartAgent}" label="${c:l('seyconserver.zul.')}" sort="auto" width="120px"/>
 				</listhead>
 				<dataitem bind=".">
 					<listcellnolabel bind="@nomAgent">
@@ -815,26 +789,12 @@
 							<divVisible bind="@msgEstat" sclass="st0"
 								style="font-weight:normal !important;" valorNoVisible="NULL">
 								<div>
-									<label style="color:#000000;font-weight:normal !important;"
-										value="${c:l('seyconserver.zul.[+]')}"/>
 									<label sclass="st" style="font-weight:normal !important;"
 										value="${c:l('seyconserver.zul.mostraerrors')}">
 										<attribute name="onClick">
 											showTaskErrors(self);
 										</attribute>
 									</label>
-									<div style="font-weight:normal !important;" visible="false">
-										<label bind="@msgEstat" multiline="true"
-											style="display:block;cursor:auto;font-weight:normal !important;"/>
-										
-										${c:l('seyconserver.zul.[')}<label sclass="st"
-											style="font-weight:normal !important;"
-											value="${c:l('seyconserver.zul.Capialerror')}">
-											<attribute name="onClick">
-												copyTaskError(self);
-											</attribute>
-										</label>${c:l('seyconserver.zul.]')}
-									</div>
 								</div>
 							</divVisible>
 						</vbox>
@@ -868,7 +828,7 @@
 			</popup>
 		</tabpanel>
 		
-		<tabpanel id="tSeyconTasks" width="auto">
+		<tabpanel id="tSeyconTasks" width="100%">
 			<window id="wSeyconTasks" apply="${tasquesSeycon}" border="normal" width="auto">
 				<div width="100%">
 					<listbox id="listboxTasques" fixedLayout="true" mold="paging"
@@ -927,29 +887,12 @@
 					<listcell bind="@missatge">
 						<divVisible bind="@stackTrace" sclass="st0" valorNoVisible="NULL">
 							<div>
-								<label style="color:#000000;font-weight:normal !important;"
-									value="${c:l('seyconserver.zul.[+]')}"/>
 								<label sclass="st" style="font-weight:normal !important;"
 									value="${c:l('seyconserver.zul.mostrastacktrace')}">
 									<attribute name="onClick">
 										showTaskErrors(self);
 									</attribute>
 								</label>
-								<div style="font-weight:normal !important;" visible="false">
-									<label bind="@stackTrace" multiline="true"
-										style="display:block;overflow:auto;cursor:auto;font-weight:normal !important;"/>
-									
-									${c:l('seyconserver.zul.[')}
-									
-									<label sclass="st" style="font-weight:normal !important;"
-										value="${c:l('seyconserver.zul.Capialerror')}">
-										<attribute name="onClick">
-											copyTaskError(self);
-										</attribute>
-									</label>
-									
-									${c:l('seyconserver.zul.]')}
-								</div>
 							</div>
 						</divVisible>
 						
@@ -1020,7 +963,7 @@
 		</tabpanel>
 		
 		<tabpanel id="tReset">
-			<hbox width="600px">
+			<hbox width="100%">
 				<listbox dataPath="/model:/servidorsagents" fixedLayout="true"
 					id="listboxReset" sclass="likeagrid" width="99%">
 					<listhead>

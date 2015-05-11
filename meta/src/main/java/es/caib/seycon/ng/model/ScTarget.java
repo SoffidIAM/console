@@ -20,7 +20,7 @@ public abstract class ScTarget {
 	@Column (name="TAR_CODI", length=10, translated="code")
 	public java.lang.String codi;
 
-	@Column (name="TAR_DATEMI", translated="issuanceDate")
+	@Column (name="TAR_DATEMI", translated="issueDate")
 	public java.util.Date dataEmissio;
 
 	@Column (name="TAR_DATCAD", translated="expirationDate")
@@ -50,7 +50,7 @@ public abstract class ScTarget {
 	@DaoFinder("select targeta \n"
 			+ "from com.soffid.iam.model.CardEntity targeta, \n"
 			+ "com.soffid.iam.model.UserEntity usuari \n"
-			+ "where targeta.code = :cardNumber and targeta.user=user and usuari.userName = :userName")
+			+ "where targeta.code = :cardNumber and targeta.user=usuari and usuari.userName = :userName")
 	public es.caib.seycon.ng.model.ScTarget findByCodiTargetaAndCodiUsuari(
 		java.lang.String cardNumber, 
 		java.lang.String userName) {

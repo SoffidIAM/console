@@ -33,8 +33,8 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 		auditoria.setAutor(codiUsuari);
 		if (entity.getGroup() != null)
 			auditoria.setGrup(entity.getGroup().getName());
-		if (entity.getRol() != null)
-			auditoria.setRol(entity.getRol().getName());
+		if (entity.getRole() != null)
+			auditoria.setRol(entity.getRole().getName());
 		if (entity.getUser() != null)
 			auditoria.setUsuari(entity.getUser().getUserName());
 		

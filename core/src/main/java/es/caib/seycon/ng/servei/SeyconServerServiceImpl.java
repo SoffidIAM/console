@@ -436,7 +436,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
 
             // Obtenim el número de tasques
             Collection<TaskEntity> tasquesPlanning = getTaskEntityDao().
-            		query("select count(*),min(tasqueEntity.data) "
+            		query("select count(*),min(tasqueEntity.date) "
             				+ "from com.soffid.iam.model.TaskEntity as tasqueEntity "
             				+ "where tasqueEntity.server is null", new Parameter[0]);
 

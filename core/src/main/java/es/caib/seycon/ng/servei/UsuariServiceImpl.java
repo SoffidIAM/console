@@ -3384,7 +3384,7 @@ public class UsuariServiceImpl extends
 		addString(criteria.getCodi(), "usuari.userName", null, joins, queries, params); //$NON-NLS-1$
 		addString(criteria.getComentari(), "usuari.comment", null, joins, queries, params); //$NON-NLS-1$
 		addString(criteria.getCodiGrupPrimari(), "grup.name", new String[] {
-									"left outer join usuari.primaryGroup as group"}, joins, queries, params); //$NON-NLS-1$ //$NON-NLS-2$
+									"left outer join usuari.primaryGroup as grup"}, joins, queries, params); //$NON-NLS-1$ //$NON-NLS-2$
 		addString(criteria.getNom(), "usuari.firstName", null, joins, queries, params); //$NON-NLS-1$
 
 		addString(criteria.getDescripcioGrupPrimari(), "grup.description", 
@@ -3426,7 +3426,7 @@ public class UsuariServiceImpl extends
 		addString2(criteria.getSecondaryGroup(), "grupSecundari",  //$NON-NLS-1$
 				"(grup.name like :grupSecundari or grupB.name like :grupSecundari)", //$NON-NLS-1$
 				new String[] {"left outer join usuari.primaryGroup as grup", //$NON-NLS-1$
-							  "left outer join usuari.secongariGroups as grupsSecundaris", //$NON-NLS-1$
+							  "left outer join usuari.secondaryGroups as grupsSecundaris", //$NON-NLS-1$
 							  "left outer join grupsSecundaris.group as grupB" }, joins, queries, params); //$NON-NLS-1$
 		addString(criteria.getDominiCorreu(), "mailDomain.name", //$NON-NLS-1$
 						new String [] { "left outer join usuari.mailDomain as mailDomain"}, //$NON-NLS-1$

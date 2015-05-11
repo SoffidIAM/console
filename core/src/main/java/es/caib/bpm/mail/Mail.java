@@ -394,7 +394,7 @@ public class Mail implements ActionHandler {
     				else
     				{
     					roleName = actorId;
-    					SystemEntityDao dao = (SystemEntityDao) ServiceLocator.instance().getService("dispatcherEntityDao");
+    					SystemEntityDao dao = (SystemEntityDao) ServiceLocator.instance().getService("systemEntityDao");
 						SystemEntity defaultDispatcher = dao.findSoffidSystem();
     					dispatcher = defaultDispatcher.getName();
     				}

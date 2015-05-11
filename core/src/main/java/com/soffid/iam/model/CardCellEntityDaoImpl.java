@@ -91,8 +91,8 @@ public class CardCellEntityDaoImpl extends com.soffid.iam.model.CardCellEntityDa
 		}
 		// Separamos fila y columna
 		try {
-			target.setFila(""+source.getFilcol().charAt(0)); //$NON-NLS-1$
-			target.setColumna(""+source.getFilcol().charAt(1)); //$NON-NLS-1$
+			target.setFila(""+source.getCell().charAt(0)); //$NON-NLS-1$
+			target.setColumna(""+source.getCell().charAt(1)); //$NON-NLS-1$
 		} catch (Exception ex) {
 
 		}

@@ -1017,7 +1017,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             for (Iterator<EntryPointUserEntity> it = _autoUsu.iterator(); it.hasNext(); ) {
                 EntryPointUserEntity auto = (EntryPointUserEntity) it.next();
                 EntryPointUserEntity apu = getEntryPointUserEntityDao().newEntryPointUserEntity();
-                apu.setUserID(auto.getUserID());
+                apu.setUserId(auto.getUserId());
                 apu.setAuthorizationLevel(auto.getAuthorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointUserEntityDao().create(apu);
@@ -1275,7 +1275,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             // USUARI: Creamos autorización
         	EntryPointUserEntity autoUsu = getEntryPointUserEntityDao().newEntryPointUserEntity();
         	autoUsu.setAuthorizationLevel(nivell);
-        	autoUsu.setUserID(idEntitat);
+        	autoUsu.setUserId(idEntitat);
         	autoUsu.setEntryPoint(puntEntradaE);
             getEntryPointUserEntityDao().create(autoUsu);
 

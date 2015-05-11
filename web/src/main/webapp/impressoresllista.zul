@@ -165,7 +165,9 @@
 		]]>
 	</zscript>
 
-	<esquema closable="true" id="esquemaLlista" position="center, center" title="${c:l('impressoresllista.Titol')}" visible="false">
+	<window id="esquemaLlista" closable="true" position="center, center"
+		sizable="true" title="${c:l('impressoresllista.Titol')}" visible="false"
+		width="800px">
 		<attribute name="onInicia">
      		pageScope.put("contextComponent", event.data);
 			if(self.mode.compareToIgnoreCase("highlighted") != 0){
@@ -240,6 +242,6 @@
 			<button label="${c:l('impressoresllista.zul.Cancel·la')}" onClick="cleanWindow()"/>								
 		</hbox>
 		
-	</esquema>
+	</window>
 
 </zk>

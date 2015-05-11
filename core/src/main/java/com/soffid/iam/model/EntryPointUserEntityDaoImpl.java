@@ -93,8 +93,8 @@ public class EntryPointUserEntityDaoImpl
 		target.setIdPuntEntrada(source.getEntryPoint().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.USUARI);
-		target.setIdEntitatAutoritzada(source.getUserID());
-		UserEntity usuari = getUserEntityDao().findById(source.getUserID());
+		target.setIdEntitatAutoritzada(source.getUserId());
+		UserEntity usuari = getUserEntityDao().findById(source.getUserId());
 		target.setDescripcioEntitatAutoritzada(usuari.getFirstName() + " " + usuari.getLastName() + " " + usuari.getMiddleName() + " [" + usuari.getUserName() + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		target.setCodiEntitatAutoritzada(usuari.getUserName());
 	}
@@ -102,7 +102,7 @@ public class EntryPointUserEntityDaoImpl
 	private void autoritzacioPuntEntradaToEntityCustom(es.caib.seycon.ng.comu.AutoritzacioPuntEntrada source, com.soffid.iam.model.EntryPointUserEntity target) {
 		
 		// Aquí se supone que la entidad está cargada o es nueva..
-		target.setUserID(source.getIdEntitatAutoritzada());
+		target.setUserId(source.getIdEntitatAutoritzada());
 		
 		// Ponemos el nivel de autorización 
 		// Hay 2 tipos: Administrador (A) y Autoritzat (C)

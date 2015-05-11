@@ -16,7 +16,7 @@ public abstract class ScContar {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="CTA_FILCOL", length=10)
+	@Column (name="CTA_FILCOL", length=10, translated="cell")
 	public java.lang.String filcol;
 
 	@Column (name="CTA_VALOR", length=10, translated="value")

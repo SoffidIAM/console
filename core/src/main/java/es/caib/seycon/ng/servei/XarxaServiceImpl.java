@@ -520,7 +520,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         // Realizamos la siguiente consulta (sin tener cuenta el alias)
         String query = "select distinct maquina from " //$NON-NLS-1$
                 + " com.soffid.iam.model.SessionEntity sessio " //$NON-NLS-1$
-                + " right outer join session.host as maquina " //$NON-NLS-1$
+                + " right outer join sessio.host as maquina " //$NON-NLS-1$
                 + " left outer join sessio.user as usuari" + //$NON-NLS-1$
                 " where maquina.deleted = false "; //$NON-NLS-1$
         if (nom != null ) {
@@ -535,19 +535,19 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
             params.add(new Parameter("operatingSystem", sistemaOperatiu)); //$NON-NLS-1$
         }
         if (adreca != null) {
-            query = query + "and maquina.adress like :adreca "; //$NON-NLS-1$
+            query = query + "and maquina.hostIP like :adreca "; //$NON-NLS-1$
             params.add(new Parameter("adreca", adreca)); //$NON-NLS-1$
         }
         if (dhcp != null) {
             query = query + "and maquina.dhcp like :dhcp "; //$NON-NLS-1$
-            params.add(new Parameter("adreca", adreca)); //$NON-NLS-1$
+            params.add(new Parameter("dhcp", dhcp)); //$NON-NLS-1$
         }
         if (correu != null) {
             query = query + "and maquina.mail like :correu "; //$NON-NLS-1$
             params.add(new Parameter("correu", correu)); //$NON-NLS-1$
         }
         if (ofimatica != null) {
-            query = query + "and maquina.folders like :ofimatica) "; //$NON-NLS-1$
+            query = query + "and maquina.folders like :ofimatica "; //$NON-NLS-1$
             params.add(new Parameter("ofimatica", ofimatica)); //$NON-NLS-1$
         }
         if (mac != null) {
@@ -976,6 +976,7 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
         }
 
         Collection<HostAdminEntity> res = getHostAdminEntityDao().findByHostNameAndRequestDate(nomHost, d_dataPeticio, d_dataCaducitat, DateUtils.nullDate);
+
         return getHostAdminEntityDao().toAutoritzacioAccesHostComAdministradorList(res);
     }
 
@@ -1395,10 +1396,10 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
 
     private Collection<NetworkAuthorization> findNetworkAuthorizationsByRol(Rol rol) {
         String query = "select xarxaAC from " //$NON-NLS-1$
-                + "es.caib.seycon.ng.model.XarxaACEntity xarxaAC where " //$NON-NLS-1$
-                + "xarxaAC.role.nom = :nom and " //$NON-NLS-1$
-                + "xarxaAC.role.baseDeDades.codi = :dispatcher and " //$NON-NLS-1$
-                + "xarxaAC.role.aplicacio.codi = :aplicacio"; //$NON-NLS-1$
+                + "com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC where " //$NON-NLS-1$
+                + "xarxaAC.role.name = :nom and " //$NON-NLS-1$
+                + "xarxaAC.role.system.name = :dispatcher and " //$NON-NLS-1$
+                + "xarxaAC.role.informationSystem.name = :aplicacio"; //$NON-NLS-1$
         Parameter parametres[] = { new Parameter("nom", rol.getNom()), //$NON-NLS-1$
                 new Parameter("dispatcher", rol.getBaseDeDades()), //$NON-NLS-1$
                 new Parameter("aplicacio", rol.getCodiAplicacio()) }; //$NON-NLS-1$
@@ -1483,22 +1484,22 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
 
         // Realizamos la siguiente consulta (sin tener cuenta el alias)
         String query = "select distinct maquina from " //$NON-NLS-1$
-                + " es.caib.seycon.ng.model.SessioEntity sessio " //$NON-NLS-1$
-                + " right outer join sessio.maquina as maquina " //$NON-NLS-1$
-                + " left outer join sessio.usuari as usuari" //$NON-NLS-1$
+                + " com.soffid.iam.model.SessionEntity sessio " //$NON-NLS-1$
+                + " right outer join sessio.host as maquina " //$NON-NLS-1$
+                + " left outer join sessio.user as usuari" //$NON-NLS-1$
                 + " where " //$NON-NLS-1$
-                + "(:nom is null or maquina.nom like :nom) and (:sistemaOperatiu is null or " //$NON-NLS-1$
+                + "(:nom is null or maquina.name like :nom) and (:sistemaOperatiu is null or " //$NON-NLS-1$
                 + "maquina.operatingSystem.name like :sistemaOperatiu) and (:adreca is null or " //$NON-NLS-1$
-                + "maquina.adreca like :adreca) and (:dhcp is null or " //$NON-NLS-1$
+                + "maquina.hostIP like :adreca) and (:dhcp is null or " //$NON-NLS-1$
                 + "maquina.dhcp like :dhcp) and (:correu is null or " //$NON-NLS-1$
-                + "maquina.correu like :correu) and (:ofimatica is null or " //$NON-NLS-1$
-                + "maquina.ofimatica like :ofimatica) " //$NON-NLS-1$
+                + "maquina.mail like :correu) and (:ofimatica is null or " //$NON-NLS-1$
+                + "maquina.folders like :ofimatica) " //$NON-NLS-1$
                 + "and (:mac is null or maquina.mac like :mac) and " //$NON-NLS-1$
-                + "(:descripcio is null or maquina.descripcio like :descripcio) and " //$NON-NLS-1$
-                + "(:xarxa is null or maquina.xarxa.codi like :xarxa) and " //$NON-NLS-1$
-                + "(:codiUsuari is null  or (usuari is not null and  usuari.codi like :codiUsuari))" //$NON-NLS-1$
-                + "and (:servidorImpressores is null or maquina.servidorImpressores like :servidorImpressores) " //$NON-NLS-1$
-                + "order by maquina.nom "; //$NON-NLS-1$
+                + "(:descripcio is null or maquina.description like :descripcio) and " //$NON-NLS-1$
+                + "(:xarxa is null or maquina.network.name like :xarxa) and " //$NON-NLS-1$
+                + "(:codiUsuari is null  or (usuari is not null and  usuari.userName like :codiUsuari))" //$NON-NLS-1$
+                + "and (:servidorImpressores is null or maquina.printers like :servidorImpressores) " //$NON-NLS-1$
+                + "order by maquina.name "; //$NON-NLS-1$
 
         Parameter[] params = new Parameter[] { new Parameter("nom", nom), //$NON-NLS-1$
                 new Parameter("sistemaOperatiu", sistemaOperatiu), new Parameter("adreca", adreca), //$NON-NLS-1$ //$NON-NLS-2$

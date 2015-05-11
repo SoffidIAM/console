@@ -33,7 +33,7 @@ public abstract class ArbrePuntEntradaEntity {
 	 return null;
 	}
 	@Operation(translated="findByParent")
-	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.children.id=:parentId order by arbre.order")
+	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.parent.id=:parentId order by arbre.order")
 	public java.util.List<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> findByPare(
 		java.lang.Long parentId) {
 	 return null;

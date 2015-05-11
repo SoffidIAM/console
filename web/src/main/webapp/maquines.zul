@@ -1090,6 +1090,11 @@
 														<vbox width="98%">
 															<input_etiqueta value="${c:l('maquines.zul.Permisosactiusdacca')}"/>
 															<listbox dataPath="/esquema/lista/listbox:/accesComAdministradorNoCaducat" fixedLayout="true" height="150px" id="gridAutoritzacionsAcces" sclass="likeagrid" width="100%">
+																<attribute name="onAfterDelete"><![CDATA[
+  	self.setDataPath (null);																                                     
+  	esquema.getFellow("lista").getFellow("listbox").getJXPathContext().getValue("/accesComAdministradorNoCaducat").refresh();
+	self.setDataPath ("/esquema/lista/listbox:/accesComAdministradorNoCaducat");																                                     
+																]]></attribute>
 																<listhead>
 																	<listheader label="${c:l('maquines.zul.Usuari-2')}" sort="auto" width="20%"/>
 																	<listheader label="${c:l('maquines.zul.Nom-2')}" sort="auto"/>
@@ -1118,56 +1123,56 @@
 																	<listcell bind="@dataCaducitatAutoritzacioAcces" dateFormat="dd/MM/yyyy kk:mm:ss"/>
 																	<listcell>
 																		<imageclic align="center" src="~./img/list-remove.gif">
-																			<attribute name="onClick">
-																				if (canQueryHostsAdminAccess) {
-																					listCell = self.getParent(); 
-																					dlistbox = listCell.getListbox(); 
-																					modelo = dlistbox.getModel();
-																					listItem = listCell.getParent(); 
-																					posicio = listItem.getIndex(); 
-																					elemPos = modelo.getElementAt(posicio); 
-																					xpath = elemPos.getDataContext().getXPath();
-																					dataSource = gridAutoritzacionsAcces.getDataSource();
-																					contexte = dataSource.getJXPathContext();
-																					dada = contexte.getValue(xpath+"/@codiUsuari");
-																					data = contexte.getValue(xpath+"/@dataCaducitatAutoritzacioAcces");
-																					nomHost = contexte.getValue(xpath+"/@nomHost");
-																					String dataFi = org.zkoss.util.resource.Labels.getLabel("maquines.ErrorObtencio");
-																					if (data != null) {
-																						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
-																						dataFi = sdf.format(data.getTime());
-																					}
-																					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Revocar"), new Object [] {dada,nomHost,dataFi}),
-																						org.zkoss.util.resource.Labels.getLabel("maquines.RevocarAcces"),
-																						new EventListener() {
-																							public void onEvent(Event evt) {
-																								if ("onOK".equals(evt.getName())) { 
-																									try {
-																										obj =  contexte.getValue(xpath);
-																										if (obj!=null @and obj instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
-																											if (obj.getInstance() !=null @and 
-																												obj.getInstance() instanceof es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador) {
-																												es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador autoritzacio = obj.getInstance();
-																												javax.naming.Context context = new javax.naming.InitialContext();		
-																												xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-																												xarxaService = xarxaHome.create();		
-																												autoNova = xarxaService.revocarAccesHostComAdministrador(autoritzacio);
-								
-																												// Refresquem el listbox
-																												gridAutoritzacionsAcces.getJXPathContext().getValue("/maquina/accesComAdministradorNoCaducat").refresh();
-																												gridAutoritzacionsAcces.dataPath = "/esquema/lista/listbox:/accesComAdministradorNoCaducat";
-																												Missatgebox.info (org.zkoss.util.resource.Labels.getLabel("maquines.AutoritzacioRevocada")); 
-																											}
-																										}
-																									} catch (es.caib.seycon.ng.exception.SeyconException ex) {
-																										Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Error"), new Object [] {ex.getMessage()}));
-																									} catch (Throwable th) {
-																										Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Error"), new Object [] {th.getMessage()}));
-																									}
-																								}
-																							}
-																						});
-																				}
+																			<attribute name="onClick"><![CDATA[
+	if (canQueryHostsAdminAccess) {
+		listCell = self.getParent(); 
+		dlistbox = listCell.getListbox(); 
+		modelo = dlistbox.getModel();
+		listItem = listCell.getParent(); 
+		posicio = listItem.getIndex(); 
+		elemPos = modelo.getElementAt(posicio); 
+		xpath = elemPos.getDataContext().getXPath();
+		dataSource = gridAutoritzacionsAcces.getDataSource();
+		contexte = dataSource.getJXPathContext();
+		dada = contexte.getValue(xpath+"/@codiUsuari");
+		data = contexte.getValue(xpath+"/@dataCaducitatAutoritzacioAcces");
+		nomHost = contexte.getValue(xpath+"/@nomHost");
+		String dataFi = org.zkoss.util.resource.Labels.getLabel("maquines.ErrorObtencio");
+		if (data != null) {
+			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
+			dataFi = sdf.format(data.getTime());
+		}
+		Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Revocar"), new Object [] {dada,nomHost,dataFi}),
+			org.zkoss.util.resource.Labels.getLabel("maquines.RevocarAcces"),
+			new EventListener() {
+				public void onEvent(Event evt) {
+					if ("onOK".equals(evt.getName())) { 
+						try {
+							obj =  contexte.getValue(xpath);
+							if (obj!=null @and obj instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
+								if (obj.getInstance() !=null @and 
+									obj.getInstance() instanceof es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador) {
+									es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador autoritzacio = obj.getInstance();
+									javax.naming.Context context = new javax.naming.InitialContext();		
+									xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
+									xarxaService = xarxaHome.create();		
+									autoNova = xarxaService.revocarAccesHostComAdministrador(autoritzacio);
+	
+									Missatgebox.info (org.zkoss.util.resource.Labels.getLabel("maquines.AutoritzacioRevocada")); 
+									// Refresquem el listbox
+									Events.postEvent("onAfterDelete", gridAutoritzacionsAcces, null); 
+								}
+							}
+						} catch (es.caib.seycon.ng.exception.SeyconException ex) {
+							Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Error"), new Object [] {ex.getMessage()}));
+						} catch (Throwable th) {
+							Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.Error"), new Object [] {th.getMessage()}));
+						}
+					}
+				}
+			});
+	}
+	]]>
 																			</attribute>
 																		</imageclic>
 																	</listcell>
@@ -1179,7 +1184,7 @@
 																<button label="${c:l('maquines.zul.Veurecontrasenya')}" onClick="solicitaPasswordAdmin()"/>
 															</hbox>
 															
-															<window id="newAccess" visible="false2" title="New authorization" width="400px" height="150px">
+															<window id="newAccess" visible="false2" title="New authorization" width="400px" height="200px">
 																<grid style="margin-top: 15px;">
 																	<rows>
 																		<row>
@@ -1230,8 +1235,7 @@
 	xarxaService.create(aut);
 
 	// Refresquem el listbox
-	model.getJXPathContext().getValue("/maquina/accesComAdministradorNoCaducat").refresh();
-	gridAutoritzacionsAcces.dataPath = "/accesComAdministradorNoCaducat";
+	esquema.getFellow("lista").getFellow("listbox").getJXPathContext().getValue("/accesComAdministradorNoCaducat").refresh();
 
 	newAccess.setVisible(false);
 																		]]></attribute>

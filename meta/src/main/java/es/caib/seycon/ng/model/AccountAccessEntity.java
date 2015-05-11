@@ -21,7 +21,7 @@ public abstract class AccountAccessEntity {
 	@Description ("Grantee role")
 	@Column (name="AAC_ROL_ID")
 	@Nullable
-	public es.caib.seycon.ng.model.RolEntity rol;
+	public es.caib.seycon.ng.model.RolEntity role;
 
 	@Description ("Grantee group")
 	@Column (name="AAC_GRU_ID")

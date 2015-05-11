@@ -80,7 +80,7 @@ public abstract class TaskLogEntity {
 	@DaoFinder("select tlog from com.soffid.iam.model.TaskLogEntity tlog\n"
 			+ "left join tlog.system system\n" + "left join tlog.task task\n"
 			+ "where system.name=:system and \n"
-			+ "(:complet is null or tlog.completed=:status) and " + "( \n"
+			+ "(:status is null or tlog.completed=:status) and " + "( \n"
 			+ "   (:server is not null and task.server=:server) or \n"
 			+ "   (:server is null and task.server is null) \n"
 			+ ") order by task.id, system.name")

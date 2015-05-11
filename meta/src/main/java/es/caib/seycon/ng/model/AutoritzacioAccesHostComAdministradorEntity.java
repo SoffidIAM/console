@@ -40,7 +40,7 @@ public abstract class AutoritzacioAccesHostComAdministradorEntity {
 			+ "where "
 			+ "  autoriza.host.name = :nomHost and "
 			+ "  (:requestDate = :nullDate or autoriza.requestDate >= :requestDate) and "
-			+ "  (:expirationDate = :nullDate or autoriza.expirationDate >= :expirationDate) "
+			+ "  (:expirationDate = :nullDate or autoriza.expirationDate > :expirationDate) "
 			+ "order by autoriza.requestDate")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity> findByNomHostIDataPeticio(
 		java.lang.String nomHost, 

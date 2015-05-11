@@ -156,6 +156,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
 	    		acc.setPasswordPolicy(ue.getUserType());
+
+	    		Dispatcher dispatcher = getDispatcherService().findDispatcherByCodi(de.getName());
+	    		acc.setDisabled( ! getDispatcherService().isUserAllowed(dispatcher, ue.getUserName()));
+	    		
 	    		getAccountEntityDao().update(acc);
 			}
 			else
@@ -167,6 +171,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     		acc.setName(name);
     		acc.setType(AccountType.USER);
     		acc.setPasswordPolicy(ue.getUserType());
+    		acc.setDisabled(! "S".equals(ue.getActive()));
     		getAccountEntityDao().create(acc);
 		}
 
@@ -456,8 +461,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				uae.setAccount(ae);
 				uae.setUser(ue);
 				getUserAccountEntityDao().create(uae);
+				
 				account.setDescription(owner.getFullName());
-
+				
+				Dispatcher dispatcher = getDispatcherService().findDispatcherByCodi(account.getDispatcher());
+				account.setDisabled( !  getDispatcherService().isUserAllowed(dispatcher, owner.getCodi()) );
+				
 				createUserTask(ue);
 
 			} else {
@@ -983,7 +992,19 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
                     rsl.setAuthToken(se.getAuth());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
-                    if (p != null) return p;
+    	            if (p != null)
+    	            {
+    	        		Auditoria audit = new Auditoria();
+    	        		audit.setAccio("S");
+    	        		audit.setObjecte("SSO");
+    	        		audit.setAutor(Security.getCurrentUser());
+    	        		audit.setCalendar(Calendar.getInstance());
+    	        		audit.setAccount(account.getName());
+    	        		audit.setBbdd(account.getDispatcher());
+    	        		audit.setData("-");
+    	        		getAuditoriaService().create(audit);
+    	            	return p;
+					}
                 } catch (Exception e) {
                     lastException = e;
                 }
@@ -1281,6 +1302,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         auditoria.setAccount(account.getName());
         auditoria.setBbdd(account.getSystem().getName());
         auditoria.setAutor(codiUsuariCanvi);
+        auditoria.setCalendar(Calendar.getInstance());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
         auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
@@ -1289,8 +1311,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
         	for (UserAccountEntity ua : account.getUsers()) auditoria.setUsuari(ua.getUser().getUserName());
         }
 
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
-        getAuditEntityDao().create(auditoriaEntity);
+        getAuditoriaService().create (auditoria);
     }
 
     /* (non-Javadoc)

@@ -8,14 +8,18 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.AuditEntity;
+
 import org.hibernate.Hibernate;
 
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import org.hibernate.Hibernate;
 
 /**
@@ -40,6 +44,7 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
 		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setCalendar(Calendar.getInstance());
 		auditoria.setObjecte("SC_ACCACC"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);

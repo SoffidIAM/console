@@ -50,8 +50,8 @@
 				}
 				catch (Exception ex) {}
 			
-				queryWindowMin = "75px";
-				queryWindowMax = "130px";
+				queryWindowMin = "";
+				queryWindowMax = "auto";
 			
 				mode = "query";
 				boolean view_altres = false;

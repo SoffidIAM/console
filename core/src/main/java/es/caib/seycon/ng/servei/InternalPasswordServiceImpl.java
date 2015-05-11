@@ -40,10 +40,7 @@ import es.caib.seycon.ng.sync.servei.TaskQueue;
 import es.caib.seycon.util.Base64;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.rmi.RemoteException;
 import java.security.MessageDigest;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -58,9 +55,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.hibernate.SessionFactory;
-import org.hibernate.collection.AbstractPersistentCollection;
-import org.hibernate.collection.PersistentSet;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -88,7 +83,7 @@ public class InternalPasswordServiceImpl extends
      */
     @SuppressWarnings(value = "rawtypes")
     protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user, com.soffid.iam.model.PasswordPolicyEntity politica, es.caib.seycon.ng.comu.Password password) throws InternalErrorException {
-        PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password);
+        PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, getUserAccounts (user, politica));
         
         if (pcr != PolicyCheckResult.VALID)
         	return pcr;
@@ -100,6 +95,28 @@ public class InternalPasswordServiceImpl extends
     }
 
     /**
+     * Gets the list of accounts that belong to a user and a selected password polciy apply.
+     * 
+     * @param user user 
+     * @param politica password policy
+     * @return set of accounts
+     */
+    private Collection<AccountEntity> getUserAccounts(UserEntity user,
+			PasswordPolicyEntity politica) {
+    	LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
+    	for (UserAccountEntity uae: user.getAccounts())
+    	{
+    		AccountEntity acc = uae.getAccount();
+    		if (acc.getType().equals(AccountType.USER))
+    		{
+    			if (acc.getSystem().getPasswordDomain() == politica.getPasswordDomain())
+    				accounts.add(acc);
+    		}
+    	}
+    	return accounts;
+	}
+
+	/**
      * @throws InternalErrorException
      * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPolicy(es.caib.seycon.ng.model.UsuariEntity,
      *      es.caib.seycon.ng.model.PoliticaContrasenyaDominiEntity,
@@ -112,7 +129,9 @@ public class InternalPasswordServiceImpl extends
     	return handleCheckPolicy (user, politica, password);
     }
 
-	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica, es.caib.seycon.ng.comu.Password password) {
+	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica, es.caib.seycon.ng.comu.Password password,
+			Collection<AccountEntity> accounts)
+	{
 		String uncrypted = password.getPassword();
         if (politica.getMaxLength() != null && uncrypted.length() > politica.getMaxLength().longValue()) {
             return PolicyCheckResult.TOO_LONG;
@@ -187,10 +206,59 @@ public class InternalPasswordServiceImpl extends
                 }
             }
         }
+        
+        if (politica.getComplexPasswords() != null && politica.getComplexPasswords().booleanValue())
+        {
+        	return checkComplexRequirements (accounts, password);
+        }
         return PolicyCheckResult.VALID;
 	}
 
-    /**
+    private PolicyCheckResult checkComplexRequirements(Collection<AccountEntity> accounts,
+			Password password) {
+    	// Check account inclussion
+    	for (AccountEntity acc: accounts)
+    	{
+    		if (password.getPassword().toLowerCase().contains(acc.getName().toLowerCase()))
+    			return PolicyCheckResult.CONTAINS_ACCOUNTNAME;
+    		
+    		if (password.getPassword().toLowerCase().contains(acc.getDescription().toLowerCase()))
+    			return PolicyCheckResult.CONTAINS_NAME;
+    	}
+    	
+    	// Check for display name inclussion
+    	for (AccountEntity acc: accounts)
+    	{
+    		for (String part: acc.getDescription().split("[,.#-_ &\t]+"))
+    		{
+    			if (part.length() >= 3 && password.getPassword().toLowerCase().contains(part.toLowerCase()))
+    	    			return PolicyCheckResult.CONTAINS_NAME;
+    		}
+    	}
+    	
+    	int mays = 0, mins = 0, numbers = 0, signs = 0, others = 0;
+    	
+    	for (char ch: password.getPassword().toCharArray())
+    	{
+    		if (Character.isUpperCase(ch))
+    			mays = 1;
+    		else if (Character.isLowerCase(ch))
+    			mins = 1;
+    		else if (Character.isDigit(ch))
+    			numbers = 1;
+    		else if (Character.isLetter(ch))
+    			others = 1;
+    		else
+    			signs = 1;
+    	}
+    	
+    	if (mays + mins + numbers + signs + others < 3)
+    		return PolicyCheckResult.MORE_TYPES_OF_CHARS;
+    	
+    	return PolicyCheckResult.VALID;
+	}
+
+	/**
      * @param untilDate 
      * @see es.caib.seycon.ng.servei.InternalPasswordService#storePassword(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String, es.caib.seycon.ng.comu.Password, boolean)
@@ -874,7 +942,7 @@ public class InternalPasswordServiceImpl extends
 				return PolicyCheckResult.NOPOLICY_DEFINED;
 			}
 			
-	        PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password);
+	        PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, Collections.singleton(account));
 	        
 	        if (pcr != PolicyCheckResult.VALID)
 	        	return pcr;
@@ -1299,6 +1367,13 @@ public class InternalPasswordServiceImpl extends
    				.append('\n');
 	}
 
+	private void addCondition (StringBuffer b, String message, Boolean value)
+	{
+   		if (value != null && value.booleanValue())
+   			b.append (String.format(message, value))
+   				.append('\n');
+	}
+
 	private void addCondition (StringBuffer b, String message, String value)
 	{
    		if (value != null && value.length() > 0)
@@ -1325,6 +1400,7 @@ public class InternalPasswordServiceImpl extends
    		addCondition(b, Messages.getString("PasswordServiceImpl.MaxSignsCondition"), politica.getMaxSymbols()); //$NON-NLS-1$
    		addCondition(b, Messages.getString("PasswordServiceImpl.PatternCondition"), politica.getRegularExpression()); //$NON-NLS-1$
    		addCondition(b, Messages.getString("PasswordServiceImpl.MaxHistoricCondition"), politica.getRememberedPasswords()); //$NON-NLS-1$
+   		addCondition (b, Messages.getString("PasswordServiceImpl.ComplexPasswordsCondition"), politica.getComplexPasswords()); //$NON-NLS-1$
    		if (politica.getForbiddenWords() != null && !politica.getForbiddenWords().isEmpty())
    		{
    			b.append (Messages.getString("PasswordServiceImpl.WordNotAllowedCondition")); //$NON-NLS-1$
@@ -1342,7 +1418,8 @@ public class InternalPasswordServiceImpl extends
 	 */
 	@Override
     protected PolicyCheckResult handleCheckPolicy(PasswordPolicyEntity policy, Password password) throws Exception {
-		return 	internalCheckBasicPolicy( policy, password);
+		Collection<AccountEntity> accounts = Collections.emptyList();
+		return 	internalCheckBasicPolicy( policy, password, accounts);
 	}
 
 	/* (non-Javadoc)

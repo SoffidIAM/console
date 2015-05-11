@@ -13,6 +13,7 @@ import com.soffid.iam.model.UserEntity;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.EstatContrasenya;
@@ -232,7 +233,8 @@ public class SelfServiceImpl extends SelfServiceBase
 	 */
 	public Password handleQueryAccountPassword (Account account) throws InternalErrorException
 	{
-		return getAccountService().queryAccountPassword(account);
+		Password p = getAccountService().queryAccountPassword(account);
+		return p;
 	}
 	
 	

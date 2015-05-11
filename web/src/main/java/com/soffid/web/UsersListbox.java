@@ -36,6 +36,7 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 					{
 						Listheader h = new Listheader(tda.getLabel());
 						h.setWidth("12%");
+						h.setVisible(false);
 						h.setParent(getListhead());
 						h.setSort("auto");
 						DataListcell lc = new DataListcell();
@@ -48,6 +49,7 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 						h.setWidth("12%");
 						h.setParent(getListhead());
 						h.setSort("auto");
+						h.setVisible(false);
 						DataListcell lc = new DataListcell();
 						lc.setParent(getMasterListItem());
 						DataDatebox db = new DataDatebox();

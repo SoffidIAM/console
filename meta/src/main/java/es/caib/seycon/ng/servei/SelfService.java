@@ -12,6 +12,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.model.AuditoriaEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.servei.DispatcherService.class,
-	DadesAddicionalsService.class})
+	DadesAddicionalsService.class,
+	AuditoriaService.class})
 public abstract class SelfService {
 
 	@Operation(translated="getUserAccounts")

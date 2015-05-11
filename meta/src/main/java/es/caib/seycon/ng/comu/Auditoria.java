@@ -12,6 +12,7 @@ import com.soffid.mda.annotation.*;
 public abstract class Auditoria {
 
 	@Attribute(translated = "additionalInfo" )
+	@Nullable
 	public java.lang.String data;
 
 	@Nullable

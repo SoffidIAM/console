@@ -6,7 +6,7 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?component name="input_finestra" macro-uri="comu/input_finestra.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+<frame xmlns:h="http://www.w3.org/1999/xhtml"> 
 	<style src="~./styles/estil.css"/>
 
 	<datamodel id="model" rootNode="llistesCorreu" src="descriptorLlistaCorreu.xml"/>
@@ -1368,4 +1368,4 @@
 	<include src="finestres/finestra_valorGeneric.zul"/>	
 	<include src="rolsllista.zul" />
 	<include src="grupsllista.zul" />
-</zk>
+</frame>

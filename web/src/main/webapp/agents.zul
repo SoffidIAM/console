@@ -675,7 +675,7 @@
 			</zscript>
 			
 			<form id="form" dataPath="/esquema/lista/listbox:/."
-				onChangeXPath="onChangeDades()">
+				onChangeXPath="onChangeDades()" width="100%">
 				<attribute name="onActualitza">
 					if (event.getData() instanceof String) {
 						dada = (String)event.getData();
@@ -690,15 +690,15 @@
 					<!-- Va afegint els grups separats per comes -->
 					camp.setValue((oldValue == null ? "" : oldValue + ", ") + dada);
 				</attribute>
-				<tabbox id="panels" width="${amplaria2}">
+				<tabbox id="panels" width="100%">
 				<tabs>
 					<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
 					<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
 					<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
 				</tabs>
 				<tabpanels>
-					<tabpanel id="basica">
-					<vbox width="${amplaria2}">
+					<tabpanel id="basica" width="100%">
+					<vbox width="100%">
 					<grid width="99%">
 					<columns visible="false"><column width="14%"/><column/> </columns>
 						<rows>

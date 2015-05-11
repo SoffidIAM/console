@@ -10,7 +10,7 @@
     <!-- jdbc connection properties -->
     
     <property name="hibernate.dialect">com.soffid.iam.model.CustomDialect</property>
-    <property name="hibernate.connection.datasource">java:/jdbc/seycon</property>
+    <property name="hibernate.connection.datasource">java:/es.caib.bpm.db</property>
 	<property name="hibernate.jdbc.batch_size">0</property>
 
     <!-- property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>  -->

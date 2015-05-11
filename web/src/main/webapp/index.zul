@@ -52,7 +52,6 @@
 					for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
 					{
 						Component c = it2.next();
-						log.info ("Found treecel " +item.getId());
 						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 						{
 							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;

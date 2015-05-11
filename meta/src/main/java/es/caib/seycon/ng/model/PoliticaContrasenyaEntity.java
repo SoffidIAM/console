@@ -108,12 +108,17 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable
 	public java.lang.Boolean allowPasswordChange;
 
+	@Description ("Enable complex password just like MS AD")
+	@Column (name="PCD_COMPLEX", defaultValue="false")
+	public Boolean complexPasswords;
+
 	@Operation(translated="findByPasswordDomain")
 	@DaoFinder("select pol from \n"
 			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"
 			+ "left join pol.passwordDomain con\n"
 			+ "where (:passwordDomain is null or con.name=:passwordDomain) \n"
 			+ "order by con.name")
+
 	public java.util.List<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> findByDominiContrasenya(
 		java.lang.String passwordDomain) {
 	 return null;

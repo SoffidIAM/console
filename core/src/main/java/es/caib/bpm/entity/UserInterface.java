@@ -34,7 +34,7 @@ METODOS PUBLICOS
 	 * 
 	 * @param id el idenfiticador �nico de la base de datos
 	 */
-	public void setId(Long  id)
+	public void setId(Long id)
 	{
 		this.id = id;
 	}

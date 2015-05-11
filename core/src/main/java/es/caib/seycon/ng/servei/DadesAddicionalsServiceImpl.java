@@ -9,6 +9,13 @@
  */
 package es.caib.seycon.ng.servei;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Vector;
+
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.UserDataEntity;

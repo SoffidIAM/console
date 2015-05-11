@@ -76,7 +76,6 @@
 			}
 			
 			mostraPanel (quin) {
-				amplaria_w = session.getAttribute("amplaria");
 				if ("agents".equals(quin)) {
 					t_tasques.setVisible(false);
 					t_tasquesagent.setVisible(false);
@@ -86,6 +85,7 @@
 					t_agents.setVisible(true);
 					t_agents.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else if ("tasques".equals(quin)) {
 					t_agents.setVisible(false);
@@ -106,6 +106,7 @@
 					t_agents.setVisible(true);
 					t_tasquesagent.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else if ("tasquesAgentDesDeTasques".equals(quin)) {
 					t_seyconInfo.setVisible(false);
@@ -116,6 +117,7 @@
 					t_dbpool.setVisible(false);
 					t_tasquesagent.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else if ("serverInfo".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -126,6 +128,7 @@
 					t_seyconInfo.setVisible(true);
 					t_seyconInfo.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else if ("serverReset".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -136,6 +139,7 @@
 					t_reset.setVisible(true);
 					t_reset.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else if ("dbpool".equals(quin)) {
 					t_tasques.setVisible(false);
@@ -146,6 +150,7 @@
 					t_dbpool.setVisible(true);
 					t_dbpool.setSelected(true);
 					titoltasques.setVisible(true);
+					panels.setWidth("100%");
 					panels.setVisible(true);
 				} else { // ALTRES...
 					panels.setVisible(false);
@@ -319,7 +324,7 @@
 					
 					model.getVariables().declareVariable("urlserver", dada);
 					tasquesSeycon.setTasques(resultat.get(0), resultat.get(1),
-							session.getAttribute("amplaria"), dada);
+							"100%", dada);
 					// Ajustem amplària del tabbox (only if needed)
 					ampleNou = tasquesSeycon.getDataRenderer().getAmpleMinimListbox();
 					if (ampleNou != 0)
@@ -610,7 +615,7 @@
 		]]>
 	</zscript>
 
-	<div sclass="titolpagina" width="800px">
+	<div sclass="titolpagina" width="100%">
 		${c:l('seyconserver.zul.Estatdelsservidorsde')}
 		
 		<h:span style="display: inline-block; margin-right: 33px; float: right">
@@ -628,13 +633,13 @@
 	<timer id="timer" delay="${refreshPageTime}" repeats="true" 
 		onTimer="refreshPage()" />
 	
-	<hbox width="800px" widths="*,1px,20px">
+	<hbox width="900px%" widths="800px,50px">
 		<vbox width="100%">
-		<listbox dataPath="/model:/server" fixedLayout="true" id="gridServidors"
-			noSizable="true" sclass="likeagrid headcentrat nosel" width="99%"
+		<listbox dataPath="/model:/server" fixedLayout="false" id="gridServidors" width="100%"
+			noSizable="true" sclass="likeagrid headcentrat nosel"
 			onCreate="checkRefreshPage()">
 			<listhead><!--  NOTA: si es canvia, canviar també el dee de tasques pendents -->
-				<listheader label="${c:l('seyconserver.zul.URL')}" width="*"/>
+				<listheader label="${c:l('seyconserver.zul.URL')}" width="20em"/>
 				<listheader label="${c:l('seyconserver.zul.Status')}" width="50px"/>
 				<listheader label="${c:l('seyconserver.zul.Agents')}" width="26%"/>
 				<listheader label="${c:l('seyconserver.zul.Tasques')}" width="22%"/>
@@ -698,9 +703,9 @@
 		</listbox>
 		<iframe height="0" id="logwindow" visible="false" width="0"/>
 		<listbox id="gridTasquesPendents" dataPath="/model:/tasquespendents"
-			fixedLayout="true" sclass="likeagrid headcentrat nosel" width="99%">
+			fixedLayout="false" sclass="likeagrid headcentrat nosel" width="100%">
 			<listhead>
-				<listheader label="${c:l('seyconserver.zul.URL')}" width="*"/>
+				<listheader label="${c:l('seyconserver.zul.URL')}" width="20em"/>
 				<listheader label="${c:l('seyconserver.zul.Estat')}" width="50px"/>
 				<listheader label="${c:l('seyconserver.zul.Agents')}" width="26%"/>
 				<listheader label="${c:l('seyconserver.zul.Tasques')}" width="22%"/>
@@ -751,7 +756,7 @@
 		<tab id="t_reset" label="${c:l('seyconserver.zul.Reinicideservidors')}" visible="${canRestartAgent}"/>
 		<tab id="t_dbpool" label="${c:l('seyconserver.zul.ConsultesSQL')}" visible="false"/>
 	</tabs>
-	<tabpanels>
+	<tabpanels width="100%">
 		<tabpanel id="tagents" width="100%">
 			<listbox id="gridAgents" dataPath="/model:/agentsserver"
 				fixedLayout="true" sclass="likeagrid headcentrat doscolors" width="100%">
@@ -837,7 +842,7 @@
 			</window>
 		</tabpanel>
 		
-		<tabpanel id="ttasquesagent">
+		<tabpanel id="ttasquesagent" width="100%">
 			<vbox width="100%">
 			<hbox sclass="taulaagents" width="99%">
 				<hbox>
@@ -904,7 +909,7 @@
 			</vbox>
 		</tabpanel>
 		
-		<tabpanel id="tSeyconInfo">
+		<tabpanel id="tSeyconInfo" width="100%">
 			<vbox>
 				<grid>
 					<columns visible="false">
@@ -962,7 +967,7 @@
 			</vbox>
 		</tabpanel>
 		
-		<tabpanel id="tReset">
+		<tabpanel id="tReset" width="100%">
 			<hbox width="100%">
 				<listbox dataPath="/model:/servidorsagents" fixedLayout="true"
 					id="listboxReset" sclass="likeagrid" width="99%">
@@ -1004,7 +1009,7 @@
 			</hbox>
 		</tabpanel>
 		
-		<tabpanel id="tb_dbpool">
+		<tabpanel id="tb_dbpool" width="100%">
 			<div height="300px" style="overflow:auto;border:1px solid #606E72;padding:5px;margin-bottom:5px;">
 				<label id="s_dbpool" multiline="true"/>
 			</div>

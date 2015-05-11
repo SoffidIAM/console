@@ -18,7 +18,7 @@
 	<!-- TABLE BPM_ACCESS_LOG  -->
 
 	<table name='BPM_ACCESS_LOG'>
-		<column name='ACC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ACC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='ACC_TYPE' type='CHAR' length='1'/>
 		<column name='ACC_DOC_ID' type='BIGINT'/>
 		<column name='ACC_USER' type='VARCHAR' length='255'/>
@@ -40,7 +40,7 @@
 	<!-- TABLE BPM_DOCUMENT  -->
 
 	<table name='BPM_DOCUMENT'>
-		<column name='DOC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='DOC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='DOC_MIME_TYPE' type='VARCHAR' length='255' notNull='true'/>
 		<column name='DOC_EXTERNAL_NAME' type='VARCHAR' length='255'/>
 		<column name='DOC_HASH' type='VARCHAR' length='255'/>
@@ -55,7 +55,7 @@
 	<!-- TABLE BPM_FILE_SYSTEM  -->
 
 	<table name='BPM_FILE_SYSTEM'>
-		<column name='FIL_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='FIL_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='FIL_APPLICATION' type='VARCHAR' length='255' notNull='true'/>
 		<column name='FIL_YEAR' type='BIGINT' notNull='true'/>
 		<column name='FIL_NEXT_DOC' type='BIGINT' notNull='true'/>
@@ -92,7 +92,7 @@
 		<column name='PDR_APP_ROLE' type='VARCHAR' length='250'/>
 		<column name='PDR_USER_ROLE' type='VARCHAR' length='250'/>
 		<column name='PDR_IS_USER' type='SMALLINT'/>
-		<column name='PDR_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='PDR_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 	</table>
 
 
@@ -104,7 +104,7 @@
 	<!-- TABLE BPM_PROCESS_FILE  -->
 
 	<table name='BPM_PROCESS_FILE'>
-		<column name='PRO_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='PRO_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='PRO_INSTANCE_ID' type='BIGINT' notNull='true'/>
 		<column name='PRO_DOC_ID' type='BIGINT' notNull='true'/>
 		<column name='PRO_DOC_HASH' type='VARCHAR' length='250' notNull='true'/>
@@ -115,7 +115,7 @@
 	<!-- TABLE BPM_PROC_DEF_PROPERTIES  -->
 
 	<table name='BPM_PROC_DEF_PROPERTIES'>
-		<column name='PDP_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='PDP_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='PDP_PROCESS_DEFINITION_ID' type='BIGINT' notNull='true'/>
 		<column name='PDP_NAME' type='VARCHAR' length='100' notNull='true'/>
 		<column name='PDP_VALUE' type='VARCHAR' length='1000'/>
@@ -130,7 +130,7 @@
 	<!-- TABLE BPM_ROLE  -->
 
 	<table name='BPM_ROLE'>
-		<column name='ROL_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ROL_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='ROL_NAME' type='VARCHAR' length='255' notNull='true'/>
 	</table>
 
@@ -141,7 +141,7 @@
 	<!-- TABLE BPM_SECCIO_PRESSUPOSTARIA  -->
 
 	<table name='BPM_SECCIO_PRESSUPOSTARIA'>
-		<column name='SEC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='SEC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='SEC_GRUP_ID' type='BIGINT'/>
 		<column name='SEC_NOM' type='VARCHAR' length='10'/>
 	</table>
@@ -150,7 +150,7 @@
 	<!-- TABLE BPM_SIGN  -->
 
 	<table name='BPM_SIGN'>
-		<column name='SIG_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='SIG_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='SIG_SIGN_TYPE' type='CHAR' length='1' notNull='true'/>
 		<column name='SIG_FS_PATH' type='VARCHAR' length='255' notNull='true'/>
 		<column name='SIG_TIMESTAMP' type='TIMESTAMP' notNull='true'/>
@@ -169,7 +169,7 @@
 	<!-- TABLE BPM_USER_CONFIG  -->
 
 	<table name='BPM_USER_CONFIG'>
-		<column name='USC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='USC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='USC_USER_ID' type='BIGINT' notNull='true'/>
 		<column name='USC_EMAIL_NOTIFICACIONS' type='VARCHAR' length='50'/>
 	</table>
@@ -182,7 +182,7 @@
 	<!-- TABLE BPM_USER_CONFIG_IGNORE_GROUPS  -->
 
 	<table name='BPM_USER_CONFIG_IGNORE_GROUPS'>
-		<column name='USC_IG_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='USC_IG_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='USC_IG_GROUP_NAME' type='VARCHAR' length='50'/>
 		<column name='USC_IG_CFG_ID' type='BIGINT' notNull='true'/>
 		<column name='USC_IG_TYPE' type='INTEGER' notNull='true'/>
@@ -192,7 +192,7 @@
 	<!-- TABLE BPM_USER_INTERFACE  -->
 
 	<table name='BPM_USER_INTERFACE'>
-		<column name='USI_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='USI_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='USI_TASK_NAME' type='VARCHAR' length='250'/>
 		<column name='USI_FILE_NAME' type='VARCHAR' length='2048'/>
 		<column name='USI_PROCESS_DEFINITION' type='BIGINT'/>
@@ -202,7 +202,7 @@
 	<!-- TABLE BPM_USER_INTERFACE_CLASS  -->
 
 	<table name='BPM_USER_INTERFACE_CLASS'>
-		<column name='USC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='USC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='USC_USI_ID' type='BIGINT' notNull='true'/>
 		<column name='USC_CLASS_NAME' type='VARCHAR' length='250' notNull='true'/>
 		<column name='USC_CLASS' type='BLOB' length='65535'/>
@@ -217,7 +217,7 @@
 	<!-- TABLE JBPM_ACTION  -->
 
 	<table name='JBPM_ACTION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='ISPROPAGATIONALLOWED_' type='SMALLINT'/>
@@ -268,7 +268,7 @@
 	<!-- TABLE JBPM_BYTEARRAY  -->
 
 	<table name='JBPM_BYTEARRAY'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='FILEDEFINITION_' type='BIGINT'/>
 	</table>
@@ -295,7 +295,7 @@
 	<!-- TABLE JBPM_COMMENT  -->
 
 	<table name='JBPM_COMMENT'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='VERSION_' type='BIGINT' notNull='true'/>
 		<column name='ACTORID_' type='VARCHAR' length='255'/>
 		<column name='TIME_' type='TIMESTAMP'/>
@@ -336,7 +336,7 @@
 	<!-- TABLE JBPM_DELEGATION  -->
 
 	<table name='JBPM_DELEGATION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASSNAME_' type='VARCHAR' length='4000'/>
 		<column name='CONFIGURATION_' type='VARCHAR' length='4000'/>
 		<column name='CONFIGTYPE_' type='VARCHAR' length='255'/>
@@ -348,7 +348,7 @@
 	<!-- TABLE JBPM_EVENT  -->
 
 	<table name='JBPM_EVENT'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='EVENTTYPE_' type='VARCHAR' length='255'/>
 		<column name='TYPE_' type='CHAR' length='1'/>
 		<column name='GRAPHELEMENT_' type='BIGINT'/>
@@ -372,7 +372,7 @@
 	<!-- TABLE JBPM_EXCEPTIONHANDLER  -->
 
 	<table name='JBPM_EXCEPTIONHANDLER'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='EXCEPTIONCLASSNAME_' type='VARCHAR' length='4000'/>
 		<column name='TYPE_' type='CHAR' length='1'/>
 		<column name='GRAPHELEMENT_' type='BIGINT'/>
@@ -387,7 +387,7 @@
 	<!-- TABLE JBPM_ID_GROUP  -->
 
 	<table name='JBPM_ID_GROUP'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='TYPE_' type='VARCHAR' length='255'/>
@@ -403,7 +403,7 @@
 	<!-- TABLE JBPM_ID_MEMBERSHIP  -->
 
 	<table name='JBPM_ID_MEMBERSHIP'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='ROLE_' type='VARCHAR' length='255'/>
@@ -435,7 +435,7 @@
 	<!-- TABLE JBPM_ID_USER  -->
 
 	<table name='JBPM_ID_USER'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='EMAIL_' type='VARCHAR' length='255'/>
@@ -449,7 +449,7 @@
 	<!-- TABLE JBPM_JOB  -->
 
 	<table name='JBPM_JOB'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='VERSION_' type='BIGINT'/>
 		<column name='DUEDATE_' type='TIMESTAMP'/>
@@ -500,7 +500,7 @@
 	<!-- TABLE JBPM_LOG  -->
 
 	<table name='JBPM_LOG'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='INDEX_' type='BIGINT'/>
 		<column name='DATE_' type='TIMESTAMP'/>
@@ -611,7 +611,7 @@
 	<!-- TABLE JBPM_MESSAGE  -->
 
 	<table name='JBPM_MESSAGE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='DESTINATION_' type='VARCHAR' length='255'/>
 		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
@@ -648,7 +648,7 @@
 	<!-- TABLE JBPM_MODULEDEFINITION  -->
 
 	<table name='JBPM_MODULEDEFINITION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='4000'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
@@ -669,7 +669,7 @@
 	<!-- TABLE JBPM_MODULEINSTANCE  -->
 
 	<table name='JBPM_MODULEINSTANCE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='PROCESSINSTANCE_' type='BIGINT'/>
 		<column name='TASKMGMTDEFINITION_' type='BIGINT'/>
@@ -691,7 +691,7 @@
 	<!-- TABLE JBPM_NODE  -->
 
 	<table name='JBPM_NODE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
@@ -741,7 +741,7 @@
 	<!-- TABLE JBPM_POOLEDACTOR  -->
 
 	<table name='JBPM_POOLEDACTOR'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='ACTORID_' type='VARCHAR' length='255'/>
 		<column name='SWIMLANEINSTANCE_' type='BIGINT'/>
 		<column name='VERSION_' type='BIGINT'/>
@@ -756,7 +756,7 @@
 	<!-- TABLE JBPM_PROCESSDEFINITION  -->
 
 	<table name='JBPM_PROCESSDEFINITION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='VERSION_' type='BIGINT'/>
 		<column name='ISTERMINATIONIMPLICIT_' type='SMALLINT'/>
@@ -774,7 +774,7 @@
 	<!-- TABLE JBPM_PROCESSINSTANCE  -->
 
 	<table name='JBPM_PROCESSINSTANCE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='VERSION_' type='BIGINT' notNull='true'/>
 		<column name='START_' type='TIMESTAMP'/>
 		<column name='END_' type='TIMESTAMP'/>
@@ -804,7 +804,7 @@
 	<!-- TABLE JBPM_RUNTIMEACTION  -->
 
 	<table name='JBPM_RUNTIMEACTION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='VERSION_' type='BIGINT' notNull='true'/>
 		<column name='EVENTTYPE_' type='VARCHAR' length='255'/>
 		<column name='TYPE_' type='CHAR' length='1'/>
@@ -828,7 +828,7 @@
 	<!-- TABLE JBPM_SWIMLANE  -->
 
 	<table name='JBPM_SWIMLANE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='ACTORIDEXPRESSION_' type='VARCHAR' length='255'/>
 		<column name='POOLEDACTORSEXPRESSION_' type='VARCHAR' length='255'/>
@@ -850,7 +850,7 @@
 	<!-- TABLE JBPM_SWIMLANEINSTANCE  -->
 
 	<table name='JBPM_SWIMLANEINSTANCE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='ACTORID_' type='VARCHAR' length='255'/>
 		<column name='SWIMLANE_' type='BIGINT'/>
@@ -872,7 +872,7 @@
 	<!-- TABLE JBPM_TASK  -->
 
 	<table name='JBPM_TASK'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
 		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
@@ -948,7 +948,7 @@
 	<!-- TABLE JBPM_TASKCONTROLLER  -->
 
 	<table name='JBPM_TASKCONTROLLER'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='TASKCONTROLLERDELEGATION_' type='BIGINT'/>
 	</table>
 
@@ -960,7 +960,7 @@
 	<!-- TABLE JBPM_TASKINSTANCE  -->
 
 	<table name='JBPM_TASKINSTANCE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
@@ -1011,7 +1011,7 @@
 	<!-- TABLE JBPM_TIMER  -->
 
 	<table name='JBPM_TIMER'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='DUEDATE_' type='TIMESTAMP'/>
 		<column name='REPEAT_' type='VARCHAR' length='255'/>
@@ -1050,7 +1050,7 @@
 	<!-- TABLE JBPM_TOKEN  -->
 
 	<table name='JBPM_TOKEN'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='VERSION_' type='BIGINT' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='START_' type='TIMESTAMP'/>
@@ -1091,7 +1091,7 @@
 	<!-- TABLE JBPM_TOKENVARIABLEMAP  -->
 
 	<table name='JBPM_TOKENVARIABLEMAP'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='CONTEXTINSTANCE_' type='BIGINT'/>
 		<column name='VERSION_' type='BIGINT'/>
@@ -1111,7 +1111,7 @@
 	<!-- TABLE JBPM_TRANSITION  -->
 
 	<table name='JBPM_TRANSITION'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
 		<column name='FROM_' type='BIGINT'/>
@@ -1140,7 +1140,7 @@
 	<!-- TABLE JBPM_VARIABLEACCESS  -->
 
 	<table name='JBPM_VARIABLEACCESS'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='VARIABLENAME_' type='VARCHAR' length='255'/>
 		<column name='ACCESS_' type='VARCHAR' length='255'/>
 		<column name='MAPPEDNAME_' type='VARCHAR' length='255'/>
@@ -1169,7 +1169,7 @@
 	<!-- TABLE JBPM_VARIABLEINSTANCE  -->
 
 	<table name='JBPM_VARIABLEINSTANCE'>
-		<column name='ID_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='CONVERTER_' type='CHAR' length='1'/>

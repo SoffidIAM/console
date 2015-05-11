@@ -200,16 +200,22 @@ public class BpmEngineImpl extends BpmEngineBase {
 						
 						Collection<RolGrant> roles = getAplicacioService().findEffectiveRolGrantByUser(userData.getId());
 						for (RolGrant role : roles) {
-                    String name = role.getRolName();
-                    if (!role.getDispatcher().equals(defaultDispatcher.getName())) name = name + "@" + role.getDispatcher();
-                    userGroups.add(name);
-                    if (role.getDomainValue() != null) {
-                        name = role.getRolName();
-                        name = name + "/" + role.getDomainValue();
-                        if (!role.getDispatcher().equals(defaultDispatcher.getName())) name = name + "@" + role.getDispatcher();
-                        userGroups.add(name);
-                    }
-                }
+							String name = role.getRolName();
+							if (role.getDispatcher().equals(defaultDispatcher.getName())) //$NON-NLS-1$
+								userGroups.add(name);
+							name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
+							userGroups.add(name);
+							// Now without domain
+							if (role.getDomainValue() != null)
+							{
+								name = role.getRolName();
+								name = name + "/" + role.getDomainValue(); //$NON-NLS-1$
+								if (role.getDispatcher().equals(defaultDispatcher.getName())) //$NON-NLS-1$
+									userGroups.add(name);
+								name = name + "@" + role.getDispatcher(); //$NON-NLS-1$
+								userGroups.add(name);
+							}
+						}
 						
 						for (String auth: Security.getAuthorizations())
 						{
@@ -2568,7 +2574,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add ("(usuari.lastName+' '+usuari.middleName) like :surName"); //$NON-NLS-1$
+			clauses.add ("concat(usuari.primerLlinatge,' ',usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
 			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
 		}
 		if (group != null) {
@@ -2589,6 +2595,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 			clause.append (subClause);
 		}
 		List<UserEntity> result = getUserEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
+		if (result.isEmpty())
+		{
+			for (Parameter param: p)
+			{
+				param.setValue("%"+param.getValue()+"%");
+			}
+		}
+		result = getUserEntityDao().query(clause.toString(), p.toArray(new Parameter[p.size()]));
 		return getUserEntityDao().toBPMUserList(result);
 	}
 

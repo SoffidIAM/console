@@ -54,7 +54,7 @@
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('valorDomini.zul.Valor')}"/>
-							<textbox id="detall_valor" maxlength="30" onChange="self.value=self.value.toUpperCase()" sclass="textbox" width="98%"/>
+							<textbox id="detall_valor" maxlength="30" onChange="" sclass="textbox" width="98%"/>
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('valorDomini.zul.Descripcia')}"/>

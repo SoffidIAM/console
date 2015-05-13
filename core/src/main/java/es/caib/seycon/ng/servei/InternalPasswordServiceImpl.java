@@ -99,15 +99,18 @@ public class InternalPasswordServiceImpl extends
     private Collection<AccountEntity> getUserAccounts(UsuariEntity user,
 			PoliticaContrasenyaEntity politica) {
     	LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
-    	for (UserAccountEntity uae: user.getAccounts())
-    	{
-    		AccountEntity acc = uae.getAccount();
-    		if (acc.getType().equals(AccountType.USER))
+	if (user != null)
+	{	
+    		for (UserAccountEntity uae: user.getAccounts())
     		{
-    			if (acc.getDispatcher().getDomini() == politica.getDominiContrasenya())
-    				accounts.add(acc);
+    			AccountEntity acc = uae.getAccount();
+    			if (acc.getType().equals(AccountType.USER))
+    			{
+    				if (acc.getDispatcher().getDomini() == politica.getDominiContrasenya())
+    					accounts.add(acc);
+    			}
     		}
-    	}
+	}
     	return accounts;
 	}
 

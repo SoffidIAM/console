@@ -457,7 +457,7 @@ public class RoleDependencyTest extends AbstractTest
 			{
 				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
 			}
-			assertEquals(2, rols.size());
+			assertEquals(true, rols.size() >= 2);
 
 		} finally {
 			Security.nestedLogoff();

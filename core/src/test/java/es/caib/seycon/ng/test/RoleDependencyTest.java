@@ -16,7 +16,9 @@ import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.servei.TipusUnitatOrganitzativaService;
 import es.caib.seycon.ng.utils.Security;
 
@@ -366,4 +368,99 @@ public class RoleDependencyTest extends AbstractTest
 		}
 	}
 
+	public void testTranistive () throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException
+	{
+		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
+		try {
+			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
+			
+			Dispatcher dis = new Dispatcher ();
+			dis.setBasRol(new Boolean(false));
+			dis.setCodi("dis4"); //$NON-NLS-1$
+			dis.setControlAccess(new Boolean(false));
+			dis.setDominiContrasenyes(dc.getCodi());
+			dis.setDominiUsuaris("DEFAULT");
+			dis.setIdDominiContrasenyes(dc.getId());
+			dis.setNomCla("- no class -"); //$NON-NLS-1$
+			dis.setRelacioLaboral("I"); //$NON-NLS-1$
+			dis = dispatcherSvc.create(dis);
+			
+			Grup g = new Grup ();
+			g.setCodi("g1");
+			g.setCodiPare("enterprise");
+			g.setDescripcio("Group 1");
+			grupSvc.create(g);
+			
+			Usuari u = new Usuari ();
+			u.setCodi("user3");
+			u.setNom("user3");
+			u.setPrimerLlinatge("user3");
+			u.setServidorCorreu("null");
+			u.setServidorHome("null");
+			u.setServidorPerfil("null");
+			u.setCodiGrupPrimari(g.getCodi());
+			u.setActiu(true);
+			u.setTipusUsuari("I");
+			u = usuariSvc.create(u);
+			
+			accountSvc.createAccount(u, dis, "user3");
+
+
+			Aplicacio app = appSvc.findAplicacioByCodiAplicacio("SOFFID"); //$NON-NLS-1$
+
+			Rol rol1 = createRol(dis, app, "ROLE_1");
+			Rol rol2 = createRol(dis, app, "ROLE_2");
+			Rol rol3 = createRol(dis, app, "ROLE_3");
+			Rol rol5 = createRol(dis, app, "ROLE_4");
+			
+			
+			// role3 => role2 => group world => user u
+			RolGrant rg = new RolGrant();
+			rg.setOwnerGroup(g.getCodi());
+			rg.setIdRol(rol2.getId());
+			rg.setDispatcher(rol2.getBaseDeDades());
+			rg.setRolName(rol2.getNom());
+			rg.setDomainValue(null);
+			rg.setHasDomain(false);
+			rol2.getGranteeGroups().add(rg);
+			rol2.getOwnerGroups().add(g);
+			appSvc.update(rol2);
+
+			rg = new RolGrant();
+			rg.setOwnerRol(rol2.getId());
+			rg.setIdRol(rol3.getId());
+			rg.setDispatcher(rol3.getBaseDeDades());
+			rg.setRolName(rol3.getNom());
+			rg.setDomainValue(null);
+			rg.setHasDomain(false);
+			rol3.getOwnerRoles().add(rg);
+			appSvc.update(rol3);
+
+			System.out.println ("User with granted role 2");
+			Collection<RolGrant> rols = appSvc.findEffectiveRolGrantsByRolId(rol2.getId());
+			for (RolGrant ru : rols)
+			{
+				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+			}
+			assertEquals(1, rols.size());
+			System.out.println ("User with granted role 3");
+			rols = appSvc.findEffectiveRolGrantsByRolId(rol3.getId());
+			for (RolGrant ru : rols)
+			{
+				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+			}
+			assertEquals(1, rols.size());
+			
+			System.out.println ("Roles granted to user user3");
+			rols = appSvc.findEffectiveRolGrantByUser(u.getId());
+			for (RolGrant ru : rols)
+			{
+				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+			}
+			assertEquals(2, rols.size());
+
+		} finally {
+			Security.nestedLogoff();
+		}
+	}
 }

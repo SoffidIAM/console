@@ -9,7 +9,7 @@ import es.caib.seycon.ng.comu.lang.MessageFactory;
 
 public class PolicyCheckResult implements Serializable {
     
-    private static int NUM_ERRORS = 16; 
+    private static int NUM_ERRORS = 19; 
 
     public static PolicyCheckResult VALID = new PolicyCheckResult (0);
     public static PolicyCheckResult TOO_LONG = new PolicyCheckResult (1);
@@ -27,6 +27,9 @@ public class PolicyCheckResult implements Serializable {
     public static PolicyCheckResult OLD_PASSWORD = new PolicyCheckResult (13);
     public static PolicyCheckResult FORBIDDEN_WORD = new PolicyCheckResult (14);
     public static PolicyCheckResult NOPOLICY_DEFINED = new PolicyCheckResult (15);
+    public static PolicyCheckResult CONTAINS_ACCOUNTNAME = new PolicyCheckResult (16);
+    public static PolicyCheckResult CONTAINS_NAME = new PolicyCheckResult (17);
+    public static PolicyCheckResult MORE_TYPES_OF_CHARS = new PolicyCheckResult (18);
 
     public int reasonCode;
     public String extraInfo;

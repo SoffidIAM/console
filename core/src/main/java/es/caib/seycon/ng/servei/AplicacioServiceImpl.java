@@ -2314,9 +2314,14 @@ public class AplicacioServiceImpl extends
 				RolAccountDetail rad;
 				if (originalGrant instanceof RolAccountEntity)
 					rad = new RolAccountDetail((RolAccountEntity) originalGrant, acc);
-				else
+				else if (originalGrant instanceof RolsGrupEntity)
 					rad = new RolAccountDetail((RolsGrupEntity) originalGrant, acc);
-				if ( ! radSet.contains(rad))
+				else if (originalGrant instanceof RolAssociacioRolEntity)
+					rad = new RolAccountDetail((RolAssociacioRolEntity) originalGrant, acc, null);
+				else
+					rad = null;
+					
+				if ( rad != null && ! radSet.contains(rad))
 				{
 					radSet.add(rad);
 				}
@@ -2482,7 +2487,7 @@ class RolAccountDetail
 			qualifierAplicacio = previous.qualifierAplicacio;
 		if (qualifierGroup == null && previous != null)
 			qualifierGroup = previous.qualifierGroup;
-		if (previous.granted != null)
+		if (previous != null && previous.granted != null)
 			granteeRol = previous.granted;
 		rolRol = ra;
 		generateHash();

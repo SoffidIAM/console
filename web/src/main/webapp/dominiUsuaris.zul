@@ -737,6 +737,12 @@
 													</hbox>
 												</row>
 												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.complexity')}"/>
+													<checkbox bind="@complexPasswords" onCheck=""
+														disabled="${!canModifyDominiUsuari}"
+														label="${c:l('dominiUsuaris.zul.complexPasswords')}"/>
+												</row>
+												<row>
 													<input_etiqueta value="${c:l('dominiUsuaris.zul.Maximdevalorshistari')}"/>
 													<input_dada bind="@maxHistoric" id="pc_detall_maxHistoric" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
 												</row>

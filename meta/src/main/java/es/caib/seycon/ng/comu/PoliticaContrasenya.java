@@ -98,8 +98,13 @@ public abstract class PoliticaContrasenya {
 	@Attribute(translated = "passwordDomainCode" )
 	public java.lang.String codiDominiContrasenya;
 
+
+	@Description("Enables users to query password value")
 	public boolean allowPasswordQuery;
 
+	@Description("Enables users to change password value")
 	public boolean allowPasswordChange;
 
+	@Description ("Enable complex password just like MS AD")
+	public boolean complexPasswords;
 }

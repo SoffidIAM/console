@@ -338,17 +338,9 @@
 
 			<hbox>
 				<input_criteri id="queryCodi" etiqueta="${c:l('aplicacions.zul.Codi')}">
-					<attribute name="onChange">
-						self.getFellow("textbox").value =
-							self.getFellow("textbox").value.toUpperCase();
-					</attribute>
 				</input_criteri>
 				<input_criteri etiqueta="${c:l('aplicacions.zul.Nom')}" id="queryNom"/>
 				<input_criteri etiqueta="${c:l('aplicacions.zul.NomRol')}" id="queryRol">
-					<attribute name="onChange">
-						self.getFellow("textbox").value =
-							self.getFellow("textbox").value.toUpperCase();
-					</attribute>
 				</input_criteri>
 				
 				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>

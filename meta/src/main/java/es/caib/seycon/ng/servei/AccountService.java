@@ -31,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.ServerEntity.class,
 	es.caib.seycon.ng.servei.DominiUsuariService.class,
-	es.caib.seycon.ng.model.AuditoriaEntity.class})
+	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	AuditoriaService.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

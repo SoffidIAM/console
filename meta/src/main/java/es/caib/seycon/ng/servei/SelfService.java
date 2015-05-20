@@ -141,5 +141,5 @@ public abstract class SelfService {
 	public DadaUsuari updateUserAttribute (DadaUsuari attribute)
 	{return null;}
 
-	public TipusDada getDataTypeDescription (String attName) { return null; }
+	public TipusDada getDataTypeDescription (@Nullable String systemName, String attName) { return null; }
 }

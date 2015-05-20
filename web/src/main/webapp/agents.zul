@@ -6,6 +6,7 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?component name="input_password" macro-uri="comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="agent/account_metadata.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
 	<style>
@@ -256,6 +257,7 @@
 			{
 				setVisibleControlAcces(false);
 				setVisibleAttributeMapping(false);
+				setVisibleMetadata(false);
 				showDetall();
 			}
 			
@@ -325,6 +327,12 @@
 				if (visible == false && esquema.getFellow("dades").getFellow("r_attributeMapping").isSelected())
 					esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
 				esquema.getFellow("dades").getFellow("r_attributeMapping").setVisible(visible);
+			}
+			
+			void setVisibleMetadata(boolean visible) {
+				if (visible == false && esquema.getFellow("dades").getFellow("r_metadata").isSelected())
+					esquema.getFellow("dades").getFellow("r_basica").setSelected(true);
+				esquema.getFellow("dades").getFellow("r_metadata").setVisible(visible);
 			}
 			
 			void carregaControlAcces() {
@@ -510,7 +518,7 @@
 					</hbox>
 					<commitbutton datamodel="/model" />
 					<undobutton datamodel="/model" listbox="/esquema/lista/listbox"
-						onClick="setVisibleControlAcces(false); setVisibleAttributeMapping(false)"/>
+						onClick="setVisibleControlAcces(false); setVisibleAttributeMapping(false); serVisibleMetadata(false);"/>
 					<listexporttoolbarbutton acces="${canQueryAgent}"
 						listbox="/esquema/lista/listbox"/>
 				</hbox>
@@ -644,6 +652,7 @@
 								agentId = XPathUtils.getValue(
 										XPathUtils.getComponentContext(form), "@id");
 								setVisibleAttributeMapping (agentId != null && enable);
+								setVisibleMetadata (agentId != null && enable);
 							}
 							
 							catch (Exception e) {
@@ -695,6 +704,7 @@
 					<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
 					<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
 					<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
+					<tab id="r_metadata" label="${c:l('agents.zul.accountMetadata')}"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="basica" width="100%">
@@ -772,12 +782,10 @@
 							</row>
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Server')}"/>
-								<hbox width="90%">
-									<!-- <input_dada bind="@url" id="detall_url" lectura="${!canModifyAgent}" maxim="100" width_custom="98%"/>-->
-	<!-- 								<textbox bind="@url" id="detall_url" readonly="${!canModifyAgent}" maxlength="100" width="98%" onChange=""/>  -->
+								<div width="90%">
 									<listbox
 										disabled="${!canModifyAgent}"
-										width="98%"
+										width="40%"
 										bind="@url" mold="select"
 										dataPath="/model:/serverSelector"
 										id="detall_url">
@@ -785,7 +793,9 @@
 											<listcell bind="@nom"/>
 										</dataitem>
 									</listbox>
-								</hbox>
+									<label value=" ${c:l('agents.zul.sharedThread')}:" />
+									<checkbox bind="@sharedDispatcher" />
+								</div>
 							</row>
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Fiable')}"/>
@@ -1661,6 +1671,9 @@
 						<div align="right"><listexportbutton acces="${canQueryAgent}" listbox="gridControlAccess"/></div>
 						</hbox>
 					</vbox>
+					</tabpanel>
+					<tabpanel id="tabMetadata">
+						<accountMetadata/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>				

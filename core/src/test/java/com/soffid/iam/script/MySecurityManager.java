@@ -18,20 +18,20 @@ public class MySecurityManager extends SecurityManager {
 	@Override
 	public void checkPermission(Permission perm) {
 		if (isScript()){
-			System.out.println ("Checking "+perm.toString());
+//			System.out.println ("Checking "+perm.toString());
 			super.checkPermission(perm);
 		}
 	}
 
 	@Override
 	public void checkPermission(Permission perm, Object context) {
-		System.out.println ("Checking "+perm.toString()+" ctx="+context);
+		//		System.out.println ("Checking "+perm.toString()+" ctx="+context);
 		super.checkPermission(perm, context);
 	}
 
 	@Override
 	public void checkPackageAccess(String pkg) {
-		System.out.println ("Checking package access "+pkg);
+		//		System.out.println ("Checking package access "+pkg);
 		if (pkg.startsWith("es.caib.seycon"))
 		{
 			System.out.println ("***");
@@ -43,7 +43,7 @@ public class MySecurityManager extends SecurityManager {
 
 	@Override
 	public void checkPackageDefinition(String pkg) {
-		System.out.println ("Checking package def "+pkg);
+		//System.out.println ("Checking package def "+pkg);
 		if (isScript())
 			throw new SecurityException ("Not allowed");
 		super.checkPackageDefinition(pkg);
@@ -51,7 +51,7 @@ public class MySecurityManager extends SecurityManager {
 
 	@Override
 	public void checkMemberAccess(Class<?> clazz, int which) {
-		System.out.println ("Checking member access "+clazz.getName()+" "+which);
+		//System.out.println ("Checking member access "+clazz.getName()+" "+which);
 		super.checkMemberAccess(clazz, which);
 	}
 

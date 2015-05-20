@@ -16,6 +16,8 @@ import java.util.Iterator;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.model.AccountAttributeEntity;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -36,7 +38,7 @@ public class DadaUsuariEntityDaoImpl
 	/**
 	 * 
 	 */
-	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss";
+	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
 
 	private void assertPhoneExists ()
 	{
@@ -69,7 +71,20 @@ public class DadaUsuariEntityDaoImpl
 			throws RuntimeException {
 		try {
 			assertPhoneExists();
-			super.create(dadaUsuari);
+			
+	    	if (dadaUsuari.getTipusDada().getUnique() != null &&
+	    			dadaUsuari.getTipusDada().getUnique().booleanValue() )
+	    	{
+				for (DadaUsuariEntity du: findByTypeAndValue(dadaUsuari.getTipusDada().getCodi(), 
+						dadaUsuari.getValorDada()))
+				{
+					throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.6"),  //$NON-NLS-1$
+							du.getValorDada(), du.getUsuari().getCodi())); 
+				}
+	    	}
+			
+
+	    	super.create(dadaUsuari);
 			if (Hibernate.isInitialized(dadaUsuari.getUsuari().getDadaUsuari()))
 				dadaUsuari.getUsuari().getDadaUsuari().add(dadaUsuari);
 			getSession(false).flush();
@@ -85,7 +100,20 @@ public class DadaUsuariEntityDaoImpl
 	public void update(DadaUsuariEntity dadaUsuariEntity) {
 		try {
 			assertPhoneExists();
-			super.update(dadaUsuariEntity);
+			
+	    	if (dadaUsuariEntity.getTipusDada().getUnique() != null &&
+	    			dadaUsuariEntity.getTipusDada().getUnique().booleanValue() )
+	    	{
+				for (DadaUsuariEntity du: findByTypeAndValue(dadaUsuariEntity.getTipusDada().getCodi(), 
+						dadaUsuariEntity.getValorDada()))
+				{
+					if (!dadaUsuariEntity.getId().equals(du.getId()))
+						throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.7"),  //$NON-NLS-1$
+							du.getValorDada(), du.getUsuari().getCodi())); 
+				}
+	    	}
+
+	    	super.update(dadaUsuariEntity);
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
@@ -205,10 +233,10 @@ public class DadaUsuariEntityDaoImpl
 
     private Calendar parseDate(String valorDada) {
     	String leftParse ;
-    	String rightParse = "";
+    	String rightParse = ""; //$NON-NLS-1$
     	String leftValue = valorDada;
-    	String rightValue = ""; 
-    	if (valorDada.endsWith("z") || valorDada.endsWith("Z"))
+    	String rightValue = "";  //$NON-NLS-1$
+    	if (valorDada.endsWith("z") || valorDada.endsWith("Z")) //$NON-NLS-1$ //$NON-NLS-2$
     	{
         	leftValue = valorDada.substring(0, valorDada.length()-1);
     	}
@@ -219,20 +247,20 @@ public class DadaUsuariEntityDaoImpl
     		int last = i > j ? i : j;
     		if (last > 0 && valorDada.length() - last == 5)
     		{
-    			rightParse = "Z";
+    			rightParse = "Z"; //$NON-NLS-1$
     			leftValue = valorDada.substring(0, last);
     			rightValue = valorDada.substring (last+1);
     		}
     		else if (last > 0)
     		{
-    			rightParse = "X";
+    			rightParse = "X"; //$NON-NLS-1$
     		}
     	}
     	
     	if (leftValue.length() > 14 && leftValue.charAt(14) == ',')
-        	leftParse = "yyyyMMddHHmmss,SSS";
+        	leftParse = "yyyyMMddHHmmss,SSS"; //$NON-NLS-1$
     	else
-    		leftParse = "yyyyMMddHHmmss.SSS";
+    		leftParse = "yyyyMMddHHmmss.SSS"; //$NON-NLS-1$
     		
     	if (leftValue.length() < leftParse.length())
     		leftParse = leftParse.substring(0, leftValue.length());

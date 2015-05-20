@@ -291,6 +291,10 @@
 								<checkbox bind="@required" disabled="${!canModifyMetadata}" onClick="" onCheck=""/>
 						</row>
 						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Unique')}"/>
+								<checkbox bind="@unique" disabled="${!canModifyMetadata}" onClick="" onCheck=""/>
+						</row>
+						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}"/>
 								<textbox bind="@size" id="detail_size" maxlength="50"
 									sclass="textbox" readonly="${!canModifyMetadata}" width="8em" onChange=""/>

@@ -553,6 +553,7 @@
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />
 							<tab label="${c:l('accounts.RolsHeredats')}" />
+							<tab label="${c:l('accounts.attribute') }"/>
 						</tabs>
 
 						<tabpanels>
@@ -1076,6 +1077,9 @@
 											acces="${canQueryUser}" listbox="gridRolsHeredats" />
 									</hbox>
 								</vbox>
+							</tabpanel>
+							<tabpanel id="attributes">
+								<embed src="/accounts/attributes.zul"/>
 							</tabpanel>
 						</tabpanels>
 					</tabbox>

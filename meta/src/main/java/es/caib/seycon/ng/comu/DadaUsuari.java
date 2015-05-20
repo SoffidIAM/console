@@ -19,9 +19,19 @@ public abstract class DadaUsuari {
 	@Attribute(translated = "value" )
 	public java.lang.String valorDada;
 
+	@Description ("User name, when the data applies to a user. Null when applies to an account")
 	@Attribute(translated = "user" )
+	@Nullable
 	public java.lang.String codiUsuari;
 
+	@Description ("Account name, when the data applies to an account. Null when applies to a user")
+	@Nullable
+	String accountName;
+	
+	@Description ("Account system, when the data applies to an account. Null when applies to a user")
+	@Nullable
+	String systemName;
+	
 	@Nullable
 	public java.lang.Long id;
 

@@ -158,7 +158,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			name = gessAccountName(ue.getCodi(), de.getCodi());
 							
 			if (name == null)
-				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")); //$NON-NLS-1$
+				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")+" ("+ue.getCodi()+" / "+de.getCodi()+") "); //$NON-NLS-1$
 		}
 		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(name, de.getCodi());
 		if (acc != null)
@@ -1050,8 +1050,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToQueryPassword")); //$NON-NLS-1$
 		
 
+		return handleQueryAccountPasswordBypassPolicy(account.getId());
+	}
+
+	@Override
+	protected Password handleQueryAccountPasswordBypassPolicy(long accountId)
+			throws InternalErrorException, Exception {
 		Usuari usuari = AutoritzacionsUsuari.getCurrentUsuari();
 		
+		AccountEntity acc = getAccountEntityDao().load(accountId);
+		if (acc == null)
+			return null;
 		
 		ServerEntityDao dao = getServerEntityDao();
 		Exception lastException = null;
@@ -1064,7 +1073,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     	            rsl.setAuthToken(se.getAuth());
     	            
     	            SyncStatusService sss = rsl.getSyncStatusService();
-    	            Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
+    	            Password p = sss.getAccountPassword(usuari.getCodi(), accountId);
     	            if (p != null)
     	            {
     	        		Auditoria audit = new Auditoria();
@@ -1072,8 +1081,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     	        		audit.setObjecte("SSO");
     	        		audit.setAutor(Security.getCurrentUser());
     	        		audit.setCalendar(Calendar.getInstance());
-    	        		audit.setAccount(account.getName());
-    	        		audit.setBbdd(account.getDispatcher());
+    	        		audit.setAccount(acc.getName());
+    	        		audit.setBbdd(acc.getDispatcher().getCodi());
     	        		audit.setData("-");
     	        		getAuditoriaService().create(audit);
     	            	return p;
@@ -1821,4 +1830,5 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getCodiDada()));
 		}
 	}
+
 }

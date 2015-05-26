@@ -14,6 +14,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Usuari;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -305,6 +306,11 @@ public abstract class AccountService {
 	 return null;
 	}
 
+	@Description ("Gets the account password bypassing passowrd policy")
+	public Password queryAccountPasswordBypassPolicy (long accountId)
+	{
+		return null;
+	}
 	///
 	@Description("Sets the account password")
 	@Operation ( grantees={roles.Tothom.class},

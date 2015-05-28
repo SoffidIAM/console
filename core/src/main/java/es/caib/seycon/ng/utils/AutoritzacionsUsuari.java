@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.model.AccountMetadataEntity;
 
 import es.caib.seycon.net.SeyconServiceLocator;
 import es.caib.seycon.ng.ServiceLocator;
@@ -384,17 +385,35 @@ public class AutoritzacionsUsuari
 	@SuppressWarnings ("rawtypes")
 	public static boolean canUpdateUserMetadata (UsuariEntity usuari)
 	{
+		return canUpdateUserMetadata(usuari,Security.AUTO_USER_METADATA_UPDATE  );
+	}
+	
+	@SuppressWarnings ("rawtypes")
+	public static boolean canUpdateAccountMetadata (UsuariEntity usuari)
+	{
+		return canUpdateUserMetadata(usuari,Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE  );
+	}
+	
+	@SuppressWarnings ("rawtypes")
+	public static boolean canQueryAccountMetadata (UsuariEntity usuari)
+	{
+		return canUpdateUserMetadata(usuari,Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY  );
+	}
+	
+	@SuppressWarnings ("rawtypes")
+	public static boolean canUpdateUserMetadata (UsuariEntity usuari, String auth)
+	{
 		// user:metadata:update [GRUPS]
 		if (! hasUpdateUserMetadata())
 			return false;
 
 		// Si pot actualitzar tots els usuaris
-		if (Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE + Security.AUTO_ALL))
+		if (Security.isUserInRole(auth + Security.AUTO_ALL))
 			return true;
 
 		boolean trobat = false;
 		if (usuari.getGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE
+						&& Security.isUserInRole(auth
 										+ "/" + usuari.getGrupPrimari().getCodi())) //$NON-NLS-1$
 			return true;
 		if (!trobat)
@@ -408,7 +427,7 @@ public class AutoritzacionsUsuari
 					UsuariGrupEntity ug = (UsuariGrupEntity) itGS.next();
 					GrupEntity grupS = ug.getGrup();
 					if (grupS != null
-									&& Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE
+									&& Security.isUserInRole(auth
 													+ "/" + grupS.getCodi())) //$NON-NLS-1$
 						return true;
 				}
@@ -2212,5 +2231,48 @@ public class AutoritzacionsUsuari
 			return AttributeVisibilityEnum.HIDDEN;
 	}
 
+	public static AttributeVisibilityEnum getAttributeVisibility(AccountEntity account, AccountMetadataEntity tda) {
+		if (account.getType().equals (AccountType.USER))
+		{
+			for (UserAccountEntity uae: account.getUsers())
+			{
+				return getAttributeVisibility(uae.getUser(), tda);
+			}
+		}
+		
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
+		else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE+Security.AUTO_AUTHORIZATION_ALL) )
+			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
+		else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY+Security.AUTO_AUTHORIZATION_ALL) )
+		{
+			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
+			if (AttributeVisibilityEnum.EDITABLE.equals (v))
+				v = AttributeVisibilityEnum.READONLY;
+			return v;
+		}
+		else
+			return AttributeVisibilityEnum.HIDDEN;
+	}
+
+	public static AttributeVisibilityEnum getAttributeVisibility(UsuariEntity user, AccountMetadataEntity tda) {
+		if (Security.getCurrentUser() != null && Security.getCurrentUser().equals(user.getCodi()))
+			return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
+		else if (AutoritzacionsUsuari.canUpdateAccountMetadata(user))
+			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
+		else if (AutoritzacionsUsuari.canQueryAccountMetadata(user))
+		{
+			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
+			if (AttributeVisibilityEnum.EDITABLE.equals (v))
+				v = AttributeVisibilityEnum.READONLY;
+			return v;
+		}
+		else
+			return AttributeVisibilityEnum.HIDDEN;
+	}
 }
 

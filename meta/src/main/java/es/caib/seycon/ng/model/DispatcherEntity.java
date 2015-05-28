@@ -159,6 +159,10 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public String authoritativeProcess;
 	
+	@Column (name="DIS_SHARED")
+	@Description ("false to use a dedicated server thread. true to use a shared server thread")
+	@Nullable
+	public Boolean sharedDispatcher;
 	@ForeignKey(foreignColumn="PAU_DIS_ID")
 	@Description ("Current authoritative changes pending to apply")
 	public Collection<AuthoritativeChangeEntity> pendingChanges;

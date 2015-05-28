@@ -54,4 +54,12 @@ public abstract class DispatcherHandler {
 
 	public abstract void doAuthoritativeImport (ScheduledTask task);
 
+	/**
+	 * Executes a single action
+	 * 
+	 * @return false if a delay should be performed
+	 * 
+	 * @throws InternalErrorException
+	 */
+	public abstract boolean runStep () throws InternalErrorException;
 }

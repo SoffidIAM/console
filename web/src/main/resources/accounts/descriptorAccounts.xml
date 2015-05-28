@@ -161,6 +161,14 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
 			</new-instance-bean>
 		</finder>
+		
+		<finder name="attribute" type ="attribute" refreshAfterCommit="true">
+			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
+				method="getAccountAttributes">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+		
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
 			<attribute-validator expr="${instance.dispatcher}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
@@ -236,4 +244,24 @@
 	
 	<datanode name="tipusUsuari" />
  	
+	<datanode name="attribute">
+		<script-handler>
+			<insert-script>
+				instance.accountName = parent.instance.name;
+				instance.systemName = parent.instance.dispatcher;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:comp/env/ejb/AccountEJB">
+			<insert-method method="createAccountAttribute" returnBean="true" > <!-- user:role:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="deleteAccountAttribute" >  <!-- user:role:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updateAccountAttribute">  
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
 </zkib-model>

@@ -53,5 +53,11 @@ public abstract class TipusDada {
 	@Nullable
 	public AttributeVisibilityEnum userVisibility;
 	
+	@Description ("System where this attribute applies to. Null applies to identity itself")
+	@Nullable
+	public String systemName;
 
+	@Description("Unique value")
+	@Nullable
+	public Boolean unique;
 }

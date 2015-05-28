@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Account",
@@ -83,4 +85,7 @@ public abstract class Account {
 	@Description("Account's user type. It is directly bound to a password policy depending on the system's password domain")
 	public java.lang.String passwordPolicy;
 
+	@Description ("Account attributes")
+	@Nullable
+	Map<String, Object> attributes;
 }

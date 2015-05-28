@@ -166,6 +166,28 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>account:attribute:update</codi>
+		<descripcio>Update accounts additional data</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			account:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>account:attribute:query</codi>
+		<descripcio>View accounts additional data</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			account:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>user:role:create</codi>
 		<descripcio>Make the assignment of users roles</descripcio>
 		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>

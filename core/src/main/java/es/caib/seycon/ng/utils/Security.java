@@ -84,7 +84,9 @@ public class Security {
     // "user:printer:query";
     // public static final String AUTO_USER_METADATA_CREATE =
     // "user:metadata:create";
+	public static final String AUTO_METADATA_UPDATE_ALL = "metadata:update:any";
     public static final String AUTO_USER_METADATA_UPDATE = "user:metadata:update"; //$NON-NLS-1$
+    
     public static final String AUTO_USER_ROLE_CREATE = "user:role:create"; //$NON-NLS-1$
     public static final String AUTO_USER_ROLE_DELETE = "user:role:delete"; //$NON-NLS-1$
     public static final String AUTO_USER_GROUP_CREATE = "user:group:create"; //$NON-NLS-1$
@@ -267,12 +269,15 @@ public class Security {
     public static final String AUTO_ACCOUNT_QUERY = "account:query"; //$NON-NLS-1$
     public static final String AUTO_ACCOUNT_PASSWORD = "account:password"; //$NON-NLS-1$
     
+    public static final String AUTO_ACCOUNT_ATTRIBUTE_UPDATE = "account:attribute:update"; //$NON-NLS-1$
+    public static final String AUTO_ACCOUNT_ATTRIBUTE_QUERY = "account:attribute:query";
+
     public static final String AUTO_REMEMBER_PASSWORD_CREATE = "rememberPassword:create"; //$NON-NLS-1$
     public static final String AUTO_REMEMBER_PASSWORD_UPDATE = "rememberPassword:update"; //$NON-NLS-1$
     public static final String AUTO_REMEMBER_PASSWORD_DELETE = "rememberPassword:delete"; //$NON-NLS-1$
     public static final String AUTO_REMEMBER_PASSWORD_QUERY = "rememberPassword:query"; //$NON-NLS-1$
     public static final String AUTO_SEU_VIEW_REMEMBER_PASSWORD = "seu:rememberPassword:show"; //$NON-NLS-1$
-
+	
     private static Class securityAssociationClass;
     private static Method getSubjectMethod;
 

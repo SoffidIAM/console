@@ -418,6 +418,7 @@ public class UsuariServiceImpl extends
 		}
 		
 		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
+		/*
 		String NIF = usuari.getNIF();
 		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
 			NIF = NIF.trim();
@@ -433,6 +434,7 @@ public class UsuariServiceImpl extends
 						codiUsuaris)); 
 			}
 		}
+		*/
 		
 		UsuariEntity usersSameCode = getUsuariEntityDao().findByCodi(usuari.getCodi());
 		if(usersSameCode != null)
@@ -1631,7 +1633,8 @@ public class UsuariServiceImpl extends
 			throw new SeyconAccessLocalException("UsuariService", "update (Usuari)", "user:update, user:update/*",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate"));			 //$NON-NLS-1$
 		}
-		
+
+		/*
 		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
 		String NIF = usuari.getNIF();
 		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
@@ -1655,6 +1658,7 @@ public class UsuariServiceImpl extends
 				}
 			}
 		}
+		*/
 		
 		// Ara hem de comprovar que si es modifica l'usuari [nom,llinatges o DNI, es verifique que siga correcte]
 		UsuariEntity usuariAbans = usuari.getId() != null ?  

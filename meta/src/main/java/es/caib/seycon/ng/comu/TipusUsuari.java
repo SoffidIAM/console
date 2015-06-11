@@ -22,4 +22,7 @@ public abstract class TipusUsuari {
 	@Attribute(translated = "description" )
 	public java.lang.String descripcio;
 
+	@Description ("True if this user or account should not be synchronized")
+	@Attribute (defaultValue="false")
+	public boolean unmanaged;
 }

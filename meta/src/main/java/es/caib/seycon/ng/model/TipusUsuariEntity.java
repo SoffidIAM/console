@@ -26,6 +26,10 @@ public abstract class TipusUsuariEntity {
 	@Nullable
 	public java.lang.String descripcio;
 
+	@Column (name="TUS_UNMANA", length=50)
+	@Nullable
+	public java.lang.Boolean unmanaged;
+
 	@ForeignKey (foreignColumn="PCD_TUS_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> politiques;
 

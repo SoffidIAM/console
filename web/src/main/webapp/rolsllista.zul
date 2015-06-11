@@ -311,7 +311,7 @@
 			]]>
 		</attribute>
 		
-		<criteris id="queryWindow" height="40px" onOK="search()" width="99%">
+		<criteris id="queryWindow" height="4em" onOK="search()" width="99%">
 			<hbox>
 				<input_criteri id="queryNom" etiqueta="${c:l('rolsllista.zul.Nom')}" />
 				<input_criteri id="queryAplicacio"

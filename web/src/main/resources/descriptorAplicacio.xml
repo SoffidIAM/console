@@ -231,6 +231,17 @@
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
+		<custom-attribute name="domainName">
+			if (instance.domini == null)
+				return "";
+			String l = org.zkoss.util.resource.Labels.getLabel("domainType."+instance.domini.nom);
+			if (l == null)
+				return instance.domini.nom;
+			else if (l.equals (""))
+			    return "";
+			else if (l != null)
+				return "&lt;"+l+"&gt;";
+		</custom-attribute>
 	</datanode>
 
 	<datanode name="responsable">  <!-- application:query -->

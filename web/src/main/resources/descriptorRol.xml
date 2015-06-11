@@ -58,7 +58,15 @@
 	</datanode>	
 	
 	<datanode name="domini">
-		<custom-attribute name="fullName" expr="${instance.nom} - ${instance.descripcio}"/>
+		<custom-attribute name="fullName" >
+			if (instance.nom == null)
+				return "";
+			String l = org.zkoss.util.resource.Labels.getLabel("domainType."+instance.nom);
+			if (l == null)
+				return instance.nom + " - "+instance.descripcio;
+			else
+				return l;
+		</custom-attribute>
 	</datanode>	
 	
 </zkib-model>

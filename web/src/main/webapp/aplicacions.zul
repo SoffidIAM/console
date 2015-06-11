@@ -1099,28 +1099,28 @@
 							</grid>
 						
 						</tabpanel>
-						<zscript>
-							// Arreglem el problema amb el checkbox de gestionableWF
-							// No funciona el primer element de la fila al carregar
-							// el contingut de forma dinàmica (fulfill), dóna un error
-							// de javascript
-							void doitright() {
-								gridRols.setDataPath("/esquema/lista/listbox:/rol");
-							}
-						</zscript>
 						
-						<tabpanel fulfill="tabrols.onSelect" id="rols" onFulfill="doitright()">
+						<tabpanel fulfill="tabrols.onSelect" id="rols">
 							<listbox fixedLayout="true" id="gridRols" mold="paging" pageSize="15" width="100%"
-								sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)">
+								sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)"
+								dataPath="/esquema/lista/listbox:/rol">
 								<listhead>
-									<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%"/>
-									<listheader label="${c:l('aplicacions.zul.Descripcia')}" sort="auto" width="32%"/>
-									<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="14%"/>
+									<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%">
+										<textboxfilter bind="@nom" />
+									</listheader>
+									<listheader label="${c:l('aplicacions.zul.Descripcia')}" sort="auto" width="32%">
+										<textboxfilter bind="@descripcio"/>
+									</listheader>
+									<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="14%">
+										<listboxfilter bind="@baseDeDades"/>
+									</listheader>
 									<listheader label="${c:l('aplicacions.zul.Defecte')}" sort="auto" tooltiptext="Defecte" width="40px"/>
 									<listheader label="${c:l('aplicacions.zul.Contrasenya')}" sort="auto" tooltiptext="Contrasenya" width="40px"/>
 									<listheader label="${c:l('aplicacions.zul.Ind')}" sort="auto" tooltiptext="Assignació Indirecta" width="30px"/>
 									<listheader label="${c:l('aplicacions.zul.gWF')}" tooltiptext="Gestionable per Workflow" width="30px"/>												
-									<listheader label="${c:l('aplicacions.zul.Domini')}" sort="auto" width="14%"/>
+									<listheader label="${c:l('aplicacions.zul.Domini')}" sort="auto" width="14%">
+										<listboxfilter bind="domainName"/>
+									</listheader>
 									<listheader id="c_gestionaRol" label="${c:l('aplicacions.zul.*')}" sclass="tcoth" visible="${canModifyAplicacio}" width="30px"/>
 									<listheader id="c_eliminaRol" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
 									<listheader id="c_eliminaRols" label="${c:l('aplicacions.zul.')}" sclass="tcoth" visible="${canModifyAplicacio or canDeleteAplicacio}" width="30px"/>
@@ -1137,7 +1137,7 @@
 									<listcell>
 										<checkbox bind="@gestionableWF" disabled="${!canModifyAplicacio}" onCheck=""/>
 									</listcell>
-									<listcell bind="domini/@nom"/>
+									<listcell bind="domainName"/>
 									<listcell sclass="tcoth">
 									<imageclic src="~./img/vincula.gif" tooltip="vincula">
 										<attribute name="onClick">

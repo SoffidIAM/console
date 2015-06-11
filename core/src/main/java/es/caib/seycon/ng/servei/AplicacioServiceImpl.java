@@ -2481,11 +2481,17 @@ class RolAccountDetail
 		qualifier = ra.getGrantedDomainValue();
 		qualifierAplicacio = ra.getGrantedApplicationDomain();
 		qualifierGroup = ra.getGrantedGroupDomain();
-		if (qualifier == null && previous != null)
+		if (qualifier == null && previous != null && 
+				previous.qualifier != null &&
+				ra.getRolContingut().getDominiAplicacio() != null &&
+				ra.getRolContingut().getDominiAplicacio().getNom().equals(previous.qualifier.getDomini().getNom()))
 			qualifier = previous.qualifier;
-		if (qualifierAplicacio == null && previous != null)
+		if (qualifierAplicacio == null && previous != null &&
+				granted.getTipusDomini().equals(TipusDomini.APLICACIONS))
 			qualifierAplicacio = previous.qualifierAplicacio;
-		if (qualifierGroup == null && previous != null)
+		if (qualifierGroup == null && previous != null &&
+				( granted.getTipusDomini().equals(TipusDomini.GRUPS) ||
+						granted.getTipusDomini().equals(TipusDomini.GRUPS_USUARI)))
 			qualifierGroup = previous.qualifierGroup;
 		if (previous != null && previous.granted != null)
 			granteeRol = previous.granted;
@@ -2493,6 +2499,7 @@ class RolAccountDetail
 		generateHash();
 	}
 	
+
 	public RolAccountDetail(RolAccountEntity ra, AccountEntity account)
 	{
 		this.account = account; 

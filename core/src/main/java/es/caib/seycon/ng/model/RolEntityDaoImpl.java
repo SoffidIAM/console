@@ -1348,7 +1348,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             }
 
         // 3) Propaguem els accounts
-        if (grupsPropagar != null)
+        if (accountsPropagar != null)
             for (Iterator<AccountEntity> it = accountsPropagar.iterator(); it.hasNext();) {
                 AccountEntity acc = it.next();
                 // insert into sc_tasque
@@ -1361,6 +1361,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 updateAccount.setStatus("P");// Posem com a pendent //$NON-NLS-1$
                 updateAccount.setUsuari(acc.getName());
                 updateAccount.setBd(acc.getDispatcher().getCodi());
+                updateAccount.setCoddis(acc.getDispatcher().getCodi());
                 TasqueEntity tasca = getTasqueEntityDao().tascaToEntity(
                         updateAccount);
                 getTasqueEntityDao().createNoFlush(tasca);

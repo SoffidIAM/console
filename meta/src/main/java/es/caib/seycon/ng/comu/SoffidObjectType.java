@@ -30,4 +30,6 @@ public class SoffidObjectType {
 
 	public java.lang.String OBJECT_AUTHORITATIVE_CHANGE="authChange";
 
+	public java.lang.String OBJECT_MAIL_LIST="mailList";
+
 }

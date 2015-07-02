@@ -8,7 +8,6 @@ public class SeyconServiceLocator {
         if (realLocator == null)
         {
             realLocator = es.caib.seycon.ng.ServiceLocator.instance();
-            realLocator.init("beanRefFactory.xml", "beanRefFactory"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return realLocator;
     }

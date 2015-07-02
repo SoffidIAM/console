@@ -25,7 +25,6 @@ public class SEULoginPage implements LoginPage {
 	
 	static {
 		locator = ServiceLocator.instance();
-		locator.init("beanRefFactory.xml", "beanRefFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public SEULoginPage() {

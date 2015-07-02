@@ -844,10 +844,14 @@
 							<listhead>
 								<listheader label="${c:l('dominiUsuaris.zul.Tipus')}" sort="auto" width="100px"/>
 								<listheader label="${c:l('dominiUsuaris.zul.Descripcia')}" sort="auto"/>
+								<listheader label="Unmanaged" sort="auto"/>
 							</listhead>
 							<dataitem bind=".">
 								<listcell bind="@codi" style="text-align:center"/>
 								<listcell bind="@descripcio"/>
+								<listcell>
+									<checkbox bind="@unmanaged" disabled="true"/>
+								</listcell>
 							</dataitem>
 						</listbox>
 					</navegador>
@@ -894,6 +898,10 @@
 											id="detall_descripcioTipusUsuari"
 											lectura="${!canModifyDominiUsuari}" maxim="50"
 											width_custom="96%"/>
+									</row>
+									<row>
+										<input_etiqueta value="Unmanaged"/>
+										<checkbox bind="@unmanaged" onCheck=""/>
 									</row>
 								</rows>
 							</grid>

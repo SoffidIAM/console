@@ -648,6 +648,14 @@ public class InternalPasswordServiceImpl extends
 		int minNums = pc.getMinNumeros() == null ? 0: pc.getMinNumeros().intValue();
 		int minSims = pc.getMinSignesPuntuacio() == null ? 0: pc.getMinSignesPuntuacio().intValue();
 		int maxMays, maxMins, maxNums, maxSims;
+		if (pc.getComplexPasswords() != null && pc.getComplexPasswords().booleanValue())
+		{
+			if (minMays <= 0) minMays = 1;
+			if (minNums <= 0) minNums = 1;
+			if (minSims <= 0) minSims = 1;
+			if (minMins <= 0) minMins = 1;
+			if ( length < 4) length  = 4;
+		}
 		maxMins = pc.getMaxMinuscules() == null ? length - minMays - minNums - minSims: 
 			pc.getMaxMinuscules().intValue();
 		if (maxMins > length)

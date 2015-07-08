@@ -21,6 +21,7 @@ import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiService
@@ -63,10 +64,10 @@ public class DominiServiceImpl extends
 					Messages.getString("DominiServiceImpl.1")); //$NON-NLS-1$
 		}
 		
+		DominiAplicacioEntity dominiEntity = getDominiAplicacioEntityDao()
+				.dominiToEntity(domini);
 		// codiExtern en dominis de tipus d'aplicació és el codi de l'aplicacio
-		if (AutoritzacionsUsuari.canDeleteAplicacio(domini.getCodiExtern())) {
-			DominiAplicacioEntity dominiEntity = getDominiAplicacioEntityDao()
-					.dominiToEntity(domini);
+		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, dominiEntity.getAplicacio())) {
 			getDominiAplicacioEntityDao().remove(dominiEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$
@@ -113,12 +114,10 @@ public class DominiServiceImpl extends
 					Messages.getString("DominiServiceImpl.4")); //$NON-NLS-1$
 		}
 		
+		ValorDominiAplicacioEntity valorDominiAplicacioEntity = getValorDominiAplicacioEntityDao()
+				.valorDominiToEntity(valorDomini);
 		// el codi extern conté el codi de l'aplicació (sempre tindrà valor)
-		if (AutoritzacionsUsuari.canCreateAplicacio(valorDomini.getCodiExternDomini()) ||
-				AutoritzacionsUsuari.canUpdateAplicacio(valorDomini.getCodiExternDomini()) ||
-				AutoritzacionsUsuari.canDeleteAplicacio(valorDomini.getCodiExternDomini())) {
-			ValorDominiAplicacioEntity valorDominiAplicacioEntity = getValorDominiAplicacioEntityDao()
-					.valorDominiToEntity(valorDomini);
+		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, valorDominiAplicacioEntity.getDomini().getAplicacio())) {
 			getValorDominiAplicacioEntityDao().remove(valorDominiAplicacioEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$

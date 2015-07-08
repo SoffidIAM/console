@@ -80,4 +80,8 @@ public abstract class RolAssociacioRolEntity {
 	public java.lang.String toString() {
 	 return null;
 	}
+
+	public boolean isAllowed(String permission) {
+		return false;
+	}
 }

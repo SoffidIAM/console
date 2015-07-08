@@ -1073,6 +1073,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         target.setIdRol(source.getRol().getId());
         target.setRolName(source.getRol().getNom());
         target.setDispatcher(source.getRol().getBaseDeDades().getCodi());
+        target.setInformationSystem(source.getRol().getAplicacio().getCodi());
 		for (UserAccountEntity ua: source.getAccount().getUsers())
 		{
 			target.setUser (ua.getUser().getCodi());

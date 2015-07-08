@@ -6,10 +6,17 @@
 
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.model.TipusDadaEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.servei.AutoritzacioService;
 
 @Entity(table = "SC_ACCATT")
 @Depends({ es.caib.seycon.ng.comu.DadaUsuari.class,
+	AutoritzacioService.class,
+	
 		es.caib.seycon.ng.model.AuditoriaEntity.class })
 public abstract class AccountAttributeEntity {
 	@Column(name = "AAT_ID")
@@ -44,6 +51,12 @@ public abstract class AccountAttributeEntity {
 	public java.util.List<AccountAttributeEntity> findByNameAndValue(
 			String system,
 			String name, String value) {
+		return null;
+	}
+
+	@Description ("Gets the visibility level for an attribue")
+	@Operation
+	public AttributeVisibilityEnum getAttributeVisibility() {
 		return null;
 	}
 }

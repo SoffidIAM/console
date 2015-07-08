@@ -590,12 +590,50 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>role:create</codi>
+		<descripcio>Create roles</descripcio>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>role:update</codi>
+		<descripcio>Update roles</descripcio>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>role:delete</codi>
+		<descripcio>Delete roles</descripcio>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query
+		</hereta>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>role:query</codi>
+		<descripcio>Query application roles</descripcio>
+		<ambit>Applications</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>application:create</codi>
 		<descripcio>Create applications</descripcio>
 		<ambit>Applications</ambit>
 		<hereta>
 			application:query,
-			application:update
+			application:update,
+			role:query,
+			role:update,
+			role:create,
+			role:delete
 		</hereta>
 	</autoritzacio>
 
@@ -605,7 +643,11 @@
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Applications</ambit>
 		<hereta>
-			application:query
+			application:query,
+			role:query,
+			role:update,
+			role:create,
+			role:delete
 		</hereta>
 	</autoritzacio>
 
@@ -615,7 +657,11 @@
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Applications</ambit>
 		<hereta>
-			application:query
+			application:query,
+			role:query,
+			role:update,
+			role:create,
+			role:delete
 		</hereta>
 	</autoritzacio>
 
@@ -626,6 +672,7 @@
 		<ambit>Applications</ambit>
 		<hereta>
 			usersDomain:query
+			role:query
 		</hereta>
 	</autoritzacio>
 

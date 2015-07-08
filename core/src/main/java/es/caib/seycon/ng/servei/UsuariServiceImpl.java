@@ -583,11 +583,6 @@ public class UsuariServiceImpl extends
 				&& certificacioDeCondicionsXML.contains("usuari"); //$NON-NLS-1$
 	}
 
-	private boolean hasNewUserCredentials(String unitatOrganitzativa)
-			throws Exception {
-		return AutoritzacionsUsuari.canCreateUsersOnGroup(unitatOrganitzativa);
-	}
-
 	// Cridat des del workflow per donar d'alta usuaris
 	public Usuari handleAltaUsuari(byte[] peticio,
 			es.caib.signatura.api.Signature signatura) throws Exception {
@@ -1017,7 +1012,7 @@ public class UsuariServiceImpl extends
 		}
 	}
 
-	private Collection findUsuarisByCriteri(String codi, String nom,
+	private Collection<UsuariEntity> findUsuarisByCriteri(String codi, String nom,
 			String primerLlinatge, String nomCurt, String dataCreacio,
 			String usuariCreacio, String actiu, String segonLlinatge,
 			String multiSessio, String comentari, String tipusUsuari,
@@ -1287,7 +1282,7 @@ public class UsuariServiceImpl extends
 			grupSecundari = null;
 		}
 
-		Collection usuaris = findUsuarisByCriteri(codi, nom, primerLlinatge,
+		Collection<UsuariEntity> usuaris = findUsuarisByCriteri(codi, nom, primerLlinatge,
 			nomCurt, dataCreacio, usuariCreacio, actiu, segonLlinatge,
 			multiSessio, comentari, tipusUsuari, servidorPerfil, servidorHome,
 			servidorCorreu, codiGrupPrimari, dni, dominiCorreu, grupSecundari,
@@ -1296,7 +1291,7 @@ public class UsuariServiceImpl extends
 		if (usuaris != null && usuaris.size() != 0)
 		{
 			// Ya tenemos los grupos del usuario con permisos
-			Collection usuarisPermis = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(usuaris);
+			Collection<UsuariEntity> usuarisPermis = filterUsers(usuaris);
 			
 			// Check maximum number of results
 			if ((restringeixCerca != null) &&
@@ -1821,10 +1816,8 @@ public class UsuariServiceImpl extends
 		Iterator<TipusDadaEntity> tipusDadesIterator = tipusDades.iterator();
 		while (tipusDadesIterator.hasNext()) {
 			TipusDadaEntity tipusDada = tipusDadesIterator.next();
-			AttributeVisibilityEnum v = AutoritzacionsUsuari.getAttributeVisibility(usuari, tipusDada);
 			if (tipusDada.getCodi().compareTo(NIF) != 0
-					&& tipusDada.getCodi().compareTo(TELEFON) != 0 &&
-					! v.equals(AttributeVisibilityEnum.HIDDEN)) {
+					&& tipusDada.getCodi().compareTo(TELEFON) != 0 ) {
 				Iterator<DadaUsuari> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
@@ -1833,18 +1826,19 @@ public class UsuariServiceImpl extends
 							&& dada.getCodiDada().compareTo(TELEFON) != 0 
 							&& dada.getCodiDada().compareTo(tipusDada.getCodi()) == 0)
 					{
-						
 						teTipusDada = true;
-						result.add(dada);
+						if (! dada.getVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+							result.add(dada);
 					}
 				}
 				if (!teTipusDada) {
-					DadaUsuari dus = new DadaUsuari();
-					dus.setCodiDada(tipusDada.getCodi());
-					dus.setDataLabel(tipusDada.getLabel() == null ? tipusDada.getCodi(): tipusDada.getLabel());
-					dus.setCodiUsuari(codiUsuari);
-					dus.setVisibility(v);
-					result.add(dus);
+					DadaUsuariEntity dus = getDadaUsuariEntityDao().newDadaUsuariEntity();
+					dus.setUsuari(usuari);
+					dus.setTipusDada(tipusDada);
+					if (! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+					{
+						result.add ( getDadaUsuariEntityDao().toDadaUsuari(dus));
+					}
 				}
 			}
 		}
@@ -2091,7 +2085,7 @@ public class UsuariServiceImpl extends
 	protected String handleCanviPassword(String codiUsuari, String codiDominiContrasenyes) throws Exception {
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
-			if ( AutoritzacionsUsuari.canUpdateUserPassword(usuari.getGrupPrimari().getCodi()) ) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari)) {
 				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService().generateNewPassword(usuari, dominiContrasenyes, true);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getCodi());
@@ -3558,11 +3552,11 @@ public class UsuariServiceImpl extends
 		}
 
 		String s = sb.toString ();
-		Collection usuaris = getUsuariEntityDao().query(s, params.toArray(new Parameter[0])); 
+		Collection<UsuariEntity> usuaris = getUsuariEntityDao().query(s, params.toArray(new Parameter[0])); 
 		if (usuaris != null && usuaris.size() != 0)
 		{
 			// Ya tenemos los grupos del usuario con permisos
-			Collection usuarisPermis = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(usuaris);
+			Collection<UsuariEntity> usuarisPermis = filterUsers(usuaris);
 			
 			if (usuarisPermis != null && usuarisPermis.size() != 0) {
 				List<Usuari> vos = getUsuariEntityDao().toUsuariList(usuarisPermis);
@@ -3592,13 +3586,23 @@ public class UsuariServiceImpl extends
 		return new Vector();
 	}
 
+	private Collection<UsuariEntity> filterUsers(Collection<UsuariEntity> usuaris) throws InternalErrorException {
+		LinkedList<UsuariEntity> result = new LinkedList<UsuariEntity>();
+		for (UsuariEntity ue: usuaris)
+		{
+			if (getAutoritzacioService().hasPermission(Security.AUTO_USER_QUERY, ue))
+				result.add (ue);
+		}
+		return result;
+	}
+
 	@Override
 	protected void handleSetTemporaryPassword(String codiUsuari,
 			String codiDominiContrasenyes, Password newPassword)
 			throws Exception {
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
-			if ( AutoritzacionsUsuari.canSetUserPassword(usuari.getGrupPrimari().getCodi()) ) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari) ) {
 				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
 				PolicyCheckResult validation = getInternalPasswordService().checkPolicy(usuari, dominiContrasenyes, newPassword);
 				if (! validation.isValid())

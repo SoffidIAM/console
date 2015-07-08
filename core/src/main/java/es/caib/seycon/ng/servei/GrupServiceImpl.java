@@ -9,11 +9,13 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -67,8 +69,8 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 	protected es.caib.seycon.ng.comu.Grup handleCreateGrup(es.caib.seycon.ng.comu.Grup grup) throws java.lang.Exception {
 
-		if (AutoritzacionsUsuari.canCreateGroup(grup.getCodi())) {
-			GrupEntity entity = getGrupEntityDao().grupToEntity(grup);
+		GrupEntity entity = getGrupEntityDao().grupToEntity(grup);
+		if (getAutoritzacioService().hasPermission(Security.AUTO_GROUP_CREATE, entity)) {
 			getGrupEntityDao().create(entity);
 			grup.setId(entity.getId());
 			return getGrupEntityDao().toGrup(entity);
@@ -81,38 +83,26 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	 * 
 	 * @see es.caib.seycon.ng.servei.GrupServiceBase#handleFindSubGrupsByCodiGrup(java.lang.String)
 	 */
-	protected Collection<Grup> handleFindSubGrupsByCodiGrup(String codiGrup) {
+	protected Collection<Grup> handleFindSubGrupsByCodiGrup(String codiGrup) throws InternalErrorException {
 		// Si és administrador d'usuaris els pot llistar tots
-		if (AutoritzacionsUsuari.canQueryGrup(codiGrup)) {
-			Collection groups = getGrupEntityDao().findSubGrupsByCodi(codiGrup);
-			if (groups != null) {
-				return getGrupEntityDao().toGrupList(groups);
-			}
-		} /*else {
-			//PJR taskId:837 26/05/09
-			//si no és administrador d'usuaris només pot llistar aquells grups als que pertany, y els seus grups pares.
-			Collection codisGrupsLectura=getCodisGrupsLectura();
-			
-			if (codisGrupsLectura.contains(codiGrup)) {
-				Collection groups = getGrupEntityDao().findSubGrupsByCodi(codiGrup);
-				
-				if (groups != null) {
-					Vector out=new Vector();
-					getGrupEntityDao().toGrupCollection(groups);
-					for(Iterator it=groups.iterator();it.hasNext();){
-						Grup grupARevisar = (Grup)it.next();
-						//només afegim els subgrups sobre els que té permisos
-						if(codisGrupsLectura.contains(grupARevisar.getCodi())){
-							out.add(grupARevisar);
-						}
-							
-					}
-					return out;
-				}
-			}
-			}*/
+		Collection<GrupEntity> groups = getGrupEntityDao().findSubGrupsByCodi(codiGrup);
+		if (groups != null) {
+			Collection<Grup> groupsList = filterGroups(groups);
+			return groupsList;
+		}
 
-		return new Vector();
+		return Collections.emptyList();
+	}
+
+	private List<Grup> filterGroups(Collection<GrupEntity> groups)
+			throws InternalErrorException {
+		List<Grup> groupsList = new LinkedList<Grup>();
+		for (GrupEntity groupEntity: groups)
+		{
+			if (getAutoritzacioService().hasPermission(Security.AUTO_GROUP_QUERY, groupEntity))
+				groupsList.add ( getGrupEntityDao().toGrup(groupEntity));
+		}
+		return groupsList;
 	}
 
 	protected Collection<Grup> handleGetLlistaDePares(String codiGrup) throws InternalErrorException {
@@ -129,11 +119,10 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		return pares;
 	}
 
-	protected Collection<Grup> handleFindGrupsByTipusGrup(String tipusGrup) {
+	protected Collection<Grup> handleFindGrupsByTipusGrup(String tipusGrup) throws InternalErrorException {
 		Collection<GrupEntity> grupEntities = getGrupEntityDao().findGrupsByTipus(tipusGrup);
 		if (grupEntities != null) {
-			Collection<GrupEntity> grupsPermis = AutoritzacionsUsuari.filtraGrupsEntityCanQuery(grupEntities);
-			return getGrupEntityDao().toGrupList(grupsPermis);
+			return filterGroups(grupEntities);
 		}
 		return new Vector();
 	}
@@ -179,7 +168,10 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	}
 
 	protected void handleSetSuperGrup(String codiSubGrup, String codiSuperGrup) throws java.lang.Exception {
-		if (AutoritzacionsUsuari.canCreateGroup(codiSubGrup) || AutoritzacionsUsuari.canUpdateGrup(codiSubGrup)) {
+		GrupEntity groupEntity  = getGrupEntityDao().findByCodi(codiSubGrup);
+		
+		if (groupEntity != null &&
+				getAutoritzacioService().hasPermission(Security.AUTO_GROUP_UPDATE, groupEntity)) {
 			getGrupEntityDao().setSuperGrup(codiSubGrup, codiSuperGrup);
 		} else {
 			throw new SeyconException(String.format(Messages.getString("GrupServiceImpl.1"), codiSuperGrup)); //$NON-NLS-1$
@@ -273,22 +265,20 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		if (principal == null) {
 			return new Vector();
 		}
-		Collection grups = getGrupEntityDao().findByFiltre(codi, pare,
+		Collection<GrupEntity> grups = getGrupEntityDao().findByFiltre(codi, pare,
 			unitatOfimatica, descripcio, tipus, obsolet, servidorOfimatic,
 			seccioPressupostaria);
 		if (grups != null)
 		{
 			// FILTREM per autoritzacio group:query [sense_domini O GRUPS]
-			Collection grupsPermis = AutoritzacionsUsuari.filtraGroupsCanQuery(grups);
+			List<Grup> grupsPermis = filterGroups(grups);
 			
 			// Check maximun number of results
 			if (grupsPermis.size() > limitResults)
 			{
-				return getGrupEntityDao().toGrupList(grupsPermis)
-					.subList(0, limitResults);
-//				throw new SeyconException(Messages.getString("GrupServiceImpl.6")); //$NON-NLS-1$
+				return grupsPermis.subList(0, limitResults);
 			}
-			return getGrupEntityDao().toGrupList(grupsPermis);
+			return grupsPermis;
 		}
 		return new Vector();
 	}
@@ -397,7 +387,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		}
 		UsuariEntity usuari = usuariGrupEntity.getUsuari();
 
-		if (AutoritzacionsUsuari.canCreateUserGroup(usuariGrupEntity.getUsuari())) {
+		if (getAutoritzacioService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
 
 			usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
 			usuari.setUsuariDarreraModificacio(getPrincipal().getName());
@@ -450,7 +440,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		}
 
 		// Mirem les autoritzacions
-		if (AutoritzacionsUsuari.canDeleteUserGroup(usuariGrupEntity.getUsuari())) {
+		if (getAutoritzacioService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
 			
 			UsuariEntity usuari = usuariGrupEntity.getUsuari();
 			usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
@@ -473,10 +463,15 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 
 	protected UsuariGrup handleUpdate(UsuariGrup usuariGrup) throws Exception {
 
-		UsuariGrupEntity usuariGrupEntity = getUsuariGrupEntityDao().usuariGrupToEntity(usuariGrup);
+		UsuariGrupEntity usuariGrupEntity = getUsuariGrupEntityDao().load(usuariGrup.getId());
+		if (!getAutoritzacioService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
+			throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
+		}
+		usuariGrupEntity = getUsuariGrupEntityDao().usuariGrupToEntity(usuariGrup);
 
 		// En principi no ha d'existir update--- seria un create
-		if (AutoritzacionsUsuari.canCreateUserGroup(usuariGrupEntity.getUsuari())) {
+		if (getAutoritzacioService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
 
 			UsuariEntity usuari = usuariGrupEntity.getUsuari();
 			usuari.setDataDarreraModificacio(GregorianCalendar.getInstance().getTime());
@@ -563,11 +558,11 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		Collection<UsuariGrup> totsUsuarisGrup = new LinkedList();
 
 		// Mirem les autoritzacions a nivell de grup per group:user:query
-		if (AutoritzacionsUsuari.canQueryGroupUsers(codiGrup)) {
-			// Obtenemos los grupos primarios primero
-			Collection usuari = getUsuariEntityDao().findByGrupPrimari(codiGrup);
-			for (Iterator it = usuari.iterator(); it.hasNext();) {
-				UsuariEntity user = (UsuariEntity) it.next();
+		// Obtenemos los grupos primarios primero
+		Collection usuari = getUsuariEntityDao().findByGrupPrimari(codiGrup);
+		for (Iterator it = usuari.iterator(); it.hasNext();) {
+			UsuariEntity user = (UsuariEntity) it.next();
+			if (getAutoritzacioService().hasPermission(Security.AUTO_USER_QUERY, user)) {
 				// El segon llinatge pot ésser null
 				String nomComplet = user.getNom() + " " + user.getPrimerLlinatge() //$NON-NLS-1$
 						+ (user.getSegonLlinatge() != null ? " " + user.getSegonLlinatge() : ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -575,12 +570,14 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 				usugru.setInfo(Messages.getString("GrupServiceImpl.PrimaryGroupText")); //$NON-NLS-1$
 				totsUsuarisGrup.add(usugru);
 			}
+		}
 
-			// Esto obtiene los usuarios que tienen el grupo como secundario
-			Collection<UsuariGrupEntity> usuaris = getUsuariGrupEntityDao().findByCodiGrup(codiGrup);
-			// Los añadimos al listado anterior
-			for (Iterator<UsuariGrupEntity> it = usuaris.iterator(); it.hasNext();) {
-				UsuariGrup ug = getUsuariGrupEntityDao().toUsuariGrup(it.next());
+		// Esto obtiene los usuarios que tienen el grupo como secundario
+		Collection<UsuariGrupEntity> usuaris = getUsuariGrupEntityDao().findByCodiGrup(codiGrup);
+		// Los añadimos al listado anterior
+		for (UsuariGrupEntity uge: usuaris) {
+			if (getAutoritzacioService().hasPermission(Security.AUTO_USER_QUERY, uge)) {
+				UsuariGrup ug = getUsuariGrupEntityDao().toUsuariGrup(uge);
 				ug.setInfo(Messages.getString("GrupServiceImpl.SecondaryGroupText")); //$NON-NLS-1$
 				totsUsuarisGrup.add(ug);
 			}

@@ -50,4 +50,6 @@ public abstract class UsuariImpressoraEntity {
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
 	 return null;
 	}
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

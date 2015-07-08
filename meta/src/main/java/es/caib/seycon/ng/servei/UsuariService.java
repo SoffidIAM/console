@@ -48,7 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.bpm.servei.BpmEngine.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
-	es.caib.seycon.ng.model.ServerEntity.class})
+	es.caib.seycon.ng.model.ServerEntity.class,
+	AutoritzacioService.class})
 
 
 public abstract class UsuariService {

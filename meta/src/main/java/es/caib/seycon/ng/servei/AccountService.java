@@ -42,6 +42,7 @@ import roles.account_attribute_update;
 	es.caib.seycon.ng.model.ServerEntity.class,
 	es.caib.seycon.ng.servei.DominiUsuariService.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
 	AuditoriaService.class})
 public abstract class AccountService {

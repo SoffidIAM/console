@@ -153,6 +153,11 @@ public class Security {
     public static final String AUTO_APPLICATION_DELETE = "application:delete"; //$NON-NLS-1$
     public static final String AUTO_APPLICATION_QUERY = "application:query"; //$NON-NLS-1$
 
+    public static final String AUTO_ROLE_CREATE = "role:create"; //$NON-NLS-1$
+    public static final String AUTO_ROLE_UPDATE = "role:update"; //$NON-NLS-1$
+    public static final String AUTO_ROLE_DELETE = "role:delete"; //$NON-NLS-1$
+    public static final String AUTO_ROLE_QUERY = "role:qwery"; //$NON-NLS-1$
+
     public static final String AUTO_ACCESSREGISTER_QUERY = "accessRegister:query"; //$NON-NLS-1$
 
     public static final String AUTO_METADATA_CREATE = "metadata:create"; //$NON-NLS-1$
@@ -283,6 +288,10 @@ public class Security {
 
     private static ThreadLocal identities = new ThreadLocal();
     private static boolean disableAllSecurityForEver = false;
+	public static boolean isDisableAllSecurityForEver() {
+		return disableAllSecurityForEver;
+	}
+
 	private static es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariServiceHome = null;
 
     private static Stack getIdentities() {

@@ -5,6 +5,8 @@
  */
 package es.caib.seycon.ng.model;
 
+import es.caib.seycon.ng.utils.Security;
+
 /**
  * @see es.caib.seycon.ng.model.RolEntity
  */
@@ -37,6 +39,16 @@ public class RolEntityImpl
 
 	public String toDescripcioRol() {//Imporante: CUIDADO AL CAMBIARLO, puede afectar a funcionalidad
 		return getNom()+"@"+getBaseDeDades().getCodi()+" ("+getAplicacio().getCodi()+")"; //$NON-NLS-1$ //$NON-NLS-2$ 
+	}
+
+	public boolean isAllowed(String permission) {
+		if (Security.isUserInRole(permission+Security.AUTO_ALL))
+			return true;
+	
+		if (getAplicacio() != null)
+			return getAplicacio().isAllowed(permission);
+		
+		return false;
 	}
 
 }

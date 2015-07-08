@@ -61,7 +61,7 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
         			targetVO.setValorDadaDate(null);
         	}
         }
-        targetVO.setVisibility(AutoritzacionsUsuari.getAttributeVisibility(sourceEntity.getAccount(), sourceEntity.getMetadata()));
+        targetVO.setVisibility(sourceEntity.getAttributeVisibility());
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariImpressoraEntity;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.ImpressoraService
@@ -252,8 +253,8 @@ public class ImpressoraServiceImpl extends
         }
 
         // Verifiquem les autoritzacions
-        if (AutoritzacionsUsuari.canCreateUserPrinter(usuariImpressoraEntity,
-                getXarxaService())) {
+        if (getAutoritzacioService().hasPermission(Security.AUTO_USER_PRINTER_CREATE,usuariImpressoraEntity))
+        {
 
             // creem l'associació entre usuari i impressora
             getUsuariImpressoraEntityDao().create(usuariImpressoraEntity);
@@ -281,10 +282,10 @@ public class ImpressoraServiceImpl extends
 
     protected GrupImpressora handleCreate(GrupImpressora grupImpressora)
             throws Exception {
-        if (AutoritzacionsUsuari.canCreateGroupPrinter(grupImpressora
-                .getCodiGrup())) {
-            GrupImpressoraEntity grupImpressoraEntity = getGrupImpressoraEntityDao()
-                    .grupImpressoraToEntity(grupImpressora);
+        GrupImpressoraEntity grupImpressoraEntity = getGrupImpressoraEntityDao()
+                .grupImpressoraToEntity(grupImpressora);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_GROUP_PRINTER_CREATE,grupImpressoraEntity))
+        {
             getGrupImpressoraEntityDao().create(grupImpressoraEntity);
             grupImpressora.setId(grupImpressoraEntity.getId());
             grupImpressora = getGrupImpressoraEntityDao().toGrupImpressora(
@@ -306,8 +307,8 @@ public class ImpressoraServiceImpl extends
 
         // Verifiquem les autoritzacions (usuari:printer:delete o
         // usuari:printer:acl:delete)
-        if (AutoritzacionsUsuari.canDeleteUserPrinter(usuariImpressoraEntity,
-                getXarxaService())) {
+        if (getAutoritzacioService().hasPermission(Security.AUTO_USER_PRINTER_DELETE, usuariImpressoraEntity))
+        {
             UsuariEntity usuariEntity = usuariImpressoraEntity.getUsuari();
             // l'esborrem (amb auditoria)
             getUsuariImpressoraEntityDao().remove(usuariImpressoraEntity);
@@ -330,11 +331,9 @@ public class ImpressoraServiceImpl extends
 
     protected void handleDelete(GrupImpressora grupImpressora) throws Exception {
 
-        if (AutoritzacionsUsuari.canDeleteGroupPrinter(grupImpressora
-                .getCodiGrup())) {
-
-            GrupImpressoraEntity grupImpressoraEntity = getGrupImpressoraEntityDao()
-                    .grupImpressoraToEntity(grupImpressora);
+        GrupImpressoraEntity grupImpressoraEntity = getGrupImpressoraEntityDao()
+                .grupImpressoraToEntity(grupImpressora);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_GROUP_PRINTER_DELETE, grupImpressoraEntity)) {
             getGrupImpressoraEntityDao().remove(grupImpressoraEntity);
         } else {
             throw new SeyconAccessLocalException(
@@ -403,8 +402,8 @@ public class ImpressoraServiceImpl extends
         UsuariEntity usuariEntity = usuariImpressoraEntity.getUsuari();
 
         // Verifiquem les autoritzacions
-        if (AutoritzacionsUsuari.canCreateUserPrinter(usuariImpressoraEntity,
-                getXarxaService())) {
+        if (getAutoritzacioService().hasPermission(Security.AUTO_USER_PRINTER_CREATE,  usuariImpressoraEntity))
+        {
             getUsuariImpressoraEntityDao().update(usuariImpressoraEntity);
             usuariImpressora = getUsuariImpressoraEntityDao()
                     .toUsuariImpressora(usuariImpressoraEntity);

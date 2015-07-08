@@ -5,13 +5,17 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.servei.AutoritzacioService;
 
 @Entity (table="SC_DADUSU" )
 @Depends ({es.caib.seycon.ng.comu.DadaUsuari.class,
 	es.caib.seycon.ng.model.TipusDadaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
-	es.caib.seycon.ng.model.AuditoriaEntity.class})
+	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	AutoritzacioService.class})
 public abstract class DadaUsuariEntity {
 
 	@Column (name="DUS_VALOR", length=1024)
@@ -55,4 +59,15 @@ public abstract class DadaUsuariEntity {
 		java.lang.String value) {
 	 return null;
 	}
+
+	@Description ("Gets the visibility level for an attribue")
+	@Operation
+	public AttributeVisibilityEnum getAttributeVisibility() {
+		return null;
+	}
+
+	public boolean isAllowed(String permission) {
+		return false;
+	}
+
 }

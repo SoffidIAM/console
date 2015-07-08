@@ -256,6 +256,7 @@ public class RolAssociacioRolEntityDaoImpl extends
         target.setIdRol(source.getRolContingut().getId());
         target.setRolName(source.getRolContingut().getNom());
         target.setDispatcher(source.getRolContingut().getBaseDeDades().getCodi());
+        target.setInformationSystem(source.getRolContingut().getAplicacio().getCodi());
     }
 
 }

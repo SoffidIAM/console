@@ -30,18 +30,32 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.api.AccessLog;
+import com.soffid.iam.api.PrinterUser;
+import com.soffid.iam.api.User;
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.ContenidorRol;
+import es.caib.seycon.ng.comu.RegistreAcces;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AutoritzacioRolEntity;
 import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.GrupEntityDao;
+import es.caib.seycon.ng.model.MaquinaEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.model.UsuariGrupEntity;
+import es.caib.seycon.ng.model.UsuariImpressoraEntity;
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TipusDomini;
@@ -949,6 +963,24 @@ public class AutoritzacioServiceImpl extends
 		list.add(0, " "); //$NON-NLS-1$
 		
 		return list;
+	}
+
+	@Override
+	protected String[] handleGetUserAuthorizationsString(String user,
+			Map<String, String> loginProperties) throws Exception {
+		return handleGetUserAuthorizationsString(user);
+	}
+
+	@Override
+	protected boolean handleHasPermission(String action, Object object)
+			throws Exception {
+		if (Security.isUserInRole(action+Security.AUTO_ALL))
+			return true;
+		
+		if (object != null && object instanceof SecurityScopeEntity)
+			return ((SecurityScopeEntity)object).isAllowed(action);
+			
+		return false;
 	}
 	
 }

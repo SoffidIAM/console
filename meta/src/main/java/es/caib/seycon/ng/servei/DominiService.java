@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.GrupService.class,
 	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
-	es.caib.seycon.ng.model.AplicacioEntity.class})
+	es.caib.seycon.ng.model.AplicacioEntity.class,
+	AutoritzacioService.class})
 public abstract class DominiService {
 
 	@Operation ( grantees={roles.application_create.class,

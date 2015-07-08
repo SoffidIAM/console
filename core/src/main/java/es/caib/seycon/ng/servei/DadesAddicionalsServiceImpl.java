@@ -240,7 +240,7 @@ public class DadesAddicionalsServiceImpl extends
 		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 				.dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+		AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility();
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
@@ -263,7 +263,7 @@ public class DadesAddicionalsServiceImpl extends
 		DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 				.dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+		AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility(); 
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
@@ -295,7 +295,7 @@ public class DadesAddicionalsServiceImpl extends
 				DadaUsuariEntity dadaUsuariEntity = getDadaUsuariEntityDao()
 						.dadaUsuariToEntity(dadaUsuari);
 				
-				AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility (dadaUsuariEntity.getUsuari(), dadaUsuariEntity.getTipusDada());
+				AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility();
 
 				if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 					throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));

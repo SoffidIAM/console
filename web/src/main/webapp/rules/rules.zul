@@ -259,7 +259,7 @@
 				<toolbar>
 					<insertbutton acces="${canCreateRules}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
-					<deletebutton acces="${canCreateRules}" />
+					<deletebutton acces="${canCreateRules}" listbox="/esquema/lista/listbox" />
 					<commitbutton datamodel="/model" />
 					<undobutton datamodel="/model"
 						listbox="/esquema/lista/listbox" />

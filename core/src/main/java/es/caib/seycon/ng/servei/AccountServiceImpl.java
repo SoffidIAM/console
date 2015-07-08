@@ -636,9 +636,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     			List<AccountEntity> accs = getAccountEntityDao().findByUsuariAndDispatcher(user, disEntity.getCodi());
 				for (AccountEntity acc : accs)
 				{
-					if (acc.isDisabled() )
+					if (acc.isDisabled() && "S".equals(ue.getActiu())) // Enable account
 					{
 						acc.setDisabled(false);
+						getAccountEntityDao().update(acc);
+					}
+					if (! acc.isDisabled() && ! "S".equals(ue.getActiu())) // Disable account
+					{
+						acc.setDisabled(true);
 						getAccountEntityDao().update(acc);
 					}
 				}

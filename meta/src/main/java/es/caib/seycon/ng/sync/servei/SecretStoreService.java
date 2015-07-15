@@ -79,7 +79,7 @@ public abstract class SecretStoreService {
 		long accountId, 
 		es.caib.seycon.ng.comu.Password value, 
 		boolean mustChange,
-		Date expirationDate)
+		@Nullable Date expirationDate)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 

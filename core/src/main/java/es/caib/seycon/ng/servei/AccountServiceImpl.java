@@ -26,6 +26,39 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
+import java.security.Principal;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.naming.NamingException;
+
+import org.apache.commons.logging.LogFactory;
+import org.jboss.invocation.pooled.server.ServerThread;
+import org.mortbay.log.Log;
+import org.omg.PortableInterceptor.USER_EXCEPTION;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserDomain;
+import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.AccountAttributeEntityDao;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
@@ -94,12 +127,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 	private ApplicationContext applicationContext;
 
-	private UserEntity getUser(String usuari) {
+	private UserEntity getUser(String usuari) throws InternalErrorException {
 		UserEntity ue = getUserEntityDao().findByUserName(usuari);
 		if (ue != null)
 		{
-			Collection<UserEntity> filtrat = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(Collections.singleton(ue));
-			if (filtrat.isEmpty())
+			if (!getAutoritzacioService().hasPermission(Security.AUTO_USER_QUERY, ue))
 				ue = null;
 		}
 		return ue;
@@ -145,7 +177,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			name = gessAccountName(ue.getUserName(), de.getName());
 							
 			if (name == null)
-				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")); //$NON-NLS-1$
+				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")+" ("+ue.getUserName()+" / "+de.getName()+") "); //$NON-NLS-1$
 		}
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(name, de.getName());
 		if (acc != null)
@@ -603,10 +635,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
                 List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getName());
                 for (AccountEntity acc : accs) {
-                    if (acc.isDisabled()) {
-                        acc.setDisabled(false);
-                        getAccountEntityDao().update(acc);
-                    }
+			if (acc.isDisabled() && "S".equals(ue.getActive())) // Enable account
+			{
+				acc.setDisabled(false);
+				getAccountEntityDao().update(acc);
+			}
+			if (! acc.isDisabled() && ! "S".equals(ue.getActive())) // Disable account
+			{
+				acc.setDisabled(true);
+				getAccountEntityDao().update(acc);
+			}
+	
                 }
             } else if (disEntity.isMainSystem() || disEntity.getUrl() != null) {
                 Dispatcher dis = disDao.toDispatcher(disEntity);
@@ -920,7 +959,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (ae != null)
 		{
 			ae.setLastUpdated(new Date());
-			getAccountEntityDao().update(ae);
+			getAccountEntityDao().update(ae, "A");
 		}
 	}
 
@@ -944,7 +983,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			else
 				ae.setPasswordExpiration(null);
 			ae.setLastPasswordSet(new Date());
-			getAccountEntityDao().update(ae);
+			getAccountEntityDao().update(ae, null);
 		}
 	}
 
@@ -960,7 +999,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		if (ae != null ) {
 			ae.setPasswordExpiration(passwordTerm);
 			ae.setLastPasswordSet(new Date());
-			getAccountEntityDao().update(ae);
+			getAccountEntityDao().update(ae, null);
 		}
 	}
 
@@ -980,8 +1019,17 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToQueryPassword")); //$NON-NLS-1$
 		
 
+		return handleQueryAccountPasswordBypassPolicy(account.getId());
+	}
+
+	@Override
+	protected Password handleQueryAccountPasswordBypassPolicy(long accountId)
+			throws InternalErrorException, Exception {
 		Usuari usuari = AutoritzacionsUsuari.getCurrentUsuari();
 		
+		AccountEntity acc = getAccountEntityDao().load(accountId);
+		if (acc == null)
+			return null;
 		
 		ServerEntityDao dao = getServerEntityDao();
 		Exception lastException = null;
@@ -991,7 +1039,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
                     RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
                     rsl.setAuthToken(se.getAuth());
                     SyncStatusService sss = rsl.getSyncStatusService();
-                    Password p = sss.getAccountPassword(usuari.getCodi(), account.getId());
+                    Password p = sss.getAccountPassword(usuari.getCodi(), acc.getId());
     	            if (p != null)
     	            {
     	        		Auditoria audit = new Auditoria();
@@ -999,8 +1047,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     	        		audit.setObjecte("SSO");
     	        		audit.setAutor(Security.getCurrentUser());
     	        		audit.setCalendar(Calendar.getInstance());
-    	        		audit.setAccount(account.getName());
-    	        		audit.setBbdd(account.getDispatcher());
+    	        		audit.setAccount(acc.getName());
+    	        		audit.setBbdd(acc.getSystem().getName());
     	        		audit.setData("-");
     	        		getAuditoriaService().create(audit);
     	            	return p;
@@ -1048,7 +1096,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						if (callerUe == null)
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 						
-						if (!callerUe.getId().equals(ue2.getId()) && !AutoritzacionsUsuari.canUpdateUserPassword(ue2.getPrimaryGroup().getName()))
+						if (! callerUe.getId().equals(ue2.getId()) &&
+								!getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, ue2))
 							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					}
 					else
@@ -1575,4 +1624,139 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		return vos;
 	}
+
+	@Override
+	protected List<DadaUsuari> handleGetAccountAttributes(Account acc)
+			throws Exception {
+		AccountEntity accountEntity = getAccountEntityDao().load(acc.getId());
+		if (accountEntity == null)
+			return Collections.emptyList();
+		else
+		{
+			List<AccountMetadataEntity> metaList = getAccountMetadataEntityDao().findBySystem(accountEntity.getSystem().getName());
+			Collections.sort(metaList, new Comparator<AccountMetadataEntity>() {
+				public int compare(AccountMetadataEntity o1, AccountMetadataEntity o2) {
+					return o1.getOrder().compareTo(o2.getOrder());
+				}
+			});
+			LinkedList<DadaUsuari> result = new LinkedList<DadaUsuari>();
+			for (AccountMetadataEntity metadata: metaList)
+			{
+				boolean found = false;
+				for ( AccountAttributeEntity data : accountEntity.getAttributes())
+				{
+					if (data.getMetadata() == metadata)
+					{
+						found = true;
+						AttributeVisibilityEnum vis = data.getAttributeVisibility();
+						if (vis.equals (AttributeVisibilityEnum.EDITABLE) ||
+								vis.equals(AttributeVisibilityEnum.READONLY))
+							result.add(getAccountAttributeEntityDao().toDadaUsuari(data));
+						break;
+					}
+				}
+				if ( ! found )
+				{
+					AccountAttributeEntity data = getAccountAttributeEntityDao().newAccountAttributeEntity();
+					data.setMetadata(metadata);
+					data.setAccount(accountEntity);
+					if (data.getAttributeVisibility().equals ( AttributeVisibilityEnum.EDITABLE) ||
+							data.getAttributeVisibility().equals ( AttributeVisibilityEnum.READONLY) )
+					{
+						DadaUsuari d = getAccountAttributeEntityDao().toDadaUsuari(data);
+						result.add(d);
+						
+					}
+				}
+			}
+			return result;
+		}
+	}
+
+	private void auditChange(DadaUsuari dadaUsuari, AccountEntity account)
+			throws InternalErrorException {
+		Auditoria audit = new Auditoria();
+		audit.setObjecte("SC_ACCATT");
+		audit.setAccio("U");
+		audit.setAccount(dadaUsuari.getAccountName());
+		audit.setBbdd(dadaUsuari.getSystemName());
+		audit.setCalendar(Calendar.getInstance());
+		audit.setParametreConfiguracio(dadaUsuari.getCodiDada());
+		audit.setAutor(Security.getCurrentAccount());
+		if (account.getType().equals (AccountType.USER))
+		{
+			for (UserAccountEntity uae: account.getUsers())
+			{
+				audit.setObjecte("SC_DADUSU");
+				audit.setUsuari(uae.getUser().getUserName());
+			}
+		}
+		getAuditoriaService().create(audit);
+	}
+
+
+	@Override
+	protected DadaUsuari handleCreateAccountAttribute(DadaUsuari attribute)
+			throws Exception {
+		AccountEntity accountEntity = getAccountEntityDao().findByNameAndSystem(attribute.getAccountName(), attribute.getSystemName());
+		if (accountEntity == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), attribute.getAccountName(), attribute.getSystemName())); //$NON-NLS-1$
+
+		AccountMetadataEntity meta = getAccountMetadataEntityDao().findByName(attribute.getSystemName (), attribute.getCodiDada());
+		if (meta == null)
+		{
+			throw new InternalErrorException ("Metadata not found for attribute "+attribute.getCodiDada());
+		}
+		AccountAttributeEntity entity = getAccountAttributeEntityDao().dadaUsuariToEntity(attribute);
+		AttributeVisibilityEnum visibility = entity.getAttributeVisibility();
+		if ( visibility == AttributeVisibilityEnum.EDITABLE)
+		{
+			if (attribute.getId() == null)
+			{
+				getAccountAttributeEntityDao().create(entity);
+			} else {
+				getAccountAttributeEntityDao().update(entity);
+			}
+			createAccountTask(accountEntity);
+			auditChange(attribute, accountEntity);
+			return getAccountAttributeEntityDao().toDadaUsuari(entity);
+		}
+		else
+		{
+			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getCodiDada()));
+		}
+	}
+
+	@Override
+	protected DadaUsuari handleUpdateAccountAttribute(DadaUsuari attribute)
+			throws Exception {
+		return handleCreateAccountAttribute (attribute);
+	}
+
+	@Override
+	protected void handleRemoveAccountAttribute(DadaUsuari attribute)
+			throws Exception {
+		AccountEntity accountEntity = getAccountEntityDao().findByNameAndSystem(attribute.getAccountName(), attribute.getSystemName());
+		if (accountEntity == null)
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), attribute.getAccountName(), attribute.getSystemName())); //$NON-NLS-1$
+
+		AccountMetadataEntity meta = getAccountMetadataEntityDao().findByName(attribute.getSystemName (), attribute.getCodiDada());
+		if (meta == null)
+		{
+			throw new InternalErrorException ("Metadata not found for attribute "+attribute.getCodiDada());
+		}
+		AccountAttributeEntity entity = getAccountAttributeEntityDao().dadaUsuariToEntity(attribute);
+		AttributeVisibilityEnum visibility = entity.getAttributeVisibility();
+		if ( visibility == AttributeVisibilityEnum.EDITABLE)
+		{
+			createAccountTask(accountEntity);
+			getAccountAttributeEntityDao().remove(entity);
+			auditChange(attribute, accountEntity);
+		}
+		else
+		{
+			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getCodiDada()));
+		}
+	}
+
 }

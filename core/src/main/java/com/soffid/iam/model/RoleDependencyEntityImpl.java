@@ -15,6 +15,8 @@ import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 import org.apache.webdav.lib.properties.GetContentLengthProperty;
 
@@ -23,6 +25,7 @@ import org.apache.webdav.lib.properties.GetContentLengthProperty;
  */
 public class RoleDependencyEntityImpl
     extends com.soffid.iam.model.RoleDependencyEntity
+    implements SecurityScopeEntity
 {
     /**
      * The serial version UID of this class. Needed for serialization.
@@ -140,5 +143,12 @@ public class RoleDependencyEntityImpl
 			return true;
 		} 
 		return false;
+	}
+
+	public boolean isAllowed(String permission) {
+		if (getContained() == null)
+			return false;
+		else
+			return getContained().isAllowed(permission);
 	}
 }

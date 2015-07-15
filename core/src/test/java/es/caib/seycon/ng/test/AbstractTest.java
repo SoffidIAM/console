@@ -7,6 +7,7 @@ import javax.sql.rowset.spi.XmlReader;
 
 import com.soffid.test.AbstractHibernateTest;
 
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
@@ -86,8 +87,13 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		
 		System.setProperty("jboss.home.dir", "target/server");
 		deleteDir (new File("target/docs"));
+		
+		
+		ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
 		ApplicationBootService bootSvc = (ApplicationBootService) context.getBean(ApplicationBootService.SERVICE_NAME);
+	
+		
 		bootSvc.consoleBoot();
 		
 		configSvc = (ConfiguracioService) context.getBean(ConfiguracioService.SERVICE_NAME);
@@ -104,7 +110,6 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		accountSvc = (AccountService) context.getBean(AccountService.SERVICE_NAME);
 		passSvc = (PasswordService) context.getBean(PasswordService.SERVICE_NAME);
 	
-		SeyconServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory"); //$NON-NLS-1$ //$NON-NLS-2$
 		System.setProperty("soffid.ui.maxrows", "9999");
 
         Configuracio cfg = configSvc.findParametreByCodiAndCodiXarxa(

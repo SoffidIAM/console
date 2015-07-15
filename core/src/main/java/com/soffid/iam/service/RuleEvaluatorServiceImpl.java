@@ -121,7 +121,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                 }
             }
 		} catch (Exception e) {
-			throw new InternalErrorException(String.format(Messages.getString("RuleEvaluatorServiceImpl.EvaluationRuleError"), rule.getDescription(), user.getUserName()), e);
+			throw new InternalErrorException(String.format(Messages.getString("RuleEvaluatorServiceImpl.EvaluationRuleError"), rule.getDescription(), user.getUserName()));
 		} finally {
 			Security.nestedLogoff();
 		}

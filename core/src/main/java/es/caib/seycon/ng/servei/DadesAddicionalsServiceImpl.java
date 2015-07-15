@@ -9,6 +9,7 @@
  */
 package es.caib.seycon.ng.servei;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,23 +18,18 @@ import java.util.List;
 import java.util.Vector;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+
+import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
-import java.nio.file.attribute.AttributeView;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * @see es.caib.seycon.ng.servei.DadesAddicionalsService
@@ -63,31 +59,76 @@ public class DadesAddicionalsServiceImpl extends
 		if (tipusDada.getAdminVisibility() == null)
 			tipusDada.setUserVisibility(AttributeVisibilityEnum.READONLY);
 
-		Long order = tipusDada.getOrdre();
-		String code = new String();
-		boolean found = false;
-		List<MetaDataEntity> tipusDadaEntityList = getMetaDataEntityDao().loadAll();
-		for (MetaDataEntity tipusDadaEntity : tipusDadaEntityList) {
-            Long orderDins = tipusDadaEntity.getOrder();
-            if (orderDins.compareTo(order) == 0) {
-                found = true;
-                code = tipusDadaEntity.getName();
-                break;
-            }
-        }
-		if(found)
-			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
-							new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
-		
-		Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByName(tipusDada.getCodi());
-		if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
-			throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
-							new Object[]{tipusDada.getCodi()}));
-		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
-		if (tipusDadaEntity != null) {
-			getMetaDataEntityDao().create(tipusDadaEntity);
-			tipusDada.setId(tipusDadaEntity.getId());
-			return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
+		if (tipusDada.getSystemName() != null && tipusDada.getSystemName().trim().length() > 0)
+		{
+			Long order = tipusDada.getOrdre();
+			String code = new String();
+			boolean found = false;
+			List<AccountMetadataEntity> tipusDadaEntityList = getAccountMetadataEntityDao().findBySystem(tipusDada.getSystemName());
+			if (order == 0)
+			{
+				long next = 10;
+				for(AccountMetadataEntity tipusDadaEntity: tipusDadaEntityList){
+					if (tipusDadaEntity.getOrder().longValue() >= next)
+						next = tipusDadaEntity.getOrder().longValue() + 1;
+				}
+			}
+			else
+			{
+				for(AccountMetadataEntity tipusDadaEntity: tipusDadaEntityList){
+					Long orderDins = tipusDadaEntity.getOrder();
+					if(orderDins.compareTo(order) == 0){
+						found = true;
+						code = tipusDadaEntity.getName();
+						break;
+					}
+				}
+			}
+			if(found)
+				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
+								new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
+			
+			AccountMetadataEntity tipusDadaMateixCodi = getAccountMetadataEntityDao().findByName(tipusDada.getSystemName(), tipusDada.getCodi());
+			if(tipusDadaMateixCodi != null)
+				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
+								new Object[]{tipusDada.getCodi()}));
+			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().tipusDadaToEntity(tipusDada);
+			if (tipusDadaEntity != null) {
+				getAccountMetadataEntityDao().create(tipusDadaEntity);
+				tipusDada.setId(tipusDadaEntity.getId());
+				return getAccountMetadataEntityDao().toTipusDada(tipusDadaEntity);
+			}
+		}
+		else
+		{
+			// Create user data
+			Long order = tipusDada.getOrdre();
+			String code = new String();
+			boolean found = false;
+
+			List<MetaDataEntity> tipusDadaEntityList = getMetaDataEntityDao().loadAll();
+			for (MetaDataEntity tipusDadaEntity : tipusDadaEntityList) {
+	            Long orderDins = tipusDadaEntity.getOrder();
+	            if (orderDins.compareTo(order) == 0) {
+	                found = true;
+	                code = tipusDadaEntity.getName();
+	                break;
+	            }
+	        }
+			if(found)
+				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
+								new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
+			
+			Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByName(tipusDada.getCodi());
+			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
+				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
+								new Object[]{tipusDada.getCodi()}));
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
+			if (tipusDadaEntity != null) {
+				getMetaDataEntityDao().create(tipusDadaEntity);
+				tipusDada.setId(tipusDadaEntity.getId());
+				return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
+			}
 		}
 		return null;
 	}
@@ -97,8 +138,14 @@ public class DadesAddicionalsServiceImpl extends
 	 */
 	protected void handleDelete(es.caib.seycon.ng.comu.TipusDada tipusDada)
 			throws java.lang.Exception {
-		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
-		getMetaDataEntityDao().remove(tipusDadaEntity);
+		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().length() == 0)
+		{
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
+			getMetaDataEntityDao().remove(tipusDadaEntity);
+		} else {
+			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().load(tipusDada.getId());
+			getAccountMetadataEntityDao().remove(tipusDadaEntity);
+		}
 	}
 
 	/**
@@ -107,17 +154,33 @@ public class DadesAddicionalsServiceImpl extends
 	protected es.caib.seycon.ng.comu.TipusDada handleUpdate(
 			es.caib.seycon.ng.comu.TipusDada tipusDada)
 			throws java.lang.Exception {
-		MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
+		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
+		{
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().tipusDadaToEntity(tipusDada);
 		
-		if (tipusDadaEntity.getAdminVisibility() == null)
-			tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
-		if (tipusDadaEntity.getAdminVisibility() == null)
-			tipusDadaEntity.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
-		if (tipusDadaEntity.getAdminVisibility() == null)
-			tipusDadaEntity.setUserVisibility(AttributeVisibilityEnum.READONLY);
-
-		getMetaDataEntityDao().update(tipusDadaEntity);
-		return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setUserVisibility(AttributeVisibilityEnum.READONLY);
+	
+			getMetaDataEntityDao().update(tipusDadaEntity);
+			return getMetaDataEntityDao().toTipusDada(tipusDadaEntity);
+		} else {
+			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao()
+					.tipusDadaToEntity(tipusDada);
+			
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
+			if (tipusDadaEntity.getAdminVisibility() == null)
+				tipusDadaEntity.setUserVisibility(AttributeVisibilityEnum.READONLY);
+	
+			getAccountMetadataEntityDao().update(tipusDadaEntity);
+			return getAccountMetadataEntityDao().toTipusDada(tipusDadaEntity);
+		}
 	}
 
 	/**
@@ -172,7 +235,7 @@ public class DadesAddicionalsServiceImpl extends
 		
 		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
+		AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility();
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
@@ -183,6 +246,9 @@ public class DadesAddicionalsServiceImpl extends
 		getUserEntityDao().update(usuari);
 
 		getUserDataEntityDao().create(dadaUsuariEntity);
+		
+		auditChange(dadaUsuari);
+
 		getRuleEvaluatorService().applyRules(usuari);
 		return getUserDataEntityDao().toDadaUsuari(dadaUsuariEntity);
 	}
@@ -190,7 +256,7 @@ public class DadesAddicionalsServiceImpl extends
 	public void handleDelete(DadaUsuari dadaUsuari) throws InternalErrorException {
 		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 
-		AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
+		AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility(); 
 
 		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 			throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
@@ -201,11 +267,15 @@ public class DadesAddicionalsServiceImpl extends
 		getUserEntityDao().update(usuari);
 
 		getUserDataEntityDao().remove(dadaUsuariEntity);
+
+		auditChange(dadaUsuari);
+
 		getRuleEvaluatorService().applyRules(usuari);
 	}
 
 	public DadaUsuari handleUpdate(DadaUsuari dadaUsuari) throws InternalErrorException {
 		if (dadaUsuari.getId() != null) {
+			auditChange(dadaUsuari);
 			if (dadaUsuari.getValorDada() == null
 					|| "".equals(dadaUsuari.getValorDada().trim())) { //$NON-NLS-1$
 				delete(dadaUsuari); // esborrar dada
@@ -216,7 +286,7 @@ public class DadesAddicionalsServiceImpl extends
 				// o només el telèfon
 				UserDataEntity dadaUsuariEntity = getUserDataEntityDao().dadaUsuariToEntity(dadaUsuari);
 				
-				AttributeVisibilityEnum visibility = AutoritzacionsUsuari.getAttributeVisibility(dadaUsuariEntity.getUser(), dadaUsuariEntity.getDataType());
+				AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility();
 
 				if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
 					throw new SecurityException (String.format("Not allowed to modify the attributes %s", dadaUsuari.getCodiDada()));
@@ -233,5 +303,36 @@ public class DadesAddicionalsServiceImpl extends
 		} else {
 			return create(dadaUsuari);
 		}
+	}
+
+	private void auditChange(DadaUsuari dadaUsuari)
+			throws InternalErrorException {
+		Auditoria audit = new Auditoria();
+		audit.setObjecte("SC_DADUSU");
+		audit.setAccio("U");
+		audit.setAutor( Security.getCurrentAccount() );
+		audit.setCalendar(Calendar.getInstance());
+		audit.setParametreConfiguracio(dadaUsuari.getCodiDada());
+		audit.setUsuari(dadaUsuari.getCodiUsuari());
+		getAuditoriaService().create(audit);
+	}
+
+	@Override
+	protected TipusDada handleFindSystemDataType(String system, String name)
+			throws Exception {
+		AccountMetadataEntity am = getAccountMetadataEntityDao().findByName(system, name);
+		if (am == null)
+			return null;
+		else
+			return getAccountMetadataEntityDao().toTipusDada(am);
+	}
+
+	@Override
+	protected List<TipusDada> handleFindSystemDataTypes(String system)
+			throws Exception {
+		SystemEntity de = getSystemEntityDao().findByName(system);
+		if (de == null)
+			return null;
+		return getAccountMetadataEntityDao().toTipusDadaList(de.getMetaData());
 	}
 }

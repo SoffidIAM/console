@@ -8,20 +8,24 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
+import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,8 +57,11 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 
 	@Override
     public void update(com.soffid.iam.model.AccountEntity entity) {
-		super.update(entity);
-		auditar("U", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
+		try {
+			handleUpdate(entity, "U");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -152,6 +159,29 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
                 target.setPasswordPolicy(uae.getUser().getUserType().getName());
             }
 		}
+		target.setAttributes(new HashMap<String, Object>());
+		for ( AccountAttributeEntity att: source.getAttributes())
+		{
+			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
+			if (vd.getValorDadaDate() != null)
+				target.getAttributes().put(vd.getCodiDada(), vd.getValorDadaDate());
+			else if (vd.getValorDada() != null)
+				target.getAttributes().put(vd.getCodiDada(), vd.getValorDada());
+		}
+		
+		HashMap<String, Object> atts = new HashMap<String, Object>();
+		target.setAttributes(atts);
+		// Now assign attributes
+		for ( AccountAttributeEntity att: source.getAttributes())
+		{
+			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
+			if (vd.getBlobDataValue() != null)
+				atts.put(vd.getCodiDada(), vd.getBlobDataValue());
+			else if (vd.getValorDadaDate() != null)
+				atts.put(vd.getCodiDada(), vd.getValorDadaDate());
+			else if (vd.getValorDada() != null)
+				atts.put(vd.getCodiDada(), vd.getValorDada());
+		}
 	}
 
 	@Override
@@ -223,4 +253,12 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
     	}
     }
 
+
+	@Override
+	protected void handleUpdate(AccountEntity entity, String auditType)
+			throws Exception {
+		super.update(entity);
+		if (auditType != null)
+			auditar(auditType, entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
+	}
 }

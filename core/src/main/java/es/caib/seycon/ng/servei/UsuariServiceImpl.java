@@ -394,32 +394,10 @@ public class UsuariServiceImpl extends
 	protected es.caib.seycon.ng.comu.Usuari handleCreate(
 			es.caib.seycon.ng.comu.Usuari usuari) throws java.lang.Exception {
 		
-		// Comprobamos autorización del usuario
-		if (!AutoritzacionsUsuari.canCreateUser(usuari, getGroupEntityDao())) {
-			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
-					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
-					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
-		}
 		
 		// Comprovem que s'hagi especificat el tipus d'usuari de domini
 		if (usuari.getTipusUsuari() == null) {
 			throw new SeyconException (Messages.getString("UsuariServiceImpl.UserTypeNotEspecified")); //$NON-NLS-1$
-		}
-		
-		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
-		String NIF = usuari.getNIF();
-		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
-			NIF = NIF.trim();
-			Collection usuarisMateixNIF = getUserEntityDao().findUsersByNationalID(NIF);
-			if (usuarisMateixNIF!=null && usuarisMateixNIF.size()!=0) {
-				String codiUsuaris=""; //$NON-NLS-1$
-				for (Iterator it = usuarisMateixNIF.iterator(); it.hasNext(); ) {
-                    codiUsuaris += "\'" + ((UserEntity) it.next()).getUserName() + "\', ";
-                }
-				codiUsuaris = codiUsuaris.substring(0,codiUsuaris.length()-2);
-				throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.ExistsUser"), //$NON-NLS-1$
-						codiUsuaris)); 
-			}
 		}
 		
 		UserEntity usersSameCode = getUserEntityDao().findByUserName(usuari.getCodi());
@@ -456,6 +434,13 @@ public class UsuariServiceImpl extends
 		
 		/* Se crea el usuario */
 		UserEntity usuariEntity = getUserEntityDao().usuariToEntity(usuari);
+
+		// Comprobamos autorización del usuario
+		if (! getAutoritzacioService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
+			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
+					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
+					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
+		}
 
 		/* se almacena la fecha de creación */
 		Calendar calendar = GregorianCalendar.getInstance();
@@ -566,11 +551,6 @@ public class UsuariServiceImpl extends
 				&& certificacioDeCondicionsXML.contains("acceptat") //$NON-NLS-1$
 				&& certificacioDeCondicionsXML.contains("obligacions") //$NON-NLS-1$
 				&& certificacioDeCondicionsXML.contains("usuari"); //$NON-NLS-1$
-	}
-
-	private boolean hasNewUserCredentials(String unitatOrganitzativa)
-			throws Exception {
-		return AutoritzacionsUsuari.canCreateUsersOnGroup(unitatOrganitzativa);
 	}
 
 	// Cridat des del workflow per donar d'alta usuaris
@@ -981,7 +961,7 @@ public class UsuariServiceImpl extends
 		}
 	}
 
-	private Collection findUsuarisByCriteri(String codi, String nom,
+	private Collection<UserEntity> findUsuarisByCriteri(String codi, String nom,
 			String primerLlinatge, String nomCurt, String dataCreacio,
 			String usuariCreacio, String actiu, String segonLlinatge,
 			String multiSessio, String comentari, String tipusUsuari,
@@ -1251,7 +1231,7 @@ public class UsuariServiceImpl extends
 			grupSecundari = null;
 		}
 
-		Collection usuaris = findUsuarisByCriteri(codi, nom, primerLlinatge,
+		Collection<UserEntity> usuaris = findUsuarisByCriteri(codi, nom, primerLlinatge,
 			nomCurt, dataCreacio, usuariCreacio, actiu, segonLlinatge,
 			multiSessio, comentari, tipusUsuari, servidorPerfil, servidorHome,
 			servidorCorreu, codiGrupPrimari, dni, dominiCorreu, grupSecundari,
@@ -1260,7 +1240,7 @@ public class UsuariServiceImpl extends
 		if (usuaris != null && usuaris.size() != 0)
 		{
 			// Ya tenemos los grupos del usuario con permisos
-			Collection usuarisPermis = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(usuaris);
+			Collection<UserEntity> usuarisPermis = filterUsers(usuaris);
 			
 			// Check maximum number of results
 			if ((restringeixCerca != null) &&
@@ -1278,11 +1258,12 @@ public class UsuariServiceImpl extends
 	}
 
 	protected void handleDelete(Usuari usuari) throws Exception {
-		if (!AutoritzacionsUsuari.canDeleteUser(usuari, getGroupEntityDao())) {
+		UserEntity usuariEntity = getUserEntityDao().findByUserName(usuari.getCodi());
+		if (!getAutoritzacioService().hasPermission(Security.AUTO_USER_DELETE, usuariEntity))
+		{
 			throw new SeyconAccessLocalException("UsuariService", "delete (Usuari)", "user:delete, user:delete/*", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToDelete")); //$NON-NLS-1$
 		}
-		UserEntity usuariEntity = getUserEntityDao().findByUserName(usuari.getCodi());
 		if (usuariEntity != null) {
 			// els usuaris mai s'eliminen, es fa un downgrade
 			baixaUsuari(usuari.getCodi());
@@ -1538,12 +1519,14 @@ public class UsuariServiceImpl extends
 	}
 
 	protected Usuari handleUpdate(Usuari usuari) throws Exception {
+		UserEntity usu = getUserEntityDao().findById(usuari.getId());
 		
-		boolean canUpdateEsteUser = AutoritzacionsUsuari.canUpdateUser(usuari, getGroupEntityDao()); 
+		boolean canUpdateEsteUser = getAutoritzacioService().hasPermission(Security.AUTO_USER_UPDATE, usu); 
 		
 		// Comprobamos autorización del usuario
 		// Si tiene customUpdate también puede pasar (!!) aunque en teoría (!!) no puede actualizar nada
-		if (!canUpdateEsteUser && !AutoritzacionsUsuari.canUpdateCustomUser(usuari, getGroupEntityDao())) {
+		if (!canUpdateEsteUser && 
+				!getAutoritzacioService().hasPermission(Security.AUTO_USER_UPDATE_CUSTOM, usu)) {
 			throw new SeyconAccessLocalException("UsuariService", "update (Usuari)", "user:update, user:update/*",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
 		}
@@ -1557,7 +1540,6 @@ public class UsuariServiceImpl extends
 		if (!canUpdateEsteUser) {
 			//Només actualitzem el telèfon (mantenim la resta de dades..)
 			if (usuari.getId() != null) {
-				UserEntity usu = getUserEntityDao().findById(usuari.getId());
 				if (usu!=null) {
 					Usuari usuTrobat = getUserEntityDao().toUsuari(usu);
 					if (usuTrobat.getTelefon() == null && usuari.getTelefon() != null ||
@@ -1593,7 +1575,8 @@ public class UsuariServiceImpl extends
 			throw new SeyconAccessLocalException("UsuariService", "update (Usuari)", "user:update, user:update/*",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate"));			 //$NON-NLS-1$
 		}
-		
+
+		/*
 		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
 		String NIF = usuari.getNIF();
 		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
@@ -1615,6 +1598,7 @@ public class UsuariServiceImpl extends
 				}
 			}
 		}
+		*/
 		
 		// Ara hem de comprovar que si es modifica l'usuari [nom,llinatges o DNI, es verifique que siga correcte]
 		UserEntity usuariAbans = usuari.getId() != null ? getUserEntityDao().load(usuari.getId()) : getUserEntityDao().findByUserName(usuari.getCodi());
@@ -1779,26 +1763,27 @@ public class UsuariServiceImpl extends
 		Iterator<MetaDataEntity> tipusDadesIterator = tipusDades.iterator();
 		while (tipusDadesIterator.hasNext()) {
 			MetaDataEntity tipusDada = tipusDadesIterator.next();
-			AttributeVisibilityEnum v = AutoritzacionsUsuari.getAttributeVisibility(usuari, tipusDada);
-			if (tipusDada.getName().compareTo(NIF) != 0 && tipusDada.getName().compareTo(TELEFON) != 0 && !v.equals(AttributeVisibilityEnum.HIDDEN)) {
+			if (tipusDada.getName().compareTo(NIF) != 0 && 
+					tipusDada.getName().compareTo(TELEFON) != 0) {
 				Iterator<DadaUsuari> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
 					DadaUsuari dada = dadesIterator.next();
 					if (dada.getCodiDada().compareTo(NIF) != 0 && dada.getCodiDada().compareTo(TELEFON) != 0 && dada.getCodiDada().compareTo(tipusDada.getName()) == 0)
 					{
-						
 						teTipusDada = true;
-						result.add(dada);
+						if (! dada.getVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+							result.add(dada);
 					}
 				}
 				if (!teTipusDada) {
-					DadaUsuari dus = new DadaUsuari();
-					dus.setCodiDada(tipusDada.getName());
-					dus.setDataLabel(tipusDada.getLabel() == null ? tipusDada.getName() : tipusDada.getLabel());
-					dus.setCodiUsuari(codiUsuari);
-					dus.setVisibility(v);
-					result.add(dus);
+					UserDataEntity dus = getUserDataEntityDao().newUserDataEntity();
+					dus.setUser(usuari);
+					dus.setDataType(tipusDada);
+					if (! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+					{
+						result.add ( getUserDataEntityDao().toDadaUsuari(dus));
+					}
 				}
 			}
 		}
@@ -1822,16 +1807,18 @@ public class UsuariServiceImpl extends
 
 	protected Collection<Sessio> handleFindSessionsByCodiUsuari(String codiUsuari)
 			throws Exception {
-		Usuari usuari = findUsuariByCodiUsuari(codiUsuari);
+		UserEntity userEntity = getUserEntityDao().findByUserName(codiUsuari);
 		
-		if (usuari != null && AutoritzacionsUsuari.canQueryUserSession(usuari, getGroupEntityDao())) {
-			List<SessionEntity> sessions = getSessionEntityDao().findSessionByUserName(codiUsuari);
+		if (userEntity != null && 
+				getAutoritzacioService().hasPermission(Security.AUTO_USER_SESSION_QUERY, userEntity))
+		{
+			Collection<SessionEntity> sessions = userEntity.getSessions();
 			if (sessions != null) {
 				return getSessionEntityDao().toSessioList(sessions);
 			}
 		} 
 		//TODO: Aquí no donem error de que no disposa permisos ... (!!)
-		return new Vector();
+		return Collections.emptyList();
 	}
 
 	protected Collection handleFindUsuariImpressoraByCodiUsuari(
@@ -2035,7 +2022,7 @@ public class UsuariServiceImpl extends
 	protected String handleCanviPassword(String codiUsuari, String codiDominiContrasenyes) throws Exception {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
-			if (AutoritzacionsUsuari.canUpdateUserPassword(usuari.getPrimaryGroup().getName())) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari)) {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao().findByName(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService().generateNewPassword(usuari, dominiContrasenyes, true);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getName());
@@ -3466,11 +3453,11 @@ public class UsuariServiceImpl extends
 		}
 
 		String s = sb.toString ();
-		Collection usuaris = getUserEntityDao().query(s, params.toArray(new Parameter[0])); 
+		Collection<UserEntity> usuaris = getUserEntityDao().query(s, params.toArray(new Parameter[0])); 
 		if (usuaris != null && usuaris.size() != 0)
 		{
 			// Ya tenemos los grupos del usuario con permisos
-			Collection usuarisPermis = AutoritzacionsUsuari.filtraUsuariEntityCanQuery(usuaris);
+			Collection<UserEntity> usuarisPermis = filterUsers(usuaris);
 			
 			if (usuarisPermis != null && usuarisPermis.size() != 0) {
 				List<Usuari> vos = getUserEntityDao().toUsuariList(usuarisPermis);
@@ -3500,13 +3487,23 @@ public class UsuariServiceImpl extends
 		return new Vector();
 	}
 
+	private Collection<UserEntity> filterUsers(Collection<UserEntity> usuaris) throws InternalErrorException {
+		LinkedList<UserEntity> result = new LinkedList<UserEntity>();
+		for (UserEntity ue: usuaris)
+		{
+			if (getAutoritzacioService().hasPermission(Security.AUTO_USER_QUERY, ue))
+				result.add (ue);
+		}
+		return result;
+	}
+
 	@Override
 	protected void handleSetTemporaryPassword(String codiUsuari,
 			String codiDominiContrasenyes, Password newPassword)
 			throws Exception {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
-			if (AutoritzacionsUsuari.canSetUserPassword(usuari.getPrimaryGroup().getName())) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari) ) {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao().findByName(codiDominiContrasenyes);
 				PolicyCheckResult validation = getInternalPasswordService().checkPolicy(usuari, dominiContrasenyes, newPassword);
 				if (! validation.isValid())

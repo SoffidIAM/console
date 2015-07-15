@@ -5,7 +5,9 @@
  */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.model.RolEntity
@@ -15,7 +17,7 @@ import es.caib.seycon.ng.model.*;
  *
  */
 public class RoleEntityImpl
-    extends com.soffid.iam.model.RoleEntity
+    extends RoleEntity implements SecurityScopeEntity
 {
     /**
      * The serial version UID of this class. Needed for serialization.
@@ -27,11 +29,28 @@ public class RoleEntityImpl
      */
     public java.lang.String toString()
     {
-        return "[ id=\'" + getId() + "\' nom=\'" + getName() + "\' descripcio=\'" + getDescription() + "\' defecte=\'" + getDefaultRole() + "\' contasenya=\'" + getPassword() + "\' tipusDomini=\'" + getDomainType() + "\' ]"; //$NON-NLS-1$
+        return 
+        "[ id='"+getId()+ //$NON-NLS-1$
+        "' name='"+getName()+ //$NON-NLS-1$
+        "' description='"+getDescription()+ //$NON-NLS-1$
+        "' default='"+getDefaultRole()+ //$NON-NLS-1$
+        "' password='"+getPassword()+ //$NON-NLS-1$
+        "' type='"+getDomainType()+ //$NON-NLS-1$
+        "' ]"; //$NON-NLS-1$
     }
 
 	public String toRoleDescription() {//Imporante: CUIDADO AL CAMBIARLO, puede afectar a funcionalidad
-		return getName() + "@" + getSystem().getName() + " (" + getInformationSystem().getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ 
+		return getName()+"@"+getSystem().getName()+" ("+getInformationSystem().getName()+")"; //$NON-NLS-1$ //$NON-NLS-2$ 
+	}
+
+	public boolean isAllowed(String permission) {
+		if (Security.isUserInRole(permission+Security.AUTO_ALL))
+			return true;
+	
+		if (getInformationSystem() != null)
+			return getInformationSystem().isAllowed(permission);
+		
+		return false;
 	}
 
 }

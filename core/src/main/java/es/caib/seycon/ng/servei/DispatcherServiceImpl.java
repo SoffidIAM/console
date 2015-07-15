@@ -54,10 +54,13 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
+
 import com.soffid.iam.model.Parameter;
+
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.intf.DatabaseReplicaMgr;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import es.caib.seycon.ng.utils.Security;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -656,6 +659,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		UserEntity ue = getUserEntityDao().findByUserName(user);
 		if (ue.getActive().equals("N"))
 			return false;
+		
+		if (de.getManualAccountCreation() != null && de.getManualAccountCreation())
+			return true;
 		
         // Test user types
         boolean found = false;

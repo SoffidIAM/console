@@ -7,10 +7,17 @@
 	<style src="~./styles/estil.css" />
 
 	<zscript>
-	import es.caib.zkib.zkiblaf.Missatgebox;
 <![CDATA[
+	import es.caib.zkib.zkiblaf.Missatgebox;
+	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
+	boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+	
 	void cleanWindow() {
 		changeName.visible = false;
+		
+		dades.getFellow("detall_nom").setBind ("/changeName/nullbean:/@name");
+
+		dades.getFellow("attributeGrid").setDataPath( "/changeName/nullbean:/attribute");
 	}
 	void onWindowClose(Event event) {
 		cleanWindow();
@@ -48,22 +55,28 @@
 	}
 
 	es.caib.zkib.datasource.DataSource ds = page.getAttribute("dataSource");
-	String path = page.getAttribute("dataPath") + "/@name";
-	dades.getFellow("detall_nom").setValue (ds.getJXPathContext().getValue(path));
-	
+	String dsPath = "//"+ds.getPage().getId() + Path.getPath(ds);
+	String rootPath = page.getAttribute("dataPath") ;
+
+	dades.getFellow("detall_nom").setBind (dsPath+":"+rootPath+ "/@name");
+
+	dades.getFellow("attributeGrid").setDataPath( dsPath+":"+rootPath+ "/attribute");
 	]]>
 		</attribute>
 
 		<beandatasource id="nullbean" />
 
 		<detalls id="dades" width="99%">
-			<form id="form" width="100%"
-				dataPath="/changeName/nullbean:/">
-				<grid width="99%">
+			<div id="form" width="100%">
+				<grid fixedLayout="true" sclass = "noBorderGrid fonsBlanc">
+					<columns>
+						<column width="260px"/>
+						<column />
+					</columns>
 					<rows>
 						<row>
 							<input_etiqueta
-								value="${c:l('user_renameaccount.Nom')}" />
+								value="${c:l('user_renameaccount.Nom')}"/>
 							<textbox id="detall_nom" maxlength="50"
 								sclass="textbox" width="99%">
 							</textbox>
@@ -71,13 +84,23 @@
 						</row>
 					</rows>
 				</grid>
-			</form>
+				<grid dataPath="/changeName/nullbean:/attribute"  
+					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"
+					if="${canUpdateUserMetadata}" fixedLayout="true">
+					<columns>
+						<column width="260px"/>
+						<column />
+					</columns>
+					<datarow>
+						<input_etiqueta bind="@dataLabel" width_custom="250px"/>
+						<div use="com.soffid.web.users.additionalData.InputField" onChange=""/>
+					</datarow>
+				</grid>
+			</div>
 			<separator spacing="5px" />
 			<hbox style="margin-left:auto; margin-right:auto">
 				<button label="${c:l('user_renameaccount.Accept')}"
 					onClick="onChange()" />
-				<button label="${c:l('user_renameaccount.Close')}"
-					onClick="onWindowClose(event)" />
 			</hbox>
 		</detalls>
 	</window>

@@ -10,14 +10,16 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service(translatedName = "DomainService", translatedPackage = "com.soffid.iam.service")
-@Depends({ es.caib.seycon.ng.model.DominiAplicacioEntity.class,
-		es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
-		es.caib.seycon.ng.servei.AplicacioService.class,
-		es.caib.seycon.ng.servei.GrupService.class,
-		es.caib.seycon.ng.servei.UsuariService.class,
-		es.caib.seycon.ng.model.GrupEntity.class,
-		es.caib.seycon.ng.model.AplicacioEntity.class })
+@Service (translatedName="DomainService",
+	translatedPackage="com.soffid.iam.service")
+@Depends ({es.caib.seycon.ng.model.DominiAplicacioEntity.class,
+	es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
+	es.caib.seycon.ng.servei.AplicacioService.class,
+	es.caib.seycon.ng.servei.GrupService.class,
+	es.caib.seycon.ng.servei.UsuariService.class,
+	es.caib.seycon.ng.model.GrupEntity.class,
+	es.caib.seycon.ng.model.AplicacioEntity.class,
+	AutoritzacioService.class})
 public abstract class DominiService {
 
 	@Operation(grantees = { roles.application_create.class,

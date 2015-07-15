@@ -5,12 +5,22 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.List;
+
+import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Usuari;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import roles.account_attribute_query;
+import roles.account_attribute_update;
 
 @Service (translatedName="AccountService", serverPath="/seycon/accountService", serverRole="agent",
 	translatedPackage="com.soffid.iam.service")
@@ -32,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ServerEntity.class,
 	es.caib.seycon.ng.servei.DominiUsuariService.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	AutoritzacioService.class,
+	AccountAttributeEntity.class, AccountMetadataEntity.class,
 	AuditoriaService.class})
 public abstract class AccountService {
 
@@ -295,6 +307,11 @@ public abstract class AccountService {
 	 return null;
 	}
 
+	@Description ("Gets the account password bypassing passowrd policy")
+	public Password queryAccountPasswordBypassPolicy (long accountId)
+	{
+		return null;
+	}
 	///
 	@Description("Sets the account password")
 	@Operation ( grantees={roles.Tothom.class},
@@ -391,4 +408,28 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Description("Gets account attributes")
+	@Operation (grantees={account_attribute_query.class})
+	public List<DadaUsuari> getAccountAttributes (Account acc) {
+		return null;
+	}
+
+	@Description("Creates an account attributes")
+	@Operation (grantees={account_attribute_update.class})
+	public DadaUsuari createAccountAttribute (DadaUsuari attribute) {
+		return null;
+	}
+
+	@Description("Updates an account attributes")
+	@Operation (grantees={account_attribute_update.class})
+	public DadaUsuari updateAccountAttribute (DadaUsuari attribute) {
+		return null;
+	}
+
+	@Description("Deletes an account attributes")
+	@Operation (grantees={account_attribute_update.class})
+	public void removeAccountAttribute (DadaUsuari attribute) {
+	}
+
 }

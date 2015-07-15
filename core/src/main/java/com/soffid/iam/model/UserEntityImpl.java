@@ -1,10 +1,13 @@
 package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
+import es.caib.seycon.ng.utils.Security;
 
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.security.SecurityScopeEntity;
 
 public class UserEntityImpl extends UserEntity
+	implements SecurityScopeEntity
 {
 
 	@Override
@@ -29,4 +32,30 @@ public class UserEntityImpl extends UserEntity
 		}
 	}
 
+	public boolean isAllowed(String permission) {
+		if (! permission.endsWith(":query"))
+		{
+			String user = Security.getCurrentUser();
+			if ( user != null && user.equals (getUserName()))
+				return false;
+		}
+		if (Security.isUserInRole(permission+Security.AUTO_ALL))
+			return true;
+		boolean trobat = false;
+		if (getPrimaryGroup() != null
+						&& Security.isUserInRole(permission + "/" //$NON-NLS-1$
+										+ getPrimaryGroup().getName()))
+			return true;
+		if (!trobat)
+		{ // mirem grups secundaris
+			for (UserGroupEntity userGroup: getSecondaryGroups())
+			{
+				if (userGroup.getGroup() != null &&
+						Security.isUserInRole(permission + "/" + userGroup.getGroup().getName() )) //$NON-NLS-1$
+					return true;
+			}
+		}
+
+		return false;
+	}
 }

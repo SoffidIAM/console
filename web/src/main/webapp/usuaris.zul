@@ -1602,7 +1602,7 @@
 									<grid dataPath="/esquema/lista/listbox:/dada"
 										if="${canUpdateUserMetadata}" width="98%">
 										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}" width="250px"></column>
 											<column></column>
 										</columns>
 										<datarow>
@@ -1615,7 +1615,7 @@
 										dataPath="/esquema/lista/listbox:/dada"
 										if="${!canUpdateUserMetadata}" width="98%">
 										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"  width="250px"></column>
 											<column></column>
 										</columns>
 										<datarow>
@@ -2031,19 +2031,19 @@
 <![CDATA[
 void actualitza (event) {
 										dada = (String)(event.getData()[0]);
-										modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridRols.getModel();
+										modelProxy = gridRols.getModel();
 	
 										ds = gridRols.getDataSource(); 
 										ctx =  ds.getJXPathContext();
 										if (event.getData()[3] != null) {
 											valorDomini = (event.getData()[3])[0];
 											bbdd = (String)(event.getData()[5]);
-											xpath = gridRols.getXPath() + 
+											xpath = "/rol" + 
 												"[@nomRol = '" + dada + "' and @baseDeDades = '" + bbdd + "' and valorDomini/@valor = '" + valorDomini + "']";
 										} else {
 											valorDomini = "";
 											bbdd = (String)(event.getData()[5]);
-											xpath = gridRols.getXPath() + 
+											xpath = "/rol" + 
 												"[@nomRol = '" + dada + "' and @baseDeDades = '" + bbdd + "']";
 										}
 
@@ -2086,25 +2086,6 @@ void actualitza (event) {
 											jaExisteix = false;
 										}
 										// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
-										if (!jaExisteix && "SC_RESPONSABLE".equals( event.getData()[0]) ) {
-											javax.naming.Context context = new javax.naming.InitialContext();		
-											aplicacioHome = context.lookup(es.caib.seycon.ng.servei.ejb.AplicacioServiceHome.JNDI_NAME);
-											aplicacioService = aplicacioHome.create();
-											String _nomRol = event.getData()[0];
-											String _codiApp = event.getData()[3][0];
-											String _codiBbdd = event.getData()[5];
-											Collection admApp = aplicacioService.findAdministracioAplicacioByNomRolAndCodiAplicacio(_nomRol,_codiApp);
-											if (admApp!=null && admApp.size()!=0) {
-												for (int i=0; i < admApp.size(); i++) {
-													String disp = admApp.get(i).getCodiBaseDeDadesRol();
-													if (disp.equals(_codiBbdd)) {
-														Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.ResponsableAplicacio"), new Object [] {_codiApp,admApp.get(i).getCodiUsuari()}));
-														return;
-													}
-												}
-											}
-										}
-										
 										if(jaExisteix) {
 											Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.RolAssignat"), new Object [] {dada,bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
 										} else {
@@ -2112,7 +2093,7 @@ void actualitza (event) {
 											ds = gridRols.getDataSource(); 
 											ctx =  ds.getJXPathContext(); 
 											xpath = gridRols.getXPath() + modelProxy.getBind(position); 
-											pointer =ctx.createPath (xpath);
+											pointer = ctx.createPath (xpath);
 											ctx2 = ctx.getRelativeContext(pointer);
 												
 											campCodiUsuari = (DataTextbox) form.getFellow("codi");
@@ -2292,21 +2273,29 @@ void actualitza (event) {
 												label="Risk"
 												width="30px" />
 											<listheader
-												label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" />
+												label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" >
+												<textboxfilter bind="@nomRol"/>
+											</listheader>
 											<listheader
-												label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" />
+												label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" >
+												<listboxfilter bind="@baseDeDades"/>
+											</listheader>
 											<listheader
 												label="${c:l('usuaris.zul.Account')}" sort="auto"
 												width="10%" />
 											<listheader
 												label="${c:l('usuaris.zul.Aplicacia')}" sort="auto"
-												width="20%" />
+												width="20%" >
+												<listboxfilter mold="select" bind="@codiAplicacio"  />
+											</listheader>
 											<listheader
 												label="${c:l('usuaris.zul.startDate')}" width="10%"  sort="auto"/>
 											<listheader
 												label="${c:l('usuaris.zul.endDate')}" width="10%"  sort="auto"/>
 											<listheader
-												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"  sort="auto"/>
+												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"  sort="auto">
+												<listboxfilter mold="select" bind="@holderGroup"/>
+											</listheader>
 											<listheader
 												label="${c:l('usuaris.zul.')}"
 												visible="${canDeleteUserRole}" width="30px" />

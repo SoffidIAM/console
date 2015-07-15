@@ -9,27 +9,28 @@
  */
 package es.caib.seycon.ng.servei;
 
-import com.soffid.iam.model.AccessLogEntity;
-import com.soffid.iam.model.HostEntity;
-import com.soffid.iam.model.HostEntityDao;
-import com.soffid.iam.model.ServiceEntity;
-import com.soffid.iam.model.ServiceEntityDao;
-import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import es.caib.seycon.ng.comu.RegistreAcces;
-import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.exception.UnknownHostException;
-import com.soffid.iam.model.Parameter;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.Security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
+
+import com.soffid.iam.model.AccessLogEntity;
+import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.HostEntityDao;
+import com.soffid.iam.model.ServiceEntity;
+import com.soffid.iam.model.ServiceEntityDao;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+
+import es.caib.seycon.ng.comu.RegistreAcces;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.SeyconAccessLocalException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.utils.DateUtils;
+import es.caib.seycon.ng.utils.LimitDates;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.RegistreAccesService
@@ -290,8 +291,12 @@ public class RegistreAccesServiceImpl extends
 			String codiUsuari, String numRegistres, String codiProtocolAcces)
 			throws Exception {
 		
+		UserEntity userEntity = getUserEntityDao().findByUserName(codiUsuari);
+		Usuari user = getUserEntityDao().toUsuari(userEntity);
+		
 		// Mirem les autoritzacions del peticionari sobre l'usuari on es fa la petició
-		if (AutoritzacionsUsuari.canQueryUserAccessRegister(codiUsuari, getGroupEntityDao())) {
+		if (getAutoritzacioService().hasPermission(
+				Security.AUTO_ACCESSREGISTER_QUERY, new Object[] {userEntity})) {
 			CriteriaSearchConfiguration config  = new CriteriaSearchConfiguration();
 			if (numRegistres != null && ! numRegistres.isEmpty())
 			{

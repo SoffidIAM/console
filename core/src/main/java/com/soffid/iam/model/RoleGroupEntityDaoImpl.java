@@ -212,7 +212,7 @@ public class RoleGroupEntityDaoImpl extends
         target.setId(source.getId());
         target.setIdRol(source.getAssignedRole().getId());
         target.setRolName(source.getAssignedRole().getName());
-        
+        target.setInformationSystem(source.getAssignedRole().getInformationSystem().getName());
     }
 
 }

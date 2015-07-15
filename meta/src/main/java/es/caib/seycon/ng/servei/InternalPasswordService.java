@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Password;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( internal=true,
@@ -352,4 +354,5 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 }

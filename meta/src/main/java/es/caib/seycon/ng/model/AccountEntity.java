@@ -119,4 +119,10 @@ public abstract class AccountEntity {
 			es.caib.seycon.ng.comu.AccountCriteria criteria) {
 		return null;
 	}
+	
+	@DaoOperation
+	public void update (AccountEntity entity, @Nullable String auditType) 
+	{
+		
+	}
 }

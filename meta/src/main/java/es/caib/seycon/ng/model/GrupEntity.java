@@ -214,4 +214,7 @@ public abstract class GrupEntity {
 		java.lang.String budgetSection) {
 	 return null;
 	}
+
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

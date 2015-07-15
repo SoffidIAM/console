@@ -159,6 +159,30 @@
 				return list;
 			</script-finder>
 		</finder>
+		<finder name="dataType" type="dataType">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				for (l: TypeEnumeration.literals())
+				{
+					list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
+		<finder name="visibility" type="visibility">
+			<script-finder>
+				import com.soffid.iam.api.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				for (l: AttributeVisibilityEnum.literals())
+				{
+					list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
 	</datanode>
 
 	<datanode name="authoritativeProcess"></datanode>	
@@ -225,6 +249,16 @@
 			</new-instance-bean>
 		</finder>	
 
+		<finder name="metadata" type="metadata">
+			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
+				method="findSystemDataTypes">  <!--agent:query-->
+				<parameter value="${instance.codi}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.TipusDada">
+			</new-instance-bean>
+		</finder>	
+
 		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
@@ -236,13 +270,40 @@
 				<parameter value="${instance}"/>
 			</update-method>
 		</ejb-handler>
+		
+		
 		<validator>
 			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="agents.DispatcherCodiValidation"/>
 			<attribute-validator expr="${instance.dominiContrasenyes}" notNull="true" friendlyName="agents.DominiContrasenyaValidation"/>
 			<attribute-validator expr="${instance.dominiUsuaris}" notNull="true" friendlyName="agents.DominiUsuariValidation"/>	 		
 		</validator>
+
+
 	</datanode>
 	
+	<datanode name="metadata">
+		<script-handler>
+			<insert-script>
+				instance.setSystemName(parent.getInstance().getCodi());
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.ordre}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
+		</validator>
+	</datanode>
+
 	<datanode name="controlAcces">
 		<script-handler>
 			<insert-script>
@@ -395,4 +456,35 @@
 		</custom-attribute>
 
 	</datanode>
+
+	<datanode name="dataType" transient="true">
+		<custom-attribute name="literal">
+			if (instance.length() == 0)
+				return "";
+			else
+			 	return org.zkoss.util.resource.Labels.getLabel("typeDadaAddicional."+instance);
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return es.caib.seycon.ng.comu.TypeEnumeration.fromString(instance);
+		</custom-attribute>
+	</datanode>
+	
+	<datanode name="visibility" transient="true">
+		<custom-attribute name="literal">
+			if (instance.length() == 0)
+				return "";
+			else
+			 	return org.zkoss.util.resource.Labels.getLabel("attributeVisibility."+instance);
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return com.soffid.iam.api.AttributeVisibilityEnum.fromString(instance);
+		</custom-attribute>
+	</datanode>
+
 </zkib-model>

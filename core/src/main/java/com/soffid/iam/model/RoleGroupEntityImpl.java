@@ -7,13 +7,17 @@ package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
 
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
 import es.caib.seycon.net.RoleInfo;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.model.RolsGrupEntity
  */
 public class RoleGroupEntityImpl
     extends com.soffid.iam.model.RoleGroupEntity
+    implements SecurityScopeEntity
 {
     /**
      * The serial version UID of this class. Needed for serialization.
@@ -28,4 +32,15 @@ public class RoleGroupEntityImpl
         // @todo implement public java.lang.String toString()
         return null;
     }
+
+	public boolean isAllowed(String permission) {
+		if (Security.isUserInRole(permission+Security.AUTO_ALL))
+			return true;
+	
+		if (getAssignedRole() != null)
+			return getAssignedRole().isAllowed(permission);
+		
+		return false;
+	}
+
 }

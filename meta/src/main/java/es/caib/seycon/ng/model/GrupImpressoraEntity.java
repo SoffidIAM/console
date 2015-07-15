@@ -54,4 +54,7 @@ public abstract class GrupImpressoraEntity {
 			java.lang.String group) {
 		return null;
 	}
+
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

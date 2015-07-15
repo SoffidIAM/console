@@ -32,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ObjectMappingEntity.class,
 	ScheduledTaskService.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
-	SeyconServerService.class})
+	SeyconServerService.class,
+	AutoritzacioService.class})
 public abstract class DispatcherService {
 
 	@Operation ( grantees={roles.agent_create.class},

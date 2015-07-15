@@ -248,6 +248,7 @@ public class RoleDependencyEntityDaoImpl extends
         target.setIdRol(source.getContained().getId());
         target.setRolName(source.getContained().getName());
         target.setDispatcher(source.getContained().getSystem().getName());
+        target.setInformationSystem(source.getContained().getInformationSystem().getName());
     }
 
 }

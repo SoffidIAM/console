@@ -9,19 +9,6 @@
  */
 package es.caib.seycon.ng.servei;
 
-import com.soffid.iam.model.AuthorizationEntity;
-import com.soffid.iam.model.GroupEntity;
-import com.soffid.iam.model.RoleEntity;
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.ValorDomini;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.AutoritzacioSEU;
-import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.util.TipusDomini;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,12 +25,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.soffid.iam.model.AuthorizationEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
+import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AutoritzacioRol;
+import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.UserAccount;
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.ValorDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.utils.AutoritzacioSEU;
+import es.caib.seycon.ng.utils.Security;
+import es.caib.seycon.util.TipusDomini;
 
 /**
  * @see es.caib.seycon.ng.servei.AutoritzacioService
@@ -891,6 +896,24 @@ public class AutoritzacioServiceImpl extends
 		list.add(0, " "); //$NON-NLS-1$
 		
 		return list;
+	}
+
+	@Override
+	protected String[] handleGetUserAuthorizationsString(String user,
+			Map<String, String> loginProperties) throws Exception {
+		return handleGetUserAuthorizationsString(user);
+	}
+
+	@Override
+	protected boolean handleHasPermission(String action, Object object)
+			throws Exception {
+		if (Security.isUserInRole(action+Security.AUTO_ALL))
+			return true;
+		
+		if (object != null && object instanceof SecurityScopeEntity)
+			return ((SecurityScopeEntity)object).isAllowed(action);
+			
+		return false;
 	}
 	
 }

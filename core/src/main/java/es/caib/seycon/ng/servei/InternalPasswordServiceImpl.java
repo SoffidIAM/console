@@ -104,15 +104,18 @@ public class InternalPasswordServiceImpl extends
     private Collection<AccountEntity> getUserAccounts(UserEntity user,
 			PasswordPolicyEntity politica) {
     	LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
-    	for (UserAccountEntity uae: user.getAccounts())
-    	{
-    		AccountEntity acc = uae.getAccount();
-    		if (acc.getType().equals(AccountType.USER))
+	if (user != null)
+	{	
+    		for (UserAccountEntity uae: user.getAccounts())
     		{
-    			if (acc.getSystem().getPasswordDomain() == politica.getPasswordDomain())
-    				accounts.add(acc);
+    			AccountEntity acc = uae.getAccount();
+    			if (acc.getType().equals(AccountType.USER))
+    			{
+    				if (acc.getSystem().getPasswordDomain() == politica.getPasswordDomain())
+    					accounts.add(acc);
+    			}
     		}
-    	}
+	}
     	return accounts;
 	}
 
@@ -315,7 +318,7 @@ public class InternalPasswordServiceImpl extends
             if (acc.getType().equals(AccountType.USER) && (acc.getSystem().getUrl() == null || acc.getSystem().getUrl().isEmpty())) {
                 acc.setLastPasswordSet(new Date());
                 acc.setPasswordExpiration(c.getTime());
-                getAccountEntityDao().update(acc);
+                getAccountEntityDao().update(acc, null);
             }
         }
     }
@@ -598,6 +601,14 @@ public class InternalPasswordServiceImpl extends
 		int minNums = pc.getMinNumbers() == null ? 0 : pc.getMinNumbers().intValue();
 		int minSims = pc.getMinSymbols() == null ? 0 : pc.getMinSymbols().intValue();
 		int maxMays, maxMins, maxNums, maxSims;
+		if (pc.getComplexPasswords() != null && pc.getComplexPasswords().booleanValue())
+		{
+			if (minMays <= 0) minMays = 1;
+			if (minNums <= 0) minNums = 1;
+			if (minSims <= 0) minSims = 1;
+			if (minMins <= 0) minMins = 1;
+			if ( length < 4) length  = 4;
+		}
 		maxMins = pc.getMaxLowerCase() == null ? length - minMays - minNums - minSims : pc.getMaxLowerCase().intValue();
 		if (maxMins > length)
 			maxMins = length;
@@ -1016,7 +1027,7 @@ public class InternalPasswordServiceImpl extends
         {
         	account.setLastPasswordSet(new Date());
         	account.setPasswordExpiration(c.getTime());
-        	getAccountEntityDao().update(account);
+        	getAccountEntityDao().update(account, "p");
         }
     }
 

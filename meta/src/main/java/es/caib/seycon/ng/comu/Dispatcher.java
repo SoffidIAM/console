@@ -110,4 +110,9 @@ public abstract class Dispatcher {
 
 	@Nullable
 	public Boolean manualAccountCreation;
+	
+	@Nullable
+	@Description ("false to use a dedicated server thread. true to use a shared server thread")
+	public Boolean sharedDispatcher;
+
 }

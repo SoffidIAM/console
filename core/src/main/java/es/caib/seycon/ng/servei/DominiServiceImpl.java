@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import es.caib.seycon.ng.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiService
@@ -65,9 +66,10 @@ public class DominiServiceImpl extends
 					Messages.getString("DominiServiceImpl.1")); //$NON-NLS-1$
 		}
 		
+		ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().dominiToEntity(domini);
 		// codiExtern en dominis de tipus d'aplicació és el codi de l'aplicacio
-		if (AutoritzacionsUsuari.canDeleteAplicacio(domini.getCodiExtern())) {
-			ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().dominiToEntity(domini);
+		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, 
+				dominiEntity.getInformationSystem())) {
 			getApplicationDomainEntityDao().remove(dominiEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$
@@ -111,11 +113,10 @@ public class DominiServiceImpl extends
 					Messages.getString("DominiServiceImpl.4")); //$NON-NLS-1$
 		}
 		
-		// el codi extern conté el codi de l'aplicació (sempre tindrà valor)
-		if (AutoritzacionsUsuari.canCreateAplicacio(valorDomini.getCodiExternDomini()) ||
-				AutoritzacionsUsuari.canUpdateAplicacio(valorDomini.getCodiExternDomini()) ||
-				AutoritzacionsUsuari.canDeleteAplicacio(valorDomini.getCodiExternDomini())) {
-			DomainValueEntity valorDominiAplicacioEntity = getDomainValueEntityDao().valorDominiToEntity(valorDomini);
+		DomainValueEntity valorDominiAplicacioEntity = getDomainValueEntityDao().
+				valorDominiToEntity(valorDomini);
+		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, 
+				valorDominiAplicacioEntity.getDomain().getInformationSystem())) {
 			getDomainValueEntityDao().remove(valorDominiAplicacioEntity);
 		} else {
 			throw new SeyconAccessLocalException("DominiService", //$NON-NLS-1$

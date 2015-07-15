@@ -65,6 +65,11 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public AttributeVisibilityEnum userVisibility;
 	
+	@Description("Unique value")
+	@Column (name="TDA_UNIQUE", length=1)
+	@Nullable
+	public Boolean unique;
+	
 
 	/********************** DAOS ************************/
 	@Operation(translated="findDataTypeByName")

@@ -23,6 +23,8 @@ public abstract class RolGrant {
 
 	@Attribute(translated = "system" )
 	public java.lang.String dispatcher;
+	
+	public java.lang.String informationSystem;
 
 	@Description("true if the grant has domain or scope")
 	public boolean hasDomain;

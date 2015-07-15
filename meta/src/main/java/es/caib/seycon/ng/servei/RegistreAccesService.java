@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.RegistreAccesEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
-	es.caib.seycon.ng.model.ServeiEntity.class})
+	es.caib.seycon.ng.model.ServeiEntity.class,
+	
+	AutoritzacioService.class})
 public abstract class RegistreAccesService {
 
 	@Operation ( grantees={roles.accessRegister_query.class},

@@ -5,10 +5,14 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.model.UsuariImpressoraEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AplicacioService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.servei.PasswordService.class,
-	es.caib.seycon.ng.servei.SessionCacheService.class})
+	es.caib.seycon.ng.servei.SessionCacheService.class,
+	XarxaService.class,
+	
+	UsuariEntity.class,
+	UsuariImpressoraEntity.class})
 public abstract class AutoritzacioService {
 
 	@Operation ( grantees={roles.Tothom.class},
@@ -66,6 +74,7 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation(translated="getUserAuthorizationString")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] getUserAuthorizationString(
@@ -73,6 +82,16 @@ public abstract class AutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Description("Gets the autohrization given some login process properties")
+	@Operation
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.lang.String[] getUserAuthorizationsString(
+		String user, Map<String,String> loginProperties)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation(translated="getUserAuthorizationString")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String[] getUserAuthorizationString(
@@ -145,5 +164,13 @@ public abstract class AutoritzacioService {
 	public java.util.List getScopeList()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+	
+	
+	@Description("Returns true if the user has the selected permission on the selected objects")
+	@Operation
+	public boolean hasPermission (String action, Object object)
+	{
+		return true;
 	}
 }

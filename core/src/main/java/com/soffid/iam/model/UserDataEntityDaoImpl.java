@@ -11,9 +11,6 @@ package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
 
-import com.soffid.iam.model.MetaDataEntity;
-import com.soffid.iam.model.UserDataEntity;
-import com.soffid.iam.model.UserEntity;
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -43,7 +40,7 @@ public class UserDataEntityDaoImpl
 	/**
 	 * 
 	 */
-	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss";
+	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
 
 	private void assertPhoneExists ()
 	{
@@ -74,7 +71,20 @@ public class UserDataEntityDaoImpl
 	public void create(com.soffid.iam.model.UserDataEntity dadaUsuari) throws RuntimeException {
 		try {
 			assertPhoneExists();
-			super.create(dadaUsuari);
+			
+	    	if (dadaUsuari.getDataType().getUnique() != null &&
+	    			dadaUsuari.getDataType().getUnique().booleanValue() )
+	    	{
+				for (UserDataEntity du: findByTypeAndValue(dadaUsuari.getDataType().getName(), 
+						dadaUsuari.getValue()))
+				{
+					throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.6"),  //$NON-NLS-1$
+							du.getValue(), du.getUser().getUserName())); 
+				}
+	    	}
+			
+
+	    	super.create(dadaUsuari);
 			if (Hibernate.isInitialized(dadaUsuari.getUser().getUserData()))
 				dadaUsuari.getUser().getUserData().add(dadaUsuari);
 			getSession(false).flush();
@@ -88,7 +98,20 @@ public class UserDataEntityDaoImpl
 	public void update(UserDataEntity dadaUsuariEntity) {
 		try {
 			assertPhoneExists();
-			super.update(dadaUsuariEntity);
+			
+	    	if (dadaUsuariEntity.getDataType().getUnique() != null &&
+	    			dadaUsuariEntity.getDataType().getUnique().booleanValue() )
+	    	{
+				for (UserDataEntity du: findByTypeAndValue(dadaUsuariEntity.getDataType().getName(), 
+						dadaUsuariEntity.getValue()))
+				{
+					if (!dadaUsuariEntity.getId().equals(du.getId()))
+						throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.7"),  //$NON-NLS-1$
+							du.getValue(), du.getUser().getUserName())); 
+				}
+	    	}
+
+	    	super.update(dadaUsuariEntity);
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
@@ -134,7 +157,7 @@ public class UserDataEntityDaoImpl
         			targetVO.setValorDadaDate(null);
         	}
         }
-        targetVO.setVisibility(AutoritzacionsUsuari.getAttributeVisibility(sourceEntity.getUser(), sourceEntity.getDataType()));
+        targetVO.setVisibility(sourceEntity.getAttributeVisibility());
     }
 
     /**
@@ -193,10 +216,10 @@ public class UserDataEntityDaoImpl
 
     private Calendar parseDate(String valorDada) {
     	String leftParse ;
-    	String rightParse = "";
+    	String rightParse = ""; //$NON-NLS-1$
     	String leftValue = valorDada;
-    	String rightValue = ""; 
-    	if (valorDada.endsWith("z") || valorDada.endsWith("Z"))
+    	String rightValue = "";  //$NON-NLS-1$
+    	if (valorDada.endsWith("z") || valorDada.endsWith("Z")) //$NON-NLS-1$ //$NON-NLS-2$
     	{
         	leftValue = valorDada.substring(0, valorDada.length()-1);
     	}
@@ -207,20 +230,20 @@ public class UserDataEntityDaoImpl
     		int last = i > j ? i : j;
     		if (last > 0 && valorDada.length() - last == 5)
     		{
-    			rightParse = "Z";
+    			rightParse = "Z"; //$NON-NLS-1$
     			leftValue = valorDada.substring(0, last);
     			rightValue = valorDada.substring (last+1);
     		}
     		else if (last > 0)
     		{
-    			rightParse = "X";
+    			rightParse = "X"; //$NON-NLS-1$
     		}
     	}
     	
     	if (leftValue.length() > 14 && leftValue.charAt(14) == ',')
-        	leftParse = "yyyyMMddHHmmss,SSS";
+        	leftParse = "yyyyMMddHHmmss,SSS"; //$NON-NLS-1$
     	else
-    		leftParse = "yyyyMMddHHmmss.SSS";
+    		leftParse = "yyyyMMddHHmmss.SSS"; //$NON-NLS-1$
     		
     	if (leftValue.length() < leftParse.length())
     		leftParse = leftParse.substring(0, leftValue.length());

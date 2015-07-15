@@ -1121,7 +1121,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         }
 
         // 3) Propaguem els accounts
-        if (grupsPropagar != null)
+        if (accountsPropagar != null)
             for (Iterator<com.soffid.iam.model.AccountEntity> it = accountsPropagar.iterator(); it.hasNext(); ) {
             com.soffid.iam.model.AccountEntity acc = it.next();
             Tasca updateAccount = new Tasca();
@@ -1130,6 +1130,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             updateAccount.setStatus("P");
             updateAccount.setUsuari(acc.getName());
             updateAccount.setBd(acc.getSystem().getName());
+            updateAccount.setCoddis(acc.getSystem().getName());
             TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateAccount);
             getTaskEntityDao().createNoFlush(tasca);
         }

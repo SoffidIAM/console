@@ -40,8 +40,8 @@
 			}			
 			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
 			if (queryEnabled) {
-				model.getJXPathContext().getValue("/valor").refresh();
-				listbox.dataPath = "/model:/valor"; 
+				dmc = model.getJXPathContext().getValue("/valor");
+				dmc.refresh();
 			} 
 		}
 
@@ -65,7 +65,7 @@
 			queryWindow.getFellow("queryCodi").getFellow("textbox").value = "";
 			queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
 			model.getVariables().declareVariable("queryEnabled", false);		
-			lista.getFellow("listbox").dataPath = "/model:/valor[false]";
+//			lista.getFellow("listbox").dataPath = "/model:/valor[false]";
 			esquemaLlista.visible=false;			
 			view_altres = false;							
 			esquemaLlista.getFellow("finishButton").disabled = true;		
@@ -143,6 +143,7 @@
 				if ( (domini.getNom().equals("GRUPS")) || 
    			         (domini.getNom().equals("APLICACIONS")) ) {				
 					esquemaLlista.getFellow("queryWindow").setVisible(true);
+					model.getJXPathContext().getValue("/valor").refresh ();
 				} else {
 					esquemaLlista.getFellow("queryWindow").setVisible(false);				
 					search(true);

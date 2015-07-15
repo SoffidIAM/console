@@ -974,7 +974,8 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         target.setIdRol(source.getRole().getId());
         target.setRolName(source.getRole().getName());
         target.setDispatcher(source.getRole().getSystem().getName());
-		for (com.soffid.iam.model.UserAccountEntity ua : source.getAccount().getUsers()) {
+        target.setInformationSystem(source.getRole().getInformationSystem().getName());
+	for (com.soffid.iam.model.UserAccountEntity ua : source.getAccount().getUsers()) {
             target.setUser(ua.getUser().getUserName());
         }
 		if (source.getHolderGroup() == null)

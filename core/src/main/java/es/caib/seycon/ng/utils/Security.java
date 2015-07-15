@@ -156,7 +156,7 @@ public class Security {
     public static final String AUTO_ROLE_CREATE = "role:create"; //$NON-NLS-1$
     public static final String AUTO_ROLE_UPDATE = "role:update"; //$NON-NLS-1$
     public static final String AUTO_ROLE_DELETE = "role:delete"; //$NON-NLS-1$
-    public static final String AUTO_ROLE_QUERY = "role:qwery"; //$NON-NLS-1$
+    public static final String AUTO_ROLE_QUERY = "role:query"; //$NON-NLS-1$
 
     public static final String AUTO_ACCESSREGISTER_QUERY = "accessRegister:query"; //$NON-NLS-1$
 

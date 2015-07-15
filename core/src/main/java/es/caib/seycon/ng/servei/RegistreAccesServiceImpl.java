@@ -304,7 +304,7 @@ public class RegistreAccesServiceImpl extends
 		
 		// Mirem les autoritzacions del peticionari sobre l'usuari on es fa la petició
 		if (getAutoritzacioService().hasPermission(
-				Security.AUTO_ACCESSREGISTER_QUERY, new Object[] {user})) {
+				Security.AUTO_ACCESSREGISTER_QUERY, new Object[] {userEntity})) {
 			CriteriaSearchConfiguration config  = new CriteriaSearchConfiguration();
 			if (numRegistres != null && ! numRegistres.isEmpty())
 			{

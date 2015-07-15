@@ -164,10 +164,11 @@
 				bbdd = (String)ctx2.getPointer("@baseDeDades").getValue();
 				aplicacio = (String)ctx2.getPointer("@codiAplicacio").getValue();
 				descripcio = (String)ctx2.getPointer("@descripcio").getValue();
+				category = (String)ctx2.getPointer("@category").getValue();
 				domini = (String)ctx2.getPointer("domini/@nom").getValue();
 				idrol = (String)ctx2.getPointer("@id").getValue().toString();
 				pointer.invalidate ();
-				Object[] dades = {nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol};
+				Object[] dades = {nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol, category};
 				Component formComponent = (Component) pageScope.get("contextComponent");
 				Events.postEvent ("onActualitza", formComponent, dades);
 				cleanWindow();
@@ -343,6 +344,7 @@
 					]]>
 				</attribute>
 				<listhead>
+					<listheader label="${c:l('aplica_rolinfo.zul.Category')}" width="20%"/>
 					<listheader label="${c:l('rolsllista.zul.Nom-2')}" width="20%"/>
 					<listheader label="${c:l('rolsllista.zul.Basededades-2')}" width="15%"/>
 					<listheader label="${c:l('rolsllista.zul.Aplicacia-2')}" width="15%"/>
@@ -355,6 +357,11 @@
 					</listfooter>
 				</listfoot>
 				<dataitem bind=".">
+					<listcell bind="@category">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
 					<listcell bind="@nom">
 						<attribute name="onDoubleClick">
 							seguent();

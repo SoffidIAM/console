@@ -344,12 +344,12 @@
 					]]>
 				</attribute>
 				<listhead>
-					<listheader label="${c:l('aplica_rolinfo.zul.Category')}" width="20%"/>
-					<listheader label="${c:l('rolsllista.zul.Nom-2')}" width="20%"/>
-					<listheader label="${c:l('rolsllista.zul.Basededades-2')}" width="15%"/>
-					<listheader label="${c:l('rolsllista.zul.Aplicacia-2')}" width="15%"/>
+					<listheader label="${c:l('aplica_rolinfo.zul.Category')}" width="10%"/>
+					<listheader label="${c:l('rolsllista.zul.Nom-2')}" width="15%"/>
+					<listheader label="${c:l('rolsllista.zul.Basededades-2')}" width="10%"/>
+					<listheader label="${c:l('rolsllista.zul.Aplicacia-2')}" width="10%"/>
 					<listheader label="${c:l('rolsllista.zul.Descripcia-2')}" width="*"/>
-					<listheader label="${c:l('rolsllista.zul.Domini')}" width="20%"/>
+					<listheader label="${c:l('rolsllista.zul.Domini')}" width="15%"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">

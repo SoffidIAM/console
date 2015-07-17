@@ -241,6 +241,7 @@
 		</criteris>
 		<navegador id="lista" width="${amplaria}">
 			<toolbar>
+				<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="auth"/>
 				<commitbutton datamodel="/model" id="boto_commit"/>
 				<undobutton datamodel="/model" id="boto_undo" listbox="/esquema/dades/gridAutoritzacions"/>
 				<listexporttoolbarbutton acces="${canQueryAuthorization}" listbox="/esquema/lista/listbox"/>
@@ -333,17 +334,15 @@
 								if (allAuto!=null) {
 									int pos =0;
 									for (Iterator it = allAuto.iterator(); it.hasNext(); ){
-										elem = it.next().getChildren();
-										if (elem.size()>=5) {
-											heretaElem = elem.get(5).getLabel();
-											if (heretaElem!=null && heretaElem.indexOf(s_codiAutoH)!=-1) {
-												int pos = heretaElem.indexOf(s_codiAutoH);
-												// correcció de autoritzacions que acaben igual
-												if (pos>0 && heretaElem.charAt(pos-1)!=':' || pos==0) {
-													codiElem = elem.get(2).getLabel();//Hi havia un get(0)
-													descripcioElem = elem.get(1).getLabel();//Hi havia un get(2)
-													socHeretat.put(codiElem,descripcioElem);
-												}
+										elem = it.next();
+										String heretaElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "hereta");
+										if (heretaElem!=null && heretaElem.indexOf(s_codiAutoH)!=-1) {
+											int pos = heretaElem.indexOf(s_codiAutoH);
+											// correcció de autoritzacions que acaben igual
+											if (pos>0 && heretaElem.charAt(pos-1)!=':' || pos==0) {
+												String codiElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "codi");
+												String descripcioElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "descripcio");
+												socHeretat.put(codiElem,descripcioElem);
 											}
 										}
 									}

@@ -10,7 +10,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>1.5.13-SNAPSHOT</version>
+  <version>1.5.14-SNAPSHOT</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -429,8 +429,8 @@
     <document.manager.version>${pom.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.18-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.17-SNAPSHOT</zkdb.version>
+    <zkiblaf.version>1.18</zkiblaf.version>
+    <zkdb.version>1.17</zkdb.version>
     <mda.reconcile.version>82</mda.reconcile.version>
   </properties>
   <pluginRepositories>

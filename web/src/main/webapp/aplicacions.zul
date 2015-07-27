@@ -1101,12 +1101,103 @@
 						</tabpanel>
 						
 						<tabpanel fulfill="tabrols.onSelect" id="rols">
+							<toolbar>
+								<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="gridRols" 
+									preferenceName="approle"/>
+								<toolbarbutton id="btAfegirRol" image="~./img/list-add.gif"
+									label="${c:l('aplicacions.zul.Afegeixrol')}"
+									visible="${canModifyAplicacio}">
+									<attribute name="onClick">
+										<![CDATA[
+											Page rolPage = desktop.getPage("rol");
+											// Grupos poseedores del rol
+											codiAplicacio = form.getJXPathContext().getValue("@codi");
+											rolPage.setAttribute("aplicacio", codiAplicacio);
+											rolPage.setAttribute("modifica", false);
+											rolPage.setAttribute("contextComponent", gridRols);
+											rolPage.setAttribute("rolPath", null);
+											rolPage.setAttribute("rol",
+												new es.caib.seycon.ng.comu.Rol());
+											rolPage.setAttribute("newRole", null);
+											Events.postEvent("onInicia",
+												rolPage.getFellow("esquemaRol"), null);
+											Events.postEvent("onInicia",
+												desktop.getPage("rol").getFellow("esquemaRol"),
+												gridRols);
+										]]>
+									</attribute>
+								</toolbarbutton>
+								<toolbarbutton image="~./img/list-remove.gif" 
+									label="${c:l('aplicacions.zul.Esborrarolsseleccion')}" 
+									visible="${canModifyAplicacio or canDeleteAplicacio}">
+									<attribute name="onClick">
+										String nomRolsBorrar = "";
+										ArrayList rolsBorrar = new ArrayList();
+										Collection items = gridRols.getItems(); 
+										for (Iterator it = items.iterator(); it.hasNext();) {
+											Listitem item = (Listitem) it.next();
+											Collection cells = item.getChildren(); 
+											int pos = 0;
+											String nomRol ="";
+											DataCheckbox cbox = null;
+											Listcell celdaBorrar = null;
+											for (Iterator itcell = cells.iterator(); itcell
+													.hasNext();) {
+												Listcell cell = (Listcell) itcell.next(); 
+												if (pos==0) {nomRol = cell.getLabel(); celdaBorrar = cell;} 
+												else if (pos==2) {nomRol += "@"+cell.getLabel(); } 
+												else
+													if (pos==11) {
+														Iterator itcb = cell.getChildren().iterator();
+														if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
+													}
+												pos++; 
+											}
+											if (cbox!=null @and cbox.isChecked()) {
+												nomRolsBorrar += nomRol+", ";
+												rolsBorrar.add(celdaBorrar);
+											}
+										}
+										if (!"".equals(nomRolsBorrar)) {
+											nomRolsBorrar = nomRolsBorrar.substring(0,nomRolsBorrar.length()-2);
+											Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRolllista"), new Object [] {nomRolsBorrar}),
+														org.zkoss.util.resource.Labels.getLabel("aplicacions.Esborra"),
+														new EventListener() {
+															public void onEvent(Event evt) {
+																if ("onOK".equals(evt.getName())) { 
+																		for (i = 0; i @lt rolsBorrar.size(); i++) {
+																			listCell = rolsBorrar.get(i);
+																			dlistbox = listCell.getListbox(); 
+																			modelo = dlistbox.getModel();
+																			listItem = listCell.getParent(); 
+																			posicio = listItem.getIndex(); 
+																			elemPos = modelo.getElementAt(posicio); 
+																			xpath = elemPos.getDataContext().getXPath(); 
+																			dataSource = gridRols.getDataSource();
+																			context = dataSource.getJXPathContext(); 
+																			context.removePath(xpath);
+																		}
+										   						}
+										   				    }
+										   		});
+										}
+									</attribute>
+								</toolbarbutton>
+								<commitbutton datamodel="/model" />
+								<undobutton datamodel="/model" listbox="/esquema/lista/listbox" />
+								<listexporttoolbarbutton acces="${canQueryAplicacio}"
+									listbox="gridRols" />
+							</toolbar>
 							<listbox fixedLayout="true" id="gridRols" mold="paging" pageSize="15" width="100%"
 								sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)"
 								dataPath="/esquema/lista/listbox:/rol">
 								<listhead>
 									<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%">
 										<textboxfilter bind="@nom" />
+									</listheader>
+									<listheader label="${c:l('aplica_rolinfo.zul.Category')}" sort="auto" width="15%"
+										visible="false">
+										<listboxfilter bind="@category"/>
 									</listheader>
 									<listheader label="${c:l('aplicacions.zul.Descripcia')}" sort="auto" width="32%">
 										<textboxfilter bind="@descripcio"/>
@@ -1129,6 +1220,7 @@
 								</listhead>
 								<dataitem bind=".">
 									<listcell bind="@nom" tooltip="tnomRol"/>
+									<listcell bind="@category"/>
 									<listcell bind="@descripcio"/>
 									<listcell bind="@baseDeDades"/>
 									<listcell bind="@defecte"/>
@@ -1275,86 +1367,6 @@
 								</attribute>
 								<label id="rolsNomTooltipLabel" value=""/>
 							</popup>
-							<div width="100%" style="margin-top: 10px">
-								<button id="btAfegirRol" image="~./img/list-add.gif"
-									label="${c:l('aplicacions.zul.Afegeixrol')}"
-									visible="${canModifyAplicacio}">
-									<attribute name="onClick">
-										<![CDATA[
-											Page rolPage = desktop.getPage("rol");
-											// Grupos poseedores del rol
-											codiAplicacio = form.getJXPathContext().getValue("@codi");
-											rolPage.setAttribute("aplicacio", codiAplicacio);
-											rolPage.setAttribute("modifica", false);
-											rolPage.setAttribute("contextComponent", gridRols);
-											rolPage.setAttribute("rolPath", null);
-											rolPage.setAttribute("rol",
-												new es.caib.seycon.ng.comu.Rol());
-											rolPage.setAttribute("newRole", null);
-											Events.postEvent("onInicia",
-												rolPage.getFellow("esquemaRol"), null);
-											Events.postEvent("onInicia",
-												desktop.getPage("rol").getFellow("esquemaRol"),
-												gridRols);
-										]]>
-									</attribute>
-								</button>
-								<button image="~./img/list-remove.gif" label="${c:l('aplicacions.zul.Esborrarolsseleccion')}" visible="${canModifyAplicacio or canDeleteAplicacio}">
-									<attribute name="onClick">
-										String nomRolsBorrar = "";
-										ArrayList rolsBorrar = new ArrayList();
-										Collection items = gridRols.getItems(); 
-										for (Iterator it = items.iterator(); it.hasNext();) {
-											Listitem item = (Listitem) it.next();
-											Collection cells = item.getChildren(); 
-											int pos = 0;
-											String nomRol ="";
-											DataCheckbox cbox = null;
-											Listcell celdaBorrar = null;
-											for (Iterator itcell = cells.iterator(); itcell
-													.hasNext();) {
-												Listcell cell = (Listcell) itcell.next(); 
-												if (pos==0) {nomRol = cell.getLabel(); celdaBorrar = cell;} 
-												else if (pos==2) {nomRol += "@"+cell.getLabel(); } 
-												else
-													if (pos==10) {
-														Iterator itcb = cell.getChildren().iterator();
-														if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
-													}
-												pos++; 
-											}
-											if (cbox!=null @and cbox.isChecked()) {
-												nomRolsBorrar += nomRol+", ";
-												rolsBorrar.add(celdaBorrar);
-											}
-										}
-										if (!"".equals(nomRolsBorrar)) {
-											nomRolsBorrar = nomRolsBorrar.substring(0,nomRolsBorrar.length()-2);
-											Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.EsborraRolllista"), new Object [] {nomRolsBorrar}),
-														org.zkoss.util.resource.Labels.getLabel("aplicacions.Esborra"),
-														new EventListener() {
-															public void onEvent(Event evt) {
-																if ("onOK".equals(evt.getName())) { 
-																		for (i = 0; i @lt rolsBorrar.size(); i++) {
-																			listCell = rolsBorrar.get(i);
-																			dlistbox = listCell.getListbox(); 
-																			modelo = dlistbox.getModel();
-																			listItem = listCell.getParent(); 
-																			posicio = listItem.getIndex(); 
-																			elemPos = modelo.getElementAt(posicio); 
-																			xpath = elemPos.getDataContext().getXPath(); 
-																			dataSource = gridRols.getDataSource();
-																			context = dataSource.getJXPathContext(); 
-																			context.removePath(xpath);
-																		}
-										   						}
-										   				    }
-										   		});
-										}
-									</attribute>
-								</button>
-								<listexportbutton acces="${canQueryAplicacio}" listbox="gridRols" style="float:right"/>
-							</div>
 							<popup id="vincula">
 								<label value="${c:l('aplicacions.zul.Modificaunrol')}"/>
 							</popup>

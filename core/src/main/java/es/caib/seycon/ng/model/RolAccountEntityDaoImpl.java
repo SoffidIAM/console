@@ -453,7 +453,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         
         
         targetVO.setNomRol(sourceEntity.getRol().getNom());
-        
+        targetVO.setRoleCategory(sourceEntity.getRol().getCategory());
         String nom;
         if (usuariEntity != null)
         {

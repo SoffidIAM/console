@@ -393,6 +393,12 @@
 							</hbox>
 						</row>
 						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Category')}"/>
+							
+							<textbox id="detall_category" sclass="textbox" width="99%"
+									bind="@category" constraint="no empty"/>
+						</row>
+						<row>
 							<input_etiqueta tooltip="infoRolAtorgatRol"
 								value="${c:l('aplica_rolinfo.zul.Rolsqueeltenenatorga')}"/>
 							<vbox width="100%" >

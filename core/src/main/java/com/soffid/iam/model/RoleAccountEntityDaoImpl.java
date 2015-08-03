@@ -440,7 +440,7 @@ public class RoleAccountEntityDaoImpl extends com.soffid.iam.model.RoleAccountEn
         
         
         targetVO.setNomRol(sourceEntity.getRole().getName());
-        
+        targetVO.setRoleCategory(sourceEntity.getRole().getCategory());
         String nom;
         if (usuariEntity != null)
         {

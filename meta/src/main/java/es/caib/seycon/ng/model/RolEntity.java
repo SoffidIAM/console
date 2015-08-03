@@ -41,7 +41,11 @@ public abstract class RolEntity {
 	@Column(name = "ROL_NOM", length = 150, translated = "name")
 	public java.lang.String nom;
 
-	@Column(name = "ROL_DESCRI", length = 150, translated = "description")
+	@Nullable
+	@Column (name="ROL_CATEGORY", length=150)
+	public java.lang.String category;
+
+	@Column (name="ROL_DESCRI", length=150, translated="description")
 	public java.lang.String descripcio;
 
 	@Column(name = "ROL_DEFECT", length = 1, translated = "defaultRole")

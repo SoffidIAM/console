@@ -9,7 +9,7 @@
 	
 	<datamodel id="model" rootNode="rolsUsuarisRols" src="descriptorRolsUsuari.xml"/>
 	
-	<zscript>
+	<zscript><![CDATA[
 
 	    import es.caib.zkib.datasource.XPathUtils;
 		mode = "query"; 
@@ -26,11 +26,19 @@
 			esquemaLlista.getFellow("listbox");
 			
 			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			System.out.println ("=====================> 0");
 			if(queryEnabled){
+				System.out.println ("=====================> 1");
 				model.getJXPathContext().getValue("/rolUsuari").refresh();
+				System.out.println ("=====================> 2");
+				System.out.println ("dp="+listbox.dataPath);
 				listbox.dataPath = "/model:/rolUsuari";
+				System.out.println ("=====================> 3");
+				System.out.println ("dp="+listbox.dataPath);
 				model.getJXPathContext().getValue("/jerarquiaRolUsuari").refresh();
+				System.out.println ("=====================> 4");
 				listboxjerarquia.dataPath = "/model:/jerarquiaRolUsuari"; 
+				System.out.println ("=====================> 5");
 				 
 			} 
 		}
@@ -58,7 +66,7 @@
 			view_altres = false;							
 		}		
 				
-	</zscript>
+	]]></zscript>
 	
  	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('aplica_usuarisRolllista.Titol')}" visible="false" width="80%">
 		<attribute name="onInicia">

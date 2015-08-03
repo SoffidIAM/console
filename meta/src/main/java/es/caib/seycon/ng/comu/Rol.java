@@ -18,6 +18,9 @@ public abstract class Rol {
 	public java.lang.String descripcio;
 
 	@Nullable
+	public String category;
+	
+	@Nullable
 	@Attribute(translated = "enableByDefault" )
 	public java.lang.Boolean defecte;
 

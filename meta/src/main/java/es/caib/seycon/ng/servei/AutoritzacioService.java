@@ -169,7 +169,7 @@ public abstract class AutoritzacioService {
 	
 	@Description("Returns true if the user has the selected permission on the selected objects")
 	@Operation
-	public boolean hasPermission (String action, Object object)
+	public boolean hasPermission (String action, @Nullable Object object)
 	{
 		return true;
 	}

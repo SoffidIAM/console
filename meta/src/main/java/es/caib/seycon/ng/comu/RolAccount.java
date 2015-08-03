@@ -30,6 +30,9 @@ public abstract class RolAccount {
 	public java.lang.String nomRol;
 
 	@Nullable
+	public java.lang.String roleCategory;
+
+	@Nullable
 	@Attribute(translated = "applicationCode" )
 	public java.lang.String codiAplicacio;
 

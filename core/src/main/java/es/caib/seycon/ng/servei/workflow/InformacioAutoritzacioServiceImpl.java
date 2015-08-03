@@ -59,9 +59,23 @@ public class InformacioAutoritzacioServiceImpl extends
 	protected java.util.Collection<Rol> handleFindRolsByCodiAplicacio(
 			java.lang.String codiAplicacio) throws java.lang.Exception {
 		AplicacioService aplicacioService = getAplicacioService();
-		Collection rols = aplicacioService
-				.findRolsByCodiAplicacio(codiAplicacio);
-		return rols;
+		Security.nestedLogin(Security.getCurrentAccount(), new String [] {
+			Security.AUTO_APPLICATION_QUERY+Security.AUTO_ALL,
+			Security.AUTO_ROLE_QUERY+Security.AUTO_ALL
+		});
+		try {
+			Collection<Rol> rols = aplicacioService
+						.findRolsByCodiAplicacio(codiAplicacio);
+			for (Iterator<Rol> it = rols.iterator(); it.hasNext();)
+			{
+				Rol r = it.next();
+				if (r.getGestionableWF() == null || ! r.getGestionableWF().booleanValue())
+					it.remove();
+			}
+			return rols;
+		} finally {
+			Security.nestedLogoff();
+		}
 	}
 	
 	/**

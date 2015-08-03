@@ -256,6 +256,625 @@ public class AutoritzacionsUsuari
 						+ Security.AUTO_ALL);
 	}
 
+	/*
+	 * A NIVELL DE TIPUS D'UNITAT ORGANITZATIVA
+	 */
+	public static boolean hasCreateOrganizationalUnit ()
+	{
+		return Security.isUserInRole(Security.AUTO_ORGANIZATIONALUNIT_CREATE);
+	}
+
+	public static boolean hasUpdateOrganizationalUnit ()
+	{
+		return Security.isUserInRole(Security.AUTO_ORGANIZATIONALUNIT_UPDATE);
+	}
+
+	public static boolean hasDeleteOrganizationalUnit ()
+	{
+		return Security.isUserInRole(Security.AUTO_ORGANIZATIONALUNIT_DELETE);
+	}
+
+	public static boolean hasQueryOrganizationalUnit ()
+	{
+		return Security.isUserInRole(Security.AUTO_ORGANIZATIONALUNIT_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE MÀQUINES
+	 */
+	public static boolean hasCreateAllHost ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_ALL_CREATE);
+	}
+
+	public static boolean hasUpdateAllHost ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_ALL_UPDATE);
+	}
+
+	// Des del zul no és permés eliminar màquines
+	public static boolean hasDeleteAllHost ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_ALL_DELETE);
+	}
+
+	public static boolean hasQueryHost ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_QUERY);
+	}
+
+	public static boolean hasQueryAllHost ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_ALL_QUERY);
+	}
+
+	public static boolean hasUpdateHostOS ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_UPDATE_OS);
+	}
+
+	public static boolean canUpdateHostOS ()
+	{
+		// host:os:update [SENSE_DOMINI]
+		return Security.isUserInRole(Security.AUTO_HOST_UPDATE_OS + Security.AUTO_ALL);
+	}
+
+	public static boolean hasQueryHostAdmin ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_QUERY_ADMINISTRATOR_ACCESS);
+	}
+
+	public static boolean hasSupportHost_VNC ()
+	{
+		return Security.isUserInRole(Security.AUTO_HOST_ALL_SUPPORT_VNC);
+	}
+
+	/*
+	 * A NIVELL DE XARXES
+	 */
+	public static boolean hasCreateNetwork ()
+	{
+		return Security.isUserInRole(Security.AUTO_NETWORK_ALL_CREATE);
+	}
+
+	public static boolean hasUpdateAllNetwork ()
+	{
+		return Security.isUserInRole(Security.AUTO_NETWORK_ALL_UPDATE);
+	}
+
+	public static boolean hasDeleteAllNetwork ()
+	{
+		return Security.isUserInRole(Security.AUTO_NETWORK_ALL_DELETE);
+	}
+
+	public static boolean hasQueryAllNetwork ()
+	{
+		return Security.isUserInRole(Security.AUTO_NETWORK_ALL_QUERY);
+	}
+
+	/*
+	 * A NIVELL D'IMPRESSORES
+	 */
+	public static boolean hasCreatePrinter ()
+	{// crear impressores
+		return Security.isUserInRole(Security.AUTO_PRINTER_CREATE);
+	}
+
+	public static boolean hasUpdatePrinter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PRINTER_UPDATE);
+	}
+
+	public static boolean hasDeletePrinter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PRINTER_DELETE);
+	}
+
+	// Totes les impressores
+	public static boolean hasQueryAllPrinter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
+	}
+
+	// Les impresores que pertanyen a màquinas on l'usuari te ACL
+	public static boolean hasQueryACLPrinter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PRINTER_ACL_QUERY);
+	}
+
+	/*
+	 * A NIVELL D'APLICACIONS
+	 */
+	public static boolean hasCreateAplicacio ()
+	{
+		return Security.isUserInRole(Security.AUTO_APPLICATION_CREATE);
+	}
+
+	public static boolean hasUpdateAplicacio ()
+	{
+		return Security.isUserInRole(Security.AUTO_APPLICATION_UPDATE);
+	}
+
+	public static boolean hasDeleteAplicacio ()
+	{
+		return Security.isUserInRole(Security.AUTO_APPLICATION_DELETE);
+	}
+
+	public static boolean hasQueryAplicacio ()
+	{
+		return Security.isUserInRole(Security.AUTO_APPLICATION_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE REGISTRES D'ACCÉS
+	 */
+	public static boolean hasQueryRegistresAcces ()
+	{
+		return Security.isUserInRole(Security.AUTO_ACCESSREGISTER_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE DADES ADDICIONALS
+	 */
+	public static boolean hasCreateMetadata ()
+	{
+		return Security.isUserInRole(Security.AUTO_METADATA_CREATE);
+	}
+
+	public static boolean hasUpdateMetadata ()
+	{
+		return Security.isUserInRole(Security.AUTO_METADATA_UPDATE);
+	}
+
+	public static boolean hasDeleteMetadata ()
+	{
+		return Security.isUserInRole(Security.AUTO_METADATA_DELETE);
+	}
+
+	public static boolean hasQueryMetadata ()
+	{
+		return Security.isUserInRole(Security.AUTO_METADATA_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE SERVEIS
+	 */
+	public static boolean hasCreateServeis ()
+	{
+		return Security.isUserInRole(Security.AUTO_SERVICE_CREATE);
+	}
+
+	public static boolean hasUpdateServeis ()
+	{
+		return Security.isUserInRole(Security.AUTO_SERVICE_UPDATE);
+	}
+
+	public static boolean hasDeleteServeis ()
+	{
+		return Security.isUserInRole(Security.AUTO_SERVICE_DELETE);
+	}
+
+	public static boolean hasQueryServeis ()
+	{
+		return Security.isUserInRole(Security.AUTO_SERVICE_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE DOMINIS I LLISTES DE CORREU
+	 */
+	public static boolean hasCreateMail ()
+	{
+		return Security.isUserInRole(Security.AUTO_MAIL_CREATE);
+	}
+
+	public static boolean hasUpdateMail ()
+	{
+		return Security.isUserInRole(Security.AUTO_MAIL_UPDATE);
+	}
+
+	public static boolean hasDeleteMail ()
+	{
+		return Security.isUserInRole(Security.AUTO_MAIL_DELETE);
+	}
+
+	public static boolean hasQueryMail ()
+	{
+		return Security.isUserInRole(Security.AUTO_MAIL_QUERY);
+	}
+
+	/*
+	 * A NIVELL DE LOPD
+	 */
+	public static boolean hasCreateLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_CREATE);
+	}
+
+	public static boolean canCreateLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_CREATE + Security.AUTO_ALL);
+	}
+
+	public static boolean hasUpdateLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_UPDATE);
+	}
+
+	public static boolean canUpdateLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_UPDATE + Security.AUTO_ALL);
+	}
+
+	public static boolean hasDeleteLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_DELETE);
+	}
+
+	public static boolean canDeleteLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_DELETE + Security.AUTO_ALL);
+	}
+
+	public static boolean hasQueryLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_QUERY);
+	}
+
+	public static boolean canQueryLopd ()
+	{
+		return Security.isUserInRole(Security.AUTO_LOPD_QUERY + Security.AUTO_ALL);
+	}
+
+	/*
+	 * A NIVELL DE PARÀMETRES
+	 */
+	public static boolean hasCreateParameter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PARAMETER_CREATE);
+	}
+
+	public static boolean hasUpdateParameter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PARAMETER_UPDATE);
+	}
+
+	public static boolean hasDeleteParameter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PARAMETER_DELETE);
+	}
+
+	public static boolean hasQueryParameter ()
+	{
+		return Security.isUserInRole(Security.AUTO_PARAMETER_QUERY);
+	}
+
+	/*
+	 * A NIVELL D'AGENTS
+	 */
+	public static boolean hasCreateAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_CREATE);
+	}
+
+	public static boolean hasUpdateAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_UPDATE);
+	}
+
+	public static boolean hasDeleteAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_DELETE);
+	}
+
+	public static boolean hasQueryAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_QUERY);
+	}
+
+	public static boolean hasPropagateAgentUsers ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_PROPAGATE_USERS);
+	}
+
+	public static boolean hasPropagateAgentRoles ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_PROPAGATE_ROLES);
+	}
+
+	public static boolean hasPropagateAgentGroups ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_PROPAGATE_GROUPS);
+	}
+
+	public static boolean hasCreateAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_CREATE);
+	}
+
+	public static boolean hasUpdateAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_UPDATE);
+	}
+
+	public static boolean hasDeleteAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_DELETE);
+	}
+
+	public static boolean hasQueryAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_QUERY);
+	}
+
+	public static boolean hasSetAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_SET);
+	}
+
+	public static boolean canCreateAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_CREATE
+						+ Security.AUTO_ALL);
+	}
+
+	public static boolean canUpdateAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_UPDATE
+						+ Security.AUTO_ALL);
+	}
+
+	public static boolean canDeleteAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_DELETE
+						+ Security.AUTO_ALL);
+	}
+
+	public static boolean canQueryAccessControlAgent ()
+	{
+		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_QUERY
+						+ Security.AUTO_ALL);
+	}
+
+	public static boolean canManageServers ()
+	{
+		return Security.isUserInRole(Security.AUTO_SERVER_MANAGE);
+	}
+
+	/*
+	 * A NIVELL D'AUDITORIA
+	 */
+	public static boolean hasQueryAuditoria ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUDIT_QUERY);
+	}
+
+	public static boolean hasQueryCustomAuditoria ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUDIT_CUSTOM_QUERY);
+	}
+
+	public static boolean canQueryCustomAuditoria ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUDIT_CUSTOM_QUERY
+						+ Security.AUTO_ALL);
+	}
+
+	/*
+	 * A NIVELL DE MENUS DE LA INTRANET
+	 */
+	public static boolean hasQueryAllMenusIntranet ()
+	{
+		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ALL_QUERY);
+	}
+
+	public static boolean hasAdminMenusIntranet ()
+	{
+		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ADMIN);
+	}
+
+	public static boolean canAdminMenusIntranet ()
+	{
+		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ADMIN
+						+ Security.AUTO_ALL);
+	}
+
+	public static boolean canQueryAllMenusIntranet ()
+	{
+		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ALL_QUERY
+						+ Security.AUTO_ALL);
+	}
+
+	/*
+	 * A NIVELL DE SEYCON-BASE
+	 */
+	/*
+	 * public static boolean hasUpdateBase() { return
+	 * Security.isUserInRole(Security.AUTO_BASE_UPDATE); } public static boolean
+	 * hasRestartBase() { return Security.isUserInRole(Security.AUTO_BASE_RESTART); }
+	 * public static boolean hasQueryBase() { return
+	 * Security.isUserInRole(Security.AUTO_BASE_QUERY); }
+	 */
+
+	public static boolean hasQueryServerListBase ()
+	{
+		return Security.isUserInRole(Security.AUTO_MONITOR_SERVER_LIST);
+	}
+
+	public static boolean hasQueryAgentListBase ()
+	{
+		return Security.isUserInRole(Security.AUTO_MONITOR_AGENT_LIST);
+	}
+
+	public static boolean hasRestartAgentBase ()
+	{
+		return Security.isUserInRole(Security.AUTO_MONITOR_AGENT_RESTART);
+	}
+
+	public static boolean hasQueryLogBase ()
+	{
+		return Security.isUserInRole(Security.AUTO_BASE_LOG_QUERY);
+	}
+
+	public static boolean hasUpdatePlugins ()
+	{
+		return Security.isUserInRole(Security.AUTO_PLUGINS_UPDATE);
+	}
+
+	public static boolean hasQueryPlugins ()
+	{
+		return Security.isUserInRole(Security.AUTO_PLUGINS_QUERY);
+	}
+
+	/*
+	 * A NIVELL D'AUTORITZACIONS
+	 */
+	public static boolean hasCreateAuthorizationRol ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUTHORIZATION_ROL_CREATE);
+	}
+
+	public static boolean hasDeleteAuthorizationRol ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUTHORIZATION_ROL_DELETE);
+	}
+
+	public static boolean hasQueryAuthorization ()
+	{
+		return Security.isUserInRole(Security.AUTO_AUTHORIZATION_QUERY);
+	}
+
+	/*
+	 * A NIVELL D'USUARIS DE TIPUS ALUMNE
+	 */
+	public static boolean hasCreatePupil ()
+	{
+		return Security.isUserInRole(Security.AUTO_PUPIL_CREATE);
+	}
+
+	/*
+	 * A NIVELL DE WORKFLOWS
+	 */
+	public static boolean canAdminWorkflows ()
+	{
+		return Security.isUserInRole(Security.AUTO_WORKFLOW_ADMIN + Security.AUTO_ALL);
+	}
+
+	/*
+	 * A NIVELL D'INTERFICIE DEL SEU
+	 */
+	public static boolean hasViewAgentsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AGENTS);
+	}
+
+	public static boolean hasViewAplicacionsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_APLICACIONS);
+	}
+
+	public static boolean hasViewAuditoriaSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AUDITORIA);
+	}
+
+	public static boolean hasViewAutoritzacionsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AUTORITZACIONS);
+	}
+
+	public static boolean hasViewCorreuSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_CORREU);
+	}
+
+	public static boolean hasViewDominisCorreuSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_DOMINISCORREU);
+	}
+
+	public static boolean hasViewDadesAddicionalsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_DADESADDICIONALS);
+	}
+
+	public static boolean hasViewGrupsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_GRUPS);
+	}
+
+	public static boolean hasViewImpressoresSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_IMPRESSORES);
+	}
+
+	public static boolean hasViewLopdSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_LOPD);
+	}
+
+	public static boolean hasViewParametresSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_PARAMETRES);
+	}
+
+	public static boolean hasViewPluginsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_PARAMETRES);
+	}
+
+	public static boolean hasViewRegistreAccesSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_REGISTREACCES);
+	}
+
+	public static boolean hasViewServeisSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_SERVEIS);
+	}
+
+	public static boolean hasViewTipusUOSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_TIPUSUO);
+	}
+
+	public static boolean hasViewUsuarisSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_USUARIS);
+	}
+
+	public static boolean hasViewMenusIntranetSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_MENUSINTRANET);
+	}
+
+	public static boolean hasViewSeyconServerSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_SEYCONSERVER);
+	}
+
+	public static boolean hasViewFederacioIdentitatsSEU ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_FEDERACIOIDENTITATS);
+	}
+
+	public static boolean hasViewDominiUsuaris ()
+	{
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_USERS_DOMAIN);
+	}
+
+	/*
+	 * MÈTODES LOCALS D'ALTRES SERVICES (per centralitzar l'ús)
+	 */
+
+	//
+	// A NIVELL D'APLICACIONS
+	//
+
+	public static boolean canQueryAllAplication ()
+	{
+		return Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL);
+	}
+
 	// A NIVELL DE XARXES
 	//
 
@@ -529,114 +1148,6 @@ public class AutoritzacionsUsuari
 	public static boolean canQueryRetrieve ()
 	{
 		return Security.isUserInRole(Security.AUTO_REMEMBER_PASSWORD_QUERY);
-	}
-
-	public static boolean canCreateAccessControlAgent() {
-		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_CREATE);
-	}
-
-	public static boolean canUpdateAccessControlAgent() {
-		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_UPDATE);
-	}
-
-	public static boolean canDeleteAccessControlAgent() {
-		return Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_DELETE);
-	}
-
-	public static boolean canUpdateHostOS() {
-		return Security.isUserInRole(Security.AUTO_HOST_UPDATE_OS);
-	}
-
-	public static boolean canQueryAllMenusIntranet() {
-		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ALL_QUERY);
-	}
-
-	public static boolean canAdminMenusIntranet() {
-		return Security.isUserInRole(Security.AUTO_INTRANETMENUS_ADMIN);
-	}
-
-	public static boolean hasQueryAllPrinter() {
-		return Security.isUserInRole(Security.AUTO_PRINTER_QUERY+Security.AUTO_ALL);
-	}
-
-	public static boolean hasQueryACLPrinter() {
-		return Security.isUserInRole(Security.AUTO_PRINTER_ACL_QUERY);
-	}
-
-	public static boolean hasViewAgentsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AGENTS);
-	}
-
-	public static boolean hasViewAplicacionsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_APLICACIONS);
-	}
-
-	public static boolean hasViewAuditoriaSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AUDITORIA);
-	}
-
-	public static boolean hasQueryCustomAuditoria() {
-		return Security.isUserInRole(Security.AUTO_AUDIT_CUSTOM_QUERY);
-	}
-
-	public static boolean hasViewAutoritzacionsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_AUTORITZACIONS);
-	}
-
-	public static boolean hasViewCorreuSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_CORREU);
-	}
-
-	public static boolean hasViewDominisCorreuSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_DOMINISCORREU);
-	}
-
-	public static boolean hasViewDadesAddicionalsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_DADESADDICIONALS);
-	}
-
-	public static boolean hasViewGrupsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_GRUPS);
-	}
-
-	public static boolean hasViewImpressoresSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_IMPRESSORES);
-	}
-
-	public static boolean hasViewLopdSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_LOPD);
-	}
-
-	public static boolean hasViewParametresSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_PARAMETRES);
-	}
-
-	public static boolean hasViewRegistreAccesSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_REGISTREACCES);
-	}
-
-	public static boolean hasViewServeisSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_SERVEIS);
-	}
-
-	public static boolean hasViewTipusUOSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_TIPUSUO);
-	}
-
-	public static boolean hasViewUsuarisSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_USUARIS);
-	}
-
-	public static boolean hasViewSeyconServerSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_SEYCONSERVER);
-	}
-
-	public static boolean hasViewFederacioIdentitatsSEU() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_FEDERACIOIDENTITATS);
-	}
-
-	public static boolean hasViewDominiUsuaris() {
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_USERS_DOMAIN);
 	}
 
 }

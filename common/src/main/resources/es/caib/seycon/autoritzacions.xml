@@ -621,6 +621,8 @@
 		<codi>role:query</codi>
 		<descripcio>Query application roles</descripcio>
 		<ambit>Applications</ambit>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<hereta></hereta>
 	</autoritzacio>
 
 	<autoritzacio>
@@ -671,7 +673,7 @@
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Applications</ambit>
 		<hereta>
-			usersDomain:query
+			usersDomain:query,
 			role:query
 		</hereta>
 	</autoritzacio>

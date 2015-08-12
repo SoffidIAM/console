@@ -788,13 +788,22 @@
 										width="40%"
 										bind="@url" mold="select"
 										dataPath="/model:/serverSelector"
-										id="detall_url">
+										id="detall_url"
+										style="margin-right: 2em">
 										<dataitem bind="@url">
 											<listcell bind="@nom"/>
 										</dataitem>
 									</listbox>
 									<label value=" ${c:l('agents.zul.sharedThread')}:" />
 									<checkbox bind="@sharedDispatcher" />
+								</div>
+							</row>
+							<row>
+								<input_etiqueta value="${c:l('agents.zul.timeout')}"/>
+								<div width="90%">
+									<intbox bind="@timeout" readonly="${!canModifyAgent}" sclass="textbox" width="10em" style="margin-right: 2em" onChange=""/>
+									<label value=" ${c:l('agents.zul.longTimeout')}:" />
+									<intbox bind="@longTimeout" readonly="${!canModifyAgent}" sclass="textbox" width="10em" onChange=""/>
 								</div>
 							</row>
 							<row>

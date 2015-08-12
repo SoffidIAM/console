@@ -13,6 +13,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import es.caib.seycon.ng.comu.RegistreAcces;
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownHostException;
@@ -22,6 +23,7 @@ import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.RegistreAccesEntity;
 import es.caib.seycon.ng.model.ServeiEntity;
 import es.caib.seycon.ng.model.ServeiEntityDao;
+import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.DateUtils;
@@ -297,8 +299,12 @@ public class RegistreAccesServiceImpl extends
 			String codiUsuari, String numRegistres, String codiProtocolAcces)
 			throws Exception {
 		
+		UsuariEntity userEntity = getUsuariEntityDao().findByCodi(codiUsuari);
+		Usuari user = getUsuariEntityDao().toUsuari(userEntity);
+		
 		// Mirem les autoritzacions del peticionari sobre l'usuari on es fa la petició
-		if (AutoritzacionsUsuari.canQueryUserAccessRegister(codiUsuari,getGrupEntityDao())) {
+		if (getAutoritzacioService().hasPermission(
+				Security.AUTO_ACCESSREGISTER_QUERY, new Object[] {userEntity})) {
 			CriteriaSearchConfiguration config  = new CriteriaSearchConfiguration();
 			if (numRegistres != null && ! numRegistres.isEmpty())
 			{

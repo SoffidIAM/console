@@ -209,7 +209,7 @@ public class RolsGrupEntityDaoImpl extends
         target.setId(source.getId());
         target.setIdRol(source.getRolOtorgat().getId());
         target.setRolName(source.getRolOtorgat().getNom());
-        
+        target.setInformationSystem(source.getRolOtorgat().getAplicacio().getCodi());
     }
 
 }

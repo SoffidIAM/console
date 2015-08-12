@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.NotificacioEntity;
 import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.RolAccountEntity;
+import es.caib.seycon.ng.model.RolAccountEntityDao;
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.RolsGrupEntity;
@@ -103,13 +105,14 @@ public class AplicacioServiceImpl extends
             throws java.lang.Exception {
         // Aquí l'autorització no te domini, aixina que amb tindre
         // application:create val
-        if (AutoritzacionsUsuari.canCreateAplicacio(aplicacio.getCodi())) {
-    		AplicacioEntity aplicationsSameCode = getAplicacioEntityDao().findByCodi(aplicacio.getCodi());
-    		if(aplicationsSameCode != null)
-    			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.CodeAplicationExists"),  //$NON-NLS-1$
-    							aplicacio.getCodi())); 
-            AplicacioEntity apl = getAplicacioEntityDao().aplicacioToEntity(
-                    aplicacio);
+		AplicacioEntity aplicationsSameCode = getAplicacioEntityDao().findByCodi(aplicacio.getCodi());
+		if(aplicationsSameCode != null)
+			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.CodeAplicationExists"),  //$NON-NLS-1$
+							aplicacio.getCodi())); 
+        AplicacioEntity apl = getAplicacioEntityDao().aplicacioToEntity(
+                aplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_CREATE, apl))
+        {
             getAplicacioEntityDao().create(apl);
             aplicacio.setId(apl.getId());
             return (getAplicacioEntityDao().toAplicacio(apl));
@@ -124,17 +127,17 @@ public class AplicacioServiceImpl extends
     protected void handleDelete(es.caib.seycon.ng.comu.Aplicacio aplicacio)
             throws java.lang.Exception {
         // Esborrem els rols d'administració de l'aplicació i l'aplicació
-        if (AutoritzacionsUsuari.canDeleteAplicacio(aplicacio.getCodi())) {
+        AplicacioEntity aplEntity = getAplicacioEntityDao().aplicacioToEntity(aplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_DELETE, aplEntity))
+        {
             // Obtenim els rols d'autorització de l'aplicació per esborrar-los
-            Collection restriccions = findAdministracioAplicacioByCodiAplicacio(aplicacio
+            Collection<AdministracioAplicacio> restriccions = findAdministracioAplicacioByCodiAplicacio(aplicacio
                     .getCodi());
-            Iterator iterator = restriccions.iterator();
+            Iterator<AdministracioAplicacio> iterator = restriccions.iterator();
             while (iterator.hasNext()) {// els esborrem
-                AdministracioAplicacio administracioAplicacio = (AdministracioAplicacio) iterator
-                        .next();
+                AdministracioAplicacio administracioAplicacio = iterator.next();
                 delete(administracioAplicacio);
             }
-            AplicacioEntity aplEntity = getAplicacioEntityDao().aplicacioToEntity(aplicacio);
             if(!aplEntity.getRols().isEmpty())
             	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.IntegrityExceptionRol"),  //$NON-NLS-1$
     							aplEntity.getCodi()));
@@ -157,9 +160,10 @@ public class AplicacioServiceImpl extends
     protected void handleUpdate(es.caib.seycon.ng.comu.Aplicacio aplicacio)
             throws java.lang.Exception {
 
-        if (AutoritzacionsUsuari.canUpdateAplicacio(aplicacio.getCodi())) {
-            getAplicacioEntityDao().update(
-                    getAplicacioEntityDao().aplicacioToEntity(aplicacio));
+    	AplicacioEntity aplEntity = getAplicacioEntityDao().aplicacioToEntity(aplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, aplEntity))
+        {
+            getAplicacioEntityDao().update(aplEntity);
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "update (Aplicacio)", "application:update", //$NON-NLS-1$ //$NON-NLS-2$
@@ -173,14 +177,13 @@ public class AplicacioServiceImpl extends
     protected Aplicacio handleFindAplicacioByCodiAplicacio(
             java.lang.String codiAplicacio) throws java.lang.Exception {
 
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
-                    .findByCodi(codiAplicacio);
-            if (aplicacioEntity != null) {
-                Aplicacio aplicacio = getAplicacioEntityDao().toAplicacio(
+        AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
+                .findByCodi(codiAplicacio);
+        if (aplicacioEntity != null && 
+        	getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_QUERY, aplicacioEntity)) {
+            Aplicacio aplicacio = getAplicacioEntityDao().toAplicacio(
                         aplicacioEntity);
-                return aplicacio;
-            }
+            return aplicacio;
         }
         return null;
     }
@@ -213,17 +216,23 @@ public class AplicacioServiceImpl extends
         // L'autoritzacio application:query [sense_domini,APLICACIONS]
         // NO n'hi ha restricció per veure els rols de l'aplicació
         // si l'usuari pot veure l'aplicació
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            Collection rols = getRolEntityDao().findByCodiAplicacio(
-                    codiAplicacio);
-            return getRolEntityDao().toRolList(rols);
+        AplicacioEntity aplicacioEntity = getAplicacioEntityDao()
+                .findByCodi(codiAplicacio);
+        if (aplicacioEntity != null) {
+        	LinkedList<Rol> rols = new LinkedList<Rol>();
+        	for (RolEntity roleEntity: aplicacioEntity.getRols())
+        	{
+        		if ( getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, roleEntity)) 
+        			rols.add ( getRolEntityDao().toRol( roleEntity ) ) ;
+        	}
+        	return rols;
         }
-        return new Vector();
+        return Collections.emptyList();
     }
 
     protected Collection<Rol> handleFindRolsByCodiAplicacioSenseRestriccions(
             String codiAplicacio) throws Exception {
-        Collection rols = getRolEntityDao().findByCodiAplicacio(codiAplicacio);
+        Collection<RolEntity> rols = getRolEntityDao().findByCodiAplicacio(codiAplicacio);
         return getRolEntityDao().toRolList(rols);
     }
 
@@ -275,17 +284,21 @@ public class AplicacioServiceImpl extends
                         .trim().compareTo("%") == 0)) { //$NON-NLS-1$
             gestionableWF = null;
         }
-        Collection aplicacions = getAplicacioEntityDao()
+        Collection<AplicacioEntity> aplicacions = getAplicacioEntityDao()
                 .findAplicacioByCriteri(codi, nom, directoriFonts, responsable,
                         directoriExecutable, bd, gestionableWF);
         // Aplicamos las restricciones correspondientes
         if (aplicacions != null) {
-            Collection<Aplicacio> aplicacionsTrobades = AutoritzacionsUsuari
-                    .filtraAplicationsVOCanQuery(getAplicacioEntityDao()
-                            .toAplicacioList(aplicacions)); // VO
-
+        	Collection<Aplicacio> res = new LinkedList<Aplicacio>();
+        	for ( AplicacioEntity appEntity: aplicacions)
+        	{
+        		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_QUERY, appEntity))
+        		{
+        			res.add(getAplicacioEntityDao().toAplicacio(appEntity));
+        		}
+        	}
 			// filtrem per cercar aplicacions per rol
-            Collection<Aplicacio> res = filtraPerRol(aplicacionsTrobades, rol); 
+            res = filtraPerRol(res, rol); 
 
 			// Check maximum number of results
             if ((res != null) && (res.size() > limitResults))
@@ -296,7 +309,7 @@ public class AplicacioServiceImpl extends
             return res;
         }
         
-        return new Vector();
+        return Collections.emptyList();
     }
 
     protected Collection<Aplicacio> handleFindAplicacioByCriteriSenseRestriccions(
@@ -360,7 +373,7 @@ public class AplicacioServiceImpl extends
              */
             return filtraPerRol;
         }
-        return new Vector();
+        return Collections.emptyList();
     }
 
     /**
@@ -405,15 +418,13 @@ public class AplicacioServiceImpl extends
             throw new SeyconException(
                     Messages.getString("AplicacioServiceImpl.NotAdminPermissionAuthorized")); //$NON-NLS-1$
         }
+        RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
+                .administracioAplicacioToEntity(administracioAplicacio);
 
         // si l'usuari té autorització per crear/modificar l'aplicació
-        if (AutoritzacionsUsuari.canCreateAplicacio(administracioAplicacio
-                .getCodiAplicacio())
-                || AutoritzacionsUsuari
-                        .canUpdateAplicacio(administracioAplicacio
-                                .getCodiAplicacio())) {
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, administracioAplicacioEntity) ||
+        		getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_CREATE, administracioAplicacioEntity))
+        {
             getRolAccountEntityDao().create(administracioAplicacioEntity);
             administracioAplicacio.setId(administracioAplicacioEntity.getId());
             administracioAplicacio = getRolAccountEntityDao()
@@ -430,18 +441,12 @@ public class AplicacioServiceImpl extends
         // comprovem que l'usuari puga fer application:create o
         // applicacion:update o application:delete
 
-        if (AutoritzacionsUsuari.canCreateAplicacio(administracioAplicacio
-                .getCodiAplicacio())
-                || AutoritzacionsUsuari
-                        .canUpdateAplicacio(administracioAplicacio
-                                .getCodiAplicacio())
-                || AutoritzacionsUsuari
-                        .canDeleteAplicacio(administracioAplicacio
-                                .getCodiAplicacio())) {
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
+        RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
+                .administracioAplicacioToEntity(administracioAplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, administracioAplicacioEntity) ||
+        		getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_CREATE, administracioAplicacioEntity))
+        {
             getRolAccountEntityDao().remove(administracioAplicacioEntity);
-
         } else {
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoPermissionToDelete"), //$NON-NLS-1$
 					getPrincipal().getName(), administracioAplicacio.getCodiAplicacio()));
@@ -502,23 +507,27 @@ public class AplicacioServiceImpl extends
     }
 
     protected Collection<AdministracioAplicacio> handleFindAdministracioAplicacioByCodiAplicacio(
-            String codiAplicacio) throws Exception {
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            String query = "select rolsUsuaris " //$NON-NLS-1$
-                    + "from es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris " //$NON-NLS-1$
-                    + "where " //$NON-NLS-1$
-                    + "rolsUsuaris.aplicacioAdministrada.codi = :codiAplicacio"; //$NON-NLS-1$
-            Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
-                    codiAplicacio);
-            Parameter[] parameters = { codiAplicacioParameter };
-            Collection aplicacions = getRolAccountEntityDao().query(query,
-                    parameters);
-            if (aplicacions != null) {
-                return getRolAccountEntityDao().toAdministracioAplicacioList(
-                        aplicacions);
-            }
+        String codiAplicacio) throws Exception {
+        String query = "select rolsUsuaris " //$NON-NLS-1$
+                + "from es.caib.seycon.ng.model.RolAccountEntity rolsUsuaris " //$NON-NLS-1$
+                + "where " //$NON-NLS-1$
+                + "rolsUsuaris.aplicacioAdministrada.codi = :codiAplicacio"; //$NON-NLS-1$
+        Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
+                codiAplicacio);
+        Parameter[] parameters = { codiAplicacioParameter };
+        Collection<RolAccountEntity> aplicacions = getRolAccountEntityDao().query(query,
+                parameters);
+        if (aplicacions != null) {
+        	LinkedList<AdministracioAplicacio> vo = new LinkedList<AdministracioAplicacio>();
+        	for ( RolAccountEntity ra: aplicacions )
+        	{
+        		if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_QUERY, ra))
+        			vo.add ( getRolAccountEntityDao().toAdministracioAplicacio(ra));
+        	}
+        	return vo;
         }
-        return new Vector();
+        else
+        	return Collections.emptyList();
     }
 
     protected Collection<Usuari> handleFindUsuarisAmbPermisosActualitzacioByCodiAplicacio(
@@ -620,16 +629,19 @@ public class AplicacioServiceImpl extends
             // Filtrem els rols per l'aplicació
             // rol application:query [SENSE_DOMINI, APLICACIONS]
 
-            Collection<RolEntity> rolsPermis = AutoritzacionsUsuari
-                    .filtraRolsAplicationsCanQuery(rols);
+        	for (Iterator<RolEntity> it = rols.iterator(); it.hasNext();)
+        	{
+        		RolEntity re = it.next();
+        		if (! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, re))
+        			it.remove();
+        	}
 
-            // Mirem si la cerca filtrada obté massa resultats
-            if (rolsPermis.size() >= 201) {
+            if (rols.size() >= 201) {
                 throw new SeyconException(
                         Messages.getString("AplicacioServiceImpl.VeryRegFinded")); //$NON-NLS-1$
             }
 
-            return getRolEntityDao().toRolList(rolsPermis);
+            return getRolEntityDao().toRolList(rols);
         }
         return new Vector();
     }
@@ -674,21 +686,23 @@ public class AplicacioServiceImpl extends
                         .trim().compareTo("%") == 0)) { //$NON-NLS-1$
             gestionableWF = null;
         }
-        Collection rols = getRolEntityDao().findRolsByFiltreGestionablesWF(nom,
+        Collection<RolEntity> rols = getRolEntityDao().findRolsByFiltreGestionablesWF(nom,
                 descripcio, defecte, baseDeDades, contrasenya, codiAplicacio,
                 gestionableWF);
         if (rols != null) {
-            Collection rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsAplicationsCanQuery(rols);
-        
+        	for (Iterator<RolEntity> it = rols.iterator(); it.hasNext();)
+        	{
+        		if  (! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, it.next()))
+        			it.remove();
+        	}
         	// Check maximum number of results
-            if (rolsFiltrats.size() > limitResults)
+            if (rols.size() > limitResults)
             {
-            	return getRolEntityDao().toRolList(rolsFiltrats)
+            	return getRolEntityDao().toRolList(rols)
 					.subList(0, limitResults);
             }
             
-            return getRolEntityDao().toRolList(rolsFiltrats);
+            return getRolEntityDao().toRolList(rols);
         }
         
         return new Vector();
@@ -700,18 +714,19 @@ public class AplicacioServiceImpl extends
         // Cap dels tres paràmetres pot ésser null
         // Mirem l'autorització de l'aplicació (fer query als rols de la app
         // no requereixen tindre una autorització específica)
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
-                            codiAplicacio, codiDispatcher);
-            if (rolEntity != null) {
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
+                        codiAplicacio, codiDispatcher);
+        if (rolEntity != null)
+        {
+        	if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity)) {
                 return getRolEntityDao().toRol(rolEntity);
-            } else
-                return null;
-        } else {
-			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
-					getPrincipal().getName(), nomRol));
-        }
+	        } else {
+				throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+						getPrincipal().getName(), nomRol));
+	        }
+        } else
+            return null;
 
     }
 
@@ -720,40 +735,43 @@ public class AplicacioServiceImpl extends
      */
     protected java.util.Collection<Rol> handleFindRolsByCodiUsuari(
             java.lang.String codiUsuari) throws java.lang.Exception {
-        Collection rols = getRolEntityDao().findRolsByCodiUsuari(codiUsuari);// RolEntity
+    	String currentUser = Security.getCurrentUser();
+        Collection<RolEntity> rols = getRolEntityDao().findRolsByCodiUsuari(codiUsuari);// RolEntity
         if (rols != null) {
             // Si l'usuari peticionari es l'usuari on se demanen, no filtrem
             // (!!)
-            Collection<RolEntity> rolsFiltrats = new ArrayList();
-            if (getPrincipal().getName().compareTo(codiUsuari) != 0) {// altre
-                                                                      // usuari
-                // rolsFiltrats: són rolsEntity
-                rolsFiltrats = AutoritzacionsUsuari
-                        .filtraRolsAplicationsCanQuery(rols);
-            } else { // per si mateix no es filtra
-                rolsFiltrats = rols;
-            }
+        	for (Iterator<RolEntity> it = rols.iterator(); it.hasNext();)
+        	{
+        		RolEntity re = it.next();
+        		if (! codiUsuari.equals(currentUser) &&
+        			! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, re))
+        			it.remove();
+        	}
             // Passem a VO:
-            return getRolEntityDao().toRolList(rolsFiltrats);
+            return getRolEntityDao().toRolList(rols);
         }
-        return new Vector();
+        return Collections.emptyList();
     }
 
     protected java.util.Collection<Rol> handleGetRols() throws java.lang.Exception {
         Collection<RolEntity> col = getRolEntityDao().loadAll();// RolEntity
-        col = AutoritzacionsUsuari.filtraRolsAplicationsCanQuery(col);
+    	for (Iterator<RolEntity> it = col.iterator(); it.hasNext();)
+    	{
+    		RolEntity re = it.next();
+    		if (! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, re))
+    			it.remove();
+    	}
         return getRolEntityDao().toRolList(col);
     }
 
     protected Collection<Usuari> handleFindUsuarisByNomRolAndCodiAplicacioRolAndCodiDispatcher(
             String nomRol, String codiAplicacio, String codiDispatcher)
             throws Exception {
-        Rol rol = findRolByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
-                codiAplicacio, codiDispatcher);
+        RolEntity rolEntity = getRolEntityDao().findByNameAndDispatcher(nomRol, codiDispatcher);
 
         // NOTA: l'autorització ja s'ha verificat en el find
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity)) 
+        {
             Collection<Usuari> toReturn = new LinkedList<Usuari>();
             for (RolAccountEntity ra: rolEntity.getAccounts()) {
             	AccountEntity acc = ra.getAccount();
@@ -772,81 +790,64 @@ public class AplicacioServiceImpl extends
     }
 
     protected Collection<RolAccount> handleFindRolsUsuariByNomRolAndCodiAplicacioRolAndCodiDispatcher(
-            String nomRol, String codiAplicacio, String codiDispatcher) throws InternalErrorException {
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacio)) {
-        	RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
-                            codiAplicacio, codiDispatcher);
-        	if (!AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getAplicacio().getCodi()))
-        		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
-					getPrincipal().getName(), nomRol));
+        String nomRol, String codiAplicacio, String codiDispatcher) throws InternalErrorException {
+    	RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
+                        codiAplicacio, codiDispatcher);
+    	if (!getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
+    		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+				getPrincipal().getName(), nomRol));
 
-            List<RolAccount> toReturn = new LinkedList<RolAccount>();
-            for (RolAccountEntity ra: rolEntity.getAccounts()) {
-            	toReturn.add (getRolAccountEntityDao().toRolAccount(ra));
-            }
-    		getSoDRuleService().qualifyRolAccountList(toReturn);
-            return toReturn;
-        } else {
-			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NotPermisionToSearch"), //$NON-NLS-1$
-					getPrincipal().getName(), codiAplicacio));
+        List<RolAccount> toReturn = new LinkedList<RolAccount>();
+        for (RolAccountEntity ra: rolEntity.getAccounts()) {
+        	toReturn.add (getRolAccountEntityDao().toRolAccount(ra));
         }
+		getSoDRuleService().qualifyRolAccountList(toReturn);
+        return toReturn;
     }
 
     protected Rol handleCreate(Rol rol) throws Exception {
         // if (usuariPotActualitzarAplicacio(rol.getCodiAplicacio())) {
 
-        if (AutoritzacionsUsuari.canCreateAplicacio(rol.getCodiAplicacio())
-                || AutoritzacionsUsuari.canUpdateAplicacio(rol
-                        .getCodiAplicacio())) {
+        RolEntity existingRole = getRolEntityDao()
+                .findByNameAndDispatcher(rol.getNom(),
+                        rol.getBaseDeDades());
 
-            RolEntity existingRole = getRolEntityDao()
-                    .findByNameAndDispatcher(rol.getNom(),
-                            rol.getBaseDeDades());
+        // No permitim crear un rol amb el mateix nom y base de dades si ja
+        // existeix un altre
+        if (existingRole != null) {
+                String aplicacio = existingRole.getAplicacio()
+                        .getCodi();
 
-            // No permitim crear un rol amb el mateix nom y base de dades si ja
-            // existeix un altre
-            if (existingRole != null) {
-                    String aplicacio = existingRole.getAplicacio()
-                            .getCodi();
-
-					throw new SeyconException(
-							String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
-									rol.getNom(), rol.getBaseDeDades(), aplicacio));
-            }
-
-            // Obtenemos la entidad asociada al VO
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
-            // Creamos la entidad asociada al VO Rol
-            getRolEntityDao().create(rolEntity);
-
-            return getRolEntityDao().toRol(rolEntity);
+				throw new SeyconException(
+						String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
+								rol.getNom(), rol.getBaseDeDades(), aplicacio));
         }
-        /*
-         * throw new SeyconException("Usuari amb codi '" +
-         * getPrincipal().getName() +
-         * "' no pot actualitzar l'aplicació amb codi '" +
-         * rol.getCodiAplicacio() + "'.");
-         */
-        else
+
+        // Obtenemos la entidad asociada al VO
+        RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+        
+        if  (! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_CREATE, rolEntity))
             throw new SeyconAccessLocalException("AplicacioService", //$NON-NLS-1$
                     "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
+        // Creamos la entidad asociada al VO Rol
+        getRolEntityDao().create(rolEntity);
+
+        return getRolEntityDao().toRol(rolEntity);
     }
 
     protected void handleDelete(Rol rol) throws Exception {
         // if (usuariPotActualitzarAplicacio(rol.getCodiAplicacio())) {
-        if (AutoritzacionsUsuari.canCreateAplicacio(rol.getCodiAplicacio())
-                || AutoritzacionsUsuari.canUpdateAplicacio(rol
-                        .getCodiAplicacio())
-                || AutoritzacionsUsuari.canDeleteAplicacio(rol
-                        .getCodiAplicacio())) {
-
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(
-                            rol.getNom(), rol.getCodiAplicacio(),
-                            rol.getBaseDeDades());
-            
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(
+                        rol.getNom(), rol.getCodiAplicacio(),
+                        rol.getBaseDeDades());
+        if (rolEntity == null)
+        	return;
+        
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_DELETE, rolEntity))
+        {
         	getSoDRuleService().internalRemovingRole(rolEntity.getId());
             getRolEntityDao().remove(rolEntity);
         } else {
@@ -855,22 +856,13 @@ public class AplicacioServiceImpl extends
                     "delete (Rol)", //$NON-NLS-1$
                     "application:delete, application:update, application:create", //$NON-NLS-1$
                     Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
-            /*
-             * throw new SeyconException("Usuari amb codi '" +
-             * getPrincipal().getName() +
-             * "' no pot actualitzar l'aplicació amb codi '" +
-             * rol.getCodiAplicacio() + "'.");
-             */
         }
     }
 
     protected Rol handleUpdate(Rol rol) throws Exception {
-        if (AutoritzacionsUsuari.canCreateAplicacio(rol.getCodiAplicacio())
-                || AutoritzacionsUsuari.canUpdateAplicacio(rol
-                        .getCodiAplicacio())) {
+        RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
-            // Realizamos las operaciones necesarias a nivel de aplicación
-            RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
             getRolEntityDao().update(rolEntity); // actualizamos cambios del rol
 
             return getRolEntityDao().toRol(rolEntity);
@@ -884,95 +876,84 @@ public class AplicacioServiceImpl extends
             throws Exception {
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         
-        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
-        	if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
-        	{
-        		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(rolsUsuaris.getAccountName(), rolsUsuaris.getBaseDeDades());
-        		if (acc != null)
-        			rolsUsuaris.setAccountId(acc.getId());
+    	if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
+    	{
+    		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(rolsUsuaris.getAccountName(), rolsUsuaris.getBaseDeDades());
+    		if (acc != null)
+    			rolsUsuaris.setAccountId(acc.getId());
+    	}
+    	// Verify the user has one account
+    	if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getCodiUsuari() != null)
+    	{
+        	Account account = null;
+    		Security.nestedLogin(Security.getCurrentAccount(), new String[] { 
+    			Security.AUTO_USER_QUERY+Security.AUTO_ALL,
+    			Security.AUTO_ACCOUNT_QUERY, 
+    			Security.AUTO_ACCOUNT_CREATE,
+    			Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL, 
+    			Security.AUTO_ACCOUNT_CREATE+Security.AUTO_ALL});
+        	try {
+        		List<UserAccount> accounts = getAccountService().findUserAccounts(rolsUsuaris.getCodiUsuari(), rolsUsuaris.getBaseDeDades());
+        		if (accounts.size() > 1)
+        		{
+        			throw new NeedsAccountNameException();
+        		}
+        		else if (accounts.size() == 0)
+        		{
+        			Usuari usu = getUsuariService().findUsuariByCodiUsuari(rolsUsuaris.getCodiUsuari());
+        			DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi (rolsUsuaris.getBaseDeDades());
+        			if (dispatcher == null)
+        				throw new InternalErrorException(
+							String.format(Messages.getString("AplicacioServiceImpl.UnknownSystem"), //$NON-NLS-1$
+								rolsUsuaris.getBaseDeDades()));
+        			account = getAccountService().createAccount(usu, getDispatcherEntityDao().toDispatcher(dispatcher), null);
+        		}
+        		else
+        		{
+        			account = accounts.iterator().next();
+        		}
+        	} finally {
+        		Security.nestedLogoff();
         	}
-        	// Verify the user has one account
-        	if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getCodiUsuari() != null)
-        	{
-            	Account account = null;
-        		Security.nestedLogin(Security.getCurrentAccount(), new String[] { 
-        			Security.AUTO_USER_QUERY+Security.AUTO_ALL,
-        			Security.AUTO_ACCOUNT_QUERY, 
-        			Security.AUTO_ACCOUNT_CREATE,
-        			Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL, 
-        			Security.AUTO_ACCOUNT_CREATE+Security.AUTO_ALL});
-            	try {
-            		List<UserAccount> accounts = getAccountService().findUserAccounts(rolsUsuaris.getCodiUsuari(), rolsUsuaris.getBaseDeDades());
-            		if (accounts.size() > 1)
-            		{
-            			throw new NeedsAccountNameException();
-            		}
-            		else if (accounts.size() == 0)
-            		{
-            			Usuari usu = getUsuariService().findUsuariByCodiUsuari(rolsUsuaris.getCodiUsuari());
-            			DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi (rolsUsuaris.getBaseDeDades());
-            			if (dispatcher == null)
-            				throw new InternalErrorException(
-    							String.format(Messages.getString("AplicacioServiceImpl.UnknownSystem"), //$NON-NLS-1$
-    								rolsUsuaris.getBaseDeDades()));
-            			account = getAccountService().createAccount(usu, getDispatcherEntityDao().toDispatcher(dispatcher), null);
-            		}
-            		else
-            		{
-            			account = accounts.iterator().next();
-            		}
-            	} finally {
-            		Security.nestedLogoff();
-            	}
-        		rolsUsuaris.setAccountId(account.getId());
-        	}
-        	
-            // Check group holder
-        	checkGroupHolder (rolsUsuaris);
-        	
-            RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
-            // Disable assigning roles to himself
-            for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())
-            {
-            	if (ua.getUser().getCodi().equals(getPrincipal().getName()))
-            	{
-                    throw new SeyconException(
-                            Messages.getString("AplicacioServiceImpl.UserAddRolError")); //$NON-NLS-1$
-            	}
-            }
-            // Enable or disable on dates
-            rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
-            // Check for Sod Rules
-            SoDRule rule = getSoDRuleService().isAllowed(rolsUsuaris);
-            if (rule != null && rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
-            {
-            	throw new InternalErrorException (String.format(Messages.getString("AplicacioServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
-            					, rule.getName()));
-            }
-            // Launch workflow approval process
-            boolean nwap = needsWorkflowApprovalProcess(rolsUsuarisEntity);
-            
-           	rolsUsuarisEntity.setApprovalPending(nwap);
-           	
-            getRolAccountEntityDao().create(rolsUsuarisEntity);
-            AccountEntity account = rolsUsuarisEntity.getAccount();
-            account.getRoles().add(rolsUsuarisEntity);
-            rolsUsuaris = getRolAccountEntityDao().toRolAccount(rolsUsuarisEntity);
-        	
-            if (nwap)
-            	launchWorkflowApprovalProcess(rolsUsuarisEntity);
-            else
-            	getAccountEntityDao().propagateChanges(account);
-            
-            enableOrDisableOnDates (rolsUsuaris, rolsUsuarisEntity);
-            
-            return rolsUsuaris;
+    		rolsUsuaris.setAccountId(account.getId());
+    	}
+    	
+        // Check group holder
+    	checkGroupHolder (rolsUsuaris);
+    	
+        RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
+                .rolAccountToEntity(rolsUsuaris);
+        // Enable or disable on dates
+        rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
+        // Check for Sod Rules
+        SoDRule rule = getSoDRuleService().isAllowed(rolsUsuaris);
+        if (rule != null && rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
+        {
+        	throw new InternalErrorException (String.format(Messages.getString("AplicacioServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
+        					, rule.getName()));
         }
-		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
+        // Launch workflow approval process
+        boolean nwap = needsWorkflowApprovalProcess(rolsUsuarisEntity);
+        
+       	rolsUsuarisEntity.setApprovalPending(nwap);
+       	
+       	if (! getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_CREATE, rolsUsuarisEntity))
+    		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
 
+       	getRolAccountEntityDao().create(rolsUsuarisEntity);
+        AccountEntity account = rolsUsuarisEntity.getAccount();
+        account.getRoles().add(rolsUsuarisEntity);
+        rolsUsuaris = getRolAccountEntityDao().toRolAccount(rolsUsuarisEntity);
+    	
+        if (nwap)
+        	launchWorkflowApprovalProcess(rolsUsuarisEntity);
+        else
+        	getAccountEntityDao().propagateChanges(account);
+        
+        enableOrDisableOnDates (rolsUsuaris, rolsUsuarisEntity);
+        
+        return rolsUsuaris;
     }
 
     /**
@@ -1104,11 +1085,13 @@ public class AplicacioServiceImpl extends
         String codiAplicacio = rolsUsuaris.getCodiAplicacio();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
         // {
-        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
+    	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
+                .load(rolsUsuaris.getId());
+    	if (rolsUsuarisEntity == null)
+    		return;
+    	
+        if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_DELETE,  rolsUsuarisEntity)) {
 
-        	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .load(rolsUsuaris.getId());
         	if (rolsUsuarisEntity.getRule() != null)
                 throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
             // Disable assigning roles to himself
@@ -1164,14 +1147,13 @@ public class AplicacioServiceImpl extends
 
 	@Override
 	protected void handleDenyApproval(RolAccount rolsUsuaris) throws Exception {
-        String codiAplicacio = rolsUsuaris.getCodiAplicacio();
-        // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
-        // {
-        if (AutoritzacionsUsuari.canDeleteUserRole(rolsUsuaris,
-                getGrupEntityDao())) {
+		RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao().load(rolsUsuaris.getId());
+		if (rolsUsuarisEntity == null)
+			return ;
+		
+		if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_DELETE, rolsUsuarisEntity))
+		{
 
-        	RolAccountEntity rolsUsuarisEntity = getRolAccountEntityDao()
-                    .rolAccountToEntity(rolsUsuaris);
         	if (rolsUsuarisEntity.getRule() != null)
                 throw new InternalErrorException("This role cannot be manually revoked. It's granted by a rule.");
             // Disable assigning roles to himself
@@ -1189,22 +1171,22 @@ public class AplicacioServiceImpl extends
             return;
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
+				Messages.getString("AplicacioServiceImpl.UnableDeleteRol"), rolsUsuarisEntity.getRol().getAplicacio().getCodi())); //$NON-NLS-1$
     }
 
 	protected RolAccount handleUpdate(RolAccount rolsUsuaris)
             throws Exception {
-        RolAccount oldRolsUsuaris = getRolAccountEntityDao().toRolAccount(
-        		getRolAccountEntityDao().load(rolsUsuaris.getId()));
-        String codiAplicacio = rolsUsuaris.getCodiAplicacio();
-        // Ho fem emprant autoritzacions (user:role:create [SENSE_DOMINI o
-        // GRUPS]
-        if (AutoritzacionsUsuari.canCreateUserRole(rolsUsuaris, 
-        		getGrupEntityDao()) &&
-        	AutoritzacionsUsuari.canCreateUserRole(oldRolsUsuaris, 
-        			getGrupEntityDao()))
-        {
-        	if (! rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName() ) ||
+		RolAccountEntity oldRolAccountEnttiy = getRolAccountEntityDao().load(rolsUsuaris.getId());
+		if (oldRolAccountEnttiy == null)
+			return rolsUsuaris;
+		
+		if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_DELETE, oldRolAccountEnttiy))
+		{
+	        RolAccount oldRolsUsuaris = getRolAccountEntityDao().toRolAccount(
+	        		getRolAccountEntityDao().load(rolsUsuaris.getId()));
+	        String codiAplicacio = rolsUsuaris.getCodiAplicacio();
+
+	        if (! rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName() ) ||
         			! rolsUsuaris.getAccountDispatcher().equals(oldRolsUsuaris.getAccountDispatcher()) ||
         			! rolsUsuaris.getBaseDeDades().equals(oldRolsUsuaris.getBaseDeDades()) ||
         			! rolsUsuaris.getNomRol().equals(oldRolsUsuaris.getNomRol()))
@@ -1217,16 +1199,22 @@ public class AplicacioServiceImpl extends
 
         	rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
         	
-        	getRolAccountEntityDao().update(rolsUsuarisEntity);
-        	
-            // Actualitzem darrera actualització de l'usuari
-            getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
-            
-            return rolsUsuaris;
+    		if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_CREATE, rolsUsuarisEntity))
+    		{
+	        	getRolAccountEntityDao().update(rolsUsuarisEntity);
+	        	
+	            // Actualitzem darrera actualització de l'usuari
+	            getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+	            
+	            return rolsUsuaris;
+    		} else {
+            	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
+    		}
         }
         else
-        	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
+        	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Messages.getString("AplicacioServiceImpl.UnableCreateRol"), oldRolAccountEnttiy.getRol().getAplicacio().getCodi())); //$NON-NLS-1$
     }
 
     protected Collection<RolAccount> handleFindRolsUsuarisByCodiUsuari(String codiUsuari)
@@ -1237,9 +1225,11 @@ public class AplicacioServiceImpl extends
 
         if (rolusus != null) {
             // Filtrem per autoritzacions
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusus);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            List<RolAccount> ra = new LinkedList<RolAccount>();
+            for (RolAccountEntity rae: rolusus) {
+            	if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae));
+            	ra.add(getRolAccountEntityDao().toRolAccount(rae));
+            }
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
        }
@@ -1282,8 +1272,9 @@ public class AplicacioServiceImpl extends
 				// mostrem rol q el té atorgat
                 crol.setMetaInfo(String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToRol"),  //$NON-NLS-1$
                         cContingut.getInfoContenidor()));
-                rgl.add(crol); // Añadimos el
-                                                 // contenedor
+                if (! "S".equals(filtraResultats) || //$NON-NLS-1$
+                			getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rad.rolRol)) 	
+                			rgl.add(crol); 
 
 			}
 			if (rad.rolGrup != null)
@@ -1298,16 +1289,11 @@ public class AplicacioServiceImpl extends
                 cr.setMetaInfo(
                 		String.format(Messages.getString("AplicacioServiceImpl.RoleGrantedToGroup"), //$NON-NLS-1$
                 				rad.rolGrup.getGrupPosseidor().getCodi() ));
-                rgl.add(cr); // Añadimos el contenedor
+                if (! "S".equals(filtraResultats) || //$NON-NLS-1$
+            			getAutoritzacioService().hasPermission(Security.AUTO_GROUP_ROLE_QUERY, rad.rolGrup)) 	
+                	rgl.add(cr); // Añadimos el contenedor
 			}
 		}
-
-        // Filtrado de roles (si se requiere) - per autoritzacions
-        if ("S".equals(filtraResultats)) { //$NON-NLS-1$
-            // user:role:query [SENSE_DOMINI, GRUPS, APLICACIONS]
-            return AutoritzacionsUsuari.filtraContenidorRolCanQuery(codiUsuari,
-                    rgl, getGrupEntityDao());
-        }
 
 		return rgl;
     }
@@ -1317,10 +1303,12 @@ public class AplicacioServiceImpl extends
         Collection<RolAccountEntity> rolusuEntity = getRolAccountEntityDao()
                 .findByCodiUsuariAndNomRol(codiUsuari, nomRol);
         if (rolusuEntity != null) {
-
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusuEntity);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            List<RolAccount> ra = new LinkedList<RolAccount>();
+            for (RolAccountEntity rae: rolusuEntity)
+            {
+            	if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae))
+            		ra.add(getRolAccountEntityDao().toRolAccount(rae));
+            }
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
 
@@ -1339,11 +1327,14 @@ public class AplicacioServiceImpl extends
 
     protected Collection<RolAccount> handleFindRolsUsuarisByNomRol(String nomRol)
             throws Exception {
-        Collection rolusus = getRolAccountEntityDao().findByNomRol(nomRol);
+        Collection<RolAccountEntity> rolusus = getRolAccountEntityDao().findByNomRol(nomRol);
         if (rolusus != null) {
-            Collection<RolAccountEntity> rolsFiltrats = AutoritzacionsUsuari
-                    .filtraRolsUsuariAplicationsCanQuery(rolusus);
-            List<RolAccount> ra = getRolAccountEntityDao().toRolAccountList(rolsFiltrats);
+            List<RolAccount> ra = new LinkedList<RolAccount>();
+            for (RolAccountEntity rae: rolusus)
+            {
+            	if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae))
+            		ra.add(getRolAccountEntityDao().toRolAccount(rae));
+            }
     		getSoDRuleService().qualifyRolAccountList(ra);
     		return ra;
         }
@@ -1400,14 +1391,10 @@ public class AplicacioServiceImpl extends
 
     protected AdministracioAplicacio handleUpdate(
             AdministracioAplicacio administracioAplicacio) throws Exception {
-        if (AutoritzacionsUsuari.canCreateAplicacio(administracioAplicacio
-                .getCodiAplicacio())
-                || AutoritzacionsUsuari
-                        .canUpdateAplicacio(administracioAplicacio
-                                .getCodiAplicacio())) {
-
-            RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
-                    .administracioAplicacioToEntity(administracioAplicacio);
+        RolAccountEntity administracioAplicacioEntity = getRolAccountEntityDao()
+                .administracioAplicacioToEntity(administracioAplicacio);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_CREATE, administracioAplicacioEntity))
+       	{
             getRolAccountEntityDao().update(administracioAplicacioEntity);
             administracioAplicacio.setId(administracioAplicacio.getId());
             administracioAplicacio = getRolAccountEntityDao()
@@ -1668,11 +1655,13 @@ public class AplicacioServiceImpl extends
     protected Collection<AutoritzacioRol> handleFindAutoritzacionsRolByNomRolAndCodiAplicacioRolAndCodiDispatcher(
             String nomRole, String codiAplicacioRol, String codiDispatcher)
             throws Exception {
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
+                        codiAplicacioRol, codiDispatcher);
 
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity) &&
+        		getAutoritzacioService().hasPermission(Security.AUTO_AUTHORIZATION_QUERY, null))
+        {
             LinkedList<AutoritzacioRol> totPermis = new LinkedList();
 
             if (rolEntity != null) {
@@ -1766,11 +1755,11 @@ public class AplicacioServiceImpl extends
             String nomRole, String codiAplicacioRol, String codiDispatcher)
             throws Exception {
 
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
-
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
+                        codiAplicacioRol, codiDispatcher);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
+        {
             LinkedList<AutoritzacioPuntEntrada> totPermis = new LinkedList();
 
             if (rolEntity != null) {
@@ -1817,11 +1806,12 @@ public class AplicacioServiceImpl extends
     protected Collection<NetworkAuthorization> handleFindACLsXarxesRolByNomRolAndCodiAplicacioRolAndCodiDispatcher(
             String nomRole, String codiAplicacioRol, String codiDispatcher)
             throws Exception {
-        if (AutoritzacionsUsuari.canQueryAplicacio(codiAplicacioRol)) {
+        RolEntity rolEntity = getRolEntityDao()
+                .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
+                        codiAplicacioRol, codiDispatcher);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
+        {
             // Cerquem el rol
-            RolEntity rolEntity = getRolEntityDao()
-                    .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRole,
-                            codiAplicacioRol, codiDispatcher);
 
             LinkedList<NetworkAuthorization> totPermis = new LinkedList<NetworkAuthorization>();
 
@@ -2438,7 +2428,8 @@ public class AplicacioServiceImpl extends
         // Cap dels tres paràmetres pot ésser null
         // Mirem l'autorització de l'aplicació (fer query als rols de la app
         // no requereixen tindre una autorització específica)
-        if (AutoritzacionsUsuari.canQueryAplicacio(rolEntity.getAplicacio().getCodi())) {
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
+        {
             return getRolEntityDao().toRol(rolEntity);
         } else {
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$

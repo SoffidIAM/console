@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.UsuariImpressoraEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.servei.XarxaService.class,
-	es.caib.seycon.ng.model.ImpressoraEntity.class})
+	es.caib.seycon.ng.model.ImpressoraEntity.class,
+	AutoritzacioService.class})
 public abstract class ImpressoraService {
 
 	@Operation ( grantees={roles.Tothom.class},

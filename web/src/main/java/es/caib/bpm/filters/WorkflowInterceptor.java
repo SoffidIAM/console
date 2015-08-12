@@ -11,6 +11,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.zkoss.util.resource.Labels;
@@ -73,6 +74,8 @@ public class WorkflowInterceptor implements Filter
 					sesion.removeAttribute("user"); //$NON-NLS-1$
 				}
 				
+				((HttpServletResponse) response).addHeader("X-UA-Compatible", "IE=8");
+
 				String uri = ((HttpServletRequest) request).getRequestURI();
 //				if (uri.endsWith("/js/zul/sel.js" ) || uri.endsWith("/js/zul/grid.js" ))
 //				{

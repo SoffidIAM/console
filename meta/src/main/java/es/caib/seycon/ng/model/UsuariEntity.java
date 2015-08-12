@@ -319,4 +319,6 @@ public abstract class UsuariEntity {
 	public java.lang.String getFullName() {
 	 return null;
 	}
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

@@ -41,9 +41,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -73,6 +75,7 @@ import org.jboss.mx.util.MBeanProxyCreationException;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.security.Util;
 
+import es.caib.loginModule.auth.ClientIPValve;
 import es.caib.loginModule.auth.ConstantesAutenticacion;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.loginModule.client.AuthorizationToken;
@@ -1328,9 +1331,12 @@ public class SesionEJB implements EntityBean {
                 roles.add("nobody"); //$NON-NLS-1$
                 roles.add("BPM_INTERNAL"); //$NON-NLS-1$
             } else {
+            	Map<String,String> attributes = new HashMap<String, String>();
+            	attributes.put("ip", sesionInfo.getIpRoute());
+            	attributes.put("method", sesionInfo.getCertificadoX509() == null ? "password" : "certificate");
                 AutoritzacioService us = SeyconServiceLocator.instance().getAutoritzacioService();
     
-                String[] rolesArray = us.getUserAuthorizationsString(getPrincipalUser());
+                String[] rolesArray = us.getUserAuthorizationsString(getPrincipalUser(), attributes);
                 for (int i = 0; i < rolesArray.length; i++) {
                     roles.add(rolesArray[i]);
                 }

@@ -100,4 +100,8 @@ public abstract class AplicacioEntity {
 		java.lang.String codiUsuari) {
 	 return null;
 	}
+
+
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

@@ -7,6 +7,8 @@ package es.caib.seycon.ng.model;
 
 import org.apache.webdav.lib.properties.GetContentLengthProperty;
 
+import com.soffid.iam.model.security.SecurityScopeEntity;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 
 /**
@@ -14,6 +16,7 @@ import es.caib.seycon.ng.comu.TipusDomini;
  */
 public class RolAssociacioRolEntityImpl
     extends es.caib.seycon.ng.model.RolAssociacioRolEntity
+    implements SecurityScopeEntity
 {
     /**
      * The serial version UID of this class. Needed for serialization.
@@ -141,5 +144,12 @@ public class RolAssociacioRolEntityImpl
 			return true;
 		} 
 		return false;
+	}
+
+	public boolean isAllowed(String permission) {
+		if (getRolContingut() == null)
+			return false;
+		else
+			return getRolContingut().isAllowed(permission);
 	}
 }

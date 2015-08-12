@@ -169,7 +169,7 @@ public class DadaUsuariEntityDaoImpl
         			targetVO.setValorDadaDate(null);
         	}
         }
-        targetVO.setVisibility(AutoritzacionsUsuari.getAttributeVisibility(sourceEntity.getUsuari(), sourceEntity.getTipusDada()));
+        targetVO.setVisibility(sourceEntity.getAttributeVisibility());
     }
 
     /**

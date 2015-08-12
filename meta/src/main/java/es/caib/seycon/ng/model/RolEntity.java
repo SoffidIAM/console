@@ -39,6 +39,10 @@ public abstract class RolEntity {
 	@Column (name="ROL_NOM", length=150)
 	public java.lang.String nom;
 
+	@Nullable
+	@Column (name="ROL_CATEGORY", length=150)
+	public java.lang.String category;
+
 	@Column (name="ROL_DESCRI", length=150)
 	public java.lang.String descripcio;
 
@@ -169,4 +173,7 @@ public abstract class RolEntity {
 	{
 		
 	}
+
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

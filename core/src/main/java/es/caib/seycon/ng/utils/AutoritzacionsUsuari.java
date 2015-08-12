@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.Vector;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
-import com.soffid.iam.model.AccountMetadataEntity;
 
-import es.caib.seycon.net.SeyconServiceLocator;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
@@ -26,7 +22,6 @@ import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.GrupEntityDao;
 import es.caib.seycon.ng.model.MaquinaEntity;
-import es.caib.seycon.ng.model.Messages;
 import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -39,7 +34,6 @@ import es.caib.seycon.ng.servei.InternalPasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.servei.XarxaService;
 import es.caib.seycon.ng.servei.XarxaServiceImpl;
-import es.caib.seycon.ng.sync.servei.ServerService;
 
 public class AutoritzacionsUsuari
 {
@@ -72,42 +66,13 @@ public class AutoritzacionsUsuari
 	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canCreateUser (Usuari usuari, GrupEntityDao grupEntityDao)
+	public static boolean canCreateUser (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
-		// user:create [GRUPS]
-		// Sólo es necesario comprobar los grupos primarios y
-		// secundarios, no sus padres (ya están en la lista de
-		// autorizaciones)
-		boolean trobat = false;
-		if (usuari.getCodiGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_CREATE + "/" //$NON-NLS-1$
-										+ usuari.getCodiGrupPrimari()))
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			Collection grupsSecundaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(usuari.getCodi()); // GrupEntity
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext();)
-			{
-				GrupEntity grupS = (GrupEntity) itGS.next();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_CREATE
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		}
-
-		return false;
-
-	}
-
-	/*
-	 * Determina si l'usuari té permis per crear usuaris d'aquest grup
-	 */
-	public static boolean canCreateUsersOnGroup (String codiGrup)
-	{
-		// user:create [GRUPS]
-		return Security.isUserInRole(Security.AUTO_USER_CREATE + "/" + codiGrup); //$NON-NLS-1$
+		return ServiceLocator.instance()
+			.getAutoritzacioService()
+			.hasPermission(Security.AUTO_USER_CREATE, new Object[] { usuari} );
 
 	}
 
@@ -119,71 +84,22 @@ public class AutoritzacionsUsuari
 	@SuppressWarnings ("rawtypes")
 	public static boolean canUpdateUser (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
-		Usuari currentUser = getCurrentUsuari();
-		
-        if (currentUser != null && currentUser.getId().equals(usuari.getId()))
-        	return false;
-		// user:update [GRUPS]
-		// Sólo es necesario comprobar los grupos primarios y
-		// secundarios, no sus padres (ya están en la lista de
-		// autorizaciones)
-
-		// Si pot actualitzar tots els usuaris
-		if (Security.isUserInRole(Security.AUTO_USER_UPDATE + Security.AUTO_ALL))
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-
-		boolean trobat = false;
-		if (usuari.getCodiGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_UPDATE + "/" //$NON-NLS-1$
-										+ usuari.getCodiGrupPrimari()))
-			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			// Retorna grupEntitys:
-			Collection grupsSecundaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(usuari.getCodi());
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext();)
-			{
-				GrupEntity grupS = (GrupEntity) itGS.next();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_UPDATE
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		}
-
-		return false;
+		return ServiceLocator.instance()
+				.getAutoritzacioService()
+				.hasPermission(Security.AUTO_USER_UPDATE, new Object[] { usuari} );
 
 	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canDeleteUser (Usuari usuari, GrupEntityDao grupEntityDao)
+	public static boolean canDeleteUser (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
-		// user:delete [GRUPS]
-		// Sólo es necesario comprobar los grupos primarios y
-		// secundarios, no sus padres (ya están en la lista de
-		// autorizaciones)
-		boolean trobat = false;
-		if (usuari.getCodiGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_DELETE + "/" //$NON-NLS-1$
-										+ usuari.getCodiGrupPrimari()))
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			// retorna grupEntity
-			Collection grupsSecundaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(usuari.getCodi());
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext();)
-			{
-				GrupEntity grupS = (GrupEntity) itGS.next();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_DELETE
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		}
-
-		return false;
+		return ServiceLocator.instance()
+				.getAutoritzacioService()
+				.hasPermission(Security.AUTO_USER_DELETE, new Object[] { usuari} );
 
 	}
 
@@ -192,64 +108,15 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM);
 	}
 
-	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateCustomUser (UsuariEntity userEntity)
-	{
-		// user:custom:update [GRUPS]
-		// Sólo es necesario comprobar los grupos primarios y
-		// secundarios, no sus padres (ya están en la lista de
-		// autorizaciones)
-
-		// Si pot actualitzar tots els usuaris
-		if (Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + Security.AUTO_ALL))
-			return true;
-
-		if (userEntity.getGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" //$NON-NLS-1$
-										+ userEntity.getGrupPrimari().getCodi()))
-			return true;
-
-		Collection grupsSecundaris = userEntity.getGrupsSecundaris();
-		if (grupsSecundaris != null)
-			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext();)
-			{
-				UsuariGrupEntity ug = (UsuariGrupEntity) itGS.next();
-				GrupEntity grupS = ug.getGrup();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		return false;
-	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateCustomUser (Usuari usuari, GrupEntityDao grupEntityDao)
+	public static boolean canUpdateCustomUser (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
-		// user:custom:update [GRUPS]
-		// Sólo es necesario comprobar los grupos primarios y
-		// secundarios, no sus padres (ya están en la lista de
-		// autorizaciones)
-		boolean trobat = false;
-		if (usuari.getCodiGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM + "/" //$NON-NLS-1$
-										+ usuari.getCodiGrupPrimari()))
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			// retorna grupEntity
-			Collection grupsSecundaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(usuari.getCodi());
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext();)
-			{
-				GrupEntity grupS = (GrupEntity) itGS.next();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_UPDATE_CUSTOM
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		}
-		return false;
+		return ServiceLocator.instance()
+				.getAutoritzacioService()
+				.hasPermission(Security.AUTO_USER_UPDATE_CUSTOM, new Object[] { usuari} );
 	}
 
 	public static boolean hasUpdateUserPassword ()
@@ -277,57 +144,6 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL);
 	}
 
-	@SuppressWarnings ("rawtypes")
-	public static Collection<ContenidorRol> filtraContenidorRolCanQuery (
-					String codiUsuari, Collection<ContenidorRol> contenidorsRol,
-					GrupEntityDao grupEntityDao)
-	{
-
-		// user:role:query [SENSE_DOMINI, GRUPS, APLICACIONS]
-		if (canQueryAllUserRole())
-		{
-			return contenidorsRol;
-		}
-
-		// GRUPS: si te un rol dels grups de l'usuari, pot veure TOTS els seus
-		// rols heretats
-		GrupEntity grupPrimari = grupEntityDao.findGrupPrimariByCodiUsuari(codiUsuari);
-		if (grupPrimari != null)
-		{
-			if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" //$NON-NLS-1$
-							+ grupPrimari.getCodi()))
-				return contenidorsRol;
-		}
-		// Grupos secundarios
-		// retorna grupentity
-		Collection grupsFromUsuaris = grupEntityDao
-						.findGrupsFromUsuarisByCodiUsuari(codiUsuari);
-		for (Iterator it = grupsFromUsuaris.iterator(); it.hasNext();)
-		{
-			GrupEntity g = (GrupEntity) it.next();
-			if (g != null
-							&& Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY
-											+ "/" + g.getCodi())) //$NON-NLS-1$
-				return contenidorsRol;
-		}
-
-		// APLICACIONS: només els rols de les aplicacions on té l'autorització
-		Collection<ContenidorRol> contenidorRolFiltrats = new ArrayList<ContenidorRol>();
-
-		// Filtrem només els rols que pot veure l'usuari
-		for (Iterator<ContenidorRol> it = contenidorsRol.iterator(); it.hasNext();)
-		{
-			ContenidorRol contenidor = it.next();
-			String infoRol = contenidor.getInfoContenidor();
-			String appRol = infoRol.substring(infoRol.indexOf('>') + 1);
-			if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY + "/" //$NON-NLS-1$
-							+ appRol))
-				contenidorRolFiltrats.add(contenidor);
-		}
-
-		return contenidorRolFiltrats;
-	}
-
 	public static boolean hasQueryUserSession ()
 	{
 		// user:session:query [GRUPS]
@@ -342,34 +158,14 @@ public class AutoritzacionsUsuari
 	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canQueryUserSession (Usuari usuari, GrupEntityDao grupEntityDao)
+	public static boolean canQueryUserSession (Usuari usuari, GrupEntityDao grupEntityDao) throws InternalErrorException
 	{
-		// user:session:query [GRUPS]
-		if (canQueryAllUserSession())
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-
-		// Mirem a nivell de grups
-		boolean trobat = false;
-		if (usuari.getCodiGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_SESSION_QUERY + "/" //$NON-NLS-1$
-										+ usuari.getCodiGrupPrimari()))
-			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			// Retorna grupEntitys:
-			Collection grupsSecundaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(usuari.getCodi());
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat && itGS.hasNext();)
-			{
-				GrupEntity grupS = (GrupEntity) itGS.next();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_SESSION_QUERY
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		}
-
-		return false;
+		return ServiceLocator.instance()
+				.getAutoritzacioService()
+				.hasPermission(Security.AUTO_USER_SESSION_QUERY, new Object[] { usuari} );
+		
 	}
 
 	/*
@@ -383,57 +179,31 @@ public class AutoritzacionsUsuari
 	}
 
 	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateUserMetadata (UsuariEntity usuari)
+	public static boolean canUpdateUserMetadata (Usuari usuari) throws InternalErrorException
 	{
 		return canUpdateUserMetadata(usuari,Security.AUTO_USER_METADATA_UPDATE  );
 	}
 	
 	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateAccountMetadata (UsuariEntity usuari)
+	public static boolean canUpdateAccountMetadata (Usuari usuari) throws InternalErrorException
 	{
 		return canUpdateUserMetadata(usuari,Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE  );
 	}
 	
 	@SuppressWarnings ("rawtypes")
-	public static boolean canQueryAccountMetadata (UsuariEntity usuari)
+	public static boolean canQueryAccountMetadata (Usuari usuari) throws InternalErrorException
 	{
 		return canUpdateUserMetadata(usuari,Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY  );
 	}
 	
 	@SuppressWarnings ("rawtypes")
-	public static boolean canUpdateUserMetadata (UsuariEntity usuari, String auth)
+	public static boolean canUpdateUserMetadata (Usuari usuari, String auth) throws InternalErrorException
 	{
-		// user:metadata:update [GRUPS]
-		if (! hasUpdateUserMetadata())
-			return false;
-
-		// Si pot actualitzar tots els usuaris
-		if (Security.isUserInRole(auth + Security.AUTO_ALL))
+		if (Security.isDisableAllSecurityForEver())
 			return true;
-
-		boolean trobat = false;
-		if (usuari.getGrupPrimari() != null
-						&& Security.isUserInRole(auth
-										+ "/" + usuari.getGrupPrimari().getCodi())) //$NON-NLS-1$
-			return true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			// Retorna grupEntitys:
-			Collection grupsSecundaris = usuari.getGrupsSecundaris();
-			if (grupsSecundaris != null)
-				for (Iterator itGS = grupsSecundaris.iterator(); !trobat
-								&& itGS.hasNext();)
-				{
-					UsuariGrupEntity ug = (UsuariGrupEntity) itGS.next();
-					GrupEntity grupS = ug.getGrup();
-					if (grupS != null
-									&& Security.isUserInRole(auth
-													+ "/" + grupS.getCodi())) //$NON-NLS-1$
-						return true;
-				}
-		}
-
-		return false;
+		return ServiceLocator.instance()
+				.getAutoritzacioService()
+				.hasPermission(auth, new Object[] { usuari} );
 	}
 
 	public static boolean canUpdateAllUserMetadata ()
@@ -465,31 +235,6 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + Security.AUTO_ALL);
 	}
 
-	@SuppressWarnings ("rawtypes")
-	public static boolean canCreateUserGroup (UsuariEntity usuari)
-	{
-		// user:group:create [GRUPS] - children
-		if (canCreateAllUserGroup())
-			return true;
-
-		if (usuari.getGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE + "/" //$NON-NLS-1$
-										+ usuari.getGrupPrimari().getCodi()))
-			return true;
-		Collection grupsSecundaris = usuari.getGrupsSecundaris(); // UsuariGrupEntity
-		if (grupsSecundaris != null)
-			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext();)
-			{
-				UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-				GrupEntity grupS = usuGrupActual.getGrup();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_GROUP_CREATE
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-		return false;
-	}
-
 	public static boolean hasDeleteUserGroup ()
 	{
 		// user:group:delete [GRUPS] - children
@@ -502,34 +247,6 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + Security.AUTO_ALL);
 	}
 
-	@SuppressWarnings ("rawtypes")
-	public static boolean canDeleteUserGroup (UsuariEntity usuari)
-	{
-		// user:group:delete [GRUPS] - children
-		if (canDeleteAllUserGroup())
-			return true;
-
-		if (usuari.getGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE + "/" //$NON-NLS-1$
-										+ usuari.getGrupPrimari().getCodi()))
-			return true;
-		Collection grupsSecundaris = usuari.getGrupsSecundaris(); // UsuariGrupEntity
-		if (grupsSecundaris != null)
-			for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext();)
-			{
-				UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-				GrupEntity grupS = usuGrupActual.getGrup();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_GROUP_DELETE
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-
-		return false;
-
-	}
-
-	// A nivell de ZUL (si ha d'apareixer el butó)
 	public static boolean hasCreateUserPrinter ()
 	{
 		// user:printer:create [GRUPS] - children
@@ -542,56 +259,6 @@ public class AutoritzacionsUsuari
 		// user:printer:create [GRUPS] - children
 		return Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE
 						+ Security.AUTO_ALL);
-	}
-
-	@SuppressWarnings ("rawtypes")
-	public static boolean canCreateUserPrinter (
-					UsuariImpressoraEntity usuariImpressoraEntity,
-					XarxaService xarxaService) throws InternalErrorException
-	{
-		// user:printer:create [GRUPS] - children
-		if (canCreateAllUserPrinter())
-			return true;
-
-		UsuariEntity usuari = usuariImpressoraEntity.getUsuari();
-		// Només ho comprovem si en té l'autorització
-		if (usuari != null && Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE))
-		{
-			if (usuari.getGrupPrimari() != null
-							&& Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE
-											+ "/" + usuari.getGrupPrimari().getCodi())) //$NON-NLS-1$
-				return true;
-			Collection grupsSecundaris = usuari.getGrupsSecundaris(); // UsuariGrupEntity
-			if (grupsSecundaris != null)
-				for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext();)
-				{
-					UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-					GrupEntity grupS = usuGrupActual.getGrup();
-					if (grupS != null
-									&& Security.isUserInRole(Security.AUTO_USER_PRINTER_CREATE
-													+ "/" + grupS.getCodi())) //$NON-NLS-1$
-						return true;
-				}
-		}
-
-		// Permís a les impressores amb ACL (a nivell de la xarxa servidor
-		// d'impressores)
-		// Només ho comprovem si en té l'autorització
-		if (Security.isUserInRole(Security.AUTO_USER_ACL_PRINTER_CREATE))
-		{
-			// Obtenim el nivell d'accés a la màquina servidora d'impressores
-			MaquinaEntity serverImp = usuariImpressoraEntity.getImpressora()
-							.getServidor();
-			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(
-							serverImp.getNom(), serverImp.getXarxa().getCodi());
-
-			// Nivell mínim: suport
-			if (nivell >= XarxaServiceImpl.SUPORT)
-				return true;
-
-		}
-
-		return false;
 	}
 
 	// A nivell de ZUL (si ha d'apareixer el butó)
@@ -609,60 +276,6 @@ public class AutoritzacionsUsuari
 						+ Security.AUTO_ALL);
 	}
 
-	@SuppressWarnings ("rawtypes")
-	public static boolean canDeleteUserPrinter (
-					UsuariImpressoraEntity usuariImpressoraEntity,
-					XarxaService xarxaService) throws InternalErrorException
-	{
-		// user:printer:delete [GRUPS] - children
-		if (canDeleteAllUserPrinter())
-			return true;
-
-		// Només ho comprovem si en té l'autorització
-		if (Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE))
-		{
-			// Permís de TOTES les impressores (a nivell de grup)
-			UsuariEntity usuari = usuariImpressoraEntity.getUsuari();
-			if (usuari != null)
-			{
-				if (usuari.getGrupPrimari() != null
-								&& Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE
-												+ "/" //$NON-NLS-1$
-												+ usuari.getGrupPrimari().getCodi()))
-					return true;
-
-				Collection grupsSecundaris = usuari.getGrupsSecundaris(); // UsuariGrupEntity
-				if (grupsSecundaris != null)
-					for (Iterator itGS = grupsSecundaris.iterator(); itGS.hasNext();)
-					{
-						UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-						GrupEntity grupS = usuGrupActual.getGrup();
-						if (grupS != null
-										&& Security.isUserInRole(Security.AUTO_USER_PRINTER_DELETE
-														+ "/" + grupS.getCodi())) //$NON-NLS-1$
-							return true;
-					}
-			}
-		}
-
-		// Permís a les impressores amb ACL (a nivell de la xarxa servidor
-		// d'impressores)
-		// Només ho comprovem si en té l'autorització
-		if (Security.isUserInRole(Security.AUTO_USER_ACL_PRINTER_DELETE))
-		{
-			// Obtenim el nivell d'accés a la màquina servidora d'impressores
-			MaquinaEntity serverImp = usuariImpressoraEntity.getImpressora()
-							.getServidor();
-			Long nivell = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(
-							serverImp.getNom(), serverImp.getXarxa().getCodi());
-
-			// Nivell mínim: suport
-			if (nivell >= XarxaServiceImpl.SUPORT)
-				return true;
-		}
-
-		return false;
-	}
 
 	public static boolean hasQueryUserAccessRegister ()
 	{
@@ -681,38 +294,6 @@ public class AutoritzacionsUsuari
 		// user:accessRegister:query [GRUPS] - children
 		return Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY
 						+ Security.AUTO_ALL);
-	}
-
-	@SuppressWarnings ("rawtypes")
-	public static boolean canQueryUserAccessRegister (String codiUsuari,
-					GrupEntityDao grupEntityDao)
-	{
-		// user:accessRegister:query [GRUPS] - children
-		if (canQueryAllUserAccessRegister())
-			return true;
-
-		// Grupo Primario
-		GrupEntity grupPrimari = grupEntityDao.findGrupPrimariByCodiUsuari(codiUsuari);
-		if (grupPrimari != null)
-		{
-			if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY
-							+ "/" + grupPrimari.getCodi())) //$NON-NLS-1$
-				return true;
-		}
-		// Grupos secundarios
-		// retorna grupentity
-		Collection grupsFromUsuaris = grupEntityDao
-						.findGrupsFromUsuarisByCodiUsuari(codiUsuari);
-		if (grupsFromUsuaris != null)
-			for (Iterator it = grupsFromUsuaris.iterator(); it.hasNext();)
-			{
-				GrupEntity g = (GrupEntity) it.next();
-				if (Security.isUserInRole(Security.AUTO_USER_ACCESSREGISTER_QUERY
-								+ "/" + g.getCodi())) //$NON-NLS-1$
-					return true;
-			}
-
-		return false;
 	}
 
 	/*
@@ -748,56 +329,14 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_GROUP_ROLE_QUERY + Security.AUTO_ALL);
 	}
 
-	public static boolean canQueryGroupRoles (String codiGrup)
-	{
-		return (Security.isUserInRole(Security.AUTO_GROUP_ROLE_QUERY + Security.AUTO_ALL) || Security
-						.isUserInRole(Security.AUTO_GROUP_ROLE_QUERY + "/" + codiGrup)); //$NON-NLS-1$
-	}
-
 	public static boolean hasQueryGroupUsers ()
 	{
 		return Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY);
 	}
 
-	public static boolean canQueryGroupUsers (String codiGrup)
-	{
-		// group:user:query [SENSE_DOMINI o GRUPS]
-		return Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY + Security.AUTO_ALL)
-						|| Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY + "/" //$NON-NLS-1$
-										+ codiGrup);
-	}
-
 	public static boolean canQueryAllGroupUsers ()
 	{
 		return Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY + Security.AUTO_ALL);
-	}
-
-	public Collection<UsuariGrup> filtraUsuarisGroupVOCanQuery (
-					Collection<UsuariGrup> usuarisGrupVO)
-	{
-		// group:user:query [SENSE_DOMINI o GRUPS]
-
-		Collection<UsuariGrup> usuarisGrupVOPermis = new ArrayList<UsuariGrup>();
-
-		if (Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY + Security.AUTO_ALL))
-		{ // sense domini
-			usuarisGrupVOPermis = usuarisGrupVO;
-		}
-		else
-		{ // per GRUP
-			// Mirem si tenim permis en el grup dels usuari
-			for (Iterator<UsuariGrup> it = usuarisGrupVO.iterator(); it.hasNext();)
-			{
-				UsuariGrup ug = it.next();
-				if (ug != null
-								&& ug.getCodiGrup() != null
-								&& Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY
-												+ "/" + ug.getCodiGrup())) //$NON-NLS-1$
-					usuarisGrupVOPermis.add(ug);
-			}
-		}
-
-		return usuarisGrupVOPermis;
 	}
 
 	public static boolean hasCreateGroupPrinter ()
@@ -813,17 +352,6 @@ public class AutoritzacionsUsuari
 						+ Security.AUTO_ALL);
 	}
 
-	public static boolean canCreateGroupPrinter (String codiGrup)
-	{
-		// group:printer:create [GRUPS] - children
-		if (canCreateAllGroupPrinter())
-			return true;
-
-		return Security.isUserInRole(Security.AUTO_GROUP_PRINTER_CREATE + "/" //$NON-NLS-1$
-						+ codiGrup);
-
-	}
-
 	public static boolean hasDeleteGroupPrinter ()
 	{
 		// group:printer:delete [GRUPS]
@@ -834,41 +362,6 @@ public class AutoritzacionsUsuari
 	{
 		return Security.isUserInRole(Security.AUTO_GROUP_PRINTER_DELETE
 						+ Security.AUTO_ALL);
-	}
-
-	public static boolean canDeleteGroupPrinter (String codiGrup)
-	{
-		// group:printer:delete [GRUPS]
-		if (canDeleteAllGroupPrinter())
-			return true;
-
-		return Security.isUserInRole(Security.AUTO_GROUP_PRINTER_DELETE + "/" //$NON-NLS-1$
-						+ codiGrup);
-	}
-
-	public static Collection<GrupEntity> filtraGroupsCanQuery (
-					Collection<GrupEntity> groupsEntity)
-	{
-		// group:query [SENSE_DOMINI o GRUPS]
-		Collection<GrupEntity> grupsPermis = new ArrayList<GrupEntity>();
-		if (Security.isUserInRole(Security.AUTO_GROUP_QUERY + Security.AUTO_ALL))
-		{
-			grupsPermis = groupsEntity;
-		}
-		else
-		{
-			// filtrem
-			for (Iterator<GrupEntity> it = groupsEntity.iterator(); it.hasNext();)
-			{
-				GrupEntity g = it.next();
-				if (g != null
-								&& Security.isUserInRole(Security.AUTO_GROUP_QUERY
-												+ "/" + g.getCodi())) { //$NON-NLS-1$
-					grupsPermis.add(g);
-				}
-			}
-		}
-		return grupsPermis;
 	}
 
 	/*
@@ -1519,425 +1012,6 @@ public class AutoritzacionsUsuari
 		return appsCanQuery;
 	}
 
-	/**
-	 * Mètode que retorna les aplicacions que pot veure l'usuari actual
-	 * 
-	 * @param aplicacionsEntity
-	 * @return
-	 */
-	public static Collection<Aplicacio> filtraAplicationsVOCanQuery (
-					Collection<Aplicacio> aplicacionsVO)
-	{
-		ArrayList<Aplicacio> appsCanQuery = new ArrayList<Aplicacio>();
-
-		// L'autorització application:query [APLICACIONS, SENSE_DOMINI]
-		// si té application:query/* pot veure totes
-
-		if (canQueryAllAplication())
-			return aplicacionsVO;
-		// Sinó filtrem per autorització d'aplicació
-		for (Iterator<Aplicacio> it = aplicacionsVO.iterator(); it.hasNext();)
-		{
-			Aplicacio app = it.next();
-			if (app != null
-							&& app.getCodi() != null
-							&& Security.isUserInRole(Security.AUTO_APPLICATION_QUERY
-											+ "/" + app.getCodi())) { //$NON-NLS-1$
-				appsCanQuery.add(app);
-			}
-		}
-
-		return appsCanQuery;
-	}
-
-	public static boolean canQueryAplicacio (String codiAplicacio)
-	{
-		// L'autorització application:query [APLICACIONS, SENSE_DOMINI]
-		// si té application:query/* pot veure totes
-		if (canQueryAllAplication()
-						|| Security.isUserInRole(Security.AUTO_APPLICATION_QUERY + "/" //$NON-NLS-1$
-										+ codiAplicacio))
-			return true;
-
-		return false;
-	}
-
-	public static boolean canDeleteAplicacio (String codiAplicacio)
-	{
-		// L'autorització application:delete [APLICACIONS, SENSE_DOMINI]
-		// si té application:delete/* pot veure totes
-		return (Security.isUserInRole(Security.AUTO_APPLICATION_DELETE
-						+ Security.AUTO_ALL) || Security
-						.isUserInRole(Security.AUTO_APPLICATION_DELETE + "/" //$NON-NLS-1$
-										+ codiAplicacio));
-	}
-
-	public static boolean canCreateAplicacio (String codiAplicacio)
-	{
-		// SENSE_DOMINI
-		return (Security.isUserInRole(Security.AUTO_APPLICATION_CREATE
-						+ Security.AUTO_ALL));
-	}
-
-	public static boolean canUpdateAplicacio (String codiAplicacio)
-	{
-		// L'autorització application:delete [APLICACIONS, SENSE_DOMINI]
-		// si té application:update/* pot actualitzar totes
-		return (Security.isUserInRole(Security.AUTO_APPLICATION_UPDATE
-						+ Security.AUTO_ALL) || Security
-						.isUserInRole(Security.AUTO_APPLICATION_UPDATE + "/" //$NON-NLS-1$
-										+ codiAplicacio));
-	}
-
-	public static Collection<RolEntity> filtraRolsAplicationsCanQuery (
-					Collection<RolEntity> rolsEntity)
-	{
-		// application:query [APLICACIONS]
-		// o user:role:query [GRUPS, APLICACIONS]: ací en el cas d'aplicacions
-		// només
-		Collection<RolEntity> rolsPermis = new LinkedList<RolEntity>();
-		if (canQueryAllAplication())
-			return rolsEntity;
-		else
-		{
-			// Filtrem els rols per l'aplicació on té autorització
-			// application:query l'usuari
-			for (Iterator<RolEntity> it = rolsEntity.iterator(); it.hasNext();)
-			{
-				RolEntity r = it.next();
-				if (r != null
-								&& r.getAplicacio() != null
-								&& (Security.isUserInRole(Security.AUTO_APPLICATION_QUERY
-												+ "/" + r.getAplicacio().getCodi()) || Security //$NON-NLS-1$
-													.isUserInRole(Security.AUTO_USER_ROLE_QUERY
-																	+ "/" + r.getAplicacio().getCodi()))) { //$NON-NLS-1$
-					rolsPermis.add(r);
-				}
-
-			}
-		}
-		return rolsPermis;
-	}
-
-	/**
-	 * Mètode per saber si un usuari pot crear assignació de rol a un usuari
-	 * 
-	 * @param rolsUsuaris
-	 * @return
-	 */
-	public static boolean canCreateUserRole (RolAccount rolAccount,
-					GrupEntityDao getGrupEntityDao)
-	{
-		// 1 rolsUsuaris només
-		// autorització user:role:create [sense_domini, GRUPS, APLICACIONS]
-
-		// SENSE_DOMINI
-		if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + Security.AUTO_ALL))
-			return true;
-
-		// FILTRE PER APLICACIO
-		if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" //$NON-NLS-1$
-						+ rolAccount.getCodiAplicacio()))
-		{
-			return true;
-		}
-
-		// FILTRE PER GRUPS
-		// Obtenemos grupos del usuario de la asignación de rol
-		// Grupo Primario
-		if (rolAccount.getCodiUsuari() != null)
-		{
-			GrupEntity grupPrimari = getGrupEntityDao
-							.findGrupPrimariByCodiUsuari(rolAccount.getCodiUsuari());
-			if (grupPrimari != null)
-			{
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" //$NON-NLS-1$
-								+ grupPrimari.getCodi()))
-					return true;
-			}
-			// Grupos secundarios
-			// retorna grupentity
-			List<GrupEntity> grupsFromUsuaris = getGrupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(rolAccount.getCodiUsuari());
-			for (Iterator<GrupEntity> it = grupsFromUsuaris.iterator(); it.hasNext();)
-			{
-				GrupEntity g = (GrupEntity) it.next();
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_CREATE + "/" //$NON-NLS-1$
-								+ g.getCodi()))
-					return true;
-			}
-		}
-
-		return false;
-
-	}
-
-	public static boolean canDeleteUserRole (RolAccount rolsUsuaris,
-					GrupEntityDao grupEntityDao)
-	{
-		// 1 rolsUsuaris només
-		// autorització user:role:delete [sense_domini, GRUPS, APLICACIONS]
-		if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + Security.AUTO_ALL))
-			return true;
-
-		// FILTRE PER APLICACIO
-		if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" //$NON-NLS-1$
-						+ rolsUsuaris.getCodiAplicacio()))
-			return true;
-
-		// FILTRE PER GRUPS
-		// Obtenemos grupos del usuario sobre el que se piden
-		// Grupo Primario
-		if (rolsUsuaris.getCodiUsuari() != null)
-		{
-			GrupEntity grupPrimari = grupEntityDao
-							.findGrupPrimariByCodiUsuari(rolsUsuaris.getCodiUsuari());
-			if (grupPrimari != null)
-			{
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" //$NON-NLS-1$
-								+ grupPrimari.getCodi()))
-					return true;
-			}
-			// Grupos secundarios
-			List<GrupEntity> grupsFromUsuaris = grupEntityDao
-							.findGrupsFromUsuarisByCodiUsuari(rolsUsuaris
-											.getCodiUsuari());
-			for (Iterator<GrupEntity> it = grupsFromUsuaris.iterator(); it.hasNext();)
-			{
-				GrupEntity g = it.next();
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_DELETE + "/" //$NON-NLS-1$
-								+ g.getCodi()))
-					return true;
-			}
-		}
-
-		return false;
-	}
-
-	@SuppressWarnings ("rawtypes")
-	public static Collection<RolAccountEntity> filtraRolsUsuariAplicationsCanQuery (
-					Collection<RolAccountEntity> rolsUsuariEntity)
-	{
-		// Autoritzacio user:role:query [sense_domini, GRUPS, APLICACIONS]
-		Collection<RolAccountEntity> rolsPermis = new ArrayList<RolAccountEntity>();
-
-		if (canQueryAllUserRole())
-		{
-			return rolsUsuariEntity; // eixim: té permis
-		}
-		else
-		{
-			// Recorremos los roles y hacemos 2 filtrados: por GRUPO y
-			// APLICACIÓN
-			//
-			// Filtramos por GRUPO (si tenemos permiso sobre grupo(e hijos)
-			// usuario: se devuelven todos)
-			// y por APLICACIÓN: sólo se muestran los roles de apps q tengamos
-			// autorización
-
-			for (Iterator<RolAccountEntity> rit = rolsUsuariEntity.iterator(); rit
-							.hasNext();)
-			{
-				RolAccountEntity rue = rit.next();
-				AccountEntity account = rue.getAccount();
-				// PRIMER FILTRE: PER GRUPS
-				// Obtenemos grupos del usuario sobre el que se piden
-				// Grupo Primario
-				boolean tienePermisoGrupoUsuario = false;
-				// String codiUsuari = rue.getUsuari().getCodi();//usuari del
-				// rol
-				// SEGONS FILTRE: PER APLICACIONS
-				// 1) l'aplicació del RolEntity
-				if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY
-								+ "/" + rue.getRol().getAplicacio().getCodi())) { //$NON-NLS-1$
-					rolsPermis.add(rue);
-				}
-				else
-				{
-					for (UserAccountEntity ua : account.getUsers())
-					{
-						UsuariEntity usuari = ua.getUser();
-
-						GrupEntity grupPrimari = usuari.getGrupPrimari(); // grupEntityDao.findGrupPrimariByCodiUsuari(codiUsuari);
-						if (grupPrimari != null)
-						{
-							if (Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY
-											+ "/" + grupPrimari.getCodi())) //$NON-NLS-1$
-								tienePermisoGrupoUsuario = true;
-						}
-						if (!tienePermisoGrupoUsuario)
-						{// si encara no tenim permis,
-						 // mirem els secundaris
-							Collection grupsFromUsuaris = usuari.getGrupsSecundaris(); // UsuariGrupEntity
-							for (Iterator it = grupsFromUsuaris.iterator(); !tienePermisoGrupoUsuario
-											&& it.hasNext();)
-							{
-								UsuariGrupEntity g = (UsuariGrupEntity) it.next();
-								if (g != null
-												&& Security.isUserInRole(Security.AUTO_USER_ROLE_QUERY
-																+ "/" + g.getGrup().getCodi())) //$NON-NLS-1$
-									tienePermisoGrupoUsuario = true;
-							}
-
-						}
-						if (tienePermisoGrupoUsuario)
-						{
-							rolsPermis.add(rue); // L'afegim
-							break;
-						}
-					} // for
-				}
-			} // for
-			return new Vector<RolAccountEntity>(rolsPermis);
-
-		}
-
-	}
-
-	//
-	// A NIVELL DE GRUPS
-	//
-
-	public static boolean canCreateGroup (String codiGrup)
-	{
-		// SENSE_DOMINI
-		return (Security.isUserInRole(Security.AUTO_GROUP_CREATE + Security.AUTO_ALL));
-	}
-
-	public static Collection<GrupEntity> filtraGrupsEntityCanQuery (
-					Collection<GrupEntity> grupsEntity)
-	{
-		// L'autorització group:query [SENSE_DOMINI, GRUPS ]
-		// si té group:query/* pot veure totes
-
-		if (canQueryAllGroups())
-			return grupsEntity;
-		// Sinó filtrem per autorització de grup
-		Collection<GrupEntity> grupsCanQuery = new ArrayList<GrupEntity>();
-		for (Iterator<GrupEntity> it = grupsEntity.iterator(); it.hasNext();)
-		{
-			GrupEntity grup = it.next();
-			if (grup != null && Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" //$NON-NLS-1$
-							+ grup.getCodi()))
-			{
-				grupsCanQuery.add(grup);
-			}
-		}
-
-		return grupsCanQuery;
-	}
-
-	public static boolean canQueryGrup (String codiGrup)
-	{
-		// L'autorització group:query [GRUPS, SENSE_DOMINI]
-
-		// si té group:query/* pot veure tots
-		if (canQueryAllGroups() || Security.isUserInRole(Security.AUTO_GROUP_QUERY + "/" //$NON-NLS-1$
-						+ codiGrup))
-			return true;
-
-		return false;
-	}
-
-	public static boolean canUpdateGrup (String codiGrup)
-	{
-		// SENSE_DOMINI, GRUPS
-		if (Security.isUserInRole(Security.AUTO_GROUP_UPDATE + Security.AUTO_ALL)
-						|| Security.isUserInRole(Security.AUTO_GROUP_UPDATE + "/" //$NON-NLS-1$
-										+ codiGrup))
-			return true;
-
-		return false;
-	}
-
-	//
-	// A NIVELL D'USUARIS
-	//
-
-	@SuppressWarnings ("rawtypes")
-	public static Collection<UsuariEntity> filtraUsuariEntityCanQuery (
-					Collection<UsuariEntity> usuarisEntity)
-	{
-		// user:query [SENSE_DOMINI o GRUPS]
-		Collection<UsuariEntity> usuarisPermis = new ArrayList<UsuariEntity>();
-
-		if (Security.isUserInRole(Security.AUTO_USER_QUERY + Security.AUTO_ALL))
-			return usuarisEntity;
-		else
-		{
-			for (Iterator<UsuariEntity> it = usuarisEntity.iterator(); it.hasNext();)
-			{
-				UsuariEntity usuariActual = it.next();
-				// Sólo es necesario comprobar los grupos primarios y
-				// secundarios, no sus padres (ya están en la lista de
-				// autorizaciones)
-				boolean trobat = canQueryUser(usuariActual);
-				if (trobat)
-				{
-					usuarisPermis.add(usuariActual);
-				}
-			}
-		}
-
-		return usuarisPermis;
-	}
-
-	public static boolean canQueryUser(UsuariEntity user) {
-		boolean trobat = false;
-
-		if (Security.isUserInRole(Security.AUTO_USER_QUERY + Security.AUTO_ALL))
-			return true;
-
-		if (user.getGrupPrimari() != null
-						&& Security.isUserInRole(Security.AUTO_USER_QUERY
-										+ "/" //$NON-NLS-1$
-										+ user.getGrupPrimari()
-														.getCodi()))
-			trobat = true;
-		if (!trobat)
-		{ // mirem grups secundaris
-			Collection grupsSecundaris = user.getGrupsSecundaris(); // UsuariGrupEntity
-			for (Iterator itGS = grupsSecundaris.iterator(); !trobat
-							&& itGS.hasNext();)
-			{
-				UsuariGrupEntity usuGrupActual = (UsuariGrupEntity) itGS.next();
-				GrupEntity grupS = usuGrupActual.getGrup();
-				if (grupS != null
-								&& Security.isUserInRole(Security.AUTO_USER_QUERY
-												+ "/" + grupS.getCodi())) //$NON-NLS-1$
-					trobat = true;
-			}
-		}
-		return trobat;
-	}
-
-	public static boolean canUpdateUserPassword (String codiGrup)
-	{
-
-		if (Security.isUserInRole(Security.AUTO_USER_UPDATE_PASSWORD + Security.AUTO_ALL)
-						||
-						// Mirem si té atorgat drets sobre el grup
-						Security.isUserInRole(Security.AUTO_USER_UPDATE_PASSWORD + "/" //$NON-NLS-1$
-										+ codiGrup))
-			return true;
-
-		return false;
-	}
-
-	public static boolean canSetUserPassword (String codiGrup)
-	{
-
-		if (Security.isUserInRole(Security.AUTO_USER_SET_PASSWORD + Security.AUTO_ALL)
-						||
-						// Mirem si té atorgat drets sobre el grup
-						Security.isUserInRole(Security.AUTO_USER_SET_PASSWORD + "/" //$NON-NLS-1$
-										+ codiGrup))
-			return true;
-
-		return false;
-	}
-
-	//
 	// A NIVELL DE XARXES
 	//
 
@@ -2213,66 +1287,5 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_REMEMBER_PASSWORD_QUERY);
 	}
 
-	public static AttributeVisibilityEnum getAttributeVisibility(UsuariEntity user, TipusDadaEntity tda) {
-		if (Security.getCurrentUser() != null && Security.getCurrentUser().equals(user.getCodi()))
-			return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
-		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
-			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
-		else if (AutoritzacionsUsuari.canUpdateUserMetadata(user))
-			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
-		else if (AutoritzacionsUsuari.canQueryUser(user))
-		{
-			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
-			if (AttributeVisibilityEnum.EDITABLE.equals (v))
-				v = AttributeVisibilityEnum.READONLY;
-			return v;
-		}
-		else
-			return AttributeVisibilityEnum.HIDDEN;
-	}
-
-	public static AttributeVisibilityEnum getAttributeVisibility(AccountEntity account, AccountMetadataEntity tda) {
-		if (account.getType().equals (AccountType.USER))
-		{
-			for (UserAccountEntity uae: account.getUsers())
-			{
-				return getAttributeVisibility(uae.getUser(), tda);
-			}
-		}
-		
-		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
-			return AttributeVisibilityEnum.EDITABLE;
-		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
-			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
-		else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE+Security.AUTO_AUTHORIZATION_ALL) )
-			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
-		else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY+Security.AUTO_AUTHORIZATION_ALL) )
-		{
-			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
-			if (AttributeVisibilityEnum.EDITABLE.equals (v))
-				v = AttributeVisibilityEnum.READONLY;
-			return v;
-		}
-		else
-			return AttributeVisibilityEnum.HIDDEN;
-	}
-
-	public static AttributeVisibilityEnum getAttributeVisibility(UsuariEntity user, AccountMetadataEntity tda) {
-		if (Security.getCurrentUser() != null && Security.getCurrentUser().equals(user.getCodi()))
-			return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
-		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
-			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
-		else if (AutoritzacionsUsuari.canUpdateAccountMetadata(user))
-			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
-		else if (AutoritzacionsUsuari.canQueryAccountMetadata(user))
-		{
-			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
-			if (AttributeVisibilityEnum.EDITABLE.equals (v))
-				v = AttributeVisibilityEnum.READONLY;
-			return v;
-		}
-		else
-			return AttributeVisibilityEnum.HIDDEN;
-	}
 }
 

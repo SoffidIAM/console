@@ -180,4 +180,7 @@ public abstract class RegistreAccesEntity {
 		es.caib.seycon.ng.model.MaquinaEntity server) {
 	 return null;
 	}
+
+	@Description("Returns true if the permission on this object is granted")
+	public boolean isAllowed(String permission) { return false; }
 }

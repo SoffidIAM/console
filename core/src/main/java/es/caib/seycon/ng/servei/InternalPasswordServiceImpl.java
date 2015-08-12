@@ -334,7 +334,7 @@ public class InternalPasswordServiceImpl extends
             {
             	acc.setLastPasswordSet(new Date());
             	acc.setPasswordExpiration(c.getTime());
-            	getAccountEntityDao().update(acc);
+            	getAccountEntityDao().update(acc, null);
             }
         }
     }
@@ -1124,7 +1124,7 @@ public class InternalPasswordServiceImpl extends
         {
         	account.setLastPasswordSet(new Date());
         	account.setPasswordExpiration(c.getTime());
-        	getAccountEntityDao().update(account);
+        	getAccountEntityDao().update(account, "p");
         }
     }
 

@@ -1602,7 +1602,7 @@
 									<grid dataPath="/esquema/lista/listbox:/dada"
 										if="${canUpdateUserMetadata}" width="98%">
 										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}" width="250px"></column>
 											<column></column>
 										</columns>
 										<datarow>
@@ -1615,7 +1615,7 @@
 										dataPath="/esquema/lista/listbox:/dada"
 										if="${!canUpdateUserMetadata}" width="98%">
 										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"></column>
+											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"  width="250px"></column>
 											<column></column>
 										</columns>
 										<datarow>

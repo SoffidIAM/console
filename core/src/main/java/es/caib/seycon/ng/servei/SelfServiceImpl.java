@@ -343,9 +343,12 @@ public class SelfServiceImpl extends SelfServiceBase
 		return getDadesAddicionalsService().update(attribute);
 	}
 	@Override
-	protected TipusDada handleGetDataTypeDescription(String attName)
+	protected TipusDada handleGetDataTypeDescription(String systemName, String attName)
 			throws Exception {
-		return getDadesAddicionalsService().findTipusDadaByCodi(attName);
+		if (systemName == null)
+			return getDadesAddicionalsService().findTipusDadaByCodi(attName);
+		else
+			return getDadesAddicionalsService().findSystemDataType(systemName, attName);
 	}
 	
 	@Override

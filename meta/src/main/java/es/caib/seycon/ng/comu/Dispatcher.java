@@ -115,4 +115,12 @@ public abstract class Dispatcher {
 	@Description ("false to use a dedicated server thread. true to use a shared server thread")
 	public Boolean sharedDispatcher;
 
+	@Description("Time out for normal operations (milliseconds)")
+	@Nullable
+	public Long timeout;
+	
+	@Description("Time out for long operations (milliseconds)")
+	@Nullable
+	public Long longTimeout;	
+	
 }

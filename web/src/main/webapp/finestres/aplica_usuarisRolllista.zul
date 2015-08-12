@@ -60,7 +60,7 @@
 
 		void cleanWindow(){
 			model.getVariables().declareVariable("queryEnabled", false);
-			listbox.dataPath = "/model:/rolUsuari[false]";
+			listbox.dataPath = "/model:/void";
 			esquemaLlista.visible=false;
 			tabmenow.setSelectedIndex(0);
 			view_altres = false;							

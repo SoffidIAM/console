@@ -26,7 +26,8 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
-import es.caib.seycon.ng.config.Config;
+import com.soffid.iam.config.Config;
+
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.SeyconException;

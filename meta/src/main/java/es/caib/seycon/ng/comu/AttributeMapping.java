@@ -7,8 +7,8 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
-@ValueObject 
-public abstract class AttributeMapping {
+@ValueObject (translatedName="AttributeMapping", translatedPackage="com.soffid.iam.api")
+public class AttributeMapping {
 
 	@Nullable
 	public java.lang.Long id;

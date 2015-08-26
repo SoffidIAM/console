@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="BpmProcess",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ProcesWF {
+public class ProcesWF {
 
 	@Attribute(translated = "processName" )
 	public java.lang.String nomProcess;

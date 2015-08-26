@@ -1,14 +1,16 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package es.caib.seycon.ng.servei.impl;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
-import es.caib.seycon.ng.comu.AgentDescriptor;
+import com.soffid.iam.api.AgentDescriptor;
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.ObjectMapping;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author bubu

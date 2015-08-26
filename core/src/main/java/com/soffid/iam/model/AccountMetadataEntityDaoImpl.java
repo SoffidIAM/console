@@ -5,13 +5,12 @@
 
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.DataType;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
-
-import es.caib.seycon.ng.comu.TipusDada;
 
 /**
  * DAO AccountMetadataEntity implementation
@@ -20,12 +19,12 @@ public class AccountMetadataEntityDaoImpl extends AccountMetadataEntityDaoBase
 {
 
 	@Override
-	public void toTipusDada(AccountMetadataEntity source, TipusDada target) {
-		super.toTipusDada(source, target);
+    public void toDataType(AccountMetadataEntity source, DataType target) {
+		super.toDataType(source, target);
 		
-		target.setCodi(source.getName());
+		target.setCode(source.getName());
 		target.setSystemName( source.getSystem().getName());
-		target.setOrdre(source.getOrder());
+		target.setOrder(source.getOrder());
 
 
 		if (source.getLabel() == null)
@@ -51,13 +50,12 @@ public class AccountMetadataEntityDaoImpl extends AccountMetadataEntityDaoBase
 	}
 
 	@Override
-	public void tipusDadaToEntity(TipusDada source,
-			AccountMetadataEntity target, boolean copyIfNull) {
-		super.tipusDadaToEntity(source, target, copyIfNull);
+    public void dataTypeToEntity(DataType source, AccountMetadataEntity target, boolean copyIfNull) {
+		super.dataTypeToEntity(source, target, copyIfNull);
 
-		target.setName(source.getCodi());
+		target.setName(source.getCode());
 		target.setSystem( getSystemEntityDao().findByName(source.getSystemName()) );
-		target.setOrder(source.getOrdre());
+		target.setOrder(source.getOrder());
 
 		if (source.getValues() == null || source.getValues().isEmpty())
 			target.setValues(null);

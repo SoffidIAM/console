@@ -26,9 +26,9 @@ public class HostAdminEntityDaoImpl
 	 * @see es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntityDao#toAutoritzacioAccesHostComAdministrador(es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity,
 	 *      es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador)
 	 */
-	public void toAutoritzacioAccesHostComAdministrador(com.soffid.iam.model.HostAdminEntity source, es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador target) {
+	public void toAdministratorAuthorizationToAccessHost(com.soffid.iam.model.HostAdminEntity source, com.soffid.iam.api.AdministratorAuthorizationToAccessHost target) {
 		// @todo verify behavior of toAutoritzacioAccesHostComAdministrador
-		super.toAutoritzacioAccesHostComAdministrador(source, target);
+		super.toAdministratorAuthorizationToAccessHost(source, target);
 		// WARNING! No conversion for target.dataCaducitatAutoritzacioAcces
 		// (can't convert
 		// source.getDataCaducitatAutoritzacioAcces():java.util.Date to
@@ -40,9 +40,9 @@ public class HostAdminEntityDaoImpl
 	/**
 	 * @see es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntityDao#toAutoritzacioAccesHostComAdministrador(es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity)
 	 */
-	public es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador toAutoritzacioAccesHostComAdministrador(final com.soffid.iam.model.HostAdminEntity entity) {
+	public com.soffid.iam.api.AdministratorAuthorizationToAccessHost toAdministratorAuthorizationToAccessHost(final com.soffid.iam.model.HostAdminEntity entity) {
 		// @todo verify behavior of toAutoritzacioAccesHostComAdministrador
-		return super.toAutoritzacioAccesHostComAdministrador(entity);
+		return super.toAdministratorAuthorizationToAccessHost(entity);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class HostAdminEntityDaoImpl
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.HostAdminEntity loadAutoritzacioAccesHostComAdministradorEntityFromAutoritzacioAccesHostComAdministrador(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador autoritzacioAccesHostComAdministrador) {
+	private com.soffid.iam.model.HostAdminEntity loadAutoritzacioAccesHostComAdministradorEntityFromAutoritzacioAccesHostComAdministrador(com.soffid.iam.api.AdministratorAuthorizationToAccessHost autoritzacioAccesHostComAdministrador) {
 
 		com.soffid.iam.model.HostAdminEntity autoritzacioAccesHostComAdministradorEntity = null;
 		
@@ -67,10 +67,9 @@ public class HostAdminEntityDaoImpl
 	/**
 	 * @see es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntityDao#autoritzacioAccesHostComAdministradorToEntity(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador)
 	 */
-	public com.soffid.iam.model.HostAdminEntity autoritzacioAccesHostComAdministradorToEntity(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador autoritzacioAccesHostComAdministrador) {
+	public com.soffid.iam.model.HostAdminEntity administratorAuthorizationToAccessHostToEntity(com.soffid.iam.api.AdministratorAuthorizationToAccessHost autoritzacioAccesHostComAdministrador) {
 		com.soffid.iam.model.HostAdminEntity entity = this.loadAutoritzacioAccesHostComAdministradorEntityFromAutoritzacioAccesHostComAdministrador(autoritzacioAccesHostComAdministrador);
-		this.autoritzacioAccesHostComAdministradorToEntity(
-				autoritzacioAccesHostComAdministrador, entity, true);
+		this.administratorAuthorizationToAccessHostToEntity(autoritzacioAccesHostComAdministrador, entity, true);
 		return entity;
 	}
 
@@ -78,48 +77,47 @@ public class HostAdminEntityDaoImpl
 	 * @see es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntityDao#autoritzacioAccesHostComAdministradorToEntity(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador,
 	 *      es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity)
 	 */
-	public void autoritzacioAccesHostComAdministradorToEntity(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador source, com.soffid.iam.model.HostAdminEntity target, boolean copyIfNull) {
-		super.autoritzacioAccesHostComAdministradorToEntity(source, target,
-				copyIfNull);
+	public void administratorAuthorizationToAccessHostToEntity(com.soffid.iam.api.AdministratorAuthorizationToAccessHost source, com.soffid.iam.model.HostAdminEntity target, boolean copyIfNull) {
+		super.administratorAuthorizationToAccessHostToEntity(source, target, copyIfNull);
 		autoritzacioAccesHostComAdministradorToEntityCustom(source, target);
 	}
 
-	public void toAutoritzacioAccesHostComAdministradorCustom(com.soffid.iam.model.HostAdminEntity source, es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador target) {
+	public void toAutoritzacioAccesHostComAdministradorCustom(com.soffid.iam.model.HostAdminEntity source, com.soffid.iam.api.AdministratorAuthorizationToAccessHost target) {
 		
 		UserEntity usu = source.getUser();
 		HostEntity maq = source.getHost();
-		target.setCodiUsuari(usu.getUserName());
+		target.setUserCode(usu.getUserName());
 		if (usu.getShortName() != null && usu.getMailDomain() != null) 
-			target.setCorreuUsuari(usu.getShortName() + "@" + usu.getMailDomain().getName()); //$NON-NLS-1$
+			target.setUserEmail(usu.getShortName() + "@" + usu.getMailDomain().getName()); //$NON-NLS-1$
 		
 		Calendar data = GregorianCalendar.getInstance();
 		data.setTime(source.getExpirationDate());
-		target.setDataCaducitatAutoritzacioAcces(data);
-		target.setDescripcioHost(maq.getDescription());
-		target.setIpHost(maq.getHostIP());
-		target.setNomHost(maq.getName());
-		target.setNomUsuari(usu.getFirstName() + " " + usu.getLastName() + " " + usu.getMiddleName()); //$NON-NLS-1$ //$NON-NLS-2$
+		target.setAuthorizationAccessExpirationDate(data);
+		target.setHostDescription(maq.getDescription());
+		target.setHostIp(maq.getHostIP());
+		target.setHostName(maq.getName());
+		target.setUserName(usu.getFirstName() + " " + usu.getLastName() + " " + usu.getMiddleName()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (maq.getNetwork() != null)
-			target.setXarxaHost(maq.getNetwork().getName());
+			target.setHostNetwork(maq.getNetwork().getName());
 		Calendar dataPeticio = GregorianCalendar.getInstance();
 		if (source.getRequestDate() != null) dataPeticio.setTime(source.getRequestDate());
-		target.setDataPeticio(dataPeticio);
+		target.setRequestDate(dataPeticio);
 
 	}
 
-	public void autoritzacioAccesHostComAdministradorToEntityCustom(es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador source, com.soffid.iam.model.HostAdminEntity target) {
+	public void autoritzacioAccesHostComAdministradorToEntityCustom(com.soffid.iam.api.AdministratorAuthorizationToAccessHost source, com.soffid.iam.model.HostAdminEntity target) {
 		
 		// Hem de cercar: usuari i màquina
-		UserEntity usuari = getUserEntityDao().findByUserName(source.getCodiUsuari());
-		HostEntity host = getHostEntityDao().findByName(source.getNomHost());
+		UserEntity usuari = getUserEntityDao().findByUserName(source.getUserCode());
+		HostEntity host = getHostEntityDao().findByName(source.getHostName());
 		
-		if (source.getDataPeticio() !=null) {
-			target.setRequestDate(source.getDataPeticio().getTime());
+		if (source.getRequestDate() != null) {
+			target.setRequestDate(source.getRequestDate().getTime());
 		}
-		target.setExpirationDate(source.getDataCaducitatAutoritzacioAcces().getTime());
+		target.setExpirationDate(source.getAuthorizationAccessExpirationDate().getTime());
 		target.setUser(usuari);
 		target.setHost(host);
-		target.setProcessWFID(source.getIdProcesWorkflow());
+		target.setProcessWFID(source.getBpmProcessId());
 		
 	}
 

@@ -7,11 +7,16 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListContainerEntity;
@@ -23,21 +28,16 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.CorreuExtern;
-import es.caib.seycon.ng.comu.LlistaCorreu;
-import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
-import es.caib.seycon.ng.comu.RelacioLlistaCorreu;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.servei.LlistesDeCorreuService;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -57,17 +57,16 @@ public class EmailListEntityDaoImpl extends
 	private void auditarLlistaDeCorreu(String accio, String nomLlistaDeCorreu,
 			String dominiLlistaCorreu) {
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setLlistaCorreu(nomLlistaDeCorreu);
-		auditoria.setDominiCorreu(dominiLlistaCorreu);
-		auditoria.setAutor(codiUsuari);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setMailList(nomLlistaDeCorreu);
+		auditoria.setMailDomain(dominiLlistaCorreu);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				Messages.getString("EmailListEntityDaoImpl.dateFormat")); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_LLICOR"); //$NON-NLS-1$
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_LLICOR"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 
@@ -169,28 +168,24 @@ public class EmailListEntityDaoImpl extends
 		}
 	}
 
-	public void toLlistaCorreu(com.soffid.iam.model.EmailListEntity sourceEntity, es.caib.seycon.ng.comu.LlistaCorreu targetVO) {
+	public void toMailList(com.soffid.iam.model.EmailListEntity sourceEntity, com.soffid.iam.api.MailList targetVO) {
 		// @todo verify behavior of toLlistaCorreu
-		super.toLlistaCorreu(sourceEntity, targetVO);
+		super.toMailList(sourceEntity, targetVO);
 		toLlistaCorreuCustom(sourceEntity, targetVO);
 	}
 
-	void toLlistaCorreuCustom(com.soffid.iam.model.EmailListEntity sourceEntity, es.caib.seycon.ng.comu.LlistaCorreu targetVO) {
+	void toLlistaCorreuCustom(com.soffid.iam.model.EmailListEntity sourceEntity, com.soffid.iam.api.MailList targetVO) {
 
 		EmailDomainEntity domini = sourceEntity.getDomain();
 		if (domini != null) {
-			targetVO.setCodiDomini(domini.getName());
+			targetVO.setDomainCode(domini.getName());
 		}
 
 		String nomLlista = sourceEntity.getName();
 		String codiDomini = sourceEntity.getDomain() == null ? null : sourceEntity.getDomain().getName();
-		targetVO
-				.setLlistaLlistes(findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
-						nomLlista, codiDomini));
+		targetVO.setLists(findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(nomLlista, codiDomini));
 		
-		targetVO
-				.setLlistaExterns(findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(
-						nomLlista, codiDomini));
+		targetVO.setExternalList(findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(nomLlista, codiDomini));
 
 		Set<String> explodedUsers = new HashSet<String>();
 		findUserMembers (sourceEntity, targetVO, explodedUsers); 
@@ -208,27 +203,27 @@ public class EmailListEntityDaoImpl extends
             llistesPertany += pertanyA.getName() + "@" + codiDominiCurrent + ", ";
         }
 		if (llistesPertany == "") {//Llevem coma final //$NON-NLS-1$
-			targetVO.setLlistaLlistesOnPertany(llistesPertany);
+			targetVO.setListsBelong(llistesPertany);
 		} else {
-			targetVO.setLlistaLlistesOnPertany(llistesPertany.substring(0, llistesPertany.length() - 2));
+			targetVO.setListsBelong(llistesPertany.substring(0, llistesPertany.length() - 2));
 		}
 
 	}
 
-	private void findRoleMembers(EmailListEntity sourceEntity, LlistaCorreu targetVO, Set<String> explodedUsers) {
+	private void findRoleMembers(EmailListEntity sourceEntity, MailList targetVO, Set<String> explodedUsers) {
 		LinkedList<String> roles = new LinkedList<String>();
 		for (MailListRoleMemberEntity rm : sourceEntity.getRoles()) {
             MailListRoleMember r = getMailListRoleMemberEntityDao().toMailListRoleMember(rm);
             String c = r.getRoleName() + "@" + r.getDispatcherName();
             if (r.getScope() != null && r.getScope().trim().length() > 0) c = c + "/" + r.getScope();
             roles.add(c);
-            Collection<RolGrant> grants;
+            Collection<RoleGrant> grants;
             try {
-                grants = getAplicacioService().findEffectiveRolGrantsByRolId(rm.getRole().getId());
+                grants = getApplicationService().findEffectiveRoleGrantsByRoleId(rm.getRole().getId());
             } catch (InternalErrorException e) {
                 throw new RuntimeException(e);
             }
-            for (RolGrant grant : grants) {
+            for (RoleGrant grant : grants) {
                 if (grant.getUser() != null) {
                     if (r.getScope() == null || r.getScope().trim().length() == 0 || r.getScope().equals(grant.getDomainValue())) {
                         UserEntity ue = getUserEntityDao().findByUserName(grant.getUser());
@@ -243,7 +238,7 @@ public class EmailListEntityDaoImpl extends
 		
 	}
 
-	private void findGroupMembers(EmailListEntity sourceEntity, LlistaCorreu targetVO, Set<String> explodedUsers) {
+	private void findGroupMembers(EmailListEntity sourceEntity, MailList targetVO, Set<String> explodedUsers) {
 		LinkedList<String> groups = new LinkedList<String>();
 		for (MailListGroupMemberEntity ue : sourceEntity.getGroups()) {
             String c = ue.getGroup().getName();
@@ -261,13 +256,13 @@ public class EmailListEntityDaoImpl extends
 		
 	}
 
-	private void findUserMembers(EmailListEntity sourceEntity, LlistaCorreu targetVO, Set<String> explodedUsers) {
+	private void findUserMembers(EmailListEntity sourceEntity, MailList targetVO, Set<String> explodedUsers) {
 		LinkedList<String> users = new LinkedList<String>();
 		for (UserEmailEntity ue : sourceEntity.getUserMailLists()) {
             users.add(ue.getUser().getUserName());
             explodedUsers.add(ue.getUser().getUserName());
         }
-		targetVO.setLlistaUsuaris(flatten (users));
+		targetVO.setUsersList(flatten(users));
 	}
 
 	private String flatten(Collection<String> users) {
@@ -289,8 +284,8 @@ public class EmailListEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.LlistaCorreuEntityDao#toLlistaCorreu(es.caib.seycon.ng.model.LlistaCorreuEntity)
 	 */
-	public es.caib.seycon.ng.comu.LlistaCorreu toLlistaCorreu(final com.soffid.iam.model.EmailListEntity entity) {
-		LlistaCorreu llistaCorreu = super.toLlistaCorreu(entity);
+	public com.soffid.iam.api.MailList toMailList(final com.soffid.iam.model.EmailListEntity entity) {
+		MailList llistaCorreu = super.toMailList(entity);
 		return llistaCorreu;
 	}
 
@@ -299,7 +294,7 @@ public class EmailListEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.EmailListEntity loadLlistaCorreuEntityFromLlistaCorreu(es.caib.seycon.ng.comu.LlistaCorreu llistaCorreu) {
+	private com.soffid.iam.model.EmailListEntity loadLlistaCorreuEntityFromLlistaCorreu(com.soffid.iam.api.MailList llistaCorreu) {
 		com.soffid.iam.model.EmailListEntity llistaCorreuEntity = null;
 		if (llistaCorreu.getId() != null) {
 			llistaCorreuEntity = load(llistaCorreu.getId());
@@ -313,20 +308,19 @@ public class EmailListEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.LlistaCorreuEntityDao#llistaCorreuToEntity(es.caib.seycon.ng.comu.LlistaCorreu)
 	 */
-	public com.soffid.iam.model.EmailListEntity llistaCorreuToEntity(es.caib.seycon.ng.comu.LlistaCorreu llistaCorreu) {
+	public com.soffid.iam.model.EmailListEntity mailListToEntity(com.soffid.iam.api.MailList llistaCorreu) {
 		com.soffid.iam.model.EmailListEntity entity = this.loadLlistaCorreuEntityFromLlistaCorreu(llistaCorreu);
-		this.llistaCorreuToEntity(llistaCorreu, entity, true);
+		this.mailListToEntity(llistaCorreu, entity, true);
 		return entity;
 	}
 
-	private void llistaCorreuToEntityCustom(es.caib.seycon.ng.comu.LlistaCorreu sourceVO, com.soffid.iam.model.EmailListEntity targetEntity) {
-		String codiDomini = sourceVO.getCodiDomini();
+	private void llistaCorreuToEntityCustom(com.soffid.iam.api.MailList sourceVO, com.soffid.iam.model.EmailListEntity targetEntity) {
+		String codiDomini = sourceVO.getDomainCode();
 		if (codiDomini != null && codiDomini.trim().compareTo("") != 0) { //$NON-NLS-1$
 			EmailDomainEntity dominiCorreu = getEmailDomainEntityDao().findByCode(codiDomini);
 			if (dominiCorreu != null) {
-				if (sourceVO.getCodiDomini() != null && (targetEntity.getDomain() == null || sourceVO.getCodiDomini().compareTo(targetEntity.getDomain().getName()) != 0) && dominiCorreu.getObsolete() != null && dominiCorreu.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
-					throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.obsoleteError"),  //$NON-NLS-1$
-							sourceVO.getCodiDomini()));
+				if (sourceVO.getDomainCode() != null && (targetEntity.getDomain() == null || sourceVO.getDomainCode().compareTo(targetEntity.getDomain().getName()) != 0) && dominiCorreu.getObsolete() != null && dominiCorreu.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
+					throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.obsoleteError"), sourceVO.getDomainCode()));
 				}else{
 					targetEntity.setDomain(dominiCorreu);
 				}
@@ -412,9 +406,9 @@ public class EmailListEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.LlistaCorreuEntityDao#llistaCorreuToEntity(es.caib.seycon.ng.comu.LlistaCorreu,
 	 *      es.caib.seycon.ng.model.LlistaCorreuEntity)
 	 */
-	public void llistaCorreuToEntity(es.caib.seycon.ng.comu.LlistaCorreu sourceVO, com.soffid.iam.model.EmailListEntity targetEntity, boolean copyIfNull) {
+	public void mailListToEntity(com.soffid.iam.api.MailList sourceVO, com.soffid.iam.model.EmailListEntity targetEntity, boolean copyIfNull) {
 		// @todo verify behavior of llistaCorreuToEntity
-		super.llistaCorreuToEntity(sourceVO, targetEntity, copyIfNull);
+		super.mailListToEntity(sourceVO, targetEntity, copyIfNull);
 		llistaCorreuToEntityCustom(sourceVO, targetEntity);
 	}
 

@@ -23,14 +23,14 @@ public class ServerPluginEntityDaoImpl extends com.soffid.iam.model.ServerPlugin
 	 * @see es.caib.seycon.ng.model.ServerPluginEntityDao#toServerPlugin(es.caib.seycon.ng.model.ServerPluginEntity,
 	 *      es.caib.seycon.ng.comu.ServerPlugin)
 	 */
-	public void toServerPlugin(com.soffid.iam.model.ServerPluginEntity source, es.caib.seycon.ng.comu.ServerPlugin target) {
+	public void toServerPlugin(com.soffid.iam.model.ServerPluginEntity source, com.soffid.iam.api.ServerPlugin target) {
 		super.toServerPlugin(source, target);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.ServerPluginEntityDao#toServerPlugin(es.caib.seycon.ng.model.ServerPluginEntity)
 	 */
-	public es.caib.seycon.ng.comu.ServerPlugin toServerPlugin(final com.soffid.iam.model.ServerPluginEntity entity) {
+	public com.soffid.iam.api.ServerPlugin toServerPlugin(final com.soffid.iam.model.ServerPluginEntity entity) {
 		return super.toServerPlugin(entity);
 	}
 
@@ -39,7 +39,7 @@ public class ServerPluginEntityDaoImpl extends com.soffid.iam.model.ServerPlugin
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.ServerPluginEntity loadServerPluginEntityFromServerPlugin(es.caib.seycon.ng.comu.ServerPlugin serverPlugin) {
+	private com.soffid.iam.model.ServerPluginEntity loadServerPluginEntityFromServerPlugin(com.soffid.iam.api.ServerPlugin serverPlugin) {
 		com.soffid.iam.model.ServerPluginEntity serverPluginEntity = null;
 		if (serverPlugin.getId() != null) {
 			serverPluginEntity = this.load(serverPlugin.getId());
@@ -53,7 +53,7 @@ public class ServerPluginEntityDaoImpl extends com.soffid.iam.model.ServerPlugin
 	/**
 	 * @see es.caib.seycon.ng.model.ServerPluginEntityDao#serverPluginToEntity(es.caib.seycon.ng.comu.ServerPlugin)
 	 */
-	public com.soffid.iam.model.ServerPluginEntity serverPluginToEntity(es.caib.seycon.ng.comu.ServerPlugin serverPlugin) {
+	public com.soffid.iam.model.ServerPluginEntity serverPluginToEntity(com.soffid.iam.api.ServerPlugin serverPlugin) {
 		com.soffid.iam.model.ServerPluginEntity entity = this.loadServerPluginEntityFromServerPlugin(serverPlugin);
 		this.serverPluginToEntity(serverPlugin, entity, true);
 		return entity;
@@ -63,7 +63,7 @@ public class ServerPluginEntityDaoImpl extends com.soffid.iam.model.ServerPlugin
 	 * @see es.caib.seycon.ng.model.ServerPluginEntityDao#serverPluginToEntity(es.caib.seycon.ng.comu.ServerPlugin,
 	 *      es.caib.seycon.ng.model.ServerPluginEntity)
 	 */
-	public void serverPluginToEntity(es.caib.seycon.ng.comu.ServerPlugin source, com.soffid.iam.model.ServerPluginEntity target, boolean copyIfNull) {
+	public void serverPluginToEntity(com.soffid.iam.api.ServerPlugin source, com.soffid.iam.model.ServerPluginEntity target, boolean copyIfNull) {
 		super.serverPluginToEntity(source, target, copyIfNull);
 	}
 

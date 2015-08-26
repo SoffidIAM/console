@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( serverOnly=true,
 	 serverPath="/seycon/CertificateEnrollService",
 	 translatedName="CertificateEnrollService",
-	 translatedPackage="es.caib.seycon.ng.sync.servei",
+	 translatedPackage="com.soffid.iam.sync.service",
 	 serverRole="")
 @Depends ({es.caib.seycon.ng.sync.servei.ServerService.class,
 	es.caib.seycon.ng.sync.servei.LogonService.class,

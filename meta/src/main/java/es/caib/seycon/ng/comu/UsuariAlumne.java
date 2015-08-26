@@ -7,9 +7,9 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
-@ValueObject ( translatedName="studentUser",
+@ValueObject ( translatedName="Student",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariAlumne {
+public class UsuariAlumne {
 
 	@Nullable
 	@Attribute(translated = "userCode" )

@@ -18,7 +18,7 @@ public class Messages
 	{
 		try
 		{
-			return es.caib.seycon.ng.comu.lang.MessageFactory.getString(BUNDLE_NAME, key);
+			return com.soffid.iam.lang.MessageFactory.getString(BUNDLE_NAME, key);
 		}
 		catch (MissingResourceException e)
 		{

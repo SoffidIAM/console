@@ -8,7 +8,7 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 @Criteria 
-public abstract class ServeiSearchCriteria {
+public class ServeiSearchCriteria {
 
 	@CriteriaColumn(parameter="name", comparator="LIKE_COMPARATOR")
 	public java.lang.String codi;

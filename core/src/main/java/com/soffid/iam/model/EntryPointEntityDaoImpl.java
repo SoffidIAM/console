@@ -7,19 +7,21 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.AccessTreeAuthorization;
+import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.model.EntryPointEntity;
 import com.soffid.iam.model.EntryPointExecutableEntity;
 import com.soffid.iam.model.EntryPointGroupEntity;
 import com.soffid.iam.model.EntryPointIconEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.EntryPointUserEntity;
-import es.caib.seycon.ng.comu.ArbrePuntEntrada;
-import es.caib.seycon.ng.comu.AutoritzacioPuntEntrada;
-import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.AmbitsExecucioPuntEntrada;
 import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
 import java.util.ArrayList;
@@ -38,18 +40,18 @@ public class EntryPointEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.PuntEntradaEntityDao#toPuntEntrada(es.caib.seycon.ng.model.PuntEntradaEntity,
 	 *      es.caib.seycon.ng.comu.PuntEntrada)
 	 */
-	public void toPuntEntrada(com.soffid.iam.model.EntryPointEntity source, es.caib.seycon.ng.comu.PuntEntrada target) {
+	public void toAccessTree(com.soffid.iam.model.EntryPointEntity source, com.soffid.iam.api.AccessTree target) {
 		// @todo verify behavior of toPuntEntrada
-		super.toPuntEntrada(source, target);
+		super.toAccessTree(source, target);
 		toPuntEntradaCustom(source, target);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.PuntEntradaEntityDao#toPuntEntrada(es.caib.seycon.ng.model.PuntEntradaEntity)
 	 */
-	public es.caib.seycon.ng.comu.PuntEntrada toPuntEntrada(final com.soffid.iam.model.EntryPointEntity entity) {
+	public com.soffid.iam.api.AccessTree toAccessTree(final com.soffid.iam.model.EntryPointEntity entity) {
 		// @todo verify behavior of toPuntEntrada
-		return super.toPuntEntrada(entity);
+		return super.toAccessTree(entity);
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class EntryPointEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.EntryPointEntity loadPuntEntradaEntityFromPuntEntrada(es.caib.seycon.ng.comu.PuntEntrada puntEntrada) {
+	private com.soffid.iam.model.EntryPointEntity loadPuntEntradaEntityFromPuntEntrada(com.soffid.iam.api.AccessTree puntEntrada) {
 		EntryPointEntity puntEntradaEntity = null;
 
 		if (puntEntrada.getId() != null)
@@ -72,10 +74,10 @@ public class EntryPointEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.PuntEntradaEntityDao#puntEntradaToEntity(es.caib.seycon.ng.comu.PuntEntrada)
 	 */
-	public com.soffid.iam.model.EntryPointEntity puntEntradaToEntity(es.caib.seycon.ng.comu.PuntEntrada puntEntrada) {
+	public com.soffid.iam.model.EntryPointEntity accessTreeToEntity(com.soffid.iam.api.AccessTree puntEntrada) {
 		// @todo verify behavior of puntEntradaToEntity
 		com.soffid.iam.model.EntryPointEntity entity = this.loadPuntEntradaEntityFromPuntEntrada(puntEntrada);
-		this.puntEntradaToEntity(puntEntrada, entity, true);
+		this.accessTreeToEntity(puntEntrada, entity, true);
 		return entity;
 	}
 
@@ -83,17 +85,17 @@ public class EntryPointEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.PuntEntradaEntityDao#puntEntradaToEntity(es.caib.seycon.ng.comu.PuntEntrada,
 	 *      es.caib.seycon.ng.model.PuntEntradaEntity)
 	 */
-	public void puntEntradaToEntity(es.caib.seycon.ng.comu.PuntEntrada source, com.soffid.iam.model.EntryPointEntity target, boolean copyIfNull) {
+	public void accessTreeToEntity(com.soffid.iam.api.AccessTree source, com.soffid.iam.model.EntryPointEntity target, boolean copyIfNull) {
 		// Cargamos la entidad si ya existe o se crea una nueva
-		super.puntEntradaToEntity(source, target, copyIfNull);
+		super.accessTreeToEntity(source, target, copyIfNull);
 
 		puntEntradaToEntityCustom(source, target);
 	}
 
-	private void toPuntEntradaCustom(com.soffid.iam.model.EntryPointEntity source, es.caib.seycon.ng.comu.PuntEntrada target) {
+	private void toPuntEntradaCustom(com.soffid.iam.model.EntryPointEntity source, com.soffid.iam.api.AccessTree target) {
 		
 		// Núm de columnes
-		if (source.getNumberOfColumns() != null) target.setNumColumnes(source.getNumberOfColumns().toString());
+		if (source.getNumberOfColumns() != null) target.setColumnsNumber(source.getNumberOfColumns().toString());
 		
 		// Autorizaciones
 		Collection autoritzaGrup = source.getAuthorizedGroups();
@@ -106,7 +108,7 @@ public class EntryPointEntityDaoImpl extends
 			for (Iterator it = autoritzaGrup.iterator(); it.hasNext(); ) {
                 EntryPointGroupEntity auto = (EntryPointGroupEntity) it.next();
                 if (source.getId() != null) auto.setEntryPoint(source);
-                autoritzacions.add(getEntryPointGroupEntityDao().toAutoritzacioPuntEntrada(auto));
+                autoritzacions.add(getEntryPointGroupEntityDao().toAccessTreeAuthorization(auto));
             }
 		}
 		if (autoritzaRol!=null && autoritzaRol.size()!=0) {
@@ -114,7 +116,7 @@ public class EntryPointEntityDaoImpl extends
 			for (Iterator it = autoritzaRol.iterator(); it.hasNext(); ) {
                 EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
                 if (source.getId() != null) auto.setEntryPoint(source);
-                autoritzacions.add(getEntryPointRoleEntityDao().toAutoritzacioPuntEntrada(auto));
+                autoritzacions.add(getEntryPointRoleEntityDao().toAccessTreeAuthorization(auto));
             }
 		}
 		if (autoritzaUsuari!=null && autoritzaUsuari.size()!=0) {
@@ -122,36 +124,36 @@ public class EntryPointEntityDaoImpl extends
 			for (Iterator it = autoritzaUsuari.iterator(); it.hasNext(); ) {
                 EntryPointUserEntity auto = (EntryPointUserEntity) it.next();
                 if (source.getId() != null) auto.setEntryPoint(source);
-                AutoritzacioPuntEntrada autoPUE = getEntryPointUserEntityDao().toAutoritzacioPuntEntrada(auto);
+                AccessTreeAuthorization autoPUE = getEntryPointUserEntityDao().toAccessTreeAuthorization(auto);
                 autoritzacions.add(autoPUE);
             }
 		}
-		target.setAutoritzacions(autoritzacions);
+		target.setAuthorizations(autoritzacions);
 		
 		// Métodos de ejecución (se guardan por separado)
-		List<ExecucioPuntEntrada> metodes = getEntryPointExecutableEntityDao().toExecucioPuntEntradaList(source.getExecutionMethod());
-		target.setExecucions(metodes);
+		List<AccessTreeExecution> metodes = getEntryPointExecutableEntityDao().toAccessTreeExecutionList(source.getExecutionMethod());
+		target.setExecutions(metodes);
 	
 		// Iconas
 		if (source.getIcon1() != null) {
 			EntryPointIconEntity ico = getEntryPointIconEntityDao().findById(source.getIcon1());
 			if (ico!=null) {
-				target.setImgIcona1(ico.getIcon());
-				target.setIdIcona1(ico.getId());
+				target.setIcon1Image(ico.getIcon());
+				target.setIcon1Id(ico.getId());
 			}
 		}
 		if (source.getIcon2() != null) {
 			EntryPointIconEntity ico = getEntryPointIconEntityDao().findById(source.getIcon2());
 			if (ico!=null) {
-				target.setImgIcona2(ico.getIcon());
-				target.setIdIcona2(ico.getId());
+				target.setIcon2Image(ico.getIcon());
+				target.setIcon2Id(ico.getId());
 			}
 		}
 		
-		target.setXmlPUE(source.getXmlEntryPoint());
+		target.setXmlAccessTree(source.getXmlEntryPoint());
 	}
 
-	private void puntEntradaToEntityCustom(es.caib.seycon.ng.comu.PuntEntrada source, com.soffid.iam.model.EntryPointEntity target) {
+	private void puntEntradaToEntityCustom(com.soffid.iam.api.AccessTree source, com.soffid.iam.model.EntryPointEntity target) {
 		
 		// Los valores S/N
 		if (source.getVisible() != null) {
@@ -160,18 +162,18 @@ public class EntryPointEntityDaoImpl extends
 			target.setVisible("N"); //$NON-NLS-1$
 		if ("S".equals(source.getMenu()) ) { //$NON-NLS-1$
 			target.setMenu("S"); //$NON-NLS-1$
-			target.setMenuType(source.getTipusMenu());
+			target.setMenuType(source.getTypeMenu());
 		} else {
 			target.setMenu("N"); //$NON-NLS-1$
 			target.setMenuType(null);
 		}
-		if (source.getEsPublic() != null) {
-			target.setPublicAccess(source.getEsPublic());
+		if (source.getIsPublic() != null) {
+			target.setPublicAccess(source.getIsPublic());
 		} else
 			target.setPublicAccess("N"); //$NON-NLS-1$
 
 		//Núm. de columnes
-		String numCol = source.getNumColumnes();
+		String numCol = source.getColumnsNumber();
 		if (numCol!=null && !"".equals(numCol.trim())) { //$NON-NLS-1$
 			try {
 				Long cols = Long.getLong(numCol);
@@ -183,29 +185,29 @@ public class EntryPointEntityDaoImpl extends
 			target.setNumberOfColumns(null);
 		
 		// Métodes Execució
-		if (source.getExecucions()!=null) {
-			List<EntryPointExecutableEntity> metodesPUE = getEntryPointExecutableEntityDao().execucioPuntEntradaToEntityList(source.getExecucions());
+		if (source.getExecutions() != null) {
+			List<EntryPointExecutableEntity> metodesPUE = getEntryPointExecutableEntityDao().accessTreeExecutionToEntityList(source.getExecutions());
 			target.getExecutionMethod().clear();
 			target.getExecutionMethod().addAll(metodesPUE);
 		} else target.setExecutionMethod(new java.util.HashSet());
 
 		// Autoritzacions (totes juntes)
-		Collection autoritza = source.getAutoritzacions();
+		Collection autoritza = source.getAuthorizations();
 		Collection autoritzaUsu = new HashSet();
 		Collection autoritzaRol = new HashSet();
 		Collection autoritzaGrup = new HashSet();
 	
 		if (autoritza != null) {
 			for (Iterator it = autoritza.iterator(); it.hasNext(); ) {
-                AutoritzacioPuntEntrada auto = (AutoritzacioPuntEntrada) it.next();
-                String tipus = auto.getTipusEntitatAutoritzada();
+                AccessTreeAuthorization auto = (AccessTreeAuthorization) it.next();
+                String tipus = auto.getAuthorizationEntityType();
                 if (TipusAutoritzacioPuntEntrada.USUARI.equals(tipus)) {
-                    EntryPointUserEntity autoEntity = getEntryPointUserEntityDao().autoritzacioPuntEntradaToEntity(auto);
+                    EntryPointUserEntity autoEntity = getEntryPointUserEntityDao().accessTreeAuthorizationToEntity(auto);
                     autoritzaUsu.add(autoEntity);
                 } else if (TipusAutoritzacioPuntEntrada.ROL.equals(tipus)) {
-                    autoritzaRol.add(getEntryPointRoleEntityDao().autoritzacioPuntEntradaToEntity(auto));
+                    autoritzaRol.add(getEntryPointRoleEntityDao().accessTreeAuthorizationToEntity(auto));
                 } else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipus)) {
-                    autoritzaGrup.add(getEntryPointGroupEntityDao().autoritzacioPuntEntradaToEntity(auto));
+                    autoritzaGrup.add(getEntryPointGroupEntityDao().accessTreeAuthorizationToEntity(auto));
                 }
             }
 		}

@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AccessControl",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ControlAcces {
+public class ControlAcces {
 
 	@Nullable
 	public java.lang.Long id;

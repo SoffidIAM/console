@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AgentDescriptor",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class AgentDescriptor {
+public class AgentDescriptor {
 
 	public java.lang.Long id;
 

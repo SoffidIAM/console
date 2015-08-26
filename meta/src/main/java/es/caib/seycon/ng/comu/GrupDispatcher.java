@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="SystemGroup",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class GrupDispatcher {
+public class GrupDispatcher {
 
 	@Nullable
 	public java.lang.Long id;

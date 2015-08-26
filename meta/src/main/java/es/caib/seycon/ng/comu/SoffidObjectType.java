@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
-@Enumeration 
+@Enumeration (translatedName="SoffidObjectType", translatedPackage="com.soffid.iam.api")
 public class SoffidObjectType {
 
 	public java.lang.String OBJECT_USER="user";

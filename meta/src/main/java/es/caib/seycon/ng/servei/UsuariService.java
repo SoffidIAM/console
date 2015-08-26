@@ -675,4 +675,12 @@ public abstract class UsuariService {
 		return null;
 	}
 
+
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
+			String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

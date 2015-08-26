@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ConsoleProperties",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariSEU {
+public class UsuariSEU {
 
 	@Nullable
 	public java.lang.Long id;

@@ -9,15 +9,15 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ApplicationAdministration",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class AdministracioAplicacio {
+public class AdministracioAplicacio {
 
-	@Attribute(translated = "applicationCode" )
+	@Attribute(translated = "informationSystemName" )
 	public java.lang.String codiAplicacio;
 
 	@Attribute(translated = "roleName" )
 	public java.lang.String nomRol;
 
-	@Attribute(translated = "userCode" )
+	@Attribute(translated = "userName" )
 	public java.lang.String codiUsuari;
 
 	@Nullable
@@ -27,10 +27,10 @@ public abstract class AdministracioAplicacio {
 	@Attribute(translated = "userFullName" )
 	public java.lang.String nomComplertUsuari;
 
-	@Attribute(translated = "applicationRoleCode" )
+	@Attribute(translated = "roleInformationSystem" )
 	public java.lang.String codiAplicacioRol;
 
-	@Attribute(translated = "databaseRoleCode" )
+	@Attribute(translated = "roleSystemName" )
 	public java.lang.String codiBaseDeDadesRol;
 
 }

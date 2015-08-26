@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AccessTreeExecutionType",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class TipusExecucioPuntEntrada {
+public class TipusExecucioPuntEntrada {
 
 	public java.lang.Long id;
 

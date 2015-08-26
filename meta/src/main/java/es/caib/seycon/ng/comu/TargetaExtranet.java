@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ExtranetCard",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class TargetaExtranet {
+public class TargetaExtranet {
 
 	@Nullable
 	public java.lang.Long id;

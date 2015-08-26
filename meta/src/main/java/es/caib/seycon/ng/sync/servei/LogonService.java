@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 	 serverPath="/seycon/LogonService",
 	 translatedName="LogonService",
 	 serverRole="agent",
-	 translatedPackage="es.caib.seycon.ng.sync.servei")
+	 translatedPackage="com.soffid.iam.sync.service")
 @Depends ({es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.sync.servei.TaskQueue.class,
 	es.caib.seycon.ng.model.DominiUsuariEntity.class,

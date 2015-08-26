@@ -8,7 +8,7 @@ package com.soffid.iam.api;
 import com.soffid.mda.annotation.*;
 
 @ValueObject 
-public abstract class RuleAssignedRole {
+public class RuleAssignedRole {
 
 	@Nullable
 	public java.lang.Long id;

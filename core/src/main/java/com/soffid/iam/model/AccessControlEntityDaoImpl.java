@@ -7,9 +7,11 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
-
-import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.AccessControlEntity;
 import com.soffid.iam.model.HostEntity;
@@ -17,9 +19,11 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
-import es.caib.seycon.ng.comu.Maquina;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
+
 import java.sql.Timestamp;
 
 /**
@@ -59,9 +63,9 @@ public class AccessControlEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ControlAccessEntityDao#toControlAcces(es.caib.seycon.ng.model.ControlAccessEntity, es.caib.seycon.ng.comu.ControlAcces)
      */
-    public void toControlAcces(com.soffid.iam.model.AccessControlEntity source, es.caib.seycon.ng.comu.ControlAcces target) {
+    public void toAccessControl(com.soffid.iam.model.AccessControlEntity source, com.soffid.iam.api.AccessControl target) {
         // @todo verify behavior of toControlAcces
-        super.toControlAcces(source, target);
+        super.toAccessControl(source, target);
         toControlAccesCustom(source, target);
     }
 
@@ -69,9 +73,9 @@ public class AccessControlEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ControlAccessEntityDao#toControlAcces(es.caib.seycon.ng.model.ControlAccessEntity)
      */
-    public es.caib.seycon.ng.comu.ControlAcces toControlAcces(final com.soffid.iam.model.AccessControlEntity entity) {
+    public com.soffid.iam.api.AccessControl toAccessControl(final com.soffid.iam.model.AccessControlEntity entity) {
         // @todo verify behavior of toControlAcces
-        return super.toControlAcces(entity);
+        return super.toAccessControl(entity);
     }
 
 
@@ -80,7 +84,7 @@ public class AccessControlEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.AccessControlEntity loadControlAccessEntityFromControlAcces(es.caib.seycon.ng.comu.ControlAcces controlAcces) {
+    private com.soffid.iam.model.AccessControlEntity loadControlAccessEntityFromControlAcces(com.soffid.iam.api.AccessControl controlAcces) {
     	AccessControlEntity controlAccessEntity = null;
     	if (controlAcces.getId()!=null) {
     		controlAccessEntity = this.load(controlAcces.getId());
@@ -96,10 +100,10 @@ public class AccessControlEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ControlAccessEntityDao#controlAccesToEntity(es.caib.seycon.ng.comu.ControlAcces)
      */
-    public com.soffid.iam.model.AccessControlEntity controlAccesToEntity(es.caib.seycon.ng.comu.ControlAcces controlAcces) {
+    public com.soffid.iam.model.AccessControlEntity accessControlToEntity(com.soffid.iam.api.AccessControl controlAcces) {
         // @todo verify behavior of controlAccesToEntity
         com.soffid.iam.model.AccessControlEntity entity = this.loadControlAccessEntityFromControlAcces(controlAcces);
-        this.controlAccesToEntity(controlAcces, entity, true);
+        this.accessControlToEntity(controlAcces, entity, true);
         return entity;
     }
 
@@ -107,18 +111,18 @@ public class AccessControlEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ControlAccessEntityDao#controlAccesToEntity(es.caib.seycon.ng.comu.ControlAcces, es.caib.seycon.ng.model.ControlAccessEntity)
      */
-    public void controlAccesToEntity(es.caib.seycon.ng.comu.ControlAcces source, com.soffid.iam.model.AccessControlEntity target, boolean copyIfNull) {
+    public void accessControlToEntity(com.soffid.iam.api.AccessControl source, com.soffid.iam.model.AccessControlEntity target, boolean copyIfNull) {
         // @todo verify behavior of controlAccesToEntity
-        super.controlAccesToEntity(source, target, copyIfNull);
+        super.accessControlToEntity(source, target, copyIfNull);
         controlAccesToEntityCustom(source, target);
     }
     
-	public void toControlAccesCustom(com.soffid.iam.model.AccessControlEntity source, es.caib.seycon.ng.comu.ControlAcces target) {
+	public void toControlAccesCustom(com.soffid.iam.model.AccessControlEntity source, com.soffid.iam.api.AccessControl target) {
 		// Ya tenemos program, usuariGeneric y maquinaGeneric
 		// Ponemos el resto
 		target.setId(source.getId());
-		target.setIdAgent(source.getAgent().getId());
-		target.setNomAgent(source.getAgent().getName()); 
+		target.setAgentId(source.getAgent().getId());
+		target.setAgentName(source.getAgent().getName()); 
 /*		if(source.getUsuari()!=null) {
 			target.setCodiUsuari(source.getUsuari().getCodi());
 			target.setIdUsuari(source.getUsuari().getId());
@@ -127,8 +131,8 @@ public class AccessControlEntityDaoImpl
 				target.setCodiUsuari(source.getUsuariGeneric());
 		}*/
 		if (source.getRole() != null) {
-			target.setDescripcioRol(source.getRole().getName());
-			target.setIdRol(source.getRole().getId());
+			target.setRoleDescription(source.getRole().getName());
+			target.setRoleId(source.getRole().getId());
 		}
 		/*if (source.getMaquina() !=null) {
 			target.setNomMaquina(source.getMaquina().getNom()+ " ["+source.getMaquina().getAdreca()+"]");
@@ -137,24 +141,24 @@ public class AccessControlEntityDaoImpl
 		if (source.getGenericHost() != null) {
 			HostEntity maquinaEntity = getHostEntityDao().findByName(source.getGenericHost());
 			if (maquinaEntity != null) {
-				target.setNomMaquina(maquinaEntity.getName());//+ " ["+maquinaEntity.getAdreca()+"]");
+				target.setHostName(maquinaEntity.getName());//+ " ["+maquinaEntity.getAdreca()+"]");
 			}
 			else {
-				target.setNomMaquina(source.getGenericHost());
+				target.setHostName(source.getGenericHost());
 			}
 		}
 		
 		//}
 	}	
 
-	public void controlAccesToEntityCustom(es.caib.seycon.ng.comu.ControlAcces source, com.soffid.iam.model.AccessControlEntity target) {
+	public void controlAccesToEntityCustom(com.soffid.iam.api.AccessControl source, com.soffid.iam.model.AccessControlEntity target) {
 		
 		SystemEntity agent = null;
 		// Obtenim el dispatcher (agent)
-		if (source.getNomAgent()==null)
+		if (source.getAgentName() == null)
 			throw new SeyconException (Messages.getString("AccessControlEntityDaoImpl.0"));  //$NON-NLS-1$
 		else {
-			agent = getSystemEntityDao().findByName(source.getNomAgent());
+			agent = getSystemEntityDao().findByName(source.getAgentName());
 			if (agent!=null)
 				target.setAgent(agent);
 			else 
@@ -172,22 +176,20 @@ public class AccessControlEntityDaoImpl
 			target.setRol(null);
 			target.setUsuariGeneric(null);
 		} else */
-		if (source.getIdRol() != null && source.getIdRol()!=0) {
-			rol = getRoleEntityDao().findById(source.getIdRol());
+		if (source.getRoleId() != null && source.getRoleId() != 0) {
+			rol = getRoleEntityDao().findById(source.getRoleId());
 			if (rol==null)
-				throw new SeyconException(String.format(
-						Messages.getString("AccessControlEntityDaoImpl.1"),   //$NON-NLS-1$
-						source.getIdRol()));
+				throw new SeyconException(String.format(Messages.getString("AccessControlEntityDaoImpl.1"), source.getRoleId()));
 			//target.setUsuari(null);
 			target.setRole(rol);
 			target.setGenericUser(null);
 			
 		} else {
-			if (source.getUsuariGeneric()==null || "".equals(source.getUsuariGeneric().trim())) //$NON-NLS-1$
+			if (source.getGenericUser() == null || "".equals(source.getGenericUser().trim())) //$NON-NLS-1$
 				throw new SeyconException (Messages.getString("AccessControlEntityDaoImpl.2"));  //$NON-NLS-1$
 			//target.setUsuari(null);
 			target.setRole(null);
-			target.setGenericUser(source.getUsuariGeneric());
+			target.setGenericUser(source.getGenericUser());
 		}
 		
 		// màquina
@@ -201,9 +203,9 @@ public class AccessControlEntityDaoImpl
 			target.setMaquina(maquina);
 			target.setMaquinaGeneric(null);
 		} else {*/
-			if (source.getMaquinaGeneric()==null)
+			if (source.getGenericHost() == null)
 				throw new SeyconException (Messages.getString("AccessControlEntityDaoImpl.3"));  //$NON-NLS-1$
-			target.setGenericHost(source.getMaquinaGeneric());		
+			target.setGenericHost(source.getGenericHost());		
 		//}
 		
 		// El program 

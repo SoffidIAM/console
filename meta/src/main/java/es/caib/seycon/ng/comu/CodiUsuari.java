@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserCode",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class CodiUsuari {
+public class CodiUsuari {
 
 	@Nullable
 	public java.lang.Long id;

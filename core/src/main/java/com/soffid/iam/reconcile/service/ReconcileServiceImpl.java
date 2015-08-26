@@ -4,19 +4,18 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.reconcile.service;
 
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Application;
+import com.soffid.iam.api.Domain;
+import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.User;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TaskEntityDao;
 import com.soffid.iam.model.UserEntityDao;
@@ -31,28 +30,31 @@ import com.soffid.iam.reconcile.model.ReconcileAssignmentEntity;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntity;
 import com.soffid.iam.reconcile.model.ReconcileRoleEntityDao;
+import com.soffid.iam.service.AccountService;
+import com.soffid.iam.service.ApplicationService;
+import com.soffid.iam.service.DispatcherService;
+import com.soffid.iam.service.UserService;
+import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.util.NameParser;
 
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.Dispatcher;
-import es.caib.seycon.ng.comu.Domini;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.ValorDomini;
-import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
-import es.caib.seycon.ng.servei.AccountService;
-import es.caib.seycon.ng.servei.AplicacioService;
-import es.caib.seycon.ng.servei.DispatcherService;
-import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
+
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author (C) Soffid 2013
@@ -369,7 +371,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 
 		newAccount.setName(account.getAccountName());
 		newAccount.setDescription(account.getDescription());
-		newAccount.setDispatcher(account.getDispatcher());
+		newAccount.setSystem(account.getDispatcher());
 		newAccount.setType(account.getAccountType());
 		newAccount.setPasswordPolicy(account.getUserType());
 		newAccount.setGrantedGroups(Collections.EMPTY_LIST);
@@ -407,12 +409,12 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	{
 		AccountService accountServ = getAccountService(); // Account handler
 		DispatcherService dispService = getDispatcherService(); // Dispatcher handler
-		Usuari user = null; // User data
-		Dispatcher disp = null; // Dispatcher data
+		User user = null; // User data
+		com.soffid.iam.api.System disp = null; // Dispatcher data
 		UserEntityDao entity = getUserEntityDao(); // Get user data from DB handler
 
-		user = getUserEntityDao().toUsuari(entity.findByUserName(account.getUserCode()));
-		disp = dispService.findDispatcherByCodi(account.getDispatcher());
+		user = getUserEntityDao().toUser(entity.findByUserName(account.getUserCode()));
+		disp = dispService.findDispatcherByName(account.getDispatcher());
 
 		// Check valid obtained user
 		if (user == null)
@@ -462,14 +464,14 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	{
 		AccountService accountServ = getAccountService(); // Account handler
 		DispatcherService dispService = getDispatcherService(); // Dispatcher handler
-		UsuariService userServ = getUsuariService(); // Service to add user info
-		Usuari user = null; // User data
-		Dispatcher disp = null; // Dispatcher data
+		UserService userServ = getUserService(); // Service to add user info
+		User user = null; // User data
+		com.soffid.iam.api.System disp = null; // Dispatcher data
 
 		user = createUserByReconcileAccount(account);
 		userServ.create(user);
 
-		disp = dispService.findDispatcherByCodi(account.getDispatcher());
+		disp = dispService.findDispatcherByName(account.getDispatcher());
 
 		// Check valid obtained dispatcher
 		if (disp == null)
@@ -497,42 +499,41 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	 *            Reconcile account to obtain user data.
 	 * @return User data obtained.
 	 */
-	private Usuari createUserByReconcileAccount (ReconcileAccount recAccount)
-	{
+	private User createUserByReconcileAccount(ReconcileAccount recAccount) {
 		NameParser nameParser = new NameParser(); // Class to process user full names
-		Usuari user = new Usuari(); // User data to add
+		User user = new User(); // User data to add
 		String[] userFullName; // User full name
 		int numWords = 0; // Number of words in full name
 
 		numWords = countNumWordsInString(recAccount.getDescription());
 		userFullName = nameParser.parse(recAccount.getDescription(), numWords);
 
-		user.setCodi(recAccount.getAccountName());
-		user.setNom(userFullName[0]);
+		user.setUserName(recAccount.getAccountName());
+		user.setFirstName(userFullName[0]);
 
 		// Check user surname 1
 		if (userFullName.length > 1)
 		{
-			user.setPrimerLlinatge(userFullName[1]);
+			user.setLastName(userFullName[1]);
 		}
 
 		else
 		{
-			user.setPrimerLlinatge(recAccount.getAccountName());
+			user.setLastName(recAccount.getAccountName());
 		}
 
 		// Check user surname 2
 		if (userFullName.length > 2)
 		{
-			user.setSegonLlinatge(userFullName[2]);
+			user.setMiddleName(userFullName[2]);
 		}
 
-		user.setServidorPerfil("null"); //$NON-NLS-1$
-		user.setServidorCorreu("null"); //$NON-NLS-1$
-		user.setServidorHome("null"); //$NON-NLS-1$
-		user.setCodiGrupPrimari(recAccount.getPrimaryGroup());
-		user.setTipusUsuari(recAccount.getUserType());
-		user.setActiu(recAccount.isActive());
+		user.setProfileServer("null"); //$NON-NLS-1$
+		user.setMailServer("null"); //$NON-NLS-1$
+		user.setHomeServer("null"); //$NON-NLS-1$
+		user.setPrimaryGroup(recAccount.getPrimaryGroup());
+		user.setUserType(recAccount.getUserType());
+		user.setActive(recAccount.isActive());
 
 		return user;
 	}
@@ -570,33 +571,25 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	@Override
 	protected void handleReconcileRoles (Long processId) throws Exception
 	{
-		Rol role = null; // Role to add
-		AplicacioService appService = getAplicacioService(); // Add role handler
+		Role role = null; // Role to add
+		ApplicationService appService = getApplicationService(); // Add role handler
 
-		for (ReconcileRole recRole : handleFindAllReconRole(processId))
-		{
-			// Check reconcile role action
-			if (recRole.getProposedAction().equals(ProposedAction.LOAD))
-			{
-				validateReconcileRole(recRole);
-
-				role = new Rol();
-
-				role.setNom(recRole.getRoleName());
-				role.setDescripcio(recRole.getDescription());
-				if (recRole.getAppName() == null || recRole.getAppName().isEmpty())
-					throw new UserWorkflowException(String.format(Messages
-									.getString("ReconcileServiceImpl.AppCodeNeeded"), //$NON-NLS-1$
-									recRole.getRoleName()));
-				else
-					role.setCodiAplicacio(recRole.getAppName());
-
-				role.setBaseDeDades(recRole.getDispatcher());
-				role.setDomini(new Domini(TipusDomini.SENSE_DOMINI));
-
-				appService.create(role);
-			}
-		}
+		for (ReconcileRole recRole : handleFindAllReconRole(processId)) {
+            if (recRole.getProposedAction().equals(ProposedAction.LOAD)) {
+                validateReconcileRole(recRole);
+                role = new Role();
+                role.setName(recRole.getRoleName());
+                role.setDescription(recRole.getDescription());
+                if (recRole.getAppName() == null || recRole.getAppName().isEmpty()) 
+                	throw new UserWorkflowException(String.format(
+                			Messages.getString("ReconcileServiceImpl.AppCodeNeeded"), recRole.getRoleName())); 
+                else 
+                	role.setInformationSystemName(recRole.getAppName());
+                role.setSystem(recRole.getDispatcher());
+                role.setDomain(new Domain(TipusDomini.SENSE_DOMINI));
+                appService.create(role);
+            }
+        }
 	}
 
 	/*
@@ -609,87 +602,50 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 	protected void handleReconcileAssignment (Long processId) throws Exception
 	{
 		Account account = null; // Account data to reconcile assignment
-		Collection<Rol> rolesList = null; // Roles found
-		Rol role = null;// Role to assign
+		Collection<Role> rolesList = null; // Roles found
+		Role role = null;// Role to assign
 		AccountService accServ = getAccountService(); // Account info handler
-		AplicacioService appService = getAplicacioService(); // Role info handler
-		RolAccount accountRole = null; // Account-role to create
+		ApplicationService appService = getApplicationService(); // Role info handler
+		RoleAccount accountRole = null; // Account-role to create
 
-		for (ReconcileAssignment assignmentAccount : handleFindAllReconAssignment(processId))
-		{
-			if (assignmentAccount.getProposedAction().equals(ProposedAction.LOAD))
-			{
-				account = accServ.findAccount(assignmentAccount.getAccountName(),
-								assignmentAccount.getDispatcher());
-
-				// Check account stored
-				if (account != null)
-				{
-					rolesList = appService.findRolsByFiltre(
-									assignmentAccount.getRoleName(), null, null,
-									assignmentAccount.getDispatcher(), null, null);
-
-					// Check collection correct size
-					if (rolesList.size() > 1)
-					{
-						throw new UserWorkflowException(
-										String.format(Messages
-														.getString("ReconcileServiceImpl.InvalidRoleListSize"), //$NON-NLS-1$
-														assignmentAccount.getRoleName()));
-					}
-
-					// Check existing role for account
-					if (rolesList.iterator().hasNext())
-					{
-						role = rolesList.iterator().next();
-					}
-
-					else
-					{
-						throw new UserWorkflowException(
-										String.format(Messages
-														.getString("ReconcileServiceImpl.NotReconciledRole"), //$NON-NLS-1$
-														assignmentAccount.getRoleName(),
-														assignmentAccount
-																		.getAccountName()));
-					}
-
-					// Check previous assignment reconciled
-					boolean found = false;
-					for (RolAccount ra: appService.findRolAccountByAccount(account.getId()))
-					{
-						if (ra.getNomRol().equals(assignmentAccount.getRoleName()) &&
-							ra.getBaseDeDades().equals(assignmentAccount.getDispatcher()))
-						{
-							if (assignmentAccount.getDomainValue() == null ||
-									ra.getValorDomini() == null ||
-									assignmentAccount.getDomainValue().equals(ra.getValorDomini().getValor()))
-							{
-								found = true ;
-								break;
-							}
-						}
-					}
-					if (! found) 
-					{
-						accountRole = new RolAccount();
-						accountRole.setBaseDeDades(assignmentAccount.getDispatcher());
-						accountRole.setDescripcioRol(role.getDescripcio());
-						accountRole.setAccountName(account.getName());
-						accountRole.setNomRol(role.getNom());
-						accountRole.setCodiAplicacio(role.getCodiAplicacio());
-						if (assignmentAccount.getDomainValue() != null)
-						{
-							accountRole.setValorDomini(new ValorDomini());
-							accountRole.getValorDomini().setValor(assignmentAccount.getDomainValue());
-						}
-						
-
-						appService.create(accountRole);
-					}
-				}
-			}
-		}
+		for (ReconcileAssignment assignmentAccount : handleFindAllReconAssignment(processId)) {
+            if (assignmentAccount.getProposedAction().equals(ProposedAction.LOAD)) {
+                account = accServ.findAccount(assignmentAccount.getAccountName(), assignmentAccount.getDispatcher());
+                if (account != null) {
+                    rolesList = appService.findRolesByFilter(assignmentAccount.getRoleName(), null, null, assignmentAccount.getDispatcher(), null, null);
+                    if (rolesList.size() > 1) {
+                        throw new UserWorkflowException(String.format(Messages.getString("ReconcileServiceImpl.InvalidRoleListSize"), assignmentAccount.getRoleName()));
+                    }
+                    if (rolesList.iterator().hasNext()) {
+                        role = rolesList.iterator().next();
+                    } else {
+                        throw new UserWorkflowException(String.format(Messages.getString("ReconcileServiceImpl.NotReconciledRole"), assignmentAccount.getRoleName(), assignmentAccount.getAccountName()));
+                    }
+                    boolean found = false;
+                    for (RoleAccount ra : appService.findRoleAccountByAccount(account.getId())) {
+                        if (ra.getRoleName().equals(assignmentAccount.getRoleName()) && ra.getSystem().equals(assignmentAccount.getDispatcher())) {
+                            if (assignmentAccount.getDomainValue() == null || ra.getDomainValue() == null || assignmentAccount.getDomainValue().equals(ra.getDomainValue().getValue())) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        accountRole = new RoleAccount();
+                        accountRole.setSystem(assignmentAccount.getDispatcher());
+                        accountRole.setRoleDescription(role.getDescription());
+                        accountRole.setAccountName(account.getName());
+                        accountRole.setRoleName(role.getName());
+                        accountRole.setInformationSystemName(role.getInformationSystemName());
+                        if (assignmentAccount.getDomainValue() != null) {
+                            accountRole.setDomainValue(new DomainValue());
+                            accountRole.getDomainValue().setValue(assignmentAccount.getDomainValue());
+                        }
+                        appService.create(accountRole);
+                    }
+                }
+            }
+        }
 	}
 
 	/*
@@ -791,9 +747,8 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 							roleInfo.getRoleName()));
 		}
 
-		AplicacioService appService = getAplicacioService(); // Add role handler
-		Aplicacio application = appService.findAplicacioByCodiAplicacio(roleInfo
-						.getAppName());
+		ApplicationService appService = getApplicationService(); // Add role handler
+		Application application = appService.findApplicationByApplicationName(roleInfo.getAppName());
 
 		// Check existing application
 		if (application == null)

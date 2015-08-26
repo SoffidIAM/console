@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Group",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Grup {
+public class Grup {
 
 	@Attribute(translated = "name" )
 	public java.lang.String codi;
@@ -18,14 +18,14 @@ public abstract class Grup {
 	public java.lang.String quota;
 
 	@Nullable
-	@Attribute(translated = "officeUnit" )
+	@Attribute(translated = "driveLetter" )
 	public java.lang.String unitatOfimatica;
 
 	@Attribute(translated = "description" )
 	public java.lang.String descripcio;
 
 	@Nullable
-	@Attribute(translated = "parentCode" )
+	@Attribute(translated = "parentGroup" )
 	public java.lang.String codiPare;
 
 	@Nullable
@@ -33,7 +33,7 @@ public abstract class Grup {
 	public java.lang.String tipus;
 
 	@Nullable
-	@Attribute(translated = "officeServerName" )
+	@Attribute(translated = "driveServerName" )
 	public java.lang.String nomServidorOfimatic;
 
 	@Nullable

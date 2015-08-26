@@ -21,6 +21,8 @@ import org.jboss.system.ServiceMBeanSupport;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Configuration;
 import com.soffid.iam.deployer.DeployerServiceMBean;
 import com.soffid.tools.db.persistence.XmlReader;
 import com.soffid.tools.db.schema.Column;
@@ -31,14 +33,13 @@ import com.soffid.tools.db.updater.MsSqlServerUpdater;
 import com.soffid.tools.db.updater.MySqlUpdater;
 import com.soffid.tools.db.updater.OracleUpdater;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;
+
 import com.soffid.iam.model.identity.IdentityGeneratorBean;
-import es.caib.seycon.ng.servei.ApplicationBootService;
-import es.caib.seycon.ng.servei.ApplicationShutdownService;
-import es.caib.seycon.ng.servei.ConfiguracioService;
-import es.caib.seycon.ng.servei.SeyconServiceLocator;
+import com.soffid.iam.service.ApplicationBootService;
+import com.soffid.iam.service.ApplicationShutdownService;
+import com.soffid.iam.service.ConfigurationService;
 
 public class UploadService extends ServiceMBeanSupport implements UploadServiceMBean {
     int scheduledInterval = 30000;
@@ -57,7 +58,7 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
             	log.warn("Error updating database schema", e);
             }
             try {
-            	SeyconServiceLocator.instance().getUsuariService();
+            	com.soffid.iam.ServiceLocator.instance().getUserService();
             } catch (Exception e)  {
             	final DeployerServiceMBean soffidDeployer = (DeployerServiceMBean) MBeanProxyExt.
             			create(DeployerServiceMBean.class, "com.soffid.iam:name=deployer") ;
@@ -91,7 +92,7 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
 			});
             
             
-            Map beans = SeyconServiceLocator.instance().getContext().
+            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
             		getBeansOfType(ApplicationBootService.class);
             
             th.start ();
@@ -193,8 +194,8 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
         }
         log.info(String.format("Uploading '%1$s' from '%2$s'", artifactId, url.toString()));   //$NON-NLS-1$
 
-        ServiceLocator locator = SeyconServiceLocator.instance();
-        ConfiguracioService service = locator.getConfiguracioService();
+        ServiceLocator locator = ServiceLocator.instance();
+        ConfigurationService service = locator.getConfigurationService();
         
         // Test for already uploaded component
         if (! version.endsWith("-SNAPSHOT"))
@@ -232,15 +233,15 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
 
         // Third: Upload data
         String paramName = "component." + artifactId + ".version";   //$NON-NLS-1$ //$NON-NLS-2$
-        Configuracio config = service.findParametreByCodiAndCodiXarxa(paramName, null);
+        Configuration config = service.findParameterByNameAndNetworkName(paramName, null);
         service.updateBlob("component." + artifactId, data, version);  //$NON-NLS-1$
         data = null;
 
         if (config == null) {
-            config = new Configuracio(paramName, version);
+            config = new Configuration(paramName, version);
             service.create(config);
         } else {
-            config.setValor(version);
+            config.setValue(version);
             service.update(config);
         }
     }
@@ -259,7 +260,7 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
     }
 
     protected void stopService() throws Exception {
-        Map beans = SeyconServiceLocator.instance().getContext().
+        Map beans = ServiceLocator.instance().getContext().
         		getBeansOfType(ApplicationShutdownService.class);
         
         for ( Object service: beans.keySet())
@@ -299,7 +300,7 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
         updater.setLog(new LoggingStream(log));
         updater.update(conn, db);
         
-    	IdentityGeneratorBean identityGenerator = (IdentityGeneratorBean) SeyconServiceLocator.instance().getService("identity-generator");
+    	IdentityGeneratorBean identityGenerator = (IdentityGeneratorBean) ServiceLocator.instance().getService("identity-generator");
     	if (! identityGenerator.isSequenceStarted())
     	{
     		long l = getMaxIdentifier(conn, db);

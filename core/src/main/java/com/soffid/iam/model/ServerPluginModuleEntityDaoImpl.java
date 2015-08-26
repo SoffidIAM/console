@@ -1,8 +1,7 @@
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.ServerPluginModule;
 import es.caib.seycon.ng.model.*;
-
-import es.caib.seycon.ng.comu.ServerPluginModule;
 
 public class ServerPluginModuleEntityDaoImpl extends
 		com.soffid.iam.model.ServerPluginModuleEntityDaoBase

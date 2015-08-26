@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Audit",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Auditoria {
+public class Auditoria {
 
 	@Attribute(translated = "additionalInfo" )
 	@Nullable

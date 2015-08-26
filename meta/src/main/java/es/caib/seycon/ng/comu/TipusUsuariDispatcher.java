@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserTypeDispatcher",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class TipusUsuariDispatcher {
+public class TipusUsuariDispatcher {
 
 	@Nullable
 	public java.lang.Long id;

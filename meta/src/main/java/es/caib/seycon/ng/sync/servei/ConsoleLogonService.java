@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverOnly=true,
 	 serverPath="/SEU/LogonService",
-	 serverRole="SEU_CONSOLE")
+	 serverRole="SEU_CONSOLE",
+	 translatedPackage="com.soffid.iam.sync.service",
+	 translatedName="ConsoleLogonService")
 @Depends ({LogonService.class})
 public abstract class ConsoleLogonService {
 

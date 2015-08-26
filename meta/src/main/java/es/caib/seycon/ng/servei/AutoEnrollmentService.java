@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
-	es.caib.seycon.ng.model.DadaUsuariEntity.class})
+	es.caib.seycon.ng.model.DadaUsuariEntity.class,
+	UsuariService.class})
 public abstract class AutoEnrollmentService {
 
 	@Operation (translated="registration")

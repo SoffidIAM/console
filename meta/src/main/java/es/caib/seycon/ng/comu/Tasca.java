@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Task",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Tasca {
+public class Tasca {
 
 	@Nullable
 	public java.lang.Long id;
@@ -79,7 +79,7 @@ public abstract class Tasca {
 	public java.lang.String bd;
 
 	@Nullable
-	@Attribute(translated = "dispatcherCode" )
+	@Attribute(translated = "systemName" )
 	public java.lang.String coddis;
 
 	@Nullable

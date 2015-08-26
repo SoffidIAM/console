@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AccessTreeExecution",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ExecucioPuntEntrada {
+public class ExecucioPuntEntrada {
 
 	@Nullable
 	public java.lang.Long id;

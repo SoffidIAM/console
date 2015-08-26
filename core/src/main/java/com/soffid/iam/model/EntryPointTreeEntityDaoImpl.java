@@ -3,11 +3,14 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.ApplicationAccessTree;
 import es.caib.seycon.ng.model.*;
-
-import es.caib.seycon.ng.comu.ArbrePuntEntrada;
 
 /**
  * @see es.caib.seycon.ng.model.ArbrePuntEntradaEntity
@@ -18,21 +21,21 @@ public class EntryPointTreeEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ArbrePuntEntradaEntityDao#toArbrePuntEntrada(es.caib.seycon.ng.model.ArbrePuntEntradaEntity, es.caib.seycon.ng.comu.ArbrePuntEntrada)
      */
-    public void toArbrePuntEntrada(com.soffid.iam.model.EntryPointTreeEntity source, es.caib.seycon.ng.comu.ArbrePuntEntrada target) {
+    public void toApplicationAccessTree(com.soffid.iam.model.EntryPointTreeEntity source, com.soffid.iam.api.ApplicationAccessTree target) {
         // @todo verify behavior of toArbrePuntEntrada
-        super.toArbrePuntEntrada(source, target);
+        super.toApplicationAccessTree(source, target);
     }
 
 
     /**
      * @see es.caib.seycon.ng.model.ArbrePuntEntradaEntityDao#toArbrePuntEntrada(es.caib.seycon.ng.model.ArbrePuntEntradaEntity)
      */
-    public es.caib.seycon.ng.comu.ArbrePuntEntrada toArbrePuntEntrada(final com.soffid.iam.model.EntryPointTreeEntity entity) {
-        ArbrePuntEntrada arbre  =  super.toArbrePuntEntrada(entity);
-		arbre.setIdPare(entity.getParent().getId());
-		arbre.setNomPare(entity.getParent().getName());
-		arbre.setIdFill(entity.getChildren().getId());
-		arbre.setNomFill(entity.getChildren().getName());
+    public com.soffid.iam.api.ApplicationAccessTree toApplicationAccessTree(final com.soffid.iam.model.EntryPointTreeEntity entity) {
+        ApplicationAccessTree arbre = super.toApplicationAccessTree(entity);
+		arbre.setParentId(entity.getParent().getId());
+		arbre.setParentName(entity.getParent().getName());
+		arbre.setChildId(entity.getChildren().getId());
+		arbre.setChildName(entity.getChildren().getName());
 		return arbre;
     }
 
@@ -42,7 +45,7 @@ public class EntryPointTreeEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.EntryPointTreeEntity loadArbrePuntEntradaEntityFromArbrePuntEntrada(es.caib.seycon.ng.comu.ArbrePuntEntrada arbrePuntEntrada) {
+    private com.soffid.iam.model.EntryPointTreeEntity loadArbrePuntEntradaEntityFromArbrePuntEntrada(com.soffid.iam.api.ApplicationAccessTree arbrePuntEntrada) {
         com.soffid.iam.model.EntryPointTreeEntity arbrePuntEntradaEntity = this.load(arbrePuntEntrada.getId());
         if (arbrePuntEntradaEntity == null)
         {
@@ -55,10 +58,10 @@ public class EntryPointTreeEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ArbrePuntEntradaEntityDao#arbrePuntEntradaToEntity(es.caib.seycon.ng.comu.ArbrePuntEntrada)
      */
-    public com.soffid.iam.model.EntryPointTreeEntity arbrePuntEntradaToEntity(es.caib.seycon.ng.comu.ArbrePuntEntrada arbrePuntEntrada) {
+    public com.soffid.iam.model.EntryPointTreeEntity applicationAccessTreeToEntity(com.soffid.iam.api.ApplicationAccessTree arbrePuntEntrada) {
         // @todo verify behavior of arbrePuntEntradaToEntity
         com.soffid.iam.model.EntryPointTreeEntity entity = this.loadArbrePuntEntradaEntityFromArbrePuntEntrada(arbrePuntEntrada);
-        this.arbrePuntEntradaToEntity(arbrePuntEntrada, entity, true);
+        this.applicationAccessTreeToEntity(arbrePuntEntrada, entity, true);
         return entity;
     }
 
@@ -66,9 +69,9 @@ public class EntryPointTreeEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ArbrePuntEntradaEntityDao#arbrePuntEntradaToEntity(es.caib.seycon.ng.comu.ArbrePuntEntrada, es.caib.seycon.ng.model.ArbrePuntEntradaEntity)
      */
-    public void arbrePuntEntradaToEntity(es.caib.seycon.ng.comu.ArbrePuntEntrada source, com.soffid.iam.model.EntryPointTreeEntity target, boolean copyIfNull) {
+    public void applicationAccessTreeToEntity(com.soffid.iam.api.ApplicationAccessTree source, com.soffid.iam.model.EntryPointTreeEntity target, boolean copyIfNull) {
         // Ens arriba amb Id si ya existeix l'arbre o sense id (nou)
-        super.arbrePuntEntradaToEntity(source, target, copyIfNull);
+        super.applicationAccessTreeToEntity(source, target, copyIfNull);
         // Acabar...
         
     }

@@ -1,19 +1,20 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
 
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.User;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.Usuari;
 
 /**
  * @author bubu
@@ -89,20 +90,16 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 	 * @see com.soffid.iam.service.CertificateValidationServiceBase#handleGetCertificateUser(java.util.List)
 	 */
 	@Override
-	protected Usuari handleGetCertificateUser (List<X509Certificate> certs)
-					throws Exception
-	{
+    protected User handleGetCertificateUser(List<X509Certificate> certs) throws Exception {
 		for (CertificateValidationModule module: getModules())
 		{
 			if (module.validateCertificate(certs))
 				return module.getCertificateUser(certs);
 		}
-		for (CertificateValidationModule module: getModules())
-		{
-			Usuari user = module.getCertificateUser(certs);
-			if (user != null)
-				return user;
-		}
+		for (CertificateValidationModule module : getModules()) {
+            User user = module.getCertificateUser(certs);
+            if (user != null) return user;
+        }
 		return null;
 	}
 

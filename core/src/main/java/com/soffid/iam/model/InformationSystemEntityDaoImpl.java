@@ -7,20 +7,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.bpm.BpmEngine;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.UserEntity;
-import es.caib.bpm.servei.BpmEngine;
 import es.caib.bpm.vo.PredefinedProcessType;
-import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
@@ -39,17 +42,16 @@ public class InformationSystemEntityDaoImpl
 	
 	private void auditarAplicacions(String accio, String codiAplicacio) throws InternalErrorException {
 		String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setAplicacio(codiAplicacio);
-		auditoria.setAutor(codiUsuari);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setApplication(codiAplicacio);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_APLICA"); //$NON-NLS-1$
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_APLICA"); //$NON-NLS-1$
 
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 	
@@ -91,48 +93,47 @@ public class InformationSystemEntityDaoImpl
 	/**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#toAplicacio(es.caib.seycon.ng.model.AplicacioEntity)
      */
-    public es.caib.seycon.ng.comu.ValorDomini toValorDomini(final com.soffid.iam.model.InformationSystemEntity entity) {
-    	ValorDomini valorDomini = new ValorDomini();
-    	valorDomini.setCodiExternDomini(null);
-    	valorDomini.setDescripcio(entity.getDescription());
-    	valorDomini.setNomDomini(TipusDomini.APLICACIONS);
-    	valorDomini.setValor(entity.getName());
+    public com.soffid.iam.api.DomainValue toDomainValue(final com.soffid.iam.model.InformationSystemEntity entity) {
+    	DomainValue valorDomini = new DomainValue();
+    	valorDomini.setExternalCodeDomain(null);
+    	valorDomini.setDescription(entity.getDescription());
+    	valorDomini.setDomainName(TipusDomini.APLICACIONS);
+    	valorDomini.setValue(entity.getName());
     	return valorDomini;
     }
 	
     /**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#toAplicacio(es.caib.seycon.ng.model.AplicacioEntity, es.caib.seycon.ng.comu.Aplicacio)
      */
-    public void toAplicacio(com.soffid.iam.model.InformationSystemEntity sourceEntity, es.caib.seycon.ng.comu.Aplicacio targetVO) {
+    public void toApplication(com.soffid.iam.model.InformationSystemEntity sourceEntity, com.soffid.iam.api.Application targetVO) {
         // @todo verify behavior of toAplicacio
-        super.toAplicacio(sourceEntity, targetVO);
+        super.toApplication(sourceEntity, targetVO);
         UserEntity usuariEntity = sourceEntity.getContactPerson();
         if(usuariEntity != null){
-        	targetVO.setCodiPersonaContacte(usuariEntity.getUserName());
+        	targetVO.setOwner(usuariEntity.getUserName());
     		String nom = usuariEntity.getFirstName();
     		nom = nom != null ? nom : ""; //$NON-NLS-1$
     		String primerCognom = usuariEntity.getLastName();
     		primerCognom = primerCognom != null ? primerCognom : ""; //$NON-NLS-1$
     		String segonCognom = usuariEntity.getMiddleName();
     		segonCognom = segonCognom != null ? segonCognom : ""; //$NON-NLS-1$
-    		targetVO.setNomComplertPersonaContacte(nom + " " + primerCognom + " " //$NON-NLS-1$ //$NON-NLS-2$
-    				+ segonCognom);
+    		targetVO.setOwnerName(nom + " " + primerCognom + " " + segonCognom);
         }
         toAplicacioCustom(sourceEntity, targetVO);
     }
     
     
-    private void toAplicacioCustom(com.soffid.iam.model.InformationSystemEntity sourceEntity, es.caib.seycon.ng.comu.Aplicacio targetVO) {
-		targetVO.setGestionableWF(new Boolean(sourceEntity.getWfManagement().compareTo("S") == 0)); //$NON-NLS-1$
+    private void toAplicacioCustom(com.soffid.iam.model.InformationSystemEntity sourceEntity, com.soffid.iam.api.Application targetVO) {
+		targetVO.setBpmEnforced(new Boolean(sourceEntity.getWfManagement().compareTo("S") == 0)); //$NON-NLS-1$
     }
 
 
     /**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#toAplicacio(es.caib.seycon.ng.model.AplicacioEntity)
      */
-    public es.caib.seycon.ng.comu.Aplicacio toAplicacio(final com.soffid.iam.model.InformationSystemEntity entity) {
+    public com.soffid.iam.api.Application toApplication(final com.soffid.iam.model.InformationSystemEntity entity) {
         // @todo verify behavior of toAplicacio
-        return super.toAplicacio(entity);
+        return super.toApplication(entity);
     }
 
 
@@ -141,7 +142,7 @@ public class InformationSystemEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.InformationSystemEntity loadAplicacioEntityFromAplicacio(es.caib.seycon.ng.comu.Aplicacio aplicacio) {
+    private com.soffid.iam.model.InformationSystemEntity loadAplicacioEntityFromAplicacio(com.soffid.iam.api.Application aplicacio) {
         
     	InformationSystemEntity aplicacioEntity = null;
     	if(aplicacio.getId() != null){
@@ -158,27 +159,27 @@ public class InformationSystemEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio)
      */
-    public com.soffid.iam.model.InformationSystemEntity aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio aplicacio) {
+    public com.soffid.iam.model.InformationSystemEntity applicationToEntity(com.soffid.iam.api.Application aplicacio) {
         // @todo verify behavior of aplicacioToEntity
         com.soffid.iam.model.InformationSystemEntity entity = this.loadAplicacioEntityFromAplicacio(aplicacio);
-        this.aplicacioToEntity(aplicacio, entity, true);
+        this.applicationToEntity(aplicacio, entity, true);
         return entity;
     }
 
     /**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio)
      */
-    public com.soffid.iam.model.InformationSystemEntity valorDominiToEntity(es.caib.seycon.ng.comu.ValorDomini valorDomini) {
+    public com.soffid.iam.model.InformationSystemEntity domainValueToEntity(com.soffid.iam.api.DomainValue valorDomini) {
     	throw new SeyconException(Messages.getString("InformationSystemEntityDaoImpl.3")); //$NON-NLS-1$
     }
     
     /**
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio, es.caib.seycon.ng.model.AplicacioEntity)
      */
-    public void aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity, boolean copyIfNull) {
+    public void applicationToEntity(com.soffid.iam.api.Application sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity, boolean copyIfNull) {
         // @todo verify behavior of aplicacioToEntity
-        super.aplicacioToEntity(sourceVO, targetEntity, copyIfNull);
-        String codiPersonaContacte = sourceVO.getCodiPersonaContacte();
+        super.applicationToEntity(sourceVO, targetEntity, copyIfNull);
+        String codiPersonaContacte = sourceVO.getOwner();
         if(codiPersonaContacte != null){
         	if("".equals(codiPersonaContacte.trim())){ //$NON-NLS-1$
             	targetEntity.setContactPerson(null);
@@ -196,18 +197,18 @@ public class InformationSystemEntityDaoImpl
         aplicacioToEntityCustom(sourceVO, targetEntity);
     }
     
-	private void aplicacioToEntityCustom(es.caib.seycon.ng.comu.Aplicacio sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity) {
-		Boolean gestionableWF = sourceVO.getGestionableWF();
+	private void aplicacioToEntityCustom(com.soffid.iam.api.Application sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity) {
+		Boolean gestionableWF = sourceVO.getBpmEnforced();
 		if (gestionableWF != null) {
-			targetEntity.setWfManagement(sourceVO.getGestionableWF().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+			targetEntity.setWfManagement(sourceVO.getBpmEnforced().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			targetEntity.setWfManagement("N"); //$NON-NLS-1$
 		}
 		// Verifiquem les adreces de correu per rebre les notificacions
-		if (sourceVO.getCorreusNotificacions()!=null && !"".equals(sourceVO.getCorreusNotificacions())) { //$NON-NLS-1$
+		if (sourceVO.getNotificationEmails() != null && !"".equals(sourceVO.getNotificationEmails())) { //$NON-NLS-1$
 			String correusFormatejats = ""; //$NON-NLS-1$
 			// Validamos las direcciones
-			String valor = sourceVO.getCorreusNotificacions();
+			String valor = sourceVO.getNotificationEmails();
 			if (valor==null || "".equals(valor.trim())) return; //$NON-NLS-1$
 			String [] valors = valor.split(","); //$NON-NLS-1$
 			if (valors.length>=1) {

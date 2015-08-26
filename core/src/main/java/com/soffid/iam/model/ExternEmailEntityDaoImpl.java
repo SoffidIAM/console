@@ -7,17 +7,22 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.ExternalName;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.TaskEntity;
-import es.caib.seycon.ng.comu.CorreuExtern;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.sql.Timestamp;
 
 /**
@@ -65,19 +70,19 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
         }
     }
 
-    public void toCorreuExtern(com.soffid.iam.model.ExternEmailEntity sourceEntity, es.caib.seycon.ng.comu.CorreuExtern targetVO) {
-        super.toCorreuExtern(sourceEntity, targetVO);
+    public void toExternalName(com.soffid.iam.model.ExternEmailEntity sourceEntity, com.soffid.iam.api.ExternalName targetVO) {
+        super.toExternalName(sourceEntity, targetVO);
         toCorreuExternCustom(sourceEntity, targetVO);
 
     }
 
-    public void toCorreuExternCustom(com.soffid.iam.model.ExternEmailEntity sourceEntity, es.caib.seycon.ng.comu.CorreuExtern targetVO) {
+    public void toCorreuExternCustom(com.soffid.iam.model.ExternEmailEntity sourceEntity, com.soffid.iam.api.ExternalName targetVO) {
         EmailListEntity llistaCorreu = sourceEntity.getMailList();
         if (llistaCorreu != null) {
-            targetVO.setLlistaCorreuNom(llistaCorreu.getName());
+            targetVO.setMailListName(llistaCorreu.getName());
             EmailDomainEntity dominiCorreu = llistaCorreu.getDomain();
             if (dominiCorreu != null) {
-                targetVO.setCodiDomini(dominiCorreu.getName());
+                targetVO.setDomainCode(dominiCorreu.getName());
             }
         }
     }
@@ -85,8 +90,8 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
     /**
      * @see es.caib.seycon.ng.model.CorreuExternEntityDao#toCorreuExtern(es.caib.seycon.ng.model.CorreuExternEntity)
      */
-    public es.caib.seycon.ng.comu.CorreuExtern toCorreuExtern(final com.soffid.iam.model.ExternEmailEntity entity) {
-        CorreuExtern correuExtern = super.toCorreuExtern(entity);
+    public com.soffid.iam.api.ExternalName toExternalName(final com.soffid.iam.model.ExternEmailEntity entity) {
+        ExternalName correuExtern = super.toExternalName(entity);
         toCorreuExternCustom(entity, correuExtern);
         return correuExtern;
     }
@@ -96,7 +101,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.ExternEmailEntity loadCorreuExternEntityFromCorreuExtern(es.caib.seycon.ng.comu.CorreuExtern correuExtern) {
+    private com.soffid.iam.model.ExternEmailEntity loadCorreuExternEntityFromCorreuExtern(com.soffid.iam.api.ExternalName correuExtern) {
         com.soffid.iam.model.ExternEmailEntity correuExternEntity = null;
         if (correuExtern.getId() != null) {
             correuExternEntity = load(correuExtern.getId());
@@ -110,15 +115,15 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
     /**
      * @see es.caib.seycon.ng.model.CorreuExternEntityDao#correuExternToEntity(es.caib.seycon.ng.CorreuExtern)
      */
-    public com.soffid.iam.model.ExternEmailEntity correuExternToEntity(es.caib.seycon.ng.comu.CorreuExtern correuExtern) {
+    public com.soffid.iam.model.ExternEmailEntity externalNameToEntity(com.soffid.iam.api.ExternalName correuExtern) {
         com.soffid.iam.model.ExternEmailEntity entity = this.loadCorreuExternEntityFromCorreuExtern(correuExtern);
-        correuExternToEntity(correuExtern, entity, true);
+        externalNameToEntity(correuExtern, entity, true);
         return entity;
     }
 
-    public void correuExternToEntityCustom(es.caib.seycon.ng.comu.CorreuExtern sourceVO, com.soffid.iam.model.ExternEmailEntity targetEntity) {
-        String nomLlistaCorreu = sourceVO.getLlistaCorreuNom();
-        String codiDomini = sourceVO.getCodiDomini();
+    public void correuExternToEntityCustom(com.soffid.iam.api.ExternalName sourceVO, com.soffid.iam.model.ExternEmailEntity targetEntity) {
+        String nomLlistaCorreu = sourceVO.getMailListName();
+        String codiDomini = sourceVO.getDomainCode();
         if (nomLlistaCorreu != null && nomLlistaCorreu.trim().compareTo("") != 0) { //$NON-NLS-1$
             EmailListEntity llistaCorreuEntity = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
             if (llistaCorreuEntity != null) {
@@ -135,8 +140,8 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
      * @see es.caib.seycon.ng.model.CorreuExternEntityDao#correuExternToEntity(es.caib.seycon.ng.CorreuExtern,
      *      es.caib.seycon.ng.model.CorreuExternEntity)
      */
-    public void correuExternToEntity(es.caib.seycon.ng.comu.CorreuExtern sourceVO, com.soffid.iam.model.ExternEmailEntity targetEntity, boolean copyIfNull) {
-        super.correuExternToEntity(sourceVO, targetEntity, copyIfNull);
+    public void externalNameToEntity(com.soffid.iam.api.ExternalName sourceVO, com.soffid.iam.model.ExternEmailEntity targetEntity, boolean copyIfNull) {
+        super.externalNameToEntity(sourceVO, targetEntity, copyIfNull);
         correuExternToEntityCustom(sourceVO, targetEntity);
     }
 

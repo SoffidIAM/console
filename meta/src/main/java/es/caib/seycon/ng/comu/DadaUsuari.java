@@ -10,7 +10,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserData",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DadaUsuari {
+public class DadaUsuari {
 
 	@Attribute(translated = "attribute" )
 	public java.lang.String codiDada;
@@ -38,6 +38,7 @@ public abstract class DadaUsuari {
 	@Nullable
 	public byte[] blobDataValue;
 
+	@Attribute(translated="dateValue")
 	@Nullable
 	public java.util.Calendar valorDadaDate;
 

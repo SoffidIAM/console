@@ -7,20 +7,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.config.Config;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.service.PasswordService;
 
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.lang.MessageFactory;
-import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.servei.PasswordService;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 
 import java.io.ByteArrayOutputStream;
@@ -80,7 +83,7 @@ public class AuditEntityDaoImpl extends
 			if (syslogServer != null && syslogServer.trim().length() > 0)
 			{
 				try {
-					Auditoria audobj  = toAuditoria(auditoria);
+					Audit audobj = toAudit(auditoria);
 	
 					InetAddress addr = InetAddress.getByName(syslogServer);
 					
@@ -100,7 +103,7 @@ public class AuditEntityDaoImpl extends
 		}
 	}
 
-	private void sendSysLog(InetAddress syslogServer, Auditoria audobj) throws IOException {
+	private void sendSysLog(InetAddress syslogServer, Audit audobj) throws IOException {
         DatagramSocket s = new DatagramSocket();
         s.connect(syslogServer, 514);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -126,7 +129,7 @@ public class AuditEntityDaoImpl extends
         p.print(" "); // SP
         p.print("SOFFID"+audobj.getId()); // MSGID
         p.print(" - "); // STRUCTURED DATA
-        p.print("["+audobj.getAutor()+"] "+audobj.getMessage());// MSG     
+        p.print("[" + audobj.getAuthor() + "] " + audobj.getMessage());// MSG     
         p.flush ();
         
         byte buf [] = out.toByteArray();
@@ -146,41 +149,41 @@ public class AuditEntityDaoImpl extends
 		}
 	}
 
-	public void toAuditoria(com.soffid.iam.model.AuditEntity sourceEntity, es.caib.seycon.ng.comu.Auditoria targetVO) {
-		super.toAuditoria(sourceEntity, targetVO);
+	public void toAudit(com.soffid.iam.model.AuditEntity sourceEntity, com.soffid.iam.api.Audit targetVO) {
+		super.toAudit(sourceEntity, targetVO);
 		toAuditoriaCustom(sourceEntity, targetVO);
 	}
 
-	public void toAuditoriaCustom(com.soffid.iam.model.AuditEntity sourceEntity, es.caib.seycon.ng.comu.Auditoria targetVO) {
+	public void toAuditoriaCustom(com.soffid.iam.model.AuditEntity sourceEntity, com.soffid.iam.api.Audit targetVO) {
 		targetVO.setAccount(sourceEntity.getAccount());
 		Date data = sourceEntity.getDate();
 		if (data != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-			targetVO.setData(dateFormat.format(data));
+			targetVO.setAdditionalInfo(dateFormat.format(data));
 		}
 		targetVO.setCalendar (Calendar.getInstance());
 		targetVO.getCalendar().setTime (data);
 
 		GroupEntity grup = sourceEntity.getGroup();
 		if (grup != null) {
-			targetVO.setGrup(grup.getName());
+			targetVO.setGroup(grup.getName());
 		}
 
 		com.soffid.iam.model.AccountEntity usuari = sourceEntity.getAccountAssoc();
 		if (usuari != null) {
-			targetVO.setAutor(usuari.getName());
+			targetVO.setAuthor(usuari.getName());
 			/* afegim nom complet de l'autor i el seu grup primari */
-			targetVO.setAutorNomComplet(usuari.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
+			targetVO.setAuthorFullName(usuari.getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
 			if (usuari.getType().equals (AccountType.USER))
 			{
 				for (com.soffid.iam.model.UserAccountEntity ua : usuari.getUsers()) {
-                    targetVO.setAutorGrupPrimari(ua.getUser().getPrimaryGroup().getName());
+                    targetVO.setPrimaryGroupAuthor(ua.getUser().getPrimaryGroup().getName());
                 }
 			}
 		}
 		
-		targetVO.setValorDomini(sourceEntity.getDomainValue());
+		targetVO.setDomainValue(sourceEntity.getDomainValue());
 		
 		if (sourceEntity.getFileId() != null) {
 			// Atenció: els fitxers es poden esborrar... per això no n'hi ha una
@@ -190,13 +193,13 @@ public class AuditEntityDaoImpl extends
 //				targetVO.setNomFitxer(f.getNom());
 			} catch (Throwable th) {
 				//Marquem el seu id
-				targetVO.setNomFitxer(sourceEntity.getFileId() + " (id)"); //$NON-NLS-1$
+				targetVO.setFileName(sourceEntity.getFileId() + " (id)"); //$NON-NLS-1$
 			}
-			targetVO.setFitxer(sourceEntity.getFileId());
+			targetVO.setFile(sourceEntity.getFileId());
 		}
 		
 		StringBuffer key = new StringBuffer(50);
-		key.append(targetVO.getObjecte()).append('/').append(targetVO.getAccio());
+		key.append(targetVO.getObject()).append('/').append(targetVO.getAction());
 		try
 		{
 			String msg;
@@ -211,11 +214,11 @@ public class AuditEntityDaoImpl extends
 				catch (MissingResourceException e2) 
 				{
 					try {
-						msg = MessageFactory.getString(BUNDLE_NAME+"_"+targetVO.getObjecte(), targetVO.getAccio()); //$NON-NLS-1$
+						msg = MessageFactory.getString(BUNDLE_NAME + "_" + targetVO.getObject(), targetVO.getAction()); //$NON-NLS-1$
 					} 
 					catch (MissingResourceException e3) 
 					{
-						msg = MessageFactory.getString(BUNDLE_NAME2+"_"+targetVO.getObjecte(), targetVO.getAccio()); //$NON-NLS-1$
+						msg = MessageFactory.getString(BUNDLE_NAME2 + "_" + targetVO.getObject(), targetVO.getAction()); //$NON-NLS-1$
 					}
 				}
 			}
@@ -257,7 +260,7 @@ public class AuditEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.AuditEntity loadAuditoriaEntityFromAuditoria(es.caib.seycon.ng.comu.Auditoria auditoria) {
+	private com.soffid.iam.model.AuditEntity loadAuditoriaEntityFromAuditoria(com.soffid.iam.api.Audit auditoria) {
 		if (auditoria.getId() == null) {
 			return newAuditEntity();
 		} else {
@@ -265,20 +268,20 @@ public class AuditEntityDaoImpl extends
 		}
 	}
 
-	public com.soffid.iam.model.AuditEntity auditoriaToEntity(es.caib.seycon.ng.comu.Auditoria auditoria) {
+	public com.soffid.iam.model.AuditEntity auditToEntity(com.soffid.iam.api.Audit auditoria) {
 		com.soffid.iam.model.AuditEntity entity = this.loadAuditoriaEntityFromAuditoria(auditoria);
-		this.auditoriaToEntity(auditoria, entity, true);
+		this.auditToEntity(auditoria, entity, true);
 		return entity;
 	}
 
-	public void auditoriaToEntityCustom(es.caib.seycon.ng.comu.Auditoria sourceVO, com.soffid.iam.model.AuditEntity targetEntity) {
+	public void auditoriaToEntityCustom(com.soffid.iam.api.Audit sourceVO, com.soffid.iam.model.AuditEntity targetEntity) {
 		if (sourceVO.getCalendar() != null)
 		{
 			targetEntity.setDate(sourceVO.getCalendar().getTime());
 		}
 		else
 		{
-    		String dateString = sourceVO.getData();
+    		String dateString = sourceVO.getAdditionalInfo();
     		try {
     			SimpleDateFormat dateFormat = new SimpleDateFormat(
     					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
@@ -289,15 +292,15 @@ public class AuditEntityDaoImpl extends
     		}
 		}
 
-		targetEntity.setDomainValue(sourceVO.getValorDomini());
+		targetEntity.setDomainValue(sourceVO.getDomainValue());
 		
-		String grup = sourceVO.getGrup();
+		String grup = sourceVO.getGroup();
 		if (grup != null && grup.trim().length() > 0) {
 			GroupEntity grupEntity = getGroupEntityDao().findByName(grup);
 			targetEntity.setGroup(grupEntity);
 		}
 
-		String usuari = sourceVO.getAutor();
+		String usuari = sourceVO.getAuthor();
 		if (usuari != null && usuari.trim().length() > 0) {
 			PasswordService passwordService = getPasswordService ();
 			try
@@ -317,8 +320,8 @@ public class AuditEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.AuditoriaEntityDao#auditoriaToEntity(es.caib.seycon.ng.comu.Auditoria,
 	 *      es.caib.seycon.ng.model.AuditoriaEntity)
 	 */
-	public void auditoriaToEntity(es.caib.seycon.ng.comu.Auditoria sourceVO, com.soffid.iam.model.AuditEntity targetEntity, boolean copyIfNull) {
-		super.auditoriaToEntity(sourceVO, targetEntity, copyIfNull);
+	public void auditToEntity(com.soffid.iam.api.Audit sourceVO, com.soffid.iam.model.AuditEntity targetEntity, boolean copyIfNull) {
+		super.auditToEntity(sourceVO, targetEntity, copyIfNull);
 		if (copyIfNull || sourceVO.getAccount() != null)
 		{
 			targetEntity.setAccount(sourceVO.getAccount());

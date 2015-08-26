@@ -1,0 +1,14 @@
+
+Benvingut als serveis de la CAIB:
+
+Ha rebut aquest correu perquè la seua adreça ha estat marcada per rebre notificacions dels canvis de les assignacions 
+de rols d'usuari a l'aplicació '@APLICACIO@'.
+
+S'ha fet la seguënt assignació de rols en l'aplicació:
+
+@ROLES@  
+
+Si no desitja rebre més correus d'aquesta aplicació ha de dirigir-se a la persona de contacte de l'aplicació '@APLICACIO@': 
+\t@RESPONSABLE@
+	
+Salutacions

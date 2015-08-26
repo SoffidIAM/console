@@ -1,17 +1,14 @@
 package es.caib.bpm.servei;
 
+import com.soffid.iam.api.BpmUserProcess;
+import com.soffid.iam.service.UserService;
+import com.soffid.iam.ServiceLocator;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.utils.Security;
 import java.util.Collection;
-
 import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.GraphElement;
 import org.jbpm.graph.exe.ExecutionContext;
-
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.UsuariWFProcess;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.utils.Security;
-
 
 public class EventServiceImpl implements org.jbpm.signal.EventService {
 
@@ -25,16 +22,14 @@ public class EventServiceImpl implements org.jbpm.signal.EventService {
 		{
 			Security.nestedLogin("bpm", new String [] {});
 			try {
-				UsuariService usvc = ServiceLocator.instance().getUsuariService();
-				Collection<UsuariWFProcess> proc = usvc.findProcessosWFUsuariByIdProces(executionContext.getProcessInstance().getId());
-				for (UsuariWFProcess pu: proc)
-				{
-					if (pu.getFinalitzat() == null || ! pu.getFinalitzat())
-					{
-						pu.setFinalitzat(true);
-						usvc.update(pu);
-					}
-				}
+				UserService usvc = ServiceLocator.instance().getUserService();
+				Collection<BpmUserProcess> proc = usvc.findBpmUserProcessByProcessId(executionContext.getProcessInstance().getId());
+				for (BpmUserProcess pu : proc) {
+                    if (pu.getTerminated() == null || !pu.getTerminated()) {
+                        pu.setTerminated(true);
+                        usvc.update(pu);
+                    }
+                }
 			} catch (InternalErrorException e) {
 				throw new RuntimeException("Unable to bind process to user", e);
 			} finally {

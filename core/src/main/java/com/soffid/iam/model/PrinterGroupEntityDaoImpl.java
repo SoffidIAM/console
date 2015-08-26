@@ -7,21 +7,26 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.PrinterGroupEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -38,17 +43,17 @@ public class PrinterGroupEntityDaoImpl extends
 	private void auditarGrupImpressora(String accio, String codiGrup,
 			String codiImpressora) {
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setImpressora(codiImpressora);
-		auditoria.setGrup(codiGrup);
-		auditoria.setAutor(codiUsuari);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setPrinter(codiImpressora);
+		auditoria.setGroup(codiGrup);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-		auditoria.setObjecte("SC_GRUIMP"); //$NON-NLS-1$
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_GRUIMP"); //$NON-NLS-1$
 
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 
@@ -99,33 +104,33 @@ public class PrinterGroupEntityDaoImpl extends
 		}
 	}
 
-	public void toGrupImpressora(com.soffid.iam.model.PrinterGroupEntity source, es.caib.seycon.ng.comu.GrupImpressora target) {
-		super.toGrupImpressora(source, target);
+	public void toPrinterGroup(com.soffid.iam.model.PrinterGroupEntity source, com.soffid.iam.api.PrinterGroup target) {
+		super.toPrinterGroup(source, target);
 		toGrupImpressoraCustom(source, target);
 	}
 
-	public void toGrupImpressoraCustom(com.soffid.iam.model.PrinterGroupEntity source, es.caib.seycon.ng.comu.GrupImpressora target) {
+	public void toGrupImpressoraCustom(com.soffid.iam.model.PrinterGroupEntity source, com.soffid.iam.api.PrinterGroup target) {
 		PrinterEntity impressora = source.getPrinter();
 		GroupEntity grup = source.getGroup();
 
-		target.setCodiImpressora(impressora.getName());
-		target.setCodiGrup(grup.getName());
+		target.setPrinterCode(impressora.getName());
+		target.setGroupCode(grup.getName());
 		Long ordre = source.getOrder();
 		if (ordre != null && ordre.equals(new Long(1))) {
-			target.setPerDefecte(new Boolean(true));
+			target.setEnabledByDefault(new Boolean(true));
 		} else {
-			target.setPerDefecte(new Boolean(false));
+			target.setEnabledByDefault(new Boolean(false));
 		}
 		
 		if (impressora != null && impressora.getServer() != null) {
-			target.setNomServidorImpressora(impressora.getServer().getName());
+			target.setPrinterServerName(impressora.getServer().getName());
 		}
 
 		
 	}
 
-	public es.caib.seycon.ng.comu.GrupImpressora toGrupImpressora(final com.soffid.iam.model.PrinterGroupEntity entity) {
-		return super.toGrupImpressora(entity);
+	public com.soffid.iam.api.PrinterGroup toPrinterGroup(final com.soffid.iam.model.PrinterGroupEntity entity) {
+		return super.toPrinterGroup(entity);
 	}
 
 	/**
@@ -133,7 +138,7 @@ public class PrinterGroupEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.PrinterGroupEntity loadGrupImpressoraEntityFromGrupImpressora(es.caib.seycon.ng.comu.GrupImpressora grupImpressora) {
+	private com.soffid.iam.model.PrinterGroupEntity loadGrupImpressoraEntityFromGrupImpressora(com.soffid.iam.api.PrinterGroup grupImpressora) {
 		com.soffid.iam.model.PrinterGroupEntity grupImpressoraEntity = null;
 		if (grupImpressora.getId() != null) {
 			grupImpressoraEntity = load(grupImpressora.getId());
@@ -147,29 +152,27 @@ public class PrinterGroupEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.GrupImpressoraEntityDao#grupImpressoraToEntity(es.caib.seycon.ng.comu.GrupImpressora)
 	 */
-	public com.soffid.iam.model.PrinterGroupEntity grupImpressoraToEntity(es.caib.seycon.ng.comu.GrupImpressora grupImpressora) {
+	public com.soffid.iam.model.PrinterGroupEntity printerGroupToEntity(com.soffid.iam.api.PrinterGroup grupImpressora) {
 		com.soffid.iam.model.PrinterGroupEntity entity = this.loadGrupImpressoraEntityFromGrupImpressora(grupImpressora);
-		this.grupImpressoraToEntity(grupImpressora, entity, true);
+		this.printerGroupToEntity(grupImpressora, entity, true);
 		return entity;
 	}
 
-	public void grupImpressoraToEntityCustom(es.caib.seycon.ng.comu.GrupImpressora source, com.soffid.iam.model.PrinterGroupEntity target) {
-		String codiGrup = source.getCodiGrup();
-		PrinterEntity impressora = getPrinterEntityDao().findByName(source.getCodiImpressora());
+	public void grupImpressoraToEntityCustom(com.soffid.iam.api.PrinterGroup source, com.soffid.iam.model.PrinterGroupEntity target) {
+		String codiGrup = source.getGroupCode();
+		PrinterEntity impressora = getPrinterEntityDao().findByName(source.getPrinterCode());
 		if (impressora != null) {
 			target.setPrinter(impressora);
 		} else {
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.3"),  //$NON-NLS-1$
-					source.getCodiImpressora()));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.3"), source.getPrinterCode()));
 		}
-		GroupEntity grup = getGroupEntityDao().findByName(source.getCodiGrup());
+		GroupEntity grup = getGroupEntityDao().findByName(source.getGroupCode());
 		if (grup != null) {
 			target.setGroup(grup);
 		} else {
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.4"),  //$NON-NLS-1$
-					source.getCodiGrup()));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.4"), source.getGroupCode()));
 		}
-		if (source.getPerDefecte().booleanValue()) {
+		if (source.getEnabledByDefault().booleanValue()) {
 			target.setOrder(new Long(1));
 		} else {
 			target.setOrder(new Long(2));
@@ -180,8 +183,8 @@ public class PrinterGroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupImpressoraEntityDao#grupImpressoraToEntity(es.caib.seycon.ng.comu.GrupImpressora,
 	 *      es.caib.seycon.ng.model.GrupImpressoraEntity)
 	 */
-	public void grupImpressoraToEntity(es.caib.seycon.ng.comu.GrupImpressora source, com.soffid.iam.model.PrinterGroupEntity target, boolean copyIfNull) {
-		super.grupImpressoraToEntity(source, target, copyIfNull);
+	public void printerGroupToEntity(com.soffid.iam.api.PrinterGroup source, com.soffid.iam.model.PrinterGroupEntity target, boolean copyIfNull) {
+		super.printerGroupToEntity(source, target, copyIfNull);
 		grupImpressoraToEntityCustom(source, target);
 	}
 

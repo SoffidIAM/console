@@ -7,16 +7,17 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.UserData;
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
@@ -129,14 +130,14 @@ public class UserDataEntityDaoImpl
 		}
 	}
 	
-    public void toDadaUsuari(com.soffid.iam.model.UserDataEntity sourceEntity, es.caib.seycon.ng.comu.DadaUsuari targetVO) {
-        super.toDadaUsuari(sourceEntity, targetVO);
+    public void toUserData(com.soffid.iam.model.UserDataEntity sourceEntity, com.soffid.iam.api.UserData targetVO) {
+        super.toUserData(sourceEntity, targetVO);
         toDadaUsuariCustom(sourceEntity, targetVO);
     }
     
-    private void toDadaUsuariCustom(com.soffid.iam.model.UserDataEntity sourceEntity, es.caib.seycon.ng.comu.DadaUsuari targetVO) {        
-        targetVO.setCodiDada(sourceEntity.getDataType().getName());
-        targetVO.setCodiUsuari(sourceEntity.getUser().getUserName());
+    private void toDadaUsuariCustom(com.soffid.iam.model.UserDataEntity sourceEntity, com.soffid.iam.api.UserData targetVO) {        
+        targetVO.setAttribute(sourceEntity.getDataType().getName());
+        targetVO.setUser(sourceEntity.getUser().getUserName());
     	targetVO.setDataLabel(sourceEntity.getDataType().getLabel());
     	if (targetVO.getDataLabel() == null || targetVO.getDataLabel().trim().length() == 0) 
     		targetVO.setDataLabel(sourceEntity.getDataType().getName());
@@ -149,12 +150,12 @@ public class UserDataEntityDaoImpl
         				Date dateObj = curFormater.parse(data);
         				Calendar calendar = Calendar.getInstance();
         				calendar .setTime(dateObj);
-        				targetVO.setValorDadaDate(calendar);
+        				targetVO.setDateValue(calendar);
         			}catch (ParseException e){
-        				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.IsNotDate"), targetVO.getValorDada())); //$NON-NLS-1$
+        				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.IsNotDate"), targetVO.getValue())); //$NON-NLS-1$
         			}
         		}else 
-        			targetVO.setValorDadaDate(null);
+        			targetVO.setDateValue(null);
         	}
         }
         targetVO.setVisibility(sourceEntity.getAttributeVisibility());
@@ -163,9 +164,9 @@ public class UserDataEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DadaUsuariEntityDao#toDadaUsuari(es.caib.seycon.ng.model.DadaUsuariEntity)
      */
-    public es.caib.seycon.ng.comu.DadaUsuari toDadaUsuari(final com.soffid.iam.model.UserDataEntity entity) {
+    public com.soffid.iam.api.UserData toUserData(final com.soffid.iam.model.UserDataEntity entity) {
         // @todo verify behavior of toDadaUsuari
-        DadaUsuari dadaUsuari = super.toDadaUsuari(entity);
+        UserData dadaUsuari = super.toUserData(entity);
         return dadaUsuari;
     }
 
@@ -175,7 +176,7 @@ public class UserDataEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.UserDataEntity loadDadaUsuariEntityFromDadaUsuari(es.caib.seycon.ng.comu.DadaUsuari dadaUsuari) {
+    private com.soffid.iam.model.UserDataEntity loadDadaUsuariEntityFromDadaUsuari(com.soffid.iam.api.UserData dadaUsuari) {
         com.soffid.iam.model.UserDataEntity dadaUsuariEntity = null;
         if(dadaUsuari.getId() != null){
         	dadaUsuariEntity = load(dadaUsuari.getId());
@@ -188,28 +189,28 @@ public class UserDataEntityDaoImpl
     }
 
     
-    private void dadaUsuariToEntityCustom(es.caib.seycon.ng.comu.DadaUsuari sourceVO, com.soffid.iam.model.UserDataEntity targetEntity) {    	
+    private void dadaUsuariToEntityCustom(com.soffid.iam.api.UserData sourceVO, com.soffid.iam.model.UserDataEntity targetEntity) {    	
     		assertPhoneExists();
-            UserEntity usuariEntity = getUserEntityDao().findByUserName(sourceVO.getCodiUsuari());
+            UserEntity usuariEntity = getUserEntityDao().findByUserName(sourceVO.getUser());
             if(usuariEntity == null){
-            	throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.3"), sourceVO.getCodiUsuari()));  //$NON-NLS-1$
+            	throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.3"), sourceVO.getUser()));  //$NON-NLS-1$
             }
-            MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByName(sourceVO.getCodiDada());
+            MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().findDataTypeByName(sourceVO.getAttribute());
 			if (tipusDadaEntity == null) {
-				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.4"), sourceVO.getCodiDada())); //$NON-NLS-1$
+				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.4"), sourceVO.getAttribute())); //$NON-NLS-1$
 			}
             targetEntity.setUser(usuariEntity);
             targetEntity.setDataType(tipusDadaEntity);
             if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()))
             {
-            	if (sourceVO.getValorDadaDate() == null && sourceVO.getValorDada() != null)
+            	if (sourceVO.getDateValue() == null && sourceVO.getValue() != null)
             	{
-            		sourceVO.setValorDadaDate(parseDate(sourceVO.getValorDada()));
+            		sourceVO.setDateValue(parseDate(sourceVO.getValue()));
             	}
-            	if (sourceVO.getValorDadaDate() != null)
+            	if (sourceVO.getDateValue() != null)
 	            {
 					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
-	            	targetEntity.setValue(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+	            	targetEntity.setValue(curFormater.format(sourceVO.getDateValue().getTime()));
 	            }
             }
         }
@@ -263,10 +264,10 @@ public class UserDataEntityDaoImpl
 	/**
      * @see es.caib.seycon.ng.model.DadaUsuariEntityDao#dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari)
      */
-    public com.soffid.iam.model.UserDataEntity dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari dadaUsuari) {
+    public com.soffid.iam.model.UserDataEntity userDataToEntity(com.soffid.iam.api.UserData dadaUsuari) {
         // @todo verify behavior of dadaUsuariToEntity
         com.soffid.iam.model.UserDataEntity entity = this.loadDadaUsuariEntityFromDadaUsuari(dadaUsuari);
-        this.dadaUsuariToEntity(dadaUsuari, entity, true);
+        this.userDataToEntity(dadaUsuari, entity, true);
         return entity;
     }
 
@@ -274,9 +275,9 @@ public class UserDataEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DadaUsuariEntityDao#dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari, es.caib.seycon.ng.model.DadaUsuariEntity)
      */
-    public void dadaUsuariToEntity(es.caib.seycon.ng.comu.DadaUsuari sourceVO, com.soffid.iam.model.UserDataEntity targetEntity, boolean copyIfNull) {
+    public void userDataToEntity(com.soffid.iam.api.UserData sourceVO, com.soffid.iam.model.UserDataEntity targetEntity, boolean copyIfNull) {
         // @todo verify behavior of dadaUsuariToEntity
-        super.dadaUsuariToEntity(sourceVO, targetEntity, copyIfNull);
+        super.userDataToEntity(sourceVO, targetEntity, copyIfNull);
         dadaUsuariToEntityCustom(sourceVO, targetEntity);
     }
 

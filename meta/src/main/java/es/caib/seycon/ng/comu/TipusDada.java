@@ -13,7 +13,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DataType",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class TipusDada {
+public class TipusDada {
 
 	@Attribute(translated = "code" )
 	public java.lang.String codi;

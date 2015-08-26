@@ -7,15 +7,18 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EmailDomainEntity;
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
@@ -32,16 +35,15 @@ public class EmailDomainEntityDaoImpl
 {
 	private void auditarDominiCorreu(String accio, String codiDomini) {
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setDominiCorreu(codiDomini);
-		auditoria.setAutor(codiUsuari);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setMailDomain(codiDomini);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_DOMCOR"); //$NON-NLS-1$
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_DOMCOR"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 	
@@ -80,14 +82,14 @@ public class EmailDomainEntityDaoImpl
 		}
 	}
 	
-    public void toDominiCorreu(com.soffid.iam.model.EmailDomainEntity sourceEntity, es.caib.seycon.ng.comu.DominiCorreu targetVO) {
+    public void toMailDomain(com.soffid.iam.model.EmailDomainEntity sourceEntity, com.soffid.iam.api.MailDomain targetVO) {
         // @todo verify behavior of toDominiCorreu
-        super.toDominiCorreu(sourceEntity, targetVO);
+        super.toMailDomain(sourceEntity, targetVO);
         String obsolet = sourceEntity.getObsolete();
         if(obsolet != null){
-        	targetVO.setObsolet(new Boolean(obsolet.compareTo("S") == 0)); //$NON-NLS-1$
+        	targetVO.setObsolete(new Boolean(obsolet.compareTo("S") == 0)); //$NON-NLS-1$
         }else{
-        	targetVO.setObsolet(new Boolean(false));
+        	targetVO.setObsolete(new Boolean(false));
         }
     }
 
@@ -95,9 +97,9 @@ public class EmailDomainEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DominiCorreuEntityDao#toDominiCorreu(es.caib.seycon.ng.model.DominiCorreuEntity)
      */
-    public es.caib.seycon.ng.comu.DominiCorreu toDominiCorreu(final com.soffid.iam.model.EmailDomainEntity entity) {
+    public com.soffid.iam.api.MailDomain toMailDomain(final com.soffid.iam.model.EmailDomainEntity entity) {
         // @todo verify behavior of toDominiCorreu
-        return super.toDominiCorreu(entity);
+        return super.toMailDomain(entity);
     }
 
 
@@ -106,7 +108,7 @@ public class EmailDomainEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.EmailDomainEntity loadDominiCorreuEntityFromDominiCorreu(es.caib.seycon.ng.comu.DominiCorreu dominiCorreu) {
+    private com.soffid.iam.model.EmailDomainEntity loadDominiCorreuEntityFromDominiCorreu(com.soffid.iam.api.MailDomain dominiCorreu) {
     	com.soffid.iam.model.EmailDomainEntity dominiCorreuEntity = null;
     	if(dominiCorreu.getId() != null){
     		dominiCorreuEntity = load(dominiCorreu.getId());
@@ -122,10 +124,10 @@ public class EmailDomainEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DominiCorreuEntityDao#dominiCorreuToEntity(es.caib.seycon.ng.DominiCorreu)
      */
-    public com.soffid.iam.model.EmailDomainEntity dominiCorreuToEntity(es.caib.seycon.ng.comu.DominiCorreu dominiCorreu) {
+    public com.soffid.iam.model.EmailDomainEntity mailDomainToEntity(com.soffid.iam.api.MailDomain dominiCorreu) {
         // @todo verify behavior of dominiCorreuToEntity
         com.soffid.iam.model.EmailDomainEntity entity = this.loadDominiCorreuEntityFromDominiCorreu(dominiCorreu);
-        this.dominiCorreuToEntity(dominiCorreu, entity, true);
+        this.mailDomainToEntity(dominiCorreu, entity, true);
         return entity;
     }
 
@@ -133,10 +135,10 @@ public class EmailDomainEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DominiCorreuEntityDao#dominiCorreuToEntity(es.caib.seycon.ng.DominiCorreu, es.caib.seycon.ng.model.DominiCorreuEntity)
      */
-    public void dominiCorreuToEntity(es.caib.seycon.ng.comu.DominiCorreu sourceVO, com.soffid.iam.model.EmailDomainEntity targetEntity, boolean copyIfNull) {
+    public void mailDomainToEntity(com.soffid.iam.api.MailDomain sourceVO, com.soffid.iam.model.EmailDomainEntity targetEntity, boolean copyIfNull) {
         // @todo verify behavior of dominiCorreuToEntity
-        super.dominiCorreuToEntity(sourceVO, targetEntity, copyIfNull);
-        targetEntity.setObsolete(sourceVO.getObsolet().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        super.mailDomainToEntity(sourceVO, targetEntity, copyIfNull);
+        targetEntity.setObsolete(sourceVO.getObsolete().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     public void create(Collection entities) {

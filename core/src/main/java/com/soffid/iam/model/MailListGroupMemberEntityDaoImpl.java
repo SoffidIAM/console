@@ -6,7 +6,8 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.model.TaskEntity;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import java.sql.Timestamp;
 
 /**

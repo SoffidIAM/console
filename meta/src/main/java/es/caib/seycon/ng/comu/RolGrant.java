@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="RoleGrant",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class RolGrant {
+public class RolGrant {
 
 	public java.lang.Long id;
 

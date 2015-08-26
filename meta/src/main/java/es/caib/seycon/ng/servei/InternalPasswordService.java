@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.ContrasenyaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.sync.servei.TaskQueue.class,
+	ConsoleLogonService.class,
 	es.caib.seycon.ng.model.PoliticaContrasenyaEntity.class,
 	es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.model.DominiUsuariEntity.class,
@@ -146,7 +148,7 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	@Operation(translated="isOldAccouuntPassword")
+	@Operation(translated="isOldAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public boolean isOldAccountPassword(
 		es.caib.seycon.ng.model.AccountEntity account, 

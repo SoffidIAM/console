@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DomainValue",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ValorDomini {
+public class ValorDomini {
 
 	@Description ("Domain value")
 	@Attribute(translated = "value" )

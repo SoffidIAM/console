@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( internal=true,
 	 serverOnly=true,
 	 translatedName="ChangePasswordNotificationQueue",
-	 translatedPackage="es.caib.seycon.ng.sync.servei")
+	 translatedPackage="com.soffid.iam.sync.service")
 @Depends ({es.caib.seycon.ng.model.SessioEntity.class})
 public abstract class ChangePasswordNotificationQueue {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void sendNotification(
-		es.caib.seycon.ng.sync.engine.ChangePasswordNotification n)
+		com.soffid.iam.sync.engine.ChangePasswordNotification n)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -27,7 +27,7 @@ public abstract class ChangePasswordNotificationQueue {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.sync.engine.ChangePasswordNotification peekNotification()
+	public com.soffid.iam.sync.engine.ChangePasswordNotification peekNotification()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

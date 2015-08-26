@@ -1,5 +1,13 @@
 package es.caib.seycon.ng.servei.impl;
 
+import com.soffid.iam.api.AgentDescriptor;
+import com.soffid.iam.api.ServerPlugin;
+import com.soffid.iam.api.ServerPluginModule;
+import es.caib.seycon.ng.comu.AttributeDirection;
+import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
+import es.caib.seycon.ng.comu.ServerPluginModuleType;
+import com.soffid.iam.api.SoffidObjectType;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +23,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,21 +31,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import es.caib.seycon.ng.comu.AttributeDirection;
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
-import es.caib.seycon.ng.comu.ServerPluginModule;
-import es.caib.seycon.ng.comu.AgentDescriptor;
-import es.caib.seycon.ng.comu.ServerPlugin;
-import es.caib.seycon.ng.comu.ServerPluginModuleType;
-import es.caib.seycon.ng.comu.SoffidObjectType;
 
 public class ServerPluginParser {
 	File f;

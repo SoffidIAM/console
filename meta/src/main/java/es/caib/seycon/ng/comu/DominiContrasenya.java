@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="PasswordDomain",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DominiContrasenya {
+public class DominiContrasenya {
 
 	@Nullable
 	public java.lang.Long id;

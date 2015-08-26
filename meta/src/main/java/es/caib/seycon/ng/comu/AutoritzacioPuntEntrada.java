@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AccessTreeAuthorization",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class AutoritzacioPuntEntrada {
+public class AutoritzacioPuntEntrada {
 
 	@Nullable
 	public java.lang.Long id;

@@ -7,21 +7,24 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
 
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.IPAddress;
 import es.caib.seycon.ng.utils.InvalidIPException;
@@ -48,14 +51,14 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
 
     private void auditarXarxa(String accio, String codiXarxa) {
         String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setXarxa(codiXarxa);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setNetwork(codiXarxa);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-        auditoria.setObjecte("SC_XARXA"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_XARXA"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -108,14 +111,14 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         }
     }
 
-    public void toXarxa(com.soffid.iam.model.NetworkEntity sourceEntity, es.caib.seycon.ng.comu.Xarxa targetVO) {
-        super.toXarxa(sourceEntity, targetVO);
+    public void toNetwork(com.soffid.iam.model.NetworkEntity sourceEntity, com.soffid.iam.api.Network targetVO) {
+        super.toNetwork(sourceEntity, targetVO);
         toXarxaCustom(sourceEntity, targetVO);
     }
 
-    public void toXarxaCustom(com.soffid.iam.model.NetworkEntity sourceEntity, es.caib.seycon.ng.comu.Xarxa targetVO) {
-        targetVO.setNormalitzada(new Boolean(sourceEntity.getNormalized().compareTo("S") == 0)); //$NON-NLS-1$
-        String adrecaXarxa = targetVO.getAdreca();
+    public void toXarxaCustom(com.soffid.iam.model.NetworkEntity sourceEntity, com.soffid.iam.api.Network targetVO) {
+        targetVO.setLanAccess(new Boolean(sourceEntity.getNormalized().compareTo("S") == 0)); //$NON-NLS-1$
+        String adrecaXarxa = targetVO.getIp();
         StringTokenizer tokenizer = new StringTokenizer(adrecaXarxa, ".", false); //$NON-NLS-1$
         List partsAdrecaXarxaList = new LinkedList();
         while (tokenizer.hasMoreTokens()) {
@@ -137,15 +140,15 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
                 adrecaBenFormada = adrecaBenFormada + "."; //$NON-NLS-1$
             }
         }
-        targetVO.setAdreca(adrecaBenFormada);
+        targetVO.setIp(adrecaBenFormada);
         targetVO.setDhcpSupport(sourceEntity.isDchpSupport());
     }
 
     /**
      * @see es.caib.seycon.ng.model.XarxaEntityDao#toXarxa(es.caib.seycon.ng.model.XarxaEntity)
      */
-    public es.caib.seycon.ng.comu.Xarxa toXarxa(final com.soffid.iam.model.NetworkEntity entity) {
-        Xarxa xarxa = super.toXarxa(entity);
+    public com.soffid.iam.api.Network toNetwork(final com.soffid.iam.model.NetworkEntity entity) {
+        Network xarxa = super.toNetwork(entity);
         toXarxaCustom(entity, xarxa);
         return xarxa;
     }
@@ -155,7 +158,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.NetworkEntity loadXarxaEntityFromXarxa(es.caib.seycon.ng.comu.Xarxa xarxa) {
+    private com.soffid.iam.model.NetworkEntity loadXarxaEntityFromXarxa(com.soffid.iam.api.Network xarxa) {
         NetworkEntity xarxaEntity = null;
         if (xarxa.getId() != null) {
             xarxaEntity = load(xarxa.getId());
@@ -169,9 +172,9 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
     /**
      * @see es.caib.seycon.ng.model.XarxaEntityDao#xarxaToEntity(es.caib.seycon.ng.comu.Xarxa)
      */
-    public com.soffid.iam.model.NetworkEntity xarxaToEntity(es.caib.seycon.ng.comu.Xarxa xarxa) {
+    public com.soffid.iam.model.NetworkEntity networkToEntity(com.soffid.iam.api.Network xarxa) {
         com.soffid.iam.model.NetworkEntity entity = this.loadXarxaEntityFromXarxa(xarxa);
-        this.xarxaToEntity(xarxa, entity, true);
+        this.networkToEntity(xarxa, entity, true);
         return entity;
     }
 
@@ -203,20 +206,20 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         return compatible;
     }
 
-    private void xarxaToEntityCustom(es.caib.seycon.ng.comu.Xarxa sourceVO, com.soffid.iam.model.NetworkEntity targetEntity) {
+    private void xarxaToEntityCustom(com.soffid.iam.api.Network sourceVO, com.soffid.iam.model.NetworkEntity targetEntity) {
 
-        if (sourceVO.getNormalitzada() != null) {
-            targetEntity.setNormalized(sourceVO.getNormalitzada().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (sourceVO.getLanAccess() != null) {
+            targetEntity.setNormalized(sourceVO.getLanAccess().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setNormalized("N"); //$NON-NLS-1$
         }
         targetEntity.setDchpSupport(sourceVO.isDhcpSupport());
-        targetEntity.setAddress(sourceVO.getAdreca().trim());
+        targetEntity.setAddress(sourceVO.getIp().trim());
         
         // Check network mask
-        if (sourceVO.getMascara() != null)
+        if (sourceVO.getMask() != null)
         {
-        	targetEntity.setMask(sourceVO.getMascara().trim());
+        	targetEntity.setMask(sourceVO.getMask().trim());
         }
         
         else
@@ -224,10 +227,8 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         	throw new SeyconException(Messages.getString("NetworkEntityDaoImpl.4")); //$NON-NLS-1$
         }
         
-        if (!adrecaCompatibleAmbXarxa(sourceVO.getAdreca(), sourceVO.getMascara())) {
-            throw new SeyconException(String.format(
-                    Messages.getString("NetworkEntityDaoImpl.3"), //$NON-NLS-1$
-                    sourceVO.getAdreca(), sourceVO.getMascara()));
+        if (!adrecaCompatibleAmbXarxa(sourceVO.getIp(), sourceVO.getMask())) {
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.3"), sourceVO.getIp(), sourceVO.getMask()));
         }
     }
 
@@ -291,8 +292,8 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      * @see es.caib.seycon.ng.model.XarxaEntityDao#xarxaToEntity(es.caib.seycon.ng.comu.Xarxa,
      *      es.caib.seycon.ng.model.XarxaEntity)
      */
-    public void xarxaToEntity(es.caib.seycon.ng.comu.Xarxa sourceVO, com.soffid.iam.model.NetworkEntity targetEntity, boolean copyIfNull) {
-        super.xarxaToEntity(sourceVO, targetEntity, copyIfNull);
+    public void networkToEntity(com.soffid.iam.api.Network sourceVO, com.soffid.iam.model.NetworkEntity targetEntity, boolean copyIfNull) {
+        super.networkToEntity(sourceVO, targetEntity, copyIfNull);
         xarxaToEntityCustom(sourceVO, targetEntity);
     }
 

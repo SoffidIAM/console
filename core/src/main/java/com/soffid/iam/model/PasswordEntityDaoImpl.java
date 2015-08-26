@@ -7,17 +7,20 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserTypeEntity;
-import es.caib.seycon.ng.comu.EstatContrasenya;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import java.security.MessageDigest;
 import java.sql.CallableStatement;
@@ -68,17 +71,17 @@ public class PasswordEntityDaoImpl extends
         }
     }
 
-	public void toEstatContrasenya(com.soffid.iam.model.PasswordEntity source, es.caib.seycon.ng.comu.EstatContrasenya target) {
-            target.setCaducitat(new GregorianCalendar());
-            target.getCaducitat().setTime(source.getExpirationDate());
-            target.setData(new GregorianCalendar());
-            target.getData().setTime(source.getDate());
+	public void toPasswordStatus(com.soffid.iam.model.PasswordEntity source, com.soffid.iam.api.PasswordStatus target) {
+            target.setExpirationDate(new GregorianCalendar());
+            target.getExpirationDate().setTime(source.getExpirationDate());
+            target.setDate(new GregorianCalendar());
+            target.getDate().setTime(source.getDate());
 		// NOTA: aquí usuari es de tipus CodiUsuariEntity
-		target.setUsuari(source.getUser().getUserName());
+		target.setUser(source.getUser().getUserName());
 		PasswordDomainEntity dominiContrasenyes = source.getDomain();
-		target.setDominiContrasenyes(dominiContrasenyes.getName());
+		target.setPasswordDomain(dominiContrasenyes.getName());
 		// Indicador de si és caducada
-		target.setCaducada(new Boolean(source.getExpirationDate().before(GregorianCalendar.getInstance().getTime())));
+		target.setExpired(new Boolean(source.getExpirationDate().before(GregorianCalendar.getInstance().getTime())));
 		// Obtenim la política de contrasenyes
 		// obtenim el tipus d'usuari
 		UserTypeEntity tipusUsuari = source.getUser().getUserType();
@@ -89,14 +92,14 @@ public class PasswordEntityDaoImpl extends
 			for (it = dominiContrasenyes.getPasswordPolicies().iterator(); !trobat && it.hasNext(); ) {
                 PasswordPolicyEntity politica = it.next();
                 if (tipusUsuari.getName().equals(politica.getUserType().getName())) {
-                    target.setTipusPoliticaContrasenya(politica.getType());
+                    target.setPasswordPolicyType(politica.getType());
                     trobat = true;
                 }
             }
 		}
         }
 
-    public PasswordEntity estatContrasenyaToEntity(EstatContrasenya estatContrasenya) {
+    public PasswordEntity passwordStatusToEntity(PasswordStatus estatContrasenya) {
         throw new UnsupportedOperationException();
     }
 

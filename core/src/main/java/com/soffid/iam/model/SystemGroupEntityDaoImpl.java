@@ -23,22 +23,22 @@ public class SystemGroupEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.GrupDispatcherEntityDao#toGrupDispatcher(es.caib.seycon.ng.model.GrupDispatcherEntity, es.caib.seycon.ng.comu.GrupDispatcher)
      */
-    public void toGrupDispatcher(com.soffid.iam.model.SystemGroupEntity source, es.caib.seycon.ng.comu.GrupDispatcher target) {
+    public void toSystemGroup(com.soffid.iam.model.SystemGroupEntity source, com.soffid.iam.api.SystemGroup target) {
         // @todo verify behavior of toGrupDispatcher
-        super.toGrupDispatcher(source, target);
+        super.toSystemGroup(source, target);
         if (source.getSystem() != null)
-        	target.setCodiDispatcher(source.getSystem().getName());
+        	target.setSystemCode(source.getSystem().getName());
         if (source.getGroup() != null)
-        	target.setCodiGrup(source.getGroup().getName());
+        	target.setGroupCode(source.getGroup().getName());
     }
 
 
     /**
      * @see es.caib.seycon.ng.model.GrupDispatcherEntityDao#toGrupDispatcher(es.caib.seycon.ng.model.GrupDispatcherEntity)
      */
-    public es.caib.seycon.ng.comu.GrupDispatcher toGrupDispatcher(final com.soffid.iam.model.SystemGroupEntity entity) {
+    public com.soffid.iam.api.SystemGroup toSystemGroup(final com.soffid.iam.model.SystemGroupEntity entity) {
         // @todo verify behavior of toGrupDispatcher
-        return super.toGrupDispatcher(entity);
+        return super.toSystemGroup(entity);
     }
 
 
@@ -47,7 +47,7 @@ public class SystemGroupEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.SystemGroupEntity loadGrupDispatcherEntityFromGrupDispatcher(es.caib.seycon.ng.comu.GrupDispatcher grupDispatcher) {
+    private com.soffid.iam.model.SystemGroupEntity loadGrupDispatcherEntityFromGrupDispatcher(com.soffid.iam.api.SystemGroup grupDispatcher) {
         com.soffid.iam.model.SystemGroupEntity grupDispatcherEntity = null;
         
         if (grupDispatcher.getId() !=null) {
@@ -64,10 +64,10 @@ public class SystemGroupEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.GrupDispatcherEntityDao#grupDispatcherToEntity(es.caib.seycon.ng.comu.GrupDispatcher)
      */
-    public com.soffid.iam.model.SystemGroupEntity grupDispatcherToEntity(es.caib.seycon.ng.comu.GrupDispatcher grupDispatcher) {
+    public com.soffid.iam.model.SystemGroupEntity systemGroupToEntity(com.soffid.iam.api.SystemGroup grupDispatcher) {
         // @todo verify behavior of grupDispatcherToEntity
         com.soffid.iam.model.SystemGroupEntity entity = this.loadGrupDispatcherEntityFromGrupDispatcher(grupDispatcher);
-        this.grupDispatcherToEntity(grupDispatcher, entity, true);
+        this.systemGroupToEntity(grupDispatcher, entity, true);
         return entity;
     }
 
@@ -75,18 +75,18 @@ public class SystemGroupEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.GrupDispatcherEntityDao#grupDispatcherToEntity(es.caib.seycon.ng.comu.GrupDispatcher, es.caib.seycon.ng.model.GrupDispatcherEntity)
      */
-	public void grupDispatcherToEntity(es.caib.seycon.ng.comu.GrupDispatcher source, com.soffid.iam.model.SystemGroupEntity target, boolean copyIfNull) {
+	public void systemGroupToEntity(com.soffid.iam.api.SystemGroup source, com.soffid.iam.model.SystemGroupEntity target, boolean copyIfNull) {
 		// @todo verify behavior of grupDispatcherToEntity
-		super.grupDispatcherToEntity(source, target, copyIfNull);
+		super.systemGroupToEntity(source, target, copyIfNull);
 		if (source.getId() != null)
 			target.setId(source.getId());
-		if (source.getCodiDispatcher() != null) {
-			SystemEntity agent = getSystemEntityDao().findByName(source.getCodiDispatcher());
+		if (source.getSystemCode() != null) {
+			SystemEntity agent = getSystemEntityDao().findByName(source.getSystemCode());
 			if (agent != null)
 				target.setSystem(agent);
 		}
-		if (source.getCodiGrup() != null) {
-			GroupEntity grup = getGroupEntityDao().findByName(source.getCodiGrup());
+		if (source.getGroupCode() != null) {
+			GroupEntity grup = getGroupEntityDao().findByName(source.getGroupCode());
 			if (grup != null)
 				target.setGroup(grup);
 		}

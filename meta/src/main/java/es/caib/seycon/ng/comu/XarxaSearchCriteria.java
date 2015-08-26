@@ -8,7 +8,7 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 @Criteria 
-public abstract class XarxaSearchCriteria {
+public class XarxaSearchCriteria {
 
 	@CriteriaColumn(comparator="LIKE_COMPARATOR", parameter="name")
 	public java.lang.String codi;

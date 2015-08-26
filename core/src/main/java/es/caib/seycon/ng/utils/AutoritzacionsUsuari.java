@@ -1,23 +1,23 @@
 package es.caib.seycon.ng.utils;
 
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.comu.Usuari;
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.service.AccountService;
+import com.soffid.iam.service.InternalPasswordService;
+import com.soffid.iam.service.UserService;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AccountService;
-import es.caib.seycon.ng.servei.InternalPasswordService;
-import es.caib.seycon.ng.servei.UsuariService;
 
 public class AutoritzacionsUsuari
 {
 
-	public static Usuari getCurrentUsuari () throws InternalErrorException
-	{
+	public static User getCurrentUsuari() throws InternalErrorException {
 		InternalPasswordService ips = ServiceLocator.instance()
 						.getInternalPasswordService();
 		AccountService as = ServiceLocator.instance().getAccountService();
-		UsuariService us = ServiceLocator.instance().getUsuariService();
+		UserService us = ServiceLocator.instance().getUserService();
 		String dispatcher = ips.getDefaultDispatcher();
 		Account caller = as.findAccount(Security.getPrincipal().getName(), dispatcher);
 		if (caller == null)
@@ -25,7 +25,7 @@ public class AutoritzacionsUsuari
 		if (caller instanceof UserAccount)
 		{
 			String codi = ((UserAccount) caller).getUser();
-			return us.findUsuariByCodiUsuari(codi);
+			return us.findUserByUserName(codi);
 		}
 		return null;
 	}

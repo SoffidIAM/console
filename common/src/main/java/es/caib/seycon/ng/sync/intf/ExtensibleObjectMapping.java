@@ -3,6 +3,9 @@ package es.caib.seycon.ng.sync.intf;
 import java.util.Collection;
 import java.util.Map;
 
+import com.soffid.iam.api.User;
+import com.soffid.iam.sync.intf.ExtensibleObject;
+
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.ObjectMapping;
 import es.caib.seycon.ng.comu.SoffidObjectType;
@@ -59,4 +62,28 @@ public class ExtensibleObjectMapping extends ObjectMapping
 		super(systemObject, soffidObject, dispatcherId);
 	}
 	
+	public static ExtensibleObjectMapping toExtensibleObjectMapping (com.soffid.iam.sync.intf.ExtensibleObjectMapping other)
+	{
+		ExtensibleObjectMapping eom = new ExtensibleObjectMapping();
+		eom.attributes = AttributeMapping.toAttributeMappingList(other.getAttributes());
+		eom.properties = other.getProperties();
+		ObjectMapping.toObjectMapping(other, eom);
+		return eom;
+	}
+
+	/**
+	 * Creates a User list on a Usuari collection.
+	 */
+	public static java.util.List<ExtensibleObjectMapping> toExtensibleObjectMappingList (java.util.Collection<com.soffid.iam.sync.intf.ExtensibleObjectMapping> source)
+	{
+		if (source == null) return null;
+
+		java.util.List<ExtensibleObjectMapping> target = new java.util.LinkedList<ExtensibleObjectMapping> ();
+		for (com.soffid.iam.sync.intf.ExtensibleObjectMapping obj: source) 
+		{
+				target.add ( toExtensibleObjectMapping(obj));
+		}
+		return target;
+	}
+
 }

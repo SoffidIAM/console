@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="SyncServerInfo",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class SeyconServerInfo {
+public class SeyconServerInfo {
 
 	public java.lang.String url;
 

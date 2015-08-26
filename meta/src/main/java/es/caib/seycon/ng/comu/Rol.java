@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Role",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Rol {
+public class Rol {
 
 	@Attribute(translated = "name" )
 	public java.lang.String nom;
@@ -32,7 +32,7 @@ public abstract class Rol {
 	@Attribute(translated = "password" )
 	public java.lang.Boolean contrasenya;
 
-	@Attribute(translated = "applicationCode" )
+	@Attribute(translated = "informationSystemName" )
 	public java.lang.String codiAplicacio;
 
 	@Nullable

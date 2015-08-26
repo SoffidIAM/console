@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="PrinterUser",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariImpressora {
+public class UsuariImpressora {
 
 	@Attribute(translated = "printer" )
 	public java.lang.String codiImpressora;

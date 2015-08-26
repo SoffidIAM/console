@@ -7,15 +7,18 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import es.caib.seycon.ng.comu.Auditoria;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.Security;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -30,16 +33,15 @@ public class PasswordDomainEntityDaoImpl
 
     private void audit(String accio, PasswordDomainEntity domain) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
         auditoria.setPasswordDomain(domain.getName());
-        auditoria.setAutor(codiUsuari);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_DOMCON"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_DOMCON"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -73,9 +75,9 @@ public class PasswordDomainEntityDaoImpl
 	/**
      * @see es.caib.seycon.ng.model.DominiContrasenyaEntityDao#toDominiContrasenya(es.caib.seycon.ng.model.DominiContrasenyaEntity, es.caib.seycon.ng.comu.DominiContrasenya)
      */
-    public void toDominiContrasenya(com.soffid.iam.model.PasswordDomainEntity source, es.caib.seycon.ng.comu.DominiContrasenya target) {
+    public void toPasswordDomain(com.soffid.iam.model.PasswordDomainEntity source, com.soffid.iam.api.PasswordDomain target) {
         // @todo verify behavior of toDominiContrasenya
-        super.toDominiContrasenya(source, target);
+        super.toPasswordDomain(source, target);
                 	
     }
 
@@ -104,9 +106,9 @@ public class PasswordDomainEntityDaoImpl
 	/**
      * @see es.caib.seycon.ng.model.DominiContrasenyaEntityDao#toDominiContrasenya(es.caib.seycon.ng.model.DominiContrasenyaEntity)
      */
-    public es.caib.seycon.ng.comu.DominiContrasenya toDominiContrasenya(final com.soffid.iam.model.PasswordDomainEntity entity) {
+    public com.soffid.iam.api.PasswordDomain toPasswordDomain(final com.soffid.iam.model.PasswordDomainEntity entity) {
         // @todo verify behavior of toDominiContrasenya
-        return super.toDominiContrasenya(entity);
+        return super.toPasswordDomain(entity);
     }
 
 
@@ -115,7 +117,7 @@ public class PasswordDomainEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.PasswordDomainEntity loadDominiContrasenyaEntityFromDominiContrasenya(es.caib.seycon.ng.comu.DominiContrasenya dominiContrasenya) {
+    private com.soffid.iam.model.PasswordDomainEntity loadDominiContrasenyaEntityFromDominiContrasenya(com.soffid.iam.api.PasswordDomain dominiContrasenya) {
         com.soffid.iam.model.PasswordDomainEntity dominiContrasenyaEntity = null; 
         if (dominiContrasenya.getId() !=null) {
         	dominiContrasenyaEntity = this.load(dominiContrasenya.getId());
@@ -131,10 +133,10 @@ public class PasswordDomainEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DominiContrasenyaEntityDao#dominiContrasenyaToEntity(es.caib.seycon.ng.comu.DominiContrasenya)
      */
-    public com.soffid.iam.model.PasswordDomainEntity dominiContrasenyaToEntity(es.caib.seycon.ng.comu.DominiContrasenya dominiContrasenya) {
+    public com.soffid.iam.model.PasswordDomainEntity passwordDomainToEntity(com.soffid.iam.api.PasswordDomain dominiContrasenya) {
         // @todo verify behavior of dominiContrasenyaToEntity
         com.soffid.iam.model.PasswordDomainEntity entity = this.loadDominiContrasenyaEntityFromDominiContrasenya(dominiContrasenya);
-        this.dominiContrasenyaToEntity(dominiContrasenya, entity, true);
+        this.passwordDomainToEntity(dominiContrasenya, entity, true);
         return entity;
     }
 
@@ -142,9 +144,9 @@ public class PasswordDomainEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.DominiContrasenyaEntityDao#dominiContrasenyaToEntity(es.caib.seycon.ng.comu.DominiContrasenya, es.caib.seycon.ng.model.DominiContrasenyaEntity)
      */
-    public void dominiContrasenyaToEntity(es.caib.seycon.ng.comu.DominiContrasenya source, com.soffid.iam.model.PasswordDomainEntity target, boolean copyIfNull) {
+    public void passwordDomainToEntity(com.soffid.iam.api.PasswordDomain source, com.soffid.iam.model.PasswordDomainEntity target, boolean copyIfNull) {
         // @todo verify behavior of dominiContrasenyaToEntity
-        super.dominiContrasenyaToEntity(source, target, copyIfNull);
+        super.passwordDomainToEntity(source, target, copyIfNull);
     }
 
 }

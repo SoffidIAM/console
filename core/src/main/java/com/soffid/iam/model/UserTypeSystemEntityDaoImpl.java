@@ -23,15 +23,15 @@ public class UserTypeSystemEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.TipusUsuariDispatcherEntityDao#toTipusUsuariDispatcher(es.caib.seycon.ng.model.TipusUsuariDispatcherEntity, es.caib.seycon.ng.comu.TipusUsuariDispatcher)
      */
-    public void toTipusUsuariDispatcher(com.soffid.iam.model.UserTypeSystemEntity source, es.caib.seycon.ng.comu.TipusUsuariDispatcher target) {
+    public void toUserTypeDispatcher(com.soffid.iam.model.UserTypeSystemEntity source, com.soffid.iam.api.UserTypeDispatcher target) {
         // @todo verify behavior of toTipusUsuariDispatcher
-        super.toTipusUsuariDispatcher(source, target);
+        super.toUserTypeDispatcher(source, target);
         
         if (source.getSystem() != null) {
-        	target.setCodiDispatcher(source.getSystem().getName());
+        	target.setDispatcherCode(source.getSystem().getName());
         }
         if (source.getUserType() != null) {
-        	target.setTipus(source.getUserType().getName());
+        	target.setType(source.getUserType().getName());
         }
     }
 
@@ -39,9 +39,9 @@ public class UserTypeSystemEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.TipusUsuariDispatcherEntityDao#toTipusUsuariDispatcher(es.caib.seycon.ng.model.TipusUsuariDispatcherEntity)
      */
-    public es.caib.seycon.ng.comu.TipusUsuariDispatcher toTipusUsuariDispatcher(final com.soffid.iam.model.UserTypeSystemEntity entity) {
+    public com.soffid.iam.api.UserTypeDispatcher toUserTypeDispatcher(final com.soffid.iam.model.UserTypeSystemEntity entity) {
         // @todo verify behavior of toTipusUsuariDispatcher
-        return super.toTipusUsuariDispatcher(entity);
+        return super.toUserTypeDispatcher(entity);
     }
 
 
@@ -50,7 +50,7 @@ public class UserTypeSystemEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.UserTypeSystemEntity loadTipusUsuariDispatcherEntityFromTipusUsuariDispatcher(es.caib.seycon.ng.comu.TipusUsuariDispatcher tipusUsuariDispatcher) {
+    private com.soffid.iam.model.UserTypeSystemEntity loadTipusUsuariDispatcherEntityFromTipusUsuariDispatcher(com.soffid.iam.api.UserTypeDispatcher tipusUsuariDispatcher) {
         com.soffid.iam.model.UserTypeSystemEntity tipusUsuariDispatcherEntity = null; 
         if (tipusUsuariDispatcher.getId() !=null) {
         	tipusUsuariDispatcherEntity = this.load(tipusUsuariDispatcher.getId());
@@ -66,10 +66,10 @@ public class UserTypeSystemEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.TipusUsuariDispatcherEntityDao#tipusUsuariDispatcherToEntity(es.caib.seycon.ng.comu.TipusUsuariDispatcher)
      */
-    public com.soffid.iam.model.UserTypeSystemEntity tipusUsuariDispatcherToEntity(es.caib.seycon.ng.comu.TipusUsuariDispatcher tipusUsuariDispatcher) {
+    public com.soffid.iam.model.UserTypeSystemEntity userTypeDispatcherToEntity(com.soffid.iam.api.UserTypeDispatcher tipusUsuariDispatcher) {
         // @todo verify behavior of tipusUsuariDispatcherToEntity
         com.soffid.iam.model.UserTypeSystemEntity entity = this.loadTipusUsuariDispatcherEntityFromTipusUsuariDispatcher(tipusUsuariDispatcher);
-        this.tipusUsuariDispatcherToEntity(tipusUsuariDispatcher, entity, true);
+        this.userTypeDispatcherToEntity(tipusUsuariDispatcher, entity, true);
         return entity;
     }
 
@@ -77,19 +77,19 @@ public class UserTypeSystemEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.TipusUsuariDispatcherEntityDao#tipusUsuariDispatcherToEntity(es.caib.seycon.ng.comu.TipusUsuariDispatcher, es.caib.seycon.ng.model.TipusUsuariDispatcherEntity)
      */
-    public void tipusUsuariDispatcherToEntity(es.caib.seycon.ng.comu.TipusUsuariDispatcher source, com.soffid.iam.model.UserTypeSystemEntity target, boolean copyIfNull) {
+    public void userTypeDispatcherToEntity(com.soffid.iam.api.UserTypeDispatcher source, com.soffid.iam.model.UserTypeSystemEntity target, boolean copyIfNull) {
 
-        super.tipusUsuariDispatcherToEntity(source, target, copyIfNull);
+        super.userTypeDispatcherToEntity(source, target, copyIfNull);
         
         if (source.getId()!=null) 
         	target.setId(source.getId());
-        if (source.getTipus()!=null) {
-        	UserTypeEntity tipusu = getUserTypeEntityDao().findByName(source.getTipus());
+        if (source.getType() != null) {
+        	UserTypeEntity tipusu = getUserTypeEntityDao().findByName(source.getType());
         	if (tipusu !=null)
         		target.setUserType(tipusu);
         }
-        if (source.getCodiDispatcher() !=null) {
-        	SystemEntity agent = getSystemEntityDao().findByName(source.getCodiDispatcher());
+        if (source.getDispatcherCode() != null) {
+        	SystemEntity agent = getSystemEntityDao().findByName(source.getDispatcherCode());
         	if (agent !=null) 
         		target.setSystem(agent);
         }

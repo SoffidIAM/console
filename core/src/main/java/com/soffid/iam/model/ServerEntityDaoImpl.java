@@ -25,7 +25,7 @@ public class ServerEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ServerEntityDao#toServer(es.caib.seycon.ng.model.ServerEntity, es.caib.seycon.ng.comu.Server)
      */
-    public void toServer(com.soffid.iam.model.ServerEntity source, es.caib.seycon.ng.comu.Server target) {
+    public void toServer(com.soffid.iam.model.ServerEntity source, com.soffid.iam.api.Server target) {
         // @todo verify behavior of toServer
         super.toServer(source, target);
         KeyFactory factory;
@@ -54,7 +54,7 @@ public class ServerEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ServerEntityDao#toServer(es.caib.seycon.ng.model.ServerEntity)
      */
-    public es.caib.seycon.ng.comu.Server toServer(final com.soffid.iam.model.ServerEntity entity) {
+    public com.soffid.iam.api.Server toServer(final com.soffid.iam.model.ServerEntity entity) {
         // @todo verify behavior of toServer
         return super.toServer(entity);
     }
@@ -65,7 +65,7 @@ public class ServerEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ServerEntityDao#serverToEntity(es.caib.seycon.ng.comu.Server, es.caib.seycon.ng.model.ServerEntity)
      */
-    public void serverToEntity(es.caib.seycon.ng.comu.Server source, com.soffid.iam.model.ServerEntity target, boolean copyIfNull) {
+    public void serverToEntity(com.soffid.iam.api.Server source, com.soffid.iam.model.ServerEntity target, boolean copyIfNull) {
         // @todo verify behavior of serverToEntity
         super.serverToEntity(source, target, copyIfNull);
         if (source.getBackupDatabase() == null && copyIfNull)

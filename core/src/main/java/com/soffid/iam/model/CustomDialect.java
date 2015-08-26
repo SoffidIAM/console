@@ -24,7 +24,7 @@ import org.hibernate.persister.entity.Lockable;
 import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.JoinFragment;
 
-import es.caib.seycon.ng.config.Config;
+import com.soffid.iam.config.Config;
 
 public class CustomDialect extends Dialect {
     Dialect proxyDialect;

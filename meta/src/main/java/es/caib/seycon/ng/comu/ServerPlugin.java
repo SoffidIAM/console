@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ServerPlugin",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ServerPlugin {
+public class ServerPlugin {
 
 	public java.lang.Long id;
 

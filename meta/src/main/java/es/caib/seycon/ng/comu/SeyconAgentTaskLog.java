@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="SyncAgentTaskLog",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class SeyconAgentTaskLog {
+public class SeyconAgentTaskLog {
 
 	@Attribute(translated = "taskId" )
 	public java.lang.Long idTasca;

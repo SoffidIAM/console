@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 	 serverPath="/seycon/AgentManager",
 	 serverRole="server",
 	 translatedName="AgentManager",
-	 translatedPackage="es.caib.seycon.ng.sync.agent")
+	 translatedPackage="com.soffid.iam.sync.agent")
 public abstract class AgentManager {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

@@ -7,10 +7,13 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.SystemEntity;
@@ -18,11 +21,8 @@ import com.soffid.iam.model.SystemGroupEntity;
 import com.soffid.iam.model.UserDomainEntity;
 import com.soffid.iam.model.UserTypeSystemEntity;
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Dispatcher;
-import es.caib.seycon.ng.comu.GrupDispatcher;
-import es.caib.seycon.ng.comu.TipusUsuariDispatcher;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import java.lang.reflect.Array;
@@ -45,15 +45,15 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 
     private void auditarDispatcher(String accio, String bbdd) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setBbdd(bbdd);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setDatabase(bbdd);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-        auditoria.setObjecte("SC_DISPAT"); //$NON-NLS-1$
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_DISPAT"); //$NON-NLS-1$
 
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -123,13 +123,13 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 		}
 	}
 
-    public void toDispatcher(com.soffid.iam.model.SystemEntity sourceEntity, es.caib.seycon.ng.comu.Dispatcher targetVO) {
-        super.toDispatcher(sourceEntity, targetVO);
+    public void toSystem(com.soffid.iam.model.SystemEntity sourceEntity, com.soffid.iam.api.System targetVO) {
+        super.toSystem(sourceEntity, targetVO);
 
         // Fem les transformacions necessàries
-        targetVO.setSegur(new Boolean(sourceEntity.getTrusted().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setBasRol(new Boolean(sourceEntity.getRoleBased().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setControlAccess(new Boolean(sourceEntity.getEnableAccessControl().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setTrusted(new Boolean(sourceEntity.getTrusted().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setRolebased(new Boolean(sourceEntity.getRoleBased().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setAccessControl(new Boolean(sourceEntity.getEnableAccessControl().compareTo("S") == 0)); //$NON-NLS-1$
 
         // Tipus d'usuari
         if (sourceEntity.getUserType() != null) {
@@ -139,18 +139,18 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
                 tipus += ((UserTypeSystemEntity) it.next()).getUserType().getName();
                 if (it.hasNext()) tipus += ",";
             }
-            targetVO.setRelacioLaboral(tipus);
+            targetVO.setUserTypes(tipus);
         }
 
         // Domini de contrasenyes (i d'usuaris per transitivitat)
         if (sourceEntity.getPasswordDomain() != null) {// de contrasenyes
             PasswordDomainEntity domini = sourceEntity.getPasswordDomain();
-            targetVO.setIdDominiContrasenyes(domini.getId());
-            targetVO.setDominiContrasenyes(domini.getName());
+            targetVO.setPasswordsDomainId(domini.getId());
+            targetVO.setPasswordsDomain(domini.getName());
         }
         if (sourceEntity.getUserDomain() != null)
         {
-            targetVO.setDominiUsuaris(sourceEntity.getUserDomain().getName());
+            targetVO.setUsersDomain(sourceEntity.getUserDomain().getName());
         }
         
         // convertim els grups a string separada per comes
@@ -160,7 +160,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
                 grups += ((SystemGroupEntity) it.next()).getGroup().getName();
                 if (it.hasNext()) grups += ",";
             }
-            targetVO.setGrups(grups);
+            targetVO.setGroups(grups);
         }
         if (sourceEntity.getReplicaDatabases().isEmpty())
         	targetVO.setDatabaseReplicaId(null);
@@ -172,8 +172,8 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
     /**
      * @see es.caib.seycon.ng.model.DispatcherEntityDao#toDispatcher(es.caib.seycon.ng.model.DispatcherEntity)
      */
-    public es.caib.seycon.ng.comu.Dispatcher toDispatcher(final com.soffid.iam.model.SystemEntity entity) {
-        Dispatcher dispatcher = super.toDispatcher(entity);
+    public com.soffid.iam.api.System toSystem(final com.soffid.iam.model.SystemEntity entity) {
+        com.soffid.iam.api.System dispatcher = super.toSystem(entity);
         // toDispatcherCustom(entity, dispatcher);
         return dispatcher;
     }
@@ -183,7 +183,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.SystemEntity loadDispatcherEntityFromDispatcher(es.caib.seycon.ng.comu.Dispatcher dispatcher) {
+    private com.soffid.iam.model.SystemEntity loadDispatcherEntityFromDispatcher(com.soffid.iam.api.System dispatcher) {
         com.soffid.iam.model.SystemEntity dispatcherEntity = null;
         if (dispatcher.getId() != null) {
             dispatcherEntity = load(dispatcher.getId());
@@ -198,54 +198,52 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
     /**
      * @see es.caib.seycon.ng.model.DispatcherEntityDao#dispatcherToEntity(es.caib.seycon.ng.Dispatcher)
      */
-    public com.soffid.iam.model.SystemEntity dispatcherToEntity(es.caib.seycon.ng.comu.Dispatcher dispatcher) {
+    public com.soffid.iam.model.SystemEntity systemToEntity(com.soffid.iam.api.System dispatcher) {
         com.soffid.iam.model.SystemEntity entity = this.loadDispatcherEntityFromDispatcher(dispatcher);
-        this.dispatcherToEntity(dispatcher, entity, true);
+        this.systemToEntity(dispatcher, entity, true);
         return entity;
     }
 
-    public void dispatcherToEntity(es.caib.seycon.ng.comu.Dispatcher sourceVO, com.soffid.iam.model.SystemEntity targetEntity, boolean copyIfNull) {
-        super.dispatcherToEntity(sourceVO, targetEntity, copyIfNull);
+    public void systemToEntity(com.soffid.iam.api.System sourceVO, com.soffid.iam.model.SystemEntity targetEntity, boolean copyIfNull) {
+        super.systemToEntity(sourceVO, targetEntity, copyIfNull);
 
         // Fem les transformacions de VO A Entity
-        Boolean esSegur = sourceVO.getSegur();
+        Boolean esSegur = sourceVO.getTrusted();
         if (esSegur != null) {
             targetEntity.setTrusted(esSegur.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setTrusted("N"); //$NON-NLS-1$
         }
-        Boolean basatEnRol = sourceVO.getBasRol();
+        Boolean basatEnRol = sourceVO.getRolebased();
         if (basatEnRol != null) {
             targetEntity.setRoleBased(basatEnRol.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setRoleBased("N"); //$NON-NLS-1$
         }
 
-        Boolean controlAcces = sourceVO.getControlAccess();
+        Boolean controlAcces = sourceVO.getAccessControl();
         if (controlAcces != null) {
             targetEntity.setEnableAccessControl(controlAcces.booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setEnableAccessControl("N"); //$NON-NLS-1$
         }
 
-        if (sourceVO.getDominiContrasenyes() == null) {
-            if (sourceVO.getIdDominiContrasenyes() == null)
+        if (sourceVO.getPasswordsDomain() == null) {
+            if (sourceVO.getPasswordsDomainId() == null)
                 targetEntity.setPasswordDomain(null);
             else
-                targetEntity.setPasswordDomain(getPasswordDomainEntityDao().load(sourceVO.getIdDominiContrasenyes()));
+                targetEntity.setPasswordDomain(getPasswordDomainEntityDao().load(sourceVO.getPasswordsDomainId()));
         } else
-            targetEntity.setPasswordDomain(getPasswordDomainEntityDao().findByName(sourceVO.getDominiContrasenyes()));
+            targetEntity.setPasswordDomain(getPasswordDomainEntityDao().findByName(sourceVO.getPasswordsDomain()));
         
         UserDomainEntity du;
-		if (sourceVO.getDominiUsuaris() == null)
+		if (sourceVO.getUsersDomain() == null)
         	targetEntity.setUserDomain(null);
         else
         {
-        	du = getUserDomainEntityDao().findByName(sourceVO.getDominiUsuaris());
+        	du = getUserDomainEntityDao().findByName(sourceVO.getUsersDomain());
         	if (du == null)
-        		throw new IllegalArgumentException(
-        				String.format("service.dominiUsuaris[%s]",  //$NON-NLS-1$
-        						sourceVO.getDominiUsuaris()));
+        		throw new IllegalArgumentException(String.format("service.dominiUsuaris[%s]", sourceVO.getUsersDomain()));
         	targetEntity.setUserDomain(du);
         }
     }

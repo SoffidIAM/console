@@ -8,7 +8,7 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.SystemEntity;
-import es.caib.seycon.ng.comu.ObjectMapping;
+import com.soffid.iam.api.ObjectMapping;
 
 /**
  * DAO ObjectMappingEntity implementation

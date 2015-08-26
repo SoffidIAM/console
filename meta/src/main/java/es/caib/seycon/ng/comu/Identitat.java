@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Identity",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Identitat {
+public class Identitat {
 
 	@Nullable
 	@Attribute(translated = "userCode" )

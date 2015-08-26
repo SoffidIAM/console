@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 	 serverPath="/seycon/ServerService",
 	 serverRole="agent",
 	 translatedName="ServerService",
-	 translatedPackage="es.caib.seycon.ng.sync.servei")
+	 translatedPackage="com.soffid.iam.sync.service")
 @Depends ({es.caib.seycon.ng.sync.servei.SecretStoreService.class,
 	es.caib.seycon.ng.sync.servei.TaskQueue.class,
 	es.caib.seycon.ng.sync.servei.TaskGenerator.class,

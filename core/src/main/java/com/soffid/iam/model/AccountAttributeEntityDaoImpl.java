@@ -5,16 +5,14 @@
 
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.UserData;
+import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.seycon.ng.exception.SeyconException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
 import org.hibernate.Hibernate;
-
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.seycon.ng.exception.SeyconException;
 
 /**
  * DAO AccountAttributeEntity implementation
@@ -26,9 +24,9 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
 
 
 	@Override
-	public void toDadaUsuari(AccountAttributeEntity sourceEntity, DadaUsuari targetVO) {
-		super.toDadaUsuari(sourceEntity, targetVO);
-        targetVO.setCodiDada(sourceEntity.getMetadata().getName());
+    public void toUserData(AccountAttributeEntity sourceEntity, UserData targetVO) {
+		super.toUserData(sourceEntity, targetVO);
+        targetVO.setAttribute(sourceEntity.getMetadata().getName());
         targetVO.setAccountName(sourceEntity.getAccount().getName());
         targetVO.setSystemName(sourceEntity.getAccount().getSystem().getName());
     	targetVO.setDataLabel(sourceEntity.getMetadata().getLabel());
@@ -36,7 +34,7 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
     		targetVO.setDataLabel(sourceEntity.getMetadata().getName());
         if(sourceEntity.getMetadata() != null && sourceEntity.getValue() != null) 
         {
-        	targetVO.setValorDada(sourceEntity.getValue());
+        	targetVO.setValue(sourceEntity.getValue());
         	if(sourceEntity.getMetadata().getType()!= null){
         		if(sourceEntity.getMetadata().getType().toString().equals("D")){ //$NON-NLS-1$
         			try{
@@ -45,42 +43,41 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
         				Date dateObj = curFormater.parse(data);
         				Calendar calendar = Calendar.getInstance();
         				calendar .setTime(dateObj);
-        				targetVO.setValorDadaDate(calendar);
+        				targetVO.setDateValue(calendar);
         			}catch (ParseException e){
-        				throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.IsNotDate"), targetVO.getValorDada())); //$NON-NLS-1$
+        				throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.IsNotDate"), targetVO.getValue())); //$NON-NLS-1$
         			}
         		}else 
-        			targetVO.setValorDadaDate(null);
+        			targetVO.setDateValue(null);
         	}
         }
         targetVO.setVisibility(sourceEntity.getAttributeVisibility());
 	}
 
 	@Override
-	public void dadaUsuariToEntity(DadaUsuari sourceVO,
-			AccountAttributeEntity targetEntity, boolean copyIfNull) {
-		super.dadaUsuariToEntity(sourceVO, targetEntity, copyIfNull);
+    public void userDataToEntity(UserData sourceVO, AccountAttributeEntity targetEntity, boolean copyIfNull) {
+		super.userDataToEntity(sourceVO, targetEntity, copyIfNull);
         AccountEntity accountEntity = getAccountEntityDao().findByNameAndSystem(sourceVO.getAccountName(), sourceVO.getSystemName());
         if(accountEntity == null) {
         	throw new SeyconException(String.format(com.soffid.iam.model.Messages.getString("AccountAttributeEntityDaoImpl.1"), sourceVO.getAccountName(), sourceVO.getSystemName())); //$NON-NLS-1$
         }
-        AccountMetadataEntity metadata = getAccountMetadataEntityDao().findByName(sourceVO.getSystemName(), sourceVO.getCodiDada());
+        AccountMetadataEntity metadata = getAccountMetadataEntityDao().findByName(sourceVO.getSystemName(), sourceVO.getAttribute());
 		if (metadata == null) {
-			throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.4"), sourceVO.getCodiDada())); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.4"), sourceVO.getAttribute())); //$NON-NLS-1$
 		}
         targetEntity.setAccount(accountEntity);
         targetEntity.setMetadata(metadata);
-        targetEntity.setValue(sourceVO.getValorDada());
+        targetEntity.setValue(sourceVO.getValue());
         if (metadata != null && TypeEnumeration.DATE_TYPE.equals(metadata.getType()))
         {
-        	if (sourceVO.getValorDadaDate() == null && sourceVO.getValorDada() != null)
+        	if (sourceVO.getDateValue() == null && sourceVO.getValue() != null)
         	{
-        		sourceVO.setValorDadaDate(parseDate(sourceVO.getValorDada()));
+        		sourceVO.setDateValue(parseDate(sourceVO.getValue()));
         	}
-        	if (sourceVO.getValorDadaDate() != null)
+        	if (sourceVO.getDateValue() != null)
             {
 				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
-            	targetEntity.setValue(curFormater.format(sourceVO.getValorDadaDate().getTime()));
+            	targetEntity.setValue(curFormater.format(sourceVO.getDateValue().getTime()));
             }
         }
 	}

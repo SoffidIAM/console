@@ -20,18 +20,22 @@ public class RoleAccountEntityImpl extends RoleAccountEntity implements Security
 	}
 
 	public boolean isAllowed(String permission) {
-		if (Security.isUserInRole(permission + Security.AUTO_ALL))
-			return true;
-				
 		if (getAccount() != null && getAccount().getType().equals (AccountType.USER))
 		{
 			for (UserAccountEntity users: getAccount().getUsers())
 			{
+				if (users.getUser() != null && users.getUser().getUserName().equals(Security.getCurrentUser()))
+					return false;
 				if (users.getUser() != null && users.getUser().isAllowed(permission))
 					return true;
 			}
 		}
 		
+		
+		
+		if (Security.isUserInRole(permission + Security.AUTO_ALL))
+			return true;
+				
 		if (getInformationSystem() != null)
 			return Security.isUserInRole(permission+"/"+getInformationSystem().getName());
 

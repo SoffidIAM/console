@@ -1,10 +1,11 @@
 package com.soffid.iam.service;
 
+import com.soffid.iam.api.Configuration;
+import es.caib.seycon.ng.ServiceLocator;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -16,21 +17,16 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
 
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.servei.ConfiguracioService;
-
-
 public class MailServiceImpl extends MailServiceBase {
 
 	String getMailHost ()
 	{
-		Configuracio param1;
+		Configuration param1;
 		try {
-			ConfiguracioService configService = ServiceLocator.instance().getConfiguracioService();
-			param1 = configService.findParametreByCodiAndCodiXarxa("mail.host", null); //$NON-NLS-1$
+			ConfigurationService configService = getConfigurationService();
+			param1 = configService.findParameterByNameAndNetworkName("mail.host", null); //$NON-NLS-1$
 			if (param1 != null)
-				return param1.getValor();
+				return param1.getValue();
 		} catch (Exception e) {
 		}
 		return "localhost";
@@ -38,12 +34,12 @@ public class MailServiceImpl extends MailServiceBase {
 
 	String getFrom () throws UnknownHostException
 	{
-		Configuracio param1;
+		Configuration param1;
 		try {
-			ConfiguracioService configService = ServiceLocator.instance().getConfiguracioService();
-			param1 = configService.findParametreByCodiAndCodiXarxa("mail.from", null); //$NON-NLS-1$
+			ConfigurationService configService = getConfigurationService();
+			param1 = configService.findParameterByNameAndNetworkName("mail.from", null); //$NON-NLS-1$
 			if (param1 != null)
-				return param1.getValor();
+				return param1.getValue();
 		} catch (Exception e) {
 		}
 		return "soffid@" + InetAddress.getLocalHost().getHostName() ;

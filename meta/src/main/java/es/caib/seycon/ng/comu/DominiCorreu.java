@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="MailDomain",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DominiCorreu {
+public class DominiCorreu {
 
 	@Attribute(translated = "code" )
 	public java.lang.String codi;

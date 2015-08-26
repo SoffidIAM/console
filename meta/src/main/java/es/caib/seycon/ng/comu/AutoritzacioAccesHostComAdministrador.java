@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AdministratorAuthorizationToAccessHost",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class AutoritzacioAccesHostComAdministrador {
+public class AutoritzacioAccesHostComAdministrador {
 
 	@Nullable
 	public java.lang.Long id;

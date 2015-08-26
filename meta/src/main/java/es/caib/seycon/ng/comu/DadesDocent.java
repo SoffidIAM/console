@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="TeachingData",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DadesDocent {
+public class DadesDocent {
 
 	@Attribute(translated = "name" )
 	public java.lang.String nom;

@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AnonimousUser",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariAnonim {
+public class UsuariAnonim {
 
 	@Attribute(translated = "name" )
 	public java.lang.String nom;

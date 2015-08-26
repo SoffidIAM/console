@@ -31,9 +31,9 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
     /**
      * @see es.caib.seycon.ng.model.ScTargetDao#toTargetaExtranet(es.caib.seycon.ng.model.ScTarget)
      */
-    public es.caib.seycon.ng.comu.TargetaExtranet toTargetaExtranet(final com.soffid.iam.model.CardEntity entity) {
+    public com.soffid.iam.api.ExtranetCard toExtranetCard(final com.soffid.iam.model.CardEntity entity) {
         // @todo verify behavior of toTargetaExtranet
-        return super.toTargetaExtranet(entity);
+        return super.toExtranetCard(entity);
     }
 
     /**
@@ -41,7 +41,7 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.CardEntity loadScTargetFromTargetaExtranet(es.caib.seycon.ng.comu.TargetaExtranet targetaExtranet) {
+    private com.soffid.iam.model.CardEntity loadScTargetFromTargetaExtranet(com.soffid.iam.api.ExtranetCard targetaExtranet) {
         com.soffid.iam.model.CardEntity scTarget = null;
         if (targetaExtranet.getId() != null) {
             scTarget = this.load(targetaExtranet.getId());
@@ -56,10 +56,10 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
     /**
      * @see es.caib.seycon.ng.model.ScTargetDao#targetaExtranetToEntity(es.caib.seycon.ng.comu.TargetaExtranet)
      */
-    public com.soffid.iam.model.CardEntity targetaExtranetToEntity(es.caib.seycon.ng.comu.TargetaExtranet targetaExtranet) {
+    public com.soffid.iam.model.CardEntity extranetCardToEntity(com.soffid.iam.api.ExtranetCard targetaExtranet) {
         // @todo verify behavior of targetaExtranetToEntity
         com.soffid.iam.model.CardEntity entity = this.loadScTargetFromTargetaExtranet(targetaExtranet);
-        this.targetaExtranetToEntity(targetaExtranet, entity, true);
+        this.extranetCardToEntity(targetaExtranet, entity, true);
         return entity;
     }
 
@@ -67,9 +67,9 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
      * @see es.caib.seycon.ng.model.ScTargetDao#targetaExtranetToEntity(es.caib.seycon.ng.comu.TargetaExtranet,
      *      es.caib.seycon.ng.model.ScTarget)
      */
-    public void targetaExtranetToEntity(es.caib.seycon.ng.comu.TargetaExtranet source, com.soffid.iam.model.CardEntity target, boolean copyIfNull) {
+    public void extranetCardToEntity(com.soffid.iam.api.ExtranetCard source, com.soffid.iam.model.CardEntity target, boolean copyIfNull) {
         // @todo verify behavior of targetaExtranetToEntity
-        super.targetaExtranetToEntity(source, target, copyIfNull);
+        super.extranetCardToEntity(source, target, copyIfNull);
         // No conversion for target.dataEmissio (can't convert
         // source.getDataEmissio():java.util.Date to java.util.Date
         // No conversion for target.dataCaducitat (can't convert
@@ -77,7 +77,7 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
         targetaExtranetToEntityCustom(source, target);
     }
 
-    private void targetaExtranetToEntityCustom(es.caib.seycon.ng.comu.TargetaExtranet source, com.soffid.iam.model.CardEntity target) {
+    private void targetaExtranetToEntityCustom(com.soffid.iam.api.ExtranetCard source, com.soffid.iam.model.CardEntity target) {
 
     }
 
@@ -85,9 +85,9 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
      * @see es.caib.seycon.ng.model.ScTargetDao#toTargetaExtranet(es.caib.seycon.ng.model.ScTarget,
      *      es.caib.seycon.ng.comu.TargetaExtranet)
      */
-    public void toTargetaExtranet(com.soffid.iam.model.CardEntity source, es.caib.seycon.ng.comu.TargetaExtranet target) {
+    public void toExtranetCard(com.soffid.iam.model.CardEntity source, com.soffid.iam.api.ExtranetCard target) {
         // @todo verify behavior of toTargetaExtranet
-        super.toTargetaExtranet(source, target);
+        super.toExtranetCard(source, target);
         // WARNING! No conversion for target.dataEmissio (can't convert
         // source.getDataEmissio():java.util.Date to java.util.Date
         // WARNING! No conversion for target.dataCaducitat (can't convert
@@ -98,7 +98,7 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
         toTargetaExtranetCustom(source, target);
     }
 
-    private void toTargetaExtranetCustom(com.soffid.iam.model.CardEntity source, es.caib.seycon.ng.comu.TargetaExtranet target) {
+    private void toTargetaExtranetCustom(com.soffid.iam.model.CardEntity source, com.soffid.iam.api.ExtranetCard target) {
 
         /*
          * if ("S".equals(source.getActiu())) target.setActiu(new Boolean
@@ -109,19 +109,19 @@ public class CardEntityDaoImpl extends com.soffid.iam.model.CardEntityDaoBase {
         if (source.getIssueDate() != null) {
             Calendar dataEmissio = Calendar.getInstance();
             dataEmissio.setTime(source.getIssueDate());
-            target.setDataEmissio(dataEmissio);
+            target.setOutputDate(dataEmissio);
         }
         if (source.getExpirationDate() != null) {
             Calendar dataCaducitat = Calendar.getInstance();
             dataCaducitat.setTime(source.getExpirationDate());
-            target.setDataCaducitat(dataCaducitat);
+            target.setExpirationDate(dataCaducitat);
         }
 
         if (source.getUser() != null)
-            target.setCodiUsuari(source.getUser().getUserName());
+            target.setUserCode(source.getUser().getUserName());
 
         if (source.getContent() != null) {
-            target.setContingut(getCardCellEntityDao().toContingutTargetaExtranetList(source.getContent()));
+            target.setContent(getCardCellEntityDao().toExtranetCardContentList(source.getContent()));
         }
 
     }

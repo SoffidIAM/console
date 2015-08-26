@@ -7,22 +7,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Domain;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.InformationSystemEntity;
-
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -39,18 +40,17 @@ public class DomainValueEntityDaoImpl extends
     private void auditarValorDominiAplicacio(String accio,
             String codiAplicacio, String nomDomini, String valorDomini) {
         String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setAplicacio(codiAplicacio);
-        auditoria.setDomini(nomDomini);
-        auditoria.setValorDomini(valorDomini);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setApplication(codiAplicacio);
+        auditoria.setDomain(nomDomini);
+        auditoria.setDomainValue(valorDomini);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_VALDOMAPP"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_VALDOMAPP"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -120,28 +120,28 @@ public class DomainValueEntityDaoImpl extends
         }
     }
 
-    public void toValorDomini(com.soffid.iam.model.DomainValueEntity source, es.caib.seycon.ng.comu.ValorDomini target) {
-        super.toValorDomini(source, target);
-        target.setDescripcio(source.getDescription());
+    public void toDomainValue(com.soffid.iam.model.DomainValueEntity source, com.soffid.iam.api.DomainValue target) {
+        super.toDomainValue(source, target);
+        target.setDescription(source.getDescription());
         ApplicationDomainEntity dominiEntity = source.getDomain();
-        Domini domini = getApplicationDomainEntityDao().toDomini(dominiEntity);
+        Domain domini = getApplicationDomainEntityDao().toDomain(dominiEntity);
         if (domini == null) {
             // el domini no és d'aplicació
             throw new SeyconException(Messages.getString("DomainValueEntityDaoImpl.invalidDomain")); //$NON-NLS-1$
         } else {
-            target.setNomDomini(domini.getNom());
-            target.setValor(source.getValue());
-            target.setCodiExternDomini(domini.getCodiExtern());
-            target.setDescripcio(source.getDescription());
+            target.setDomainName(domini.getName());
+            target.setValue(source.getValue());
+            target.setExternalCodeDomain(domini.getExternalCode());
+            target.setDescription(source.getDescription());
         }
     }
 
     /**
      * @see es.caib.seycon.ng.model.ValorDominiAplicacioEntityDao#toValorDomini(es.caib.seycon.ng.model.ValorDominiAplicacioEntity)
      */
-    public es.caib.seycon.ng.comu.ValorDomini toValorDomini(final com.soffid.iam.model.DomainValueEntity entity) {
+    public com.soffid.iam.api.DomainValue toDomainValue(final com.soffid.iam.model.DomainValueEntity entity) {
         try {
-            return super.toValorDomini(entity);
+            return super.toDomainValue(entity);
         } catch (SeyconException e) {
             // el valor del domini no és d'aplicació
             return null;
@@ -153,7 +153,7 @@ public class DomainValueEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.DomainValueEntity loadValorDominiAplicacioEntityFromValorDomini(es.caib.seycon.ng.comu.ValorDomini valorDomini) {
+    private com.soffid.iam.model.DomainValueEntity loadValorDominiAplicacioEntityFromValorDomini(com.soffid.iam.api.DomainValue valorDomini) {
         DomainValueEntity valorDominiAplicacioEntity = null;
         if (valorDomini.getId() != null) {
             valorDominiAplicacioEntity = this.load(valorDomini.getId());
@@ -167,17 +167,17 @@ public class DomainValueEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.ValorDominiAplicacioEntityDao#valorDominiToEntity(es.caib.seycon.ng.comu.ValorDomini)
      */
-    public com.soffid.iam.model.DomainValueEntity valorDominiToEntity(es.caib.seycon.ng.comu.ValorDomini valorDomini) {
+    public com.soffid.iam.model.DomainValueEntity domainValueToEntity(com.soffid.iam.api.DomainValue valorDomini) {
         com.soffid.iam.model.DomainValueEntity entity = this.loadValorDominiAplicacioEntityFromValorDomini(valorDomini);
-        this.valorDominiToEntity(valorDomini, entity, true);
+        this.domainValueToEntity(valorDomini, entity, true);
         return entity;
     }
 
-    public void valorDominiToEntityCustom(es.caib.seycon.ng.comu.ValorDomini source, com.soffid.iam.model.DomainValueEntity target) {
-        target.setDescription(source.getDescripcio());
-        target.setValue(source.getValor());
-        String nom = source.getNomDomini();
-        String codiAplicacio = source.getCodiExternDomini();
+    public void valorDominiToEntityCustom(com.soffid.iam.api.DomainValue source, com.soffid.iam.model.DomainValueEntity target) {
+        target.setDescription(source.getDescription());
+        target.setValue(source.getValue());
+        String nom = source.getDomainName();
+        String codiAplicacio = source.getExternalCodeDomain();
         String query = "select domini " //$NON-NLS-1$
                 + "from com.soffid.iam.model.ApplicationDomainEntity domini " //$NON-NLS-1$
                 + "left join domini.informationSystem aplicacio " //$NON-NLS-1$
@@ -209,8 +209,8 @@ public class DomainValueEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.ValorDominiAplicacioEntityDao#valorDominiToEntity(es.caib.seycon.ng.comu.ValorDomini,
      *      es.caib.seycon.ng.model.ValorDominiAplicacioEntity)
      */
-    public void valorDominiToEntity(es.caib.seycon.ng.comu.ValorDomini source, com.soffid.iam.model.DomainValueEntity target, boolean copyIfNull) {
-        super.valorDominiToEntity(source, target, copyIfNull);
+    public void domainValueToEntity(com.soffid.iam.api.DomainValue source, com.soffid.iam.model.DomainValueEntity target, boolean copyIfNull) {
+        super.domainValueToEntity(source, target, copyIfNull);
         valorDominiToEntityCustom(source, target);
     }
 

@@ -1,5 +1,12 @@
 package es.caib.seycon.ng.utils;
 
+import com.soffid.iam.api.User;
+import com.soffid.iam.config.Config;
+import com.soffid.iam.service.ejb.UserServiceHome;
+
+import es.caib.seycon.ng.ServiceLocator;
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -17,13 +24,6 @@ import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
-
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.config.Config;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 
 // import org.jboss.security.SecurityAssociation;
 
@@ -292,7 +292,7 @@ public class Security {
 		return disableAllSecurityForEver;
 	}
 
-	private static es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariServiceHome = null;
+	private static com.soffid.iam.service.ejb.UserServiceHome usuariServiceHome = null;
 
     private static Stack getIdentities() {
         Stack s = (Stack) identities.get();
@@ -517,18 +517,18 @@ public class Security {
             if (usuariServiceHome == null)
             {
             	try {
-					usuariServiceHome = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
+					usuariServiceHome = (UserServiceHome) new InitialContext().lookup(UserServiceHome.JNDI_NAME);
 				} catch (NamingException e) {
 					return null;
 				}
             }
             try
 			{
-				Usuari usuari = usuariServiceHome.create().getCurrentUsuari();
+				User usuari = usuariServiceHome.create().getCurrentUser();
 				if (usuari == null)
 					return null;
 				else
-					return usuari.getCodi();
+					return usuari.getUserName();
 			}
 			catch (InternalErrorException e)
 			{

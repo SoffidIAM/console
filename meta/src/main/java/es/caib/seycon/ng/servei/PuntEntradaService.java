@@ -206,7 +206,7 @@ public abstract class PuntEntradaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="findApplicationAccessById")
+	@Operation (translated="findApplicationAccessByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.PuntEntrada> findPuntsEntrada(
 		java.lang.String nomPUE, 

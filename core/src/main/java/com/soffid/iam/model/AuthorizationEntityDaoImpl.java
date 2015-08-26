@@ -7,17 +7,19 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Role;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.AuthorizationEntity;
 import com.soffid.iam.model.RoleEntity;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Domini;
-import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
@@ -45,23 +47,22 @@ public class AuthorizationEntityDaoImpl
 
 		String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$
 		
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setAutor(codiUsuari);
-		auditoria.setAutoritzacio(autoritzacio);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setAuthor(codiUsuari);
+		auditoria.setAuthorization(autoritzacio);
 		
-		auditoria.setRol(nomRol);
-		auditoria.setBbdd(bbdd);
-		auditoria.setAplicacio(codiAplicacio);
-		auditoria.setDomini(domini);
+		auditoria.setRole(nomRol);
+		auditoria.setDatabase(bbdd);
+		auditoria.setApplication(codiAplicacio);
+		auditoria.setDomain(domini);
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_AUTROL"); //$NON-NLS-1$
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_AUTROL"); //$NON-NLS-1$
 
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 		
 	}		
@@ -69,9 +70,9 @@ public class AuthorizationEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.AutoritzacioRolEntityDao#toAutoritzacioRol(es.caib.seycon.ng.model.AutoritzacioRolEntity, es.caib.seycon.ng.comu.AutoritzacioRol)
      */
-    public void toAutoritzacioRol(com.soffid.iam.model.AuthorizationEntity source, es.caib.seycon.ng.comu.AutoritzacioRol target) {
+    public void toAuthorizationRole(com.soffid.iam.model.AuthorizationEntity source, com.soffid.iam.api.AuthorizationRole target) {
         // @todo verify behavior of toAutoritzacioRol
-        super.toAutoritzacioRol(source, target);
+        super.toAuthorizationRole(source, target);
         toAutoritzacioRolCustom(source, target);
     }
 
@@ -79,9 +80,9 @@ public class AuthorizationEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.AutoritzacioRolEntityDao#toAutoritzacioRol(es.caib.seycon.ng.model.AutoritzacioRolEntity)
      */
-    public es.caib.seycon.ng.comu.AutoritzacioRol toAutoritzacioRol(final com.soffid.iam.model.AuthorizationEntity entity) {
+    public com.soffid.iam.api.AuthorizationRole toAuthorizationRole(final com.soffid.iam.model.AuthorizationEntity entity) {
         // @todo verify behavior of toAutoritzacioRol
-        return super.toAutoritzacioRol(entity);
+        return super.toAuthorizationRole(entity);
     }
 
 
@@ -90,7 +91,7 @@ public class AuthorizationEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.AuthorizationEntity loadAutoritzacioRolEntityFromAutoritzacioRol(es.caib.seycon.ng.comu.AutoritzacioRol autoritzacioRol) {
+    private com.soffid.iam.model.AuthorizationEntity loadAutoritzacioRolEntityFromAutoritzacioRol(com.soffid.iam.api.AuthorizationRole autoritzacioRol) {
         com.soffid.iam.model.AuthorizationEntity autoritzacioRolEntity = null;
         if (autoritzacioRol.getId() != null) {
         	autoritzacioRolEntity = this.load(autoritzacioRol.getId());	
@@ -108,10 +109,10 @@ public class AuthorizationEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.AutoritzacioRolEntityDao#autoritzacioRolToEntity(es.caib.seycon.ng.comu.AutoritzacioRol)
      */
-    public com.soffid.iam.model.AuthorizationEntity autoritzacioRolToEntity(es.caib.seycon.ng.comu.AutoritzacioRol autoritzacioRol) {
+    public com.soffid.iam.model.AuthorizationEntity authorizationRoleToEntity(com.soffid.iam.api.AuthorizationRole autoritzacioRol) {
         // @todo verify behavior of autoritzacioRolToEntity
         com.soffid.iam.model.AuthorizationEntity entity = this.loadAutoritzacioRolEntityFromAutoritzacioRol(autoritzacioRol);
-        this.autoritzacioRolToEntity(autoritzacioRol, entity, true);
+        this.authorizationRoleToEntity(autoritzacioRol, entity, true);
         return entity;
     }
 
@@ -119,19 +120,19 @@ public class AuthorizationEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.AutoritzacioRolEntityDao#autoritzacioRolToEntity(es.caib.seycon.ng.comu.AutoritzacioRol, es.caib.seycon.ng.model.AutoritzacioRolEntity)
      */
-    public void autoritzacioRolToEntity(es.caib.seycon.ng.comu.AutoritzacioRol source, com.soffid.iam.model.AuthorizationEntity target, boolean copyIfNull) {
+    public void authorizationRoleToEntity(com.soffid.iam.api.AuthorizationRole source, com.soffid.iam.model.AuthorizationEntity target, boolean copyIfNull) {
         // @todo verify behavior of autoritzacioRolToEntity
-        super.autoritzacioRolToEntity(source, target, copyIfNull);
+        super.authorizationRoleToEntity(source, target, copyIfNull);
         autoritzacioRolToEntityCustom(source, target);
     }
     
-    private void toAutoritzacioRolCustom(com.soffid.iam.model.AuthorizationEntity source, es.caib.seycon.ng.comu.AutoritzacioRol target) {
+    private void toAutoritzacioRolCustom(com.soffid.iam.model.AuthorizationEntity source, com.soffid.iam.api.AuthorizationRole target) {
     	
     	//només tenim el codi d'autorització (camp autoritzacio)
     	RoleEntity rolE = source.getRole();
     	if (rolE!=null) {
-    		Rol rol = getRoleEntityDao().toRol(rolE);
-    		target.setRol(rol);
+    		Role rol = getRoleEntityDao().toRole(rolE);
+    		target.setRole(rol);
     	}
     	
     	//les dades de l'usuari s'obtenen des del service
@@ -139,7 +140,7 @@ public class AuthorizationEntityDaoImpl
     	
     }
     
-    private void autoritzacioRolToEntityCustom(es.caib.seycon.ng.comu.AutoritzacioRol source, com.soffid.iam.model.AuthorizationEntity target) {
+    private void autoritzacioRolToEntityCustom(com.soffid.iam.api.AuthorizationRole source, com.soffid.iam.model.AuthorizationEntity target) {
     	// tenim autoritzacio
     	if (source.getId() != null) {
     		// Carreguem l'existent (no es poden modificar)
@@ -147,9 +148,9 @@ public class AuthorizationEntityDaoImpl
     		return;
     	}
     	// el rol en principio SIEMPRE TIENE QUE ESTAR
-    	if (source.getRol()!=null) {
-    		Rol rolSrc = source.getRol();
-    		RoleEntity rol = getRoleEntityDao().rolToEntity(rolSrc);
+    	if (source.getRole() != null) {
+    		Role rolSrc = source.getRole();
+    		RoleEntity rol = getRoleEntityDao().roleToEntity(rolSrc);
     		target.setRole(rol);
     	}
     	

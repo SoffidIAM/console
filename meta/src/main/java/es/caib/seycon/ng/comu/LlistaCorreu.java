@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="MailList",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class LlistaCorreu {
+public class LlistaCorreu {
 
 	@Description ("Mail list name")
 	@Attribute(translated = "name" )

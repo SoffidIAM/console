@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <!-- ========================= DATASOURCE DEFINITION ========================= -->
+
+    <!-- JNDI DataSource for J2EE environments -->
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName"><value>java:/jdbc/seycon</value></property>
+    </bean>
+    
+    <!-- ====================== End of DATASOURCE DEFINITION ====================== -->
+
+    <!-- ===================== TRANSACTION MANAGER DEFINITION ========================= -->
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="userTransactionName"><value>UserTransaction</value></property>
+        <property name="transactionManagerName"><value>java:/TransactionManager</value></property>
+    </bean>
+
+    <!-- ===================== TRANSACTION MANAGER DEFINITION ========================= -->
+
+</beans>

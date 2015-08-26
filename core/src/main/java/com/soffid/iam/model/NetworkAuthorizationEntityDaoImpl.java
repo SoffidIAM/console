@@ -7,28 +7,26 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Identity;
+import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEntity;
-
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Identitat;
-import es.caib.seycon.ng.comu.NetworkAuthorization;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -46,22 +44,21 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			String codiGrup, String codiUsuariAuditat, String rol,
 			String codiAplicacio, String codiBbdd, String maquines) {
 		String codiUsuari = Security.getCurrentAccount(); //$NON-NLS-1$
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setAplicacio(codiAplicacio);
-		auditoria.setXarxa(codiXarxa);
-		auditoria.setGrup(codiGrup);
-		auditoria.setUsuari(codiUsuariAuditat);
-		auditoria.setMaquina(maquines);
-		auditoria.setAutor(codiUsuari);
-		auditoria.setRol(rol);
-		auditoria.setBbdd(codiBbdd);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setApplication(codiAplicacio);
+		auditoria.setNetwork(codiXarxa);
+		auditoria.setGroup(codiGrup);
+		auditoria.setUser(codiUsuariAuditat);
+		auditoria.setHost(maquines);
+		auditoria.setAuthor(codiUsuari);
+		auditoria.setRole(rol);
+		auditoria.setDatabase(codiBbdd);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				Messages.getString("NetworkAuthorizationEntityDaoImpl.1")); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_AUTXAR"); //$NON-NLS-1$
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_AUTXAR"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 
@@ -134,36 +131,36 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		}
 	}
 
-	public void toNetworkAuthorization(com.soffid.iam.model.NetworkAuthorizationEntity source, es.caib.seycon.ng.comu.NetworkAuthorization target) {
+	public void toNetworkAuthorization(com.soffid.iam.model.NetworkAuthorizationEntity source, com.soffid.iam.api.NetworkAuthorization target) {
 		super.toNetworkAuthorization(source, target);
 		toNetworkAuthorizationCustom(source, target);
 	}
 
-	private void toNetworkAuthorizationCustom(com.soffid.iam.model.NetworkAuthorizationEntity source, es.caib.seycon.ng.comu.NetworkAuthorization target) {
+	private void toNetworkAuthorizationCustom(com.soffid.iam.model.NetworkAuthorizationEntity source, com.soffid.iam.api.NetworkAuthorization target) {
 		NetworkEntity xarxa = source.getNetwork();
 		if (xarxa != null) {
-			target.setCodiXarxa(xarxa.getName());
+			target.setNetworkCode(xarxa.getName());
 		}
 		GroupEntity grup = source.getGroup();
 		RoleEntity rol = source.getRole();
 		UserEntity usuari = source.getUser();
 		if (grup != null) {
-			Identitat identitat = getGroupEntityDao().toIdentitat(grup);
-			target.setIdentitat(identitat);
+			Identity identitat = getGroupEntityDao().toIdentity(grup);
+			target.setIdentity(identitat);
 		} else if (rol != null) {
-			Identitat identitat = getRoleEntityDao().toIdentitat(rol);
-			target.setIdentitat(identitat);
+			Identity identitat = getRoleEntityDao().toIdentity(rol);
+			target.setIdentity(identitat);
 		} else {
-			Identitat identitat = getUserEntityDao().toIdentitat(usuari);
-			target.setIdentitat(identitat);
+			Identity identitat = getUserEntityDao().toIdentity(usuari);
+			target.setIdentity(identitat);
 		}
-		target.setMascara(source.getHostsName());
+		target.setMask(source.getHostsName());
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.XarxaACEntityDao#toNetworkAuthorization(es.caib.seycon.ng.model.XarxaACEntity)
 	 */
-	public es.caib.seycon.ng.comu.NetworkAuthorization toNetworkAuthorization(final com.soffid.iam.model.NetworkAuthorizationEntity entity) {
+	public com.soffid.iam.api.NetworkAuthorization toNetworkAuthorization(final com.soffid.iam.model.NetworkAuthorizationEntity entity) {
 		NetworkAuthorization newtowkAuthorization = super
 				.toNetworkAuthorization(entity);
 		toNetworkAuthorizationCustom(entity, newtowkAuthorization);
@@ -175,7 +172,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.NetworkAuthorizationEntity loadXarxaACEntityFromNetworkAuthorization(es.caib.seycon.ng.comu.NetworkAuthorization networkAuthorization) {
+	private com.soffid.iam.model.NetworkAuthorizationEntity loadXarxaACEntityFromNetworkAuthorization(com.soffid.iam.api.NetworkAuthorization networkAuthorization) {
 		NetworkAuthorizationEntity xarxaACEntity = null;
 		if (networkAuthorization.getId() != null) {
 			xarxaACEntity = load(networkAuthorization.getId());
@@ -189,36 +186,36 @@ public class NetworkAuthorizationEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.XarxaACEntityDao#networkAuthorizationToEntity(es.caib.seycon.ng.comu.NetworkAuthorization)
 	 */
-	public com.soffid.iam.model.NetworkAuthorizationEntity networkAuthorizationToEntity(es.caib.seycon.ng.comu.NetworkAuthorization networkAuthorization) {
+	public com.soffid.iam.model.NetworkAuthorizationEntity networkAuthorizationToEntity(com.soffid.iam.api.NetworkAuthorization networkAuthorization) {
 		com.soffid.iam.model.NetworkAuthorizationEntity entity = this.loadXarxaACEntityFromNetworkAuthorization(networkAuthorization);
 		this.networkAuthorizationToEntity(networkAuthorization, entity, true);
 		return entity;
 	}
 
-	public void networkAuthorizationToEntityCustom(es.caib.seycon.ng.comu.NetworkAuthorization source, com.soffid.iam.model.NetworkAuthorizationEntity target) {
-		NetworkEntity xarxa = getNetworkEntityDao().findByName(source.getCodiXarxa());
+	public void networkAuthorizationToEntityCustom(com.soffid.iam.api.NetworkAuthorization source, com.soffid.iam.model.NetworkAuthorizationEntity target) {
+		NetworkEntity xarxa = getNetworkEntityDao().findByName(source.getNetworkCode());
 		if (xarxa != null) {
 			target.setNetwork(xarxa);
 		} else {
-			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.networkNotFound"), source.getCodiXarxa())); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.networkNotFound"), source.getNetworkCode())); //$NON-NLS-1$
 		}
-		target.setHostsName(source.getMascara());
+		target.setHostsName(source.getMask());
 
-		Identitat identitat = source.getIdentitat();
-		String nomRol = identitat.getNomRol();
+		Identity identitat = source.getIdentity();
+		String nomRol = identitat.getRoleName();
 		if (nomRol != null && nomRol.trim().compareTo("") == 0) { //$NON-NLS-1$
 			nomRol = null;
 		}
-		String codiGrup = identitat.getCodiGrup();
+		String codiGrup = identitat.getGroupCode();
 		if (codiGrup != null && codiGrup.trim().compareTo("") == 0) { //$NON-NLS-1$
 			codiGrup = null;
 		}
-		String codiUsuari = identitat.getCodiUsuari();
+		String codiUsuari = identitat.getUserCode();
 		if (codiUsuari != null && codiUsuari.trim().compareTo("") == 0) { //$NON-NLS-1$
 			codiUsuari = null;
 		}
 
-		String codiIdentitat = identitat.getCodiIdentitat();
+		String codiIdentitat = identitat.getIdentityCode();
 		if (codiIdentitat != null && codiIdentitat.trim().compareTo("") == 0) { //$NON-NLS-1$
 			codiIdentitat = null;
 		}
@@ -271,7 +268,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			}
 
 			if (!esRol && !esUsuari && !esGrup) {
-				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.identityNotFound"), identitat.getCodiIdentitat())); //$NON-NLS-1$
+				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.identityNotFound"), identitat.getIdentityCode())); //$NON-NLS-1$
 			}
 		}
 
@@ -325,7 +322,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.XarxaACEntityDao#networkAuthorizationToEntity(es.caib.seycon.ng.comu.NetworkAuthorization,
 	 *      es.caib.seycon.ng.model.XarxaACEntity)
 	 */
-	public void networkAuthorizationToEntity(es.caib.seycon.ng.comu.NetworkAuthorization source, com.soffid.iam.model.NetworkAuthorizationEntity target, boolean copyIfNull) {
+	public void networkAuthorizationToEntity(com.soffid.iam.api.NetworkAuthorization source, com.soffid.iam.model.NetworkAuthorizationEntity target, boolean copyIfNull) {
 		super.networkAuthorizationToEntity(source, target, copyIfNull);
 		networkAuthorizationToEntityCustom(source, target);
 	}

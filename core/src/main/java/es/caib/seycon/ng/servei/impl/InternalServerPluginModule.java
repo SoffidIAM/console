@@ -1,6 +1,6 @@
 package es.caib.seycon.ng.servei.impl;
 
-import es.caib.seycon.ng.comu.ServerPluginModule;
+import com.soffid.iam.api.ServerPluginModule;
 
 /**
  * @author bubu

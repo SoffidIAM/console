@@ -1,22 +1,19 @@
 package es.caib.loginModule.auth;
 
+import com.soffid.iam.service.AuthorizationService;
+import es.caib.seycon.ng.ServiceLocator;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.security.SimpleGroup;
 import org.jboss.security.SimplePrincipal;
-
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.servei.AutoritzacioService;
 
 public class SEUAuthorizationModule implements
 		javax.security.auth.spi.LoginModule {
@@ -111,7 +108,7 @@ public class SEUAuthorizationModule implements
 			
 			// Obtenim les autoritzacions
 			//if (codiUsuari!=null && !codiUsuari.equals(nameUnauthenticatedIdentity)) {
-			AutoritzacioService svc = ServiceLocator.instance().getAutoritzacioService();
+			AuthorizationService svc = com.soffid.iam.ServiceLocator.instance().getAuthorizationService();
 	
 			autoritzacions = svc.getUserAuthorizationsString(codiUsuari);
 			/*} else {

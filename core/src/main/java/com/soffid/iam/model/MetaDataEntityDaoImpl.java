@@ -48,8 +48,8 @@ public class MetaDataEntityDaoImpl extends
 		}
 	}
 
-	public void toTipusDada(com.soffid.iam.model.MetaDataEntity sourceEntity, es.caib.seycon.ng.comu.TipusDada targetVO) {
-		super.toTipusDada(sourceEntity, targetVO);
+	public void toDataType(com.soffid.iam.model.MetaDataEntity sourceEntity, com.soffid.iam.api.DataType targetVO) {
+		super.toDataType(sourceEntity, targetVO);
 		if (sourceEntity.getLabel() == null)
 			targetVO.setLabel(sourceEntity.getName());
 		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)
@@ -75,8 +75,8 @@ public class MetaDataEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#toTipusDada(es.caib.seycon.ng.model.TipusDadaEntity)
 	 */
-	public es.caib.seycon.ng.comu.TipusDada toTipusDada(final com.soffid.iam.model.MetaDataEntity entity) {
-		return super.toTipusDada(entity);
+	public com.soffid.iam.api.DataType toDataType(final com.soffid.iam.model.MetaDataEntity entity) {
+		return super.toDataType(entity);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class MetaDataEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.MetaDataEntity loadTipusDadaEntityFromTipusDada(es.caib.seycon.ng.comu.TipusDada tipusDada) {
+	private com.soffid.iam.model.MetaDataEntity loadTipusDadaEntityFromTipusDada(com.soffid.iam.api.DataType tipusDada) {
 		MetaDataEntity tipusDadaEntity = null;
 		if (tipusDada.getId() != null) {
 			tipusDadaEntity = load(tipusDada.getId());
@@ -98,9 +98,9 @@ public class MetaDataEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada)
 	 */
-	public com.soffid.iam.model.MetaDataEntity tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada tipusDada) {
+	public com.soffid.iam.model.MetaDataEntity dataTypeToEntity(com.soffid.iam.api.DataType tipusDada) {
 		com.soffid.iam.model.MetaDataEntity entity = this.loadTipusDadaEntityFromTipusDada(tipusDada);
-		this.tipusDadaToEntity(tipusDada, entity, true);
+		this.dataTypeToEntity(tipusDada, entity, true);
 		return entity;
 	}
 
@@ -108,8 +108,8 @@ public class MetaDataEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada,
 	 *      es.caib.seycon.ng.model.TipusDadaEntity)
 	 */
-	public void tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada sourceVO, com.soffid.iam.model.MetaDataEntity targetEntity, boolean copyIfNull) {
-		super.tipusDadaToEntity(sourceVO, targetEntity, copyIfNull);
+	public void dataTypeToEntity(com.soffid.iam.api.DataType sourceVO, com.soffid.iam.model.MetaDataEntity targetEntity, boolean copyIfNull) {
+		super.dataTypeToEntity(sourceVO, targetEntity, copyIfNull);
 		if (sourceVO.getValues() == null || sourceVO.getValues().isEmpty())
 			targetEntity.setValues(null);
 		else

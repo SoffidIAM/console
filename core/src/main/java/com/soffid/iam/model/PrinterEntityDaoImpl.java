@@ -7,21 +7,26 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Printer;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Impressora;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -36,16 +41,15 @@ public class PrinterEntityDaoImpl extends
         com.soffid.iam.model.PrinterEntityDaoBase {
     private void auditarImpressora(String accio, String codiImpressora) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setImpressora(codiImpressora);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setPrinter(codiImpressora);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_IMPRES"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_IMPRES"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -100,15 +104,15 @@ public class PrinterEntityDaoImpl extends
         }
     }
 
-    public void toImpressora(com.soffid.iam.model.PrinterEntity sourceEntity, es.caib.seycon.ng.comu.Impressora targetVO) {
-        super.toImpressora(sourceEntity, targetVO);
+    public void toPrinter(com.soffid.iam.model.PrinterEntity sourceEntity, com.soffid.iam.api.Printer targetVO) {
+        super.toPrinter(sourceEntity, targetVO);
         toImpressoraCustom(sourceEntity, targetVO);
     }
 
-    public void toImpressoraCustom(com.soffid.iam.model.PrinterEntity sourceEntity, es.caib.seycon.ng.comu.Impressora targetVO) {
+    public void toImpressoraCustom(com.soffid.iam.model.PrinterEntity sourceEntity, com.soffid.iam.api.Printer targetVO) {
         HostEntity maquina = sourceEntity.getServer();
         if (maquina != null) {
-            targetVO.setNomMaquina(maquina.getName());
+            targetVO.setHostName(maquina.getName());
         }
 
         String local = sourceEntity.getLocal();
@@ -122,8 +126,8 @@ public class PrinterEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.ImpressoraEntityDao#toImpressora(es.caib.seycon.ng.model.ImpressoraEntity)
      */
-    public es.caib.seycon.ng.comu.Impressora toImpressora(final com.soffid.iam.model.PrinterEntity entity) {
-        Impressora impressora = super.toImpressora(entity);
+    public com.soffid.iam.api.Printer toPrinter(final com.soffid.iam.model.PrinterEntity entity) {
+        Printer impressora = super.toPrinter(entity);
         toImpressoraCustom(entity, impressora);
         return impressora;
     }
@@ -133,7 +137,7 @@ public class PrinterEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.PrinterEntity loadImpressoraEntityFromImpressora(es.caib.seycon.ng.comu.Impressora impressora) {
+    private com.soffid.iam.model.PrinterEntity loadImpressoraEntityFromImpressora(com.soffid.iam.api.Printer impressora) {
         PrinterEntity impressoraEntity = null;
         if (impressora.getId() != null) {
             impressoraEntity = load(impressora.getId());
@@ -147,14 +151,14 @@ public class PrinterEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.ImpressoraEntityDao#impressoraToEntity(es.caib.seycon.ng.comu.Impressora)
      */
-    public com.soffid.iam.model.PrinterEntity impressoraToEntity(es.caib.seycon.ng.comu.Impressora impressora) {
+    public com.soffid.iam.model.PrinterEntity printerToEntity(com.soffid.iam.api.Printer impressora) {
         com.soffid.iam.model.PrinterEntity entity = this.loadImpressoraEntityFromImpressora(impressora);
-        this.impressoraToEntity(impressora, entity, true);
+        this.printerToEntity(impressora, entity, true);
         return entity;
     }
 
-    public void impressoraToEntityCustom(es.caib.seycon.ng.comu.Impressora sourceVO, com.soffid.iam.model.PrinterEntity targetEntity) {
-        String nomMaquina = sourceVO.getNomMaquina();
+    public void impressoraToEntityCustom(com.soffid.iam.api.Printer sourceVO, com.soffid.iam.model.PrinterEntity targetEntity) {
+        String nomMaquina = sourceVO.getHostName();
         if (nomMaquina != null && nomMaquina.trim().compareTo("") != 0) { //$NON-NLS-1$
             HostEntity maquinaEntity = getHostEntityDao().findByName(nomMaquina);
             if (maquinaEntity != null) {
@@ -187,8 +191,8 @@ public class PrinterEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.ImpressoraEntityDao#impressoraToEntity(es.caib.seycon.ng.comu.Impressora,
      *      es.caib.seycon.ng.model.ImpressoraEntity)
      */
-    public void impressoraToEntity(es.caib.seycon.ng.comu.Impressora sourceVO, com.soffid.iam.model.PrinterEntity targetEntity, boolean copyIfNull) {
-        super.impressoraToEntity(sourceVO, targetEntity, copyIfNull);
+    public void printerToEntity(com.soffid.iam.api.Printer sourceVO, com.soffid.iam.model.PrinterEntity targetEntity, boolean copyIfNull) {
+        super.printerToEntity(sourceVO, targetEntity, copyIfNull);
         impressoraToEntityCustom(sourceVO, targetEntity);
     }
 

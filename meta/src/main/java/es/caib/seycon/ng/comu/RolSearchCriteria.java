@@ -8,7 +8,7 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 @Criteria 
-public abstract class RolSearchCriteria {
+public class RolSearchCriteria {
 
 	public String nom;
 

@@ -7,10 +7,17 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Identity;
+import com.soffid.iam.api.Task;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupTypeEntity;
@@ -23,17 +30,12 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
 
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.ContenidorRol;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Identitat;
-import es.caib.seycon.ng.comu.Tasca;
-import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 
@@ -57,16 +59,15 @@ public class GroupEntityDaoImpl extends
 
 	private void auditarGrup(String accio, String codiGrup) {
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
-		auditoria.setGrup(codiGrup);
-		auditoria.setAutor(codiUsuari);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
+		auditoria.setGroup(codiGrup);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_GRUP"); //$NON-NLS-1$
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_GRUP"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 
@@ -204,30 +205,29 @@ public class GroupEntityDaoImpl extends
 		}
 	}
 
-	public void toGrup(com.soffid.iam.model.GroupEntity sourceEntity, es.caib.seycon.ng.comu.Grup targetVO) {
-		super.toGrup(sourceEntity, targetVO);
+	public void toGroup(com.soffid.iam.model.GroupEntity sourceEntity, com.soffid.iam.api.Group targetVO) {
+		super.toGroup(sourceEntity, targetVO);
 		toGrupCustom(targetVO, sourceEntity);
 	}
 
-	private void toGrupCustom(Grup grup, final GroupEntity entity) {
+	private void toGrupCustom(Group grup, final GroupEntity entity) {
 		String organitzatiu = entity.getOrganizational();
 		if (organitzatiu != null && organitzatiu.trim().compareTo("") != 0) { //$NON-NLS-1$
-			grup.setOrganitzatiu(new Boolean(organitzatiu.trim()
-					.compareToIgnoreCase("S") == 0 ? true : false)); //$NON-NLS-1$
+			grup.setOrganizational(new Boolean(organitzatiu.trim().compareToIgnoreCase("S") == 0 ? true : false)); //$NON-NLS-1$
 		} else {
-			grup.setOrganitzatiu(new Boolean(false));
+			grup.setOrganizational(new Boolean(false));
 		}
 
 		GroupEntity grupPare = entity.getParent();
 		if (grupPare != null) {
 			String codiPare = grupPare.getName();
-			grup.setCodiPare(codiPare);
+			grup.setParentGroup(codiPare);
 		}
 
 		HostEntity servidorOfimatic = entity.getHomeServer();
 		if (servidorOfimatic != null) {
 			String nomServidorOfimatic = servidorOfimatic.getName();
-			grup.setNomServidorOfimatic(nomServidorOfimatic);
+			grup.setDriveServerName(nomServidorOfimatic);
 		}
 		
 
@@ -235,17 +235,16 @@ public class GroupEntityDaoImpl extends
 		GroupTypeEntity tipusUnitatOrganitzativa = grupEntity.getUnitType();
 		if (tipusUnitatOrganitzativa != null) {
 			String codiTipus = tipusUnitatOrganitzativa.getName();
-			grup.setTipus(codiTipus); // Unitat Organizativa
+			grup.setType(codiTipus); // Unitat Organizativa
 		} else {
-			grup.setTipus(null); // Unitat Organizativa
+			grup.setType(null); // Unitat Organizativa
 		}
 
 		String obsolet = entity.getObsolete();
 		if (obsolet != null && obsolet.compareTo("") != 0) { //$NON-NLS-1$
-			grup.setObsolet(obsolet.compareTo("S") == 0 ? new Boolean(true) //$NON-NLS-1$
-					: new Boolean(false));
+			grup.setObsolete(obsolet.compareTo("S") == 0 ? new Boolean(true) : new Boolean(false));
 		} else {
-			grup.setObsolet(new Boolean(false));
+			grup.setObsolete(new Boolean(false));
 		}
 
 		if (entity.getQuotaGroup() != null) {
@@ -258,8 +257,8 @@ public class GroupEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#toGrup(es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public es.caib.seycon.ng.comu.Grup toGrup(final com.soffid.iam.model.GroupEntity entity) {
-		Grup grup = super.toGrup(entity);
+	public com.soffid.iam.api.Group toGroup(final com.soffid.iam.model.GroupEntity entity) {
+		Group grup = super.toGroup(entity);
 		toGrupCustom(grup, entity);
 		return grup;
 	}
@@ -269,7 +268,7 @@ public class GroupEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.GroupEntity loadGrupEntityFromGrup(es.caib.seycon.ng.comu.Grup grup) {
+	private com.soffid.iam.model.GroupEntity loadGrupEntityFromGrup(com.soffid.iam.api.Group grup) {
 		com.soffid.iam.model.GroupEntity grupEntity = null;
 		if (grup.getId() != null) {
 			grupEntity = load(grup.getId());
@@ -283,23 +282,23 @@ public class GroupEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#grupToEntity(es.caib.seycon.ng.comu.Grup)
 	 */
-	public com.soffid.iam.model.GroupEntity grupToEntity(es.caib.seycon.ng.comu.Grup grup) {
+	public com.soffid.iam.model.GroupEntity groupToEntity(com.soffid.iam.api.Group grup) {
 		com.soffid.iam.model.GroupEntity entity = this.loadGrupEntityFromGrup(grup);
-		this.grupToEntity(grup, entity, true);
+		this.groupToEntity(grup, entity, true);
 		return entity;
 	}
 
-	private void grupToEntityCustom(es.caib.seycon.ng.comu.Grup sourceVO, com.soffid.iam.model.GroupEntity targetEntity) {
-		Boolean organitzatiu = sourceVO.getOrganitzatiu();
+	private void grupToEntityCustom(com.soffid.iam.api.Group sourceVO, com.soffid.iam.model.GroupEntity targetEntity) {
+		Boolean organitzatiu = sourceVO.getOrganizational();
 		if (organitzatiu != null) {
 			targetEntity.setOrganizational(organitzatiu.booleanValue() ? "S" : "N"); //$NON-NLS-1$
 		}else{
 			targetEntity.setOrganizational("N"); //$NON-NLS-1$
 		}
 
-		String codiPare = sourceVO.getCodiPare();
+		String codiPare = sourceVO.getParentGroup();
 		if (codiPare != null && codiPare.trim().compareTo("") != 0) { //$NON-NLS-1$
-			GroupEntity grupPare = findByName(sourceVO.getCodiPare());
+			GroupEntity grupPare = findByName(sourceVO.getParentGroup());
 			if (grupPare == null) {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.3"), codiPare)); //$NON-NLS-1$
 			} else {
@@ -314,7 +313,7 @@ public class GroupEntityDaoImpl extends
 			targetEntity.setParent(null);
 		}
 
-		String nomServidorOfimatic = sourceVO.getNomServidorOfimatic();
+		String nomServidorOfimatic = sourceVO.getDriveServerName();
 		if (nomServidorOfimatic != null
 				&& nomServidorOfimatic.trim().compareTo("") != 0) { //$NON-NLS-1$
 			HostEntity servidorOfimatic = getHostEntityDao().findByName(nomServidorOfimatic);
@@ -328,7 +327,7 @@ public class GroupEntityDaoImpl extends
 			targetEntity.setHomeServer(null);
 		}
 
-		String codiTipus = sourceVO.getTipus(); // Unitat Organizativa
+		String codiTipus = sourceVO.getType(); // Unitat Organizativa
 		if (codiTipus != null && codiTipus.trim().compareTo("") != 0) { //$NON-NLS-1$
 			GroupTypeEntity tipusEntity = getGroupTypeEntityDao().findByName(codiTipus);
 			if (tipusEntity != null) {
@@ -341,8 +340,8 @@ public class GroupEntityDaoImpl extends
 			targetEntity.setUnitType(null);
 		}
 
-		if (sourceVO.getObsolet() != null) {
-			targetEntity.setObsolete(sourceVO.getObsolet().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+		if (sourceVO.getObsolete() != null) {
+			targetEntity.setObsolete(sourceVO.getObsolete().booleanValue() ? "S" : "N"); //$NON-NLS-1$
 		} else {
 			targetEntity.setObsolete("N"); //$NON-NLS-1$
 		}
@@ -364,8 +363,8 @@ public class GroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#grupToEntity(es.caib.seycon.ng.comu.Grup,
 	 *      es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public void grupToEntity(es.caib.seycon.ng.comu.Grup sourceVO, com.soffid.iam.model.GroupEntity targetEntity, boolean copyIfNull) {
-		super.grupToEntity(sourceVO, targetEntity, copyIfNull);
+	public void groupToEntity(com.soffid.iam.api.Group sourceVO, com.soffid.iam.model.GroupEntity targetEntity, boolean copyIfNull) {
+		super.groupToEntity(sourceVO, targetEntity, copyIfNull);
 		grupToEntityCustom(sourceVO, targetEntity);
 	}
 
@@ -393,24 +392,24 @@ public class GroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#toIdentitat(es.caib.seycon.ng.model.GrupEntity,
 	 *      es.caib.seycon.ng.comu.Identitat)
 	 */
-	public void toIdentitat(com.soffid.iam.model.GroupEntity source, es.caib.seycon.ng.comu.Identitat target) {
-		super.toIdentitat(source, target);
+	public void toIdentity(com.soffid.iam.model.GroupEntity source, com.soffid.iam.api.Identity target) {
+		super.toIdentity(source, target);
 		toIdentitatCustom(source, target);
 	}
 
-	public void toIdentitatCustom(com.soffid.iam.model.GroupEntity source, es.caib.seycon.ng.comu.Identitat target) {
+	public void toIdentitatCustom(com.soffid.iam.model.GroupEntity source, com.soffid.iam.api.Identity target) {
 		String codiGrup = source.getName();
-		target.setCodiGrup(codiGrup);
-		target.setCodiIdentitat(codiGrup);
+		target.setGroupCode(codiGrup);
+		target.setIdentityCode(codiGrup);
 		String descripcio = source.getDescription();
-		target.setDescripcio(descripcio);
+		target.setDescription(descripcio);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#toIdentitat(es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public es.caib.seycon.ng.comu.Identitat toIdentitat(final com.soffid.iam.model.GroupEntity entity) {
-		Identitat identitat = super.toIdentitat(entity);
+	public com.soffid.iam.api.Identity toIdentity(final com.soffid.iam.model.GroupEntity entity) {
+		Identity identitat = super.toIdentity(entity);
 		toIdentitatCustom(entity, identitat);
 		return identitat;
 	}
@@ -420,11 +419,11 @@ public class GroupEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.GroupEntity loadGrupEntityFromIdentitat(es.caib.seycon.ng.comu.Identitat identitat) {
+	private com.soffid.iam.model.GroupEntity loadGrupEntityFromIdentitat(com.soffid.iam.api.Identity identitat) {
 		/*
 		 * La identitat és read only
 		 */
-		String codiGrup = identitat.getCodiGrup();
+		String codiGrup = identitat.getGroupCode();
 		if (codiGrup != null) {
 			GroupEntity grupEntity = findByName(codiGrup);
 			if (grupEntity != null) {
@@ -440,10 +439,10 @@ public class GroupEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#identitatToEntity(es.caib.seycon.ng.comu.Identitat)
 	 */
-	public com.soffid.iam.model.GroupEntity identitatToEntity(es.caib.seycon.ng.comu.Identitat identitat) {
+	public com.soffid.iam.model.GroupEntity identityToEntity(com.soffid.iam.api.Identity identitat) {
 		// @todo verify behavior of identitatToEntity
 		com.soffid.iam.model.GroupEntity entity = this.loadGrupEntityFromIdentitat(identitat);
-		this.identitatToEntity(identitat, entity, true);
+		this.identityToEntity(identitat, entity, true);
 		return entity;
 	}
 
@@ -451,24 +450,24 @@ public class GroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#identitatToEntity(es.caib.seycon.ng.comu.Identitat,
 	 *      es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public void identitatToEntity(es.caib.seycon.ng.comu.Identitat source, com.soffid.iam.model.GroupEntity target, boolean copyIfNull) {
-		super.identitatToEntity(source, target, copyIfNull);
+	public void identityToEntity(com.soffid.iam.api.Identity source, com.soffid.iam.model.GroupEntity target, boolean copyIfNull) {
+		super.identityToEntity(source, target, copyIfNull);
 	}
 
-	public GroupEntity valorDominiToEntity(ValorDomini valorDomini) {
+	public GroupEntity domainValueToEntity(DomainValue valorDomini) {
 		// els tipus domini son read-only
 		return null;
 	}
 
-	public ValorDomini toValorDomini(GroupEntity entity) {
-		ValorDomini valorDomini = super.toValorDomini(entity);
-		valorDomini.setDescripcio(entity.getDescription());
+	public DomainValue toDomainValue(GroupEntity entity) {
+		DomainValue valorDomini = super.toDomainValue(entity);
+		valorDomini.setDescription(entity.getDescription());
 		// pot ser GRUPS o GRUPS_USUARI
 		// domini service ho emplena
-		valorDomini.setNomDomini(null);
-		valorDomini.setValor(entity.getName());
+		valorDomini.setDomainName(null);
+		valorDomini.setValue(entity.getName());
 		// encara no es sap l'usuari del grup si aquest és GRUPS_USUARI
-		valorDomini.setCodiExternDomini(null);
+		valorDomini.setExternalCodeDomain(null);
 		return valorDomini;
 	}
 
@@ -598,13 +597,13 @@ public class GroupEntityDaoImpl extends
                 Object obj = it.next();
                 if (obj != null) {
                     RoleEntity role = (RoleEntity) obj;
-                    Tasca updateRole = new Tasca();
-                    updateRole.setTransa("UpdateRole");
-                    updateRole.setDataTasca(Calendar.getInstance());
+                    Task updateRole = new Task();
+                    updateRole.setTransaction("UpdateRole");
+                    updateRole.setTaskDate(Calendar.getInstance());
                     updateRole.setStatus("P");
                     updateRole.setRole(role.getName());
-                    updateRole.setBd(role.getSystem().getName());
-                    TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
+                    updateRole.setDatabase(role.getSystem().getName());
+                    TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
                 }
             }
@@ -638,12 +637,12 @@ public class GroupEntityDaoImpl extends
             Object obj = it.next();
             if (obj != null) {
                 String codiUsuari = (String) obj;
-                Tasca updateUser = new Tasca();
-                updateUser.setTransa("UpdateUser");
-                updateUser.setDataTasca(Calendar.getInstance());
-                updateUser.setUsuari(codiUsuari);
+                Task updateUser = new Task();
+                updateUser.setTransaction("UpdateUser");
+                updateUser.setTaskDate(Calendar.getInstance());
+                updateUser.setUser(codiUsuari);
                 updateUser.setStatus("P");
-                TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateUser);
+                TaskEntity tasca = getTaskEntityDao().taskToEntity(updateUser);
                 getTaskEntityDao().create(tasca);
             }
         }		

@@ -4,7 +4,31 @@
 /**
  * Modificación de la clase org.jbpm.Mail para que se pueda extender sus funcionalidades.
  */
+/**
+ * Modificación de la clase org.jbpm.Mail para que se pueda extender sus funcionalidades.
+ */
 package es.caib.bpm.mail;
+
+import com.soffid.iam.api.AuthorizationRole;
+import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserData;
+import com.soffid.iam.lang.MessageFactory;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
+import com.soffid.iam.service.ApplicationService;
+import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.service.ConfigurationService;
+import com.soffid.iam.service.GroupService;
+import com.soffid.iam.ServiceLocator;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.utils.MailUtils;
+import es.caib.seycon.ng.utils.Security;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,27 +64,6 @@ import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
-import com.soffid.iam.model.SystemEntity;
-import com.soffid.iam.model.SystemEntityDao;
-
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.Configuracio;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariGrup;
-import es.caib.seycon.ng.comu.lang.MessageFactory;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AplicacioService;
-import es.caib.seycon.ng.servei.AutoritzacioService;
-import es.caib.seycon.ng.servei.ConfiguracioService;
-import es.caib.seycon.ng.servei.GrupService;
-import es.caib.seycon.ng.utils.MailUtils;
-import es.caib.seycon.ng.utils.Security;
-
 public class Mail implements ActionHandler {
 	private static final long serialVersionUID = 1L;
 
@@ -87,15 +90,15 @@ public class Mail implements ActionHandler {
 	}
 
 	public void initialize() {
-		Configuracio param1;
+		Configuration param1;
 		try {
-			ConfiguracioService configService = ServiceLocator.instance().getConfiguracioService();
-			param1 = configService.findParametreByCodiAndCodiXarxa("mail.host", null); //$NON-NLS-1$
+			ConfigurationService configService = ServiceLocator.instance().getConfigurationService();
+			param1 = configService.findParameterByNameAndNetworkName("mail.host", null); //$NON-NLS-1$
 			if (param1 != null)
-				mailHost = param1.getValor();
-			Configuracio param2 = configService.findParametreByCodiAndCodiXarxa("mail.from", null); //$NON-NLS-1$
+				mailHost = param1.getValue();
+			Configuration param2 = configService.findParameterByNameAndNetworkName("mail.from", null); //$NON-NLS-1$
 			if (param2 != null)
-				mailFrom = param2.getValor();
+				mailFrom = param2.getValue();
 		} catch (Exception e) {
 		}
 	}
@@ -321,16 +324,14 @@ public class Mail implements ActionHandler {
 				domain = autorization.substring(i + 1);
 				autorization = autorization.substring(0,i);
 			}
-			AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+			AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
 			debug ("Resolving address for AUTHORIZATION "+autorization);
-			for (AutoritzacioRol ar: autService.getRolsAutoritzacio(autorization))
-			{
-				String rol = ar.getRol().getNom();
-				if (domain != null)
-					rol = rol + "/" + domain; //$NON-NLS-1$
-				rol = rol+"@"+ar.getRol().getBaseDeDades(); //$NON-NLS-1$
-				result.addAll(getAddress(rol));
-			}
+			for (AuthorizationRole ar : autService.getAuthorizationRoles(autorization)) {
+                String rol = ar.getRole().getName();
+                if (domain != null) rol = rol + "/" + domain;
+                rol = rol + "@" + ar.getRole().getSystem();
+                result.addAll(getAddress(rol));
+            }
 			return result;
 			
 		}
@@ -341,26 +342,23 @@ public class Mail implements ActionHandler {
 						Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
 						Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
 		try {
-    		Usuari usuari = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(actorId);
+    		User usuari = ServiceLocator.instance().getUserService().findUserByUserName(actorId);
     		if (usuari != null)
     		{
-    			debug ("Resolving address for user "+usuari.getCodi());
-    			if (usuari.getActiu().booleanValue())
+    			debug("Resolving address for user " + usuari.getUserName());
+    			if (usuari.getActive().booleanValue())
     			{
-        			if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
+        			if (usuari.getShortName() != null && usuari.getMailDomain() != null)
         			{
-        				result.add(new InternetAddress( 
-        							usuari.getNomCurt()+"@"+usuari.getDominiCorreu(),
-        							usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				result.add(new InternetAddress(usuari.getShortName() + "@" + usuari.getMailDomain(), usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             			return result;
         			}
         			else
         			{
-        				DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(actorId, "EMAIL"); //$NON-NLS-1$
-        				if (dada != null && dada.getValorDada() != null)
+        				UserData dada = ServiceLocator.instance().getUserService().findDataByTypeDataName(actorId, "EMAIL"); //$NON-NLS-1$
+        				if (dada != null && dada.getValue() != null)
         				{
-            				result.add(new InternetAddress(dada.getValorDada(),
-            						usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            				result.add(new InternetAddress(dada.getValue(), usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             				return result;
         				}
         			}
@@ -368,16 +366,15 @@ public class Mail implements ActionHandler {
     		}
     		else
     		{
-    			GrupService gs = ServiceLocator.instance().getGrupService();
-    			Grup grup = gs.findGrupByCodiGrup(actorId);
+    			GroupService gs = ServiceLocator.instance().getGroupService();
+    			Group grup = gs.findGroupByGroupName(actorId);
     			if (grup != null)
     			{
     				StringBuffer sb = new StringBuffer();
-        			debug ("Resolving group members: "+grup.getCodi());
-    				for (UsuariGrup ug: gs.findUsuarisPertanyenAlGrupByCodiGrup(actorId))
-    				{
-    					result.addAll( getAddress(ug.getCodiUsuari()) );
-    				}
+        			debug("Resolving group members: " + grup.getName());
+    				for (GroupUser ug : gs.findUsersBelongtoGroupByGroupName(actorId)) {
+                        result.addAll(getAddress(ug.getUser()));
+                    }
     				return result;
     			}
     			else
@@ -405,18 +402,15 @@ public class Mail implements ActionHandler {
     					roleName = roleName.substring(0, i);
     				}
         			debug ("Resolving role"+roleName+"@"+dispatcher);
-    				AplicacioService aplicacioService = ServiceLocator.instance().getAplicacioService();
-					for (Rol role: aplicacioService.findRolsByFiltre(roleName, "%", "%", dispatcher, "%", "%")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    				{
-	        			debug ("Resolving role grantees: "+role.getNom()+"@"+role.getBaseDeDades());
-    					for (RolGrant grant: aplicacioService.findEffectiveRolGrantsByRolId(role.getId()))
-    					{
-    						if (scope == null || scope.equals (grant.getDomainValue()))
-    						{
-    							result.addAll(getAddress(grant.getUser()));
-    						}
-    					}
-    				}
+    				ApplicationService aplicacioService = ServiceLocator.instance().getApplicationService();
+					for (Role role : aplicacioService.findRolesByFilter(roleName, "%", "%", dispatcher, "%", "%")) {
+                        debug("Resolving role grantees: " + role.getName() + "@" + role.getSystem());
+                        for (RoleGrant grant : aplicacioService.findEffectiveRoleGrantsByRoleId(role.getId())) {
+                            if (scope == null || scope.equals(grant.getDomainValue())) {
+                                result.addAll(getAddress(grant.getUser()));
+                            }
+                        }
+                    }
     				return result;
     			}
     		}

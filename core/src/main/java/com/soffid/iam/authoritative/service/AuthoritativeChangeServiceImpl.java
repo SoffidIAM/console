@@ -4,21 +4,26 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.authoritative.service;
 
+import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserData;
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.TipusDada;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariGrup;
+import com.soffid.iam.sync.intf.AuthoritativeChange;
+import com.soffid.iam.sync.intf.AuthoritativeChangeIdentifier;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
-import es.caib.seycon.ng.sync.intf.AuthoritativeChangeIdentifier;
 import es.caib.seycon.ng.utils.Security;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
@@ -29,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -86,8 +92,8 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		if (dispatcher == null)
 			throw new InternalErrorException(String.format("Invalid source change %s", change.getSourceSystem()));
 		
-		if (change.getGroups() != null && change.getUser().getCodiGrupPrimari() != null)
-			change.getGroups().remove(change.getUser().getCodiGrupPrimari());
+		if (change.getGroups() != null && change.getUser().getPrimaryGroup() != null)
+			change.getGroups().remove(change.getUser().getPrimaryGroup());
 		
 		if (dispatcher.getAuthoritativeProcess() == null || dispatcher.getAuthoritativeProcess().isEmpty())
 		{
@@ -99,9 +105,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			AuthoritativeChangeIdentifier changeId = change.getId();
 			UserEntity ue = null;
 			// Cancels any pending workflow
-			if (change.getUser() != null && change.getUser().getCodi() != null)
+			if (change.getUser() != null && change.getUser().getUserName() != null)
 			{
-				ue = getUserEntityDao().findByUserName(change.getUser().getCodi());
+				ue = getUserEntityDao().findByUserName(change.getUser().getUserName());
 				if (ue != null)
 				{
 					for ( AuthoritativeChangeEntity ch: ue.getPendingAuthoritativeChanges())
@@ -197,16 +203,16 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			
 			ProcessInstance pi = def.createProcessInstance();
 			
-			Usuari u = change.getUser();
-			if (u.getCodi() != null)
+			User u = change.getUser();
+			if (u.getUserName() != null)
 			{
-				u = getUsuariService().findUsuariByCodiUsuari(u.getCodi());
+				u = getUserService().findUserByUserName(u.getUserName());
 			}
 			
 			pi.getContextInstance().createVariable("change", change);
 			if (u != null)
 			{
-				AuthoritativeChange current = getCurrentAttributes(u.getCodi());
+				AuthoritativeChange current = getCurrentAttributes(u.getUserName());
 				pi.getContextInstance().createVariable("current", current);
 				pi.getContextInstance().createVariable("user", u);
 			}
@@ -237,34 +243,20 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	{
 		if (change.getAttributes() != null)
 		{
-			for (String attribute: change.getAttributes().keySet())
-			{
-				Object value = change.getAttributes().get(attribute);
-				if (value != null && value instanceof Date)
-				{
-					Calendar c = Calendar.getInstance();
-					c.setTime( (Date) value);
-					value = c;
-				}
-				DadaUsuari dada = getUsuariService().findDadaByCodiTipusDada(change.getUser().getCodi(), attribute);
-				if (dada == null && value != null)
-					return true;
-				else if (value == null && dada!= null)
-					return true;
-				else if (value != null && value instanceof byte[])
-				{
-					if (((byte[])value).equals(dada.getBlobDataValue())) 
-						return true;
-				}
-				else if (value != null && value instanceof Calendar)
-				{
-					if ( ! ((Calendar)value).equals(dada.getValorDadaDate())) 
-						return true;
-				}
-				else if (value != null && ! value.toString().equals(dada.getValorDada())) 
-					return true;
-				
-			}
+			for (String attribute : change.getAttributes().keySet()) {
+                Object value = change.getAttributes().get(attribute);
+                if (value != null && value instanceof Date) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTime((Date) value);
+                    value = c;
+                }
+                UserData dada = getUserService().findDataByTypeDataName(change.getUser().getUserName(), attribute);
+                if (dada == null && value != null) return true; else if (value == null && dada != null) return true; else if (value != null && value instanceof byte[]) {
+                    if (((byte[]) value).equals(dada.getBlobDataValue())) return true;
+                } else if (value != null && value instanceof Calendar) {
+                    if (!((Calendar) value).equals(dada.getDateValue())) return true;
+                } else if (value != null && !value.toString().equals(dada.getValue())) return true;
+            }
 		}
 		return false;
 	}
@@ -280,24 +272,20 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		if (change.getGroups() == null)
 			return false;
 		
-		Collection<UsuariGrup> grups = getGrupService().findUsuariGrupsByCodiUsuari(change.getUser().getCodi());
+		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(change.getUser().getUserName());
 		
 		Set<String> actualGroups = new HashSet<String>(change.getGroups());
 		
 		// First remove
-		for (Iterator<UsuariGrup> it = grups.iterator(); it.hasNext();)
-		{
-			UsuariGrup ug = it.next();
-			if (actualGroups.contains(ug.getCodiGrup()))
-			{
-				log.info("Received user without group "+ug.getCodiGrup());
-				actualGroups.remove(ug.getCodiGrup());
-			}
-			else
-			{
-				return true;
-			}
-		}
+		for (Iterator<GroupUser> it = grups.iterator(); it.hasNext(); ) {
+            GroupUser ug = it.next();
+            if (actualGroups.contains(ug.getGroup())) {
+                log.info("Received user without group " + ug.getGroup());
+                actualGroups.remove(ug.getGroup());
+            } else {
+                return true;
+            }
+        }
 		
 		return ! actualGroups.isEmpty();
 	}
@@ -315,12 +303,12 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detectUserChange (AuthoritativeChange change) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InternalErrorException
 	{
-		if (change.getUser().getCodi() == null)
+		if (change.getUser().getUserName() == null)
 		{
 			log.info("Received change without userName. New user is expected");
 			return true;
 		}
-		Usuari old = getUsuariService().findUsuariByCodiUsuari(change.getUser().getCodi());
+		User old = getUserService().findUserByUserName(change.getUser().getUserName());
 		if (old == null)
 		{
 			log.info("Received new user");
@@ -363,7 +351,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			ProcessTracker tracker = new ProcessTracker();
 			tracker.change = change;
 			tracker.auditGenerated = false;
-    		Usuari user = applyUserChange (tracker);
+    		User user = applyUserChange(tracker);
     		if (change.getAttributes() != null)
     			applyAttributesChange (user, tracker);
     		if (change.getGroups() != null)
@@ -378,33 +366,27 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @param change
 	 * @throws InternalErrorException 
 	 */
-	private void applyGroupChange (Usuari user, ProcessTracker tracker) throws InternalErrorException
-	{
-		Collection<UsuariGrup> grups = getGrupService().findUsuariGrupsByCodiUsuari(user.getCodi());
+	private void applyGroupChange(User user, ProcessTracker tracker) throws InternalErrorException {
+		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		
 		AuthoritativeChange change = tracker.change;
 		Set<String> actualGroups = change.getGroups();
 		
 		// First remove
-		for (Iterator<UsuariGrup> it = grups.iterator(); it.hasNext();)
-		{
-			UsuariGrup ug = it.next();
-			if (actualGroups.contains(ug.getCodiGrup()))
-			{
-				actualGroups.remove(ug.getCodiGrup());
-			}
-			else
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				getGrupService().removeGrupFromUsuari(user.getCodi(), ug.getCodiGrup());
-			}
-		}
+		for (Iterator<GroupUser> it = grups.iterator(); it.hasNext(); ) {
+            GroupUser ug = it.next();
+            if (actualGroups.contains(ug.getGroup())) {
+                actualGroups.remove(ug.getGroup());
+            } else {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                getGroupService().removeGroupFormUser(user.getUserName(), ug.getGroup());
+            }
+        }
 		
-		for (String group: actualGroups)
-		{
-			auditAuthoritativeChange(user.getCodi(), tracker);
-			getGrupService().addGrupToUsuari(user.getCodi(), group);
-		}
+		for (String group : actualGroups) {
+            auditAuthoritativeChange(user.getUserName(), tracker);
+            getGroupService().addGroupToUser(user.getUserName(), group);
+        }
 		
 	}
 
@@ -432,63 +414,50 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	private Usuari applyUserChange (ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
-	{
+	private User applyUserChange(ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		AuthoritativeChange change = tracker.change;
-		Usuari user = change.getUser();
-		Usuari oldUser = getUsuariService().findUsuariByCodiUsuari(user.getCodi());
+		User user = change.getUser();
+		User oldUser = getUserService().findUserByUserName(user.getUserName());
 		if (oldUser == null)
 		{
-			if (user.getCodiGrupPrimari() == null) user.setCodiGrupPrimari("World");
-			if (user.getNom() == null) user.setNom("?");
-			if (user.getPrimerLlinatge() == null) user.setPrimerLlinatge("?");
-			if (user.getActiu() == null) user.setActiu(Boolean.TRUE);
-			if (user.getMultiSessio() == null) user.setMultiSessio(Boolean.FALSE);
-			if (user.getServidorCorreu() == null) user.setServidorCorreu("null");
-			if (user.getServidorHome() == null) user.setServidorHome("null");
-			if (user.getServidorPerfil() == null) user.setServidorPerfil("null");
-			if (user.getTipusUsuari() == null) user.setTipusUsuari("I");
-			oldUser = getUsuariService().create(user);
+			if (user.getPrimaryGroup() == null) user.setPrimaryGroup("World");
+			if (user.getFirstName() == null) user.setFirstName("?");
+			if (user.getLastName() == null) user.setLastName("?");
+			if (user.getActive() == null) user.setActive(Boolean.TRUE);
+			if (user.getMultiSession() == null) user.setMultiSession(Boolean.FALSE);
+			if (user.getMailServer() == null) user.setMailServer("null");
+			if (user.getHomeServer() == null) user.setHomeServer("null");
+			if (user.getProfileServer() == null) user.setProfileServer("null");
+			if (user.getUserType() == null) user.setUserType("I");
+			oldUser = getUserService().create(user);
 		} else {
 			boolean anyChange = !compareUsers(user, oldUser);
 			if (anyChange)
 			{
-				auditAuthoritativeChange(oldUser.getCodi(), tracker);
-				getUsuariService().update(oldUser);
+				auditAuthoritativeChange(oldUser.getUserName(), tracker);
+				getUserService().update(oldUser);
 			}
 		}
 		return oldUser;
 	}
 
-	private boolean compareUsers (Usuari user, Usuari oldUser)
-					throws NoSuchMethodException, IllegalAccessException,
-					InvocationTargetException
-	{
+	private boolean compareUsers(User user, User oldUser) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		boolean anyChange = false;
-		for (String att: new String[] {"Actiu", "AliesCorreu", "CodiGrupPrimari", "Comentari", 
-						"DominiCorreu", "MultiSessio", "NIF", "Nom", "NomCurt", "PrimerLlinatge",
-						"SegonLlinatge", "ServidorCorreu", "ServidorPerfil", "ServidorHome", 
-						"Telefon", "TipusUsuari"})
-		{
-			Method getter = Usuari.class.getMethod("get"+att);
-			Method setter = Usuari.class.getMethod("set"+att, getter.getReturnType());
-			Object value = getter.invoke(user);
-			if ("".equals(value))
-				value = null;
-			if (value != null)
-			{
-				Object oldValue = getter.invoke(oldUser);
-				if ("".equals(oldValue))
-					oldValue = null;
-				
-				if (oldValue == null || !oldValue.equals(value))
-				{
-					log.info("Received change on attribute "+att);
-					setter.invoke(oldUser, value);
-					anyChange = true;
-				}
-			}
-		}
+		for (String att : new String[]{"Actiu", "AliesCorreu", "CodiGrupPrimari", "Comentari", "DominiCorreu", "MultiSessio", "NIF", "Nom", "NomCurt", "PrimerLlinatge", "SegonLlinatge", "ServidorCorreu", "ServidorPerfil", "ServidorHome", "Telefon", "TipusUsuari"}) {
+            Method getter = User.class.getMethod("get" + att);
+            Method setter = User.class.getMethod("set" + att, getter.getReturnType());
+            Object value = getter.invoke(user);
+            if ("".equals(value)) value = null;
+            if (value != null) {
+                Object oldValue = getter.invoke(oldUser);
+                if ("".equals(oldValue)) oldValue = null;
+                if (oldValue == null || !oldValue.equals(value)) {
+                    log.info("Received change on attribute " + att);
+                    setter.invoke(oldUser, value);
+                    anyChange = true;
+                }
+            }
+        }
 		return ! anyChange;
 	}
 
@@ -496,73 +465,53 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @param change
 	 * @throws InternalErrorException 
 	 */
-	private void applyAttributesChange (Usuari user, ProcessTracker tracker) throws InternalErrorException
-	{
+	private void applyAttributesChange(User user, ProcessTracker tracker) throws InternalErrorException {
 		AuthoritativeChange change = tracker.change;
 		
-		for (String attribute: change.getAttributes().keySet())
-		{
-			Object value = change.getAttributes().get(attribute);
-			if (value != null && value instanceof Date)
-			{
-				Calendar c = Calendar.getInstance();
-				c.setTime( (Date) value);
-				value = c;
-			}
-			TipusDada tda = getDadesAddicionalsService().findTipusDadaByCodi(attribute);
-			if (tda == null)
-			{
-				long i = 100;
-				tda = new TipusDada();
-				for (TipusDada tda2: getDadesAddicionalsService().getTipusDades())
-				{
-					if (tda2.getOrdre().longValue() >= i)
-						i = tda2.getOrdre().longValue()+1;
-				}
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				tda.setOrdre(i);
-				tda.setCodi(attribute);
-				tda = getDadesAddicionalsService().create(tda);
-			}
-			DadaUsuari dada = getUsuariService().findDadaByCodiTipusDada(user.getCodi(), attribute);
-			if (dada == null && value != null)
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				dada = new DadaUsuari();
-				dada.setCodiDada(tda.getCodi());
-				dada.setCodiUsuari(user.getCodi());
-				if (value instanceof byte[])
-					dada.setBlobDataValue((byte[]) value);
-				else if (value instanceof Calendar)
-					dada.setValorDadaDate((Calendar) value);
-				else if (value != null)
-					dada.setValorDada(value.toString());
-				getDadesAddicionalsService().create(dada);
-			} 
-			else if (value == null && dada!= null)
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				getDadesAddicionalsService().delete(dada);
-			} 
-			else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				dada.setBlobDataValue((byte[])value);
-				getDadesAddicionalsService().update(dada);
-			}
-			else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getBlobDataValue())) 
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				dada.setValorDadaDate((Calendar)value);
-				getDadesAddicionalsService().update(dada);
-			}
-			else if (value != null && ! value.equals(dada.getValorDada())) 
-			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				dada.setValorDada(value.toString());
-				getDadesAddicionalsService().update(dada);
-			}
-		}
+		for (String attribute : change.getAttributes().keySet()) {
+            Object value = change.getAttributes().get(attribute);
+            if (value != null && value instanceof Date) {
+                Calendar c = Calendar.getInstance();
+                c.setTime((Date) value);
+                value = c;
+            }
+            DataType tda = getAdditionalDataService().findDataTypeByName(attribute);
+            if (tda == null) {
+                long i = 100;
+                tda = new DataType();
+                for (DataType tda2 : getAdditionalDataService().getDataTypes()) {
+                    if (tda2.getOrder().longValue() >= i) i = tda2.getOrder().longValue() + 1;
+                }
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                tda.setOrder(i);
+                tda.setCode(attribute);
+                tda = getAdditionalDataService().create(tda);
+            }
+            UserData dada = getUserService().findDataByTypeDataName(user.getUserName(), attribute);
+            if (dada == null && value != null) {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                dada = new UserData();
+                dada.setAttribute(tda.getCode());
+                dada.setUser(user.getUserName());
+                if (value instanceof byte[]) dada.setBlobDataValue((byte[]) value); else if (value instanceof Calendar) dada.setDateValue((Calendar) value); else if (value != null) dada.setValue(value.toString());
+                getAdditionalDataService().create(dada);
+            } else if (value == null && dada != null) {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                getAdditionalDataService().delete(dada);
+            } else if (value != null && value instanceof byte[] && !((byte[]) value).equals(dada.getBlobDataValue())) {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                dada.setBlobDataValue((byte[]) value);
+                getAdditionalDataService().update(dada);
+            } else if (value != null && value instanceof Calendar && !((Calendar) value).equals(dada.getBlobDataValue())) {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                dada.setDateValue((Calendar) value);
+                getAdditionalDataService().update(dada);
+            } else if (value != null && !value.equals(dada.getValue())) {
+                auditAuthoritativeChange(user.getUserName(), tracker);
+                dada.setValue(value.toString());
+                getAdditionalDataService().update(dada);
+            }
+        }
 	}
 	
 	private AuthoritativeChange getCurrentAttributes (String user) throws InternalErrorException
@@ -571,25 +520,20 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			return null;
 		
 		AuthoritativeChange current = new AuthoritativeChange();
-		current.setUser(getUsuariService().findUsuariByCodiUsuari(user));
+		current.setUser(getUserService().findUserByUserName(user));
 		if (current.getUser() == null)
 			return null;
 		else
 		{
     		current.setGroups(new HashSet<String>());
-    		for (Grup grup: getUsuariService().getUserGroups(current.getUser().getId()))
-    		{
-    			current.getGroups().add(grup.getCodi());
-    		}
+    		for (Group grup : getUserService().getUserGroups(current.getUser().getId())) {
+                current.getGroups().add(grup.getName());
+            }
     		
     		current.setAttributes(new HashMap<String, Object>());
-    		for (DadaUsuari dus: getUsuariService().findDadesUsuariByCodiUsuari(user))
-    		{
-    			current.getAttributes().put(dus.getCodiDada(), 
-    							dus.getBlobDataValue() != null ? dus.getBlobDataValue():
-    							dus.getValorDadaDate() != null ? dus.getValorDadaDate():
-    							dus.getValorDada());
-    		}
+    		for (UserData dus : getUserService().findUserDataByUserName(user)) {
+                current.getAttributes().put(dus.getAttribute(), dus.getBlobDataValue() != null ? dus.getBlobDataValue() : dus.getDateValue() != null ? dus.getDateValue() : dus.getValue());
+            }
     		return current;
 		}
 	}

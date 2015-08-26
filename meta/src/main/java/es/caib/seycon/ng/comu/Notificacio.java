@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Reminder",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Notificacio {
+public class Notificacio {
 
 	@Attribute(translated = "applicationCode" )
 	public java.lang.String codiAplicacio;

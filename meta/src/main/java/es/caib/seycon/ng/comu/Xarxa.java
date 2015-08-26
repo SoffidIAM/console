@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Network",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Xarxa {
+public class Xarxa {
 
 	@Attribute(translated = "code" )
 	public java.lang.String codi;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	 <class name="es.caib.bpm.entity.UserInterface" table="BPM_USER_INTERFACE">
+        
+        <id name="id" unsaved-value="null">
+            <column name="USI_ID" />
+            <generator class="native">
+            </generator>
+        </id>
+		
+		<property name="processDefinitionId" column="USI_PROCESS_DEFINITION" type="long" not-null="true"/>
+		<property name="tarea" column="USI_TASK_NAME" type="string" not-null="true"/>
+		<property name="fileName" column="USI_FILE_NAME" type="text" not-null="true"/>
+    </class>
+</hibernate-mapping>

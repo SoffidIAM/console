@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="PasswordPolicy",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class PoliticaContrasenya {
+public class PoliticaContrasenya {
 
 	@Nullable
 	public java.lang.Long id;

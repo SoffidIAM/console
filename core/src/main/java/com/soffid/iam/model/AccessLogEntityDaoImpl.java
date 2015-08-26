@@ -50,24 +50,24 @@ public class AccessLogEntityDaoImpl extends
         }
     }
 
-    public void toRegistreAcces(com.soffid.iam.model.AccessLogEntity source, es.caib.seycon.ng.comu.RegistreAcces target) {
-        super.toRegistreAcces(source, target);
+    public void toAccessLog(com.soffid.iam.model.AccessLogEntity source, com.soffid.iam.api.AccessLog target) {
+        super.toAccessLog(source, target);
 
         Calendar calendar = GregorianCalendar.getInstance();
         if (source.getStartDate() != null) {
             calendar.setTime(source.getStartDate());
-            target.setDataInici(calendar);
+            target.setStartDate(calendar);
         }
 
         if (source.getEndDate() != null) {
             calendar = GregorianCalendar.getInstance();
             calendar.setTime(source.getEndDate());
-            target.setDataFi(calendar);
+            target.setEndDate(calendar);
         }
 
         UserEntity usuari = source.getUser();
         if (usuari != null) {
-            target.setCodiUsuari(usuari.getUserName());
+            target.setUserCode(usuari.getUserName());
             // Afegim nom i llinatges de l'usuari
             String nom = usuari.getFirstName();
             nom = nom != null ? nom : ""; //$NON-NLS-1$
@@ -75,48 +75,48 @@ public class AccessLogEntityDaoImpl extends
             primerCognom = primerCognom != null ? primerCognom + " " : ""; //$NON-NLS-1$ //$NON-NLS-2$
             String segonCognom = usuari.getMiddleName();
             segonCognom = segonCognom != null ? segonCognom : ""; //$NON-NLS-1$
-            target.setNomCompletUsuari(nom + " " + primerCognom + segonCognom); //$NON-NLS-1$
+            target.setUserFullName(nom + " " + primerCognom + segonCognom); //$NON-NLS-1$
         }
 
         HostEntity servidor = source.getServer();
         if (servidor != null) {
-            target.setNomServidor(servidor.getName());
+            target.setServerName(servidor.getName());
         } else if (source.getHostName() != null )
         {
-        	target.setNomServidor(source.getHostName());
+        	target.setServerName(source.getHostName());
         } else if (source.getHostAddress() != null)
         {
-        	target.setNomServidor(source.getHostAddress());
+        	target.setServerName(source.getHostAddress());
         }
 
         HostEntity client = source.getClient();
         if (client != null) {
-            target.setNomClinet(client.getName());
+            target.setClientName(client.getName());
         } else if (source.getClientHostName() != null )
         {
-        	target.setNomClinet(source.getClientHostName());
+        	target.setClientName(source.getClientHostName());
         } else if (source.getClientAddress() != null)
         {
-        	target.setNomClinet(source.getClientAddress());
+        	target.setClientName(source.getClientAddress());
         }
 
         if (source.getAccessType() == null || "L".equals(source.getAccessType())) //$NON-NLS-1$
-            target.setTipusAcces("logon"); //$NON-NLS-1$
+            target.setAccessType("logon"); //$NON-NLS-1$
         else if ("D".equals(source.getAccessType())) //$NON-NLS-1$
-            target.setTipusAcces("logon denied"); //$NON-NLS-1$
+            target.setAccessType("logon denied"); //$NON-NLS-1$
 
         // Afegim informació del protocol d'accés
         if (source.getProtocol() != null) {
-            target.setProtocolAcces(source.getProtocol().getName());
+            target.setAccessProtocol(source.getProtocol().getName());
         }
     }
 
     /**
      * @see es.caib.seycon.ng.model.RegistreAccesEntityDao#toRegistreAcces(es.caib.seycon.ng.model.RegistreAccesEntity)
      */
-    public es.caib.seycon.ng.comu.RegistreAcces toRegistreAcces(final com.soffid.iam.model.AccessLogEntity entity) {
+    public com.soffid.iam.api.AccessLog toAccessLog(final com.soffid.iam.model.AccessLogEntity entity) {
         // @todo verify behavior of toRegistreAcces
-        return super.toRegistreAcces(entity);
+        return super.toAccessLog(entity);
     }
 
     /**
@@ -124,7 +124,7 @@ public class AccessLogEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.AccessLogEntity loadRegistreAccesEntityFromRegistreAcces(es.caib.seycon.ng.comu.RegistreAcces registreAcces) {
+    private com.soffid.iam.model.AccessLogEntity loadRegistreAccesEntityFromRegistreAcces(com.soffid.iam.api.AccessLog registreAcces) {
         throw new SeyconException(
                 Messages.getString("AccessLogEntityDaoImpl.cannotUpdate")); //$NON-NLS-1$
     }
@@ -132,10 +132,10 @@ public class AccessLogEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.RegistreAccesEntityDao#registreAccesToEntity(es.caib.seycon.ng.comu.RegistreAcces)
      */
-    public com.soffid.iam.model.AccessLogEntity registreAccesToEntity(es.caib.seycon.ng.comu.RegistreAcces registreAcces) {
+    public com.soffid.iam.model.AccessLogEntity accessLogToEntity(com.soffid.iam.api.AccessLog registreAcces) {
         // @todo verify behavior of registreAccesToEntity
         com.soffid.iam.model.AccessLogEntity entity = this.loadRegistreAccesEntityFromRegistreAcces(registreAcces);
-        this.registreAccesToEntity(registreAcces, entity, true);
+        this.accessLogToEntity(registreAcces, entity, true);
         return entity;
     }
 
@@ -143,9 +143,9 @@ public class AccessLogEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.RegistreAccesEntityDao#registreAccesToEntity(es.caib.seycon.ng.comu.RegistreAcces,
      *      es.caib.seycon.ng.model.RegistreAccesEntity)
      */
-    public void registreAccesToEntity(es.caib.seycon.ng.comu.RegistreAcces source, com.soffid.iam.model.AccessLogEntity target, boolean copyIfNull) {
+    public void accessLogToEntity(com.soffid.iam.api.AccessLog source, com.soffid.iam.model.AccessLogEntity target, boolean copyIfNull) {
         // @todo verify behavior of registreAccesToEntity
-        super.registreAccesToEntity(source, target, copyIfNull);
+        super.accessLogToEntity(source, target, copyIfNull);
         // No conversion for target.dataInici (can't convert
         // source.getDataInici():java.util.Date to java.util.Date
         // No conversion for target.dataFi (can't convert

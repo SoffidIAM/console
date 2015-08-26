@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service (translatedName="SeyconServerService",
+@Service (translatedName="SyncServerService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.TaskLogEntity.class,
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class SeyconServerService {
 
 	@Operation ( grantees={roles.monitor_server_list.class},
-			translated="getSeyconServersStatus")
+			translated="getSyncServersStatus")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.SeyconServerInfo> getSeyconServersStatus()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

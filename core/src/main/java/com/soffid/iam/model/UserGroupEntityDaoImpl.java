@@ -7,10 +7,15 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.Task;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
@@ -20,16 +25,16 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Tasca;
-import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -40,6 +45,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import org.hibernate.Hibernate;
 
 /**
@@ -49,16 +55,16 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
 
     private void auditarUsuariGrup(String accio, String codiUsuariAuditat, String codiGrup) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setUsuari(codiUsuariAuditat);
-        auditoria.setGrup(codiGrup);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setUser(codiUsuariAuditat);
+        auditoria.setGroup(codiGrup);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-        auditoria.setObjecte("SC_USUGRU"); //$NON-NLS-1$
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_USUGRU"); //$NON-NLS-1$
 
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -200,8 +206,8 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         }
     }
 
-    public void toUsuariGrup(com.soffid.iam.model.UserGroupEntity sourceEntity, es.caib.seycon.ng.comu.UsuariGrup targetVO) {
-        super.toUsuariGrup(sourceEntity, targetVO);
+    public void toGroupUser(com.soffid.iam.model.UserGroupEntity sourceEntity, com.soffid.iam.api.GroupUser targetVO) {
+        super.toGroupUser(sourceEntity, targetVO);
     }
 
     /**
@@ -211,21 +217,21 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param sourceEntity
      * @param targetVO
      */
-    private void toUsuariGrupCustom(com.soffid.iam.model.UserGroupEntity sourceEntity, es.caib.seycon.ng.comu.UsuariGrup targetVO) {
-        targetVO.setCodiGrup(sourceEntity.getGroup().getName());
-        targetVO.setCodiUsuari(sourceEntity.getUser().getUserName());
-        targetVO.setDescripcioGrup(sourceEntity.getGroup().getDescription());
+    private void toUsuariGrupCustom(com.soffid.iam.model.UserGroupEntity sourceEntity, com.soffid.iam.api.GroupUser targetVO) {
+        targetVO.setGroup(sourceEntity.getGroup().getName());
+        targetVO.setUser(sourceEntity.getUser().getUserName());
+        targetVO.setGroupDescription(sourceEntity.getGroup().getDescription());
         UserEntity user = sourceEntity.getUser();
         String nomComplet = user.getFirstName() + " " + user.getLastName() + (user.getMiddleName() != null ? " " + user.getMiddleName() : ""); //$NON-NLS-1$ //$NON-NLS-2$
-        targetVO.setNomComplet(nomComplet);
+        targetVO.setFullName(nomComplet);
     }
 
     /**
      * @see es.caib.seycon.ng.model.UsuariGrupEntityDao#toUsuariGrup(es.caib.seycon.ng.model.UsuariGrupEntity)
      */
-    public es.caib.seycon.ng.comu.UsuariGrup toUsuariGrup(final com.soffid.iam.model.UserGroupEntity entity) {
+    public com.soffid.iam.api.GroupUser toGroupUser(final com.soffid.iam.model.UserGroupEntity entity) {
         // @todo verify behavior of toUsuariGrup
-        UsuariGrup usuariGrup = super.toUsuariGrup(entity);
+        GroupUser usuariGrup = super.toGroupUser(entity);
         toUsuariGrupCustom(entity, usuariGrup);
         return usuariGrup;
     }
@@ -235,7 +241,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.UserGroupEntity loadUsuariGrupEntityFromUsuariGrup(es.caib.seycon.ng.comu.UsuariGrup usuariGrup) {
+    private com.soffid.iam.model.UserGroupEntity loadUsuariGrupEntityFromUsuariGrup(com.soffid.iam.api.GroupUser usuariGrup) {
         com.soffid.iam.model.UserGroupEntity usuariGrupEntity = null;
         if (usuariGrup.getId() != null) {
             usuariGrupEntity = load(usuariGrup.getId());
@@ -249,10 +255,10 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
     /**
      * @see es.caib.seycon.ng.model.UsuariGrupEntityDao#usuariGrupToEntity(es.caib.seycon.ng.comu.UsuariGrup)
      */
-    public com.soffid.iam.model.UserGroupEntity usuariGrupToEntity(es.caib.seycon.ng.comu.UsuariGrup usuariGrup) {
+    public com.soffid.iam.model.UserGroupEntity groupUserToEntity(com.soffid.iam.api.GroupUser usuariGrup) {
         // @todo verify behavior of usuariGrupToEntity
         com.soffid.iam.model.UserGroupEntity entity = this.loadUsuariGrupEntityFromUsuariGrup(usuariGrup);
-        this.usuariGrupToEntity(usuariGrup, entity, true);
+        this.groupUserToEntity(usuariGrup, entity, true);
         return entity;
     }
 
@@ -264,17 +270,15 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param sourceVO
      * @param targetEntity
      */
-    private void usuariGrupToEntityCustom(es.caib.seycon.ng.comu.UsuariGrup sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity) {
-        UserEntity usuari = getUserEntityDao().findByUserName(sourceVO.getCodiUsuari());
+    private void usuariGrupToEntityCustom(com.soffid.iam.api.GroupUser sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity) {
+        UserEntity usuari = getUserEntityDao().findByUserName(sourceVO.getUser());
         if (usuari == null) {
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.8"), //$NON-NLS-1$
-                    sourceVO.getCodiUsuari()));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.8"), sourceVO.getUser()));
         }
         targetEntity.setUser(usuari);
-        GroupEntity grup = getGroupEntityDao().findByName(sourceVO.getCodiGrup());
+        GroupEntity grup = getGroupEntityDao().findByName(sourceVO.getGroup());
         if (grup == null) {
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.9"), //$NON-NLS-1$
-                    sourceVO.getCodiGrup()));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.9"), sourceVO.getGroup()));
         } else {
             targetEntity.setGroup(grup);
         }
@@ -284,8 +288,8 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @see es.caib.seycon.ng.model.UsuariGrupEntityDao#usuariGrupToEntity(es.caib.seycon.ng.comu.UsuariGrup,
      *      es.caib.seycon.ng.model.UsuariGrupEntity)
      */
-    public void usuariGrupToEntity(es.caib.seycon.ng.comu.UsuariGrup sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity, boolean copyIfNull) {
-        super.usuariGrupToEntity(sourceVO, targetEntity, copyIfNull);
+    public void groupUserToEntity(com.soffid.iam.api.GroupUser sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity, boolean copyIfNull) {
+        super.groupUserToEntity(sourceVO, targetEntity, copyIfNull);
         usuariGrupToEntityCustom(sourceVO, targetEntity);
     }
 
@@ -377,13 +381,13 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
                 Object obj = it.next();
                 if (obj != null) {
                     RoleEntity role = (RoleEntity) obj;
-                    Tasca updateRole = new Tasca();
-                    updateRole.setTransa("UpdateRole");
-                    updateRole.setDataTasca(Calendar.getInstance());
+                    Task updateRole = new Task();
+                    updateRole.setTransaction("UpdateRole");
+                    updateRole.setTaskDate(Calendar.getInstance());
                     updateRole.setStatus("P");
                     updateRole.setRole(role.getName());
-                    updateRole.setBd(role.getSystem().getName());
-                    TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
+                    updateRole.setDatabase(role.getSystem().getName());
+                    TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
                 }
             }

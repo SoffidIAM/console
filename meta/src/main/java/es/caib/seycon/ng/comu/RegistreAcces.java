@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AccessLog",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class RegistreAcces {
+public class RegistreAcces {
 
 	public java.lang.Long id;
 

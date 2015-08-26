@@ -7,24 +7,28 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.ContainerRole;
+import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.GroupRoles;
+import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
-import es.caib.seycon.ng.comu.ContenidorRol;
-import es.caib.seycon.ng.comu.Domini;
-import es.caib.seycon.ng.comu.RolGrant;
-import es.caib.seycon.ng.comu.RolsGrup;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.ValorDomini;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.TipusContenidorRol;
+
 import java.sql.Timestamp;
 
 /**
@@ -37,12 +41,12 @@ import java.sql.Timestamp;
 public class RoleGroupEntityDaoImpl extends
         com.soffid.iam.model.RoleGroupEntityDaoBase {
 
-    public RoleGroupEntity rolsGrupToEntity(RolsGrup rolsGrup) {
+    public RoleGroupEntity groupRolesToEntity(GroupRoles rolsGrup) {
         return null;
     }
 
-    public void rolsGrupToEntity(RolsGrup source, RoleGroupEntity target, boolean copyIfNull) {
-        super.rolsGrupToEntity(source, target, copyIfNull);
+    public void groupRolesToEntity(GroupRoles source, RoleGroupEntity target, boolean copyIfNull) {
+        super.groupRolesToEntity(source, target, copyIfNull);
     }
 
     @Override
@@ -88,18 +92,18 @@ public class RoleGroupEntityDaoImpl extends
         getSession().flush();
     }
 
-    public void toRolsGrup(RoleGroupEntity source, RolsGrup target) {
-        super.toRolsGrup(source, target);
+    public void toGroupRoles(RoleGroupEntity source, GroupRoles target) {
+        super.toGroupRoles(source, target);
         toRolsGrupCustom(source, target);
     }
 
-    public RolsGrup toRolsGrup(RoleGroupEntity entity) {
-        RolsGrup rolGrup = super.toRolsGrup(entity);
+    public GroupRoles toGroupRoles(RoleGroupEntity entity) {
+        GroupRoles rolGrup = super.toGroupRoles(entity);
         toRolsGrupCustom(entity, rolGrup);
         return rolGrup;
     }
 
-    private void toRolsGrupCustom(RoleGroupEntity sourceEntity, RolsGrup targetVO) {
+    private void toRolsGrupCustom(RoleGroupEntity sourceEntity, GroupRoles targetVO) {
         // TODO: Revisar transformaciones: se utilizan en roles de grupos de
         // seyconweb
         String tipusDomini = sourceEntity.getAssignedRole().getDomainType();
@@ -107,84 +111,84 @@ public class RoleGroupEntityDaoImpl extends
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
         if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
-        	ValorDomini valorDomini;
+        	DomainValue valorDomini;
             if (sourceEntity.getGrantedDomainValue() != null)
             {
-            	valorDomini = getDomainValueEntityDao().toValorDomini(sourceEntity.getGrantedDomainValue());
+            	valorDomini = getDomainValueEntityDao().toDomainValue(sourceEntity.getGrantedDomainValue());
             }
             else
             {
                 ApplicationDomainEntity dominiAplicacio = sourceEntity.getAssignedRole().getApplicationDomain();
-                valorDomini = new ValorDomini();
+                valorDomini = new DomainValue();
                 // Le asignamos como nombre la descripción del dominio de aplicación
-                valorDomini.setNomDomini(sourceEntity.getAssignedRole().getApplicationDomain().getName());
+                valorDomini.setDomainName(sourceEntity.getAssignedRole().getApplicationDomain().getName());
             }
-        	targetVO.setValorDomini(valorDomini);
+        	targetVO.setDomainValue(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
                 || tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-            ValorDomini valorDomini = new ValorDomini();
-            valorDomini.setNomDomini(tipusDomini);
+            DomainValue valorDomini = new DomainValue();
+            valorDomini.setDomainName(tipusDomini);
             if (sourceEntity.getGrantedGroupDomain() != null)
             {
-            	valorDomini.setDescripcio(sourceEntity.getGrantedGroupDomain().getDescription());
-            	valorDomini.setValor(sourceEntity.getGrantedGroupDomain().getName());
+            	valorDomini.setDescription(sourceEntity.getGrantedGroupDomain().getDescription());
+            	valorDomini.setValue(sourceEntity.getGrantedGroupDomain().getName());
             }
-            valorDomini.setCodiExternDomini(null);
-            targetVO.setValorDomini(valorDomini);
+            valorDomini.setExternalCodeDomain(null);
+            targetVO.setDomainValue(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
-            ValorDomini valorDomini = new ValorDomini();
-            valorDomini.setNomDomini(tipusDomini);
+            DomainValue valorDomini = new DomainValue();
+            valorDomini.setDomainName(tipusDomini);
             if (sourceEntity.getGrantedGroupDomain() != null)
             {
-            	valorDomini.setDescripcio(sourceEntity.getGrantedApplicationDomain().getDescription());
-            	valorDomini.setValor(sourceEntity.getGrantedApplicationDomain().getName());
+            	valorDomini.setDescription(sourceEntity.getGrantedApplicationDomain().getDescription());
+            	valorDomini.setValue(sourceEntity.getGrantedApplicationDomain().getName());
             }
-            valorDomini.setCodiExternDomini(null);
-            targetVO.setValorDomini(valorDomini);
+            valorDomini.setExternalCodeDomain(null);
+            targetVO.setDomainValue(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
-            ValorDomini valorDomini = new ValorDomini();
-            valorDomini.setCodiExternDomini(null);
-            valorDomini.setDescripcio(TipusDomini.Descripcio.SENSE_DOMINI);
-            valorDomini.setNomDomini(TipusDomini.SENSE_DOMINI);
-            valorDomini.setValor(""); //$NON-NLS-1$
+            DomainValue valorDomini = new DomainValue();
+            valorDomini.setExternalCodeDomain(null);
+            valorDomini.setDescription("");
+            valorDomini.setDomainName(TipusDomini.SENSE_DOMINI);
+            valorDomini.setValue(""); //$NON-NLS-1$
             // targetVO.setValorDomini(valorDomini); // No se muestra
         }
 
-        targetVO.setNomRol(sourceEntity.getAssignedRole().getName());
-        targetVO.setDescripcioRol(sourceEntity.getAssignedRole().getDescription());
-        targetVO.setBaseDeDadesRol(sourceEntity.getAssignedRole().getSystem().getName());
+        targetVO.setRoleName(sourceEntity.getAssignedRole().getName());
+        targetVO.setRoleDescription(sourceEntity.getAssignedRole().getDescription());
+        targetVO.setRoleDatabases(sourceEntity.getAssignedRole().getSystem().getName());
         InformationSystemEntity aplicacio = sourceEntity.getAssignedRole().getInformationSystem();
         if (aplicacio != null) {
-            targetVO.setCodiAplicacio(aplicacio.getName());
+            targetVO.setApplicationCode(aplicacio.getName());
         }
-        targetVO.setCodiGrup(sourceEntity.getOwnerGroup().getName());
-        targetVO.setDescripcioGrup(sourceEntity.getOwnerGroup().getDescription());
+        targetVO.setGroupCode(sourceEntity.getOwnerGroup().getName());
+        targetVO.setGroupDescription(sourceEntity.getOwnerGroup().getDescription());
 
     }
 
-    public RoleGroupEntity contenidorRolToEntity(ContenidorRol contenidorRol) {
+    public RoleGroupEntity containerRoleToEntity(ContainerRole contenidorRol) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public ContenidorRol toContenidorRol(RoleGroupEntity entity) {
-        ContenidorRol contenidorRol = super.toContenidorRol(entity); // Pasamos
+    public ContainerRole toContainerRole(RoleGroupEntity entity) {
+        ContainerRole contenidorRol = super.toContainerRole(entity); // Pasamos
                                                                      // el id
-        contenidorRol.setTipus(TipusContenidorRol.ROL_GRUP);
+        contenidorRol.setType(TipusContenidorRol.ROL_GRUP);
         // Información específica:
         RoleEntity rol = entity.getAssignedRole();
         GroupEntity grup = entity.getOwnerGroup();
-        contenidorRol.setInfoContenidor(String.format(Messages.getString("RoleGroupEntityDaoImpl.0"), rol.getName(), grup.getName()));
+        contenidorRol.setContainerInfo(String.format(Messages.getString("RoleGroupEntityDaoImpl.0"), rol.getName(), grup.getName()));
         return contenidorRol;
     }
 
-    public RoleGroupEntity rolGrantToEntity(RolGrant rolGrant) {
+    public RoleGroupEntity roleGrantToEntity(RoleGrant rolGrant) {
         return load(rolGrant.getId());
     }
 
     @Override
-    public void toRolGrant(RoleGroupEntity source, RolGrant target) {
-        target.setDispatcher(source.getAssignedRole().getSystem().getName());
+    public void toRoleGrant(RoleGroupEntity source, RoleGrant target) {
+        target.setSystem(source.getAssignedRole().getSystem().getName());
         String tipus = source.getAssignedRole().getDomainType();
         if (TipusDomini.SENSE_DOMINI.equals(tipus)) {
             target.setHasDomain(false);
@@ -204,14 +208,14 @@ public class RoleGroupEntityDaoImpl extends
             target.setHasDomain(false);
             target.setDomainValue(null);
         }
-        target.setOwnerRol(null);
-        target.setOwnerRolName(null);
+        target.setOwnerRole(null);
+        target.setOwnerRoleName(null);
         target.setOwnerGroup(source.getOwnerGroup().getName());
-        target.setOwnerDispatcher(null);
+        target.setOwnerSystem(null);
         target.setOwnerAccountName(null);
         target.setId(source.getId());
-        target.setIdRol(source.getAssignedRole().getId());
-        target.setRolName(source.getAssignedRole().getName());
+        target.setRoleId(source.getAssignedRole().getId());
+        target.setRoleName(source.getAssignedRole().getName());
         target.setInformationSystem(source.getAssignedRole().getInformationSystem().getName());
     }
 

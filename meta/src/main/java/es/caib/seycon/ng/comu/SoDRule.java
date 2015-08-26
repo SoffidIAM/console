@@ -8,7 +8,7 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 @ValueObject 
-public abstract class SoDRule {
+public class SoDRule {
 
 	@Nullable
 	public java.lang.Long id;

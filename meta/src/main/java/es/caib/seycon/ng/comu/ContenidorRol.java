@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ContainerRole",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ContenidorRol {
+public class ContenidorRol {
 
 	public java.lang.Long id;
 

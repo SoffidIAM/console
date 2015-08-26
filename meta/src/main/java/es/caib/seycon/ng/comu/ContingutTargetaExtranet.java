@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ExtranetCardContent",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ContingutTargetaExtranet {
+public class ContingutTargetaExtranet {
 
 	@Attribute(translated = "rowColumn" )
 	public java.lang.String filcol;

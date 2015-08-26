@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="GroupRoles",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class RolsGrup {
+public class RolsGrup {
 
 	@Nullable
 	public java.lang.Long id;

@@ -8,7 +8,7 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 @Criteria 
-public abstract class RenovacioSearchCriteria {
+public class RenovacioSearchCriteria {
 
 	public java.util.Calendar data;
 

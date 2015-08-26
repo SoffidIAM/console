@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserAccount",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UserAccount extends es.caib.seycon.ng.comu.Account {
+public class UserAccount extends es.caib.seycon.ng.comu.Account {
 
 	public java.lang.String user;
 

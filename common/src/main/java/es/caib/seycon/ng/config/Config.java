@@ -1,512 +1,321 @@
 package es.caib.seycon.ng.config;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
+import com.soffid.iam.remote.URLManager;
+
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.ServerRedirectException;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.remote.URLManager;
 import es.caib.seycon.ng.sync.servei.ServerService;
 
-public class Config {
-    public static final String PORT_PROPERTY = "port";
-	public static final String DB_PROPERTY = "db";
-	public static final String BACKUPDB_PROPERTY = "backupdb";
-	public static final String BACKUP_PASSWORD_PROPERTY = "backuppassword";
-	public static final String BACKUPUSER_PROPERTY = "backupuser";
-	public static final String PASSWORD_PROPERTY = "password";
-	public static final String ROL_PROPERTY = "rol";
-	public static final String USER_PROPERTY = "user";
-	public static final String SEYCON_SERVER_STANDBY_PROPERTY = "seycon.server.standby";
-	public static final String AUTOUPDATE_PROPERTY = "autoupdate";
-	public static final String SERVERLIST_PROPERTY = "serverlist";
-	private static Config theConfig;
-    Properties prop = new Properties();
 
-    boolean inMemory = false;
-    private ServerService serverService;
 
-    private Config() throws FileNotFoundException, IOException {
-        reload();
-    }
-    
-    static final String []propertiesToMerge = new String [] {
-    	ROL_PROPERTY,
-    	SERVERLIST_PROPERTY,
-    	PORT_PROPERTY,
-    	DB_PROPERTY,
-    	PASSWORD_PROPERTY,
-    	USER_PROPERTY,
-    	BACKUPDB_PROPERTY,
-    	BACKUP_PASSWORD_PROPERTY,
-    	BACKUPUSER_PROPERTY
-    };
-    
-    public void updateFromServer () throws IOException, InternalErrorException
-    {
-    	RemoteServiceLocator rsl = new RemoteServiceLocator();
-    	boolean repeat;
-        do
-        {
-        	repeat = false;
-    		try
-    		{
-    			mergeProperties( serverService.getMyConfig() );
-    		}
-    		catch (ServerRedirectException e)
-    		{
-    			if (e.getServerList().isEmpty())
-    				throw new InternalErrorException("No servers available");
-    			String firstServer = e.getServerList().iterator().next();
-    			rsl = new RemoteServiceLocator(firstServer);
-    			repeat = true;
-    		}
-        } while (repeat);
-    	
-    }
-    public void mergeProperties (Properties newProp) throws IOException
-    {
-    	for (String s: propertiesToMerge)
-    	{
-    		String value = newProp.getProperty(s);
-    		if (value == null)
-    			prop.remove(s);
-    		else
-    			prop.setProperty(s, newProp.getProperty(s));
-    	}
-    	update();
-    }
+public class Config 
+{
+    public static final String PORT_PROPERTY = com.soffid.iam.config.Config.PORT_PROPERTY;
+	public static final String DB_PROPERTY = com.soffid.iam.config.Config.DB_PROPERTY;
+	public static final String BACKUPDB_PROPERTY = com.soffid.iam.config.Config.BACKUPDB_PROPERTY;
+	public static final String BACKUP_PASSWORD_PROPERTY = com.soffid.iam.config.Config.BACKUP_PASSWORD_PROPERTY;
+	public static final String BACKUPUSER_PROPERTY = com.soffid.iam.config.Config.BACKUPUSER_PROPERTY;
+	public static final String PASSWORD_PROPERTY = com.soffid.iam.config.Config.PASSWORD_PROPERTY;
+	public static final String ROL_PROPERTY = com.soffid.iam.config.Config.ROL_PROPERTY;
+	public static final String USER_PROPERTY = com.soffid.iam.config.Config.USER_PROPERTY;
+	public static final String SEYCON_SERVER_STANDBY_PROPERTY = com.soffid.iam.config.Config.SEYCON_SERVER_STANDBY_PROPERTY;
+	public static final String AUTOUPDATE_PROPERTY = com.soffid.iam.config.Config.AUTOUPDATE_PROPERTY;
+	public static final String SERVERLIST_PROPERTY = com.soffid.iam.config.Config.SERVERLIST_PROPERTY;
 
-	public void reload() throws IOException, FileNotFoundException
+	
+	static Config theConfig;
+	com.soffid.iam.config.Config actualConfig;
+	
+	public Config () throws FileNotFoundException, IOException
 	{
-		File config = getConfigFile();
-        if (config.canRead()) {
-            prop.load(new FileInputStream(config));
-        }
+    	actualConfig = com.soffid.iam.config.Config.getConfig();
 	}
-
-    public ServerService getServerService() {
-        return serverService;
-    }
-
-    public void setServerService(ServerService server) {
-        this.serverService = server;
-    }
-
-    private Config(String serverList, String port)
-            throws FileNotFoundException, IOException {
-        inMemory = true;
-        setRole("client"); //$NON-NLS-1$
-        setServerList(serverList);
-        setPort(port);
-    }
-
-    private File getConfigFile() throws IOException {
-        return new File(getHomeDir(), "/conf/seycon.properties"); //$NON-NLS-1$
-    }
-
-    private void update() throws IOException {
-        if (!inMemory)
-            prop.store(new FileOutputStream(getConfigFile()),
-                    "Soffid autogenerated file"); //$NON-NLS-1$
-    }
-
-    public File getHomeDir() throws IOException {
-        String exe = System.getProperty("exe4j.moduleName"); //$NON-NLS-1$
-        if (exe != null) {
-            return new File(exe).getParentFile().getParentFile();
-        }
-        URL url = Config.class.getResource("Config.class"); //$NON-NLS-1$
-        if ("jar".equals(url.getProtocol())) { //$NON-NLS-1$
-            int i = url.getFile().lastIndexOf('!');
-            if (i > 0) {
-                URL jarFileUrl = new URL(url.getFile().substring(0, i));
-                if ("file".equals(jarFileUrl.getProtocol())) { //$NON-NLS-1$
-                    String jarURL = jarFileUrl.getFile();
-                    jarURL = jarURL.replace("%20", " "); //$NON-NLS-1$ //$NON-NLS-2$
-                    File f = new File(jarURL);
-                    return f.getParentFile().getParentFile().getCanonicalFile();
-                }
-            }
-        }
-
-        if ("file".equals(url.getProtocol())) { //$NON-NLS-1$
-            File classRoot = new File(url.getFile()). // /classes/es/caib/seycon/config/Config.class
-                    getParentFile(). // /classes/es/caib/seycon/config
-                    getParentFile(). // /classes/es/caib/seycon
-                    getParentFile(). // /classes/es/caib
-                    getParentFile(). // /classes/es
-                    getParentFile(); // /classes
-            return new File(classRoot.getParent(), "server-test").getCanonicalFile(); //$NON-NLS-1$
-        }
-
-        return new File("."); //$NON-NLS-1$
-    }
-
-    public File getLogFile() throws IOException {
-        File dir = getLogDir();
-        return new File(dir, "syncserver.log"); //$NON-NLS-1$
-    }
-
-    public File getLogDir() throws IOException {
-        File home = getHomeDir();
-        File dir;
-        if (File.separatorChar == '\\') {
-            dir = new File(home, "log"); //$NON-NLS-1$
-        } else {
-            dir = new File("/var/log/soffid"); //$NON-NLS-1$
-        }
-	dir.mkdirs();
-        return dir;
-    }
-
+	
     public static Config getConfig() throws FileNotFoundException, IOException {
-        if (theConfig == null)
+        if (theConfig == null) 
+        {
             theConfig = new Config();
+        }
         return theConfig;
     }
 
-    public static void configureClient(String serverList, String port)
-            throws FileNotFoundException, IOException {
-        theConfig = new Config(serverList, port);
-    }
+	public int hashCode()
+	{
+		return actualConfig.hashCode();
+	}
 
-    public String getServerList() throws RemoteException,
-            InternalErrorException {
-        if (isServer()) {
-            return serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
-        } else
-            return prop.getProperty(SERVERLIST_PROPERTY); //$NON-NLS-1$
-    }
+	public void updateFromServer() throws IOException, InternalErrorException
+	{
+		actualConfig.updateFromServer();
+	}
 
-    public String getJVMOptions() throws RemoteException,
-            InternalErrorException {
-        String properties = prop.getProperty("java_opt"); //$NON-NLS-1$
-        if (properties == null) {
-            if (isServer()) {
-                properties = "-Xmx512m"; //$NON-NLS-1$
-            } else {
-                properties = "-Xmx64m"; //$NON-NLS-1$
-            }
-        }
-        return properties;
-    }
+	public void mergeProperties(Properties newProp) throws IOException
+	{
+		actualConfig.mergeProperties(newProp);
+	}
 
-    public void setServerList(String list) throws IOException {
-    	if (list == null)
-    		prop.remove(SERVERLIST_PROPERTY);
-    	else
-    		prop.setProperty(SERVERLIST_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public void reload() throws IOException, FileNotFoundException
+	{
+		actualConfig.reload();
+	}
 
-    public String getRole() {
-        return prop.getProperty(ROL_PROPERTY); //$NON-NLS-1$
-    }
+	public boolean equals(Object obj)
+	{
+		return actualConfig.equals(obj);
+	}
 
-    public boolean isServer() {
-        return "server".equals(getRole()) && serverService != null; //$NON-NLS-1$
-    }
+	public File getHomeDir() throws IOException
+	{
+		return actualConfig.getHomeDir();
+	}
 
-    public boolean isAgent() {
-        return "agent".equals(getRole()); //$NON-NLS-1$
-    }
+	public File getLogFile() throws IOException
+	{
+		return actualConfig.getLogFile();
+	}
 
-    public boolean isUpdateEnabled() {
-        String s = prop.getProperty(AUTOUPDATE_PROPERTY); //$NON-NLS-1$
-        if (s == null) {
-            prop.setProperty(AUTOUPDATE_PROPERTY, "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            try {
-                update();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-        return !"false".equals(s); //$NON-NLS-1$
-    }
+	public File getLogDir() throws IOException
+	{
+		return actualConfig.getLogDir();
+	}
 
-    public boolean isStandbyServer() throws RemoteException,
-            InternalErrorException {
-        return isServer() && !isActiveServer();
-    }
+	public String getServerList() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.getServerList();
+	}
 
-    public boolean isActiveServer() throws RemoteException,
-            InternalErrorException {
-        if (serverService == null)
-            return false;
-        String standbyservers = serverService.getConfig(SEYCON_SERVER_STANDBY_PROPERTY); //$NON-NLS-1$
-        if (standbyservers == null)
-            return true;
-        String split[] = standbyservers.split("[, ]+"); //$NON-NLS-1$
-        for (int i = 0; i < split.length; i++) {
-            if (split[i].equals(getHostName()))
-                return false;
-        }
-        return true;
-    }
+	public String getJVMOptions() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.getJVMOptions();
+	}
 
-    public void setRole(String list) throws IOException {
-        prop.setProperty(ROL_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public void setServerList(String list) throws IOException
+	{
+		actualConfig.setServerList(list);
+	}
 
-    public String getDbUser() {
-        return prop.getProperty(USER_PROPERTY); //$NON-NLS-1$
-    }
+	public String getRole()
+	{
+		return actualConfig.getRole();
+	}
 
-    public void setDbUser(String list) throws IOException {
-        prop.setProperty(USER_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public boolean isServer()
+	{
+		return actualConfig.isServer();
+	}
 
-    public Password getPassword() {
-        String s = prop.getProperty(PASSWORD_PROPERTY); //$NON-NLS-1$
-        if (s == null)
-            return null;
-        return Password.decode(s);
-    }
+	public boolean isAgent()
+	{
+		return actualConfig.isAgent();
+	}
 
-    public void setPassword(Password list) throws IOException {
-        prop.setProperty(PASSWORD_PROPERTY, list.toString()); //$NON-NLS-1$
-        update();
-    }
+	public boolean isUpdateEnabled()
+	{
+		return actualConfig.isUpdateEnabled();
+	}
+
+	public boolean isStandbyServer() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.isStandbyServer();
+	}
+
+	public boolean isActiveServer() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.isActiveServer();
+	}
+
+	public void setRole(String list) throws IOException
+	{
+		actualConfig.setRole(list);
+	}
+
+	public String getDbUser()
+	{
+		return actualConfig.getDbUser();
+	}
+
+	public void setDbUser(String list) throws IOException
+	{
+		actualConfig.setDbUser(list);
+	}
 
 
-    public String getBackupDbUser() {
-        return prop.getProperty(BACKUPUSER_PROPERTY); //$NON-NLS-1$
-    }
+	public String toString()
+	{
+		return actualConfig.toString();
+	}
 
-    public void setBackupDbUser(String list) throws IOException {
-        prop.setProperty(BACKUPUSER_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public String getBackupDbUser()
+	{
+		return actualConfig.getBackupDbUser();
+	}
 
-    public Password getBackupPassword() {
-        String s = prop.getProperty(BACKUP_PASSWORD_PROPERTY); //$NON-NLS-1$
-        if (s == null)
-            return null;
-        return Password.decode(s);
-    }
+	public void setBackupDbUser(String list) throws IOException
+	{
+		actualConfig.setBackupDbUser(list);
+	}
 
-    public void setBackupPassword(Password list) throws IOException {
-        prop.setProperty(BACKUP_PASSWORD_PROPERTY, list.toString()); //$NON-NLS-1$
-        update();
-    }
+	public void setBackupPassword(Password list) throws IOException
+	{
+		actualConfig.setBackupPassword(list);
+	}
 
-    public String getBackupDB() {
-        return prop.getProperty(BACKUPDB_PROPERTY); //$NON-NLS-1$
-    }
+	public String getBackupDB()
+	{
+		return actualConfig.getBackupDB();
+	}
 
-    public void setBackupDB(String list) throws IOException {
-        prop.setProperty(BACKUPDB_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public void setBackupDB(String list) throws IOException
+	{
+		actualConfig.setBackupDB(list);
+	}
 
+	public String getDB()
+	{
+		return actualConfig.getDB();
+	}
 
-    public String getDB() {
-        return prop.getProperty(DB_PROPERTY); //$NON-NLS-1$
-    }
+	public void setDB(String list) throws IOException
+	{
+		actualConfig.setDB(list);
+	}
 
-    public void setDB(String list) throws IOException {
-        prop.setProperty(DB_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public void setSSLKey(Password list) throws IOException
+	{
+		actualConfig.setSSLKey(list);
+	}
 
-    public Password getSSLKey() {
-        String s = prop.getProperty("sslkey"); //$NON-NLS-1$
-        if (s == null)
-            return null;
-        return Password.decode(s);
-    }
+	public es.caib.seycon.ng.comu.Password getPassword()
+	{
+		return es.caib.seycon.ng.comu.Password.toPassword(actualConfig.getPassword());
+	}
 
-    public void setSSLKey(Password list) throws IOException {
-        prop.setProperty("sslkey", list.toString()); //$NON-NLS-1$
-        update();
-    }
+	public void setPassword(com.soffid.iam.api.Password list)
+			throws IOException
+	{
+		actualConfig.setPassword(list);
+	}
 
-    public String getHostName() {
-        return prop.getProperty("hostname"); //$NON-NLS-1$
-    }
+	public es.caib.seycon.ng.comu.Password getBackupPassword()
+	{
+		return es.caib.seycon.ng.comu.Password.toPassword(actualConfig.getBackupPassword());
+	}
 
-    public void setHostName(String list) throws IOException {
-        prop.setProperty("hostname", list); //$NON-NLS-1$
-        update();
-    }
+	public void setBackupPassword(com.soffid.iam.api.Password list)
+			throws IOException
+	{
+		actualConfig.setBackupPassword(list);
+	}
 
-    public String getPort() throws RemoteException, InternalErrorException {
-        if (isServer())
-            return serverService.getConfig("seycon.https.port"); //$NON-NLS-1$
-        else
-            return prop.getProperty(PORT_PROPERTY); //$NON-NLS-1$
-    }
+	public es.caib.seycon.ng.comu.Password getSSLKey()
+	{
+		return es.caib.seycon.ng.comu.Password.toPassword(actualConfig.getSSLKey());
+	}
 
-    public void setPort(String list) throws IOException {
-        prop.setProperty(PORT_PROPERTY, list); //$NON-NLS-1$
-        update();
-    }
+	public String getHostName()
+	{
+		return actualConfig.getHostName();
+	}
 
-    public boolean isRMIEnabled() {
+	public void setHostName(String list) throws IOException
+	{
+		actualConfig.setHostName(list);
+	}
 
-        return "true".equals(prop.getProperty("rmi")); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	public String getPort() throws RemoteException, InternalErrorException
+	{
+		return actualConfig.getPort();
+	}
 
-    public boolean isBroadcastListen() {
+	public void setPort(String list) throws IOException
+	{
+		actualConfig.setPort(list);
+	}
 
-        return "true".equals(prop.getProperty("broadcast_listen")); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	public boolean isRMIEnabled()
+	{
+		return actualConfig.isRMIEnabled();
+	}
 
-    public void setRMIEnabled(boolean enabled) throws IOException {
-        prop.setProperty("rmi", Boolean.toString(enabled)); //$NON-NLS-1$
-        update();
-    }
+	public boolean isBroadcastListen()
+	{
+		return actualConfig.isBroadcastListen();
+	}
 
-    public boolean isMainServer() throws FileNotFoundException, IOException,
-            InternalErrorException {
-        return isServer() && isFirstServer();
-    }
+	public void setRMIEnabled(boolean enabled) throws IOException
+	{
+		actualConfig.setRMIEnabled(enabled);
+	}
 
-    public URLManager getURL() throws FileNotFoundException, IOException,
-            InternalErrorException {
-        if (isServer()) {
-            String list = serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
-            String split[] = list.split("[, ]+"); //$NON-NLS-1$
-            for (int i = 0; i < split.length; i++) {
-                URLManager manager = new URLManager(split[i]);
-                if (manager.getServerURL().getHost().equals(getHostName()))
-                    return manager;
-            }
-            return null;
-        } else {
-            return new URLManager("https://" + getHostName() + ":" + getPort() //$NON-NLS-1$ //$NON-NLS-2$
-                    + "/seycon/Agent"); //$NON-NLS-1$
-        }
-    }
+	public boolean isMainServer() throws FileNotFoundException, IOException,
+			InternalErrorException
+	{
+		return actualConfig.isMainServer();
+	}
 
+	public URLManager getURL() throws FileNotFoundException, IOException,
+			InternalErrorException
+	{
+		return actualConfig.getURL();
+	}
 
-    private static String FILE_SEPARATOR = File.separator;
+	public int numberOfDamemonThreads() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.numberOfDamemonThreads();
+	}
 
-    public static boolean hasKeystore() {
-        String BASE_DIRECTORY = null;
-        try {
-            BASE_DIRECTORY = getConfig().getHomeDir().getAbsolutePath();
-        } catch (Exception e) {
-            return false;
-        }
-        File file = new File(BASE_DIRECTORY + FILE_SEPARATOR + "conf" //$NON-NLS-1$
-                + FILE_SEPARATOR + "keystore.jks"); //$NON-NLS-1$
-        return file.exists();
-    }
+	public String[] getSeyconServerHostList() throws InternalErrorException,
+			IOException
+	{
+		return actualConfig.getSeyconServerHostList();
+	}
 
-    private boolean isFirstServer() throws FileNotFoundException, IOException,
-            InternalErrorException {
-        Config config = getConfig();
-        String[] split = getSeyconServerHostList();
-        String firstHost = split[0];
-        if (firstHost.equals(config.getHostName()))
-            return true;
-        else
-            return false;
-    }
+	public String getRawSeyconServerList() throws RemoteException,
+			InternalErrorException
+	{
+		return actualConfig.getRawSeyconServerList();
+	}
 
-    public int numberOfDamemonThreads() throws RemoteException,
-            InternalErrorException {
-        String numberOfThreads;
-        numberOfThreads = serverService.getConfig("seycon.jetty.threads"); //$NON-NLS-1$
-        Integer numberOfThreadsInteger = Integer.decode(numberOfThreads);
-        return numberOfThreadsInteger.intValue();
-    }
+	public boolean isAnyServer() throws FileNotFoundException, IOException,
+			InternalErrorException
+	{
+		return actualConfig.isAnyServer();
+	}
 
-    public String[] getSeyconServerHostList() throws InternalErrorException,
-            IOException {
-        String list = getRawSeyconServerList();
-        if (list == null)
-            return null;
-        String[] split = list.split("[, ]+"); //$NON-NLS-1$
-        String split2[] = new String[split.length];
-        for (int i = 0; i < split.length; i++) {
-            split2[i] = new URLManager(split[i]).getServerURL().getHost();
-        }
-        return split2;
-    }
+	public String getVersion()
+	{
+		return actualConfig.getVersion();
+	}
 
-    public String getRawSeyconServerList() throws RemoteException,
-            InternalErrorException {
-        String list = ""; //$NON-NLS-1$
-        if (isServer()) {
-            list = serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
-        } else {
-            list = prop.getProperty(SERVERLIST_PROPERTY); //$NON-NLS-1$
-        }
-        return list;
-    }
+	public boolean isDebug()
+	{
+		return actualConfig.isDebug();
+	}
 
-    public boolean isAnyServer() throws FileNotFoundException, IOException,
-            InternalErrorException {
-        Config config = getConfig();
-        String[] split = getSeyconServerHostList();
-        for (int i = 0; i < split.length; i++) {
-            if (split[i].equals(config.getHostName()))
-                return true;
-        }
-        return false;
-    }
+	public boolean canUpdateComponent(String component)
+	{
+		return actualConfig.canUpdateComponent(component);
+	}
 
-    public String getVersion() {
-        try {
-            InputStream in = Config.class
-                	.getResourceAsStream("/META-INF/maven/com.soffid.iam.sync/syncserver/pom.properties"); //$NON-NLS-1$
-            if (in == null)
-                in = Config.class
-                        .getResourceAsStream("/META-INF/maven/es.caib.seycon.ng/seycon-base/pom.properties"); //$NON-NLS-1$
-            if (in == null)
-                return "UNKNOWN"; //$NON-NLS-1$
-            else {
-                Properties p = new Properties();
-                p.load(in);
-                return p.getProperty("version"); //$NON-NLS-1$
-            }
-        } catch (IOException e) {
-            return "UNKNOWN"; //$NON-NLS-1$
-        }
-    }
+	public String getRequestId()
+	{
+		return actualConfig.getRequestId();
+	}
 
-    public boolean isDebug() {
-        return prop.getProperty("debug") != null; //$NON-NLS-1$
-    }
-    
-    public boolean canUpdateComponent (String component) {
-        if (!isUpdateEnabled())
-            return false;
-        
-        String frozen = prop.getProperty("frozenComponents"); //$NON-NLS-1$
-        if (frozen != null) {
-            String[] frozenArray = frozen.split("[, ]+"); //$NON-NLS-1$
-            for (int i = 0; i < frozenArray.length ; i++)
-                if (frozenArray[i].equals(component))
-                    return false;
-        }
-        return true;
-    }
-    
-    public String getRequestId() {
-        return prop.getProperty("requestId"); //$NON-NLS-1$
-    }
-    
-    public void setRequestId(String value) throws IOException {
-        if (value != null)
-            prop.setProperty("requestId", value); //$NON-NLS-1$
-        else
-            prop.remove("requestId"); //$NON-NLS-1$
-        update();
-    }
+	public void setRequestId(String value) throws IOException
+	{
+		actualConfig.setRequestId(value);
+	}
+
 }

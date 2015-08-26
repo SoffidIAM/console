@@ -7,23 +7,21 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.InformationSystemEntity;
-
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Domini;
-import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -39,17 +37,16 @@ public class ApplicationDomainEntityDaoImpl extends
     private void auditarDominiAplicacio(String accio, String codiDomini,
             String codiAplicacio) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setDomini(codiDomini);
-        auditoria.setAplicacio(codiAplicacio);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setDomain(codiDomini);
+        auditoria.setApplication(codiAplicacio);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_DOMAPP"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_DOMAPP"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -93,26 +90,26 @@ public class ApplicationDomainEntityDaoImpl extends
         }
     }
 
-    public void toDomini(com.soffid.iam.model.ApplicationDomainEntity source, es.caib.seycon.ng.comu.Domini target) {
-        super.toDomini(source, target);
+    public void toDomain(com.soffid.iam.model.ApplicationDomainEntity source, com.soffid.iam.api.Domain target) {
+        super.toDomain(source, target);
         toDominiCustom(source, target);
     }
 
-    private void toDominiCustom(com.soffid.iam.model.ApplicationDomainEntity source, es.caib.seycon.ng.comu.Domini target) {
-        target.setNom(source.getName());
+    private void toDominiCustom(com.soffid.iam.model.ApplicationDomainEntity source, com.soffid.iam.api.Domain target) {
+        target.setName(source.getName());
         InformationSystemEntity aplicacioEntity = source.getInformationSystem();
         if (aplicacioEntity != null) {
-            target.setCodiExtern(aplicacioEntity.getName());
+            target.setExternalCode(aplicacioEntity.getName());
         }
-        target.setDescripcio(source.getDescription());
+        target.setDescription(source.getDescription());
     }
 
     /**
      * @see es.caib.seycon.ng.model.DominiAplicacioEntityDao#toDomini(es.caib.seycon.ng.model.DominiAplicacioEntity)
      */
-    public es.caib.seycon.ng.comu.Domini toDomini(final com.soffid.iam.model.ApplicationDomainEntity entity) {
+    public com.soffid.iam.api.Domain toDomain(final com.soffid.iam.model.ApplicationDomainEntity entity) {
         try {
-            return super.toDomini(entity);
+            return super.toDomain(entity);
         } catch (SeyconException e) {
             // no és un domini d'aplicació
             return null;
@@ -124,7 +121,7 @@ public class ApplicationDomainEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.ApplicationDomainEntity loadDominiAplicacioEntityFromDomini(es.caib.seycon.ng.comu.Domini domini) {
+    private com.soffid.iam.model.ApplicationDomainEntity loadDominiAplicacioEntityFromDomini(com.soffid.iam.api.Domain domini) {
         ApplicationDomainEntity dominiAplicacioEntity = null;
         if (domini.getId() != null) {
             dominiAplicacioEntity = load(domini.getId());
@@ -138,14 +135,14 @@ public class ApplicationDomainEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.DominiAplicacioEntityDao#dominiToEntity(es.caib.seycon.ng.comu.Domini)
      */
-    public com.soffid.iam.model.ApplicationDomainEntity dominiToEntity(es.caib.seycon.ng.comu.Domini domini) {
+    public com.soffid.iam.model.ApplicationDomainEntity domainToEntity(com.soffid.iam.api.Domain domini) {
         com.soffid.iam.model.ApplicationDomainEntity entity = this.loadDominiAplicacioEntityFromDomini(domini);
-        this.dominiToEntity(domini, entity, true);
+        this.domainToEntity(domini, entity, true);
         return entity;
     }
 
-    public void dominiToEntityCustom(es.caib.seycon.ng.comu.Domini source, com.soffid.iam.model.ApplicationDomainEntity target) {
-        String codiExtern = source.getCodiExtern();
+    public void dominiToEntityCustom(com.soffid.iam.api.Domain source, com.soffid.iam.model.ApplicationDomainEntity target) {
+        String codiExtern = source.getExternalCode();
         if (codiExtern == null) {
             throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.12")); //$NON-NLS-1$
         }
@@ -157,7 +154,7 @@ public class ApplicationDomainEntityDaoImpl extends
         }
         target.setInformationSystem(aplicacioEntity);
 
-        target.setName(source.getNom());
+        target.setName(source.getName());
 
         /*
          * String nomRol = source.getNomRol(); if (nomRol != null) { RolEntity
@@ -177,8 +174,8 @@ public class ApplicationDomainEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.DominiAplicacioEntityDao#dominiToEntity(es.caib.seycon.ng.comu.Domini,
      *      es.caib.seycon.ng.model.DominiAplicacioEntity)
      */
-    public void dominiToEntity(es.caib.seycon.ng.comu.Domini source, com.soffid.iam.model.ApplicationDomainEntity target, boolean copyIfNull) {
-        super.dominiToEntity(source, target, copyIfNull);
+    public void domainToEntity(com.soffid.iam.api.Domain source, com.soffid.iam.model.ApplicationDomainEntity target, boolean copyIfNull) {
+        super.domainToEntity(source, target, copyIfNull);
         dominiToEntityCustom(source, target);
     }
 

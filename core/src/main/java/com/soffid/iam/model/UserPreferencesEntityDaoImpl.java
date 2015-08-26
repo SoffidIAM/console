@@ -26,9 +26,9 @@ public class UserPreferencesEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.UsuariSEUEntityDao#toUsuariSEU(es.caib.seycon.ng.model.UsuariSEUEntity,
 	 *      es.caib.seycon.ng.comu.UsuariSEU)
 	 */
-	public void toUsuariSEU(com.soffid.iam.model.UserPreferencesEntity source, es.caib.seycon.ng.comu.UsuariSEU target) {
+	public void toConsoleProperties(com.soffid.iam.model.UserPreferencesEntity source, com.soffid.iam.api.ConsoleProperties target) {
 		// @todo verify behavior of toUsuariSEU
-		super.toUsuariSEU(source, target);
+		super.toConsoleProperties(source, target);
 
 		toUsuariSEUCustom(source, target);
 	}
@@ -36,9 +36,9 @@ public class UserPreferencesEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.UsuariSEUEntityDao#toUsuariSEU(es.caib.seycon.ng.model.UsuariSEUEntity)
 	 */
-	public es.caib.seycon.ng.comu.UsuariSEU toUsuariSEU(final com.soffid.iam.model.UserPreferencesEntity entity) {
+	public com.soffid.iam.api.ConsoleProperties toConsoleProperties(final com.soffid.iam.model.UserPreferencesEntity entity) {
 		// @todo verify behavior of toUsuariSEU
-		return super.toUsuariSEU(entity);
+		return super.toConsoleProperties(entity);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class UserPreferencesEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.UserPreferencesEntity loadUsuariSEUEntityFromUsuariSEU(es.caib.seycon.ng.comu.UsuariSEU usuariSEU) {
+	private com.soffid.iam.model.UserPreferencesEntity loadUsuariSEUEntityFromUsuariSEU(com.soffid.iam.api.ConsoleProperties usuariSEU) {
 		com.soffid.iam.model.UserPreferencesEntity usuariSEUEntity = null;
 		if (usuariSEU.getId() != null) {
 			usuariSEUEntity = this.load(usuariSEU.getId());
@@ -60,10 +60,10 @@ public class UserPreferencesEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.UsuariSEUEntityDao#usuariSEUToEntity(es.caib.seycon.ng.comu.UsuariSEU)
 	 */
-	public com.soffid.iam.model.UserPreferencesEntity usuariSEUToEntity(es.caib.seycon.ng.comu.UsuariSEU usuariSEU) {
+	public com.soffid.iam.model.UserPreferencesEntity consolePropertiesToEntity(com.soffid.iam.api.ConsoleProperties usuariSEU) {
 		// @todo verify behavior of usuariSEUToEntity
 		com.soffid.iam.model.UserPreferencesEntity entity = this.loadUsuariSEUEntityFromUsuariSEU(usuariSEU);
-		this.usuariSEUToEntity(usuariSEU, entity, true);
+		this.consolePropertiesToEntity(usuariSEU, entity, true);
 		return entity;
 	}
 
@@ -71,24 +71,24 @@ public class UserPreferencesEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.UsuariSEUEntityDao#usuariSEUToEntity(es.caib.seycon.ng.comu.UsuariSEU,
 	 *      es.caib.seycon.ng.model.UsuariSEUEntity)
 	 */
-	public void usuariSEUToEntity(es.caib.seycon.ng.comu.UsuariSEU source, com.soffid.iam.model.UserPreferencesEntity target, boolean copyIfNull) {
+	public void consolePropertiesToEntity(com.soffid.iam.api.ConsoleProperties source, com.soffid.iam.model.UserPreferencesEntity target, boolean copyIfNull) {
 		// @todo verify behavior of usuariSEUToEntity
-		super.usuariSEUToEntity(source, target, copyIfNull);
+		super.consolePropertiesToEntity(source, target, copyIfNull);
 		// No conversion for target.dataDarrerLogin (can't convert
 		// source.getDataDarrerLogin():java.util.Date to java.util.Date
 
 		usuariSEUToEntityCustom(source, target);
 	}
 
-	public void toUsuariSEUCustom(com.soffid.iam.model.UserPreferencesEntity source, es.caib.seycon.ng.comu.UsuariSEU target) {
+	public void toUsuariSEUCustom(com.soffid.iam.model.UserPreferencesEntity source, com.soffid.iam.api.ConsoleProperties target) {
 
-		target.setCodiUsuari(source.getUser().getUserName());
+		target.setUserName(source.getUser().getUserName());
 
 		// Mostrem la data de darrer login al seu
 		if (source.getLastLoginData() != null) {
 			Calendar darrerAccesSEU = Calendar.getInstance();
 			darrerAccesSEU.setTime(source.getLastLoginData());
-			target.setDataDarrerLogin(darrerAccesSEU);
+			target.setLastLoginDate(darrerAccesSEU);
 		}
 
 		// Obtenim les preferències de l'usuari
@@ -113,26 +113,26 @@ public class UserPreferencesEntityDaoImpl extends
 			}
 		}
 		// Guardem les preferències de l'usuari
-		target.setPreferenciesSEU(preferencies);
+		target.setPreferences(preferencies);
 		// Establim certes values de preferències (no funciona el EL d'accés a
 		// Map)
-		target.setIdioma((String) preferencies.get("lang")); //$NON-NLS-1$
+		target.setLanguage((String) preferencies.get("lang")); //$NON-NLS-1$
 		target.setLastIP((String) preferencies.get("lastIP")); //$NON-NLS-1$
 	}
 
-	private void usuariSEUToEntityCustom(es.caib.seycon.ng.comu.UsuariSEU source, com.soffid.iam.model.UserPreferencesEntity target) {
+	private void usuariSEUToEntityCustom(com.soffid.iam.api.ConsoleProperties source, com.soffid.iam.model.UserPreferencesEntity target) {
 
-		UserEntity usuari = getUserEntityDao().findByUserName(source.getCodiUsuari());
+		UserEntity usuari = getUserEntityDao().findByUserName(source.getUserName());
 		
 		target.setUser(usuari);
 
 		// Guardamos fecha de última sesión del SEU:
-		if (source.getDataDarrerLogin() != null) {
-			target.setLastLoginData(source.getDataDarrerLogin().getTime());
+		if (source.getLastLoginDate() != null) {
+			target.setLastLoginData(source.getLastLoginDate().getTime());
 		}
 
 		// Guardem les preferencies-opcions de l'usuari
-		Map prefs = source.getPreferenciesSEU();
+		Map prefs = source.getPreferences();
 		String preferencies = ""; //$NON-NLS-1$
 		if (prefs != null) {
 			for (Iterator it = prefs.keySet().iterator(); it.hasNext();) {

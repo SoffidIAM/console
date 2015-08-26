@@ -7,14 +7,17 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Session;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.SessionEntity;
-import es.caib.seycon.ng.comu.Sessio;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import java.util.Calendar;
 import java.util.Collection;
@@ -46,45 +49,45 @@ public class SessionEntityDaoImpl extends
 		}
 	}
 
-	public void toSessio(com.soffid.iam.model.SessionEntity sourceEntity, es.caib.seycon.ng.comu.Sessio targetVO) {
-		super.toSessio(sourceEntity, targetVO);
+	public void toSession(com.soffid.iam.model.SessionEntity sourceEntity, com.soffid.iam.api.Session targetVO) {
+		super.toSession(sourceEntity, targetVO);
 		toSessioCustom(sourceEntity, targetVO);
 	}
 
-	public void toSessioCustom(com.soffid.iam.model.SessionEntity sourceEntity, es.caib.seycon.ng.comu.Sessio targetVO) {
+	public void toSessioCustom(com.soffid.iam.model.SessionEntity sourceEntity, com.soffid.iam.api.Session targetVO) {
 		targetVO.setPort(sourceEntity.getPort());
 		targetVO.setUrl(sourceEntity.getWebHandler());
 		if (sourceEntity.getStartDate() != null) {
 			Calendar dadaIniciSessio = Calendar.getInstance();
 			dadaIniciSessio.setTime(sourceEntity.getStartDate());
-			targetVO.setDataInici(dadaIniciSessio);
+			targetVO.setStartDate(dadaIniciSessio);
 		}
 		
 		HostEntity maquinaClientEntity = sourceEntity.getClientHost();
 		if (maquinaClientEntity == null)
 		{
-			targetVO.setNomMaquinaClient(sourceEntity.getClientHostName());
+			targetVO.setClientHostName(sourceEntity.getClientHostName());
 		}
 		else
 		{
-    		targetVO.setNomMaquinaClient(maquinaClientEntity == null ? "" : maquinaClientEntity.getName());
+    		targetVO.setClientHostName(maquinaClientEntity == null ? "" : maquinaClientEntity.getName());
 		}
 		if (sourceEntity.getHost() == null)
 		{
-			targetVO.setNomMaquinaServidora(sourceEntity.getHostName());
+			targetVO.setServerHostName(sourceEntity.getHostName());
 		} else {
-			targetVO.setNomMaquinaServidora(sourceEntity.getHost().getName());
+			targetVO.setServerHostName(sourceEntity.getHost().getName());
 		}
-		targetVO.setCodiUsuari(sourceEntity.getUser().getUserName());
-		targetVO.setNomComplertUsuari(sourceEntity.getUser().getFullName());
-		targetVO.setIdRegistreAccess(sourceEntity.getLoginLogInfo().getId());
+		targetVO.setUserName(sourceEntity.getUser().getUserName());
+		targetVO.setUserFullName(sourceEntity.getUser().getFullName());
+		targetVO.setAccessLogId(sourceEntity.getLoginLogInfo().getId());
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.SessioEntityDao#toSessio(es.caib.seycon.ng.model.SessioEntity)
 	 */
-	public es.caib.seycon.ng.comu.Sessio toSessio(final com.soffid.iam.model.SessionEntity entity) {
-		Sessio sessio = super.toSessio(entity);
+	public com.soffid.iam.api.Session toSession(final com.soffid.iam.model.SessionEntity entity) {
+		Session sessio = super.toSession(entity);
 		toSessioCustom(entity, sessio);
 		return sessio;
 	}
@@ -94,7 +97,7 @@ public class SessionEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.SessionEntity loadSessioEntityFromSessio(es.caib.seycon.ng.comu.Sessio sessio) {
+	private com.soffid.iam.model.SessionEntity loadSessioEntityFromSessio(com.soffid.iam.api.Session sessio) {
 		throw new SeyconException(
 				Messages.getString("SessionEntityDaoImpl.2")); //$NON-NLS-1$
 	}
@@ -102,15 +105,15 @@ public class SessionEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.SessioEntityDao#sessioToEntity(es.caib.seycon.ng.comu.Sessio)
 	 */
-	public com.soffid.iam.model.SessionEntity sessioToEntity(es.caib.seycon.ng.comu.Sessio sessio) {
+	public com.soffid.iam.model.SessionEntity sessionToEntity(com.soffid.iam.api.Session sessio) {
 		// @todo verify behavior of sessioToEntity
 		com.soffid.iam.model.SessionEntity entity = this.loadSessioEntityFromSessio(sessio);
-		this.sessioToEntity(sessio, entity, true);
+		this.sessionToEntity(sessio, entity, true);
 		return entity;
 	}
 
 
-	public void sessioToEntityCustom(es.caib.seycon.ng.comu.Sessio sourceVO, com.soffid.iam.model.SessionEntity targetEntity) {
+	public void sessioToEntityCustom(com.soffid.iam.api.Session sourceVO, com.soffid.iam.model.SessionEntity targetEntity) {
 		// les sessions no es poden editar ni crear
 	}
 
@@ -118,9 +121,9 @@ public class SessionEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.SessioEntityDao#sessioToEntity(es.caib.seycon.ng.comu.Sessio,
 	 *      es.caib.seycon.ng.model.SessioEntity)
 	 */
-	public void sessioToEntity(es.caib.seycon.ng.comu.Sessio sourceVO, com.soffid.iam.model.SessionEntity targetEntity, boolean copyIfNull) {
+	public void sessionToEntity(com.soffid.iam.api.Session sourceVO, com.soffid.iam.model.SessionEntity targetEntity, boolean copyIfNull) {
 		// @todo verify behavior of sessioToEntity
-		super.sessioToEntity(sourceVO, targetEntity, copyIfNull);
+		super.sessionToEntity(sourceVO, targetEntity, copyIfNull);
 	}
 
 	public void create(Collection entities) {

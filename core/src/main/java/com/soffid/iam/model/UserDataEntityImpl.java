@@ -7,11 +7,10 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.security.SecurityScopeEntity;
-
+import com.soffid.iam.service.AuthorizationService;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.utils.Security;
 
 /**
@@ -21,7 +20,7 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 	implements SecurityScopeEntity
 {
 	public AttributeVisibilityEnum getAttributeVisibility() {
-		AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+		AuthorizationService autService = com.soffid.iam.ServiceLocator.instance().getAuthorizationService();
 		try {
 			if (autService.hasPermission(
 					Security.AUTO_USER_METADATA_UPDATE, this))
@@ -42,9 +41,6 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 		if (Security.isDisableAllSecurityForEver())
 			return AttributeVisibilityEnum.EDITABLE;
 		
-		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
-			return AttributeVisibilityEnum.EDITABLE;
-
 		MetaDataEntity tda = getDataType();
 		if (tda == null)
 			return AttributeVisibilityEnum.HIDDEN;
@@ -55,6 +51,9 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 			if (getUser().getUserName().equals(user))
 				return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
 		}
+
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
 		
 		if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
 			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE

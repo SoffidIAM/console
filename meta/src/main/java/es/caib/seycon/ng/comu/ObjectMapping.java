@@ -7,15 +7,15 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
-@ValueObject 
-public abstract class ObjectMapping {
+@ValueObject (translatedName="ObjectMapping", translatedPackage="com.soffid.iam.api") 
+public class ObjectMapping {
 
 	@Nullable
 	public java.lang.Long id;
 
 	public java.lang.String systemObject;
 
-	public es.caib.seycon.ng.comu.SoffidObjectType soffidObject;
+	public SoffidObjectType soffidObject;
 
 	@Nullable
 	public java.lang.String condition;

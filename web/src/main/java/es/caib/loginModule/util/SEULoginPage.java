@@ -8,8 +8,9 @@ import java.util.Locale;
 import javax.management.remote.JMXPrincipal;
 import javax.servlet.http.HttpServletRequest;
 
+import com.soffid.iam.PrincipalStore;
+
 import es.caib.loginModule.auth.ConstantesAutenticacion;
-import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;

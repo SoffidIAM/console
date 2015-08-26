@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="AuthorizationRole",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class AutoritzacioRol {
+public class AutoritzacioRol {
 
 	@Nullable
 	public java.lang.Long id;

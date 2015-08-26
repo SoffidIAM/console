@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="BPMUser",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class BPMUser {
+public class BPMUser {
 
 	public java.lang.String userName;
 

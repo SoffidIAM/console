@@ -1,0 +1,1217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<database>
+<!-- 
+  **
+  ** SEQUENCES
+  **
+  -->
+
+	<sequence name='HIBERNATE_SEQUENCE'/>
+
+<!-- 
+  **
+  ** TABLES & INDEXES
+  **
+  -->
+
+
+	<!-- TABLE BPM_ACCESS_LOG  -->
+
+	<table name='BPM_ACCESS_LOG'>
+		<column name='ACC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='ACC_TYPE' type='CHAR' length='1'/>
+		<column name='ACC_DOC_ID' type='BIGINT'/>
+		<column name='ACC_USER' type='VARCHAR' length='255'/>
+		<column name='ACC_DATE' type='TIMESTAMP'/>
+		<column name='ACC_ROLE_ID' type='BIGINT'/>
+	</table>
+
+
+	<!-- TABLE BPM_DATABASE_PROPERTY  -->
+
+	<table name='BPM_DATABASE_PROPERTY'>
+		<column name='DBP_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='DBP_APP' type='VARCHAR' length='250'/>
+		<column name='DBP_KEY' type='VARCHAR' length='250'/>
+		<column name='DBP_VALUE' type='VARCHAR' length='1024'/>
+	</table>
+
+
+	<!-- TABLE BPM_DOCUMENT  -->
+
+	<table name='BPM_DOCUMENT'>
+		<column name='DOC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='DOC_MIME_TYPE' type='VARCHAR' length='255' notNull='true'/>
+		<column name='DOC_EXTERNAL_NAME' type='VARCHAR' length='255'/>
+		<column name='DOC_HASH' type='VARCHAR' length='255'/>
+		<column name='DOC_FS_PATH' type='VARCHAR' length='255' notNull='true'/>
+	</table>
+
+	<index name='DOC_FS_PATH' table='BPM_DOCUMENT' unique='false'>
+		<column name='DOC_FS_PATH'/>
+	</index>
+
+
+	<!-- TABLE BPM_FILE_SYSTEM  -->
+
+	<table name='BPM_FILE_SYSTEM'>
+		<column name='FIL_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='FIL_APPLICATION' type='VARCHAR' length='255' notNull='true'/>
+		<column name='FIL_YEAR' type='BIGINT' notNull='true'/>
+		<column name='FIL_NEXT_DOC' type='BIGINT' notNull='true'/>
+	</table>
+
+
+	<!-- TABLE BPM_PERMISSION  -->
+
+	<table name='BPM_PERMISSION'>
+		<column name='PER_DOC_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='PER_ROL_ID' type='BIGINT' notNull='true' primaryKey='true'/>
+	</table>
+
+	<foreignKey name='BPM_PERMISSION_FK_PER_ROL_ID' table='BPM_PERMISSION' foreignTable='BPM_ROLE'>
+		<column name='PER_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+
+	<foreignKey name='BPM_PERMISSION_FK_PER_DOC_ID' table='BPM_PERMISSION' foreignTable='BPM_DOCUMENT'>
+		<column name='PER_DOC_ID'/>
+		<foreignColumn name='DOC_ID'/>
+	</foreignKey>
+
+	<index name='BPM_PERMISSION_FULL' table='BPM_PERMISSION' unique='true'>
+		<column name='PER_ROL_ID'/>
+		<column name='PER_DOC_ID'/>
+	</index>
+
+
+	<!-- TABLE BPM_PROCESS_DEFINITION_ROLES  -->
+
+	<table name='BPM_PROCESS_DEFINITION_ROLES'>
+		<column name='PDR_PROCESS_DEFINITION_ID' type='BIGINT'/>
+		<column name='PDR_APP_ROLE' type='VARCHAR' length='250'/>
+		<column name='PDR_USER_ROLE' type='VARCHAR' length='250'/>
+		<column name='PDR_IS_USER' type='SMALLINT'/>
+		<column name='PDR_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+	</table>
+
+
+	<foreignKey name='BPM_PDR_FK_PD' table='BPM_PROCESS_DEFINITION_ROLES' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PDR_PROCESS_DEFINITION_ID'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<!-- TABLE BPM_PROCESS_FILE  -->
+
+	<table name='BPM_PROCESS_FILE'>
+		<column name='PRO_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='PRO_INSTANCE_ID' type='BIGINT' notNull='true'/>
+		<column name='PRO_DOC_ID' type='BIGINT' notNull='true'/>
+		<column name='PRO_DOC_HASH' type='VARCHAR' length='250' notNull='true'/>
+		<column name='PRO_DELETED' type='SMALLINT' notNull='true'/>
+	</table>
+
+
+	<!-- TABLE BPM_PROC_DEF_PROPERTIES  -->
+
+	<table name='BPM_PROC_DEF_PROPERTIES'>
+		<column name='PDP_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='PDP_PROCESS_DEFINITION_ID' type='BIGINT' notNull='true'/>
+		<column name='PDP_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='PDP_VALUE' type='VARCHAR' length='1000'/>
+	</table>
+
+	<index name='BPM_PDP_UK' table='BPM_PROC_DEF_PROPERTIES' unique='false'>
+		<column name='PDP_PROCESS_DEFINITION_ID'/>
+		<column name='PDP_NAME'/>
+	</index>
+
+
+	<!-- TABLE BPM_ROLE  -->
+
+	<table name='BPM_ROLE'>
+		<column name='ROL_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='ROL_NAME' type='VARCHAR' length='255' notNull='true'/>
+	</table>
+
+	<index name='ROL_NAME' table='BPM_ROLE' unique='false'>
+		<column name='ROL_NAME'/>
+	</index>
+
+	<!-- TABLE BPM_SECCIO_PRESSUPOSTARIA  -->
+
+	<table name='BPM_SECCIO_PRESSUPOSTARIA'>
+		<column name='SEC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='SEC_GRUP_ID' type='BIGINT'/>
+		<column name='SEC_NOM' type='VARCHAR' length='10'/>
+	</table>
+
+
+	<!-- TABLE BPM_SIGN  -->
+
+	<table name='BPM_SIGN'>
+		<column name='SIG_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='SIG_SIGN_TYPE' type='CHAR' length='1' notNull='true'/>
+		<column name='SIG_FS_PATH' type='VARCHAR' length='255' notNull='true'/>
+		<column name='SIG_TIMESTAMP' type='TIMESTAMP' notNull='true'/>
+		<column name='SIG_DOC_ID' type='BIGINT' notNull='true'/>
+	</table>
+
+	<foreignKey name='FKD8C6CC3DAA02D8B3' table='BPM_SIGN' foreignTable='BPM_DOCUMENT'>
+		<column name='SIG_DOC_ID'/>
+		<foreignColumn name='DOC_ID'/>
+	</foreignKey>
+
+	<index name='SIG_FS_PATH' table='BPM_SIGN' unique='true'>
+		<column name='SIG_FS_PATH'/>
+	</index>
+
+	<!-- TABLE BPM_USER_CONFIG  -->
+
+	<table name='BPM_USER_CONFIG'>
+		<column name='USC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='USC_USER_ID' type='BIGINT' notNull='true'/>
+		<column name='USC_EMAIL_NOTIFICACIONS' type='VARCHAR' length='50'/>
+	</table>
+
+	<index name='BPM_USC_USUID_UK' table='BPM_USER_CONFIG' unique='false'>
+		<column name='USC_USER_ID'/>
+	</index>
+
+
+	<!-- TABLE BPM_USER_CONFIG_IGNORE_GROUPS  -->
+
+	<table name='BPM_USER_CONFIG_IGNORE_GROUPS'>
+		<column name='USC_IG_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='USC_IG_GROUP_NAME' type='VARCHAR' length='50'/>
+		<column name='USC_IG_CFG_ID' type='BIGINT' notNull='true'/>
+		<column name='USC_IG_TYPE' type='INTEGER' notNull='true'/>
+	</table>
+
+
+	<!-- TABLE BPM_USER_INTERFACE  -->
+
+	<table name='BPM_USER_INTERFACE'>
+		<column name='USI_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='USI_TASK_NAME' type='VARCHAR' length='250'/>
+		<column name='USI_FILE_NAME' type='VARCHAR' length='2048'/>
+		<column name='USI_PROCESS_DEFINITION' type='BIGINT'/>
+	</table>
+
+
+	<!-- TABLE BPM_USER_INTERFACE_CLASS  -->
+
+	<table name='BPM_USER_INTERFACE_CLASS'>
+		<column name='USC_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='USC_USI_ID' type='BIGINT' notNull='true'/>
+		<column name='USC_CLASS_NAME' type='VARCHAR' length='250' notNull='true'/>
+		<column name='USC_CLASS' type='BLOB' length='65535'/>
+	</table>
+
+	<foreignKey name='BPM_USC_FK_USI_ID' table='BPM_USER_INTERFACE_CLASS' foreignTable='BPM_USER_INTERFACE'>
+		<column name='USC_USI_ID'/>
+		<foreignColumn name='USI_ID'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_ACTION  -->
+
+	<table name='JBPM_ACTION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='ISPROPAGATIONALLOWED_' type='SMALLINT'/>
+		<column name='ACTIONEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='ISASYNC_' type='SMALLINT'/>
+		<column name='REFERENCEDACTION_' type='BIGINT'/>
+		<column name='ACTIONDELEGATION_' type='BIGINT'/>
+		<column name='EVENT_' type='BIGINT'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='TIMERNAME_' type='VARCHAR' length='255'/>
+		<column name='DUEDATE_' type='VARCHAR' length='255'/>
+		<column name='REPEAT_' type='VARCHAR' length='255'/>
+		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
+		<column name='TIMERACTION_' type='BIGINT'/>
+		<column name='EXPRESSION_' type='VARCHAR' length='4000'/>
+		<column name='EVENTINDEX_' type='BIGINT'/>
+		<column name='EXCEPTIONHANDLER_' type='BIGINT'/>
+		<column name='EXCEPTIONHANDLERINDEX_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_ACTION_ACTNDEL' table='JBPM_ACTION' foreignTable='JBPM_DELEGATION'>
+		<column name='ACTIONDELEGATION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_ACTION_EVENT' table='JBPM_ACTION' foreignTable='JBPM_EVENT'>
+		<column name='EVENT_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_ACTION_EXPTHDL' table='JBPM_ACTION' foreignTable='JBPM_EXCEPTIONHANDLER'>
+		<column name='EXCEPTIONHANDLER_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_ACTION_REFACT' table='JBPM_ACTION' foreignTable='JBPM_ACTION'>
+		<column name='REFERENCEDACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_CRTETIMERACT_TA' table='JBPM_ACTION' foreignTable='JBPM_ACTION'>
+		<column name='TIMERACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+
+	<!-- TABLE JBPM_BYTEARRAY  -->
+
+	<table name='JBPM_BYTEARRAY'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='FILEDEFINITION_' type='BIGINT'/>
+	</table>
+
+	<index name='JBPM_BYTEARR_FDEFINITION' table='JBPM_BYTEARRAY' unique='false'>
+		<column name='FILEDEFINITION_'/>
+	</index>
+
+
+	<!-- TABLE JBPM_BYTEBLOCK  -->
+
+	<table name='JBPM_BYTEBLOCK'>
+		<column name='PROCESSFILE_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='BYTES_' type='VARBINARY' length='1024'/>
+		<column name='INDEX_' type='BIGINT' notNull='true' primaryKey='true'/>
+	</table>
+
+	<foreignKey name='FK_BYTEBLOCK_FILE' table='JBPM_BYTEBLOCK' foreignTable='JBPM_BYTEARRAY'>
+		<column name='PROCESSFILE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_COMMENT  -->
+
+	<table name='JBPM_COMMENT'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='VERSION_' type='BIGINT' notNull='true'/>
+		<column name='ACTORID_' type='VARCHAR' length='255'/>
+		<column name='TIME_' type='TIMESTAMP'/>
+		<column name='MESSAGE_' type='VARCHAR' length='4000'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+		<column name='TOKENINDEX_' type='BIGINT'/>
+		<column name='TASKINSTANCEINDEX_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_COMMENT_TOKEN' table='JBPM_COMMENT' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_COMMENT_TSK' table='JBPM_COMMENT' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_DECISIONCONDITIONS  -->
+
+	<table name='JBPM_DECISIONCONDITIONS'>
+		<column name='DECISION_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
+		<column name='EXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='INDEX_' type='BIGINT' notNull='true' primaryKey='true'/>
+	</table>
+
+	<foreignKey name='FK_DECCOND_DEC' table='JBPM_DECISIONCONDITIONS' foreignTable='JBPM_NODE'>
+		<column name='DECISION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+
+	<!-- TABLE JBPM_DELEGATION  -->
+
+	<table name='JBPM_DELEGATION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASSNAME_' type='VARCHAR' length='4000'/>
+		<column name='CONFIGURATION_' type='VARCHAR' length='4000'/>
+		<column name='CONFIGTYPE_' type='VARCHAR' length='255'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+	</table>
+
+	
+
+	<!-- TABLE JBPM_EVENT  -->
+
+	<table name='JBPM_EVENT'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='EVENTTYPE_' type='VARCHAR' length='255'/>
+		<column name='TYPE_' type='CHAR' length='1'/>
+		<column name='GRAPHELEMENT_' type='BIGINT'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='NODE_' type='BIGINT'/>
+		<column name='TRANSITION_' type='BIGINT'/>
+		<column name='TASK_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_EVENT_PROCDEF' table='JBPM_EVENT' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_EVENT_TASK' table='JBPM_EVENT' foreignTable='JBPM_TASK'>
+		<column name='TASK_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_EXCEPTIONHANDLER  -->
+
+	<table name='JBPM_EXCEPTIONHANDLER'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='EXCEPTIONCLASSNAME_' type='VARCHAR' length='4000'/>
+		<column name='TYPE_' type='CHAR' length='1'/>
+		<column name='GRAPHELEMENT_' type='BIGINT'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='GRAPHELEMENTINDEX_' type='BIGINT'/>
+		<column name='NODE_' type='BIGINT'/>
+		<column name='TRANSITION_' type='BIGINT'/>
+		<column name='TASK_' type='BIGINT'/>
+	</table>
+
+
+	<!-- TABLE JBPM_ID_GROUP  -->
+
+	<table name='JBPM_ID_GROUP'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='TYPE_' type='VARCHAR' length='255'/>
+		<column name='PARENT_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_ID_GRP_PARENT' table='JBPM_ID_GROUP' foreignTable='JBPM_ID_GROUP'>
+		<column name='PARENT_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_ID_MEMBERSHIP  -->
+
+	<table name='JBPM_ID_MEMBERSHIP'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='ROLE_' type='VARCHAR' length='255'/>
+		<column name='USER_' type='BIGINT'/>
+		<column name='GROUP_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_ID_MEMSHIP_GRP' table='JBPM_ID_MEMBERSHIP' foreignTable='JBPM_ID_GROUP'>
+		<column name='GROUP_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_ID_MEMSHIP_USR' table='JBPM_ID_MEMBERSHIP' foreignTable='JBPM_ID_USER'>
+		<column name='USER_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_ID_PERMISSIONS  -->
+
+	<table name='JBPM_ID_PERMISSIONS'>
+		<column name='ENTITY_' type='BIGINT' notNull='true'/>
+		<column name='CLASS_' type='VARCHAR' length='255' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='ACTION_' type='VARCHAR' length='255'/>
+	</table>
+
+
+	<!-- TABLE JBPM_ID_USER  -->
+
+	<table name='JBPM_ID_USER'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='EMAIL_' type='VARCHAR' length='255'/>
+		<column name='PASSWORD_' type='VARCHAR' length='255'/>
+		<column name='NIF' type='VARCHAR' length='20'/>
+		<column name='GIVENNAME' type='VARCHAR' length='100'/>
+		<column name='SURNAME' type='VARCHAR' length='100'/>
+	</table>
+
+	
+	<!-- TABLE JBPM_JOB  -->
+
+	<table name='JBPM_JOB'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='VERSION_' type='BIGINT'/>
+		<column name='DUEDATE_' type='TIMESTAMP'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISEXCLUSIVE_' type='SMALLINT'/>
+		<column name='LOCKOWNER_' type='VARCHAR' length='255'/>
+		<column name='LOCKTIME_' type='TIMESTAMP'/>
+		<column name='EXCEPTION_' type='LONGVARCHAR' length='65535'/>
+		<column name='RETRIES_' type='BIGINT'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='REPEAT_' type='VARCHAR' length='255'/>
+		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='GRAPHELEMENTTYPE_' type='VARCHAR' length='255'/>
+		<column name='GRAPHELEMENT_' type='BIGINT'/>
+		<column name='NODE_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_JOB_ACTION' table='JBPM_JOB' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_JOB_NODE' table='JBPM_JOB' foreignTable='JBPM_NODE'>
+		<column name='NODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_JOB_PRINST' table='JBPM_JOB' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_JOB_TOKEN' table='JBPM_JOB' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_JOB_TSKINST' table='JBPM_JOB' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_LOG  -->
+
+	<table name='JBPM_LOG'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='INDEX_' type='BIGINT'/>
+		<column name='DATE_' type='TIMESTAMP'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='PARENT_' type='BIGINT'/>
+		<column name='MESSAGE_' type='VARCHAR' length='4000'/>
+		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='NODE_' type='BIGINT'/>
+		<column name='ENTER_' type='TIMESTAMP'/>
+		<column name='LEAVE_' type='TIMESTAMP'/>
+		<column name='DURATION_' type='BIGINT'/>
+		<column name='NEWLONGVALUE_' type='BIGINT'/>
+		<column name='TRANSITION_' type='BIGINT'/>
+		<column name='CHILD_' type='BIGINT'/>
+		<column name='SOURCENODE_' type='BIGINT'/>
+		<column name='DESTINATIONNODE_' type='BIGINT'/>
+		<column name='VARIABLEINSTANCE_' type='BIGINT'/>
+		<column name='OLDBYTEARRAY_' type='BIGINT'/>
+		<column name='NEWBYTEARRAY_' type='BIGINT'/>
+		<column name='OLDDATEVALUE_' type='TIMESTAMP'/>
+		<column name='NEWDATEVALUE_' type='TIMESTAMP'/>
+		<column name='OLDDOUBLEVALUE_' type='DOUBLE'/>
+		<column name='NEWDOUBLEVALUE_' type='DOUBLE'/>
+		<column name='OLDLONGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='OLDLONGIDVALUE_' type='BIGINT'/>
+		<column name='NEWLONGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='NEWLONGIDVALUE_' type='BIGINT'/>
+		<column name='OLDSTRINGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='OLDSTRINGIDVALUE_' type='VARCHAR' length='255'/>
+		<column name='NEWSTRINGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='NEWSTRINGIDVALUE_' type='VARCHAR' length='255'/>
+		<column name='OLDLONGVALUE_' type='BIGINT'/>
+		<column name='OLDSTRINGVALUE_' type='VARCHAR' length='4000'/>
+		<column name='NEWSTRINGVALUE_' type='VARCHAR' length='4000'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+		<column name='TASKACTORID_' type='VARCHAR' length='255'/>
+		<column name='TASKOLDACTORID_' type='VARCHAR' length='255'/>
+		<column name='SWIMLANEINSTANCE_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_LOG_ACTION' table='JBPM_LOG' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_CHILDTOKEN' table='JBPM_LOG' foreignTable='JBPM_TOKEN'>
+		<column name='CHILD_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_DESTNODE' table='JBPM_LOG' foreignTable='JBPM_NODE'>
+		<column name='DESTINATIONNODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_NEWBYTES' table='JBPM_LOG' foreignTable='JBPM_BYTEARRAY'>
+		<column name='NEWBYTEARRAY_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_NODE' table='JBPM_LOG' foreignTable='JBPM_NODE'>
+		<column name='NODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_OLDBYTES' table='JBPM_LOG' foreignTable='JBPM_BYTEARRAY'>
+		<column name='OLDBYTEARRAY_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_PARENT' table='JBPM_LOG' foreignTable='JBPM_LOG'>
+		<column name='PARENT_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_SOURCENODE' table='JBPM_LOG' foreignTable='JBPM_NODE'>
+		<column name='SOURCENODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_SWIMINST' table='JBPM_LOG' foreignTable='JBPM_SWIMLANEINSTANCE'>
+		<column name='SWIMLANEINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_TASKINST' table='JBPM_LOG' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_TOKEN' table='JBPM_LOG' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_TRANSITION' table='JBPM_LOG' foreignTable='JBPM_TRANSITION'>
+		<column name='TRANSITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_LOG_VARINST' table='JBPM_LOG' foreignTable='JBPM_VARIABLEINSTANCE'>
+		<column name='VARIABLEINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_MESSAGE  -->
+
+	<table name='JBPM_MESSAGE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='DESTINATION_' type='VARCHAR' length='255'/>
+		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='TEXT_' type='VARCHAR' length='255'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='NODE_' type='BIGINT'/>
+		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_CMD_ACTION' table='JBPM_MESSAGE' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_CMD_NODE' table='JBPM_MESSAGE' foreignTable='JBPM_NODE'>
+		<column name='NODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_CMD_TASKINST' table='JBPM_MESSAGE' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_MSG_TOKEN' table='JBPM_MESSAGE' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_MODULEDEFINITION  -->
+
+	<table name='JBPM_MODULEDEFINITION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='4000'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='STARTTASK_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_MODDEF_PROCDEF' table='JBPM_MODULEDEFINITION' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TSKDEF_START' table='JBPM_MODULEDEFINITION' foreignTable='JBPM_TASK'>
+		<column name='STARTTASK_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_MODULEINSTANCE  -->
+
+	<table name='JBPM_MODULEINSTANCE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='TASKMGMTDEFINITION_' type='BIGINT'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='VERSION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_MODINST_PRCINST' table='JBPM_MODULEINSTANCE' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASKMGTINST_TMD' table='JBPM_MODULEINSTANCE' foreignTable='JBPM_MODULEDEFINITION'>
+		<column name='TASKMGMTDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_NODE  -->
+
+	<table name='JBPM_NODE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='ISASYNC_' type='SMALLINT'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='SUPERSTATE_' type='BIGINT'/>
+		<column name='SUBPROCESSDEFINITION_' type='BIGINT'/>
+		<column name='DECISIONEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='DECISIONDELEGATION' type='BIGINT'/>
+		<column name='SIGNAL_' type='BIGINT'/>
+		<column name='CREATETASKS_' type='SMALLINT'/>
+		<column name='ENDTASKS_' type='SMALLINT'/>
+		<column name='NODECOLLECTIONINDEX_' type='BIGINT'/>
+		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
+		<column name='ISASYNCEXCL_' type='SMALLINT'/>
+		<column name='SUBPROCNAME_' type='VARCHAR' length='255'/>
+		<column name='SCRIPT_' type='BIGINT'/>
+		<column name='PARENTLOCKMODE_' type='VARCHAR' length='255'/>
+	</table>
+
+	<foreignKey name='FK_DECISION_DELEG' table='JBPM_NODE' foreignTable='JBPM_DELEGATION'>
+		<column name='DECISIONDELEGATION'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_NODE_ACTION' table='JBPM_NODE' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_NODE_PROCDEF' table='JBPM_NODE' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_NODE_SUPERSTATE' table='JBPM_NODE' foreignTable='JBPM_NODE'>
+		<column name='SUPERSTATE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_PROCST_SBPRCDEF' table='JBPM_NODE' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='SUBPROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_POOLEDACTOR  -->
+
+	<table name='JBPM_POOLEDACTOR'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='ACTORID_' type='VARCHAR' length='255'/>
+		<column name='SWIMLANEINSTANCE_' type='BIGINT'/>
+		<column name='VERSION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_POOLEDACTOR_SLI' table='JBPM_POOLEDACTOR' foreignTable='JBPM_SWIMLANEINSTANCE'>
+		<column name='SWIMLANEINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_PROCESSDEFINITION  -->
+
+	<table name='JBPM_PROCESSDEFINITION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='VERSION_' type='BIGINT'/>
+		<column name='ISTERMINATIONIMPLICIT_' type='SMALLINT'/>
+		<column name='STARTSTATE_' type='BIGINT'/>
+		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
+		<column name='CLASS_' type='CHAR' length='1'/>
+	</table>
+
+	<foreignKey name='FK_PROCDEF_STRTSTA' table='JBPM_PROCESSDEFINITION' foreignTable='JBPM_NODE'>
+		<column name='STARTSTATE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_PROCESSINSTANCE  -->
+
+	<table name='JBPM_PROCESSINSTANCE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='VERSION_' type='BIGINT' notNull='true'/>
+		<column name='START_' type='TIMESTAMP'/>
+		<column name='END_' type='TIMESTAMP'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='ROOTTOKEN_' type='BIGINT'/>
+		<column name='SUPERPROCESSTOKEN_' type='BIGINT'/>
+		<column name='KEY_' type='VARCHAR' length='255'/>
+	</table>
+
+	<foreignKey name='FK_PROCIN_PROCDEF' table='JBPM_PROCESSINSTANCE' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_PROCIN_ROOTTKN' table='JBPM_PROCESSINSTANCE' foreignTable='JBPM_TOKEN'>
+		<column name='ROOTTOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_PROCIN_SPROCTKN' table='JBPM_PROCESSINSTANCE' foreignTable='JBPM_TOKEN'>
+		<column name='SUPERPROCESSTOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_RUNTIMEACTION  -->
+
+	<table name='JBPM_RUNTIMEACTION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='VERSION_' type='BIGINT' notNull='true'/>
+		<column name='EVENTTYPE_' type='VARCHAR' length='255'/>
+		<column name='TYPE_' type='CHAR' length='1'/>
+		<column name='GRAPHELEMENT_' type='BIGINT'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='PROCESSINSTANCEINDEX_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_RTACTN_ACTION' table='JBPM_RUNTIMEACTION' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_RTACTN_PROCINST' table='JBPM_RUNTIMEACTION' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_SWIMLANE  -->
+
+	<table name='JBPM_SWIMLANE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='ACTORIDEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='POOLEDACTORSEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='ASSIGNMENTDELEGATION_' type='BIGINT'/>
+		<column name='TASKMGMTDEFINITION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_SWL_ASSDEL' table='JBPM_SWIMLANE' foreignTable='JBPM_DELEGATION'>
+		<column name='ASSIGNMENTDELEGATION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_SWL_TSKMGMTDEF' table='JBPM_SWIMLANE' foreignTable='JBPM_MODULEDEFINITION'>
+		<column name='TASKMGMTDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_SWIMLANEINSTANCE  -->
+
+	<table name='JBPM_SWIMLANEINSTANCE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='ACTORID_' type='VARCHAR' length='255'/>
+		<column name='SWIMLANE_' type='BIGINT'/>
+		<column name='TASKMGMTINSTANCE_' type='BIGINT'/>
+		<column name='VERSION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_SWIMLANEINST_SL' table='JBPM_SWIMLANEINSTANCE' foreignTable='JBPM_SWIMLANE'>
+		<column name='SWIMLANE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_SWIMLANEINST_TM' table='JBPM_SWIMLANEINSTANCE' foreignTable='JBPM_MODULEINSTANCE'>
+		<column name='TASKMGMTINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_TASK  -->
+
+	<table name='JBPM_TASK'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
+		<column name='ISBLOCKING_' type='SMALLINT'/>
+		<column name='ISSIGNALLING_' type='SMALLINT'/>
+		<column name='DUEDATE_' type='VARCHAR' length='255'/>
+		<column name='ACTORIDEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='POOLEDACTORSEXPRESSION_' type='VARCHAR' length='255'/>
+		<column name='TASKMGMTDEFINITION_' type='BIGINT'/>
+		<column name='TASKNODE_' type='BIGINT'/>
+		<column name='STARTSTATE_' type='BIGINT'/>
+		<column name='ASSIGNMENTDELEGATION_' type='BIGINT'/>
+		<column name='SWIMLANE_' type='BIGINT'/>
+		<column name='TASKCONTROLLER_' type='BIGINT'/>
+		<column name='CONDITION_' type='VARCHAR' length='255'/>
+		<column name='PRIORITY_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_TASK_ASSDEL' table='JBPM_TASK' foreignTable='JBPM_DELEGATION'>
+		<column name='ASSIGNMENTDELEGATION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASK_PROCDEF' table='JBPM_TASK' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASK_STARTST' table='JBPM_TASK' foreignTable='JBPM_NODE'>
+		<column name='STARTSTATE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASK_SWIMLANE' table='JBPM_TASK' foreignTable='JBPM_SWIMLANE'>
+		<column name='SWIMLANE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASK_TASKMGTDEF' table='JBPM_TASK' foreignTable='JBPM_MODULEDEFINITION'>
+		<column name='TASKMGMTDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASK_TASKNODE' table='JBPM_TASK' foreignTable='JBPM_NODE'>
+		<column name='TASKNODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TSK_TSKCTRL' table='JBPM_TASK' foreignTable='JBPM_TASKCONTROLLER'>
+		<column name='TASKCONTROLLER_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_TASKACTORPOOL  -->
+
+	<table name='JBPM_TASKACTORPOOL'>
+		<column name='TASKINSTANCE_' type='BIGINT' notNull='true' primaryKey='true'/>
+		<column name='POOLEDACTOR_' type='BIGINT' notNull='true' primaryKey='true'/>
+	</table>
+
+	<foreignKey name='FK_TASKACTPL_TSKI' table='JBPM_TASKACTORPOOL' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TSKACTPOL_PLACT' table='JBPM_TASKACTORPOOL' foreignTable='JBPM_POOLEDACTOR'>
+		<column name='POOLEDACTOR_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_TASKCONTROLLER  -->
+
+	<table name='JBPM_TASKCONTROLLER'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='TASKCONTROLLERDELEGATION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_TSKCTRL_DELEG' table='JBPM_TASKCONTROLLER' foreignTable='JBPM_DELEGATION'>
+		<column name='TASKCONTROLLERDELEGATION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<!-- TABLE JBPM_TASKINSTANCE  -->
+
+	<table name='JBPM_TASKINSTANCE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
+		<column name='ACTORID_' type='VARCHAR' length='255'/>
+		<column name='CREATE_' type='TIMESTAMP'/>
+		<column name='START_' type='TIMESTAMP'/>
+		<column name='END_' type='TIMESTAMP'/>
+		<column name='DUEDATE_' type='TIMESTAMP'/>
+		<column name='PRIORITY_' type='BIGINT'/>
+		<column name='ISCANCELLED_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISOPEN_' type='SMALLINT'/>
+		<column name='ISSIGNALLING_' type='SMALLINT'/>
+		<column name='ISBLOCKING_' type='SMALLINT'/>
+		<column name='TASK_' type='BIGINT'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='SWIMLANINSTANCE_' type='BIGINT'/>
+		<column name='TASKMGMTINSTANCE_' type='BIGINT'/>
+		<column name='VERSION_' type='BIGINT'/>
+		<column name='PROCINST_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_TASKINST_SLINST' table='JBPM_TASKINSTANCE' foreignTable='JBPM_SWIMLANEINSTANCE'>
+		<column name='SWIMLANINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASKINST_TASK' table='JBPM_TASKINSTANCE' foreignTable='JBPM_TASK'>
+		<column name='TASK_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASKINST_TMINST' table='JBPM_TASKINSTANCE' foreignTable='JBPM_MODULEINSTANCE'>
+		<column name='TASKMGMTINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TASKINST_TOKEN' table='JBPM_TASKINSTANCE' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<index name='IDX_TASK_ACTORID' table='JBPM_TASKINSTANCE' unique='false'>
+		<column name='ACTORID_'/>
+	</index>
+
+
+	<!-- TABLE JBPM_TIMER  -->
+
+	<table name='JBPM_TIMER'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='DUEDATE_' type='TIMESTAMP'/>
+		<column name='REPEAT_' type='VARCHAR' length='255'/>
+		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
+		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ACTION_' type='BIGINT'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+		<column name='GRAPHELEMENTTYPE_' type='VARCHAR' length='255'/>
+		<column name='GRAPHELEMENT_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_TIMER_ACTION' table='JBPM_TIMER' foreignTable='JBPM_ACTION'>
+		<column name='ACTION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TIMER_PRINST' table='JBPM_TIMER' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TIMER_TOKEN' table='JBPM_TIMER' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TIMER_TSKINST' table='JBPM_TIMER' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_TOKEN  -->
+
+	<table name='JBPM_TOKEN'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='VERSION_' type='BIGINT' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='START_' type='TIMESTAMP'/>
+		<column name='END_' type='TIMESTAMP'/>
+		<column name='NODEENTER_' type='TIMESTAMP'/>
+		<column name='NEXTLOGINDEX_' type='BIGINT'/>
+		<column name='ISABLETOREACTIVATEPARENT_' type='SMALLINT'/>
+		<column name='ISTERMINATIONIMPLICIT_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='NODE_' type='BIGINT'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='PARENT_' type='BIGINT'/>
+		<column name='SUBPROCESSINSTANCE_' type='BIGINT'/>
+		<column name='LOCK_' type='VARCHAR' length='255'/>
+	</table>
+
+	<foreignKey name='FK_TOKEN_NODE' table='JBPM_TOKEN' foreignTable='JBPM_NODE'>
+		<column name='NODE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TOKEN_PARENT' table='JBPM_TOKEN' foreignTable='JBPM_TOKEN'>
+		<column name='PARENT_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TOKEN_PROCINST' table='JBPM_TOKEN' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TOKEN_SUBPI' table='JBPM_TOKEN' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='SUBPROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_TOKENVARIABLEMAP  -->
+
+	<table name='JBPM_TOKENVARIABLEMAP'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='CONTEXTINSTANCE_' type='BIGINT'/>
+		<column name='VERSION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_TKVARMAP_CTXT' table='JBPM_TOKENVARIABLEMAP' foreignTable='JBPM_MODULEINSTANCE'>
+		<column name='CONTEXTINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TKVARMAP_TOKEN' table='JBPM_TOKENVARIABLEMAP' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+	<!-- TABLE JBPM_TRANSITION  -->
+
+	<table name='JBPM_TRANSITION'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='PROCESSDEFINITION_' type='BIGINT'/>
+		<column name='FROM_' type='BIGINT'/>
+		<column name='TO_' type='BIGINT'/>
+		<column name='FROMINDEX_' type='BIGINT'/>
+		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
+		<column name='CONDITION_' type='VARCHAR' length='255'/>
+	</table>
+
+	<foreignKey name='FK_TRANSITION_FROM' table='JBPM_TRANSITION' foreignTable='JBPM_NODE'>
+		<column name='FROM_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TRANSITION_TO' table='JBPM_TRANSITION' foreignTable='JBPM_NODE'>
+		<column name='TO_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_TRANS_PROCDEF' table='JBPM_TRANSITION' foreignTable='JBPM_PROCESSDEFINITION'>
+		<column name='PROCESSDEFINITION_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_VARIABLEACCESS  -->
+
+	<table name='JBPM_VARIABLEACCESS'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='VARIABLENAME_' type='VARCHAR' length='255'/>
+		<column name='ACCESS_' type='VARCHAR' length='255'/>
+		<column name='MAPPEDNAME_' type='VARCHAR' length='255'/>
+		<column name='PROCESSSTATE_' type='BIGINT'/>
+		<column name='TASKCONTROLLER_' type='BIGINT'/>
+		<column name='INDEX_' type='BIGINT'/>
+		<column name='SCRIPT_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_VARACC_PROCST' table='JBPM_VARIABLEACCESS' foreignTable='JBPM_NODE'>
+		<column name='PROCESSSTATE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VARACC_SCRIPT' table='JBPM_VARIABLEACCESS' foreignTable='JBPM_ACTION'>
+		<column name='SCRIPT_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VARACC_TSKCTRL' table='JBPM_VARIABLEACCESS' foreignTable='JBPM_TASKCONTROLLER'>
+		<column name='TASKCONTROLLER_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	
+	<!-- TABLE JBPM_VARIABLEINSTANCE  -->
+
+	<table name='JBPM_VARIABLEINSTANCE'>
+		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
+		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
+		<column name='NAME_' type='VARCHAR' length='255'/>
+		<column name='CONVERTER_' type='CHAR' length='1'/>
+		<column name='TOKEN_' type='BIGINT'/>
+		<column name='TOKENVARIABLEMAP_' type='BIGINT'/>
+		<column name='PROCESSINSTANCE_' type='BIGINT'/>
+		<column name='BYTEARRAYVALUE_' type='BIGINT'/>
+		<column name='DATEVALUE_' type='TIMESTAMP'/>
+		<column name='DOUBLEVALUE_' type='DOUBLE'/>
+		<column name='LONGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='LONGVALUE_' type='BIGINT'/>
+		<column name='STRINGIDCLASS_' type='VARCHAR' length='255'/>
+		<column name='STRINGVALUE_' type='VARCHAR' length='2048'/>
+		<column name='TASKINSTANCE_' type='BIGINT'/>
+		<column name='VERSION_' type='BIGINT'/>
+	</table>
+
+	<foreignKey name='FK_BYTEINST_ARRAY' table='JBPM_VARIABLEINSTANCE' foreignTable='JBPM_BYTEARRAY'>
+		<column name='BYTEARRAYVALUE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VARINST_PRCINST' table='JBPM_VARIABLEINSTANCE' foreignTable='JBPM_PROCESSINSTANCE'>
+		<column name='PROCESSINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VARINST_TK' table='JBPM_VARIABLEINSTANCE' foreignTable='JBPM_TOKEN'>
+		<column name='TOKEN_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VARINST_TKVARMP' table='JBPM_VARIABLEINSTANCE' foreignTable='JBPM_TOKENVARIABLEMAP'>
+		<column name='TOKENVARIABLEMAP_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+	<foreignKey name='FK_VAR_TSKINST' table='JBPM_VARIABLEINSTANCE' foreignTable='JBPM_TASKINSTANCE'>
+		<column name='TASKINSTANCE_'/>
+		<foreignColumn name='ID_'/>
+	</foreignKey>
+
+
+</database>
+

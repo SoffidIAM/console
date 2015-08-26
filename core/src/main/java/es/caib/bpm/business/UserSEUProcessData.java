@@ -1,18 +1,19 @@
 package es.caib.bpm.business;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.BpmUserProcess;
+import com.soffid.iam.service.UserService;
+
+import es.caib.bpm.config.BpmServiceLocator;
+import es.caib.bpm.process.UserProcessData;
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.context.exe.VariableInstance;
 import org.jbpm.graph.exe.ProcessInstance;
-
-import es.caib.bpm.config.BpmServiceLocator;
-import es.caib.bpm.process.UserProcessData;
-import es.caib.seycon.ng.comu.UsuariWFProcess;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.UsuariService;
-
 
 public class UserSEUProcessData extends UserProcessData {
 
@@ -27,23 +28,21 @@ public class UserSEUProcessData extends UserProcessData {
 		try { // cridat onPreUpdate PER A TOT ProcessInstance
 				// Marquem com a finalitzat el procés
 
-			UsuariService usuariService = BpmServiceLocator.instance().getUsuariService();
+			UserService usuariService = ServiceLocator.instance().getUserService();
 
 			if (pi != null) {
 				// Cerquem si existeix aquest procés a la bbdd
-				Collection<UsuariWFProcess> procesosExistents = usuariService.findProcessosWFUsuariByIdProces(pi.getId());
+				Collection<BpmUserProcess> procesosExistents = usuariService.findBpmUserProcessByProcessId(pi.getId());
 				if (procesosExistents != null && procesosExistents.size() > 0) {
 					// Si el procés està finalitzat: actualitzem els existents
 					if (pi.hasEnded()) {
 						// Ja existeix: els marquem tots (en principi només existirà 1)
-						for (UsuariWFProcess procesUsuari : procesosExistents) {
-							if (!procesUsuari.getFinalitzat()) {
-								// Ho marquem com a finalitzat
-								procesUsuari.setFinalitzat(pi.hasEnded());
-								// I ho actualitzem
-								usuariService.update(procesUsuari);
-							}
-						}
+						for (BpmUserProcess procesUsuari : procesosExistents) {
+                            if (!procesUsuari.getTerminated()) {
+                                procesUsuari.setTerminated(pi.hasEnded());
+                                usuariService.update(procesUsuari);
+                            }
+                        }
 					}
 				}
 
@@ -84,34 +83,32 @@ public class UserSEUProcessData extends UserProcessData {
 		try {
 			if (variableInstance != null && variableInstance.getProcessInstance() != null) {
 				ProcessInstance pi = variableInstance.getProcessInstance();
-				UsuariService usuariService = BpmServiceLocator.instance().getUsuariService();
+				UserService usuariService = ServiceLocator.instance().getUserService();
 
 				// Cerquem si ja existeix aquest procés a la bbdd (UPDATE)
-				Collection<UsuariWFProcess> procesosExistents = usuariService.findProcessosWFUsuariByIdProces(pi.getId());
+				Collection<BpmUserProcess> procesosExistents = usuariService.findBpmUserProcessByProcessId(pi.getId());
 				if (procesosExistents != null && procesosExistents.size() > 0) {
-					for (UsuariWFProcess procesUsuari : procesosExistents) {
-						if ("nif".equals(variableInstance.getName())) { //$NON-NLS-1$
-							procesUsuari.setNifUsuari((String) variableInstance.getValue());
-							// I ho actualitzem
-							usuariService.update(procesUsuari);
-						} else if ("codiUsuari".equals(variableInstance.getName())) { //$NON-NLS-1$
-							procesUsuari.setCodiUsuari((String) variableInstance.getValue());
-							// I ho actualitzem
-							usuariService.update(procesUsuari);
-						}
-					}
+					for (BpmUserProcess procesUsuari : procesosExistents) {
+                        if ("nif".equals(variableInstance.getName())) {
+                            procesUsuari.setUserNationalId((String) variableInstance.getValue());
+                            usuariService.update(procesUsuari);
+                        } else if ("codiUsuari".equals(variableInstance.getName())) {
+                            procesUsuari.setUserCode((String) variableInstance.getValue());
+                            usuariService.update(procesUsuari);
+                        }
+                    }
 				} else {
 					// Hem de crear una nova instància
 					// Creem un de nou: encara no existeix
-					UsuariWFProcess nouProces = new UsuariWFProcess();
-					nouProces.setIdProces(pi.getId());
+					BpmUserProcess nouProces = new BpmUserProcess();
+					nouProces.setProcessId(pi.getId());
 					if ("nif".equals(variableInstance.getName())) { //$NON-NLS-1$
-						nouProces.setNifUsuari((String) variableInstance.getValue());
+						nouProces.setUserNationalId((String) variableInstance.getValue());
 					} else if ("codiUsuari".equals(variableInstance.getName())) { //$NON-NLS-1$
-						nouProces.setCodiUsuari((String) variableInstance.getValue());
+						nouProces.setUserCode((String) variableInstance.getValue());
 					}
 					// Ho marquem com a finalitzat (si cal..)
-					nouProces.setFinalitzat(pi.hasEnded());
+					nouProces.setTerminated(pi.hasEnded());
 					// I ho creem
 					usuariService.create(nouProces);
 
@@ -127,18 +124,16 @@ public class UserSEUProcessData extends UserProcessData {
 	public void deleteProcessInstance(ProcessInstance pi) throws Exception {
 		// Esborrem tota l'informació d'aquest procés
 		try { // cridat onPreUpdate PER A TOT ProcessInstance
-
-			UsuariService usuariService = BpmServiceLocator.instance().getUsuariService();
+			UserService usuariService = ServiceLocator.instance().getUserService();
 
 			if (pi != null) {
 				// Cerquem les dades d'aquest procés
-				Collection<UsuariWFProcess> procesosExistents = usuariService.findProcessosWFUsuariByIdProces(pi.getId());
+				Collection<BpmUserProcess> procesosExistents = usuariService.findBpmUserProcessByProcessId(pi.getId());
 				if (procesosExistents != null) {
 					// Si el procés està finalitzat: actualitzem els existents
-					for (UsuariWFProcess procesUsuari : procesosExistents) {
-						// l'esborrem
-						usuariService.delete(procesUsuari);
-					}
+					for (BpmUserProcess procesUsuari : procesosExistents) {
+                        usuariService.delete(procesUsuari);
+                    }
 				}
 			}
 

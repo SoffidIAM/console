@@ -5,10 +5,7 @@
 
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
-import es.caib.seycon.ng.comu.ObjectMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import com.soffid.iam.api.ObjectMappingProperty;
 
 /**
  * DAO ObjectMappingPropertyEntity implementation

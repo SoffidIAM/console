@@ -15,7 +15,6 @@ import org.zkoss.util.resource.Labels;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.DadesAddicionalsServiceImpl;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
 import es.caib.seycon.ng.servei.ejb.UsuariService;

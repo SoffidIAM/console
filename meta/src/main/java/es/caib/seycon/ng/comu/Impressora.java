@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Printer",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Impressora {
+public class Impressora {
 
 	@Nullable
 	public java.lang.String model;

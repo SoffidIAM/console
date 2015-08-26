@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="PrinterGroup",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class GrupImpressora {
+public class GrupImpressora {
 
 	@Attribute(translated = "enabledByDefault" )
 	public java.lang.Boolean perDefecte;

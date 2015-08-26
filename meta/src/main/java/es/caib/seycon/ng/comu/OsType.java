@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="OsType",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class OsType {
+public class OsType {
 
 	@Nullable
 	public java.lang.Long id;

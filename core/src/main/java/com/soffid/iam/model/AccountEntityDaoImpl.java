@@ -1,23 +1,22 @@
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.sync.engine.TaskHandler;
 
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
@@ -36,15 +35,15 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 	{
 
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio(accio);
+		Audit auditoria = new Audit();
+		auditoria.setAction(accio);
 		auditoria.setAccount(account);
-		auditoria.setBbdd(dispatcher);
-		auditoria.setAutor(codiUsuari);
+		auditoria.setDatabase(dispatcher);
+		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-		auditoria.setObjecte("SC_ACCOUN"); //$NON-NLS-1$
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_ACCOUN"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 
@@ -101,43 +100,34 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
 		// Missing attribute grantedGroups on entity
 		// Missing attribute grantedUsers on entity
 		// Missing attribute grantedRoles on entity
-		target.setDispatcher(source.getSystem().getName());
-		Collection<Grup> grups = new LinkedList<Grup>();
-		Collection<Rol> roles = new LinkedList<Rol>();
-		Collection<Usuari> usuaris = new LinkedList<Usuari>();
-		Collection<Grup> managerGrups = new LinkedList<Grup>();
-		Collection<Rol> managerRoles = new LinkedList<Rol>();
-		Collection<Usuari> managerUsers = new LinkedList<Usuari>();
-		Collection<Grup> ownerGrups = new LinkedList<Grup>();
-		Collection<Rol> ownerRoles = new LinkedList<Rol>();
-		Collection<Usuari> ownerUsers = new LinkedList<Usuari>();
+		target.setSystem(source.getSystem().getName());
+		Collection<Group> grups = new LinkedList<Group>();
+		Collection<Role> roles = new LinkedList<Role>();
+		Collection<User> usuaris = new LinkedList<User>();
+		Collection<Group> managerGrups = new LinkedList<Group>();
+		Collection<Role> managerRoles = new LinkedList<Role>();
+		Collection<User> managerUsers = new LinkedList<User>();
+		Collection<Group> ownerGrups = new LinkedList<Group>();
+		Collection<Role> ownerRoles = new LinkedList<Role>();
+		Collection<User> ownerUsers = new LinkedList<User>();
 		if ( source.getType().equals (AccountType.USER))
 		{
 			for (com.soffid.iam.model.UserAccountEntity uae : source.getUsers()) {
-                ownerUsers.add(getUserEntityDao().toUsuari(uae.getUser()));
+                ownerUsers.add(getUserEntityDao().toUser(uae.getUser()));
             }
 		}
 		else
 		{
 			for (com.soffid.iam.model.AccountAccessEntity acl : source.getAcl()) {
-                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) 
-                	grups.add(getGroupEntityDao().toGrup(acl.getGroup()));
-                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) 
-                	roles.add(getRoleEntityDao().toRol(acl.getRole()));
-                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) 
-                	usuaris.add(getUserEntityDao().toUsuari(acl.getUser()));
-                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER))
-                	managerGrups.add(getGroupEntityDao().toGrup(acl.getGroup()));
-                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER)) 
-                	managerRoles.add(getRoleEntityDao().toRol(acl.getRole()));
-                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER)) 
-                	managerUsers.add(getUserEntityDao().toUsuari(acl.getUser()));
-                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) 
-                	ownerGrups.add(getGroupEntityDao().toGrup(acl.getGroup()));
-                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) 
-                	ownerRoles.add(getRoleEntityDao().toRol(acl.getRole()));
-                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) 
-                	ownerUsers.add(getUserEntityDao().toUsuari(acl.getUser()));
+                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) roles.add(getRoleEntityDao().toRole(acl.getRole()));
+                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_USER)) usuaris.add(getUserEntityDao().toUser(acl.getUser()));
+                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER)) managerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER)) managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER)) managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+                if (acl.getGroup() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+                if (acl.getRole() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+                if (acl.getUser() != null & acl.getLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER)) ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
             }
 		}
 		target.setGrantedGroups(grups);
@@ -160,46 +150,30 @@ public class AccountEntityDaoImpl extends com.soffid.iam.model.AccountEntityDaoB
             }
 		}
 		target.setAttributes(new HashMap<String, Object>());
-		for ( AccountAttributeEntity att: source.getAttributes())
-		{
-			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
-			if (vd.getValorDadaDate() != null)
-				target.getAttributes().put(vd.getCodiDada(), vd.getValorDadaDate());
-			else if (vd.getValorDada() != null)
-				target.getAttributes().put(vd.getCodiDada(), vd.getValorDada());
-		}
+		for (AccountAttributeEntity att : source.getAttributes()) {
+            UserData vd = getAccountAttributeEntityDao().toUserData(att);
+            if (vd.getDateValue() != null) target.getAttributes().put(vd.getAttribute(), vd.getDateValue()); else if (vd.getValue() != null) target.getAttributes().put(vd.getAttribute(), vd.getValue());
+        }
 		
 		HashMap<String, Object> atts = new HashMap<String, Object>();
 		target.setAttributes(atts);
 		// Now assign attributes
-		for ( AccountAttributeEntity att: source.getAttributes())
-		{
-			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
-			if (vd.getBlobDataValue() != null)
-				atts.put(vd.getCodiDada(), vd.getBlobDataValue());
-			else if (vd.getValorDadaDate() != null)
-				atts.put(vd.getCodiDada(), vd.getValorDadaDate());
-			else if (vd.getValorDada() != null)
-				atts.put(vd.getCodiDada(), vd.getValorDada());
-		}
+		for (AccountAttributeEntity att : source.getAttributes()) {
+            UserData vd = getAccountAttributeEntityDao().toUserData(att);
+            if (vd.getBlobDataValue() != null) atts.put(vd.getAttribute(), vd.getBlobDataValue()); else if (vd.getDateValue() != null) atts.put(vd.getAttribute(), vd.getDateValue()); else if (vd.getValue() != null) atts.put(vd.getAttribute(), vd.getValue());
+        }
 	}
 
 	@Override
     public void accountToEntity(Account source, com.soffid.iam.model.AccountEntity target, boolean copyIfNull) {
 		super.accountToEntity(source, target, copyIfNull);
-		SystemEntity dispatcher = getSystemEntityDao().findByName(source.getDispatcher());
+		SystemEntity dispatcher = getSystemEntityDao().findByName(source.getSystem());
 		if (dispatcher == null)
-			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongDispatcher"),  //$NON-NLS-1$
-					source.getDispatcher(),
-					source.getName(),
-					source.getDispatcher()));
+			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongDispatcher"), source.getSystem(), source.getName(), source.getSystem()));
 		target.setSystem(dispatcher);
 		UserTypeEntity tipus = getUserTypeEntityDao().findByName(source.getPasswordPolicy());
 		if (tipus == null)
-			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongPassword"),  //$NON-NLS-1$
-					source.getPasswordPolicy(),
-					source.getName(),
-					source.getDispatcher()));
+			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongPassword"), source.getPasswordPolicy(), source.getName(), source.getSystem()));
 		target.setPasswordPolicy(tipus);
 	}
 

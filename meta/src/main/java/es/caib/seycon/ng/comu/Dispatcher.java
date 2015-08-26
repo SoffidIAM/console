@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="System",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Dispatcher {
+public class Dispatcher {
 
 	@Attribute(translated = "name" )
 	public java.lang.String codi;

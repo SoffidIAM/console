@@ -7,11 +7,14 @@
 package es.caib.seycon.ng.servei.workflow;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.ConfiguracioService;
+import es.caib.seycon.ng.servei.UsuariService;
+
 import org.springframework.transaction.annotation.Transactional;
 
-@Service (translatedName="ServerService",
+@Service (translatedName="ServerLookupService",
 	translatedPackage="com.soffid.iam.service.workflow")
-@Depends ({es.caib.seycon.ng.servei.XarxaService.class})
+@Depends ({es.caib.seycon.ng.servei.XarxaService.class, UsuariService.class, ConfiguracioService.class})
 public abstract class ServidorsService {
 
 	@Operation (translated="getMailServers")

@@ -8,12 +8,15 @@ package es.caib.seycon.ng.model;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.XarxaService;
+
 @Entity(table = "SC_GRUIMP", translatedName = "PrinterGroupEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({ es.caib.seycon.ng.comu.GrupImpressora.class,
 		es.caib.seycon.ng.model.ImpressoraEntity.class,
 		es.caib.seycon.ng.model.GrupEntity.class,
 		es.caib.seycon.ng.model.AuditoriaEntity.class,
-		es.caib.seycon.ng.model.TasqueEntity.class })
+		es.caib.seycon.ng.model.TasqueEntity.class,
+		XarxaService.class})
 public abstract class GrupImpressoraEntity {
 
 	@Column(name = "GIM_ORDRE", translated = "order")

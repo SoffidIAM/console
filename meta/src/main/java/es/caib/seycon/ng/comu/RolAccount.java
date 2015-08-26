@@ -13,7 +13,7 @@ import es.caib.seycon.ng.model.GrupEntity;
 
 @ValueObject ( translatedName="RoleAccount",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class RolAccount {
+public class RolAccount {
 
 	@Nullable
 	public java.lang.Long accountId;
@@ -33,7 +33,7 @@ public abstract class RolAccount {
 	public java.lang.String roleCategory;
 
 	@Nullable
-	@Attribute(translated = "applicationCode" )
+	@Attribute(translated = "informationSystemName" )
 	public java.lang.String codiAplicacio;
 
 	@Nullable

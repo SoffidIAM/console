@@ -7,14 +7,17 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.HostAlias;
 import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
-import es.caib.seycon.ng.comu.AliasMaquina;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import java.util.Collection;
 import java.util.Iterator;
@@ -59,13 +62,13 @@ public class HostAliasEntityDaoImpl
 		}
 	}
 	
-	public HostAliasEntity aliasMaquinaToEntity(AliasMaquina aliasMaquina) {
+	public HostAliasEntity hostAliasToEntity(HostAlias aliasMaquina) {
 		HostAliasEntity entity = loadAliasMaquinaEntityFromAliasMaquina(aliasMaquina);
-		this.aliasMaquinaToEntity(aliasMaquina, entity, true);
+		this.hostAliasToEntity(aliasMaquina, entity, true);
 		return entity;
 	}
 	
-	private HostAliasEntity loadAliasMaquinaEntityFromAliasMaquina(AliasMaquina aliasMaquina) {
+	private HostAliasEntity loadAliasMaquinaEntityFromAliasMaquina(HostAlias aliasMaquina) {
 		
 		HostAliasEntity aliasMaquinaEntity = null;
 		if (aliasMaquina.getId() != null) {
@@ -79,31 +82,31 @@ public class HostAliasEntityDaoImpl
 	}	
 
 
-	public void aliasMaquinaToEntity(AliasMaquina source, HostAliasEntity target, boolean copyIfNull) {
-		super.aliasMaquinaToEntity(source, target, copyIfNull);
+	public void hostAliasToEntity(HostAlias source, HostAliasEntity target, boolean copyIfNull) {
+		super.hostAliasToEntity(source, target, copyIfNull);
 		aliasMaquinaToEntityCustom(source, target);
 	}
 
-	public void toAliasMaquina(HostAliasEntity source, AliasMaquina target) {
-		super.toAliasMaquina(source, target);
+	public void toHostAlias(HostAliasEntity source, HostAlias target) {
+		super.toHostAlias(source, target);
 		toAliasMaquinaCustom(source, target);
 	}
 
 
-	private void toAliasMaquinaCustom(HostAliasEntity entity, AliasMaquina targetVO) {
-		targetVO.setIdMaquina(entity.getHost().getId());
-		targetVO.setNomMaquina(entity.getHost().getName());
+	private void toAliasMaquinaCustom(HostAliasEntity entity, HostAlias targetVO) {
+		targetVO.setHostId(entity.getHost().getId());
+		targetVO.setHostName(entity.getHost().getName());
 	}
 
-	private void aliasMaquinaToEntityCustom(AliasMaquina sourceVO, HostAliasEntity entity) {
+	private void aliasMaquinaToEntityCustom(HostAlias sourceVO, HostAliasEntity entity) {
 		// Ponemos la máquina que corresponde
 		HostEntity maquina = null;
 		// Si es nuevo el id puede ser nulo 
-		if (sourceVO.getIdMaquina()!=null) {
-			maquina = getHostEntityDao().findById(sourceVO.getIdMaquina());
+		if (sourceVO.getHostId() != null) {
+			maquina = getHostEntityDao().findById(sourceVO.getHostId());
 		} 
-		if (maquina==null && sourceVO.getNomMaquina()!=null) {
-			maquina = getHostEntityDao().findByName(sourceVO.getNomMaquina());
+		if (maquina == null && sourceVO.getHostName() != null) {
+			maquina = getHostEntityDao().findByName(sourceVO.getHostName());
 		}
 		entity.setHost(maquina);
 	}

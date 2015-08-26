@@ -1,5 +1,10 @@
 package es.caib.seycon.ng.ui;
 
+import com.soffid.iam.api.SyncAgentTaskLog;
+import com.soffid.iam.service.ejb.SyncServerServiceHome;
+
+import es.caib.seycon.ng.ui.SeyconTask.Estat;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -12,11 +17,6 @@ import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-
-import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
-import es.caib.seycon.ng.servei.SeyconServerService;
-import es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome;
-import es.caib.seycon.ng.ui.SeyconTask.Estat;
 
 public class SeyconTaskRenderer implements ListitemRenderer {
 	
@@ -57,51 +57,33 @@ public class SeyconTaskRenderer implements ListitemRenderer {
 			}
 		} else {
 			// Iterem per la capçalera.. per no entrar en error
-			for (int i=0; i < getNumAgents(); i++) {
-				
-				if (i >= estatExecucio.length) {
-					Listcell c = new Listcell();
-					// Posem sclass per donar-li estils
-					c.setSclass("seycontask " + Estat.UNKNOWN); //$NON-NLS-1$
-					c.setLabel(Estat.UNKNOWN);
-					c.setParent(item);
-					
-				} else {
-					Listcell c = new Listcell();
-					c.setLabel(estatExecucio[i]);
-					// Posem sclass per donar-li estils
-					c.setSclass("seycontask " + estatExecucio[i]); //$NON-NLS-1$
-					c.setParent(item);
-					
-					if (estatExecucio[i].equals(Estat.ERROR) &&
-									t.getUrlAgent() != null)
-					{
-						c.setLabel(estatExecucio[i] + "*"); //$NON-NLS-1$
-						
-						String taskAgent = this.agentsHeader
-							.toArray()[i].toString();
-						
-						SeyconServerServiceHome home = (SeyconServerServiceHome) new InitialContext().lookup (SeyconServerServiceHome.JNDI_NAME);
-						es.caib.seycon.ng.servei.ejb.SeyconServerService svc = home.create();
-						Iterator<SeyconAgentTaskLog> taskIterator = svc
-							.getAgentTasks(t.getUrlAgent(), taskAgent).iterator();
-						
-						while (taskIterator.hasNext())
-						{
-							es.caib.seycon.ng.comu.SeyconAgentTaskLog log = taskIterator.next();
-							
-							if (log.getIdTasca().equals(t.getId()))
-							{
-								if (log.getStackTrace() != null && log.getStackTrace().length() > 0) 	
-									c.setTooltiptext(formatStackTrace(log.getStackTrace()));
-								else
-									c.setTooltiptext(""); //$NON-NLS-1$
-								c.setStyle("cursor: help;"); //$NON-NLS-1$
-							}
-						}
-					}
-				}
-			}
+			for (int i = 0; i < getNumAgents(); i++) {
+                if (i >= estatExecucio.length) {
+                    Listcell c = new Listcell();
+                    c.setSclass("seycontask " + Estat.UNKNOWN);
+                    c.setLabel(Estat.UNKNOWN);
+                    c.setParent(item);
+                } else {
+                    Listcell c = new Listcell();
+                    c.setLabel(estatExecucio[i]);
+                    c.setSclass("seycontask " + estatExecucio[i]);
+                    c.setParent(item);
+                    if (estatExecucio[i].equals(Estat.ERROR) && t.getUrlAgent() != null) {
+                        c.setLabel(estatExecucio[i] + "*");
+                        String taskAgent = this.agentsHeader.toArray()[i].toString();
+                        SyncServerServiceHome home = (SyncServerServiceHome) new InitialContext().lookup(SyncServerServiceHome.JNDI_NAME);
+                        com.soffid.iam.service.ejb.SyncServerService svc = home.create();
+                        Iterator<SyncAgentTaskLog> taskIterator = svc.getAgentTasks(t.getUrlAgent(), taskAgent).iterator();
+                        while (taskIterator.hasNext()) {
+                            com.soffid.iam.api.SyncAgentTaskLog log = taskIterator.next();
+                            if (log.getTaskId().equals(t.getId())) {
+                                if (log.getStackTrace() != null && log.getStackTrace().length() > 0) c.setTooltiptext(formatStackTrace(log.getStackTrace())); else c.setTooltiptext("");
+                                c.setStyle("cursor: help;");
+                            }
+                        }
+                    }
+                }
+            }
 		}
 	}
 	

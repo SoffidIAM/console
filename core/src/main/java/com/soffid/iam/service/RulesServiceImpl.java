@@ -4,14 +4,17 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
 
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.model.RuleAssignedRoleEntity;
 import com.soffid.iam.model.RuleEntity;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.utils.Security;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -138,27 +141,27 @@ public class RulesServiceImpl extends RulesServiceBase
 
     private void auditRule(String accio, RuleEntity rule) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
         auditoria.setRule(rule.getDescription());
-        auditoria.setAutor(codiUsuari);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
-        auditoria.setObjecte("SC_RULE"); //$NON-NLS-1$
-        getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(auditoria));
+        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
+        auditoria.setObject("SC_RULE"); //$NON-NLS-1$
+        getAuditEntityDao().create(getAuditEntityDao().auditToEntity(auditoria));
     }
 
     private void auditRuleRole(String accio, RuleAssignedRoleEntity role) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
         auditoria.setRule(role.getRule().getDescription());
-        auditoria.setRol(role.getRole().getName());
-        auditoria.setBbdd(role.getRole().getSystem().getName());
-        auditoria.setAutor(codiUsuari);
+        auditoria.setRole(role.getRole().getName());
+        auditoria.setDatabase(role.getRole().getSystem().getName());
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(Calendar.getInstance().getTime()));
-        auditoria.setObjecte("SC_RULROL"); //$NON-NLS-1$
-        getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(auditoria));
+        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
+        auditoria.setObject("SC_RULROL"); //$NON-NLS-1$
+        getAuditEntityDao().create(getAuditEntityDao().auditToEntity(auditoria));
     }
 }

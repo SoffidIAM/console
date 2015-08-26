@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ExternalName",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class CorreuExtern {
+public class CorreuExtern {
 
 	@Attribute(translated = "email" )
 	public java.lang.String adreca;

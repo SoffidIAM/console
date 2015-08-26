@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="GroupUser",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariGrup {
+public class UsuariGrup {
 
 	@Attribute(translated = "user" )
 	public java.lang.String codiUsuari;

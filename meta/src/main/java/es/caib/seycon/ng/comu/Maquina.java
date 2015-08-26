@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Host",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Maquina {
+public class Maquina {
 
 	@Nullable
 	public java.lang.Long id;

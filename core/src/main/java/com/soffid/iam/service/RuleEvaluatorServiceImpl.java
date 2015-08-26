@@ -4,13 +4,20 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+
+import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -24,25 +31,22 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.RolAccount;
-import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.Security;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -100,23 +104,23 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			// Now remove unneded roles
 			for (RoleAccountEntity role : roles) {
                 if (role.getRule() == rule) {
-                    RolAccount r = getRoleAccountEntityDao().toRolAccount(role);
-                    getAplicacioService().update(r);
+                    RoleAccount r = getRoleAccountEntityDao().toRoleAccount(role);
+                    getApplicationService().update(r);
                     raDao.remove(role);
-                    Tasca updateRole = new Tasca();
-                    updateRole.setTransa("UpdateRole");
-                    updateRole.setDataTasca(Calendar.getInstance());
+                    Task updateRole = new Task();
+                    updateRole.setTransaction("UpdateRole");
+                    updateRole.setTaskDate(Calendar.getInstance());
                     updateRole.setStatus("P");
-                    updateRole.setRole(r.getNomRol());
-                    updateRole.setBd(r.getBaseDeDades());
-                    TaskEntity tasca = getTaskEntityDao().tascaToEntity(updateRole);
+                    updateRole.setRole(r.getRoleName());
+                    updateRole.setDatabase(r.getSystem());
+                    TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
                     getTaskEntityDao().create(tasca);
-                    Tasca updateUser = new Tasca();
-                    updateUser.setTransa(TaskHandler.UPDATE_USER);
-                    updateUser.setDataTasca(Calendar.getInstance());
+                    Task updateUser = new Task();
+                    updateUser.setTransaction(TaskHandler.UPDATE_USER);
+                    updateUser.setTaskDate(Calendar.getInstance());
                     updateUser.setStatus("P");
-                    updateUser.setUsuari(user.getUserName());
-                    TaskEntity tasca2 = getTaskEntityDao().tascaToEntity(updateUser);
+                    updateUser.setUser(user.getUserName());
+                    TaskEntity tasca2 = getTaskEntityDao().taskToEntity(updateUser);
                     getTaskEntityDao().create(tasca2);
                 }
             }
@@ -168,27 +172,26 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		
 		// Second. Assign now
 		List<AccountEntity> accounts = getAccountsForRole(user, role);
-		RolAccount ra = generateRolAccount (rule, role, stringValue);
+		RoleAccount ra = generateRolAccount(rule, role, stringValue);
 		if (accounts.isEmpty())
 		{
-			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUsuari(user), getSystemEntityDao().toDispatcher(role.getSystem()), null);
+			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
 			ra.setAccountId(account.getId());
 			ra.setAccountName(account.getName());
 			Security.nestedLogin(Security.getCurrentAccount(), new String[] {
 				Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL
 			});
 			try {
-				getAplicacioService().create(ra);
+				getApplicationService().create(ra);
 			} finally {
 				Security.nestedLogoff();
 			}
 		} else {
-			for (AccountEntity account: accounts)
-			{
-				ra.setAccountId(account.getId());
-				ra.setAccountName(account.getName());
-				getAplicacioService().create(ra);
-			}
+			for (AccountEntity account : accounts) {
+                ra.setAccountId(account.getId());
+                ra.setAccountName(account.getName());
+                getApplicationService().create(ra);
+            }
 		}
 		
 	}
@@ -199,30 +202,30 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 * @param stringValue
 	 * @return
 	 */
-	private RolAccount generateRolAccount(RuleEntity rule, RoleEntity role, String stringValue) {
-		RolAccount ra = new RolAccount();
-        ra.setAccountDispatcher(role.getSystem().getName());
-        ra.setBaseDeDades(role.getSystem().getName());
-        ra.setCodiAplicacio(role.getInformationSystem().getName());
-        ra.setNomRol(role.getName());
+	private RoleAccount generateRolAccount(RuleEntity rule, RoleEntity role, String stringValue) {
+		RoleAccount ra = new RoleAccount();
+        ra.setAccountSystem(role.getSystem().getName());
+        ra.setSystem(role.getSystem().getName());
+        ra.setInformationSystemName(role.getInformationSystem().getName());
+        ra.setRoleName(role.getName());
         ra.setRuleId(rule.getId());
         ra.setRuleDescription(rule.getDescription());
         if (stringValue != null)
         {
-        	ValorDomini vd = new ValorDomini();
-        	vd.setValor(stringValue);
-    		vd.setDescripcio("??"); //$NON-NLS-1$
+        	DomainValue vd = new DomainValue();
+        	vd.setValue(stringValue);
+    		vd.setDescription("??"); //$NON-NLS-1$
         	if (role.getApplicationDomain() != null)
         	{
-        		vd.setNomDomini(role.getApplicationDomain().getName());
-        		vd.setCodiExternDomini(role.getApplicationDomain().getName());
+        		vd.setDomainName(role.getApplicationDomain().getName());
+        		vd.setExternalCodeDomain(role.getApplicationDomain().getName());
         	} 
         	else if (role.getDomainType() != null)
         	{
-        		vd.setNomDomini(role.getDomainType());
-        		vd.setCodiExternDomini(role.getDomainType());
+        		vd.setDomainName(role.getDomainType());
+        		vd.setExternalCodeDomain(role.getDomainType());
         	}
-    		ra.setValorDomini(vd);
+    		ra.setDomainValue(vd);
         }
         return ra;
 	}
@@ -290,8 +293,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	private void addGroups(HashMap<String, Group> groups, GroupEntity grup) {
 		if (!groups.containsKey(grup.getName()))
 		{
-			Grup grupVO = getGroupEntityDao().toGrup(grup);
-			groups.put(grup.getName(), Group.toGroup(grupVO));
+			Group grupVO = getGroupEntityDao().toGroup(grup);
+			groups.put(grup.getName(), (grupVO));
 			if (grup.getParent() != null)
 				addGroups(groups, grup.getParent());	
 		}
@@ -314,8 +317,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		private HashMap<String, Group> groups;
 		
 		public InterpreterEnvironment(UserEntity user) {
-			Usuari usuariVO = getUserEntityDao().toUsuari(user);
-			userVO = User.toUser(usuariVO);
+			User usuariVO = getUserEntityDao().toUser(user);
+			userVO = (usuariVO);
 			
 			attributes = new HashMap<String, String>();
 			for (UserDataEntity dada : user.getUserData()) {

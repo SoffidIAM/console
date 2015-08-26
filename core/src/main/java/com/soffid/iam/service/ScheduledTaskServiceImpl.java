@@ -4,14 +4,17 @@
 /**
  * 
  */
+/**
+ * 
+ */
 package com.soffid.iam.service;
 
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
 import java.util.Calendar;
@@ -189,31 +192,31 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	private void reconfigureTasks () throws InternalErrorException
 	{
 		String timeStamp = Long.toString(System.currentTimeMillis());
-		Configuracio config = getConfiguracioService().findParametreByCodiAndCodiXarxa("soffid.schedule.timeStamp", null); //$NON-NLS-1$
+		Configuration config = getConfigurationService().findParameterByNameAndNetworkName("soffid.schedule.timeStamp", null); //$NON-NLS-1$
 		if (config == null)
 		{
-			config = new Configuracio();
-			config.setCodi("soffid.schedule.timeStamp"); //$NON-NLS-1$
-			config.setDescripcio("Task scheduler update time stamp"); //$NON-NLS-1$
-			config.setValor(timeStamp);
-			getConfiguracioService().create(config);
+			config = new Configuration();
+			config.setCode("soffid.schedule.timeStamp"); //$NON-NLS-1$
+			config.setDescription("Task scheduler update time stamp"); //$NON-NLS-1$
+			config.setValue(timeStamp);
+			getConfigurationService().create(config);
 		}
 		else
 		{
-			config.setValor(timeStamp);
-			getConfiguracioService().update(config);
+			config.setValue(timeStamp);
+			getConfigurationService().update(config);
 		}
 	}
 	
 	private void audit (String task, String action) throws InternalErrorException
 	{
-		Auditoria aud = new Auditoria ();
-		aud.setAccio(action);
-		aud.setObjecte("SC_SCHTAS"); //$NON-NLS-1$
+		Audit aud = new Audit();
+		aud.setAction(action);
+		aud.setObject("SC_SCHTAS"); //$NON-NLS-1$
 		aud.setScheduledTask(task);
-		aud.setAutor(Security.getCurrentAccount());
+		aud.setAuthor(Security.getCurrentAccount());
 		aud.setCalendar(Calendar.getInstance());
-		getAuditEntityDao().create(getAuditEntityDao().auditoriaToEntity(aud));
+		getAuditEntityDao().create(getAuditEntityDao().auditToEntity(aud));
 	}
 
 	/* (non-Javadoc)

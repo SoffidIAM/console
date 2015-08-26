@@ -18,7 +18,7 @@ public class SoDRoleEntityDaoImpl extends com.soffid.iam.model.SoDRoleEntityDaoB
 	@Override
     public void toSoDRole(com.soffid.iam.model.SoDRoleEntity source, SoDRole target) {
 		super.toSoDRole(source, target);
-		target.setRole(getRoleEntityDao().toRol(source.getRole()));
+		target.setRole(getRoleEntityDao().toRole(source.getRole()));
 		target.setRuleId(source.getRule().getId());
 	}
 

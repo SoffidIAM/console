@@ -10,7 +10,7 @@ public class Messages {
 
 	public static String getString(String key) {
 		try {
-            return es.caib.seycon.ng.comu.lang.MessageFactory.getString(BUNDLE_NAME, key);
+            return com.soffid.iam.lang.MessageFactory.getString(BUNDLE_NAME, key);
 		} catch (MissingResourceException e) {
 			return '!' + key + '!';
 		}

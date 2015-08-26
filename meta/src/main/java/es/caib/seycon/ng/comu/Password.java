@@ -1,5 +1,8 @@
 package es.caib.seycon.ng.comu;
 
-public class Password {
+import com.soffid.mda.annotation.ValueObject;
+
+@ValueObject(translatedName="Password", translatedPackage="com.soffid.iam.api")
+public abstract class Password {
 
 }

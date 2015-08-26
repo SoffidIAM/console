@@ -7,14 +7,16 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
-
-import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.ServiceEntity;
 import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
@@ -59,15 +61,15 @@ public class ServiceEntityDaoImpl extends
 		}
 	}
 
-	public void toServei(com.soffid.iam.model.ServiceEntity sourceEntity, es.caib.seycon.ng.comu.Servei targetVO) {
-		super.toServei(sourceEntity, targetVO);
+	public void toService(com.soffid.iam.model.ServiceEntity sourceEntity, com.soffid.iam.api.Service targetVO) {
+		super.toService(sourceEntity, targetVO);
 	}
 
 	/**
 	 * @see es.caib.seycon.ng.model.ServeiEntityDao#toServei(es.caib.seycon.ng.model.ServeiEntity)
 	 */
-	public es.caib.seycon.ng.comu.Servei toServei(final com.soffid.iam.model.ServiceEntity entity) {
-		return super.toServei(entity);
+	public com.soffid.iam.api.Service toService(final com.soffid.iam.model.ServiceEntity entity) {
+		return super.toService(entity);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class ServiceEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.ServiceEntity loadServeiEntityFromServei(es.caib.seycon.ng.comu.Servei servei) {
+	private com.soffid.iam.model.ServiceEntity loadServeiEntityFromServei(com.soffid.iam.api.Service servei) {
 		com.soffid.iam.model.ServiceEntity serveiEntity = null;
 		if (servei.getId() != null) {
 			serveiEntity = load(servei.getId());
@@ -89,9 +91,9 @@ public class ServiceEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.ServeiEntityDao#serveiToEntity(es.caib.seycon.ng.comu.Servei)
 	 */
-	public com.soffid.iam.model.ServiceEntity serveiToEntity(es.caib.seycon.ng.comu.Servei servei) {
+	public com.soffid.iam.model.ServiceEntity serviceToEntity(com.soffid.iam.api.Service servei) {
 		com.soffid.iam.model.ServiceEntity entity = this.loadServeiEntityFromServei(servei);
-		this.serveiToEntity(servei, entity, true);
+		this.serviceToEntity(servei, entity, true);
 		return entity;
 	}
 
@@ -99,8 +101,8 @@ public class ServiceEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.ServeiEntityDao#serveiToEntity(es.caib.seycon.ng.comu.Servei,
 	 *      es.caib.seycon.ng.model.ServeiEntity)
 	 */
-	public void serveiToEntity(es.caib.seycon.ng.comu.Servei sourceVO, com.soffid.iam.model.ServiceEntity targetEntity, boolean copyIfNull) {
-		super.serveiToEntity(sourceVO, targetEntity, copyIfNull);
+	public void serviceToEntity(com.soffid.iam.api.Service sourceVO, com.soffid.iam.model.ServiceEntity targetEntity, boolean copyIfNull) {
+		super.serviceToEntity(sourceVO, targetEntity, copyIfNull);
 	}
 
 	public void create(Collection entities) {

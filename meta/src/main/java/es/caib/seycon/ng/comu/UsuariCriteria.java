@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserCriteria",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class UsuariCriteria {
+public class UsuariCriteria {
 
 	@Nullable
 	@Attribute(translated = "userName" )
@@ -40,7 +40,7 @@ public abstract class UsuariCriteria {
 	public java.lang.Boolean actiu;
 
 	@Nullable
-	@Attribute(translated = "lastName2" )
+	@Attribute(translated = "middleName" )
 	public java.lang.String segonLlinatge;
 
 	@Nullable

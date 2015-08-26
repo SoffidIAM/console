@@ -9,9 +9,9 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Session",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Sessio {
+public class Sessio {
 
-	@Attribute(translated = "userCode" )
+	@Attribute(translated = "userName" )
 	public java.lang.String codiUsuari;
 
 	@Attribute(translated = "serverHostName" )
@@ -39,6 +39,7 @@ public abstract class Sessio {
 	public java.lang.String clau;
 
 	@Nullable
+	@Attribute(translated = "keepAliveDate" )
 	public java.util.Calendar dataKeepAlive;
 
 	@Nullable

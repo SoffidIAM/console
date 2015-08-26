@@ -5,11 +5,8 @@
  */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
 import com.soffid.iam.model.security.SecurityScopeEntity;
 
-import es.caib.seycon.net.RoleInfo;
 import es.caib.seycon.ng.utils.Security;
 
 /**

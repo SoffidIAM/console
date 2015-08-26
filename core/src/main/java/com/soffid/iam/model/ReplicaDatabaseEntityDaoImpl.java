@@ -5,10 +5,9 @@
 
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.ReplicaDatabase;
 import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.ReplicaDatabase;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.Security;
 
 /**

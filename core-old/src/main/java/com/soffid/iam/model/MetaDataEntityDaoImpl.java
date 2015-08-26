@@ -1,0 +1,165 @@
+// license-header java merge-point
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
+package com.soffid.iam.model;
+
+import es.caib.seycon.ng.model.*;
+
+import com.soffid.iam.model.MetaDataEntity;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.utils.ExceptionTranslator;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * @see es.caib.seycon.ng.model.TipusDadaEntity
+ */
+public class MetaDataEntityDaoImpl extends
+		com.soffid.iam.model.MetaDataEntityDaoBase {
+
+	public void create(com.soffid.iam.model.MetaDataEntity tipusDada) throws RuntimeException {
+		try {
+			super.create(tipusDada);
+			getSession(false).flush();
+		} catch (Throwable e) {
+			String message = ExceptionTranslator.translate(e);
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.0"), tipusDada.getName(), message));
+		}
+	}
+
+	public void remove(com.soffid.iam.model.MetaDataEntity tipusDada) throws RuntimeException {
+		try {
+			super.remove(tipusDada);
+			getSession(false).flush();
+		} catch (Throwable e) {
+			String message = ExceptionTranslator.translate(e);
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.1"), tipusDada.getName(), message));
+		}
+	}
+
+	public void toTipusDada(com.soffid.iam.model.MetaDataEntity sourceEntity, es.caib.seycon.ng.comu.TipusDada targetVO) {
+		super.toTipusDada(sourceEntity, targetVO);
+		if (sourceEntity.getLabel() == null)
+			targetVO.setLabel(sourceEntity.getName());
+		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)
+			targetVO.setValues ( new LinkedList<String>() );
+		else
+		{
+			List<String> values = new LinkedList<String>();
+			for (String s: sourceEntity.getValues().split(" "))
+			{
+				try
+				{
+					values.add (URLDecoder.decode(s, "UTF-8"));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException (e);
+				}
+			}
+			targetVO.setValues(values);
+		}
+	}
+
+	/**
+	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#toTipusDada(es.caib.seycon.ng.model.TipusDadaEntity)
+	 */
+	public es.caib.seycon.ng.comu.TipusDada toTipusDada(final com.soffid.iam.model.MetaDataEntity entity) {
+		return super.toTipusDada(entity);
+	}
+
+	/**
+	 * Retrieves the entity object that is associated with the specified value
+	 * object from the object store. If no such entity object exists in the
+	 * object store, a new, blank entity is created
+	 */
+	private com.soffid.iam.model.MetaDataEntity loadTipusDadaEntityFromTipusDada(es.caib.seycon.ng.comu.TipusDada tipusDada) {
+		MetaDataEntity tipusDadaEntity = null;
+		if (tipusDada.getId() != null) {
+			tipusDadaEntity = load(tipusDada.getId());
+		}
+		if (tipusDadaEntity == null) {
+			return newMetaDataEntity();
+		}
+		return tipusDadaEntity;
+	}
+
+	/**
+	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada)
+	 */
+	public com.soffid.iam.model.MetaDataEntity tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada tipusDada) {
+		com.soffid.iam.model.MetaDataEntity entity = this.loadTipusDadaEntityFromTipusDada(tipusDada);
+		this.tipusDadaToEntity(tipusDada, entity, true);
+		return entity;
+	}
+
+	/**
+	 * @see es.caib.seycon.ng.model.TipusDadaEntityDao#tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada,
+	 *      es.caib.seycon.ng.model.TipusDadaEntity)
+	 */
+	public void tipusDadaToEntity(es.caib.seycon.ng.comu.TipusDada sourceVO, com.soffid.iam.model.MetaDataEntity targetEntity, boolean copyIfNull) {
+		super.tipusDadaToEntity(sourceVO, targetEntity, copyIfNull);
+		if (sourceVO.getValues() == null || sourceVO.getValues().isEmpty())
+			targetEntity.setValues(null);
+		else
+		{
+			StringBuffer b = new StringBuffer();
+			for (String s: sourceVO.getValues())
+			{
+				if (b.length() > 0)
+					b.append (" ");
+				try
+				{
+					b.append (URLEncoder.encode(s, "UTF-8"));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException (e);
+				}
+			}
+			targetEntity.setValues(b.toString());
+		}
+	}
+	
+	public void create(Collection entities) {
+		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
+            Object obj = it.next();
+            if (obj instanceof MetaDataEntity) {
+                MetaDataEntity entity = (MetaDataEntity) obj;
+                this.create(entity);
+            }
+        }
+	}
+
+	public void update(Collection entities) {
+		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
+            Object obj = it.next();
+            if (obj instanceof MetaDataEntity) {
+                MetaDataEntity entity = (MetaDataEntity) obj;
+                this.update(entity);
+            }
+        }
+	}
+
+	public void remove(Collection entities) {
+		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
+            Object obj = it.next();
+            if (obj instanceof MetaDataEntity) {
+                MetaDataEntity entity = (MetaDataEntity) obj;
+                this.remove(entity);
+            }
+        }
+	}	
+
+}

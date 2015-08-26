@@ -3,8 +3,8 @@ package es.caib.seycon.ng.servei.impl;
 import com.soffid.iam.model.BlobConfigurationEntity;
 import com.soffid.iam.model.BlobConfigurationEntityDao;
 import com.soffid.iam.model.ServerPluginEntityDao;
+import com.soffid.iam.service.ConfigurationService;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ConfiguracioService;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +19,7 @@ import org.apache.axis.utils.ByteArrayOutputStream;
 
 public class PluginMerger {
     ServerPluginEntityDao pluginDao;
-    ConfiguracioService configuracio;
+    ConfigurationService configuracio;
     BlobConfigurationEntityDao blobConfigDao;
 
     public BlobConfigurationEntityDao getBlobConfigDao() {
@@ -38,11 +38,11 @@ public class PluginMerger {
         this.pluginDao = pluginDao;
     }
 
-    public ConfiguracioService getConfiguracio() {
+    public ConfigurationService getConfiguracio() {
         return configuracio;
     }
 
-    public void setConfiguracio(ConfiguracioService configuracio) {
+    public void setConfiguracio(ConfigurationService configuracio) {
         this.configuracio = configuracio;
     }
 

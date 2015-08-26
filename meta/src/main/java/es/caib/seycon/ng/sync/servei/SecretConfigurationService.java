@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( internal=true,
 	 serverOnly=true,
 	 translatedName="SecretConfigurationService",
-	 translatedPackage="es.caib.seycon.ng.sync.servei")
+	 translatedPackage="com.soffid.iam.sync.service")
 @Depends ({es.caib.seycon.ng.model.ServerEntity.class})
 public abstract class SecretConfigurationService {
 

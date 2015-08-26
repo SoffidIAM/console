@@ -1,14 +1,11 @@
 package es.caib.seycon.ng.comu.lang;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
-import org.zkoss.util.Locales;
 
 public class MessageFactory
 {

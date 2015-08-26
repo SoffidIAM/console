@@ -1,10 +1,13 @@
 package es.caib.bpm.index;
 
+import com.soffid.iam.bpm.BpmEngineImpl;
+import es.caib.bpm.entity.DBProperty;
+import es.caib.bpm.toolkit.EJBContainer;
+import es.caib.bpm.vo.ConfigParameterVO;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -14,11 +17,6 @@ import org.apache.lucene.util.Version;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jbpm.JbpmContext;
-
-import es.caib.bpm.entity.DBProperty;
-import es.caib.bpm.servei.BpmEngineImpl;
-import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.vo.ConfigParameterVO;
 
 public class DirectoryFactory {
 	private static Log logger = LogFactory.getLog(DirectoryFactory.class);

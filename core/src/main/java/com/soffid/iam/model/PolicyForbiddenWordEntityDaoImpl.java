@@ -7,16 +7,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
+
+import com.soffid.iam.api.ForbiddenWord;
+import com.soffid.iam.api.PasswordPolicy;
+import com.soffid.iam.model.ForbiddenWordEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 import es.caib.seycon.ng.model.*;
 
-import com.soffid.iam.model.ForbiddenWordEntity;
-import com.soffid.iam.model.PasswordPolicyEntity;
-import es.caib.seycon.ng.comu.ParaulaProhibida;
-import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @see es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity
@@ -27,20 +34,20 @@ public class PolicyForbiddenWordEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntityDao#toParaulaProhibidaPoliticaContrasenya(es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity, es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya)
      */
-    public void toParaulaProhibidaPoliticaContrasenya(com.soffid.iam.model.PolicyForbiddenWordEntity source, es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya target) {
+    public void toPasswordPolicyForbbidenWord(com.soffid.iam.model.PolicyForbiddenWordEntity source, com.soffid.iam.api.PasswordPolicyForbbidenWord target) {
         // @todo verify behavior of toParaulaProhibidaPoliticaContrasenya
-        super.toParaulaProhibidaPoliticaContrasenya(source, target);
+        super.toPasswordPolicyForbbidenWord(source, target);
         // WARNING! No conversion for target.paraulaProhibida (can't convert source.getParaulaProhibida():es.caib.seycon.ng.model.ParaulesProhibidesEntity to java.lang.String
         
         // Fem els canvis necessaris
         if (source.getForbiddenWord() != null) {
-        	ParaulaProhibida p = getForbiddenWordEntityDao().toParaulaProhibida(source.getForbiddenWord());
-        	target.setParaulaProhibida(p);
+        	ForbiddenWord p = getForbiddenWordEntityDao().toForbiddenWord(source.getForbiddenWord());
+        	target.setForbiddenWord(p);
         }
         
         if (source.getPasswordPolicy() != null) {
-        	PoliticaContrasenya pc = getPasswordPolicyEntityDao().toPoliticaContrasenya(source.getPasswordPolicy());
-        	target.setPoliticaContrasenyaDomini(pc);
+        	PasswordPolicy pc = getPasswordPolicyEntityDao().toPasswordPolicy(source.getPasswordPolicy());
+        	target.setPasswordDomainPolicy(pc);
         }
         
     }
@@ -49,9 +56,9 @@ public class PolicyForbiddenWordEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntityDao#toParaulaProhibidaPoliticaContrasenya(es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity)
      */
-    public es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya toParaulaProhibidaPoliticaContrasenya(final com.soffid.iam.model.PolicyForbiddenWordEntity entity) {
+    public com.soffid.iam.api.PasswordPolicyForbbidenWord toPasswordPolicyForbbidenWord(final com.soffid.iam.model.PolicyForbiddenWordEntity entity) {
         // @todo verify behavior of toParaulaProhibidaPoliticaContrasenya
-        return super.toParaulaProhibidaPoliticaContrasenya(entity);
+        return super.toPasswordPolicyForbbidenWord(entity);
     }
 
 
@@ -60,7 +67,7 @@ public class PolicyForbiddenWordEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.PolicyForbiddenWordEntity loadParaulaProhibidaPoliticaContrasenyaEntityFromParaulaProhibidaPoliticaContrasenya(es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenyaDomini) {
+    private com.soffid.iam.model.PolicyForbiddenWordEntity loadParaulaProhibidaPoliticaContrasenyaEntityFromParaulaProhibidaPoliticaContrasenya(com.soffid.iam.api.PasswordPolicyForbbidenWord paraulaProhibidaContrasenyaDomini) {
         com.soffid.iam.model.PolicyForbiddenWordEntity paraulaProhibidaContrasenyaDominiEntity = null;
         if (paraulaProhibidaContrasenyaDomini.getId() !=null) {
         	paraulaProhibidaContrasenyaDominiEntity = this.load(paraulaProhibidaContrasenyaDomini.getId());
@@ -76,10 +83,10 @@ public class PolicyForbiddenWordEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntityDao#paraulaProhibidaContrasenyaDominiToEntity(es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya)
      */
-    public com.soffid.iam.model.PolicyForbiddenWordEntity paraulaProhibidaPoliticaContrasenyaToEntity(es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya paraulaProhibidaContrasenyaDomini) {
+    public com.soffid.iam.model.PolicyForbiddenWordEntity passwordPolicyForbbidenWordToEntity(com.soffid.iam.api.PasswordPolicyForbbidenWord paraulaProhibidaContrasenyaDomini) {
         // @todo verify behavior of paraulaProhibidaContrasenyaDominiToEntity
         com.soffid.iam.model.PolicyForbiddenWordEntity entity = this.loadParaulaProhibidaPoliticaContrasenyaEntityFromParaulaProhibidaPoliticaContrasenya(paraulaProhibidaContrasenyaDomini);
-        this.paraulaProhibidaPoliticaContrasenyaToEntity(paraulaProhibidaContrasenyaDomini, entity, true);
+        this.passwordPolicyForbbidenWordToEntity(paraulaProhibidaContrasenyaDomini, entity, true);
         return entity;
     }
 
@@ -87,28 +94,28 @@ public class PolicyForbiddenWordEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntityDao#paraulaProhibidaContrasenyaDominiToEntity(es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya, es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity)
      */
-    public void paraulaProhibidaPoliticaContrasenyaToEntity(es.caib.seycon.ng.comu.ParaulaProhibidaPoliticaContrasenya source, com.soffid.iam.model.PolicyForbiddenWordEntity target, boolean copyIfNull) {
+    public void passwordPolicyForbbidenWordToEntity(com.soffid.iam.api.PasswordPolicyForbbidenWord source, com.soffid.iam.model.PolicyForbiddenWordEntity target, boolean copyIfNull) {
         // @todo verify behavior of paraulaProhibidaContrasenyaDominiToEntity
-        super.paraulaProhibidaPoliticaContrasenyaToEntity(source, target, copyIfNull);
+        super.passwordPolicyForbbidenWordToEntity(source, target, copyIfNull);
         
         // Fem els canvis necessaris
         //TODO: revisar
-        if (source.getParaulaProhibida()!=null) {
-        	ForbiddenWordEntity p = getForbiddenWordEntityDao().load(source.getParaulaProhibida().getId());
+        if (source.getForbiddenWord() != null) {
+        	ForbiddenWordEntity p = getForbiddenWordEntityDao().load(source.getForbiddenWord().getId());
         	if (p!=null) target.setForbiddenWord(p);
         }
         
-        if (source.getPoliticaContrasenyaDomini() !=null) {
-        	PoliticaContrasenya pcd = source.getPoliticaContrasenyaDomini();
+        if (source.getPasswordDomainPolicy() != null) {
+        	PasswordPolicy pcd = source.getPasswordDomainPolicy();
         	PasswordPolicyEntity pc = null;
         	if (pcd.getId()!=null) {
-        		pc = getPasswordPolicyEntityDao().load(source.getPoliticaContrasenyaDomini().getId());
+        		pc = getPasswordPolicyEntityDao().load(source.getPasswordDomainPolicy().getId());
         	} else {
-        		Collection<PasswordPolicyEntity> pcdc = getPasswordPolicyEntityDao().findByPasswordDomain(pcd.getCodiDominiContrasenya());
+        		Collection<PasswordPolicyEntity> pcdc = getPasswordPolicyEntityDao().findByPasswordDomain(pcd.getPasswordDomainCode());
         		boolean trobat = false;
         		if (pcdc!=null) for (Iterator<PasswordPolicyEntity> it = pcdc.iterator(); !trobat && it.hasNext(); ) {
                     PasswordPolicyEntity p = it.next();
-                    if (p.getUserType().getName().equals(pcd.getTipusUsuari())) {
+                    if (p.getUserType().getName().equals(pcd.getUserType())) {
                         trobat = true;
                         pc = p;
                     }
@@ -119,5 +126,6 @@ public class PolicyForbiddenWordEntityDaoImpl
         }
         
     }
+
 
 }

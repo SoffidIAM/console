@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 	 serverPath="SEU/SyncStatusService",
 	 serverRole="SEU_CONSOLE",
 	 translatedName="SyncStatusService",
-	 translatedPackage="es.caib.seycon.ng.sync.servei")
+	 translatedPackage="com.soffid.iam.sync.service")
 @Depends ({es.caib.seycon.ng.sync.servei.TaskGenerator.class,
 	es.caib.seycon.ng.sync.servei.TaskQueue.class,
 	es.caib.seycon.ng.sync.servei.SecretStoreService.class,
@@ -26,15 +26,20 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class SyncStatusService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Operation(translated="getSyncAgentsInfo")
 	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getSeyconAgentsInfo()
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation(translated="getSyncServerStatus")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerStatus()
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation(translated="getSyncServerInfo")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerInfo()
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {

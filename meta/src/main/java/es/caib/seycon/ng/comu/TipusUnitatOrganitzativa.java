@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="OUType",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class TipusUnitatOrganitzativa {
+public class TipusUnitatOrganitzativa {
 
 	@Attribute(translated = "code" )
 	public java.lang.String codi;

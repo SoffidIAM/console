@@ -41,7 +41,6 @@ import es.caib.seycon.ng.servei.DispatcherService;
 import es.caib.seycon.ng.servei.DominiUsuariService;
 import es.caib.seycon.ng.servei.GrupService;
 import es.caib.seycon.ng.servei.InternalPasswordService;
-import es.caib.seycon.ng.servei.InternalPasswordServiceImpl;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.PuntEntradaService;
 import es.caib.seycon.ng.servei.SeyconServiceLocator;
@@ -52,7 +51,7 @@ import es.caib.seycon.ng.utils.Security;
 public abstract class AbstractTest extends AbstractHibernateTest
 {
 
-	protected InternalPasswordServiceImpl ps;
+	protected InternalPasswordService ps;
 	protected ConfiguracioService configSvc;
 	protected AplicacioService appSvc;
 	protected DominiUsuariService dominiSvc;
@@ -89,7 +88,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		deleteDir (new File("target/docs"));
 		
 		
-		ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
 		ApplicationBootService bootSvc = (ApplicationBootService) context.getBean(ApplicationBootService.SERVICE_NAME);
 	

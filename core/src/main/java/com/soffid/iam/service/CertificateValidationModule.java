@@ -34,9 +34,7 @@ public interface CertificateValidationModule
 	 * @param certs 
 	 * @return 
 	 */
-	es.caib.seycon.ng.comu.Usuari getCertificateUser(
-		java.util.List<java.security.cert.X509Certificate> certs)
-			throws es.caib.seycon.ng.exception.InternalErrorException;
+	com.soffid.iam.api.User getCertificateUser(java.util.List<java.security.cert.X509Certificate> certs) throws es.caib.seycon.ng.exception.InternalErrorException;
 
 	/**
 	 * Operation getCertificateAccount
@@ -44,9 +42,7 @@ public interface CertificateValidationModule
 	 * @param certs 
 	 * @return 
 	 */
-	es.caib.seycon.ng.comu.Account getCertificateAccount(
-		java.util.List<java.security.cert.X509Certificate> certs)
-			throws es.caib.seycon.ng.exception.InternalErrorException;
+	com.soffid.iam.api.Account getCertificateAccount(java.util.List<java.security.cert.X509Certificate> certs) throws es.caib.seycon.ng.exception.InternalErrorException;
 
 
 }

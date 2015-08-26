@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Domain",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Domini {
+public class Domini {
 
 	@Nullable
 	@Description("Unique identifier")

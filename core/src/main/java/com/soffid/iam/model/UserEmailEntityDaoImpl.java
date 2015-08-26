@@ -7,21 +7,23 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
 
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.LlistaCorreuUsuari;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 
@@ -49,24 +51,23 @@ public class UserEmailEntityDaoImpl extends
      * @param dominiLlistaCorreu
      */
     private void auditarLlistaDeCorreuUsuari(String accio, UserEmailEntity llistaCorreuUsuari) {
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
         EmailListEntity llista = llistaCorreuUsuari.getMailList();
         if (llista != null) {
-            auditoria.setLlistaCorreu(llista.getName());
+            auditoria.setMailList(llista.getName());
             EmailDomainEntity domini = llista.getDomain();
             if (domini != null)
-                auditoria.setDominiCorreu(domini.getName());
+                auditoria.setMailDomain(domini.getName());
         }
         if (llistaCorreuUsuari.getUser() != null)
-            auditoria.setUsuari(llistaCorreuUsuari.getUser().getUserName());
-        auditoria.setAutor(Security.getCurrentAccount()); //$NON-NLS-1$
+            auditoria.setUser(llistaCorreuUsuari.getUser().getUserName());
+        auditoria.setAuthor(Security.getCurrentAccount()); //$NON-NLS-1$
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_USULCO"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_USULCO"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 
@@ -136,31 +137,31 @@ public class UserEmailEntityDaoImpl extends
         }
     }
 
-    public void toLlistaCorreuUsuari(com.soffid.iam.model.UserEmailEntity source, es.caib.seycon.ng.comu.LlistaCorreuUsuari target) {
-        super.toLlistaCorreuUsuari(source, target);
+    public void toUserMailList(com.soffid.iam.model.UserEmailEntity source, com.soffid.iam.api.UserMailList target) {
+        super.toUserMailList(source, target);
         toLlistaCorreuUsuariCustom(source, target);
     }
 
-    public void toLlistaCorreuUsuariCustom(com.soffid.iam.model.UserEmailEntity source, es.caib.seycon.ng.comu.LlistaCorreuUsuari target) {
+    public void toLlistaCorreuUsuariCustom(com.soffid.iam.model.UserEmailEntity source, com.soffid.iam.api.UserMailList target) {
         EmailListEntity llistaCorreu = source.getMailList();
-        target.setNomLlistaCorreu(llistaCorreu.getName());
+        target.setMailListName(llistaCorreu.getName());
         EmailDomainEntity dominiCorreu = llistaCorreu.getDomain();
         if (dominiCorreu != null) {
-            target.setCodiDomini(dominiCorreu.getName());
+            target.setDomainCode(dominiCorreu.getName());
         }
         UserEntity usuari = source.getUser();
-        target.setCodiUsuari(usuari.getUserName());
+        target.setUserCode(usuari.getUserName());
         String nomComplert = usuari.getFirstName() != null ? usuari.getFirstName() : ""; //$NON-NLS-1$
         nomComplert += usuari.getLastName() != null ? " " + usuari.getLastName() : ""; //$NON-NLS-1$
         nomComplert += usuari.getMiddleName() != null ? " " + usuari.getMiddleName() : ""; //$NON-NLS-1$
-        target.setNomComplert(nomComplert);
+        target.setFullName(nomComplert);
     }
 
     /**
      * @see es.caib.seycon.ng.model.LlistaCorreuUsuariEntityDao#toLlistaCorreuUsuari(es.caib.seycon.ng.model.LlistaCorreuUsuariEntity)
      */
-    public es.caib.seycon.ng.comu.LlistaCorreuUsuari toLlistaCorreuUsuari(final com.soffid.iam.model.UserEmailEntity entity) {
-        return super.toLlistaCorreuUsuari(entity);
+    public com.soffid.iam.api.UserMailList toUserMailList(final com.soffid.iam.model.UserEmailEntity entity) {
+        return super.toUserMailList(entity);
     }
 
     /**
@@ -168,7 +169,7 @@ public class UserEmailEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.UserEmailEntity loadLlistaCorreuUsuariEntityFromLlistaCorreuUsuari(es.caib.seycon.ng.comu.LlistaCorreuUsuari llistaCorreuUsuari) {
+    private com.soffid.iam.model.UserEmailEntity loadLlistaCorreuUsuariEntityFromLlistaCorreuUsuari(com.soffid.iam.api.UserMailList llistaCorreuUsuari) {
         UserEmailEntity llistaCorreuUsuariEntity = null;
         if (llistaCorreuUsuari.getId() != null) {
             llistaCorreuUsuariEntity = load(llistaCorreuUsuari.getId());
@@ -182,14 +183,14 @@ public class UserEmailEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.LlistaCorreuUsuariEntityDao#llistaCorreuUsuariToEntity(es.caib.seycon.ng.comu.LlistaCorreuUsuari)
      */
-    public com.soffid.iam.model.UserEmailEntity llistaCorreuUsuariToEntity(es.caib.seycon.ng.comu.LlistaCorreuUsuari llistaCorreuUsuari) {
+    public com.soffid.iam.model.UserEmailEntity userMailListToEntity(com.soffid.iam.api.UserMailList llistaCorreuUsuari) {
         com.soffid.iam.model.UserEmailEntity entity = this.loadLlistaCorreuUsuariEntityFromLlistaCorreuUsuari(llistaCorreuUsuari);
-        this.llistaCorreuUsuariToEntity(llistaCorreuUsuari, entity, true);
+        this.userMailListToEntity(llistaCorreuUsuari, entity, true);
         return entity;
     }
 
-    public void llistaCorreuUsuariToEntityCustom(es.caib.seycon.ng.comu.LlistaCorreuUsuari source, com.soffid.iam.model.UserEmailEntity target) {
-        String codiUsuari = source.getCodiUsuari();
+    public void llistaCorreuUsuariToEntityCustom(com.soffid.iam.api.UserMailList source, com.soffid.iam.model.UserEmailEntity target) {
+        String codiUsuari = source.getUserCode();
         UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
         if (usuari != null) {
             target.setUser(usuari);
@@ -197,8 +198,8 @@ public class UserEmailEntityDaoImpl extends
 			throw new SeyconException(String.format(Messages.getString("UserEmailEntityDaoImpl.3"), codiUsuari)); //$NON-NLS-1$
         }
 
-        String nomLlistaCorreu = source.getNomLlistaCorreu();
-        String codiDomini = source.getCodiDomini();
+        String nomLlistaCorreu = source.getMailListName();
+        String codiDomini = source.getDomainCode();
         EmailListEntity llistaCorreu = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
         if (llistaCorreu != null) {
             target.setMailList(llistaCorreu);
@@ -214,8 +215,8 @@ public class UserEmailEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.LlistaCorreuUsuariEntityDao#llistaCorreuUsuariToEntity(es.caib.seycon.ng.comu.LlistaCorreuUsuari,
      *      es.caib.seycon.ng.model.LlistaCorreuUsuariEntity)
      */
-    public void llistaCorreuUsuariToEntity(es.caib.seycon.ng.comu.LlistaCorreuUsuari source, com.soffid.iam.model.UserEmailEntity target, boolean copyIfNull) {
-        super.llistaCorreuUsuariToEntity(source, target, copyIfNull);
+    public void userMailListToEntity(com.soffid.iam.api.UserMailList source, com.soffid.iam.model.UserEmailEntity target, boolean copyIfNull) {
+        super.userMailListToEntity(source, target, copyIfNull);
         llistaCorreuUsuariToEntityCustom(source, target);
     }
 

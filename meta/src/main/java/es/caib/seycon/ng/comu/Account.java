@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Account",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Account {
+public class Account {
 
 	@Nullable
 	public java.lang.Long id;

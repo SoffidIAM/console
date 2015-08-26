@@ -6,9 +6,9 @@ package es.caib.seycon.ng.servei.impl;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.ObjectMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
 
 /**
  * @author bubu

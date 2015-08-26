@@ -22,18 +22,18 @@ public class UserProcessEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.UsuariWFProcessEntityDao#toUsuariWFProcess(es.caib.seycon.ng.model.UsuariWFProcessEntity, es.caib.seycon.ng.comu.UsuariWFProcess)
      */
-    public void toUsuariWFProcess(com.soffid.iam.model.UserProcessEntity source, es.caib.seycon.ng.comu.UsuariWFProcess target) {
+    public void toBpmUserProcess(com.soffid.iam.model.UserProcessEntity source, com.soffid.iam.api.BpmUserProcess target) {
         // @todo verify behavior of toUsuariWFProcess
-        super.toUsuariWFProcess(source, target);
+        super.toBpmUserProcess(source, target);
     }
 
 
     /**
      * @see es.caib.seycon.ng.model.UsuariWFProcessEntityDao#toUsuariWFProcess(es.caib.seycon.ng.model.UsuariWFProcessEntity)
      */
-    public es.caib.seycon.ng.comu.UsuariWFProcess toUsuariWFProcess(final com.soffid.iam.model.UserProcessEntity entity) {
+    public com.soffid.iam.api.BpmUserProcess toBpmUserProcess(final com.soffid.iam.model.UserProcessEntity entity) {
         // @todo verify behavior of toUsuariWFProcess
-        return super.toUsuariWFProcess(entity);
+        return super.toBpmUserProcess(entity);
     }
 
 
@@ -42,7 +42,7 @@ public class UserProcessEntityDaoImpl
      * from the object store. If no such entity object exists in the object store,
      * a new, blank entity is created
      */
-    private com.soffid.iam.model.UserProcessEntity loadUsuariWFProcessEntityFromUsuariWFProcess(es.caib.seycon.ng.comu.UsuariWFProcess usuariWFProcess) {
+    private com.soffid.iam.model.UserProcessEntity loadUsuariWFProcessEntityFromUsuariWFProcess(com.soffid.iam.api.BpmUserProcess usuariWFProcess) {
 
 		com.soffid.iam.model.UserProcessEntity usuariWFProcessEntity = null;
 		
@@ -62,10 +62,10 @@ public class UserProcessEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.UsuariWFProcessEntityDao#usuariWFProcessToEntity(es.caib.seycon.ng.comu.UsuariWFProcess)
      */
-    public com.soffid.iam.model.UserProcessEntity usuariWFProcessToEntity(es.caib.seycon.ng.comu.UsuariWFProcess usuariWFProcess) {
+    public com.soffid.iam.model.UserProcessEntity bpmUserProcessToEntity(com.soffid.iam.api.BpmUserProcess usuariWFProcess) {
         // @todo verify behavior of usuariWFProcessToEntity
         com.soffid.iam.model.UserProcessEntity entity = this.loadUsuariWFProcessEntityFromUsuariWFProcess(usuariWFProcess);
-        this.usuariWFProcessToEntity(usuariWFProcess, entity, true);
+        this.bpmUserProcessToEntity(usuariWFProcess, entity, true);
         return entity;
     }
 
@@ -73,9 +73,9 @@ public class UserProcessEntityDaoImpl
     /**
      * @see es.caib.seycon.ng.model.UsuariWFProcessEntityDao#usuariWFProcessToEntity(es.caib.seycon.ng.comu.UsuariWFProcess, es.caib.seycon.ng.model.UsuariWFProcessEntity)
      */
-    public void usuariWFProcessToEntity(es.caib.seycon.ng.comu.UsuariWFProcess source, com.soffid.iam.model.UserProcessEntity target, boolean copyIfNull) {
+    public void bpmUserProcessToEntity(com.soffid.iam.api.BpmUserProcess source, com.soffid.iam.model.UserProcessEntity target, boolean copyIfNull) {
         // @todo verify behavior of usuariWFProcessToEntity
-        super.usuariWFProcessToEntity(source, target, copyIfNull);
+        super.bpmUserProcessToEntity(source, target, copyIfNull);
     }
 
 

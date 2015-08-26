@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Renewal",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Renovacio {
+public class Renovacio {
 
 	@Attribute(translated = "date" )
 	public java.util.Calendar data;

@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="PasswordStatus",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class EstatContrasenya extends java.lang.Object {
+public class EstatContrasenya extends java.lang.Object {
 
 	@Nullable
 	@Attribute(translated = "user" )

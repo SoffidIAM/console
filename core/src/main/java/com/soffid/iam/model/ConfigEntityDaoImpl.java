@@ -7,20 +7,21 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Configuration;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.NetworkEntity;
-
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
-
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -37,17 +38,16 @@ public class ConfigEntityDaoImpl extends
 	
 	private void auditarConfiguracio(String accio, String parametre) {
 		String codiUsuari = Security.getCurrentAccount();
-		Auditoria auditoria = new Auditoria();
-		auditoria.setAutor(codiUsuari);
-		auditoria.setAccio(accio);
-		auditoria.setParametreConfiguracio(parametre);
+		Audit auditoria = new Audit();
+		auditoria.setAuthor(codiUsuari);
+		auditoria.setAction(accio);
+		auditoria.setConfigurationParameter(parametre);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-				.getTime()));
-		auditoria.setObjecte("SC_CONFIG"); //$NON-NLS-1$
+		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+		auditoria.setObject("SC_CONFIG"); //$NON-NLS-1$
 
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
 	
@@ -87,20 +87,20 @@ public class ConfigEntityDaoImpl extends
 		}
 	}
 
-	public void toConfiguracio(com.soffid.iam.model.ConfigEntity sourceEntity, es.caib.seycon.ng.comu.Configuracio targetVO) {
-		super.toConfiguracio(sourceEntity, targetVO);
+	public void toConfiguration(com.soffid.iam.model.ConfigEntity sourceEntity, com.soffid.iam.api.Configuration targetVO) {
+		super.toConfiguration(sourceEntity, targetVO);
 		toConfiguracioCustom(sourceEntity, targetVO);
 	}
 
-	public void toConfiguracioCustom(com.soffid.iam.model.ConfigEntity sourceEntity, es.caib.seycon.ng.comu.Configuracio targetVO) {
+	public void toConfiguracioCustom(com.soffid.iam.model.ConfigEntity sourceEntity, com.soffid.iam.api.Configuration targetVO) {
 		NetworkEntity xarxaEntity = sourceEntity.getNetwork();
 		if (xarxaEntity != null) {
-			targetVO.setCodiXarxa(xarxaEntity.getName());
+			targetVO.setNetworkCode(xarxaEntity.getName());
 		}
 	}
 
-	public es.caib.seycon.ng.comu.Configuracio toConfiguracio(final com.soffid.iam.model.ConfigEntity entity) {
-		Configuracio configuracio = super.toConfiguracio(entity);
+	public com.soffid.iam.api.Configuration toConfiguration(final com.soffid.iam.model.ConfigEntity entity) {
+		Configuration configuracio = super.toConfiguration(entity);
 		toConfiguracioCustom(entity, configuracio);
 		return configuracio;
 	}
@@ -110,7 +110,7 @@ public class ConfigEntityDaoImpl extends
 	 * object from the object store. If no such entity object exists in the
 	 * object store, a new, blank entity is created
 	 */
-	private com.soffid.iam.model.ConfigEntity loadConfiguracioEntityFromConfiguracio(es.caib.seycon.ng.comu.Configuracio configuracio) {
+	private com.soffid.iam.model.ConfigEntity loadConfiguracioEntityFromConfiguracio(com.soffid.iam.api.Configuration configuracio) {
 		ConfigEntity configuracioEntity = null;
 		if (configuracio.getId() != null) {
 			configuracioEntity = load(configuracio.getId());
@@ -124,14 +124,14 @@ public class ConfigEntityDaoImpl extends
 	/**
 	 * @see es.caib.seycon.ng.model.ConfiguracioEntityDao#configuracioToEntity(es.caib.seycon.ng.Configuracio)
 	 */
-	public com.soffid.iam.model.ConfigEntity configuracioToEntity(es.caib.seycon.ng.comu.Configuracio configuracio) {
+	public com.soffid.iam.model.ConfigEntity configurationToEntity(com.soffid.iam.api.Configuration configuracio) {
 		com.soffid.iam.model.ConfigEntity entity = this.loadConfiguracioEntityFromConfiguracio(configuracio);
-		this.configuracioToEntity(configuracio, entity, true);
+		this.configurationToEntity(configuracio, entity, true);
 		return entity;
 	}
 
-	public void configuracioToEntityCustom(es.caib.seycon.ng.comu.Configuracio sourceVO, com.soffid.iam.model.ConfigEntity targetEntity) {
-		String codiXarxa = sourceVO.getCodiXarxa();
+	public void configuracioToEntityCustom(com.soffid.iam.api.Configuration sourceVO, com.soffid.iam.model.ConfigEntity targetEntity) {
+		String codiXarxa = sourceVO.getNetworkCode();
 		if (codiXarxa != null && codiXarxa.trim().compareTo("") != 0) { //$NON-NLS-1$
 			NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
 			if (xarxaEntity != null) {
@@ -148,8 +148,8 @@ public class ConfigEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.ConfiguracioEntityDao#configuracioToEntity(es.caib.seycon.ng.Configuracio,
 	 *      es.caib.seycon.ng.model.ConfiguracioEntity)
 	 */
-	public void configuracioToEntity(es.caib.seycon.ng.comu.Configuracio sourceVO, com.soffid.iam.model.ConfigEntity targetEntity, boolean copyIfNull) {
-		super.configuracioToEntity(sourceVO, targetEntity, copyIfNull);
+	public void configurationToEntity(com.soffid.iam.api.Configuration sourceVO, com.soffid.iam.model.ConfigEntity targetEntity, boolean copyIfNull) {
+		super.configurationToEntity(sourceVO, targetEntity, copyIfNull);
 		configuracioToEntityCustom(sourceVO, targetEntity);
 	}
 

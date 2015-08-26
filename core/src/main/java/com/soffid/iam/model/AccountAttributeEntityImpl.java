@@ -5,13 +5,13 @@
 
 package com.soffid.iam.model;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.service.AuthorizationService;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.utils.Security;
 
 /**
@@ -24,7 +24,7 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 	AttributeVisibilityEnum v = null;
 	
 	public AttributeVisibilityEnum getAttributeVisibility() {
-		AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+		AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
 		try {
 			if (autService.hasPermission(
 					Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE, this))
@@ -67,7 +67,7 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 						}
 					}
 				}
-				AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+				AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
 				if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
 					v =  tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
 				else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE))

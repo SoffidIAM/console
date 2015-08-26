@@ -6,10 +6,9 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.model.security.SecurityScopeEntity;
-
-import es.caib.seycon.ng.ServiceLocator;
+import com.soffid.iam.service.NetworkServiceImpl;
+import com.soffid.iam.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.XarxaServiceImpl;
 import es.caib.seycon.ng.utils.Security;
 
 /**
@@ -35,15 +34,14 @@ public class PrinterGroupEntityImpl extends com.soffid.iam.model.PrinterGroupEnt
                 HostEntity serverImp = getPrinter().getServer();
                 Long nivell;
 				try {
-					nivell = ServiceLocator.instance().getXarxaService()
-							.findNivellAccesByNomMaquinaAndCodiXarxa
-								(serverImp.getName(), serverImp.getNetwork().getName());
+					nivell = ServiceLocator.instance().getNetworkService()
+							.findAccessLevelByHostNameAndNetworkName(serverImp.getName(), serverImp.getNetwork().getName());
 				} catch (InternalErrorException e) {
 					throw new RuntimeException (e);
 				}
 
                 // Nivell mínim: suport
-                if (nivell >= XarxaServiceImpl.SUPORT)
+                if (nivell >= NetworkServiceImpl.SUPORT)
                         return true;
 
         }

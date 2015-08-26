@@ -14,6 +14,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  * @author u88683
  * 
  */
+@Deprecated
 public interface AccessControlMgr {
 
     /**

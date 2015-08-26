@@ -1,13 +1,14 @@
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.Security;
+
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
@@ -15,7 +16,7 @@ public class UserAccountEntityDaoImpl extends com.soffid.iam.model.UserAccountEn
 {
 
 	public com.soffid.iam.model.UserAccountEntity userAccountToEntity(UserAccount instance) {
-		com.soffid.iam.model.UserAccountEntity entity = findByAccountSystemAndName(instance.getName(), instance.getDispatcher(), instance.getUser());
+		com.soffid.iam.model.UserAccountEntity entity = findByAccountSystemAndName(instance.getName(), instance.getSystem(), instance.getUser());
 		if (entity == null)
 			entity = newUserAccountEntity();
 		

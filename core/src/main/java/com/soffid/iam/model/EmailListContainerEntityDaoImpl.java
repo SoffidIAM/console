@@ -7,21 +7,26 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.MailListRelated;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListContainerEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.TaskEntity;
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.RelacioLlistaCorreu;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -98,30 +103,29 @@ public class EmailListContainerEntityDaoImpl extends
         }
     }
 
-    public void toRelacioLlistaCorreu(com.soffid.iam.model.EmailListContainerEntity source, es.caib.seycon.ng.comu.RelacioLlistaCorreu target) {
-        super.toRelacioLlistaCorreu(source, target);
+    public void toMailListRelated(com.soffid.iam.model.EmailListContainerEntity source, com.soffid.iam.api.MailListRelated target) {
+        super.toMailListRelated(source, target);
         toRelacioLlistaCorreuCustom(source, target);
     }
 
-    public void toRelacioLlistaCorreuCustom(com.soffid.iam.model.EmailListContainerEntity source, es.caib.seycon.ng.comu.RelacioLlistaCorreu target) {
-        target.setNomLlistaCorreuConte(source.getContains().getName());
-        target.setNomLlistaCorreuPertany(source.getPertains().getName());
+    public void toRelacioLlistaCorreuCustom(com.soffid.iam.model.EmailListContainerEntity source, com.soffid.iam.api.MailListRelated target) {
+        target.setMailListNameIncluded(source.getContains().getName());
+        target.setMailListNameBelong(source.getPertains().getName());
         EmailDomainEntity dominiCorreuConte = source.getContains().getDomain();
         EmailDomainEntity dominiCorreuPertany = source.getPertains().getDomain();
         if (dominiCorreuConte != null) {
-            target.setCodiDominiCorreuConte(dominiCorreuConte.getName());
+            target.setMailDomainAccountCode(dominiCorreuConte.getName());
         }
         if (dominiCorreuPertany != null) {
-            target.setCodiDominiCorreuPertany(dominiCorreuPertany.getName());
+            target.setMailDomainBelongCode(dominiCorreuPertany.getName());
         }
     }
 
     /**
      * @see es.caib.seycon.ng.model.RelacioLlistaCorreuEntityDao#toRelacioLlistaCorreu(es.caib.seycon.ng.model.RelacioLlistaCorreuEntity)
      */
-    public es.caib.seycon.ng.comu.RelacioLlistaCorreu toRelacioLlistaCorreu(final com.soffid.iam.model.EmailListContainerEntity entity) {
-        RelacioLlistaCorreu relacioLlistaCorreu = super
-                .toRelacioLlistaCorreu(entity);
+    public com.soffid.iam.api.MailListRelated toMailListRelated(final com.soffid.iam.model.EmailListContainerEntity entity) {
+        MailListRelated relacioLlistaCorreu = super.toMailListRelated(entity);
         toRelacioLlistaCorreuCustom(entity, relacioLlistaCorreu);
         return relacioLlistaCorreu;
     }
@@ -131,7 +135,7 @@ public class EmailListContainerEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.EmailListContainerEntity loadRelacioLlistaCorreuEntityFromRelacioLlistaCorreu(es.caib.seycon.ng.comu.RelacioLlistaCorreu relacioLlistaCorreu) {
+    private com.soffid.iam.model.EmailListContainerEntity loadRelacioLlistaCorreuEntityFromRelacioLlistaCorreu(com.soffid.iam.api.MailListRelated relacioLlistaCorreu) {
         com.soffid.iam.model.EmailListContainerEntity relacioLlistaCorreuEntity = null;
         if (relacioLlistaCorreu.getId() != null) {
             relacioLlistaCorreuEntity = load(relacioLlistaCorreu.getId());
@@ -145,15 +149,15 @@ public class EmailListContainerEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.RelacioLlistaCorreuEntityDao#relacioLlistaCorreuToEntity(es.caib.seycon.ng.comu.RelacioLlistaCorreu)
      */
-    public com.soffid.iam.model.EmailListContainerEntity relacioLlistaCorreuToEntity(es.caib.seycon.ng.comu.RelacioLlistaCorreu relacioLlistaCorreu) {
+    public com.soffid.iam.model.EmailListContainerEntity mailListRelatedToEntity(com.soffid.iam.api.MailListRelated relacioLlistaCorreu) {
         com.soffid.iam.model.EmailListContainerEntity entity = this.loadRelacioLlistaCorreuEntityFromRelacioLlistaCorreu(relacioLlistaCorreu);
-        this.relacioLlistaCorreuToEntity(relacioLlistaCorreu, entity, true);
+        this.mailListRelatedToEntity(relacioLlistaCorreu, entity, true);
         return entity;
     }
 
-    public void relacioLlistaCorreuToEntityCustom(es.caib.seycon.ng.comu.RelacioLlistaCorreu source, com.soffid.iam.model.EmailListContainerEntity target) {
-        String nomLlistaCorreuConte = source.getNomLlistaCorreuConte();
-        String codiDominiConte = source.getCodiDominiCorreuConte();
+    public void relacioLlistaCorreuToEntityCustom(com.soffid.iam.api.MailListRelated source, com.soffid.iam.model.EmailListContainerEntity target) {
+        String nomLlistaCorreuConte = source.getMailListNameIncluded();
+        String codiDominiConte = source.getMailDomainAccountCode();
         EmailListEntity llistaCorreuEntityConte = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreuConte, codiDominiConte);
         if (llistaCorreuEntityConte != null) {
             target.setContains(llistaCorreuEntityConte);
@@ -163,8 +167,8 @@ public class EmailListContainerEntityDaoImpl extends
 					codiDominiConte));
         }
 
-        String nomLlistaCorreuPertany = source.getNomLlistaCorreuPertany();
-        String codiDominiPertany = source.getCodiDominiCorreuPertany();
+        String nomLlistaCorreuPertany = source.getMailListNameBelong();
+        String codiDominiPertany = source.getMailDomainBelongCode();
         EmailListEntity llistaCorreuEntityPertany = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreuPertany, "null".equals(codiDominiPertany) ? null : codiDominiPertany);
         if (llistaCorreuEntityPertany != null) {
             target.setPertains(llistaCorreuEntityPertany);
@@ -178,8 +182,8 @@ public class EmailListContainerEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.RelacioLlistaCorreuEntityDao#relacioLlistaCorreuToEntity(es.caib.seycon.ng.comu.RelacioLlistaCorreu,
      *      es.caib.seycon.ng.model.RelacioLlistaCorreuEntity)
      */
-    public void relacioLlistaCorreuToEntity(es.caib.seycon.ng.comu.RelacioLlistaCorreu source, com.soffid.iam.model.EmailListContainerEntity target, boolean copyIfNull) {
-        super.relacioLlistaCorreuToEntity(source, target, copyIfNull);
+    public void mailListRelatedToEntity(com.soffid.iam.api.MailListRelated source, com.soffid.iam.model.EmailListContainerEntity target, boolean copyIfNull) {
+        super.mailListRelatedToEntity(source, target, copyIfNull);
         relacioLlistaCorreuToEntityCustom(source, target);
     }
 
@@ -220,23 +224,22 @@ public class EmailListContainerEntityDaoImpl extends
             String dominiLlistaConte, String nomLlistaPertany,
             String nomDominiPertany) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
         // Afegim les dues llistas
         // la contenidora
-        auditoria.setLlistaCorreu(nomLlistaConte);
-        auditoria.setDomini(dominiLlistaConte);
+        auditoria.setMailList(nomLlistaConte);
+        auditoria.setDomain(dominiLlistaConte);
         // i la continguda (o que pertany)
-        auditoria.setLlistaCorreuPertany(nomLlistaPertany);
-        auditoria.setDominiCorreuPertany(nomDominiPertany);
+        auditoria.setMailListBelong(nomLlistaPertany);
+        auditoria.setMailDomainBelogns(nomDominiPertany);
 
-        auditoria.setAutor(codiUsuari);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_LCOLCO"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_LCOLCO"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 

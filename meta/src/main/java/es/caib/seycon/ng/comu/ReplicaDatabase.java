@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ReplicaDatabase",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ReplicaDatabase {
+public class ReplicaDatabase {
 
 	@Nullable
 	public java.lang.Long id;

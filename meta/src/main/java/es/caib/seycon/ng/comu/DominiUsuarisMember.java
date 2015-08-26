@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DomainUsersMember",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DominiUsuarisMember {
+public class DominiUsuarisMember {
 
 	@Nullable
 	@Attribute(translated = "code" )

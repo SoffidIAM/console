@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserDomain",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class DominiUsuari {
+public class DominiUsuari {
 
 	@Nullable
 	public java.lang.Long id;

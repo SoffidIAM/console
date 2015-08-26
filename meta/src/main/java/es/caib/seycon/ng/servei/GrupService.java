@@ -10,7 +10,9 @@ import com.soffid.mda.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="GroupService",
-	translatedPackage="com.soffid.iam.service")
+	translatedPackage="com.soffid.iam.service",
+	serverPath="/seycon/GrupService",
+	serverRole="agent")
 @Depends ({
 	/********** Entities *************/
 	es.caib.seycon.ng.model.RolsGrupEntity.class,

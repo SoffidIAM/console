@@ -7,21 +7,24 @@
  * This is only generated once! It will never be overwritten.
  * You can (and have to!) safely modify it by hand.
  */
+/**
+ * This is only generated once! It will never be overwritten.
+ * You can (and have to!) safely modify it by hand.
+ */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
 
-import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Maquina;
-import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 import es.caib.seycon.ng.utils.Security;
 
@@ -41,21 +44,21 @@ import java.util.List;
 public class HostEntityDaoImpl extends
         com.soffid.iam.model.HostEntityDaoBase {
 
-    public void toMaquina(com.soffid.iam.model.HostEntity sourceEntity, es.caib.seycon.ng.comu.Maquina targetVO) {
-        super.toMaquina(sourceEntity, targetVO);
+    public void toHost(com.soffid.iam.model.HostEntity sourceEntity, com.soffid.iam.api.Host targetVO) {
+        super.toHost(sourceEntity, targetVO);
         toMaquinaCustom(sourceEntity, targetVO);
     }
 
-    private void toMaquinaCustom(com.soffid.iam.model.HostEntity sourceEntity, es.caib.seycon.ng.comu.Maquina targetVO) {
+    private void toMaquinaCustom(com.soffid.iam.model.HostEntity sourceEntity, com.soffid.iam.api.Host targetVO) {
         NetworkEntity xarxa = sourceEntity.getNetwork();
         if (xarxa != null) {
-            targetVO.setCodiXarxa(sourceEntity.getNetwork().getName());
+            targetVO.setNetworkCode(sourceEntity.getNetwork().getName());
         } else {
-            targetVO.setCodiXarxa(null);
+            targetVO.setNetworkCode(null);
         }
-        targetVO.setOfimatica(new Boolean(sourceEntity.getFolders().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setCorreu(new Boolean(sourceEntity.getMail().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setServidorImpressores(new Boolean(sourceEntity.getPrintersServer().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setOffice(new Boolean(sourceEntity.getFolders().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setMail(new Boolean(sourceEntity.getMail().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setPrintersServer(new Boolean(sourceEntity.getPrintersServer().compareTo("S") == 0)); //$NON-NLS-1$
 
         String alies = ""; //$NON-NLS-1$
         Collection c_alies = sourceEntity.getHostAlias();
@@ -63,7 +66,7 @@ public class HostEntityDaoImpl extends
             HostAliasEntity al = (HostAliasEntity) it.next();
             alies += al.getAlias() + " ";
         }
-        targetVO.setAliasMaquina(alies.trim()); // quitamos espacios "extra"
+        targetVO.setHostAlias(alies.trim()); // quitamos espacios "extra"
         if (sourceEntity.getLastSeen() == null)
             targetVO.setLastSeen(null);
         else
@@ -74,16 +77,15 @@ public class HostEntityDaoImpl extends
         }
         targetVO.setDynamicIp(sourceEntity.getDynamicIP());
         
-        targetVO.setSistemaOperatiu(sourceEntity.getOperatingSystem() == null ?
-			null : sourceEntity.getOperatingSystem().getName());
+        targetVO.setOs(sourceEntity.getOperatingSystem() == null ? null : sourceEntity.getOperatingSystem().getName());
     }
     
 
     /**
      * @see es.caib.seycon.ng.model.MaquinaEntityDao#toMaquina(es.caib.seycon.ng.model.MaquinaEntity)
      */
-    public es.caib.seycon.ng.comu.Maquina toMaquina(final com.soffid.iam.model.HostEntity entity) {
-        Maquina maquina = super.toMaquina(entity);
+    public com.soffid.iam.api.Host toHost(final com.soffid.iam.model.HostEntity entity) {
+        Host maquina = super.toHost(entity);
         toMaquinaCustom(entity, maquina);
         return maquina;
     }
@@ -93,7 +95,7 @@ public class HostEntityDaoImpl extends
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.HostEntity loadMaquinaEntityFromMaquina(es.caib.seycon.ng.comu.Maquina maquina) {
+    private com.soffid.iam.model.HostEntity loadMaquinaEntityFromMaquina(com.soffid.iam.api.Host maquina) {
         com.soffid.iam.model.HostEntity maquinaEntity = null;
         if (maquina.getId() != null) {
             maquinaEntity = load(maquina.getId());
@@ -107,27 +109,27 @@ public class HostEntityDaoImpl extends
     /**
      * @see es.caib.seycon.ng.model.MaquinaEntityDao#maquinaToEntity(es.caib.seycon.ng.comu.Maquina)
      */
-    public com.soffid.iam.model.HostEntity maquinaToEntity(es.caib.seycon.ng.comu.Maquina maquina) {
+    public com.soffid.iam.model.HostEntity hostToEntity(com.soffid.iam.api.Host maquina) {
         com.soffid.iam.model.HostEntity entity = this.loadMaquinaEntityFromMaquina(maquina);
-        this.maquinaToEntity(maquina, entity, true);
+        this.hostToEntity(maquina, entity, true);
         return entity;
     }
 
-    private void maquinaToEntityCustom(es.caib.seycon.ng.comu.Maquina sourceVO, com.soffid.iam.model.HostEntity targetEntity) {
-        if (sourceVO.getOfimatica() != null) {
-            targetEntity.setFolders(sourceVO.getOfimatica().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+    private void maquinaToEntityCustom(com.soffid.iam.api.Host sourceVO, com.soffid.iam.model.HostEntity targetEntity) {
+        if (sourceVO.getOffice() != null) {
+            targetEntity.setFolders(sourceVO.getOffice().booleanValue() ? "S" : "N"); //$NON-NLS-1$
         } else {
             targetEntity.setFolders("N"); //$NON-NLS-1$
         }
 
-        if (sourceVO.getCorreu() != null) {
-            targetEntity.setMail(sourceVO.getCorreu().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+        if (sourceVO.getMail() != null) {
+            targetEntity.setMail(sourceVO.getMail().booleanValue() ? "S" : "N"); //$NON-NLS-1$
         } else {
             targetEntity.setMail("N"); //$NON-NLS-1$
         }
 
-        if (sourceVO.getServidorImpressores() != null) {
-            targetEntity.setPrintersServer(sourceVO.getServidorImpressores().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (sourceVO.getPrintersServer() != null) {
+            targetEntity.setPrintersServer(sourceVO.getPrintersServer().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setPrintersServer("N"); //$NON-NLS-1$
         }
@@ -141,20 +143,16 @@ public class HostEntityDaoImpl extends
         else
         	targetEntity.setDynamicIP(sourceVO.getDynamicIp());
 
-        String codiXarxa = sourceVO.getCodiXarxa();
+        String codiXarxa = sourceVO.getNetworkCode();
         if (codiXarxa != null && codiXarxa.trim().compareTo("") != 0) { //$NON-NLS-1$
             NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
             if (xarxaEntity != null) {
                 /* comprova que la ip és compatible amb la xarxa */
-                Xarxa xarxa = this.getNetworkEntityDao().toXarxa(xarxaEntity);
-                if (maquinaCompatibleAmbXarxa(sourceVO.getAdreca(),
-                        xarxa.getAdreca(), xarxa.getMascara())) {
+                Network xarxa = this.getNetworkEntityDao().toNetwork(xarxaEntity);
+                if (maquinaCompatibleAmbXarxa(sourceVO.getIp(), xarxa.getIp(), xarxa.getMask())) {
                     targetEntity.setNetwork(xarxaEntity);
                 } else {
-                    throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.0"), //$NON-NLS-1$
-                            xarxa.getMascara(),
-                            xarxa.getAdreca(),
-                            sourceVO.getAdreca()));
+                    throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.0"), xarxa.getMask(), xarxa.getIp(), sourceVO.getIp()));
                 }
             } else {
 				throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.1"), codiXarxa)); //$NON-NLS-1$
@@ -163,12 +161,11 @@ public class HostEntityDaoImpl extends
             targetEntity.setNetwork(null);
         }
         
-		if (sourceVO.getSistemaOperatiu() != null)
+		if (sourceVO.getOs() != null)
 		{
-			com.soffid.iam.model.OsTypeEntity os = getOsTypeEntityDao().findOSTypeByName(sourceVO.getSistemaOperatiu());
+			com.soffid.iam.model.OsTypeEntity os = getOsTypeEntityDao().findOSTypeByName(sourceVO.getOs());
 			if (os == null)
-				throw new SeyconException (String.format(Messages.getString("HostEntityDaoImpl.InvalidOS"), //$NON-NLS-1$
-								sourceVO.getSistemaOperatiu()));
+				throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.InvalidOS"), sourceVO.getOs()));
 			targetEntity.setOperatingSystem(os);
 		}
     }
@@ -231,23 +228,22 @@ public class HostEntityDaoImpl extends
      * @see es.caib.seycon.ng.model.MaquinaEntityDao#maquinaToEntity(es.caib.seycon.ng.comu.Maquina,
      *      es.caib.seycon.ng.model.MaquinaEntity)
      */
-    public void maquinaToEntity(es.caib.seycon.ng.comu.Maquina sourceVO, com.soffid.iam.model.HostEntity targetEntity, boolean copyIfNull) {
-        super.maquinaToEntity(sourceVO, targetEntity, copyIfNull);
+    public void hostToEntity(com.soffid.iam.api.Host sourceVO, com.soffid.iam.model.HostEntity targetEntity, boolean copyIfNull) {
+        super.hostToEntity(sourceVO, targetEntity, copyIfNull);
         maquinaToEntityCustom(sourceVO, targetEntity);
     }
 
     private void auditarMaquina(String accio, String nomMaquina) {
         String codiUsuari = Security.getCurrentAccount();
-        Auditoria auditoria = new Auditoria();
-        auditoria.setAccio(accio);
-        auditoria.setMaquina(nomMaquina);
-        auditoria.setAutor(codiUsuari);
+        Audit auditoria = new Audit();
+        auditoria.setAction(accio);
+        auditoria.setHost(nomMaquina);
+        auditoria.setAuthor(codiUsuari);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setData(dateFormat.format(GregorianCalendar.getInstance()
-                .getTime()));
-        auditoria.setObjecte("SC_MAQUIN"); //$NON-NLS-1$
-        AuditEntity auditoriaEntity = getAuditEntityDao().auditoriaToEntity(auditoria);
+        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setObject("SC_MAQUIN"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);
     }
 

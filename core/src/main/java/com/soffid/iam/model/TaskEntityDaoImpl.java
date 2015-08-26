@@ -12,7 +12,8 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.TaskEntity;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -61,21 +62,21 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
      * @see es.caib.seycon.ng.model.TasqueEntityDao#toTasca(es.caib.seycon.ng.model.TasqueEntity,
      *      es.caib.seycon.ng.comu.Tasca)
      */
-    public void toTasca(com.soffid.iam.model.TaskEntity source, es.caib.seycon.ng.comu.Tasca target) {
+    public void toTask(com.soffid.iam.model.TaskEntity source, com.soffid.iam.api.Task target) {
         // @todo verify behavior of toTasca
-        super.toTasca(source, target);
+        super.toTask(source, target);
 
         Calendar cal = GregorianCalendar.getInstance();
         cal.setTimeInMillis(source.getDate().getTime());
-        target.setDataTasca(cal);
+        target.setTaskDate(cal);
     }
 
     /**
      * @see es.caib.seycon.ng.model.TasqueEntityDao#toTasca(es.caib.seycon.ng.model.TasqueEntity)
      */
-    public es.caib.seycon.ng.comu.Tasca toTasca(final com.soffid.iam.model.TaskEntity entity) {
+    public com.soffid.iam.api.Task toTask(final com.soffid.iam.model.TaskEntity entity) {
         // @todo verify behavior of toTasca
-        return super.toTasca(entity);
+        return super.toTask(entity);
     }
 
     /**
@@ -83,7 +84,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
      * object from the object store. If no such entity object exists in the
      * object store, a new, blank entity is created
      */
-    private com.soffid.iam.model.TaskEntity loadTasqueEntityFromTasca(es.caib.seycon.ng.comu.Tasca tasca) {
+    private com.soffid.iam.model.TaskEntity loadTasqueEntityFromTasca(com.soffid.iam.api.Task tasca) {
         TaskEntity tasqueEntity = null;
 
         if (tasca.getId() != null) {
@@ -98,10 +99,10 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     /**
      * @see es.caib.seycon.ng.model.TasqueEntityDao#tascaToEntity(es.caib.seycon.ng.comu.Tasca)
      */
-    public com.soffid.iam.model.TaskEntity tascaToEntity(es.caib.seycon.ng.comu.Tasca tasca) {
+    public com.soffid.iam.model.TaskEntity taskToEntity(com.soffid.iam.api.Task tasca) {
         // @todo verify behavior of tascaToEntity
         com.soffid.iam.model.TaskEntity entity = this.loadTasqueEntityFromTasca(tasca);
-        this.tascaToEntity(tasca, entity, true);
+        this.taskToEntity(tasca, entity, true);
         return entity;
     }
 
@@ -109,17 +110,17 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
      * @see es.caib.seycon.ng.model.TasqueEntityDao#tascaToEntity(es.caib.seycon.ng.comu.Tasca,
      *      es.caib.seycon.ng.model.TasqueEntity)
      */
-    public void tascaToEntity(es.caib.seycon.ng.comu.Tasca source, com.soffid.iam.model.TaskEntity target, boolean copyIfNull) {
+    public void taskToEntity(com.soffid.iam.api.Task source, com.soffid.iam.model.TaskEntity target, boolean copyIfNull) {
         // @todo verify behavior of tascaToEntity
-        super.tascaToEntity(source, target, copyIfNull);
+        super.taskToEntity(source, target, copyIfNull);
 
         // control de nulls
-        if (source.getDataTasca() == null)
+        if (source.getTaskDate() == null)
             throw new es.caib.seycon.ng.exception.SeyconException(
                     Messages.getString("TaskEntityDaoImpl.1")); //$NON-NLS-1$
 
         // mapeig adicional
-        target.setDate(new Timestamp(source.getDataTasca().getTimeInMillis()));
+        target.setDate(new Timestamp(source.getTaskDate().getTimeInMillis()));
 
     }
 

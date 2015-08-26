@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.User;
+import es.caib.seycon.ng.sync.intf.ExtensibleObject;
 
 public class ExtensibleObjects implements Serializable
 {
@@ -29,6 +30,15 @@ public class ExtensibleObjects implements Serializable
 		this.objects = objects;
 	}
 
+	public static ExtensibleObjects toExtensibleObjects (com.soffid.iam.sync.intf.ExtensibleObjects eos)
+	{
+		ExtensibleObjects target = new ExtensibleObjects();
+		for (com.soffid.iam.sync.intf.ExtensibleObject eo: eos.getObjects())
+		{
+			target.objects.add( ExtensibleObject.toExtensibleObject(eo));
+		}
+		return target;
+	}
 
 	
 }

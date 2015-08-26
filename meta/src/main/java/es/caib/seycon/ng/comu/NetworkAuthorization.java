@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="NetworkAuthorization",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class NetworkAuthorization {
+public class NetworkAuthorization {
 
 	@Attribute(translated = "identity" )
 	public es.caib.seycon.ng.comu.Identitat identitat;

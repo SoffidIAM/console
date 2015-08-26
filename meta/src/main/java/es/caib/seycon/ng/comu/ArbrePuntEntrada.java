@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ApplicationAccessTree",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class ArbrePuntEntrada {
+public class ArbrePuntEntrada {
 
 	public java.lang.Long id;
 

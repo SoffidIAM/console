@@ -7,9 +7,12 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.UsuariEntity;
+
+@JsonObject (hibernateClass=UsuariEntity.class)
 @ValueObject ( translatedName="User",
 	 translatedPackage="com.soffid.iam.api")
-public abstract class Usuari {
+public class Usuari {
 
 	@Attribute(translated = "userName" )
 	public java.lang.String codi;
@@ -37,7 +40,7 @@ public abstract class Usuari {
 	public java.lang.Boolean actiu;
 
 	@Nullable
-	@Attribute(translated = "lastName2" )
+	@Attribute(translated = "middleName" )
 	public java.lang.String segonLlinatge;
 
 	@Nullable

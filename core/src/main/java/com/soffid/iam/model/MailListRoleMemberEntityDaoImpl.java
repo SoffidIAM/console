@@ -7,8 +7,10 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.sync.engine.TaskHandler;
+
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
+
 import java.sql.Timestamp;
 
 /**

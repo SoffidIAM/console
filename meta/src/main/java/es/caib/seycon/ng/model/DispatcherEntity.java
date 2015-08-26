@@ -163,9 +163,20 @@ public abstract class DispatcherEntity {
 	@Description ("false to use a dedicated server thread. true to use a shared server thread")
 	@Nullable
 	public Boolean sharedDispatcher;
+	
 	@ForeignKey(foreignColumn="PAU_DIS_ID")
 	@Description ("Current authoritative changes pending to apply")
 	public Collection<AuthoritativeChangeEntity> pendingChanges;
+	
+	@Column (name="DIS_TIMOUT")
+	@Description("Time out for normal operations (milliseconds)")
+	@Nullable
+	Long timeout;
+	
+	@Column (name="DIS_LOTIOT")
+	@Description("Time out for long operations (milliseconds)")
+	@Nullable
+	Long longTimeout;	
 	
 	/************************ DAOS *******************************/
 	@DaoFinder("from com.soffid.iam.model.SystemEntity se "

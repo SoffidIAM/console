@@ -54,6 +54,11 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	public ExtensibleObjectMapping(ObjectMapping otherBean)
 	{
 		super(otherBean);
+		if (otherBean instanceof ExtensibleObjectMapping)
+		{
+			setAttributes(((ExtensibleObjectMapping) otherBean).getAttributes());
+			setProperties(((ExtensibleObjectMapping) otherBean).getProperties());
+		}
 	}
 
 	public ExtensibleObjectMapping(String systemObject,

@@ -30,13 +30,13 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
 import java.sql.Timestamp;

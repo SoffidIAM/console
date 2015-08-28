@@ -9,10 +9,12 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.service.GroupService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;

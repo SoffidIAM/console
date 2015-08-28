@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.utils.Security;
 import bsh.BshClassManager;
 import bsh.UtilEvalError;
 

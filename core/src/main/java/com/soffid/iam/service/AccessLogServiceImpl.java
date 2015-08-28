@@ -24,11 +24,13 @@ import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.LimitDates;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;

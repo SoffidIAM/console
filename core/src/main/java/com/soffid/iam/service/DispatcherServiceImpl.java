@@ -53,6 +53,8 @@ import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.service.SystemScheduledTasks;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
@@ -61,8 +63,6 @@ import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
 
 import java.sql.Timestamp;
 import java.util.Calendar;

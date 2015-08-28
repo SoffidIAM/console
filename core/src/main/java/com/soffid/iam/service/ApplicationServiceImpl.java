@@ -48,6 +48,11 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.utils.AutoritzacioSEU;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.Security;
+
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.SoDRisk;
@@ -58,10 +63,7 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.utils.AutoritzacioSEU;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -75,6 +77,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
+
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;

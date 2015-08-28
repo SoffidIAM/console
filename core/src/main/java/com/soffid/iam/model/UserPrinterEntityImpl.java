@@ -8,9 +8,10 @@ package com.soffid.iam.model;
 import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.service.NetworkServiceImpl;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.ServiceLocator;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * Entity UsuariImpressoraEntity implementation

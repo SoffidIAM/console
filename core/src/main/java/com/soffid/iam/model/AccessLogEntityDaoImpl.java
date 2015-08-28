@@ -9,14 +9,12 @@
  */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
 
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
 
 import java.util.Calendar;
 import java.util.Collection;

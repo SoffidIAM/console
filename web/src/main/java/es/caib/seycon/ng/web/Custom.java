@@ -8,10 +8,11 @@ import javax.naming.NamingException;
 
 import org.zkoss.zk.ui.Executions;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.utils.Security;
 
 /*
  * Classe per customitzar la presentació del SEU web

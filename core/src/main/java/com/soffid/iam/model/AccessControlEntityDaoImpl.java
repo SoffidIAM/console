@@ -22,7 +22,6 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.*;
 
 import java.sql.Timestamp;
 

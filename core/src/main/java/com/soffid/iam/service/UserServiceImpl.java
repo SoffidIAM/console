@@ -27,7 +27,7 @@ import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserCriteria;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
-import com.soffid.iam.bpm.BpmEngine;
+import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CardEntity;
@@ -61,6 +61,12 @@ import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.service.GroupService;
 import com.soffid.iam.service.MailListsService;
+import com.soffid.iam.service.impl.CertificateParser;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.LimitDates;
+import com.soffid.iam.utils.ProcesWFUsuari;
+import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
@@ -68,8 +74,10 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.comu.AccountType;
+
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PolicyCheckResult;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -78,11 +86,6 @@ import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.ProcesWFUsuari;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.ParsedCertificate;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.cliente.ValidadorCertificados;
@@ -3238,12 +3241,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		try {
 			// Obtenim els processos que l'usuari actual pot iniciar (i són
 			// habilitats)
-			List<es.caib.bpm.vo.ProcessDefinition> processosUsuari = engine
+			List<com.soffid.iam.bpm.api.ProcessDefinition> processosUsuari = engine
 					.findInitiatorProcessDefinitions();
 			if (processosUsuari != null)
-				for (Iterator<es.caib.bpm.vo.ProcessDefinition> it = processosUsuari
+				for (Iterator<com.soffid.iam.bpm.api.ProcessDefinition> it = processosUsuari
 						.iterator(); it.hasNext();) {
-					es.caib.bpm.vo.ProcessDefinition def = it.next();
+					com.soffid.iam.bpm.api.ProcessDefinition def = it.next();
 					if (def != null && def.getName() != null
 							&& "user".equals(def.getAppliesTo())
 							&& def.isEnabled())
@@ -3308,16 +3311,16 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected Collection<es.caib.bpm.vo.ProcessInstance> handleFindBpmUserProcessInstanceByUserName(
+	protected Collection<com.soffid.iam.bpm.api.ProcessInstance> handleFindBpmUserProcessInstanceByUserName(
 			String codiUsuari) throws Exception {
-		Collection<es.caib.bpm.vo.ProcessInstance> processos = new LinkedList<es.caib.bpm.vo.ProcessInstance>();
+		Collection<com.soffid.iam.bpm.api.ProcessInstance> processos = new LinkedList<com.soffid.iam.bpm.api.ProcessInstance>();
 		// Cerquem els processos de l'usuari
 		Collection<UserProcessEntity> usuproc = getUserProcessEntityDao()
 				.findByUserName(codiUsuari);
 		if (usuproc != null) {
 			for (UserProcessEntity up : usuproc) {
 				try {
-					es.caib.bpm.vo.ProcessInstance pi = getBpmEngine()
+					com.soffid.iam.bpm.api.ProcessInstance pi = getBpmEngine()
 							.getProcess(up.getProcessId());
 					if (pi != null) {
 						processos.add(pi);

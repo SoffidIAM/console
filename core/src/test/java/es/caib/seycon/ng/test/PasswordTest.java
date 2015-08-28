@@ -13,12 +13,12 @@ import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.hibernate.type.Type;
 
 import com.soffid.iam.model.UserEntityImpl;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.AutoritzacioService;
-import es.caib.seycon.ng.utils.Security;
 
 public class PasswordTest extends AbstractTest
 {

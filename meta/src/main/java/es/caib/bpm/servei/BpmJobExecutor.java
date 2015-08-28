@@ -9,7 +9,8 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={roles.anonymous.class})
+@Service ( grantees={roles.anonymous.class},
+		translatedName="BpmJobExecutor", translatedPackage="com.soffid.iam.bpm.service")
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.bpm.servei.BpmEngine.class})
 public abstract class BpmJobExecutor {

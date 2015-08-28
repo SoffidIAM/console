@@ -36,11 +36,13 @@ import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
-import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.Principal;
@@ -59,8 +61,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
+
 import org.apache.commons.collections.map.LRUMap;
 import org.dom4j.Document;
 import org.xml.sax.EntityResolver;

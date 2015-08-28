@@ -9,10 +9,10 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * Entity AccountAttributeEntity implementation

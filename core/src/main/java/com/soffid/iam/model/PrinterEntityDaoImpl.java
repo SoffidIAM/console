@@ -20,12 +20,12 @@ import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
 import java.sql.Timestamp;

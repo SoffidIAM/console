@@ -15,10 +15,10 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.attachment.TaskAttachmentManager;
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 
 public class CMSSignatureManagerHelper {

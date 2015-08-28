@@ -6,8 +6,7 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.model.security.SecurityScopeEntity;
-
-import es.caib.seycon.ng.utils.Security;
+import com.soffid.iam.utils.Security;
 
 /**
  * Entity SessioEntity implementation

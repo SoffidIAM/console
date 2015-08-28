@@ -19,12 +19,12 @@ import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.utils.ExceptionTranslator;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

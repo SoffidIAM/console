@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	 <class name="com.soffid.iam.bpm.entity.ProcessDefinitionProperty" table="BPM_PROC_DEF_PROPERTIES">
+        
+        <id name="id">
+            <column name="PDP_ID" />
+            <generator class="native">
+            </generator>
+        </id>
+		
+		<property name="processDefinitionId" column="PDP_PROCESS_DEFINITION_ID" type="long" not-null="true"/>
+		<property name="name" column="PDP_NAME" type="string" not-null="true"/>
+		<property name="value" column="PDP_VALUE" type="string" not-null="false"/>
+    </class>
+</hibernate-mapping>

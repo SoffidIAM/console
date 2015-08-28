@@ -31,10 +31,10 @@ import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
+import com.soffid.iam.ui.SeyconTask;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.ui.SeyconTask;
 import es.caib.seycon.util.Base64;
 
 import java.io.IOException;

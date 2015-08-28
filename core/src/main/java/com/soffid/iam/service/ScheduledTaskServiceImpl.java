@@ -15,8 +15,10 @@ import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;

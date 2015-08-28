@@ -75,6 +75,8 @@ import org.jboss.mx.util.MBeanProxyCreationException;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.security.Util;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.loginModule.auth.ClientIPValve;
 import es.caib.loginModule.auth.ConstantesAutenticacion;
 import es.caib.loginModule.client.AuthenticationFailureException;
@@ -97,7 +99,6 @@ import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.RegistreAccesService;
 import es.caib.seycon.ng.servei.SeyconServiceLocator;
 import es.caib.seycon.ng.servei.UsuariService;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureProviderException;
 import es.caib.signatura.api.SignatureVerifyException;

@@ -12,7 +12,7 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.UserEntity;
-import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 
 /**
  * @see es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity

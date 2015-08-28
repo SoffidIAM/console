@@ -5,9 +5,10 @@ import java.rmi.RemoteException;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.servei.ejb.PuntEntradaService;
 import es.caib.seycon.ng.servei.ejb.XarxaService;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * Obté si certs menús del SEU s'han de mostrar (per ACLs)

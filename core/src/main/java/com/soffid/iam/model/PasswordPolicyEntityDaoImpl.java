@@ -18,8 +18,10 @@ import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
+
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;

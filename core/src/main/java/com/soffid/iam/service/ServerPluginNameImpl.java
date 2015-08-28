@@ -38,14 +38,14 @@ import com.soffid.iam.model.ServerPluginEntity;
 import com.soffid.iam.model.ServerPluginEntityDao;
 import com.soffid.iam.model.ServerPluginModuleEntity;
 import com.soffid.iam.model.ServerPluginModuleEntityDao;
+import com.soffid.iam.service.impl.InternalAgentDescriptor;
+import com.soffid.iam.service.impl.InternalObjectMapping;
+import com.soffid.iam.service.impl.InternalServerPluginModule;
+import com.soffid.iam.service.impl.ServerPluginParser;
 
 import es.caib.seycon.ng.comu.ServerPluginModuleType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.DuplicatedClassException;
-import es.caib.seycon.ng.servei.impl.InternalAgentDescriptor;
-import es.caib.seycon.ng.servei.impl.InternalObjectMapping;
-import es.caib.seycon.ng.servei.impl.InternalServerPluginModule;
-import es.caib.seycon.ng.servei.impl.ServerPluginParser;
 
 /**
  * @see es.caib.seycon.ng.servei.ServerPluginServer

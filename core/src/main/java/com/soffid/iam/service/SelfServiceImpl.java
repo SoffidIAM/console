@@ -29,11 +29,15 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.service.EntryPointService;
 import com.soffid.iam.service.NetworkService;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
+
 import com.soffid.iam.api.Password;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;

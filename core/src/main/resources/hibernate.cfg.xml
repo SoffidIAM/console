@@ -186,12 +186,13 @@
    <mapping resource="org/jbpm/taskmgmt/log/SwimlaneAssignLog.hbm.xml"/>
 
    <!-- BPM specific objects -->
-   <mapping resource="es/caib/bpm/entity/AuthenticationLog.hbm.xml"/>
-   <mapping resource="es/caib/bpm/entity/UserInterface.hbm.xml"/>
-   <mapping resource="es/caib/bpm/entity/ProcessDefinitionUserRole.hbm.xml"/>
-   <mapping resource="es/caib/bpm/entity/ProcessDefinitionProperty.hbm.xml"/>
-   <mapping resource="es/caib/bpm/entity/DBProperty.hbm.xml"/>
-   <mapping resource="es/caib/bpm/task/BPMTaskInstance.hbm.xml"/>
+   <!-- BPM specific objects -->
+   <mapping resource="com/soffid/iam/bpm/model/AuthenticationLog.hbm.xml"/>
+   <mapping resource="com/soffid/iam/bpm/model/UserInterface.hbm.xml"/>
+   <mapping resource="com/soffid/iam/bpm/model/ProcessDefinitionUserRole.hbm.xml"/>
+   <mapping resource="com/soffid/iam/bpm/model/ProcessDefinitionProperty.hbm.xml"/>
+   <mapping resource="com/soffid/iam/bpm/model/DBProperty.hbm.xml"/>
+   <mapping resource="com/soffid/iam/bpm/task/BPMTaskInstance.hbm.xml"/>
    <!-- hql queries and type defs -->
    <mapping resource="default.queries.hbm.xml" />
 
@@ -256,13 +257,13 @@
   <collection-cache collection="org.jbpm.taskmgmt.def.TaskMgmtDefinition.swimlanes" usage="nonstrict-read-write" />
   <collection-cache collection="org.jbpm.taskmgmt.def.TaskMgmtDefinition.tasks" usage="nonstrict-read-write" />
   <event type="pre-insert">
-            <listener class="es.caib.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
   </event>
   <event type="pre-update">
-            <listener class="es.caib.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
   </event>
   <event type="flush">
-            <listener class="es.caib.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
   </event>
 </session-factory>
 </hibernate-configuration>

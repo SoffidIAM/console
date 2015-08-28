@@ -20,9 +20,9 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.intf.AuthoritativeChange;
 import com.soffid.iam.sync.intf.AuthoritativeChangeIdentifier;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

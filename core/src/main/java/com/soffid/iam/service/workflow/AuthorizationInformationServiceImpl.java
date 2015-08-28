@@ -26,8 +26,10 @@ import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.service.workflow.CreateDisableUserServiceImpl.ComparaGrups;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

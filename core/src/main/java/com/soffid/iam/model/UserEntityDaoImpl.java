@@ -15,7 +15,7 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.AnonimousUser;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.BPMUser;
+import com.soffid.iam.bpm.api.BPMUser;
 import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.RoleAccount;
@@ -43,6 +43,8 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
@@ -51,8 +53,6 @@ import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
 import java.sql.CallableStatement;
@@ -1170,7 +1170,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		return null;
 	}
 
-    public void toBPMUser(com.soffid.iam.model.UserEntity source, com.soffid.iam.api.BPMUser target) {
+    public void toBPMUser(com.soffid.iam.model.UserEntity source, BPMUser target) {
     	target.setUserName(source.getUserName());
     	target.setGivenName(source.getFirstName());
     	target.setGroup(source.getPrimaryGroup().getName());

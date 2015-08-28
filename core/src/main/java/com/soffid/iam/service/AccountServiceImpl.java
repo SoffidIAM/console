@@ -49,6 +49,8 @@ import com.soffid.iam.service.UserDomainService;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.util.NameParser;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -68,8 +70,6 @@ import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.servei.SecretStoreService;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
 import java.sql.SQLException;

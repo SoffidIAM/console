@@ -4,7 +4,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.util.Initiator;
 
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
 
 /**
  * Classe per fer la comprovació de permisos als ZULS, rep com a paràmetre un

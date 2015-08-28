@@ -12,8 +12,10 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;

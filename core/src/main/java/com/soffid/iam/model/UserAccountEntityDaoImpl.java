@@ -4,10 +4,10 @@ import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;

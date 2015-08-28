@@ -9,7 +9,7 @@ package com.soffid.iam;
  * Stores the currently logged in Principal. The principal is passed
  * from another tier of the application (i.e. the web application).
  */
-public final class PrincipalStore
+public class PrincipalStore
 {
 	private static final ThreadLocal<java.security.Principal> store = new ThreadLocal<java.security.Principal>();
 

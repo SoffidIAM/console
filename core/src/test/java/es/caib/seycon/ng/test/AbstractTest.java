@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import javax.sql.rowset.spi.XmlReader;
 
+import com.soffid.iam.utils.Security;
 import com.soffid.test.AbstractHibernateTest;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -46,7 +47,6 @@ import es.caib.seycon.ng.servei.PuntEntradaService;
 import es.caib.seycon.ng.servei.SeyconServiceLocator;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.servei.XarxaService;
-import es.caib.seycon.ng.utils.Security;
 
 public abstract class AbstractTest extends AbstractHibernateTest
 {

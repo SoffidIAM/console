@@ -7,9 +7,9 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.utils.Security;
 
 /**
  * Entity UsuariGrupEntity implementation

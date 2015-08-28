@@ -20,11 +20,13 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.SystemGroupEntity;
 import com.soffid.iam.model.UserDomainEntity;
 import com.soffid.iam.model.UserTypeSystemEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
+
 import java.lang.reflect.Array;
 import java.security.Principal;
 import java.text.SimpleDateFormat;

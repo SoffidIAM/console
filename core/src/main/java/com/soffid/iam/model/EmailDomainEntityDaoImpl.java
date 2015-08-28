@@ -16,11 +16,13 @@ package com.soffid.iam.model;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EmailDomainEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;

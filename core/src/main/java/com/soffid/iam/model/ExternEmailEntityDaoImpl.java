@@ -18,10 +18,10 @@ import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ExceptionTranslator;
 
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
 
 import java.sql.Timestamp;
 

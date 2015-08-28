@@ -19,11 +19,11 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.LimitDates;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.LimitDates;
-import es.caib.seycon.ng.utils.Security;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;

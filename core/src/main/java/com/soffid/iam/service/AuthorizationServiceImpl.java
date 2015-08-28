@@ -27,10 +27,12 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.utils.AutoritzacioSEU;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.AutoritzacioSEU;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TipusDomini;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,8 +49,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -18,10 +18,13 @@ import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
+
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**

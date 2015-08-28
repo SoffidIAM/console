@@ -16,9 +16,11 @@ package com.soffid.iam.model;
 import com.soffid.iam.api.HostAlias;
 import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.util.Collection;
 import java.util.Iterator;
 

@@ -5,9 +5,9 @@ import java.util.Collection;
 import org.zkoss.zk.au.in.GetUploadInfoCommand;
 
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.utils.Security;
 
 public class RoleAccountEntityImpl extends RoleAccountEntity implements SecurityScopeEntity
 {

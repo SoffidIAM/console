@@ -15,17 +15,19 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DomainValue;
-import com.soffid.iam.bpm.BpmEngine;
+import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;

@@ -6,7 +6,7 @@ import javax.servlet.jsp.el.FunctionMapper;
 
 import org.jbpm.jpdl.el.ELException;
 
-import es.caib.seycon.ng.utils.Security;
+import com.soffid.iam.utils.Security;
 
 public class SecurityFunctionMapper implements FunctionMapper {
 

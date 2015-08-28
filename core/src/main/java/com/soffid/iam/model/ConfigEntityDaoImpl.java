@@ -18,10 +18,12 @@ import com.soffid.iam.api.Configuration;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.NetworkEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
-import es.caib.seycon.ng.utils.Security;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;

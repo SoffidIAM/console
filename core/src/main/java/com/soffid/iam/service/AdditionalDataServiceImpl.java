@@ -24,9 +24,11 @@ import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;

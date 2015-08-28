@@ -21,14 +21,17 @@ import com.soffid.iam.model.EntryPointGroupEntity;
 import com.soffid.iam.model.EntryPointIconEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.EntryPointUserEntity;
+import com.soffid.iam.utils.AmbitsExecucioPuntEntrada;
+import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
+
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.AmbitsExecucioPuntEntrada;
-import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 
 /**

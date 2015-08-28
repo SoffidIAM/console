@@ -63,6 +63,7 @@ import org.zkoss.zul.impl.InputElement;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.attachment.TaskAttachmentManager;
 import es.caib.bpm.classloader.UIClassLoader;
@@ -79,7 +80,6 @@ import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureTimestampException;
 import es.caib.zkib.component.DataGrid;

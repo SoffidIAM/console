@@ -14,8 +14,10 @@ import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.model.RuleAssignedRoleEntity;
 import com.soffid.iam.model.RuleEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.utils.Security;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;

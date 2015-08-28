@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.webdav.lib.properties.GetLastModifiedProperty;
 import org.zkoss.zk.ui.Sessions;
 
-import es.caib.bpm.servei.impl.UserContextCache;
-import es.caib.seycon.ng.utils.Security;
+import com.soffid.iam.bpm.service.impl.UserContextCache;
+import com.soffid.iam.utils.Security;
 
 /**
  * @author bubu

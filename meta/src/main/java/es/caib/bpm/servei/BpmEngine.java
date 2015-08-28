@@ -7,12 +7,17 @@
 package es.caib.bpm.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.vo.Job;
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.bpm.vo.ProcessDefinition;
+import es.caib.bpm.vo.ProcessInstance;
+import es.caib.bpm.vo.TaskDefinition;
+import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.servei.AplicacioService;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={roles.Tothom.class}, translatedName="BpmEngine", translatedPackage="com.soffid.iam.bpm")
+@Service ( grantees={roles.Tothom.class}, translatedName="BpmEngine", translatedPackage="com.soffid.iam.bpm.service")
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.seycon.ng.servei.UsuariService.class, AplicacioService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -21,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class BpmEngine {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findMyProcesses()
+	public java.util.List<ProcessInstance> findMyProcesses()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -38,7 +43,7 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List searchProcessInstances(
+	public java.util.List<ProcessInstance> searchProcessInstances(
 		@Nullable java.lang.String query, 
 		@Nullable java.lang.String processID, 
 		@Nullable java.lang.String startDate, 
@@ -48,7 +53,7 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findProcessInstances(
+	public java.util.List<ProcessInstance> findProcessInstances(
 		java.util.List definitions, 
 		java.lang.String processId, 
 		java.lang.String estado, 
@@ -59,7 +64,7 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findProcessInstances(
+	public java.util.List<ProcessInstance> findProcessInstances(
 		es.caib.bpm.vo.ProcessDefinition def)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
@@ -104,17 +109,17 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findMyTasks()
+	public java.util.List<TaskInstance> findMyTasks()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findMyTasksLightweight()
+	public java.util.List<TaskInstance> findMyTasksLightweight()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findGroupTasks()
+	public java.util.List<TaskInstance> findGroupTasks()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
@@ -176,8 +181,8 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findTasks(
-		java.util.List def, 
+	public java.util.List<TaskInstance> findTasks(
+		java.util.List<ProcessInstance> def, 
 		es.caib.bpm.vo.TaskDefinition task, 
 		java.lang.String actor, 
 		java.util.Date processStartDate, 
@@ -187,8 +192,8 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findTasks(
-		java.util.List def, 
+	public java.util.List<TaskInstance> findTasks(
+		java.util.List<ProcessInstance> def, 
 		java.lang.String process, 
 		es.caib.bpm.vo.TaskDefinition task, 
 		java.lang.String actor, 
@@ -217,14 +222,14 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List getPendingTasks(
+	public java.util.List<TaskInstance> getPendingTasks(
 		es.caib.bpm.vo.ProcessInstance process)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findProcessDefinitions(
+	public java.util.List<ProcessDefinition> findProcessDefinitions(
 		@Nullable java.lang.String name, 
 		boolean onlyEnabled)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -233,7 +238,7 @@ public abstract class BpmEngine {
 
 	@Description("Searches for process definition of a predefined type")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findProcessDefinitions(
+	public java.util.List<ProcessDefinition> findProcessDefinitions(
 		@Nullable java.lang.String name, 
 		PredefinedProcessType processType)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -272,17 +277,17 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findInitiatorProcessDefinitions()
+	public java.util.List<ProcessDefinition> findInitiatorProcessDefinitions()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findObserverProcessDefinitions()
+	public java.util.List<ProcessDefinition> findObserverProcessDefinitions()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findSupervisorProcessDefinitions()
+	public java.util.List<ProcessDefinition> findSupervisorProcessDefinitions()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
@@ -293,7 +298,7 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List findTaskDefinitions(
+	public java.util.List<TaskDefinition> findTaskDefinitions(
 		es.caib.bpm.vo.ProcessDefinition def)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
@@ -363,19 +368,19 @@ public abstract class BpmEngine {
 	 return false;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List getActiveJobs(
+	public java.util.List<Job> getActiveJobs(
 		es.caib.bpm.vo.ProcessInstance process)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List getActiveTasks(
+	public java.util.List<TaskInstance> getActiveTasks(
 		es.caib.bpm.vo.ProcessInstance process)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.List getActiveJobs()
+	public java.util.List<Job> getActiveJobs()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
@@ -396,11 +401,11 @@ public abstract class BpmEngine {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void changeConfiguration(
-		java.util.Map m)
+		java.util.Map<String,String> m)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Map getConfiguration()
+	public java.util.Map<String,String> getConfiguration()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

@@ -2,9 +2,9 @@ package es.caib.seycon.ng.test;
 
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.DocumentService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.Security;
 
 public class DocumentServiceTest extends AbstractTest
 {

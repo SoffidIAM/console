@@ -21,18 +21,23 @@ import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.AccountType;
+
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
+
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InvalidPasswordException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.utils.Security;
+
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+
 import org.apache.webdav.lib.properties.GetContentLengthProperty;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 

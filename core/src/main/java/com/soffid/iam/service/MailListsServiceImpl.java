@@ -33,13 +33,14 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownApplicationException;
 import es.caib.seycon.ng.exception.UnknownMailListException;
 import es.caib.seycon.ng.exception.UnknownRoleException;
-import es.caib.seycon.ng.servei.Messages;
-import es.caib.seycon.ng.utils.Security;
+
 import java.rmi.activation.UnknownGroupException;
 import java.util.Collection;
 import java.util.GregorianCalendar;

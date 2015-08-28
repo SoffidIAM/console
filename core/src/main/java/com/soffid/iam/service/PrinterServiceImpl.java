@@ -26,11 +26,13 @@ import com.soffid.iam.model.PrinterGroupEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.service.NetworkServiceImpl;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;

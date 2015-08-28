@@ -22,11 +22,13 @@ import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.Security;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;

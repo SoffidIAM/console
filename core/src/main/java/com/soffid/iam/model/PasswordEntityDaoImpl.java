@@ -18,10 +18,12 @@ import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.security.MessageDigest;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -32,6 +34,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+
 import org.hibernate.Session;
 
 /**

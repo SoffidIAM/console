@@ -5,8 +5,8 @@ package es.caib.bpm.jmx;
 import org.apache.log4j.Logger;
 import org.jboss.system.ServiceMBeanSupport;
 
-import es.caib.bpm.index.IndexerThread;
-import es.caib.bpm.job.JobExecutor;
+import com.soffid.iam.bpm.index.IndexerThread;
+import com.soffid.iam.bpm.job.JobExecutor;
 
 public class JBPMService extends ServiceMBeanSupport implements JBPMServiceMBean {
 	JobExecutor scheduler = null;

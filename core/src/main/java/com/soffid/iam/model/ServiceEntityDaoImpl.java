@@ -14,10 +14,12 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.model.ServiceEntity;
+import com.soffid.iam.utils.ExceptionTranslator;
+
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.ExceptionTranslator;
+
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;

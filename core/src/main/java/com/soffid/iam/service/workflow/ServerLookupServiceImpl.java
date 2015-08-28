@@ -17,12 +17,13 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.service.NetworkService;
+import com.soffid.iam.utils.MailUtils;
+
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.utils.MailUtils;
+
 import java.util.*;
-import java.util.LinkedList;
-import java.util.Properties;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.naming.NamingException;

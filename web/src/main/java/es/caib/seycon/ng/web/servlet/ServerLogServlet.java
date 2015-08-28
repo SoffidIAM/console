@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome;
-import es.caib.seycon.ng.utils.Security;
 
 public class ServerLogServlet extends HttpServlet {
 

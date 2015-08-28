@@ -11,7 +11,8 @@ import es.caib.seycon.ng.servei.ApplicationBootService;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service ( grantees={roles.Tothom.class})
+@Service ( grantees={roles.Tothom.class},
+		translatedName="BpmConfigService", translatedPackage="com.soffid.iam.bpm.service")
 public abstract class BpmConfigService extends ApplicationBootService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

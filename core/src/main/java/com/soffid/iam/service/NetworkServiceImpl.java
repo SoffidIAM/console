@@ -44,17 +44,19 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.XarxaSearchCriteria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownHostException;
 import es.caib.seycon.ng.exception.UnknownNetworkException;
-import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-import es.caib.seycon.ng.utils.DateUtils;
-import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TimedOutException;
 import es.caib.seycon.util.TimedProcess;
+
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -70,6 +72,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 

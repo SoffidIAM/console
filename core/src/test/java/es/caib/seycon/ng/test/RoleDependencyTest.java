@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Dispatcher;
@@ -20,7 +22,6 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.servei.TipusUnitatOrganitzativaService;
-import es.caib.seycon.ng.utils.Security;
 
 public class RoleDependencyTest extends AbstractTest
 {

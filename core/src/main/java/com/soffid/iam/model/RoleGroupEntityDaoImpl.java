@@ -24,10 +24,10 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.TipusContenidorRol;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.TipusContenidorRol;
 
 import java.sql.Timestamp;
 

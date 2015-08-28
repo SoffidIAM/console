@@ -29,8 +29,8 @@ import com.soffid.iam.doc.model.DocumentEntity;
 import com.soffid.iam.doc.nas.NASManager;
 import com.soffid.iam.doc.nas.SignerStrategy;
 import com.soffid.iam.doc.nas.crypto.CryptoUtil;
+import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureTimestampException;
 

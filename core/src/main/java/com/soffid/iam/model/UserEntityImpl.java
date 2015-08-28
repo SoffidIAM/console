@@ -1,10 +1,10 @@
 package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
 
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.utils.Security;
 
 public class UserEntityImpl extends UserEntity
 	implements SecurityScopeEntity

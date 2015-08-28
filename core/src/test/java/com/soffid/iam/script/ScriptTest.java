@@ -60,7 +60,7 @@ public class ScriptTest extends  TestCase {
 	public void test2 () throws EvalError 
 	{
 		try {
-			es.caib.seycon.ng.utils.Security.nestedLogin ("hola", new String[] {} );
+			com.soffid.iam.utils.Security.nestedLogin ("hola", new String[] {} );
 			Object r = interpreter.eval("es.caib.seycon.ng.utils.Security.nestedLogin (\"hola\", new String[] {} );");
 //			assertFalse("Expected exception not thrown", true);
 		} catch (EvalError e) {

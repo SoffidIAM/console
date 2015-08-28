@@ -7,13 +7,14 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import org.hibernate.Hibernate;
 
 /**

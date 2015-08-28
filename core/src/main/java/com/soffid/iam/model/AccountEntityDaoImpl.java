@@ -13,11 +13,10 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.model.*;
-import es.caib.seycon.ng.utils.Security;
 
 import java.security.Principal;
 import java.sql.Timestamp;

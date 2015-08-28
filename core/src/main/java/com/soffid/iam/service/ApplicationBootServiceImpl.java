@@ -22,6 +22,8 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.bpm.api.ConfigParameterVO;
+import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.service.AdditionalDataService;
 import com.soffid.iam.service.ApplicationService;
@@ -33,10 +35,9 @@ import com.soffid.iam.service.NetworkService;
 import com.soffid.iam.service.SystemScheduledTasks;
 import com.soffid.iam.service.UserDomainService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.BpmConfigService;
-import es.caib.bpm.vo.ConfigParameterVO;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Password;
@@ -44,7 +45,6 @@ import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
-import es.caib.seycon.ng.utils.Security;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -115,7 +115,7 @@ public class ApplicationBootServiceImpl extends com.soffid.iam.service.Applicati
 	@Override
 	protected void handleConsoleBoot() throws Exception
 	{
-		SeyconServiceLocator.instance();
+		ServiceLocator.instance();
 		
 		System.setProperty("soffid.ui.maxrows", //$NON-NLS-1$
 			Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$

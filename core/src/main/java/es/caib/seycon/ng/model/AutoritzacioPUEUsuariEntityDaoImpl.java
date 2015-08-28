@@ -98,8 +98,8 @@ public class AutoritzacioPUEUsuariEntityDaoImpl
 		target.setIdPuntEntrada(source.getPuntEntrada().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.USUARI);
-		target.setIdEntitatAutoritzada(source.getIdUsuari());
-		UsuariEntity usuari = getUsuariEntityDao().findById(source.getIdUsuari());
+		target.setIdEntitatAutoritzada(source.getUser().getId());
+		UsuariEntity usuari = source.getUser();
 		target.setDescripcioEntitatAutoritzada(usuari.getNom()+" "+usuari.getPrimerLlinatge()+" "+usuari.getSegonLlinatge()+" ["+usuari.getCodi()+"]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		target.setCodiEntitatAutoritzada(usuari.getCodi());
 	}
@@ -109,7 +109,7 @@ public class AutoritzacioPUEUsuariEntityDaoImpl
 			es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity target) {
 		
 		// Aquí se supone que la entidad está cargada o es nueva..
-		target.setIdUsuari(source.getIdEntitatAutoritzada());
+		target.setUser(getUsuariEntityDao().load(source.getIdEntitatAutoritzada()));
 		
 		// Ponemos el nivel de autorización 
 		// Hay 2 tipos: Administrador (A) y Autoritzat (C)

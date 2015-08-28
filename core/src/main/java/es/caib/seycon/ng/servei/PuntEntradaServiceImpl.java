@@ -1035,7 +1035,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it.next();
                 AutoritzacioPUERolEntity apu = 
                 		getAutoritzacioPUERolEntityDao().newAutoritzacioPUERolEntity();
-                apu.setIdRol(auto.getIdRol());
+                apu.setRole(auto.getRole());
                 apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
                 apu.setPuntEntrada(nouPUEClonat);
                 getAutoritzacioPUERolEntityDao().create(apu);
@@ -1049,7 +1049,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 AutoritzacioPUEGrupEntity auto = (AutoritzacioPUEGrupEntity) it.next();
                 AutoritzacioPUEGrupEntity apu = 
                 		getAutoritzacioPUEGrupEntityDao().newAutoritzacioPUEGrupEntity();
-                apu.setIdGrup(auto.getIdGrup());
+                apu.setGroup(auto.getGroup());
                 apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
                 apu.setPuntEntrada(nouPUEClonat);
                 getAutoritzacioPUEGrupEntityDao().create(apu);
@@ -1064,7 +1064,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 AutoritzacioPUEUsuariEntity auto = (AutoritzacioPUEUsuariEntity) it.next();
                 AutoritzacioPUEUsuariEntity apu = 
                 		getAutoritzacioPUEUsuariEntityDao().newAutoritzacioPUEUsuariEntity();
-                apu.setIdUsuari(auto.getIdUsuari());
+                apu.setUser(auto.getUser());
                 apu.setNivellAutoritzacio(auto.getNivellAutoritzacio());
                 apu.setPuntEntrada(nouPUEClonat);
                 getAutoritzacioPUEUsuariEntityDao().create(apu);
@@ -1304,7 +1304,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             		getAutoritzacioPUERolEntityDao(). 
             			newAutoritzacioPUERolEntity();
             autoRol.setNivellAutoritzacio(nivell);
-            autoRol.setIdRol(idEntitat);
+            autoRol.setRole (getRolEntityDao().load(idEntitat));
             autoRol.setPuntEntrada(puntEntradaE);
             getAutoritzacioPUERolEntityDao().create(autoRol);
 
@@ -1322,7 +1322,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             		getAutoritzacioPUEGrupEntityDao(). 
             			newAutoritzacioPUEGrupEntity();
         	autoGrup.setNivellAutoritzacio(nivell);
-        	autoGrup.setIdGrup(idEntitat);
+        	autoGrup.setGroup(getGrupEntityDao().load(idEntitat));
         	autoGrup.setPuntEntrada(puntEntradaE);
             getAutoritzacioPUEGrupEntityDao().create(autoGrup);
 
@@ -1340,7 +1340,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             		getAutoritzacioPUEUsuariEntityDao(). 
             			newAutoritzacioPUEUsuariEntity();
         	autoUsu.setNivellAutoritzacio(nivell);
-        	autoUsu.setIdUsuari(idEntitat);
+        	autoUsu.setUser(getUsuariEntityDao().load(idEntitat));
         	autoUsu.setPuntEntrada(puntEntradaE);
             getAutoritzacioPUEUsuariEntityDao().create(autoUsu);
 
@@ -1860,7 +1860,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         for (Iterator it = autoRol.iterator(); it.hasNext();) {
             // ho mirem per entity (per reduir les cerques): només als rols
             AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it.next();
-            if (permisos.getRolsUsuariPUE().contains(auto.getIdRol())) {
+            if (permisos.getRolsUsuariPUE().contains(auto.getRole().getId())) {
                 // Només administradors. NOTA: al entity pot ésser A o C
                 // (!!)
                 if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(auto.getNivellAutoritzacio()))

@@ -97,8 +97,8 @@ public class AutoritzacioPUERolEntityDaoImpl
 		target.setIdPuntEntrada(source.getPuntEntrada().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.ROL);
-		target.setIdEntitatAutoritzada(source.getIdRol());
-		RolEntity rol = getRolEntityDao().findById(source.getIdRol());
+		target.setIdEntitatAutoritzada(source.getRole().getId());
+		RolEntity rol = source.getRole();
 		// Format de toDescripcioRol: nomRol+"@"+codiBbdd+">"+codiAplicacio)
 		String descripcioUnicaRol = rol.toDescripcioRol();
 		// Guardem només el nom del rol (com es fa al seycon-net)
@@ -120,6 +120,6 @@ public class AutoritzacioPUERolEntityDaoImpl
 		else
 			target.setNivellAutoritzacio("C"); //$NON-NLS-1$
 		
-		target.setIdRol(source.getIdEntitatAutoritzada());
+		target.setRole(getRolEntityDao().load(source.getIdEntitatAutoritzada()));
 	}
 }

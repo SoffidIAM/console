@@ -2085,7 +2085,7 @@ public class UsuariServiceImpl extends
 	protected String handleCanviPassword(String codiUsuari, String codiDominiContrasenyes) throws Exception {
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
-			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari)) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_UPDATE_PASSWORD, usuari)) {
 				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService().generateNewPassword(usuari, dominiContrasenyes, true);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getCodi());

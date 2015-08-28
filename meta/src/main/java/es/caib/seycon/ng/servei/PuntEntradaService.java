@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.RolEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={roles.intranetMenus_admin.class,roles.Tothom.class},
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity.class,
 	es.caib.seycon.ng.model.IconaEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	GrupEntity.class, RolEntity.class,
 	es.caib.seycon.ng.servei.UsuariService.class})
 public abstract class PuntEntradaService {
 

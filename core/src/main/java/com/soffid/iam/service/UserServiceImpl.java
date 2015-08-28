@@ -2161,7 +2161,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
 			if (getAuthorizationService().hasPermission(
-					Security.AUTO_USER_SET_PASSWORD, usuari)) {
+					Security.AUTO_USER_UPDATE_PASSWORD, usuari)) {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao()
 						.findByName(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService()

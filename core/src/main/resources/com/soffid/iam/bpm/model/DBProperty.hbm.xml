@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	
-	 <class name="com.soffid.iam.bpm.entity.DBProperty" table="BPM_DATABASE_PROPERTY">
+	 <class name="com.soffid.iam.bpm.model.DBProperty" table="BPM_DATABASE_PROPERTY">
         
         <id name="id">
             <column name="DBP_ID" />

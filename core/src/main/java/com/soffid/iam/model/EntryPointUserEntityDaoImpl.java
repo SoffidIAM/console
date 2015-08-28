@@ -93,8 +93,8 @@ public class EntryPointUserEntityDaoImpl
 		target.setAccessTreeId(source.getEntryPoint().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setAuthorizationEntityType(TipusAutoritzacioPuntEntrada.USUARI);
-		target.setAuthorizationEntityId(source.getUserId());
-		UserEntity usuari = getUserEntityDao().findById(source.getUserId());
+		target.setAuthorizationEntityId(source.getUser().getId());
+		UserEntity usuari = source.getUser();
 		target.setAuthorizedEntityDescription(usuari.getFirstName() + " " + usuari.getLastName() + " " + usuari.getMiddleName() + " [" + usuari.getUserName() + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		target.setAuthorizedEntityCode(usuari.getUserName());
 	}
@@ -102,7 +102,7 @@ public class EntryPointUserEntityDaoImpl
 	private void autoritzacioPuntEntradaToEntityCustom(com.soffid.iam.api.AccessTreeAuthorization source, com.soffid.iam.model.EntryPointUserEntity target) {
 		
 		// Aquí se supone que la entidad está cargada o es nueva..
-		target.setUserId(source.getAuthorizationEntityId());
+		target.setUser(getUserEntityDao().load(source.getAuthorizationEntityId()));
 		
 		// Ponemos el nivel de autorización 
 		// Hay 2 tipos: Administrador (A) y Autoritzat (C)

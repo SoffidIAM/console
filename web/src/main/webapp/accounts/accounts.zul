@@ -426,12 +426,11 @@
 								etiqueta="${c:l('accounts.description')}" bind="@description" />
 							<hbox width="250px" widths="100px,*">
 								<label sclass="etiqueta" value="${c:l('accounts.dispatcher')}" />
-								<listbox bind="@dispatcher" id="queryDispatcher" mold="select"
-									dataPath="/model:/dispatcher">
-									<dataitem bind="@codi">
-										<listcell bind="@codi" />
-									</dataitem>
-								</listbox>
+								<combobox bind="@dispatcher" id="queryDispatcher"
+									dataPath="/model:/dispatcher" value="%">
+									<datacomboitem bind="@codi" labelBind="@codi">
+									</datacomboitem>
+								</combobox>
 							</hbox>
 							<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
 						</hbox>

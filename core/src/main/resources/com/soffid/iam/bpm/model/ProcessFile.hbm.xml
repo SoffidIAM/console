@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	
-	 <class name="com.soffid.iam.bpm.entity.ProcessFile" table="BPM_PROCESS_FILE">
+	 <class name="com.soffid.iam.bpm.model.ProcessFile" table="BPM_PROCESS_FILE">
         
         <id name="id">
             <column name="PRO_ID" />

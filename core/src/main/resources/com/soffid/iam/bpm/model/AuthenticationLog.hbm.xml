@@ -6,7 +6,7 @@
 
 <hibernate-mapping auto-import="false" default-access="field">
 
-  <subclass name="com.soffid.iam.bpm.entity.AuthenticationLog" 
+  <subclass name="com.soffid.iam.bpm.model.AuthenticationLog" 
             extends="org.jbpm.logging.log.CompositeLog"
             discriminator-value="$">
             

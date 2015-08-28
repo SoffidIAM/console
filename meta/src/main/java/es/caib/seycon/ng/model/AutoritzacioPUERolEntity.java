@@ -25,12 +25,12 @@ public abstract class AutoritzacioPUERolEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column(name = "RPE_IDROL", translated = "roleId")
-	public java.lang.Long idRol;
+	@Column(name = "RPE_IDROL")
+	public RolEntity role;
 
 	@Operation(translated = "findByRoleId")
-	@DaoFinder("select autor from com.soffid.iam.model.EntryPointRoleEntity autor where autor.roleId=:idRol")
-	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUERolEntity> findByIdRol(
+	@DaoFinder("select autor from com.soffid.iam.model.EntryPointRoleEntity autor where autor.role.id=:idRol")
+	public java.util.List<AutoritzacioPUERolEntity> findByIdRol(
 			java.lang.Long idRol) {
 		return null;
 	}

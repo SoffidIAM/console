@@ -88,8 +88,8 @@ public class EntryPointRoleEntityDaoImpl
 		target.setAccessTreeId(source.getEntryPoint().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setAuthorizationEntityType(TipusAutoritzacioPuntEntrada.ROL);
-		target.setAuthorizationEntityId(source.getRoleId());
-		RoleEntity rol = getRoleEntityDao().findById(source.getRoleId());
+		target.setAuthorizationEntityId(source.getRole().getId());
+		RoleEntity rol = source.getRole();
 		// Format de toDescripcioRol: nomRol+"@"+codiBbdd+">"+codiAplicacio)
 		String descripcioUnicaRol = rol.toRoleDescription();
 		// Guardem només el nom del rol (com es fa al seycon-net)
@@ -107,6 +107,6 @@ public class EntryPointRoleEntityDaoImpl
 		else
 			target.setAuthorizationLevel("C"); //$NON-NLS-1$
 		
-		target.setRoleId(source.getAuthorizationEntityId());
+		target.setRole(getRoleEntityDao().load(source.getAuthorizationEntityId()));
 	}
 }

@@ -44,7 +44,6 @@ import es.caib.seycon.ng.servei.GrupService;
 import es.caib.seycon.ng.servei.InternalPasswordService;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.PuntEntradaService;
-import es.caib.seycon.ng.servei.SeyconServiceLocator;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.servei.XarxaService;
 

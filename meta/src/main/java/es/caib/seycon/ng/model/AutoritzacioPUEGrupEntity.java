@@ -24,7 +24,7 @@ public abstract class AutoritzacioPUEGrupEntity {
 	@Column (name="GPE_IDPUE", translated="entryPoint")
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
-	@Column (name="GPE_IDGRU", translated="groupId")
-	public java.lang.Long idGrup;
+	@Column (name="GPE_IDGRU")
+	public GrupEntity group;
 
 }

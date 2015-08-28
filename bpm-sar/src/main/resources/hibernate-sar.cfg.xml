@@ -260,13 +260,13 @@
 
 
   <event type="pre-insert">
-            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
   </event>
   <event type="pre-update">
-            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
   </event>
   <event type="flush">
-            <listener class="com.soffid.iam.bpm.entity.IndexEventListener"/>
+            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
   </event>
 </session-factory>
 </hibernate-configuration>

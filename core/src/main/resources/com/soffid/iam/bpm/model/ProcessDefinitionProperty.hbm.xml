@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	
-	 <class name="com.soffid.iam.bpm.entity.ProcessDefinitionProperty" table="BPM_PROC_DEF_PROPERTIES">
+	 <class name="com.soffid.iam.bpm.model.ProcessDefinitionProperty" table="BPM_PROC_DEF_PROPERTIES">
         
         <id name="id">
             <column name="PDP_ID" />

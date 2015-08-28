@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	
-	 <class name="com.soffid.iam.bpm.entity.UserInterface" table="BPM_USER_INTERFACE">
+	 <class name="com.soffid.iam.bpm.model.UserInterface" table="BPM_USER_INTERFACE">
         
         <id name="id" unsaved-value="null">
             <column name="USI_ID" />

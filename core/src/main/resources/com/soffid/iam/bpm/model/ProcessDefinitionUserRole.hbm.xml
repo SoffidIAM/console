@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 	
-	 <class name="com.soffid.iam.bpm.entity.ProcessDefinitionUserRole" table="BPM_PROCESS_DEFINITION_ROLES">
+	 <class name="com.soffid.iam.bpm.model.ProcessDefinitionUserRole" table="BPM_PROCESS_DEFINITION_ROLES">
         
         <id name="id">
             <column name="PDR_ID" />

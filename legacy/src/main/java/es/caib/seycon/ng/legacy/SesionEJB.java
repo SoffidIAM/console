@@ -75,6 +75,17 @@ import org.jboss.mx.util.MBeanProxyCreationException;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.jboss.security.Util;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AccessLog;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Password;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.service.AccessLogService;
+import com.soffid.iam.service.AccountService;
+import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.service.UserService;
 import com.soffid.iam.utils.Security;
 
 import es.caib.loginModule.auth.ClientIPValve;
@@ -87,18 +98,7 @@ import es.caib.loginModule.client.SessionIdentifier;
 import es.caib.loginModule.client.SeyconPrincipal;
 import es.caib.loginModule.jmx.SesionData;
 import es.caib.loginModule.jmx.SeyconRealmServerMBean;
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.RegistreAcces;
-import es.caib.seycon.ng.comu.UserAccount;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AccountService;
-import es.caib.seycon.ng.servei.AutoritzacioService;
-import es.caib.seycon.ng.servei.PasswordService;
-import es.caib.seycon.ng.servei.RegistreAccesService;
-import es.caib.seycon.ng.servei.SeyconServiceLocator;
-import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureProviderException;
 import es.caib.signatura.api.SignatureVerifyException;
@@ -1106,9 +1106,9 @@ public class SesionEJB implements EntityBean {
         try {
             // Valida usuario/dni contra BBDD
 
-            UsuariService us = SeyconServiceLocator.instance().getUsuariService();
-            AccountService as = SeyconServiceLocator.instance().getAccountService();
-            PasswordService ps = SeyconServiceLocator.instance().getPasswordService();
+            UserService us = ServiceLocator.instance().getUserService();
+            AccountService as = ServiceLocator.instance().getAccountService();
+            PasswordService ps = ServiceLocator.instance().getPasswordService();
 
             String dispatcher = ps.getDefaultDispatcher();
             Account acc = as.findAccount(principal.getIntranetUser(), dispatcher);
@@ -1298,13 +1298,13 @@ public class SesionEJB implements EntityBean {
         Security.nestedLogin("$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
                 + Security.AUTO_ALL });
         try {
-            UsuariService us = SeyconServiceLocator.instance().getUsuariService();
+            UserService us = ServiceLocator.instance().getUserService();
 
-            Usuari usuari = us.findUsuariByNIFUsuari(principal.getNif());
+            User usuari = us.findUserByUserName(principal.getNif());
             if (usuari == null) {
                 return false;
             }
-            principal.setIntranetUser(usuari.getCodi());
+            principal.setIntranetUser(usuari.getUserName());
             return true;
         } finally {
             Security.nestedLogoff();
@@ -1335,7 +1335,7 @@ public class SesionEJB implements EntityBean {
             	Map<String,String> attributes = new HashMap<String, String>();
             	attributes.put("ip", sesionInfo.getIpRoute());
             	attributes.put("method", sesionInfo.getCertificadoX509() == null ? "password" : "certificate");
-                AutoritzacioService us = SeyconServiceLocator.instance().getAutoritzacioService();
+                AuthorizationService us = ServiceLocator.instance().getAuthorizationService();
     
                 String[] rolesArray = us.getUserAuthorizationsString(getPrincipalUser(), attributes);
                 for (int i = 0; i < rolesArray.length; i++) {
@@ -1357,25 +1357,25 @@ public class SesionEJB implements EntityBean {
                 + Security.AUTO_ALL });
         try {
 
-            UsuariService us = SeyconServiceLocator.instance().getUsuariService();
-            AccountService as = SeyconServiceLocator.instance().getAccountService();
-            PasswordService ps = SeyconServiceLocator.instance().getPasswordService();
+            UserService us = ServiceLocator.instance().getUserService();
+            AccountService as = ServiceLocator.instance().getAccountService();
+            PasswordService ps = ServiceLocator.instance().getPasswordService();
 
             String dispatcher = ps.getDefaultDispatcher();
             Account acc = as.findAccount(cod, dispatcher);
-            Usuari usuari = null;
+            User usuari = null;
             if (acc == null)
             {
                 return null;
             }
             if (acc instanceof UserAccount){
             	
-            	usuari = us.findUsuariByCodiUsuari( ((UserAccount) acc).getUser());;
+            	usuari = us.findUserByUserName( ((UserAccount) acc).getUser());;
             }
 
             userBd = acc.getName();
             String nomBd = usuari == null ? acc.getDescription(): usuari.getFullName(); //$NON-NLS-1$ //$NON-NLS-2$
-            String nifBd = usuari == null ? null: usuari.getNIF();
+            String nifBd = usuari == null ? null: usuari.getNationalID();
 
             SeyconPrincipal principal = new SeyconPrincipal(userBd, nomBd, nifBd);
             sesionInfo.setPrincipal(principal);
@@ -1391,28 +1391,28 @@ public class SesionEJB implements EntityBean {
         log.info(String.format(Messages.getString("SesionEJB.LoginInfo"), sesionInfo.getIpRoute(), //$NON-NLS-1$
         		(usuNIF == null ? usuSeycon : usuNIF), metodo, autenticado));
         try {
-            RegistreAccesService service = SeyconServiceLocator.instance().getRegistreAccesService();
-            RegistreAcces rac = new RegistreAcces ();
+            AccessLogService service = ServiceLocator.instance().getAccessLogService();
+            AccessLog rac = new AccessLog ();
             rac.setId(new Long(0));
             String hostName = InetAddress.getLocalHost().getHostName();
             if (hostName.indexOf('.') > 0)
                 hostName = hostName.substring(0, hostName.indexOf('.'));
             rac.setCodeAge(hostName);
-            rac.setCodiUsuari(usuSeycon);
-            rac.setDataFi(Calendar.getInstance());
-            rac.setDataInici(Calendar.getInstance());
-            rac.setNomServidor(hostName);
-            rac.setInformacio(sesionInfo.getIpRoute());
-            rac.setProtocolAcces("HTTP"); //$NON-NLS-1$
+            rac.setUserCode(usuSeycon);
+            rac.setEndDate(Calendar.getInstance());
+            rac.setStartDate(Calendar.getInstance());
+            rac.setServerName(hostName);
+            rac.setInformation(sesionInfo.getIpRoute());
+            rac.setAccessProtocol("HTTP"); //$NON-NLS-1$
             if (autenticado == 'S')
-                rac.setTipusAcces("L"); //$NON-NLS-1$
+                rac.setAccessType("L"); //$NON-NLS-1$
             else
-                rac.setTipusAcces("D"); //$NON-NLS-1$
+                rac.setAccessType("D"); //$NON-NLS-1$
             if (certificadoX509 != null) {
                 byte certBase64[] = Base64.encodeBase64(certificadoX509.getEncoded());
-                rac.setInformacio("Cert:"+new String(certBase64, "ISO-8859-1")); //$NON-NLS-1$ //$NON-NLS-2$
+                rac.setInformation(rac.getInformation()+" Cert:"+new String(certBase64, "ISO-8859-1")); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            rac.setNomClinet(sesionInfo.getIpRoute());
+            rac.setClientName(sesionInfo.getIpRoute());
             service.create(rac);
         } catch (Exception e) {
             log.error(Messages.getString("SesionEJB.AuthenticationLogError"), e); //$NON-NLS-1$

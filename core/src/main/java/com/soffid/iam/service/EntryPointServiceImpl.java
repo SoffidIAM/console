@@ -974,7 +974,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             for (Iterator<EntryPointRoleEntity> it = _autoRol.iterator(); it.hasNext(); ) {
                 EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
                 EntryPointRoleEntity apu = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
-                apu.setRoleId(auto.getRoleId());
+                apu.setRole(auto.getRole());
                 apu.setAuthorizationLevel(auto.getAuthorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointRoleEntityDao().create(apu);
@@ -987,7 +987,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             for (Iterator<EntryPointGroupEntity> it = _autoGrup.iterator(); it.hasNext(); ) {
                 EntryPointGroupEntity auto = (EntryPointGroupEntity) it.next();
                 EntryPointGroupEntity apu = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
-                apu.setGroupId(auto.getGroupId());
+                apu.setGroup(auto.getGroup());
                 apu.setAuhtorizationLevel(auto.getAuhtorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointGroupEntityDao().create(apu);
@@ -1000,7 +1000,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             for (Iterator<EntryPointUserEntity> it = _autoUsu.iterator(); it.hasNext(); ) {
                 EntryPointUserEntity auto = (EntryPointUserEntity) it.next();
                 EntryPointUserEntity apu = getEntryPointUserEntityDao().newEntryPointUserEntity();
-                apu.setUserId(auto.getUserId());
+                apu.setUser(auto.getUser());
                 apu.setAuthorizationLevel(auto.getAuthorizationLevel());
                 apu.setEntryPoint(nouPUEClonat);
                 getEntryPointUserEntityDao().create(apu);
@@ -1220,7 +1220,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             // ROL: Creamos autorización
             EntryPointRoleEntity autoRol = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
             autoRol.setAuthorizationLevel(nivell);
-            autoRol.setRoleId(idEntitat);
+            autoRol.setRole(getRoleEntityDao().load(idEntitat));
             autoRol.setEntryPoint(puntEntradaE);
             getEntryPointRoleEntityDao().create(autoRol);
 
@@ -1231,7 +1231,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             // GRUP: Creamos autorización
         	EntryPointGroupEntity autoGrup = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
         	autoGrup.setAuhtorizationLevel(nivell);
-        	autoGrup.setGroupId(idEntitat);
+        	autoGrup.setGroup(getGroupEntityDao().load(idEntitat));
         	autoGrup.setEntryPoint(puntEntradaE);
             getEntryPointGroupEntityDao().create(autoGrup);
 
@@ -1242,7 +1242,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
             // USUARI: Creamos autorización
         	EntryPointUserEntity autoUsu = getEntryPointUserEntityDao().newEntryPointUserEntity();
         	autoUsu.setAuthorizationLevel(nivell);
-        	autoUsu.setUserId(idEntitat);
+        	autoUsu.setUser(getUserEntityDao().load(idEntitat));
         	autoUsu.setEntryPoint(puntEntradaE);
             getEntryPointUserEntityDao().create(autoUsu);
 
@@ -1714,7 +1714,7 @@ public class EntryPointServiceImpl extends com.soffid.iam.service.EntryPointServ
         		query("from com.soffid.iam.model.EntryPointRoleEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
         for (Iterator it = autoRol.iterator(); it.hasNext(); ) {
             EntryPointRoleEntity auto = (EntryPointRoleEntity) it.next();
-            if (permisos.getRolsUsuariPUE().contains(auto.getRoleId())) {
+            if (permisos.getRolsUsuariPUE().contains(auto.getRole().getId())) {
                 if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(auto.getAuthorizationLevel())) return true;
             }
         }

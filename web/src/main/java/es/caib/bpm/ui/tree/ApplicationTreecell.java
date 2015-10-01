@@ -34,92 +34,6 @@ public class ApplicationTreecell extends Treecell {
 	String pagina = null;
 	
 	
-	/* Sobreescribim els mètodes pare */
-
-	/*
-	public String getColumnHtmlPostfix() {
-
-		return super.getColumnHtmlPostfix();
-	}
-
-	public String getColumnHtmlPrefix() {
-		// TODO Auto-generated method stub
-		return super.getColumnHtmlPrefix();
-	}
-
-	public int getColumnIndex() {
-		// TODO Auto-generated method stub
-		return super.getColumnIndex();
-	}
-
-	public String getLabelAttrs() {
-		// TODO Auto-generated method stub
-		return super.getLabelAttrs();
-	}
-
-	public int getLevel() {
-		// TODO Auto-generated method stub
-		return super.getLevel();
-	}
-
-	public int getMaxlength() {
-		// TODO Auto-generated method stub
-		return super.getMaxlength();
-	}
-
-	public String getOuterAttrs() {
-		// TODO Auto-generated method stub
-		return super.getOuterAttrs();
-	}
-
-	protected String getRealStyle() {
-		// TODO Auto-generated method stub
-		return super.getRealStyle();
-	}
-
-	public int getSpan() {
-		// TODO Auto-generated method stub
-		return super.getSpan();
-	}
-
-	public Tree getTree() {
-		// TODO Auto-generated method stub
-		return super.getTree();
-	}
-
-	public Treecol getTreecol() {
-		// TODO Auto-generated method stub
-		return super.getTreecol();
-	}
-
-	public Treeitem getTreeitem() {
-		// TODO Auto-generated method stub
-		return super.getTreeitem();
-	}
-
-	public String getWidth() {
-		// TODO Auto-generated method stub
-		return super.getWidth();
-	}
-
-	public void setParent(Component parent) {
-		// TODO Auto-generated method stub
-		super.setParent(parent);
-	}
-
-	public void setSpan(int span) {
-		// TODO Auto-generated method stub
-		super.setSpan(span);
-	}
-
-	public void setWidth(String width) {
-		// TODO Auto-generated method stub
-		super.setWidth(width);
-	}
-	*/
-
-	/* mètodes específics */
-	
 	public String getLanglabel() {
 		return langlabel;
 	}
@@ -143,7 +57,11 @@ public class ApplicationTreecell extends Treecell {
 		
 		// Tanquem el menu
 		Window menu = (Window) Path.getComponent(app.getSpaceOwner(), app.getMenu());
-		if (menu!=null) menu.setVisible(false);
+		if (menu!=null)
+		{
+			menu.setVisible(true);
+			menu.setVisible(false);
+		}
 				
 		if (!(evento instanceof org.zkoss.zk.ui.event.MouseEvent)) return;
 

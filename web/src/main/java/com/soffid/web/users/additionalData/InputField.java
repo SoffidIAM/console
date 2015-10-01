@@ -5,6 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,6 +16,7 @@ import javax.ejb.CreateException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
@@ -27,6 +31,7 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
@@ -47,6 +52,7 @@ import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
 import es.caib.zkib.events.XPathValueEvent;
+import es.caib.zkib.jxpath.JXPathNotFoundException;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField extends Div implements XPathSubscriber{
@@ -228,13 +234,13 @@ public class InputField extends Div implements XPathSubscriber{
 									+ "<imageclic src='/img/pencil.png' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
 										+readonlyExpr+"\" visible='false'/>" 
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"
 									+ "<label/>"+required+"</div>";
 						} else {
 							result = "<div style='display:inline' visible='"+(!dualEdit)+"'>"
-									+ "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
 									+readonlyExpr+"\"/>" +
 									"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"
 									+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
@@ -280,7 +286,7 @@ public class InputField extends Div implements XPathSubscriber{
 					}
 					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 					{
-						result = "<textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' visible='"+(!dualEdit)+"' "
+						result = "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' visible='"+(!dualEdit)+"' "
 									+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\"/>";
 						if (dualEdit)
 						{
@@ -297,6 +303,21 @@ public class InputField extends Div implements XPathSubscriber{
 								
 						}
 					}	
+					else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
+					{
+						String []split = getFormValues ();
+						result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.updateSsoForm()\" width='40%'  "
+									+ "readonly=\""+readonlyExpr+"\" value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
+									+ "<label value=' = '/>"
+									+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.updateSsoForm()\" width='40%'  "
+									+ "readonly=\""+readonlyExpr+"\" value='"+StringEscapeUtils.escapeXml(split[1])+"'/>"
+									+ "</zk>";
+						if (required.length() > 0)
+						{
+							result = "<zk>"+result+required+"</zk>"; 
+								
+						}
+					}	
 					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
 					{
 						if (dualEdit)
@@ -304,11 +325,11 @@ public class InputField extends Div implements XPathSubscriber{
 									+ "<imageclic src='/img/pencil.png' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox bind=\"@valorDada\" maxlength=\"" + size +"\" width='80%' "
+									+ "<textbox sclass=\"textbox\" bind=\"@valorDada\" maxlength=\"" + size +"\" width='80%' "
 											+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='self.parent.parent.changeData()'/>"
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
 						else
-							result = "<zk><textbox maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' "
+							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' "
 									+ "readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 					} else { // Listbox
 						result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" "
@@ -343,11 +364,11 @@ public class InputField extends Div implements XPathSubscriber{
 								+ "<imageclic src='/img/pencil.png' "
 									+ "onClick='self.visible = self.previousSibling.visible = false; "
 										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-								+ "<textbox bind=\"@valorDada\" width='70%' "
+								+ "<textbox sclass=\"textbox\" bind=\"@valorDada\" width='70%' "
 										+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()'/>"
 								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()'/>"+required+"</div>";
 					else
-						result= "<zk><textbox bind=\"@valorDada\" width='80%' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
+						result= "<zk><textbox sclass=\"textbox\" bind=\"@valorDada\" width='80%' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 				}
 				if(compos.isEmpty() || !compos.equals(result))
 				{
@@ -362,10 +383,27 @@ public class InputField extends Div implements XPathSubscriber{
 				//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
 				//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre
 			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			// Ignore
 		} finally {
 			disableRecursive = false;
 		}
 		
+	}
+
+	private String[] getFormValues() throws UnsupportedEncodingException {
+		String result[] = new String[] {"", ""};
+		String v = (String) binder.getValue();
+		if (v != null)
+		{
+			String split [] = v.split("=");
+			if (split.length > 0)
+				result[0] = URLDecoder.decode(split[0], "UTF-8");
+			if (split.length > 1)
+				result[1] = URLDecoder.decode(split[1], "UTF-8");
+		}
+		return result;
 	}
 
 	private boolean testEmail(String value) {
@@ -493,9 +531,6 @@ public class InputField extends Div implements XPathSubscriber{
 	
 	public void setPage(Page page) {
 		super.setPage(page);
-		binder.setPage(page);
-		binder3.setPage(page);
-		binder4.setPage(page);
 	}
 
 	public void setParent(Component parent) {
@@ -503,6 +538,18 @@ public class InputField extends Div implements XPathSubscriber{
 		binder.setParent(parent);
 		binder3.setParent(parent);
 		binder4.setParent(parent);
+/*
+		if (parent != null && getPage() != null)
+		{
+			try {
+				createField();
+			} catch (NamingException e) {
+			} catch (CreateException e) {
+			} catch (InternalErrorException e) {
+			} catch (IOException e) {
+			}
+		}
+*/
 	}
 
 	public Object clone() {
@@ -524,5 +571,21 @@ public class InputField extends Div implements XPathSubscriber{
 	public byte[] getBlobDataValue()
 	{
 		return (byte[]) binder3.getValue();
+	}
+	
+	public void updateSsoForm () throws UnsupportedEncodingException
+	{
+		String values[] = new String[] { "", ""};
+		int i = 0;
+		for (Object obj: getChildren())
+		{
+			if (i < 2 && obj instanceof Textbox)
+			{	
+				values[i++] = ((Textbox)obj).getText();
+			}
+		}
+		binder.setValue(URLEncoder.encode(values[0], "UTF-8")
+				+ "="
+				+URLEncoder.encode(values[1], "UTF-8"));
 	}
 }

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="accountDetails"?>
+<!-- <?taglib uri="WEB-INF/tld/web/core.dsp.tld" prefix="c" ?> -->
+<?taglib 	uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="accounts" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="account_acl" macro-uri="/sharedAccounts/accountAcl.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<zscript><![CDATA[
+	import es.caib.zkib.binder.BindContext;
+	import es.caib.zkib.datasource.XPathUtils;
+	import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+	void updateFormFields () {
+		BindContext ctx = XPathUtils.getComponentContext(panels);
+		boolean owner = false;
+		boolean manager = false;
+		try {
+			AccountAccessLevelEnum level = XPathUtils.getValue(ctx, "/actualAccount/accessLevel");
+			owner = (level.equals (AccountAccessLevelEnum.ACCESS_OWNER));
+			manager = (level.equals (AccountAccessLevelEnum.ACCESS_MANAGER));
+		} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {
+			
+		}
+		passwordButton.setVisible(owner || manager);
+		txtAccountDescription.getFellow("dada").setReadonly (!owner && ! manager);
+	}
+	
+
+	]]>
+	</zscript>
+	<style dynamic="true">
+		<!-- Make Plain Grid -->
+		.GridLayoutNoBorder tr.z-row td.z-row-inner, tr.z-row
+		.z-cell,div.z-grid { border: none; overflow: hidden; zoom: 1;
+		background: white; border-top: none; border-left: none;
+		border-right: none; border-bottom: none; }
+	</style>
+		<form dataPath="/treebox:/" id="form"
+			onChangeXPath="updateFormFields()">
+			<tabbox id="panels" width="${amplaria2}">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('accounts.attribute') }" />
+				</tabs>
+
+				<tabpanels>
+					<tabpanel id="basica">
+						<hbox width="100%" widths="50%,1px,45%,*">
+							<grid>
+								<rows>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.name')}:" />
+										<hbox width="97%"
+											widths="*, 1em, 16px">
+											<input_dada
+												id="txtAccountName" bind="@name"
+												lectura="${!canModifyAccounts}" maxlength="10"
+												multiline_custom="false" width_custom="100%" />
+											<image
+												src="~./img/exclamacio.gif" id="updateIndicator"
+												visible="false" width="16px" height="16px">
+											</image>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											style="white-space:nowrap;"
+											value="${c:l('accounts.dispatcher')}:" />
+										<label bind="@system"/>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.description')}:" />
+										<input_dada
+											id="txtAccountDescription" bind="actualAccount/@description"
+											lectura="${!canModifyAccounts}" maxlength="50"
+											multiline_custom="false" width_custom="97%" />
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.lastPasswordSet')}:" />
+										<hbox>
+											<datebox readonly="true"
+												disabled="true" bind="actualAccount/@lastPasswordSet" width="10em"
+												format="${c:l('usuaris.zul.dateFormat')}" />
+											<button 
+												id ="passwordButton"
+												label="${c:l('accounts.setPassword')}"
+												onClick="setPassword()" />
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.passwordExpiration')}:" />
+										<datebox readonly="true"
+											disabled="true" bind="actualAccount/@passwordExpiration" width="10em"
+											format="${c:l('usuaris.zul.dateFormat')}" />
+									</row>
+								</rows>
+							</grid>
+							<separator />
+							<vbox>
+								<label value="${c:l('accounts.owner')}" />
+								<account_acl id="ownerAcl"
+									userList="actualAccount/ownerUsers" 
+									groupList="actualAccount/ownerGroups"
+									roleList="actualAccount/ownerRoles" />
+								<label
+									value="${c:l('accounts.manager')}" />
+								<account_acl id="managerAcl"
+									userList="actualAccount/managerUsers" 
+									groupList="actualAccount/managerGroups"
+									roleList="actualAccount/managerRoles" />
+								<label value="${c:l('accounts.user')}" />
+								<account_acl id="userAcl"
+									userList="actualAccount/grantedUsers" 
+									groupList="actualAccount/grantedGroups"
+									roleList="actualAccount/grantedRoles" />
+							</vbox>
+						</hbox>
+					</tabpanel>
+
+					<tabpanel id="attributes">
+						<embed src="/sharedAccounts/attributes.zul" />
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</form>
+
+	<window closable="true" id="newPassword" position="center, center"
+		sizable="true" title="${c:l('accounts.setPassword.title')}"
+		visible="false" width="34em"
+		onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+				<![CDATA[
+	void onCancelPassword() {
+		Window wnd = Path.getComponent("/newPassword");
+		password.setValue("");
+		wnd.setVisible(false);
+	}
+	void onSetPassword() {
+		es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
+				.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
+				.create();
+		Listbox lb = Path.getComponent("/treebox");
+		Account account = lb.getSelectedItem().getValue().getInstance();
+
+		model.commit();
+
+		service.setAccountPassword(account, new Password(password.getValue()));
+		es.caib.zkib.zkiblaf.Missatgebox
+				.confirmaOK(org.zkoss.util.resource.Labels
+						.getLabel("accounts.setPassword.msg"));
+		onCancelPassword();
+	}
+]]>
+			</zscript>
+		<vbox width="30em" heights="5em, 3em" align="center">
+			<hbox align="center" height="5em">
+				<hbox width="8em" align="center" pack="end">
+					<label
+						value="${c:l('accounts.setPassword.label')}">
+					</label>
+				</hbox>
+				<space width="2em"></space>
+				<hbox width="18em" align="center" pack="start">
+					<textbox type="password" width="18em" id="password"
+						onOK="onSetPassword();">
+					</textbox>
+				</hbox>
+			</hbox>
+			<hbox align="center" pack="end" width="30em">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="onSetPassword()" />
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="onCancelPassword()" />
+			</hbox>
+		</vbox>
+	</window>
+
+	<include src="rolsllista.zul" />
+	<include src="finestres/canviPassword.zul" />
+	<include src="usuarisllista.zul" />
+	<include src="grupsllista.zul" />
+</zk>

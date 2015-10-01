@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -62,18 +63,27 @@ public class SelfServiceImpl extends SelfServiceBase
 		{
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handleGetUserAccounts()
 	 */
 	@Override
 	protected Collection<Account> handleGetUserAccounts () throws Exception
 	{
+		Dispatcher mainDispatcher = getDispatcherService().findSoffidDispatcher();
 		Usuari u = getCurrentUsuari();
 		Collection<Account> accounts = new LinkedList<Account>();
 		for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
 		{
 			if (!acc.getType().equals(AccountType.IGNORED))
-				accounts.add (acc);
+			{
+				Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
+				if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||
+						acc.getDispatcher().equals (mainDispatcher.getCodi()))
+				{
+					accounts.add (acc);
+				}
+			}
 		}
 		return accounts;
 	}
@@ -354,5 +364,151 @@ public class SelfServiceImpl extends SelfServiceBase
 	@Override
 	protected Collection<PuntEntrada> handleFindEntryPoints(String name) throws Exception {
 		return getPuntEntradaService().findPuntsEntrada("%"+name+"%", "%", "%", "%", "%", "%");
+	}
+	@Override
+	protected List<Account> handleGetSharedAccounts(String filter)
+			throws Exception {
+		Dispatcher mainDispatcher = getDispatcherService().findSoffidDispatcher();
+		Usuari u = getCurrentUsuari();
+		List<Account> accounts = new LinkedList<Account>();
+		Security.nestedLogin(Security.getCurrentUser(), 
+				new String [] { Security.AUTO_ACCOUNT_QUERY});
+		try 
+		{
+			for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+			{
+				if (!acc.getType().equals(AccountType.IGNORED) &&
+						!acc.getType().equals(AccountType.USER))
+				{
+					Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
+					if  ( !acc.getDispatcher().equals (mainDispatcher.getCodi()) &&
+						(d == null || d.getUrl() == null || d.getUrl().trim().length() == 0))
+					{
+						if (matchFilter (filter, acc))
+							accounts.add (acc);
+					}
+				}
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+		return accounts;
+		
+	}
+	private boolean matchFilter(String filter, Account acc) {
+		if (filter == null)
+			return true;
+		
+		filter = filter.toLowerCase();
+		
+		if (acc.getName() != null && acc.getName().toLowerCase().contains(filter))
+			return true;
+
+		if (acc.getDescription() != null && acc.getDescription().toLowerCase().contains(filter))
+			return true;
+
+		if (acc.getAttributes() != null)
+		{
+			for (Object value: acc.getAttributes().values())
+			{
+				if (value != null && value.toString().toLowerCase().contains(filter))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected Account handleUpdateSharedAccount(Account account)
+			throws Exception {
+		Account acc = getAccountService().findAccount(account.getName(), account.getDispatcher());
+		if (acc == null || ! acc.getId().equals(account.getId()))
+			throw new InternalErrorException ("Account not found");
+		
+		if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER) ||
+				acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER))
+		{
+			if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER))
+			{
+				account.setGrantedGroups(acc.getGrantedGroups());
+				account.setGrantedRoles(acc.getGrantedRoles());
+				account.setGrantedUsers(acc.getGrantedUsers());
+			}
+			Security.nestedLogin(Security.getCurrentUser(), 
+					new String [] { Security.AUTO_ACCOUNT_QUERY,
+						Security.AUTO_ACCOUNT_UPDATE});
+			try 
+			{
+				getAccountService().updateAccount(account);
+			} finally {
+				Security.nestedLogoff();
+			}
+			return account;
+		}
+		else
+		{
+			throw new SecurityException (String.format("Not authorized to update account %s on %s",acc.getName(), acc.getDispatcher()));
+		}
+	}
+	@Override
+	protected DadaUsuari handleUpdateSharedAccountData(DadaUsuari data)
+			throws Exception {
+		Account acc = getAccountService().findAccount(data.getAccountName(), data.getSystemName());
+		if (acc == null )
+			throw new InternalErrorException ("Account not found");
+		
+		if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER) ||
+				acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER))
+		{
+			Security.nestedLogin(Security.getCurrentUser(), 
+					new String [] { Security.AUTO_ACCOUNT_QUERY,
+						Security.AUTO_ACCOUNT_UPDATE});
+			try 
+			{
+				return getAccountService().updateAccountAttribute(data);
+			} finally {
+				Security.nestedLogoff();
+			}
+		}
+		else
+		{
+			throw new SecurityException (String.format("Not authorized to update account %s on %s",acc.getName(), acc.getDispatcher()));
+		}
+	}
+
+	@Override
+	protected DadaUsuari handleCreateSharedAccountData(DadaUsuari data)
+			throws Exception {
+		Account acc = getAccountService().findAccount(data.getAccountName(), data.getSystemName());
+		if (acc == null )
+			throw new InternalErrorException ("Account not found");
+		
+		if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER) ||
+				acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER))
+		{
+			return getAccountService().createAccountAttribute(data);
+		}
+		else
+		{
+			throw new SecurityException (String.format("Not authorized to update account %s on %s",acc.getName(), acc.getDispatcher()));
+		}
+	}
+
+	@Override
+	protected List<DadaUsuari> handleGetAccountAttributes(Account account)
+			throws Exception {
+		Account acc = getAccountService().findAccountById(account.getId());
+		if (acc == null )
+			throw new InternalErrorException ("Account not found");
+		
+		if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER) ||
+				acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER))
+		{
+			return getAccountService().getAccountAttributes(acc);
+		}
+		else
+		{
+			throw new SecurityException (String.format("Not authorized to update account %s on %s",acc.getName(), acc.getDispatcher()));
+		}
 	}
 }

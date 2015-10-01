@@ -69,7 +69,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     private static final String ROOT_TAG = "Root"; //$NON-NLS-1$
     Map<String, PermissionsCache> permisosCache;
-
+    
     public PuntEntradaServiceImpl() {
         permisosCache = Collections.synchronizedMap(new LRUMap(50));
     }
@@ -881,8 +881,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         Long idParePuntEntradaMoure = puntEntradaMoure.getIdPare();
         Long idPueOrigen = puntEntradaMoure.getId();
         Long idPueDesti = puntEntradaMenuDesti.getId();
-        Long idParePuntEntradaDesti = (!idPueDesti.equals(ROOT_ID)) ? puntEntradaMenuDesti
-                .getIdPare() : ROOT_ID;
+        Long idParePuntEntradaDesti = (!ROOT_TAG.equals(puntEntradaMenuDesti.getCodi())) ?
+        		puntEntradaMenuDesti.getIdPare() : puntEntradaMenuDesti.getId();
         if (idPueOrigen == null || idParePuntEntradaMoure == null || idPueDesti == null
                 || idParePuntEntradaDesti == null)
             throw new SeyconException(
@@ -1128,8 +1128,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         Long idParePuntEntradaClonar = puntEntradaCopiar.getIdPare();
         Long idPueOrigen = puntEntradaCopiar.getId();
         Long idPueDesti = puntEntradaMenuDesti.getId();
-        Long idParePuntEntradaDesti = (!idPueDesti.equals(ROOT_ID)) ? puntEntradaMenuDesti
-                .getIdPare() : ROOT_ID;
+        Long idParePuntEntradaDesti = (!ROOT_TAG.equals(puntEntradaMenuDesti.getCodi())) ? 
+        		puntEntradaMenuDesti.getIdPare() : puntEntradaMenuDesti.getId();
         if (idPueOrigen == null || idParePuntEntradaClonar == null || idPueDesti == null
                 || idParePuntEntradaDesti == null)
             throw new SeyconException(
@@ -1191,8 +1191,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         Long idParePuntEntradaCopiar = puntEntradaCopiar.getIdPare();
         Long idPueOrigen = puntEntradaCopiar.getId();
         Long idPueDesti = puntEntradaMenuDesti.getId();
-        Long idParePuntEntradaDesti = (!idPueDesti.equals(ROOT_ID)) ? puntEntradaMenuDesti
-                .getIdPare() : ROOT_ID;
+        Long idParePuntEntradaDesti = (!ROOT_TAG.equals(puntEntradaMenuDesti.getCodi())) ? 
+        		puntEntradaMenuDesti.getIdPare() : puntEntradaMenuDesti.getId();
         if (idPueOrigen == null || idParePuntEntradaCopiar == null || idPueDesti == null
                 || idParePuntEntradaDesti == null)
             throw new SeyconException(
@@ -1718,7 +1718,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                 if (visited.contains(node)) {
                     continue;
                 }
-                if (node.getId().equals(ROOT_ID)) {
+                if (ROOT_TAG.equals(node.getCodi())) {
                     visited.add(node);
                     rutes.add(printPath(visited));
                     visited.removeLast();
@@ -1728,7 +1728,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             // in breadth-first, recursion needs to come after visiting adjacent
             // nodes
             for (PuntEntradaEntity node : nodes) {
-                if (visited.contains(node) || node.getId().equals(ROOT_ID)) {
+                if (visited.contains(node) || ROOT_TAG.equals(node.getCodi())) {
                     continue;
                 }
                 visited.addLast(node);

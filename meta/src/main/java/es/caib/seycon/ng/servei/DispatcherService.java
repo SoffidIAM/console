@@ -62,6 +62,7 @@ public abstract class DispatcherService {
 		es.caib.seycon.ng.comu.Dispatcher dispatcher)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
 	@Operation ( grantees={roles.agent_query.class,
 			roles.application_update.class},
 			translated="findDispatchersByFilter")
@@ -76,6 +77,13 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.agent_query.class, roles.application_update.class})
+	@Description ("Finds the dispatcher bound to soffid itself")
+	public es.caib.seycon.ng.comu.Dispatcher findSoffidDispatcher() {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.agent_query.class},
 			translated="findDispatcherByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})

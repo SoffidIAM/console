@@ -33,6 +33,11 @@ td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 	background-color:#FFFFFF;
 }
 
+.text, .textbox {
+    box-sizing: content-box;
+    padding: 2px;
+}
+
 .finestraTimeout {
 	border:3px double #0e5462;
 	background-color:#FAFAFA;

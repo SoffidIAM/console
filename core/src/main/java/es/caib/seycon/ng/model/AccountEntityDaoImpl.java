@@ -9,16 +9,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.model.AccountAttributeEntity;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.AccountAccessLevelEnumEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.Security;
@@ -191,6 +194,62 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			else if (vd.getValorDada() != null)
 				atts.put(vd.getCodiDada(), vd.getValorDada());
 		}
+		
+		try {
+			target.setAccessLevel(getAccessLevel ( source));
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private AccountAccessLevelEnum getAccessLevel(AccountEntity source) throws InternalErrorException {
+		if (Security.isDisableAllSecurityForEver())
+			return AccountAccessLevelEnum.ACCESS_OWNER;
+		
+		String u = Security.getCurrentUser();
+		if ( u != null)
+		{
+			UsuariEntity ue = getUsuariEntityDao().findByCodi(u);
+			if (ue != null)
+			{
+				if (source.getType().equals(AccountType.USER))
+				{
+					for (UserAccountEntity uac: source.getUsers())
+					{
+						if (uac.getUser().getId().equals (ue.getId()))
+							return AccountAccessLevelEnum.ACCESS_OWNER;
+					}
+				}
+				for (AccountAccessLevelEnum al: new AccountAccessLevelEnum [] {
+						AccountAccessLevelEnum.ACCESS_OWNER,
+						AccountAccessLevelEnum.ACCESS_MANAGER,
+						AccountAccessLevelEnum.ACCESS_USER})
+				{
+					AccessControlList acl = generateAcl (source, al);
+					if ( getACLService().isUserIncluded(ue.getId(), acl))
+						return al;
+				}
+			}			
+		}
+		return AccountAccessLevelEnum.ACCESS_NONE;
+	}
+
+	protected AccessControlList generateAcl(AccountEntity source,
+			AccountAccessLevelEnum al) {
+		AccessControlList acl = new AccessControlList();
+		for ( AccountAccessEntity entry: source.getAcl())
+		{
+			if (entry.getLevel().equals (al))
+			{
+				if (entry.getUser() != null)
+					acl.getUsers().add(entry.getUser().getId());
+				if (entry.getGroup() != null)
+					acl.getGroups().add(entry.getGroup().getId());
+				if (entry.getRol() != null)
+					acl.getRoles().add(entry.getRol().getId());
+			}
+		}
+		return acl;
 	}
 
 	@Override

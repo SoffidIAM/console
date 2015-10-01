@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_ACCOUN" )
@@ -19,7 +20,10 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.UserAccountEntity.class,
 	es.caib.seycon.ng.model.AccountAccessEntity.class,
 	es.caib.seycon.ng.model.AccountPasswordEntity.class,
-	es.caib.seycon.ng.model.TipusUsuariEntity.class})
+	es.caib.seycon.ng.model.TipusUsuariEntity.class,
+
+	ACLService.class
+})
 public abstract class AccountEntity {
 
 	@Column (name="ACC_ID")

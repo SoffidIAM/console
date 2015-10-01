@@ -6,9 +6,11 @@
 
 package es.caib.seycon.ng.servei;
 import java.util.Collection;
+import java.util.List;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
@@ -142,4 +144,34 @@ public abstract class SelfService {
 	{return null;}
 
 	public TipusDada getDataTypeDescription (@Nullable String systemName, String attName) { return null; }
+	
+	@Operation
+	@Description("Gets the list of shared accounts granted to the user")
+	public List<Account> getSharedAccounts (@Nullable String filter) {
+		return null;
+	}
+	
+	@Operation
+	@Description("Updates an account, including ACLs if user is owner")
+	public Account updateSharedAccount (Account account) {
+		return null;
+	}
+
+	@Operation
+	@Description("Updates an account attribute")
+	public DadaUsuari updateSharedAccountData (DadaUsuari data) {
+		return null;
+	}
+
+	@Operation
+	@Description("Created an account attribute")
+	public DadaUsuari createSharedAccountData (DadaUsuari data) {
+		return null;
+	}
+	
+	@Operation
+	@Description("Get account attributes")
+	public List<DadaUsuari> getAccountAttributes (Account acc) {
+		return null;
+	}
 }

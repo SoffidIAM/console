@@ -1833,4 +1833,18 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 	}
 
+	@Override
+	protected Account handleFindAccountById(long id) throws Exception {
+		AccountEntity acc = getAccountEntityDao().load(id);
+		if (acc == null)
+			return null;
+		
+		if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1)
+		{
+			return getUserAccountEntityDao().toUserAccount(acc.getUsers().iterator().next());
+		}
+		else
+			return getAccountEntityDao().toAccount(acc);
+	}
+
 }

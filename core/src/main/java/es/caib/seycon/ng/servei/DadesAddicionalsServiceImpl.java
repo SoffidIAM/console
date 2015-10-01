@@ -74,6 +74,7 @@ public class DadesAddicionalsServiceImpl extends
 					if (tipusDadaEntity.getOrder().longValue() >= next)
 						next = tipusDadaEntity.getOrder().longValue() + 1;
 				}
+				tipusDada.setOrdre(next);
 			}
 			else
 			{

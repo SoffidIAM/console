@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.model.index;
 import com.soffid.mda.annotation.*;
 
-@Index (name="PU_ROL_2",	unique=false,
+@Index (name="PUE_ROL_2",	unique=false,
 	entity=es.caib.seycon.ng.model.AutoritzacioPUERolEntity.class,
 	columns={"RPE_IDROL"})
 public abstract class AutoritzacioPUERolIndex {

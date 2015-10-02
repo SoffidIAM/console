@@ -29,6 +29,23 @@
 	</datanode>
 	
 	<datanode name="autoritzacio">
+		<custom-attribute name="domainTypeDescription">
+			StringBuffer tds2 = new StringBuffer ();
+			if (instance.tipusDomini != null)
+			{
+				for (String s: instance.tipusDomini.split("[ ,]+"))
+				{
+					if ( tds2.length() > 0)
+						tds2.append(", ");
+					String loc = org.zkoss.util.resource.Labels.getLabel("domainType."+s);
+					if (loc != null)
+						tds2.append(loc);
+					else
+						tds2.append (s);
+				}
+			}
+			return tds2.toString();
+		</custom-attribute>
 		<finder name="autoritzacioRol" type="autoritzacioRol">   <!-- tothom -->
 			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
 				method="getRolsAutoritzacio">

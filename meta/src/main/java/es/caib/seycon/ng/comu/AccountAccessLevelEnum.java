@@ -14,4 +14,7 @@ public class AccountAccessLevelEnum {
 
 	@Description("User can managed account's access control list")
 	public static String ACCESS_OWNER = "O";
+
+	@Description("User canot use the account")
+	public static String ACCESS_NONE = "-";
 }

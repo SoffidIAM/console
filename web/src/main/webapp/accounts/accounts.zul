@@ -426,12 +426,11 @@
 								etiqueta="${c:l('accounts.description')}" bind="@description" />
 							<hbox width="250px" widths="100px,*">
 								<label sclass="etiqueta" value="${c:l('accounts.dispatcher')}" />
-								<listbox bind="@dispatcher" id="queryDispatcher" mold="select"
-									dataPath="/model:/dispatcher">
-									<dataitem bind="@codi">
-										<listcell bind="@codi" />
-									</dataitem>
-								</listbox>
+								<combobox bind="@dispatcher" id="queryDispatcher"
+									dataPath="/model:/dispatcher" value="%">
+									<datacomboitem bind="@codi" labelBind="@codi">
+									</datacomboitem>
+								</combobox>
 							</hbox>
 							<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
 						</hbox>
@@ -541,14 +540,14 @@
 				</listbox>
 			</navegador>
 
-			<detalls id="dades" width="${amplaria}">
+			<detalls id="dades" width="${amplaria}" style="border: none">
 				<toolbar height="22px" if="${requestedAccount != null}">
 					<commitbutton datamodel="/model" />
 				</toolbar>
 				<form dataPath="/esquema/lista/listbox:/" id="form"
 					onChangeXPath="updateFormFields()">
 					<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();"/>
-					<tabbox id="panels" width="${amplaria2}">
+					<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 						<tabs>
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />

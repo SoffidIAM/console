@@ -5,8 +5,15 @@
  */
 package es.caib.seycon.ng.model;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import com.soffid.iam.model.security.SecurityScopeEntity;
 
+import es.caib.seycon.ng.ServiceLocator;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.AutoritzacioService;
+import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.Security;
 
 /**
@@ -29,6 +36,19 @@ public class GrupEntityImpl extends es.caib.seycon.ng.model.GrupEntity
 		        getId(), getCodi(),getDescripcio(), getTipusUnitatOrganizativa());
 	}
 
+	private boolean checkDeep (String permission, GrupEntity entity)
+	{
+		if (Security.isUserInRole(permission+"/"+entity.getCodi()))
+			return true;
+		for (GrupEntity child: entity.getFills())
+		{
+			if (checkDeep(permission, child))
+				return true;
+		}
+		return false;
+		
+	}
+	
 	public boolean isAllowed(String permission) {
 		if (Security.isUserInRole(permission+Security.AUTO_ALL))
 			return true;
@@ -36,6 +56,36 @@ public class GrupEntityImpl extends es.caib.seycon.ng.model.GrupEntity
 		if (Security.isUserInRole(permission+"/"+getCodi()))
 			return true;
 		
-		return false;
+		try 
+		{
+			AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+			for (Iterator it = autService.getInformacioAutoritzacio(permission).iterator(); it.hasNext(); )
+			{
+				AutoritzacioSEU as = (AutoritzacioSEU) it.next();
+				if ("parents".equals(as.getScope()) || "both".equals(as.getScope()))
+				{
+					for (GrupEntity child: getFills())
+					{
+						if (checkDeep(permission, child))
+							return true;
+					}
+				}
+				
+				if ("children".equals(as.getScope()) || "both".equals(as.getScope()))
+				{
+					GrupEntity parent = getPare();
+					while (parent != null)
+					{
+						if (Security.isUserInRole(permission+"/"+parent.getCodi()))
+							return true;
+						parent = parent.getPare();
+					}
+				}
+
+			}
+			return false;
+		} catch (InternalErrorException e) {
+			throw new SecurityException ("Unable to check permissions", e);
+		}
 	}
 }

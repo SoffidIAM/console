@@ -54,6 +54,14 @@
 				
 				model.getVariables().declareVariable("query", false);
 				
+				enableTimers = true;
+				
+				es.caib.zkib.datamodel.DataModelCollection lm = model.getJXPathContext().getValue("/usuari/account");
+				if (lm.getSize() > 10)
+				{
+					enableTimes = false;
+				}
+				
 				try
 				{
 					es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -380,7 +388,7 @@
 											queryPassword(self);
 										</attribute>
 									</imageclic>
-									<timer delay="${timerDelay}" repeats="true"
+									<timer delay="${timerDelay}" repeats="${enableTimers}" 
 										onTimer="checkIsUpdatePending(self.parent.parent);" />
 								</listcell>	
 								<listcell style="text-align: center; vertical-align: top;">

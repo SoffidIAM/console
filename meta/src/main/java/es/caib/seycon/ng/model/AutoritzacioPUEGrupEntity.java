@@ -25,7 +25,7 @@ public abstract class AutoritzacioPUEGrupEntity {
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
 	@Column (name="GPE_IDGRU")
-	public java.lang.Long idGrup;
+	public GrupEntity group;
 
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity> findAll() {

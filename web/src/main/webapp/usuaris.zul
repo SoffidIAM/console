@@ -10,7 +10,6 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<frame id="p_usuaris" saveContent="true"
 		title="${c:l('usuaris.lblGestionUsuarios1')}" width="99%">
-		<style src="~./styles/estil.css" />
 		<style>
 			span.etiqueta {white-space:nowrap !important;}
 			.dataListcelldestacada div { background-color: #FF0000; }
@@ -639,156 +638,159 @@
 				
 				public void verificaNIF (nif) 
 				{
-					int longitud, dni, resto;
-					String nifSinLetra, letraActual, letra_NIF, valor, primerCaracter, ultimCaracter,
-						numNIE, numNIEaux;
-					Integer dniInt;
-					boolean esNIE = false, esNIF =false;
-					
-					if (!nif.equals("")) 
+					if ("spain".equals(System.getProperty("soffid.nationalid.type")))
 					{
-						nif = nif.toUpperCase();
-						longitud = nif.length();
-						primerCaracter = nif.substring(0,1);
-						ultimCaracter = nif.substring(longitud-1);
-							
-						// Primer, averiguar si és un NIF (té 9 caracters i l'últim és una lletra) o és un NIE (comença per X, Y o Z i l'últim és una lletra)
-						if (primerCaracter.equals("X") || primerCaracter.equals("Y") || primerCaracter.equals("Z"))
+						int longitud, dni, resto;
+						String nifSinLetra, letraActual, letra_NIF, valor, primerCaracter, ultimCaracter,
+							numNIE, numNIEaux;
+						Integer dniInt;
+						boolean esNIE = false, esNIF =false;
+						
+						if (!nif.equals("")) 
 						{
-							if (!checkIfNumber(ultimCaracter)) {
-								esNIE = true;
-							} else {
-								esNIE = false;
-							}
-						} else {
-							if (!checkIfNumber(ultimCaracter)) {
-								if (longitud == 9)
-									esNIF = true;
-								else
-									esNIF = false;
-							} else {
-								esNIF = false;
-							}
-						}
-						
-						nifSinLetra = "";
-						letraActual = "";
-						numNIEaux = "";
-						java.text.DecimalFormat ceros = new java.text.DecimalFormat("0000000");
-						java.text.DecimalFormat ceros8 = new java.text.DecimalFormat("00000000");
-						
-						// Si és un NIE s'ha d'autocompletar fins 7 caràcters amb 0's davant)
-						if (esNIE && longitud > 2) {
-							numNIEaux = nif.substring(1,longitud-1);
-							if (checkIfNumber(numNIEaux)) {
-								if (primerCaracter.equals("Y")) {
-									numNIE = "1" + ceros.format(Long.parseLong(numNIEaux));
-								}
-								else if (primerCaracter.equals("Z")) {
-									numNIE = "2" + ceros.format(Long.parseLong(numNIEaux));
-								}
-								else {
-									if (numNIEaux.length() < 8) numNIE = ceros.format(Long.parseLong(numNIEaux));
-									else	numNIE = ceros8.format(Long.parseLong(numNIEaux));
-								}
-		
-								if (numNIE.length() == 7) {
-									letraActual = ultimCaracter;
-									nif = primerCaracter + ceros.format(Long.parseLong(numNIEaux)) + letraActual; 
-									nifSinLetra = numNIE;
-								} else if (numNIEaux.length() == 8)	{
-									letraActual = ultimCaracter;
-									nif = primerCaracter + ceros8.format(Long.parseLong(numNIEaux)) + letraActual;
-									nifSinLetra = numNIE;
+							nif = nif.toUpperCase();
+							longitud = nif.length();
+							primerCaracter = nif.substring(0,1);
+							ultimCaracter = nif.substring(longitud-1);
+								
+							// Primer, averiguar si és un NIF (té 9 caracters i l'últim és una lletra) o és un NIE (comença per X, Y o Z i l'últim és una lletra)
+							if (primerCaracter.equals("X") || primerCaracter.equals("Y") || primerCaracter.equals("Z"))
+							{
+								if (!checkIfNumber(ultimCaracter)) {
+									esNIE = true;
 								} else {
 									esNIE = false;
 								}
 							} else {
-								esNIE = false;
+								if (!checkIfNumber(ultimCaracter)) {
+									if (longitud == 9)
+										esNIF = true;
+									else
+										esNIF = false;
+								} else {
+									esNIF = false;
+								}
 							}
-						}
-		
-						if (esNIF) {
-							nifSinLetra =  nif.substring(0,longitud-1);
-							letraActual = ultimCaracter;
-						}
-						
-						if (esNIF || esNIE)
-						{
-							if (checkIfNumber(nifSinLetra))
+							
+							nifSinLetra = "";
+							letraActual = "";
+							numNIEaux = "";
+							java.text.DecimalFormat ceros = new java.text.DecimalFormat("0000000");
+							java.text.DecimalFormat ceros8 = new java.text.DecimalFormat("00000000");
+							
+							// Si és un NIE s'ha d'autocompletar fins 7 caràcters amb 0's davant)
+							if (esNIE && longitud > 2) {
+								numNIEaux = nif.substring(1,longitud-1);
+								if (checkIfNumber(numNIEaux)) {
+									if (primerCaracter.equals("Y")) {
+										numNIE = "1" + ceros.format(Long.parseLong(numNIEaux));
+									}
+									else if (primerCaracter.equals("Z")) {
+										numNIE = "2" + ceros.format(Long.parseLong(numNIEaux));
+									}
+									else {
+										if (numNIEaux.length() < 8) numNIE = ceros.format(Long.parseLong(numNIEaux));
+										else	numNIE = ceros8.format(Long.parseLong(numNIEaux));
+									}
+			
+									if (numNIE.length() == 7) {
+										letraActual = ultimCaracter;
+										nif = primerCaracter + ceros.format(Long.parseLong(numNIEaux)) + letraActual; 
+										nifSinLetra = numNIE;
+									} else if (numNIEaux.length() == 8)	{
+										letraActual = ultimCaracter;
+										nif = primerCaracter + ceros8.format(Long.parseLong(numNIEaux)) + letraActual;
+										nifSinLetra = numNIE;
+									} else {
+										esNIE = false;
+									}
+								} else {
+									esNIE = false;
+								}
+							}
+			
+							if (esNIF) {
+								nifSinLetra =  nif.substring(0,longitud-1);
+								letraActual = ultimCaracter;
+							}
+							
+							if (esNIF || esNIE)
 							{
-								dniInt = Integer.valueOf(nifSinLetra);
-								dni = dniInt.intValue();
-								
-								resto = dni % 23;
-								
-								switch (resto)
+								if (checkIfNumber(nifSinLetra))
 								{
-									case 0:  letra_NIF="T"; break;
-									case 1:  letra_NIF="R"; break;
-									case 2:  letra_NIF="W"; break;
-									case 3:  letra_NIF="A"; break;
-									case 4:  letra_NIF="G"; break;
-									case 5:  letra_NIF="M"; break;
-									case 6:  letra_NIF="Y"; break;
-									case 7:  letra_NIF="F"; break;
-									case 8:  letra_NIF="P"; break;
-									case 9:  letra_NIF="D"; break;
-									case 10:  letra_NIF="X"; break;
-									case 11:  letra_NIF="B"; break;
-									case 12:  letra_NIF="N"; break;
-									case 13:  letra_NIF="J"; break;
-									case 14:  letra_NIF="Z"; break;
-									case 15:  letra_NIF="S"; break;
-									case 16:  letra_NIF="Q"; break;
-									case 17:  letra_NIF="V"; break;
-									case 18:  letra_NIF="H"; break;
-									case 19:  letra_NIF="L"; break;
-									case 20:  letra_NIF="C"; break;
-									case 21:  letra_NIF="K"; break;
-									case 22:  letra_NIF="E"; break;
+									dniInt = Integer.valueOf(nifSinLetra);
+									dni = dniInt.intValue();
 									
-									default:
+									resto = dni % 23;
+									
+									switch (resto)
 									{
-										letra_NIF = "";
-										Missatgebox.info(org.zkoss.util.resource.Labels.getLabel("usuaris.DNIInvalid"),org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
-										break;
+										case 0:  letra_NIF="T"; break;
+										case 1:  letra_NIF="R"; break;
+										case 2:  letra_NIF="W"; break;
+										case 3:  letra_NIF="A"; break;
+										case 4:  letra_NIF="G"; break;
+										case 5:  letra_NIF="M"; break;
+										case 6:  letra_NIF="Y"; break;
+										case 7:  letra_NIF="F"; break;
+										case 8:  letra_NIF="P"; break;
+										case 9:  letra_NIF="D"; break;
+										case 10:  letra_NIF="X"; break;
+										case 11:  letra_NIF="B"; break;
+										case 12:  letra_NIF="N"; break;
+										case 13:  letra_NIF="J"; break;
+										case 14:  letra_NIF="Z"; break;
+										case 15:  letra_NIF="S"; break;
+										case 16:  letra_NIF="Q"; break;
+										case 17:  letra_NIF="V"; break;
+										case 18:  letra_NIF="H"; break;
+										case 19:  letra_NIF="L"; break;
+										case 20:  letra_NIF="C"; break;
+										case 21:  letra_NIF="K"; break;
+										case 22:  letra_NIF="E"; break;
+										
+										default:
+										{
+											letra_NIF = "";
+											Missatgebox.info(org.zkoss.util.resource.Labels.getLabel("usuaris.DNIInvalid"),org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
+											break;
+										}
+									}
+									
+									if (esNIE) {
+										if (primerCaracter.equals("X"))
+											valor = primerCaracter + nifSinLetra + letra_NIF;
+										else
+											valor = primerCaracter + ceros.format(Long.parseLong(numNIEaux)) + letra_NIF;
+									} else valor = nifSinLetra + letra_NIF;
+									
+									txtNif =  form.getFellow("NIF");
+									txtNif.setText(nif.toUpperCase());
+									
+									if (!nif.equals(valor))
+									{
+										Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.LletraNIF"), new Object [] {nif,letraActual,valor,letra_NIF}),org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
 									}
 								}
 								
-								if (esNIE) {
-									if (primerCaracter.equals("X"))
-										valor = primerCaracter + nifSinLetra + letra_NIF;
-									else
-										valor = primerCaracter + ceros.format(Long.parseLong(numNIEaux)) + letra_NIF;
-								} else valor = nifSinLetra + letra_NIF;
-								
-								txtNif =  form.getFellow("NIF");
-								txtNif.setText(nif.toUpperCase());
-								
-								if (!nif.equals(valor))
+								else
 								{
-									Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.LletraNIF"), new Object [] {nif,letraActual,valor,letra_NIF}),org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
+									Missatgebox.info(org.zkoss.util.resource.Labels.getLabel("usuaris.NoDNI"),
+										org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
 								}
 							}
 							
 							else
 							{
-								Missatgebox.info(org.zkoss.util.resource.Labels.getLabel("usuaris.NoDNI"),
+								Missatgebox.info(org.zkoss.util.resource
+										.Labels.getLabel("usuaris.NoDNI"),
 									org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
 							}
-						}
-						
-						else
-						{
-							Missatgebox.info(org.zkoss.util.resource
-									.Labels.getLabel("usuaris.NoDNI"),
-								org.zkoss.util.resource.Labels.getLabel("usuaris.VerDNI"));
 						}
 					}
 				}
 				
-				// Functionality to refress the user sessions info
+				// Functionality to refresh the user sessions info
 				void refreshUserSessions(data)
 				{
 					try{
@@ -974,7 +976,7 @@
 				</listbox>
 			</navegador>
 
-			<detalls id="dades" width="${amplaria}" >
+			<detalls id="dades" width="${amplaria}" style="border:none">
 				<toolbar if="${requestedUser != null }" height="22px">
 					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
 				</toolbar>
@@ -1033,7 +1035,7 @@
 						camp.setValue(dada);
 					</attribute>
 
-					<tabbox id="panels" width="${amplaria2}">
+					<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 						<tabs>
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Accounts')}" />

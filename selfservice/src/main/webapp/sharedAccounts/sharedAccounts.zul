@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="selfservice" title="${c:l('selfService.Titol')}" style="width:100%;height:100%"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<frame saveContent="true"
+		title="${c:l('selfService.Titol')}" width="100%" height="100%" onPerformQuery="performQuery()" id ="topFrame">
+		
+		<datamodel id="model" rootNode="root" src="accounts/descriptorSelfServiceAccounts.xml"/>
+		<zscript>
+			<![CDATA[
+				import org.zkoss.image.*;
+				import org.zkoss.zul.*;
+				import es.caib.zkib.datasource.XPathUtils;
+				import es.caib.seycon.ng.comu.*;
+				import java.util.Calendar;
+				
+				void search (String s) 
+				{
+					es.caib.zkib.jxpath.JXPathContext ctx = model.getJXPathContext();
+					es.caib.zkib.jxpath.Variables v = ctx.getVariables();
+					if (s == null || s.trim().isEmpty())
+					{
+						v.declareVariable("filter", null);
+					} else {
+						v.declareVariable("filter", s);
+					}
+					model.refresh();
+				}
+
+				String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
+				String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
+				model.getVariables().declareVariable("account", requestedAccount);
+				model.getVariables().declareVariable("system", requestedSystem);
+				if (requestedAccount != null && requestedSystem != null)
+				{
+					System.out.println("Scheduling query");
+					Events.postEvent(-100, "onPerformQuery", topFrame, null);
+				}
+				
+				void performQuery() 
+				{
+					System.out.println("Scheduled query");
+					// Select first (only) account
+					Treeitem firstRow = treebox.getTreechildren().getFirstChild();
+					if (firstRow != null)
+					{
+						firstRow.setOpen(true);
+						Treeitem secondRow = firstRow.getTreechildren().getFirstChild();
+						if (secondRow != null)
+						{
+//							alert("hola");
+							treebox.setSelectedItem(secondRow);
+							detail.setVisible(true);
+							alternatetoolbar.setVisible(true);
+							header.setVisible(false);
+							sidebar.setVisible(false);
+						}
+						else
+							System.out.println("secondrow = null");
+					} else {
+						System.out.println("firstrow = null");
+					}
+				}
+			]]>
+		</zscript>
+		
+		<div class="content">
+			<div id="header">
+				<label value="${c:l('selfService.Accounts')}" sclass="titolSelf"/>
+				<div style="margin-bottom: 14px;">
+					<textbox style="width:90%; padding: 4px;" onChanging="search(event.value)" focus="true" id="appfinder"
+						onCancel='appfinder.setValue(""); search(null)'
+						onOK='search(appfinder.getValue())'></textbox>
+					<imageclic src="/img/cancel.png" onClick='appfinder.setValue(""); search(null);'/>
+				</div>
+			</div>
+			<div class="sidebar aplications" id="sidebar">
+				<toolbar height="22px" sclass="toolbar whitetoolbar">
+					<commitbutton datamodel="/model" />
+				</toolbar>
+				<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="treebox" 
+							sclass="senseBorder1">
+					<treeitemfinder bind="." open="true" path="/systemName">
+						<treerow sclass="fons" onClick="detail.setVisible(false);">
+							<treecell>
+								<label bind="@name" /> 
+							</treecell>
+						</treerow>
+					</treeitemfinder>
+					<treeitemfinder bind="/actualAccount" open="false" path="/account">
+						<treerow sclass="fons" onClick="detail.setVisible(true);">
+							<treecell>
+								<label bind="@name" />  
+							</treecell>
+						</treerow>
+					</treeitemfinder>
+				</tree>
+			</div>
+			<toolbar height="22px" id="alternatetoolbar" visible="false" sclass="toolbar whitetoolbar">
+				<commitbutton datamodel="/model" />
+			</toolbar>
+			<div class="wrap" visible="false" id="detail">
+				<embed src="sharedAccounts/accountDetails.zul"/>
+			</div>
+		</div>
+		
+	</frame>
+</zk>

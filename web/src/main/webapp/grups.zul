@@ -386,7 +386,7 @@
 			</tree>
 		</navegador>
 	
-		<detalls id="dades" width="${amplaria}">
+		<detalls id="dades" width="${amplaria}" style="border:none">
 			<toolbar if="${requestedGroup != null }"  height="20px">
 				<commitbutton id="b_commit" datamodel="/model"/>
 				<toolbarbutton label="" ></toolbarbutton>
@@ -514,7 +514,7 @@
 					camp.setValue(dada);
 				</attribute>
 
-				<tabbox id="panels" width="${amplaria2}">
+				<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 					<tabs>
 						<tab label="${c:l('grups.zul.Grup')}"/>
 						<tab label="${c:l('grups.zul.Impressores')}"/>

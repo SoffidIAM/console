@@ -92,9 +92,12 @@
 						} 
 						// Fem la selecció
 						if(esquema.getFellow("lista").getFellow("listbox").selectedItem != null){
+							es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils
+									.getComponentContext(
+											esquema.getFellow("lista").getFellow("listbox").selectedItem);
 							String codiSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(2).getLabel();
 							String descripcioSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(1).getLabel();
-							String tipusDominiSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(3).getLabel();
+							String tipusDominiSeleccionat = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "domainTypeDescription");  
 							String scopeSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(4).getLabel();
 							String heretaSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(5).getLabel();
 						
@@ -112,7 +115,6 @@
 						// Posem etiqueta descriptiva
 							esquema.getFellow("dades").getFellow("form").getFellow("auto_seleccionada").getFellow("label").setValue(org.zkoss.util.resource.Labels.getLabel("autoritzacions.Poder")+" "+descripcioSeleccionat);
 						// i el tipus de domini
-							tipusDominiSeleccionat = "".equals(tipusDominiSeleccionat.trim())?"":", "+tipusDominiSeleccionat;
 							String s_tipusDominiSeleccionat = org.zkoss.util.resource.Labels.getLabel("autoritzacions.TipusDomini")+tipusDominiSeleccionat;
 							model.getVariables().declareVariable("s_tipusDominiSeleccionat", s_tipusDominiSeleccionat);
 							esquema.getFellow("dades").getFellow("form").getFellow("tipusDomini_seleccionada").getFellow("label").setValue(s_tipusDominiSeleccionat);
@@ -268,7 +270,7 @@
 					<listcell bind="ambit"/>
 					<listcell bind="descripcio"/>
 					<listcell bind="codi"/>
-					<listcell bind="tipusDomini"/>
+					<listcell bind="domainTypeDescription"/>
 					<listcell bind="scope"/>
 					<listcell bind="hereta"/>
 				</dataitem>

@@ -1358,4 +1358,12 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
         }
 
 	}
+
+	@Override
+	protected Dispatcher handleFindSoffidDispatcher() throws Exception {
+		DispatcherEntity sd = getDispatcherEntityDao().findSoffidDispatcher();
+		if (sd == null)
+			throw new InternalErrorException("Unable to locate Soffid system descriptor");
+		return getDispatcherEntityDao().toDispatcher(sd);
+	}
 }

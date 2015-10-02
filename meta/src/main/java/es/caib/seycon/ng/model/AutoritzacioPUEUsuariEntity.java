@@ -25,7 +25,7 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
 	@Column (name="UPE_IDUSU")
-	public java.lang.Long idUsuari;
+	public UsuariEntity user;
 
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity> findAll() {

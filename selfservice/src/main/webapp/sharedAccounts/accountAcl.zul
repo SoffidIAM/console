@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--  Expects the following parameters:
+      * userList
+      * groupList
+      * roleList 
+-->
+<zk>
+	<zscript id="script">
+				void addGrantedUser() {
+					Events.postEvent("onInicia", desktop.getPage("usuarisLlista")
+							.getFellow("esquemaLlista"), self);
+				}
+				void grantUser(Object[] dades) {
+					String codiUsuari = (String) dades[0];
+					String nomComplert = (String) dades[1];
+					String idUsuari = (String) dades[2];
+					// Creem l'autorització
+					Usuari u = new Usuari();
+					u.setId(Long.decode(idUsuari));
+					u.setCodi(codiUsuari);
+					u.setFullName(nomComplert);
+					ctx = XPathUtils.getComponentContext(self);
+					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+							+ "/"+treeGrants.getAttribute("userList"), u);
+				}
+				void addGrantedRole() {
+					desktop.getPage("rolsLlista").setAttribute("tipus", "cap");
+					desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF",
+							"true");//perquè mostre rols gestionableWF	
+					desktop.getPage("rolsLlista").setAttribute("usuari", ""); //??	
+					Events.postEvent("onInicia",
+							desktop.getPage("rolsLlista").getFellow("esquemaLlista"), self);
+				}
+				void grantRole(Object[] dades) {
+					//Obtenim les dades del rol
+					//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
+					String nomRol = (String) dades[0];
+					String codiAplicacio = (String) dades[1];
+					String descripcio = (String) dades[2];
+					String bbdd = (String) dades[5];
+					String idrol = (String) dades[6];
+					// Creem l'autorització
+					Rol r = new Rol();
+					r.setId(Long.decode(idrol));
+					r.setNom(nomRol);
+					r.setDescripcio(descripcio);
+					r.setBaseDeDades(bbdd);
+					r.setCodiAplicacio(codiAplicacio);
+					ctx = XPathUtils.getComponentContext(self);
+					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+							+ "/"+treeGrants.getAttribute("roleList"), r);
+				}
+				void addGrantedGroup() {
+					desktop.getPage("grupsLlista").setAttribute("tipus", "");
+					desktop.getPage("grupsLlista").setAttribute("llistaObsolets", false);
+					Events.postEvent("onInicia",
+							desktop.getPage("grupsLlista").getFellow("esquemaLlista"), self);
+				}
+				void grantGroup(Object[] dades) {
+					String codiGrup = (String) dades[0];
+					String descGrup = (String) dades[1];
+					String idGrup = (String) dades[2];
+					// Creem l'autorització
+					Grup g = new Grup();
+					g.setCodi(codiGrup);
+					g.setId(Long.decode(idGrup));
+					g.setDescripcio(descGrup);
+					ctx = XPathUtils.getComponentContext(self);
+					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+							+ "/"+treeGrants.getAttribute("groupList"), g);
+				}
+	</zscript>
+	<toolbar>
+		<toolbarbutton image="~./img/list-add.gif"
+			id="btnGrantUser" label="${c:l('accounts.addUser')}"
+			visible="${canModifyAccounts}" onClick="addGrantedUser()"
+			onActualitza="grantUser(event.data)" />
+		<toolbarbutton image="~./img/list-add.gif"
+			id="btnGrantGroup" label="${c:l('accounts.addGroup')}"
+			visible="${canModifyAccounts}" onClick="addGrantedGroup()"
+			onActualitza="grantGroup(event.data)" />
+		<toolbarbutton image="~./img/list-add.gif"
+			id="btnGrantRole" label="${c:l('accounts.addRole')}"
+			visible="${canModifyAccounts}" onClick="addGrantedRole()"
+			onActualitza="grantRole(event.data)" />
+		<deletetreebutton acces="${canModifyAccounts}"
+			id="b_esborrar" potEsborrarBranquesAmbFills="false"
+			tree="/esquema/dades/${arg.includer.id}/treeGrants" />
+	</toolbar>
+	<tree autocommit="false" dataPath="." id="treeGrants">
+		<custom-attributes userList="${arg.userList}"
+			groupList="${arg.groupList}"
+			roleList="${arg.roleList}"/>
+		<treecols>
+			<treecol label="${c:l('accounts.grantee')}" />
+			<treecol label="${c:l('accounts.description')}" />
+		</treecols>
+		<treeitemfinder bind="." open="true" path="/${arg.userList}">
+			<treerow>
+				<treecellimage bind="@codi" image="/img/user.png" />
+				<treecell>
+					<label bind="@fullName"  style="margin-right: 1em"/>
+				</treecell>
+			</treerow>
+		</treeitemfinder>
+		<treeitemfinder bind="." open="true" path="/${arg.groupList}">
+			<treerow>
+				<treecellimage bind="@codi" image="/img/group.png" />
+				<treecell >
+					<label bind="@descripcio" style="margin-right: 1em"/>
+				</treecell>
+			</treerow>
+		</treeitemfinder>
+		<treeitemfinder bind="." open="true" path="/${arg.roleList}">
+			<treerow>
+				<treecellimage bind="@nom" image="/img/key.png" />
+				<treecell bind="@descripcio" />
+			</treerow>
+		</treeitemfinder>
+	</tree>
+</zk>

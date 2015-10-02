@@ -46,9 +46,9 @@ span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ back
 
 .fons{ background-color:transparent; }
 .content{ display: table;width: 100%; max-width: 100%;margin: 0 auto; }
-.sidebar{ float:left; width:17%; margin-right:25px; }
+.sidebar{ float:left; width:25%; margin-right:25px; }
 .workarea{ padding:5px !important;}
-.wrap{ float:left; width:80%; }
+.wrap{ float:left; width:70%; }
 .wrap > div, .wrap > div > .tasks{ margin-bottom:25px; }	
 
 /* Texto de las tablas */
@@ -99,6 +99,14 @@ div.tabpanel{border-left:1px solid #7F9FC2;border-right:1px solid #7F9FC2;border
 //	.own-ip{top:37px; padding:3px; bottom:initial;}
 }
 
+div.whitetoolbar {
+	background-color:white;
+}
+div.whitetoolbar a {
+	height:22px;
+	background-color:white;
+	color: #637792;
+}
 /* Tablet Portrait size to standard 960 (devices and browsers) */
 @media only screen and (min-width: 877px) and (max-width: 1024px) {
 	.sidebar{width:23%;}

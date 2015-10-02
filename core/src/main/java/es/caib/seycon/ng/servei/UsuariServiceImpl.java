@@ -405,13 +405,6 @@ public class UsuariServiceImpl extends
 	protected es.caib.seycon.ng.comu.Usuari handleCreate(
 			es.caib.seycon.ng.comu.Usuari usuari) throws java.lang.Exception {
 		
-		// Comprobamos autorización del usuario
-		if (!AutoritzacionsUsuari.canCreateUser(usuari, getGrupEntityDao())) {
-			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
-					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
-					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
-		}
-		
 		// Comprovem que s'hagi especificat el tipus d'usuari de domini
 		if (usuari.getTipusUsuari() == null) {
 			throw new SeyconException (Messages.getString("UsuariServiceImpl.UserTypeNotEspecified")); //$NON-NLS-1$
@@ -482,6 +475,13 @@ public class UsuariServiceImpl extends
 
 		usuariEntity.setUsuariCreacio(codiUsuariCreacio);
 
+		// Comprobamos autorización del usuario
+		if (!getAutoritzacioService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
+			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
+					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
+					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
+		}
+		
 		getUsuariEntityDao().create(usuariEntity);
 
 		/* Una vez creado, se almacena el NIF */
@@ -2085,7 +2085,7 @@ public class UsuariServiceImpl extends
 	protected String handleCanviPassword(String codiUsuari, String codiDominiContrasenyes) throws Exception {
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActiu())) { //$NON-NLS-1$
-			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_SET_PASSWORD, usuari)) {
+			if ( getAutoritzacioService().hasPermission(Security.AUTO_USER_UPDATE_PASSWORD, usuari)) {
 				DominiContrasenyaEntity dominiContrasenyes = getDominiContrasenyaEntityDao().findByCodi(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService().generateNewPassword(usuari, dominiContrasenyes, true);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getCodi());
@@ -3339,13 +3339,19 @@ public class UsuariServiceImpl extends
 			return null;
 		
 		String dispatcherName = getInternalPasswordService().getDefaultDispatcher();
-		Account acc = getAccountService().findAccount(p.getName(), dispatcherName);
+		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(p.getName(), dispatcherName);
 		if (acc == null)
 			return  null;
-		else if (acc instanceof UserAccount)
-			return findUsuariByCodiUsuari(((UserAccount)acc).getUser());
-		else
-			return null;
+		else if (acc.getType().equals (AccountType.USER))
+		{
+			for (UserAccountEntity uae: acc.getUsers())
+			{
+				UsuariEntity ue = uae.getUser();
+				if (ue != null)
+					return getUsuariEntityDao().toUsuari(ue);
+			}
+		}
+		return null;
 	}
 
     private String getServerList() throws InternalErrorException, SQLException, NamingException {

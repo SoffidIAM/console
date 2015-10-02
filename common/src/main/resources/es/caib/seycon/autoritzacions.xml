@@ -1321,4 +1321,15 @@
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
+	<autoritzacio>
+		<codi>sso:createAccount</codi>
+		<descripcio>Create shared accounts using SSO</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>sso:manageAccounts</codi>
+		<descripcio>Manage shared accounts using self service</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
 </autoritzacions>

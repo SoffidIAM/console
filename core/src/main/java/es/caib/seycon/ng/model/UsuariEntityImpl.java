@@ -43,15 +43,13 @@ public class UsuariEntityImpl extends UsuariEntity implements SecurityScopeEntit
 			return true;
 		boolean trobat = false;
 		if (getGrupPrimari() != null
-						&& Security.isUserInRole(permission + "/" //$NON-NLS-1$
-										+ getGrupPrimari().getCodi()))
+						&& getGrupPrimari().isAllowed(permission))
 			return true;
 		if (!trobat)
 		{ // mirem grups secundaris
 			for (UsuariGrupEntity userGroup: getGrupsSecundaris())
 			{
-				if (userGroup.getGrup() != null &&
-						Security.isUserInRole(permission + "/" + userGroup.getGrup().getCodi() )) //$NON-NLS-1$
+				if (userGroup.getGrup() != null && userGroup.getGrup().isAllowed(permission)) //$NON-NLS-1$
 					return true;
 			}
 		}

@@ -232,7 +232,7 @@
 					.getFellow("queryGrupSecundari").getFellow("textbox").value = "";
 				
 				model.getVariables().declareVariable("queryEnabled", false);
-				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/usuari[false]";
+				model.refresh();
 				esquemaLlista.visible=false;
 				view_altres = false;
 				esquemaLlista.getFellow("finishButton").disabled = true;

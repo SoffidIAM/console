@@ -540,14 +540,14 @@
 				</listbox>
 			</navegador>
 
-			<detalls id="dades" width="${amplaria}">
+			<detalls id="dades" width="${amplaria}" style="border: none">
 				<toolbar height="22px" if="${requestedAccount != null}">
 					<commitbutton datamodel="/model" />
 				</toolbar>
 				<form dataPath="/esquema/lista/listbox:/" id="form"
 					onChangeXPath="updateFormFields()">
 					<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();"/>
-					<tabbox id="panels" width="${amplaria2}">
+					<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 						<tabs>
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />

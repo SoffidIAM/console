@@ -252,4 +252,8 @@ public abstract class PuntEntradaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	public void sortChildren (long entryPointId) {
+		return ;
+	}
 }

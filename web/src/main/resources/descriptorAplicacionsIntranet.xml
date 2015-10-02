@@ -16,7 +16,7 @@
 		</finder>
 	</datanode>
 	<datanode name="appsintranet">
-		<finder name="app" type="app" refreshAfterCommit="true">  <!-- intranetMenus:query -->
+		<finder name="app" type="app" refreshAfterCommit="false">  <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
 				if="${queryEnabled}" method="findPuntsEntrada">
 				<parameter value="${nom}" />
@@ -28,7 +28,7 @@
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
 		</finder>
-		<finder name="moure" type="moure">  <!-- intranetMenus:query -->
+		<finder name="moure" type="moure" refreshAfterCommit="true">  <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
 				method="findRoot" />
 			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />

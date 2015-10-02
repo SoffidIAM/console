@@ -6,7 +6,7 @@
 
 <hibernate-mapping auto-import="false" default-access="field">
 
-  <subclass name="es.caib.bpm.task.BPMTaskInstance" 
+  <subclass name="com.soffid.iam.bpm.task.BPMTaskInstance" 
             extends="org.jbpm.taskmgmt.exe.TaskInstance"
             discriminator-value="B">
   </subclass>

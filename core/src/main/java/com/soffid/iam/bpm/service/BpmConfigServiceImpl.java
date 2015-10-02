@@ -73,7 +73,7 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 		try {
 			JbpmContext ctx = getContext();
 			Session session = ctx.getSession();
-			Query q = session.createQuery("from es.caib.bpm.entity.DBProperty"); //$NON-NLS-1$
+			Query q = session.createQuery("from com.soffid.iam.bpm.model.DBProperty"); //$NON-NLS-1$
 
 			Collection<DBProperty> result = q.list();
 			if (result != null)
@@ -96,7 +96,7 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 			JbpmContext ctx = getContext();
 			Session session = ctx.getSession();
 			Query q = session
-					.createQuery("from es.caib.bpm.entity.DBProperty where id=:id"); //$NON-NLS-1$
+					.createQuery("from com.soffid.iam.bpm.model.DBProperty where id=:id"); //$NON-NLS-1$
 			q.setParameter("id", id); //$NON-NLS-1$
 
 			Collection<DBProperty> result = q.list();
@@ -120,7 +120,7 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 		try{
 			JbpmContext ctx=getContext();
 			Session session=ctx.getSession();
-			Query q=session.createQuery("from es.caib.bpm.entity.DBProperty where app=:app and key=:key"); //$NON-NLS-1$
+			Query q=session.createQuery("from com.soffid.iam.bpm.model.DBProperty where app=:app and key=:key"); //$NON-NLS-1$
 			if(app==null || "".equals(app)) app="%"; //$NON-NLS-1$ //$NON-NLS-2$
 			if(key==null || "".equals(key)) key="%"; //$NON-NLS-1$ //$NON-NLS-2$
 			q.setParameter("app", app); //$NON-NLS-1$
@@ -147,7 +147,7 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 			JbpmContext ctx = getContext();
 			Session session = ctx.getSession();
 			Query q = session
-					.createQuery("from es.caib.bpm.entity.DBProperty where app=:app and key=:key"); //$NON-NLS-1$
+					.createQuery("from com.soffid.iam.bpm.model.DBProperty where app=:app and key=:key"); //$NON-NLS-1$
 			if (app == null || "".equals(app)) //$NON-NLS-1$
 				app = "%"; //$NON-NLS-1$
 			if (key == null || "".equals(key)) //$NON-NLS-1$

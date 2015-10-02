@@ -22,8 +22,6 @@ import org.jbpm.job.Job;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.Indexer;
 
-import es.caib.bpm.servei.BpmJobExecutorBase;
-
 public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 	static Integer lock = new Integer(10001);
 	private Log log;

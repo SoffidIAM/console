@@ -42,16 +42,13 @@ public class UserEntityImpl extends UserEntity
 		if (Security.isUserInRole(permission+Security.AUTO_ALL))
 			return true;
 		boolean trobat = false;
-		if (getPrimaryGroup() != null
-						&& Security.isUserInRole(permission + "/" //$NON-NLS-1$
-										+ getPrimaryGroup().getName()))
+		if (getPrimaryGroup() != null && getPrimaryGroup().isAllowed(permission))
 			return true;
 		if (!trobat)
 		{ // mirem grups secundaris
 			for (UserGroupEntity userGroup: getSecondaryGroups())
 			{
-				if (userGroup.getGroup() != null &&
-						Security.isUserInRole(permission + "/" + userGroup.getGroup().getName() )) //$NON-NLS-1$
+				if (userGroup.getGroup() != null && userGroup.getGroup().isAllowed(permission)) //$NON-NLS-1$
 					return true;
 			}
 		}

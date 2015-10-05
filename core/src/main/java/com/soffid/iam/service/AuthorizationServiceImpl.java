@@ -27,7 +27,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
-import com.soffid.iam.utils.AutoritzacioSEU;
+import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -112,7 +112,7 @@ public class AuthorizationServiceImpl extends
         
                         if (nodeAutoritzacio.getNodeType() == Node.ELEMENT_NODE) {
                             // Construim l'autoritzacióVO a partir del XML
-                            AutoritzacioSEU auto = new AutoritzacioSEU(
+                            SoffidAuthorization auto = new SoffidAuthorization(
                                     (Element) nodeAutoritzacio);
                             // Si no té codi, l'ignorem
                             if (auto.getCodi() != null) {
@@ -253,7 +253,7 @@ public class AuthorizationServiceImpl extends
         if (autoritzacionsRolVO != null && autoritzacionsRolVO.size() != 0) {
             for (Iterator it = autoritzacionsRolVO.iterator(); it.hasNext(); ) {
                 AuthorizationRole autoRolVO = (AuthorizationRole) it.next();
-                AutoritzacioSEU autoSEU = (AutoritzacioSEU) getAuthorizations().get(autoRolVO.getAuthorization());
+                SoffidAuthorization autoSEU = (SoffidAuthorization) getAuthorizations().get(autoRolVO.getAuthorization());
                 String scope = autoSEU != null ? autoSEU.getScope() : null;
                 autoRolVO.setBusinessGroupScope(scope != null ? scope : Security.AUTO_SCOPE_ONE);
                 if (autoRolVO.getUserRoleValueDomain() == null) {
@@ -303,7 +303,7 @@ public class AuthorizationServiceImpl extends
 
     }
 
-	private void addInheriedAuthorizations(List<AuthorizationRole> autoritzacionsUsuari, AuthorizationRole autoRolVO, AutoritzacioSEU autoSEU) {
+	private void addInheriedAuthorizations(List<AuthorizationRole> autoritzacionsUsuari, AuthorizationRole autoRolVO, SoffidAuthorization autoSEU) {
 		if (autoSEU != null
 		        && autoSEU.getAutoritzacionsHereta() != null) {
 
@@ -318,7 +318,7 @@ public class AuthorizationServiceImpl extends
 
 		    for (Iterator ait = autosHereta.iterator(); ait.hasNext(); ) {
                 String codiAutoHereta = (String) ait.next();
-                AutoritzacioSEU autoHereta = (AutoritzacioSEU) getAuthorizations().get(codiAutoHereta);
+                SoffidAuthorization autoHereta = (SoffidAuthorization) getAuthorizations().get(codiAutoHereta);
                 if (autoHereta == null) continue;
                 String tipusDominiHereta = autoHereta.getTipusDomini();
                 AuthorizationRole novaAutoHereta = new AuthorizationRole(null, autoHereta.getCodi(), autoRolVO.getRole(), autoRolVO.getUserRoleValueDomain() != null ? new ArrayList(autoRolVO.getUserRoleValueDomain()) : new ArrayList(), autoHereta.getDescripcio(), tipusDominiHereta, autoHereta.getScope(), autoHereta.getAmbit(), null);
@@ -333,7 +333,7 @@ public class AuthorizationServiceImpl extends
                 boolean found = isAuthorizationAlreadyPresent(autoritzacionsUsuari, novaAutoHereta);
                 if (!found) {
                     autoritzacionsUsuari.add(novaAutoHereta);
-                    addInheriedAuthorizations(autoritzacionsUsuari, novaAutoHereta, (AutoritzacioSEU) getAuthorizations().get(novaAutoHereta.getAuthorization()));
+                    addInheriedAuthorizations(autoritzacionsUsuari, novaAutoHereta, (SoffidAuthorization) getAuthorizations().get(novaAutoHereta.getAuthorization()));
                 }
             }
 		}
@@ -529,7 +529,7 @@ public class AuthorizationServiceImpl extends
         if (autoritzacionsRolUsuari != null) {
             for (Iterator it = autoritzacionsRolUsuari.iterator(); it.hasNext(); ) {
                 AuthorizationRole auto = (AuthorizationRole) it.next();
-                AutoritzacioSEU autoSEU = (AutoritzacioSEU) getAuthorizations().get(auto.getAuthorization());
+                SoffidAuthorization autoSEU = (SoffidAuthorization) getAuthorizations().get(auto.getAuthorization());
                 if (autoSEU != null) {
                     String valorDominiUsuari = "";
                     if (auto.getUserRoleValueDomain() != null && auto.getUserRoleValueDomain().size() > 0) {
@@ -569,9 +569,9 @@ public class AuthorizationServiceImpl extends
                 else if (!a1.getDescription().equals(a2.getDescription()))
                     return a1.getDescription().compareTo(a2.getDescription());
             }
-            else if(o1 instanceof AutoritzacioSEU && o2 instanceof AutoritzacioSEU) {
-                AutoritzacioSEU a1 = (AutoritzacioSEU) o1;
-                AutoritzacioSEU a2 = (AutoritzacioSEU) o2;
+            else if(o1 instanceof SoffidAuthorization && o2 instanceof SoffidAuthorization) {
+                SoffidAuthorization a1 = (SoffidAuthorization) o1;
+                SoffidAuthorization a2 = (SoffidAuthorization) o2;
                 if (!a1.getAmbit().equals(a2.getAmbit()))
                     return a1.getAmbit().compareTo(a2.getAmbit());
                 else if (!a1.getDescripcio().equals(a2.getDescripcio()))
@@ -588,13 +588,13 @@ public class AuthorizationServiceImpl extends
         Object obj = getAuthorizations().get(autoritzacio);
         LinkedList<Object> res = new LinkedList();
 
-        if (obj != null && obj instanceof AutoritzacioSEU) {
-            AutoritzacioSEU auto = (AutoritzacioSEU) obj;
+        if (obj != null && obj instanceof SoffidAuthorization) {
+            SoffidAuthorization auto = (SoffidAuthorization) obj;
             res.add(auto);
             return res;
         }
         // No l'hem trobada: tornem una buida (no hauria d'ocorrer)
-        res.add(new AutoritzacioSEU(autoritzacio, autoritzacio, "", "", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        res.add(new SoffidAuthorization(autoritzacio, autoritzacio, "", "", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         return res;
     }
 
@@ -602,7 +602,7 @@ public class AuthorizationServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.AutoritzacioServiceBase#handleFindAuthorizations(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected Collection<AutoritzacioSEU> handleFindAuthorizations (String ambit,
+	protected Collection<SoffidAuthorization> handleFindAuthorizations (String ambit,
 					String descripcio, String codi)
 					throws Exception
 	{
@@ -622,8 +622,8 @@ public class AuthorizationServiceImpl extends
             codi = null;
         }
 			
-		Collection<AutoritzacioSEU> allAuthorizations = getAuthorizations().values();
-		List<AutoritzacioSEU> authorizations = new LinkedList<AutoritzacioSEU>();
+		Collection<SoffidAuthorization> allAuthorizations = getAuthorizations().values();
+		List<SoffidAuthorization> authorizations = new LinkedList<SoffidAuthorization>();
 				
 		if(ambit == null && descripcio == null && codi == null)
 		{
@@ -632,9 +632,9 @@ public class AuthorizationServiceImpl extends
 		}
 		else
 		{
-    		List<AutoritzacioSEU> ambitList = findAmbitAuthorizations(allAuthorizations, ambit);
-    		List<AutoritzacioSEU> descripcioList = findDescripcioAuthorizations(allAuthorizations, descripcio);
-    		List<AutoritzacioSEU> codiList = findCodiAuthorizations(allAuthorizations, codi);
+    		List<SoffidAuthorization> ambitList = findAmbitAuthorizations(allAuthorizations, ambit);
+    		List<SoffidAuthorization> descripcioList = findDescripcioAuthorizations(allAuthorizations, descripcio);
+    		List<SoffidAuthorization> codiList = findCodiAuthorizations(allAuthorizations, codi);
     		
     		if((ambitList != null && !ambitList.isEmpty()) || (descripcioList != null && !descripcioList.isEmpty()))
     			authorizations = compareLists(ambitList, descripcioList);
@@ -651,11 +651,11 @@ public class AuthorizationServiceImpl extends
 	 * @param allAuthorizations
 	 * @return
 	 */
-	private List<AutoritzacioSEU> sort (
-					Collection<AutoritzacioSEU> allAuthorizations)
+	private List<SoffidAuthorization> sort (
+					Collection<SoffidAuthorization> allAuthorizations)
 	{
-		List<AutoritzacioSEU> list = new LinkedList<AutoritzacioSEU>();
-		for(AutoritzacioSEU auto: allAuthorizations){
+		List<SoffidAuthorization> list = new LinkedList<SoffidAuthorization>();
+		for(SoffidAuthorization auto: allAuthorizations){
 			list.add(auto);
 		}
 		
@@ -686,14 +686,14 @@ public class AuthorizationServiceImpl extends
 	 * @param ambit
 	 * @return
 	 */
-	private List<AutoritzacioSEU> findCodiAuthorizations (
-					Collection<AutoritzacioSEU> allAuthorizations, String codi)
+	private List<SoffidAuthorization> findCodiAuthorizations (
+					Collection<SoffidAuthorization> allAuthorizations, String codi)
 	{
-		List<AutoritzacioSEU> list = new LinkedList<AutoritzacioSEU>();
+		List<SoffidAuthorization> list = new LinkedList<SoffidAuthorization>();
 		
 		if(codi != null)
 		{
-    		for(AutoritzacioSEU auto: allAuthorizations)
+    		for(SoffidAuthorization auto: allAuthorizations)
     		{
     			String autoCodi = auto.getCodi();
     			if(autoCodi != null && autoCodi.contains(codi))
@@ -710,14 +710,14 @@ public class AuthorizationServiceImpl extends
 	 * @param ambit
 	 * @return
 	 */
-	private List<AutoritzacioSEU> findDescripcioAuthorizations (
-					Collection<AutoritzacioSEU> allAuthorizations, String descripcio)
+	private List<SoffidAuthorization> findDescripcioAuthorizations (
+					Collection<SoffidAuthorization> allAuthorizations, String descripcio)
 	{
-		List<AutoritzacioSEU> list = new LinkedList<AutoritzacioSEU>();
+		List<SoffidAuthorization> list = new LinkedList<SoffidAuthorization>();
 		
 		if(descripcio != null)
 		{
-    		for(AutoritzacioSEU auto: allAuthorizations)
+    		for(SoffidAuthorization auto: allAuthorizations)
     		{
     			String autoDesc = auto.getDescripcio();
     			if(autoDesc != null && autoDesc.contains(descripcio))
@@ -734,14 +734,14 @@ public class AuthorizationServiceImpl extends
 	 * @param ambit
 	 * @return
 	 */
-	private List<AutoritzacioSEU> findAmbitAuthorizations (
-					Collection<AutoritzacioSEU> allAuthorizations, String ambit)
+	private List<SoffidAuthorization> findAmbitAuthorizations (
+					Collection<SoffidAuthorization> allAuthorizations, String ambit)
 	{
-		List<AutoritzacioSEU> list = new LinkedList<AutoritzacioSEU>();
+		List<SoffidAuthorization> list = new LinkedList<SoffidAuthorization>();
 		
 		if(ambit != null)
 		{
-    		for(AutoritzacioSEU auto: allAuthorizations)
+    		for(SoffidAuthorization auto: allAuthorizations)
     		{
     			String autoAmbit = auto.getAmbit();
     			if(autoAmbit.equals(ambit))
@@ -753,10 +753,10 @@ public class AuthorizationServiceImpl extends
 		return list;
 	}
 	
-	private List<AutoritzacioSEU> compareLists(List<AutoritzacioSEU> first, List<AutoritzacioSEU> second){
-		List<AutoritzacioSEU> endList = new LinkedList<AutoritzacioSEU>();
+	private List<SoffidAuthorization> compareLists(List<SoffidAuthorization> first, List<SoffidAuthorization> second){
+		List<SoffidAuthorization> endList = new LinkedList<SoffidAuthorization>();
 		if(first != null && second != null && !first.isEmpty() && !second.isEmpty()){
-			for(AutoritzacioSEU auto: first){
+			for(SoffidAuthorization auto: first){
 				if(second.contains(auto)){
 					endList.add(auto);
 				}
@@ -776,8 +776,8 @@ public class AuthorizationServiceImpl extends
 	protected List<String> handleGetScopeList () throws Exception
 	{
 		Set<String> set = new HashSet<String>();
-		Collection<AutoritzacioSEU> allAuthorizations = getAuthorizations().values();
-		for(AutoritzacioSEU auto: allAuthorizations){
+		Collection<SoffidAuthorization> allAuthorizations = getAuthorizations().values();
+		for(SoffidAuthorization auto: allAuthorizations){
 			set.add(auto.getAmbit());
 		}
 		List<String> list = new LinkedList<String>();

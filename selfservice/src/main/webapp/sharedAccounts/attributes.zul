@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<zk>
+	<zscript><![CDATA[
+		import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
+		boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+	]]>
+	</zscript>
+	<grid dataPath="/treebox:/attribute" sclass="noBorderGrid"
+		if="${canUpdateUserMetadata}" fixedLayout="true">
+		<columns>
+			<column width="260px"/>
+			<column />
+		</columns>
+		<datarow>
+			<input_etiqueta bind="@dataLabel" width_custom="250px"/>
+			<div use="com.soffid.web.users.additionalData.InputField" onChange=""/> 
+		</datarow>
+	</grid>
+</zk>

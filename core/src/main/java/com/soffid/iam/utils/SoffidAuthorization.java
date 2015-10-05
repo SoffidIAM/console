@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AutoritzacioSEU {
+public class SoffidAuthorization {
 	String codi;
 	String descripcio;
 	String tipusDomini; //opcional [SENSE_DOMINI per defecte]
@@ -17,14 +17,14 @@ public class AutoritzacioSEU {
 	HashSet<String> autoritzacionsHereta = new HashSet();
 	String hereta; //opcional [com al xml]
 	
-	private static Log log = LogFactory.getLog(AutoritzacioSEU.class);
+	private static Log log = LogFactory.getLog(SoffidAuthorization.class);
 	
 	
 	/**
 	 * Construix una AutoritzacioSEU a partir de un node XML
 	 * @param nodeAnalitzar
 	 */
-	public AutoritzacioSEU(Element nodeAnalitzar) {
+	public SoffidAuthorization(Element nodeAnalitzar) {
 		
 		String codiAutoritzacio = getAtributXML(nodeAnalitzar, "codi"); //$NON-NLS-1$
 		
@@ -66,7 +66,7 @@ public class AutoritzacioSEU {
 	 * @param scope
 	 * @param autosHereta
 	 */
-	public AutoritzacioSEU(String codi, String descripcio, String tipusDomini, String scope, String autosHereta) {
+	public SoffidAuthorization(String codi, String descripcio, String tipusDomini, String scope, String autosHereta) {
 		this.codi = codi;
 		this.descripcio = descripcio;
 		this.tipusDomini = tipusDomini;

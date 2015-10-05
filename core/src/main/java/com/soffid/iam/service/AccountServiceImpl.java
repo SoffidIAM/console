@@ -839,7 +839,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (UserGroupEntity ug : group.getSecondaryGroupUsers()) {
             users.add(ug.getUser().getUserName());
         }
-		for (GroupEntity child : group.getChildrens()) {
+		for (GroupEntity child : group.getChildren()) {
             addGroupMembers(child, users);
         }
 	}
@@ -1653,6 +1653,20 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getAttribute()));
 		}
+	}
+
+	@Override
+	protected Account handleFindAccountById(long id) throws Exception {
+		AccountEntity acc = getAccountEntityDao().load(id);
+		if (acc == null)
+			return null;
+		
+		if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1)
+		{
+			return getUserAccountEntityDao().toUserAccount(acc.getUsers().iterator().next());
+		}
+		else
+			return getAccountEntityDao().toAccount(acc);
 	}
 
 }

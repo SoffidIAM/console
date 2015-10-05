@@ -34,8 +34,8 @@ public class EntryPointTreeEntityDaoImpl
         ApplicationAccessTree arbre = super.toApplicationAccessTree(entity);
 		arbre.setParentId(entity.getParent().getId());
 		arbre.setParentName(entity.getParent().getName());
-		arbre.setChildId(entity.getChildren().getId());
-		arbre.setChildName(entity.getChildren().getName());
+		arbre.setChildId(entity.getChild().getId());
+		arbre.setChildName(entity.getChild().getName());
 		return arbre;
     }
 

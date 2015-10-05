@@ -75,6 +75,7 @@ public class AdditionalDataServiceImpl extends
 					if (tipusDadaEntity.getOrder().longValue() >= next)
 						next = tipusDadaEntity.getOrder().longValue() + 1;
 				}
+				tipusDada.setOrder(next);
 			}
 			else
 			{

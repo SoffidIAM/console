@@ -23,11 +23,11 @@ public abstract class ArbrePuntEntradaEntity {
 	@Column (name="PPE_IDPEPA", translated="parent")
 	public es.caib.seycon.ng.model.PuntEntradaEntity pare;
 
-	@Column (name="PPE_IDPEFI", translated="children")
+	@Column (name="PPE_IDPEFI", translated="child")
 	public es.caib.seycon.ng.model.PuntEntradaEntity fill;
 
 	@Operation(translated="findByChildren")
-	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.children.id=:childId order by arbre.order")
+	@DaoFinder("select arbre from com.soffid.iam.model.EntryPointTreeEntity arbre where arbre.child.id=:childId order by arbre.order")
 	public java.util.List<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> findByFill(
 		java.lang.Long childId) {
 	 return null;

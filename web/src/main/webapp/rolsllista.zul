@@ -145,7 +145,8 @@
 				queryWindow.getFellow("queryBbdd").setSelectedIndex(0);
 				queryWindow.getFellow("queryAplicacio").getFellow("textbox").value = "";
 				model.getVariables().declareVariable("queryEnabled", false);
-				lista.getFellow("listbox").dataPath = "/model:/rol[false]"; //tothom
+				model.refresh();
+//				lista.getFellow("listbox").dataPath = "/model:/rol[false]"; //tothom
 				esquemaLlista.visible=false;
 				view_altres = false;
 				usuari = "";
@@ -189,8 +190,8 @@
 			
 			void seguent()
 			{
-				if (!wizard) {acceptaDada(null); }; // amaguem la lista de valors de domini
-				if (esquemaLlista.getFellow("lista").getFellow("listbox").selectedIndex != -1) {
+				if (!wizard) {acceptaDada(null); } // amaguem la lista de valors de domini
+				else if (esquemaLlista.getFellow("lista").getFellow("listbox").selectedIndex != -1) {
 					dominiRol = getDominiRol();
 					if (dominiRol != null) {
 						if (dominiRol.getNom().equals("SENSE_DOMINI") ) {

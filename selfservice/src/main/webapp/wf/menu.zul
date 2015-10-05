@@ -61,7 +61,7 @@
 	//showFavorites = es.caib.zkib.zkiblaf.Application.isFavoritesVisible();
   </zscript>
   <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" use="es.caib.bpm.ui.main.MainMenuWindow" visible="false" width="30em">
-    <tree fixedLayout="true" vflex="false">
+    <tree fixedLayout="true" vflex="false" id="menutree">
     	<treechildren>
     		<treeitem>
     			<treerow>

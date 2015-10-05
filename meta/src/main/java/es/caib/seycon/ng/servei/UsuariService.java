@@ -10,6 +10,7 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.exception.BadPasswordException;
+import es.caib.seycon.ng.model.AccountEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +50,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AccountService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.model.ServerEntity.class,
-	AutoritzacioService.class})
+	AutoritzacioService.class,
+	AccountEntity.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")

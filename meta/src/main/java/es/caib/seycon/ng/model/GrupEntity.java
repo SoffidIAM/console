@@ -60,7 +60,7 @@ public abstract class GrupEntity {
 	@Nullable
 	public java.lang.Long quotaGrup;
 
-	@ForeignKey (foreignColumn="GRU_PARE", translated="childrens")
+	@ForeignKey (foreignColumn="GRU_PARE", translated="children")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupEntity> fills;
 
 	@Column (name="GRU_PARE", translated="parent")

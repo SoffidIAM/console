@@ -231,7 +231,7 @@ public class CreateDisableUserServiceImpl extends com.soffid.iam.service.workflo
 			Group grupVO = getGroupEntityDao().toGroup(grup);
 			if (!grupsContainsGrup(grups, grupVO)) {
 				grups.add(grupVO);
-				Iterator it = grup.getChildrens().iterator();
+				Iterator it = grup.getChildren().iterator();
 				while (it.hasNext()) {
 					addGroupAndDescendants(grups, (GroupEntity) it.next());
 				}

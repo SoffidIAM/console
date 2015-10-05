@@ -957,7 +957,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
     }
 
     private Collection<GroupEntity> getTotsFillsGrup(GroupEntity grupAnalitzar) {
-        Collection<GroupEntity> fills = grupAnalitzar.getChildrens();
+        Collection<GroupEntity> fills = grupAnalitzar.getChildren();
         Collection<GroupEntity> totsFills = new HashSet<GroupEntity>();
 
         for (Iterator<GroupEntity> it = fills.iterator(); it.hasNext(); ) {

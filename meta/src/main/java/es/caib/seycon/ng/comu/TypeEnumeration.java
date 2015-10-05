@@ -21,4 +21,6 @@ public class TypeEnumeration {
 	public java.lang.String emailType="E";
 
 	public java.lang.String userType="U";
+
+	public java.lang.String ssoFormType="F";
 }

@@ -14,8 +14,7 @@
 		problemas en IE al incluirlo en un frame... no obtiene estilos locales (IE6,7,8)
 	 -->
 	<datamodel id="model" rootNode="appsintranet" src="descriptorAplicacionsIntranet.xml"
-		onChange="showCancelButton()"
-		onCommit="onRefrescaArbreIntern(true);"/>
+		onChange="showCancelButton()" />
 	<datamodel id="modelCerca" rootNode="cerca" src="descriptorAplicacionsIntranet.xml"/>
 	<datamodel id="modelMime" rootNode="tipusmime" src="descriptorAplicacionsIntranet.xml"/>
 
@@ -609,10 +608,10 @@
 		}
 		
 		String[] campsDisable = {"opublicaccess","ovisible","odetall_aplicacio","oautousu",
-			"otipus_menu","cbintranetEM","mime_intranetEM","content_intranetEM","cbextranetEM",
+			"bt_sortchildren", "otipus_menu","cbintranetEM","mime_intranetEM","content_intranetEM","cbextranetEM",
 			"mime_extranetEM","content_extranetEM","cbinternetEM","mime_internetEM","content_internetEM",
 			"bt_editajsInternet","bt_editajsExtranet","bt_editajsIntranet"};
-		String[] campsLectura = {"odetall_name","odetall_codi","onum_columnes"};
+		String[] campsLectura = {"odetall_name","odetall_codi"};
 		String[] campsVisible = {"oremoveautoritzacio"};
 		void habilitaModificacions(boolean habilitat) {
 			form = esquema.getFellow("dades").getFellow("form");
@@ -1536,6 +1535,36 @@
 			//Missatgebox.info ("oncommit done");
 		}	
 		
+		
+		void sortChildren (Component c)
+		{
+			es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(c);
+			Long id = (Long) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@id");
+			XmlDataNode branch = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/");
+			String xpath = branch.getXPath();
+			
+			Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.zul.SortChildrenConfirm"),
+				new org.zkoss.zk.ui.event.EventListener() {
+					public void onEvent(Event event) {
+						if ("onOK".equals(event.getName())) {
+							es.caib.seycon.ng.servei.ejb.PuntEntradaService ejb = 
+									new javax.naming.InitialContext()
+										.lookup ( es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.JNDI_NAME)
+										.create();
+							ejb.sortChildren(id);
+							model.refresh();
+							// I obrim les branques origen i destí (si correspon)  
+							// nota: pot fallar si es canvia l'ordre.. però s'aproxima.. [IDEA fer-ho per instance si és l'ultim nivell]
+									
+							es.caib.zkib.component.DataTree tree = esquema.getFellow("lista").getFellow("treebox");
+							tree.obreBrancaByXpath(xpath);
+						}
+					}
+					
+				}
+			);
+		}
+		
 		void onRefrescaArbreIntern(boolean checkCommit) {
 			treebox = esquema.getFellow("lista").getFellow("treebox");
 			if (checkCommit && esquema.isCommitPending()) {
@@ -1618,13 +1647,13 @@
 				</treeitemfinder>
 			</tree>
 		</navegador>
-		<detalls id="dades" width="${amplaria}">
+		<detalls id="dades" width="${amplaria}" style="border:none">
 			<form id="form" dataPath="/esquema/lista/treebox:/"
 				onChangeXPath="onChangeDades()" width="99%">
 				<attribute name="onActualitza">
 					Object[] dades = (Object[]) event.getData();
 				</attribute>
-				<tabbox id="panels" width="${amplaria2}">
+				<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 					<tabs>
 						<tab id="p_basico" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
 						<tab id="p_autoritzacions" label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
@@ -1703,8 +1732,7 @@
 												<listitem label="${c:l('aplicacionsIntranet.zul.Icones')}" value="I"/>
 												<listitem label="${c:l('aplicacionsIntranet.zul.Arbre')}" value="A"/>
 											</listbox>
-											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Namerodecolumnes')}"/>
-											<input_dada bind="@numColumnes" id="onum_columnes" lectura="true" maxim="10" width_custom="120px"/>
+											<button label="${c:l('aplicacionsIntranet.zul.SortChildren')}" id="bt_sortchildren" onClick="sortChildren(self);"/>
 										</hbox>
 									</row>
 									<row>

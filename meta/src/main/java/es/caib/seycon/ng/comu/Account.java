@@ -12,7 +12,6 @@ import com.soffid.mda.annotation.*;
 @ValueObject ( translatedName="Account",
 	 translatedPackage="com.soffid.iam.api")
 public class Account {
-
 	@Nullable
 	public java.lang.Long id;
 
@@ -88,4 +87,8 @@ public class Account {
 	@Description ("Account attributes")
 	@Nullable
 	Map<String, Object> attributes;
+	
+	@Description("Read only attribute. Access level. See access level constants")
+	@Nullable
+	AccountAccessLevelEnum accessLevel;
 }

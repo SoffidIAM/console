@@ -4,8 +4,12 @@
 <zscript>
 </zscript>
 <window border="none" style="border:0px;" id="menu" sclass="menuprincipal menu-display shadow-window" title="${c:l('menu.title')}" use="es.caib.bpm.ui.main.MainMenuWindow" visible="false" width="30em">
-
-	<tree fixedLayout="true" vflex="false">
+	<zscript>
+	<![CDATA[
+	canManageSharedAccounts = es.caib.seycon.ng.utils.Security.isUserInRole("sso:manageAccounts");
+	]]>
+	</zscript>
+	<tree fixedLayout="true" vflex="false" id="menutree">
 		<treechildren>
 			<treeitem>
 		    	<treerow>
@@ -13,13 +17,11 @@
 		    		<!-- <apptreecell langlabel="selfService.Titol" onClick='Executions.sendRedirect("/index.zul")'/> -->
 		    	</treerow>
 		    </treeitem>
-		    <!-- 
 			<treeitem>
 		    	<treerow>
-		    		<apptreecell langlabel="selfService.MenuConsole" onClick='Executions.sendRedirect("../index.zul")'/>
+		    		<apptreecell langlabel="selfService.SharedAccounts" if="${canManageSharedAccounts}" pagina="sharedAccounts/sharedAccounts.zul"/>  <!--Això és el que ha d'anar quan es llevi el js -->
 		    	</treerow>
 		    </treeitem>
-		     -->
     		<treeitem>
     			<treerow>
     				<apptreecell langlabel="main.lblSearch" pagina="/wf/search.zul"/>

@@ -48,7 +48,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AuthorizationService;
-import com.soffid.iam.utils.AutoritzacioSEU;
+import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
@@ -1298,7 +1298,7 @@ public class ApplicationServiceImpl extends
                             Collection desc = getAuthorizationService().getAuthorizationInfo(auto.getAuthorization());
                             AuthorizationRole autoVO = getAuthorizationEntityDao().toAuthorizationRole(auto);
                             if (desc != null && desc.iterator().hasNext()) {
-                                AutoritzacioSEU a = (AutoritzacioSEU) desc.iterator().next();
+                                SoffidAuthorization a = (SoffidAuthorization) desc.iterator().next();
                                 autoVO.setDescription(a.getDescripcio());
                                 autoVO.setScope(a.getAmbit());
                                 autoVO.setInherit(a.getHereta());
@@ -1739,7 +1739,7 @@ public class ApplicationServiceImpl extends
             populateParentGrantsForUser(radSet, sg.getUser(), originalGrant, grup);
         }
 
-		for (GroupEntity fill : grup.getChildrens()) {
+		for (GroupEntity fill : grup.getChildren()) {
             populateParentGrantsForGroup(radSet, fill, originalGrant);
         }
 	}

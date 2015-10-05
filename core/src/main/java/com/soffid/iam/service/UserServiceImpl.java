@@ -29,6 +29,7 @@ import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CardEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -49,6 +50,7 @@ import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserEntityDao;
@@ -501,6 +503,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		dadaUsuari.setBlobDataValue(null);
 		UserDataEntity dadaUsuariEntity = getUserDataEntityDao()
 				.userDataToEntity(dadaUsuari);
+		// Comprobamos autorización del usuario
+		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
+			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
+					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
+					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
+		}
 		getUserDataEntityDao().create(dadaUsuariEntity);
 
 		/* El teléfon es guarda quan ja s'ha creat l'usuari */
@@ -3474,14 +3482,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		String dispatcherName = getInternalPasswordService()
 				.getDefaultDispatcher();
-		Account acc = getAccountService().findAccount(p.getName(),
-				dispatcherName);
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(p.getName(), dispatcherName);
 		if (acc == null)
 			return null;
-		else if (acc instanceof UserAccount)
-			return findUserByUserName(((UserAccount) acc).getUser());
-		else
-			return null;
+		else if (acc.getType().equals (AccountType.USER))
+		{
+			for (UserAccountEntity uae: acc.getUsers())
+			{
+				UserEntity ue = uae.getUser();
+				if (ue != null)
+					return getUserEntityDao().toUser(ue);
+			}
+		}
+		return null;
 	}
 
 	private String getServerList() throws InternalErrorException, SQLException,

@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+import com.soffid.iam.model.EntryPointAccountEntity;
+
 import es.caib.seycon.ng.comu.ArbrePuntEntrada;
 import es.caib.seycon.ng.comu.AutoritzacioPuntEntrada;
 import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
@@ -97,6 +99,7 @@ public class PuntEntradaEntityDaoImpl extends
 		Collection autoritzaGrup = source.getAutoritzaGrup();
 		Collection autoritzaRol = source.getAutoritzaRol();
 		Collection autoritzaUsuari = source.getAutoritzaUsuari();
+		Collection<EntryPointAccountEntity> accounts = source.getAuthorizedAccounts();
 		Collection autoritzacions = new ArrayList();
 		
 		if (autoritzaGrup!=null && autoritzaGrup.size()!=0) {
@@ -113,6 +116,14 @@ public class PuntEntradaEntityDaoImpl extends
 				AutoritzacioPUERolEntity auto = (AutoritzacioPUERolEntity) it.next();
 				if (source.getId()!=null) auto.setPuntEntrada(source);
 				autoritzacions.add(getAutoritzacioPUERolEntityDao().toAutoritzacioPuntEntrada(auto));
+			}
+		}
+		if (accounts!=null && accounts.size()!=0) {
+			accounts = new ArrayList<EntryPointAccountEntity>(accounts);
+			for (Iterator<EntryPointAccountEntity> it = accounts.iterator(); it.hasNext(); ){
+				EntryPointAccountEntity auto = it.next();
+				if (source.getId()!=null) auto.setEntryPoint(source);
+				autoritzacions.add(getEntryPointAccountEntityDao().toAutoritzacioPuntEntrada(auto));
 			}
 		}
 		if (autoritzaUsuari!=null && autoritzaUsuari.size()!=0) {
@@ -187,16 +198,17 @@ public class PuntEntradaEntityDaoImpl extends
 			List<ExecucioPuntEntradaEntity> metodesPUE = getExecucioPuntEntradaEntityDao().execucioPuntEntradaToEntityList(source.getExecucions());
 			target.getMetodesExecucio().clear();
 			target.getMetodesExecucio().addAll(metodesPUE);
-		} else target.setMetodesExecucio(new java.util.HashSet());
+		} else target.setMetodesExecucio(new java.util.HashSet<ExecucioPuntEntradaEntity>());
 
 		// Autoritzacions (totes juntes)
-		Collection autoritza = source.getAutoritzacions();
-		Collection autoritzaUsu = new HashSet();
-		Collection autoritzaRol = new HashSet();
-		Collection autoritzaGrup = new HashSet();
+		Collection<AutoritzacioPuntEntrada> autoritza = source.getAutoritzacions();
+		Collection<AutoritzacioPUEUsuariEntity> autoritzaUsu = new HashSet<AutoritzacioPUEUsuariEntity>();
+		Collection<AutoritzacioPUERolEntity> autoritzaRol = new HashSet<AutoritzacioPUERolEntity>();
+		Collection<AutoritzacioPUEGrupEntity> autoritzaGrup = new HashSet<AutoritzacioPUEGrupEntity>();
+		Collection<EntryPointAccountEntity> autoritzaAccount = new HashSet<EntryPointAccountEntity>();
 	
 		if (autoritza != null) {
-			for (Iterator it = autoritza.iterator(); it.hasNext();) {
+			for (Iterator<AutoritzacioPuntEntrada> it = autoritza.iterator(); it.hasNext();) {
 				AutoritzacioPuntEntrada auto = (AutoritzacioPuntEntrada) it
 						.next();
 				String tipus = auto.getTipusEntitatAutoritzada();
@@ -206,6 +218,9 @@ public class PuntEntradaEntityDaoImpl extends
 					autoritzaUsu.add(autoEntity);
 				} else if (TipusAutoritzacioPuntEntrada.ROL.equals(tipus)) {// Rol
 					autoritzaRol.add(getAutoritzacioPUERolEntityDao()
+							.autoritzacioPuntEntradaToEntity(auto));
+				} else if (TipusAutoritzacioPuntEntrada.ACCOUNT.equals(tipus)) {// Rol
+					autoritzaAccount.add(getEntryPointAccountEntityDao()
 							.autoritzacioPuntEntradaToEntity(auto));
 				} else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipus)) {// Grup
 					autoritzaGrup.add(getAutoritzacioPUEGrupEntityDao()
@@ -217,6 +232,7 @@ public class PuntEntradaEntityDaoImpl extends
 		target.setAutoritzaUsuari(autoritzaUsu);
 		target.setAutoritzaRol(autoritzaRol);
 		target.setAutoritzaGrup(autoritzaGrup);
+		target.setAuthorizedAccounts(autoritzaAccount);
 	}
 
 }

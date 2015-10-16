@@ -6,6 +6,7 @@ public class TipusAutoritzacioPuntEntrada {
 	public final static String GRUP = "Grup"; //$NON-NLS-1$
 	public final static String ROL = "Rol"; //$NON-NLS-1$
 	public final static String USUARI = "Usuari"; //$NON-NLS-1$
+	public final static String ACCOUNT = "Account"; //$NON-NLS-1$
 	
 	// Para convertir la constante a cadena el nivel de autorización
 	public final static String NIVELL_A_DESCRIPCIO = "Administrador"; //$NON-NLS-1$

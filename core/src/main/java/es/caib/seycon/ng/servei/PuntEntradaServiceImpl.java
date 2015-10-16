@@ -34,6 +34,9 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.soffid.iam.model.EntryPointAccountEntity;
+
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.ArbrePuntEntrada;
 import es.caib.seycon.ng.comu.Auditoria;
@@ -612,6 +615,16 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
                             .equals(nivell));
                 }
+            } else if (tipus.equals(TipusAutoritzacioPuntEntrada.ACCOUNT)) {
+                // Lo buscamos en la hash
+                if (permisos.getAccountsPUE().contains(auto.getIdEntitatAutoritzada())) {// codiAuto.toUpperCase()))
+                    // {
+                    // Comprovem el nivell d'autorització
+                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
+                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
+                            .equals(nivell));
+                }
+
             } else if (tipus.equals(TipusAutoritzacioPuntEntrada.ROL)) {
                 // Lo buscamos en la hash
                 if (permisos.getRolsUsuariPUE().contains(auto.getIdEntitatAutoritzada())) {// codiAuto.toUpperCase()))
@@ -675,6 +688,11 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     // La clau és el id del rol (!!)
                     entry.getRolsUsuariPUE().add(rol.getId());// , rol);
                 }
+            }
+            // Get active accounts
+            for ( Account acc: getAccountService().getUserGrantedAccounts(getUsuariEntityDao().toUsuari(usuari)))
+            {
+            	entry.getAccountsPUE().add(acc.getId());
             }
             // Guardem les dades de l'usuari actual
             permisosCache.put(user, entry);
@@ -1379,6 +1397,24 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                             + puntEntrada.getNom());
 
             return getAutoritzacioPUEGrupEntityDao().toAutoritzacioPuntEntrada(autoGrup);
+        } else if (TipusAutoritzacioPuntEntrada.ACCOUNT.equals(tipusAutoritzacio)) {
+            // GRUP: Creamos autorización
+        	EntryPointAccountEntity autoAccount =
+            		getEntryPointAccountEntityDao(). 
+            			newEntryPointAccountEntity();
+        	autoAccount.setAuthorizationlevel(nivell);
+        	autoAccount.setAccount(getAccountEntityDao().load(idEntitat));
+        	autoAccount.setEntryPoint(puntEntradaE);
+            getEntryPointAccountEntityDao().create(autoAccount);
+
+            auditarAutoritzacioPuntEntrada(
+                    "C", //$NON-NLS-1$
+                    tipusAutoritzacio,
+                    autoritzacio.getDescripcioNivellAutoritzacio() + " - " //$NON-NLS-1$
+                            + autoritzacio.getDescripcioEntitatAutoritzada() + " - " //$NON-NLS-1$
+                            + puntEntrada.getNom());
+
+            return getEntryPointAccountEntityDao().toAutoritzacioPuntEntrada(autoAccount);
         } else if (TipusAutoritzacioPuntEntrada.USUARI.equals(tipusAutoritzacio)) {
             // USUARI: Creamos autorización
         	AutoritzacioPUEUsuariEntity autoUsu =
@@ -1430,6 +1466,9 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         } else if (TipusAutoritzacioPuntEntrada.USUARI.equals(tipusAutoritzacio)) {
             // USUARI: Borramos autorización
             getAutoritzacioPUEUsuariEntityDao().remove(autoritzacio.getId());
+        } else if (TipusAutoritzacioPuntEntrada.ACCOUNT.equals(tipusAutoritzacio)) {
+            // USUARI: Borramos autorización
+            getEntryPointAccountEntityDao().remove(autoritzacio.getId());
         }
 
         auditarAutoritzacioPuntEntrada(
@@ -1574,6 +1613,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             taula = "SC_USUPUE"; //$NON-NLS-1$
         else if (tipus.equals(TipusAutoritzacioPuntEntrada.GRUP))
             taula = "SC_GRUPUE"; //$NON-NLS-1$
+        else if (tipus.equals(TipusAutoritzacioPuntEntrada.ROL))
+            taula = "SC_ACCOUN"; //$NON-NLS-1$
         auditoria.setObjecte(taula);
         AuditoriaEntity auditoriaEntity = getAuditoriaEntityDao().auditoriaToEntity(auditoria);
         getAuditoriaEntityDao().create(auditoriaEntity);
@@ -1881,6 +1922,16 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                             .equals(nivell));
                 }
 
+            } else if (tipus.equals(TipusAutoritzacioPuntEntrada.ACCOUNT)) {
+                // Lo buscamos en la hash
+                if (permisos.getAccountsPUE().contains(auto.getIdEntitatAutoritzada())) {// codiAuto.toUpperCase()))
+                    // {
+                    // Comprovem el nivell d'autorització
+                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
+                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
+                            .equals(nivell));
+                }
+
             } else if (tipus.equals(TipusAutoritzacioPuntEntrada.GRUP)) {
                 // Lo buscamos en la hash
                 if (permisos.getGrupsUsuariPUE().contains(codiAuto)) {
@@ -2039,9 +2090,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 	}
 }
 
+/**
+ * @author gbuades
+ *
+ */
 class PermissionsCache {
     private Set<String> grupsUsuariPUE;
     private Set<Long> rolsUsuariPUE;
+    private Set<Long> accountsPUE;
     Date expirationDate;
 
     public PermissionsCache() {
@@ -2050,6 +2106,7 @@ class PermissionsCache {
                                                                         // cache
         grupsUsuariPUE = new HashSet<String>();
         rolsUsuariPUE = new HashSet<Long>();
+        accountsPUE = new HashSet<Long>();
     }
 
     public boolean isValid() {
@@ -2071,5 +2128,13 @@ class PermissionsCache {
     public void setRolsUsuariPUE(Set<Long> rolsUsuariPUE) {
         this.rolsUsuariPUE = rolsUsuariPUE;
     }
+
+	public Set<Long> getAccountsPUE() {
+		return accountsPUE;
+	}
+
+	public void setAccountsPUE(Set<Long> accountsPUE) {
+		this.accountsPUE = accountsPUE;
+	}
     
 }

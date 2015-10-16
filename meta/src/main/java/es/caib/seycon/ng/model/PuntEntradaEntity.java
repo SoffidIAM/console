@@ -60,6 +60,9 @@ public abstract class PuntEntradaEntity {
 	@ForeignKey (foreignColumn="EPE_IDPUE")
 	public java.util.Collection<es.caib.seycon.ng.model.ExecucioPuntEntradaEntity> metodesExecucio;
 
+	@ForeignKey (foreignColumn="CPE_IDPUE")
+	public java.util.Collection<com.soffid.iam.model.EntryPointAccountEntity> authorizedAccounts;
+
 	@Column (name="PUE_ICON")
 	@Nullable
 	public java.lang.Long icona1;

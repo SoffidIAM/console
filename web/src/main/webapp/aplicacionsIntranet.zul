@@ -1802,6 +1802,16 @@
 							                           			"index.zul?embed&target=/usuaris.zul?user="+code,
 							                          				"soffid_popup");
 						                          	}						
+						                          	else if (tipus.equals("Account"))
+						                          	{
+						                          		int i = code.lastIndexOf('@');
+						                          		String account = java.net.URLEncoder.encode( i > 0 ? code.substring(0,i): code, "UTF-8");
+						                          		String system = java.net.URLEncoder.encode(i > 0 ? code.substring(i+1): "", "UTF-8");
+							                            if (esquema.canClose())
+							                           		Executions.getCurrent().sendRedirect(
+							                           			"index.zul?embed&target=/accounts/accounts.zul?account="+account+"&system="+system,
+							                          				"soffid_popup");
+						                          	}						
 						                          	else
 						                          	{
 						                          		self.setVisible ( false );
@@ -2061,4 +2071,5 @@
 	<include src="finestres/editorXML.zul"/>
 	<include src="finestres/editorJS.zul"/>
 	<include src="finestres/aplicaIntranet_autoritzacio.zul"/>
+	<include src="accounts/accountsList.zul"/>
 </frame>

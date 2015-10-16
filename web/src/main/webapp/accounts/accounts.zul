@@ -22,9 +22,9 @@
 			{
 				esquema.getFellow("queryWindow").getFellow("queryName")
 						.getFellow("textbox").setValue(pageScope{"requestedAccount"});
-				Listbox dispatcher = esquema.getFellow("queryWindow")
+				Combobox dispatcher = esquema.getFellow("queryWindow")
 						.getFellow("queryDispatcher");
-				for (Listitem li: dispatcher.getItems())
+				for (Comboitem li: dispatcher.getItems())
 				{
 					if (li.getValue() != null && li.getValue().equals(pageScope{"requestedSystem"}))
 					{

@@ -59,7 +59,7 @@
 				es.caib.zkib.datamodel.DataModelCollection lm = model.getJXPathContext().getValue("/usuari/account");
 				if (lm.getSize() > 10)
 				{
-					enableTimes = false;
+					enableTimers = false;
 				}
 				
 				try

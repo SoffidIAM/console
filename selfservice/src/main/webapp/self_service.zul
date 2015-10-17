@@ -194,7 +194,8 @@
 							if (tm.equals("N") && pe.getExecucions().isEmpty())
 								r.getChildren().get(0).getChildren().get(0).getChildren().get(2).setStyle("color: #EEEEEE; ");
 						}
-					} catch (NullPointerException e) {}
+					} catch (NullPointerException e) {
+					} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {}
 				}
 				
 				void checkIsUpdatePending(Component item)

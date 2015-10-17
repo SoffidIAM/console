@@ -68,6 +68,7 @@
 				initialGrup = requestedGroup;
 				
 			}
+			model.getVariables().declareVariable("codi", initialGrup);
 			
 			void populateDetails ()
 			{
@@ -168,7 +169,7 @@
 				if (queryEnabled)
 				{
 					model.getJXPathContext().getValue("/grup").refresh();
-					treebox.setDataPath( "/model:/" );
+//					treebox.setDataPath( "/model:/" );
 				}
 				
 				if ((treebox.getItemCount() == 0) && !retrySearch)
@@ -263,7 +264,7 @@
 				
 				// Refresquem el contingut
 				model.getJXPathContext().getValue("/grup").refresh();
-				treebox.setDataPath("/model:/");
+				//treebox.setDataPath("/model:/");
 				
 				// I tornem a obrir les branques als dos arbres
 				if (xpath_arbre != null)
@@ -292,7 +293,7 @@
 	</zscript>
 
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
-		onCreate="search()" onHideFormulari="showLista()">
+		onHideFormulari="showLista()">
 		<attribute name="onAutoQuery">
 		<![CDATA[
 			esquema.getFellow("queryWindow").parent.parent.setVisible(false);

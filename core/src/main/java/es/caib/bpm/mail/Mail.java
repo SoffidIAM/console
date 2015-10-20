@@ -269,7 +269,7 @@ public class Mail implements ActionHandler {
 	private Log log = LogFactory.getLog(getClass());
 
 	public void debug(String message) {
-		log.debug(
+		log.info(
 				"[" + __processInstanceId + "] " + message); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

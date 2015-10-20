@@ -53,7 +53,7 @@
 				return searchValues;
 			}
 			
-			void search (boolean queryEnabled)
+			void search (boolean retrySearch)
 			{
 				java.util.Map lista = new java.util.HashMap();
 				

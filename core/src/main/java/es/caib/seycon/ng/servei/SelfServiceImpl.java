@@ -381,12 +381,8 @@ public class SelfServiceImpl extends SelfServiceBase
 						!acc.getType().equals(AccountType.USER))
 				{
 					Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
-					if  ( !acc.getDispatcher().equals (mainDispatcher.getCodi()) &&
-						(d == null || d.getUrl() == null || d.getUrl().trim().length() == 0))
-					{
-						if (matchFilter (filter, acc))
-							accounts.add (acc);
-					}
+					if (matchFilter (filter, acc))
+						accounts.add (acc);
 				}
 			}
 		} finally {

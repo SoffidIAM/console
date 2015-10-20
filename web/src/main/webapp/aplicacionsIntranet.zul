@@ -550,7 +550,7 @@
 				p_xml.setVisible(autoritzat || canAdmin || hasQueryALLMenusIntranet); //si pot veure tots
 				content_xml.setReadonly(!canAdmin);
 				bt_xml.setDisabled(!canAdmin);
-				bt_editaxml.setDisabled(!canAdmin);
+//				bt_editaxml.setDisabled(!canAdmin);
 				// Verifiquem que la pestanya que es mostra siga sent vàlida:
 				if ( (!p_autoritzacions.isVisible() && p_autoritzacions.isSelected() ) 
 					|| (!p_execucions.isVisible() && p_execucions.isSelected()) 

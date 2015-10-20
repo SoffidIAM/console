@@ -10,14 +10,14 @@
 		<![CDATA[
 			void cleanWindow()
 			{
-				esquemaXML.getFellow("dades").getFellow("form")
+				esquemaXML.getFellow("dades")
 					.getFellow("code_xml").setValue("");
 				esquemaXML.visible=false;
 			}
 			
 			void acceptaDada()
 			{
-				String valor = esquemaXML.getFellow("dades").getFellow("form")
+				String valor = esquemaXML.getFellow("dades")
 						.getFellow("code_xml").getValue();
 				//String[] dades = {valor};
 				Component formComponent = (Component) pageScope.get("contextComponent");
@@ -63,7 +63,7 @@
 			// Method to validate Mazinger rule
 			void validaMazinger(boolean closeOnValidate)
 			{
-				String valor = esquemaXML.getFellow("dades").getFellow("form")
+				String valor = esquemaXML.getFellow("dades")
 						.getFellow("code_xml").getValue();
 					
 				// Validem mazinger
@@ -110,7 +110,7 @@
 					.getAttribute("contingutXML");
 				if (contingutXML != null)
 				{
-					esquemaXML.getFellow("dades").getFellow("form")
+					esquemaXML.getFellow("dades")
 						.getFellow("code_xml").setValue(contingutXML);
 				} 
 			]]>
@@ -123,25 +123,8 @@
 		</attribute>
 		
 		<detalls id="dades" width="99%">
-			<hbox sclass="vcentre" style="padding:0 5px 3px 5px"
-				width="100%" widths="*,80px">
-				<div>
-					<label style="font-weight:bold;"
-						value="${c:l('editorXML.zul.Acceleradors')}"/>
-					<label value="${c:l('editorXML.zul.(escriureipolsarTAB)')}"/>
-					<label multiline="true" style="font-style:oblique;font-size:12px;"
-						value="${c:l('editorXML.zul.maz=Mazingerwebapp=W')}"/>
-				</div>
-				<div align="right">
-					<button id="bt_xml" image="~./img/accept.gif"
-						label="${c:l('editorXML.zul.Valida')}"
-						onClick="validaMazinger(false)" />
-				</div>
-			</hbox>
-			<form id="form" width="100%">
-				<codepress id="code_xml" autocomplete="true" language="mazinger"
+			<codemirror id="code_xml" language="xml"
 					style="width:99%; height:450px;"/>
-			</form>
 		</detalls>
 		
 		<separator spacing="5px"/>

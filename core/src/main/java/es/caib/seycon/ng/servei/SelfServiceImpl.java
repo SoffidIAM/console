@@ -70,22 +70,31 @@ public class SelfServiceImpl extends SelfServiceBase
 	@Override
 	protected Collection<Account> handleGetUserAccounts () throws Exception
 	{
-		Dispatcher mainDispatcher = getDispatcherService().findSoffidDispatcher();
 		Usuari u = getCurrentUsuari();
-		Collection<Account> accounts = new LinkedList<Account>();
-		for (Account acc: getAccountService().getUserAccounts(u))
-		{
-			if (acc.getType().equals(AccountType.USER))
+		Security.nestedLogin(u.getCodi(), new String[] {
+			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
+			Security.AUTO_ACCOUNT_QUERY,
+			Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL
+		});
+		try {
+			Dispatcher mainDispatcher = getDispatcherService().findSoffidDispatcher();
+			Collection<Account> accounts = new LinkedList<Account>();
+			for (Account acc: getAccountService().getUserAccounts(u))
 			{
-				Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
-				if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||
-						acc.getDispatcher().equals (mainDispatcher.getCodi()))
+				if (acc.getType().equals(AccountType.USER))
 				{
-					accounts.add (acc);
+					Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
+					if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||
+							acc.getDispatcher().equals (mainDispatcher.getCodi()))
+					{
+						accounts.add (acc);
+					}
 				}
 			}
+			return accounts;
+		} finally {
+			Security.nestedLogoff();
 		}
-		return accounts;
 	}
 
 	/* (non-Javadoc)

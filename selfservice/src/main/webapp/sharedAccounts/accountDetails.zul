@@ -185,7 +185,7 @@
 
 	]]>
 	</zscript>
-	<timer delay="10" repeats="true" onTimer="checkIsUpdatePending();" />
+	<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();" />
 	<style dynamic="true">
 		<!-- Make Plain Grid -->
 		.GridLayoutNoBorder tr.z-row td.z-row-inner, tr.z-row

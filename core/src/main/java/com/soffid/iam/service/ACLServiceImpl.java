@@ -21,7 +21,15 @@ public class ACLServiceImpl extends ACLServiceBase {
 
 	public ACLServiceImpl ()
 	{
-        permissionCache = Collections.synchronizedMap(new LRUMap(100));
+    	int size = 50;
+    	try {
+	    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+	    	if (cacheSize != null )
+	    		size = Integer.parseInt(cacheSize);
+    	} catch (Throwable t) {
+    		
+    	}
+        permissionCache = Collections.synchronizedMap(new LRUMap(size));
 	}
 	
 	@Override

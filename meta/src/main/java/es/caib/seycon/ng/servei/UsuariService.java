@@ -51,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.model.ServerEntity.class,
 	AutoritzacioService.class,
+	SessionCacheService.class,
 	AccountEntity.class})
 
 

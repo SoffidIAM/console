@@ -3337,6 +3337,11 @@ public class UsuariServiceImpl extends
 		Principal p = Security.getPrincipal();
 		if (p == null)
 			return null;
+
+		// First,check from cache
+		Usuari u = (Usuari) getSessionCacheService().getObject("currentUser");
+		if (u != null)
+			return u;
 		
 		String dispatcherName = getInternalPasswordService().getDefaultDispatcher();
 		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(p.getName(), dispatcherName);
@@ -3348,7 +3353,11 @@ public class UsuariServiceImpl extends
 			{
 				UsuariEntity ue = uae.getUser();
 				if (ue != null)
-					return getUsuariEntityDao().toUsuari(ue);
+				{
+					u = getUsuariEntityDao().toUsuari(ue);
+					getSessionCacheService().putObject("currentUser", u);
+					return u;
+				}
 			}
 		}
 		return null;

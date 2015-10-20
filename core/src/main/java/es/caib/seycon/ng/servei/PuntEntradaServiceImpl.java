@@ -75,7 +75,15 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     Map<String, PermissionsCache> permisosCache;
     
     public PuntEntradaServiceImpl() {
-        permisosCache = Collections.synchronizedMap(new LRUMap(50));
+    	int size = 50;
+    	try {
+	    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+	    	if (cacheSize != null )
+	    		size = Integer.parseInt(cacheSize);
+    	} catch (Throwable t) {
+    		
+    	}
+        permisosCache = Collections.synchronizedMap(new LRUMap(size));
     }
 
     private static final Long ROOT_ID = new Long(0);

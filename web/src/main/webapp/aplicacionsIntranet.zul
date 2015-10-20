@@ -1655,11 +1655,11 @@
 				</attribute>
 				<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 					<tabs>
-						<tab id="p_basico" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
-						<tab id="p_autoritzacions" label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
-						<tab id="p_execucions" label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
-						<tab id="p_moure" label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
-						<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/> 
+						<tab id="p_basico"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+						<tab id="p_autoritzacions"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
+						<tab id="p_execucions"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
+						<tab id="p_moure"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
+						<tab id="p_xml" width="12em" label="${c:l('aplicacionsIntranet.zul.Mazinger')}" onSelect="content_xml.invalidate();"/> 
 					</tabs>
 					<tabpanels>
 						<tabpanel id="basica">
@@ -2052,9 +2052,11 @@
 								if (dada!=null) content_xml.setValue(dada);
 							</attribute>
 							<vbox width="100%">
+<!-- 
 								<textbox bind="@xmlPUE" cols="70" disabled="false" id="content_xml" onChange="" rows="15" sclass="textbox" width="100%"/>
+								 -->
+								<codemirror  value="&lt;Mazinger/&gt;" width="100%" linenumbers="true" onChange="" id="content_xml" language="xml" height="15em" bind="@xmlPUE" />
 								<div align="right">
-									<button id="bt_editaxml" image="~./img/edit.gif" label="${c:l('aplicacionsIntranet.zul.EditorXML')}" onClick="editorXML(content_xml.value)"/>
 									<button id="bt_xml" image="~./img/accept.gif" label="${c:l('aplicacionsIntranet.zul.Valida')}" onClick="validaXML()"/>
 								</div>
 							</vbox>

@@ -73,9 +73,9 @@ public class SelfServiceImpl extends SelfServiceBase
 		Dispatcher mainDispatcher = getDispatcherService().findSoffidDispatcher();
 		Usuari u = getCurrentUsuari();
 		Collection<Account> accounts = new LinkedList<Account>();
-		for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+		for (Account acc: getAccountService().getUserAccounts(u))
 		{
-			if (!acc.getType().equals(AccountType.IGNORED))
+			if (acc.getType().equals(AccountType.USER))
 			{
 				Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
 				if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||

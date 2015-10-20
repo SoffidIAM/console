@@ -57,7 +57,15 @@ public class SessionCacheServiceImpl extends SessionCacheServiceBase
     		}
     		if (map == null)
     		{
-    			map = Collections.synchronizedMap(new LRUMap(500));			
+    	    	int size = 500;
+    	    	try {
+    		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+    		    	if (cacheSize != null )
+    		    		size = Integer.parseInt(cacheSize);
+    	    	} catch (Throwable t) {
+    	    		
+    	    	}
+    			map = Collections.synchronizedMap(new LRUMap(size));			
     		}
 		}
 	}

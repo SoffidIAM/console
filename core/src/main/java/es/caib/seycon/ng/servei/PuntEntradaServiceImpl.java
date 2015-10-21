@@ -479,18 +479,20 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             Collection<PuntEntrada> fills = new LinkedList<PuntEntrada>();
             for (Iterator<ArbrePuntEntradaEntity> it = arbre.iterator(); it.hasNext();) {
                 ArbrePuntEntradaEntity a = it.next();
-                // Només si tenim permis
-                PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(a.getFill());
-                // Establim la posició a l'arbre del punt d'entrada (per poder
-                // moure'l)
-                pue.setIdPare(a.getPare().getId());
-                pue.setOrdre("" + a.getOrdre());		//pue.setOrdre(a.getOrdre()); //$NON-NLS-1$
-                // Formen la ruta a partir del pare
-                String rutaPare = puntEntrada.getRutaArbre() != null ? puntEntrada.getRutaArbre()
-                        + " > " : ""; //$NON-NLS-1$ //$NON-NLS-2$
-                pue.setRutaArbre(rutaPare + puntEntrada.getNom());
-                if (canView(pue))
+                if (canView(a.getFill()))
+                {
+	                // Només si tenim permis
+	                PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(a.getFill());
+	                // Establim la posició a l'arbre del punt d'entrada (per poder
+	                // moure'l)
+	                pue.setIdPare(a.getPare().getId());
+	                pue.setOrdre("" + a.getOrdre());		//pue.setOrdre(a.getOrdre()); //$NON-NLS-1$
+	                // Formen la ruta a partir del pare
+	                String rutaPare = puntEntrada.getRutaArbre() != null ? puntEntrada.getRutaArbre()
+	                        + " > " : ""; //$NON-NLS-1$ //$NON-NLS-2$
+	                pue.setRutaArbre(rutaPare + puntEntrada.getNom());
                     fills.add(pue);
+                }
             }
             return fills;
 
@@ -551,7 +553,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     protected Collection<AutoritzacioPuntEntrada> handleGetAutoritzacionsPUE(PuntEntrada puntEntrada)
             throws Exception {
-        return puntEntrada.getAutoritzacions();
+    	PuntEntradaEntity entity = getPuntEntradaEntityDao().load(puntEntrada.getId());
+    	if (canAdmin(puntEntrada))
+    	{
+    		return getPuntEntradaEntityDao().toPuntEntrada(entity).getAutoritzacions();
+    	}
+    	else
+    		return new LinkedList<AutoritzacioPuntEntrada>();
     }
 
     protected boolean handleCanAdmin(PuntEntrada puntEntrada) throws Exception {
@@ -580,6 +588,11 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
 
     protected boolean handleCanView(PuntEntrada puntEntrada) throws Exception {
+    	PuntEntradaEntity entity = getPuntEntradaEntityDao().load(puntEntrada.getId());
+    	return canView (entity);
+    }
+
+    protected boolean canView(PuntEntradaEntity puntEntrada) throws Exception {
         // return visible || publicAccess || authorized (entityContext,
         // Authorization.query);
         if ("S".equals(puntEntrada.getVisible()) || "S".equals(puntEntrada.getEsPublic()) //$NON-NLS-1$ //$NON-NLS-2$
@@ -587,71 +600,71 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                                                                    // autorització
                                                                    // per veure
                                                                    // tots
-                || esAutoritzat(puntEntrada, TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO))
+                || isAuthorized(puntEntrada, TipusAutoritzacioPuntEntrada.NIVELL_ALTRES))
             return true;
         return false;
     }
 
     protected boolean handleEsAutoritzat(PuntEntrada puntEntrada, String nivell) throws Exception {
 
+    	PuntEntradaEntity entity = getPuntEntradaEntityDao().load(puntEntrada.getId());
+    	return isAuthorized (entity, 
+    			nivell.equals( TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)? 
+    					TipusAutoritzacioPuntEntrada.NIVELL_A: 
+    					TipusAutoritzacioPuntEntrada.NIVELL_ALTRES );
+    }
+    
+    protected boolean isAuthorized(PuntEntradaEntity entry, String level) throws Exception {
         // Hacemos que los administradores de los menús de la
         // intranet puedan hacerlo todo (!!)
         if (AutoritzacionsUsuari.canAdminMenusIntranet())
             return true;
 
-        Principal principal = Security.getPrincipal();
-        if (principal == null)
-        	return false;
-        String user = principal.getName();
-        Collection<AutoritzacioPuntEntrada> autoritzacions = puntEntrada.getAutoritzacions();
-        if (autoritzacions == null)
-            return false;
-        Iterator<AutoritzacioPuntEntrada> iterator = autoritzacions.iterator();
         PermissionsCache permisos = getCurrentAuthorizations();
 
         boolean trobat = false;
+        
+        for (EntryPointAccountEntity acc: entry.getAuthorizedAccounts())
+        {
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getAuthorizationlevel()) || 
+        			acc.getAuthorizationlevel().equals(level))
+        	{
+        		if (permisos.getAccountsPUE().contains(acc.getAccount().getId()))
+        			return true;
+        	}
+        }
 
-        while (!trobat && iterator.hasNext()) {
-            AutoritzacioPuntEntrada auto = iterator.next();
-            // Puede ser de 3 tipos: usuario, rol o grupo
-            String tipus = auto.getTipusEntitatAutoritzada();
-            String codiAuto = auto.getCodiEntitatAutoritzada(); // és ÚNIC !!
-            if (tipus.equals(TipusAutoritzacioPuntEntrada.USUARI)) {
-                if (user.equals(codiAuto)) {
-                    // Comprovem el nivell d'autorització
-                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
-                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
-                            .equals(nivell));
-                }
-            } else if (tipus.equals(TipusAutoritzacioPuntEntrada.ACCOUNT)) {
-                // Lo buscamos en la hash
-                if (permisos.getAccountsPUE().contains(auto.getIdEntitatAutoritzada())) {// codiAuto.toUpperCase()))
-                    // {
-                    // Comprovem el nivell d'autorització
-                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
-                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
-                            .equals(nivell));
-                }
+        for (AutoritzacioPUEGrupEntity acc: entry.getAutoritzaGrup())
+        {
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
+        			acc.getNivellAutoritzacio().equals(level))
+        	{
+        		if (permisos.getGrupsUsuariPUE().contains(acc.getGroup().getId()))
+        			return true;
+        	}
+        }
 
-            } else if (tipus.equals(TipusAutoritzacioPuntEntrada.ROL)) {
-                // Lo buscamos en la hash
-                if (permisos.getRolsUsuariPUE().contains(auto.getIdEntitatAutoritzada())) {// codiAuto.toUpperCase()))
-                    // {
-                    // Comprovem el nivell d'autorització
-                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
-                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
-                            .equals(nivell));
-                }
+        if (permisos.getUserId() != null)
+        {
+	        for (AutoritzacioPUEUsuariEntity acc: entry.getAutoritzaUsuari())
+	        {
+	        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
+	        			acc.getNivellAutoritzacio().equals(level))
+	        	{
+	        		if (permisos.getUserId().equals(acc.getUser().getId()))
+	        			return true;
+	        	}
+	        }
+        }
 
-            } else if (tipus.equals(TipusAutoritzacioPuntEntrada.GRUP)) {
-                // Lo buscamos en la hash
-                if (permisos.getGrupsUsuariPUE().contains(codiAuto)) {
-                    // Comprovem el nivell d'autorització
-                    String nivellAuto = auto.getDescripcioNivellAutoritzacio();
-                    trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO.equals(nivellAuto) || nivellAuto
-                            .equals(nivell));
-                }
-            }
+        for (AutoritzacioPUERolEntity acc: entry.getAutoritzaRol())
+        {
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
+        			acc.getNivellAutoritzacio().equals(level))
+        	{
+        		if (permisos.getRolsUsuariPUE().contains(acc.getRole().getId()))
+        			return true;
+        	}
         }
 
         return trobat;
@@ -659,6 +672,9 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     private PermissionsCache getCurrentAuthorizations() throws InternalErrorException {
         String user = Security.getCurrentUser();
+        if (user == null)
+        	return new PermissionsCache();
+        
         PermissionsCache entry = permisosCache.get(user);
         if (entry != null && !entry.isValid())
             permisosCache.remove(user);
@@ -672,18 +688,19 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
         if (usuari != null) {
             PermissionsCache entry = new PermissionsCache();
 
+            entry.setUserId(usuari.getId());
             // Grups de l'usuari
             GrupEntity gprimari = usuari.getGrupPrimari();
             Collection<UsuariGrupEntity> grups = usuari.getGrupsSecundaris();
             if (gprimari != null) {
-                entry.getGrupsUsuariPUE().add(gprimari.getCodi());// ,gprimari);
+                entry.getGrupsUsuariPUE().add(gprimari.getId());// ,gprimari);
             }
             if (grups != null) {
                 for (Iterator<UsuariGrupEntity> it = grups.iterator(); it.hasNext();) {
                     UsuariGrupEntity uge = it.next();
                     GrupEntity g = uge.getGrup();
                     // getCodi ens dóna un identificador únic del grup
-                    entry.getGrupsUsuariPUE().add(g.getCodi());// ,g);
+                    entry.getGrupsUsuariPUE().add(g.getId());// ,g);
                 }
             }
 
@@ -2103,7 +2120,16 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
  *
  */
 class PermissionsCache {
-    private Set<String> grupsUsuariPUE;
+	private Long userId;
+    public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	private Set<Long> grupsUsuariPUE;
     private Set<Long> rolsUsuariPUE;
     private Set<Long> accountsPUE;
     Date expirationDate;
@@ -2112,20 +2138,21 @@ class PermissionsCache {
         expirationDate = new Date(System.currentTimeMillis() + 600000); // 10
                                                                         // mins
                                                                         // cache
-        grupsUsuariPUE = new HashSet<String>();
+        grupsUsuariPUE = new HashSet<Long>();
         rolsUsuariPUE = new HashSet<Long>();
         accountsPUE = new HashSet<Long>();
+        userId = null;
     }
 
     public boolean isValid() {
         return expirationDate.after(new Date());
     }
 
-    public Set<String> getGrupsUsuariPUE() {
+    public Set<Long> getGrupsUsuariPUE() {
         return grupsUsuariPUE;
     }
 
-    public void setGrupsUsuariPUE(Set<String> grupsUsuariPUE) {
+    public void setGrupsUsuariPUE(Set<Long> grupsUsuariPUE) {
         this.grupsUsuariPUE = grupsUsuariPUE;
     }
 

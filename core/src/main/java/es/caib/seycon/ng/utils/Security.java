@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.ejb.CreateException;
@@ -18,10 +19,13 @@ import javax.security.auth.Subject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import org.apache.commons.collections.map.LRUMap;
+
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.SessionCacheService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 
@@ -502,6 +506,8 @@ public class Security {
     	else
     		return p.getName();
     }
+
+    static Map<String, String> principalToUserMap = null;
     
     public static String getCurrentUser () 
     {
@@ -511,24 +517,44 @@ public class Security {
     		return identity.principal.getName();
     	}
     	else if (disableAllSecurityForEver)
-    		return "???"; //$NON-NLS-1$
+    		return null;
     	else
     	{
-            if (usuariServiceHome == null)
-            {
-            	try {
-					usuariServiceHome = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
-				} catch (NamingException e) {
-					return null;
-				}
-            }
+    		Principal p = getPrincipal();
+    		if (p == null)
+    			return null;
+    		if (principalToUserMap == null)
+    		{
+    	    	int size = 500;
+    	    	try {
+    		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+    		    	if (cacheSize != null )
+    		    		size = Integer.parseInt(cacheSize);
+    	    	} catch (Throwable t) {
+    	    		
+    	    	}
+    	    	principalToUserMap = Collections.synchronizedMap(new LRUMap(size));			
+    		}
             try
-			{
-				Usuari usuari = usuariServiceHome.create().getCurrentUsuari();
-				if (usuari == null)
-					return null;
-				else
-					return usuari.getCodi();
+            {
+	    		String user = principalToUserMap.get(p.getName());
+	    		if (user == null)
+	    		{
+		            if (usuariServiceHome == null)
+		            {
+		            	try {
+							usuariServiceHome = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
+						} catch (NamingException e) {
+							return null;
+						}
+		            }
+					Usuari usuari = usuariServiceHome.create().getCurrentUsuari();
+					if (usuari == null)
+						return null;
+					user = usuari.getCodi();
+					principalToUserMap.put(p.getName(), user);
+	    		}
+	    		return user;
 			}
 			catch (InternalErrorException e)
 			{

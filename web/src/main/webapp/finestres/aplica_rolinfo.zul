@@ -206,11 +206,15 @@
 							es.caib.seycon.ng.comu.Domini d = form.getJXPathContext().getValue("/domini"); 
 							String s_valor_domini = d.getNom();
 							String s_valor_domini_source = grantedRol.getDomini().getNom();
-							
+							String currentUser = new javax.naming.InitialContext()
+								.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
+								.create()
+								.getCurrentUsuari()
+								.getCodi();
 							if (s_valor_domini_source!=null && ! "".equals(s_valor_domini_source.trim()) && 
 									! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini_source)) {
 								Page p = desktop.getPage("valorsDominisRol");
-								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+								p.setAttribute("usuari", currentUser);
 								p.setAttribute("domini", grantedRol.getDomini());
 								p.setAttribute("senseDomini", "N");
 								p.setAttribute("newElement", path);
@@ -218,7 +222,7 @@
 								Events.postEvent ("onInicia", p.getFellow("esquemaLlista"),form);
 							} else if (s_valor_domini!=null && ! "".equals(s_valor_domini.trim()) && ! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
 								Page p = desktop.getPage("valorsDominisRol");
-								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+								p.setAttribute("usuari", currentUser);
 								p.setAttribute("domini", d);
 								p.setAttribute("senseDomini", "N");
 								p.setAttribute("newElement", path);
@@ -231,6 +235,11 @@
 						
 						void onSelectedDomainValue (List dades)
 						{
+							String currentUser = new javax.naming.InitialContext()
+								.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
+								.create()
+								.getCurrentUsuari()
+								.getCodi();
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
 							String path = desktop.getPage("valorsDominisRol").getAttribute("newElement");
 							if (dades != null && dades.size() > 0)
@@ -254,7 +263,7 @@
 							String s_valor_domini = d.getNom();
 							if (s_valor_domini!=null && ! "".equals(s_valor_domini.trim()) && ! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
 								Page p = desktop.getPage("valorsDominisRol");
-								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+								p.setAttribute("usuari", currentUser);
 								p.setAttribute("domini", d);
 								p.setAttribute("senseDomini", "N");
 								p.setAttribute("eventName", "onSelectedDomainValue2");
@@ -326,8 +335,14 @@
 							if (s_valor_domini !=null && 
 									! "".equals(s_valor_domini.trim()) && 
 									! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
+								String currentUser = new javax.naming.InitialContext()
+									.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
+									.create()
+									.getCurrentUsuari()
+									.getCodi();
+
 								Page p = desktop.getPage("valorsDominisRol");
-								p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+								p.setAttribute("usuari", currentUser);
 								p.setAttribute("domini", currentRol.getDomini());
 								p.setAttribute("senseDomini", "N");
 								p.setAttribute("newElement", path);

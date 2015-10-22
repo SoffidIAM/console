@@ -29,6 +29,9 @@ import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
 
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.webdav.lib.properties.GetLastModifiedProperty;
 import org.dom4j.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -221,7 +224,6 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     	if (existingEntity == null)
     		return null;
     	PuntEntrada existing = getPuntEntradaEntityDao().toPuntEntrada(existingEntity);
-    	
     	
         if (!canAdmin(existing))
             throw new SecurityException(Messages.getString("PuntEntradaServiceImpl.UnauthorizedToUpdate")); //$NON-NLS-1$
@@ -459,6 +461,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             return getPuntEntradaEntityDao().toPuntEntrada(entity);
     }
 
+    
+    Log log = LogFactory.getLog(getClass());
     /**
      * @see es.caib.seycon.ng.servei.PuntEntradaService#findChildren(es.caib.seycon.ng.comu.PuntEntrada)
      */
@@ -467,16 +471,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     	PuntEntradaEntity existingEntity1 = getPuntEntradaEntityDao().load (puntEntrada.getId());
     	if (existingEntity1 == null)
     		return null;
-    	PuntEntrada existing1 = getPuntEntradaEntityDao().toPuntEntrada(existingEntity1);
         // Comprovem autorització
-        if (!canView(existing1)) // No donem error
+        if (!canView(existingEntity1)) // No donem error
             return new LinkedList<PuntEntrada>();// throw new
                                                  // SeyconException("no autoritzat");
 
-        Collection<ArbrePuntEntradaEntity> arbre = getArbrePuntEntradaEntityDao().findByPare(
-                puntEntrada.getId());
+        Collection<ArbrePuntEntradaEntity> arbre = existingEntity1.getArbrePuntEntradaSocPare();
         if (arbre != null && arbre.size() != 0) {// Verificamos permisos
-            Collection<PuntEntrada> fills = new LinkedList<PuntEntrada>();
+            List<PuntEntrada> fills = new LinkedList<PuntEntrada>();
             for (Iterator<ArbrePuntEntradaEntity> it = arbre.iterator(); it.hasNext();) {
                 ArbrePuntEntradaEntity a = it.next();
                 if (canView(a.getFill()))
@@ -494,6 +496,11 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
                     fills.add(pue);
                 }
             }
+            Collections.sort(fills, new Comparator<PuntEntrada>() {
+				public int compare(PuntEntrada o1, PuntEntrada o2) {
+					return o1.getOrdre().compareTo(o2.getOrdre());
+				}
+			});
             return fills;
 
         }
@@ -564,7 +571,6 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 
     protected boolean handleCanAdmin(PuntEntrada puntEntrada) throws Exception {
         // return authorized (entityContext, Authorization.admin);
-    	
         return esAutoritzat(puntEntrada, TipusAutoritzacioPuntEntrada.NIVELL_ADMIN_DESCRIPCIO);
     }
 
@@ -595,12 +601,13 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     protected boolean canView(PuntEntradaEntity puntEntrada) throws Exception {
         // return visible || publicAccess || authorized (entityContext,
         // Authorization.query);
-        if ("S".equals(puntEntrada.getVisible()) || "S".equals(puntEntrada.getEsPublic()) //$NON-NLS-1$ //$NON-NLS-2$
-                || AutoritzacionsUsuari.canQueryAllMenusIntranet() // nova
-                                                                   // autorització
-                                                                   // per veure
-                                                                   // tots
-                || isAuthorized(puntEntrada, TipusAutoritzacioPuntEntrada.NIVELL_ALTRES))
+        if ("S".equals(puntEntrada.getVisible()))
+        	return true;
+        if ("S".equals(puntEntrada.getEsPublic())) //$NON-NLS-1$ //$NON-NLS-2$
+        	return true;
+        if (AutoritzacionsUsuari.canQueryAllMenusIntranet())
+        	return true;
+        if (isAuthorized(puntEntrada, TipusAutoritzacioPuntEntrada.NIVELL_ALTRES))
             return true;
         return false;
     }
@@ -614,70 +621,126 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     					TipusAutoritzacioPuntEntrada.NIVELL_ALTRES );
     }
     
+    
+    HashMap<Long, EntryPointCache> entryCache = new HashMap<Long, EntryPointCache>();
+    
     protected boolean isAuthorized(PuntEntradaEntity entry, String level) throws Exception {
         // Hacemos que los administradores de los menús de la
         // intranet puedan hacerlo todo (!!)
         if (AutoritzacionsUsuari.canAdminMenusIntranet())
             return true;
 
-        PermissionsCache permisos = getCurrentAuthorizations();
+    	if (level.equals (TipusAutoritzacioPuntEntrada.NIVELL_A))
+        	removeEntryPointCache(entry);
 
-        boolean trobat = false;
+        PermissionsCache permisos = getCurrentAuthorizations();
+        EntryPointCache cache;
+        synchronized (entryCache)
+        {
+        	cache = entryCache.get(entry.getId());
+        }
+        if (cache == null || cache.timeout < System.currentTimeMillis())
+        	cache = createEntryPointCache( entry);
         
+        for (Long l: cache.adminaccounts)
+        	if (permisos.getAccountsPUE().contains(l))
+        		return true;
+        
+        for (Long l: cache.adminusers)
+        	if (permisos.getUserId().equals(l))
+        		return true;
+        
+        for (Long l: cache.admingroups)
+        	if (permisos.getGrupsUsuariPUE().contains(l))
+        		return true;
+        
+        for (Long l: cache.adminroles)
+        	if (permisos.getRolsUsuariPUE().contains(l))
+        		return true;
+        
+
+        if (level.equals(TipusAutoritzacioPuntEntrada.NIVELL_ALTRES))
+        {
+            for (Long l: cache.accounts)
+            	if (permisos.getAccountsPUE().contains(l))
+            		return true;
+            
+            for (Long l: cache.users)
+            	if (permisos.getUserId().equals(l))
+            		return true;
+            
+            for (Long l: cache.groups)
+            	if (permisos.getGrupsUsuariPUE().contains(l))
+            		return true;
+            
+            for (Long l: cache.roles)
+            	if (permisos.getRolsUsuariPUE().contains(l))
+            		return true;
+        }
+        
+        return false;
+        
+    }
+
+    private void removeEntryPointCache(PuntEntradaEntity entry) {
+        synchronized (entryCache)
+        {
+        	entryCache.remove(entry.getId());
+        }
+    }
+    
+    private EntryPointCache createEntryPointCache(PuntEntradaEntity entry) {
+    	Long now = System.currentTimeMillis();
+    	EntryPointCache c = new EntryPointCache();
+    	c.timeout = now + 600000;
         for (EntryPointAccountEntity acc: entry.getAuthorizedAccounts())
         {
-        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getAuthorizationlevel()) || 
-        			acc.getAuthorizationlevel().equals(level))
-        	{
-        		if (permisos.getAccountsPUE().contains(acc.getAccount().getId()))
-        			return true;
-        	}
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getAuthorizationlevel()))
+       			c.adminaccounts.add (acc.getAccount().getId());
+        	else
+       			c.accounts.add (acc.getAccount().getId());
         }
 
         for (AutoritzacioPUEGrupEntity acc: entry.getAutoritzaGrup())
         {
-        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
-        			acc.getNivellAutoritzacio().equals(level))
-        	{
-        		if (permisos.getGrupsUsuariPUE().contains(acc.getGroup().getId()))
-        			return true;
-        	}
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()))
+       			c.admingroups.add (acc.getGroup().getId());
+        	else
+       			c.groups.add (acc.getGroup().getId());
         }
 
-        if (permisos.getUserId() != null)
+        for (AutoritzacioPUEUsuariEntity acc: entry.getAutoritzaUsuari())
         {
-	        for (AutoritzacioPUEUsuariEntity acc: entry.getAutoritzaUsuari())
-	        {
-	        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
-	        			acc.getNivellAutoritzacio().equals(level))
-	        	{
-	        		if (permisos.getUserId().equals(acc.getUser().getId()))
-	        			return true;
-	        	}
-	        }
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()))
+       			c.adminusers.add (acc.getUser().getId());
+        	else
+       			c.users.add (acc.getUser().getId());
         }
 
         for (AutoritzacioPUERolEntity acc: entry.getAutoritzaRol())
         {
-        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()) || 
-        			acc.getNivellAutoritzacio().equals(level))
-        	{
-        		if (permisos.getRolsUsuariPUE().contains(acc.getRole().getId()))
-        			return true;
-        	}
+        	if (TipusAutoritzacioPuntEntrada.NIVELL_A.equals(acc.getNivellAutoritzacio()))
+       			c.adminroles.add (acc.getRole().getId());
+        	else
+       			c.roles.add (acc.getRole().getId());
         }
+        synchronized (entryCache)
+        {
+        	entryCache.put(entry.getId(), c);
+        }
+        return c;
+	}
 
-        return trobat;
-    }
-
-    private PermissionsCache getCurrentAuthorizations() throws InternalErrorException {
+	private PermissionsCache getCurrentAuthorizations() throws InternalErrorException {
         String user = Security.getCurrentUser();
         if (user == null)
         	return new PermissionsCache();
         
         PermissionsCache entry = permisosCache.get(user);
-        if (entry != null && !entry.isValid())
-            permisosCache.remove(user);
+        if (entry != null && entry.isValid())
+        	return entry;
+        
+        permisosCache.remove(user);
 
         return calculateAuthorizations(user);
     }
@@ -2145,7 +2208,7 @@ class PermissionsCache {
     }
 
     public boolean isValid() {
-        return expirationDate.after(new Date());
+        return expirationDate.before(new Date());
     }
 
     public Set<Long> getGrupsUsuariPUE() {
@@ -2172,4 +2235,16 @@ class PermissionsCache {
 		this.accountsPUE = accountsPUE;
 	}
     
+}
+
+class EntryPointCache {
+	public long timeout;
+	public LinkedList<Long> users = new LinkedList<Long>();
+	public LinkedList<Long> adminusers = new LinkedList<Long>();
+	public LinkedList<Long> groups = new LinkedList<Long>();
+	public LinkedList<Long> admingroups = new LinkedList<Long>();
+	public LinkedList<Long> roles = new LinkedList<Long>();
+	public LinkedList<Long> adminroles = new LinkedList<Long>();
+	public LinkedList<Long> accounts = new LinkedList<Long>();
+	public LinkedList<Long> adminaccounts = new LinkedList<Long>();
 }

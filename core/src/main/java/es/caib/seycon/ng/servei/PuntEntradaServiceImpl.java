@@ -78,7 +78,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     Map<String, PermissionsCache> permisosCache;
     
     public PuntEntradaServiceImpl() {
-    	int size = 50;
+    	int size = 500;
     	try {
 	    	String cacheSize = System.getProperty("soffid.cache.identity.size");
 	    	if (cacheSize != null )
@@ -468,6 +468,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
      */
     protected java.util.Collection<PuntEntrada> handleFindChildren(
             es.caib.seycon.ng.comu.PuntEntrada puntEntrada) throws java.lang.Exception {
+        // log.info("Finding children");
     	PuntEntradaEntity existingEntity1 = getPuntEntradaEntityDao().load (puntEntrada.getId());
     	if (existingEntity1 == null)
     		return null;
@@ -481,8 +482,10 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             List<PuntEntrada> fills = new LinkedList<PuntEntrada>();
             for (Iterator<ArbrePuntEntradaEntity> it = arbre.iterator(); it.hasNext();) {
                 ArbrePuntEntradaEntity a = it.next();
+                // log.info("Testing child");
                 if (canView(a.getFill()))
                 {
+                    // log.info("Adding child");
 	                // Només si tenim permis
 	                PuntEntrada pue = getPuntEntradaEntityDao().toPuntEntrada(a.getFill());
 	                // Establim la posició a l'arbre del punt d'entrada (per poder
@@ -494,13 +497,16 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 	                        + " > " : ""; //$NON-NLS-1$ //$NON-NLS-2$
 	                pue.setRutaArbre(rutaPare + puntEntrada.getNom());
                     fills.add(pue);
+                    // log.info("Added child");
                 }
             }
+            // log.info("Sorting children");
             Collections.sort(fills, new Comparator<PuntEntrada>() {
 				public int compare(PuntEntrada o1, PuntEntrada o2) {
-					return o1.getOrdre().compareTo(o2.getOrdre());
+					return Integer.decode(o1.getOrdre()).compareTo(Integer.decode(o2.getOrdre()));
 				}
 			});
+            // log.info("End");
             return fills;
 
         }
@@ -633,12 +639,14 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     	if (level.equals (TipusAutoritzacioPuntEntrada.NIVELL_A))
         	removeEntryPointCache(entry);
 
+    	// log.info("Checking acl for "+entry.getId());
         PermissionsCache permisos = getCurrentAuthorizations();
         EntryPointCache cache;
         synchronized (entryCache)
         {
         	cache = entryCache.get(entry.getId());
         }
+
         if (cache == null || cache.timeout < System.currentTimeMillis())
         	cache = createEntryPointCache( entry);
         
@@ -690,6 +698,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
     
     private EntryPointCache createEntryPointCache(PuntEntradaEntity entry) {
+    	// log.info("Loading acl for "+entry.getId());
     	Long now = System.currentTimeMillis();
     	EntryPointCache c = new EntryPointCache();
     	c.timeout = now + 600000;
@@ -732,11 +741,19 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
 	}
 
 	private PermissionsCache getCurrentAuthorizations() throws InternalErrorException {
-        String user = Security.getCurrentUser();
+		String user = Security.getCurrentUser();
         if (user == null)
         	return new PermissionsCache();
         
         PermissionsCache entry = permisosCache.get(user);
+        if (entry == null)
+        {
+        	// log.info("User permissions for +"+user+" not in cache");
+        }
+        else if (! entry.isValid())
+        {
+        	// log.info ("User permissions for "+user+" invalid");
+        }
         if (entry != null && entry.isValid())
         	return entry;
         
@@ -746,7 +763,8 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
     }
 
     private PermissionsCache calculateAuthorizations(String user) throws InternalErrorException {
-
+    	// log.info("Calculating user permissions for "+user);
+    	        
         UsuariEntity usuari = getUsuariEntityDao().findByCodi(user);
         if (usuari != null) {
             PermissionsCache entry = new PermissionsCache();
@@ -784,6 +802,7 @@ public class PuntEntradaServiceImpl extends es.caib.seycon.ng.servei.PuntEntrada
             }
             // Guardem les dades de l'usuari actual
             permisosCache.put(user, entry);
+        	// log.info("Calculated "+user+": "+entry.getAccountsPUE().size()+" accounts "+entry.getGrupsUsuariPUE().size()+" groups "+entry.getRolsUsuariPUE().size()+" roles");
             return entry;
         } else {
             return new PermissionsCache();
@@ -2195,10 +2214,10 @@ class PermissionsCache {
 	private Set<Long> grupsUsuariPUE;
     private Set<Long> rolsUsuariPUE;
     private Set<Long> accountsPUE;
-    Date expirationDate;
+    long expirationDate;
 
     public PermissionsCache() {
-        expirationDate = new Date(System.currentTimeMillis() + 600000); // 10
+        expirationDate = System.currentTimeMillis() + 600000; // 10
                                                                         // mins
                                                                         // cache
         grupsUsuariPUE = new HashSet<Long>();
@@ -2208,7 +2227,7 @@ class PermissionsCache {
     }
 
     public boolean isValid() {
-        return expirationDate.before(new Date());
+        return expirationDate > System.currentTimeMillis();
     }
 
     public Set<Long> getGrupsUsuariPUE() {

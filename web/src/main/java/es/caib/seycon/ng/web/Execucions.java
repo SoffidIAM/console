@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Iterator;
 
+import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +17,7 @@ import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.PuntEntradaService;
+import es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome;
 
 public class Execucions extends HttpServlet {
 
@@ -46,27 +48,30 @@ public class Execucions extends HttpServlet {
 				}
 			}
 		} else {
-			AplicacioService appService = ServiceLocator.instance().getAplicacioService();
-			PuntEntradaService puntEntradaSvc = ServiceLocator.instance().getPuntEntradaService();
-			PuntEntrada pe;
 			try {
-				pe = puntEntradaSvc.findPuntEntradaById(Long.decode(id).longValue());
-				for (Iterator<ExecucioPuntEntrada> it = pe.getExecucions().iterator(); it.hasNext();)
+				es.caib.seycon.ng.servei.ejb.PuntEntradaService puntEntradaService = 
+						((PuntEntradaServiceHome) new InitialContext()
+							.lookup(PuntEntradaServiceHome.JNDI_NAME))
+								.create();
+				PuntEntrada pe;
+				pe = puntEntradaService.findPuntEntradaById(Long.decode(id).longValue());
+				if (pe != null)
 				{
-					ExecucioPuntEntrada exe = it.next();
-					if ("text/html".equals(exe.getTipusMimeExecucio())) { //$NON-NLS-1$
-						response.sendRedirect(exe.getContingut());
-					} else {
-						response.reset();
-						response.resetBuffer();
-						response.setContentType(URLDecoder.decode(exe.getTipusMimeExecucio(),"UTF-8")); //$NON-NLS-1$
-						response.getWriter().print(URLDecoder.decode(id,"UTF-8")); //$NON-NLS-1$
+					for (Iterator<ExecucioPuntEntrada> it = pe.getExecucions().iterator(); it.hasNext();)
+					{
+						ExecucioPuntEntrada exe = it.next();
+						if ("text/html".equals(exe.getTipusMimeExecucio())) { //$NON-NLS-1$
+							response.sendRedirect(exe.getContingut());
+						} else {
+							response.reset();
+							response.resetBuffer();
+							response.setContentType(URLDecoder.decode(exe.getTipusMimeExecucio(),"UTF-8")); //$NON-NLS-1$
+							response.getWriter().print(URLDecoder.decode(id,"UTF-8")); //$NON-NLS-1$
+						}
+						return;
 					}
-					return;
 				}
-			} catch (NumberFormatException e) {
-				throw new ServletException(e);
-			} catch (InternalErrorException e) {
+			} catch (Throwable e) {
 				throw new ServletException(e);
 			}
 		}

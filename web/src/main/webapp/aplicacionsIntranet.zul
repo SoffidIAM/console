@@ -252,7 +252,7 @@
 					PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
 					oesmenu = esquema.getFellow("dades").getFellow("form")
 							.getFellow("appsGrid").getFellow("oesmenu");
-					boolean canAdmin = getPuntEntradaService().canAdmin(nodeActual);
+					boolean canAdmin = nodeActual.getId() == null || getPuntEntradaService().canAdmin(nodeActual);
 					boolean esMenu = "S".equals(nodeActual.getMenu()); 
 					boolean teID = (nodeActual.getId()!=null); //Sólo puede insertar tras commit
 					b_inserir.setVisible(!cercant && canAdmin && esMenu && teID); // Només deixem inserir als menus
@@ -477,7 +477,9 @@
 				String code = nodeActual.getCodi();
 				String name = nodeActual.getNom();
 				boolean autoritzat = false;
-				if(name != null) 
+				if (nodeActual.getId() == null)
+					atuortizat = true;
+				else if(name != null) 
 					autoritzat = getPuntEntradaService().esAutoritzat(nodeActual, TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO);
 				else
 					Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMostraPuntEntrada")); 
@@ -685,9 +687,9 @@
 						oesmenu = esquema.getFellow("dades").getFellow("form").getFellow("appsGrid").getFellow("oesmenu");	
 						oesmenu.setDisabled(false);
 					}
-					boolean canAdmin = getPuntEntradaService().canAdmin(pue);
+					boolean canAdmin = pue.getId() == null || getPuntEntradaService().canAdmin(pue);
 					habilitaModificacions(canAdmin);
-					boolean canExecute = getPuntEntradaService().canExecute(pue);
+					boolean canExecute = pue.getId() == null || getPuntEntradaService().canExecute(pue);
 					habilitaExecucions(canExecute);
 					mostraDadesPuntEntrada(canAdmin,pue);
 				}
@@ -2010,7 +2012,7 @@
 								<label value="${c:l('aplicacionsIntranet.zul.Sel·leccioneelmenaon')}"/>
 								<vbox>
 									<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="mouretreebox" pageSize="19" rows="12">
-										<treeitemfinder bind="." open="false" path="/moure">
+										<treeitemfinder bind="." openLevels="1" path="/moure">
 											<treerow>
 												<treecell bind="@nom"/>
 											</treerow>

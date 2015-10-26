@@ -37,6 +37,13 @@
 		}
 
 		checkIsUpdatePending ();
+		for (  Component c : new Component [] { ownerAcl, managerAcl, userAcl} )
+		{
+			c.getFellow("btnGrantUser").setVisible(owner);
+			c.getFellow("btnGrantGroup").setVisible(owner);
+			c.getFellow("btnGrantRole").setVisible(owner);
+			c.getFellow("b_esborrar").setAcces(owner);
+		}
 	}
 	
 

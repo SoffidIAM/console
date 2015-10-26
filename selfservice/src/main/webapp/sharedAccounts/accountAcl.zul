@@ -21,7 +21,7 @@
 					u.setFullName(nomComplert);
 					ctx = XPathUtils.getComponentContext(self);
 					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("userList"), u);
+							+ treeGrants.getAttribute("userList"), u);
 				}
 				void addGrantedRole() {
 					desktop.getPage("rolsLlista").setAttribute("tipus", "cap");
@@ -32,6 +32,7 @@
 							desktop.getPage("rolsLlista").getFellow("esquemaLlista"), self);
 				}
 				void grantRole(Object[] dades) {
+				alert("grantRole2");
 					//Obtenim les dades del rol
 					//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
 					String nomRol = (String) dades[0];
@@ -46,9 +47,10 @@
 					r.setDescripcio(descripcio);
 					r.setBaseDeDades(bbdd);
 					r.setCodiAplicacio(codiAplicacio);
+					alert("rol = "+r);
 					ctx = XPathUtils.getComponentContext(self);
 					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("roleList"), r);
+							+ treeGrants.getAttribute("roleList"), r);
 				}
 				void addGrantedGroup() {
 					desktop.getPage("grupsLlista").setAttribute("tipus", "");
@@ -67,25 +69,25 @@
 					g.setDescripcio(descGrup);
 					ctx = XPathUtils.getComponentContext(self);
 					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("groupList"), g);
+							+ treeGrants.getAttribute("groupList"), g);
 				}
 	</zscript>
-	<toolbar>
+	<toolbar style="min-height:20px">
 		<toolbarbutton image="~./img/list-add.gif"
 			id="btnGrantUser" label="${c:l('accounts.addUser')}"
-			visible="${canModifyAccounts}" onClick="addGrantedUser()"
+			visible="false" onClick="addGrantedUser()"
 			onActualitza="grantUser(event.data)" />
 		<toolbarbutton image="~./img/list-add.gif"
 			id="btnGrantGroup" label="${c:l('accounts.addGroup')}"
-			visible="${canModifyAccounts}" onClick="addGrantedGroup()"
+			visible="false" onClick="addGrantedGroup()"
 			onActualitza="grantGroup(event.data)" />
 		<toolbarbutton image="~./img/list-add.gif"
 			id="btnGrantRole" label="${c:l('accounts.addRole')}"
-			visible="${canModifyAccounts}" onClick="addGrantedRole()"
+			visible="false" onClick="addGrantedRole()"
 			onActualitza="grantRole(event.data)" />
-		<deletetreebutton acces="${canModifyAccounts}"
+		<deletetreebutton acces="false"
 			id="b_esborrar" potEsborrarBranquesAmbFills="false"
-			tree="/esquema/dades/${arg.includer.id}/treeGrants" />
+			tree="/topFrame/accountDetails/${arg.includer.id}/treeGrants" />
 	</toolbar>
 	<tree autocommit="false" dataPath="." id="treeGrants">
 		<custom-attributes userList="${arg.userList}"
@@ -95,7 +97,7 @@
 			<treecol label="${c:l('accounts.grantee')}" />
 			<treecol label="${c:l('accounts.description')}" />
 		</treecols>
-		<treeitemfinder bind="." open="true" path="/${arg.userList}">
+		<treeitemfinder bind="." open="true" path="${arg.userList}">
 			<treerow>
 				<treecellimage bind="@codi" image="/img/user.png" />
 				<treecell>
@@ -103,7 +105,7 @@
 				</treecell>
 			</treerow>
 		</treeitemfinder>
-		<treeitemfinder bind="." open="true" path="/${arg.groupList}">
+		<treeitemfinder bind="." open="true" path="${arg.groupList}">
 			<treerow>
 				<treecellimage bind="@codi" image="/img/group.png" />
 				<treecell >
@@ -111,7 +113,7 @@
 				</treecell>
 			</treerow>
 		</treeitemfinder>
-		<treeitemfinder bind="." open="true" path="/${arg.roleList}">
+		<treeitemfinder bind="." open="true" path="${arg.roleList}">
 			<treerow>
 				<treecellimage bind="@nom" image="/img/key.png" />
 				<treecell bind="@descripcio" />

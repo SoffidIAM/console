@@ -104,7 +104,7 @@
 				<commitbutton datamodel="/model" />
 			</toolbar>
 			<div class="wrap" visible="false" id="detail">
-				<embed src="sharedAccounts/accountDetails.zul"/>
+				<embed id="accountDetails" src="sharedAccounts/accountDetails.zul"/>
 			</div>
 		</div>
 		

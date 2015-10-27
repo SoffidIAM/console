@@ -78,22 +78,31 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	@Override
 	protected Collection<Account> handleGetUserAccounts () throws Exception
 	{
-		com.soffid.iam.api.System mainDispatcher = getDispatcherService().findSoffidDispatcher();
 		User u = getCurrentUser();
-		Collection<Account> accounts = new LinkedList<Account>();
-		for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
-		{
-			if (!acc.getType().equals(AccountType.IGNORED))
+		Security.nestedLogin(u.getCodi(), new String[] {
+			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
+			Security.AUTO_ACCOUNT_QUERY,
+			Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL
+		});
+		try {
+			com.soffid.iam.api.System mainDispatcher = getDispatcherService().findSoffidDispatcher();
+			Collection<Account> accounts = new LinkedList<Account>();
+			for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
 			{
-				com.soffid.iam.api.System d = getDispatcherService().findDispatcherByName(acc.getSystem());
-				if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||
-						acc.getSystem().equals (mainDispatcher.getName()))
+				if (!acc.getType().equals(AccountType.IGNORED))
 				{
-					accounts.add (acc);
+					com.soffid.iam.api.System d = getDispatcherService().findDispatcherByName(acc.getSystem());
+					if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||
+						acc.getSystem().equals (mainDispatcher.getName()))
+					{
+						accounts.add (acc);
+					}
 				}
 			}
+			return accounts;
+		} finally {
+			Security.nestedLogoff();
 		}
-		return accounts;
 	}
 
 	/* (non-Javadoc)
@@ -359,13 +368,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 				if (!acc.getType().equals(AccountType.IGNORED) &&
 						!acc.getType().equals(AccountType.USER))
 				{
-					com.soffid.iam.api.System d = getDispatcherService().findDispatcherByName(acc.getSystem());
-					if  ( !acc.getSystem().equals (mainDispatcher.getName()) &&
-						(d == null || d.getUrl() == null || d.getUrl().trim().length() == 0))
-					{
-						if (matchFilter (filter, acc))
-							accounts.add (acc);
-					}
+					Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
+					if (matchFilter (filter, acc))
+						accounts.add (acc);
 				}
 			}
 		} finally {

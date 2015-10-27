@@ -74,7 +74,7 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 					v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
 				else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY))
 				{
-					AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
+					v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
 					if (AttributeVisibilityEnum.EDITABLE.equals (v))
 						v = AttributeVisibilityEnum.READONLY;
 				}

@@ -11,7 +11,8 @@
 	<zscript><![CDATA[
 	import es.caib.zkib.binder.BindContext;
 	import es.caib.zkib.datasource.XPathUtils;
-	import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+	import es.caib.seycon.ng.comu.*;
+	
 	void updateFormFields () {
 		BindContext ctx = XPathUtils.getComponentContext(panels);
 		boolean owner = false;
@@ -23,13 +24,175 @@
 		} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {
 			
 		}
-		passwordButton.setVisible(owner || manager);
+		passwordImg.setVisible(owner || manager);
+		queryImg.setVisible(owner || manager);
 		txtAccountDescription.getFellow("dada").setReadonly (!owner && ! manager);
+		
+		try {
+			Object ownerName = XPathUtils.getValue(ctx, "/owner[1]/codi");
+			ownerRow.setVisible (ownerName != null);
+		} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) 
+		{
+			ownerRow.setVisible (false);
+		}
+
+		checkIsUpdatePending ();
+		for (  Component c : new Component [] { ownerAcl, managerAcl, userAcl} )
+		{
+			c.getFellow("btnGrantUser").setVisible(owner);
+			c.getFellow("btnGrantGroup").setVisible(owner);
+			c.getFellow("btnGrantRole").setVisible(owner);
+			c.getFellow("b_esborrar").setAcces(owner);
+		}
+	}
+	
+
+	void queryPassword(Component button){
+		try{
+			if (! queryImg.isVisible())  return;
+			
+			showPassword.getFellow("qpassword").setValue("");
+			showPassword.getFellow("popupPwd").setValue("");
+			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
+			Account account = XPathUtils.getValue(ctx, ".").getInstance().getActualAccount();
+			es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
+					.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
+					.create();
+			if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
+			{
+				showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
+				showPassword.getFellow("labelPWDis").setVisible(false);
+				showPassword.getFellow("qpassword").setMultiline(true);
+				showPassword.setVisible(true);
+				showPassword.setMode("highlighted");
+			}
+			else
+			{
+				Password pawd = service.queryAccountPassword(account);
+				if(pawd!=null){
+						String cadena = pawd.getPassword();
+						String cadenaResultant = "";
+						showPassword.getFellow("qpassword").setValue(cadena);
+						int i = cadena.length();
+						for(int j=0; j<i; j++){
+							cadenaResultant = cadenaResultant + cadena.charAt(j) + "\t";
+							Character c = cadena.charAt(j);
+							if(c.isUpperCase(c)){
+								cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Majuscula");
+							}
+							if(c.isLowerCase(c)){
+								cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Minuscula");
+							}
+							if(c.isDigit(c)){
+								cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Number");
+							}
+							if(!c.isLetter(c) && !c.isDigit(c)){
+								cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Symbol");
+							}
+							cadenaResultant = cadenaResultant + "\n";
+						}
+						showPassword.getFellow("popupPwd").setValue(cadenaResultant);
+						showPassword.getFellow("labelPWDis").setVisible(true);
+				}
+				else{
+					showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.EmptyField"));
+					showPassword.getFellow("popupPwd").setValue("");
+					showPassword.getFellow("labelPWDis").setVisible(true);
+				}
+				showPassword.setVisible(true);
+				showPassword.setMode("highlighted");
+			}	
+		} catch ( InterruptedException e){}
+	}
+	
+	void setPassword (Component button)
+	{
+		try{
+			if (! passwordImg.isVisible())  return;
+			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
+			Account account = XPathUtils.getValue(ctx, ".").getInstance().getActualAccount();
+			if (account.getType().equals(AccountType.USER)){
+				newPasswordS.setAttribute("acco", account);
+				es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+					.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+					.create();
+				String afectats = service.queryOtherAffectedAccounts(account);
+				if(afectats != null){
+					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
+							new Object[] {afectats}), 
+							org.zkoss.util.resource.Labels.getLabel("selfService.Segur2") , 
+							new EventListener(){
+								public void onEvent(Event evt){
+									if("onOK".equals(evt.getName())){
+										newPasswordS.setVisible(true);
+										newPasswordS.setMode("highlighted");
+									}
+								}
+							});
+				}
+			}else if (account.getType().equals(AccountType.SHARED)){
+				newPasswordS.setAttribute("acco", account);
+				newPasswordS.setVisible(true);
+				newPasswordS.setMode("highlighted");
+			}else if (account.getType().equals(AccountType.PRIVILEGED)){
+				newPassword.setAttribute("acco", account);
+				Calendar dia = Calendar.getInstance();
+				dia.add(Calendar.DAY_OF_MONTH, 1);
+				newPassword.getFellow("timepwd").setValue(dia.getTime());
+				dia.clear();
+				newPassword.setVisible(true);
+				newPassword.setMode("highlighted");
+			}
+		} catch ( InterruptedException e) {	}
+	}
+
+	void checkinAccount (Component c)
+	{
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(c);
+		Account acc = XPathUtils.getValue(ctx, ".").getInstance().getActualAccount();
+		es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account", 
+				new org.zkoss.zk.ui.event.EventListener() {
+					public void onEvent(Event evt) {
+						if ("onOK".equals(evt.getName()))
+						{
+							javax.naming.Context ctx = new javax.naming.InitialContext();
+							es.caib.seycon.ng.servei.ejb.AccountService ejb = ctx.lookup( es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME ).create();
+							ejb.checkinHPAccount(acc);
+							ownerRow.setVisible (false);
+						}
+					}
+			}
+		);
+	}
+	
+	void checkIsUpdatePending()
+	{
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(form);
+		try {
+			Object o = XPathUtils.getValue(ctx, ".");
+			if (o != null && o.getInstance() != null)
+			{
+				Account acc = o.getInstance().getActualAccount();
+				
+				if (acc != null && acc.getId() != null)
+				{
+					es.caib.seycon.ng.servei.AccountService accountService =
+							es.caib.seycon.ng.ServiceLocator
+								.instance().getAccountService();
+					
+					updateIndicator.setVisible(accountService.isUpdatePending(acc));
+				}
+			}
+		} catch ( es.caib.zkib.jxpath.JXPathNotFoundException e ) {
+			
+			updateIndicator.setVisible(false);
+		}
 	}
 	
 
 	]]>
 	</zscript>
+	<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();" />
 	<style dynamic="true">
 		<!-- Make Plain Grid -->
 		.GridLayoutNoBorder tr.z-row td.z-row-inner, tr.z-row
@@ -37,147 +200,235 @@
 		background: white; border-top: none; border-left: none;
 		border-right: none; border-bottom: none; }
 	</style>
-		<form dataPath="/treebox:/" id="form"
-			onChangeXPath="updateFormFields()">
-			<tabbox id="panels" width="${amplaria2}">
-				<tabs>
-					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
-					<tab label="${c:l('accounts.attribute') }" />
-				</tabs>
+	<form dataPath="/treebox:/" id="form"
+		onChangeXPath="updateFormFields()">
+		<tabbox id="panels" width="${amplaria2}">
+			<tabs>
+				<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+				<tab label="${c:l('accounts.attribute') }" />
+			</tabs>
 
-				<tabpanels>
-					<tabpanel id="basica">
-						<hbox width="100%" widths="50%,1px,45%,*">
-							<grid>
-								<rows>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.name')}:" />
-										<hbox width="97%"
-											widths="*, 1em, 16px">
-											<input_dada
-												id="txtAccountName" bind="@name"
-												lectura="${!canModifyAccounts}" maxlength="10"
-												multiline_custom="false" width_custom="100%" />
-											<image
-												src="~./img/exclamacio.gif" id="updateIndicator"
-												visible="false" width="16px" height="16px">
-											</image>
-										</hbox>
-									</row>
-									<row>
-										<input_etiqueta
-											style="white-space:nowrap;"
-											value="${c:l('accounts.dispatcher')}:" />
-										<label bind="@system"/>
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.description')}:" />
+			<tabpanels>
+				<tabpanel id="basica">
+					<hbox width="100%" widths="50%,1px,45%,*">
+						<grid>
+							<rows>
+								<row>
+									<input_etiqueta
+										value="${c:l('accounts.name')}:" />
+									<hbox width="97%"
+										widths="*, 16px">
 										<input_dada
-											id="txtAccountDescription" bind="actualAccount/@description"
-											lectura="${!canModifyAccounts}" maxlength="50"
-											multiline_custom="false" width_custom="97%" />
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.lastPasswordSet')}:" />
-										<hbox>
-											<datebox readonly="true"
-												disabled="true" bind="actualAccount/@lastPasswordSet" width="10em"
-												format="${c:l('usuaris.zul.dateFormat')}" />
-											<button 
-												id ="passwordButton"
-												label="${c:l('accounts.setPassword')}"
-												onClick="setPassword()" />
-										</hbox>
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.passwordExpiration')}:" />
+											id="txtAccountName" bind="@name"
+											lectura="${!canModifyAccounts}" maxlength="10"
+											multiline_custom="false" width_custom="100%" />
+										<image
+											src="~./img/exclamacio.gif" id="updateIndicator"
+											visible="false" width="16px" height="16px">
+										</image>
+									</hbox>
+								</row>
+								<row>
+									<input_etiqueta
+										style="white-space:nowrap;"
+										value="${c:l('accounts.dispatcher')}:" />
+									<label bind="@system"/>
+								</row>
+								<row>
+									<input_etiqueta
+										value="${c:l('accounts.description')}:" />
+									<input_dada
+										id="txtAccountDescription" bind="actualAccount/@description"
+										lectura="${!canModifyAccounts}" maxlength="50"
+										multiline_custom="false" width_custom="97%" />
+								</row>
+								<row>
+									<input_etiqueta
+										value="${c:l('accounts.lastPasswordSet')}:" />
+									<hbox>
 										<datebox readonly="true"
-											disabled="true" bind="actualAccount/@passwordExpiration" width="10em"
+											disabled="true" bind="actualAccount/@lastPasswordSet" width="10em"
 											format="${c:l('usuaris.zul.dateFormat')}" />
-									</row>
-								</rows>
-							</grid>
-							<separator />
-							<vbox>
-								<label value="${c:l('accounts.owner')}" />
-								<account_acl id="ownerAcl"
-									userList="actualAccount/ownerUsers" 
-									groupList="actualAccount/ownerGroups"
-									roleList="actualAccount/ownerRoles" />
-								<label
-									value="${c:l('accounts.manager')}" />
-								<account_acl id="managerAcl"
-									userList="actualAccount/managerUsers" 
-									groupList="actualAccount/managerGroups"
-									roleList="actualAccount/managerRoles" />
-								<label value="${c:l('accounts.user')}" />
-								<account_acl id="userAcl"
-									userList="actualAccount/grantedUsers" 
-									groupList="actualAccount/grantedGroups"
-									roleList="actualAccount/grantedRoles" />
-							</vbox>
-						</hbox>
-					</tabpanel>
+										<imageclic src="/img/lupa.gif" id ="queryImg">
+											<attribute name="onClick">
+												queryPassword(self);
+											</attribute>
+										</imageclic>
+										<imageclic src="~./img/pwd.gif" id="passwordImg">
+											<attribute name="onClick">
+												setPassword(self);
+											</attribute>
+										</imageclic>
+									</hbox>
+								</row>
+								<row>
+									<input_etiqueta
+										value="${c:l('accounts.passwordExpiration')}:" />
+									<datebox readonly="true"
+										disabled="true" bind="actualAccount/@passwordExpiration" width="10em"
+										format="${c:l('usuaris.zul.dateFormat')}" />
+								</row>
+								<row id="ownerRow">
+									<label value="Owner:" />
+									<div>
+										<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@codi"></label>
+										<image src="/img/cancel.png" width="12px" height="12px" onClick="checkinAccount(self)"/>
+									</div>
+								</row>
+							</rows>
+						</grid>
+						<separator />
+						<vbox>
+							<label value="${c:l('accounts.owner')}" />
+							<account_acl id="ownerAcl"
+								userList="actualAccount/ownerUsers" 
+								groupList="actualAccount/ownerGroups"
+								roleList="actualAccount/ownerRoles" />
+							<label
+								value="${c:l('accounts.manager')}" />
+							<account_acl id="managerAcl"
+								userList="actualAccount/managerUsers" 
+								groupList="actualAccount/managerGroups"
+								roleList="actualAccount/managerRoles" />
+							<label value="${c:l('accounts.user')}" />
+							<account_acl id="userAcl"
+								userList="actualAccount/grantedUsers" 
+								groupList="actualAccount/grantedGroups"
+								roleList="actualAccount/grantedRoles" />
+						</vbox>
+					</hbox>
+				</tabpanel>
 
-					<tabpanel id="attributes">
-						<embed src="/sharedAccounts/attributes.zul" />
-					</tabpanel>
-				</tabpanels>
-			</tabbox>
-		</form>
+				<tabpanel id="attributes">
+					<embed src="/sharedAccounts/attributes.zul" />
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+	</form>
 
-	<window closable="true" id="newPassword" position="center, center"
-		sizable="true" title="${c:l('accounts.setPassword.title')}"
-		visible="false" width="34em"
-		onClose="onCancelPassword(); event.stopPropagation();">
+		<window id="newPassword" closable="true" sclass="new-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.NewPassword')}" visible="false" width="31em"
+			onClose="onCancelPassword(); event.stopPropagation();">
 		<zscript>
-				<![CDATA[
-	void onCancelPassword() {
-		Window wnd = Path.getComponent("/newPassword");
-		password.setValue("");
-		wnd.setVisible(false);
-	}
-	void onSetPassword() {
-		es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-				.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
-				.create();
-		Listbox lb = Path.getComponent("/treebox");
-		Account account = lb.getSelectedItem().getValue().getInstance();
+			<![CDATA[
+				void onCancelPassword() {
+					password.setValue("");
+					newPassword.setVisible(false);
+				}
 
-		model.commit();
-
-		service.setAccountPassword(account, new Password(password.getValue()));
-		es.caib.zkib.zkiblaf.Missatgebox
-				.confirmaOK(org.zkoss.util.resource.Labels
-						.getLabel("accounts.setPassword.msg"));
-		onCancelPassword();
-	}
-]]>
-			</zscript>
-		<vbox width="30em" heights="5em, 3em" align="center">
-			<hbox align="center" height="5em">
-				<hbox width="8em" align="center" pack="end">
-					<label
-						value="${c:l('accounts.setPassword.label')}">
-					</label>
-				</hbox>
-				<space width="2em"></space>
-				<hbox width="18em" align="center" pack="start">
-					<textbox type="password" width="18em" id="password"
-						onOK="onSetPassword();">
-					</textbox>
-				</hbox>
-			</hbox>
-			<hbox align="center" pack="end" width="30em">
+				void onSetPassword() {
+					es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+							.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+							.create();
+					Account account = newPassword.getAttribute("acco");
+					timepwd.getValue();
+					service.setHPAccountPassword(account,
+							new Password(password.getValue()), timepwd.getValue(),
+								checkpwd.isChecked());
+					es.caib.zkib.zkiblaf.Missatgebox
+							.confirmaOK(org.zkoss.util.resource.Labels
+							.getLabel("accounts.setPassword.msg"));
+					BindContext ctx = XPathUtils.getComponentContext(form);
+					XPathUtils.getValue(ctx, "/owner").refresh();
+					ownerRow.setVisible (true);
+					onCancelPassword();
+				}
+			]]>
+		</zscript>
+		<div width="100%">
+	 		<div class="label" align="center">
+				<label value="${c:l('accounts.setPassword.label')}"/>
+				<space width="1em"/>
+				<textbox id="password" type="password" width="18em" onOK="onSetPassword();"/>
+			</div>
+			<div class="label" align="center">
+				<label id="lblpwd" value="${c:l('selfService.Valid')}"/>
+				<space width="1em"/>
+				<datebox id="timepwd" width="18em"
+					format="${c:l('selfService.Format')}" constraint="no past,no empty"/>
+			</div>
+			<div class="label" align="center">
+				<label id="lblcheckpwd" value="${c:l('selfService.Force')}"/>
+				<checkbox id="checkpwd"/> 
+			</div>
+			<div align="center">
 				<button label="${c:l('accounts.setPassword.OK')}"
 					onClick="onSetPassword()" />
+				<space width="1em" />
 				<button label="${c:l('accounts.setPassword.Cancel')}"
 					onClick="onCancelPassword()" />
+			</div>
+		</div>
+	</window>
+	<window id="showPassword" closable="true" sclass="show-pass"
+		position="center, center" sizable="true"
+		title="${c:l('selfService.QueryPasswords')}" visible="false" width="31em"
+		onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+			<![CDATA[
+				void onCancelPassword() {
+					qpassword.setValue("");
+					showPassword.setVisible(false);
+				}
+			]]>
+		</zscript>
+		<popup id="toolPwd">
+			<vbox>
+				<label id="popupPwd" multiline="true"/>
+			</vbox>
+		</popup>
+		<vbox width="100%" align="center">
+			<space width="2em"/>
+			<hbox align="center">
+				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}"/>
+				<label id="qpassword" tooltip="toolPwd"/>
 			</hbox>
+			<space width="2em"/>
+			<hbox>
+				<button label="${c:l('selfService.Close')}"
+					onClick="onCancelPassword()" />
+			</hbox>
+			<space width="1em"/>
+		</vbox>
+	</window>
+	<window id="newPasswordS" closable="true" sclass="new-pass"
+		position="center, center" sizable="true"
+		title="${c:l('selfService.NewPassword')}" visible="false" width="34em"
+		onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+			<![CDATA[
+				void onCancelPassword() {
+					p1.setValue("");
+					newPasswordS.setVisible(false);
+				}
+				
+				void onSetPassword() {
+					es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
+							.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
+							.create();
+					Account account = newPasswordS.getAttribute("acco");
+					service.setAccountPassword(account, new Password(p1.getValue()));
+					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
+					onCancelPassword();
+					checkIsUpdatePending();
+				}
+			]]>
+		</zscript>
+		<vbox width="100%" align="center">
+	 		<div align="center" class="label">
+				<label value="${c:l('accounts.setPassword.label')}"/>
+				<space width="1em"/>
+				<textbox type="password" width="18em" id="p1" onOK="onSetPassword();"/>
+			</div>
+			
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="onSetPassword()" />
+				<space width="1em"/>
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="onCancelPassword()" />
+			</div>
 		</vbox>
 	</window>
 

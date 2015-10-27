@@ -5,8 +5,10 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.model.EntryPointAccountEntity;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
 
@@ -27,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.IconaEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	GrupEntity.class, RolEntity.class,
+	AccountService.class,
+	EntryPointAccountEntity.class,
+	AccountEntity.class,
 	es.caib.seycon.ng.servei.UsuariService.class})
 public abstract class PuntEntradaService {
 

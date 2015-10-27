@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="accountsList" title="Accountslist"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="800px">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="root" src="accounts/descriptorAccounts.xml"/>
+	
+	<zscript src="/comu/checkTruncatedResults.zul"/>
+	
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.datasource.XPathUtils;
+			import es.caib.seycon.ng.comu.*;
+
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			
+			String mode = "query"; 
+			boolean view_altres = false;
+			model.getJXPathContext().getVariables().declareVariable("queryEnabled", false);
+			model.getVariables().declareVariable("restringeixCerca", true);
+			
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+			
+				// Method to obtain the parameters to search process
+				java.util.Map getSearchParameters()
+				{
+					java.util.Map searchValues = new java.util.HashMap();
+					
+					name = esquema.getFellow("queryWindow").getFellow("queryName")
+							.getFellow("textbox");
+					description = esquema.getFellow("queryWindow")
+							.getFellow("queryDescription").getFellow("textbox");
+					dispatcher = esquema.getFellow("queryWindow")
+							.getFellow("queryDispatcher").getSelectedItem();
+					accountType = esquema.getFellow("queryWindow").getFellow("queryAccountType")
+							.getSelectedItem();
+					ignoreType = esquema.getFellow("queryWindow")
+							.getFellow("queryIgnore").getSelectedItem();
+					grantedUsers = esquema.getFellow("queryWindow")
+							.getFellow("queryGrantedUsers").getFellow("textbox");
+					grantedGroups = esquema.getFellow("queryWindow")
+							.getFellow("queryGrantedGroups").getFellow("textbox");
+					grantedRoles = esquema.getFellow("queryWindow")
+							.getFellow("queryGrantedRoles").getFellow("textbox");
+					
+					// Check enable query
+					if (((name == null) || (name.value == null) ||
+							(name.value.trim().length() == 0)) &&
+							(description.value.trim().length() == 0) &&
+							(dispatcher == null) && (accountType == null) &&
+							(grantedUsers.value.trim().length() == 0) &&
+							(grantedGroups.value.trim().length() == 0) &&
+							(grantedRoles.value.trim().length() == 0))
+					{
+						queryEnabled = false;
+					}
+					
+					else
+					{
+						queryEnabled = true;
+					}
+					
+					return searchValues;
+				}
+				
+				void search()
+				{
+					model.getJXPathContext().getVariables().declareVariable("queryEnabled", true);
+					java.util.Map lista = new java.util.HashMap();
+					AccountCriteria criteria = model.getJXPathContext().getValue("/query[1]").instance;
+					
+					if (esquema.isCommitPending())
+					{
+						Missatgebox.avis(org.zkoss.util.resource.Labels
+								.getLabel("usuaris.Confirmar"),
+								org.zkoss.util.resource.Labels
+										.getLabel("usuaris.CanvisPendents"));
+						return;
+					}
+					
+					getSearchParameters();
+					
+					if (!retrySearch)
+					{
+						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
+								.replaceAsteriskChar(criteria.getDescription()));
+						criteria.setDispatcher(criteria.getDispatcher());
+						criteria.setExcludeType(criteria.getExcludeType());
+						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
+								.replaceAsteriskChar(criteria.getGrantedGroups()));
+						criteria.setGrantedRoles(es.caib.seycon.ng.web.utils.Autowildcards
+								.replaceAsteriskChar(criteria.getGrantedRoles()));
+						criteria.setGrantedUsers(es.caib.seycon.ng.web.utils.Autowildcards
+								.replaceAsteriskChar(criteria.getGrantedUsers()));
+						criteria.setName(es.caib.seycon.ng.web.utils.Autowildcards
+								.replaceAsteriskChar(criteria.getName()));
+						criteria.setType(criteria.getType());
+					}
+					
+					else
+					{
+						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
+								.addPercentChar(criteria.getDescription()));
+						criteria.setDispatcher(criteria.getDispatcher());
+						criteria.setExcludeType(criteria.getExcludeType());
+						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
+								.addPercentChar(criteria.getGrantedGroups()));
+						criteria.setGrantedRoles(es.caib.seycon.ng.web.utils.Autowildcards
+								.addPercentChar(criteria.getGrantedRoles()));
+						criteria.setGrantedUsers(es.caib.seycon.ng.web.utils.Autowildcards
+								.addPercentChar(criteria.getGrantedUsers()));
+						criteria.setName(es.caib.seycon.ng.web.utils.Autowildcards
+								.addPercentChar(criteria.getName()));
+						criteria.setType(criteria.getType());
+					}
+					
+					listbox = esquema.getFellow("lista").getFellow("listbox");
+					if (queryEnabled)
+					{
+						model.getJXPathContext().getValue("/account").refresh();
+						// listbox.dataPath = "/model:/account";
+					}
+					if (listbox.getModel().getSize() == 1)
+					{
+						listbox.renderAll();
+						Listitem elem = listbox.getItemAtIndex(0);
+						if (elem != null)
+							listbox.setSelectedItem(elem);
+					}
+					else
+					{
+						if ((listbox.getModel().getSize() == 0) && !retrySearch)
+						{
+							retrySearch = true;
+							search();
+						}
+						
+						else
+						{
+							retrySearch = false;
+						}
+					}
+					
+					checkTruncatedList(listbox);
+				}
+				
+				void showAltres()
+				{
+					if (view_altres == false)
+					{
+						esquema.getFellow("queryWindow").setHeight(queryWindowMax);
+						esquema.getFellow("queryWindow").getFellow("queryWindowAltres")
+								.setVisible(true);
+						esquema.getFellow("queryWindow").getFellow("img_altres")
+								.setSrc("~./img/fletxa-baix.gif");
+						view_altres = true;
+					}
+					else
+					{
+						esquema.getFellow("queryWindow").setHeight(queryWindowMin);
+						esquema.getFellow("queryWindow").getFellow("queryWindowAltres")
+								.setVisible(false);
+						esquema.getFellow("queryWindow").getFellow("img_altres")
+								.setSrc("~./img/fletxa.gif");
+						view_altres = false;
+					}
+				}
+				
+				void blockSearchCriteria()
+				{
+					if (view_search_criteria == false)
+					{
+						esquema.getFellow("queryWindow").setHeight(queryWindowMin);
+						esquema.getFellow("queryWindow")
+								.getFellow("label_show_search")
+								.setLabel(
+										org.zkoss.util.resource.Labels
+												.getLabel("usuaris.zul.HideSearch"));
+						esquema.getFellow("queryWindow").getFellow("img_test")
+								.setSrc("~./img/fletxa-baix.gif");
+						view_search_criteria = true;
+					}
+				}
+
+			void cleanWindow()
+			{
+				queryWindow = esquemaLlista.getFellow("esquema").getFellow("queryWindow");
+				
+				queryWindow.getFellow("queryName").getFellow("textbox").setValue("");
+				queryWindow.getFellow("queryDescription").getFellow("textbox").setValue("");
+				queryWindow.getFellow("queryDispatcher").setSelectedItem(null);
+				queryWindow.getFellow("queryAccountType").setSelectedItem(null);
+				queryWindow.getFellow("queryIgnore").setSelectedItem(null);
+				queryWindow.getFellow("queryGrantedUsers").getFellow("textbox").setValue("");;
+				queryWindow.getFellow("queryGrantedGroups").getFellow("textbox").setValue("");;
+				queryWindow.getFellow("queryGrantedRoles").getFellow("textbox").setValue("");;
+				
+				model.getVariables().declareVariable("queryEnabled", false);
+				model.refresh();
+				esquemaLlista.visible=false;
+				view_altres = false;
+				// esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void acceptaDada()
+			{
+				es.caib.zkib.component.DataListbox lb = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+				if (lb.getSelectedItem() != null)
+				{
+					ctx2 = lb.getJXPathContext();
+					String account = (String)ctx2.getPointer("@name").getValue();
+					String system = (String)ctx2.getPointer("@dispatcher").getValue();
+					String description = (String)ctx2.getPointer("@description").getValue();
+					String id = (String)ctx2.getPointer("@id").getValue().toString();
+					String[] dades = {id, account, system, description};
+					Component formComponent = (Component) pageScope.get("contextComponent");
+					Events.postEvent ("onActualitza", formComponent, dades);
+					cleanWindow();
+				}
+			}
+		]]>
+	</zscript>
+	
+	
+	<window id="esquemaLlista" closable="true" position="center, center" sizable="true"
+		title="${c:l('usuaris.zul.Accounts')}" visible="false" width="850px">
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setMode("highlighted");
+				}else{
+					self.visible = true;
+				}
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation ();
+			]]>
+		</attribute>
+		 
+		<esquema id="esquema">
+			<form dataPath="/model:/query" width="100%">
+				<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()"
+					width="${amplaria}">
+					<vbox>
+						<hbox>
+							<input_criteri id="queryName" etiqueta="${c:l('accounts.name')}"
+								bind="name" />
+							<input_criteri id="queryDescription"
+								etiqueta="${c:l('accounts.description')}" bind="@description" />
+							<hbox width="250px" widths="100px,*">
+								<label sclass="etiqueta" value="${c:l('accounts.dispatcher')}" />
+								<combobox bind="@dispatcher" id="queryDispatcher"
+									dataPath="/model:/dispatcher" value="%">
+									<datacomboitem bind="@codi" labelBind="@codi">
+									</datacomboitem>
+								</combobox>
+							</hbox>
+							<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
+						</hbox>
+						<hbox>
+							<hbox width="250px" widths="100px,*">
+								<label sclass="etiqueta" value="${c:l('accounts.type')}" />
+								<listbox id="queryAccountType" bind="@type" mold="select" 
+									dataPath="/model:/type">
+									<dataitem bind="@value">
+										<listcell bind="@literal" />
+									</dataitem>
+								</listbox>
+							</hbox>
+							<hbox width="250px" widths="100px,*">
+								<label sclass="etiqueta"
+									value="${c:l('accounts.excludeType')}" />
+								<listbox bind="@excludeType" id="queryIgnore"
+									mold="select" dataPath="/model:/type">
+									<dataitem bind="@value">
+										<listcell bind="@literal" />
+									</dataitem>
+								</listbox>
+							</hbox>
+						</hbox>
+						<hbox>
+							<input_criteri id="queryGrantedUsers"
+								etiqueta="${c:l('accounts.user')}" bind="@grantedUsers" />
+							<input_criteri id="queryGrantedGroups"
+								etiqueta="${c:l('accounts.group')}" bind="@grantedGroups" />
+							<input_criteri id="queryGrantedRoles"
+								etiqueta="${c:l('accounts.role')}" bind="@grantedRoles" />
+						</hbox>
+					</vbox>
+					<separator spacing="9px" />
+				</criteris>
+			</form>
+			<navegador id="lista">
+				<listbox id="listbox" autocommit="false" dataPath="/model:/account"
+					fixedLayout="true" height="96%" onClick="showDetall()"
+					rows="${fileres}" onCreate="checkTruncatedList(self)">
+					<listhead>
+						<listheader label="${c:l('accounts.name')}" sort="auto" />
+						<listheader label="${c:l('accounts.dispatcher')}" sort="auto" />
+						<listheader label="${c:l('accounts.description')}" sort="auto" />
+						<listheader label="${c:l('accounts.type')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.policy')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.lastUpdated')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.lastPasswordSet')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.passwordExpiration')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.status')}" sort="auto" visible="false"/>
+					</listhead>
+					<listfoot>
+						<listfooter span="3">
+							<label id="listboxFoot" style="margin-left: 10px;" />
+						</listfooter>
+					</listfoot>
+					<dataitem bind=".">
+						<listcell bind="@name" onDoubleClick="acceptaDada()"/>
+						<listcell bind="@dispatcher" onDoubleClick="acceptaDada()"/>
+						<listcell bind="@description" onDoubleClick="acceptaDada()"/>
+						<listcell >
+												<listbox bind="@type" mold="label"
+													dataPath="/model:/type" onSelect="alert('A');invalidate();" onDoubleClick="acceptaDada()">
+													<dataitem bind="@value">
+														<listcell bind="@literal" />
+													</dataitem>
+												</listbox>
+						</listcell>
+						<listcell>
+													<listbox bind="@passwordPolicy" mold="label"
+														dataPath="/model:/tipusUsuari" onDoubleClick="acceptaDada()">
+														<dataitem bind="@codi">
+															<listcell bind="@descripcio" />
+														</dataitem>
+													</listbox>
+													
+						</listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastUpdated" format="${c:l('usuaris.zul.dateFormat')}" onDoubleClick="acceptaDada()"/></listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastPasswordSet"  format="${c:l('usuaris.zul.dateFormat')}" onDoubleClick="acceptaDada()"/></listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@passwordExpiration"  format="${c:l('usuaris.zul.dateFormat')}" onDoubleClick="acceptaDada()"/></listcell>
+						<listcell>
+												<listbox bind="@disabled" disabled="true"
+													mold="label" onDoubleClick="acceptaDada()">
+													<listitem value="${false}">
+														<listcell label="${c:l('accounts.Enabled')}" />
+													</listitem>
+													<listitem value="${true}">
+														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+												</listbox>
+						</listcell>
+					</dataitem>
+				</listbox>
+			</navegador>
+			
+		</esquema>
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" label="${c:l('usuarisllista.zul.Accepta')}">
+				<attribute name="onClick">
+					acceptaDada();
+				</attribute>
+			</button>
+			<button label="${c:l('usuarisllista.zul.Cancel·la')}" onClick="cleanWindow()"/>
+		</hbox>
+	</window>
+</div>

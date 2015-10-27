@@ -53,7 +53,7 @@
 				return searchValues;
 			}
 			
-			void search (boolean queryEnabled)
+			void search (boolean retrySearch)
 			{
 				java.util.Map lista = new java.util.HashMap();
 				
@@ -154,8 +154,14 @@
    			         (domini.getNom().equals("APLICACIONS")) ) {				
 					esquemaLlista.getFellow("queryWindow").setVisible(true);
 				} else {
-					esquemaLlista.getFellow("queryWindow").setVisible(false);				
-					search(true);
+					esquemaLlista.getFellow("queryWindow").setVisible(true);				
+                    codi = esquemaLlista.getFellow("queryWindow").getFellow("queryCodi")
+                                                .getFellow("textbox");
+                    descripcio = esquemaLlista.getFellow("queryWindow")
+                                                .getFellow("queryDescripcio").getFellow("textbox");
+                    codi.setValue("%");
+                    descripcio.setValue("");
+ 					search(true);
 				}
 			} else {
 				<!-- desktop.getPage("valorsDominisLlista").setTitle("Llista de valors de dominis"); -->
@@ -173,7 +179,7 @@
 			event.stopPropagation ();
 		</attribute>
 
-		<criteris height="40px" id="queryWindow" onOK="search(false)" width="99%">
+		<criteris height="60px" id="queryWindow" onOK="search(false)" width="99%">
 			<hbox>
 				<input_criteri etiqueta="${c:l('valorsDominisllistaAmbCerca.zul.Codi')}" id="queryCodi"/>
 				<imageclic onClick="search(false)" src="~./img/fletxa_cerca.gif"/>

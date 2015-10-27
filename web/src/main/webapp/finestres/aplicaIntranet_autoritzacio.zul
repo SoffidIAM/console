@@ -67,6 +67,20 @@
 			auto.setCodiEntitatAutoritzada(codiGrup.toUpperCase());
 			
 			Events.postEvent("onAutoritzacio", (Component) pageScope.get("contextComponent"), auto);
+		} else if ("account".equals(tipusAutoritzacio)) {
+			// We've got account data {id, name, dispatcher, description}
+			String name = (String) dadesPagina[1]+"@"+ dadesPagina[2];
+			String desc = (String) dadesPagina[3];
+			String id = (String) dadesPagina[0];
+			// Creem l'autorització
+			AutoritzacioPuntEntrada auto = new AutoritzacioPuntEntrada();
+			auto.setDescripcioNivellAutoritzacio(nivellAutoritzacio);
+			auto.setTipusEntitatAutoritzada(TipusAutoritzacioPuntEntrada.ACCOUNT);
+			auto.setIdEntitatAutoritzada(new Long(id));
+			auto.setDescripcioEntitatAutoritzada(desc);
+			auto.setCodiEntitatAutoritzada(name);
+			
+			Events.postEvent("onAutoritzacio", (Component) pageScope.get("contextComponent"), auto);
 		}
 		cleanWindow();
 	}
@@ -125,6 +139,9 @@
 								<row>
 									<radio label="${c:l('aplicaIntranet_autoritzacio.Role')}" value="rol"/>
 								</row>
+								<row>
+									<radio label="${c:l('auditoria.zul.account')}" value="account"/>
+								</row>
 							</rows>
 						</grid>
 					</radiogroup>
@@ -150,6 +167,10 @@
 						desktop.getPage("grupsLlista").setAttribute("tipus","");		
 						desktop.getPage("grupsLlista").setAttribute("llistaObsolets",false);																									 
 						Events.postEvent	("onInicia",desktop.getPage("grupsLlista").getFellow("esquemaLlista"),finishButton);
+					} else if ("account".equals(tipusAutoritzacio)) {
+//						desktop.getPage("accountsList").setAttribute("tipus","");		
+//						desktop.getPage("accountsList").setAttribute("llistaObsolets",false);																									 
+						Events.postEvent("onInicia",desktop.getPage("accountsList").getFellow("esquemaLlista"),finishButton);
 					}
 				</attribute>
 			</button>

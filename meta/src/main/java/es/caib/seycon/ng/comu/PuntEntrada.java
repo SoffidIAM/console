@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ExecucioPuntEntradaEntity;
+
 @ValueObject ( translatedName="AccessTree",
 	 translatedPackage="com.soffid.iam.api")
 public class PuntEntrada {
@@ -38,11 +40,11 @@ public class PuntEntrada {
 
 	@Nullable
 	@Attribute(translated = "authorizations" )
-	public java.util.Collection autoritzacions;
+	public java.util.Collection<AutoritzacioPuntEntrada> autoritzacions;
 
 	@Nullable
 	@Attribute(translated = "executions" )
-	public java.util.Collection execucions;
+	public java.util.Collection<ExecucioPuntEntrada> execucions;
 
 	@Nullable
 	@Attribute(translated = "icon1Image" )

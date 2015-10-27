@@ -443,8 +443,8 @@
     <document.manager.version>${pom.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.18-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.19-SNAPSHOT</zkdb.version>
+    <zkiblaf.version>1.18</zkiblaf.version>
+    <zkdb.version>1.21-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>

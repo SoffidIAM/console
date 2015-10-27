@@ -252,7 +252,7 @@
 					PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
 					oesmenu = esquema.getFellow("dades").getFellow("form")
 							.getFellow("appsGrid").getFellow("oesmenu");
-					boolean canAdmin = getPuntEntradaService().canAdmin(nodeActual);
+					boolean canAdmin = nodeActual.getId() == null || getPuntEntradaService().canAdmin(nodeActual);
 					boolean esMenu = "S".equals(nodeActual.getMenu()); 
 					boolean teID = (nodeActual.getId()!=null); //Sólo puede insertar tras commit
 					b_inserir.setVisible(!cercant && canAdmin && esMenu && teID); // Només deixem inserir als menus
@@ -319,7 +319,7 @@
 					pointer = ctx.createPath(xpath);
 					ctx2 = ctx.getRelativeContext(pointer);
 		
-					ctx2.setValue("@id", null); // l'autorització és nova
+					ctx2.setValue("@id", auto.getId());
 					ctx2.setValue("@descripcioNivellAutoritzacio", auto
 							.getDescripcioNivellAutoritzacio());
 					ctx2.setValue("@idPuntEntrada", auto.getIdPuntEntrada());
@@ -449,7 +449,6 @@
 				
 			
 			void mostraDadesPuntEntrada(boolean canAdmin, PuntEntrada nodeActual) {
-				
 				if (nodeActual==null) return;
 				//Ocultamos los puntos de ejecución
 				amagaDadesExecucio("intranetEM");
@@ -478,7 +477,9 @@
 				String code = nodeActual.getCodi();
 				String name = nodeActual.getNom();
 				boolean autoritzat = false;
-				if(name != null) 
+				if (nodeActual.getId() == null)
+					atuortizat = true;
+				else if(name != null) 
 					autoritzat = getPuntEntradaService().esAutoritzat(nodeActual, TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO);
 				else
 					Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.ErrorMostraPuntEntrada")); 
@@ -550,7 +551,7 @@
 				p_xml.setVisible(autoritzat || canAdmin || hasQueryALLMenusIntranet); //si pot veure tots
 				content_xml.setReadonly(!canAdmin);
 				bt_xml.setDisabled(!canAdmin);
-				bt_editaxml.setDisabled(!canAdmin);
+//				bt_editaxml.setDisabled(!canAdmin);
 				// Verifiquem que la pestanya que es mostra siga sent vàlida:
 				if ( (!p_autoritzacions.isVisible() && p_autoritzacions.isSelected() ) 
 					|| (!p_execucions.isVisible() && p_execucions.isSelected()) 
@@ -574,43 +575,47 @@
 					if (exec!=null) {
 						cbextranetEM.setChecked(true);
 						content_extranetEM.setValue(exec.getContingut());
-					cercaMime (mime_extranetEM,exec);
-					v_extranetEM.setVisible(true);
-				} else {
-					cbextranetEM.setChecked(false);
-					content_extranetEM.setValue("");
-					v_extranetEM.setVisible(false);
-				}
-				
-			} else if (tipus.equals("intra")) {
-				if (exec!=null) {
-					cbintranetEM.setChecked(true);
-					content_intranetEM.setValue(exec.getContingut());
-					cercaMime (mime_intranetEM,exec);
-					v_intranetEM.setVisible(true);
-				} else {
-					cbintranetEM.setChecked(false);
-					content_intranetEM.setValue(""); 
-					v_intranetEM.setVisible(false);
-				}
-			} else if (tipus.equals("inter")) {
-				if (exec!=null) {
-					cbinternetEM.setChecked(true);
-					content_internetEM.setValue(exec.getContingut());
-					cercaMime (mime_internetEM,exec);
-					v_internetEM.setVisible(true);
-				} else {
-					cbinternetEM.setChecked(false);
-					content_internetEM.setValue("");
-					v_internetEM.setVisible(false);
+						content_extranetEM.setLanguage("MZN".equals(exec.getCodiTipusExecucio())? "javascript": "xml");
+						cercaMime (mime_extranetEM,exec);
+						v_extranetEM.setVisible(true);
+						v_extranetEM.invalidate();
+					} else {
+						cbextranetEM.setChecked(false);
+						content_extranetEM.setValue("");
+						v_extranetEM.setVisible(false);
+					}
+				} else if (tipus.equals("intra")) {
+					if (exec!=null) {
+						cbintranetEM.setChecked(true);
+						content_intranetEM.setValue(exec.getContingut());
+						content_intranetEM.setLanguage("MZN".equals(exec.getCodiTipusExecucio())? "javascript": "xml");
+						cercaMime (mime_intranetEM,exec);
+						v_intranetEM.setVisible(true);
+						v_intranetEM.invalidate();
+					} else {
+						cbintranetEM.setChecked(false);
+						content_intranetEM.setValue(""); 
+						v_intranetEM.setVisible(false);
+					}
+				} else if (tipus.equals("inter")) {
+					if (exec!=null) {
+						cbinternetEM.setChecked(true);
+						content_internetEM.setValue(exec.getContingut());
+						content_internetEM.setLanguage("MZN".equals(exec.getCodiTipusExecucio())? "javascript": "xml");
+						cercaMime (mime_internetEM,exec);
+						v_internetEM.setVisible(true);
+						v_internetEM.invalidate();
+					} else {
+						cbinternetEM.setChecked(false);
+						content_internetEM.setValue("");
+						v_internetEM.setVisible(false);
+					}
 				}
 			}
-		}
 		
 		String[] campsDisable = {"opublicaccess","ovisible","odetall_aplicacio","oautousu",
 			"bt_sortchildren", "otipus_menu","cbintranetEM","mime_intranetEM","content_intranetEM","cbextranetEM",
-			"mime_extranetEM","content_extranetEM","cbinternetEM","mime_internetEM","content_internetEM",
-			"bt_editajsInternet","bt_editajsExtranet","bt_editajsIntranet"};
+			"mime_extranetEM","content_extranetEM","cbinternetEM","mime_internetEM","content_internetEM"};
 		String[] campsLectura = {"odetall_name","odetall_codi"};
 		String[] campsVisible = {"oremoveautoritzacio"};
 		void habilitaModificacions(boolean habilitat) {
@@ -682,14 +687,14 @@
 						oesmenu = esquema.getFellow("dades").getFellow("form").getFellow("appsGrid").getFellow("oesmenu");	
 						oesmenu.setDisabled(false);
 					}
-					boolean canAdmin = getPuntEntradaService().canAdmin(pue);
+					boolean canAdmin = pue.getId() == null || getPuntEntradaService().canAdmin(pue);
 					habilitaModificacions(canAdmin);
-					boolean canExecute = getPuntEntradaService().canExecute(pue);
+					boolean canExecute = pue.getId() == null || getPuntEntradaService().canExecute(pue);
 					habilitaExecucions(canExecute);
 					mostraDadesPuntEntrada(canAdmin,pue);
 				}
 			} catch (Exception e) {
-				//Missatgebox.info ("hej!: Avís d'error: "+e.getMessage()); e.printStackTrace();
+				Missatgebox.info ("hej!: Avís d'error: "+e.getMessage()); e.printStackTrace();
 			}
 			
 		}
@@ -727,7 +732,7 @@
 		}
 		
 		void canviaExecucio(quina) {
-			String laexecucio = quina.substring(8); 
+			String laexecucio = quina.substring(8);
 			ds = gridExecucions.getDataSource();
 			ctx = ds.getJXPathContext();
 			Collection filas = gridExecucions.getRows().getChildren();
@@ -1655,11 +1660,17 @@
 				</attribute>
 				<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 					<tabs>
-						<tab id="p_basico" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
-						<tab id="p_autoritzacions" label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
-						<tab id="p_execucions" label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
-						<tab id="p_moure" label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
-						<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/> 
+						<tab id="p_basico"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+						<tab id="p_autoritzacions"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
+						<tab id="p_execucions"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Execucions')}">
+							<attribute name="onSelect">
+								v_intranetEM.invalidate();
+								v_extranetEM.invalidate();
+								v_internetEM.invalidate();
+							</attribute>
+						</tab>
+						<tab id="p_moure"  width="12em"  label="${c:l('aplicacionsIntranet.zul.Copia/Moua')}"/>
+						<tab id="p_xml" width="12em" label="${c:l('aplicacionsIntranet.zul.Mazinger')}" onSelect="content_xml.invalidate();"/> 
 					</tabs>
 					<tabpanels>
 						<tabpanel id="basica">
@@ -1802,6 +1813,16 @@
 							                           			"index.zul?embed&target=/usuaris.zul?user="+code,
 							                          				"soffid_popup");
 						                          	}						
+						                          	else if (tipus.equals("Account"))
+						                          	{
+						                          		int i = code.lastIndexOf('@');
+						                          		String account = java.net.URLEncoder.encode( i > 0 ? code.substring(0,i): code, "UTF-8");
+						                          		String system = java.net.URLEncoder.encode(i > 0 ? code.substring(i+1): "", "UTF-8");
+							                            if (esquema.canClose())
+							                           		Executions.getCurrent().sendRedirect(
+							                           			"index.zul?embed&target=/accounts/accounts.zul?account="+account+"&system="+system,
+							                          				"soffid_popup");
+						                          	}						
 						                          	else
 						                          	{
 						                          		self.setVisible ( false );
@@ -1917,17 +1938,10 @@
 										</hbox>
 										<hbox>
 										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
-										<textbox id="content_intranetEM" cols="60" disabled="false"
-											onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+										<codemirror value="dummy ();" id="content_intranetEM" linenumbers="true"
+											onChange="canviaExecucio(self.id)" height="5em" language="javascript"
 											width="600px"/>
 										<vbox>
-											<button id="bt_editajsIntranet" image="img/pencil.png"
-												label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
-												<attribute name="onClick">
-													editorJS(content_intranetEM.value,"intranet");
-												</attribute>
-											</button>
-											<separator height="20px"/>
 											<button id="provar_intranetEM" visible="false"
 												label="${c:l('aplicacionsIntranet.zul.Provar')}"
 												onClick="provarExecucio(self.id)" width="60px"/>
@@ -1953,17 +1967,10 @@
 										</hbox>
 										<hbox>
 											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
-											<textbox cols="60" disabled="false" id="content_extranetEM"
-												onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+											<codemirror id="content_extranetEM" cols="60" disabled="false"  linenumbers="true"
+												onChange="canviaExecucio(self.id)" height="5em" language="javascript"
 												width="600px"/>
 											<vbox>
-												<button id="bt_editajsExtranet" image="img/pencil.png"
-													label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
-													<attribute name="onClick">
-														editorJS(content_extranetEM.value,"extranet")
-													</attribute>
-												</button>
-												<separator height="20px"/>
 												<button id="provar_extranetEM" visible="false"
 													label="${c:l('aplicacionsIntranet.zul.Provar')}"
 													onClick="provarExecucio(self.id)" width="60px"/>
@@ -1987,17 +1994,10 @@
 										</hbox>
 										<hbox>
 											<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Contingut')}"/>
-											<textbox id="content_internetEM" cols="60" disabled="false"
-												onChange="canviaExecucio(self.id)" rows="5" sclass="textbox"
+											<codemirror id="content_internetEM" cols="60" disabled="false" linenumbers="true"
+												onChange="canviaExecucio(self.id)" height="5em" language="javascript"
 												width="600px"/>
 											<vbox>
-												<button id="bt_editajsInternet" image="img/pencil.png"
-													label="${c:l('aplicacionsIntranet.zul.Editor')}" width="60px">
-													<attribute name="onClick">
-														editorJS(content_internetEM.value,"internet")
-													</attribute>
-												</button>
-												<separator height="20px"/>
 												<button id="provar_internetEM" visible="false"
 													label="${c:l('aplicacionsIntranet.zul.Provar')}"
 													onClick="provarExecucio(self.id)" width="60px"/>
@@ -2012,7 +2012,7 @@
 								<label value="${c:l('aplicacionsIntranet.zul.Sel·leccioneelmenaon')}"/>
 								<vbox>
 									<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="mouretreebox" pageSize="19" rows="12">
-										<treeitemfinder bind="." open="false" path="/moure">
+										<treeitemfinder bind="." openLevels="1" path="/moure">
 											<treerow>
 												<treecell bind="@nom"/>
 											</treerow>
@@ -2042,9 +2042,11 @@
 								if (dada!=null) content_xml.setValue(dada);
 							</attribute>
 							<vbox width="100%">
+<!-- 
 								<textbox bind="@xmlPUE" cols="70" disabled="false" id="content_xml" onChange="" rows="15" sclass="textbox" width="100%"/>
+								 -->
+								<codemirror  value="&lt;Mazinger/&gt;" width="100%" linenumbers="true" onChange="" id="content_xml" language="xml" height="15em" bind="@xmlPUE" />
 								<div align="right">
-									<button id="bt_editaxml" image="~./img/edit.gif" label="${c:l('aplicacionsIntranet.zul.EditorXML')}" onClick="editorXML(content_xml.value)"/>
 									<button id="bt_xml" image="~./img/accept.gif" label="${c:l('aplicacionsIntranet.zul.Valida')}" onClick="validaXML()"/>
 								</div>
 							</vbox>
@@ -2061,4 +2063,5 @@
 	<include src="finestres/editorXML.zul"/>
 	<include src="finestres/editorJS.zul"/>
 	<include src="finestres/aplicaIntranet_autoritzacio.zul"/>
+	<include src="accounts/accountsList.zul"/>
 </frame>

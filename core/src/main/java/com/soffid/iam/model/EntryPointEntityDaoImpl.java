@@ -104,6 +104,7 @@ public class EntryPointEntityDaoImpl extends
 		Collection autoritzaGrup = source.getAuthorizedGroups();
 		Collection autoritzaRol = source.getAuthorizedRoles();
 		Collection autoritzaUsuari = source.getAuthorizedUsers();
+		Collection<EntryPointAccountEntity> accounts = source.getAuthorizedAccounts();
 		Collection autoritzacions = new ArrayList();
 		
 		if (autoritzaGrup!=null && autoritzaGrup.size()!=0) {
@@ -121,6 +122,14 @@ public class EntryPointEntityDaoImpl extends
                 if (source.getId() != null) auto.setEntryPoint(source);
                 autoritzacions.add(getEntryPointRoleEntityDao().toAccessTreeAuthorization(auto));
             }
+		}
+		if (accounts!=null && accounts.size()!=0) {
+			accounts = new ArrayList<EntryPointAccountEntity>(accounts);
+			for (Iterator<EntryPointAccountEntity> it = accounts.iterator(); it.hasNext(); ){
+				EntryPointAccountEntity auto = it.next();
+				if (source.getId()!=null) auto.setEntryPoint(source);
+				autoritzacions.add(getEntryPointAccountEntityDao().toAutoritzacioPuntEntrada(auto));
+			}
 		}
 		if (autoritzaUsuari!=null && autoritzaUsuari.size()!=0) {
 			autoritzaUsuari = new ArrayList(autoritzaUsuari);
@@ -199,7 +208,8 @@ public class EntryPointEntityDaoImpl extends
 		Collection autoritzaUsu = new HashSet();
 		Collection autoritzaRol = new HashSet();
 		Collection autoritzaGrup = new HashSet();
-	
+		Collection<EntryPointAccountEntity> autoritzaAccount = new HashSet<EntryPointAccountEntity>();
+
 		if (autoritza != null) {
 			for (Iterator it = autoritza.iterator(); it.hasNext(); ) {
                 AccessTreeAuthorization auto = (AccessTreeAuthorization) it.next();
@@ -209,6 +219,9 @@ public class EntryPointEntityDaoImpl extends
                     autoritzaUsu.add(autoEntity);
                 } else if (TipusAutoritzacioPuntEntrada.ROL.equals(tipus)) {
                     autoritzaRol.add(getEntryPointRoleEntityDao().accessTreeAuthorizationToEntity(auto));
+				} else if (TipusAutoritzacioPuntEntrada.ACCOUNT.equals(tipus)) {// Rol
+					autoritzaAccount.add(getEntryPointAccountEntityDao()
+							.autoritzacioPuntEntradaToEntity(auto));
                 } else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipus)) {
                     autoritzaGrup.add(getEntryPointGroupEntityDao().accessTreeAuthorizationToEntity(auto));
                 }
@@ -218,6 +231,7 @@ public class EntryPointEntityDaoImpl extends
 		target.setAuthorizedUsers(autoritzaUsu);
 		target.setAuthorizedRoles(autoritzaRol);
 		target.setAuthorizedGroups(autoritzaGrup);
+		target.setAuthorizedAccounts(autoritzaAccount);
 	}
 
 }

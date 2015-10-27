@@ -59,7 +59,7 @@
 				es.caib.zkib.datamodel.DataModelCollection lm = model.getJXPathContext().getValue("/usuari/account");
 				if (lm.getSize() > 10)
 				{
-					enableTimes = false;
+					enableTimers = false;
 				}
 				
 				try
@@ -167,11 +167,7 @@
 				}
 				
 				void select(){
-					PuntEntrada instan = fusuaris.getFellow("treebox").getSelectedItem().getValue().getInstance();
-					Long name = instan.getId();
-					LinkedList punt = instan.getExecucions();
-					if(!punt.isEmpty())
-						Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');"); 
+					openTree(fusuaris.getFellow("treebox").getSelectedItem());
 				}
 				
 				void carregaIcona(Component r){
@@ -194,7 +190,8 @@
 							if (tm.equals("N") && pe.getExecucions().isEmpty())
 								r.getChildren().get(0).getChildren().get(0).getChildren().get(2).setStyle("color: #EEEEEE; ");
 						}
-					} catch (NullPointerException e) {}
+					} catch (NullPointerException e) {
+					} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {}
 				}
 				
 				void checkIsUpdatePending(Component item)
@@ -222,8 +219,9 @@
 				}
 				
 				void openTree(Treeitem selected){
-					System.out.println("selected: " + selected.getValue().getInstance());
-					Object obj = selected.getValue().getInstance();
+					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(selected);
+					Object obj2 = XPathUtils.getValue(ctx, ".");
+					Object obj = obj2.getInstance();
 					if(obj instanceof PuntEntrada){
 						PuntEntrada instance = (PuntEntrada) obj;
 						if(!selected.isOpen() && instance.getMenu().equals("S")){

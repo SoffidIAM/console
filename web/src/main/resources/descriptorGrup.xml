@@ -46,7 +46,7 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.Grup">
 			</new-instance-bean>
 		</finder>
-		<finder name="pare" type="pare">
+		<finder name="pare" type="grup">
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="getLlistaDePares"
 				if="canQueryGroup"> <!-- group:query -->
 				<parameter value="${instance.codi}" />

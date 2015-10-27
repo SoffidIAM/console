@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.ejb.CreateException;
@@ -504,6 +505,8 @@ public class Security {
     		return p.getName();
     }
     
+    static Map<String, String> principalToUserMap = null;
+    
     public static String getCurrentUser () 
     {
     	if (! getIdentities().isEmpty())
@@ -512,24 +515,44 @@ public class Security {
     		return identity.principal.getName();
     	}
     	else if (disableAllSecurityForEver)
-    		return "???"; //$NON-NLS-1$
+    		return null;
     	else
     	{
-            if (usuariServiceHome == null)
-            {
-            	try {
-					usuariServiceHome = (UserServiceHome) new InitialContext().lookup(UserServiceHome.JNDI_NAME);
-				} catch (NamingException e) {
-					return null;
-				}
-            }
+    		Principal p = getPrincipal();
+    		if (p == null)
+    			return null;
+    		if (principalToUserMap == null)
+    		{
+    	    	int size = 500;
+    	    	try {
+    		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+    		    	if (cacheSize != null )
+    		    		size = Integer.parseInt(cacheSize);
+    	    	} catch (Throwable t) {
+    	    		
+    	    	}
+    	    	principalToUserMap = Collections.synchronizedMap(new LRUMap(size));			
+    		}
             try
-			{
-				User usuari = usuariServiceHome.create().getCurrentUser();
-				if (usuari == null)
-					return null;
-				else
-					return usuari.getUserName();
+            {
+	    		String user = principalToUserMap.get(p.getName());
+	    		if (user == null)
+	    		{
+		            if (usuariServiceHome == null)
+		            {
+		            	try {
+							usuariServiceHome = (UserServiceHome) new InitialContext().lookup(UserServiceHome.JNDI_NAME);
+						} catch (NamingException e) {
+							return null;
+						}
+		            }
+					User usuari = usuariServiceHome.create().getCurrentUser();
+					if (usuari == null)
+						return null;
+					user = usuari.getUserName();
+					principalToUserMap.put(p.getName(), user);
+	    		}
+	    		return user;
 			}
 			catch (InternalErrorException e)
 			{

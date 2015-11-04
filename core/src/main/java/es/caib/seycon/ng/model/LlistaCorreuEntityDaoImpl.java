@@ -307,7 +307,8 @@ public class LlistaCorreuEntityDaoImpl extends
 		for (LlistaCorreuUsuariEntity ue: sourceEntity.getLlistaDeCorreuUsuari())
 		{
 			users.add (ue.getUsuari().getCodi());
-			explodedUsers.add(ue.getUsuari().getCodi());
+			if ("S".equals(ue.getUsuari().getActiu()))
+				explodedUsers.add(ue.getUsuari().getCodi());
 		}
 		targetVO.setLlistaUsuaris(flatten (users));
 	}

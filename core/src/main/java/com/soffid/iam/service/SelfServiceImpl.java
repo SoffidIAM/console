@@ -20,6 +20,7 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
@@ -79,7 +80,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	protected Collection<Account> handleGetUserAccounts () throws Exception
 	{
 		User u = getCurrentUser();
-		Security.nestedLogin(u.getCodi(), new String[] {
+		Security.nestedLogin(u.getUserName(), new String[] {
 			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
 			Security.AUTO_ACCOUNT_QUERY,
 			Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL
@@ -368,7 +369,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 				if (!acc.getType().equals(AccountType.IGNORED) &&
 						!acc.getType().equals(AccountType.USER))
 				{
-					Dispatcher d = getDispatcherService().findDispatcherByCodi(acc.getDispatcher());
+					System d = getDispatcherService().findDispatcherByName(acc.getSystem());
 					if (matchFilter (filter, acc))
 						accounts.add (acc);
 				}

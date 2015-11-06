@@ -1187,7 +1187,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		String mailAfter = usuari.getShortName() + "@" + (usuari.getMailDomain() == null ? "" : usuari.getMailDomain().getName());
 
 
-		if (! mailBefore.equals(mailAfter))
+		if (! mailBefore.equals(mailAfter) || usuari.getActive().equals("S") != oldValue.getActive().booleanValue() )
 		{
 			createMailTask(usuari);
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();

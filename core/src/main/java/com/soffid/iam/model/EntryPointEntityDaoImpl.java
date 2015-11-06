@@ -221,7 +221,7 @@ public class EntryPointEntityDaoImpl extends
                     autoritzaRol.add(getEntryPointRoleEntityDao().accessTreeAuthorizationToEntity(auto));
 				} else if (TipusAutoritzacioPuntEntrada.ACCOUNT.equals(tipus)) {// Rol
 					autoritzaAccount.add(getEntryPointAccountEntityDao()
-							.autoritzacioPuntEntradaToEntity(auto));
+							.accessTreeAuthorizationToEntity(auto));
                 } else if (TipusAutoritzacioPuntEntrada.GRUP.equals(tipus)) {
                     autoritzaGrup.add(getEntryPointGroupEntityDao().accessTreeAuthorizationToEntity(auto));
                 }

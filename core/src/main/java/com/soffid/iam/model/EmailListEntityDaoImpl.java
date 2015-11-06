@@ -260,7 +260,8 @@ public class EmailListEntityDaoImpl extends
 		LinkedList<String> users = new LinkedList<String>();
 		for (UserEmailEntity ue : sourceEntity.getUserMailLists()) {
             users.add(ue.getUser().getUserName());
-            explodedUsers.add(ue.getUser().getUserName());
+            if ("S".equals(ue.getUser().getActive()))
+                explodedUsers.add(ue.getUser().getUserName());
         }
 		targetVO.setUsersList(flatten(users));
 	}

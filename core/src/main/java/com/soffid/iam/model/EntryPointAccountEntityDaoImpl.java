@@ -101,7 +101,7 @@ public class EntryPointAccountEntityDaoImpl
 		// Format de toDescripcioRol: nomRol+"@"+codiBbdd+">"+codiAplicacio)
 		String descripcioUnicaRol = source.getAccount().getDescription();
 		// Guardem només el nom del rol (com es fa al seycon-net)
-		target.setCodiEntitatAutoritzada(source.getAccount().getName()+"@"+source.getAccount().getDispatcher().getCodi());
+		target.setCodiEntitatAutoritzada(source.getAccount().getName()+"@"+source.getAccount().getSystem().getName());
 		target.setDescripcioEntitatAutoritzada(descripcioUnicaRol);
 	}
 	

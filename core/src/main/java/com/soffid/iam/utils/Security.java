@@ -27,6 +27,8 @@ import javax.security.auth.Subject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import org.apache.commons.collections.LRUMap;
+
 // import org.jboss.security.SecurityAssociation;
 
 /**

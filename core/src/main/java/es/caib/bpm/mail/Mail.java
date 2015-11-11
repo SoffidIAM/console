@@ -351,6 +351,7 @@ public class Mail implements ActionHandler {
 		}
 		Security.nestedLogin("mail-server", new String[] { //$NON-NLS-1$
 						Security.AUTO_USER_QUERY + Security.AUTO_ALL,
+						Security.AUTO_ROLE_QUERY + Security.AUTO_ALL,
 						Security.AUTO_GROUP_QUERY + Security.AUTO_ALL,
 						Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL,
 						Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
@@ -419,7 +420,7 @@ public class Mail implements ActionHandler {
     					scope = roleName.substring(i+1);
     					roleName = roleName.substring(0, i);
     				}
-        			debug ("Resolving role"+roleName+"@"+dispatcher);
+        			debug ("Resolving role "+roleName+"@"+dispatcher);
     				AplicacioService aplicacioService = ServiceLocator.instance().getAplicacioService();
 					for (Rol role: aplicacioService.findRolsByFiltre(roleName, "%", "%", dispatcher, "%", "%")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     				{

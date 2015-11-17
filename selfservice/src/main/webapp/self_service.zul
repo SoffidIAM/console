@@ -54,7 +54,7 @@
 				
 				model.getVariables().declareVariable("query", false);
 				
-				enableTimers = true;
+				enableTimers = false;
 				
 				es.caib.zkib.datamodel.DataModelCollection lm = model.getJXPathContext().getValue("/usuari/account");
 				if (lm.getSize() > 10)

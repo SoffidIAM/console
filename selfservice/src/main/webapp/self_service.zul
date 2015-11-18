@@ -6,299 +6,16 @@
 
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<frame id="p_selfService" saveContent="true"
+	<frame id="p_selfService" saveContent="true" use="com.soffid.selfservice.web.SelfServiceHandler"
 		title="${c:l('selfService.Titol')}" width="100%" height="100%">
-		<attribute name="onReturn">
-			Events.postEvent("onReturn", inboxhandler, null); 
-		</attribute>
-		<attribute name="onClientInfo">
-			<![CDATA[ 
-				Box form = Path.getComponent("//selfservice/fusuaris");
-				boolean petit=false;
-				if (form != null){
-					int heigthPantalla = event.getDesktopHeight();
-					int hPantalla2 = (int) ((heigthPantalla)*0.90);
-					form.setHeight(""+hPantalla2+"px");
-					int ample = event.getDesktopWidth();
-					if(ample <568){
-						petit=true;
-						Component headQ = self.getFellow("headQuery");
-						headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords2"));
-						Component headP = self.getFellow("headChange");
-						headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword2"));
-					}else{
-						petit=false;
-						Component headQ = self.getFellow("headQuery");
-						headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords"));
-						Component headP = self.getFellow("headChange");
-						headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword"));
-					}
-				}
-			]]>
-		</attribute>
 
-		<!-- <style src="~./styles/estil.css"/>-->
-		
 		<datamodel id="model" rootNode="root" src="descriptorSelfService.xml"/>
 		<zscript>
 			<![CDATA[
-				import org.zkoss.image.*;
-				import org.zkoss.zul.*;
-				import es.caib.zkib.datasource.XPathUtils;
-				import es.caib.seycon.ng.comu.*;
-				import java.util.Calendar;
-				
-				canUpdateUserMetadata = true;
-				
-				timerDelay = 10000;
-				
-				model.getVariables().declareVariable("query", false);
-				
-				enableTimers = false;
-				
-				es.caib.zkib.datamodel.DataModelCollection lm = model.getJXPathContext().getValue("/usuari/account");
-				if (lm.getSize() > 10)
-				{
-					enableTimers = false;
-				}
-				
-				try
-				{
-					es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
-							.Labels.getLabel("selfService.Titol"));
-					
-				}
-				catch (Exception ex) {}
-			
-				void setPassword (Component button)
-				{
-					try{
-						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
-						Account account = XPathUtils.getValue(ctx, ".").getInstance();
-						if (account.getType().equals(AccountType.USER)){
-							newPasswordS.setAttribute("acco", account);
-							es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-								.create();
-							String afectats = service.queryOtherAffectedAccounts(account);
-							if(afectats != null){
-								Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
-										new Object[] {afectats}), 
-										org.zkoss.util.resource.Labels.getLabel("selfService.Segur2") , 
-										new EventListener(){
-											public void onEvent(Event evt){
-												if("onOK".equals(evt.getName())){
-													newPasswordS.setVisible(true);
-													newPasswordS.setMode("highlighted");
-												}
-											}
-										});
-							}
-						}else if (account.getType().equals(AccountType.SHARED)){
-							newPasswordS.setAttribute("acco", account);
-							newPasswordS.setVisible(true);
-							newPasswordS.setMode("highlighted");
-						}else if (account.getType().equals(AccountType.PRIVILEGED)){
-							newPassword.setAttribute("acco", account);
-							Calendar dia = Calendar.getInstance();
-							dia.add(Calendar.DAY_OF_MONTH, 1);
-							newPassword.getFellow("timepwd").setValue(dia.getTime());
-							dia.clear();
-							newPassword.setVisible(true);
-							newPassword.setMode("highlighted");
-						}
-					} catch ( InterruptedException e) {	}
-				}
-				
-				void queryPassword(Component button){
-					try{
-						showPassword.getFellow("qpassword").setValue("");
-						showPassword.getFellow("popupPwd").setValue("");
-						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
-						Account account = XPathUtils.getValue(ctx, ".").getInstance();
-						es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
-								.create();
-						if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
-						{
-							showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
-							showPassword.getFellow("labelPWDis").setVisible(false);
-							showPassword.getFellow("qpassword").setMultiline(true);
-							showPassword.setVisible(true);
-							showPassword.setMode("highlighted");
-						}
-						else
-						{
-							Password pawd = service.queryAccountPassword(account);
-							if(pawd!=null){
-									String cadena = pawd.getPassword();
-									String cadenaResultant = "";
-									showPassword.getFellow("qpassword").setValue(cadena);
-									int i = cadena.length();
-									for(int j=0; j<i; j++){
-										cadenaResultant = cadenaResultant + cadena.charAt(j) + "\t";
-										Character c = cadena.charAt(j);
-										if(c.isUpperCase(c)){
-											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Majuscula");
-										}
-										if(c.isLowerCase(c)){
-											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Minuscula");
-										}
-										if(c.isDigit(c)){
-											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Number");
-										}
-										if(!c.isLetter(c) && !c.isDigit(c)){
-											cadenaResultant = cadenaResultant + org.zkoss.util.resource.Labels.getLabel("selfService.Symbol");
-										}
-										cadenaResultant = cadenaResultant + "\n";
-									}
-									showPassword.getFellow("popupPwd").setValue(cadenaResultant);
-									showPassword.getFellow("labelPWDis").setVisible(true);
-							}
-							else{
-								showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.EmptyField"));
-								showPassword.getFellow("popupPwd").setValue("");
-								showPassword.getFellow("labelPWDis").setVisible(true);
-							}
-							showPassword.setVisible(true);
-							showPassword.setMode("highlighted");
-						}	
-					} catch ( InterruptedException e){}
-				}
-				
-				void select(){
-					openTree(fusuaris.getFellow("treebox").getSelectedItem());
-				}
-				
-				void carregaIcona(Component r){
-					es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
-					try {
-						PuntEntrada pe = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").getInstance();
-						if (pe != null)
-						{
-							byte [] imgIcona1 = pe.getImgIcona1();
-							String tm = pe.getMenu();
-							org.zkoss.zul.Image img = r.getChildren().get(0).getChildren().get(0).getChildren().get(0);
-							if (imgIcona1 != null)
-							{
-								img.setContent(new AImage(pe.getId(), imgIcona1));
-							} else if (imgIcona1 == null && tm != null && tm.equals("S")){
-								img.setSrc("/img/root.gif");
-							} else if (imgIcona1 == null && tm != null && tm.equals("N")){
-								img.setSrc("/img/punt-verd.gif");
-							}
-							if (tm.equals("N") && pe.getExecucions().isEmpty())
-								r.getChildren().get(0).getChildren().get(0).getChildren().get(2).setStyle("color: #EEEEEE; ");
-						}
-					} catch (NullPointerException e) {
-					} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {}
-				}
-				
-				void checkIsUpdatePending(Component item)
-				{
-					es.caib.zkib.binder.BindContext ctx = XPathUtils
-							.getComponentContext(item);
-					es.caib.zkib.datamodel.DataNode dn = XPathUtils.getValue(ctx, ".");
-					
-					if (dn != null)
-					{
-						Account acc = dn.getInstance();
-						if (acc != null && acc.getId() != null)
-						{
-							es.caib.seycon.ng.servei.AccountService accountService =
-									es.caib.seycon.ng.ServiceLocator
-										.instance().getAccountService();
-							
-							Component img = item.getChildren().get(2).getChildren().get(0)
-									.getChildren().get(2);
-							img.setVisible(accountService.isUpdatePending(acc));
-							
-							es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
-						}
-					}
-				}
-				
-				void openTree(Treeitem selected){
-					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(selected);
-					Object obj2 = XPathUtils.getValue(ctx, ".");
-					Object obj = obj2.getInstance();
-					if(obj instanceof PuntEntrada){
-						PuntEntrada instance = (PuntEntrada) obj;
-						if(!selected.isOpen() && instance.getMenu().equals("S")){
-							selected.setOpen(true);
-						}else if (instance.getMenu().equals("S"))
-							selected.setOpen(false);
-						else{
-							Long name = instance.getId();
-							LinkedList punt = instance.getExecucions();
-							if(!punt.isEmpty())
-								Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
-							else
-								alert("Cannot execute");
-						}
-							
-					}
-				}
-				
-				void onNewAccount (Listitem row)
-				{
-					es.caib.zkib.binder.BindContext ctx  = XPathUtils.getComponentContext(row);
-					try {
-						owner = XPathUtils.getValue(ctx, "/owner[1]/codi");
-						if (owner != null)
-						{
-							row.getChildren().get(2).getChildren().get(1).visible = true;
-							if (owner.equals ( execution.getUserPrincipal().getName()))
-									row.getChildren().get(2).getChildren().get(1).getChildren().get(2).visible = true;
-						}
-					} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) 
-					{
-						
-					}
-						
-				}
-				
-				void checkinAccount (Component c)
-				{
-					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(c);
-					Account acc = XPathUtils.getValue(ctx, ".").getInstance();
-					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account", 
-							new org.zkoss.zk.ui.event.EventListener() {
-								public void onEvent(Event evt) {
-									if ("onOK".equals(evt.getName()))
-									{
-										javax.naming.Context ctx = new javax.naming.InitialContext();
-										es.caib.seycon.ng.servei.ejb.AccountService ejb = ctx.lookup( es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME ).create();
-										ejb.checkinHPAccount(acc);
-										model.refresh();
-									}
-								}
-						}
-					);
-				}
-				
-				void search (String s) 
-				{
-					es.caib.zkib.jxpath.JXPathContext ctx = model.getJXPathContext();
-					es.caib.zkib.jxpath.Variables v = ctx.getVariables();
-					if (s == null || s.trim().isEmpty())
-					{
-						v.declareVariable("query", false);
-					} else {
-						v.declareVariable("query", true);
-						v.declareVariable("queryName", s);
-					}
-					model.getValue("/moure").refresh();
-				}
+			 		model.getVariables().declareVariable("query", false);
 			]]>
 		</zscript>
 		
-		<zscript>
-			es.caib.seycon.ng.servei.ejb.SelfService servei = new javax.naming.InitialContext()
-				.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-				.create();
-			ambit = (servei.getClientHost());
-		</zscript>
 		<popup id="toolCaducat">
 			<vbox>
 				<label value="${c:l('selfService.Expired')}" multiline="true"/>
@@ -313,19 +30,18 @@
 			<div class="sidebar aplications">
 				<label value="${c:l('selfService.Applications')}" sclass="titolSelf"/>
 				<div>
-					<textbox style="width:90%" onChanging="search(event.value)" focus="true" id="appfinder"
-						onCancel='appfinder.setValue(""); search(null)'
-						onOK='search(appfinder.getValue())'></textbox>
-					<imageclic src="/img/cancel.png" onClick='appfinder.setValue(""); search(null);'/>
+					<textbox style="width:90%" focus="true" id="appfinder"
+						></textbox>
+					<imageclic id="appcancelbutton" src="/img/cancel.png" />
 				</div>
 				<tree autocommit="false" dataPath="/model:/" fixedLayout="true" id="treebox" 
-							onNewRow="carregaIcona(event.data)" onSelect="select()" sclass="senseBorder1">
+							sclass="senseBorder1">
 					<treeitemfinder bind="." open="false" path="/moure">
 						<treerow sclass="fons">
 							<treecell>
-								<image align="center" height="15px" width="15px" onClick="openTree(self.parent.parent.parent)"/>
-								<label value="  " onClick="openTree(self.parent.parent.parent)"/>
-								<label bind="@nom" onClick="openTree(self.parent.parent.parent)"/> 
+								<image align="center" height="15px" width="15px" onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label value="  " onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label bind="@nom" onClick="p_selfService.openTree(self.parent.parent.parent)"/> 
 							</treecell>
 						</treerow>
 					</treeitemfinder>
@@ -348,7 +64,6 @@
 						<label value="${c:l('selfService.Accounts')}" sclass="titolSelf"/>
 						<listbox id="listadoAccounts" autocommit="false"
 							dataPath="/model:/usuari/account" fixedLayout="true"
-							onNewRow="onNewAccount(event.data)"
 							sclass="senseBorder tabla-cuentas">
 							<listhead>
 								<listheader label="${c:l('accounts.dispatcher')}" width="20%" visible="false"/>
@@ -377,23 +92,23 @@
 									<div visible="false" style="background-color: darkgray; border: 3px solid darkgray; border-radius: 3px; display: inline-block">
 										<label value="owner:" style="font-size: 8pt; vertical-align:top"/>
 										<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@codi"></label>
-										<image src="/img/cancel.png" width="12px" height="12px" visible="false" onClick="checkinAccount(self)"/>
+										<image src="/img/cancel.png" width="12px" height="12px" visible="false" onClick="p_selfService.checkinAccount(self)"/>
 									</div>
 								</listcell>
 								<listcell style="text-align: center; vertical-align: top;">
 									<imageclic src="/img/lupa.gif">
 										<attribute name="onClick">
-											queryPassword(self);
+											p_selfService.queryPassword(self);
 										</attribute>
 									</imageclic>
-									<timer delay="${timerDelay}" repeats="${enableTimers}" 
+<!-- 									<timer delay="${p_selfService.timerDelay}" repeats="${p_selfService.enableTimers}" 
 										onTimer="checkIsUpdatePending(self.parent.parent);" />
+										 -->
 								</listcell>	
 								<listcell style="text-align: center; vertical-align: top;">
 									<imageclic src="~./img/pwd.gif">
 										<attribute name="onClick">
-											
-											setPassword(self);
+											p_selfService.setPassword(self);
 										</attribute>
 									</imageclic>
 								</listcell>
@@ -500,7 +215,7 @@
 		
 		<div class="own-ip">
 			<hbox align="end" pack="end">
-				<label value="${c:l('selfService.Conneted')} ${ambit}"/>
+				<label value="${c:l('selfService.Conneted')} ${p_selfService.ambit}"/>
 			</hbox>
 		</div>
 			

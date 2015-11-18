@@ -1358,14 +1358,23 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			return false;
 		
 		Calendar c = Calendar.getInstance();
-		c.setTime(accEntity.getLastPasswordSet());
-		account.setLastPasswordSet(c);
+		if (accEntity.getLastPasswordSet() != null)
+		{
+			c.setTime(accEntity.getLastPasswordSet());
+			account.setLastPasswordSet(c);
+		}
 		c = Calendar.getInstance();
-		c.setTime(accEntity.getLastUpdated());
-		account.setLastUpdated(c);
+		if (accEntity.getLastUpdated() != null)
+		{
+			c.setTime(accEntity.getLastUpdated());
+			account.setLastUpdated(c);
+		}
 		c = Calendar.getInstance();
-		c.setTime(accEntity.getPasswordExpiration());
-		account.setPasswordExpiration(c);
+		if (accEntity.getPasswordExpiration() != null)
+		{
+			c.setTime(accEntity.getPasswordExpiration());
+			account.setPasswordExpiration(c);
+		}
 
 		List<TasqueEntity> coll = getTasqueEntityDao().findByAccount (accEntity.getName(), accEntity.getDispatcher().getCodi());
 		for (TasqueEntity tasque: coll)

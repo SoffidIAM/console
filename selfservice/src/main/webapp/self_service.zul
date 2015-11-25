@@ -12,6 +12,7 @@
 		<datamodel id="model" rootNode="root" src="descriptorSelfService.xml"/>
 		<zscript>
 			<![CDATA[
+					import es.caib.seycon.ng.comu.*;
 			 		model.getVariables().declareVariable("query", false);
 			]]>
 		</zscript>
@@ -236,7 +237,7 @@
 								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
 								.create();
 						Window wnd = Path.getComponent("/newPassword");
-						Account account = wnd.getAttribute("acco");
+						es.caib.seycon.ng.comu.Account account = wnd.getAttribute("acco");
 						timepwd.getValue();
 						service.setHPAccountPassword(account,
 								new Password(password.getValue()), timepwd.getValue(),

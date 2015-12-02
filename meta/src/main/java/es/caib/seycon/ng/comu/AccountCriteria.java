@@ -28,7 +28,7 @@ public abstract class AccountCriteria {
 	public java.lang.String grantedUsers;
 
 	@Nullable
-	@CriteriaColumn(parameter="acl.rol.codi")
+	@CriteriaColumn(parameter="acl.rol.nom")
 	public java.lang.String grantedRoles;
 
 	@Nullable

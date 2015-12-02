@@ -524,6 +524,7 @@ public class InternalPasswordServiceImpl extends
                         "select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass " //$NON-NLS-1$
         						+ "join pass.account as account " //$NON-NLS-1$
                                 + "where account.dispatcher.domini = :domini and " //$NON-NLS-1$
+                                + "account.dispatcher.url is not null and "
                                 + "account.passwordPolicy = :tipusUsuari and " //$NON-NLS-1$
                                 + "account.disabled = false and " //$NON-NLS-1$
                                 + "pass.expirationDate <= :caducitat and " //$NON-NLS-1$
@@ -874,6 +875,7 @@ public class InternalPasswordServiceImpl extends
                         "select pass from es.caib.seycon.ng.model.AccountPasswordEntity as pass " //$NON-NLS-1$
         						+ "join pass.account as account " //$NON-NLS-1$
                                 + "where account.dispatcher.domini = :domini and " //$NON-NLS-1$
+                                + "account.dispatcher.url is not null and "
                                 + "account.passwordPolicy = :tipusUsuari and " //$NON-NLS-1$
                                 + "account.disabled = false and " //$NON-NLS-1$
                                 + "pass.expirationDate <= :caducitat and " //$NON-NLS-1$

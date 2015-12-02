@@ -1300,8 +1300,7 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 		String mailBefore = oldValue.getNomCurt()+"@" + ( oldValue.getDominiCorreu() == null ? "": oldValue.getDominiCorreu()); 
 		String mailAfter = usuari.getNomCurt()+"@" + ( usuari.getDominiCorreu() == null ? "": usuari.getDominiCorreu().getCodi());
 
-
-		if (! mailBefore.equals(mailAfter))
+		if (! mailBefore.equals(mailAfter) || usuari.getActiu().equals("S") != oldValue.getActiu().booleanValue())
 		{
 			createMailTask(usuari);
 			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();

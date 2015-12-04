@@ -152,4 +152,5 @@ public class RolAssociacioRolEntityImpl
 		else
 			return getRolContingut().isAllowed(permission);
 	}
+
 }

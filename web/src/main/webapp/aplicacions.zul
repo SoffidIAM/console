@@ -1518,12 +1518,24 @@ void removeSodRule (Component button)
 										}
 											</attribute>
 												<listhead>
-													<listheader label="${c:l('aplicacions.zul.Codi-2')}" sort="auto" width="10%"/>
-													<listheader label="${c:l('aplicacions.zul.Nomcomplert')}" sort="auto" width="25%"/>
-													<listheader label="${c:l('aplicacions.zul.Grup')}" sort="auto" width="14%"/>
-													<listheader label="${c:l('aplicacions.zul.Rol')}" sort="auto" width="17%"/>
-													<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="17%"/>
-													<listheader label="${c:l('aplicacions.zul.ValordeDomini')}" width="17%"/>
+													<listheader label="${c:l('aplicacions.zul.Codi-2')}" sort="auto" width="10%">
+														<listboxfilter bind="@accountName"/>
+													</listheader>
+													<listheader label="${c:l('aplicacions.zul.Nomcomplert')}" sort="auto" width="25%">
+														<listboxfilter bind="@nomComplertUsuari"/>
+													</listheader>
+													<listheader label="${c:l('aplicacions.zul.Grup')}" sort="auto" width="14%">
+														<listboxfilter bind="@codiGrupUsuari"/>
+													</listheader>
+													<listheader label="${c:l('aplicacions.zul.Rol')}" sort="auto" width="17%">
+														<listboxfilter bind="@nomRol"/>
+													</listheader>
+													<listheader label="${c:l('aplicacions.zul.Bbdd')}" sort="auto" width="17%">
+														<listboxfilter bind="@baseDeDades"/>
+													</listheader>
+													<listheader label="${c:l('aplicacions.zul.ValordeDomini')}" sort="auto" width="17%">
+														<listboxfilter bind="valorDomini/@descripcio"/>
+													</listheader>
 													<listheader label="${c:l('usuaris.zul.recertification')}" width="17%"/>
 												</listhead>
 												<dataitem bind=".">

@@ -98,6 +98,7 @@
 							String codiSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(2).getLabel();
 							String descripcioSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(1).getLabel();
 							String tipusDominiSeleccionat = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "domainTypeDescription");  
+							String tipusDomini = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "tipusDomini");  
 							String scopeSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(4).getLabel();
 							String heretaSeleccionat = esquema.getFellow("lista").getFellow("listbox").selectedItem.getChildren().get(5).getLabel();
 						
@@ -106,6 +107,7 @@
 							model.getVariables().declareVariable("codiAutoritzacio", codiSeleccionat);
 							model.getVariables().declareVariable("descripcioSeleccionat", descripcioSeleccionat);
 							model.getVariables().declareVariable("tipusDominiSeleccionat", tipusDominiSeleccionat);
+							model.getVariables().declareVariable("tipusDomini", tipusDomini);
 							model.getVariables().declareVariable("scopeSeleccionat", scopeSeleccionat);
 							model.getVariables().declareVariable("heretaSeleccionat", heretaSeleccionat);
 						
@@ -388,9 +390,11 @@
 								//Missatgebox.info ("tipus domini "+dades[4]);
 								
 								// Comprovem el tipus de domini del rol
-								tipusDominiRol = dades[4]!=null ? dades[4].trim() :"";
-								tipusDominiAuto = model.getVariables().getVariable("tipusDominiSeleccionat");
+								String tipusDominiRol = dades[4]!=null ? dades[4].trim() :"";
+								String tipusDominiAutoDescription = model.getVariables().getVariable("tipusDominiSeleccionat");
+								String tipusDominiAuto = model.getVariables().getVariable("tipusDomini");
 								
+								alert ("tipusDominiAuto = "+tipusDominiAutoDescription);
 								if (tipusDominiAuto!=null && (!"".equals(tipusDominiAuto.trim())) 
 									&& !es.caib.seycon.util.TipusDomini.SENSE_DOMINI.equals(tipusDominiRol)) {
 									String [] td = tipusDominiAuto.split(",");
@@ -401,7 +405,8 @@
 									}
 									if (!trobat) {
 										o = !"".equals(tipusDominiAuto.trim())?", ":"";
-										Missatgebox.error(String.format (org.zkoss.util.resource.Labels.getLabel("autoritzacions.Restriccio"), new Object[]{o,tipusDominiAuto}),
+										Missatgebox.error(String.format (org.zkoss.util.resource.Labels.getLabel("autoritzacions.Restriccio"), 
+												new Object[]{tipusDominiAutoDescription}),
 											org.zkoss.util.resource.Labels.getLabel("autoritzacions.ErrorDomini"));
 										return;
 									}

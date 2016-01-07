@@ -1225,9 +1225,9 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                     Collection<RolAccountEntity> rolsUsuarisRolContenidor = new ArrayList<RolAccountEntity>();
                     // Cerquem usuaris amb el rol d'usuari amb valor de domini
                     // corresponent
-                    if (associacio.getGrantedGroupDomain() != null
-                            || associacio.getGrantedApplicationDomain() != null
-                            || associacio.getGrantedDomainValue() != null) {
+                    if (associacio.getGranteeGroupDomain() != null
+                            || associacio.getGranteeApplicationDomain() != null
+                            || associacio.getGranteeDomainValue() != null) {
                         rolsUsuarisRolContenidor = getRolAccountEntityDao()
                                 .findByRolAndValorDomini(
                                         rolContenidor.getNom(),
@@ -1235,14 +1235,14 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                                                 .getCodi(),
                                         rolContenidor.getAplicacio().getCodi(),
                                         rolContenidor.getTipusDomini(),
-                                        associacio.getGrantedGroupDomain() != null ? associacio
-                                                .getGrantedGroupDomain().getCodi()
+                                        associacio.getGranteeGroupDomain() != null ? associacio
+                                                .getGranteeGroupDomain().getCodi()
                                                 : null,
-                                        associacio.getGrantedApplicationDomain() != null ? associacio
-                                                .getGrantedApplicationDomain().getCodi()
+                                        associacio.getGranteeApplicationDomain() != null ? associacio
+                                                .getGranteeApplicationDomain().getCodi()
                                                 : null,
-                                        associacio.getGrantedApplicationDomain() != null ? associacio
-                                                .getGrantedApplicationDomain()
+                                        associacio.getGranteeApplicationDomain() != null ? associacio
+                                                .getGranteeApplicationDomain()
                                                 .getId() : null);
                     } else {// Cerquem a tots els valors de domini (sense_domini
                             // o qualque_valor)

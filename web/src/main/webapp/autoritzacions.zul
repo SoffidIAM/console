@@ -394,7 +394,6 @@
 								String tipusDominiAutoDescription = model.getVariables().getVariable("tipusDominiSeleccionat");
 								String tipusDominiAuto = model.getVariables().getVariable("tipusDomini");
 								
-								alert ("tipusDominiAuto = "+tipusDominiAutoDescription);
 								if (tipusDominiAuto!=null && (!"".equals(tipusDominiAuto.trim())) 
 									&& !es.caib.seycon.util.TipusDomini.SENSE_DOMINI.equals(tipusDominiRol)) {
 									String [] td = tipusDominiAuto.split(",");

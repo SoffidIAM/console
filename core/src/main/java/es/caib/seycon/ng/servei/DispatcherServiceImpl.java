@@ -1320,7 +1320,19 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		if (ome == null)
 			return Collections.emptyList();
 		else
-			return getObjectMappingPropertyEntityDao().toObjectMappingPropertyList(ome.getProperties());
+		{
+			List<ObjectMappingProperty> list = getObjectMappingPropertyEntityDao().toObjectMappingPropertyList(ome.getProperties());
+			Collections.sort(
+						list,
+						new Comparator<ObjectMappingProperty>() {
+
+							public int compare(ObjectMappingProperty o1,
+									ObjectMappingProperty o2) {
+								return o1.getProperty().compareTo(o2.getProperty());
+							}
+						});
+			return list;
+		}
 	}
 	
 	private void updateServers () throws InternalErrorException

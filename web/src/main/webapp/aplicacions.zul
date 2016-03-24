@@ -1101,6 +1101,8 @@
 						</tabpanel>
 						
 						<tabpanel fulfill="tabrols.onSelect" id="rols">
+							<label value="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}  "></label>
+							<label bind="@codi"/>
 							<toolbar>
 								<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="gridRols" 
 									preferenceName="approle"/>

@@ -258,7 +258,7 @@
 					criteria.setDominiCorreu(lista.get("dominiCorreu"));
 					criteria.setTipusUsuari(lista.get("tipusUsuari"));
 					if (lista.get("actiu") != null && ! "%".equals(lista.get("actiu")) && ! "".equals(lista.get("actiu")))
-						criteria.setActiu(lista.get("actiu").equals("S"));
+						criteria.setActiu(lista.get("actiu").contains("S"));
 					criteria.setSecondaryGroup(lista.get("grupSecundari"));
 					criteria.setNomCurt(lista.get("nomCurt"));
 					criteria.setAccountName(lista.get("accountName"));

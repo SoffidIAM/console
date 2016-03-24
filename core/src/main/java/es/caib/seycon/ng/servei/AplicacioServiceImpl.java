@@ -794,6 +794,10 @@ public class AplicacioServiceImpl extends
     	RolEntity rolEntity = getRolEntityDao()
                 .findByNomRolAndCodiAplicacioAndCodiDispatcher(nomRol,
                         codiAplicacio, codiDispatcher);
+    	if (rolEntity == null)
+    	{
+    		return new LinkedList<RolAccount>();
+    	}
     	if (!getAutoritzacioService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
     		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 				getPrincipal().getName(), nomRol));

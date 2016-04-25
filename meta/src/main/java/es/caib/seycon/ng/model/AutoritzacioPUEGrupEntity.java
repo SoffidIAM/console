@@ -28,3 +28,10 @@ public abstract class AutoritzacioPUEGrupEntity {
 	public GrupEntity group;
 
 }
+
+@Index (name="GRU_PUE_1",	unique=false,
+entity=es.caib.seycon.ng.model.AutoritzacioPUEGrupEntity.class,
+columns={"GPE_IDGRU"})
+abstract class AutoritzacioPUEGrupIndex {
+}
+

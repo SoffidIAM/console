@@ -59,7 +59,8 @@ public abstract class XarxaACEntity {
 			+ "  (grup is not null and grup.name = :identity) or \n"
 			+ "  (user is not null and user.userName = :identity) or \n"
 			+ "  (rol is not null and rol.name = :identity) \n" + ") \n"
-			+ "and xarxaAC.network.name = :networkName")
+			+ "and xarxaAC.network.name = :networkName "
+			+ "and xarxaAC.network.tenant.id = :tenantId ")
 	public es.caib.seycon.ng.model.XarxaACEntity findByCodiXarxaAndCodiIdentiat(
 			java.lang.String networkName, java.lang.String identity) {
 		return null;
@@ -68,7 +69,8 @@ public abstract class XarxaACEntity {
 	@Operation(translated = "findByRoleName")
 	@DaoFinder("select xarxaAC\n"
 			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
-			+ "where xarxaAC.role.name = :roleName")
+			+ "where xarxaAC.role.name = :roleName and "
+			+ "xarxaAC.role.system.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRol(
 			java.lang.String roleName) {
 		return null;
@@ -77,7 +79,8 @@ public abstract class XarxaACEntity {
 	@Operation(translated = "findByUserName")
 	@DaoFinder("select xarxaAC\n"
 			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
-			+ "where xarxaAC.user.userName = :userName")
+			+ "where xarxaAC.user.userName = :userName and "
+			+ "xarxaAC.user.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiUsuari(
 			java.lang.String userName) {
 		return null;
@@ -86,7 +89,8 @@ public abstract class XarxaACEntity {
 	@Operation(translated = "findByGroupName")
 	@DaoFinder("select xarxaAC\n"
 			+ "from com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC\n"
-			+ "where xarxaAC.group.name = :groupName")
+			+ "where xarxaAC.group.name = :groupName and "
+			+ "xarxaAC.group.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByCodiGrup(
 			java.lang.String groupName) {
 		return null;
@@ -100,7 +104,9 @@ public abstract class XarxaACEntity {
 			+ "left join elrol.system as agent\n"
 			+ "where elrol.name = :roleName \n"
 			+ "and aplica.name = :informationSystem\n"
-			+ "and agent.name = :system\n" + "order by xarxaAC.network.name")
+			+ "and agent.name = :system "
+			+ "and agent.tenant.id = :tenantId \n" 
+			+ "order by xarxaAC.network.name")
 	public java.util.List<es.caib.seycon.ng.model.XarxaACEntity> findByNomRolAndCodiAplicacioRolAndCodiDispatcher(
 			java.lang.String roleName, java.lang.String informationSystem,
 			java.lang.String system) {

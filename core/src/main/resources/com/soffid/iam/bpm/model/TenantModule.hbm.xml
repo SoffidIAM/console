@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" default-access="field">
+
+  <subclass name="com.soffid.iam.bpm.model.TenantModule" 
+            extends="org.jbpm.module.exe.ModuleInstance" 
+            discriminator-value="E">
+    <property name="tenantId" column="TENANT_" />            
+  </subclass>
+
+</hibernate-mapping>

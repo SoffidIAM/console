@@ -34,7 +34,8 @@ public abstract class UserAccountEntity {
 			+ "from  com.soffid.iam.model.UserAccountEntity as uae\n"
 			+ "where uae.user.userName=:user and "
 			+ "uae.account.name=:account and "
-			+ "uae.account.system.name=:systemName")
+			+ "uae.account.system.name=:systemName and "
+			+ "uae.account.system.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UserAccountEntity findByAccountDispatcherAndName(
 			java.lang.String account, java.lang.String systemName,
 			java.lang.String user) {
@@ -46,7 +47,8 @@ public abstract class UserAccountEntity {
 			+ "from  com.soffid.iam.model.UserAccountEntity uae\n"
 			+ "where uae.user.userName=:user and "
 			+ "uae.account.system.name=:dispatcher and "
-			+ "uae.account.type = 'U'")
+			+ "uae.account.type = 'U' and "
+			+ "uae.account.system.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.UserAccountEntity> findByUserAndDispatcher(
 			java.lang.String user, java.lang.String dispatcher) {
 		return null;

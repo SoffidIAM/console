@@ -113,7 +113,7 @@ public class EntryPointServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.ObtaintParentPointEntryError")); //$NON-NLS-1$
 
-		EntryPointEntity pareE = getEntryPointEntityDao().findById(
+		EntryPointEntity pareE = getEntryPointEntityDao().load(
 				puntEntrada.getParentId());
 
 		if (pareE == null)
@@ -471,7 +471,7 @@ public class EntryPointServiceImpl extends
 	protected com.soffid.iam.api.AccessTree handleFindRoot()
 			throws java.lang.Exception {
 
-		EntryPointEntity entity = getEntryPointEntityDao().findById(ROOT_ID);
+		EntryPointEntity entity = getEntryPointEntityDao().load(ROOT_ID);
 		if (entity == null) {
 			List<EntryPointEntity> entities = getEntryPointEntityDao()
 					.findByCriteria("%", ROOT_TAG); //$NON-NLS-1$
@@ -966,9 +966,9 @@ public class EntryPointServiceImpl extends
 				}
 
 			// Creen la nova entrada a l'arbre
-			EntryPointEntity nouPare = getEntryPointEntityDao().findById(
+			EntryPointEntity nouPare = getEntryPointEntityDao().load(
 					idPareArbreDesti);
-			EntryPointEntity pueMogut = getEntryPointEntityDao().findById(
+			EntryPointEntity pueMogut = getEntryPointEntityDao().load(
 					idPueOrigen);
 
 			EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao()
@@ -1072,12 +1072,12 @@ public class EntryPointServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.NotNodeMoviment")); //$NON-NLS-1$
 
-		EntryPointEntity pareOrigenE = getEntryPointEntityDao().findById(
+		EntryPointEntity pareOrigenE = getEntryPointEntityDao().load(
 				idParePuntEntradaMoure);
 		AccessTree pareOrigen = getEntryPointEntityDao().toAccessTree(
 				pareOrigenE);
 		// PuntEntradaEntity pareDestiE =
-		// getPuntEntradaEntityDao().findById(idParePuntEntradaDesti);
+		// getPuntEntradaEntityDao().load(idParePuntEntradaDesti);
 		// PuntEntrada pareDesti =
 		// getPuntEntradaEntityDao().toPuntEntrada(pareDestiE);
 		// Tiene que tener permisos en el punto de entrada origen y destino (es
@@ -1119,8 +1119,8 @@ public class EntryPointServiceImpl extends
 		}
 		// Creen la nova entrada a l'arbre destí
 		EntryPointEntity nouPare = getEntryPointEntityDao()
-				.findById(idPueDesti);
-		EntryPointEntity pueMogut = getEntryPointEntityDao().findById(
+				.load(idPueDesti);
+		EntryPointEntity pueMogut = getEntryPointEntityDao().load(
 				idPueOrigen);
 
 		// Obtenim L'ORDRE DE L'ARBRE destí
@@ -1176,7 +1176,7 @@ public class EntryPointServiceImpl extends
 
 		// Creamos la copia y obtenemos el id de la misma
 		if (pueClonar.getIcon1() != null) {
-			EntryPointIconEntity ie = getEntryPointIconEntityDao().findById(
+			EntryPointIconEntity ie = getEntryPointIconEntityDao().load(
 					pueClonar.getIcon1()); // se
 			// guarda
 			// id
@@ -1191,7 +1191,7 @@ public class EntryPointServiceImpl extends
 			}
 		}
 		if (pueClonar.getIcon2() != null) {
-			EntryPointIconEntity ie = getEntryPointIconEntityDao().findById(
+			EntryPointIconEntity ie = getEntryPointIconEntityDao().load(
 					pueClonar.getIcon2()); // se
 			// guarda
 			// id
@@ -1365,7 +1365,7 @@ public class EntryPointServiceImpl extends
 			}
 		}
 		// Obtenim el pare
-		EntryPointEntity pueDesti = getEntryPointEntityDao().findById(
+		EntryPointEntity pueDesti = getEntryPointEntityDao().load(
 				idPueDesti);
 		Collection<EntryPointTreeEntity> fillsNouPare = pueDesti
 				.getParentEntryPointTree();
@@ -1427,7 +1427,7 @@ public class EntryPointServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToCopyEntryPoint")); //$NON-NLS-1$
 
-		EntryPointEntity pareOrigenE = getEntryPointEntityDao().findById(
+		EntryPointEntity pareOrigenE = getEntryPointEntityDao().load(
 				idParePuntEntradaCopiar);
 		AccessTree pareOrigen = getEntryPointEntityDao().toAccessTree(
 				pareOrigenE);
@@ -1466,8 +1466,8 @@ public class EntryPointServiceImpl extends
 
 		// Creamos una copia del árbol en el menú destino:
 		EntryPointEntity nouPare = getEntryPointEntityDao()
-				.findById(idPueDesti);
-		EntryPointEntity pueCopiat = getEntryPointEntityDao().findById(
+				.load(idPueDesti);
+		EntryPointEntity pueCopiat = getEntryPointEntityDao().load(
 				idPueOrigen);
 
 		// Creen la nova entrada a l'arbre destí
@@ -1774,8 +1774,7 @@ public class EntryPointServiceImpl extends
 	}
 
 	private void auditarPuntEntrada(String accio, String nomPuntEntrada) {
-		Principal principal = Security.getPrincipal();
-		String codiUsuari = principal.getName();
+		String codiUsuari = Security.getCurrentAccount();
 		Audit auditoria = new Audit();
 		auditoria.setAction(accio);
 		auditoria
@@ -2119,14 +2118,14 @@ public class EntryPointServiceImpl extends
 			String nivell) throws Exception {
 
 		// Carreguem el punt d'entrada
-		EntryPointEntity puntEntradaE = getEntryPointEntityDao().findById(
+		EntryPointEntity puntEntradaE = getEntryPointEntityDao().load(
 				idPuntEntrada);
 		if (puntEntradaE == null)
 			return false;
 		AccessTree puntEntrada = getEntryPointEntityDao().toAccessTree(
 				puntEntradaE);
 
-		String user = getPrincipal().getName();
+		String user = Security.getCurrentUser();
 		Collection<AccessTreeAuthorization> autoritzacions = puntEntrada
 				.getAuthorizations();
 		if (autoritzacions == null)
@@ -2141,7 +2140,7 @@ public class EntryPointServiceImpl extends
 			String tipus = auto.getAuthorizationEntityType();
 			String codiAuto = auto.getAuthorizedEntityCode(); // és ÚNIC !!
 			if (tipus.equals(TipusAutoritzacioPuntEntrada.USUARI)) {
-				if (user.equals(codiAuto)) {
+				if (codiAuto.equals(user)) {
 					// Comprovem el nivell d'autorització
 					String nivellAuto = auto.getAuthorizationLevelDescription();
 					trobat = (TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO
@@ -2230,7 +2229,7 @@ public class EntryPointServiceImpl extends
 	@Override
 	protected AccessTree handleFindApplicationAccessById(long id)
 			throws Exception {
-		EntryPointEntity pueEntity = getEntryPointEntityDao().findById(id);
+		EntryPointEntity pueEntity = getEntryPointEntityDao().load(id);
 		AccessTree pue = getEntryPointEntityDao().toAccessTree(pueEntity);
 
 		if (canView(pue))
@@ -2253,11 +2252,6 @@ public class EntryPointServiceImpl extends
 			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.ImageTooBigError")); //$NON-NLS-1$
 		}
-	}
-
-	@Override
-	protected java.security.Principal getPrincipal() {
-		return Security.getPrincipal();
 	}
 
     private int findId (List<AccessTree> children, Long entryPointId)

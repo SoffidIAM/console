@@ -130,7 +130,7 @@ public class ApplicationServiceImpl extends
             return (getInformationSystemEntityDao().toApplication(apl));
         }
 		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoUserPermission"), //$NON-NLS-1$
-				getPrincipal().getName())); //$NON-NLS-1$
+				Security.getCurrentAccount())); //$NON-NLS-1$
     }
 
     /**
@@ -396,7 +396,7 @@ public class ApplicationServiceImpl extends
         // applicacion:update
 
         // Comprovem que l'usuari creador no siga el mateix a qui se li atorga
-        if (administracioAplicacio.getUserName().compareTo(getPrincipal().getName()) == 0) {
+        if (administracioAplicacio.getUserName().compareTo(Security.getCurrentUser()) == 0) {
             throw new SeyconException(
                     Messages.getString("ApplicationServiceImpl.NotAdminPermissionAuthorized")); //$NON-NLS-1$
         }
@@ -410,7 +410,7 @@ public class ApplicationServiceImpl extends
             administracioAplicacio = getRoleAccountEntityDao().toApplicationAdministration(administracioAplicacioEntity);
             return administracioAplicacio;
         }
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToAsign"), getPrincipal().getName(), administracioAplicacio.getInformationSystemName()));
+		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToAsign"), Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
     }
 
     protected void handleManageApplication(ApplicationAdministration administracioAplicacio) throws Exception {
@@ -423,7 +423,8 @@ public class ApplicationServiceImpl extends
         {
             getRoleAccountEntityDao().remove(administracioAplicacioEntity);
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToDelete"), getPrincipal().getName(), administracioAplicacio.getInformationSystemName()));
+			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToDelete"), 
+					Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
         }
     }
 
@@ -555,7 +556,7 @@ public class ApplicationServiceImpl extends
                 return getRoleEntityDao().toRole(rolEntity);
 	        } else {
 				throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
-						getPrincipal().getName(), nomRol));
+						Security.getCurrentAccount(), nomRol));
 	        }
         } else
             return null;
@@ -605,7 +606,7 @@ public class ApplicationServiceImpl extends
             return toReturn;
         } else {
 			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToSearch"), //$NON-NLS-1$
-					getPrincipal().getName(), codiAplicacio));
+				Security.getCurrentAccount(), codiAplicacio));
         }
     }
 
@@ -613,7 +614,7 @@ public class ApplicationServiceImpl extends
         RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(nomRol, codiAplicacio, codiDispatcher);
     	if (!getAuthorizationService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
     		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
-				getPrincipal().getName(), nomRol));
+				Security.getCurrentAccount(), nomRol));
 
         List<RoleAccount> toReturn = new LinkedList<RoleAccount>();
         for (RoleAccountEntity ra : rolEntity.getAccounts()) {
@@ -675,7 +676,8 @@ public class ApplicationServiceImpl extends
             return getRoleEntityDao().toRole(rolEntity);
         }
 
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UpdateApplicationError"), getPrincipal().getName(), rol.getInformationSystemName()));
+		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UpdateApplicationError"), 
+				Security.getCurrentAccount(), rol.getInformationSystemName()));
     }
 
     protected RoleAccount handleCreate(RoleAccount rolsUsuaris) throws Exception {
@@ -891,7 +893,7 @@ public class ApplicationServiceImpl extends
             // Disable assigning roles to himself
         	UserEntity user = null;
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
-                if (ua.getUser().getUserName().equals(getPrincipal().getName())) {
+                if (ua.getUser().getUserName().equals(Security.getCurrentUser())) {
                     throw new SeyconException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
                 }
                 user = ua.getUser();
@@ -945,7 +947,7 @@ public class ApplicationServiceImpl extends
                 throw new InternalErrorException("This role cannot be manually revoked. It's granted by a rule.");
             // Disable assigning roles to himself
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
-                if (ua.getUser().getUserName().equals(getPrincipal().getName())) {
+                if (ua.getUser().getUserName().equals(Security.getCurrentUser())) {
                     throw new SeyconException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
                 }
             }
@@ -1050,42 +1052,6 @@ public class ApplicationServiceImpl extends
 		return rgl;
     }
 
-    protected Collection<RoleAccount> handleFindUsersRolesByUserNameAndRoleName(String codiUsuari, String nomRol) throws Exception {
-        Collection<RoleAccountEntity> rolusuEntity = getRoleAccountEntityDao().findByUserAndRole(codiUsuari, nomRol);
-        if (rolusuEntity != null) {
-            List<RoleAccount> ra = new LinkedList<RoleAccount>();
-            for (RoleAccountEntity rae : rolusuEntity) {
-                if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
-            }
-    		getSoDRuleService().qualifyRolAccountList(ra);
-    		return ra;
-
-            /*
-             * getRoleAccountEntityDao().toRolAccountCollection(rolusuEntity);
-             * 
-             * Collection rolusu = new ArrayList(); for (Iterator it =
-             * rolusuEntity.iterator(); it.hasNext(); ) { RolAccount ru =
-             * (RolAccount) it.next(); if
-             * (this.usuariPotAccedirAplicacio(ru.getCodiAplicacio())) {
-             * rolusu.add(ru); } } return rolusu;
-             */
-        }
-        return null;
-    }
-
-    protected Collection<RoleAccount> handleFindUsersRolesByRoleName(String nomRol) throws Exception {
-        Collection<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByRole(nomRol);
-        if (rolusus != null) {
-            List<RoleAccount> ra = new LinkedList<RoleAccount>();
-            for (RoleAccountEntity rae : rolusus) {
-                if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
-            }
-    		getSoDRuleService().qualifyRolAccountList(ra);
-    		return ra;
-        }
-        return new Vector();
-    }
-
     protected Collection<Role> handleFindRolesByDomainNameAndApplicationName(String nomDomini, String codiAplicacio) throws Exception {
     	List<RoleEntity> roles = getRoleEntityDao().findByInformationSystemAndDomain(codiAplicacio, nomDomini);
         if (roles != null) {
@@ -1104,7 +1070,8 @@ public class ApplicationServiceImpl extends
             administracioAplicacio = getRoleAccountEntityDao().toApplicationAdministration(administracioAplicacioEntity);
             return administracioAplicacio;
         }
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToUpdate"), getPrincipal().getName(), administracioAplicacio.getInformationSystemName()));
+		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToUpdate"), 
+				Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
     }
 
     protected Role handleFindRoleById(Long rolId) throws Exception {
@@ -1147,10 +1114,6 @@ public class ApplicationServiceImpl extends
         return getRoleEntityDao().toRoleList(rols);
         
         
-    }
-
-    protected java.security.Principal getPrincipal() {
-        return Security.getPrincipal();
     }
 
     public Collection findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName(String nomRol, String codiAplicacio, String codiDispatcher) throws InternalErrorException {
@@ -1312,7 +1275,7 @@ public class ApplicationServiceImpl extends
             return totPermis;
         } else {
 			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
-					getPrincipal().getName(), codiAplicacioRol));
+					Security.getCurrentAccount(), codiAplicacioRol));
         }
 
     }
@@ -1382,7 +1345,7 @@ public class ApplicationServiceImpl extends
             return totPermis;
         } else {
 			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
-					getPrincipal().getName(), codiAplicacioRol));
+					Security.getCurrentAccount(), codiAplicacioRol));
         }
 
     }
@@ -1416,7 +1379,7 @@ public class ApplicationServiceImpl extends
         } else {
 			throw new SeyconException(
 					String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
-					getPrincipal().getName(), codiAplicacioRol));
+					Security.getCurrentAccount(), codiAplicacioRol));
         }
     }
     
@@ -1877,7 +1840,7 @@ public class ApplicationServiceImpl extends
             return getRoleEntityDao().toRole(rolEntity);
         } else {
 			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
-					getPrincipal().getName(), name));
+					Security.getCurrentAccount(), name));
         }
 	}
 
@@ -1885,7 +1848,6 @@ public class ApplicationServiceImpl extends
     protected Collection<RoleAccount> handleFindUserRolesByInformationSystem(String informationSystem) throws Exception {
 		return getRoleAccountEntityDao().toRoleAccountList(getRoleAccountEntityDao().findByInformationSystem(informationSystem));
 	}
-
 
 }
 

@@ -653,6 +653,7 @@
 		<column name='NAME_' type='VARCHAR' length='4000'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
 		<column name='STARTTASK_' type='BIGINT'/>
+		<column name='TENANT_' type='BIGINT'/>
 	</table>
 
 	<foreignKey name='FK_MODDEF_PROCDEF' table='JBPM_MODULEDEFINITION' foreignTable='JBPM_PROCESSDEFINITION'>
@@ -675,6 +676,7 @@
 		<column name='TASKMGMTDEFINITION_' type='BIGINT'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='VERSION_' type='BIGINT'/>
+		<column name='TENANT_' type='BIGINT'/>
 	</table>
 
 	<foreignKey name='FK_MODINST_PRCINST' table='JBPM_MODULEINSTANCE' foreignTable='JBPM_PROCESSINSTANCE'>
@@ -981,6 +983,7 @@
 		<column name='TASKMGMTINSTANCE_' type='BIGINT'/>
 		<column name='VERSION_' type='BIGINT'/>
 		<column name='PROCINST_' type='BIGINT'/>
+		<column name='TENANT_' type='BIGINT'/>
 	</table>
 
 	<foreignKey name='FK_TASKINST_SLINST' table='JBPM_TASKINSTANCE' foreignTable='JBPM_SWIMLANEINSTANCE'>

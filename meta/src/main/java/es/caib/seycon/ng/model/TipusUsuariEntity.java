@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_TIPUSU", translatedName="UserTypeEntity", translatedPackage="com.soffid.iam.model" )
@@ -30,6 +31,9 @@ public abstract class TipusUsuariEntity {
 	@Nullable
 	public java.lang.Boolean unmanaged;
 
+	@Column (name="TUS_TEN_ID")
+	public TenantEntity tenant;
+	
 	@ForeignKey (foreignColumn="PCD_TUS_ID", translated="policies")
 	public java.util.Collection<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> politiques;
 

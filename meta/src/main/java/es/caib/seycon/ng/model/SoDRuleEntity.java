@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SODRUL", translatedName="SoDRuleEntity", translatedPackage="com.soffid.iam.model" )
@@ -26,6 +27,9 @@ public abstract class SoDRuleEntity {
 
 	@Column (name="SOD_APL_ID")
 	public es.caib.seycon.ng.model.AplicacioEntity application;
+	
+	@Column (name="SOD_TEN_ID")
+	public TenantEntity tenant;
 
 	@ForeignKey (foreignColumn="SOR_SOD_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.SoDRoleEntity> roles;

@@ -25,6 +25,9 @@ import org.hibernate.sql.CaseFragment;
 import org.hibernate.sql.JoinFragment;
 
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.hibernate.CustomMySQL5InnoDBDialect;
+import com.soffid.iam.model.hibernate.CustomOracle10gDialect;
+import com.soffid.iam.model.hibernate.CustomSQLServerDialect;
 
 public class CustomDialect extends Dialect {
     Dialect proxyDialect;
@@ -62,15 +65,17 @@ public class CustomDialect extends Dialect {
 	        }
 	        if ("mysql".equals(type))  //$NON-NLS-1$
 	        {
-	            proxyDialect = new MySQL5InnoDBDialect();
+	            proxyDialect = new CustomMySQL5InnoDBDialect();
 	        } else if ("oracle".equals (type)) { //$NON-NLS-1$
-	            proxyDialect = new Oracle10gDialect();
+	            proxyDialect = new CustomOracle10gDialect();
 	        } else if ("sqlserver".equals(type)) { //$NON-NLS-1$
-	        	proxyDialect = new SQLServerDialect();
+	        	proxyDialect = new CustomSQLServerDialect();
 	        } else {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
         }
+        registerFunction("currenttenant", new CurrentTenantFunction());
+        proxyDialect.getKeywords().add("currenttenant");
     }
 
     public String getTypeName(int code) throws HibernateException {

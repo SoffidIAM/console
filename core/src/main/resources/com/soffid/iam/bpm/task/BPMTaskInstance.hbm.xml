@@ -9,6 +9,7 @@
   <subclass name="com.soffid.iam.bpm.task.BPMTaskInstance" 
             extends="org.jbpm.taskmgmt.exe.TaskInstance"
             discriminator-value="B">
+    <property name="tenantId" column="TENANT_" />            
   </subclass>
 
 </hibernate-mapping>

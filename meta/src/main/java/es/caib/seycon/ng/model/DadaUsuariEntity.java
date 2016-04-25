@@ -39,7 +39,7 @@ public abstract class DadaUsuariEntity {
 	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
 			+ "left join dadaUsuari.user as user "
 			+ "left join dadaUsuari.dataType as type "
-			+ "where user.userName = :userName and type.name=:dataType")
+			+ "where user.userName = :userName and type.name=:dataType and user.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiTipusDada(
 		java.lang.String userName, 
 		java.lang.String dataType) {
@@ -50,7 +50,7 @@ public abstract class DadaUsuariEntity {
 	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
 			+ "left join dadaUsuari.user as user "
 			+ "left join dadaUsuari.dataType as type "
-			+ "where user.userName = :userName and type.name=:dataType")
+			+ "where user.userName = :userName and type.name=:dataType and user.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiUsuariAndCodiTipusDada(
 		java.lang.String userName, 
 		java.lang.String dataType) {
@@ -59,7 +59,8 @@ public abstract class DadaUsuariEntity {
 
 	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
 			+ "left join dadaUsuari.dataType as type "
-			+ "where dadaUsuari.value = :value and type.name=:dataType")
+			+ "where dadaUsuari.value = :value and type.name=:dataType and "
+			+ "dadaUsuari.user.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.DadaUsuariEntity> findByTypeAndValue(
 		java.lang.String dataType, 
 		java.lang.String value) {

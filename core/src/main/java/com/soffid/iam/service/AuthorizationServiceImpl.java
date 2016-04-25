@@ -123,12 +123,13 @@ public class AuthorizationServiceImpl extends
                     }
                     is.close();
             	}
-    //            System.out.println("Carregades autoritzacions XML");
             	xmlAuthorizations = xmlAutoritzacions;
             } catch (Throwable e) {
                 System.err
                         .println(Messages.getString("AuthorizationServiceImpl.ErrorObtainingAuthorizations") //$NON-NLS-1$
                                 + e.getMessage());
+                e.printStackTrace();
+                return new HashMap();
             } finally {
                 try {
                     if (is != null)

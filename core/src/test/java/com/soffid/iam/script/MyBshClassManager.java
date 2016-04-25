@@ -30,6 +30,7 @@ public class MyBshClassManager extends BshClassManager {
 	public Class plainClassForName(String name) throws ClassNotFoundException {
 		Class c = null;
 
+		System.out.println("Testing class for name "+name);
 		if (! isAllowed (name))
 			return null;
 		try {

@@ -990,7 +990,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
-		String principal = Security.getPrincipal().getName();
+		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
 		
 		if (ae.getType().equals(AccountType.PRIVILEGED))
@@ -1076,7 +1076,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 
 
-		String principal = Security.getPrincipal().getName();
+		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
 		String dispatcher = ips.getDefaultDispatcher();
 		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
@@ -1386,7 +1386,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 
 
-		String principal = Security.getPrincipal().getName();
+		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
 		String dispatcher = ips.getDefaultDispatcher();
 		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
@@ -1449,7 +1449,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 
 		
-		String principal = Security.getPrincipal().getName();
+		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
 		String dispatcher = ips.getDefaultDispatcher();
 		AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);

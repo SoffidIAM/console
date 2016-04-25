@@ -53,7 +53,9 @@ public class MailListRoleMemberEntity {
 	@Nullable ValorDominiAplicacioEntity domainValueScope;
 
 	///////////////////////////////////
-	@DaoFinder("from com.soffid.iam.model.MailListRoleMemberEntity e where e.mailList.id=:mailListId and e.role.id=:roleId")
+	@DaoFinder("from com.soffid.iam.model.MailListRoleMemberEntity e "
+			+ "where e.mailList.id=:mailListId and e.role.id=:roleId "
+			+ "and e.role.system.tenant.id=:tenantId")
 	Collection<MailListGroupMemberEntity> findByMailListAndGroup (long mailListId, long roleId) {
 		return null;
 	}

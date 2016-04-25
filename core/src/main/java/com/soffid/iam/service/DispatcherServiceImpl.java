@@ -17,6 +17,7 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AccessControl;
 import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.ReplicaDatabase;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
@@ -36,8 +37,6 @@ import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
 import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.ReplicaDatabaseEntity;
-import com.soffid.iam.model.ReplicaDatabaseEntityDao;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -806,88 +805,6 @@ public class DispatcherServiceImpl extends
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleFindAllDatabases()
-	 */
-	@Override
-	protected Collection<com.soffid.iam.api.ReplicaDatabase> handleFindAllDatabases()
-			throws Exception {
-		List<ReplicaDatabaseEntity> db = getReplicaDatabaseEntityDao()
-				.loadAll();
-		return getReplicaDatabaseEntityDao().toReplicaDatabaseList(db);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleUpdate(es.caib.seycon
-	 * .ng.ReplicaDatabase)
-	 */
-	@Override
-	protected com.soffid.iam.api.ReplicaDatabase handleUpdate(
-			com.soffid.iam.api.ReplicaDatabase database) throws Exception {
-		ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
-		ReplicaDatabaseEntity entity = dao.replicaDatabaseToEntity(database);
-		dao.update(entity);
-		updateReplicaAgent(entity);
-		return dao.toReplicaDatabase(entity);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleCreate(es.caib.seycon
-	 * .ng.ReplicaDatabase)
-	 */
-	@Override
-	protected com.soffid.iam.api.ReplicaDatabase handleCreate(
-			com.soffid.iam.api.ReplicaDatabase database) throws Exception {
-		ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
-		ReplicaDatabaseEntity entity = dao.replicaDatabaseToEntity(database);
-		if (entity.getIdSeed() == null) {
-			long last = 0;
-			for (ReplicaDatabaseEntity rdbe : dao.loadAll()) {
-				if (rdbe.getIdSeed().longValue() >= last)
-					last = rdbe.getIdSeed().longValue();
-			}
-			entity.setIdSeed(new Long(last + 1));
-		}
-		dao.create(entity);
-		updateReplicaAgent(entity);
-		updateReplicaParameter();
-		return dao.toReplicaDatabase(entity);
-	}
-
-	/**
-	 * @throws InternalErrorException
-	 * 
-	 */
-	private void updateReplicaParameter() throws InternalErrorException {
-		String value;
-		if (getReplicaDatabaseEntityDao().loadAll().isEmpty())
-			value = "false"; //$NON-NLS-1$
-		else
-			value = "true"; //$NON-NLS-1$
-		ConfigurationService configSvc = getConfigurationService();
-		Configuration config = configSvc.findParameterByNameAndNetworkName(
-				"soffid.replica.enabled", null); //$NON-NLS-1$
-		if (config == null) {
-			config = new Configuration();
-			config.setCode("soffid.replica.enabled"); //$NON-NLS-1$
-			config.setValue(value);
-			config.setDescription("Enables Soffid replica mechanism"); //$NON-NLS-1$
-			configSvc.create(config);
-		} else {
-			config.setValue(value);
-			configSvc.update(config);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleFindAllServers()
 	 */
 	@Override
@@ -939,23 +856,6 @@ public class DispatcherServiceImpl extends
 		updateSeyconServerList();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleDelete(es.caib.seycon
-	 * .ng.ReplicaDatabase)
-	 */
-	@Override
-	protected void handleDelete(com.soffid.iam.api.ReplicaDatabase database)
-			throws Exception {
-		ReplicaDatabaseEntity dbEntity = getReplicaDatabaseEntityDao().load(
-				database.getId());
-		SystemEntity dispatcher = dbEntity.getSystem();
-		getReplicaDatabaseEntityDao().remove(dbEntity);
-		getSystemEntityDao().remove(dispatcher);
-	}
-
 	protected void updateSeyconServerList() throws InternalErrorException {
 		StringBuffer serverList = null;
 		List<ServerEntity> servers = new LinkedList(getServerEntityDao()
@@ -995,32 +895,6 @@ public class DispatcherServiceImpl extends
 		}
 	}
 
-	protected void updateReplicaAgent(ReplicaDatabaseEntity db)
-			throws InternalErrorException {
-		if (db.getSystem() == null) {
-			SystemEntity mainDispatcher = getSystemEntityDao()
-					.findSoffidSystem();
-			SystemEntity dispatcher = getSystemEntityDao().newSystemEntity();
-			dispatcher
-					.setClassName("com.soffid.iam.addons.replica.agent.ReplicaAgent"); //$NON-NLS-1$
-			dispatcher.setRoleBased("N"); //$NON-NLS-1$
-			dispatcher.setName(db.getName());
-			dispatcher.setReadOnly(false);
-			dispatcher.setTrusted("S"); //$NON-NLS-1$
-			dispatcher.setUrl("local"); //$NON-NLS-1$
-			dispatcher.setUserDomain(mainDispatcher.getUserDomain());
-			dispatcher.setPasswordDomain(mainDispatcher.getPasswordDomain());
-			dispatcher.setEnableAccessControl("N"); //$NON-NLS-1$
-			getSystemEntityDao().create(dispatcher);
-			dispatcher.getReplicaDatabases().add(db);
-			db.setSystem(dispatcher);
-			getReplicaDatabaseEntityDao().update(db);
-		} else {
-			db.getSystem().setName(db.getName());
-			getSystemEntityDao().update(db.getSystem());
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1037,22 +911,6 @@ public class DispatcherServiceImpl extends
 		return dao.toServer(serverEntity);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.caib.seycon.ng.servei.DispatcherServiceBase#handleFindReplicaDatabase
-	 * (java.lang.Long)
-	 */
-	@Override
-	protected com.soffid.iam.api.ReplicaDatabase handleFindReplicaDatabase(
-			Long id) throws Exception {
-		ReplicaDatabaseEntity entity = getReplicaDatabaseEntityDao().load(id);
-		if (entity == null)
-			return null;
-		else
-			return getReplicaDatabaseEntityDao().toReplicaDatabase(entity);
-	}
 
 	/*
 	 * (non-Javadoc)

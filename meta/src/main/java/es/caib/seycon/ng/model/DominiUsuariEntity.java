@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_DOMUSU", translatedName="UserDomainEntity", translatedPackage="com.soffid.iam.model")
@@ -40,9 +41,13 @@ public abstract class DominiUsuariEntity {
 	@Column (name="DOU_GENERA", length=64)
 	@Nullable
 	public java.lang.String beanGenerator;
+	
+	@Column (name="DOU_TEN_ID")
+	TenantEntity tenant;
 
 	@Operation(translated="findByName")
-	@DaoFinder
+	@DaoFinder("from com.soffid.iam.model.UserDomainEntity ud "
+			+ "where ud.name = :name and ud.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByCodi(
 		java.lang.String name) {
 	 return null;
@@ -51,7 +56,7 @@ public abstract class DominiUsuariEntity {
 	@DaoFinder("select du "
 			+ "from com.soffid.iam.model.SystemEntity as dispatcher "
 			+ "left join dispatcher.userDomain as du "
-			+ "where dispatcher.name=:system")
+			+ "where dispatcher.name=:system and dispatcher.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DominiUsuariEntity findByDispatcher(
 		java.lang.String system) {
 	 return null;

@@ -44,10 +44,7 @@ public class ServerEntityDaoImpl
                 throw new RuntimeException(e);
             }
         }
-        if (source.getBackupDatabase() != null)
-        	target.setBackupDatabase(source.getBackupDatabase().getId());
-        else
-        	target.setBackupDatabase(null);
+       	target.setBackupDatabase(null);
     }
 
 
@@ -68,16 +65,6 @@ public class ServerEntityDaoImpl
     public void serverToEntity(com.soffid.iam.api.Server source, com.soffid.iam.model.ServerEntity target, boolean copyIfNull) {
         // @todo verify behavior of serverToEntity
         super.serverToEntity(source, target, copyIfNull);
-        if (source.getBackupDatabase() == null && copyIfNull)
-        	target.setBackupDatabase(null);
-        else if (source.getBackupDatabase() != null)
-        {
-        	com.soffid.iam.model.ReplicaDatabaseEntity rde = getReplicaDatabaseEntityDao().load(source.getBackupDatabase());
-        	if (rde != null)
-        		target.setBackupDatabase(rde);
-        	else
-        		throw new HibernateException(String.format(Messages.getString("ServerEntityDaoImpl.DBnotFound"), source.getBackupDatabase())); //$NON-NLS-1$
-        }
     }
 
 	/* (non-Javadoc)

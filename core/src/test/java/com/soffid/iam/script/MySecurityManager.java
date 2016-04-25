@@ -11,7 +11,13 @@ public class MySecurityManager extends SecurityManager {
 	public boolean isScript ()
 	{
 		Class[] stack = getClassContext();
-		
+		for (Class x: stack)
+		{
+			System.out.println ("CTX="+x.getName());
+		}
+		System.out.println("Checking is script: "+
+				(stack == null ? "NULL STACK":
+					stack[1].getPackage().getName()));
 		return stack == null || stack[0].getPackage().getName().startsWith("bsh");
 
 	}
@@ -31,7 +37,7 @@ public class MySecurityManager extends SecurityManager {
 
 	@Override
 	public void checkPackageAccess(String pkg) {
-		//		System.out.println ("Checking package access "+pkg);
+		System.out.println ("Checking package access "+pkg);
 		if (pkg.startsWith("es.caib.seycon"))
 		{
 			System.out.println ("***");

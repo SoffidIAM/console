@@ -25,6 +25,7 @@ public class PasswordTest extends AbstractTest
 
 	public void testGeneratePassword() throws InternalErrorException
 	{
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
 		Security.nestedLogin("Test", new String[] { 
 				Security.AUTO_AUTHORIZATION_ALL });
@@ -49,6 +50,8 @@ public class PasswordTest extends AbstractTest
 
 	public void testGenerateComplexPassword() throws InternalErrorException
 	{
+
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
 		Security.nestedLogin("Test", new String[] { 
 				Security.AUTO_AUTHORIZATION_ALL });

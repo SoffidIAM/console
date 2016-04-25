@@ -161,7 +161,7 @@ public class PrinterServiceImpl extends
                 || AutoritzacionsUsuari.canSupportAllNetworks_VNC()) {
             return impressores;
         }
-        String codiUsuari = getPrincipal().getName();
+        String codiUsuari = Security.getCurrentUser();
         // Obtenim TOTES LES Network Authorizations de l'usuari:
         Collection networkAuthorizations = getNetworkService().findALLNetworkAuthorizationsByUserName(codiUsuari);
         Collection<PrinterEntity> impresoresPermeses = new LinkedList<PrinterEntity>();
@@ -218,7 +218,7 @@ public class PrinterServiceImpl extends
         UserEntity usuariEntity = usuariImpressoraEntity.getUser();
 
         // Un usuari no pot afegir-se a si mateix impressores
-        if (getPrincipal() != null && usuariEntity.getUserName().compareTo(getPrincipal().getName()) == 0) {
+        if (getPrincipal() != null && usuariEntity.getUserName().compareTo(Security.getCurrentUser()) == 0) {
             throw new SeyconException(
                     Messages.getString("PrinterServiceImpl.1")); //$NON-NLS-1$
         }
@@ -280,7 +280,7 @@ public class PrinterServiceImpl extends
             // s'actualitzen els camps de "Modificat per" i "Data de darrera
             // modificació
             usuariEntity.setLastModificationDate(Calendar.getInstance().getTime());
-            usuariEntity.setLastUserModification(getPrincipal().getName());
+            usuariEntity.setLastUserModification(Security.getCurrentAccount());
             getUserEntityDao().update(usuariEntity); // guardem els canvis
         } else {
             throw new SeyconAccessLocalException(
@@ -355,7 +355,7 @@ public class PrinterServiceImpl extends
             // s'actualitzen els camps de "Modificat per" i "Data de darrera
             // modificació
             usuariEntity.setLastModificationDate(Calendar.getInstance().getTime());
-            usuariEntity.setLastUserModification(getPrincipal().getName());
+            usuariEntity.setLastUserModification(Security.getCurrentAccount());
             getUserEntityDao().update(usuariEntity); // guardem els canvis
 
             return usuariImpressora;

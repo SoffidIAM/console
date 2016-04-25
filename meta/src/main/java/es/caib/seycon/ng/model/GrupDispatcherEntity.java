@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_GRUDIS",
@@ -27,7 +28,7 @@ public abstract class GrupDispatcherEntity {
 
 	@Operation(translated="findBySystem")
 	@DaoFinder("select gd from com.soffid.iam.model.SystemGroupEntity gd "
-			+ "where gd.system.name=:systemName")
+			+ "where gd.system.name=:systemName and gd.system.tenant.id = :tenantId")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> findByCodiAgent(
 		java.lang.String systemName) {
 	 return null;

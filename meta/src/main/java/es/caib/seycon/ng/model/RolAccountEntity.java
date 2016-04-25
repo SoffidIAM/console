@@ -96,20 +96,6 @@ public abstract class RolAccountEntity {
 	@Nullable
 	public Date certificationDate;
 
-	/**************************** DAOs ******************************/
-	@DaoFinder("select ra " 
-			+ "from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "inner join    ra.account as account\n"
-			+ "inner join    account.users as users\n"
-			+ "inner join    users.user as user\n"
-			+ "inner join    ra.role as role\n"
-			+ "where user.userName = :userName and role.name = :roleName")
-	@Operation(translated="findByUserAndRole")
-	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuariAndNomRol(
-			java.lang.String userName, java.lang.String roleName) {
-		return null;
-	}
-
 	@DaoFinder("select ra" 
 			+ " from com.soffid.iam.model.RoleAccountEntity ra\n"
 			+ "inner join    ra.account as account\n"
@@ -117,21 +103,11 @@ public abstract class RolAccountEntity {
 			+ "inner join    account.users as users\n"
 			+ "inner join    users.user as user\n"
 			+ "inner join    ra.role as role\n"
-			+ "where user.userName = :userName and account.type='U'\n"
+			+ "where user.userName = :userName and account.type='U' and user.tenant.id=:tenantId \n"
 			+ "order by dispatcher.name, role.name\n")
 	@Operation(translated="findByUserName")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuari(
 			java.lang.String userName) {
-		return null;
-	}
-
-	@Operation(translated="findByRole")
-	@DaoFinder("select ra " 
-			+ "from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "inner join    ra.role as role\n" 
-			+ "where role.name = :roleName")
-	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByNomRol(
-			java.lang.String roleName) {
 		return null;
 	}
 
@@ -142,7 +118,7 @@ public abstract class RolAccountEntity {
 	@Operation(translated = "findByGroupName")
 	@DaoFinder("select ra\n"
 			+ "from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "where ra.group.name=:groupName")
+			+ "where ra.group.name=:groupName and ra.group.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiGrup(
 			java.lang.String groupName) {
 		return null;
@@ -160,7 +136,8 @@ public abstract class RolAccountEntity {
 			+ "ra.domainType=:domainType and \n"
 			+ "( gr is null or :groupScope = gr.name) and \n"
 			+ "( informationSystem is null or :informationSystemScope = informationSystem.name) and \n"
-			+ "( domainValue is null or :domainValueId = domainValue.id)")
+			+ "( domainValue is null or :domainValueId = domainValue.id) and "
+			+ "role.system.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByRolAndValorDomini(
 			java.lang.String roleName, 
 			java.lang.String systemName,
@@ -178,7 +155,8 @@ public abstract class RolAccountEntity {
 			+ "where role.name = :roleName and "
 			+ "role.system.name = :systemName and \n"
 			+ "role.informationSystem.name = :informationSystemName and "
-			+ "ra.domainType=:domainType")
+			+ "ra.domainType=:domainType and "
+			+ "role.system.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByRolAndTipusDomini(
 			java.lang.String roleName, java.lang.String systemName,
 			java.lang.String informationSystemName, java.lang.String domainType) {
@@ -192,7 +170,7 @@ public abstract class RolAccountEntity {
 			+ "join users.user as user\n"
 			+ "left join ra.role as role\n"
 			+ "left join role.system as system\n"
-			+ "where  user.userName = :userName \n"
+			+ "where  user.userName = :userName and user.tenant.id = :tenantId\n"
 			+ "order by system.name, role.name")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllByCodiUsuari(
 			java.lang.String userName) {
@@ -201,14 +179,14 @@ public abstract class RolAccountEntity {
 
 	@Operation(translated = "findByQualifierGroup")
 	@DaoFinder("select ra from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "where ra.group.name=:groupName\n")
+			+ "where ra.group.name=:groupName and ra.group.tenant.id=:tenantId\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByGrupQualifier(
 			java.lang.String groupName) {
 		return null;
 	}
 
 	@DaoFinder("select ra from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "where ra.informationSystem.name=:informationSystem\n")
+			+ "where ra.informationSystem.name=:informationSystem and ra.role.system.tenant.id = :tenantId\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByQualifierIS(
 			java.lang.String informationSystem) {
 		return null;
@@ -216,7 +194,9 @@ public abstract class RolAccountEntity {
 
 	@DaoFinder("select ra from com.soffid.iam.model.RoleAccountEntity ra\n"
 			+ "join ra.account.users as useraccount\n"
-			+ "where ra.rule.id = :ruleId and useraccount.user.id = :userId and ra.account.type='U'")
+			+ "where ra.rule.id = :ruleId and useraccount.user.id = :userId and ra.account.type='U' "
+			+ "and ra.account.system.tenant.id = :tenantId "
+			+ "order by ra.account.name")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByUserAndRule(
 			java.lang.Long userId, java.lang.Long ruleId) {
 		return null;
@@ -224,7 +204,8 @@ public abstract class RolAccountEntity {
 
 	@DaoFinder("select ra "
 			+ "from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "where ra.endDate < :now and ra.enabled = true")
+			+ "where ra.endDate < :now and ra.enabled = true "
+			+ "and ra.account.system.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToDisable(
 			Date now) {
 		return null;
@@ -232,7 +213,8 @@ public abstract class RolAccountEntity {
 
 	@DaoFinder("select ra "
 			+ "from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "where ra.startDate < :now and (ra.endDate is null or ra.endDate >= :now) and ra.enabled = false")
+			+ "where ra.startDate < :now and (ra.endDate is null or ra.endDate >= :now) and ra.enabled = false "
+			+ "and ra.account.system.tenant.id = :tenantId ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEnable(
 			Date now) {
 		return null;
@@ -250,7 +232,8 @@ public abstract class RolAccountEntity {
                 + "(rolsUsuaris.domainType = :domainType) and " //$NON-NLS-1$
                 + "((:groupName is null and grup is null) or (grup.name = :groupName)) and " //$NON-NLS-1$
                 + "((:informationSystem is null and aplicacio is null) or (aplicacio.name = :informationSystem)) and " //$NON-NLS-1$
-                + "((:domainValue is null and valorDominiAplicacio is null) or (valorDominiAplicacio.value = :domainValue)) ") //$NON-NLS-1$
+                + "((:domainValue is null and valorDominiAplicacio is null) or (valorDominiAplicacio.value = :domainValue)) and "
+                + "rolsUsuaris.account.system.tenant.id = :tenantId") //$NON-NLS-1$
      public java.util.List<RolAccountEntity> findMatching (
     		 Long accountId,
     		 Long roleId,
@@ -270,7 +253,8 @@ public abstract class RolAccountEntity {
 				+ "join rolusu.account.users as users "  //$NON-NLS-1$
 				+ "join users.user as user " //$NON-NLS-1$
 				+ "where " //$NON-NLS-1$
-				+ "rolusu.role.informationSystem.name = :informationSystem " //$NON-NLS-1$
+				+ "rolusu.role.informationSystem.name = :informationSystem and "
+				+ "rolusu.role.system.tenant.id = :tenantId " //$NON-NLS-1$
 				+ "order by user.userName, rolusu.role.name, rolusu.role.system.name") //$NON-NLS-1$
      public java.util.List<RolAccountEntity> findByInformationSystem (
     		 String informationSystem

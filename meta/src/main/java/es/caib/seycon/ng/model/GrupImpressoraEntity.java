@@ -36,7 +36,9 @@ public abstract class GrupImpressoraEntity {
 	@Operation(translated = "findByGroupAndPrinter")
 	@DaoFinder("select grupImpressora "
 			+ "from com.soffid.iam.model.PrinterGroupEntity grupImpressora "
-			+ "where grupImpressora.group.name = :group and grupImpressora.printer.name = :printer")
+			+ "where grupImpressora.group.name = :group and grupImpressora.printer.name = :printer and "
+			+ "grupImpressora.group.tenant.id = :tenantId "
+			+ "order by grupImpressora.printer.name")
 	public es.caib.seycon.ng.model.GrupImpressoraEntity findGrupImpressoraByCodiGrupAndCodiImpressora(
 			java.lang.String group, java.lang.String printer) {
 		return null;
@@ -44,7 +46,8 @@ public abstract class GrupImpressoraEntity {
 
 	@Operation(translated = "findByPrinter")
 	@DaoFinder("select grupImpressora from com.soffid.iam.model.PrinterGroupEntity grupImpressora "
-			+ "where grupImpressora.printer.name = :printer")
+			+ "where grupImpressora.printer.name = :printer and grupImpressora.printer.tenant.id=:tenantId "
+			+ "order by grupImpressora.group.name")
 	public java.util.List<es.caib.seycon.ng.model.GrupImpressoraEntity> findGrupImpressoresByCodiImpressora(
 			java.lang.String printer) {
 		return null;
@@ -52,7 +55,8 @@ public abstract class GrupImpressoraEntity {
 
 	@Operation(translated = "findByGroup")
 	@DaoFinder("select grupImpressora from com.soffid.iam.model.PrinterGroupEntity grupImpressora "
-			+ "where grupImpressora.group.name = :group")
+			+ "where grupImpressora.group.name = :group and grupImpressora.group.tenant.id = :tenantId "
+			+ "order by grupImpressora.printer.name")
 	public java.util.List<es.caib.seycon.ng.model.GrupImpressoraEntity> findGrupImpressoresByCodiGrup(
 			java.lang.String group) {
 		return null;

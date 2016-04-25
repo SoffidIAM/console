@@ -253,12 +253,4 @@ public class AuthorizationInformationServiceImpl extends
 		return apps;
 	}
 
-	protected Collection<RoleAccount> handleFindUsersRolesByUserCodeAndRoleNameUnrestricted(String codiUsuari, String nomRol) throws Exception {
-		Collection<RoleAccountEntity> rolsUsu = getRoleAccountEntityDao().findByUserAndRole(codiUsuari, nomRol);
-		if (rolsUsu != null) {
-			return getRoleAccountEntityDao().toRoleAccountList(rolsUsu);
-		}
-		return new LinkedList<RoleAccount>();
-	}
-
 }

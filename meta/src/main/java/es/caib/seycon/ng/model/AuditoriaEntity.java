@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_AUDITO", translatedName="AuditEntity", translatedPackage="com.soffid.iam.model" )
@@ -140,6 +141,9 @@ public abstract class AuditoriaEntity {
 	@Column (name="AUD_SCHTAS")
 	@Nullable
 	public java.lang.String scheduledTask;
+	
+	@Column (name="AUD_TEN_ID")
+	public TenantEntity tenant;
 
 	@DaoFinder
 	public es.caib.seycon.ng.model.AuditoriaEntity findById(
@@ -152,7 +156,8 @@ public abstract class AuditoriaEntity {
 			+ "where  (:user is null or audit.user like :user) and \n"
 			+ " (:object is null or audit.object like :object) and \n"
 			+ " (:author is null or accountAssoc.name like :author)  and\n"
-			+ " (:action is null or audit.action=:action)  \n"
+			+ " (:action is null or audit.action=:action) and \n"
+			+ " audit.tenant.id = :tenantId\n"
 			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri1(
 		java.lang.String author, 
@@ -190,7 +195,7 @@ public abstract class AuditoriaEntity {
 			+ "      or (:column='userDomain' and audit.userDomain like :value)\n"
 			+ "    )\n"
 			+ "   )\n"
-			+ ")\n"
+			+ ") and audit.tenant.id = :tenantId\n"
 			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri2(
 		java.lang.String author, 
@@ -209,7 +214,8 @@ public abstract class AuditoriaEntity {
 			+ " (:since = :nullDate or audit.date > :since ) and\n "
 			+ " (:object is null or audit.object like :object) and \n"
 			+ " (:author is null or accountAssoc.name like :author)  and\n"
-			+ " (:action is null or audit.action=:action)  \n"
+			+ " (:action is null or audit.action=:action) and\n"
+			+ " audit.tenant.id = :tenantId \n"
 			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri3(
 		java.util.Date nullDate, 
@@ -252,7 +258,8 @@ public abstract class AuditoriaEntity {
 			+ "      or (:column='userDomain' and audit.userDomain like :value)\n"
 			+ "    )\n"
 			+ "   )\n"
-			+ ")\n"
+			+ ") and\n"
+			+ "audit.tenant.id = :tenantId \n"
 			+ "order by audit.date asc")
 	public java.util.List<es.caib.seycon.ng.model.AuditoriaEntity> findAuditoriesByCriteri4(
 		java.util.Date nullDate, 
@@ -267,3 +274,10 @@ public abstract class AuditoriaEntity {
 	 return null;
 	}
 }
+
+@Index (name="SC_AUDITO_BORRAR",	unique=false,
+entity=es.caib.seycon.ng.model.AuditoriaEntity.class,
+columns={"AUD_DATA"})
+abstract class AuditoriaDataIndex {
+}
+

@@ -28,3 +28,9 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	public UsuariEntity user;
 
 }
+
+@Index (name="PUE_USU_2",	unique=false,
+entity=es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity.class,
+columns={"UPE_IDUSU"})
+abstract class PuntEntradaUsuariIndex {
+}

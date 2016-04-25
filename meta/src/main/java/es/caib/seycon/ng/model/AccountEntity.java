@@ -79,7 +79,9 @@ public abstract class AccountEntity {
 	public es.caib.seycon.ng.model.TipusUsuariEntity passwordPolicy;
 
 	@Operation(translated = "findByNameAndSystem")
-	@DaoFinder("from com.soffid.iam.model.AccountEntity acc\nwhere acc.name = :name and acc.system.name=:dispatcher")
+	@DaoFinder("from com.soffid.iam.model.AccountEntity acc\n"
+			+ "where acc.name = :name and acc.system.name=:dispatcher "
+			+ "and acc.system.tenant.id=:tenantId")
 	public es.caib.seycon.ng.model.AccountEntity findByNameAndDispatcher(
 			java.lang.String name, java.lang.String dispatcher) {
 		return null;
@@ -91,13 +93,17 @@ public abstract class AccountEntity {
 			+ "left join     acc.users as users\n"
 			+ "left join     users.user as user\n"
 			+ "left join     acc.system as dispatcher\n"
-			+ "where acc.type='U' and user.userName = :user and dispatcher.name = :dispatcher")
+			+ "where acc.type='U' and user.userName = :user and dispatcher.name = :dispatcher "
+			+ "and dispatcher.tenant.id = :tenantId "
+			+ "order by user.userName, acc.name")
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByUsuariAndDispatcher(
 			java.lang.String user, java.lang.String dispatcher) {
 		return null;
 	}
 
-	@DaoFinder
+	@DaoFinder("select acc from com.soffid.iam.model.AccountEntity acc "
+			+ "where acc.name = :name and acc.system.name = :system and acc.system.tenant.id = :tenantId "
+			+ "order by acc.name")
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findSharedAccounts(
 			@Nullable java.lang.String name, @Nullable java.lang.String system) {
 		return null;
@@ -129,3 +135,10 @@ public abstract class AccountEntity {
 		
 	}
 }
+
+@Index (name="SC_ACCOUN_NAME",	unique=true,
+entity=es.caib.seycon.ng.model.AccountEntity.class,
+columns={"ACC_NAME", "ACC_DIS_ID"})
+abstract class AccountIndex {
+}
+

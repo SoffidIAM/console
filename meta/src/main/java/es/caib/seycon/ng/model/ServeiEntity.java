@@ -5,13 +5,13 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SERVEI", translatedName="ServiceEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.Servei.class,
-	es.caib.seycon.ng.model.RegistreAccesEntity.class,
-	es.caib.seycon.ng.model.SsoEntity.class})
+	es.caib.seycon.ng.model.RegistreAccesEntity.class})
 public abstract class ServeiEntity {
 
 	@Column (name="SER_ID")
@@ -24,6 +24,9 @@ public abstract class ServeiEntity {
 	@Column (name="SER_DESCRI", length=50, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
+	
+	@Column (name="SER_TEN_ID")
+	TenantEntity tenant;
 
 	@Operation(translated="findByCriteria")
 	@DaoFinder
@@ -38,9 +41,19 @@ public abstract class ServeiEntity {
 	 return null;
 	}
 	@Operation(translated="findAllByName")
-	@DaoFinder("select servei from com.soffid.iam.model.ServiceEntity servei where servei.name like :name order by servei.name")
+	@DaoFinder("select servei from com.soffid.iam.model.ServiceEntity servei "
+			+ "where servei.name like :name and servei.tenant.id = :tenantId "
+			+ "order by servei.name")
 	public java.util.List<es.caib.seycon.ng.model.ServeiEntity> findAllByCodi(
 		java.lang.String name) {
 	 return null;
 	}
 }
+
+
+@Index (name="SER_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.ServeiEntity.class,
+columns={"SER_TEN_ID", "SER_CODI"})
+abstract class ServeiIndex {
+}
+

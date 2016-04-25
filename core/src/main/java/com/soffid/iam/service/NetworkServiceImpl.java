@@ -825,7 +825,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Host handleFindHostById(Long idMaquina) throws Exception {
-        HostEntity maquinaEntity = getHostEntityDao().findById(idMaquina);
+        HostEntity maquinaEntity = getHostEntityDao().load(idMaquina);
         if (maquinaEntity != null) {
             return getHostEntityDao().toHost(maquinaEntity);
         }

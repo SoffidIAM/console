@@ -8,6 +8,7 @@ package es.caib.seycon.ng.model;
 import java.util.Collection;
 
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_DISPAT",
@@ -25,7 +26,6 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.ControlAccessEntity.class,
 	es.caib.seycon.ng.model.DominiUsuariEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
-	es.caib.seycon.ng.model.ReplicaDatabaseEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class})
 public abstract class DispatcherEntity {
 
@@ -98,6 +98,9 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public Boolean manualAccountCreation;
 
+	@Column (name="DIS_TEN_ID")
+	public TenantEntity tenant;
+	
 	@ForeignKey (foreignColumn="ROL_IDDISPAT", translated="role")
 	public java.util.Collection<es.caib.seycon.ng.model.RolEntity> rol;
 
@@ -130,9 +133,6 @@ public abstract class DispatcherEntity {
 	@Column (name="DIS_RDONLY",
 		defaultValue="false")
 	public boolean readOnly;
-
-	@ForeignKey (foreignColumn="RPL_DIS_ID")
-	public java.util.Collection<es.caib.seycon.ng.model.ReplicaDatabaseEntity> replicaDatabases;
 
 	@Column (name="DIS_AUTHRT",
 		defaultValue="false")
@@ -185,7 +185,8 @@ public abstract class DispatcherEntity {
 			+ "(:url is null or se.url like :url) and "
 			+ "(:roleBased is null or se.roleBased = :roleBased) and "
 			+ "(:trusted is null or se.trusted = :trusted) and "
-			+ "(:active is null or se.url is not null)")
+			+ "(:active is null or se.url is not null) and "
+			+ "se.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findByFilter(
 		java.lang.String name, 
 		java.lang.String className, 
@@ -196,7 +197,8 @@ public abstract class DispatcherEntity {
 	 return null;
 	}
 	@Operation(translated="findByName")
-	@DaoFinder
+	@DaoFinder("from com.soffid.iam.model.SystemEntity s "
+			+ "where s.name = :name and s.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DispatcherEntity findByCodi(
 		java.lang.String name) {
 	 return null;
@@ -215,4 +217,10 @@ public abstract class DispatcherEntity {
 	public es.caib.seycon.ng.model.DispatcherEntity findSoffidDispatcher() {
 	 return null;
 	}
+}
+
+@Index (name="DIS_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.DispatcherEntity.class,
+columns={"DIS_TEN_ID", "DIS_CODI"})
+abstract class DispatcherIndex {
 }

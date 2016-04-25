@@ -896,7 +896,27 @@ public class SesionEJB implements EntityBean {
         return sesionInfo.getPrincipal().getIntranetUser();
     }
 
-    private String getPrincipalNif() {
+    private String getPrincipalAccount() {
+        if (sesionInfo == null)
+            return null;
+        if (sesionInfo.getPrincipal() == null)
+            return null;
+        return getPrincipalAccount (sesionInfo.getPrincipal());
+    }
+
+    private String getPrincipalAccount(SeyconPrincipal principal) {
+        return getPrincipalAccount (principal.getIntranetUser());
+	}
+
+    private String getPrincipalAccount(String u) {
+        int i = u.indexOf('\\');
+        if ( i >= 0)
+        	return u.substring(i+1);
+        else
+        	return u;
+	}
+
+	private String getPrincipalNif() {
         if (sesionInfo == null)
             return null;
         if (sesionInfo.getPrincipal() == null)
@@ -1090,6 +1110,27 @@ public class SesionEJB implements EntityBean {
     //
     // ------ Funciones auxiliares
     //
+    
+    private String getPrincipalTenant (SeyconPrincipal principal)
+    {
+    	return getUserNameTenant(principal.getName());
+    }
+    
+    private String getUserNameTenant (String userName)
+    {
+    	String s = userName;
+    	int i = s.indexOf('\\');
+    	if ( i >= 0)
+    		return s.substring(0, i);
+    	else
+    	{
+       		try {
+				return ServiceLocator.instance().getTenantService().getMasterTenant().getName();
+			} catch (InternalErrorException e) {
+				throw new RuntimeException ("Unable to get default tenant name", e);
+			}
+    	}
+    }
     /**
      * Valida credenciales
      * 
@@ -1101,7 +1142,9 @@ public class SesionEJB implements EntityBean {
             throws NamingException, LockedUserException, InternalErrorException {
         // Obtenemos metodo autenticación
 
-        Security.nestedLogin("$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
+    	String tenant = getPrincipalTenant(principal);
+    	String accountName = getPrincipalAccount(principal);
+        Security.nestedLogin(tenant+"\\$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
                 + Security.AUTO_ALL });
         try {
             // Valida usuario/dni contra BBDD
@@ -1111,7 +1154,7 @@ public class SesionEJB implements EntityBean {
             PasswordService ps = ServiceLocator.instance().getPasswordService();
 
             String dispatcher = ps.getDefaultDispatcher();
-            Account acc = as.findAccount(principal.getIntranetUser(), dispatcher);
+            Account acc = as.findAccount(accountName, dispatcher);
             if (acc == null)
                 return false;
 
@@ -1122,19 +1165,19 @@ public class SesionEJB implements EntityBean {
             }
 
             String passwordDomain = ps.getDefaultDispatcher();
-            if (ps.checkPassword(principal.getIntranetUser(), passwordDomain, new Password(pass), true,
+            if (ps.checkPassword(accountName, passwordDomain, new Password(pass), true,
                     false)) {
                 sesionInfo.setNeedsChangePassword(false);
                 LockoutTracker.registerSuccess(principal.getIntranetUser());
                 return true;
-            } else if (ps.checkPassword(principal.getIntranetUser(), passwordDomain, new Password(pass),
+            } else if (ps.checkPassword(accountName, passwordDomain, new Password(pass),
                     false, true)) {
                 sesionInfo.setNeedsChangePassword(true);
                 LockoutTracker.registerSuccess(principal.getIntranetUser());
                 return true;
             } else {
                 log.debug(String.format(Messages.getString("SesionEJB.NotValidUserPass"), principal.getIntranetUser())); //$NON-NLS-1$
-                LockoutTracker.registerFailure(principal.getIntranetUser(), lockMaxFails,
+                LockoutTracker.registerFailure(accountName, lockMaxFails,
                         lockPeriod, acc.getLastPasswordSet()); //$NON-NLS-1$
                 return false;
             }
@@ -1295,7 +1338,8 @@ public class SesionEJB implements EntityBean {
         if (principal.getNif() == null)
             return false;
 
-        Security.nestedLogin("$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
+    	String tenant = getPrincipalTenant(principal);
+        Security.nestedLogin(tenant+"\\$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
                 + Security.AUTO_ALL });
         try {
             UserService us = ServiceLocator.instance().getUserService();
@@ -1323,8 +1367,8 @@ public class SesionEJB implements EntityBean {
      * @throws NamingException
      */
     private ArrayList populateRoles(String domain) throws InternalErrorException {
-
-        Security.nestedLogin("$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
+    	String tenant = getPrincipalTenant(sesionInfo.getPrincipal());
+        Security.nestedLogin( tenant+"\\$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
                 + Security.AUTO_ALL });
         try {
             ArrayList roles = new ArrayList();
@@ -1337,7 +1381,7 @@ public class SesionEJB implements EntityBean {
             	attributes.put("method", sesionInfo.getCertificadoX509() == null ? "password" : "certificate");
                 AuthorizationService us = ServiceLocator.instance().getAuthorizationService();
     
-                String[] rolesArray = us.getUserAuthorizationsString(getPrincipalUser(), attributes);
+                String[] rolesArray = us.getUserAuthorizationsString(getPrincipalAccount(), attributes);
                 for (int i = 0; i < rolesArray.length; i++) {
                     roles.add(rolesArray[i]);
                 }
@@ -1353,7 +1397,10 @@ public class SesionEJB implements EntityBean {
             throws InternalErrorException {
         String userBd = null;
 
-        Security.nestedLogin("$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
+        String tenant = getUserNameTenant(cod);
+        String userName = getPrincipalAccount(cod);
+        
+        Security.nestedLogin(tenant+"\\$$INTERNAL$$", new String[] { Security.AUTO_USER_QUERY //$NON-NLS-1$
                 + Security.AUTO_ALL });
         try {
 
@@ -1362,7 +1409,7 @@ public class SesionEJB implements EntityBean {
             PasswordService ps = ServiceLocator.instance().getPasswordService();
 
             String dispatcher = ps.getDefaultDispatcher();
-            Account acc = as.findAccount(cod, dispatcher);
+            Account acc = as.findAccount(userName, dispatcher);
             User usuari = null;
             if (acc == null)
             {
@@ -1370,14 +1417,14 @@ public class SesionEJB implements EntityBean {
             }
             if (acc instanceof UserAccount){
             	
-            	usuari = us.findUserByUserName( ((UserAccount) acc).getUser());;
+            	usuari = us.findUserByUserName( ((UserAccount) acc).getUser());
             }
 
             userBd = acc.getName();
             String nomBd = usuari == null ? acc.getDescription(): usuari.getFullName(); //$NON-NLS-1$ //$NON-NLS-2$
             String nifBd = usuari == null ? null: usuari.getNationalID();
 
-            SeyconPrincipal principal = new SeyconPrincipal(userBd, nomBd, nifBd);
+            SeyconPrincipal principal = new SeyconPrincipal(tenant+"\\"+userBd, nomBd, nifBd);
             sesionInfo.setPrincipal(principal);
             return principal;
         } finally {

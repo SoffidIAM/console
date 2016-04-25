@@ -5,6 +5,9 @@ import java.util.Collection;
 
 import javax.sql.rowset.spi.XmlReader;
 
+import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.model.TenantEntityDao;
 import com.soffid.iam.utils.Security;
 import com.soffid.test.AbstractHibernateTest;
 
@@ -79,6 +82,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		}
 		f.delete();
 	}
+
 	public void setupdb() throws InternalErrorException,
 			NeedsAccountNameException
 	{
@@ -87,8 +91,6 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		deleteDir (new File("target/docs"));
 		
 		
-		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
-
 		ApplicationBootService bootSvc = (ApplicationBootService) context.getBean(ApplicationBootService.SERVICE_NAME);
 	
 		
@@ -114,6 +116,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 				"versionLevel", null); //$NON-NLS-1$
 		if (cfg == null)
 		{
+			
 			DominiUsuari du = dominiSvc
 					.findDominiUsuariByCodi("DEFAULT"); //$NON-NLS-1$
 			if (du == null)
@@ -359,12 +362,10 @@ public abstract class AbstractTest extends AbstractHibernateTest
 			}
 	
 			boolean found = false;
-			for (RolAccount ru : appSvc.findRolsUsuarisByCodiUsuariAndNomRol(
-					usu.getCodi(), rol.getNom()))
-			{
-				if (ru.getBaseDeDades().equals(rol.getBaseDeDades()))
-					found = true;
-			}
+			for (RolAccount ru : appSvc.findRolAccountByAccount(account.getId())) {
+	            if (ru.getBaseDeDades().equals(rol.getBaseDeDades()) &&
+	            		ru.getNomRol().equals(rol.getNom())) found = true;
+	        }
 			if (!found)
 			{
 				RolAccount ru = new RolAccount();
@@ -405,6 +406,8 @@ public abstract class AbstractTest extends AbstractHibernateTest
 	{
 		super.setUp();
 	
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
+
 		Security.nestedLogin("Test", new String[] { 
 				Security.AUTO_AUTHORIZATION_ALL });
 		try {

@@ -33,7 +33,8 @@ public abstract class UsuariGrupEntity {
 	@DaoFinder("select usuariGrup "
 			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
 			+ "where usuariGrup.group.name = :groupName and "
-			+ "usuariGrup.user.userName = :userName \n"
+			+ "usuariGrup.user.userName = :userName and \n"
+			+ "usuariGrup.user.tenant.id = :tenantId "
 			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public es.caib.seycon.ng.model.UsuariGrupEntity findByCodiUsuariAndCodiGrup(
 		java.lang.String userName, 
@@ -44,7 +45,8 @@ public abstract class UsuariGrupEntity {
 	@DaoFinder("select usuariGrup "
 			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
 			+ "where "
-			+ "usuariGrup.user.userName = :userName \n"
+			+ "usuariGrup.user.userName = :userName and "
+			+ "usuariGrup.user.tenant.id = :tenantId \n"
 			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> findByCodiUsuari(
 		java.lang.String userName) {
@@ -53,7 +55,8 @@ public abstract class UsuariGrupEntity {
 	@Operation(translated="findByGroupName")
 	@DaoFinder("select usuariGrup "
 			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
-			+ "where usuariGrup.group.name = :groupName "
+			+ "where usuariGrup.group.name = :groupName and "
+			+ "usuariGrup.group.tenant.id = :tenantId "
 			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> findByCodiGrup(
 		java.lang.String groupName) {

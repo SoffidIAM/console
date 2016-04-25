@@ -1,19 +1,24 @@
 package com.soffid.iam.utils;
 
-import com.soffid.iam.PrincipalStore;
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.ejb.UserServiceHome;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.security.acl.Group;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -296,7 +301,7 @@ public class Security {
 		return disableAllSecurityForEver;
 	}
 
-	private static com.soffid.iam.service.ejb.UserServiceHome usuariServiceHome = null;
+	private static com.soffid.iam.service.UserService userService = null;
 
     private static Stack getIdentities() {
         Stack s = (Stack) identities.get();
@@ -320,14 +325,7 @@ public class Security {
 
             Subject subject;
             try {
-                if (securityAssociationClass == null) {
-                    securityAssociationClass = Class
-                            .forName("org.jboss.security.SecurityAssociation"); //$NON-NLS-1$
-                }
-                if (getSubjectMethod == null)
-                    getSubjectMethod = securityAssociationClass.getMethod("getSubject"); //$NON-NLS-1$
-
-                subject = (Subject) getSubjectMethod.invoke(null);
+                subject = getCurrentSubject();
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -385,6 +383,21 @@ public class Security {
         }
     }
 
+	private static Subject getCurrentSubject() throws ClassNotFoundException,
+			NoSuchMethodException, IllegalAccessException,
+			InvocationTargetException {
+		Subject subject;
+		if (securityAssociationClass == null) {
+		    securityAssociationClass = Class
+		            .forName("org.jboss.security.SecurityAssociation"); //$NON-NLS-1$
+		}
+		if (getSubjectMethod == null)
+		    getSubjectMethod = securityAssociationClass.getMethod("getSubject"); //$NON-NLS-1$
+
+		subject = (Subject) getSubjectMethod.invoke(null);
+		return subject;
+	}
+
     public static List<String> getAuthorizations() {
         String roles [] = null;
 
@@ -394,14 +407,7 @@ public class Security {
 
             Subject subject;
             try {
-                if (securityAssociationClass == null) {
-                    securityAssociationClass = Class
-                            .forName("org.jboss.security.SecurityAssociation"); //$NON-NLS-1$
-                }
-                if (getSubjectMethod == null)
-                    getSubjectMethod = securityAssociationClass.getMethod("getSubject"); //$NON-NLS-1$
-
-                subject = (Subject) getSubjectMethod.invoke(null);
+                subject = getCurrentSubject();
             } catch (Exception e) {
                 e.printStackTrace();
                 return Collections.emptyList();
@@ -450,7 +456,6 @@ public class Security {
     }
 
     public static Principal getPrincipal() {
-
         if (!getIdentities().isEmpty()) {
             return ((Identity) getIdentities().peek()).principal;
         } else if (disableAllSecurityForEver) {
@@ -465,13 +470,42 @@ public class Security {
                 }
             }
             return new RunAsPrincipal(host);
-        } else
-            return PrincipalStore.get();
+        } else {
+        	try {
+				Subject s = getCurrentSubject();
+				for (Principal p: s.getPrincipals())
+				{
+					if (! (p instanceof Group)) {
+						return p;
+					} 
+				}
+				return null;
+			} catch (Exception e) {
+				return null;
+			}
+        }
     }
 
+    private static TenantService tenantService = null;
+    public static TenantService getTenantService ()
+    {
+    	if (tenantService == null)
+    		tenantService = ServiceLocator.instance().getTenantService ();
+    	return tenantService;
+    }
+    
     public static void nestedLogin(String user, String roles[])  {
-
+    	assertCanSetIdentity(Thread.currentThread().getStackTrace());
+    	
         Identity i = new Identity();
+        String ctn;
+		try {
+			ctn = getCurrentTenantName()+"\\";
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
+		}
+        if (! user.startsWith(ctn))
+        	user = ctn + user;
         i.principal = new RunAsPrincipal(user);
         i.roles = roles;
         i.transactionInitiated = false;
@@ -490,6 +524,10 @@ public class Security {
         }
     }
 
+    public static void nestedLogin( String roles[])  {
+        nestedLogin (getPrincipal().getName(), roles);
+    }
+
     public static void nestedLogoff() {
         Identity i = (Identity) getIdentities().pop();
     }
@@ -504,65 +542,128 @@ public class Security {
     	if (p == null)
     		return null;
     	else
-    		return p.getName();
+    	{
+    		String n = p.getName();
+    		int i = n.lastIndexOf('\\');
+    		if ( i >= 0)
+    			return n.substring(i+1);
+    		else
+    			return n;
+    	}
     }
     
     static Map<String, String> principalToUserMap = null;
+    static long currentTenant = 0L;
+    
+    public static long getCurrentTenantId ()
+    {
+    	try {
+			String t = getCurrentTenantName();
+			return getTenantId(t);
+		} catch (InternalErrorException e) {
+			throw new RuntimeException("Unable to get current tenant id: "+e.getMessage(), e);
+		} 
+    }
+    
+    public static String getCurrentTenantName () throws InternalErrorException
+    {
+    	Principal p = getPrincipal();
+    	Tenant t = null;
+    	if (p != null)
+    	{
+    		int i = p.getName().indexOf('\\');
+    		if (i >= 0)
+    			return p.getName().substring(0, i);
+    	}
+    	
+   		return getTenantService().getMasterTenant().getName();
+    }
+    
+
+    public static boolean isAuthorizedTenant (TenantEntity tenant) 
+    {
+    	return (tenant.getId().longValue() == getCurrentTenantId());
+    }
     
     public static String getCurrentUser () 
     {
+    	Principal p;
     	if (! getIdentities().isEmpty())
     	{
     		Identity identity = (Identity) getIdentities().peek();
-    		return identity.principal.getName();
+    		p = identity.principal;
     	}
     	else if (disableAllSecurityForEver)
     		return null;
     	else
     	{
-    		Principal p = getPrincipal();
-    		if (p == null)
-    			return null;
-    		if (principalToUserMap == null)
-    		{
-    	    	int size = 500;
-    	    	try {
-    		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
-    		    	if (cacheSize != null )
-    		    		size = Integer.parseInt(cacheSize);
-    	    	} catch (Throwable t) {
-    	    		
-    	    	}
-    	    	principalToUserMap = Collections.synchronizedMap(new LRUMap(size));			
-    		}
-            try
-            {
-	    		String user = principalToUserMap.get(p.getName());
-	    		if (user == null)
-	    		{
-		            if (usuariServiceHome == null)
-		            {
-		            	try {
-							usuariServiceHome = (UserServiceHome) new InitialContext().lookup(UserServiceHome.JNDI_NAME);
-						} catch (NamingException e) {
-							return null;
-						}
-		            }
-					User usuari = usuariServiceHome.create().getCurrentUser();
-					if (usuari == null)
-						return null;
-					user = usuari.getUserName();
-					principalToUserMap.put(p.getName(), user);
-	    		}
-	    		return user;
-			}
-			catch (InternalErrorException e)
-			{
-				return null;
-			} catch (CreateException e) {
-				return null;
-			}
+    		p = getPrincipal();
     	}
+    	
+		if (p == null)
+			return null;
+		if (principalToUserMap == null)
+		{
+	    	int size = 500;
+	    	try {
+		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+		    	if (cacheSize != null )
+		    		size = Integer.parseInt(cacheSize);
+	    	} catch (Throwable t) {
+	    		
+	    	}
+	    	principalToUserMap = Collections.synchronizedMap(new LRUMap(size));			
+		}
+        try
+        {
+    		String user = principalToUserMap.get(p.getName());
+    		if (user == null)
+    		{
+	            if (userService == null)
+	            {
+            		userService = ServiceLocator.instance().getUserService();
+	            }
+				User usuari = userService.getCurrentUser();
+				if (usuari == null)
+					return null;
+				user = usuari.getUserName();
+				principalToUserMap.put(p.getName(), user);
+    		}
+    		return user;
+		}
+		catch (InternalErrorException e)
+		{
+			return null;
+		}
+    }
+    
+    static HashMap<String, Long> tenants = new HashMap<String,Long>();
+    public static Long getTenantId (String tenantName) throws InternalErrorException {
+    	Long id = tenants.get(tenantName);
+    	if (id == null)
+    	{
+    		Tenant tenant = tenantName == null ? 
+    			getTenantService().getMasterTenant() :
+    			getTenantService().getTenant(tenantName);
+    		if (tenant != null)
+    		{
+    			id = tenant.getId();
+    			tenants.put(tenantName, id);
+    		}
+    	}
+    	return id;
+    }
+    
+    private static void assertCanSetIdentity (StackTraceElement trace[])
+    {
+    	// Find Security methods
+    	int i = 0;
+    	while (i < trace.length && ! trace[i].getClassName().equals(Security.class.getName()))
+    		i++;
+    	// Skip security methods
+    	while (i < trace.length && trace[i].getClassName().equals(Security.class.getName()))
+    		i++;
+    	
     }
 }
 

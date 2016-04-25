@@ -43,3 +43,9 @@ public abstract class AccountPasswordEntity {
 	 return null;
 	}
 }
+
+@Index (name="SC_ACCPWD_UK1",	unique=true,
+entity=es.caib.seycon.ng.model.AccountPasswordEntity.class,
+columns={"APW_ORDER", "APW_ACC_ID"})
+abstract class AccpwdIdOrderIndex {
+}

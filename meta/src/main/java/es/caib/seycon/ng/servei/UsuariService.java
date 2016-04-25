@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
-	es.caib.seycon.ng.model.ScTarget.class,
 	es.caib.seycon.ng.model.UsuariSEUEntity.class,
 	es.caib.seycon.ng.model.TipusUsuariEntity.class,
 	es.caib.seycon.ng.model.UsuariWFProcessEntity.class,
@@ -363,14 +362,6 @@ public abstract class UsuariService {
 		return null;
 	}
 
-	@Operation(translated = "createPupilUser")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public es.caib.seycon.ng.comu.UsuariAlumne altaUsuariAlumne(
-			es.caib.seycon.ng.comu.UsuariAlumne usuariAlumne)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
 	@Operation(translated = "createExtranetCard")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.TargetaExtranet creaTargetaExtranet(
@@ -491,22 +482,6 @@ public abstract class UsuariService {
 			@Nullable java.lang.String tipusDocument,
 			@Nullable java.lang.String document,
 			@Nullable java.lang.String numSolicitud)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(translated = "createHostUser")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public es.caib.seycon.ng.comu.Usuari altaUsuariMaquina(
-			java.lang.String nom, java.lang.String descripcio)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(translated = "changePasswordUserHost")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String canviPasswordUsuariMaquina(
-			java.lang.String codiUsuari, java.lang.String codiDominiContrasenyes)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

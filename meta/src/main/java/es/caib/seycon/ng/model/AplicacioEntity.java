@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -63,6 +64,9 @@ public abstract class AplicacioEntity {
 	@Column (name="APL_APRPRO", length=256)
 	@Nullable
 	public String approvalProcess;
+	
+	@Column(name="APL_TEN_ID")
+	public TenantEntity tenant;
 
 	/************************** DAOS *********************************************************/
 	
@@ -86,7 +90,8 @@ public abstract class AplicacioEntity {
 			+ "(:contactPerson is null or contactPerson.userName like :contactPerson) and\n"
 			+ "(:targetDir is null or aplicacioEntity.targetDir like :targetDir) and\n"
 			+ "(:dataBase is null or aplicacioEntity.dataBase like :dataBase)  and "
-			+ "(:wfManagement is null or aplicacioEntity.wfManagement like :wfManagement)\n"
+			+ "(:wfManagement is null or aplicacioEntity.wfManagement like :wfManagement) and\n"
+			+ "(aplicacioEntity.tenant.id = :tenantId) \n"
 			+ "order by aplicacioEntity.name")
 	public java.util.List<es.caib.seycon.ng.model.AplicacioEntity> findAplicacioByCriteri(
 		java.lang.String name, 
@@ -105,7 +110,8 @@ public abstract class AplicacioEntity {
 			+ "join account.roles as roles\n"
 			+ "join roles.role as rol\n"
 			+ "join rol.informationSystem as aplicacio with aplicacio.wfManagement='S'\n"
-			+ "where usuari.userName = :userName ")
+			+ "where usuari.userName = :userName \n"
+			+ "and aplicacio.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.AplicacioEntity> findManageableByUser(
 		java.lang.String userName) {
 	 return null;
@@ -117,7 +123,8 @@ public abstract class AplicacioEntity {
 			+ "join account.roles as roles\n"
 			+ "join roles.role as rol\n"
 			+ "join rol.informationSystem as aplicacio \n"
-			+ "where usuari.userName = :userName ")
+			+ "where usuari.userName = :userName \n"
+			+ "and aplicacio.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.AplicacioEntity> findByUser(
 		java.lang.String userName) {
 	 return null;
@@ -126,4 +133,10 @@ public abstract class AplicacioEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+}
+
+@Index (name="APL_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.AplicacioEntity.class,
+columns={"APL_TEN_ID", "APL_CODI"})
+abstract class AplicacioIndex {
 }

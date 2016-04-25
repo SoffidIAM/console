@@ -32,7 +32,8 @@ public abstract class UsuariImpressoraEntity {
 
 	@Operation(translated = "findUserByUserAndPrinter")
 	@DaoFinder("from com.soffid.iam.model.UserPrinterEntity as ui "
-			+ "where ui.user.userName=:userName and ui.printer.name=:printer "
+			+ "where ui.user.userName=:userName and ui.printer.name=:printer and "
+			+ "ui.user.tenant.id = :tenantId "
 			+ "order by ui.user.userName, ui.printer.name")
 	public es.caib.seycon.ng.model.UsuariImpressoraEntity findUsuariImpressoraByCodiUsuariAndCodiImpressora(
 			java.lang.String userName, java.lang.String printer) {
@@ -41,7 +42,8 @@ public abstract class UsuariImpressoraEntity {
 
 	@Operation(translated = "findByPrinter")
 	@DaoFinder("from com.soffid.iam.model.UserPrinterEntity as ui "
-			+ "where ui.printer.name=:printer "
+			+ "where ui.printer.name=:printer and "
+			+ "ui.printer.tenant.id = :tenantId "
 			+ "order by ui.user.userName, ui.printer.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariImpressoraEntity> findUsuariImpressoresByCodiImpressora(
 			java.lang.String printer) {
@@ -50,7 +52,8 @@ public abstract class UsuariImpressoraEntity {
 
 	@Operation(translated = "findByUser")
 	@DaoFinder("from com.soffid.iam.model.UserPrinterEntity as ui "
-			+ "where ui.user.userName=:userName  "
+			+ "where ui.user.userName=:userName and "
+			+ "ui.user.tenant.id = :tenantId "
 			+ "order by ui.user.userName, ui.printer.name")
 	public java.util.List<es.caib.seycon.ng.model.UsuariImpressoraEntity> findUsuariImpressoresByCodiUsuari(
 			java.lang.String userName) {
@@ -59,4 +62,10 @@ public abstract class UsuariImpressoraEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+}
+
+@Index (name="UIM_UK_IDIMP_IDUSU",	unique=false,
+entity=es.caib.seycon.ng.model.UsuariImpressoraEntity.class,
+columns={"UIM_IDUSU", "UIM_IDIMP"})
+abstract class UsuariImpressoraIndex {
 }

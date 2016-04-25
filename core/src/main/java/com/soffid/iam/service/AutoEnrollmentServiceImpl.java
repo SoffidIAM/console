@@ -27,11 +27,12 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.remote.RemoteInvokerFactory;
 import com.soffid.iam.remote.URLManager;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.ServiceLocator;
-
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
+
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InvalidPasswordException;
@@ -228,9 +229,7 @@ public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnroll
         usuari.setMailServer("nul"); // FIXME: canviar el servidor de correu //$NON-NLS-1$
         usuari.setHomeServer("nul"); // FIXME: canviar el servidor home //$NON-NLS-1$
         usuari.setProfileServer("nul"); // FIXME: canviar el servidor perfil //$NON-NLS-1$
-        usuari.setCreatedByUser(getPrincipal().getName()); // FIXME: canviar
-                                                           // l'usuari de
-                                                           // creació
+        usuari.setCreatedByUser(Security.getCurrentAccount());
 
         // cridem l'EJB per a que crei l'usuari
         UserEntity usuariEntity = getUserEntityDao().userToEntity(usuari);

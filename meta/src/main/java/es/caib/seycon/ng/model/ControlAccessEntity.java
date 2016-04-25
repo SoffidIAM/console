@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.mda.annotation.*;
 
+@Description ("Access control rules for Oracle agent")
 @Entity (table="SC_CONACC", translatedName="AccessControlEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.ControlAcces.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
@@ -44,7 +45,7 @@ public abstract class ControlAccessEntity {
 	public java.lang.String ipsPropagades;
 
 	@Operation(translated="findByAgentCode")
-	@DaoFinder("select cac from com.soffid.iam.model.AccessControlEntity cac where cac.agent.name=:systemName")
+	@DaoFinder("select cac from com.soffid.iam.model.AccessControlEntity cac where cac.agent.name=:systemName and cac.agent.tenant.id = :tenantId")
 	public java.util.Collection<es.caib.seycon.ng.model.ControlAccessEntity> findByCodiAgent(
 		java.lang.String systemName) {
 	 return null;

@@ -6,13 +6,13 @@
 
 package es.caib.seycon.ng.model;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Usuari;
 
 @Entity(table = "SC_USUARI", translatedName = "UserEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({
-		es.caib.seycon.ng.model.ScTarget.class,
 		es.caib.seycon.ng.model.RolsGrupEntity.class,
 		es.caib.seycon.ng.model.UsuariSEUEntity.class,
 		es.caib.seycon.ng.model.TipusUsuariEntity.class,
@@ -35,7 +35,6 @@ import es.caib.seycon.ng.comu.Usuari;
 		es.caib.bpm.vo.BPMUser.class,
 		es.caib.seycon.ng.comu.UsuariAnonim.class,
 		es.caib.seycon.ng.model.XarxaACEntity.class,
-		es.caib.seycon.ng.model.SsoEntity.class,
 		es.caib.seycon.ng.model.UsuariImpressoraEntity.class,
 		es.caib.seycon.ng.model.SessioEntity.class,
 		es.caib.seycon.ng.model.AplicacioEntity.class,
@@ -112,9 +111,6 @@ public abstract class UsuariEntity {
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grupPrimari;
 
-	@ForeignKey(foreignColumn = "TAR_IDUSU", translated = "extranetCard")
-	public java.util.Collection<es.caib.seycon.ng.model.ScTarget> targetesExtranet;
-
 	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "userData")
 	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> dadaUsuari;
 
@@ -134,6 +130,9 @@ public abstract class UsuariEntity {
 	@Nullable
 	public java.lang.String multiSessio;
 
+	@Column (name="USU_TEN_ID")
+	TenantEntity tenant;
+	
 	/**
 	 * @Column (name="USU_ALCOAN", length=240)
 	 * @Nullable Not used public java.lang.String aliesCorreu;
@@ -168,7 +167,7 @@ public abstract class UsuariEntity {
 
 	/************************ DAOs **********************************/
 	@Operation(translated = "findByUserName")
-	@DaoFinder("from com.soffid.iam.model.UserEntity  where userName = :userName")
+	@DaoFinder("from com.soffid.iam.model.UserEntity  where userName = :userName and tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariEntity findByCodi(
 			java.lang.String userName) {
 		return null;
@@ -188,7 +187,7 @@ public abstract class UsuariEntity {
 	@Operation(translated = "findByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
 			+ "join usuari.userData as dadaUsuari "
-			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif")
+			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and usuari.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariEntity findByNIF(java.lang.String nif) {
 		return null;
 	}
@@ -229,7 +228,8 @@ public abstract class UsuariEntity {
 			+ "join usu.userData as dada \n" 
 			+ "WHERE \n"
 			+ "   dada.dataType.name = :dataType  and \n"
-			+ "   dada.value = :value")
+			+ "   dada.value = :value and "
+			+ "   usu.tenant.id = :tenantId ")
 	public es.caib.seycon.ng.model.UsuariEntity findUsuariByCodiTipusDadaIValorDada(
 			java.lang.String dataType, java.lang.String value) {
 		return null;
@@ -245,7 +245,8 @@ public abstract class UsuariEntity {
 	@DaoFinder("select usuari "
 			+ "from com.soffid.iam.model.UserEntity as usuari "
 			+ "join usuari.primaryGroup as grup "
-			+ "where grup.name=:primaryGroupName")
+			+ "where grup.name=:primaryGroupName and "
+			+ "usuari.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findByGrupPrimari(
 			java.lang.String primaryGroupName) {
 		return null;
@@ -254,15 +255,10 @@ public abstract class UsuariEntity {
 	@Operation(translated = "findUsersByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
 			+ "join usuari.userData as dadaUsuari "
-			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif")
+			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and "
+			+ "usuari.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisByNIF(
 			java.lang.String nif) {
-		return null;
-	}
-
-	@Operation(translated = "findFollowingAlumnCode")
-	@DaoFinder("- CUSTOM -")
-	public java.lang.String getSeguentCodiAlumne() {
 		return null;
 	}
 
@@ -276,12 +272,6 @@ public abstract class UsuariEntity {
 	@Operation(translated = "getNextUserIDRequest")
 	@DaoFinder("- CUSTOM -")
 	public java.lang.String getSeguentNumSolicitudVerificarIdentitatUsuari() {
-		return null;
-	}
-
-	@Operation(translated = "getNextHostUserName")
-	@DaoFinder("- CUSTOM -")
-	public java.lang.String getSeguentCodiMaquina() {
 		return null;
 	}
 
@@ -299,7 +289,8 @@ public abstract class UsuariEntity {
 			+ "join acc.system as dispatcher\n"
 			+ "where acc.type='U' and "
 			+ "dispatcher.name=:system and "
-			+ "acc.name=:account\n")
+			+ "acc.name=:account and "
+			+ "dispatcher.tenant.id = :tenantId\n")
 	public es.caib.seycon.ng.model.UsuariEntity findByAccount(
 			java.lang.String account, java.lang.String system) {
 		return null;
@@ -308,6 +299,21 @@ public abstract class UsuariEntity {
 	public java.lang.String getFullName() {
 		return null;
 	}
+	
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 }
+
+@Index (name="USU_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.UsuariEntity.class,
+columns={"USU_TEN_ID", "USU_CODI"})
+abstract class UsuariIndex {
+}
+
+
+@Index (name="USU_UK_NOMCUR_IDDCO",	unique=true,
+entity=es.caib.seycon.ng.model.UsuariEntity.class,
+columns={"USU_TEN_ID", "USU_NOMCUR", "USU_IDDCO"})
+abstract class UsuariNomCurtIndex {
+}
+

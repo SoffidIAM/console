@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_XARXES", translatedName="NetworkEntity", translatedPackage="com.soffid.iam.model" )
@@ -40,6 +41,10 @@ public abstract class XarxaEntity {
 	@Column (name="XAR_PARDHC", length=50)
 	@Nullable
 	public java.lang.String dhcp;
+	
+	@Column (name="XAR_TEN_ID")
+	@Nullable
+	TenantEntity tenant;
 
 	@ForeignKey (foreignColumn="AXA_IDXAR", translated="authorizations")
 	public java.util.Collection<es.caib.seycon.ng.model.XarxaACEntity> autoritzacions;
@@ -90,3 +95,17 @@ public abstract class XarxaEntity {
 	 return null;
 	}
 }
+
+
+@Index (name="XAR_UK_ADRIP",	unique=true,
+	entity=es.caib.seycon.ng.model.XarxaEntity.class,
+	columns={"XAR_TEN_ID", "XAR_ADRIP"})
+abstract class XarxesAdressIndex {
+}
+
+@Index (name="XAR_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.XarxaEntity.class,
+columns={"XAR_TEN_ID", "XAR_CODI"})
+abstract class XarxesIndex {
+}
+

@@ -246,22 +246,6 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
-	@Operation(grantees = { roles.application_query.class }, translated = "findUsersRolesByRoleName")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByNomRol(
-			java.lang.String nomRol)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(grantees = { roles.application_query.class }, translated = "findUsersRolesByUserNameAndRoleName")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuariAndNomRol(
-			java.lang.String codiUsuari, java.lang.String nomRol)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
 	@Operation(grantees = { roles.application_query.class }, translated = "findRolesByDomainNameAndApplicationName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByNomDominiAndCodiAplicacio(

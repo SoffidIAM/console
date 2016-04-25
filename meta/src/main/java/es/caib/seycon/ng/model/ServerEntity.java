@@ -5,11 +5,11 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SERVER", translatedName="ServerEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.comu.Server.class,
-	es.caib.seycon.ng.model.ReplicaDatabaseEntity.class,
 	es.caib.seycon.ng.model.SecretEntity.class,
 	com.soffid.iam.model.ScheduledTaskEntity.class})
 public abstract class ServerEntity {
@@ -37,14 +37,14 @@ public abstract class ServerEntity {
 	@Nullable
 	public java.lang.Boolean useMasterDatabase;
 
-	@Column (name="SRV_DBA_ID")
-	@Nullable
-	public es.caib.seycon.ng.model.ReplicaDatabaseEntity backupDatabase;
-
 	@Column (name="SRV_URL")
 	@Nullable
 	public java.lang.String url;
 
+	@Column (name="SRV_TEN_ID")
+	@Nullable 
+	TenantEntity tenant;
+	
 	@ForeignKey (foreignColumn="SEC_IDSRV")
 	public java.util.Collection<es.caib.seycon.ng.model.SecretEntity> secrets;
 
@@ -57,4 +57,10 @@ public abstract class ServerEntity {
 		java.lang.String name) {
 	 return null;
 	}
+}
+
+@Index (name="SC_SERVER_UK1",	unique=true,
+entity=es.caib.seycon.ng.model.ServerEntity.class,
+columns={"SRV_NOM", "SRV_TEN_ID"})
+abstract class ServerIndex {
 }

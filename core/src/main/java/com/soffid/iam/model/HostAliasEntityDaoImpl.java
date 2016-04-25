@@ -105,7 +105,7 @@ public class HostAliasEntityDaoImpl
 		HostEntity maquina = null;
 		// Si es nuevo el id puede ser nulo 
 		if (sourceVO.getHostId() != null) {
-			maquina = getHostEntityDao().findById(sourceVO.getHostId());
+			maquina = getHostEntityDao().load(sourceVO.getHostId());
 		} 
 		if (maquina == null && sourceVO.getHostName() != null) {
 			maquina = getHostEntityDao().findByName(sourceVO.getHostName());

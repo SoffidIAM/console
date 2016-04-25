@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_TASQUE", translatedName = "TaskEntity", translatedPackage = "com.soffid.iam.model")
@@ -121,6 +122,9 @@ public abstract class TasqueEntity {
 	@Column(name = "TAS_PKVAL", length = 50)
 	@Nullable
 	public java.lang.Long primaryKeyValue;
+	
+	@Column(name = "TAS_TEN_ID")
+	public TenantEntity tenant;
 
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
@@ -198,3 +202,11 @@ public abstract class TasqueEntity {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 }
+
+
+@Index (name="SC_TAS_HASH",	unique=false,
+	entity=es.caib.seycon.ng.model.TasqueEntity.class,
+	columns={"TAS_TEN_ID", "TAS_HASH"})
+abstract class TasqueHashIndex {
+}
+

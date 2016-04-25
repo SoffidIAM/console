@@ -31,7 +31,6 @@ import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
-import com.soffid.iam.model.CardEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.HostEntity;
@@ -2238,10 +2237,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	}
 
-	protected java.security.Principal getPrincipal() {
-		return Security.getPrincipal();
-	}
-
 	private UserEntity findUsuariExistentperCodiXestib(String codiXestib) {
 		// obtenim el codi d'usuari a partir del codi Xestib
 		try {
@@ -2313,206 +2308,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return new String(pw);
 	}
 
-	protected Student handleCreatePupilUser(Student usuariAlumne)
-			throws Exception {
-
-		// Verifiquem que l'usuari no existisca ja (pot tornar null)
-		UserEntity usu = findUsuariExistentperCodiXestib(usuariAlumne
-				.getCodiXestib());
-
-		if (usu != null && !"Z".equals(usu.getUserType().getName())) { // Si no és de tipus alumne, no permetem donar d'alta com alumne //$NON-NLS-1$
-			throw new SeyconException(String.format(
-					Messages.getString("UserServiceImpl.UserAlreadyExists"),
-					usuariAlumne.getCodiXestib(), usu.getUserType().getName()));
-		}
-
-		if (usu == null) {// creem el usuari VO nou
-			User usuari = new User();
-
-			usuari.setUserName(getUserEntityDao().findFollowingAlumnCode());
-			usuari.setCreatedDate(GregorianCalendar.getInstance());
-			usuari.setMultiSession(new Boolean(false));
-
-			usuari.setActive(new Boolean(true));
-			// No en té efecte i ja no existeix al VO
-			// usuari.setContrasenyaCaducada(new Boolean(true)); //li asignarem
-			// una nova
-
-			// dades bàsiques:
-			usuari.setFirstName(usuariAlumne.getNom());
-			usuari.setLastName(usuariAlumne.getLlinatge1());
-			usuari.setMiddleName(usuariAlumne.getLlinatge2());
-			usuari.setUserType("Z"); //Tipus d'usuari alumne //$NON-NLS-1$
-
-			// Assignem el GRUP primari de l'alumne: (el creem si no existeix
-			// encara)
-			GroupEntity grupCentreAlumne = gestionaGrupAlumne(usuariAlumne
-					.getSchool());
-			usuari.setPrimaryGroup(grupCentreAlumne.getName());
-
-			usuari.setMailServer("nul"); //$NON-NLS-1$
-			usuari.setHomeServer("nul"); //$NON-NLS-1$
-			usuari.setProfileServer("nul"); //$NON-NLS-1$
-
-			usuari.setCreatedByUser(getPrincipal().getName());
-
-			// Cridem l'EJB per a que cree l'usuari
-			usu = getUserEntityDao().userToEntity(usuari);
-			getUserEntityDao().create(usu);
-
-			// creem el codi Xestib com a dada addicional
-			UserData dadaUsuariXestib = new UserData();
-			dadaUsuariXestib.setAttribute(DADA_ADDICIONAL_CODI_XESTIB);
-			dadaUsuariXestib.setUser(usu.getUserName());
-			dadaUsuariXestib.setValue(usuariAlumne.getCodiXestib());
-			UserDataEntity dadaUsuariEntity = getUserDataEntityDao()
-					.userDataToEntity(dadaUsuariXestib);
-			getUserDataEntityDao().create(dadaUsuariEntity);
-
-			// creem la descripció del grup de l'alumne com a dada adicional
-			UserData dadaUsuariGrupDescripcioXestib = new UserData();
-			dadaUsuariGrupDescripcioXestib
-					.setAttribute(DADA_ADDICIONAL_CODI_XESTIB_GRUPALUMNE);
-			dadaUsuariGrupDescripcioXestib.setUser(usu.getUserName());
-			dadaUsuariGrupDescripcioXestib.setValue(usuariAlumne
-					.getGrupAlumne());
-			UserDataEntity dadaUsuariGrupDescripcioEntity = getUserDataEntityDao()
-					.userDataToEntity(dadaUsuariGrupDescripcioXestib);
-			getUserDataEntityDao().create(dadaUsuariGrupDescripcioEntity);
-
-			// creem l'adreça de correu extern com a dada addicional
-			if (usuariAlumne.getCorreuElectronic() != null
-					&& !"".equals(usuariAlumne.getCorreuElectronic())) { //$NON-NLS-1$
-				UserData dadaUsuariCorreuElectronic = new UserData();
-				dadaUsuariCorreuElectronic.setAttribute(E_MAIL_CONTACTE);
-				dadaUsuariCorreuElectronic.setUser(usu.getUserName());
-				dadaUsuariCorreuElectronic.setValue(usuariAlumne
-						.getCorreuElectronic());
-				UserDataEntity dadaUsuariCorreuElectronicEntity = getUserDataEntityDao()
-						.userDataToEntity(dadaUsuariCorreuElectronic);
-				getUserDataEntityDao().create(dadaUsuariCorreuElectronicEntity);
-			}
-
-		} else {
-			// L'usuari ja existeix:
-			// El transformem a VO
-			User usuari = getUserEntityDao().toUser(usu);
-
-			usuari.setActive(new Boolean(true));
-			// No en té efecte i ja no existeix al VO:
-			// usuari.setContrasenyaCaducada(new Boolean(true));
-
-			// Actualitzem les seues dades bàsiques:
-			usuari.setFirstName(usuariAlumne.getNom());
-			usuari.setLastName(usuariAlumne.getLlinatge1());
-			usuari.setMiddleName(usuariAlumne.getLlinatge2());
-			usuari.setUserType("Z"); //Tipus d'usuari alumne //$NON-NLS-1$
-
-			// Indiquem l'usuari que fa le modificacions
-			usuari.setModifiedByUser(getPrincipal().getName());
-
-			// Transformem a entity i actualitzem les dades
-			usu = getUserEntityDao().userToEntity(usuari);
-			getUserEntityDao().update(usu);
-
-			// actualitzem el seu centre (grup primari de l'usuari) i les dades
-			// addicionals
-			GroupEntity grupCentreAlumne = gestionaGrupAlumne(usuariAlumne
-					.getSchool());
-			usu.setPrimaryGroup(grupCentreAlumne); // Grup Primari
-			// Actualitzem dades addicionals (descripció grup de l'alumne)
-			UserDataEntity d_grupAlumne = null;
-			UserDataEntity d_correuElectronic = null; // correu electrònic
-
-			Collection dadesAddicionals = new HashSet(usu.getUserData()); // you're
-																			// so
-																			// lazy
-			for (Iterator it = dadesAddicionals.iterator(); it.hasNext();) {
-				UserDataEntity dada = (UserDataEntity) it.next();
-				if (dada.getDataType().getName()
-						.equals(DADA_ADDICIONAL_CODI_XESTIB_GRUPALUMNE)) {
-					d_grupAlumne = dada;
-				} else if (dada.getDataType().getName().equals(E_MAIL_CONTACTE)) {
-					d_correuElectronic = dada;
-				}
-			}
-			// Actualitzem la dada addicional del grup del alumne
-			if (d_grupAlumne != null) {
-				d_grupAlumne.setValue(usuariAlumne.getGrupAlumne());
-				getUserDataEntityDao().update(d_grupAlumne);
-			} else {
-				UserData dadaUsuariGrupDescripcioXestib = new UserData();
-				dadaUsuariGrupDescripcioXestib
-						.setAttribute(DADA_ADDICIONAL_CODI_XESTIB_GRUPALUMNE);
-				dadaUsuariGrupDescripcioXestib.setUser(usu.getUserName());
-				dadaUsuariGrupDescripcioXestib.setValue(usuariAlumne
-						.getGrupAlumne());
-				UserDataEntity dadaUsuariGrupDescripcioEntity = getUserDataEntityDao()
-						.userDataToEntity(dadaUsuariGrupDescripcioXestib);
-				getUserDataEntityDao().create(dadaUsuariGrupDescripcioEntity);
-			}
-
-			// Actualitzem la dada addicional de correu electrònic
-			String correuElectronic = usuariAlumne.getCorreuElectronic();
-
-			// Si l'han esborrat el correu electrònic i existeix ja: l'esborrem
-			if (correuElectronic == null || "".equals(correuElectronic.trim())) { //$NON-NLS-1$
-				if (d_correuElectronic != null) {
-					getUserDataEntityDao().remove(d_correuElectronic);
-				}
-			} else {// s'ha d'establir la dada addicional
-				if (d_correuElectronic != null) {// ja existeix
-					d_correuElectronic.setValue(correuElectronic);
-					getUserDataEntityDao().update(d_correuElectronic);
-				} else {// no existeix: el creem
-					UserData dadaUsuariCorreuElectronic = new UserData();
-					dadaUsuariCorreuElectronic.setAttribute(E_MAIL_CONTACTE);
-					dadaUsuariCorreuElectronic.setUser(usu.getUserName());
-					dadaUsuariCorreuElectronic.setValue(usuariAlumne
-							.getCorreuElectronic());
-					UserDataEntity dadaUsuariCorreuElectronicEntity = getUserDataEntityDao()
-							.userDataToEntity(dadaUsuariCorreuElectronic);
-					getUserDataEntityDao().create(
-							dadaUsuariCorreuElectronicEntity);
-				}
-			}
-
-			// Actualitzem l'usuari (dades addicionals)
-			getUserEntityDao().update(usu);
-		}
-
-		// Renovem contrasenya:
-		String contrasenya = generaContrasenyaAlumne(6);
-		// Establim contrasenya a l'usuari
-		// Generem la tasca
-		Task canviaPass = new Task();
-		canviaPass.setTransaction("UpdateUserPassword");//Actualització del password de l'usuari //$NON-NLS-1$
-		canviaPass.setTaskDate(Calendar.getInstance());
-		canviaPass.setUser(usu.getUserName());
-		canviaPass.setPassword(contrasenya);
-		canviaPass.setPasswordChange("N");//Posem que no ha de Canviar contrasenya //$NON-NLS-1$
-		TaskEntity tasca = getTaskEntityDao().taskToEntity(canviaPass);
-		getTaskEntityDao().create(tasca);
-
-		usuariAlumne.setContrasenya(contrasenya);
-
-		// Retornem el codi de l'usuari
-		usuariAlumne.setUserCode(usu.getUserName());
-
-		// Actualitzem els canvis al UsuariEntity
-		getUserEntityDao().update(usu);
-
-		getRuleEvaluatorService().applyRules(usu);
-
-		return usuariAlumne;
-	}
-
 	protected ExtranetCard handleCreateExtranetCard(String codiUsuari)
 			throws Exception {
-
-		CardEntity entity = getCardEntityDao().createExtranetCard(codiUsuari);
-		if (entity != null)
-			return getCardEntityDao().toExtranetCard(entity);
+		
+		// TODO
 
 		return null;
 	}
@@ -2524,32 +2323,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (ue == null)
 			return null;
 		LinkedList<ExtranetCard> cards = new LinkedList<ExtranetCard>();
-		for (CardEntity t : ue.getExtranetCard()) {
-			if (activa.equals(t.getActive()))
-				cards.add(getCardEntityDao().toExtranetCard(t));
-		}
 		return cards;
 	}
 
 	protected ExtranetCard handleUpdate(ExtranetCard targetaExtranet)
 			throws Exception {
-		CardEntity entity = getCardEntityDao().extranetCardToEntity(
-				targetaExtranet);
-		if (entity != null) {
-			getCardEntityDao().update(entity);
-			return getCardEntityDao().toExtranetCard(entity);
-		}
 		return null;
 	}
 
 	protected ExtranetCard handleFindExtranetCardByUserNameAndCardName(
 			String codiUsuari, String codiTargeta) throws Exception {
-		CardEntity entity = getCardEntityDao().findByCardCodeAndUserCode(
-				codiTargeta, codiUsuari);
-		if (entity == null)
 			throw new SeyconException(
 					Messages.getString("UserServiceImpl.NoCardFounded")); //$NON-NLS-1$
-		return getCardEntityDao().toExtranetCard(entity);
 	}
 
 	protected Collection<Role> handleFindUserRolesHierachyByUserName(
@@ -3021,50 +2806,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	protected User handleCreateHostUser(String nom, String descripcio)
-			throws Exception {
-		if (true)
-			throw new RuntimeException(
-					Messages.getString("UserServiceImpl.NotImplementedMessage")); //$NON-NLS-1$
-
-		/* Es crea l'usuari */
-		User usuariMaquina = new User();
-
-		// Li assignem el següent codi de màquina lliure
-		usuariMaquina.setUserName(getUserEntityDao().getNextHostUserName());
-
-		// dades bàsiques:
-		usuariMaquina.setFirstName(nom);
-		usuariMaquina.setLastName(descripcio);
-		usuariMaquina.setUserType("H"); //Tipus d'usuari màquina //$NON-NLS-1$
-
-		/* se almacena la fecha de creación */
-		usuariMaquina.setCreatedDate(GregorianCalendar.getInstance());
-		/* se almacena el usuario que lo crea */
-		usuariMaquina.setCreatedByUser(Security.getCurrentAccount());
-
-		// Li assignem certs paràmetres...
-		usuariMaquina.setActive(new Boolean(true));
-		usuariMaquina.setMultiSession(new Boolean(false));
-		// No en té efecte i ja no existeix al VO
-		// usuariMaquina.setContrasenyaCaducada(new Boolean(true));
-
-		// Establim grup primari i servidors de correu..
-		usuariMaquina.setPrimaryGroup("nul"); //TODO: li hem d'assingar un altre grup primari? //$NON-NLS-1$
-
-		usuariMaquina.setMailServer("nul"); //$NON-NLS-1$
-		usuariMaquina.setHomeServer("nul"); //$NON-NLS-1$
-		usuariMaquina.setProfileServer("nul"); //$NON-NLS-1$
-
-		UserEntity usuariEntity = getUserEntityDao()
-				.userToEntity(usuariMaquina);
-
-		getUserEntityDao().create(usuariEntity);
-
-		getRuleEvaluatorService().applyRules(usuariEntity);
-
-		return getUserEntityDao().toUser(usuariEntity);
-	}
 
 	protected String handleChangePasswordUserHost(String codiUsuari,
 			String codiDominiContrasenyes) throws Exception {
@@ -3117,10 +2858,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		usuariEntity.setLastName(usuari.getLastName());
 		usuariEntity.setMiddleName(usuari.getMiddleName());
 
+		String currentAccount = Security.getCurrentAccount();
 		// Marquem que l'usuari ha estat modificat
 		usuariEntity
-				.setLastUserModification(getPrincipal() != null ? getPrincipal()
-						.getName() : "SEYCON"); //$NON-NLS-1$
+				.setLastUserModification(currentAccount == null ? "Soffid": currentAccount); //$NON-NLS-1$
 		usuariEntity.setLastModificationDate(GregorianCalendar.getInstance()
 				.getTime());
 
@@ -3476,13 +3217,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	 */
 	@Override
 	protected User handleGetCurrentUser() throws Exception {
-		Principal p = Security.getPrincipal();
-		if (p == null)
+		String account = Security.getCurrentAccount();
+		if (account == null)
 			return null;
 
 		String dispatcherName = getInternalPasswordService()
 				.getDefaultDispatcher();
-		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(p.getName(), dispatcherName);
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(Security.getCurrentAccount(), dispatcherName);
 		if (acc == null)
 			return null;
 		else if (acc.getType().equals (AccountType.USER))

@@ -137,6 +137,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	 */
 	@Override
     protected void handleCreateNoFlush(TaskEntity tasque) throws Exception {
+		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
 		this.getHibernateTemplate().save(tasque);
 	}
 

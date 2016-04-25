@@ -37,7 +37,7 @@ public class UserAccountEntityDaoImpl extends com.soffid.iam.model.UserAccountEn
     	if (account.getAccount().getType().equals(AccountType.USER))
     	{
     		UserEntity usuariEntity = account.getUser();
-            usuariEntity.setLastUserModification(Security.getCurrentUser());
+            usuariEntity.setLastUserModification(Security.getCurrentAccount());
             usuariEntity.setLastModificationDate(GregorianCalendar.getInstance().getTime());
             getUserEntityDao().update(usuariEntity);
 

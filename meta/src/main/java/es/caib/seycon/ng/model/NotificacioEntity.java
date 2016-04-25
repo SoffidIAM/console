@@ -36,7 +36,8 @@ public abstract class NotificacioEntity {
 
 	@Operation(translated="findByApplicationCode")
 	@DaoFinder("from com.soffid.iam.model.NoticeEntity notifica where "
-			+ "notifica.application.name = :informationSystem "
+			+ "notifica.application.name = :informationSystem and "
+			+ "notifica.application.tenant.id = :tenantId "
 			+ "order by notifica.modificationDate asc")
 	public java.util.List<es.caib.seycon.ng.model.NotificacioEntity> findByCodiAplicacio(
 		java.lang.String informationSystem) {

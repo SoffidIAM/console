@@ -11,6 +11,7 @@ public class DocumentServiceTest extends AbstractTest
 
 	public void testDocumentService () throws InternalErrorException, DocumentBeanException
 	{
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
 		try {
 			DocumentService ds1 = (DocumentService) context.getBean(DocumentService.SERVICE_NAME);

@@ -4,6 +4,8 @@ import java.io.StringReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import com.soffid.iam.ServiceLocator;
+
 import bsh.BshClassManager;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -60,6 +62,7 @@ public class ScriptTest extends  TestCase {
 	public void test2 () throws EvalError 
 	{
 		try {
+			com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 			com.soffid.iam.utils.Security.nestedLogin ("hola", new String[] {} );
 			Object r = interpreter.eval("es.caib.seycon.ng.utils.Security.nestedLogin (\"hola\", new String[] {} );");
 //			assertFalse("Expected exception not thrown", true);
@@ -84,6 +87,10 @@ public class ScriptTest extends  TestCase {
 	{
 		Object r = interpreter.eval("x = new es.caib.seycon.ng.comu.Usuari()");
 		System.out.println ("Result = "+r);
+		Object r2 = interpreter.eval("x = new com.soffid.iam.api.User()");
+		System.out.println ("Result = "+r2);
+		r2 = interpreter.eval("new bsh.Interpreter()");
+		System.out.println ("Result = "+r2);
 	}
 
 	public void test5 () 

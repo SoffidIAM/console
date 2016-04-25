@@ -1220,6 +1220,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:tenant:show</codi>
+		<descripcio>Access to tenants management window</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>account:create</codi>
 		<descripcio>Create high risk accounts</descripcio>
 		<ambit>Accounts</ambit>
@@ -1334,4 +1340,23 @@
 		<descripcio>Manage shared accounts using self service</descripcio>
 		<ambit>SelfService</ambit>
 	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>tenant:Query</codi>
+		<descripcio>Query existing tenants</descripcio>
+		<ambit>Tenancy</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>tenant:Update</codi>
+		<descripcio>Update existing tenants</descripcio>
+		<ambit>Tenancy</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>tenant:Create</codi>
+		<descripcio>Create existing tenants</descripcio>
+		<ambit>Tenancy</ambit>
+	</autoritzacio>
+	
 </autoritzacions>

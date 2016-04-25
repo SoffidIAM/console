@@ -30,6 +30,7 @@ public abstract class LlistaCorreuUsuariEntity {
 			+ "from com.soffid.iam.model.UserEmailEntity liu "
 			+ "left join liu.mailList.domain as dominiCorreu "
 			+ "where liu.mailList.name = :mailList and "
+			+ "  liu.mailList.tenant.id = :tenantId and "
 			+ " ((:domain is null and dominiCorreu is null) or "
 			+ " ( :domain is not null and dominiCorreu is not null and dominiCorreu.name = :domain)) and"
 			+ " liu.user.userName = :user ")
@@ -40,7 +41,8 @@ public abstract class LlistaCorreuUsuariEntity {
 	 return null;
 	}
 	@Operation(translated="findByUser")
-	@DaoFinder("from  com.soffid.iam.model.UserEmailEntity liu where liu.user.userName = :user")
+	@DaoFinder("from  com.soffid.iam.model.UserEmailEntity liu where liu.user.userName = :user and liu.user.tenant.id = :tenantId "
+			+ "order by liu.mailList.name, liu.mailList.domain.name")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> findByCodiUsuari(
 		java.lang.String user) {
 	 return null;
@@ -49,6 +51,7 @@ public abstract class LlistaCorreuUsuariEntity {
 	@DaoFinder("from  com.soffid.iam.model.UserEmailEntity liu "
 			+ "left join liu.mailList.domain as dominiCorreu "
 			+ "where liu.mailList.name = :mailList and "
+			+ "liu.mailList.tenant.id = :tenantId and "
 			+ "((:domain is null and dominiCorreu is null) or "
 			+ " ( :domain is not null and dominiCorreu is not null and dominiCorreu.name = :domain))")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> findByNomLlistaCorreuAndCodiDomini(

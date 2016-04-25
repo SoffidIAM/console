@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 import java.util.List;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_CONFIG", translatedName="ConfigEntity", translatedPackage="com.soffid.iam.model" )
@@ -32,13 +33,18 @@ public abstract class ConfiguracioEntity {
 	@Column (name="CON_DESC", length=255, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
+	
+	@Column (name="CON_TEN_ID")
+	public TenantEntity tenant;
 
 	@Operation(translated="findByCodeAndNetworkCode")
 	@DaoFinder("select configuracio  \n"
 			+ "from com.soffid.iam.model.ConfigEntity as configuracio \n"
 			+ "left join configuracio.network as network \n"
 			+ "where \n"
-			+ "  configuracio.name = :name and \n((:networkName is null and network is null) or (network.name = :networkName))")
+			+ "  configuracio.name = :name and \n"
+			+ "  configuracio.tenant.id = :tenantId and\n"
+			+ " ((:networkName is null and network is null) or (network.name = :networkName))")
 	public es.caib.seycon.ng.model.ConfiguracioEntity findByCodiAndCodiXarxa(
 		java.lang.String name, 
 		java.lang.String networkName) {
@@ -52,7 +58,8 @@ public abstract class ConfiguracioEntity {
 				"(:name is null or config.name like :name) and " + //$NON-NLS-1$
 				"(:network is null or network.name like :network) and " + //$NON-NLS-1$
 				"(:value is null or config.value like :value) and " + //$NON-NLS-1$
-				"(:description is null or config.description like :description)")
+				"(:description is null or config.description like :description) and \n"+
+				"config.tenant.id = :tenantId")
 	public List<ConfiguracioEntity> findByFilter(
 			java.lang.String name, 
 			java.lang.String network,

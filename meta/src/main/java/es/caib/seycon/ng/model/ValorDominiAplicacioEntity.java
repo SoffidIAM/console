@@ -48,8 +48,9 @@ public abstract class ValorDominiAplicacioEntity {
 			+ "left join value.domain as domain\n"
 			+ "left join domain.informationSystem as app\n"
 			+ "where \n"
-				+ "app.name = :app and\n"
-				+ "domain.name = :domain and\n"
+				+ "app.name = :app and "
+				+ "app.tenant.id = :tenantId and "
+				+ "domain.name = :domain and "
 				+ "value.value = :value")
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity findByApplicationDomainValue(
 		java.lang.String app, 
@@ -63,7 +64,8 @@ public abstract class ValorDominiAplicacioEntity {
 			+ "left join value.domain as domain\n"
 			+ "left join domain.informationSystem as app\n"
 			+ "where \n"
-				+ "app.name = :informationSystem and\n"
+				+ "app.name = :informationSystem and "
+				+ "app.tenant.id = :tenantId and\n"
 				+ "domain.name = :domain")
 	public List<ValorDominiAplicacioEntity> findByInformationSystem(
 		java.lang.String informationSystem, 
@@ -71,3 +73,10 @@ public abstract class ValorDominiAplicacioEntity {
 	 return null;
 	}
 }
+
+@Index (name="UNIQUE_VALOR_DOMINI",	unique=true,
+entity=es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
+columns={"VDO_VALOR", "VDO_DOM"})
+abstract class ValorDominiUniqueIndex {
+}
+

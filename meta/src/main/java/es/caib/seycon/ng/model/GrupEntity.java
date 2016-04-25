@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_GRUPS", translatedName="GroupEntity", translatedPackage="com.soffid.iam.model" )
@@ -19,7 +20,6 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.model.RolsGrupEntity.class,
 	es.caib.seycon.ng.model.GrupImpressoraEntity.class,
-	es.caib.seycon.ng.model.SsoEntity.class,
 	es.caib.seycon.ng.model.XarxaACEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.RolAccountEntity.class,
@@ -81,6 +81,9 @@ public abstract class GrupEntity {
 	@Nullable
 	public java.lang.String organitzatiu;
 
+	@Column (name="GRU_TEN_ID")
+	TenantEntity tenant;
+	
 	@ForeignKey (foreignColumn="GRD_IDGRUP", translated="systemGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> grupDispatcher;
 
@@ -104,14 +107,18 @@ public abstract class GrupEntity {
 	/*********************************************************** METHODS **************************************/
 	
 	
-	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent")
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent "
+			+ "and grup.tenant.id = :tenantId "
+			+ "order by grup.name")
 	@Operation(translated="findByParent")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findSubGrupsByCodi(
 		java.lang.String parent) {
 	 return null;
 	}
 	@Operation(translated="findByType")
-	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.unitType.name = :unitType")
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.unitType.name = :unitType and "
+			+ "grup.unitType.tenant.id = :tenantId "
+			+ "order by grup.name")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsByTipus(
 		java.lang.String unitType) {
 	 return null;
@@ -125,7 +132,10 @@ public abstract class GrupEntity {
 	}
 
 	@Operation(translated="findByName")
-	@DaoFinder
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup "
+			+ "where grup.name = :name and "
+			+ "grup.tenant.id = :tenantId "
+			+ "order by grup.name")
 	public es.caib.seycon.ng.model.GrupEntity findByCodi(
 		java.lang.String name) {
 	 return null;
@@ -140,7 +150,9 @@ public abstract class GrupEntity {
 			+ "(:type is null or tipus.name like :type) and "
 			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
-			+ "(:obsolete is null or grup.obsolete = :obsolete)")
+			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
+			+ "grup.tenant.id = :tenantId "
+			+ "order by grup.name")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
 		java.lang.String name, 
 		java.lang.String parent, 
@@ -150,8 +162,11 @@ public abstract class GrupEntity {
 		java.lang.String obsolete) {
 	 return null;
 	}
+
 	@Operation(translated="findPrimaryGroupByUser")
-	@DaoFinder("select usuari.primaryGroup from com.soffid.iam.model.UserEntity usuari where usuari.userName = :userName")
+	@DaoFinder("select usuari.primaryGroup from com.soffid.iam.model.UserEntity usuari "
+			+ "where usuari.userName = :userName and "
+			+ "usuari.tenant.id = :tenantId" )
 	public es.caib.seycon.ng.model.GrupEntity findGrupPrimariByCodiUsuari(
 		java.lang.String userName) {
 	 return null;
@@ -159,7 +174,7 @@ public abstract class GrupEntity {
 	@Operation(translated="findGroupsByUser")
 	@DaoFinder("select  usuariGrup.group "
 			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
-			+ "where usuariGrup.user.userName = :userName")
+			+ "where usuariGrup.user.userName = :userName and usuariGrup.user.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromUsuarisByCodiUsuari(
 		java.lang.String userName) {
 	 return null;
@@ -172,13 +187,15 @@ public abstract class GrupEntity {
 			+ "join accounts.account as account with account.type='U' "
 			+ "join account.roles as roles "
 			+ "join roles.group as grup "
-			+ "where usu.userName=:userName\n")
+			+ "where usu.userName=:userName and usu.tenant.id = :tenantId "
+			+ "order by grup.name\n")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsFromRolsByCodiUsuari(
 		java.lang.String userName) {
 	 return null;
 	}
 
-	@DaoFinder("select grup.parent from com.soffid.iam.model.GroupEntity grup where grup.name = :groupName")
+	@DaoFinder("select grup.parent from com.soffid.iam.model.GroupEntity grup "
+			+ "where grup.name = :groupName and grup.tenant.id = :tenantId")
 	@Operation(translated="findByChild")
 	public es.caib.seycon.ng.model.GrupEntity getSuperGrup(
 		java.lang.String groupName) {
@@ -202,7 +219,9 @@ public abstract class GrupEntity {
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
 			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
 			+ "(:homeServer is null or servofim.name like :homeServer) and "
-			+ "(:budgetSection is null or grup.budgetSection like :budgetSection)")
+			+ "(:budgetSection is null or grup.budgetSection like :budgetSection) and "
+			+ "grup.tenant.id = :tenantId "
+			+ "order by grup.name ")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByFiltre(
 		java.lang.String name, 
 		java.lang.String parent, 
@@ -218,3 +237,11 @@ public abstract class GrupEntity {
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 }
+
+
+@Index (name="GRU_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.GrupEntity.class,
+columns={"GRU_TEN_ID", "GRU_CODI"})
+abstract class GrupIndex {
+}
+

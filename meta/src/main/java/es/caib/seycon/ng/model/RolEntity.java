@@ -110,7 +110,9 @@ public abstract class RolEntity {
 	@Operation(translated = "findByInformationSystem")
 	@DaoFinder("select role \n"
 			+ "from com.soffid.iam.model.RoleEntity role \n"
-			+ "where \nrole.informationSystem.name = :informationSystem \norder by role.name, role.system.name")
+			+ "where role.informationSystem.name = :informationSystem and "
+			+ "      role.informationSystem.tenant.id = :tenantId \n"
+			+ "order by role.name, role.system.name")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findByCodiAplicacio(
 			java.lang.String informationSystem) {
 		return null;
@@ -124,8 +126,10 @@ public abstract class RolEntity {
 	@Operation(translated = "findRoleByNameInformationSystemAndStystem")
 	@DaoFinder("select rolEntity \n"
 			+ "from com.soffid.iam.model.RoleEntity rolEntity \n"
-			+ "where \nrolEntity.informationSystem.name = :informationSystem and\n"
-			+ "rolEntity.name = :roleName and\n"
+			+ "where \n"
+			+ "rolEntity.informationSystem.name = :informationSystem and\n"
+			+ "rolEntity.name = :roleName and "
+			+ "rolEntity.system.tenant.id = :tenantId and \n"
 			+ "rolEntity.system.name = :system")
 	public es.caib.seycon.ng.model.RolEntity findByNomRolAndCodiAplicacioAndCodiDispatcher(
 			java.lang.String roleName, java.lang.String informationSystem,
@@ -142,7 +146,8 @@ public abstract class RolEntity {
 			+ "(:defaultRole is null or rol.defaultRole = :defaultRole) and "
 			+ "(:system is null or baseDeDades.name like :system) and "
 			+ "(:password is null or rol.password = :password)  and "
-			+ "(:informationSystem is null or rol.informationSystem.name like :informationSystem) \n"
+			+ "(:informationSystem is null or rol.informationSystem.name like :informationSystem) and\n"
+			+ "baseDeDades.tenant.id = :tenantId "
 			+ "order by rol.name, baseDeDades.name")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findRolsByFiltre(
 			java.lang.String roleName, java.lang.String description,
@@ -159,7 +164,8 @@ public abstract class RolEntity {
 			+ "join account.roles as roles\n "
 			+ "join roles.role as role\n "
 			+ "join role.informationSystem as informationSystem\n"
-			+ "where user.userName = :userName and informationSystem.name = :informationSystem")
+			+ "where user.userName = :userName and informationSystem.name = :informationSystem "
+			+ "and user.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> getRolsAplicacioByCodiUsuariAndCodiAplicacio(
 			java.lang.String userName, java.lang.String informationSystem) {
 		return null;
@@ -172,7 +178,7 @@ public abstract class RolEntity {
 			+ " join accounts.account as account with account.type='U'\n"
 			+ " join account.roles as roles\n"
 			+ " join roles.role as rol\n"
-			+ "where usu.userName = :userName ")
+			+ "where usu.userName = :userName and usu.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findRolsByCodiUsuari(
 			java.lang.String userName) {
 		return null;
@@ -197,7 +203,8 @@ public abstract class RolEntity {
 			+ "(:system is null or system.name like :system) and "
 			+ "(:password is null or rol.password = :password)  and "
 			+ "(:informationSystem is null or rol.informationSystem.name like :informationSystem) and "
-			+ "(:manageableWF is null or rol.manageableWF =:manageableWF)\n"
+			+ "(:manageableWF is null or rol.manageableWF =:manageableWF) and\n"
+			+ "system.tenant.id = :tenantId "
 			+ "order by rol.name, system.name")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findRolsByFiltreGestionablesWF(
 			java.lang.String roleName, java.lang.String description,
@@ -210,8 +217,9 @@ public abstract class RolEntity {
 	@Operation(translated = "findByNameAndSystem")
 	@DaoFinder("select rolEntity \n"
 			+ "from com.soffid.iam.model.RoleEntity rolEntity \n"
-			+ "where \nrolEntity.name = :roleName and\n"
-			+ "rolEntity.system.name = :system")
+			+ "where rolEntity.name = :roleName and\n"
+			+ "rolEntity.system.name = :system and "
+			+ "rolEntity.system.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.RolEntity findByNameAndDispatcher(
 			java.lang.String roleName, 
 			java.lang.String system) {
@@ -231,7 +239,8 @@ public abstract class RolEntity {
                 + "left join domini.informationSystem aplicacio " //$NON-NLS-1$
                 + "where " //$NON-NLS-1$
                 + "domini.name = :domainName and " //$NON-NLS-1$
-                + "((:informationSystem is null and aplicacio is null) or (aplicacio.name = :informationSystem))") //$NON-NLS-1$
+                + "((:informationSystem is null and aplicacio is null) or (aplicacio.name = :informationSystem)) and "
+                + "aplicacio.tenant.id = :tenantId") //$NON-NLS-1$
 	public List<RolEntity> findByInformationSystemAndDomain(
 			java.lang.String informationSystem, 
 			java.lang.String domainName) {
@@ -241,3 +250,18 @@ public abstract class RolEntity {
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 }
+
+
+@Index (name="ROL_UK_NOM_IDDISPAT_IDAPL",	unique=true,
+entity=es.caib.seycon.ng.model.RolEntity.class,
+columns={"ROL_NOM", "ROL_IDDISPAT"})
+abstract class RolIndex {
+}
+
+@Index (name="ROL_APL_NDX",	unique=true,
+entity=es.caib.seycon.ng.model.RolEntity.class,
+columns={"ROL_IDAPL"})
+abstract class RolApplicationIndex {
+}
+
+

@@ -51,15 +51,6 @@ public abstract class TaskLogEntity {
 	@Column(name = "TLO_DIS_ID", translated = "system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
-	@Operation(translated = "findBySystem")
-	@DaoFinder("from com.soffid.iam.model.TaskLogEntity tlog "
-			+ "left join tlog.system system "
-			+ "where system.name=:systemName order by tlog.task.id")
-	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByCodiAgent(
-			String systemName) {
-		return null;
-	}
-
 	@Operation(translated = "findByTaskID")
 	@DaoFinder("from com.soffid.iam.model.TaskLogEntity tlog\nwhere tlog.task.id=:taskId")
 	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByIdTasca(

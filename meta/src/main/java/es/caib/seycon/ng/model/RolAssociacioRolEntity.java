@@ -61,7 +61,8 @@ public abstract class RolAssociacioRolEntity {
 			+ "where \n"
 			+ " rolAssociacioRol.contained.name = :roleName and\n"
 			+ " rolAssociacioRol.contained.informationSystem.name = :informationSystem and\n"
-			+ " rolAssociacioRol.contained.system.name = :systemName\n")
+			+ " rolAssociacioRol.contained.system.name = :systemName and "
+			+ "rolAssociacioRol.contained.system.tenant.id = :tenantId\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findContenidorsByNomRolCodiAplicacioCodiBBDD(
 			java.lang.String roleName, java.lang.String informationSystem,
 			java.lang.String systemName) {
@@ -71,7 +72,7 @@ public abstract class RolAssociacioRolEntity {
 	@Operation(translated = "findRolesAssociationRole")
 	@DaoFinder("select rolAssociacioRol\n"
 			+ "from com.soffid.iam.model.RoleDependencyEntity rolAssociacioRol\n"
-			+ "where \n" + "   rolAssociacioRol.contained = :containedRole and"
+			+ "where \n" + "   rolAssociacioRol.contained = :containedRole and "
 			+ "   rolAssociacioRol.container = :containerRole\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findRolAssociacioRol(
 			es.caib.seycon.ng.model.RolEntity containedRole,

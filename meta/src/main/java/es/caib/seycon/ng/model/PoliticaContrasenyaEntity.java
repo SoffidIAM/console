@@ -116,7 +116,8 @@ public abstract class PoliticaContrasenyaEntity {
 	@DaoFinder("select pol from \n"
 			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"
 			+ "left join pol.passwordDomain con\n"
-			+ "where (:passwordDomain is null or con.name=:passwordDomain) \n"
+			+ "where (:passwordDomain is null or con.name=:passwordDomain) and \n"
+			+ "con.tenant.id = :tenantId "
 			+ "order by con.name")
 
 	public java.util.List<es.caib.seycon.ng.model.PoliticaContrasenyaEntity> findByDominiContrasenya(
@@ -128,8 +129,9 @@ public abstract class PoliticaContrasenyaEntity {
 			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"
 			+ "left join pol.passwordDomain domini\n"
 			+ "left join pol.userType tus\n"
-			+ "where domini.name=:passwordDomain and\n"
-			+ "           tus.name=:userType ")
+			+ "where domini.name=:passwordDomain and \n"
+			+ "domini.tenant.id = :tenantId and"
+			+ "           tus.name=:userType")
 	public es.caib.seycon.ng.model.PoliticaContrasenyaEntity findByDominiContrasenyaTipusUsuari(
 		java.lang.String passwordDomain, 
 		java.lang.String userType) {

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -30,6 +32,7 @@ public class RoleDependencyTest extends AbstractTest
 
 	public void testMultiRole () throws InternalErrorException
 	{
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
 		try {
 			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
@@ -214,14 +217,18 @@ public class RoleDependencyTest extends AbstractTest
 	private RolAccount grant (Usuari usu, Rol rol, String holderGroup) throws InternalErrorException
 	{
 		boolean found = false;
-		for (RolAccount ru : appSvc.findRolsUsuarisByCodiUsuariAndNomRol(
-				usu.getCodi(), rol.getNom()))
+		for (UserAccount acc: accountSvc.getUserAccounts(usu))
 		{
-			if (ru.getBaseDeDades().equals(rol.getBaseDeDades()))
+			if (acc.getDispatcher().equals (rol.getBaseDeDades()))
 			{
-				return ru;
+				for (RolAccount ru : appSvc.findRolAccountByAccount(acc.getId())) {
+		            if (ru.getBaseDeDades().equals(rol.getBaseDeDades()) &&
+		            		ru.getNomRol().equals(rol.getNom()))
+		            	return ru;
+		        }
 			}
 		}
+
 		RolAccount ru = new RolAccount();
 		ru.setBaseDeDades(rol.getBaseDeDades());
 		ru.setCodiAplicacio(rol.getCodiAplicacio());

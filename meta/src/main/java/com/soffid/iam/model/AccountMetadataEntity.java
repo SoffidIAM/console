@@ -75,13 +75,15 @@ public abstract class AccountMetadataEntity {
 	public Boolean unique;
 
 	/********************** DAOS ************************/
-	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name")
+	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name\n"
+			+ "and system.tenant.id=:tenantId")
 	public AccountMetadataEntity findByName(String system,
 			String name) {
 		return null;
 	}
 
-	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :systemName "
+	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :systemName\n"
+			+ "and system.tenant.id=:tenantId "
 			+ "order by order")
 	public java.util.List<AccountMetadataEntity> findBySystem(
 			java.lang.String systemName) {

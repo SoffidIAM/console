@@ -33,7 +33,9 @@ public class MailListGroupMemberEntity {
 	GrupEntity group;
 	
 	///////////////////////////////////
-	@DaoFinder("from com.soffid.iam.model.MailListGroupMemberEntity e where e.mailList.id=:mailListId and e.group.id=:groupId")
+	@DaoFinder("from com.soffid.iam.model.MailListGroupMemberEntity e "
+			+ "where e.mailList.id=:mailListId and e.group.id=:groupId "
+			+ "and e.group.tenant.id=:tenantId")
 	Collection<MailListGroupMemberEntity> findByMailListAndGroup (long mailListId, long groupId) {
 		return null;
 	}

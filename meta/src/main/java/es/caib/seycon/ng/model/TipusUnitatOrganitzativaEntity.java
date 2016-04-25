@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_TIPUSUO", translatedName = "GroupTypeEntity", translatedPackage = "com.soffid.iam.model")
@@ -33,6 +34,10 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@Column(name = "TUO_ROLHOL", defaultValue = "false")
 	@Nullable
 	public boolean roleHolder;
+	
+	
+	@Column(name="TUO_TEN_ID")
+	public TenantEntity tenant;
 
 	@ForeignKey(foreignColumn = "TUO_PARE", translated = "childs")
 	public java.util.Collection<es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity> fills;
@@ -51,9 +56,18 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@Operation(translated = "findByFilter")
 	@DaoFinder("select uo from com.soffid.iam.model.GroupTypeEntity uo "
 			+ "where (:name is null or (:name is not null and uo.name like :name)) and "
-			+ " (:description is null or (:description is not null and uo.description like :description))")
+			+ " (:description is null or (:description is not null and uo.description like :description)) and"
+			+ " uo.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity> findByFiltre(
 			@Nullable java.lang.String name, @Nullable String description) {
 		return null;
 	}
 }
+
+
+@Index (name="TUO_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity.class,
+columns={"TUO_TEN_ID", "TUO_CODI"})
+abstract class TipusUnitatOrganitzativaIndex {
+}
+

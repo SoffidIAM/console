@@ -41,7 +41,8 @@ public abstract class RolsGrupEntity {
 
 
 	@Operation(translated="findOwnerGroupsByRole")
-	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup where rolsgrup.assignedRole = :rolOtorgat")
+	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup "
+			+ "where rolsgrup.assignedRole = :rolOtorgat")
 	public java.util.List<es.caib.seycon.ng.model.RolsGrupEntity> findGrupsPosseidorsRol(
 		es.caib.seycon.ng.model.RolEntity rolOtorgat) {
 	 return null;
@@ -50,7 +51,8 @@ public abstract class RolsGrupEntity {
 	 return null;
 	}
 	@Operation(translated="findAssignedRolesByGroup")
-	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup where rolsgrup.ownerGroup = :grup")
+	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup "
+			+ "where rolsgrup.ownerGroup = :grup")
 	public java.util.List<es.caib.seycon.ng.model.RolsGrupEntity> findRolsAtorgatsGrup(
 		es.caib.seycon.ng.model.GrupEntity grup) {
 	 return null;
@@ -59,3 +61,10 @@ public abstract class RolsGrupEntity {
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 }
+
+@Index (name="RLG_ROLGRUP_ROLGRUP",	unique=false,
+entity=es.caib.seycon.ng.model.RolsGrupEntity.class,
+columns={"RLG_ROL", "RLG_GRUP"})
+abstract class RolGrupRolGrupIndex {
+}
+

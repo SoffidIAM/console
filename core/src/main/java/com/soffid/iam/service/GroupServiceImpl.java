@@ -256,7 +256,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			seccioPressupostaria = null;
 		}
 
-		Principal principal = this.getPrincipal();
+		Principal principal = Security.getPrincipal();
 		if (principal == null) {
 			return new Vector();
 		}
@@ -291,7 +291,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		// Obtenemos sólo los grupos relacionados con los roles (para poder ver
 		// los grupos donde
 		// el usuario tiene asignado un rol: antes se filtra)
-		Collection grupsFromRols = findGroupsFromRolesByUserName(getPrincipal().getName());
+		Collection grupsFromRols = findGroupsFromRolesByUserName(Security.getCurrentUser());
 		Collection grups = getSubGrups(grupsFromRols);
 
 		if (grups != null) {
@@ -375,7 +375,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected GroupUser handleCreate(GroupUser usuariGrup) throws Exception {
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
-		if (usuariGrupEntity.getUser().getUserName().compareTo(getPrincipal().getName()) == 0) {
+		if (usuariGrupEntity.getUser().getUserName().compareTo(Security.getCurrentUser()) == 0) {
 			throw new SeyconException(Messages.getString("GroupServiceImpl.7")); //$NON-NLS-1$
 		}
 		UserEntity usuari = usuariGrupEntity.getUser();
@@ -429,7 +429,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			
 			UserEntity usuari = usuariGrupEntity.getUser();
 			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-			usuari.setLastUserModification(getPrincipal().getName());
+			usuari.setLastUserModification(Security.getCurrentAccount());
 			getUserEntityDao().update(usuari);
 			long groupId = usuariGrupEntity.getGroup().getId();
 
@@ -460,7 +460,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 			UserEntity usuari = usuariGrupEntity.getUser();
 			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-			usuari.setLastUserModification(getPrincipal().getName());
+			usuari.setLastUserModification(Security.getCurrentAccount());
 			getUserEntityDao().update(usuari);
 
 			getUserGroupEntityDao().update(usuariGrupEntity);
@@ -588,10 +588,6 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		LinkedList rolsGrup = new LinkedList(rolsGrupE);// Lo activamos
 
 		return getRoleGroupEntityDao().toGroupRolesList(rolsGrup);
-	}
-
-	protected java.security.Principal getPrincipal() {
-		return Security.getPrincipal();
 	}
 
 	protected Collection<RoleAccount> handleFindUsersRolesDomainTypeAndUserGroups(String codiGrup) throws Exception {

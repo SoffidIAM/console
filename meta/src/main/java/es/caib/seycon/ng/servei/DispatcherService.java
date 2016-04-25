@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.servei.AplicacioService.class,
 	es.caib.seycon.ng.model.ServerEntity.class,
-	es.caib.seycon.ng.model.ReplicaDatabaseEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class,
 	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
@@ -243,29 +242,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	@Operation ( grantees={roles.server_query.class},
-			translated="findAllDatabases")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.ReplicaDatabase> findAllDatabases()
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	 return null;
-	}
-	@Operation ( grantees={roles.server_manage.class},
-			translated="update")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.ReplicaDatabase update(
-		es.caib.seycon.ng.comu.ReplicaDatabase database)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	 return null;
-	}
-	@Operation ( grantees={roles.server_manage.class},
-			translated="create")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.ReplicaDatabase create(
-		es.caib.seycon.ng.comu.ReplicaDatabase database)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	 return null;
-	}
+	
 	@Operation ( grantees={roles.server_query.class},
 			translated="findAllServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -289,24 +266,10 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	@Operation ( grantees={roles.server_manage.class},
-			translated="delete")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void delete(
-		es.caib.seycon.ng.comu.ReplicaDatabase database)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	}
-	@Operation ( grantees={roles.server_manage.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Server create(
 		es.caib.seycon.ng.comu.Server server)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	 return null;
-	}
-	@Operation(translated="findReplicaDatabase")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.ReplicaDatabase findReplicaDatabase(
-		java.lang.Long id)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

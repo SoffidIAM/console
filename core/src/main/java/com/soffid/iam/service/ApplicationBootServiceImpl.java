@@ -25,6 +25,8 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.model.TenantEntityDao;
 import com.soffid.iam.service.AdditionalDataService;
 import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
@@ -102,6 +104,7 @@ public class ApplicationBootServiceImpl extends com.soffid.iam.service.Applicati
 
 	private Log log = LogFactory.getLog(com.soffid.iam.service.ApplicationBootService.class);
 	private ApplicationContext applicationContext;
+	private TenantEntityDao tenantDao;
 
 	
 	@Override
@@ -1129,17 +1132,18 @@ public class ApplicationBootServiceImpl extends com.soffid.iam.service.Applicati
 			usu = usuariSvc.create(usu);
 
 			passSvc.storePassword(usu.getUserName(), dc.getCode(), "changeit", false); //$NON-NLS-1$
-			UserAccount account = null;
-			for (UserAccount ua : accountSvc.listUserAccounts(usu)) {
-                if (ua.getSystem().equals(dis.getName())) {
-                    account = ua;
-                    break;
-                }
+		}
+
+		UserAccount account = null;
+		for (UserAccount ua : accountSvc.listUserAccounts(usu)) {
+            if (ua.getSystem().equals(dis.getName())) {
+                account = ua;
+                break;
             }
-			if (account == null)
-			{
-				account = accountSvc.createAccount(usu, dis, null);
-			}
+        }
+		if (account == null)
+		{
+			account = accountSvc.createAccount(usu, dis, null);
 		}
 
 		Collection<AuthorizationRole> auts = autSvc.getAuthorizationRoles(Security.AUTO_AUTHORIZATION_ALL);
@@ -1152,8 +1156,9 @@ public class ApplicationBootServiceImpl extends com.soffid.iam.service.Applicati
 		}
 
 		boolean found = false;
-		for (RoleAccount ru : appSvc.findUsersRolesByUserNameAndRoleName(usu.getUserName(), rol.getName())) {
-            if (ru.getSystem().equals(rol.getSystem())) found = true;
+		for (RoleAccount ru : appSvc.findRoleAccountByAccount(account.getId())) {
+            if (ru.getSystem().equals(rol.getSystem()) &&
+            		ru.getRoleName().equals(rol.getName())) found = true;
         }
 		if (!found)
 		{

@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_MAQUIN", translatedName="HostEntity", translatedPackage="com.soffid.iam.model" )
@@ -103,19 +104,18 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public es.caib.seycon.ng.model.OsTypeEntity operatingSystem;
 
+	@Column (name="MAQ_TEN_ID")
+	public TenantEntity tenant;
+	
 	@Operation(translated="findByName")
 	@DaoFinder("select maq "
 			+ "from com.soffid.iam.model.HostEntity maq "
-			+ "where maq.name=:name and maq.deleted = false")
+			+ "where maq.name=:name and maq.deleted = false and maq.tenant.id=:tenantId")
 	public es.caib.seycon.ng.model.MaquinaEntity findByNom(
 		@Nullable java.lang.String name) {
 	 return null;
 	}
-	@DaoFinder
-	public es.caib.seycon.ng.model.MaquinaEntity findById(
-		java.lang.Long id) {
-	 return null;
-	}
+
 	@Operation(translated="findHostByCriteria")
 	@DaoFinder("select maquina from com.soffid.iam.model.HostEntity maquina, "
 			+ "com.soffid.iam.model.SessionEntity sessio "
@@ -131,7 +131,8 @@ public abstract class MaquinaEntity {
 			+ "(:description is null or maquina.description like :description) and  \n"
 			+ "(:network is null or maquina.network.name like :network) and \n"
 			+ "(:codiUsuari is null or sessio.user.userName like :codiUsuari) and \n"
-			+ "maquina.deleted=false\n"
+			+ "maquina.deleted=false and \n"
+			+ "maquina.tenant.id=:tenantId "
 			+ "order by maquina.name \n")
 	public java.util.List<es.caib.seycon.ng.model.MaquinaEntity> findMaquinaByFiltre(
 		java.lang.String name, 
@@ -164,3 +165,22 @@ public abstract class MaquinaEntity {
 	 return null;
 	}
 }
+
+@Index (name="MAQ_UK_IP",	unique=true,
+entity=es.caib.seycon.ng.model.MaquinaEntity.class,
+columns={"MAQ_TEN_ID", "MAQ_ADRIP"})
+abstract class MaquinaIndex {
+}
+
+@Index (name="MAQ_UK_SERIAL",	unique=true,
+entity=es.caib.seycon.ng.model.MaquinaEntity.class,
+columns={"MAQ_TEN_ID", "MAQ_SERIAL"})
+abstract class MaquinaSerialIndex {
+}
+
+@Index (name="MAQ_NDX_NAME",	unique=true,
+entity=es.caib.seycon.ng.model.MaquinaEntity.class,
+columns={"MAQ_TEN_ID", "MAQ_NOM"})
+abstract class MaquinaNameIndex {
+}
+

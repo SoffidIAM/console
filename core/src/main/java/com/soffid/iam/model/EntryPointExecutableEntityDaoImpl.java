@@ -85,7 +85,7 @@ public class EntryPointExecutableEntityDaoImpl
 		
 		// Posem el punt d'entrada
 		if (source.getAccessTreeId() != null) {
-			target.setEntryPoint(getEntryPointEntityDao().findById(source.getAccessTreeId()));
+			target.setEntryPoint(getEntryPointEntityDao().load(source.getAccessTreeId()));
 		}
 
 

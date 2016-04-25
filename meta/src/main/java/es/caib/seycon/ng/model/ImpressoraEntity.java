@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_IMPRES", translatedName="PrinterEntity", translatedPackage="com.soffid.iam.model" )
@@ -33,6 +34,9 @@ public abstract class ImpressoraEntity {
 
 	@Column (name="IMP_IDMAQ", translated="server")
 	public es.caib.seycon.ng.model.MaquinaEntity servidor;
+	
+	@Column (name="IMP_TEN_ID")
+	TenantEntity tenant;
 
 	@ForeignKey (foreignColumn="GIM_IDIMP", translated="groups")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupImpressoraEntity> grups;
@@ -41,7 +45,8 @@ public abstract class ImpressoraEntity {
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariImpressoraEntity> usuaris;
 
 	@Operation(translated="findByName")
-	@DaoFinder
+	@DaoFinder("from com.soffid.iam.model.PrinterEntity p "
+			+ "where p.name=:name and p.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.ImpressoraEntity findByCodi(
 		java.lang.String name) {
 	 return null;
@@ -52,7 +57,8 @@ public abstract class ImpressoraEntity {
 			+ "where (:name is null or impressora.name like :name) and "
 			+ "(:model is null or impressora.model like :model) and "
 			+ "(:local is null or impressora.local = :local) and "
-			+ "(:host is null or  impressora.server.name like :host) "
+			+ "(:host is null or  impressora.server.name like :host) and "
+			+ "impressora.tenant.id = :tenantId "
 			+ "order by impressora.name")
 	public java.util.List<es.caib.seycon.ng.model.ImpressoraEntity> findImpressoresByCriteri(
 		java.lang.String model, 
@@ -62,3 +68,10 @@ public abstract class ImpressoraEntity {
 	 return null;
 	}
 }
+
+@Index (name="IMP_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.ImpressoraEntity.class,
+columns={"IMP_TEN_ID", "IMP_CODI"})
+abstract class ImpressoraIndex {
+}
+

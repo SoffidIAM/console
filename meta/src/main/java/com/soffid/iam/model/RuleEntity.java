@@ -23,6 +23,9 @@ public abstract class RuleEntity {
 
 	@Column (name="RUL_EXPRES")
 	public java.lang.String bshExpression;
+	
+	@Column (name="RUL_TEN_ID")
+	public TenantEntity tenant;
 
 	@ForeignKey (foreignColumn="RUR_RUL_ID")
 	public java.util.Collection<com.soffid.iam.model.RuleAssignedRoleEntity> roles;
@@ -30,7 +33,9 @@ public abstract class RuleEntity {
 	@ForeignKey (foreignColumn="RLU_RUL_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.RolAccountEntity> generated;
 
-	@DaoFinder("select rule \nfrom com.soffid.iam.model.RuleEntity as rule\nwhere rule.description like :description or :description is null")
+	@DaoFinder("select rule \nfrom com.soffid.iam.model.RuleEntity as rule\n"
+			+ "where rule.tenant.id=:tenantId and "
+			+ "(rule.description like :description or :description is null)")
 	public java.util.List<com.soffid.iam.model.RuleEntity> findByDescription(
 		@Nullable java.lang.String description) {
 	 return null;

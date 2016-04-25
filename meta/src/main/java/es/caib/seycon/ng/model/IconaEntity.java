@@ -17,9 +17,4 @@ public abstract class IconaEntity {
 	@Column (name="ICO_ICONA", length=20000, translated="icon")
 	public byte[] icona;
 
-	@DaoFinder
-	public es.caib.seycon.ng.model.IconaEntity findById(
-		java.lang.Long id) {
-	 return null;
-	}
 }

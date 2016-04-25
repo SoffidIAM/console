@@ -31,9 +31,10 @@ public class EntryPointAccountEntity {
 	public java.util.List<EntryPointAccountEntity> findAll() {
 	 return null;
 	}
+	
 	@DaoFinder("select auth.entryPoint "
 			+ "from com.soffid.iam.model.EntryPointAccountEntity auth "
-			+ "where auth.account.id=:accountId")
+			+ "where auth.account.id=:accountId and auth.account.system.tenant.id=:tenantId")
 	public java.util.List<es.caib.seycon.ng.model.AutoritzacioPUERolEntity> findByAccountId(
 		java.lang.Long accountId) {
 	 return null;

@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_DOMCOR", translatedName="EmailDomainEntity", translatedPackage="com.soffid.iam.model" )
@@ -34,6 +35,9 @@ public abstract class DominiCorreuEntity {
 	@Column (name="DCO_OBSOLET", length=5, translated="obsolete")
 	public java.lang.String obsolet;
 
+	@Column (name="DCO_TEN_ID")
+	TenantEntity tenant;
+	
 	@Operation(translated="findByCode")
 	@DaoFinder
 	public es.caib.seycon.ng.model.DominiCorreuEntity findByCodi(
@@ -44,7 +48,8 @@ public abstract class DominiCorreuEntity {
 	@DaoFinder("from com.soffid.iam.model.EmailDomainEntity dominiCorreu "
 			+ "where (:name is null or dominiCorreu.name like :name) and "
 			+ "(:description is null or dominiCorreu.description like :description) and "
-			+ "(:obsolete is null or dominiCorreu.obsolete = :obsolete) "
+			+ "(:obsolete is null or dominiCorreu.obsolete = :obsolete) and "
+			+ "dominiCorreu.tenant.id = :tenantId "
 			+ "order by dominiCorreu.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiCorreuEntity> findByFiltre(
 		java.lang.String name, 
@@ -53,3 +58,10 @@ public abstract class DominiCorreuEntity {
 	 return null;
 	}
 }
+
+@Index (name="DCO_UK_CODI",	unique=true,
+entity=es.caib.seycon.ng.model.DominiCorreuEntity.class,
+columns={"DCO_TEN_ID", "DCO_CODI"})
+abstract class DominiCorreuIndex {
+}
+

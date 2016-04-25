@@ -148,14 +148,14 @@ public class EntryPointEntityDaoImpl extends
 	
 		// Iconas
 		if (source.getIcon1() != null) {
-			EntryPointIconEntity ico = getEntryPointIconEntityDao().findById(source.getIcon1());
+			EntryPointIconEntity ico = getEntryPointIconEntityDao().load(source.getIcon1());
 			if (ico!=null) {
 				target.setIcon1Image(ico.getIcon());
 				target.setIcon1Id(ico.getId());
 			}
 		}
 		if (source.getIcon2() != null) {
-			EntryPointIconEntity ico = getEntryPointIconEntityDao().findById(source.getIcon2());
+			EntryPointIconEntity ico = getEntryPointIconEntityDao().load(source.getIcon2());
 			if (ico!=null) {
 				target.setIcon2Image(ico.getIcon());
 				target.setIcon2Id(ico.getId());

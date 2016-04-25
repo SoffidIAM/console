@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_PUNENT", translatedName = "EntryPointEntity", translatedPackage = "com.soffid.iam.model")
@@ -85,17 +86,30 @@ public abstract class PuntEntradaEntity {
 	@Nullable
 	public java.lang.String xmlPUE;
 
-	@DaoFinder
-	public es.caib.seycon.ng.model.PuntEntradaEntity findById(java.lang.Long id) {
-		return null;
-	}
-
+	@Column(name="PUE_TEN_ID")
+	TenantEntity tenant;
+	
 	@Operation(translated = "findByCriteria")
 	@DaoFinder("select pue from com.soffid.iam.model.EntryPointEntity as pue "
 			+ "where (:name is null or name like :name) and"
-			+ " (:code is null or (pue.code is not null and pue.code like :code)) ")
+			+ " (:code is null or (pue.code is not null and pue.code like :code)) and "
+			+ "pue.tenant.id = :tenantId "
+			+ "order by pue.code, pue.name")
 	public java.util.List<es.caib.seycon.ng.model.PuntEntradaEntity> findByCriteris(
 			@Nullable java.lang.String name, @Nullable java.lang.String code) {
 		return null;
 	}
+}
+
+
+@Index (name="PUE_APL_1",	unique=false,
+entity=es.caib.seycon.ng.model.PuntEntradaEntity.class,
+columns={"PUE_TEN_ID", "PUE_IDAPL"})
+abstract class PuntEntradaIndex {
+}
+
+@Index (name="PUE_CODE",	unique=false,
+entity=es.caib.seycon.ng.model.PuntEntradaEntity.class,
+columns={"PUE_TEN_ID", "PUE_CODI"})
+abstract class PuntEntradaCodeIndex {
 }

@@ -19,7 +19,7 @@ public class AutoritzacionsUsuari
 		AccountService as = ServiceLocator.instance().getAccountService();
 		UserService us = ServiceLocator.instance().getUserService();
 		String dispatcher = ips.getDefaultDispatcher();
-		Account caller = as.findAccount(Security.getPrincipal().getName(), dispatcher);
+		Account caller = as.findAccount(Security.getCurrentAccount(), dispatcher);
 		if (caller == null)
 			return null;
 		if (caller instanceof UserAccount)

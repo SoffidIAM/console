@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
@@ -70,18 +71,37 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public Boolean unique;
 	
+	
+	@Column (name="TDA_TEN_ID")
+	TenantEntity tenant;
 
 	/********************** DAOS ************************/
 	@Operation(translated="findDataTypeByName")
-	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name")
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name and tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
 		java.lang.String name) {
 	 return null;
 	}
 	@Operation(translated="findDataTypesByName")
-	@DaoFinder("from com.soffid.iam.model.MetaDataEntity tipusDada where (:name is null or tipusDada.name like :name)")
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity tipusDada "
+			+ "where (:name is null or tipusDada.name like :name) and "
+			+ "tipusDada.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByCodi(
 		java.lang.String name) {
 	 return null;
 	}
 }
+
+@Index (name="TAD_UK_CODE",	unique=true,
+entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
+columns={"TDA_TEN_ID", "TDA_CODI"})
+abstract class TipusDadaCodiIndex {
+}
+
+
+@Index (name="TDA_UK_ORDRE",	unique=true,
+entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
+columns={"TDA_TEN_ID", "TDA_ORDRE"})
+abstract class TipusDadaOrdreIndex {
+}
+

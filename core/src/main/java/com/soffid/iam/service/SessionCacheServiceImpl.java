@@ -3,6 +3,7 @@
  */
 package com.soffid.iam.service;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -85,19 +86,13 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 	}
 
 	@SuppressWarnings ("unchecked")
-	private Map<String,Object> getSessionContext() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	private Map<String,Object> getSessionContext() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InternalErrorException {
 		loadSessionClass();
 		if (zkGetCurrentMethod == null || zkGetNativeSession == null)
 			return null;
 		
 		String sessionId;
-		Principal p = Security.getPrincipal();
-		String user;
-		if (p == null)
-			user = "nobody"; //$NON-NLS-1$
-		else
-			user = p.getName();
-
+		String user = "" + Security.getCurrentTenantName() + "\\" + Security.getCurrentAccount();
 		
 		Object session = zkGetCurrentMethod.invoke(null, new Object[0]);
 		if (session == null) {

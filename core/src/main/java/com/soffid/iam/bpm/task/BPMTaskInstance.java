@@ -9,8 +9,21 @@ import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
+import com.soffid.iam.utils.Security;
+
 
 public class BPMTaskInstance extends TaskInstance {
+
+	long tenantId;
+	
+	public long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(long tenantId) {
+		this.tenantId = tenantId;
+	}
+
 
 	/**
 	 * 
@@ -19,14 +32,17 @@ public class BPMTaskInstance extends TaskInstance {
 
 	public BPMTaskInstance() {
 		super();
+		this.tenantId = Security.getCurrentTenantId();
 	}
 
 	public BPMTaskInstance(String taskName, String actorId) {
 		super(taskName, actorId);
+		this.tenantId = Security.getCurrentTenantId();
 	}
 
 	public BPMTaskInstance(String taskName) {
 		super(taskName);
+		this.tenantId = Security.getCurrentTenantId();
 	}
 
 	public void setActorId(String actorId, boolean overwriteSwimlane) {

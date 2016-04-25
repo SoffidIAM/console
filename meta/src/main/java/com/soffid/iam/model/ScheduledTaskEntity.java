@@ -58,12 +58,19 @@ public abstract class ScheduledTaskEntity {
 	@Column (name="SCT_ENABLE", defaultValue="false")
 	public boolean enabled;
 
+	@Column (name="SCT_TEN_ID")
+	public TenantEntity tenant;
+
 	@DaoFinder
 	public com.soffid.iam.model.ScheduledTaskEntity findByName(
 		java.lang.String name) {
 	 return null;
 	}
-	@DaoFinder("select ste\nfrom  com.soffid.iam.model.ScheduledTaskEntity as ste\njoin ste.handler as handler\nwhere handler.name=:handlerName and ste.params=:params")
+	@DaoFinder("select ste\n"
+			+ "from  com.soffid.iam.model.ScheduledTaskEntity as ste\n"
+			+ "join ste.handler as handler\n"
+			+ "where handler.name=:handlerName and ste.params=:params\n"
+			+ "and ste.tenant.id=:tenantId")
 	public com.soffid.iam.model.ScheduledTaskEntity findByHandlerParams(
 		java.lang.String handlerName, 
 		java.lang.String params) {

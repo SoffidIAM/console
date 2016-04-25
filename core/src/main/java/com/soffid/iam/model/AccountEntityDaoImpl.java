@@ -291,13 +291,15 @@ public class AccountEntityDaoImpl extends
 		try {
 			StringBuffer where = new StringBuffer();
 			where.append("select ac from com.soffid.iam.model.AccountEntity as ac "
-					+ "where ac.type != '" + AccountType.USER + "' "); //$NON-NLS-1$ //$NON-NLS-2$
+					+ "where ac.type != '" + AccountType.USER + "' "
+							+ "and ac.system.tenant.id=:tenantId"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (name != null && !name.isEmpty())
 				where.append(" and ac.name like :name"); //$NON-NLS-1$
 			if (dispatcher != null && !dispatcher.isEmpty())
 				where.append(" and ac.system.name like :dispatcher"); //$NON-NLS-1$
 			org.hibernate.Query queryObject = super.getSession(false)
 					.createQuery(where.toString());
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
 			if (name != null && !name.isEmpty())
 				queryObject.setParameter("name", name); //$NON-NLS-1$
 			if (dispatcher != null && !dispatcher.isEmpty())

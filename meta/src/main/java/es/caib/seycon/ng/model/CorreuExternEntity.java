@@ -25,7 +25,11 @@ public abstract class CorreuExternEntity {
 	public java.lang.Long id;
 
 	@Operation(translated="findByAddress")
-	@DaoFinder
+	@DaoFinder("select extern \n"
+			+ "from com.soffid.iam.model.EmailListEntity llicor "
+			+ "left join llicor.externals as extern "
+			+ "where extern.address = :address and "
+			+ " llicor.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.CorreuExternEntity findByAdreca(
 		java.lang.String address) {
 	 return null;
@@ -35,7 +39,9 @@ public abstract class CorreuExternEntity {
 			+ "from com.soffid.iam.model.EmailListEntity llicor "
 			+ "left join llicor.domain as dominiCorreu "
 			+ "where (:listName is null or llicor.name = :listName) and "
-			+ " ( (:listDomain is null and dominiCorreu is null) or (:listDomain is not null and dominiCorreu is not null and dominiCorreu.name = :listDomain))")
+			+ " llicor.tenant.id = :tenantId and"
+			+ " ( (:listDomain is null and dominiCorreu is null) or "
+			+ "(:listDomain is not null and dominiCorreu is not null and dominiCorreu.name = :listDomain))")
 	public java.util.List<es.caib.seycon.ng.model.CorreuExternEntity> findCorreusExternsByNomLlistaCorreuAndCodiDomini(
 		java.lang.String listName, 
 		java.lang.String listDomain) {

@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.ContrasenyaEntity.class,
-	es.caib.seycon.ng.model.ScTarget.class,
-	es.caib.seycon.ng.model.ScContar.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
 	es.caib.seycon.ng.sync.servei.TaskGenerator.class,
 	es.caib.seycon.ng.servei.SessioService.class,

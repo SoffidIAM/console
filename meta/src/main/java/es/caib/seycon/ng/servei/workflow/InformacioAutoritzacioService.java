@@ -134,12 +134,4 @@ public abstract class InformacioAutoritzacioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation (translated="findUsersRolesByUserCodeAndRoleNameUnrestricted")
-	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuariAndNomRolSenseRestriccions(
-		java.lang.String codiUsuari, 
-		java.lang.String nomRol)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
-	 return null;
-	}
 }

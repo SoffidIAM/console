@@ -38,7 +38,10 @@ public abstract class AccountAttributeEntity {
 	public byte[] blobDataValue;
 
 	@DaoFinder("select att from com.soffid.iam.model.AccountAttributeEntity as att "
-			+ "where att.account.name = :account and att.account.system.name = :system and att.metadata.name = :name")
+			+ "where att.account.name = :account and "
+			+ "att.account.system.name = :system and "
+			+ "att.metadata.name = :name and "
+			+ "att.account.system.tenant.id=:tenantId")
 	public AccountAttributeEntity findByName(
 			String system,
 			String account, String name) {
@@ -47,7 +50,7 @@ public abstract class AccountAttributeEntity {
 
 	@DaoFinder("select att from com.soffid.iam.model.AccountAttributeEntity as att "
 			+ "where att.account.system.name = :system and "
-			+ "att.metadata.name = :name and att.value = :value ")
+			+ "att.metadata.name = :name and att.value = :value and att.account.system.tenant.id=:tenantId")
 	public java.util.List<AccountAttributeEntity> findByNameAndValue(
 			String system,
 			String name, String value) {

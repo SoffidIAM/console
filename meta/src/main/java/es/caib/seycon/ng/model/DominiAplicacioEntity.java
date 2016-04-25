@@ -44,18 +44,10 @@ public abstract class DominiAplicacioEntity {
 			+ "left join dominiAplicacio.roles as role "
 			+ "where ((:roleName is null and role is null) or "
 			+ "       (:roleName is not null and role.name = :roleName)) and "
-			+ "  dominiAplicacio.name = :domainName")
+			+ "  dominiAplicacio.name = :domainName and "
+			+ "  dominiAplicacio.informationSystem.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DominiAplicacioEntity findByNomDominiAndNomRol(
 			java.lang.String domainName, java.lang.String roleName) {
-		return null;
-	}
-
-	@Operation(translated = "findByRoleName")
-	@DaoFinder("select dominiAplicacio from com.soffid.iam.model.ApplicationDomainEntity as dominiAplicacio \n"
-			+ "left join dominiAplicacio.roles as role "
-			+ "where role.name = :roleName")
-	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByNomRol(
-			java.lang.String roleName) {
 		return null;
 	}
 
@@ -63,7 +55,8 @@ public abstract class DominiAplicacioEntity {
 	@DaoFinder("select dominiAplicacio "
 			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
 			+ "left join dominiAplicacio.informationSystem aplicacio "
-			+ "where aplicacio.name = :informationSystem "
+			+ "where aplicacio.name = :informationSystem and "
+			+ "aplicacio.tenant.id = :tenantId "
 			+ "order by dominiAplicacio.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByCodiAplicacio(
 			java.lang.String informationSystem) {
@@ -74,7 +67,8 @@ public abstract class DominiAplicacioEntity {
 	@DaoFinder("select dominiAplicacio "
 			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
 			+ "left join dominiAplicacio.informationSystem aplicacio "
-			+ "where aplicacio.name like :informationSystem "
+			+ "where aplicacio.name like :informationSystem and "
+			+ "aplicacio.tenant.id = :tenantId "
 			+ "order by dominiAplicacio.name")
 	public java.util.List<es.caib.seycon.ng.model.DominiAplicacioEntity> findByCodisAplicacions(
 			java.lang.String informationSystem) {
@@ -85,7 +79,8 @@ public abstract class DominiAplicacioEntity {
 			+ "from com.soffid.iam.model.ApplicationDomainEntity dominiAplicacio "
 			+ "left join dominiAplicacio.informationSystem aplicacio "
 			+ "where aplicacio.name = :informationSystem and "
-			+ "dominiAplicacio.name = :name "
+			+ "dominiAplicacio.name = :name and "
+			+ "aplicacio.tenant.id = :tenantId "
 			+ "order by dominiAplicacio.name")
 	public es.caib.seycon.ng.model.DominiAplicacioEntity findByName(
 		String name,
@@ -93,4 +88,10 @@ public abstract class DominiAplicacioEntity {
 	 return null;
 	}
 
+}
+
+@Index (name="DOM_UK_NOM_APP",	unique=true,
+entity=es.caib.seycon.ng.model.DominiAplicacioEntity.class,
+columns={"DOM_APP", "DOM_NOM"})
+abstract class DominiAplicacioIndex {
 }

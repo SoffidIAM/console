@@ -203,7 +203,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	// Marquem l'usuari com a modificat quan es modifica una llista de correu
 	// d'usuari
 	private void updateUserModification(UserEntity usuariEntity) {// OK
-		String usuModifica = getPrincipal() != null ? getPrincipal().getName() : "SEYCON"; //$NON-NLS-1$
+		String usuModifica = getPrincipal() != null ? Security.getCurrentAccount() : "SOFFID"; //$NON-NLS-1$
 		usuariEntity.setLastUserModification(usuModifica);
 		usuariEntity.setLastModificationDate(GregorianCalendar.getInstance().getTime());
 		getUserEntityDao().update(usuariEntity);

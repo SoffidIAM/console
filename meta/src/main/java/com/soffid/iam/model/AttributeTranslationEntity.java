@@ -45,10 +45,15 @@ public class AttributeTranslationEntity {
 	@Nullable
 	public java.lang.String column5;
 	
+	@Column (name="ATT_TEN_ID")
+	public TenantEntity tenant;
+
 	@DaoFinder("select ate from com.soffid.iam.model.AttributeTranslationEntity as ate "
 			+ "where (ate.domain like :domain or :domain is null) and "
 			+ "(ate.column1 like :column1 or :column1 is null) and"
-			+ "(ate.column2 like :column2 or :column2 is null)")
+			+ "(ate.column2 like :column2 or :column2 is null) and\n"
+			+ "ate.tenant.id = :tenantId "
+			+ "order by ate.domain, ate.column1")
 	public Collection<AttributeTranslationEntity> findByExample (@Nullable String domain, @Nullable String column1, @Nullable String column2)
 	{
 		return null;
@@ -65,13 +70,13 @@ public class AttributeTranslationEntity {
 	}
 }
 
-@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL1_NDX", unique=false, columns = { "ATT_DOMAIN", "ATT_COLUMN1" })
+@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL1_NDX", unique=false, columns = { "ATT_TEN_ID", "ATT_DOMAIN", "ATT_COLUMN1" })
 class AttributeTranslationColumn1Index 
 {
 	
 }
 
-@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL2_NDX", unique=false, columns = { "ATT_DOMAIN", "ATT_COLUMN2" })
+@Index (entity=AttributeTranslationEntity.class, name="SC_ATTTRA_COL2_NDX", unique=false, columns = { "ATT_TEN_ID", "ATT_DOMAIN", "ATT_COLUMN2" })
 class AttributeTranslationColumn2Index 
 {
 	

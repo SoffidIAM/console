@@ -34,9 +34,17 @@ public abstract class UsuariSEUEntity {
 	@DaoFinder("select ususeu "
 			+ "from com.soffid.iam.model.UserPreferencesEntity as ususeu "
 			+ "left join ususeu.user usu "
-			+ "where (:userName is null or usu.userName = :userName)")
+			+ "where usu.userName = :userName and usu.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariSEUEntity findByCodiUsuari(
 			java.lang.String userName) {
 		return null;
 	}
 }
+
+@Index (name="SC_USUSEU_USUID",	unique=true,
+entity=es.caib.seycon.ng.model.UsuariSEUEntity.class,
+columns={"USE_USUID"})
+abstract class UsuariSEUIndex {
+}
+
+

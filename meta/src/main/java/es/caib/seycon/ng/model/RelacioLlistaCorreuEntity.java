@@ -30,6 +30,7 @@ public abstract class RelacioLlistaCorreuEntity {
 			+ "left join llistaCorreuR.pertains.domain as correuDominiPertany \n"
 			+ "left join llistaCorreuR.contains.domain as correuDominiConte \n"
 			+ "where \n"
+			+ "llistaCorreuR.pertains.tenant.id = :tenantId and "
 			+ " llistaCorreuR.pertains.name = :ownerName and \n"
 			+ "llistaCorreuR.contains.name = :ownedName and \n"
 			+ "((:ownedDomain is null and correuDominiConte is null) or \n"
@@ -48,6 +49,7 @@ public abstract class RelacioLlistaCorreuEntity {
 			+ "from com.soffid.iam.model.EmailListContainerEntity llistaCorreuR \n"
 			+ "left join llistaCorreuR.pertains.domain as correuDominiPertany \n"
 			+ "where \n"
+			+ " llistaCorreuR.pertains.tenant.id=:tenantId and "
 			+ " llistaCorreuR.pertains.name = :ownerName and \n"
 			+ "((:ownerDomain is null and correuDominiPertany is null) or \n"
 			+ " (:ownerDomain is not null and correuDominiPertany.name = :ownerDomain))")
@@ -61,6 +63,7 @@ public abstract class RelacioLlistaCorreuEntity {
 			+ "from com.soffid.iam.model.EmailListContainerEntity llistaCorreuR \n"
 			+ "left join llistaCorreuR.contains.domain as mailDomain \n"
 			+ "where \n"
+			+ " llistaCorreuR.contains.tenant.id = :tenantId and "
 			+ " llistaCorreuR.contains.name = :ownedName and \n"
 			+ "((:ownedDomain is null and mailDomain is null) or \n"
 			+ " (:ownedDomain is not null and mailDomain.name = :ownedDomain))")

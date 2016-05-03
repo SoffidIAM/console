@@ -45,10 +45,7 @@ public class Custom {
 	public static UsuariService getUsuariService() throws NamingException, CreateException, RemoteException {
 		javax.naming.Context context = new javax.naming.InitialContext();
 		Object objUsuari = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-		es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-					.narrow(objUsuari, es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-		es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome.create();
-		return usuariService;
+		return (UsuariService) objUsuari;
 	}
 	
 	/**

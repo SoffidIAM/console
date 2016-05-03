@@ -23,7 +23,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Configuration;
-import com.soffid.iam.deployer.DeployerServiceMBean;
 import com.soffid.tools.db.persistence.XmlReader;
 import com.soffid.tools.db.schema.Column;
 import com.soffid.tools.db.schema.Database;

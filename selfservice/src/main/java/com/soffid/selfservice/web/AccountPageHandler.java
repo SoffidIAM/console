@@ -33,8 +33,7 @@ public class AccountPageHandler {
 	public Collection<SystemName> find (String filter, String account, String system) 
 			throws CreateException, InternalErrorException, NamingException, UnsupportedEncodingException
 	{
-		SelfServiceHome home = (SelfServiceHome) new InitialContext().lookup(SelfServiceHome.JNDI_NAME);
-		ejb = home.create();
+		ejb = (SelfService) new InitialContext().lookup(SelfServiceHome.JNDI_NAME);
 		
 		Map<String,SystemName> systems = new HashMap<String, SystemName>();
 		

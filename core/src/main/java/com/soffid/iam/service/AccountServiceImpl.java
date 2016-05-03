@@ -90,7 +90,6 @@ import java.util.Vector;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
-import org.jboss.invocation.pooled.server.ServerThread;
 import org.mortbay.log.Log;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeansException;

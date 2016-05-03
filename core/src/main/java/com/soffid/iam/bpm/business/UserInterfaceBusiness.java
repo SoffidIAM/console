@@ -40,7 +40,6 @@ import org.dom4j.DocumentException;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jboss.proxy.ejb.RetryInterceptor;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Event;

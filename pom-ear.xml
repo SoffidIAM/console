@@ -76,6 +76,7 @@
           <artifactId>mda-maven-plugin</artifactId>
           <version>2.0.26-SNAPSHOT</version>
           <configuration>
+            <targetServer>tomee</targetServer>
             <translate>true</translate>
             <translateEntities>true</translateEntities>
           </configuration>
@@ -443,7 +444,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.18</zkiblaf.version>
-    <zkdb.version>1.21-SNAPSHOT</zkdb.version>
+    <zkdb.version>1.23-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>

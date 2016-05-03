@@ -7,10 +7,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread() {
 		super();
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -19,10 +15,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(Runnable target, String name) {
 		super(target, name);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -30,10 +22,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(Runnable target) {
 		super(target);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -41,10 +29,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(String name) {
 		super(name);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -55,10 +39,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(ThreadGroup group, Runnable target, String name, long stackSize) {
 		super(group, target, name, stackSize);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -68,10 +48,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(ThreadGroup group, Runnable target, String name) {
 		super(group, target, name);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -80,10 +56,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(ThreadGroup group, Runnable target) {
 		super(group, target);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	/**
@@ -92,10 +64,6 @@ public class NotLoggedThread extends Thread{
 	 */
 	public NotLoggedThread(ThreadGroup group, String name) {
 		super(group, name);
-		org.jboss.security.SecurityAssociation.clear();
-		//org.jboss.security.SecurityAssociation.getSubject();
-		//java.security.AccessController.getContext();
-		//Thread.currentThread();
 	}
 
 	

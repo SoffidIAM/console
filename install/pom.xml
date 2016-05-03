@@ -181,7 +181,7 @@
             	<groupId>${pom.groupId}</groupId>
             	<artifactId>deployer</artifactId>
 		<version>${pom.version}</version>
-		<type>sar</type>
+		<type>ejb</type>
 		</dependency>
 	    <dependency>
             <groupId>${pom.groupId}</groupId>

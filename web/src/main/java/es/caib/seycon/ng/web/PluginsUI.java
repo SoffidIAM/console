@@ -190,9 +190,8 @@ public class PluginsUI extends Window implements AfterCompose {
 
     private ServerPluginService getPluginService() throws CreateException,
             NamingException, InternalErrorException {
-        ServerPluginServiceHome home = (ServerPluginServiceHome) new InitialContext()
+        return (ServerPluginService) new InitialContext()
                 .lookup("java:comp/env/ejb/ServerPluginEJB"); //$NON-NLS-1$
-        return home.create();
     }
 
     public void afterCompose() {

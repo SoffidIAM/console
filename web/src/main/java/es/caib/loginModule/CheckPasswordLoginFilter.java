@@ -16,6 +16,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.loginModule.client.SeyconPrincipal;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.BadPasswordException;
@@ -93,7 +95,7 @@ public class CheckPasswordLoginFilter implements Filter {
 				if (principal !=null && principal.getName()!=null) {
 					log.info(String.format(Messages.getString("CheckPasswordLoginFilter.MustChangePassCallInfo"), principal.getName()));  //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-1$
 					// Ho verifiquem en amb SC_CONTRA
-					mustChangePassword = checkMustChangePassword(principal.getName());
+					mustChangePassword = checkMustChangePassword(Security.getCurrentAccount());
 					// i contra els rols (jboss)
 					boolean mustChangeJboss = req.isUserInRole("SEYCON_CHANGE_PASSWORD"); //$NON-NLS-1$
 					// si qualsevols dels dos és true: mustChangePassword

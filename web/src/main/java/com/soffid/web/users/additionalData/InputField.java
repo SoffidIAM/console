@@ -162,8 +162,7 @@ public class InputField extends Div implements XPathSubscriber{
 				l.setValue("");
 			else
 			{
-				UsuariService ejb = ((UsuariServiceHome) new InitialContext(). lookup (UsuariServiceHome.JNDI_NAME))
-						.create();
+				UsuariService ejb = (UsuariService) new InitialContext(). lookup (UsuariServiceHome.JNDI_NAME);
 				Usuari u = ejb.findUsuariByCodiUsuari(user);
 				if (u == null)
 				{
@@ -190,8 +189,7 @@ public class InputField extends Div implements XPathSubscriber{
 		try
 		{
 			
-			SelfServiceHome home = (SelfServiceHome)  new InitialContext().lookup (SelfServiceHome.JNDI_NAME);
-			SelfService ejb = home.create();
+			SelfService ejb = (SelfService)  new InitialContext().lookup (SelfServiceHome.JNDI_NAME);
 			
 			BindContext bindCtx = XPathUtils.getComponentContext(this);
 			String dataType = (String) XPathUtils.getValue(bindCtx, "@codiDada");

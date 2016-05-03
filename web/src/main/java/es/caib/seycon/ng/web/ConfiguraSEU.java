@@ -258,9 +258,7 @@ public class ConfiguraSEU extends Vbox {
 			javax.naming.Context context = new javax.naming.InitialContext();
 			Object objUsuari = context
 					.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-			es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-					.narrow(objUsuari, es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-			es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome.create();
+			UsuariService usuariService = (UsuariService) objUsuari;
 			return usuariService;
 		} else return usuari_service;
 		

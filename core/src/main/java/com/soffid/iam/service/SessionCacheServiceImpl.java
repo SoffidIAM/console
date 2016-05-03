@@ -18,7 +18,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.webdav.lib.properties.GetLastModifiedProperty;
 import org.zkoss.zk.ui.Sessions;
 
 import com.soffid.iam.bpm.service.impl.UserContextCache;

@@ -18,7 +18,6 @@ import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 
 import es.caib.seycon.ng.comu.TipusDomini;
-import org.apache.webdav.lib.properties.GetContentLengthProperty;
 
 /**
  * @see es.caib.seycon.ng.model.RolAssociacioRolEntity

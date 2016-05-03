@@ -31,15 +31,14 @@ public class ShowAdditionalData {
 	{
 		if (dadesAddicionalsService == null)
 		{
-			DadesAddicionalsServiceHome homeDades = (DadesAddicionalsServiceHome) new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
-			dadesAddicionalsService = homeDades.create();
+			dadesAddicionalsService = (DadesAddicionalsService) 
+					new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
 		}
 		return dadesAddicionalsService;
 	}
 	
 	public ShowAdditionalData() throws NamingException, CreateException{
-		UsuariServiceHome home = (UsuariServiceHome) new InitialContext().lookup (UsuariServiceHome.JNDI_NAME);
-		usuariServ = home.create();
+		usuariServ = (UsuariService) new InitialContext().lookup (UsuariServiceHome.JNDI_NAME);
 		
 	}
 

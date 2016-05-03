@@ -247,10 +247,9 @@ public class ConfigureIndex extends Frame
 	private void clearNotUserProperty(String key) throws NamingException,
 		CreateException, InternalErrorException
 	{
-		ConfiguracioServiceHome home =
-				(ConfiguracioServiceHome) new InitialContext()
+		ConfiguracioService ejb =
+				(ConfiguracioService) new InitialContext()
 					.lookup(ConfiguracioServiceHome.JNDI_NAME);
-		ConfiguracioService ejb = home.create();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);
@@ -273,10 +272,9 @@ public class ConfigureIndex extends Frame
 	private void saveParameter(String key, String value)
 		throws NamingException, CreateException, InternalErrorException
 	{
-		ConfiguracioServiceHome home =
-			(ConfiguracioServiceHome) new InitialContext()
+		ConfiguracioService ejb =
+			(ConfiguracioService) new InitialContext()
 				.lookup(ConfiguracioServiceHome.JNDI_NAME);
-		ConfiguracioService ejb = home.create();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);
@@ -310,10 +308,9 @@ public class ConfigureIndex extends Frame
 	private String getDocumentMngParameter(String key) throws NamingException,
 		CreateException, InternalErrorException
 	{
-		ConfiguracioServiceHome home =
-				(ConfiguracioServiceHome) new InitialContext()
+		ConfiguracioService ejb =
+				(ConfiguracioService) new InitialContext()
 					.lookup(ConfiguracioServiceHome.JNDI_NAME);
-		ConfiguracioService ejb = home.create();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);

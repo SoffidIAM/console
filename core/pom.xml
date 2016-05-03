@@ -56,6 +56,7 @@
 							es/caib/seycon/ng/exception/*.class
 						</clientInclude>
 					</clientIncludes>
+					<ejbVersion>3.0</ejbVersion>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -260,12 +261,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-cache</artifactId>
-			<version>1.2.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>es.caib.signatura.api</groupId>
 			<artifactId>signaturaapi</artifactId>
 			<version>2.3</version>
@@ -341,11 +336,6 @@
 			<artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
 			<scope>provided</scope>
@@ -397,20 +387,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jbossall-client</artifactId>
-			<version>3.2.8-5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-common-jdbc-wrapper</artifactId>
-			<version>3.2.8-5</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -442,12 +420,6 @@
 			<version>1.6.6</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>es.caib.jboss</groupId>
-			<artifactId>seyconsession-common</artifactId>
-			<version>2.3.8-caib5</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>dom4j</groupId>
@@ -596,6 +568,12 @@
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>scim-query</artifactId>
 			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0-6</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

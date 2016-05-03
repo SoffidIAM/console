@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="query" type="query">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				q = new AccountCriteria ();
+				q.setExcludeType ( AccountType.USER);
+				return q;
+			</script-finder>
+		</finder>
+
+		<finder name="tenant" type="tenant">
+			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.TenantService"
+				method="find" if="${queryEnabled}"> <!-- parameter:query -->
+				<parameter value="${self.query[0].instance}" />
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.Configuracio">
+			</new-instance-bean>
+		</finder>
+	</datanode>	
+	
+	<datanode name="query" transient="true" />
+
+	<datanode name="account">
+		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService">
+			<insert-method method="create" returnBean="true" >  <!-- user:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<update-method method="update"> <!-- user:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		
+		</ejb-handler>
+	</datanode>
+	
+</zkib-model>

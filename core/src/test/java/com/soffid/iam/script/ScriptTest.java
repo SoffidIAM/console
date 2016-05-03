@@ -1,10 +1,15 @@
 package com.soffid.iam.script;
 
 import java.io.StringReader;
+import java.security.AccessControlContext;
 import java.security.AccessController;
+import java.security.Principal;
 import java.security.PrivilegedAction;
 
+import javax.security.auth.Subject;
+
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.utils.RunAsPrincipal;
 
 import bsh.BshClassManager;
 import bsh.EvalError;
@@ -17,10 +22,9 @@ public class ScriptTest extends  TestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		
 		AccessController.doPrivileged(new PrivilegedAction<String>() {
 			public String run() {
-				System.setSecurityManager(old);
+				System.setSecurityManager(previousSecurityManager);
 				return null;
 			}
 		});
@@ -29,7 +33,8 @@ public class ScriptTest extends  TestCase {
 	BshClassManager bshcm;
 	NameSpace ns;
 	Interpreter interpreter ;
-	private SecurityManager old;
+	private SecurityManager previousSecurityManager;
+
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -38,12 +43,12 @@ public class ScriptTest extends  TestCase {
 		ns = new bsh.NameSpace(bshcm, "namespace");
 		interpreter = new Interpreter( new StringReader(""), System.out, System.err, false, ns);
 		interpreter = new Interpreter();
-		old = System.getSecurityManager();
 		
 		AccessController.doPrivileged(new PrivilegedAction<String>() {
 
 			public String run() {
-				System.setSecurityManager(new MySecurityManager());
+				previousSecurityManager = System.getSecurityManager();
+				System.setSecurityManager(new MySecurityManager(previousSecurityManager));
 				return null;
 			}
 		});
@@ -109,5 +114,4 @@ public class ScriptTest extends  TestCase {
 			e.printStackTrace();
 		}
 	}
-
 }

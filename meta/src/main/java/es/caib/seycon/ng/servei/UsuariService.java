@@ -411,30 +411,6 @@ public abstract class UsuariService {
 		return null;
 	}
 
-	@Operation(grantees = { roles.user_update.class, roles.user_create.class }, translated = "checkUserIdentity")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String[] verificarIdentitatUsuari(
-			@Nullable java.lang.String nom,
-			@Nullable java.lang.String llinatge1,
-			@Nullable java.lang.String llinatge2,
-			@Nullable java.lang.String document)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(grantees = { roles.user_update.class, roles.user_create.class }, translated = "checkUserIdentity")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String[] verificarIdentitatUsuari(
-			@Nullable java.lang.String nom,
-			@Nullable java.lang.String llinatge1,
-			@Nullable java.lang.String llinatge2,
-			@Nullable java.lang.String tipusDocument,
-			@Nullable java.lang.String document,
-			@Nullable java.lang.String numSolicitud)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
 	@Operation(grantees = { roles.Tothom.class }, translated = "update")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.UsuariSEU update(
@@ -464,24 +440,6 @@ public abstract class UsuariService {
 	public java.util.Collection<es.caib.seycon.ng.comu.EstatContrasenya> getContrasenyesTipusUsuari(
 			java.util.Date dataInici, @Nullable java.util.Date dataFi,
 			@Nullable java.lang.String tipusUsuari)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(translated = "seeUserIdentity")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String[] consultarIdentitatUsuari(
-			@Nullable java.lang.String document)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(translated = "seeUserIdentity")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String[] consultarIdentitatUsuari(
-			@Nullable java.lang.String tipusDocument,
-			@Nullable java.lang.String document,
-			@Nullable java.lang.String numSolicitud)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

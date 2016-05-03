@@ -1,65 +1,76 @@
 package com.soffid.iam.script;
 
+import java.io.FileDescriptor;
+import java.net.InetAddress;
 import java.security.AccessControlException;
 import java.security.Permission;
 
 public class MySecurityManager extends SecurityManager {
 
-	public MySecurityManager() {
+	private SecurityManager chain;
+
+	public MySecurityManager(SecurityManager previousSecurityManager) {
+		this.chain = previousSecurityManager;
 	}
 
 	public boolean isScript ()
 	{
 		Class[] stack = getClassContext();
-		for (Class x: stack)
-		{
-			System.out.println ("CTX="+x.getName());
-		}
 		System.out.println("Checking is script: "+
 				(stack == null ? "NULL STACK":
 					stack[1].getPackage().getName()));
-		return stack == null || stack[0].getPackage().getName().startsWith("bsh");
+		for (int i = 0; i < 3; i++)
+		{
+			System.out.println (stack[i].getName());
+		}
+		return stack == null || stack[1].getPackage().getName().startsWith("bsh");
 
 	}
 	@Override
 	public void checkPermission(Permission perm) {
-		if (isScript()){
-//			System.out.println ("Checking "+perm.toString());
-			super.checkPermission(perm);
+		System.out.println ("Checking "+perm.toString());
+		try {
+			if (chain != null)
+				chain.checkPermission(perm);
+		} catch (RuntimeException e) {
+			System.out.println ("************** DENIED "+e.toString());
+			throw e;
 		}
 	}
 
 	@Override
 	public void checkPermission(Permission perm, Object context) {
-		//		System.out.println ("Checking "+perm.toString()+" ctx="+context);
-		super.checkPermission(perm, context);
+		System.out.println ("Checking "+perm.toString()+" ctx="+context);
+		try {
+			if (chain != null)
+				chain.checkPermission(perm, context);
+		} catch (RuntimeException e) {
+			System.out.println ("************** DENIED "+e.toString());
+			throw e;
+		}
 	}
 
 	@Override
 	public void checkPackageAccess(String pkg) {
 		System.out.println ("Checking package access "+pkg);
-		if (pkg.startsWith("es.caib.seycon"))
-		{
-			System.out.println ("***");
-		}
 		if (isScript())
+		{
+			System.out.println ("*************** DENIED");
 			throw new SecurityException ("Not allowed");
-		super.checkPackageAccess(pkg);
+		}
+		if (chain != null)
+			chain.checkPackageAccess(pkg);
 	}
 
 	@Override
 	public void checkPackageDefinition(String pkg) {
-		//System.out.println ("Checking package def "+pkg);
 		if (isScript())
+		{
+			System.out.println ("*************** DENIED");
 			throw new SecurityException ("Not allowed");
-		super.checkPackageDefinition(pkg);
+		}
+		if (chain != null)
+			chain.checkPackageDefinition(pkg);
 	}
 
-	@Override
-	public void checkMemberAccess(Class<?> clazz, int which) {
-		//System.out.println ("Checking member access "+clazz.getName()+" "+which);
-		super.checkMemberAccess(clazz, which);
-	}
-
-	
 }

@@ -23,8 +23,7 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 
 	public void afterCompose() {
 		try {
-			DadesAddicionalsServiceHome home = (DadesAddicionalsServiceHome) new InitialContext().lookup(DadesAddicionalsServiceHome.JNDI_NAME);
-			DadesAddicionalsService bean = home.create();
+			DadesAddicionalsService bean = (DadesAddicionalsService) new InitialContext().lookup(DadesAddicionalsServiceHome.JNDI_NAME);
 			for (TipusDada tda: bean.findTipusDadesByCodi("%") )
 			{
 				if (( AttributeVisibilityEnum.EDITABLE.equals(tda.getOperatorVisibility()) ||

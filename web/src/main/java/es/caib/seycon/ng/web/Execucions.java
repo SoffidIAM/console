@@ -50,9 +50,8 @@ public class Execucions extends HttpServlet {
 		} else {
 			try {
 				es.caib.seycon.ng.servei.ejb.PuntEntradaService puntEntradaService = 
-						((PuntEntradaServiceHome) new InitialContext()
-							.lookup(PuntEntradaServiceHome.JNDI_NAME))
-								.create();
+						(es.caib.seycon.ng.servei.ejb.PuntEntradaService) new InitialContext()
+							.lookup(PuntEntradaServiceHome.JNDI_NAME);
 				PuntEntrada pe;
 				pe = puntEntradaService.findPuntEntradaById(Long.decode(id).longValue());
 				if (pe != null)

@@ -27,6 +27,9 @@
 	boolean canViewDominiUsuaris = AutoritzacionsUsuari.hasViewDominiUsuaris();
 	boolean canViewAccounts = AutoritzacionsUsuari.hasViewAccountsSEU();
 	boolean canViewAttributeTranslation = es.caib.seycon.ng.utils.Security.isUserInRole("seu:attributeTranslation:show");
+	com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
+	boolean canViewTenants = es.caib.seycon.ng.utils.Security.isUserInRole("seu:tenant:show") &&
+			com.soffid.iam.utils.Security.getCurrentTenantName().equals ( masterTenant.getName() );
 	
 	boolean canViewRules = es.caib.seycon.ng.utils.Security.isUserInRole("seu:rules:show");
 	// Ara es mira per ACL de xarxes i màquines
@@ -208,6 +211,11 @@
     				<treecell label="${c:l('seu.configaudito')}" onClick="configaudito.setOpen ( ! configaudito.isOpen() )"/>
     			</treerow>
 		    	<treechildren>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewTenants}" langlabel="seu.tenants" pagina="/tenants/tenants.zul"/>
+		    			</treerow>
+		    		</treeitem>
 					<treeitem>
 		    			<treerow>
 		    				<apptreecell if="${canViewParametres}" langlabel="seu.parametres" pagina="/parametres.zul"/>

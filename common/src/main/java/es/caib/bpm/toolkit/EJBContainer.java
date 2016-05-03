@@ -66,9 +66,7 @@ public class EJBContainer {
 		}
 		if (engine == null)
 		{
-			Object o = new InitialContext().lookup (BpmEngineHome.JNDI_NAME);
-			BpmEngineHome engineHome = (BpmEngineHome)o;
-			engine=engineHome.create();
+			engine = (BpmEngine) new InitialContext().lookup (BpmEngineHome.JNDI_NAME);
 		}
 		return engine;
 
@@ -77,12 +75,7 @@ public class EJBContainer {
 	public static BpmConfigService getBPMConfigBean () throws CreateException, NamingException
 	{
 		try{
-			Object o = new InitialContext().lookup (BpmConfigServiceHome.JNDI_NAME);
-			BpmConfigServiceHome beanHome = (BpmConfigServiceHome)o;
-			return beanHome.create();
-		}catch(CreateException e){
-			LogFactory.getLog(EJBContainer.class).error(e.getMessage(), e);
-			throw e;
+			return  (BpmConfigService) new InitialContext().lookup (BpmConfigServiceHome.JNDI_NAME);
 		}catch(NamingException e){
 			LogFactory.getLog(EJBContainer.class).error(e.getMessage(), e);
 			throw e;

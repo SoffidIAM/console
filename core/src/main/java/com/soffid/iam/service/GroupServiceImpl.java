@@ -375,7 +375,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected GroupUser handleCreate(GroupUser usuariGrup) throws Exception {
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
-		if (usuariGrupEntity.getUser().getUserName().compareTo(Security.getCurrentUser()) == 0) {
+		if (usuariGrupEntity.getUser().getUserName().equals (Security.getCurrentUser())) {
 			throw new SeyconException(Messages.getString("GroupServiceImpl.7")); //$NON-NLS-1$
 		}
 		UserEntity usuari = usuariGrupEntity.getUser();
@@ -383,7 +383,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
 
 			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-			usuari.setLastUserModification(getPrincipal().getName());
+			usuari.setLastUserModification(Security.getCurrentAccount());
 			getUserEntityDao().update(usuari);
 
 			getUserGroupEntityDao().create(usuariGrupEntity);

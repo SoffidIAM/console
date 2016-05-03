@@ -494,19 +494,9 @@ public class Security {
     	return tenantService;
     }
     
-    public static void nestedLogin(String user, String roles[])  {
-    	assertCanSetIdentity(Thread.currentThread().getStackTrace());
-    	
+    private static void internalNestedLogin(String tenant, String user, String roles[])  {
         Identity i = new Identity();
-        String ctn;
-		try {
-			ctn = getCurrentTenantName()+"\\";
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
-		}
-        if (! user.startsWith(ctn))
-        	user = ctn + user;
-        i.principal = new RunAsPrincipal(user);
+        i.principal = new RunAsPrincipal(tenant+"\\"+user);
         i.roles = roles;
         i.transactionInitiated = false;
         getIdentities().push(i);
@@ -522,6 +512,27 @@ public class Security {
             } catch (Exception e1) {
             }
         }
+    }
+
+    public static void nestedLogin(String user, String roles[])  {
+    	assertCanSetIdentity();
+    	
+        String ctn;
+		try {
+			ctn = getCurrentTenantName()+"\\";
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
+		}
+        if (! user.startsWith(ctn))
+        	user = ctn + user;
+        int i = user.indexOf('\\');
+        internalNestedLogin(user.substring(0, i), user.substring(i+1), roles);
+    }
+
+    public static void nestedLogin(String tenant, String user, String roles[])  {
+    	assertCanSetTenant();
+    	
+        internalNestedLogin(tenant, user, roles);
     }
 
     public static void nestedLogin( String roles[])  {
@@ -654,8 +665,9 @@ public class Security {
     	return id;
     }
     
-    private static void assertCanSetIdentity (StackTraceElement trace[])
+    private static StackTraceElement getCaller ()
     {
+    	StackTraceElement trace[] = Thread.currentThread().getStackTrace();
     	// Find Security methods
     	int i = 0;
     	while (i < trace.length && ! trace[i].getClassName().equals(Security.class.getName()))
@@ -663,6 +675,22 @@ public class Security {
     	// Skip security methods
     	while (i < trace.length && trace[i].getClassName().equals(Security.class.getName()))
     		i++;
+    	if (i < trace.length)
+    		return trace[i];
+    	
+    	else
+    		return null;
+    	
+    }
+
+    private static void assertCanSetIdentity ()
+    {
+    	StackTraceElement caller = getCaller();
+    }
+
+    private static void assertCanSetTenant ()
+    {
+    	StackTraceElement caller = getCaller();
     	
     }
 }

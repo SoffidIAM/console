@@ -38,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
-import org.apache.webdav.lib.properties.GetContentLengthProperty;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**

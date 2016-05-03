@@ -24,6 +24,9 @@ public class TenantEntity {
 	@Column(name = "TEN_DESCRI")
 	public java.lang.String description;
 
+	@Column(name = "TEN_ENABLE", defaultValue="true")
+	public boolean enabled;
+	
 	@DaoFinder
 	public TenantEntity findByName (String name)
 	{ return null;}

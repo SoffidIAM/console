@@ -51,8 +51,7 @@ public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate
 	private UsuariService usuariService;
 	
 	public SeleccionUsuarioUI2() throws CreateException, NamingException {
-		UsuariServiceHome svcHome = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
-		usuariService = svcHome.create();
+		usuariService = (UsuariService) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
 
 		cmpAsc[3]=new StringArrayComparator(true,3);
 		cmpAsc[2]=new StringArrayComparator(true,2);

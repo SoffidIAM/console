@@ -153,8 +153,7 @@ public class HideColumnsComponent extends Toolbarbutton
 
 	private UsuariService getUsuariService () throws NamingException, CreateException
 	{
-		UsuariServiceHome home = (UsuariServiceHome) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
-		return home.create ();
+		return (UsuariService) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
 	}
 	
 	private boolean[] getCurrentPreferences () throws InternalErrorException, NamingException, CreateException

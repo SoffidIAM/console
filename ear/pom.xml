@@ -36,22 +36,6 @@
 		</dependency>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
-			<artifactId>iam-legacy</artifactId>
-			<version>${pom.version}</version>
-			<type>ejb</type>
-			<exclusions>
-				<exclusion>
-					<groupId>axis</groupId>
-					<artifactId>axis-jaxrpc</artifactId>
-				</exclusion>
-				<exclusion>
-					<artifactId>dom4j</artifactId>
-					<groupId>dom4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-web</artifactId>
 			<version>${pom.version}</version>
 			<type>war</type>

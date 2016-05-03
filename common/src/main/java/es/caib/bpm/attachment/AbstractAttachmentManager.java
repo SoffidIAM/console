@@ -86,13 +86,10 @@ public abstract class AbstractAttachmentManager {
         log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
         context = new InitialContext();
 
-        log.debug(Messages.getString("AbstractAttachmentManager.SendToHome")); //$NON-NLS-1$
-        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
-        documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(o,
-                DocumentServiceHome.class);
-
         log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        document = documentHome.create();
+        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
+        document = (DocumentService) PortableRemoteObject.narrow(o,
+                DocumentServiceHome.class);
         document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
 
         return document;
@@ -109,11 +106,10 @@ public abstract class AbstractAttachmentManager {
 
         log.debug(Messages.getString("AbstractAttachmentManager.SendToHome")); //$NON-NLS-1$
         Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
-        documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(o,
+        document = (DocumentService) PortableRemoteObject.narrow(o,
                 DocumentServiceHome.class);
 
         log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        document = documentHome.create();
         document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
 
         return document;
@@ -150,16 +146,13 @@ public abstract class AbstractAttachmentManager {
 
     public DocumentService getDocument(String tag) throws NamingException,
             RemoteException, CreateException, InternalErrorException {
-        DocumentServiceHome documentHome = (DocumentServiceHome) PortableRemoteObject.narrow(
-                new InitialContext().lookup(DocumentServiceHome.JNDI_NAME),
-                DocumentServiceHome.class);
         DocumentReference ref = getReference(tag);
 
         if (ref == null)
             return null;
         else
         {
-            DocumentService doc = documentHome.create();
+            DocumentService doc = (DocumentService) new InitialContext().lookup(DocumentServiceHome.JNDI_NAME);
             doc.openDocument(ref);
             return doc;
         }

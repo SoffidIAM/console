@@ -1,6 +1,7 @@
 package com.soffid.iam.ui;
 
 import com.soffid.iam.api.SyncAgentTaskLog;
+import com.soffid.iam.service.ejb.SyncServerService;
 import com.soffid.iam.service.ejb.SyncServerServiceHome;
 import com.soffid.iam.ui.SeyconTask.Estat;
 
@@ -70,8 +71,7 @@ public class SeyconTaskRenderer implements ListitemRenderer {
                     if (estatExecucio[i].equals(Estat.ERROR) && t.getUrlAgent() != null) {
                         c.setLabel(estatExecucio[i] + "*");
                         String taskAgent = this.agentsHeader.toArray()[i].toString();
-                        SyncServerServiceHome home = (SyncServerServiceHome) new InitialContext().lookup(SyncServerServiceHome.JNDI_NAME);
-                        com.soffid.iam.service.ejb.SyncServerService svc = home.create();
+                        com.soffid.iam.service.ejb.SyncServerService svc = (SyncServerService) new InitialContext().lookup(SyncServerServiceHome.JNDI_NAME);
                         Iterator<SyncAgentTaskLog> taskIterator = svc.getAgentTasks(t.getUrlAgent(), taskAgent).iterator();
                         while (taskIterator.hasNext()) {
                             com.soffid.iam.api.SyncAgentTaskLog log = taskIterator.next();

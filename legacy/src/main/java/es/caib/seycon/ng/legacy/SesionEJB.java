@@ -79,6 +79,7 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AccessLog;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.service.AccessLogService;
@@ -86,6 +87,7 @@ import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.PasswordService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.service.TenantService;
 import com.soffid.iam.utils.Security;
 
 import es.caib.loginModule.auth.ClientIPValve;
@@ -1148,10 +1150,14 @@ public class SesionEJB implements EntityBean {
                 + Security.AUTO_ALL });
         try {
             // Valida usuario/dni contra BBDD
-
+        	TenantService ts = ServiceLocator.instance().getTenantService();
             UserService us = ServiceLocator.instance().getUserService();
             AccountService as = ServiceLocator.instance().getAccountService();
             PasswordService ps = ServiceLocator.instance().getPasswordService();
+
+            Tenant t = ts.getTenant(tenant);
+            if (tenant == null || ! t.isEnabled())
+            	return false;
 
             String dispatcher = ps.getDefaultDispatcher();
             Account acc = as.findAccount(accountName, dispatcher);
@@ -1205,7 +1211,7 @@ public class SesionEJB implements EntityBean {
                 if (fetchIntranetUser((String) e.nextElement()))
                     return true;
             } catch (NamingException e1) {
-                if (!e.hasMoreElements())
+                if (!e.hasMoreElements()) 
                     throw e1;
             }
         }
@@ -1404,6 +1410,7 @@ public class SesionEJB implements EntityBean {
                 + Security.AUTO_ALL });
         try {
 
+        	TenantService ts = ServiceLocator.instance().getTenantService();
             UserService us = ServiceLocator.instance().getUserService();
             AccountService as = ServiceLocator.instance().getAccountService();
             PasswordService ps = ServiceLocator.instance().getPasswordService();

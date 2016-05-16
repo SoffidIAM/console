@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.utils.Security;
 
-import es.caib.loginModule.client.SeyconPrincipal;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InvalidPasswordException;
@@ -67,25 +66,12 @@ public class CheckPasswordLoginFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		// SI L'USUARI HA ENTRAT AMB CERTIFICAT, NO COMPROVEM
-		try {
-			if (SeyconPrincipal.getCurrent()
-					.getCredentialType() == SeyconPrincipal.SIGNATURE_CREDENTIAL)  {
-				//log.info ("L'usuari ha entrat amb certificat");
-				chain.doFilter(request, response);	
-				return; //sortim
-			}
-		} catch (NamingException e) {
-			log.warn (e);			
-		}
-
 		HttpServletRequest req = (HttpServletRequest) request;
 		// Obtenim la sessio
 		HttpSession session = req.getSession(true);
 		
 		// I l'atribut mustChangePassword per veure si ja s'ha establert
-		Boolean mustChangePassword = (Boolean) session
-				.getAttribute("SEYCON_MUSTCHANGEPASSWORD"); //$NON-NLS-1$
+		Boolean mustChangePassword = req.isUserInRole("PASSWORD:EXPIRED"); //$NON-NLS-1$
 		
 		if (mustChangePassword == null) {// Si és null: fem la comprovació
 			//log.info("Atribut SEYCON_MUSTCHANGEPASSWORD = " + mustChangePassword);

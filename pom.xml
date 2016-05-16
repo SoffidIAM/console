@@ -437,6 +437,27 @@
 			<version>2.4.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.30</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0-6</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>openejb-core</artifactId>
+			<version>4.7.4</version>
+			<scope>provided</scope>
+		</dependency>
+
     </dependencies>
   </dependencyManagement>
   <properties>
@@ -444,7 +465,7 @@
     <document.manager.version>${pom.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.18</zkiblaf.version>
+    <zkiblaf.version>1.19-SNAPSHOT</zkiblaf.version>
     <zkdb.version>1.23-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>

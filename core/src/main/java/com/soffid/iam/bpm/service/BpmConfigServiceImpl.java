@@ -15,6 +15,7 @@ import org.jbpm.JbpmContext;
 
 import es.caib.bpm.exception.BPMException;
 
+import com.soffid.iam.api.Tenant;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.model.DBProperty;
@@ -273,6 +274,10 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 	protected void handleConsoleBoot () throws Exception
 	{
 		Configuration.configureForConsole();
+	}
+
+	@Override
+	protected void handleTenantBoot(Tenant tenant) throws Exception {
 	}
 
 

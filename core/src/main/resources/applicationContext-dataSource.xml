@@ -8,7 +8,7 @@
 
     <!-- JNDI DataSource for J2EE environments -->
     <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName"><value>java:/jdbc/seycon</value></property>
+        <property name="jndiName"><value>openejb:/Resource/jdbc/soffid</value></property>
     </bean>
     
     <!-- ====================== End of DATASOURCE DEFINITION ====================== -->
@@ -16,8 +16,8 @@
     <!-- ===================== TRANSACTION MANAGER DEFINITION ========================= -->
 
     <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-        <property name="userTransactionName"><value>UserTransaction</value></property>
-        <property name="transactionManagerName"><value>java:/TransactionManager</value></property>
+        <property name="userTransactionName"><value>java:/comp/UserTransaction</value></property>
+        <property name="transactionManagerName"><value>java:/comp/TransactionManager</value></property>
     </bean>
 
     <!-- ===================== TRANSACTION MANAGER DEFINITION ========================= -->

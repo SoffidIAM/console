@@ -44,6 +44,11 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>iam-legacy</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<scope>provided</scope>
@@ -63,14 +68,10 @@
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
 			<artifactId>openejb-core</artifactId>
-			<version>4.7.4</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
 			<artifactId>javaee-api</artifactId>
-			<version>6.0-6</version>
-			<scope>provided</scope>
 		</dependency>
 		
 	</dependencies>

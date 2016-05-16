@@ -11,12 +11,14 @@
 	<name>Soffid IAM Console EAR</name>
 	<description>Soffid IAM Console</description>
 	<dependencies>
+<!--
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
 			<artifactId>bpm-sar</artifactId>
 			<version>${pom.version}</version>
 			<type>sar</type>
 		</dependency>
+-->
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
@@ -48,15 +50,16 @@
 		</dependency>		
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
+			<artifactId>upload-components</artifactId>
+			<version>${pom.version}</version>
+			<type>ejb</type>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-webservice</artifactId>
 			<version>${pom.version}</version>
 			<type>war</type>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>upload-components</artifactId>
-			<version>${pom.version}</version>
-			<type>sar</type>
 		</dependency>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
@@ -64,6 +67,7 @@
 			<version>${pom.version}</version>
 			<type>war</type>
 		</dependency>
+-->
 	</dependencies>
 	<build>
 		<resources>
@@ -81,17 +85,21 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<version>2.8</version>
 				<configuration>
+			        <defaultLibBundleDir>lib/</defaultLibBundleDir>
+ 		            <skinnyWars>true</skinnyWars>
 					<modules>
 						<webModule>
 							<groupId>${pom.groupId}</groupId>
 							<artifactId>iam-web</artifactId>
 							<contextRoot>/</contextRoot>
 						</webModule>
+						<!-- 
 						<webModule>
 							<groupId>${pom.groupId}</groupId>
 							<artifactId>iam-webservice</artifactId>
 							<contextRoot>/webservice</contextRoot>
 						</webModule>
+						 -->
 						<webModule>
 							<groupId>${pom.groupId}</groupId>
 							<artifactId>iam-weblogout</artifactId>

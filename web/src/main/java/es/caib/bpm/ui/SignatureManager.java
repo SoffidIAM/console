@@ -74,7 +74,7 @@ public class SignatureManager implements SignaturaHandler {
 			// Ahora mostrar el interfaz de usuario para firmar
 			CMSSignatureManagerHelper.doSign (window,am, tag, doc);
 			
-			doc.remove();
+			doc.closeDocument();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -94,7 +94,7 @@ public class SignatureManager implements SignaturaHandler {
 			// Ahora mostrar el interfaz de usuario
 			SignPDFSignatureManagerHelper.doSignPDF (am, inputTag,outputTag, enabledStampType, enabledPositions, forcedAdditionalText);
 			
-			doc.remove();
+			doc.closeDocument();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -115,7 +115,7 @@ public class SignatureManager implements SignaturaHandler {
 			// Ahora mostrar el interfaz de usuario
 			SignPDFSignatureManagerHelper.doSignPDF (am, inputTag,outputTag, enabledStampType, stampPositions, top, left, height, width, rotation, forcedAdditionalText);
 			
-			doc.remove();
+			doc.closeDocument();
 		} catch (UserWorkflowException e) {
 			throw e;
 		
@@ -172,7 +172,7 @@ public class SignatureManager implements SignaturaHandler {
 				// Ahora mostrar el interfaz de usuario
 				CertifyDigitalCopyPDFSignatureManagerHelper.doCompulsaPDF (am, inputTag,outputTag,url,location,x,y,rotation);
 				
-				doc.remove();
+				doc.closeDocument();
 			} catch (UserWorkflowException e) {
 				throw e;
 			

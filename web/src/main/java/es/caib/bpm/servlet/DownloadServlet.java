@@ -91,7 +91,7 @@ public class DownloadServlet extends HttpServlet {
 				b = d.nextDownloadPackage(8192);
 			}
 			d.endDownloadTransfer();
-			d.remove();
+			d.closeDocument();
 		} catch (CreateException e) {
 			throw new ServletException(Messages.getString("DownloadServlet.SessionExpired"), e); //$NON-NLS-1$
 		} catch (NamingException e) {
@@ -103,8 +103,6 @@ public class DownloadServlet extends HttpServlet {
 		} catch (InternalErrorException e) {
 			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
 		} catch (EJBException e) {
-			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
-		} catch (RemoveException e) {
 			throw new ServletException(Messages.getString("DownloadServlet.InternalError"), e); //$NON-NLS-1$
 		}
 	}

@@ -61,7 +61,7 @@ public abstract class AbstractAttachmentManager {
 
         attach(tag, document);
         
-        document.remove();
+        document.closeDocument();
         
     }
 

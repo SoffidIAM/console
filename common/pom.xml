@@ -214,28 +214,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.zkoss.zk</groupId>
-			<artifactId>zul</artifactId>
-			<version>3.0.8</version>
-			<scope>provided</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.soffid.zkib</groupId>
-			<artifactId>zkdb</artifactId>
-			<version>1.12</version>
-			<scope>provided</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.soffid.zkib</groupId>
-			<artifactId>zkiblaf</artifactId>
-			<version>1.11</version>
-			<classifier>classes</classifier>
-			<scope>provided</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.jbpm.jbpm3</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
 			<version>3.3.1.GA</version>

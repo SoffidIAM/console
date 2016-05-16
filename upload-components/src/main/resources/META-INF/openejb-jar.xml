@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openejb-jar>
+  <ejb-deployment ejb-name="UploadServiceBean">
+    <jndi name="UploadServiceBean"/>  
+  </ejb-deployment>
+  <ejb-deployment ejb-name="LoginService">
+  	<jndi name="soffid.ejb.com.soffid.iam.tomcat.service.LoginService"/>
+  </ejb-deployment>
+</openejb-jar>

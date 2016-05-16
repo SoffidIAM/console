@@ -75,7 +75,7 @@ public class UploadServlet extends HttpServlet {
             //si no fem update, el attach no es guarda
             engine.update(task);
             
-            d.remove();
+            d.closeDocument();
         } catch (CreateException e) {
             throw new ServletException(Messages.getString("UploadServlet.SessionExpired"), e); //$NON-NLS-1$
         } catch (NamingException e) {
@@ -89,8 +89,6 @@ public class UploadServlet extends HttpServlet {
 		} catch (InternalErrorException e) {
             throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
 		} catch (EJBException e) {
-            throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
-		} catch (RemoveException e) {
             throw new ServletException(Messages.getString("UploadServlet.InternalError"), e); //$NON-NLS-1$
 		}
     }
@@ -152,7 +150,7 @@ public class UploadServlet extends HttpServlet {
 				
 				//si no fem update, el attach no es guarda
 				//engine.update(task);
-	        	doc.remove();
+	        	doc.closeDocument();
 	        //fi de procés d'upload al document manager
 		}catch(Exception e){
 			throw new ServletException(e);

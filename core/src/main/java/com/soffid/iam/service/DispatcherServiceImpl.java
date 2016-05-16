@@ -13,11 +13,26 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 
 import com.soffid.iam.api.AccessControl;
+import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Configuration;
-import com.soffid.iam.api.ReplicaDatabase;
+import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
@@ -36,7 +51,6 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
-import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -48,36 +62,13 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
-import com.soffid.iam.service.ConfigurationService;
-import com.soffid.iam.service.SystemScheduledTasks;
-import com.soffid.iam.service.UserService;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
-import com.soffid.iam.utils.Security;
-import com.soffid.iam.api.AttributeMapping;
-import com.soffid.iam.api.ObjectMapping;
-import com.soffid.iam.api.ObjectMappingProperty;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-
-import org.apache.axis.components.logger.LogFactory;
-import org.hibernate.Hibernate;
-import org.mortbay.log.Log;
 
 /**
  * @see es.caib.seycon.ng.servei.DispatcherService

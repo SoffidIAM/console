@@ -11,18 +11,22 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.mx.util.MBeanProxyExt;
-import org.jboss.system.ServiceMBeanSupport;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Configuration;
+import com.soffid.iam.deployer.DeployerService;
+import com.soffid.iam.model.identity.IdentityGeneratorBean;
+import com.soffid.iam.service.ApplicationBootService;
+import com.soffid.iam.service.ApplicationShutdownService;
+import com.soffid.iam.service.ConfigurationService;
 import com.soffid.tools.db.persistence.XmlReader;
 import com.soffid.tools.db.schema.Column;
 import com.soffid.tools.db.schema.Database;
@@ -32,20 +36,20 @@ import com.soffid.tools.db.updater.MsSqlServerUpdater;
 import com.soffid.tools.db.updater.MySqlUpdater;
 import com.soffid.tools.db.updater.OracleUpdater;
 
-import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
-import com.soffid.iam.model.identity.IdentityGeneratorBean;
-import com.soffid.iam.service.ApplicationBootService;
-import com.soffid.iam.service.ApplicationShutdownService;
-import com.soffid.iam.service.ConfigurationService;
-
-public class UploadService extends ServiceMBeanSupport implements UploadServiceMBean {
+// @Singleton(name="UploadServiceBean")
+// @Startup
+public class UploadService {
     int scheduledInterval = 30000;
     int maxScheduledInterval = 30000;
     int schedulerThreads = 1;
     Log log = LogFactory.getLog(UploadService.class);
 
+    
+    @EJB(beanName="SoffidDeployerBean")
+    DeployerService soffidDeployer;
+    
     protected void startService() throws Exception {
         try {
             log.info(Messages.getString("UploadService.StartingUploadInfo")); //$NON-NLS-1$
@@ -59,8 +63,6 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
             try {
             	com.soffid.iam.ServiceLocator.instance().getUserService();
             } catch (Exception e)  {
-            	final DeployerServiceMBean soffidDeployer = (DeployerServiceMBean) MBeanProxyExt.
-            			create(DeployerServiceMBean.class, "com.soffid.iam:name=deployer") ;
             	if (! soffidDeployer.isFailSafe())
             	{
             		soffidDeployer.setFailSafe(true);

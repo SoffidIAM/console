@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.api.Tenant;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -27,8 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.bpm.servei.BpmEngine.class,
 	es.caib.seycon.ng.servei.SoDRuleService.class,
-	com.soffid.iam.service.ScheduledTaskService.class,
-	TenantEntity.class})
+	com.soffid.iam.service.ScheduledTaskService.class})
 public abstract class ApplicationBootService {
 
 	@Operation(translated="syncServerBoot")
@@ -36,6 +36,13 @@ public abstract class ApplicationBootService {
 	public void syncServerBoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"})
+	public void tenantBoot(Tenant tenant)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
+
 	@Operation(translated="consoleBoot")
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"})
 	public void consoleBoot()

@@ -20,6 +20,7 @@ import java.util.zip.ZipInputStream;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.Local;
 import javax.ejb.SessionContext;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -61,6 +62,7 @@ import org.apache.openejb.NoSuchApplicationException;
 import org.apache.openejb.UndeployException;
 import org.apache.openejb.assembler.Deployer;
 import org.apache.openejb.assembler.DeployerEjb;
+import org.apache.openejb.assembler.classic.AppInfo;
 import org.apache.openejb.jee.jba.cmp.Datasource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -71,9 +73,10 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-@Singleton(name="com.soffid.iam/version2/DeployerBean")
+@Singleton(name="SoffidDeployerBean")
+@Local({DeployerService.class})
 @Startup
-public class DeployerBean {
+public class DeployerBean implements DeployerService {
 	int schedulerThreads = 1;
 	Log log = LogFactory.getLog(DeployerBean.class);
 	private File mainWarFile;
@@ -99,8 +102,8 @@ public class DeployerBean {
 	@PostConstruct
 	public void init() throws Exception {
 		log.info("Started deployer bean");
-		deploy();
-		context.getTimerService().createTimer(5000, "Scan Timer");
+		deploy(true);
+		context.getTimerService().createTimer(5000, 5000, "Scan Timer");
 	}
 
 	public List<String> getInitClasses() {
@@ -126,7 +129,6 @@ public class DeployerBean {
 		extractPlugins(qh);
 		log.info("Setting application up");
 		updateApplicationXml();
-		updateJBossAppXml();
 		new FileOutputStream(getTimestampFile()).close();
 	}
 
@@ -164,15 +166,12 @@ public class DeployerBean {
 
 		Node node = (Node) xpath.evaluate(
 				"/application", doc, XPathConstants.NODE); //$NON-NLS-1$
-		NodeList modules = node.getChildNodes();
-		Node firstModule = null;
-		for (int i = 0; i < modules.getLength(); i++) {
-			Node m = modules.item(i);
-			if (m instanceof Element
-					&& ((Element) m).getTagName().equals("module")) {
-				firstModule = m;
-				break;
-			}
+		NodeList webmodules = (NodeList) xpath.evaluate("module/web", node, XPathConstants.NODESET);
+		for (int i = 0; i < webmodules.getLength(); i++) {
+			Node webmodule = webmodules.item(i);
+			Node webUri = (Node) xpath.evaluate("web-uri", webmodule, XPathConstants.NODE);
+			String path = webUri.getTextContent();
+			webUri.setTextContent(removeExtension(path));
 		}
 
 		for (String modulePath : coreModules) {
@@ -184,59 +183,6 @@ public class DeployerBean {
 				me.appendChild(ejb);
 				node.appendChild(me);
 				log.info("Registering ejb module " + moduleFile.getName());
-			}
-		}
-
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		appXml.delete();
-		FileOutputStream out = new FileOutputStream(appXml);
-		StreamResult result = new StreamResult(out);
-		transformer.transform(new DOMSource(doc), result);
-		out.close();
-	}
-
-	private void updateJBossAppXml() throws SAXException, IOException,
-			ParserConfigurationException, XPathExpressionException,
-			TransformerException {
-		File appXml = new File(
-				new File(deployDir(), "META-INF"), "jboss-app.xml"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-		f.setValidating(false);
-		f.setFeature("http://xml.org/sax/features/validation", false);
-		f.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-dtd-grammar",
-				false);
-		f.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-external-dtd",
-				false);
-
-		DocumentBuilder builder = f.newDocumentBuilder();
-		builder.setEntityResolver(new EntityResolver() {
-
-			public InputSource resolveEntity(String publicId, String systemId)
-					throws SAXException, IOException {
-				return new InputSource();
-			}
-		});
-		FileInputStream in = new FileInputStream(appXml);
-		Document doc = builder.parse(in);
-		in.close();
-
-		XPath xpath = XPathFactory.newInstance().newXPath();
-
-		Node node = (Node) xpath.evaluate(
-				"/jboss-app/loader-repository", doc, XPathConstants.NODE); //$NON-NLS-1$
-		NodeList modules = node.getChildNodes();
-		Node firstModule = null;
-		for (int i = 0; i < modules.getLength(); i++) {
-			Node m = modules.item(i);
-			if (m instanceof Text) {
-				m.setTextContent("jboss.loader:loader=soffid-"
-						+ System.currentTimeMillis() + "\n");
-				break;
 			}
 		}
 
@@ -547,6 +493,13 @@ public class DeployerBean {
 		}
 	}
 
+	private String removeExtension (String warFile) {
+		int i = warFile.lastIndexOf('.');
+		if ( i >= 0)
+			return warFile.substring(0,i);
+		else
+			return warFile;
+	}
 	private void extractWar(InputStream in, File warFile)
 			throws FileNotFoundException, IOException {
 		log.info("Exploding war " + warFile.getPath());
@@ -556,6 +509,7 @@ public class DeployerBean {
 			selfServiceWarFile = warFile;
 		if (warFile.getName().startsWith("iam-webservice-")) //$NON-NLS-1$
 			webserviceWarFile = warFile;
+		warFile = new File (removeExtension(warFile.getPath()));
 		warFile.mkdirs();
 		ZipEntry entry;
 		ZipInputStream zin = new ZipInputStream(in);
@@ -617,7 +571,22 @@ public class DeployerBean {
 
 	private void undeploy() throws MalformedURLException, UndeployException,
 			NoSuchApplicationException {
-		deployer.undeploy(deployDir().getPath());
+		try {
+			if (failedWarInfo != null)
+			{
+				log.info("Undeploying "+failedWarInfo.path);
+				deployer.undeploy(failedWarInfo.path);
+				failedWarInfo = null;
+			}
+		} catch (Throwable e2) {
+			log.warn(e2);
+		}
+
+		if (appInfo != null)
+		{
+			deployer.undeploy(appInfo.path);
+			appInfo = null;
+		}
 		initClasses = new LinkedList<String>();
 		coreModules = new LinkedList<String>();
 		javaModules = new LinkedList<String>();
@@ -633,37 +602,22 @@ public class DeployerBean {
 	}
 
 	public void redeploy() throws Exception {
+		pauseConnector();
 		undeploy();
-		deploy();
+		deploy(false);
+		resumeConnector();
 	}
 
-	private void deploy() throws Exception {
+	AppInfo failedWarInfo = null;
+	private AppInfo appInfo = null;
+	private void deploy(boolean firstTime) throws Exception {
 
 		File home = getJbossHomeDir();
-		File startingWar = new File(new File(home, "soffid"), "starting.ear");
 		File failedWar = new File(new File(home, "soffid"), "failed.ear");
 
+		lastModified = initialEarFile().lastModified();
+
 		try {
-			if (failedWar.isFile() || failedWar.isDirectory()) {
-				try {
-					deployer.undeploy(startingWar.getPath());
-				} catch (Exception e2) {
-				}
-			}
-
-			if (startingWar.isFile() || startingWar.isDirectory()) {
-				try {
-					deployer.undeploy(startingWar.getPath());
-				} catch (Exception e2) {
-				}
-				try {
-					log.info("Deploying "+startingWar.getPath());
-					deployer.deploy(startingWar.getPath());
-				} catch (Exception e2) {
-					log.warn(e2);
-				}
-			}
-
 			if (failSafe) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
@@ -704,24 +658,19 @@ public class DeployerBean {
 			}
 
 			try {
-
-				pauseConnector();
 				log.info("Deploying "+deployDir().getPath());
-				deployer.deploy(deployDir().getPath());
+				appInfo = deployer.deploy(deployDir().getPath());
 			} finally {
-				Thread.sleep(2000);
-				resumeConnector();
+				Thread.sleep(1000);
 			}
-		} catch (Exception e) {
+
+		} catch (Throwable e) {
 			log.warn(Messages.getString("UploadService.UploadFileError"), e); //$NON-NLS-1$
-			if (failedWar.isFile() || failedWar.isDirectory()) {
-				try {
-					deployer.deploy(failedWar.getPath());
-				} catch (Exception e2) {
-					log.warn(e2);
-				}
+			try {
+				failedWarInfo = deployer.deploy(failedWar.getPath());
+			} catch (Exception e2) {
+				log.warn(e2);
 			}
-			throw e;
 		}
 	}
 
@@ -729,26 +678,23 @@ public class DeployerBean {
 
 	@Timeout
 	public void timeOutHandler(Timer timer) throws Exception {
-		log.info("Running timer");
-		long last = initialEarFile().lastModified();
-		File addonsDir = new File(
-				new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (addonsDir.isDirectory()) {
-			for (File f : addonsDir.listFiles()) {
-				if (f.lastModified() > last)
-					last = f.lastModified();
+		try {
+			long last = initialEarFile().lastModified();
+			File addonsDir = new File(
+					new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (addonsDir.isDirectory()) {
+				for (File f : addonsDir.listFiles()) {
+					if (f.lastModified() > last)
+						last = f.lastModified();
+				}
 			}
-		}
-
-		if (last > lastModified) {
-			if (lastModified == 0) {
-				lastModified = last;
-				deploy();
-			} else {
-				lastModified = last;
+	
+			if (last > lastModified) {
 				failSafe = false;
 				redeploy();
 			}
+		} catch (Exception e) {
+			log.info("Error on deployer timer", e);
 		}
 	}
 

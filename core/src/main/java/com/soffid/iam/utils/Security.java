@@ -1,24 +1,36 @@
 package com.soffid.iam.utils;
 
+import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
+import com.soffid.iam.service.TenantServiceImpl;
 import com.soffid.iam.service.ejb.UserServiceHome;
+import com.soffid.iam.tomcat.SoffidPrincipal;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.Principal;
 import java.security.acl.Group;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +44,11 @@ import javax.security.auth.Subject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import org.apache.commons.collections.LRUMap;
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.openejb.loader.SystemInstance;
+import org.apache.openejb.spi.Assembler;
+import org.apache.openejb.spi.SecurityService;
 
 // import org.jboss.security.SecurityAssociation;
 
@@ -292,10 +308,7 @@ public class Security {
     public static final String AUTO_REMEMBER_PASSWORD_QUERY = "rememberPassword:query"; //$NON-NLS-1$
     public static final String AUTO_SEU_VIEW_REMEMBER_PASSWORD = "seu:rememberPassword:show"; //$NON-NLS-1$
 	
-    private static Class securityAssociationClass;
-    private static Method getSubjectMethod;
-
-    private static ThreadLocal identities = new ThreadLocal();
+    private static ThreadLocal<Stack<SoffidPrincipal>> identities = new ThreadLocal<Stack<SoffidPrincipal>>();
     private static boolean disableAllSecurityForEver = false;
 	public static boolean isDisableAllSecurityForEver() {
 		return disableAllSecurityForEver;
@@ -303,10 +316,10 @@ public class Security {
 
 	private static com.soffid.iam.service.UserService userService = null;
 
-    private static Stack getIdentities() {
-        Stack s = (Stack) identities.get();
+    private static Stack<SoffidPrincipal> getIdentities() {
+        Stack<SoffidPrincipal> s = (Stack<SoffidPrincipal>) identities.get();
         if (s == null) {
-            s = new Stack();
+            s = new Stack<SoffidPrincipal>();
             identities.set(s);
         }
         return s;
@@ -316,148 +329,47 @@ public class Security {
         if (disableAllSecurityForEver)
             return true;
 
-        int roleCercatSenseDomini = role.lastIndexOf("/"); //$NON-NLS-1$
-        boolean rolAmbDomini = (roleCercatSenseDomini != -1);
+        GenericPrincipal principal = getPrincipal ();
 
-        if (getIdentities().isEmpty()) {
-            if (disableAllSecurityForEver)
-                return true;
+        if (principal == null)
+        	return false;
+        
+    	if (principal.hasRole(role))
+    		return true;
+    	
+    	if (principal.hasRole(AUTO_AUTHORIZATION_ALL))
+    		return true;
 
-            Subject subject;
-            try {
-                subject = getCurrentSubject();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-
-            if (subject == null)
-                return false; // pot ésser nul??
-            boolean userInRole = false;
-            Iterator principalIterator = subject.getPrincipals().iterator();
-
-            while (!userInRole && principalIterator.hasNext()) {
-                Principal principal = (Principal) principalIterator.next();
-                if (principal.getName().compareTo("Roles") == 0) { //$NON-NLS-1$
-                    String[] roles = splitRoles(principal.toString());
-                    for (int i = 0; (!userInRole) && i < roles.length; i++) {
-                        if (rolAmbDomini) {
-                            // Comprovem que siga la mateixa autorització
-                            if (roles[i].startsWith(role.substring(0, roleCercatSenseDomini))) {
-                                // l'usuari té l'autorització amb domini i tot o
-                                // la té per tots els dominis
-                                userInRole = (roles[i].compareTo(role) == 0 || roles[i]
-                                        .endsWith("/*")); //$NON-NLS-1$
-                            }
-                            // userInRole =
-                            // roles[i].startsWith(role.substring(0,role.length()-1));
-                        } else {
-                            userInRole = roles[i].compareTo(role) == 0;
-                        }
-                    }
-                }
-            }
-            return userInRole;
-        } else {
-            Identity id = (Identity) getIdentities().peek();
-            for (int i = 0; i < id.roles.length; i++) {
-                if (id.roles[i].equals(AUTO_AUTHORIZATION_ALL))
-                    return true;
-                if (rolAmbDomini) {
-                    /*
-                     * return id.roles[i].startsWith(role.substring(0,
-                     * role.length() - 1));
-                     */
-                    if (id.roles[i].startsWith(role.substring(0, roleCercatSenseDomini))) {
-                        // l'usuari té l'autorització amb domini i tot o la té
-                        // per tots els dominis
-                        if (id.roles[i].compareTo(role) == 0 || id.roles[i].endsWith("/*")) //$NON-NLS-1$
-                            return true;
-                    }
-                } else {
-                    if (role.equals(id.roles[i]))
-                        return true;
-                }
-            }
-            return false;
-        }
-    }
-
-	private static Subject getCurrentSubject() throws ClassNotFoundException,
-			NoSuchMethodException, IllegalAccessException,
-			InvocationTargetException {
-		Subject subject;
-		if (securityAssociationClass == null) {
-		    securityAssociationClass = Class
-		            .forName("org.jboss.security.SecurityAssociation"); //$NON-NLS-1$
-		}
-		if (getSubjectMethod == null)
-		    getSubjectMethod = securityAssociationClass.getMethod("getSubject"); //$NON-NLS-1$
-
-		subject = (Subject) getSubjectMethod.invoke(null);
-		return subject;
-	}
-
-    public static List<String> getAuthorizations() {
-        String roles [] = null;
-
-        if (getIdentities().isEmpty()) {
-            if (disableAllSecurityForEver)
-                return Collections.emptyList();
-
-            Subject subject;
-            try {
-                subject = getCurrentSubject();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Collections.emptyList();
-            }
-
-            if (subject == null)
-                return Collections.emptyList();
-
-            Iterator principalIterator = subject.getPrincipals().iterator();
-            while (roles == null && principalIterator.hasNext()) {
-                Principal principal = (Principal) principalIterator.next();
-                if (principal.getName().compareTo("Roles") == 0) { //$NON-NLS-1$
-                    roles = splitRoles(principal.toString());
-                }
-            }
-        } else {
-            Identity id = (Identity) getIdentities().peek();
-            roles = id.roles;
-        }
-        if (roles == null)
-        	return Collections.emptyList();
-        	
-        LinkedList<String> rolesList = new LinkedList <String>();
-        for (String role: roles)
+    	int i = role.indexOf('/');
+        if (i <= 0)
         {
-        	rolesList.add (role);
-        	int i = role.lastIndexOf("/"); //$NON-NLS-1$
-        	if (i > 0)
+        	for ( String s: principal.getRoles())
         	{
-        		rolesList.add (role.substring(0, i));
+        		if (s.startsWith(role+"/"))
+        			return true;
         	}
         }
-        return rolesList;
-    }
-
-
-    private static String[] splitRoles(String roleList) {
-        roleList = roleList.replace("Roles(members:", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        roleList = roleList.replace(")", ""); //$NON-NLS-1$ //$NON-NLS-2$
-        String[] rolesInitial = roleList.split(","); //$NON-NLS-1$
-        String[] rolesFinal = new String[rolesInitial.length];
-        for (int i = 0; i < rolesInitial.length; i++) {
-            rolesFinal[i] = rolesInitial[i].trim();
+        else
+        {
+        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL))
+        		return true;
         }
-        return rolesFinal;
+        
+        return false;
     }
 
-    public static Principal getPrincipal() {
+    public static List<String> getAuthorizations() {
+    	SoffidPrincipal principal = getPrincipal();
+    	if (principal == null)
+    		return Collections.emptyList();
+    	else
+    		return Arrays.asList(principal.getRoles());
+    }
+
+
+    public static SoffidPrincipal getPrincipal() {
         if (!getIdentities().isEmpty()) {
-            return ((Identity) getIdentities().peek()).principal;
+            return getIdentities().peek();
         } else if (disableAllSecurityForEver) {
             String host;
             try {
@@ -469,20 +381,22 @@ public class Security {
                     host = "root"; //$NON-NLS-1$
                 }
             }
-            return new RunAsPrincipal(host);
+            return new SoffidPrincipal(host, host, Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
         } else {
-        	try {
-				Subject s = getCurrentSubject();
-				for (Principal p: s.getPrincipals())
-				{
-					if (! (p instanceof Group)) {
-						return p;
-					} 
-				}
-				return null;
-			} catch (Exception e) {
-				return null;
-			}
+        	SystemInstance si = SystemInstance.get();
+        	if (si == null)
+        		return null;
+        	Assembler a = si.getComponent(Assembler.class);
+        	if (a == null)
+        		return null;
+            final SecurityService<?> ss = a.getSecurityService();
+            if (ss == null)
+            	return null;
+            Principal p = ss.getCallerPrincipal();
+            if (p instanceof SoffidPrincipal)
+            	return (SoffidPrincipal) p;
+            else
+            	return null;
         }
     }
 
@@ -495,23 +409,8 @@ public class Security {
     }
     
     private static void internalNestedLogin(String tenant, String user, String roles[])  {
-        Identity i = new Identity();
-        i.principal = new RunAsPrincipal(tenant+"\\"+user);
-        i.roles = roles;
-        i.transactionInitiated = false;
-        getIdentities().push(i);
-        boolean doTransaction = false;
-        if (doTransaction) { 
-            try {
-                UserTransaction tx = (UserTransaction) new InitialContext().lookup("/UserTransaction"); //$NON-NLS-1$
-                if (tx != null && tx.getStatus() == Status.STATUS_NO_TRANSACTION) {
-                    tx.begin();
-                    i.transaction = tx;
-                    i.transactionInitiated = true;
-                }
-            } catch (Exception e1) {
-            }
-        }
+        SoffidPrincipal p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
+        getIdentities().push(p);
     }
 
     public static void nestedLogin(String user, String roles[])  {
@@ -540,7 +439,7 @@ public class Security {
     }
 
     public static void nestedLogoff() {
-        Identity i = (Identity) getIdentities().pop();
+        getIdentities().pop();
     }
 
     public static void disableAllSecurityForEver() {
@@ -579,7 +478,6 @@ public class Security {
     public static String getCurrentTenantName () throws InternalErrorException
     {
     	Principal p = getPrincipal();
-    	Tenant t = null;
     	if (p != null)
     	{
     		int i = p.getName().indexOf('\\');
@@ -598,11 +496,10 @@ public class Security {
     
     public static String getCurrentUser () 
     {
-    	Principal p;
+    	SoffidPrincipal p;
     	if (! getIdentities().isEmpty())
     	{
-    		Identity identity = (Identity) getIdentities().peek();
-    		p = identity.principal;
+    		p = getIdentities().peek();
     	}
     	else if (disableAllSecurityForEver)
     		return null;
@@ -688,10 +585,33 @@ public class Security {
     	StackTraceElement caller = getCaller();
     }
 
+    private static HashSet<String> trustedClasses = null;
+    
     private static void assertCanSetTenant ()
     {
+    	if (trustedClasses == null)
+    	{
+    		try {
+				for (
+					Enumeration<URL> trustedResources = Security.class.getClassLoader().getResources("com/soffid/iam/utils/trusted-classes");
+					trustedResources.hasMoreElements();)
+				{
+					InputStream in = trustedResources.nextElement().openConnection().getInputStream();
+					InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+					LineNumberReader lnr = new LineNumberReader(reader);
+					String line;
+					while ( (line = lnr.readLine()) != null)
+					{
+						trustedClasses.add(line);
+					}
+				}
+			} catch (Exception e) {
+	    		throw new SecurityException("Unable to parse trusted tenants list", e);
+			}
+    	}
     	StackTraceElement caller = getCaller();
-    	
+    	if (! trustedClasses.contains(caller.getClassName()))
+    		throw new SecurityException("Not allowed to change tenant");
     }
 }
 

@@ -195,23 +195,6 @@
 			<version>${zkdb.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-			<version>3.2.3</version><!--$NO-MVN-MAN-VER$-->
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>es.caib.jboss</groupId>
-			<artifactId>seyconsession-common</artifactId>
-			<version>2.3.8-caib5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-weblogout</artifactId>
 			<version>${pom.version}</version>
@@ -245,6 +228,10 @@
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>javaee-api</artifactId>
 		</dependency>
 	</dependencies>
 </project>

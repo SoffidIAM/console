@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE ejb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN" "http://java.sun.com/dtd/ejb-jar_2_0.dtd">
+
+<ejb-jar>
+
+	<description><![CDATA[No Description.]]></description>
+	<display-name>After initialization service beans</display-name>
+
+	<enterprise-beans>
+
+		<!-- Entity Beans -->
+		<session>
+			<description><![CDATA[Upload server component]]></description>
+			<display-name>UploadServiceBean</display-name>
+
+			<ejb-name>UploadServiceBean</ejb-name>
+
+			<ejb-class>es.caib.seycon.ng.upload.UploadService</ejb-class>
+			<session-type>Stateless</session-type>
+            <transaction-type>Bean</transaction-type>
+		</session>
+
+		<!-- Message Driven Beans -->
+		<!-- To add message driven beans that you have deployment descriptor info 
+			for, add a file to your XDoclet merge directory called message-driven-beans.xml 
+			that contains the <message-driven></message-driven> markup for those beans. -->
+
+	</enterprise-beans>
+
+	<!-- Relationships -->
+
+	<!-- Assembly Descriptor -->
+	<!-- To specify your own assembly descriptor info here, add a file to your 
+		XDoclet merge directory called assembly-descriptor.xml that contains the 
+		<assembly-descriptor></assembly-descriptor> markup. -->
+
+	<assembly-descriptor>
+		<!-- equival al rol SC_ADMINISTRADOR -->
+
+		<method-permission>
+			<description><![CDATA[No access control]]></description>
+			<unchecked />
+			<method>
+				<description><![CDATA[Default create method]]></description>
+				<ejb-name>UploadServiceBean</ejb-name>
+				<method-name>*</method-name>
+			</method>
+		</method-permission>
+	</assembly-descriptor>
+
+</ejb-jar>

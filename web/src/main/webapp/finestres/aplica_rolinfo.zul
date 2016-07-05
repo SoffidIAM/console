@@ -418,7 +418,8 @@
 								value="${c:l('aplica_rolinfo.zul.Rolsqueeltenenatorga')}"/>
 							<vbox width="100%" >
 								<hbox>
-									<grid id="ownerRolesGrid" dataPath="/ownerRoles" fixedLayout="false"  style="margin-bottom: 2em">
+									<listbox id="ownerRolesGrid" dataPath="/ownerRoles" fixedLayout="true"
+									 style="margin-bottom: 2em" rows="6" width="100%">
 										<zscript>
 											<![CDATA[
 												void onDeleteRow() 
@@ -450,27 +451,38 @@
 												}
 											]]>
 										</zscript>
-										<columns>
-											<column label="${c:l('aplica_rolinfo.zul.Rol')}" width="15em"/>
-											<column label="${c:l('aplica_rolsllista.zul.Basededades-2')}" width="15em"/>
-											<column label="${c:l('aplica_rolinfo.zul.Domini')}" width="15em"/>
-											<column label="" width="2em"/>
-											<column label="${c:l('aplica_rolinfo.zul.Rol')}" width="15em"/>
-											<column label="${c:l('aplica_rolinfo.zul.Domini')}" width="15em"/>
-											<column label="${c:l('aplica_rolinfo.zul.')}" width="30px"/>
-										</columns> 
-										<datarow width="100%">
-											<label bind="@ownerRolName"/>
-											<label bind="@ownerDispatcher"/>
-											<label bind="@ownerRolDomainValue"/>
-											<label value="=>"/>
-											<label bind="@rolName"/>
-											<label bind="@domainValue"/>
-											<imageclic align="right" src="~./img/list-remove.gif"
-												onClick="onDeleteRow()">
-											</imageclic>
-										</datarow>
-									</grid>
+										<listhead>
+											<listheader label="${c:l('aplica_rolinfo.zul.Rol')}" width="15%" sort="auto">
+												<textboxfilter bind="@ownerRolName"></textboxfilter>
+											</listheader>
+											<listheader label="${c:l('aplica_rolsllista.zul.Basededades-2')}" width="15%"  sort="auto">
+												<textboxfilter  bind="@ownerDispatcher"/>
+											</listheader>
+											<listheader label="${c:l('aplica_rolinfo.zul.Domini')}" width="15%"  sort="auto">
+												<textboxfilter bind="@ownerRolDomainValue"/>
+											</listheader>
+											<listheader label="" width="2em"/>
+											<listheader label="${c:l('aplica_rolinfo.zul.Rol')}" width="15%"  sort="auto">
+											</listheader>
+											<listheader label="${c:l('aplica_rolinfo.zul.Domini')}" width="15%"  sort="auto">
+												<textboxfilter bind="@domainValue"/>
+											</listheader>
+											<listheader label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
+										</listhead> 
+										<dataitem width="100%">
+											<listcell bind="@ownerRolName"/>
+											<listcell bind="@ownerDispatcher"/>
+											<listcell bind="@ownerRolDomainValue"/>
+											<listcell label="=>"/>
+											<listcell bind="@rolName"/>
+											<listcell bind="@domainValue"/>
+											<listcell>
+												<imageclic align="right" src="~./img/list-remove.gif"
+													onClick="onDeleteRow()">
+												</imageclic>
+											</listcell>
+										</dataitem>
+									</listbox>
 									<separator width="10px"/>
 								</hbox>
 								<button image="~./img/list-add.gif"
@@ -513,46 +525,52 @@
 								value="${c:l('aplica_rolinfo.zul.Grupsqueeltenenatorg')}"/>
 							<vbox width="100%" >
 								<hbox width="100%">
-									<grid fixedLayout="true" id="ownerGroupsGrid" dataPath="/granteeGroups"  style="margin-bottom: 2em">
-										<columns>
-											<column label="${c:l('aplica_rolinfo.zul.Grup')}"  width="15em"/>
-											<column label="" width="2em"/>
-											<column label="${c:l('aplica_rolinfo.zul.Rol')}" width="15em"/>
-											<column label="${c:l('aplica_rolinfo.zul.Domini')}" width="15em"/>
-											<column label="${c:l('aplica_rolinfo.zul.')}" width="30px"/>
-										</columns> 
-										<datarow width="100%">
-											<label bind="@ownerGroup"/>
-											<label value="=>"/>
-											<label bind="@rolName"/>
-											<label bind="@domainValue"/>
-											<imageclic align="right" src="~./img/list-remove.gif">
-												<attribute name="onClick">
-												<![CDATA[
-													es.caib.zkib.binder.BindContext ctx = es.caib.zkib
-														.datasource.XPathUtils.getComponentContext(self);
-													dada = ctx.getDataSource()
-															.getValue(ctx.getXPath() + "/@ownerGroup");
-													String xpath = ctx.getXPath();
-													Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
-															.util.resource.Labels
-																.getLabel("usuaris.SegurEsborrar"),
-															new Object [] {dada}),
-															org.zkoss.util.resource.Labels
-																.getLabel("usuaris.Esborra"),
-															new EventListener() {
-																public void onEvent(Event evt) {
-																	if ("onOK".equals(evt.getName())) {
-																		dsAgents.removePath(xpath);
-																		ownerGroupsGrid.dataPath = ownerGroupsGrid.dataPath;
+									<listbox fixedLayout="true" id="ownerGroupsGrid" dataPath="/granteeGroups"  style="margin-bottom: 2em">
+										<listhead>
+											<listheader label="${c:l('aplica_rolinfo.zul.Grup')}"  width="30%">
+												<textboxfilter bind="@ownerGroup"/>
+											</listheader>
+											<listheader label="" width="2em"/>
+											<listheader label="${c:l('aplica_rolinfo.zul.Rol')}" width="15%"/>
+											<listheader label="${c:l('aplica_rolinfo.zul.Domini')}" width="30%">
+												<textboxfilter bind="@domainValue"/>
+											</listheader>
+											<listheader label="${c:l('aplica_rolinfo.zul.')}" width="30px"/>
+										</listhead> 
+										<dataitem width="100%">
+											<listcell bind="@ownerGroup"/>
+											<listcell label="=>"/>
+											<listcell bind="@rolName"/>
+											<listcell bind="@domainValue"/>
+											<listcell>
+												<imageclic align="right" src="~./img/list-remove.gif">
+													<attribute name="onClick">
+													<![CDATA[
+														es.caib.zkib.binder.BindContext ctx = es.caib.zkib
+															.datasource.XPathUtils.getComponentContext(self);
+														dada = ctx.getDataSource()
+																.getValue(ctx.getXPath() + "/@ownerGroup");
+														String xpath = ctx.getXPath();
+														Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
+																.util.resource.Labels
+																	.getLabel("usuaris.SegurEsborrar"),
+																new Object [] {dada}),
+																org.zkoss.util.resource.Labels
+																	.getLabel("usuaris.Esborra"),
+																new EventListener() {
+																	public void onEvent(Event evt) {
+																		if ("onOK".equals(evt.getName())) {
+																			dsAgents.removePath(xpath);
+																			ownerGroupsGrid.dataPath = ownerGroupsGrid.dataPath;
+																		}
 																	}
-																}
-															});
-													]]>
-												</attribute>
-											</imageclic>
-										</datarow>
-									</grid>
+																}); 
+														]]>
+													</attribute>
+												</imageclic>
+											</listcell>
+										</dataitem>
+									</listbox>
 									<separator width="10px"/>
 								</hbox>
 								<button image="~./img/list-add.gif" label="${c:l('aplica_rolinfo.zul.Atorgarelrolaungrup')}">

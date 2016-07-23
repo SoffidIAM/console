@@ -80,16 +80,6 @@ public class RoleDependencyEntityDaoImpl extends
         getTaskEntityDao().create(tasque);
     }
 
-    public List<RoleDependencyEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this,
-                    queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-    }
-
     public static boolean verificaAssociacioSenseCicles(RoleDependencyEntity associacio, StringBuffer cami) {
         RoleEntity contingut = associacio.getContained();
         RoleEntity pare = associacio.getContainer();

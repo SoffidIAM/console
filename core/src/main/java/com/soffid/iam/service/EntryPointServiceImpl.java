@@ -37,6 +37,7 @@ import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 
@@ -84,7 +85,7 @@ public class EntryPointServiceImpl extends
 	public EntryPointServiceImpl() {
     	int size = 500;
     	try {
-	    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+	    	String cacheSize = ConfigurationCache.getProperty("soffid.cache.identity.size");
 	    	if (cacheSize != null )
 	    		size = Integer.parseInt(cacheSize);
     	} catch (Throwable t) {

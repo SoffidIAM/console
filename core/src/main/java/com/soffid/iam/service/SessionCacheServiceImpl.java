@@ -12,15 +12,19 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.zkoss.zk.ui.Sessions;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.bpm.service.impl.UserContextCache;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 /**
@@ -28,12 +32,9 @@ import com.soffid.iam.utils.Security;
  *
  */
 public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCacheServiceBase
+	implements ApplicationContextAware
 {
-	private Class<?> zkSessionClass = null;
-	private Method zkGetCurrentMethod = null;
-	private Method zkGetNativeSession = null;
 	private Log log = LogFactory.getLog(getClass());
-	private Class<?> zkSessionsClass;
 	/**
 	 * 
 	 */
@@ -42,75 +43,11 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 	{
 	}
 	
-	private void loadSessionClass ()
-	{
-		if (zkSessionClass == null)
-		{
-    		try
-    		{
-    			zkSessionClass = Class.forName("org.zkoss.zk.ui.Session"); //$NON-NLS-1$
-    			zkSessionsClass = Class.forName("org.zkoss.zk.ui.Sessions"); //$NON-NLS-1$
-    			zkGetNativeSession = zkSessionClass.getMethod("getNativeSession", new Class[0]); //$NON-NLS-1$
-    			zkGetCurrentMethod = zkSessionsClass.getMethod("getCurrent", new Class[0]); //$NON-NLS-1$
-    		}
-    		catch (Exception e)
-    		{
-    			log.info (Messages.getString("SessionCacheServiceImpl.SessionCacheServiceDisabled") + e.toString()); //$NON-NLS-1$
-    		}
-    		if (map == null)
-    		{
-    	    	int size = 500;
-    	    	try {
-    		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
-    		    	if (cacheSize != null )
-    		    		size = Integer.parseInt(cacheSize);
-    	    	} catch (Throwable t) {
-    	    		
-    	    	}
-    			map = Collections.synchronizedMap(new LRUMap(size));			
-    		}
-		}
-	}
-	
 	@SuppressWarnings ("rawtypes")
-	static Map map = null;
-	public static UserContextCache get (String user) {
-		UserContextCache data = (UserContextCache) map.get(user);
-		return data;
-	}
-	
-	@SuppressWarnings ("unchecked")
-	public static void  put (String user, UserContextCache ctx ) {
-		map.put(user, ctx);
-	}
-
-	@SuppressWarnings ("unchecked")
-	private Map<String,Object> getSessionContext() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InternalErrorException {
-		loadSessionClass();
-		if (zkGetCurrentMethod == null || zkGetNativeSession == null)
-			return null;
-		
-		String sessionId;
-		String user = "" + Security.getCurrentTenantName() + "\\" + Security.getCurrentAccount();
-		
-		Object session = zkGetCurrentMethod.invoke(null, new Object[0]);
-		if (session == null) {
-			return null;
-		}
-
-		HttpSession s = (HttpSession) zkGetNativeSession.invoke(session, new Object[0]);
-		sessionId = "s" + s.getId()+"."+user; //$NON-NLS-1$ //$NON-NLS-2$
-		
-		Map<String,Object> v = (Map<String, Object>) map.get(sessionId);
-		if (v == null)
-		{
-			v = new HashMap<String, Object>();
-			map.put(sessionId, v);
-		}
-		
-		return v;
-
-	}
+	static Map<String,Map<String,Object>> map = null;
+	static ThreadLocal<String> currentSession = new ThreadLocal<String>();
+	@SuppressWarnings ("rawtypes")
+	static ThreadLocal<Map<String,Object>> currentMap = new ThreadLocal<Map<String,Object>>();
 
 
 	/* (non-Javadoc)
@@ -119,7 +56,7 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 	@Override
 	protected Object handleGetObject (String tag) throws Exception
 	{
-		Map<String, Object> sessionMap = getSessionContext();
+		Map<String, Object> sessionMap = currentMap.get();
 		if (sessionMap == null)
 			return null;
 		return sessionMap.get(tag);
@@ -131,9 +68,67 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 	@Override
 	protected void handlePutObject (String tag, Object value) throws Exception
 	{
-		Map<String, Object> sessionMap = getSessionContext();
+		Map<String, Object> sessionMap = currentMap.get();
 		if (sessionMap != null)
 			sessionMap.put(tag, value);
+	}
+
+	@Override
+	protected String handleClearSession() throws Exception {
+		currentMap.set(null);
+		currentSession.set(null);
+		return null;
+	}
+
+	static Random random = new Random();
+	@Override
+	protected String handleCreateSession() throws Exception {
+		String id;
+		do
+		{
+			id = Security.getCurrentAccount()+"_"+random.nextLong();
+		} while (map.containsKey(id));
+		Map<String,Object> sessionMap = new HashMap<String, Object>();
+		currentSession.set(id);
+		currentMap.set(sessionMap);
+		map.put(id, sessionMap);
+		return id;
+	}
+
+	@Override
+	protected String handleGetCurrentSessionId() throws Exception {
+		return currentSession.get();
+	}
+
+	@Override
+	protected String handleSetSession(String sessionId) throws Exception {
+		if ( ! map.containsKey(sessionId))
+		{
+			Map<String,Object> sessionMap = new HashMap<String, Object>();
+			currentSession.set(sessionId);
+			currentMap.set(sessionMap);
+			map.put(sessionId, sessionMap);
+		}
+		else
+		{
+			currentMap.set( map.get(sessionId));
+			currentSession.set(sessionId);
+		}
+		return sessionId;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
+    	int size = 500;
+    	try {
+	    	String cacheSize = ConfigurationCache.getMasterProperty("soffid.cache.identity.size");
+	    	if (cacheSize != null )
+	    		size = Integer.parseInt(cacheSize);
+    	} catch (Throwable t) {
+    		
+    	}
+		map = Collections.synchronizedMap(new LRUMap(size));			
 	}
 
 }

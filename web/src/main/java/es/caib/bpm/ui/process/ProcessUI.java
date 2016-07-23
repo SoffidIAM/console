@@ -638,7 +638,7 @@ public class ProcessUI extends Frame {
         if (loader == null) {
             clases = engine.getUIClassesForTask(def);
 
-            loader = new UIClassLoader(clases, heavenLoader);
+            loader = new UIClassLoader(def.getId(), clases, heavenLoader);
 
             loader.cargarClases();
 

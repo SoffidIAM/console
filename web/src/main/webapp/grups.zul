@@ -461,10 +461,7 @@
 						String codiGrup = ctx.getValue("@codi");
 				
 						javax.naming.Context context = new javax.naming.InitialContext();		
-						Object objGrup = context.lookup(es.caib.seycon.ng.servei.ejb.GrupServiceHome.JNDI_NAME);
-						es.caib.seycon.ng.servei.ejb.GrupServiceHome grupHome = (es.caib.seycon.ng.servei.ejb.GrupServiceHome) javax.rmi.PortableRemoteObject.narrow(
-							objGrup, es.caib.seycon.ng.servei.ejb.GrupServiceHome.class);
-						es.caib.seycon.ng.servei.ejb.GrupService grupService = grupHome.create();
+						es.caib.seycon.ng.servei.ejb.GrupService grupService = es.caib.seycon.ng.EJBLocator.getGrupService();
 						
 						java.util.Collection pares = grupService.getLlistaDePares(codiGrup);
 				

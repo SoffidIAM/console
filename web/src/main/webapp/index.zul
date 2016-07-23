@@ -7,6 +7,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
 	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: visible">
+	<attribute name="onCreate">
+		principal = com.soffid.iam.utils.Security.getPrincipal();
+		app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );
+	</attribute>
     <div>
 		<zscript>
 			<![CDATA[
@@ -19,7 +23,7 @@
 		<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
 			initialPage="wf/inbox.zul"
 			style="overflow: visible" embed="${embed}" 
-			logoutPage="/logout/" mainWindowTitle="Soffid IAM" menu="//menu/menu" showFavorites="false" width="100%">
+			logoutPage="/prelogout" mainWindowTitle="Soffid IAM" menu="//menu/menu" showFavorites="false" width="100%">
 			<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
 				<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
 			</div>
@@ -69,7 +73,6 @@
 			}
 			
 			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
-			System.out.println ("target="+target);
 			if (target != null)
 			{
 				Component menuPage = Executions.createComponents("/wf/menu.zul", self, new HashMap());                      

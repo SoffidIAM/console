@@ -17,6 +17,7 @@ import org.w3c.jwput.JWPut;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.nas.CommunicationStrategy;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.util.Base64;
 
@@ -90,14 +91,16 @@ public class HTTPStrategy implements CommunicationStrategy
 	/**
 	 * @see com.soffid.iam.doc.nas.CommunicationStrategy#setProperties(java.util.Properties)
 	 */
-	public void setProperties(Properties properties) throws NASException 
+	public void setProperties() throws NASException 
 	{
-		this.rootURL= properties.getProperty("soffid.ui.docServer");
-		this.tempPath= properties.getProperty("soffid.ui.docTempPath");
+		this.rootURL= ConfigurationCache.getMasterProperty("soffid.ui.docServer");
+		this.tempPath= ConfigurationCache.getMasterProperty("soffid.ui.docTempPath");
+		
+		Properties properties = new Properties();
 		
 		properties.put(JWOptions.QUIET_P, JWOptions.TRUE_P);
-		this.user = properties.getProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
-		this.password = properties.getProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
+		this.user = ConfigurationCache.getMasterProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
+		this.password = ConfigurationCache.getMasterProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
 		if (user != null && password != null)
 		{
 			properties.put (JWOptions.USER_P, user);

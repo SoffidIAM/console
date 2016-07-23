@@ -6,12 +6,12 @@
 			<script-finder>
 				return "*";
 			</script-finder>
-			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.AttributeTranslationService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
 				method="findDomains" > 
 			</ejb-finder>
 		</finder>
 		<finder name="translation" type="translation">
-			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.AttributeTranslationService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
 				method="findByExample" if = "${queryEnabled}"> <!--agent:query, application:update-->
 				<parameter value="${domain}"/>
 				<parameter value="${column1}"/>
@@ -28,7 +28,7 @@
 	</datanode>	
 	
 	<datanode name="translation">
-		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.AttributeTranslationService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>

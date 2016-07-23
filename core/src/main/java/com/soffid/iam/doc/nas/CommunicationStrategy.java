@@ -15,10 +15,9 @@ public interface CommunicationStrategy
 	/**
 	 * Establece las propiedades a la estrategia.
 	 * 
-	 * @param properties
 	 * @throws NASException si no puede obtener alguna configuracion del archivo.
 	 */
-	public void setProperties(Properties properties) throws NASException;
+	public void setProperties() throws NASException;
 	
 	/**
 	 * Sube un archivo al NAS en la ubicacion indicada.

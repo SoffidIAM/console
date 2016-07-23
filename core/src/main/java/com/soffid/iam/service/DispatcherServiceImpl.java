@@ -64,6 +64,7 @@ import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -448,7 +449,7 @@ public class DispatcherServiceImpl extends
 	protected Collection<com.soffid.iam.api.System> handleFindDispatchersByFilter(
 			String codi, String nomCla, String url, String basRol,
 			String segur, Boolean actiu) throws Exception {
-		int limitResults = Integer.parseInt(System
+		int limitResults = Integer.parseInt(ConfigurationCache
 				.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 
 		if (codi == null || codi.trim().compareTo("") == 0) { //$NON-NLS-1$

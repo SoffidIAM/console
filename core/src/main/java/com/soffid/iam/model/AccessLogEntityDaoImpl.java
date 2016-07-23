@@ -13,6 +13,7 @@ import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.SeyconException;
 
@@ -150,16 +151,6 @@ public class AccessLogEntityDaoImpl extends
         // source.getDataFi():java.util.Date to java.util.Date
     }
 
-    public List<AccessLogEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this,
-                    queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-    }
-
     // Versió optimitzada per la consulta dels darrers n registres
     // d'accés de l'usuari des de la finestra d'usuaris
     // Alejandro Usero - 12/09/2011
@@ -194,12 +185,14 @@ public class AccessLogEntityDaoImpl extends
             		+ "from com.soffid.iam.model.AccessLogEntity registreAcces " //$NON-NLS-1$
                     + "left join registreAcces.user " //$NON-NLS-1$
                     + "left join registreAcces.protocol where  " //$NON-NLS-1$
+                    + "registreAcces.tenant.id = :tenantId and "
                     + "(registreAcces.user is not null and registreAcces.user.name = :codiUsuari) and " //$NON-NLS-1$
                     + "(registreAcces.protocol is not null and registreAcces.protocol.name= :codiProtocolAcces) " //$NON-NLS-1$
                     + "order by registreAcces.dataInici desc "; //$NON-NLS-1$
 
             org.hibernate.Query queryObject = super.getSession(false)
                     .createQuery(queryString);
+            queryObject.setParameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
             queryObject.setParameter("codiUsuari", codiUsuari); //$NON-NLS-1$
             queryObject.setParameter("codiProtocolAcces", codiProtocolAcces); //$NON-NLS-1$
             // Probem el maxresults per restringir els resultats de la cerca:
@@ -242,12 +235,14 @@ public class AccessLogEntityDaoImpl extends
             String queryString = "select registreAcces "
             		+ "from com.soffid.iam.model.AccessLogEntity registreAcces " //$NON-NLS-1$
                     + "left join registreAcces.server server where " //$NON-NLS-1$
+                    + "registreAcces.tenant.id = :tenantId and "
                     + "(registreAcces.server is not null and  server.nom like :nomServidor) and " //$NON-NLS-1$
                     + "(registreAcces.protocol is not null and registreAcces.protocol.name = :protocolAcces) " //$NON-NLS-1$
                     + "order by registreAcces.startDate desc"; //$NON-NLS-1$
 
             org.hibernate.Query queryObject = super.getSession(false)
                     .createQuery(queryString);
+            queryObject.setParameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
             queryObject.setParameter("nomServidor", nomServidor); //$NON-NLS-1$
             queryObject.setParameter("protocolAcces", protocolAcces); //$NON-NLS-1$
             // Probem el maxresults per restringir els resultats de la cerca:
@@ -294,9 +289,7 @@ public class AccessLogEntityDaoImpl extends
                             : "") //$NON-NLS-1$
                     + (!senseUsuari ? "left join registreAcces.user user " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + (!senseDataIni || !senseDataFi || !senseClient
-                            || !senseServidor || !senseUsuari ? "where 1=1 " //$NON-NLS-1$
-                            : "") //$NON-NLS-1$
+                    + ("where registreAccess.tenant.id = :tenantId ") //$NON-NLS-1$
                     + (!senseClient ? "and (client.name like :nomClient) " : "") //$NON-NLS-1$ //$NON-NLS-2$
                     + (!senseServidor ? "and (server.name like :nomServidor) " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
@@ -309,6 +302,7 @@ public class AccessLogEntityDaoImpl extends
 
             org.hibernate.Query queryObject = super.getSession(false)
                     .createQuery(queryString);
+            queryObject.setParameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
             if (!senseClient)
                 queryObject.setParameter("nomClient", nomClient); //$NON-NLS-1$
             if (!senseServidor)

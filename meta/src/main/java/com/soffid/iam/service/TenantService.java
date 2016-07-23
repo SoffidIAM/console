@@ -14,9 +14,12 @@ import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.servei.ApplicationBootService;
+
 @Service
 @Depends ( {
-	TenantEntity.class
+	TenantEntity.class,
+	ApplicationBootService.class
 })
 public class TenantService extends Object {
 	@Operation(grantees={tenantQuery.class})

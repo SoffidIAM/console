@@ -397,16 +397,6 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         return getIPsBuidesOcupades(ipXarxa, netmask, false);
     }
 
-    public java.util.List find(final java.lang.String queryString,
-            final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this, queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-    }
-
     public void create(Collection entities) {
         if (entities != null)
             for (Iterator it = entities.iterator(); it.hasNext(); ) {

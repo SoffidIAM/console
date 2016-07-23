@@ -23,6 +23,8 @@ import com.soffid.iam.model.BlobConfigurationEntity;
 import com.soffid.iam.model.BlobConfigurationEntityDao;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -78,8 +80,8 @@ public class ConfigurationServiceImpl
 	 */
 	private boolean checkAllConfigurationSet(Configuration configuracio) {
 		boolean configSet = false;
-		String docStrategy = System.getProperty("soffid.ui.docStrategy"); //$NON-NLS-1$
-		String tempPath = System.getProperty("soffid.ui.docTempPath"); //$NON-NLS-1$
+		String docStrategy = ConfigurationCache.getProperty("soffid.ui.docStrategy"); //$NON-NLS-1$
+		String tempPath = ConfigurationCache.getProperty("soffid.ui.docTempPath"); //$NON-NLS-1$
 		
 		if ((docStrategy != null) && (tempPath != null))
 		{
@@ -90,15 +92,15 @@ public class ConfigurationServiceImpl
 			
 			if ((docStrategy.equals("es.caib.bpm.nas.comm.FTPStrategy") || //$NON-NLS-1$
 				docStrategy.equals("es.caib.bpm.nas.comm.CIFSStrategy")) && //$NON-NLS-1$
-				(System.getProperty("soffid.ui.docUsername") != null) &&  //$NON-NLS-1$
-				(System.getProperty("soffid.ui.docUserPassword") != null) && //$NON-NLS-1$
-				(System.getProperty("soffid.ui.docServer") != null)) //$NON-NLS-1$
+				(ConfigurationCache.getProperty("soffid.ui.docUsername") != null) &&  //$NON-NLS-1$
+				(ConfigurationCache.getProperty("soffid.ui.docUserPassword") != null) && //$NON-NLS-1$
+				(ConfigurationCache.getProperty("soffid.ui.docServer") != null)) //$NON-NLS-1$
 			{
 				return true;
 			}
 			
 			if (docStrategy.equals("es.caib.bpm.nas.comm.HTTPStrategy") && //$NON-NLS-1$
-				(System.getProperty("soffid.ui.docServer") != null)) //$NON-NLS-1$
+				(ConfigurationCache.getProperty("soffid.ui.docServer") != null)) //$NON-NLS-1$
 			{
 				return true;
 			}
@@ -111,16 +113,15 @@ public class ConfigurationServiceImpl
 		ConfigEntity configuracioEntity = getConfigEntityDao().configurationToEntity(configuracio);
 		
 		// Check configuration parameter
-		System.setProperty(configuracio.getCode(), configuracio.getValue()); //$NON-NLS-1$
-		
-		reconfigureNAS(configuracio);
-		
 		getConfigEntityDao().create(configuracioEntity);
 		configuracio.setId(new Long(configuracioEntity.getId().longValue()));
 		
 		if (configuracio.getNetworkCode() == null)
 		{
-			System.setProperty(configuracio.getCode(), configuracio.getValue());
+			ConfigurationCache.setProperty(configuracio.getCode(), configuracio.getValue());
+			if (Security.isMasterTenant())
+				reconfigureNAS(configuracio);
+			
 		}
 
 		return getConfigEntityDao().toConfiguration(configuracioEntity);
@@ -132,7 +133,7 @@ public class ConfigurationServiceImpl
 		String codi = configuracioEntity.getName();
 		getConfigEntityDao().remove(configuracioEntity);
 		if (toRemove) {
-			System.getProperties().remove(codi);
+			ConfigurationCache.remove(codi);
 		}
 	}
 
@@ -140,14 +141,15 @@ public class ConfigurationServiceImpl
 		ConfigEntity configuracioEntity = getConfigEntityDao().configurationToEntity(configuracio);
 		
 		System.setProperty(configuracio.getCode(), configuracio.getValue()); //$NON-NLS-1$
-		reconfigureNAS(configuracio);
 		
 		getConfigEntityDao().update(configuracioEntity);
 		configuracio = getConfigEntityDao().toConfiguration(configuracioEntity);
 		
 		if (configuracio.getNetworkCode() == null)
 		{
-			System.setProperty(configuracio.getCode(), configuracio.getValue());
+			ConfigurationCache.setProperty(configuracio.getCode(), configuracio.getValue());
+			if (Security.isMasterTenant())
+				reconfigureNAS(configuracio);
 		}
 		return configuracio;
 	}
@@ -160,9 +162,9 @@ public class ConfigurationServiceImpl
 		int limitResults = 0;	// Limit of rows to obtain
 		
 		// Check limit defined
-		if (System.getProperty("soffid.ui.maxrows") != null) //$NON-NLS-1$
+		if (ConfigurationCache.getProperty("soffid.ui.maxrows") != null) //$NON-NLS-1$
 		{
-			limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+			limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		}
 		
 		if(codi != null && (codi.trim().compareTo("") == 0 || codi.trim().compareTo("%") == 0 )){ //$NON-NLS-1$ //$NON-NLS-2$

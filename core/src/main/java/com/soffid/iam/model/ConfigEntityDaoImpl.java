@@ -161,32 +161,17 @@ public class ConfigEntityDaoImpl extends
 					"select configuracio " //$NON-NLS-1$
 							+ "from com.soffid.iam.model.ConfigEntity configuracio " //$NON-NLS-1$
 							+ "left join configuracio.network as xarxa " //$NON-NLS-1$
-							+ "where configuracio.name = :codi and xarxa.name = :codiXarxa)", //$NON-NLS-1$
+							+ "where configuracio.tenant.id = :tenantId and configuracio.name = :codi and xarxa.name = :codiXarxa)", //$NON-NLS-1$
 					codi, codiXarxa);
 			return (ConfigEntity) result;
 		}
 		return findByCodiAndCodiXarxa(
 				"select configuracio " //$NON-NLS-1$
 						+ "from com.soffid.iam.model.ConfigEntity configuracio " //$NON-NLS-1$
-						+ "where configuracio.name = :codi and configuracio.network is null", //$NON-NLS-1$
+						+ "where configuracio.tenant.id = :tenantId and configuracio.name = :codi and configuracio.network is null", //$NON-NLS-1$
 				codi, null);
 	}
 
-        /**
-         * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
-         *      es.caib.seycon.ng.model.Parameter[])
-         */
-        public List find(final java.lang.String queryString,
-                        final Parameter[] parameters) {
-                try {
-                        java.util.List results = new QueryBuilder().query(this,
-                                        queryString, parameters);
-                        return results;
-                } catch (org.hibernate.HibernateException ex) {
-                        throw super.convertHibernateAccessException(ex);
-                }
-        }
-        
 	/**
 	 * @see es.caib.seycon.ng.model.ConfiguracioEntityDao#findByCodiAndCodiXarxa(int,
 	 *      java.lang.String, java.lang.String, java.lang.String)
@@ -198,6 +183,7 @@ public class ConfigEntityDaoImpl extends
 			queryObject.setParameter("codi", codi); //$NON-NLS-1$
 			if (codiXarxa != null)
 				queryObject.setParameter("codiXarxa", codiXarxa); //$NON-NLS-1$
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
 			java.util.Set results = new java.util.LinkedHashSet(queryObject
 					.list());
 			java.lang.Object result = null;

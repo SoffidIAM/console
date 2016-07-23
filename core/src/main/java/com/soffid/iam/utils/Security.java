@@ -1,6 +1,5 @@
 package com.soffid.iam.utils;
 
-import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
@@ -24,6 +23,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.AccessController;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Arrays;
@@ -49,6 +49,7 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.openejb.loader.SystemInstance;
 import org.apache.openejb.spi.Assembler;
 import org.apache.openejb.spi.SecurityService;
+import org.apache.tomee.catalina.TomcatSecurityService.TomcatUser;
 
 // import org.jboss.security.SecurityAssociation;
 
@@ -325,6 +326,16 @@ public class Security {
         return s;
     }
 
+    private static String[] getPrincipalRoles (GenericPrincipal p)
+    {
+    	try {
+    		return p.getRoles();
+		} catch (Exception e) {
+			return new String[0];
+		}
+    }
+    
+
     public static boolean isUserInRole(String role) {
         if (disableAllSecurityForEver)
             return true;
@@ -343,7 +354,7 @@ public class Security {
     	int i = role.indexOf('/');
         if (i <= 0)
         {
-        	for ( String s: principal.getRoles())
+        	for ( String s: getPrincipalRoles(principal))
         	{
         		if (s.startsWith(role+"/"))
         			return true;
@@ -351,7 +362,7 @@ public class Security {
         }
         else
         {
-        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL))
+        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL));
         		return true;
         }
         
@@ -359,7 +370,7 @@ public class Security {
     }
 
     public static List<String> getAuthorizations() {
-    	SoffidPrincipal principal = getPrincipal();
+    	GenericPrincipal principal = getPrincipal();
     	if (principal == null)
     		return Collections.emptyList();
     	else
@@ -367,7 +378,7 @@ public class Security {
     }
 
 
-    public static SoffidPrincipal getPrincipal() {
+    public static GenericPrincipal getPrincipal() {
         if (!getIdentities().isEmpty()) {
             return getIdentities().peek();
         } else if (disableAllSecurityForEver) {
@@ -393,15 +404,21 @@ public class Security {
             if (ss == null)
             	return null;
             Principal p = ss.getCallerPrincipal();
-            if (p instanceof SoffidPrincipal)
-            	return (SoffidPrincipal) p;
-            else
-            	return null;
+            while (p != null)
+            {
+	            if (p instanceof TomcatUser)
+	            	p = ((TomcatUser)p).getTomcatPrincipal();
+	            else if (p instanceof GenericPrincipal)
+	            	return (GenericPrincipal) p;
+	            else
+	            	return null;
+            }
+            return null;
         }
     }
 
     private static TenantService tenantService = null;
-    public static TenantService getTenantService ()
+    private static TenantService getTenantService ()
     {
     	if (tenantService == null)
     		tenantService = ServiceLocator.instance().getTenantService ();
@@ -429,10 +446,24 @@ public class Security {
     }
 
     public static void nestedLogin(String tenant, String user, String roles[])  {
-    	assertCanSetTenant();
-    	
+    	assertCanSetTenant(tenant);
+    	assertCanSetIdentity();
         internalNestedLogin(tenant, user, roles);
     }
+
+    public static void nestedLogin(GenericPrincipal principal)  {
+        if (principal instanceof SoffidPrincipal)
+        {
+            int i = principal.getName().indexOf('\\');
+            if ( i >= 0)
+            	assertCanSetTenant(principal.getName().substring(0, i));
+        	assertCanSetIdentity();
+        	getIdentities().push((SoffidPrincipal) principal);
+        }
+        else
+        	nestedLogin(principal.getName(), principal.getRoles());
+    }
+
 
     public static void nestedLogin( String roles[])  {
         nestedLogin (getPrincipal().getName(), roles);
@@ -477,7 +508,7 @@ public class Security {
     
     public static String getCurrentTenantName () throws InternalErrorException
     {
-    	Principal p = getPrincipal();
+    	GenericPrincipal p = getPrincipal();
     	if (p != null)
     	{
     		int i = p.getName().indexOf('\\');
@@ -496,7 +527,7 @@ public class Security {
     
     public static String getCurrentUser () 
     {
-    	SoffidPrincipal p;
+    	GenericPrincipal p;
     	if (! getIdentities().isEmpty())
     	{
     		p = getIdentities().peek();
@@ -514,7 +545,7 @@ public class Security {
 		{
 	    	int size = 500;
 	    	try {
-		    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+		    	String cacheSize = ConfigurationCache.getMasterProperty("soffid.cache.identity.size");
 		    	if (cacheSize != null )
 		    		size = Integer.parseInt(cacheSize);
 	    	} catch (Throwable t) {
@@ -582,37 +613,24 @@ public class Security {
 
     private static void assertCanSetIdentity ()
     {
-    	StackTraceElement caller = getCaller();
+    	AccessController.checkPermission(new NestedLoginPermission("login"));
     }
 
-    private static HashSet<String> trustedClasses = null;
-    
-    private static void assertCanSetTenant ()
+    private static void assertCanSetTenant (String tenant)
     {
-    	if (trustedClasses == null)
-    	{
-    		try {
-				for (
-					Enumeration<URL> trustedResources = Security.class.getClassLoader().getResources("com/soffid/iam/utils/trusted-classes");
-					trustedResources.hasMoreElements();)
-				{
-					InputStream in = trustedResources.nextElement().openConnection().getInputStream();
-					InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-					LineNumberReader lnr = new LineNumberReader(reader);
-					String line;
-					while ( (line = lnr.readLine()) != null)
-					{
-						trustedClasses.add(line);
-					}
-				}
-			} catch (Exception e) {
-	    		throw new SecurityException("Unable to parse trusted tenants list", e);
-			}
-    	}
-    	StackTraceElement caller = getCaller();
-    	if (! trustedClasses.contains(caller.getClassName()))
-    		throw new SecurityException("Not allowed to change tenant");
+    	try {
+			if (! isMasterTenant() && ! tenant.equals( getCurrentTenantName()))
+				throw new SecurityException("Not allowed to change tenant");
+		} catch (InternalErrorException e) {
+			throw new SecurityException("Not allowed to change tenant", e);
+		}
     }
+
+	public static boolean isMasterTenant() throws InternalErrorException {
+		return getCurrentTenantName() == null || 
+				getCurrentTenantName ().equals (getTenantService().getMasterTenant().getName());
+	}
+
 }
 
 class Identity {

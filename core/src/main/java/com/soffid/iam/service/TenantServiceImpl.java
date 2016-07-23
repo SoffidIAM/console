@@ -42,7 +42,9 @@ public class TenantServiceImpl extends TenantServiceBase {
 		}
 		TenantEntity entity = getTenantEntityDao().tenantToEntity(tenant);
 		getTenantEntityDao().create(entity);
-		return getTenantEntityDao().toTenant(entity);
+		Tenant t = getTenantEntityDao().toTenant(entity);
+		getApplicationBootService().tenantBoot(t);
+		return t;
 	}
 
 	@Override

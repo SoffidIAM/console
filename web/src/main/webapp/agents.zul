@@ -353,10 +353,9 @@
 										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
 										String codiAgent = agent.getCodi();
 										javax.naming.Context context = new javax.naming.InitialContext();
-										Object objDis = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
-										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
-											objDis, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
-										es.caib.seycon.ng.servei.ejb.DispatcherService disService = disHome.create();
+										es.caib.seycon.ng.servei.ejb.DispatcherService disService =
+												es.caib.seycon.ng.EJBLocator.getDispatcherService();
+												
 										disService.propagateUsuarisDispatcher(codiAgent);
 									}
 								}
@@ -382,11 +381,8 @@
 									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
 										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
 										String codiAgent = agent.getCodi(); 
-										javax.naming.Context context = new javax.naming.InitialContext();
-										Object objDis2 = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
-										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome2 = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
-											objDis2, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
-										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR = disHome2.create();
+										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR =
+												es.caib.seycon.ng.EJBLocator.getDispatcherService();
 										disServiceR.propagateRolsDispatcher(codiAgent);
 									}
 								}
@@ -412,11 +408,8 @@
 									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
 										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
 										String codiAgent = agent.getCodi(); 
-										javax.naming.Context context = new javax.naming.InitialContext();
-										Object objDis2 = context.lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
-										es.caib.seycon.ng.servei.ejb.DispatcherServiceHome disHome2 = (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome) javax.rmi.PortableRemoteObject.narrow(
-											objDis2, es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.class);
-										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR = disHome2.create();
+										es.caib.seycon.ng.servei.ejb.DispatcherService disServiceR =
+												es.caib.seycon.ng.EJBLocator.getDispatcherService();
 										disServiceR.propagateDispatcherGroups(codiAgent);
 									}
 								}
@@ -1087,10 +1080,8 @@
 						   							es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
 						   							listbox.commit();
 													Long id = XPathUtils.getValue(listbox, "/@id");
-													es.caib.seycon.ng.servei.ejb.DispatcherService ejb = 
-														new javax.naming.InitialContext().
-															lookup (es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME).
-																create ();
+													es.caib.seycon.ng.servei.ejb.DispatcherService ejb =
+															es.caib.seycon.ng.EJBLocator.getDispatcherService();
 													ejb.setDefaultMappingsByDispatcher(id);
 													XPathUtils.getValue(listbox, "/objectMapping").refresh();
 												}														

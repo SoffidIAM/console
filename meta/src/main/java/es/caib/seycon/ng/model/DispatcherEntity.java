@@ -206,14 +206,15 @@ public abstract class DispatcherEntity {
 	
 	@Operation(translated="findActives")
 	@DaoFinder("from com.soffid.iam.model.SystemEntity agent "
-			+ "where agent.url is not null order by agent.name")
+			+ "where agent.url is not null and agent.tenant.id = :tenantId "
+			+ "order by agent.name")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findActius() {
 	 return null;
 	}
 	@Operation(translated="findSoffidSystem")
 	@DaoFinder("select dis "
 			+ "from com.soffid.iam.model.SystemEntity as dis "
-			+ "where dis.mainSystem = true")
+			+ "where dis.mainSystem = true and dis.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DispatcherEntity findSoffidDispatcher() {
 	 return null;
 	}

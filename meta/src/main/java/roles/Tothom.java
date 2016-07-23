@@ -7,6 +7,6 @@
 package roles;
 import com.soffid.mda.annotation.*;
 
-@Role (name="tothom" )
+@Role (name="*" )
 public abstract class Tothom {
 }

@@ -41,8 +41,7 @@
 				else
 				{
 							
-					es.caib.seycon.ng.servei.ejb.AccountServiceHome ah = new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.AccountService as = ah.create ();
+					es.caib.seycon.ng.servei.ejb.AccountService as = es.caib.seycon.ng.EJBLocator.getAccountService();
 					String newName = as.gessAccountName(ds.getJXPathContext().getValue(path  + "/@codi"), dispatcher.getCodi());
 					nameBox.setValue(newName);
 					form2.visible = true;

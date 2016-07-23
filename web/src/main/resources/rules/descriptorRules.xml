@@ -3,7 +3,7 @@
 <zkib-model>
 	<datanode name="root">
 		<finder name="rule" type="rule">
-			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.RulesService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.RulesService"
 				method="findRules" if = "${queryEnabled}"> <!--agent:query, application:update-->
 				<parameter value="${description}"/>
 			</ejb-finder>
@@ -14,7 +14,7 @@
 	</datanode>
 	
 	<datanode name="rule">
-		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.RulesService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.RulesService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -32,7 +32,7 @@
 			<attribute-validator expr="${instance.bshExpression}" notNull="true" friendlyName="rule.bshExpressionValidation"/>
 		</validator>
 		<finder name="ruleAssignedRole" type="ruleAssignedRole">
-			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.RulesService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.RulesService"
 				method="findRuleAssignments"> <!--agent:query, application:update-->
 				<parameter value="${instance}"/>
 			</ejb-finder>
@@ -49,7 +49,7 @@
 				instance.ruleId = parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.RulesService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.RulesService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>

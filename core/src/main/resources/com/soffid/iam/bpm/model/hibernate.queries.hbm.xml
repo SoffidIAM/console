@@ -7,7 +7,7 @@
 <hibernate-mapping>
 
   <!-- related to ProcessDefintion -->
-  <!-- ########################### -->
+  <!-- ########################### 
 
   <query name="GraphSession.AllProcessNames">
     <![CDATA[
@@ -36,12 +36,14 @@
     ]]>
   </query>
   
+  -->
+  
   <query name="GraphSession.findLatestProcessDefinitionQuery">
     <![CDATA[
      select pd
      from com.soffid.iam.bpm.model.TenantModuleDefinition td
      join td.processDefinition as pd 
-     where pd.name = :name and td.tenantId = currentTenant()
+     where pd.name = :name and td.tenantId = :tenant
      order by pd.version desc    
     ]]>
   </query>
@@ -53,7 +55,7 @@
       join td.processDefinition as pd 
       where pd.name = :name
         and pd.version = :version
-        and td.tenantId = currentTenant()
+        and td.tenantId = :tenant
     ]]>
   </query>
   
@@ -62,7 +64,7 @@
       select pd
       from com.soffid.iam.bpm.model.TenantModuleDefinition td
       join td.processDefinition as pd 
-      where td.tenantId = currentTenant()
+      where td.tenantId = :tenant
       order by pd.name, pd.version desc
     ]]>
   </query>
@@ -72,7 +74,7 @@
       select pd
       from com.soffid.iam.bpm.model.TenantModuleDefinition td
       join td.processDefinition as pd 
-      where td.tenantId = currentTenant()
+      where td.tenantId = :tenant
         and pd.name = :name
       order by pd.version desc
     ]]>
@@ -96,7 +98,7 @@
   </query>
 
   <!-- related to ProcessInstance -->
-  <!-- ########################## -->
+  <!-- ########################## 
 
 
   <query name="GraphSession.findAllRunningProcessInstancesWithProcessName">
@@ -142,7 +144,7 @@
       order by pi.start desc
     ]]>
   </query>
-  
+-->  
   <query name="GraphSession.findSubProcessInstances">
     <![CDATA[
       select pi
@@ -162,6 +164,7 @@
     ]]>
   </query>
 
+<!-- 
   <query name="GraphSession.findTokensForProcessVersionInNode">
     <![CDATA[
       select token
@@ -175,6 +178,8 @@
     ]]>
   </query>
   
+   -->
+   
   <query name="GraphSession.findProcessInstanceByKey">
     <![CDATA[
       select processInstance
@@ -182,7 +187,6 @@
       join tm.processInstance as processInstance
       where processInstance.processDefinition = :processDefinition
       and  processInstance.key = :key
-      and  tm.tenantId = currentTenant()
     ]]>
   </query>
   
@@ -384,7 +388,7 @@
       where ti.actorId = :actorId
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
+        and ti.tenantId = :tenant
     ]]>
   </query>
 
@@ -395,7 +399,7 @@
       where ti.actorId in ( :actorIds )
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
+        and ti.tenantId = :tenant
     ]]>
   </query>
 
@@ -408,7 +412,7 @@
         and ti.actorId is null
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
+        and ti.tenantId = :tenant
     ]]>
   </query>
 
@@ -421,7 +425,7 @@
         and ti.actorId is null
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
+        and ti.tenantId = :tenant
     ]]>
   </query>
 
@@ -446,7 +450,6 @@
       where ti.token.id = :tokenId
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
     ]]>
   </query>
 
@@ -457,7 +460,6 @@
       where ti.token.processInstance = :processInstance
         and ti.isSuspended != true
         and ti.isOpen = true
-        and ti.tenantId = currentTenant()
     ]]>
   </query>
 
@@ -466,7 +468,6 @@
       select ti
       from com.soffid.iam.bpm.task.BPMTaskInstance as ti
       where ti.id in ( :taskInstanceIds )
-        and ti.tenantId = currentTenant()
     ]]>
   </query>
   
@@ -477,7 +478,6 @@
       from com.soffid.iam.bpm.task.BPMTaskInstance as ti
       where ti.token.processInstance = :instance 
       and ti.end IS NULL
-      and ti.tenantId = currentTenant()
     ]]>
   </query>
 

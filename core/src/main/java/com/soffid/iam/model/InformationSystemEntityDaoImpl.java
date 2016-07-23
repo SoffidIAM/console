@@ -303,6 +303,7 @@ public class InformationSystemEntityDaoImpl
 	        try
 	        {
 	            org.hibernate.Query queryObject = super.getSession(false).createQuery(queryString);
+	            queryObject.setParameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
 	            queryObject.setParameter("nomRole", nomRole); //$NON-NLS-1$
 	            queryObject.setParameter("codiAplicacioRol", codiAplicacioRol); //$NON-NLS-1$
 	            queryObject.setParameter("codiDispatcher", codiDispatcher); //$NON-NLS-1$

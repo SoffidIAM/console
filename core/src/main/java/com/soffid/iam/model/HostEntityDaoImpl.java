@@ -320,10 +320,11 @@ public class HostEntityDaoImpl extends
         LinkedList<String> lista = new LinkedList<String>();
     	for (TaskEntity t : getTaskEntityDao().query(
     			"select tasca from com.soffid.iam.model.TaskEntity as tasca "
-    			+ "where tasca.host=:maquina", 
+    			+ "where tasca.host=:maquina and tasca.tenant.id = :tenantId", 
     			new Parameter[]{
-    					new Parameter("maquina", nomMaquina
-    			)})) {
+    					new Parameter("maquina", nomMaquina),
+    					new Parameter("tenantId", Security.getCurrentTenantId())
+    			})) {
             String transaccion = t.getTransaction();
             Timestamp datatime = t.getDate();
             Date data = new Date();
@@ -342,23 +343,6 @@ public class HostEntityDaoImpl extends
             lista.add(transaccion + " # " + dataString + " # " + missatge + " # " + rol + " # " + agentsPendents);
         }
         return (String[]) lista.toArray(new String[lista.size()]);
-    }
-
-    /*
-     * The finder !! in the sun and in the rain, it's quite the same, it's never
-     * gonna change i'll be looking for Jane (non-Javadoc)
-     * 
-     * @see es.caib.seycon.ng.model.MaquinaEntityDaoBase#find(int,
-     * java.lang.String, es.caib.seycon.ng.model.Parameter[])
-     */
-    public List<HostEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this,
-                    queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
     }
 
     public void create(Collection entities) {

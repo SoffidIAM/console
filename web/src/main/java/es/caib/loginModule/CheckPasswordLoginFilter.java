@@ -1,6 +1,7 @@
 package es.caib.loginModule;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.Principal;
 
 import javax.naming.NamingException;
@@ -36,7 +37,6 @@ public class CheckPasswordLoginFilter implements Filter {
 	
 	// Pàgina de canvi de contrasenya (parametrizable)
 	private String changePassPage = "/changepass.zul"; //$NON-NLS-1$
-	private String changePassPublicPage = "/public/changepass.zul"; //$NON-NLS-1$
 
 	/** servidor RMI seyconLogon */
 
@@ -47,8 +47,6 @@ public class CheckPasswordLoginFilter implements Filter {
 		// Paràmetre de configuració: pàgina de canvi de contrasenya
 		if (filterConfig.getInitParameter("changePassPage") != null) //$NON-NLS-1$
 			changePassPage = filterConfig.getInitParameter("changePassPage"); //$NON-NLS-1$
-		if (filterConfig.getInitParameter("changePassPublicPage") != null) //$NON-NLS-1$
-			changePassPublicPage = filterConfig.getInitParameter("changePassPublicPage");		 //$NON-NLS-1$
 	}
 
 	/**
@@ -70,81 +68,23 @@ public class CheckPasswordLoginFilter implements Filter {
 		// Obtenim la sessio
 		HttpSession session = req.getSession(true);
 		
-		// I l'atribut mustChangePassword per veure si ja s'ha establert
-		Boolean mustChangePassword = req.isUserInRole("PASSWORD:EXPIRED"); //$NON-NLS-1$
+		boolean mustChangePassword = req.isUserInRole("PASSWORD:EXPIRED"); //$NON-NLS-1$
+		Boolean passwordAlreadyChanged = (Boolean) session.getAttribute("$$SoffidPasswordChanged$$");
 		
-		if (mustChangePassword == null) {// Si és null: fem la comprovació
-			//log.info("Atribut SEYCON_MUSTCHANGEPASSWORD = " + mustChangePassword);
-			// Ho comprovem, i ho fiquem a la sessió
-			try {
-				Principal principal = req.getUserPrincipal();
-				if (principal !=null && principal.getName()!=null) {
-					log.info(String.format(Messages.getString("CheckPasswordLoginFilter.MustChangePassCallInfo"), principal.getName()));  //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-1$
-					// Ho verifiquem en amb SC_CONTRA
-					mustChangePassword = checkMustChangePassword(Security.getCurrentAccount());
-					// i contra els rols (jboss)
-					boolean mustChangeJboss = req.isUserInRole("SEYCON_CHANGE_PASSWORD"); //$NON-NLS-1$
-					// si qualsevols dels dos és true: mustChangePassword
-					mustChangePassword = new Boolean (mustChangePassword.booleanValue() || mustChangeJboss);
-				} else {
-					log.info (Messages.getString("CheckPasswordLoginFilter.PrincipalNotObtained")); //$NON-NLS-1$
-					mustChangePassword = new Boolean(req.isUserInRole("SEYCON_CHANGE_PASSWORD")); //$NON-NLS-1$
-				}
-			} catch (Exception e) {
-				// ha ocorregut un error
-				log.warn(Messages.getString("CheckPasswordLoginFilter.CallMustChangePassError"),e); //$NON-NLS-1$
-
-				// Si falla ho mirem a nivell de ROL
-				mustChangePassword = new Boolean(req.isUserInRole("SEYCON_CHANGE_PASSWORD")); //$NON-NLS-1$
+		if (mustChangePassword && passwordAlreadyChanged == null) {
+			if (session.getAttribute("$$SoffidPassswordBack$$") == null)
+			{
+				String url = req.getRequestURI();
+				if (req.getQueryString() != null && req.getQueryString().length() > 0)
+					url = url + "?" + URLEncoder.encode(req.getQueryString(), "ISO-8859-1");
+				session.setAttribute("$$SoffidPassswordBack$$", url);
 			}
-			// Guardem el valor a la sessió
-			//log.info ("Guardant SEYCON_MUSTCHANGEPASSWORD com a "+mustChangePassword);
-			session.setAttribute("SEYCON_MUSTCHANGEPASSWORD", mustChangePassword); //$NON-NLS-1$
-		}
-
-		if (mustChangePassword.booleanValue()) {
-			//log.info ("request URI "+req.getRequestURI());
-			String changePage = changePassPage;
-			if (req.getRequestURI().endsWith("/public/")) { //$NON-NLS-1$
-				changePage = changePassPublicPage;
-			} 
-			
-			//String urlInterna = req.getRequestURI().substring(req.getContextPath().length());
-			//log.info("request2: "+urlInterna);
-			log.info(String.format(Messages.getString("CheckPasswordLoginFilter.MustChangePassRedirectInfo"), changePage));  //$NON-NLS-1$
-			// Indicamos que estamos en public
 			request.getRequestDispatcher(
-					changePage).forward(
+					changePassPage).forward(
 					request, response);	
-
-			return; // no procesamos el resto de los filtros (!!)
 		} else {
-			//log.info("filter: no filtering");
-		}
-
-		// Procesamos el resto de los filtros
-		chain.doFilter(request, response);
-	}
-
-	protected java.lang.Boolean checkMustChangePassword(String user)
-			throws UnknownUserException, BadPasswordException,
-			InvalidPasswordException, SeyconException {
-		try {
-			// cridem al seycon server comprovar si l'usuari
-			// ha de canviar la contrasenya
-			PasswordService passwordService = ServiceLocator.instance().getPasswordService();
-			String passwordDomain = passwordService.getDefaultDispatcher();
-			if (passwordDomain == null)
-				passwordDomain = "soffid"; // Per defecte //$NON-NLS-1$
-			return passwordService.checkPasswordExpired(user, passwordDomain);
-		} catch (Throwable sex) {
-			sex.printStackTrace();
-			SeyconException ex = new SeyconException(
-					Messages.getString("CheckPasswordLoginFilter.ServerInternalError")); //$NON-NLS-1$
-			ex.setStackTrace(sex.getStackTrace());
-			throw ex;
+			chain.doFilter(request, response);
 		}
 	}
 
-	
 }

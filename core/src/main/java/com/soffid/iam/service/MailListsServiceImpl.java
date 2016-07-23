@@ -33,6 +33,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TipusDomini;
@@ -91,7 +92,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected Collection<MailList> handleFindMailListsByData(String nom, String domini, String descripcio, String membres) throws Exception {
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		if (nom != null && (nom.trim().compareTo("") == 0)) { //$NON-NLS-1$
 			nom = null;
@@ -353,7 +354,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected Collection<MailDomain> handleFindMailDomainsByFilter(String codi, String descripcio, String obsolet) throws Exception {
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		if (codi != null && ((codi.trim().compareTo("") == 0) || (codi.trim().compareTo("%") == 0))) { //$NON-NLS-1$ //$NON-NLS-2$
 			codi = null;

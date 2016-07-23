@@ -31,7 +31,7 @@
 		autoReload="false" 
 		favorits="//favorits/favorits" 
 		initialPage="self_service.zul" 
-		logoutPage="/logout/?logoutTo=selfservice/index.zul" 
+		logoutPage="/logout" 
 		mainWindowTitle="Soffid IAM" 
 		menu="//menu/menu" 
 		showFavorites="false" 

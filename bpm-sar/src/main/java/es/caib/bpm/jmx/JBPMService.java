@@ -2,7 +2,8 @@ package es.caib.bpm.jmx;
 
 
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.system.ServiceMBeanSupport;
 
 import com.soffid.iam.bpm.index.IndexerThread;
@@ -14,7 +15,7 @@ public class JBPMService extends ServiceMBeanSupport implements JBPMServiceMBean
 	int scheduledInterval = 30000;
 	int maxScheduledInterval = 30000;
 	int schedulerThreads = 1;
-	Logger log = Logger.getLogger(JBPMService.class);
+	Log log = LogFactory.getLog(JBPMService.class);
 
 	private IndexerThread indexerThread;
 

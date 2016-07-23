@@ -19,6 +19,7 @@ import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -64,10 +65,6 @@ public class AuditEntityDaoImpl extends
 		return au;
 	}
 
-	public java.lang.String[] find(java.lang.String sqlQuery) {
-		throw new UnsupportedOperationException();
-	}
-
 	public void create(com.soffid.iam.model.AuditEntity auditoria) throws RuntimeException {
 		try {
 			if (auditoria.getAccount() != null && auditoria.getDb() != null)
@@ -79,7 +76,7 @@ public class AuditEntityDaoImpl extends
 			super.create(auditoria);
 			getSession(false).flush();
 			
-			String syslogServer = System.getProperty ("soffid.syslog.server");
+			String syslogServer = ConfigurationCache.getProperty ("soffid.syslog.server");
 			if (syslogServer != null && syslogServer.trim().length() > 0)
 			{
 				try {

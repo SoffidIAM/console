@@ -19,6 +19,7 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.Security;
@@ -68,7 +69,7 @@ public class AuditServiceImpl extends
 
 	// Reemplacem anterior
 	protected Collection<Audit> handleFindAuditsByCriteria(String dataIni, String dataFi, String autor, String objecte, String usuari, String objecteAuditat, String valorOA, String accio) throws Exception {
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		//Aquest és el que es crida desde auditoria.zul
 		// Si dataFi es nulo, empleamos el método anterior
@@ -163,7 +164,7 @@ public class AuditServiceImpl extends
 	protected Collection<Audit> handleFindAuditsByCriteria(String data, String autor, String objecte, String usuari, String objecteAuditat, String valorOA, String accio) throws Exception {
 		LimitDates limitDates = null;
 		StringBuffer msg = new StringBuffer();
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 
 		if (data != null && data.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& data.trim().compareTo("%") != 0) { //$NON-NLS-1$

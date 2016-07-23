@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
@@ -35,6 +36,13 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Djava.security.manager -Djava.security.policy=${project.basedir}/src/test/resources/java.policy</argLine>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-ejb-plugin</artifactId>
@@ -85,66 +93,66 @@
 				</configuration>
 			</plugin>
 
-	<plugin>
-		<artifactId>maven-dependency-plugin</artifactId>
-		<executions>
-			<execution>
-				<goals>
-					<goal>unpack</goal>
-				</goals>
-				<phase>generate-sources</phase>
-			</execution>
-		</executions>
-		<configuration>
-			<artifactItems>
-				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
-					<classifier>core</classifier>
-					<type>zip</type>
-					<overWrite>true</overWrite>
-					<outputDirectory>${project.build.directory}/src</outputDirectory>
-				</artifactItem>
-				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
-					<classifier>core-resource</classifier>
-					<type>zip</type>
-					<overWrite>true</overWrite>
-					<outputDirectory>${project.build.directory}/resources</outputDirectory>
-				</artifactItem>
-				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
-					<classifier>core-src</classifier>
-					<type>zip</type>
-					<overWrite>false</overWrite>
-					<outputDirectory>${project.build.directory}/src-template</outputDirectory>
-				</artifactItem>
-				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
-					<classifier>test</classifier>
-					<type>zip</type>
-					<overWrite>true</overWrite>
-					<outputDirectory>${project.build.directory}/src-test</outputDirectory>
-				</artifactItem>
-				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
-					<classifier>test-resource</classifier>
-					<type>zip</type>
-					<overWrite>true</overWrite>
-					<outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-				</artifactItem>
-			</artifactItems>
-		</configuration>
-	</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<phase>generate-sources</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${pom.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${pom.version}</version>
+							<classifier>core</classifier>
+							<type>zip</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/src</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>${pom.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${pom.version}</version>
+							<classifier>core-resource</classifier>
+							<type>zip</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/resources</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>${pom.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${pom.version}</version>
+							<classifier>core-src</classifier>
+							<type>zip</type>
+							<overWrite>false</overWrite>
+							<outputDirectory>${project.build.directory}/src-template</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>${pom.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${pom.version}</version>
+							<classifier>test</classifier>
+							<type>zip</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/src-test</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>${pom.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${pom.version}</version>
+							<classifier>test-resource</classifier>
+							<type>zip</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
 
 		</plugins>
 		<pluginManagement>
@@ -426,17 +434,6 @@
 			<version>1.6.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.zkoss.zk</groupId>
-			<artifactId>zul</artifactId>
-			<version>3.0.8</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- per poder llançar wf des d'usuaris i sw xestib docent <dependency> 
-			<groupId>${pom.groupId}</groupId> <artifactId>bpm-core</artifactId> <version>${pom.version}</version> 
-			<scope>provided</scope> <exclusions> <exclusion> <groupId>log4j</groupId> 
-			<artifactId>log4j</artifactId> </exclusion> <exclusion> <artifactId>signaturaapi</artifactId> 
-			<groupId>es.caib.signatura.api</groupId> </exclusion> </exclusions> </dependency> -->
-		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.11</version>
@@ -497,52 +494,52 @@
 			<version>1.8.0.7</version>
 			<scope>test</scope>
 		</dependency>
-	    <dependency>
-	      <groupId>net.sf.jasperreports</groupId>
-	      <artifactId>jasperreports</artifactId>
-	      <version>5.5.2</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-collections</artifactId>
-						<groupId>commons-collections</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-beanutils</artifactId>
-						<groupId>commons-beanutils</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>xml-apis</artifactId>
-						<groupId>xml-apis</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jfreechart</artifactId>
-						<groupId>jfree</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>bcmail-jdk14</artifactId>
-						<groupId>bouncycastle</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>bcprov-jdk14</artifactId>
-						<groupId>bouncycastle</groupId>
-					</exclusion>
-				</exclusions>
-	    </dependency>
-	    <dependency>
-	    	<groupId>it.sauronsoftware.cron4j</groupId>
-	    	<artifactId>cron4j</artifactId>
-	    	<version>2.2.5</version>
-	    </dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>5.5.2</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-collections</artifactId>
+					<groupId>commons-collections</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-beanutils</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jfreechart</artifactId>
+					<groupId>jfree</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>bcmail-jdk14</artifactId>
+					<groupId>bouncycastle</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>bcprov-jdk14</artifactId>
+					<groupId>bouncycastle</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>it.sauronsoftware.cron4j</groupId>
+			<artifactId>cron4j</artifactId>
+			<version>2.2.5</version>
+		</dependency>
 		<dependency>
 			<groupId>com.twmacinta</groupId>
 			<artifactId>fast-md5</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-		<dependency> 
+		<dependency>
 			<groupId>org.finj</groupId>
 			<artifactId>finj</artifactId>
 			<version>1.0.0</version>
@@ -573,6 +570,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
+			<artifactId>tomee-catalina</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
 			<artifactId>openejb-core</artifactId>
 		</dependency>
 		<dependency>
@@ -584,6 +586,11 @@
 			<artifactId>iam-legacy</artifactId>
 			<version>${pom.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>jaxen</groupId>
+		    <artifactId>jaxen</artifactId>
+		    <version>1.1.6</version>
 		</dependency>
 	</dependencies>
 </project>

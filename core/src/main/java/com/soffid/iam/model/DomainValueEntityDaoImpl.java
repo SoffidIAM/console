@@ -182,14 +182,15 @@ public class DomainValueEntityDaoImpl extends
         String codiAplicacio = source.getExternalCodeDomain();
         String query = "select domini " //$NON-NLS-1$
                 + "from com.soffid.iam.model.ApplicationDomainEntity domini " //$NON-NLS-1$
-                + "left join domini.informationSystem aplicacio " //$NON-NLS-1$
-                + "where " //$NON-NLS-1$
-                + "((:codiAplicacio is null and aplicacio is null) or (aplicacio.name = :codiAplicacio)) and " //$NON-NLS-1$
+                + "join domini.informationSystem aplicacio " //$NON-NLS-1$
+                + "where aplicacio.tenant.id=:tenantId and " //$NON-NLS-1$
+                + "aplicacio.name = :codiAplicacio and " //$NON-NLS-1$
                 + "domini.name = :nom"; //$NON-NLS-1$
         Parameter codiAplicacioParameter = new Parameter("codiAplicacio", //$NON-NLS-1$
                 codiAplicacio);
         Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
-        Parameter[] parameters = { codiAplicacioParameter, nomParameter };
+        Parameter[] parameters = { codiAplicacioParameter, nomParameter,
+        		new Parameter("tenantId", Security.getCurrentTenantId())};
         Collection dominis = getApplicationDomainEntityDao().query(query, parameters);
         ApplicationDomainEntity dominiAplicacio = null;
         if (dominis != null) {
@@ -214,20 +215,6 @@ public class DomainValueEntityDaoImpl extends
     public void domainValueToEntity(com.soffid.iam.api.DomainValue source, com.soffid.iam.model.DomainValueEntity target, boolean copyIfNull) {
         super.domainValueToEntity(source, target, copyIfNull);
         valorDominiToEntityCustom(source, target);
-    }
-
-    /**
-     * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
-     *      es.caib.seycon.ng.model.Parameter[])
-     */
-    public List<DomainValueEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this,
-                    queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
     }
 
     public void create(Collection entities) {

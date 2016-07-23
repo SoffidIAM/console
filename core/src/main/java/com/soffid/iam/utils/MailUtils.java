@@ -20,8 +20,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-import org.zkoss.util.logging.Log;
-
 public class MailUtils {
 
 	public static void sendMail(String smtpServer, String to, String from,

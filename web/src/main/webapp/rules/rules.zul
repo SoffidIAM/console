@@ -329,9 +329,7 @@
 						<div style="float: right">
 							<button label="${c:l('rules.apply')}">
 								<attribute name="onClick">
-									model.commit ();
-									home = new javax.naming.InitialContext().lookup(com.soffid.iam.service.ejb.RulesServiceHome.JNDI_NAME);
-									com.soffid.iam.service.ejb.RulesService svc = home.create ();
+									com.soffid.iam.service.ejb.RulesService svc = es.caib.seycon.ng.EJBLocator.getRulesService();
 									svc.apply(form.getJXPathContext().getValue("/").getInstance());
 								</attribute>
 							</button>

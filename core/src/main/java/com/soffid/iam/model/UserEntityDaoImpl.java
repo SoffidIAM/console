@@ -839,18 +839,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         return valor;
     }
 
-    public String findFollowingAlumnCode() {
-        String valor = ""; //$NON-NLS-1$
-        boolean continua = true;
-        long valorActual;
-        do {
-            valorActual = generaCodiAlumneLong();
-            valor = toStringCodiUsuariAlumne(valorActual);
-            continua = existeixCodi(valor);
-        } while (continua /* || valorActual < 80000 */);
-        return valor;
-    }
-
     public String getNextHostUserName() {
         String valor = ""; //$NON-NLS-1$
         boolean continua = true;
@@ -932,17 +920,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
      * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
      *      es.caib.seycon.ng.model.Parameter[])
      */
-    public List<UserEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List results = new QueryBuilder().query(this, queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-    }
 
     public UserEntity anonimousUserToEntity(AnonimousUser usuariAnonim) {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -38,6 +38,7 @@ import com.soffid.iam.service.NetworkService;
 import com.soffid.iam.service.SystemScheduledTasks;
 import com.soffid.iam.service.UserDomainService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.exception.BPMException;
@@ -107,6 +108,7 @@ public class ApplicationBootServiceImpl extends
 
 	@Override
 	protected void handleSyncServerBoot() throws Exception {
+		loadServiceHandlers();
 		System.setProperty(
 				"soffid.ui.maxrows", Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 		configureSystemProperties();
@@ -117,11 +119,13 @@ public class ApplicationBootServiceImpl extends
 	@Override
 	protected void handleConsoleBoot() throws Exception {
 		ServiceLocator.instance();
+		
+		loadServiceHandlers();
 
-		System.setProperty("soffid.ui.maxrows", //$NON-NLS-1$
+		ConfigurationCache.setProperty("soffid.ui.maxrows", //$NON-NLS-1$
 				Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 
-		System.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
+		ConfigurationCache.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		configureDatabase();
 
@@ -140,6 +144,23 @@ public class ApplicationBootServiceImpl extends
 		loadWorkflows();
 	}
 
+	
+	private void loadServiceHandlers ()
+	{
+		bpmConfigSvc = getBpmConfigService();
+		configSvc = getConfigurationService();
+		appSvc = getApplicationService();
+		grupSvc = getGroupService();
+		dominiSvc = getUserDomainService();
+		dispatcherSvc = getDispatcherService();
+		xarxaSvc = getNetworkService();
+		usuariSvc = getUserService();
+		passSvc = getInternalPasswordService();
+		autSvc = getAuthorizationService();
+		tdSvc = getAdditionalDataService();
+		peSvc = getEntryPointService();
+		accountSvc = getAccountService();
+	}
 	/**
 	 * 
 	 */
@@ -265,28 +286,12 @@ public class ApplicationBootServiceImpl extends
 			NeedsAccountNameException, AccountAlreadyExistsException,
 			BPMException, IOException, NamingException, SQLException {
 
-		bpmConfigSvc = getBpmConfigService();
-		configSvc = getConfigurationService();
-		appSvc = getApplicationService();
-		grupSvc = getGroupService();
-		dominiSvc = getUserDomainService();
-		dispatcherSvc = getDispatcherService();
-		xarxaSvc = getNetworkService();
-		usuariSvc = getUserService();
-		passSvc = getInternalPasswordService();
-		autSvc = getAuthorizationService();
-		tdSvc = getAdditionalDataService();
-		peSvc = getEntryPointService();
-		accountSvc = getAccountService();
-
 		Configuration cfg = configSvc.findParameterByNameAndNetworkName(
 				"versionLevel", null); //$NON-NLS-1$
 		boolean firstSetup = (cfg == null);
 		if (firstSetup) {
 			createInitialData();
 			configureDocumentManager();
-			cfg = new Configuration("versionLevel", "100"); //$NON-NLS-1$ //$NON-NLS-2$
-			configSvc.create(cfg);
 		}
 	}
 
@@ -809,6 +814,9 @@ public class ApplicationBootServiceImpl extends
 			configSvc.create(cfg2);
 		}
 
+		cfg = new Configuration("versionLevel", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+		configSvc.create(cfg);
+
 	}
 
 	protected void configureSystemProperties() throws InternalErrorException {
@@ -817,11 +825,11 @@ public class ApplicationBootServiceImpl extends
 		for (Configuration config : configSvc.findConfigurationByFilter("%",
 				null, null, null)) {
 			if (config.getNetworkCode() == null) {
-				System.setProperty(config.getCode(), config.getValue());
+				ConfigurationCache.setProperty(config.getCode(), config.getValue());
 			}
 		}
-		if (System.getProperty("soffid.ui.wildcards") == null) //$NON-NLS-1$
-			System.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (ConfigurationCache.getProperty("soffid.ui.wildcards") == null) //$NON-NLS-1$
+			ConfigurationCache.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -866,7 +874,9 @@ public class ApplicationBootServiceImpl extends
 
 	@Override
 	protected void handleTenantBoot(Tenant tenant) throws Exception {
-		Security.nestedLogin(tenant.getName() + "\\Anonymous", new String[] { //$NON-NLS-1$
+		loadServiceHandlers();
+		
+		Security.nestedLogin(tenant.getName(),  "Anonymous", new String[] { //$NON-NLS-1$
 				Security.AUTO_APPLICATION_CREATE + Security.AUTO_ALL,
 						Security.AUTO_USER_CREATE + Security.AUTO_ALL,
 						Security.AUTO_HOST_ALL_CREATE,

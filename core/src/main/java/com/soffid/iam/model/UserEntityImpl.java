@@ -4,6 +4,7 @@ import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 public class UserEntityImpl extends UserEntity
@@ -13,7 +14,7 @@ public class UserEntityImpl extends UserEntity
 	@Override
 	public String getFullName()
 	{
-		String nameFormat = System.getProperty("soffid.nameformat");
+		String nameFormat = ConfigurationCache.getProperty("soffid.nameformat");
 		
 		if (nameFormat == null)
 		{

@@ -47,9 +47,11 @@ import com.soffid.iam.reconcile.common.ReconcileAccount;
 import com.soffid.iam.remote.URLManager;
 import com.soffid.iam.service.UserDomainService;
 import com.soffid.iam.service.account.AccountNameGenerator;
+import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.util.NameParser;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -71,6 +73,7 @@ import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.servei.SecretStoreService;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
 
+import java.net.MalformedURLException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -687,9 +690,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return null;
 	}
 
-	private String evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName) throws EvalError {
+	private String evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName) throws EvalError, MalformedURLException {
 		User userVO = getUserEntityDao().toUser(ue);
-		Interpreter interpreter = new Interpreter();
+		SecureInterpreter interpreter = new SecureInterpreter();
 		SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
 		
 		HashMap<String, String> attributes;
@@ -708,6 +711,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		interpreter.set("groups", groups); //$NON-NLS-1$
 		interpreter.set("groupsList", groups.keySet()); //$NON-NLS-1$
 		interpreter.set("applicationContext", applicationContext); //$NON-NLS-1$
+		interpreter.set("serviceLocator", com.soffid.iam.ServiceLocator.instance()); //$NON-NLS-1$
 		interpreter.set("usuariEntity", ue); //$NON-NLS-1$
 		interpreter.set("user", userVO); //$NON-NLS-1$
 		interpreter.set("dominiEntity", du); //$NON-NLS-1$
@@ -724,7 +728,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		throws Exception
 	{
 		AccountEntityDao dao = getAccountEntityDao();
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		if ((criteria.getDescription() != null) &&
 			criteria.getDescription().equals("%")) //$NON-NLS-1$
@@ -1110,7 +1114,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         }
                     }
 					if (!found)
+					{
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
+					}
 				}
 				else if (ae.getType().equals(AccountType.SHARED))
 				{
@@ -1292,10 +1298,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		query = "select account " + //$NON-NLS-1$
 			"from com.soffid.iam.model.AccountEntity as account " + //$NON-NLS-1$
-			"where account.passwordExpiration between :currentDate and :limitDate"; //$NON-NLS-1$
+			"where account.passwordExpiration between :currentDate and :limitDate and "
+			+ "account.system.tenant.id = :tenantId "; //$NON-NLS-1$
 		
 		paramsList.add(new Parameter("currentDate", currentDate)); //$NON-NLS-1$
 		paramsList.add(new Parameter("limitDate", limitDate)); //$NON-NLS-1$
+		paramsList.add(new Parameter("tenantId", Security.getCurrentTenantId())); //$NON-NLS-1$
 		
 		// Check accounts types to search
 		if (accTypes != null && !accTypes.isEmpty())

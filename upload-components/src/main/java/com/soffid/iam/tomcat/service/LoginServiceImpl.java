@@ -62,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
 				return null;
 			}
 
-			Security.nestedLogin(tenant.getName() + "\\$$INTERNAL$$", new String[] {
+			Security.nestedLogin(tenant.getName(), "$$INTERNAL$$", new String[] {
 					Security.AUTO_USER_QUERY + Security.AUTO_ALL,
 					Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL });
 			try {
@@ -91,9 +91,11 @@ public class LoginServiceImpl implements LoginService {
 							roles);
 				} else if (ps.checkPassword(account, passwordDomain, new Password(
 						credentials), false, true)) {
+					List<String> roles = getRoles(acc);
+					roles.add("PASSWORD:EXPIRED");
 					principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
 							credentials,
-							Collections.singletonList("PASSWORD:EXPIRED"));
+							roles);
 				} else {
 					log.info(username + " login rejected. Invalid password");
 					return null;

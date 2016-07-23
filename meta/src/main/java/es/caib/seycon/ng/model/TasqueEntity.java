@@ -128,7 +128,7 @@ public abstract class TasqueEntity {
 
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
-			+ "where tasques.server=:server "
+			+ "where tasques.server=:server  and tasques.tenant.id = :tenantId "
 			+ "order by tasques.date, tasques.id")
 	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByServer(
 			java.lang.String server) {
@@ -139,6 +139,7 @@ public abstract class TasqueEntity {
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server=:server and "
 			+ "(tasques.systemName is null or tasques.systemName = :system) "
+			+ "and tasques.tenant.id = :tenantId "
 			+ "order by tasques.date, tasques.id")
 	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByServerAndSystem(
 			java.lang.String server,
@@ -149,7 +150,7 @@ public abstract class TasqueEntity {
 	@Operation(translated = "findByTaskAndServer")
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
-			+ "where tasques.server=:server and tasques.transaction=:transaction "
+			+ "where tasques.server=:server and tasques.transaction=:transaction  and tasques.tenant.id = :tenantId "
 			+ "order by tasques.date, tasques.id")
 	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByTascaAndServer(
 			java.lang.String transaction, java.lang.String server) {
@@ -159,15 +160,16 @@ public abstract class TasqueEntity {
 	@Operation(translated = "findDataUnplannedTasks")
 	@DaoFinder("select count(*),max(tasqueEntity.date) "
 			+ "from com.soffid.iam.model.TaskEntity as tasqueEntity "
-			+ "where tasqueEntity.server is null")
+			+ "where tasqueEntity.server is null and tasqueEntity.tenant.id = :tenantId")
 	public java.util.List<Object[]> findDadesTasquesSensePlanificar() {
 		return null;
 	}
 
 	@Operation(translated = "findDataPendingTasks")
 	@DaoFinder("select count(*) from com.soffid.iam.model.TaskEntity as tasqueEntity "
-			+ "where (:server is null and tasqueEntity.server is null) or "
-			+ "      (:server is not null and  tasqueEntity.server=:server)")
+			+ "where ((:server is null and tasqueEntity.server is null) or "
+			+ "       (:server is not null and  tasqueEntity.server=:server) ) "
+			+ "and tasqueEntity.tenant.id = :tenantId ")
 	public java.util.List<Long> findDadesTasquesPendentsServer(
 			java.lang.String server) {
 		return null;

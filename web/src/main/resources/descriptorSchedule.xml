@@ -3,7 +3,7 @@
 <zkib-model>
 	<datanode name="root">
 		<finder name="task" type="task">
-			<ejb-finder jndi="soffid/ejb/com.soffid.iam.service.ScheduledTaskService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService"
 				method="listTasks"> 
 			</ejb-finder>
 		</finder>
@@ -29,7 +29,7 @@
 	</datanode>
 	
 	<datanode name="task">
-		<ejb-handler jndi="soffid/ejb/com.soffid.iam.service.ScheduledTaskService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService">
 			<update-method method="update">
 				<parameter value="${instance}"/>
 			</update-method>

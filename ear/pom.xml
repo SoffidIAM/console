@@ -86,7 +86,7 @@
 				<version>2.8</version>
 				<configuration>
 			        <defaultLibBundleDir>lib/</defaultLibBundleDir>
- 		            <skinnyWars>true</skinnyWars>
+ 		            <skinnyWars>false</skinnyWars>
 					<modules>
 						<webModule>
 							<groupId>${pom.groupId}</groupId>

@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.Security;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -68,7 +71,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -102,8 +104,17 @@ public class DeployerBean implements DeployerService {
 	@PostConstruct
 	public void init() throws Exception {
 		log.info("Started deployer bean");
-		deploy(true);
-		context.getTimerService().createTimer(5000, 5000, "Scan Timer");
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+			public Void run() {
+				try {
+					deploy(true);
+					context.getTimerService().createTimer(5000, 5000, "Scan Timer");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		});
 	}
 
 	public List<String> getInitClasses() {
@@ -566,7 +577,16 @@ public class DeployerBean implements DeployerService {
 	}
 
 	protected void stopService() throws Exception {
-		undeploy();
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+			public Void run() {
+				try {
+					undeploy();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		});
 	}
 
 	private void undeploy() throws MalformedURLException, UndeployException,
@@ -602,10 +622,19 @@ public class DeployerBean implements DeployerService {
 	}
 
 	public void redeploy() throws Exception {
-		pauseConnector();
-		undeploy();
-		deploy(false);
-		resumeConnector();
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+			public Void run() {
+				try {
+					pauseConnector();
+					undeploy();
+					deploy(false);
+					resumeConnector();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		});
 	}
 
 	AppInfo failedWarInfo = null;
@@ -674,24 +703,43 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
+
+	private void doDeploy() throws Exception {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+			public Void run() {
+				try {
+					deploy(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		});
+	}
+
 	private long lastModified = 0;
 
 	@Timeout
 	public void timeOutHandler(Timer timer) throws Exception {
 		try {
-			long last = initialEarFile().lastModified();
-			File addonsDir = new File(
-					new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (addonsDir.isDirectory()) {
-				for (File f : addonsDir.listFiles()) {
-					if (f.lastModified() > last)
-						last = f.lastModified();
+			if (lastModified  == 0)
+				doDeploy ();
+			else
+			{
+				long last = initialEarFile().lastModified();
+				File addonsDir = new File(
+						new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (addonsDir.isDirectory()) {
+					for (File f : addonsDir.listFiles()) {
+						if (f.lastModified() > last)
+							last = f.lastModified();
+					}
 				}
-			}
-	
-			if (last > lastModified) {
-				failSafe = false;
-				redeploy();
+		
+				if (last > lastModified) {
+					failSafe = false;
+					redeploy();
+				}
 			}
 		} catch (Exception e) {
 			log.info("Error on deployer timer", e);

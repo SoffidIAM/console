@@ -2,7 +2,7 @@
 void checkTruncatedList(list)
 {
 	// Check truncated number of elements
-	if (list.getModel().getSize() == Integer.parseInt(System
+	if (list.getModel().getSize() == Integer.parseInt(com.soffid.iam.utils.ConfigurationCache
 			.getProperty("soffid.ui.maxrows")))
 	{
 		list.getFellow("listboxFoot").setValue(
@@ -21,7 +21,7 @@ void checkTruncatedList(list)
 void checkTruncatedTree(tree)
 {
 	// Check truncated number of elements
-	if (tree.getItemCount() == Integer.parseInt(System
+	if (tree.getItemCount() == Integer.parseInt(com.soffid.iam.utils.ConfigurationCache
 				.getProperty("soffid.ui.maxrows")))
 	{
 		tree.getFellow("treeboxFoot").setValue(

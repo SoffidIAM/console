@@ -203,12 +203,7 @@
 				ctx =  ds.getJXPathContext();
 				String codiXarxa = ctx.getValue("@codi");
 				
-				javax.naming.Context context = new javax.naming.InitialContext();
-				Object objXarxa = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.XarxaServiceHome xarxaHome = (es.caib.seycon.ng.servei.ejb.XarxaServiceHome) javax.rmi.PortableRemoteObject.narrow(
-					objXarxa, es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-				es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = xarxaHome.create();
-	
+				es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();	
 				if (codiXarxa == null)
 				{
 					lliures = 0;

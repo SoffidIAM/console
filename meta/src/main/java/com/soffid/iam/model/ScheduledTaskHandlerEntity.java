@@ -32,3 +32,10 @@ public abstract class ScheduledTaskHandlerEntity {
 	 return null;
 	}
 }
+
+@Index (name="SC_SCTAHA_NAME_UK",	unique=true,
+entity=com.soffid.iam.model.ScheduledTaskHandlerEntity.class,
+columns={"STH_NAME"})
+abstract class SheculedTaskHandlerNameIndex {
+}
+

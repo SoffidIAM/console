@@ -4,8 +4,13 @@
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
 		<zscript><![CDATA[
-		    if (execution.isUserInRole("SEYCON_CHANGE_PASSWORD"))
+		    String message = "Not authorized (403 forbidden)";
+		    if (execution.isUserInRole("PASSWORD:EXPIRED"))
+		    {
 		    	execution.sendRedirect("/changepass.zul");
+		    	message = "Password must be changed";
+		    }
+		    	
 		]]></zscript>
 		<html><![CDATA[
 		
@@ -14,7 +19,7 @@
         	<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
    			<p style="height:100px; "/>
         
-			<p style="color:red">Not authorized (403 forbidden)</p>
+			<p style="color:red">${message}</p>
 		</div>
 		]]></html>
 </zk>

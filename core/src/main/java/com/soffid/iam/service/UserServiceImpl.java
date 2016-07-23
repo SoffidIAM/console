@@ -64,6 +64,7 @@ import com.soffid.iam.service.GroupService;
 import com.soffid.iam.service.MailListsService;
 import com.soffid.iam.service.impl.CertificateParser;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.ProcesWFUsuari;
@@ -1147,7 +1148,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		int limitResults = Integer.MAX_VALUE;
 		try {
-			limitResults = Integer.parseInt(System
+			limitResults = Integer.parseInt(ConfigurationCache
 					.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		} catch (NumberFormatException e) {
 		}
@@ -2878,7 +2879,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			throws Exception {
 		int limitResults = Integer.MAX_VALUE;
 		try {
-			limitResults = Integer.parseInt(System
+			limitResults = Integer.parseInt(ConfigurationCache
 					.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		} catch (NumberFormatException e) {
 		}
@@ -2989,16 +2990,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		StringBuffer sb = new StringBuffer(
-				"select usuari from com.soffid.iam.model.UserEntity as usuari"); //$NON-NLS-1$
+				"select usuari from com.soffid.iam.model.UserEntity as usuari "); //$NON-NLS-1$
 		for (String join : joins) {
 			sb.append(' ').append(join);
 		}
+		sb.append ("where usuari.tenant.id = :tenantId"); //$NON-NLS-1$
+		params.add(new Parameter("tenantId", Security.getCurrentTenantId()));
 		boolean first = true;
 		for (String query : queries) {
-			if (first)
-				sb.append(" where "); //$NON-NLS-1$
-			else
-				sb.append(" and "); //$NON-NLS-1$
+			sb.append(" and "); //$NON-NLS-1$
 			sb.append(query);
 			first = false;
 		}

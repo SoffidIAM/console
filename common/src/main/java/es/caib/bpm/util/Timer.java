@@ -1,7 +1,7 @@
 package es.caib.bpm.util;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
 
 
 public class Timer {
@@ -52,7 +52,7 @@ public class Timer {
 		
 		if(maxDif<milisToLog) return;
 		
-		Logger.getLogger(this.getClass()).warn(timeString);
+		LogFactory.getLog(this.getClass()).warn(timeString);
 	}
 	
 }

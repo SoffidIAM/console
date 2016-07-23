@@ -139,7 +139,7 @@ public class InboxHandler extends Frame {
 						task = (TaskInstance) itTask.next();
 						item = decorator.createListitem(task);
 						listbox.getItems().add(item);
-					t2.logTime("AbstractInboxHandler.createListitem",Integer.parseInt(System.getProperty("es.caib.ibkey.timer.fastTask.milis","100"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					t2.logTime("AbstractInboxHandler.createListitem", 100); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					
 				}
 			}

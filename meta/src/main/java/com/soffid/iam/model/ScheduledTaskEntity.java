@@ -77,3 +77,20 @@ public abstract class ScheduledTaskEntity {
 	 return null;
 	}
 }
+
+
+
+@Index (name="SC_SCHTAS_NAME_UK",	unique=true,
+	entity=com.soffid.iam.model.ScheduledTaskEntity.class,
+	columns={"SCT_TEN_ID", "SCT_NAME"})
+abstract class ScheduledTaskEntityNameIndex {
+}
+
+
+@Index (name="SC_SCHTAS_HANDLER_UK",	unique=true,
+entity=com.soffid.iam.model.ScheduledTaskEntity.class,
+columns={"SCT_HANDLE", "SCT_TEN_ID", "SCT_PARAM"})
+abstract class ScheduledTaskEntityHandlerIndex {
+}
+
+

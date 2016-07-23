@@ -37,7 +37,7 @@
 			</ejb-finder>
 		</finder>
 		<finder name="account" type="account">
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService"
 				method="findAccountsByCriteria" if="${queryEnabled}"> <!--agent:query, application:update -->
 				<parameter value="${self.query[0].instance}" />
 			</ejb-finder>
@@ -88,7 +88,7 @@
 	<datanode name="dispatcher" transient="true"/>
 	
 	<datanode name="account">
-		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService">
 			<insert-method method="createAccount" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
 			</insert-method>

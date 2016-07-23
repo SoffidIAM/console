@@ -24,6 +24,7 @@ import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.Security;
@@ -332,7 +333,7 @@ public class AccessLogServiceImpl extends
 	// Emprat des de la finestra de registres d'accés: 
 	// Versió optimitzada... [12/09/2011] Alejandro Usero Ruiz
 	protected Collection<AccessLog> handleFindEntryByNewFilter(String dataIni, String dataFi, String nomServidor, String nomClient, String codiUsuari) throws Exception {
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		Date d_dataIni = null;
 		Date d_dataFi = null;

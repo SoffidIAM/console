@@ -86,15 +86,15 @@
 				method="findAllServers"> <!--agent:query, application:update-->
 			</ejb-finder>
 		</finder>
-		<finder name="database" type="database">
+		<!--  No longer supported finder name="database" type="database">
 			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="findAllDatabases"> <!--agent:query, application:update-->
+				method="findAllDatabases"> 
 			</ejb-finder>
 			<new-instance-bean
 				className="es.caib.seycon.ng.comu.ReplicaDatabase">
 			</new-instance-bean>
-		</finder>
-		<finder name="databaseSelector" type="database">
+		</finder -->
+		<!--  finder name="databaseSelector" type="database">
 			<script-finder>
 				obj = new es.caib.seycon.ng.comu.ReplicaDatabase();
 				obj.setId(null);
@@ -104,9 +104,9 @@
 				return v;				
 			</script-finder>
 			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="findAllDatabases"> <!--agent:query, application:update-->
+				method="findAllDatabases"> 
 			</ejb-finder>
-		</finder>
+		</finder -->
 		<finder name="serverSelector" type="server">
 			<script-finder>
 				v = new java.util.Vector();
@@ -140,9 +140,7 @@
 		</finder>
 		<finder name="authoritativeProcess" type="authoritativeProcess">
 			<script-finder>
-				engine = new javax.naming.InitialContext()
-					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
-					.create();
+				engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
 				java.util.LinkedList list = new java.util.LinkedList ();
 				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
 				tv.setTag ("-");
@@ -195,7 +193,8 @@
 	
 	<datanode name="tipusUsuari"/>
 	
-	<datanode name="database">
+	<!--  NO LONGER SUPPORTED
+		datanode name="database">
 		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
@@ -213,7 +212,7 @@
 		<validator>
 			<attribute-validator expr="${instance.url}" notNull="true" friendlyName="agents.DataBaseUrlValidation"/>
 		</validator>
-	</datanode>
+	</datanode -->
 
 	
 	<datanode name="server">

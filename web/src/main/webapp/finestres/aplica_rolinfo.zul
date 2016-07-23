@@ -206,11 +206,7 @@
 							es.caib.seycon.ng.comu.Domini d = form.getJXPathContext().getValue("/domini"); 
 							String s_valor_domini = d.getNom();
 							String s_valor_domini_source = grantedRol.getDomini().getNom();
-							String currentUser = new javax.naming.InitialContext()
-								.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
-								.create()
-								.getCurrentUsuari()
-								.getCodi();
+							String currentUser = com.soffid.iam.utils.Security.getCurrentUser();
 							if (s_valor_domini_source!=null && ! "".equals(s_valor_domini_source.trim()) && 
 									! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini_source)) {
 								Page p = desktop.getPage("valorsDominisRol");
@@ -235,11 +231,7 @@
 						
 						void onSelectedDomainValue (List dades)
 						{
-							String currentUser = new javax.naming.InitialContext()
-								.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
-								.create()
-								.getCurrentUsuari()
-								.getCodi();
+							String currentUser = com.soffid.iam.utils.Security.getCurrentUser();
 							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
 							String path = desktop.getPage("valorsDominisRol").getAttribute("newElement");
 							if (dades != null && dades.size() > 0)
@@ -335,11 +327,7 @@
 							if (s_valor_domini !=null && 
 									! "".equals(s_valor_domini.trim()) && 
 									! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(s_valor_domini)) {
-								String currentUser = new javax.naming.InitialContext()
-									.lookup (es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
-									.create()
-									.getCurrentUsuari()
-									.getCodi();
+								String currentUser = com.soffid.iam.utils.Security.getCurrentUser();
 
 								Page p = desktop.getPage("valorsDominisRol");
 								p.setAttribute("usuari", currentUser);
@@ -605,9 +593,7 @@
 													// Obtenim els usuaris q tenen atorgat aquest rol (si n'hi ha cap)
 													try {
 														if (es_rol_existent && (roleID != null)) { //Només als rols ja existents
-															javax.naming.Context context = new javax.naming.InitialContext();		
-															aplicacioHome = context.lookup(es.caib.seycon.ng.servei.ejb.AplicacioServiceHome.JNDI_NAME);
-															aplicacioService = aplicacioHome.create();
+															aplicacioService = es.caib.seycon.ng.EJBLocator.getAplicacioService();
 															// Obteniem els atributs originals:
 															Long max = new Long(15);
 															num = aplicacioService.findRolGrantByRol(roleID, max);

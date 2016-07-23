@@ -461,9 +461,7 @@
 									// obtenim el rol
 									es.caib.seycon.ng.comu.Rol rolnou = null;
 									try {
-										javax.naming.Context context = new javax.naming.InitialContext();		
-										aplicacioHome = context.lookup(es.caib.seycon.ng.servei.ejb.AplicacioServiceHome.JNDI_NAME);
-										aplicacioService = aplicacioHome.create();
+										aplicacioService = es.caib.seycon.ng.EJBLocator.getAplicacioService();
 										rolnou = aplicacioService.findRolById(new Long(idrol));
 									} catch (Throwable th) {
 										Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.ErrorRol2"),new Object[] {nomRol, bbdd, codiAplicacio}));

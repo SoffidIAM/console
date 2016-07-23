@@ -22,9 +22,7 @@
 			String usuari = desktop.getPage("mazingerconfig").getAttribute("usuari");
 			
 			if (usuari != null) {
-				es.caib.seycon.ng.servei.ejb.UsuariServiceHome home = new javax.naming.InitialContext().
-				lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.UsuariService ejb=home.create();
+				es.caib.seycon.ng.servei.ejb.UsuariService ejb= es.caib.seycon.ng.EJBLocator.getUsuariService();
 				byte[] rules = ejb.getMazingerRules(usuari);
 				String rulesStr = new String(rules,"UTF-8");
 				esquemaLlista.setTitle(String.format(org.zkoss.util.resource.Labels.getLabel("getmazingerconfig.Usuari"),new Object [] {usuari}));

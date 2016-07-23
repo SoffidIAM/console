@@ -190,9 +190,9 @@
 			<scope>provided</scope>
 		</dependency>		
 		<dependency>
-			<groupId>com.soffid.zkib</groupId>
-			<artifactId>zkdb</artifactId>
-			<version>${zkdb.version}</version>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>web-common</artifactId>
+			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
@@ -232,6 +232,23 @@
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
 			<artifactId>javaee-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>iam-tomee</artifactId>
+			<version>${pom.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>openejb-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.30</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

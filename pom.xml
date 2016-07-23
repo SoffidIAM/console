@@ -83,50 +83,6 @@
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-											org.apache.maven.plugins
-										</groupId>
-                    <artifactId>
-											maven-resources-plugin
-										</artifactId>
-                    <versionRange>
-											[2.2,)
-										</versionRange>
-                    <goals>
-                      <goal>resources</goal>
-                      <goal>testResources</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                	<pluginExecutionFilter>
-                		<groupId></groupId>
-                		<artifactId></artifactId>
-                		<versionRange>[,)</versionRange>
-                		<goals>
-                			<goal></goal>
-                		</goals>
-                	</pluginExecutionFilter>
-                	<action>
-                		<ignore></ignore>
-                	</action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -135,7 +91,8 @@
     <module>deployer</module>
     <module>common</module>
     <module>core</module>
-    <module>legacy</module>
+    <module>tomee</module>
+    <module>web-common</module>
     <module>bpm-sar</module>
     <module>weblogout</module>
     <module>web</module>
@@ -458,6 +415,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>tomee-catalina</artifactId>
+			<version>1.7.4</version>
+			<scope>provided</scope>
+		</dependency>
+
     </dependencies>
   </dependencyManagement>
   <properties>
@@ -466,7 +430,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.19-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.23-SNAPSHOT</zkdb.version>
+    <zkdb.version>1.24-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>

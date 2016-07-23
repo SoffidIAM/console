@@ -785,21 +785,6 @@ public class RoleAccountEntityDaoImpl extends
 		rolsUsuarisToEntityCustom(sourceVO, targetEntity);
 	}
 
-	/**
-	 * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
-	 *      es.caib.seycon.ng.model.Parameter[])
-	 */
-	public List<RoleAccountEntity> find(final java.lang.String queryString,
-			final Parameter[] parameters) {
-		try {
-			java.util.List results = new QueryBuilder().query(this,
-					queryString, parameters);
-			return results;
-		} catch (org.hibernate.HibernateException ex) {
-			throw super.convertHibernateAccessException(ex);
-		}
-	}
-
 	private com.soffid.iam.model.RoleAccountEntity loadRolAccountEntityFromAdministracioAplicacio(
 			com.soffid.iam.api.ApplicationAdministration administracioAplicacio) {
 		RoleAccountEntity rolsUsuarisEntity = null;

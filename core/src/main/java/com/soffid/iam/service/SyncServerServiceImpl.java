@@ -440,15 +440,12 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             // posem url ficticia TASQUES_SENSE_PLANIFICAR
 
             // Obtenim el número de tasques
-            Collection<TaskEntity> tasquesPlanning = getTaskEntityDao().
-            		query("select count(*),min(tasqueEntity.date) "
-            				+ "from com.soffid.iam.model.TaskEntity as tasqueEntity "
-            				+ "where tasqueEntity.server is null", new Parameter[0]);
+            Collection<Object[]> tasquesPlanning = getTaskEntityDao().findDataUnplannedTasks();
 
             if (tasquesPlanning != null) {
-                Iterator it = tasquesPlanning.iterator();
+                Iterator<Object[]> it = tasquesPlanning.iterator();
                 if (it.hasNext()) { // n'hi ha dues dades: numTasks i timestamp
-                    Object dades[] = (Object[]) it.next();
+                    Object dades[] = it.next();
                     if (dades != null && dades.length >= 2) {
                         Long numTasquesPendents = (Long) dades[0];
                         Timestamp mindata = (Timestamp) dades[1];

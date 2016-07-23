@@ -1,48 +1,5 @@
 package com.soffid.iam.bpm.service;
 
-import es.caib.bpm.servei.*;
-
-import com.soffid.iam.bpm.api.BPMUser;
-import com.soffid.iam.api.Group;
-import com.soffid.iam.api.RoleGrant;
-import com.soffid.iam.api.User;
-import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.SystemEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.service.UserService;
-import com.soffid.iam.utils.Security;
-
-import es.caib.bpm.exception.BPMErrorCodes;
-import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.exception.InvalidConfigurationException;
-import es.caib.bpm.exception.InvalidParameterException;
-import es.caib.bpm.util.Timer;
-
-import com.soffid.iam.bpm.api.Job;
-import com.soffid.iam.bpm.api.ProcessDefinition;
-import com.soffid.iam.bpm.api.ProcessInstance;
-import com.soffid.iam.bpm.api.ProcessLog;
-import com.soffid.iam.bpm.api.TaskDefinition;
-import com.soffid.iam.bpm.api.TaskInstance;
-import com.soffid.iam.bpm.api.Token;
-import com.soffid.iam.bpm.business.ProcessDefinitionRolesBusiness;
-import com.soffid.iam.bpm.business.UserInterfaceBusiness;
-import com.soffid.iam.bpm.business.VOFactory;
-import com.soffid.iam.bpm.config.Configuration;
-import com.soffid.iam.bpm.index.DirectoryFactory;
-import com.soffid.iam.bpm.index.Indexer;
-import com.soffid.iam.bpm.model.AuthenticationLog;
-import com.soffid.iam.bpm.model.DBProperty;
-import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
-import com.soffid.iam.bpm.model.UserInterface;
-import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
-import com.soffid.iam.bpm.service.impl.UserContextCache;
-import com.soffid.iam.bpm.utils.ColeccionesUtils;
-import com.soffid.iam.bpm.utils.FechaUtils;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.UnknownUserException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,7 +11,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,19 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipInputStream;
-
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.naming.NamingException;
-import javax.naming.directory.InvalidSearchFilterException;
-import javax.security.auth.login.LoginException;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
@@ -94,8 +40,6 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.FilterClause;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -134,7 +78,45 @@ import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.xml.sax.SAXException;
-import org.zkoss.zk.ui.Sessions;
+
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.api.BPMUser;
+import com.soffid.iam.bpm.api.Job;
+import com.soffid.iam.bpm.api.ProcessDefinition;
+import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.bpm.api.ProcessLog;
+import com.soffid.iam.bpm.api.TaskDefinition;
+import com.soffid.iam.bpm.api.TaskInstance;
+import com.soffid.iam.bpm.api.Token;
+import com.soffid.iam.bpm.business.ProcessDefinitionRolesBusiness;
+import com.soffid.iam.bpm.business.UserInterfaceBusiness;
+import com.soffid.iam.bpm.business.VOFactory;
+import com.soffid.iam.bpm.config.Configuration;
+import com.soffid.iam.bpm.index.DirectoryFactory;
+import com.soffid.iam.bpm.index.Indexer;
+import com.soffid.iam.bpm.model.AuthenticationLog;
+import com.soffid.iam.bpm.model.DBProperty;
+import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
+import com.soffid.iam.bpm.model.TenantModuleDefinition;
+import com.soffid.iam.bpm.model.UserInterface;
+import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
+import com.soffid.iam.bpm.service.impl.UserContextCache;
+import com.soffid.iam.bpm.utils.ColeccionesUtils;
+import com.soffid.iam.bpm.utils.FechaUtils;
+import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.Security;
+
+import es.caib.bpm.exception.BPMErrorCodes;
+import es.caib.bpm.exception.BPMException;
+import es.caib.bpm.exception.InvalidConfigurationException;
+import es.caib.bpm.exception.InvalidParameterException;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 
 public class BpmEngineImpl extends BpmEngineBase {
 	/**
@@ -178,14 +160,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			cached.setRoles(new String[] { "anonymous" }); //$NON-NLS-1$
 			return cached;
 		}
-
-		org.zkoss.zk.ui.Session session = Sessions.getCurrent();
-		if (session == null) {
-			sessionId = user;
-		} else {
-			sessionId = "session-" + session.hashCode(); //$NON-NLS-1$
-		}
-
+		
 		cached = (UserContextCache) getSessionCacheService().getObject(
 				CACHE_TAG);
 		if (cached == null) {
@@ -1783,7 +1758,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
 						.next();
 
-				if (business
+				TenantModuleDefinition tm = (TenantModuleDefinition) definition.getDefinition(TenantModuleDefinition.class);
+				
+				if (tm.getTenantId().equals ( Security.getCurrentTenantId()) &&
+					business
 						.isUserAuthorized(name, getUserGroups(), definition)) {
 					com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
 							.newProcessDefinition(definition, context);
@@ -1809,10 +1787,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
 				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
 						.next();
-				com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
-						.newProcessDefinition(definition, context);
-				if (def.isEnabled() && type.equals(def.getType())) {
-					resultadoFinal.add(def);
+				
+				TenantModuleDefinition tm = (TenantModuleDefinition) definition.getDefinition(TenantModuleDefinition.class);
+				
+				if (tm.getTenantId().equals ( Security.getCurrentTenantId()) && 
+						(name == null || name.trim().length() == 0 || name.equals (definition.getName())))
+				{
+					com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
+							.newProcessDefinition(definition, context);
+					if (def.isEnabled() && type.equals(def.getType())) {
+						resultadoFinal.add(def);
+					}
 				}
 			}
 			return resultadoFinal;
@@ -1878,7 +1863,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				.getSession()
 				.createQuery(
 						"select pdp " //$NON-NLS-1$
-								+ "from es.caib.bpm.entity.ProcessDefinitionProperty pdp " //$NON-NLS-1$
+								+ "from com.soffid.iam.bpm.model.ProcessDefinitionProperty pdp " //$NON-NLS-1$
 								+ "where pdp.name = 'disabled' and pdp.processDefinitionId=:id "); //$NON-NLS-1$
 		q.setParameter("id", new Long(def.getId())); //$NON-NLS-1$
 		prop = (ProcessDefinitionProperty) q.uniqueResult();
@@ -1922,7 +1907,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
-	private int[] getCoordinates(Node node) throws DocumentException {
+	private int[] getCoordinates(Node node) throws DocumentException, SAXException {
 		org.jbpm.graph.def.ProcessDefinition definition;
 		String nodeName;
 		XPath xPath;
@@ -1937,6 +1922,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 			// Hacer el PARSE XML del documento
 			org.dom4j.io.SAXReader reader = new org.dom4j.io.SAXReader();
+	        reader.setFeature("http://xml.org/sax/features/validation", false); //$NON-NLS-1$
 			Document doc = reader.read(new ByteArrayInputStream(resultado));
 
 			xPath = new DefaultXPath("//node[@name='" //$NON-NLS-1$
@@ -2184,6 +2170,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.parseParZipInputStream(new ZipInputStream(streamLectura));
 
 			streamLectura.close();
+			
+			TenantModuleDefinition tmd = new TenantModuleDefinition();
+			tmd.setTenantId(Security.getCurrentTenantId());
+			definition.addDefinition( tmd );
 
 			context.deployProcessDefinition(definition);
 
@@ -2515,7 +2505,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		HashSet s = new HashSet(m.keySet());
 		try {
 			Query q = context.getSession().createQuery("select prop " + //$NON-NLS-1$
-					"from es.caib.bpm.entity.DBProperty prop " + //$NON-NLS-1$
+					"from com.soffid.iam.bpm.model.DBProperty prop " + //$NON-NLS-1$
 					"where prop.app='" + BPM_APPLICATION_ID + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Iterator i = q.list().iterator(); i.hasNext();) {
 				DBProperty prop = (DBProperty) i.next();
@@ -2549,7 +2539,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 		try {
 			Query q = context.getSession().createQuery("select prop " + //$NON-NLS-1$
-					"from es.caib.bpm.entity.DBProperty prop " + //$NON-NLS-1$
+					"from com.soffid.iam.bpm.model.DBProperty prop " + //$NON-NLS-1$
 					"where prop.app='" + BPM_APPLICATION_ID + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Iterator i = q.list().iterator(); i.hasNext();) {
 				DBProperty prop = (DBProperty) i.next();
@@ -2612,6 +2602,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 		LinkedList<Parameter> p = new LinkedList<Parameter>();
 		List<String> clauses = new LinkedList<String>();
 		StringBuffer query = new StringBuffer();
+		StringBuffer clause = new StringBuffer();
+		clause.append("select usuari " + //$NON-NLS-1$
+				"from com.soffid.iam.model.UserEntity usuari "
+				+ "where usuari.tenant.id = :tenantId "); //$NON-NLS-1$
+		p.add (new Parameter("tenantId", Security.getCurrentTenantId()));
+		
 		if (userName != null) {
 			clauses.add("usuari.userName like :userName"); //$NON-NLS-1$
 			p.add(new Parameter("userName", userName)); //$NON-NLS-1$
@@ -2628,16 +2624,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			clauses.add("usuari.primaryGroup.name like :group"); //$NON-NLS-1$
 			p.add(new Parameter("group", group)); //$NON-NLS-1$
 		}
-		StringBuffer clause = new StringBuffer();
-		clause.append("select usuari " + //$NON-NLS-1$
-				"from com.soffid.iam.model.UserEntity usuari"); //$NON-NLS-1$
-		boolean first = true;
 		for (String subClause : clauses) {
-			if (first) {
-				clause.append(" where "); //$NON-NLS-1$
-				first = false;
-			} else
-				clause.append(" and "); //$NON-NLS-1$
+			clause.append(" and "); //$NON-NLS-1$
 			clause.append(subClause);
 		}
 		List<UserEntity> result = getUserEntityDao().query(clause.toString(),
@@ -2712,6 +2700,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 	 * @return
 	 */
 	private boolean isGreater(String version, String tag) {
+		if (version.equals(tag))
+			return false;
 		String versionSplit[] = version.split("[,.-_]"); //$NON-NLS-1$
 		String tagSplit[] = version.split("[,.-_]"); //$NON-NLS-1$
 		int i;

@@ -16,6 +16,7 @@ import com.soffid.iam.doc.model.FileSystemDao;
 import com.soffid.iam.doc.nas.comm.CIFSStrategy;
 import com.soffid.iam.doc.nas.comm.FTPStrategy;
 import com.soffid.iam.doc.nas.sign.CAIBStrategy;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.signatura.api.Signature;
 
@@ -66,7 +67,7 @@ public class NASManager
 				loadConfiguration();
 				
 				log.debug(String.format("NAS Manager started with strategy: %1$s", //$NON-NLS-1$
-					new Object[]{System.getProperty("soffid.ui.docStrategy")})); //$NON-NLS-1$
+					new Object[]{ConfigurationCache.getProperty("soffid.ui.docStrategy")})); //$NON-NLS-1$
 			}
 			
 		}
@@ -109,19 +110,21 @@ public class NASManager
 		IllegalAccessException, ClassNotFoundException, NASException
 	{
 		// Instance of communication strategy
-		String docStrategy = System.getProperty("soffid.ui.docStrategy");
+		String docStrategy = ConfigurationCache.getProperty("soffid.ui.docStrategy");
 		
 		if (docStrategy.startsWith("es.caib.bpm.nas.comm."))
 			docStrategy = "com.soffid.iam.doc.nas.comm" + docStrategy.substring(docStrategy.lastIndexOf('.'));
 		
 		instance.comStrategy = (CommunicationStrategy) Class.forName(docStrategy).newInstance(); //$NON-NLS-1$
 		instance.signStrategy=  new CAIBStrategy();
-		
+		instance.comStrategy.setProperties();
+
+		String tmpPath = ConfigurationCache.getMasterProperty("soffid.ui.docTempPath");
+		if (tmpPath == null)
+			tmpPath = System.getProperty ("file.io.tmpdir");
 		instance.tempPath =
-			new File(System.getProperty("soffid.ui.docTempPath"));
+			new File(tmpPath);
 		instance.tempPath.mkdirs();
-		
-		instance.comStrategy.setProperties(System.getProperties());
 	}
 
 	public File getTempFile() throws NASException

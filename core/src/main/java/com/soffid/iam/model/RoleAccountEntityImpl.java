@@ -2,8 +2,6 @@ package com.soffid.iam.model;
 
 import java.util.Collection;
 
-import org.zkoss.zk.au.in.GetUploadInfoCommand;
-
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.utils.Security;
 
@@ -24,7 +22,9 @@ public class RoleAccountEntityImpl extends RoleAccountEntity implements Security
 		{
 			for (UserAccountEntity users: getAccount().getUsers())
 			{
-				if (users.getUser() != null && users.getUser().getUserName().equals(Security.getCurrentUser()))
+				if (users.getUser() != null && 
+						users.getUser().getUserName().equals(Security.getCurrentUser()) &&
+						getRule() == null)
 					return false;
 				if (users.getUser() != null && users.getUser().isAllowed(permission))
 					return true;

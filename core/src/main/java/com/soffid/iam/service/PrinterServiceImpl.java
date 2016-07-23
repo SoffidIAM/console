@@ -27,6 +27,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.service.NetworkServiceImpl;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -96,7 +97,7 @@ public class PrinterServiceImpl extends
     }
 
     protected Collection<Printer> handleFindPrintersByFilter(String codi, String model, String local, String maquina) throws Exception {
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
     	if (codi != null &&
 			(codi.trim().compareTo("") == 0 || codi.trim() //$NON-NLS-1$

@@ -18,8 +18,11 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.Service;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ServiceEntity;
+import com.soffid.iam.utils.ConfigurationCache;
+
 import es.caib.seycon.ng.comu.ServeiSearchCriteria;
 import es.caib.seycon.ng.exception.SeyconException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
@@ -64,7 +67,7 @@ public class ServiceServiceImpl extends
 
 	protected Collection<Service> handleFindServicesByCriteria(String codi, String descripcio) throws Exception {
 		ServeiSearchCriteria criteri = new ServeiSearchCriteria();
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		if ((codi != null) && codi.equals("%")) //$NON-NLS-1$
 		{

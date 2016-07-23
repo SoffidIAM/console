@@ -18,7 +18,10 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.model.GroupTypeEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.utils.ConfigurationCache;
+
 import es.caib.seycon.ng.exception.SeyconException;
+
 import java.util.Collection;
 
 /**
@@ -75,7 +78,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	 */
 	protected Collection<OUType> handleFindOUTypeByFilter(String codi, String descripcio) throws Exception {
 		Collection<GroupTypeEntity> entities = getGroupTypeEntityDao().findByFilter(codi, descripcio);
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		// Check maximum number of results
 		if (entities.size() > limitResults)

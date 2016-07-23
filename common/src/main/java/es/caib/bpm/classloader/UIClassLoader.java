@@ -1,14 +1,21 @@
 package es.caib.bpm.classloader;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
+import java.security.CodeSource;
+import java.security.PermissionCollection;
+import java.security.Policy;
+import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.soffid.iam.api.ParentData;
 
 /**
  * Representa un classloader para las interfaces de usuario.
@@ -17,26 +24,35 @@ import org.apache.log4j.Logger;
  */
 public class UIClassLoader extends ClassLoader 
 {
-	public UIClassLoader(Map mapaClases, ClassLoader parentClassLoader)
+	private ProtectionDomain protectionDomain;
+	public UIClassLoader(Long processId, Map mapaClases, ClassLoader parentClassLoader)
 	{
 	    super (parentClassLoader);
 	    this.mapaClases= mapaClases;
+		Policy p = Policy.getPolicy();
+	    CodeSource cs;
+		try
+		{
+			cs = new CodeSource(new URL("http://bpm.customers.soffid.com/"+processId), new Certificate[0]);
+			PermissionCollection permissions = p.getPermissions(cs);
+		    this.protectionDomain = new ProtectionDomain(cs, permissions);
+		}
+		catch (MalformedURLException e)
+		{
+		}
 	}
 
 	public void cargarClases() throws ClassNotFoundException
 	{
-		String clase= null;
 		for(Iterator it= this.mapaClases.keySet().iterator(); it.hasNext();)
 		{
-			clase= it.next().toString().trim();
-			
+			String clase= it.next().toString().trim();
 //			this.loadClass(clase);
 		}
 	}
 	
 	
 	public InputStream getResourceAsStream(String name) {
-//		System.out.println ("Getting resource "+name);
 		if (mapaClases.containsKey(name))
 		{
 			return new ByteArrayInputStream ((byte[]) mapaClases.get(name));
@@ -54,12 +70,13 @@ public class UIClassLoader extends ClassLoader
 		if (mapaClases.containsKey(newName))
 		{
 			byte[] bytesClase = (byte[])mapaClases.get(newName);
-			return this.defineClass(name, bytesClase, 0, bytesClase.length);
+			return this.defineClass(name, bytesClase, 0, bytesClase.length, protectionDomain);
 			
 		}
-
-		return this.getClass().getClassLoader().loadClass(name);
+		return getParent().loadClass(name);
 	}
+	
 	private Map mapaClases= null;
-	private static Logger log= Logger.getLogger(UIClassLoader.class);
+	private static Log log= LogFactory.getLog(UIClassLoader.class);
 }
+

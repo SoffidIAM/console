@@ -1081,11 +1081,7 @@
 		es.caib.seycon.ng.servei.ejb.PuntEntradaService pueService;
 		public es.caib.seycon.ng.servei.ejb.PuntEntradaService getPuntEntradaService() {
 			if (pueService==null) {
-				javax.naming.Context context = new javax.naming.InitialContext();
-				Object objPUE = context.lookup(es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome pueHome = (es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome) javax.rmi.PortableRemoteObject.narrow(
-					objPUE, es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.class);
-				/*es.caib.seycon.ng.servei.ejb.PuntEntradaService*/ pueService = pueHome.create();
+				pueService = es.caib.seycon.ng.EJBLocator.getPuntEntradaService();
 			}
 			return 	pueService;
 		
@@ -1553,9 +1549,7 @@
 					public void onEvent(Event event) {
 						if ("onOK".equals(event.getName())) {
 							es.caib.seycon.ng.servei.ejb.PuntEntradaService ejb = 
-									new javax.naming.InitialContext()
-										.lookup ( es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.JNDI_NAME)
-										.create();
+									es.caib.seycon.ng.EJBLocator.getPuntEntradaService();
 							ejb.sortChildren(id);
 							model.refresh();
 							// I obrim les branques origen i destí (si correspon)  

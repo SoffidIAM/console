@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.nas.CommunicationStrategy;
+import com.soffid.iam.utils.ConfigurationCache;
 
 /**
  * Representa una estrategia para guardar archivos en un filesystem local.
@@ -24,8 +25,9 @@ public class LocalFileSystemStrategy implements CommunicationStrategy
 	/**
 	 * @see com.soffid.iam.doc.nas.CommunicationStrategy#setProperties(java.util.Properties)
 	 */
-	public void setProperties(Properties properties) throws NASException {
-		this.rootPath = new File(properties.get("soffid.ui.docPath").toString());
+	public void setProperties() throws NASException {
+		this.rootPath = new File( ConfigurationCache.getMasterProperty("soffid.ui.docPath").toString());
+		log.info("Setting root path = "+rootPath);
 	}
 
 	/**

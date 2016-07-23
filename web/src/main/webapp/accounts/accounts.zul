@@ -1101,9 +1101,7 @@
 					
 					void onSetPassword()
 					{
-						es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
-								.create();
+						es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
 						Listbox lb = Path.getComponent("/esquema/lista/listbox");
 						Account account = lb.getSelectedItem().getValue().getInstance();
 				

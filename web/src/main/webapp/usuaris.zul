@@ -402,23 +402,17 @@
 				 }*/
 				boolean launchVNC(Long sessioId)
 				 {
-					javax.naming.Context context = new javax.naming.InitialContext();
-					xarxaHome = context
-							.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-					xarxaService = xarxaHome.create();
+					es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 					return xarxaService.launchVNC(sessioId).booleanValue();
 				}
 				es.caib.seycon.ng.servei.ejb.UsuariService _usuariService = null;
+
 				es.caib.seycon.ng.servei.ejb.UsuariService getUsuariService()
 				{
 					if (_usuariService == null) {
 						javax.naming.Context context = new javax.naming.InitialContext();
-						Object objUsuari = context
+						_usuariService = context
 								.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-						es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-								.narrow(objUsuari,
-										es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-						_usuariService = usuariHome.create();
 					}
 					return _usuariService;
 				}
@@ -499,13 +493,8 @@
 					String codiUsuari = ctx.getValue("@codi");
 			
 					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objUsuari = context
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
 							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-							.narrow(objUsuari,
-									es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome
-							.create();
 			
 					String[] tasquesSeycon = usuariService.refreshCanvis(codiUsuari);
 					tasques.visible = true;
@@ -520,13 +509,8 @@
 					String codiUsuari = ctx.getValue("@codi");
 			
 					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objUsuari = context
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
 							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-							.narrow(objUsuari,
-									es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome
-							.create();
 					
 					String[] tasquesSeycon = usuariService.getTasques(codiUsuari);
 					tasques.visible = true;
@@ -546,13 +530,8 @@
 					String codiUsuari = ctx.getValue("@codi");
 			
 					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objUsuari = context
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
 							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject
-							.narrow(objUsuari,
-									es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome
-							.create();
 			
 					String seguentCodi = usuariService.getSeguentCodi();
 					esquema.getFellow("dades").getFellow("form").getFellow("codi")
@@ -603,10 +582,8 @@
 				public void verificaNIF_WS (nif)  //No s'emplea.. s'emplea en el DAO(create,update[nom-llinatges-dni]
 				{
 					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objUsuari = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject.narrow(
-						objUsuari, es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome.create();
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = 
+							context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
 					
 					vnom = esquema.getFellow("dades").getFellow("form").getFellow("nom").getFellow("dada").value;
 					vprimerLlinatge = esquema.getFellow("dades").getFellow("form").getFellow("primerLlinatge").getFellow("dada").value;
@@ -2329,12 +2306,10 @@ void actualitza (event) {
 											
 											es.caib.seycon.ng.servei.ejb.GrupService gs = 
 													new javax.naming.InitialContext()
-														.lookup (es.caib.seycon.ng.servei.ejb.GrupServiceHome.JNDI_NAME)
-															.create();
+														.lookup (es.caib.seycon.ng.servei.ejb.GrupServiceHome.JNDI_NAME);
 											es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus =
 													new javax.naming.InitialContext()
-														.lookup (es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaServiceHome.JNDI_NAME)
-															.create();
+														.lookup (es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaServiceHome.JNDI_NAME);
 											for (String group: groups)
 											{
 												Grup grup = gs.findGrupByCodiGrup(group);
@@ -2940,8 +2915,7 @@ void actualitza (event) {
 					void onSetPassword()
 					{
 						es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
-								.create();
+								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
 						model.commit();
 				
 						es.caib.zkib.datasource.DataSource ds = newPassword.getAttribute("ds");
@@ -3002,8 +2976,7 @@ void actualitza (event) {
 					{
 						model.commit();
 						es.caib.seycon.ng.servei.ejb.UsuariService service = new javax.naming.InitialContext()
-							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME)
-							.create();
+							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
 						String user = newPassword2.getAttribute("user");
 						String domain = newPassword2.getAttribute("domain");
 						if (generationType.selectedItem == generationSet)

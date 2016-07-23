@@ -62,6 +62,9 @@ public class MyBshClassManager extends BshClassManager {
 		if (name.equals("java.lang.Class"))
 			return false;
 		
+		if (name.startsWith("java.lang.reflect."))
+			return false;
+
 		if (name.startsWith("java.")
 				|| name.startsWith("javax."))
 			return true;

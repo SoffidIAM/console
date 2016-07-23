@@ -71,8 +71,8 @@ public class CustomDialect extends Dialect {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
         }
-        registerFunction("currenttenant", new CurrentTenantFunction());
-        proxyDialect.getKeywords().add("currenttenant");
+//        registerFunction("currenttenant", new CurrentTenantFunction());
+//        proxyDialect.getKeywords().add("currenttenant");
     }
 
     public String getTypeName(int code) throws HibernateException {

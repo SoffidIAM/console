@@ -78,9 +78,7 @@
 				té l'autorització canModifyAllHosts, o bé perquè pertany al menys a una llista de ACL de xarxes
 				com nivell 'Administració' */
 					
-				javax.naming.Context context = new javax.naming.InitialContext();
-				xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-				xarxaService = xarxaHome.create();
+				xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 				teNivellAdministracio = xarxaService.teXarxaAdministrada();
 				if (teNivellAdministracio || canModifyAllHosts)
 				{
@@ -305,11 +303,7 @@
 					ctx =  ds.getJXPathContext();
 					String codiXarxa = ctx.getValue("@codiXarxa");
 					
-					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objXarxa = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.XarxaServiceHome xarxaHome = (es.caib.seycon.ng.servei.ejb.XarxaServiceHome) javax.rmi.PortableRemoteObject.narrow(
-						objXarxa, es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = xarxaHome.create();
+					es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 		
 					Long ipsBuides = xarxaService.getIPsBuides(codiXarxa);
 					String ip = "";
@@ -334,11 +328,7 @@
 					teAcces = false;
 					if (nomMaquina != null && codiXarxa !=null) {
 						if (!nomMaquina.equals("") && !codiXarxa.equals("")) {
-							javax.naming.Context context = new javax.naming.InitialContext();
-							Object objXarxa = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-							es.caib.seycon.ng.servei.ejb.XarxaServiceHome xarxaHome = (es.caib.seycon.ng.servei.ejb.XarxaServiceHome) javax.rmi.PortableRemoteObject.narrow(
-								objXarxa, es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-							es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = xarxaHome.create();
+							es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 		
 							Long acces = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(nomMaquina,codiXarxa);
 							switch (acces) {
@@ -370,11 +360,7 @@
 					String nomMaquina = ctx.getValue("@nom");
 					String codiXarxa = ctx.getValue("@codiXarxa");
 								
-					javax.naming.Context context = new javax.naming.InitialContext();
-					Object objXarxa = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-					es.caib.seycon.ng.servei.ejb.XarxaServiceHome xarxaHome = (es.caib.seycon.ng.servei.ejb.XarxaServiceHome) javax.rmi.PortableRemoteObject.narrow(
-						objXarxa, es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-					es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = xarxaHome.create();
+					es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 					
 					Long acces = xarxaService.findNivellAccesByNomMaquinaAndCodiXarxa(nomMaquina,codiXarxa);
 					switch (acces) {
@@ -400,9 +386,7 @@
 				
 				boolean launchVNC(Long sessioId)
 				{
-					javax.naming.Context context = new javax.naming.InitialContext();
-					xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-					xarxaService = xarxaHome.create();
+					xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 					return xarxaService.launchVNC(sessioId).booleanValue();
 				}
 				
@@ -414,14 +398,7 @@
 					
 					if (nomMaquina != null)
 					{
-						javax.naming.Context context = new javax.naming.InitialContext();
-						Object objXarxa = context.lookup(es.caib.seycon.ng.servei.ejb
-							.XarxaServiceHome.JNDI_NAME);
-						es.caib.seycon.ng.servei.ejb.XarxaServiceHome xarxaHome =
-							(es.caib.seycon.ng.servei.ejb.XarxaServiceHome) javax.rmi
-								.PortableRemoteObject.narrow(objXarxa,
-										es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-						es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = xarxaHome.create();
+						es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 						
 						String [] tasquesSeycon = xarxaService.getTasques(nomMaquina);
 						tasques.visible = true;
@@ -1076,9 +1053,7 @@
 															model.getVariables().declareVariable("dataCaducitat", hui);*/
 															
 															void solicitaPasswordAdmin() {
-																xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-																xarxaService = xarxaHome.create();
-																String nommaquina_ = model.getVariables().getVariable("nomMaquinaAct");
+																xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();																String nommaquina_ = model.getVariables().getVariable("nomMaquinaAct");
 																String[] dadesAdmin = xarxaService.getUsuariAndContrasenyaAdministradorHost(nommaquina_);
 																if (dadesAdmin!=null @and dadesAdmin.length==3) {
 																	Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.DadesUsuari"), new Object [] {dadesAdmin[0], dadesAdmin[1],dadesAdmin[2]}),
@@ -1153,9 +1128,7 @@
 								if (obj.getInstance() !=null @and 
 									obj.getInstance() instanceof es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador) {
 									es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador autoritzacio = obj.getInstance();
-									javax.naming.Context context = new javax.naming.InitialContext();		
-									xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-									xarxaService = xarxaHome.create();		
+									xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 									autoNova = xarxaService.revocarAccesHostComAdministrador(autoritzacio);
 	
 									Missatgebox.info (org.zkoss.util.resource.Labels.getLabel("maquines.AutoritzacioRevocada")); 
@@ -1229,9 +1202,7 @@
     aut.setNomHost(host);
     aut.setIdProcesWorkflow(0);
     
-	javax.naming.Context context = new javax.naming.InitialContext();		
-	xarxaHome = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-	xarxaService = xarxaHome.create();		
+	xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 	xarxaService.create(aut);
 
 	// Refresquem el listbox

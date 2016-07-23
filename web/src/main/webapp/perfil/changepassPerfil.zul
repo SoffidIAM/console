@@ -26,10 +26,7 @@
 					canviVoluntari = true;
 				}
 				
-				es.caib.seycon.ng.servei.ejb.PasswordServiceHome psh =
-					new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei
-							.ejb.PasswordServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.PasswordService ps = psh.create();
+				es.caib.seycon.ng.servei.ejb.PasswordService ps = es.caib.seycon.ng.EJBLocator.getPasswordService();
 				String dispatcher = ps.getDefaultDispatcher();
 				
 				String []pds = ps.getPolicyDescription(usuari, dispatcher).split("\n");

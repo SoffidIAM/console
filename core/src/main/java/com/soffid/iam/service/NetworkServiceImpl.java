@@ -45,6 +45,7 @@ import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
 
@@ -395,7 +396,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected java.util.Collection<Network> handleFindNetworkByFilter(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
 		Collection xarxes = localFindXarxaByFiltre(codi, adreca, descripcio,
 			mascara, normalitzada, dhcp, maquina);
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
     	if (xarxes != null && xarxes.size() != 0)
     	{
@@ -553,7 +554,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     // Emprar des de maquines.zul per cercar
     protected Collection<Host> handleFindHostByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean filtra) throws Exception {
 		Collection<Host> maquines = null;
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
     	// Cridem al "nou" mètode i després restringim
     	// NOTA: El mètode ens torna Maquina (VO), si llevem la crida
@@ -1300,7 +1301,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Collection<Host> handleFindOfficeHostUserByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean restringeixCerca, String servidorImpressores) throws Exception {
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 
         if (nom != null && (nom.trim().compareTo("") == 0 || nom.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
             nom = null;
@@ -1746,7 +1747,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
         if (xarxa == null)
         {
-        	String defaultNetwork = System.getProperty("soffid.network.internet"); //$NON-NLS-1$
+        	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
         	if (defaultNetwork != null)
         	{
         		xarxa = dao.findByName(defaultNetwork);

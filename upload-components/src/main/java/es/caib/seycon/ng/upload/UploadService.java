@@ -11,7 +11,10 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -38,8 +41,8 @@ import com.soffid.tools.db.updater.OracleUpdater;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
-// @Singleton(name="UploadServiceBean")
-// @Startup
+@Singleton(name="UploadServiceBean")
+@Startup
 public class UploadService {
     int scheduledInterval = 30000;
     int maxScheduledInterval = 30000;
@@ -50,7 +53,8 @@ public class UploadService {
     @EJB(beanName="SoffidDeployerBean")
     DeployerService soffidDeployer;
     
-    protected void startService() throws Exception {
+	@PostConstruct
+	public void init() throws Exception {
         try {
             log.info(Messages.getString("UploadService.StartingUploadInfo")); //$NON-NLS-1$
             try {
@@ -283,7 +287,7 @@ public class UploadService {
     	parseResources(rpr, db, reader, "console-ddl.xml");
     	parseResources(rpr, db, reader, "core-ddl.xml");
     	parseResources(rpr, db, reader, "plugin-ddl.xml");
-        DataSource ds = (DataSource) new InitialContext().lookup("java:jdbc/seycon");
+        DataSource ds = (DataSource) new InitialContext().lookup("openejb:/Resource/jdbc/soffid");
         Connection conn = ds.getConnection();
         String type = System.getProperty("dbDriverString"); //$NON-NLS-1$
         DBUpdater updater ;

@@ -1,9 +1,9 @@
 package com.soffid.iam.bpm.index;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.service.BpmEngineImpl;
 
-import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.vo.ConfigParameterVO;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class DirectoryFactory {
         ConfigParameterVO prop = null;
         
         try {
-			prop = EJBContainer.getBPMConfigBean().findFirstByAppKey(BpmEngineImpl.BPM_APPLICATION_ID,BpmEngineImpl.LUCENE_DIR_PARAM);
+        	prop = es.caib.seycon.ng.EJBLocator.getBpmConfigService().findFirstByAppKey(BpmEngineImpl.BPM_APPLICATION_ID,BpmEngineImpl.LUCENE_DIR_PARAM);
 		} catch (Exception e) {
 		}
 

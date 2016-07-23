@@ -33,6 +33,8 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.ConsoleLogonService;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
 
@@ -55,6 +57,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -753,7 +756,7 @@ public class InternalPasswordServiceImpl extends
         {
         
         }
-		if (checkTrusted && ! taskQueue && "true".equals(System.getProperty("soffid.auth.trustedLogin")))
+		if (checkTrusted && ! taskQueue && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin")))
 		{
 			for (UserAccountEntity userAccount : user.getAccounts()) {
                 AccountEntity ae = userAccount.getAccount();
@@ -1138,7 +1141,7 @@ public class InternalPasswordServiceImpl extends
 		            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
 	                    : PasswordValidation.PASSWORD_WRONG;
 	        	}
-	    		else if (checkTrusted && "true".equals(System.getProperty("soffid.auth.trustedLogin"))) 
+	    		else if (checkTrusted && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) 
 	    		{
 	    			return validatePasswordOnServer (account, password);
 	    		}
@@ -1343,14 +1346,15 @@ public class InternalPasswordServiceImpl extends
 		return account.getPasswords().isEmpty();
 	}
 
-	static String defaultDispatcher;
+	HashMap<String,String> defaultDispatchers = new HashMap<String,String>();
 	@Override
 	protected String handleGetDefaultDispatcher() throws Exception
 	{
+		String defaultDispatcher = defaultDispatchers.get( Security.getCurrentTenantName());
 		if (defaultDispatcher == null)
 		{
 			SystemEntityDao dao = getSystemEntityDao();
-			String defaultName = System.getProperty("soffid.auth.system");
+			String defaultName = ConfigurationCache.getProperty("soffid.auth.system");
 			if (defaultName != null)
 			{
 				SystemEntity dispatcher = dao.findByName(defaultName); //$NON-NLS-1$
@@ -1377,6 +1381,7 @@ public class InternalPasswordServiceImpl extends
 				getSystemEntityDao().update(dispatcher);
 				defaultDispatcher = dispatcher.getName();
 			}
+			defaultDispatchers.put(Security.getCurrentTenantName(), defaultDispatcher);
 		}
 		return defaultDispatcher;
 		

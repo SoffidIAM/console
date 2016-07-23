@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Textbox;
+
 /**
  * @author Soffid
  * 
@@ -16,6 +19,22 @@ import java.util.Map;
 public class Autowildcards
 {
 
+	@SuppressWarnings("unchecked")
+	public static void replaceAsteriskChar (Component c)
+	{
+		if (c instanceof Textbox)
+		{
+			Textbox tb = (Textbox) c;
+			tb.setValue(replaceAsteriskChar(tb.getValue()));
+		}
+		else
+		{
+			for (Component c2: (List<Component>) c.getChildren())
+			{
+				replaceAsteriskChar(c2);
+			}
+		}
+	}
 	/**
 	 * Method to replace asterisk character in string by percent sign.
 	 * 
@@ -40,6 +59,22 @@ public class Autowildcards
 		return process;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static void addPercentChar (Component c)
+	{
+		if (c instanceof Textbox)
+		{
+			Textbox tb = (Textbox) c;
+			tb.setValue(addPercentChar(tb.getValue()));
+		}
+		else
+		{
+			for (Component c2: (List<Component>) c.getChildren())
+			{
+				addPercentChar(c2);
+			}
+		}
+	}
 	/**
 	 * Method to add percent value at the start and end of string.
 	 * 
@@ -89,8 +124,7 @@ public class Autowildcards
 																		// dictionary
 
 		// Check wildcards enabled
-		if (System.getProperty("soffid.ui.wildcards").equals("auto") &&
-			(toReplace != null))
+		if (toReplace != null)
 		{
 			for (String index : toReplace.keySet())
 			{
@@ -121,8 +155,7 @@ public class Autowildcards
 																		// dictionary
 
 		// Check wildcards enabled
-		if (System.getProperty("soffid.ui.wildcards").equals("auto") &&
-				(toReplace != null))
+		if (toReplace != null)
 		{
 			for (String index : toReplace.keySet())
 			{

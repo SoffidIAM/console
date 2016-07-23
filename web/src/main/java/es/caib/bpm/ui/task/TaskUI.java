@@ -498,7 +498,7 @@ public class TaskUI extends Frame implements EventListener {
         if (loader == null) {
             clases = engine.getUIClassesForTask(def);
 
-            loader = new UIClassLoader(clases, heavenLoader);
+            loader = new UIClassLoader(def.getId(), clases, heavenLoader);
 
             loader.cargarClases();
 

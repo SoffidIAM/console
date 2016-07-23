@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.zkoss.util.Locales;
-
 public class MessageFactory
 {
 	private static Class localesClass = null;

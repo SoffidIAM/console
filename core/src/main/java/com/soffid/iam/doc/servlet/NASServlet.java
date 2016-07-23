@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.utils.ConfigurationCache;
+
 import es.caib.seycon.util.Base64;
 
 public class NASServlet extends HttpServlet {
@@ -29,8 +31,8 @@ public class NASServlet extends HttpServlet {
 		}
 		else
 		{
-			String user = System.getProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
-			String password = System.getProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
+			String user = ConfigurationCache.getProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
+			String password = ConfigurationCache.getProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
 			String s = user+":"+password;
 			String encoded;
 			try {
@@ -51,7 +53,7 @@ public class NASServlet extends HttpServlet {
 	
 	File getFile (HttpServletRequest req) throws ServletException, IOException
 	{
-		String base = System.getProperty("soffid.ui.docLocalPath");
+		String base = ConfigurationCache.getProperty("soffid.ui.docLocalPath");
 		if (base == null)
 		{
 			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");

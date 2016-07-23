@@ -112,6 +112,19 @@
 		<url-pattern>/SEU/serverlog</url-pattern>
 	</servlet-mapping>
 
+	<!--  Logout srevlet -->
+	<servlet>
+		<description>
+			<![CDATA[Logout servlet]]>
+		</description>
+		<servlet-name>logoutServlet</servlet-name>
+		<servlet-class>com.soffid.web.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>logoutServlet</servlet-name>
+		<url-pattern>/prelogout</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<description>
 			<![CDATA[Document Manager Servlet]]>
@@ -144,6 +157,7 @@
 	</servlet-mapping>
 
 
+
 	<!-- mustChangePassword FILTER -->
 	<filter>
 		<filter-name>CheckPasswordLoginFilter</filter-name>
@@ -152,17 +166,13 @@
 			<param-name>changePassPage</param-name>
 			<param-value>/changepass.zul</param-value>
 		</init-param>
-		<init-param>
-			<param-name>changePassPublicPage</param-name>
-			<param-value>/public/changepass.zul</param-value>
-		</init-param>
 	</filter>
 
 	<filter-mapping>
 		<filter-name>CheckPasswordLoginFilter</filter-name>
 		<url-pattern>*.zul</url-pattern>
+		<url-pattern>*.html</url-pattern>
 	</filter-mapping>
-
 
 	<!-- Workflow FILTERS -->
 	<filter>
@@ -361,22 +371,12 @@
 			<url-pattern>/public/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>PASSWORD:VALID</role-name>
+		 	<role-name>PASSWORD:VALID</role-name>
+			<role-name>PASSWORD:EXPIRED</role-name>
 		</auth-constraint>
 		<user-data-constraint>
 			<transport-guarantee>NONE</transport-guarantee>
 		</user-data-constraint>
-	</security-constraint>
-
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>ExpiredPassword</web-resource-name>
-			<url-pattern>/zkau/*</url-pattern>
-			<url-pattern>/changepass.zul</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>*</role-name>
-		</auth-constraint>
 	</security-constraint>
 
 	<security-constraint>
@@ -401,7 +401,7 @@
 		<realm-name>Soffid IAM</realm-name>
 		<form-login-config>
 			<form-login-page>/anonymous/login.zul</form-login-page>
-			<form-error-page>/anonymous/login.zul</form-error-page>
+			<form-error-page>/anonymous/login.zul?failed=true</form-error-page>
 		</form-login-config>
 	</login-config>
 
@@ -413,131 +413,121 @@
 		<role-name>BPM_INTERNAL</role-name>
 	</security-role>
 
-	<ejb-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/InformacioAutoritzacioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>
+		<local>
 			es.caib.seycon.ng.servei.workflow.ejb.InformacioAutoritzacioService
-		</home>
-		<remote>
-			es.caib.seycon.ng.servei.workflow.ejb.InformacioAutoritzacioServiceHome
-		</remote>
-	</ejb-ref>
-	<ejb-ref>
+		</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/ImpressoraEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.ImpressoraService</home>
-		<remote>es.caib.seycon.ng.servei.ejb.ImpressoraServiceHome</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ImpressoraService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/ServeiEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.ServeiService</home>
-		<remote>es.caib.seycon.ng.servei.ejb.ServeiServiceHome</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ServeiService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/LlistesDeCorreuEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.LlistesDeCorreuService</home>
-		<remote>es.caib.seycon.ng.servei.ejb.LlistesDeCorreuServiceHome</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.LlistesDeCorreuService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/GrupEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.GrupServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.GrupService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		<local>es.caib.seycon.ng.servei.ejb.GrupService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/UsuariEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.UsuariServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.UsuariService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.UsuariService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/AltaBaixaUsuariEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>
-			es.caib.seycon.ng.servei.workflow.ejb.AltaBaixaUsuariServiceHome
-		</home>
-		<remote>es.caib.seycon.ng.servei.workflow.ejb.AltaBaixaUsuariService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		<local>es.caib.seycon.ng.servei.workflow.ejb.AltaBaixaUsuariService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/ServidorsEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.workflow.ejb.ServidorsServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.workflow.ejb.ServidorsService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.workflow.ejb.ServidorsService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/ConfiguracioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.ConfiguracioServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.ConfiguracioService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ConfiguracioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/XarxaEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.XarxaServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.XarxaService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.XarxaService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/AplicacioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.AplicacioServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.AplicacioService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.AplicacioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/SessioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.net.SessioEJBHome</home>
-		<remote>es.caib.seycon.net.SessioEJB</remote>
-	</ejb-ref>
-	<ejb-ref>
+		<local>es.caib.seycon.ng.servei.ejb.SessioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/DominiEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.DominiServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.DominiService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DominiService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/DispatcherEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.DispatcherServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.DispatcherService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DispatcherService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/AuditoriaEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.AuditoriaServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.AuditoriaService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.AuditoriaService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/DadesAddicionalsEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.DadesAddicionalsService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DadesAddicionalsService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/RegistreAccesEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.RegistreAccesServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.RegistreAccesService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.RegistreAccesService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/TipusUnitatOrganitzativaEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService</remote>
-	</ejb-ref>
+		
+		<local>es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService</local>
+	</ejb-local-ref>
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/PuntEntradaServiceEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<local-home>es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome</local-home>
 		<local>es.caib.seycon.ng.servei.ejb.PuntEntradaService</local>
 	</ejb-local-ref>
 
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/AutoritzacioRolsEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<local-home>es.caib.seycon.ng.servei.ejb.AutoritzacioServiceHome</local-home>
 		<local>es.caib.seycon.ng.servei.ejb.AutoritzacioService</local>
 		<ejb-link>AutoritzacioService</ejb-link>
 	</ejb-local-ref>
@@ -545,52 +535,41 @@
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/AccountEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<local-home>es.caib.seycon.ng.servei.ejb.AccountServiceHome</local-home>
 		<local>es.caib.seycon.ng.servei.ejb.AccountService</local>
 	</ejb-local-ref>
 
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/BPMEngineBeanLocal</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<local-home>es.caib.bpm.servei.ejb.BpmEngineLocalHome</local-home>
-		<local>es.caib.bpm.servei.ejb.BpmEngineLocal</local>
-		<ejb-link>BpmEngine</ejb-link>
+		<local>es.caib.bpm.servei.ejb.BpmEngine</local>
 	</ejb-local-ref>
 
-	<ejb-ref>
-		<ejb-ref-name>ejb/Document</ejb-ref-name>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/Document</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.bpm.beans.home.DocumentHome</home>
-		<remote>es.caib.bpm.beans.remote.Document</remote>
-		<ejb-link>ejb/Document</ejb-link>
-	</ejb-ref>
-	<ejb-ref>
+		<local>com.soffid.iam.doc.service.ejb.DocumentService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/SeyconServerEJB</ejb-ref-name>
-		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.SeyconServerService</home>
-		<remote>es.caib.seycon.ng.servei.ejb.SeyconServerService</remote>
-	</ejb-ref>
-	<ejb-ref>
+		<ejb-ref-type>Session</ejb-ref-type>		
+		<local>es.caib.seycon.ng.servei.ejb.SeyconServerService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/ServerPluginEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.ServerPluginServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.ServerPluginService</remote>
-	</ejb-ref>
-
-	<ejb-ref>
-		<ejb-ref-name>ejb/FederacioIdentitatsEJB</ejb-ref-name>
-		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.FederacioServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.FederacioService</remote>
-	</ejb-ref>
-
-	<ejb-ref>
+		<local>es.caib.seycon.ng.servei.ejb.ServerPluginService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/DominiUsuariEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<home>es.caib.seycon.ng.servei.ejb.DominiUsuariServiceHome</home>
-		<remote>es.caib.seycon.ng.servei.ejb.DominiUsuariService</remote>
-	</ejb-ref>
-
+		<local>es.caib.seycon.ng.servei.ejb.DominiUsuariService</local>
+	</ejb-local-ref>
+	
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/TenantEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.TenantService</local>
+	</ejb-local-ref>
 
 
 	<env-entry>
@@ -612,41 +591,6 @@
 		<env-entry-type>java.lang.String</env-entry-type>
 		<env-entry-value>
 			<![CDATA[1009]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/servidorHome</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[6576]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/servidorCorreu</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[6576]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/servidorPerfil</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[6576]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/tipusUsuari</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[M]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/caducitat</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[365]]>
 		</env-entry-value>
 	</env-entry>
 

@@ -68,9 +68,7 @@
 			getSeyconServerService() {
 			
 				if (seyconServerService == null) {
-					javax.naming.Context context = new javax.naming.InitialContext();
-					ssHome = context.lookup(es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome.JNDI_NAME);
-					seyconServerService = ssHome.create();
+					seyconServerService = es.caib.seycon.ng.EJBLocator.getSeyconServerService();
 				}
 				return seyconServerService;
 			}
@@ -162,8 +160,8 @@
 				}
 			}
 			
-			es.caib.seycon.ng.ui.SeyconTaskComposer tasquesSeycon =
-					new es.caib.seycon.ng.ui.SeyconTaskComposer();
+			com.soffid.iam.ui.SeyconTaskComposer tasquesSeycon =
+					new com.soffid.iam.ui.SeyconTaskComposer();
 			// Li afegim un event al header del listbox
 			org.zkoss.zk.ui.event.EventListener ssevent = new org.zkoss.zk.ui.event.EventListener()
 			{

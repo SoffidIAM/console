@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.nas.CommunicationStrategy;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import jcifs.Config;
 import jcifs.smb.SmbFile;
@@ -91,17 +92,20 @@ public class CIFSStrategy implements CommunicationStrategy
 	/**
 	 * @see com.soffid.iam.doc.nas.CommunicationStrategy#setProperties(java.util.Properties)
 	 */
-	public void setProperties(Properties properties) throws NASException 
+	public void setProperties() throws NASException 
 	{
 		try 
 		{
-			Config.setProperty("jcifs.smb.client.domain", properties.getProperty("domain").trim());
-			Config.setProperty("jcifs.smb.client.username", properties.getProperty("username").trim());
-			Config.setProperty("jcifs.smb.client.password", properties.getProperty("password").trim());
+			Config.setProperty("jcifs.smb.client.username",
+					ConfigurationCache.getMasterProperty("soffid.ui.docUsername").trim()); //$NON-NLS-1$
+			Config.setProperty("jcifs.smb.client.password",
+					ConfigurationCache.getMasterProperty("soffid.ui.docUserPassword").trim()); //$NON-NLS-1$
+			Config.setProperty("jcifs.smb.client.domain",
+					ConfigurationCache.getMasterProperty("soffid.ui.docDomain").trim());
 			
-			this.rootPath= new SmbFile(properties.get("rootPath").toString());
+			this.rootPath= new SmbFile(ConfigurationCache.getMasterProperty("soffid.ui.docPath").toString());
 			
-			this.tempPath= new File(properties.get("tempPath").toString());
+			this.tempPath= new File(ConfigurationCache.getMasterProperty("soffid.ui.docTempPath").toString());
 			
 			LogFactory.getLog(CIFSStrategy.class).info("Carpetas establecidas.");
 		} 

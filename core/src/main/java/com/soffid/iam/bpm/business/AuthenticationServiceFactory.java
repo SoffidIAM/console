@@ -3,12 +3,16 @@ package com.soffid.iam.bpm.business;
 import java.lang.reflect.Constructor;
 import java.security.cert.X509Certificate;
 
+import javax.naming.InitialContext;
+
 import org.jbpm.security.AuthenticationService;
 import org.jbpm.svc.Service;
 import org.jbpm.svc.ServiceFactory;
 
-import es.caib.bpm.toolkit.EJBContainer;
+import es.caib.bpm.servei.ejb.BpmConfigService;
+import es.caib.bpm.servei.ejb.BpmConfigServiceHome;
 import es.caib.bpm.vo.ConfigParameterVO;
+import es.caib.seycon.ng.EJBLocator;
 
 
 
@@ -33,7 +37,9 @@ public class AuthenticationServiceFactory implements ServiceFactory {
 	        ConfigParameterVO param = null;
 	        String authenticationServiceClassName="es.caib.bpm.security.SeyconAuthenticationService"; //$NON-NLS-1$
 	        try {
-				param = EJBContainer.getBPMConfigBean().findFirstByAppKey("BPM","es.caib.bpm.authenticationServiceDelegate"); //$NON-NLS-1$ //$NON-NLS-2$
+	        	
+				BpmConfigService bean = EJBLocator.getBpmConfigService();
+				param = bean.findFirstByAppKey("BPM","es.caib.bpm.authenticationServiceDelegate"); //$NON-NLS-1$ //$NON-NLS-2$
 			} catch (Exception e) {}
 	        if(param!=null) authenticationServiceClassName=param.getValue();	        
 

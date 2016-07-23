@@ -26,7 +26,6 @@ import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.util.Timer;
 
 import com.soffid.iam.ServiceLocator;

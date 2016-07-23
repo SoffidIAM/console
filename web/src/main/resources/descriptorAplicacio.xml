@@ -32,9 +32,7 @@
 		
 		<finder name="approvalProcess" type="approvalProcess">
 			<script-finder>
-				engine = new javax.naming.InitialContext()
-					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
-					.create();
+				engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
 				java.util.LinkedList list = new java.util.LinkedList ();
 				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
 				tv.setTag ("-");
@@ -142,7 +140,7 @@
 			</new-instance-bean>
 		</finder>
 		<finder name="sodRule" type="sodRule">  <!-- application:query -->
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.SoDRuleService"
 				method="findRuleByApplication">
 				<parameter value="${instance.id}" />
 			</ejb-finder>
@@ -168,7 +166,7 @@
 
 	<datanode name="sodRule">
 		<finder name="sodRole" type="sodRole" refreshAfterCommit="true">
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.SoDRuleService"
 				method="findRolesByRule">
 				<parameter value="${instance.id}" />
 			</ejb-finder>
@@ -180,7 +178,7 @@
 				instance.applicationId = parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.SoDRuleService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -202,7 +200,7 @@
 				instance.ruleId = parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.SoDRuleService">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.SoDRuleService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>

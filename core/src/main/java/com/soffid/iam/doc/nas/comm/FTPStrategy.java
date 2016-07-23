@@ -13,9 +13,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.finj.FTPClient;
 import org.finj.FTPException;
+import org.w3c.jwput.JWOptions;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.nas.CommunicationStrategy;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import jcifs.Config;
 import jcifs.smb.SmbFile;
@@ -90,31 +92,31 @@ public class FTPStrategy implements CommunicationStrategy
 	/**
 	 * @see com.soffid.iam.doc.nas.CommunicationStrategy#setProperties(java.util.Properties)
 	 */
-	public void setProperties(Properties properties) throws NASException 
+	public void setProperties() throws NASException 
 	{
 		try 
 		{
 			this.client = new FTPClient();
 			
-			this.server = properties.getProperty("soffid.ui.docServer").trim(); //$NON-NLS-1$
-			this.user = properties.getProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
-			this.password = properties.getProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
+			this.server = ConfigurationCache.getMasterProperty("soffid.ui.docServer").trim(); //$NON-NLS-1$
+			this.user = ConfigurationCache.getMasterProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
+			this.password = ConfigurationCache.getMasterProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
 			
 			// Check '/' end symbol
-			if (properties.get("soffid.ui.docPath").toString().endsWith("/"))
+			if (ConfigurationCache.getMasterProperty("soffid.ui.docPath").toString().endsWith("/"))
 			{
-				this.rootPath = properties.get("soffid.ui.docPath")
-					.toString().substring(0, properties.get("soffid.ui.docPath")
+				this.rootPath = ConfigurationCache.getMasterProperty("soffid.ui.docPath")
+					.toString().substring(0, ConfigurationCache.getMasterProperty("soffid.ui.docPath")
 						.toString().length() - 1).trim(); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			
 			else
 			{
-				this.rootPath = properties.get("soffid.ui.docPath").toString();
+				this.rootPath = ConfigurationCache.getMasterProperty("soffid.ui.docPath").toString();
 			}
 			
 			this.tempPath =
-				new File(properties.get("soffid.ui.docTempPath").toString());
+				new File(ConfigurationCache.getMasterProperty("soffid.ui.docTempPath").toString());
 			
 			log.info("FTP folders established."); //$NON-NLS-1$
 		} 

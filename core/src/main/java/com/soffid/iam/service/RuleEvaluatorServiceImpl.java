@@ -125,7 +125,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                 }
             }
 		} catch (Exception e) {
-			throw new InternalErrorException(String.format(Messages.getString("RuleEvaluatorServiceImpl.EvaluationRuleError"), rule.getDescription(), user.getUserName()));
+			throw new InternalErrorException(String.format(Messages.getString("RuleEvaluatorServiceImpl.EvaluationRuleError"), rule.getDescription(), user.getUserName()),
+					e);
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -178,7 +179,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
 			ra.setAccountId(account.getId());
 			ra.setAccountName(account.getName());
-			Security.nestedLogin(Security.getCurrentAccount(), new String[] {
+			Security.nestedLogin(Security.getCurrentAccount (), new String[] {
 				Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL
 			});
 			try {

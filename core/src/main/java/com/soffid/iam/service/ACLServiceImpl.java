@@ -14,6 +14,7 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.RolGrant;
 
@@ -25,7 +26,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 	{
     	int size = 50;
     	try {
-	    	String cacheSize = System.getProperty("soffid.cache.identity.size");
+	    	String cacheSize = ConfigurationCache.getProperty("soffid.cache.identity.size");
 	    	if (cacheSize != null )
 	    		size = Integer.parseInt(cacheSize);
     	} catch (Throwable t) {

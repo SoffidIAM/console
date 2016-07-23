@@ -2,17 +2,17 @@
 <?page id="parametres" title="Gestió dels Paràmetres de configuració"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="parametres" ?>
-<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
-<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
-<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<style src="~./styles/estil.css"/>
 
-	<datamodel id="model" rootNode="parametres" src="descriptorTenants"/>
+	<datamodel id="model" rootNode="root" src="descriptorTenants.xml"/>
 	
-	<zscript src="comu/netejaCriteris.zul"/>
-	<zscript src="comu/checkTruncatedResults.zul"/>
+	<zscript src="/comu/netejaCriteris.zul"/>
+	<zscript src="/comu/checkTruncatedResults.zul"/>
 
 	<zscript>
 		<![CDATA[
@@ -31,14 +31,17 @@
 			view_altres = false;
 			
 			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-			canCreateParameter = AutoritzacionsUsuari.hasCreateParameter();
-			canUpdateParameter = AutoritzacionsUsuari.hasUpdateParameter();
-			canDeleteParameter = AutoritzacionsUsuari.hasDeleteParameter();
-			canQueryParameter = AutoritzacionsUsuari.hasQueryParameter();
-			canModifyParameter = canCreateParameter || canUpdateParameter;
+			import com.soffid.iam.utils.Security;;
 			
-			model.getVariables().declareVariable("queryEnabled", canQueryParameter);
-			model.getVariables().declareVariable("codi", "%");
+			com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
+
+			boolean isMaster = com.soffid.iam.utils.Security.getCurrentTenantName().equals ( masterTenant.getName() );
+			boolean canCreateTenant = isMaster && Security.isUserInRole("tenant:create");
+			boolean canUpdateTenant = isMaster && Security.isUserInRole("tenant:update");
+			boolean canDeleteTenant = false && isMaster && Security.isUserInRole("tenant:remove");
+			boolean canQueryTenant = isMaster && Security.isUserInRole("tenant:query");;
+			
+			model.getVariables().declareVariable("queryEnabled", false);
 			
 			queryEnabled = false;
 			retrySearch = false;
@@ -48,44 +51,7 @@
 				mode = "query";
 			}
 	
-			// Method to obtain the parameters to search process
-			java.util.Map getSearchParameters()
-			{
-				java.util.Map searchValues = new java.util.HashMap();
-				
-				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
-						.getFellow("textbox");
-				valor = esquema.getFellow("queryWindow").getFellow("queryValor")
-						.getFellow("textbox");
-				descripcio = esquema.getFellow("queryWindow")
-						.getFellow("queryDescripcio").getFellow("textbox");
-				xarxa = esquema.getFellow("queryWindow").getFellow("queryXarxa")
-						.getFellow("textbox");
-				
-				// Check enable query
-				if ((codi.value.trim().length() == 0) &&
-						(valor.value.trim().length() == 0) &&
-						(descripcio.value.trim().length() == 0) &&
-						(xarxa.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
-				
-				// Add parameters to search
-				searchValues.put("codi", codi.value);
-				searchValues.put("valor", valor.value);
-				searchValues.put("descripcio", descripcio.value);
-				searchValues.put("xarxa", xarxa.value);
-				
-				return searchValues;
-			}
-			
-			void search()
+			void search(boolean retrySearch)
 			{
 				java.util.Map lista = new java.util.HashMap();
 
@@ -98,31 +64,21 @@
 					return;
 				}
 				
+				Component queryWindow = esquema.getFellow("queryWindow");
 				if (!retrySearch)
 				{
-					lista = es.caib.seycon.ng.web.utils.
-						Autowildcards.replaceAsteriskChar(getSearchParameters());
+					es.caib.seycon.ng.web.utils.Autowildcards.replaceAsteriskChar(queryWindow);
 				}
-				
 				else
 				{
-					lista = es.caib.seycon.ng.web.utils.
-							Autowildcards.addPercentChar(getSearchParameters());
+					es.caib.seycon.ng.web.utils.Autowildcards.addPercentChar(queryWindow);
 				}
 				
-				for (String key : lista.keySet())
-				{
-					model.getVariables().declareVariable(key, lista.get(key));
-				} 
-
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				model.getVariables().declareVariable("queryEnabled", true);
 				
 				listbox =	esquema.getFellow("lista").getFellow("listbox");
-				if (queryEnabled)
-				{
-					model.getJXPathContext().getValue("/parametre").refresh();
-					listbox.dataPath = "/model:/parametre"; 
-				}
+
+				model.getJXPathContext().getValue("/tenant").refresh();
 				
 				if (listbox.getModel().getSize() == 1)
 				{
@@ -142,36 +98,15 @@
 				{
 					if ((listbox.getModel().getSize() == 0) && !retrySearch)
 					{
-						retrySearch = true;
-						search();
+						search(true);
 					}
-					
 					else
 					{
-						esquema.hideFormulari(); //amaguem dades..
-						retrySearch = false;
+						esquema.hideFormulari();
 					}
 				}
 				
 				checkTruncatedList(listbox);
-			}
-			
-			void showAltres () 
-			{
-				if (view_altres == false)
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
-					view_altres = true;
-				}
-				else
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
-					view_altres = false;
-				}
 			}
 			
 			void select () 
@@ -198,44 +133,37 @@
 
 	<esquema id="esquema" datamodel="/model"
 		 focusCriteri="queryCodi" onHideFormulari="showLista()">
-	
-		<criteris id="queryWindow" height="${queryWindowMin}" 
-			onOK="search()">
-			<hbox>
-				<input_criteri  id="queryCodi"
-					etiqueta="${c:l('parametres.zul.Parametre')}"/>
-				<input_criteri id="queryValor"
-					etiqueta="${c:l('parametres.zul.Valor')}" />
-				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
-			</hbox>
-			<hbox> 
-				<input_criteri id="queryDescripcio"
-					etiqueta="${c:l('parametres.zul.Descripcia')}"/>
-				<input_criteri id="queryXarxa"
-					etiqueta="${c:l('parametres.zul.Xarxa')}"/>
-			</hbox>
-		</criteris>
-		
+		<form dataPath="/model:/query" width="100%">
+			<criteris id="queryWindow" height="${queryWindowMin}" 
+				onOK="search(false)" >
+				<hbox>
+					<input_criteri bind="@name" id="criteria_name"
+						etiqueta="${c:l('tenant.zul.name')}"/>
+					<input_criteri bind="@description"
+						etiqueta="${c:l('tenant.zul.description')}" />
+					<imageclic onClick="search(false)" src="~./img/fletxa_cerca.gif"/>
+				</hbox>
+			</criteris>
+		</form>
+				
 		<navegador id="lista" >
 			<toolbar>
-				<insertbutton acces="${canCreateParameter}"
+				<insertbutton acces="${canCreateTenant}"
 					listbox="/esquema/lista/listbox" onClick="showDetall()"/>
-				<deletebutton acces="${canDeleteParameter}"
+				<deletebutton acces="${canDeleteTenant}"
 					listbox="/esquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>
 				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
 			</toolbar>
-			<listbox id="listbox" autocommit="false" dataPath="/model:/parametre"
+			<listbox id="listbox" autocommit="false" dataPath="/model:/tenant"
 				fixedLayout="true" height="340px" onClick="showDetall()"
 				onSelect="select()" rows="${fileres}" onCreate="checkTruncatedList(self)" >
 				<listhead>
-					<listheader label="${c:l('parametres.zul.Parametre-2')}" sort="auto"
+					<listheader label="${c:l('tenant.zul.name')}" sort="auto"
 						width="20%"/>
-					<listheader label="${c:l('parametres.zul.Valor-2')}" sort="auto"/>
-					<listheader label="${c:l('parametres.zul.Xarxa-2')}" sort="auto"
+					<listheader label="${c:l('tenant.zul.description')}" sort="auto"/>
+					<listheader label="${c:l('tenant.zul.enabled')}" sort="auto"
 						width="10%"/>
-					<listheader label="${c:l('parametres.zul.Descripcia-2')}" sort="auto"
-						width="30%"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">
@@ -243,27 +171,49 @@
 					</listfooter>
 				</listfoot>
 				<dataitem bind=".">
-					<listcell bind="@codi"/>
-					<listcell bind="@valor"/>
-					<listcell bind="@codiXarxa"/>
-					<listcell bind="@descripcio"/>
+					<listcell bind="@name"/>
+					<listcell bind="@description"/>
+					<listcell bind="@enabled"/>
 				</dataitem>
 			</listbox>
 		</navegador>
 	
 		<detalls id="dades">
 			<zscript>
+			<![CDATA[
 				void onChangeDades()
 				{
 					try {
 						ds = form.getDataSource(); 
 						ctx =  ds.getJXPathContext(); 
 						registre = ctx.getValue("/");
-						form.getFellow("detall_par").getFellow("dada").setDisabled(!registre.isNew());
+						form.getFellow("form_name").getFellow("dada").setDisabled(!registre.isNew());
 					} catch (Exception e) {
-						form.getFellow("detall_par").getFellow("dada").setDisabled(true);
+						form.getFellow("form_name").getFellow("dada").setDisabled(true);
 					}
 				}
+				
+				void nestedLogin () 
+				{
+					if ( esquema.isCommitPending() )
+					{
+			    		Messagebox.show(org.zkoss.util.resource.Labels.getLabel("dbpropertyadmin.CanvisPendents"), org.zkoss.util.resource.Labels.getLabel("dbpropertyadmin.Alerta"), Messagebox.OK, Messagebox.EXCLAMATION);
+						return;
+					}
+					String name = es.caib.zkib.datasource.XPathUtils.getValue(form, "name");
+					if (name != null)
+					{
+						com.soffid.iam.tomcat.SoffidPrincipal p = new com.soffid.iam.tomcat.SoffidPrincipal (
+								name+"\\"+Security.getCurrentAccount(),
+								"*",
+								Security.getAuthorizations());
+						p.setFullName( Security.getPrincipal().getFullName());
+						session.setAttribute(es.caib.bpm.filters.WorkflowInterceptor.SOFFID_NESTED_PRINCIPAL,
+								p);
+						Executions.sendRedirect("/index.zul");
+					}
+				}
+			]]>
 			</zscript>
 			
 			<form id="form" onChangeXPath="onChangeDades()"
@@ -276,57 +226,35 @@
 				<grid>
 					<rows>
 						<row>
-							<input_etiqueta value="${c:l('parametres.zul.Parametre-2')}"/>
+							<input_etiqueta value="${c:l('tenant.zul.name')}"/>
 							
 							<hbox>
-								<input_dada bind="@codi" id="detall_par" maxim="50"
-									width_custom="${amplediv2_98-100}px" mascara="no empty"/>
-									
+								<input_dada bind="@name" id="form_name" lectura="${!canUpdateTenant}" maxim="50"
+									width_custom="12em" mascara="no empty"/>
 								<label value="*" />
+								<button label="Log in" onClick="nestedLogin()"/>
 							</hbox>
 						</row>
 						
 						<row>
-							<input_etiqueta value="${c:l('parametres.zul.Xarxa-2')}"/>
-							<hbox width="100%" widths="*,40px">
-								<input_dada id="detall_xarxa" bind="@codiXarxa"
-									lectura="${!canModifyParameter}"
+							<input_etiqueta value="${c:l('tenant.zul.description')}"/>
+							<input_dada bind="@description"
+									lectura="${!canUpdateTenant}"
 									width_custom="${amplediv2_98-100}px"/>
-								<imageclic align="right" src="~./img/xarxa.gif">
-									<attribute name="onClick">
-										if (canModifyParameter) {
-											idActualitza ="detall_xarxa";
-											Events.postEvent	("onInicia",desktop.getPage("xarxesLlista").getFellow("esquemaLlista"),form);
-										}
-									</attribute>
-								</imageclic>
-								<separator width="5px"/>
-							</hbox>
 						</row>
 						
 						<row>
-							<input_etiqueta value="${c:l('parametres.zul.Valor-2')}"/>
+							<input_etiqueta value="${c:l('tenant.zul.enabled')}"/>
 							
-							<hbox>
-								<input_dada id="detall_valor" bind="@valor" 
-									lectura="${!canModifyParameter}" maxim="250"
-									width_custom="${amplediv2_98-100}px" mascara="no empty"/>
-									
-								<label value="*" />
-							</hbox>
-						</row>
-						
-						<row>
-							<input_etiqueta value="${c:l('parametres.zul.Descripcia-2')}"/>
-							<input_dada id="detall_descripcio" bind="@descripcio"
-								lectura="${!canModifyParameter}" maxim="255"
-								width_custom="${amplediv2_98-100}px"/>
+							<checkbox bind="@enabled" 
+									disabled="${!canUpdateTenant}"/>
 						</row>
 					</rows>
 				</grid>
 			</form>
 		</detalls>
 	</esquema>
-
-	<include src="xarxesllista.zul"/>
+	<zscript>
+		esquema.getFellow("queryWindow").getFellow("criteria_name").getFellow("textbox").focus();
+	</zscript>
 </zk>

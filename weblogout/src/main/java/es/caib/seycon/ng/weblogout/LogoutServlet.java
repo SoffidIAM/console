@@ -6,8 +6,6 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.util.Locale;
 
-import es.caib.loginModule.util.SessionManager;
-
 public class LogoutServlet extends HttpServlet {
 
 	public void init(ServletConfig conf) throws ServletException {
@@ -71,6 +69,11 @@ public class LogoutServlet extends HttpServlet {
 		printWriter.flush();
 		response.flushBuffer();
 
+		HttpSession s = request.getSession(false);
+		if (s != null)
+			s.invalidate();
+		
+		
 		/*
 		 * SessionManager sessionManager = new SessionManager();
 		 * sessionManager.endSession(request, response); HttpSession httpSession

@@ -12,6 +12,7 @@
 	</style>
 	
 	<zscript>
+	<![CDATA[
 	import es.caib.zkib.zkiblaf.Missatgebox;
 		// Guardem el triat per l'usuari
 		Textbox usuariSelect, maquinaSelect;
@@ -75,12 +76,7 @@
 			try {
 				if (codiUsuari==null || codiUsuari.indexOf("%")!=-1) return true; //generic
 	
-				javax.naming.Context context = new javax.naming.InitialContext();
-				Object objUsu = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) 
-					javax.rmi.PortableRemoteObject.narrow(
-					objUsu, es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-				es.caib.seycon.ng.servei.ejb.UsuariService usuService = usuHome.create();
+				es.caib.seycon.ng.servei.ejb.UsuariService usuService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 				es.caib.seycon.ng.comu.Usuari usuari = usuService.findUsuariByCodiUsuari(codiUsuari);
 				if (usuari == null) 
 					return false;
@@ -92,12 +88,7 @@
 			try {
 				if (codiMaquina==null || codiMaquina.indexOf("%")!=-1) return null; //generic
 				
-				javax.naming.Context context = new javax.naming.InitialContext();
-				Object objMaq = context.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.XarxaServiceHome maqHome = (es.caib.seycon.ng.servei.ejb.XarxaServiceHome) 
-					javax.rmi.PortableRemoteObject.narrow(
-					objMaq, es.caib.seycon.ng.servei.ejb.XarxaServiceHome.class);
-				es.caib.seycon.ng.servei.ejb.XarxaService maqService = maqHome.create();
+				es.caib.seycon.ng.servei.ejb.XarxaService maqService = es.caib.seycon.ng.EJBLocator.getXarxaService();
 				es.caib.seycon.ng.comu.Maquina maquina = maqService.findMaquinaByNom(codiMaquina);
 				if (maquina == null) 
 					return null;
@@ -112,6 +103,7 @@
 			return p.matcher(ip).matches();
 		}
 			
+	]]>
 	</zscript>
 		
 	<window closable="true" id="esquemaLlista" position="center, center" title="${c:l('controlAcces.Titol')}" visible="false" width="700px">

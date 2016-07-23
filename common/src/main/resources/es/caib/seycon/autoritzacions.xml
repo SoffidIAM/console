@@ -1342,20 +1342,33 @@
 	</autoritzacio>
 	
 	<autoritzacio>
-		<codi>tenant:Query</codi>
+		<codi>tenant:query</codi>
 		<descripcio>Query existing tenants</descripcio>
 		<ambit>Tenancy</ambit>
 	</autoritzacio>
 	
 	<autoritzacio>
-		<codi>tenant:Update</codi>
+		<codi>tenant:update</codi>
 		<descripcio>Update existing tenants</descripcio>
 		<ambit>Tenancy</ambit>
 	</autoritzacio>
 	
 	<autoritzacio>
-		<codi>tenant:Create</codi>
+		<codi>tenant:create</codi>
 		<descripcio>Create existing tenants</descripcio>
+		<ambit>Tenancy</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>tenant:remove</codi>
+		<descripcio>Remove tenants</descripcio>
+		<ambit>Tenancy</ambit>
+	</autoritzacio>
+	
+	
+	<autoritzacio>
+		<codi>tenant:switch</codi>
+		<descripcio>Switch to any tenant</descripcio>
 		<ambit>Tenancy</ambit>
 	</autoritzacio>
 	

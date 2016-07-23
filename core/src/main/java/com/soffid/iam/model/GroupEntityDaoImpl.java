@@ -471,22 +471,6 @@ public class GroupEntityDaoImpl extends
 		return valorDomini;
 	}
 
-	/**
-	 * @see es.caib.seycon.ng.model.UsuariEntityDao#find(int, java.lang.String,
-	 *      es.caib.seycon.ng.model.Parameter[])
-	 */
-	public List find(final java.lang.String queryString,
-			final Parameter[] parameters) {
-		try {
-			java.util.List results = new QueryBuilder().query(this,
-					queryString, parameters);
-			return results;
-		} catch (org.hibernate.HibernateException ex) {
-			throw super.convertHibernateAccessException(ex);
-		}
-	}
-	
-
 	/* HERENCIA DE ROLES  */
 	
 	/**

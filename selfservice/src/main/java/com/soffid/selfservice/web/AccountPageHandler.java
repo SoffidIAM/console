@@ -12,10 +12,11 @@ import javax.ejb.CreateException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.soffid.iam.utils.ConfigurationCache;
+
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.servei.ejb.SelfService;
 import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
-
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class AccountPageHandler {
@@ -83,7 +84,7 @@ public class AccountPageHandler {
 		ea.setName(acc.getName());
 		ea.setSystem( getSystem (acc));
 		
-		String sso = System.getProperty("AutoSSOSystem");
+		String sso = ConfigurationCache.getProperty("AutoSSOSystem");
 		if (sso != null && sso.equals (acc.getDispatcher()))
 		{
 			String att = (String) acc.getAttributes().get("SSO:1");

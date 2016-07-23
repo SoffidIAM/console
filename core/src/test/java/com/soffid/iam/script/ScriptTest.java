@@ -21,20 +21,11 @@ public class ScriptTest extends  TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-
-		AccessController.doPrivileged(new PrivilegedAction<String>() {
-			public String run() {
-				System.setSecurityManager(previousSecurityManager);
-				return null;
-			}
-		});
 	}
 
 	BshClassManager bshcm;
 	NameSpace ns;
 	Interpreter interpreter ;
-	private SecurityManager previousSecurityManager;
-
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -44,14 +35,6 @@ public class ScriptTest extends  TestCase {
 		interpreter = new Interpreter( new StringReader(""), System.out, System.err, false, ns);
 		interpreter = new Interpreter();
 		
-		AccessController.doPrivileged(new PrivilegedAction<String>() {
-
-			public String run() {
-				previousSecurityManager = System.getSecurityManager();
-				System.setSecurityManager(new MySecurityManager(previousSecurityManager));
-				return null;
-			}
-		});
 	}
 
 
@@ -80,9 +63,9 @@ public class ScriptTest extends  TestCase {
 	public void test4 () throws EvalError 
 	{
 		try {
-			Object r = interpreter.eval("c = Class.forName(\"es.caib.seycon.ng.utils.Security\").getMethod(\"nestedLogooff\", new Class[0]).invoke(null, new Object[0]);");
+			Object r = interpreter.eval("c = Class.forName(\"es.caib.seycon.ng.utils.Security\").getMethod(\"nestedLogoff\", new Class[0]).invoke(null, new Object[0]);");
 //			assertFalse("Expected exception not thrown", true);
-		} catch (EvalError e) {
+		} catch (Exception e) {
 			System.out.println ("Excpected error");
 			e.printStackTrace();
 		}

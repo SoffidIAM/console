@@ -8,6 +8,7 @@ import javax.sql.rowset.spi.XmlReader;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.model.TenantEntityDao;
+import com.soffid.iam.service.TenantService;
 import com.soffid.iam.utils.Security;
 import com.soffid.test.AbstractHibernateTest;
 
@@ -92,9 +93,10 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		
 		
 		ApplicationBootService bootSvc = (ApplicationBootService) context.getBean(ApplicationBootService.SERVICE_NAME);
-	
+		TenantService tenantService = (TenantService) context.getBean(com.soffid.iam.service.TenantService.SERVICE_NAME);
 		
 		bootSvc.consoleBoot();
+		bootSvc.tenantBoot(tenantService.getMasterTenant());
 		
 		configSvc = (ConfiguracioService) context.getBean(ConfiguracioService.SERVICE_NAME);
 		appSvc = (AplicacioService) context.getBean(AplicacioService.SERVICE_NAME);
@@ -110,8 +112,6 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		accountSvc = (AccountService) context.getBean(AccountService.SERVICE_NAME);
 		passSvc = (PasswordService) context.getBean(PasswordService.SERVICE_NAME);
 	
-		System.setProperty("soffid.ui.maxrows", "9999");
-
         Configuracio cfg = configSvc.findParametreByCodiAndCodiXarxa(
 				"versionLevel", null); //$NON-NLS-1$
 		if (cfg == null)

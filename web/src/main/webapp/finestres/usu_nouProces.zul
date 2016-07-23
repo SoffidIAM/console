@@ -26,9 +26,7 @@
 		
 		void creaProcesUsuari(String nomProces) {
 			String codiUsuari = desktop.getPage("usuNouProces").getAttribute("codiUsuari");
-			javax.naming.Context context = new javax.naming.InitialContext();		
-			ejbHome = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-			usuariService = ejbHome.create();
+			usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 			urlProces = usuariService.creaNouProcesUsuari(nomProces, codiUsuari, true);
 			if (urlProces !=null) {
 				es.caib.zkib.zkiblaf.Application.call(urlProces);

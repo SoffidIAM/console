@@ -284,11 +284,8 @@
 				
 				String obteInformacioUsuari(String codiUsuari) {
 					if (codiUsuari!=null && !"".equals(codiUsuari.trim()) && infoUsuaris.get(codiUsuari) == null) {
-						javax.naming.Context context = new javax.naming.InitialContext();		
-						Object objUsuari = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-						es.caib.seycon.ng.servei.ejb.UsuariServiceHome usuariHome = (es.caib.seycon.ng.servei.ejb.UsuariServiceHome) javax.rmi.PortableRemoteObject.narrow(
-							objUsuari, es.caib.seycon.ng.servei.ejb.UsuariServiceHome.class);
-						es.caib.seycon.ng.servei.ejb.UsuariService usuariService = usuariHome.create();
+						es.caib.seycon.ng.servei.ejb.UsuariService usuariService = 
+								es.caib.seycon.ng.EJBLocator.getUsuariService();
 						
 						es.caib.seycon.ng.comu.Usuari usu = usuariService.findUsuariByCodiUsuari(codiUsuari);
 						if (usu != null) {

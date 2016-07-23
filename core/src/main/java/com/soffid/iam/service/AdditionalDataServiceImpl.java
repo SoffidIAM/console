@@ -24,6 +24,7 @@ import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -183,7 +184,7 @@ public class AdditionalDataServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DadesAddicionalsService#findTipusDadesByCodi(java.lang.String)
 	 */
 	protected java.util.Collection<DataType> handleFindDataTypesByName(java.lang.String codi) throws java.lang.Exception {
-		int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 		
 		if (codi != null
 				&& (codi.trim().compareTo("") == 0 || codi.trim() //$NON-NLS-1$

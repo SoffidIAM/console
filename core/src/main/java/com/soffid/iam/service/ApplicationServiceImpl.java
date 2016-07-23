@@ -48,6 +48,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.DateUtils;
@@ -236,7 +237,7 @@ public class ApplicationServiceImpl extends
     }
 
     protected Collection<Application> handleFindApplicationByCriteria(String codi, String nom, String directoriFonts, String responsable, String directoriExecutable, String bd, String rol, String gestionableWF) throws Exception {
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 
         // Si no en té autorització li retornem un array buit
         // RTIR #29273
@@ -377,12 +378,14 @@ public class ApplicationServiceImpl extends
             Iterator aplicacionsIterator = aplicacionsTrobades.iterator();
             while (aplicacionsIterator.hasNext()) {
                 Application aplicacio = (Application) aplicacionsIterator.next();
-                aplicacions += "\'" + aplicacio.getName() + "\'" + (aplicacionsIterator.hasNext() ? "," : ""); //$NON-NLS-1$ //$NON-NLS-2$
+                aplicacions += "\'" + aplicacio.getName().replace('\'', '_').replace('\"', '_') + "\'" + (aplicacionsIterator.hasNext() ? "," : ""); //$NON-NLS-1$ //$NON-NLS-2$
             }
             String query = "select distinct rol.informationSystem " //$NON-NLS-1$
                     + "from com.soffid.iam.model.RoleEntity rol where " //$NON-NLS-1$
-                    + "rol.name like :rol and " + "rol.informationSystem.name in (" //$NON-NLS-1$ //$NON-NLS-2$
-                    + aplicacions + ")"; //$NON-NLS-1$
+                    + "rol.name like :rol and " //$NON-NLS-1$
+                    + "rol.informationSystem.name in (" //$NON-NLS-1$ //$NON-NLS-2$
+                    + aplicacions + ") and"
+                    + "rol.informationSystem.tenant.id = :tenantId"; //$NON-NLS-1$
             Parameter parametres[] = { new Parameter("rol", rol) }; //$NON-NLS-1$
             Collection<InformationSystemEntity> aplicacionsTrobadesE = getInformationSystemEntityDao().query(query, parametres);
             return getInformationSystemEntityDao().toApplicationList(aplicacionsTrobadesE);
@@ -492,7 +495,7 @@ public class ApplicationServiceImpl extends
     }
 
     protected Collection handleFindRolesByFilter(String nom, String descripcio, String defecte, String baseDeDades, String contrasenya, String codiAplicacio, String gestionableWF) throws Exception {
-    	int limitResults = Integer.parseInt(System.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
+    	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
         if (nom != null
                 && (nom.trim().compareTo("") == 0 || nom.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -843,7 +846,7 @@ public class ApplicationServiceImpl extends
      * @throws UnknownUserException 
 	 */
 	private void checkGroupHolder(RoleAccount rolsUsuaris) throws InternalErrorException, UnknownUserException {
-		if ("never".equals(System.getProperty("soffid.entitlement.group.holder")))
+		if ("never".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")))
 			rolsUsuaris.setHolderGroup(null);
 		else
 		{
@@ -858,7 +861,7 @@ public class ApplicationServiceImpl extends
     				if (primaryGroup.getUnitType() != null && primaryGroup.getUnitType().isRoleHolder())
     					rolsUsuaris.setHolderGroup(primaryGroup.getName());
     			}
-            	else if (rolsUsuaris.getHolderGroup().length () == 0 && "optional".equals(System.getProperty("soffid.entitlement.group.holder")))
+            	else if (rolsUsuaris.getHolderGroup().length () == 0 && "optional".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")))
             	{
             		rolsUsuaris.setHolderGroup(null);			
             	}

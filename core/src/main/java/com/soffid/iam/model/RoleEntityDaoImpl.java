@@ -927,17 +927,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         super.identityToEntity(source, target, copyIfNull);
     }
 
-    public List<RoleEntity> find(final java.lang.String queryString, final Parameter[] parameters) {
-        try {
-            java.util.List<RoleEntity> results = new QueryBuilder().query(this, queryString, parameters);
-            return results;
-        } catch (org.hibernate.HibernateException ex) {
-            throw super.convertHibernateAccessException(ex);
-        }
-    }
-
     public RoleEntity containerRoleToEntity(ContainerRole contenidorRol) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -952,7 +942,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
     }
 
     public void containerRoleToEntity(ContainerRole source, RoleEntity target, boolean copyIfNull) {
-        // TODO Auto-generated method stub
         super.containerRoleToEntity(source, target, copyIfNull);
     }
 

@@ -11,6 +11,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -44,7 +45,8 @@ import roles.account_attribute_update;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
-	AuditoriaService.class})
+	AuditoriaService.class,
+	BpmEngine.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

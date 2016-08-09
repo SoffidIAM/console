@@ -11,6 +11,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.mda.annotation.*;
 
+import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -44,7 +45,8 @@ import roles.account_attribute_update;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
-	AuditoriaService.class})
+	AuditoriaService.class,
+	BpmEngine.class})
 public abstract class AccountService {
 
 	/// listUserAccounts
@@ -343,16 +345,17 @@ public abstract class AccountService {
 	
 	
 	///
-	@Description ("Sets the high privileged account password")
+	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},
 			translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void setHPAccountPassword(
+	public boolean setHPAccountPassword(
 		es.caib.seycon.ng.comu.Account account, 
 		es.caib.seycon.ng.comu.Password password, 
 		java.util.Date untilDate, 
 		boolean force)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return false;
 	}
 
 	

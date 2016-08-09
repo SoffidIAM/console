@@ -20,6 +20,8 @@ import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
 import org.jboss.invocation.pooled.server.ServerThread;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.mortbay.log.Log;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeansException;
@@ -37,6 +39,8 @@ import com.soffid.iam.reconcile.common.ReconcileAccount;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -52,14 +56,17 @@ import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PolicyCheckResult;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.SeyconServerInfo;
+import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.comu.TipusUsuari;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariGrup;
+import es.caib.seycon.ng.comu.UsuariWFProcess;
 import es.caib.seycon.ng.comu.sso.NameParser;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.BadPasswordException;
@@ -1190,7 +1197,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	 * @see es.caib.seycon.ng.servei.AccountServiceBase#handleSetHPAccountPassword(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Password, boolean)
 	 */
 	@Override
-	protected void handleSetHPAccountPassword (Account account, Password password,
+	protected boolean handleSetHPAccountPassword (Account account, Password password,
 					java.util.Date date, boolean force) throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
@@ -1213,6 +1220,20 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 
 		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
 		{
+			// Check if policy allows user change
+			DominiUsuariService dominiUsuariService = getDominiUsuariService();
+			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(
+							ae.getPasswordPolicy().getCodi(), 
+							ae.getDispatcher().getDomini().getCodi());
+			if (politica == null)
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
+			if (!politica.isAllowPasswordChange())
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
+			PolicyCheckResult pcr = ips.checkAccountPolicy(ae, password);
+			if (!pcr.isValid())
+				throw new BadPasswordException(pcr.getReason());
+			
+			// Check user authorization
 			if (caller.getId() != ae.getId())
 			{
 				if (ae.getType().equals(AccountType.USER))
@@ -1238,22 +1259,25 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 						}
 					}
 					if (!found)
+					{
+						// Try to request throw workflow
+						users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_USER);
+						found = false;
+						for (String user : users) {
+	                        if (user.equals(callerUe.getCodi())) {
+	                        	// Launch workflow
+	            				if ( startHPWorkflow(account, password, date)) 
+	            					return false;
+	                        }
+						}
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
+					}
 				}
 				else if (ae.getType().equals(AccountType.SHARED))
 				{
 					throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotChangePasswordAccountShared"))); //$NON-NLS-1$
 				}
 			}
-			// Check if policy allows user change
-			DominiUsuariService dominiUsuariService = getDominiUsuariService();
-			PoliticaContrasenya politica = dominiUsuariService.findPoliticaByTipusAndDominiContrasenyas(
-							ae.getPasswordPolicy().getCodi(), 
-							ae.getDispatcher().getDomini().getCodi());
-			if (politica == null)
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
-			if (!politica.isAllowPasswordChange())
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
 		}
 		
 		if (! force )
@@ -1288,6 +1312,30 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		// Now, audit
 		audit("H", ae); //$NON-NLS-1$
 		audit("P", ae); //$NON-NLS-1$
+		
+		return true;
+	}
+
+	private boolean startHPWorkflow(Account acc, Password p, Date until) throws InternalErrorException {
+		List def = getBpmEngine().findProcessDefinitions(null, PredefinedProcessType.PRIVILEGED_ACCOUNT);
+		if (def.isEmpty())
+			return false;
+		JbpmContext ctx = getBpmEngine().getContext();
+		try {
+			ProcessDefinition pd = (ProcessDefinition) def.get(0);
+			ProcessInstance pi = ctx.newProcessInstance(pd.getName());
+			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
+			pi.getContextInstance().createVariable("account", acc.getId());
+			pi.getContextInstance().createVariable("accountSystem", acc.getDispatcher());
+			pi.getContextInstance().createVariable("accountName", acc.getName());
+			pi.getContextInstance().createVariable("password", p.toString());
+			pi.getContextInstance().createVariable("until", until);
+			pi.signal();
+			ctx.save(pi);
+			return true;
+		} finally {
+			ctx.close();
+		}
 	}
 	
 	private UsuariEntity getUserForAccount (AccountEntity acc)
@@ -1582,7 +1630,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_USER);
 					boolean found = false;
 					for ( String user: users)
 					{

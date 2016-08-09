@@ -49,12 +49,13 @@ public abstract class SelfService {
 	}
 	@Operation(translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void setHPAccountPassword(
+	public boolean setHPAccountPassword(
 		es.caib.seycon.ng.comu.Account account, 
 		es.caib.seycon.ng.comu.Password password, 
 		java.util.Date untilDate, 
 		boolean force)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return false;
 	}
 	@Operation (translated="getCurrentUser")
 	@Transactional(rollbackFor={java.lang.Exception.class})

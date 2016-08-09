@@ -111,10 +111,10 @@ public class SelfServiceImpl extends SelfServiceBase
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handleSetHPAccountPassword(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Password, java.util.Date, boolean)
 	 */
 	@Override
-	protected void handleSetHPAccountPassword (Account account, Password password,
+	protected boolean handleSetHPAccountPassword (Account account, Password password,
 					Date untilDate, boolean force) throws Exception
 	{
-		getAccountService().setHPAccountPassword(account, password, untilDate, force);
+		return getAccountService().setHPAccountPassword(account, password, untilDate, force);
 	}
 
 	/* (non-Javadoc)
@@ -384,7 +384,7 @@ public class SelfServiceImpl extends SelfServiceBase
 				new String [] { Security.AUTO_ACCOUNT_QUERY});
 		try 
 		{
-			for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+			for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_USER))
 			{
 				if (!acc.getType().equals(AccountType.IGNORED) &&
 						!acc.getType().equals(AccountType.USER))

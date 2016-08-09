@@ -2,7 +2,6 @@
 <?page id="accountDetails"?>
 <!-- <?taglib uri="WEB-INF/tld/web/core.dsp.tld" prefix="c" ?> -->
 <?taglib 	uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
-<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="accounts" ?>
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
@@ -17,14 +16,16 @@
 		BindContext ctx = XPathUtils.getComponentContext(panels);
 		boolean owner = false;
 		boolean manager = false;
+		boolean privileged = false;
 		try {
 			AccountAccessLevelEnum level = XPathUtils.getValue(ctx, "/actualAccount/accessLevel");
 			owner = (level.equals (AccountAccessLevelEnum.ACCESS_OWNER));
 			manager = (level.equals (AccountAccessLevelEnum.ACCESS_MANAGER));
+			privileged = AccountType.PRIVILEGED.equals( XPathUtils.getValue(ctx, "/actualAccount/type") );
 		} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {
 			
 		}
-		passwordImg.setVisible(owner || manager);
+		passwordImg.setVisible(owner || manager || privileged);
 		queryImg.setVisible(owner || manager);
 		txtAccountDescription.getFellow("dada").setReadonly (!owner && ! manager);
 		
@@ -323,15 +324,24 @@
 							.create();
 					Account account = newPassword.getAttribute("acco");
 					timepwd.getValue();
-					service.setHPAccountPassword(account,
+					boolean done = service.setHPAccountPassword(account,
 							new Password(password.getValue()), timepwd.getValue(),
 								checkpwd.isChecked());
-					es.caib.zkib.zkiblaf.Missatgebox
+					if (done)
+					{
+						es.caib.zkib.zkiblaf.Missatgebox
 							.confirmaOK(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
-					BindContext ctx = XPathUtils.getComponentContext(form);
-					XPathUtils.getValue(ctx, "/owner").refresh();
-					ownerRow.setVisible (true);
+						BindContext ctx = XPathUtils.getComponentContext(form);
+						XPathUtils.getValue(ctx, "/owner").refresh();
+						ownerRow.setVisible (true);
+					}
+					else
+					{
+						es.caib.zkib.zkiblaf.Missatgebox
+						.confirmaOK(org.zkoss.util.resource.Labels
+						.getLabel("accounts.setPassword.delayed.msg"));
+					}
 					onCancelPassword();
 				}
 			]]>

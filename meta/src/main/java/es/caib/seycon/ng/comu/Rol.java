@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Role",
@@ -61,5 +63,13 @@ public abstract class Rol {
 	@Nullable
 	@Attribute(translated = "bpmEnforced" )
 	public java.lang.Boolean gestionableWF;
+
+	@Description("Last modification date")
+	@Nullable
+	public Date approvalStart;
+
+	@Description("Approval date")
+	@Nullable
+	public Date approvalEnd;
 
 }

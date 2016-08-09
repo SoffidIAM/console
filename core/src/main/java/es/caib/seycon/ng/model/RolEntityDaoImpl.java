@@ -9,6 +9,7 @@ package es.caib.seycon.ng.model;
  * @see es.caib.seycon.ng.model.RolEntity
  */
 import java.security.Principal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,9 +22,20 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
+import org.jbpm.JbpmContext;
+
+import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.model.MailListRoleMemberEntity;
 
+import es.caib.bpm.exception.BPMException;
+import es.caib.bpm.servei.BpmEngine;
+import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.bpm.vo.ProcessDefinition;
+import es.caib.bpm.vo.ProcessInstance;
 import es.caib.seycon.ng.PrincipalStore;
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.ContenidorRol;
@@ -31,12 +43,15 @@ import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.Identitat;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownRoleException;
 import es.caib.seycon.ng.servei.GrupServiceImpl;
 import es.caib.seycon.ng.servei.ejb.GrupService;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
@@ -72,63 +87,6 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             super.create(rol); // Creamos la entidad
             getSession(false).flush();
 
-            // Creamos las relaciones con los roles padre (a qui sóc atorgat) y
-            // con los grupos
-            // Creamos la asociación con el rol (sóc contingut-atorgat)
-            if (rol.getRolAssociacioRolSocContingut() != null)
-                for (Iterator it = rol.getRolAssociacioRolSocContingut()
-                        .iterator(); it.hasNext();) {
-                    RolAssociacioRolEntity associacio = (RolAssociacioRolEntity) it
-                            .next();
-                    // Verificamos que no haya ciclos
-                    StringBuffer cami = new StringBuffer(""); //$NON-NLS-1$
-                    if (RolAssociacioRolEntityDaoImpl
-                            .verificaAssociacioSenseCicles(associacio, cami)) {
-                        getRolAssociacioRolEntityDao().create(associacio);
-                    } else {
-						throw new Exception(String.format(Messages.getString("RolEntityDaoImpl.0"),   //$NON-NLS-1$
-								associacio.getRolContingut().toDescripcioRol(), 
-								associacio.getRolContenidor().toDescripcioRol(), 
-								cami));
-                    }
-                }
-            // Creamos la asociación con los grupos (directamente)
-            Collection grupsPosseidors = rol.getGrupsPosseidorsRol();
-            if (grupsPosseidors != null)
-                for (Iterator it = grupsPosseidors.iterator(); it.hasNext();) {
-                    RolsGrupEntity rolsgrup = (RolsGrupEntity) it.next();
-                    getRolsGrupEntityDao().create(rolsgrup);
-                }
-
-            // Propaguem usuaris, grups i rols
-            // Herencia:
-            // ROL: Atorgació del rol (aquest rol) a un altre rol (contenidor) :
-            // hem de fer
-            // updateRole(contenidor) i
-            // updateUser(per_a_tot_usuari_ROL_contenidor)
-            // GRUP: atorgació del rol (aquest rol) a un grup: hem de fer
-            // updateUser(per_a_tot_usuari_GRUP_i_SUBGRUPS_del_GRUP_posseidor)
-            // updateGrup(grup_posseidor_i_SUBGRUPS)
-            // Els usuaris ho fem només una vegada
-            HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
-            HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
-            HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
-            HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
-            // Obtenim el resultat de rols a la creació del rol
-            getHerenciaRol_Usuaris_Rols_Grups(rol, usuarisPropagar, accountsPropagar,
-                    rolsPropagar, grupsPropagar, false);
-            propagarUsuarisRolsIGrups(usuarisPropagar, accountsPropagar, rolsPropagar,
-                    grupsPropagar);
-            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_ROLE);
-            tasque.setRole(rol.getNom());
-            tasque.setBd(rol.getBaseDeDades().getCodi());
-            getTasqueEntityDao().createNoFlush(tasque);
-
-            getSession(false).flush();
-            auditarRol("C", rol.getNom(), rol.getAplicacio().getCodi(), rol //$NON-NLS-1$
-                    .getBaseDeDades().getCodi());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.1"), rol.getNom(), message));  //$NON-NLS-1$
@@ -156,214 +114,342 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
     	}
     }
     
-    public void update(es.caib.seycon.ng.model.RolEntity rol)
-            throws RuntimeException {
-        try {
-            RolEntity oldRol = load(rol.getId());
-            // Actualitzem el rol a la base de dades
-            super.update(rol);
-            getSession(false).flush();
+	private void generatePropagationTasks(
+			HashSet<UsuariEntity> usuarisPropagar,
+			HashSet<AccountEntity> accountsPropagar,
+			HashSet<RolEntity> rolsPropagar, HashSet<GrupEntity> grupsPropagar,
+			HashSet<UsuariEntity> usuarisPropagarAfter,
+			HashSet<AccountEntity> accountsPropagarAfter,
+			HashSet<RolEntity> rolsPropagarAfter,
+			HashSet<GrupEntity> grupsPropagarAfter)
+			throws InternalErrorException {
+		// En update, si no se modifica la tabla sc_roles, no se lanza un
+		// updateRole
 
-            // 0) Obtenim els usuaris, grups i rols afectats abans del canvi
-            HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
-            HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
-            HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
-            HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
-            // Obtenim informació del rol abans de fer l'update (darrer
-            // paràmetre a true)
-            getHerenciaRol_Usuaris_Rols_Grups(rol, usuarisPropagar, accountsPropagar,
-                    rolsPropagar, grupsPropagar, true);
+		// Ara fem la diferència entre els usuaris d'abans i els nous
+		// Clonem els de després:
+		// USUARIS:
+		HashSet<UsuariEntity> usuarisBorrar = new HashSet<UsuariEntity>(usuarisPropagar); // abans
+		usuarisBorrar.removeAll(usuarisPropagarAfter);// deixen només els
+		                                              // usus que ja no
+		                                              // tenen el rol
 
-            // Comprobamos los ciclos (antes de crearlos) en rol-rol
-            if (rol.getRolAssociacioRolSocContingut() != null)
-                for (Iterator it = rol.getRolAssociacioRolSocContingut()
-                        .iterator(); it.hasNext();) {
-                    RolAssociacioRolEntity relacio = (RolAssociacioRolEntity) it
-                            .next();
-                    StringBuffer cami = new StringBuffer(""); //$NON-NLS-1$
-                    if (!RolAssociacioRolEntityDaoImpl
-                            .verificaAssociacioSenseCicles(relacio, cami)) {
-						throw new Exception(String.format(Messages.getString("RolEntityDaoImpl.0"),   //$NON-NLS-1$
-								relacio.getRolContingut().toDescripcioRol(), 
-								relacio.getRolContenidor().toDescripcioRol(), 
-								cami));
-                    }
-                }
+		HashSet<UsuariEntity> usuarisAfegir = new HashSet<UsuariEntity>(usuarisPropagarAfter); // després
+		usuarisAfegir.removeAll(usuarisPropagar); // deixem els nous
+		                                          // (eliminem els q es
+		                                          // mantenen)
 
-            // Relaciones Rol-Rol
-            // 1) Obtenemos la lista actual de relaciones rol-rol
-            Collection rolAsocRolActual = rol.getRolAssociacioRolSocContingut();
-            // 2) Hacemos una copia (para trabajar con ella)
-            ArrayList copiaRolAsocRolActual = new ArrayList(rolAsocRolActual);
+		// Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
+		// d'actualitzar tots dos)
+		usuarisAfegir.addAll(usuarisBorrar);
 
-            // 3) Obtenemos las relaciones con otros roles ya existentes
-            // en la Entidad (desde la base de datos)
-            Collection rolAssociacioRolContingutAbans = getRolAssociacioRolEntityDao()
-                    .findRolAssociacioRolEsContingut(rol); // atorgat
+		// ACCOUNTS:
+		HashSet<AccountEntity> accountsBorrar = new HashSet<AccountEntity>(accountsPropagar); // abans
+		accountsBorrar.removeAll(accountsPropagarAfter);// deixen només els
+		                                              // usus que ja no
+		                                              // tenen el rol
 
-            // Compraramos con los existentes anteriormente : i esborrem els que
-            // ja no existeixen
-            if (rolAssociacioRolContingutAbans != null) {
-                Iterator itrol = rolAssociacioRolContingutAbans.iterator();
-                while (itrol.hasNext()) {
-                    RolAssociacioRolEntity relacio = (RolAssociacioRolEntity) itrol
-                            .next();
-                    boolean trobat = false;
-                    Iterator rit = copiaRolAsocRolActual.iterator();
-                    while (!trobat && rit.hasNext()) {
-                        RolAssociacioRolEntity rar = (RolAssociacioRolEntity) rit
-                                .next();
-                        if (rar.equals(relacio)) { // Comparem..
-                            trobat = true;
-                            rit.remove();// l'eliminem de la còpia (per no
-                                         // crear-lo
-                                         // de nou)
-                        }
-                    }
-                    if (!trobat) {
-                        // L'eliminem de la base de dades (ja no existeix)
-                        getRolAssociacioRolEntityDao().remove(relacio);
-                    }
-                }
-            }
-            // Creem la resta
-            if (copiaRolAsocRolActual.size() != 0)
-                getRolAssociacioRolEntityDao().create(copiaRolAsocRolActual);
+		HashSet<AccountEntity> accountsAfegir = new HashSet<AccountEntity>(accountsPropagarAfter); // després
+		accountsAfegir.removeAll(accountsPropagar); // deixem els nous
+		                                          // (eliminem els q es
+		                                          // mantenen)
 
-            // Relació amb GRUPS
-            // 1) Obtenemos la lista actual de atorgar rol-grup
-            Collection rolsGrupActual = rol.getGrupsPosseidorsRol();
-            // 2) Hacemos una copia (para trabajar con ella)
-            ArrayList copiaRolAsocGrupActual = new ArrayList(rolsGrupActual);
-            // 3) Obtenemos las relaciones con otros grupos ya existentes
-            // en la Entidad (desde la base de datos)
-            Collection rolsGrupAbans = getRolsGrupEntityDao()
-                    .findGrupsPosseidorsRol(rol);
-            Iterator itgrup = rolsGrupAbans.iterator();
-            while (itgrup.hasNext()) {
-                RolsGrupEntity relacio = (RolsGrupEntity) itgrup.next();
-                boolean trobat = false;
-                Iterator git = copiaRolAsocGrupActual.iterator();
-                while (!trobat && git.hasNext()) {
-                    RolsGrupEntity rag = (RolsGrupEntity) git.next();
-                    if (rag.getGrupPosseidor().getId()
-                            .equals(relacio.getGrupPosseidor().getId())) { // Comparem
-                                                                           // el
-                                                                           // grup..
-                        trobat = true;
-                        git.remove(); // l'eliminem (ja existeix: no tornarem a
-                                      // crear la relació)
-                    }
-                }
-                if (!trobat) {
-                    // L'eliminem de la base de dades (ja no existeix la relació
-                    // R-G)
-                    getRolsGrupEntityDao().remove(relacio);
-                }
-            }
-            // Creem la resta
-            if (copiaRolAsocGrupActual.size() != 0)
-                getRolsGrupEntityDao().create(copiaRolAsocGrupActual);
-
-            getSession(false).flush();
-            auditarRol("U", rol.getNom(), rol.getAplicacio().getCodi(), rol //$NON-NLS-1$
-                    .getBaseDeDades().getCodi());
-
-            // Obtenim el rol una vegada s'hagi actualitzat (conté els afectats
-            // abans del canvi)
-            HashSet<UsuariEntity> usuarisPropagarAfter = new HashSet<UsuariEntity>();
-            HashSet<AccountEntity> accountsPropagarAfter = new HashSet<AccountEntity>();
-            HashSet<RolEntity> rolsPropagarAfter = new HashSet<RolEntity>();
-            HashSet<GrupEntity> grupsPropagarAfter = new HashSet<GrupEntity>();
-
-            getHerenciaRol_Usuaris_Rols_Grups(rol, usuarisPropagarAfter,
-                    accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
-
-            // En update, si no se modifica la tabla sc_roles, no se lanza un
-            // updateRole
-
-            // Ara fem la diferència entre els usuaris d'abans i els nous
-            // Clonem els de després:
-            // USUARIS:
-            HashSet<UsuariEntity> usuarisBorrar = new HashSet<UsuariEntity>(usuarisPropagar); // abans
-            usuarisBorrar.removeAll(usuarisPropagarAfter);// deixen només els
-                                                          // usus que ja no
-                                                          // tenen el rol
-
-            HashSet<UsuariEntity> usuarisAfegir = new HashSet<UsuariEntity>(usuarisPropagarAfter); // després
-            usuarisAfegir.removeAll(usuarisPropagar); // deixem els nous
-                                                      // (eliminem els q es
-                                                      // mantenen)
-
-            // Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
-            // d'actualitzar tots dos)
-            usuarisAfegir.addAll(usuarisBorrar);
-
-            // ACCOUNTS:
-            HashSet<AccountEntity> accountsBorrar = new HashSet<AccountEntity>(accountsPropagar); // abans
-            accountsBorrar.removeAll(accountsPropagarAfter);// deixen només els
-                                                          // usus que ja no
-                                                          // tenen el rol
-
-            HashSet<AccountEntity> accountsAfegir = new HashSet<AccountEntity>(accountsPropagarAfter); // després
-            accountsAfegir.removeAll(accountsPropagar); // deixem els nous
-                                                      // (eliminem els q es
-                                                      // mantenen)
-
-            // Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
-            // d'actualitzar tots dos)
-            usuarisAfegir.addAll(usuarisBorrar);
+		// Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
+		// d'actualitzar tots dos)
+		usuarisAfegir.addAll(usuarisBorrar);
 
  
-            // ROLS:
-            HashSet<RolEntity> rolsBorrar = new HashSet<RolEntity>(rolsPropagar); // abans
-            rolsBorrar.removeAll(rolsPropagarAfter); // deixem només els rols q
-                                                     // ja no estan
+		// ROLS:
+		HashSet<RolEntity> rolsBorrar = new HashSet<RolEntity>(rolsPropagar); // abans
+		rolsBorrar.removeAll(rolsPropagarAfter); // deixem només els rols q
+		                                         // ja no estan
 
-            HashSet<RolEntity> rolsAfegir = new HashSet<RolEntity>(rolsPropagarAfter); // després
-            rolsAfegir.removeAll(rolsPropagar); // deixem els nous (eliminem els
-                                                // q es mantenen)
+		HashSet<RolEntity> rolsAfegir = new HashSet<RolEntity>(rolsPropagarAfter); // després
+		rolsAfegir.removeAll(rolsPropagar); // deixem els nous (eliminem els
+		                                    // q es mantenen)
 
-            // Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
-            // d'actualitzar tots dos)
-            rolsAfegir.addAll(rolsBorrar);
+		// Fem la unió dels que hem d'afegir i els que hem de eliminar (hem
+		// d'actualitzar tots dos)
+		rolsAfegir.addAll(rolsBorrar);
 
-            // GRUPS:
-            HashSet<GrupEntity> grupsBorrar = new HashSet<GrupEntity>(grupsPropagar); // abans
-            grupsBorrar.removeAll(grupsPropagarAfter);
+		// GRUPS:
+		HashSet<GrupEntity> grupsBorrar = new HashSet<GrupEntity>(grupsPropagar); // abans
+		grupsBorrar.removeAll(grupsPropagarAfter);
 
-            HashSet<GrupEntity> grupsAfegir = new HashSet<GrupEntity>(grupsPropagarAfter); // després
-            grupsAfegir.removeAll(grupsPropagar);
+		HashSet<GrupEntity> grupsAfegir = new HashSet<GrupEntity>(grupsPropagarAfter); // després
+		grupsAfegir.removeAll(grupsPropagar);
 
-            grupsAfegir.addAll(grupsBorrar);
+		grupsAfegir.addAll(grupsBorrar);
 
-            // I fem la propagació: només dels que siguen "nous"
-            propagarUsuarisRolsIGrups(usuarisAfegir, accountsAfegir, rolsAfegir, grupsAfegir);
+		// I fem la propagació: només dels que siguen "nous"
+		propagarUsuarisRolsIGrups(usuarisAfegir, accountsAfegir, rolsAfegir, grupsAfegir);
+	}
 
-            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-            tasque.setData(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransa(TaskHandler.UPDATE_ROLE);
-            tasque.setRole(rol.getNom());
-            tasque.setBd(rol.getBaseDeDades().getCodi());
-            getTasqueEntityDao().createNoFlush(tasque);
-            if (! rol.getNom().equals(oldRol.getNom()) || 
-                    ! rol.getBaseDeDades().getId().equals(oldRol.getBaseDeDades().getId()))
-            {
-                tasque = getTasqueEntityDao().newTasqueEntity();
-                tasque.setData(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransa(TaskHandler.UPDATE_ROLE);
-                tasque.setRole(oldRol.getNom());
-                tasque.setBd(oldRol.getBaseDeDades().getCodi());
-                getTasqueEntityDao().createNoFlush(tasque);
-            }
-            getSession(false).flush();
+	
+	/**
+	 * Returns true if an approval process has been initiated
+	 * 
+	 * @param role
+	 * @return
+	 * @throws InternalErrorException 
+	 * @throws BPMException 
+	 */
+	private boolean startApprovalProcess (RolEntity role) throws InternalErrorException, BPMException
+	{
+		java.util.Date now = new java.util.Date();
+		String approvalProcess = role.getAplicacio().getRoleDefinitionProcess();
+		if (approvalProcess == null || approvalProcess.trim().isEmpty())
+		{
+			if (role.getApprovalStart() == null ||
+					now.getTime() - role.getApprovalStart().getTime() > 2000) // Updated more than 2 secons ago
+			{
+				role.setApprovalEnd(now);
+				role.setApprovalStart(now);
+				update (role);
+			}
+			return false;
+		}
+		else
+		{
+			BpmEngine engine = getBpmEngine();
+			Security.nestedLogin(Security.getCurrentAccount(), new String [] {
+				"BPM_INTERNAL" //$NON-NLS-1$
+			});
+			try {
+				
+				if (role.getApprovalProcess() != null)
+				{
+					ProcessInstance oldProcess = engine.getProcess(role.getApprovalProcess());
+					if (oldProcess.getEnd() == null)
+					{
+						if (role.getApprovalStart() != null &&
+								now.getTime() - role.getApprovalStart().getTime() < 60000) // WF created less than one minute ago
+						{
+							return true;
+						}
+						else	// Cancel current WF and start a new one
+							engine.cancel(oldProcess);
+					}
+				}
+				// Starts new workflow
+				List<ProcessDefinition> defs = getBpmEngine().findProcessDefinitions(approvalProcess, PredefinedProcessType.ROLE_DEFINITION_APPROVAL);
+				if (defs == null || defs.isEmpty())
+					throw new InternalErrorException ("No business process found with name '%s'", approvalProcess);
+				ProcessDefinition def = defs.get(0);
+	
+				ProcessInstance pi = engine.newProcess(def, false);
+				pi.getVariables().put("roleId", role.getId());
+				pi.getVariables().put("roleName", role.getNom());
+				pi.getVariables().put("system", role.getBaseDeDades().getCodi());
+				pi.getVariables().put("application", role.getAplicacio().getNom());
+				pi.getVariables().put("requester", Security.getCurrentUser());
+				engine.update(pi);
+				engine.startProcess(pi);
+				
+				role.setApprovalProcess( pi.getId());
+				role.setApprovalEnd(null);
+				role.setApprovalStart(new java.util.Date());
+				update (role);
+				
+				return true;
+			} finally {
+				Security.nestedLogoff();
+			}
+		}
+	}
+	
+	private void updateGranteeRoles(Rol role, es.caib.seycon.ng.model.RolEntity entity) throws InternalErrorException, BPMException {
+		// Compraramos con los existentes anteriormente : i esborrem els que
+		// ja no existeixen
+		LinkedList<RolAssociacioRolEntity> currentGrants = new LinkedList<RolAssociacioRolEntity>(entity.getRolAssociacioRolSocContingut());
+		if (role.getOwnerRoles() != null) {
+			for (RolGrant grant: role.getOwnerRoles())
+			{
+				boolean found = false;
+				for ( Iterator<RolAssociacioRolEntity> it = currentGrants.iterator(); it.hasNext();)
+				{
+					RolAssociacioRolEntity grantEntity = it.next();
+					if (grantEntity.getId().equals( grant.getId()))
+					{
+						found = true;
+						it.remove();
+						updateRolDependency(grantEntity, grant);
+						break;
+					}
+						
+				}
+				if ( ! found )
+					createRoleDependency(grant);
+			}
+		}
+		for ( RolAssociacioRolEntity grantEntity: currentGrants)
+		{
+			deleteRolDependency(grantEntity);
+		}
+	}
 
-            updateMailLists (rol);
-        } catch (Throwable e) {
-            String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.2"), rol.getNom(), message));  //$NON-NLS-1$
+	private void updateGranteeGroups(Rol role, es.caib.seycon.ng.model.RolEntity entity) throws InternalErrorException, BPMException {
+		// Compraramos con los existentes anteriormente : i esborrem els que
+		// ja no existeixen
+		LinkedList<RolsGrupEntity> currentGrants = new LinkedList<RolsGrupEntity>(entity.getGrupsPosseidorsRol());
+		if (role.getGranteeGroups() != null) {
+			for (RolGrant grant: role.getGranteeGroups())
+			{
+				boolean found = false;
+				for ( Iterator<RolsGrupEntity> it = currentGrants.iterator(); it.hasNext();)
+				{
+					RolsGrupEntity grantEntity = it.next();
+					if (grantEntity.getId().equals( grant.getId()))
+					{
+						found = true;
+						it.remove();
+						// NO update allowed
+//						updateRoleGroupDependency(grantEntity, grant);
+						break;
+					}
+						
+				}
+				if ( ! found )
+					createRoleGroupDependency(grant);
+			}
+		}
+		for ( RolsGrupEntity grantEntity: currentGrants)
+		{
+			deleteRoleGroupDependency(grantEntity);
+		}
+	}
+
+	private void updateGrantedRoles(Rol role, es.caib.seycon.ng.model.RolEntity entity) throws InternalErrorException, BPMException {
+		// Compraramos con los existentes anteriormente : i esborrem els que
+		// ja no existeixen
+		LinkedList<RolAssociacioRolEntity> currentGrants = new LinkedList<RolAssociacioRolEntity>(entity.getRolAssociacioRolSocContenidor());
+		if (role.getOwnedRoles() != null) {
+			for (RolGrant grant: role.getOwnedRoles())
+			{
+				boolean found = false;
+				for ( Iterator<RolAssociacioRolEntity> it = currentGrants.iterator(); it.hasNext();)
+				{
+					RolAssociacioRolEntity grantEntity = it.next();
+					if (grantEntity.getId().equals( grant.getId()))
+					{
+						found = true;
+						it.remove();
+						updateRolDependency(grantEntity, grant);
+						break;
+					}
+						
+				}
+				if ( ! found )
+					createRoleDependency(grant);
+			}
+		}
+		for ( RolAssociacioRolEntity grantEntity: currentGrants)
+		{
+			deleteRolDependency(grantEntity);
+		}
+	}
+
+	private void createRoleDependency(RolGrant grant) throws InternalErrorException, BPMException {
+		StringBuffer path = new StringBuffer();
+        RolEntity ownerRole = load (grant.getOwnerRol()); 
+        RolEntity ownedRole = load (grant.getIdRol()); 
+        
+        if (checkNoCycles( grant, path)) {
+        	RolAssociacioRolEntity entity = getRolAssociacioRolEntityDao().newRolAssociacioRolEntity();
+        	
+	        entity.setRolContingut(ownedRole);
+	        entity.setRolContenidor(ownerRole);
+
+	        assignDomainValue(entity, grant, ownedRole,
+            		ownerRole);
+
+            assignGranteeDomainValue(entity, grant, ownedRole,
+            		ownerRole);
+
+            if ( Hibernate.isInitialized(ownedRole.getRolAssociacioRolSocContingut()))
+            	ownedRole.getRolAssociacioRolSocContingut().add(entity);
+            
+            if ( Hibernate.isInitialized(ownerRole.getRolAssociacioRolSocContenidor()))
+            	ownerRole.getRolAssociacioRolSocContenidor().add(entity);
+
+            if (startApprovalProcess(ownerRole))
+            	entity.setStatus(RoleDependencyStatus.STATUS_TOAPPROVE);
+            else
+            	entity.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
+            
+            getRolAssociacioRolEntityDao().create(entity);
+
+        } else {
+			throw new InternalErrorException(String.format(Messages.getString("RolEntityDaoImpl.0"),   //$NON-NLS-1$
+					ownedRole.toDescripcioRol(), 
+					ownerRole.toDescripcioRol(), 
+					path));
         }
-    }
+	}
+
+
+	private void createRoleGroupDependency(RolGrant grant) throws InternalErrorException, BPMException {
+		StringBuffer path = new StringBuffer();
+        GrupEntity ownerGroup = getGrupEntityDao().findByCodi(grant.getOwnerGroup()); 
+        RolEntity ownedRole = load (grant.getIdRol()); 
+    
+    	RolsGrupEntity entity = getRolsGrupEntityDao().newRolsGrupEntity();
+    	
+        entity.setRolOtorgat(ownedRole);
+        entity.setGrupPosseidor(ownerGroup);
+
+        String nomDomini = ownedRole.getTipusDomini();
+        if (TipusDomini.APLICACIONS.equals(nomDomini))
+        {
+        	entity.setGrantedApplicationDomain(getAplicacioEntityDao().findByCodi(grant.getDomainValue()));
+        }
+        else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini))
+        {
+        	entity.setGrantedGroupDomain(getGrupEntityDao().findByCodi(grant.getDomainValue()));
+        }
+        else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini))
+        {
+        	entity.setGrantedDomainValue(
+        			getValorDominiAplicacioEntityDao()
+        				.findByApplicationDomainValue(
+        						ownedRole.getAplicacio().getCodi(), 
+        						ownedRole.getDominiAplicacio().getNom(), 
+        						grant.getDomainValue()));
+        }
+
+        if ( Hibernate.isInitialized(ownedRole.getGrupsPosseidorsRol()))
+        	ownedRole.getGrupsPosseidorsRol().add(entity);
+        
+        if ( Hibernate.isInitialized(ownerGroup.getRolsOtorgatsGrup()))
+        	ownerGroup.getRolsOtorgatsGrup().add(entity);
+
+        getRolsGrupEntityDao().create(entity);
+
+	}
+
+	private void deleteRoleGroupDependency(RolsGrupEntity entity) throws InternalErrorException, BPMException {
+		getRolsGrupEntityDao().remove(entity);
+	}
+	
+	private void deleteRolDependency(RolAssociacioRolEntity entity) throws InternalErrorException, BPMException {
+        RolEntity ownerRole = entity.getRolContenidor();
+        
+        // Delete a not approved yet role or no approval is needed
+        if (RoleDependencyStatus.STATUS_TOAPPROVE.equals( entity.getStatus()) || 
+        		!startApprovalProcess(ownerRole))
+        {
+        	getRolAssociacioRolEntityDao().remove(entity);
+        } else {
+        	entity.setStatus(RoleDependencyStatus.STATUS_TOREMOVE);
+        	getRolAssociacioRolEntityDao().update(entity);
+        }
+	}
+
+	private void updateRolDependency(RolAssociacioRolEntity entity, RolGrant grant) throws InternalErrorException, BPMException {
+		if (grant.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
+			deleteRolDependency(entity);
+		// No update is allowed
+	}
 
     public void remove(es.caib.seycon.ng.model.RolEntity rol)
             throws RuntimeException {
@@ -676,17 +762,6 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         updateEntityDomainType(sourceVO, targetEntity);
         updateEntityApplication(sourceVO, targetEntity);
         upateEntityOthers(sourceVO, targetEntity);
-
-    	// GRUPOS POSEEDORES DEL ROL: NUEVO
-        // Collección de Grups posseidors (VO)
-        updateEntityGranteeGroups(sourceVO, targetEntity);
-
-        // JERARQUÍA DE ROLES PADRES DEL ROL: NUEVO
-        // Creamos una nueva (luego en el update - si corresponde - se verifican
-        // los existentes)
-        // Eliminamos referencias existentes
-        updateEntityGranteeRoles(sourceVO, targetEntity);
-
 
     }
 
@@ -1215,58 +1290,63 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 for (Iterator<RolAssociacioRolEntity> it = socContingut.iterator(); it.hasNext();) {
                     RolAssociacioRolEntity associacio = (RolAssociacioRolEntity) it
                             .next();
-                    // Obtenemos los usuarios del contenedor
-                    RolEntity rolContenidor = associacio.getRolContenidor();
-                    // Guardamos el rol para propagarlo
-                    rolsPropagar.add(rolContenidor);
-                    // Añadimos el rol contenedor para analizar si a su vez es
-                    // contenido en otro (atorgat)
-                    rolsAnalitzar.add(rolContenidor);
-                    Collection<RolAccountEntity> rolsUsuarisRolContenidor = new ArrayList<RolAccountEntity>();
-                    // Cerquem usuaris amb el rol d'usuari amb valor de domini
-                    // corresponent
-                    if (associacio.getGranteeGroupDomain() != null
-                            || associacio.getGranteeApplicationDomain() != null
-                            || associacio.getGranteeDomainValue() != null) {
-                        rolsUsuarisRolContenidor = getRolAccountEntityDao()
-                                .findByRolAndValorDomini(
-                                        rolContenidor.getNom(),
-                                        rolContenidor.getBaseDeDades()
-                                                .getCodi(),
-                                        rolContenidor.getAplicacio().getCodi(),
-                                        rolContenidor.getTipusDomini(),
-                                        associacio.getGranteeGroupDomain() != null ? associacio
-                                                .getGranteeGroupDomain().getCodi()
-                                                : null,
-                                        associacio.getGranteeApplicationDomain() != null ? associacio
-                                                .getGranteeApplicationDomain().getCodi()
-                                                : null,
-                                        associacio.getGranteeApplicationDomain() != null ? associacio
-                                                .getGranteeApplicationDomain()
-                                                .getId() : null);
-                    } else {// Cerquem a tots els valors de domini (sense_domini
-                            // o qualque_valor)
-                        rolsUsuarisRolContenidor = getRolAccountEntityDao()
-                                .findByRolAndTipusDomini(
-                                        rolContenidor.getNom(),
-                                        rolContenidor.getBaseDeDades()
-                                                .getCodi(),
-                                        rolContenidor.getAplicacio().getCodi(),
-                                        rolContenidor.getTipusDomini());
+                    if (associacio.getStatus() == null ||
+                    		associacio.getStatus().equals (RoleDependencyStatus.STATUS_ACTIVE) ||
+                    		associacio.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
+                    {
+	                    // Obtenemos los usuarios del contenedor
+	                    RolEntity rolContenidor = associacio.getRolContenidor();
+	                    // Guardamos el rol para propagarlo
+	                    rolsPropagar.add(rolContenidor);
+	                    // Añadimos el rol contenedor para analizar si a su vez es
+	                    // contenido en otro (atorgat)
+	                    rolsAnalitzar.add(rolContenidor);
+	                    Collection<RolAccountEntity> rolsUsuarisRolContenidor = new ArrayList<RolAccountEntity>();
+	                    // Cerquem usuaris amb el rol d'usuari amb valor de domini
+	                    // corresponent
+	                    if (associacio.getGranteeGroupDomain() != null
+	                            || associacio.getGranteeApplicationDomain() != null
+	                            || associacio.getGranteeDomainValue() != null) {
+	                        rolsUsuarisRolContenidor = getRolAccountEntityDao()
+	                                .findByRolAndValorDomini(
+	                                        rolContenidor.getNom(),
+	                                        rolContenidor.getBaseDeDades()
+	                                                .getCodi(),
+	                                        rolContenidor.getAplicacio().getCodi(),
+	                                        rolContenidor.getTipusDomini(),
+	                                        associacio.getGranteeGroupDomain() != null ? associacio
+	                                                .getGranteeGroupDomain().getCodi()
+	                                                : null,
+	                                        associacio.getGranteeApplicationDomain() != null ? associacio
+	                                                .getGranteeApplicationDomain().getCodi()
+	                                                : null,
+	                                        associacio.getGranteeApplicationDomain() != null ? associacio
+	                                                .getGranteeApplicationDomain()
+	                                                .getId() : null);
+	                    } else {// Cerquem a tots els valors de domini (sense_domini
+	                            // o qualque_valor)
+	                        rolsUsuarisRolContenidor = getRolAccountEntityDao()
+	                                .findByRolAndTipusDomini(
+	                                        rolContenidor.getNom(),
+	                                        rolContenidor.getBaseDeDades()
+	                                                .getCodi(),
+	                                        rolContenidor.getAplicacio().getCodi(),
+	                                        rolContenidor.getTipusDomini());
+	                    }
+	
+	                    // Guardem el codi d'usuari (per propagar-los)
+	                    if (rolsUsuarisRolContenidor != null)
+	                        for (Iterator ruit = rolsUsuarisRolContenidor
+	                                .iterator(); ruit.hasNext();) {
+	                            RolAccountEntity rui = (RolAccountEntity) ruit
+	                                    .next();
+	                            if (rui.getAccount().getType().equals(AccountType.USER) &&
+	                            		rui.getAccount().getUsers().size() == 1)
+	                            	usuarisPropagar.add(rui.getAccount().getUsers().iterator().next().getUser());
+	                            else
+	                            	accountsPropagar.add(rui.getAccount());
+	                        }
                     }
-
-                    // Guardem el codi d'usuari (per propagar-los)
-                    if (rolsUsuarisRolContenidor != null)
-                        for (Iterator ruit = rolsUsuarisRolContenidor
-                                .iterator(); ruit.hasNext();) {
-                            RolAccountEntity rui = (RolAccountEntity) ruit
-                                    .next();
-                            if (rui.getAccount().getType().equals(AccountType.USER) &&
-                            		rui.getAccount().getUsers().size() == 1)
-                            	usuarisPropagar.add(rui.getAccount().getUsers().iterator().next().getUser());
-                            else
-                            	accountsPropagar.add(rui.getAccount());
-                        }
                 }
         }
 
@@ -1417,4 +1497,290 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
                 }
             }
     }
+
+	@Override
+	protected void handleRemove(Rol role) throws Exception {
+        RolEntity entity = load (role.getId());
+        remove(entity);
+
+	}
+
+    private boolean checkNoCycles(
+            RolGrant grant, StringBuffer cami) {
+        RolEntity contingut = load ( grant.getIdRol());
+        RolEntity pare = load (grant.getOwnerRol());
+
+        // Método: Para todo T,D / T & D son RolEntity
+        // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
+        // (versión breve)
+        // exista un camino C(D1, T): D1 está contenido en T
+        //
+        // Obtenemos dónde está contenido el padre (el contenedor del rol)
+        // return true;
+        cami.append(contingut.getNom() + " => "); //$NON-NLS-1$
+        return checkNoCycles(contingut, pare, cami);
+    }
+
+    private boolean checkNoCycles(RolEntity fill,
+            RolEntity pare, StringBuffer cami) {
+        Collection pareEsContingut = pare.getRolAssociacioRolSocContingut();
+        boolean senseCicles = true;
+        cami.append(pare.getNom() + " => "); //$NON-NLS-1$
+        for (Iterator it = pareEsContingut.iterator(); senseCicles
+                && it.hasNext();) {
+            RolAssociacioRolEntity relacio = (RolAssociacioRolEntity) it.next();
+            RolEntity parePare = relacio.getRolContenidor();
+            if (parePare.equals(fill)) {
+                senseCicles = false;
+                cami.append(parePare.getNom());
+                return false; // S'ha trobat un cicle
+            } else {
+                // Verificamos la descendencia del contenedor (padre)
+                senseCicles = checkNoCycles(fill, parePare,
+                        cami);
+            }
+        }
+        return senseCicles;
+    }
+
+
+	@Override
+	protected RolEntity handleCreate(Rol role, boolean updateOwnedRoles) throws Exception {
+        try {
+        	RolEntity entity = newRolEntity();
+           	rolToEntity(role, entity, true);
+            
+            // 0) Obtenim els usuaris, grups i rols afectats abans del canvi
+            HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
+            HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
+            HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
+            HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
+            // Obtenim informació del rol abans de fer l'update (darrer
+            // paràmetre a true)
+
+            // Actualitzem el rol a la base de dades
+            create (entity);
+            
+            updateGranteeRoles(role, entity);
+
+            if (updateOwnedRoles)
+            	updateGrantedRoles(role, entity);
+
+            updateGranteeGroups(role, entity);
+
+            getSession(false).flush();
+            auditarRol("C", entity.getNom(), entity.getAplicacio().getCodi(), entity //$NON-NLS-1$
+                    .getBaseDeDades().getCodi());
+
+            // Obtenim el rol una vegada s'hagi actualitzat (conté els afectats
+            // abans del canvi)
+            HashSet<UsuariEntity> usuarisPropagarAfter = new HashSet<UsuariEntity>();
+            HashSet<AccountEntity> accountsPropagarAfter = new HashSet<AccountEntity>();
+            HashSet<RolEntity> rolsPropagarAfter = new HashSet<RolEntity>();
+            HashSet<GrupEntity> grupsPropagarAfter = new HashSet<GrupEntity>();
+
+            getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
+                    accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
+
+            generatePropagationTasks(usuarisPropagar, accountsPropagar,
+					rolsPropagar, grupsPropagar, usuarisPropagarAfter,
+					accountsPropagarAfter, rolsPropagarAfter,
+					grupsPropagarAfter);
+
+            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+            tasque.setData(new Timestamp(System.currentTimeMillis()));
+            tasque.setTransa(TaskHandler.UPDATE_ROLE);
+            tasque.setRole(entity.getNom());
+            tasque.setBd(entity.getBaseDeDades().getCodi());
+            getTasqueEntityDao().createNoFlush(tasque);
+
+            getSession(false).flush();
+
+            updateMailLists (entity);
+
+            return entity;
+        } catch (Throwable e) {
+            String message = ExceptionTranslator.translate(e);
+			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.2"), role.getNom(), message));  //$NON-NLS-1$
+        }
+	}
+
+	@Override
+	protected RolEntity handleUpdate(Rol role, boolean updateOwnedRoles) throws Exception {
+        try {
+            RolEntity entity = load (role.getId());
+            if (entity == null)
+            	throw new UnknownRoleException("id: "+role.getId());
+
+            String oldName = entity.getNom();
+            String oldSystem = entity.getBaseDeDades().getCodi();
+            boolean sameName = role.getNom().equals ( oldName ) &&
+            		role.getBaseDeDades().equals (oldSystem);
+            	
+           	rolToEntity(role, entity, true);
+            
+            // 0) Obtenim els usuaris, grups i rols afectats abans del canvi
+            HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
+            HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
+            HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
+            HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
+            // Obtenim informació del rol abans de fer l'update (darrer
+            // paràmetre a true)
+            getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagar, accountsPropagar,
+                    rolsPropagar, grupsPropagar, true);
+
+            // Actualitzem el rol a la base de dades
+            update (entity);
+            
+            updateGranteeRoles(role, entity);
+
+            if (updateOwnedRoles)
+            	updateGrantedRoles(role, entity);
+
+            updateGranteeGroups(role, entity);
+
+            getSession(false).flush();
+            auditarRol("U", entity.getNom(), entity.getAplicacio().getCodi(), entity //$NON-NLS-1$
+                    .getBaseDeDades().getCodi());
+
+            // Obtenim el rol una vegada s'hagi actualitzat (conté els afectats
+            // abans del canvi)
+            HashSet<UsuariEntity> usuarisPropagarAfter = new HashSet<UsuariEntity>();
+            HashSet<AccountEntity> accountsPropagarAfter = new HashSet<AccountEntity>();
+            HashSet<RolEntity> rolsPropagarAfter = new HashSet<RolEntity>();
+            HashSet<GrupEntity> grupsPropagarAfter = new HashSet<GrupEntity>();
+
+            getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
+                    accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
+
+            generatePropagationTasks(usuarisPropagar, accountsPropagar,
+					rolsPropagar, grupsPropagar, usuarisPropagarAfter,
+					accountsPropagarAfter, rolsPropagarAfter,
+					grupsPropagarAfter);
+
+            TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+            tasque.setData(new Timestamp(System.currentTimeMillis()));
+            tasque.setTransa(TaskHandler.UPDATE_ROLE);
+            tasque.setRole(entity.getNom());
+            tasque.setBd(entity.getBaseDeDades().getCodi());
+            getTasqueEntityDao().createNoFlush(tasque);
+            if (! sameName)
+            {
+                tasque = getTasqueEntityDao().newTasqueEntity();
+                tasque.setData(new Timestamp(System.currentTimeMillis()));
+                tasque.setTransa(TaskHandler.UPDATE_ROLE);
+                tasque.setRole(oldName);
+                tasque.setBd(oldSystem);
+                getTasqueEntityDao().createNoFlush(tasque);
+            }
+            getSession(false).flush();
+
+            updateMailLists (entity);
+            return entity;
+        } catch (Throwable e) {
+            String message = ExceptionTranslator.translate(e);
+			throw new SeyconException(String.format(Messages.getString("RolEntityDaoImpl.2"), role.getNom(), message));  //$NON-NLS-1$
+        }
+	}
+
+	@Override
+	protected void handleCommitDefinition(RolEntity entity) throws Exception {
+        // Calculate current users
+        HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
+        HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
+        HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
+        HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
+        getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagar, accountsPropagar,
+                rolsPropagar, grupsPropagar, true);
+
+        // Commit changes
+        for ( RolAssociacioRolEntity grant: entity.getRolAssociacioRolSocContenidor())
+    	{
+    		if ( RoleDependencyStatus.STATUS_TOAPPROVE.equals(grant.getStatus() ))
+    		{
+    			grant.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
+    			getRolAssociacioRolEntityDao().update(grant);
+    		}
+    		if ( RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus() ))
+    		{
+    			getRolAssociacioRolEntityDao().remove(grant);
+    		}
+    	}
+
+        // Calculate new users
+        HashSet<UsuariEntity> usuarisPropagarAfter = new HashSet<UsuariEntity>();
+        HashSet<AccountEntity> accountsPropagarAfter = new HashSet<AccountEntity>();
+        HashSet<RolEntity> rolsPropagarAfter = new HashSet<RolEntity>();
+        HashSet<GrupEntity> grupsPropagarAfter = new HashSet<GrupEntity>();
+
+        // Generate propagation tasks
+        getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
+                accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
+
+        generatePropagationTasks(usuarisPropagar, accountsPropagar,
+				rolsPropagar, grupsPropagar, usuarisPropagarAfter,
+				accountsPropagarAfter, rolsPropagarAfter,
+				grupsPropagarAfter);
+
+        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+        tasque.setData(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransa(TaskHandler.UPDATE_ROLE);
+        tasque.setRole(entity.getNom());
+        tasque.setBd(entity.getBaseDeDades().getCodi());
+        getTasqueEntityDao().createNoFlush(tasque);
+
+        entity.setApprovalEnd(new java.util.Date());
+        entity.setApprovalProcess(null);
+	}
+
+	@Override
+	protected void handleRollbackDefinition(RolEntity entity) throws Exception {
+        // Calculate current users
+        HashSet<UsuariEntity> usuarisPropagar = new HashSet<UsuariEntity>();
+        HashSet<AccountEntity> accountsPropagar = new HashSet<AccountEntity>();
+        HashSet<RolEntity> rolsPropagar = new HashSet<RolEntity>();
+        HashSet<GrupEntity> grupsPropagar = new HashSet<GrupEntity>();
+        getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagar, accountsPropagar,
+                rolsPropagar, grupsPropagar, true);
+
+        // Commit changes
+        for ( RolAssociacioRolEntity grant: entity.getRolAssociacioRolSocContenidor())
+    	{
+    		if ( RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus() ))
+    		{
+    			grant.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
+    			getRolAssociacioRolEntityDao().update(grant);
+    		}
+    		if ( RoleDependencyStatus.STATUS_TOAPPROVE.equals(grant.getStatus() ))
+    		{
+    			getRolAssociacioRolEntityDao().remove(grant);
+    		}
+    	}
+
+        // Calculate new users
+        HashSet<UsuariEntity> usuarisPropagarAfter = new HashSet<UsuariEntity>();
+        HashSet<AccountEntity> accountsPropagarAfter = new HashSet<AccountEntity>();
+        HashSet<RolEntity> rolsPropagarAfter = new HashSet<RolEntity>();
+        HashSet<GrupEntity> grupsPropagarAfter = new HashSet<GrupEntity>();
+
+        // Generate propagation tasks
+        getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
+                accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
+
+        generatePropagationTasks(usuarisPropagar, accountsPropagar,
+				rolsPropagar, grupsPropagar, usuarisPropagarAfter,
+				accountsPropagarAfter, rolsPropagarAfter,
+				grupsPropagarAfter);
+
+        TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+        tasque.setData(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransa(TaskHandler.UPDATE_ROLE);
+        tasque.setRole(entity.getNom());
+        tasque.setBd(entity.getBaseDeDades().getCodi());
+        getTasqueEntityDao().createNoFlush(tasque);
+
+        entity.setApprovalEnd(new java.util.Date());
+        entity.setApprovalProcess(null);
+	}
+
 }

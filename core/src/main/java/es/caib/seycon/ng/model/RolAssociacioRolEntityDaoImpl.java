@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.soffid.iam.api.RoleDependencyStatus;
+
 import es.caib.seycon.ng.comu.ContenidorRol;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
@@ -75,44 +77,6 @@ public class RolAssociacioRolEntityDaoImpl extends
         } catch (org.hibernate.HibernateException ex) {
             throw super.convertHibernateAccessException(ex);
         }
-    }
-
-    public static boolean verificaAssociacioSenseCicles(
-            RolAssociacioRolEntity associacio, StringBuffer cami) {
-        RolEntity contingut = associacio.getRolContingut();
-        RolEntity pare = associacio.getRolContenidor();
-
-        // Método: Para todo T,D / T & D son RolEntity
-        // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
-        // (versión breve)
-        // exista un camino C(D1, T): D1 está contenido en T
-        //
-        // Obtenemos dónde está contenido el padre (el contenedor del rol)
-        // return true;
-        cami.append(contingut.getNom() + " => "); //$NON-NLS-1$
-        return verificaAssociacioSenseCicles(contingut, pare, cami);
-    }
-
-    public static boolean verificaAssociacioSenseCicles(RolEntity fill,
-            RolEntity pare, StringBuffer cami) {
-        Collection pareEsContingut = pare.getRolAssociacioRolSocContingut();
-        boolean senseCicles = true;
-        cami.append(pare.getNom() + " => "); //$NON-NLS-1$
-        for (Iterator it = pareEsContingut.iterator(); senseCicles
-                && it.hasNext();) {
-            RolAssociacioRolEntity relacio = (RolAssociacioRolEntity) it.next();
-            RolEntity parePare = relacio.getRolContenidor();
-            if (parePare.equals(fill)) {
-                senseCicles = false;
-                cami.append(parePare.getNom());
-                return false; // S'ha trobat un cicle
-            } else {
-                // Verificamos la descendencia del contenedor (padre)
-                senseCicles = verificaAssociacioSenseCicles(fill, parePare,
-                        cami);
-            }
-        }
-        return senseCicles;
     }
 
     public RolAssociacioRolEntity contenidorRolToEntity(
@@ -257,6 +221,10 @@ public class RolAssociacioRolEntityDaoImpl extends
         target.setRolName(source.getRolContingut().getNom());
         target.setDispatcher(source.getRolContingut().getBaseDeDades().getCodi());
         target.setInformationSystem(source.getRolContingut().getAplicacio().getCodi());
+        if (source.getStatus() == null)
+        	target.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
+        else
+        	target.setStatus( source.getStatus() );
     }
 
 }

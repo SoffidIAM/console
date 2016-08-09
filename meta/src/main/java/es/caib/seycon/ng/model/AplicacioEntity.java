@@ -64,6 +64,11 @@ public abstract class AplicacioEntity {
 	@Nullable
 	public String approvalProcess;
 
+	@Description ("Approval process needed for any change applied to this application roles. Null value means no approval process is needed")
+	@Column (name="APL_RODEPR", length=256)
+	@Nullable
+	public String roleDefinitionProcess;
+
 	/************************** DAOS *********************************************************/
 	
 	@ForeignKey (foreignColumn="SOD_APL_ID")

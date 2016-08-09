@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.comu;
 import java.util.Date;
 
+import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="RoleGrant",
@@ -73,4 +74,7 @@ public abstract class RolGrant {
 	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
 	@Nullable
 	public String holderGroup;
+	
+	@Nullable
+	public RoleDependencyStatus status;
 }

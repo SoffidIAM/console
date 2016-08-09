@@ -24,6 +24,7 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.RoleDependencyStatus;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
@@ -836,7 +837,38 @@ public class AplicacioServiceImpl extends
                     "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
         // Creamos la entidad asociada al VO Rol
-        getRolEntityDao().create(rolEntity);
+        rolEntity = getRolEntityDao().create(rol, true);
+
+        return getRolEntityDao().toRol(rolEntity);
+    }
+
+    protected Rol handleCreate2(Rol rol) throws Exception {
+        // if (usuariPotActualitzarAplicacio(rol.getCodiAplicacio())) {
+
+        RolEntity existingRole = getRolEntityDao()
+                .findByNameAndDispatcher(rol.getNom(),
+                        rol.getBaseDeDades());
+
+        // No permitim crear un rol amb el mateix nom y base de dades si ja
+        // existeix un altre
+        if (existingRole != null) {
+                String aplicacio = existingRole.getAplicacio()
+                        .getCodi();
+
+				throw new SeyconException(
+						String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
+								rol.getNom(), rol.getBaseDeDades(), aplicacio));
+        }
+
+        // Obtenemos la entidad asociada al VO
+        RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+        
+        if  (! getAutoritzacioService().hasPermission(Security.AUTO_ROLE_CREATE, rolEntity))
+            throw new SeyconAccessLocalException("AplicacioService", //$NON-NLS-1$
+                    "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
+                    Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
+        // Creamos la entidad asociada al VO Rol
+        rolEntity = getRolEntityDao().create(rol, true);
 
         return getRolEntityDao().toRol(rolEntity);
     }
@@ -867,7 +899,7 @@ public class AplicacioServiceImpl extends
         RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
         if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
-            getRolEntityDao().update(rolEntity); // actualizamos cambios del rol
+            rolEntity = getRolEntityDao().update(rol, false); // actualizamos cambios del rol
 
             return getRolEntityDao().toRol(rolEntity);
         }
@@ -990,7 +1022,7 @@ public class AplicacioServiceImpl extends
 			AplicacioEntity app = role.getAplicacio();
 			if (app != null && app.getApprovalProcess() != null)
 			{
-				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
+				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (def.isEmpty())
 					throw new InternalErrorException ("Approval process %s for application %s is not available",
 									app.getApprovalProcess(), app.getCodi());
@@ -1953,7 +1985,10 @@ public class AplicacioServiceImpl extends
 		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContenidor())
 		{
 			// Only propagate if domain value matches
-			if (matchesGranteeDomainValue (currentRol, ra))
+			if (matchesGranteeDomainValue (currentRol, ra) && 
+					(ra.getStatus() == null || 
+					 ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) ||
+					 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
 			{
 				for (AccountEntity ae: getAccountsForDispatcher(originUser,
 						originAccount, ra.getRolContingut().getBaseDeDades()))
@@ -2264,6 +2299,9 @@ public class AplicacioServiceImpl extends
 		
 		for (RolAssociacioRolEntity ra: rol.getRolAssociacioRolSocContingut())
 		{
+			if (ra.getStatus() == null || 
+					ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) || 
+					ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
 			populateParentGrantsForRol(radSet, ra.getRolContenidor(), originalGrant == null? ra: originalGrant);
 		}
 
@@ -2439,6 +2477,47 @@ public class AplicacioServiceImpl extends
 			throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					getPrincipal().getName(), name));
         }
+	}
+
+	@Override
+	protected Rol handleUpdate2(Rol rol) throws Exception {
+        RolEntity rolEntity = getRolEntityDao().rolToEntity(rol);
+        if (getAutoritzacioService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
+
+        	
+            rolEntity = getRolEntityDao().update(rol, true); // actualizamos cambios del rol
+            
+            return getRolEntityDao().toRol(rolEntity);
+            
+        }
+
+		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getCodiAplicacio()));
+	}
+
+	@Override
+	protected Rol handleApproveRoleDefinition(Rol rol) throws Exception {
+		RolEntity entity = getRolEntityDao().load(rol.getId());
+	    if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, entity)) {
+	    	getRolEntityDao().commitDefinition(entity);
+	    	return getRolEntityDao().toRol(entity);
+		}
+	    else
+	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getCodiAplicacio()));
+	
+	}
+
+	@Override
+	protected Rol handleDenyRoleDefinition(Rol rol) throws Exception {
+		RolEntity entity = getRolEntityDao().load(rol.getId());
+	    if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, entity)) {
+	    	getRolEntityDao().rollbackDefinition(entity);
+	    	return getRolEntityDao().toRol(entity);
+		}
+	    else
+	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getCodiAplicacio()));
 	}
 
 

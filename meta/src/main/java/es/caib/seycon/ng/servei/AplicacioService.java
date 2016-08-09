@@ -210,11 +210,24 @@ public abstract class AplicacioService {
 			roles.application_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Description ("This method does NOT add grants made to the new role")
 	public es.caib.seycon.ng.comu.Rol create(
 		es.caib.seycon.ng.comu.Rol rol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.application_create.class,
+			roles.application_update.class},
+			translated="create2")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Description ("This method does add grants made to the new role")
+	public es.caib.seycon.ng.comu.Rol create2(
+		es.caib.seycon.ng.comu.Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.application_create.class,
 			roles.application_update.class,roles.application_delete.class},
 			translated="delete")
@@ -223,14 +236,48 @@ public abstract class AplicacioService {
 		es.caib.seycon.ng.comu.Rol rol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
 	@Operation ( grantees={roles.application_update.class},
 			translated="update")
+	@Description("Updates role, including grantee roles and groups, but not roles granted to this one")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Rol update(
 		es.caib.seycon.ng.comu.Rol rol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( 
+			grantees={roles.application_update.class},
+			translated="update2")
+	@Description("Updates role, including roles granted to this role, and role and group grantee")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Rol update2(
+		es.caib.seycon.ng.comu.Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( 
+			grantees={roles.application_update.class})
+	@Description("Makes role dependencies persistent")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Rol approveRoleDefinition(
+		es.caib.seycon.ng.comu.Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( 
+			grantees={roles.application_update.class})
+	@Description("Makes role dependencies persistent")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Rol denyRoleDefinition(
+		es.caib.seycon.ng.comu.Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.user_role_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})

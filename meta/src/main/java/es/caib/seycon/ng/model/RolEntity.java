@@ -5,7 +5,12 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
+
+import es.caib.bpm.servei.BpmEngine;
+import es.caib.seycon.ng.comu.Rol;
 
 @Entity (table="SC_ROLES" )
 @Depends ({es.caib.seycon.ng.model.AplicacioEntity.class,
@@ -29,6 +34,7 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.AccountAccessEntity.class,
 	com.soffid.iam.model.RuleAssignedRoleEntity.class,
 	es.caib.seycon.ng.model.SoDRoleEntity.class,
+	BpmEngine.class,
 	LlistaCorreuEntity.class})
 public abstract class RolEntity {
 
@@ -105,6 +111,19 @@ public abstract class RolEntity {
 	@ForeignKey (foreignColumn="SOR_ROL_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.SoDRoleEntity> sodRules;
 
+	@Description("When an aproval process is needed to enable this rol grants")
+	@Column(name="ROL_APRPRO")
+	@Nullable
+	public Long approvalProcess;
+
+	@Column(name="ROL_APREND")
+	@Nullable
+	public Date approvalStart;
+
+	@Column(name="ROL_APRSTA")
+	@Nullable
+	public Date approvalEnd;
+
 	@DaoFinder("select rol \nfrom \nes.caib.seycon.ng.model.RolEntity rol \nwhere \nrol.aplicacio.codi = :codiAplicacio \norder by rol.nom, rol.baseDeDades.codi")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findByCodiAplicacio(
 		java.lang.String codiAplicacio) {
@@ -176,4 +195,26 @@ public abstract class RolEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+	
+	// Value object operations
+	
+	@DaoOperation
+	public RolEntity create (Rol role, boolean updateOwnedRoles)
+	{ return null; }
+
+	@DaoOperation
+	public RolEntity update (Rol role, boolean updateOwnedRoles)
+	{ return null; }
+
+	@DaoOperation
+	public void remove (Rol role)
+	{ return ; }
+
+	@DaoOperation
+	public void commitDefinition (RolEntity role)
+	{ return ; }
+
+	@DaoOperation
+	public void rollbackDefinition (RolEntity role)
+	{ return ; }
 }

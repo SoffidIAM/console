@@ -54,6 +54,10 @@ public abstract class RolAssociacioRolEntity {
 	@Nullable
 	public es.caib.seycon.ng.model.ValorDominiAplicacioEntity grantedDomainValue;
 
+	@Column (name="RRL_STATUS")
+	@Nullable
+	public com.soffid.iam.api.RoleDependencyStatus status;
+
 	@DaoFinder("select rolAssociacioRol.rolContenidor\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut.nom = :nomRol and\nrolAssociacioRol.rolContingut.aplicacio.codi = :codiAplicacio and\nrolAssociacioRol.rolContingut.baseDeDades.codi = :codiBBDD\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findContenidorsByNomRolCodiAplicacioCodiBBDD(
 		java.lang.String nomRol, 
@@ -77,6 +81,13 @@ public abstract class RolAssociacioRolEntity {
 		es.caib.seycon.ng.model.RolEntity rolContingut) {
 	 return null;
 	}
+
+	@DaoFinder("select rolAssociacioRol\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContenidor = :containerRole\n")
+	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findByContainer(
+		es.caib.seycon.ng.model.RolEntity containerRole) {
+	 return null;
+	}
+
 	public java.lang.String toString() {
 	 return null;
 	}

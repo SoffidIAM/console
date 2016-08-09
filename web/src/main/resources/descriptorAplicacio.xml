@@ -30,7 +30,7 @@
 			</script-finder>
 		</finder>
 		
-		<finder name="approvalProcess" type="approvalProcess">
+		<finder name="approvalProcess" type="process">
 			<script-finder>
 				engine = new javax.naming.InitialContext()
 					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
@@ -40,7 +40,7 @@
 				tv.setTag ("-");
 				tv.setValue(null);
 				list.add (tv);
-				for (def: engine.findProcessDefinitions (null, es.caib.bpm.vo.PredefinedProcessType.ROLE_APPROVAL))
+				for (def: engine.findProcessDefinitions (null, es.caib.bpm.vo.PredefinedProcessType.ROLE_GRANT_APPROVAL))
 				{
 					tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
 					tv.setTag (def.name);
@@ -52,9 +52,30 @@
 			</script-finder>
 		</finder>
 		
+		<finder name="definitionProcess" type="process">
+			<script-finder>
+				engine = new javax.naming.InitialContext()
+					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
+					.create();
+				java.util.LinkedList list = new java.util.LinkedList ();
+				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+				tv.setTag ("-");
+				tv.setValue(null);
+				list.add (tv);
+				for (def: engine.findProcessDefinitions (null, es.caib.bpm.vo.PredefinedProcessType.ROLE_DEFINITION_APPROVAL))
+				{
+					tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
+					tv.setTag (def.name);
+					tv.setValue(def.name);
+				
+					list.add (tv);
+				}
+				return list;
+			</script-finder>
+		</finder>
 	</datanode>
 
-	<datanode name="approvalProcess" transient="true" >
+	<datanode name="process" transient="true" >
 		
 	</datanode>
 	
@@ -81,7 +102,7 @@
 	</datanode>
 
 	<datanode name="aplicacio">
-		<finder name="rol" type="rol">  <!-- application:query -->
+		<finder name="rol" type="rol" refreshAfterCommit="true">  <!-- application:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRolsByCodiAplicacio">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
@@ -221,13 +242,13 @@
 	
 	<datanode name="rol">
 		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
-			<insert-method method="create" returnBean="true">
+			<insert-method method="create2" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
 			<delete-method method="delete">
 				<parameter value="${instance}" />
 			</delete-method>
-			<update-method method="update">
+			<update-method method="update2">
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>

@@ -515,16 +515,24 @@
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.GestionableperWorkfl')}"/>
-										<div style="width: 100%; display: inline">
-											<checkbox id="gestionable_wf" bind="@gestionableWF"
+										<checkbox id="gestionable_wf" bind="@gestionableWF"
 												disabled="${!canModifyAplicacio}" onCheck=""/>
+									</row>
+									<row>
 											<input_etiqueta value="${c:l('aplicacions.zul.Process')}"/>
 											<listbox mold="select" bind="@approvalProcess" dataPath="/model:/approvalProcess" width="20em" disabled="${!canModifyAplicacio}" >
 												<dataitem bind="@value">
 													<listcell bind="@tag"></listcell>
 												</dataitem>
 											</listbox>
-										</div>
+									</row>
+									<row>
+											<input_etiqueta value="${c:l('aplicacions.zul.DefinitionProcess')}"/>
+											<listbox mold="select" bind="@roleDefinitionProcess" dataPath="/model:/definitionProcess" width="20em" disabled="${!canModifyAplicacio}" >
+												<dataitem bind="@value">
+													<listcell bind="@tag"></listcell>
+												</dataitem>
+											</listbox>
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.Correunotificacions')}"/>

@@ -19,6 +19,9 @@ import java.util.LinkedList;
 import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.logging.Log;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.comu.AgentStatusInfo;
 import es.caib.seycon.ng.comu.Configuracio;
@@ -178,6 +181,7 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
             return agentstatus != null ? agentstatus : new LinkedList<AgentStatusInfo>();
 
         } catch (Throwable th) {
+        	LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
             throw new SeyconException(String.format(
                     Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
         }
@@ -617,7 +621,6 @@ public class SeyconServerServiceImpl extends es.caib.seycon.ng.servei.SeyconServ
                     serversInfo.add(info);
                 }
             } catch (Throwable th) {
-                // th.printStackTrace();
                 // url, versio, estat, numAgents, numTasquesPendents, sso,
                 // jetty, ssoDaemon, taskGenerator, caducitatRootCertificate,
                 // caducitatMainCertificate, dataActualServer,

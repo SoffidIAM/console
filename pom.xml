@@ -115,21 +115,6 @@
       </plugins>
     </pluginManagement>
   </build>
-  <modules>
-    <module>meta</module>
-    <module>deployer</module>
-    <module>common</module>
-    <module>core</module>
-    <module>legacy</module>
-    <module>bpm-sar</module>
-    <module>weblogout</module>
-    <module>web</module>
-    <module>selfservice</module>
-    <module>webservice</module>
-    <module>upload-components</module>
-    <module>ear</module>
-    <module>install</module>
-  </modules>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -465,4 +450,42 @@
       <url>${soffid.deploy.site.url}/console</url>
     </site>
   </distributionManagement>
+  <profiles>
+     <profile>
+        <id>ear</id>
+ 		<modules>
+   			<module>meta</module>
+   			<module>common</module>
+   			<module>core</module>
+   			<module>legacy</module>
+   			<module>weblogout</module>
+   			<module>web</module>
+   			<module>selfservice</module>
+   			<module>webservice</module>
+   			<module>upload-components</module>
+   			<module>ear</module>
+ 		</modules>
+	 </profile>
+     <profile>
+        <id>default</id>
+        <activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+  		<modules>
+    		<module>meta</module>
+    		<module>deployer</module>
+    		<module>common</module>
+    		<module>core</module>
+    		<module>legacy</module>
+    		<module>bpm-sar</module>
+    		<module>weblogout</module>
+    		<module>web</module>
+    		<module>selfservice</module>
+    		<module>webservice</module>
+    		<module>upload-components</module>
+    		<module>ear</module>
+    		<module>install</module>
+  		</modules>
+	 </profile>
+   </profiles>
 </project>

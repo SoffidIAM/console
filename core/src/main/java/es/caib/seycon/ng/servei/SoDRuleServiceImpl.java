@@ -15,6 +15,7 @@ import es.caib.seycon.ng.comu.SoDRole;
 import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AplicacioEntity;
+import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.SoDRoleEntity;
 import es.caib.seycon.ng.model.SoDRuleEntity;
@@ -319,6 +320,11 @@ public class SoDRuleServiceImpl extends SoDRuleServiceBase
 					rules.add(rule);
 				}
 			}
+		}
+		// Now check inherited rules
+		for ( RolAssociacioRolEntity childRole: role.getRolAssociacioRolSocContenidor()) 
+		{
+			rules.addAll(doFindSodNonCompliances(childRole.getRolContingut(), rols));
 		}
 		return rules;
 	}

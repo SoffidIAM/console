@@ -999,7 +999,7 @@ public class AplicacioServiceImpl extends
 	private boolean needsWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
 	{
 		RolEntity role = rolAccountEntity.getRol();
-		if (role != null && "S".equals(role.getGestionableWF()))
+		if (role != null )
 		{
 			AplicacioEntity app = role.getAplicacio();
 			if (app != null && app.getApprovalProcess() != null)
@@ -1017,7 +1017,7 @@ public class AplicacioServiceImpl extends
 	private void launchWorkflowApprovalProcess (RolAccountEntity rolAccountEntity) throws InternalErrorException
 	{
 		RolEntity role = rolAccountEntity.getRol();
-		if (role != null && "S".equals(role.getGestionableWF()))
+		if (role != null)
 		{
 			AplicacioEntity app = role.getAplicacio();
 			if (app != null && app.getApprovalProcess() != null)

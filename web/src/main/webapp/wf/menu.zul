@@ -4,11 +4,13 @@
     <zscript>
     <![CDATA[
   	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+  	import es.caib.seycon.ng.utils.Security;
   	
   	boolean admin = AutoritzacionsUsuari.canAdminWorkflows();
 
 	// Control d'accés del SEU
 	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
+	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
 	boolean canViewGrups =  AutoritzacionsUsuari.hasViewGrupsSEU();		
 	boolean canViewDadesAddicionals = AutoritzacionsUsuari.hasViewDadesAddicionalsSEU();		
 	boolean canViewTipusUOrganitzativa = AutoritzacionsUsuari.hasViewTipusUOSEU();
@@ -127,7 +129,7 @@
 		    			</treechildren>
     				</treeitem>
     				<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->	
-    				<treeitem id="recursostecnologics" if="${canViewXarxes || canViewMaquines || canViewImpressores || canViewServeis || canViewAccounts}" open="false">
+    				<treeitem id="recursostecnologics" if="${canViewVault || canViewXarxes || canViewMaquines || canViewImpressores || canViewServeis || canViewAccounts}" open="false">
     					<treerow>
     						<treecell label="${c:l('seu.recursostecnologics')}" onClick="recursostecnologics.setOpen ( ! recursostecnologics.isOpen() )"/>
     					</treerow>
@@ -155,6 +157,11 @@
 		    			<treeitem>
 		    				<treerow>
 		    					<apptreecell if="${canViewAccounts}" langlabel="seu.accounts" pagina="/accounts/accounts.zul"/>
+		    				</treerow>
+		    			</treeitem>		    		
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewVault}" langlabel="seu.vault" pagina="/vault/vault.zul"/>
 		    				</treerow>
 		    			</treeitem>		    		
 		    		</treechildren>

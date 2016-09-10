@@ -2,13 +2,44 @@
 
 <zkib-model>
 	<datanode name="root">
-		<finder name="query" type="query">
-			<script-finder>
-				import es.caib.seycon.ng.comu.*;
-				q = new AccountCriteria ();
-				q.setExcludeType ( AccountType.USER);
-				return q;
-			</script-finder>
+		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				 method="findFolders" >
+				<parameter value="${filter}" />
+			</ejb-finder>
+			<new-instance-script>
+				bean = new com.soffid.iam.api.VaultFolder();
+				bean.setGrantedUsers ( new LinkedList()) ;
+				bean.setGrantedRoles (new LinkedList());
+				bean.setGrantedGroups (new LinkedList());
+				bean.setManagerUsers ( new LinkedList()) ;
+				bean.setManagerRoles (new LinkedList());
+				bean.setManagerGroups (new LinkedList());
+				bean.setOwnerUsers ( new LinkedList()) ;
+				bean.setOwnerRoles (new LinkedList());
+				bean.setOwnerGroups (new LinkedList());
+				return bean;
+			</new-instance-script>
+		</finder>
+		<finder name="account" type="account">
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="findAccounts" > <!--agent:query, application:update -->
+				<parameter value="${filter}" />
+			</ejb-finder>
+			<new-instance-script>
+				bean = new es.caib.seycon.ng.comu.Account();
+				bean.setType(es.caib.seycon.ng.comu.AccountType.SHARED);
+				bean.setGrantedUsers ( new LinkedList()) ;
+				bean.setGrantedRoles (new LinkedList());
+				bean.setGrantedGroups (new LinkedList());
+				bean.setManagerUsers ( new LinkedList()) ;
+				bean.setManagerRoles (new LinkedList());
+				bean.setManagerGroups (new LinkedList());
+				bean.setOwnerUsers ( new LinkedList()) ;
+				bean.setOwnerRoles (new LinkedList());
+				bean.setOwnerGroups (new LinkedList());
+				return bean;
+			</new-instance-script>
 		</finder>
 		<finder name="type" type="type">
 			<script-finder>
@@ -36,10 +67,54 @@
 				<parameter value="${null}" />
 			</ejb-finder>
 		</finder>
-		<finder name="account" type="account">
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
-				method="findAccountsByCriteria" if="${queryEnabled}"> <!--agent:query, application:update -->
-				<parameter value="${self.query[0].instance}" />
+		<finder name="tipusUsuari" type="tipusUsuari">
+			<script-finder>
+				obj = new es.caib.seycon.ng.comu.TipusUsuari();
+				obj.descripcio = " - Select user type - ";
+				return obj;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
+			</ejb-finder>
+		</finder>		
+	</datanode>
+ 
+	<datanode name="folder">
+		<ejb-handler jndi="java:comp/env/ejb/VaultServiceEJB">
+			<insert-method method="create" returnBean="true" >  <!-- user:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="remove">    
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> <!-- user:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		
+		</ejb-handler>
+
+		<finder name="folder" type="folder">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="getChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-script>
+				bean = new com.soffid.iam.api.VaultFolder();
+				bean.setGrantedUsers ( new LinkedList()) ;
+				bean.setGrantedRoles (new LinkedList());
+				bean.setGrantedGroups (new LinkedList());
+				bean.setManagerUsers ( new LinkedList()) ;
+				bean.setManagerRoles (new LinkedList());
+				bean.setManagerGroups (new LinkedList());
+				bean.setOwnerUsers ( new LinkedList()) ;
+				bean.setOwnerRoles (new LinkedList());
+				bean.setOwnerGroups (new LinkedList());
+				return bean;
+			</new-instance-script>
+		</finder>
+		<finder name="account" type="account">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="list">
+				<parameter value="${instance}" />
 			</ejb-finder>
 			<new-instance-script>
 				bean = new es.caib.seycon.ng.comu.Account();
@@ -56,32 +131,10 @@
 				return bean;
 			</new-instance-script>
 		</finder>
-		<finder name="tipusUsuari" type="tipusUsuari">
-			<script-finder>
-				obj = new es.caib.seycon.ng.comu.TipusUsuari();
-				obj.descripcio = " - Select user type - ";
-				return obj;
-			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
-			</ejb-finder>
-		</finder>		
-		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				 method="findFolders" >
-				<parameter value="${null}" />
-			</ejb-finder>
-		</finder>
-	</datanode>
-
-	<datanode name="query" transient="true" />
-
-	<datanode name="folder" transient="true" >
-		<finder name="folder" type="folder">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				method="getChildren">
-				<parameter value="${instance}" />
-			</ejb-finder>
-		</finder>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" maxLength="256" friendlyName="vault.folder.name"/>
+			<attribute-validator expr="${instance.description}" notNull="true" maxLength="1024" friendlyName="vault.folder.description"/>
+		</validator>
 	</datanode>
 
 	<datanode name="type" transient="true">
@@ -184,12 +237,21 @@
 			</ejb-finder>
 		</finder>
 		
+		<finder name="owner" type="void">
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+				method="getHPAccountOwner">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
 			<attribute-validator expr="${instance.dispatcher}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
 			<attribute-validator expr="${instance.passwordPolicy}" notNull="true" friendlyName="accounts.passwordPolicyValidation"/>
 		</validator>
 	</datanode>
+	
+	<datanode name="void" />
 	
 	<datanode name="grantedUser">
 		<collection-handler collection="${self.instance.grantedUsers}"/>

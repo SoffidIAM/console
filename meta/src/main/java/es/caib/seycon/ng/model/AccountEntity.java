@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
 
@@ -72,6 +73,18 @@ public abstract class AccountEntity {
 	@Column (name="ACC_DISABL",
 		defaultValue="false")
 	public boolean disabled;
+
+	@Column (name="ACC_VAF_ID", reverseAttribute="accounts")
+	@Nullable
+	VaultFolderEntity folder;
+	
+	@Column (name="ACC_INHPER", defaultValue="false")
+	@Nullable
+	Boolean inheritNewPermissions;
+
+	@Column (name="ACC_URL")
+	@Nullable
+	String loginUrl;
 
 	@ForeignKey (foreignColumn="APW_ACC_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountPasswordEntity> passwords;

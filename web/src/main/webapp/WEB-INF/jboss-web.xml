@@ -15,6 +15,12 @@
 		</jndi-name>
 	</ejb-ref>
 	<ejb-ref>
+		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
+		<jndi-name>
+			soffid/ejb/com.soffid.iam.service.VaultService
+		</jndi-name>
+	</ejb-ref>
+	<ejb-ref>
 		<ejb-ref-name>ejb/GrupEJB</ejb-ref-name>
 		<jndi-name>
 			soffid/ejb/es.caib.seycon.ng.servei.GrupService

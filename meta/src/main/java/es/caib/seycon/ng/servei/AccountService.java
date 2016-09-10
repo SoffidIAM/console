@@ -7,8 +7,11 @@
 package es.caib.seycon.ng.servei;
 import java.util.List;
 
+import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.iam.service.VaultService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -46,7 +49,9 @@ import roles.account_attribute_update;
 	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
 	AuditoriaService.class,
-	BpmEngine.class})
+	BpmEngine.class,
+	VaultService.class,
+	VaultFolderEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

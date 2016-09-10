@@ -91,4 +91,16 @@ public abstract class Account {
 	@Description("Read only attribute. Access level. See access level constants")
 	@Nullable
 	AccountAccessLevelEnum accessLevel;
+	
+	@Nullable
+	Long vaultFolderId;
+	
+	@Nullable
+	String vaultFolder;
+
+	@Attribute(defaultValue="false")
+	boolean inheritNewPermissions;
+
+	@Nullable
+	String loginUrl;
 }

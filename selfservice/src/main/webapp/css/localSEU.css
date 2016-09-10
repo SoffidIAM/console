@@ -460,3 +460,36 @@ body
     color: black;
     text-indent: 20px;
 }
+
+
+.noBorderGrid tr.z-row td.z-row-inner, tr.z-row .z-cell, div.z-grid { border: none;  }
+.noBorderGrid div.grid-body tbody tr td.gc {border: none;}
+tr.noBorderGrid td.gc, tr.noBorderGrid { background-color: white;}  
+
+
+/* Botons */
+button.small-button {
+	background-color: white;
+	border: 1px solid #9EC73C;
+	border-image: none;
+	padding: 0px;
+	margin-left: 4px;
+	margin-right: 4px;
+	color: #7F9FC2;
+	height: 2em;
+ 	border-radius: 8px;
+ 	font-size: 10px;
+}	
+
+/* Buttons */
+button:hover, input[type="button"]:hover {
+	background-color: #9EC73C;
+	color: white;
+}
+
+button.small-button img {
+	height: 1em;
+	vertical-align: baseline;
+}
+
+

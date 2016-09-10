@@ -46,6 +46,24 @@
 							</treecell>
 						</treerow>
 					</treeitemfinder>
+					<treeitemfinder bind="." open="false" path="/folder">
+						<treerow sclass="fons">
+							<treecell>
+								<image align="center" height="15px" width="15px" onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label value="  " onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label bind="@name" onClick="p_selfService.openTree(self.parent.parent.parent)"/> 
+							</treecell>
+						</treerow>
+					</treeitemfinder>
+					<treeitemfinder bind="." open="false" path="/folderAccount">
+						<treerow sclass="fons">
+							<treecell>
+								<image align="center" height="15px" width="15px" onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label value="  " onClick="p_selfService.openTree(self.parent.parent.parent)"/>
+								<label bind="@name" onClick="p_selfService.openTree(self.parent.parent.parent)"/> 
+							</treecell>
+						</treerow>
+					</treeitemfinder>
 				</tree>
 			</div>
 			<div class="wrap">

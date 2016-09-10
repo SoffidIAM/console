@@ -262,14 +262,19 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			acc.setDispatcher(getDispatcherEntityDao().findByCodi(account.getDispatcher()));
 			acc.setName(account.getName());
 			acc.setType(account.getType());
+			acc.setInheritNewPermissions(account.isInheritNewPermissions());
 			TipusUsuariEntity tu = getTipusUsuariEntityDao().findByCodi(account.getPasswordPolicy());
 			if (tu == null)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
 			acc.setPasswordPolicy( tu );
 			getAccountEntityDao().create(acc);
 			updateAcl (acc, account);
+			
+			account.setId(acc.getId());
+			account = getVaultService().addToFolder(account);
+			
 			createAccountTask(acc);
-			return getAccountEntityDao().toAccount(acc);
+			return account;
 		}
 		else
 		{
@@ -528,6 +533,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		else
 			updateAcl(ae, account);
 		getAccountEntityDao().update(ae);
+
+		getVaultService().addToFolder(account);
+
 		createAccountTask(ae);
 	}
 

@@ -17,6 +17,8 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 import org.zkoss.image.*;
 import org.zkoss.zul.*;
 
+import com.soffid.iam.api.VaultFolder;
+
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -294,14 +296,18 @@ public class SelfServiceHandler extends Frame
 	void carregaIcona(Component r) throws IOException{
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
 		try {
-			PuntEntrada pe = (PuntEntrada) ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
-			if (pe != null)
+			Object value = ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
+			if (value != null && value instanceof PuntEntrada)
 			{
+				PuntEntrada pe = (PuntEntrada) value;
 				byte [] imgIcona1 = pe.getImgIcona1();
 				String tm = pe.getMenu();
 				org.zkoss.zul.Image img = (Image) ((Component)
 							((Component)r.getChildren().get(0))
 						.getChildren().get(0)).getChildren().get(0);
+				Treeitem item = (Treeitem) r;
+				if (tm.equals("N"))
+					item.getTreechildren().setParent(null);
 				if (imgIcona1 != null)
 				{
 					img.setContent(new AImage(pe.getId().toString(), imgIcona1));
@@ -317,6 +323,26 @@ public class SelfServiceHandler extends Frame
 							.getChildren().get(0))
 						.getChildren().get(2))
 					.setStyle("color: #EEEEEE; ");
+			} else if (value instanceof VaultFolder) {
+				org.zkoss.zul.Image img = (Image) ((Component)
+						((Component)r.getChildren().get(0))
+					.getChildren().get(0)).getChildren().get(0);
+				img.setSrc("/img/root.gif");
+			} else if (value instanceof Account){
+				String url = (String) ((Account)value).getAttributes().get("SSO:URL");
+				if (url == null || url.trim().length() == 0)
+					((HtmlBasedComponent)
+						((Component)
+							((Component)r.getChildren().get(0))
+							.getChildren().get(0))
+						.getChildren().get(2))
+					.setStyle("color: #EEEEEE; ");
+
+				org.zkoss.zul.Image img = (Image) ((Component)
+						((Component)r.getChildren().get(0))
+					.getChildren().get(0)).getChildren().get(0);
+				img.setSrc("/img/punt-verd.gif");
+				
 			}
 		} catch (NullPointerException e) {
 		} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {}
@@ -368,6 +394,14 @@ public class SelfServiceHandler extends Frame
 					Messagebox.show("Cannot execute");
 			}
 				
+		} else if (obj instanceof Account) {
+			Account account = (Account) obj;
+			String url = (String) account.getAttributes().get("SSO:URL");
+			if (url != null)
+			{
+				url.replaceAll("'", "\\'");
+				Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+			}
 		}
 	}
 	

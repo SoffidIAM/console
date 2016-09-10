@@ -1219,31 +1219,31 @@
 
 	<autoritzacio>
 		<codi>account:create</codi>
-		<descripcio>Create high risk accounts</descripcio>
+		<descripcio>Create shared accounts</descripcio>
 		<ambit>Accounts</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>account:update</codi>
-		<descripcio>Update hight risk accounts</descripcio>
+		<descripcio>Update shared accounts</descripcio>
 		<ambit>Accounts</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>account:query</codi>
-		<descripcio>Query high risk accounts</descripcio>
+		<descripcio>Query shared accounts</descripcio>
 		<ambit>Accounts</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>account:delete</codi>
-		<descripcio>Delete high risk accounts</descripcio>
+		<descripcio>Delete shared accounts</descripcio>
 		<ambit>Accounts</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>account:password</codi>
-		<descripcio>Change account password</descripcio>
+		<descripcio>Change shared account password</descripcio>
 		<ambit>Accounts</ambit>
 	</autoritzacio>
 
@@ -1324,6 +1324,12 @@
 	<autoritzacio>
 		<codi>sso:createAccount</codi>
 		<descripcio>Create shared accounts using SSO</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>sso:createSharedFolders</codi>
+		<descripcio>Create root shared folders</descripcio>
 		<ambit>SelfService</ambit>
 	</autoritzacio>
 

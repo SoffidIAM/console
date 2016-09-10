@@ -19,7 +19,7 @@
 		    </treeitem>
 			<treeitem>
 		    	<treerow>
-		    		<apptreecell langlabel="selfService.SharedAccounts" if="${canManageSharedAccounts}" pagina="sharedAccounts/sharedAccounts.zul"/>  <!--Això és el que ha d'anar quan es llevi el js -->
+		    		<apptreecell langlabel="selfService.SharedAccounts" if="${canManageSharedAccounts}" pagina="vault/vault.zul"/> 
 		    	</treerow>
 		    </treeitem>
     		<treeitem>

@@ -195,6 +195,18 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 				atts.put(vd.getCodiDada(), vd.getValorDada());
 		}
 		
+		// Assign vault folder
+		if (source.getFolder() == null)
+		{
+			target.setVaultFolder(null);
+			target.setVaultFolderId(null);
+		}
+		else
+		{
+			target.setVaultFolder(source.getFolder().getName());
+			target.setVaultFolderId(source.getFolder().getId());
+		}
+		
 		try {
 			target.setAccessLevel(getAccessLevel ( source));
 		} catch (InternalErrorException e) {

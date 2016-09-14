@@ -599,12 +599,12 @@
 											<div style="padding: 0 5px 0 0; overflow: hidden">
 												<input_dada
 													id="txtAccountName" bind="@name"
-													maxlength="10"
+													maxlength="128"
 													multiline_custom="false" width_custom="95%" />
 												<textbox sclass="textbox"
 													id="txtAccountName2" 
 													onChange="onChangeAccountName(self)"
-													maxlength="10"
+													maxlength="128"
 													multiline="false" width="90%" />
 											</div>
 										</div>
@@ -662,7 +662,7 @@
 											value="${c:l('accounts.description')}:" />
 										<input_dada
 											id="txtAccountDescription" bind="@description"
-											maxlength="50"
+											maxlength="255"
 											multiline_custom="false" width_custom="97%" />
 									</row>
 									<row id="urlRow">

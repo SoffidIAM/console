@@ -34,7 +34,7 @@ public abstract class VaultFolderAccessEntity {
 	public es.caib.seycon.ng.model.UsuariEntity user;
 
 	@Description ("Granted folder")
-	@Column (name="VFA_VAF_ID", reverseAttribute="acl")
+	@Column (name="VFA_VAF_ID", reverseAttribute="acl", cascadeDelete=true)
 	public VaultFolderEntity vault;
 
 	@Description ("Access level")

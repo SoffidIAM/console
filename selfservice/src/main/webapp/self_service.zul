@@ -60,7 +60,7 @@
 							<treecell>
 								<image align="center" height="15px" width="15px" onClick="p_selfService.openTree(self.parent.parent.parent)"/>
 								<label value="  " onClick="p_selfService.openTree(self.parent.parent.parent)"/>
-								<label bind="@name" onClick="p_selfService.openTree(self.parent.parent.parent)"/> 
+								<label bind="@description" onClick="p_selfService.openTree(self.parent.parent.parent)"/> 
 							</treecell>
 						</treerow>
 					</treeitemfinder>

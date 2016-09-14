@@ -296,39 +296,46 @@ public class SelfServiceHandler extends Frame
 	void carregaIcona(Component r) throws IOException{
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
 		try {
+			org.zkoss.zul.Image img = null ;
+			Treeitem item = (Treeitem) r;
+			Treerow row = item.getTreerow();
+			if ( row != null && row.getChildren().size() > 0)
+			{
+				Treecell c = (Treecell) row.getChildren().get(0);
+				if ( c.getChildren().size() > 0)
+				{
+					img = (Image) c.getChildren().get(0);
+				}
+			}
 			Object value = ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
 			if (value != null && value instanceof PuntEntrada)
 			{
 				PuntEntrada pe = (PuntEntrada) value;
 				byte [] imgIcona1 = pe.getImgIcona1();
 				String tm = pe.getMenu();
-				org.zkoss.zul.Image img = (Image) ((Component)
-							((Component)r.getChildren().get(0))
-						.getChildren().get(0)).getChildren().get(0);
-				Treeitem item = (Treeitem) r;
 				if (tm.equals("N"))
 					item.getTreechildren().setParent(null);
-				if (imgIcona1 != null)
+				if (img != null)
 				{
-					img.setContent(new AImage(pe.getId().toString(), imgIcona1));
-				} else if (imgIcona1 == null && tm != null && tm.equals("S")){
-					img.setSrc("/img/root.gif");
-				} else if (imgIcona1 == null && tm != null && tm.equals("N")){
-					img.setSrc("/img/punt-verd.gif");
+					if (imgIcona1 != null)
+					{
+						img.setContent(new AImage(pe.getId().toString(), imgIcona1));
+					} else if (imgIcona1 == null && tm != null && tm.equals("S")){
+						img.setSrc("/img/root.gif");
+					} else if (imgIcona1 == null && tm != null && tm.equals("N")){
+						img.setSrc("/img/punt-verd.gif");
+					}
+					if (tm.equals("N") && pe.getExecucions().isEmpty())
+						((HtmlBasedComponent)
+							((Component)
+								((Component)r.getChildren().get(0))
+								.getChildren().get(0))
+							.getChildren().get(2))
+						.setStyle("color: #EEEEEE; ");
 				}
-				if (tm.equals("N") && pe.getExecucions().isEmpty())
-					((HtmlBasedComponent)
-						((Component)
-							((Component)r.getChildren().get(0))
-							.getChildren().get(0))
-						.getChildren().get(2))
-					.setStyle("color: #EEEEEE; ");
-			} else if (value instanceof VaultFolder) {
-				org.zkoss.zul.Image img = (Image) ((Component)
-						((Component)r.getChildren().get(0))
-					.getChildren().get(0)).getChildren().get(0);
+			} else if (value instanceof VaultFolder && img != null) {
 				img.setSrc("/img/root.gif");
-			} else if (value instanceof Account){
+			} else if (value instanceof Account && img != null){
 				String url = (String) ((Account)value).getAttributes().get("SSO:URL");
 				if (url == null || url.trim().length() == 0)
 					((HtmlBasedComponent)
@@ -337,10 +344,6 @@ public class SelfServiceHandler extends Frame
 							.getChildren().get(0))
 						.getChildren().get(2))
 					.setStyle("color: #EEEEEE; ");
-
-				org.zkoss.zul.Image img = (Image) ((Component)
-						((Component)r.getChildren().get(0))
-					.getChildren().get(0)).getChildren().get(0);
 				img.setSrc("/img/punt-verd.gif");
 				
 			}
@@ -457,10 +460,13 @@ public class SelfServiceHandler extends Frame
 		if (s == null || s.trim().isEmpty())
 		{
 			v.declareVariable("query", false);
+			v.declareVariable("queryName", null);
 		} else {
 			v.declareVariable("query", true);
 			v.declareVariable("queryName", s);
 		}
 		((DataNodeCollection)model.getValue("/moure")).refresh();
+		((DataNodeCollection)model.getValue("/folder")).refresh();
+		((DataNodeCollection)model.getValue("/folderAccount")).refresh();
 	}
 }

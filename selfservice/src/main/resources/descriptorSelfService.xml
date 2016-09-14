@@ -21,7 +21,13 @@
 		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
 				 method="findFolders" >
-				<parameter value="${null}" />
+				<parameter value="${queryName}" />
+			</ejb-finder>
+		</finder>
+		<finder name="folderAccount" type="folderAccount">
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="findAccounts" > <!--agent:query, application:update -->
+				<parameter value="${queryName}" />
 			</ejb-finder>
 		</finder>
 	</datanode>

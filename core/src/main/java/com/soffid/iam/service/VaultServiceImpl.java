@@ -52,9 +52,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 			if (newFolderEntity != oldFolderEntity)
 			{
 				accountEntity.setFolder(newFolderEntity);
-				if (accountEntity.getInheritNewPermissions() == null ||
-						accountEntity.getInheritNewPermissions().booleanValue())
-					setAccountPermissions (accountEntity);
+				if (newFolderEntity.getPersonal() ||
+						oldFolderEntity == null ||
+						oldFolderEntity.getPersonal())
+					accountEntity.setInheritNewPermissions(true);
+					
+				setAccountPermissions (accountEntity);
 				getAccountEntityDao().update(accountEntity);
 				account = getAccountEntityDao().toAccount(accountEntity);
 			}

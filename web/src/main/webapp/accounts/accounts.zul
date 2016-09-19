@@ -706,6 +706,7 @@
 										<account_acl id="managerAcl" userList="managerUsers" groupList="managerGroups" roleList="managerRoles"/>
 										<label value="${c:l('accounts.userAccess')}" />
 										<account_acl id="userAcl" userList="grantedUsers" groupList="grantedGroups" roleList="grantedRoles"/>
+										<checkbox id="inheritNewPermissionsCheckbox" bind="@inheritNewPermissions" label="${c:l('vault.account.inheritPermissions')}"></checkbox>
 									</vbox>
 								</hbox>
 							</tabpanel>

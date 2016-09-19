@@ -54,6 +54,9 @@ public class VaultService {
 	public VaultFolder update (VaultFolder folder) { return null; }
 
 	@Operation(grantees={Tothom.class})
+	public VaultFolder findFolder (long id) { return null; }
+
+	@Operation(grantees={Tothom.class})
 	public void remove (VaultFolder folder) { return; }
 
 	@Operation(grantees={Tothom.class})

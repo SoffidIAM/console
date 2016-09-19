@@ -149,9 +149,10 @@ public abstract class AccountService {
 	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
 			translated="updateAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void updateAccount(
+	public Account updateAccount(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
+		return null;
 	}
 	
 	/**

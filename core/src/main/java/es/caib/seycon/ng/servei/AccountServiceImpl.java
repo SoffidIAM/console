@@ -459,7 +459,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	}
 
 	@Override
-	protected void handleUpdateAccount(es.caib.seycon.ng.comu.Account account)
+	protected Account handleUpdateAccount(es.caib.seycon.ng.comu.Account account)
 			throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
@@ -534,9 +534,11 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			updateAcl(ae, account);
 		getAccountEntityDao().update(ae);
 
-		getVaultService().addToFolder(account);
+		account = getVaultService().addToFolder(account);
 
 		createAccountTask(ae);
+		
+		return account;
 	}
 
 	private void createUserTask(UsuariEntity ue) {

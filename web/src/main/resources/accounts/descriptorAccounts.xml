@@ -110,7 +110,7 @@
 			<delete-method method="removeAccount">    
 				<parameter value="${instance}" />
 			</delete-method>
-			<update-method method="updateAccount"> <!-- user:update -->
+			<update-method method="updateAccount" returnBean="true"> <!-- user:update -->
 				<parameter value="${instance}" />
 			</update-method>
 		

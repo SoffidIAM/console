@@ -53,11 +53,13 @@ public class VaultServiceImpl extends VaultServiceBase {
 			{
 				accountEntity.setFolder(newFolderEntity);
 				if (newFolderEntity.getPersonal() ||
-						oldFolderEntity == null ||
-						oldFolderEntity.getPersonal())
+						(oldFolderEntity != null && 
+						oldFolderEntity.getPersonal()) )
 					accountEntity.setInheritNewPermissions(true);
 					
-				setAccountPermissions (accountEntity);
+				if (accountEntity.getInheritNewPermissions() != null &&
+						accountEntity.getInheritNewPermissions().booleanValue())
+					setAccountPermissions (accountEntity);
 				getAccountEntityDao().update(accountEntity);
 				account = getAccountEntityDao().toAccount(accountEntity);
 			}
@@ -67,7 +69,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	private void setAccountPermissions(AccountEntity accountEntity) {
 		// Remove previous permissions
-		for ( AccountAccessEntity aae: accountEntity.getAcl())
+		for ( AccountAccessEntity aae: new LinkedList<AccountAccessEntity> (accountEntity.getAcl()))
 		{
 			getAccountAccessEntityDao().remove (aae);
 		}
@@ -81,6 +83,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 				AccountAccessEntity aae = generateAccountAccessEntity(fae,
 						accountEntity);
 				getAccountAccessEntityDao().create(aae);
+				accountEntity.getAcl().add(aae);
 			}
 		}
 	}
@@ -236,6 +239,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 		}
 		Collections.sort(accounts, new Comparator<Account>() {
 			public int compare(Account o1, Account o2) {
+				if (o1.getDescription() == null && o2.getDescription() == null) return 0;
+				else if (o2.getDescription() == null) return -1;
+				else if (o1.getDescription() == null) return +1;
 				return o1.getDescription().compareTo(o2.getDescription());
 			}
 			
@@ -884,4 +890,14 @@ public class VaultServiceImpl extends VaultServiceBase {
 		}
 	}
 
+	@Override
+	protected VaultFolder handleFindFolder(long id) throws Exception {
+		VaultFolderEntity entity = getVaultFolderEntityDao().load(id);
+		VaultFolder folder = getVaultFolderEntityDao().toVaultFolder(entity);
+		
+		if (folder.getAccessLevel().equals (AccountAccessLevelEnum.ACCESS_NONE))
+			return null;
+		else
+			return folder;
+	}
 }

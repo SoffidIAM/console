@@ -54,7 +54,6 @@
 				"managerUsers", "managerGroups", "managerRoles",
 				"ownerUsers", "ownerGroups", "ownerRoles"} )
 		{
-			System.out.println ("COPYING :" +parentPath+ " / "+pathToCopy);
 			for (Iterator it = model.getJXPathContext().iterate(parentPath+"/"+pathToCopy);
 					it.hasNext();)
 			{
@@ -97,7 +96,13 @@
 		innerWindow.setTitle(org.zkoss.util.resource.Labels.getLabel("vault.account.new"));
 
 		String parentPath = path.substring(0, path.lastIndexOf('/'));
-		boolean personal = es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath+"/@personal");
+		boolean personal = false;
+		try {
+			personal = es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath+"/@personal");
+		} catch (Exception e)
+		{
+			
+		}
 		
 		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("ownerAcl"), !personal && isAdmin));
 		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("managerAcl"), !personal && isAdmin));
@@ -368,6 +373,7 @@
 		if (treebox.getSelectedItem() != null)
 			xPath = treebox.getSelectedItem().getValue().getXPath();
 
+		model.getVariables().declareVariable("directFilter", false);
 		model.refresh();
 
 		if (xPath != null)
@@ -488,6 +494,7 @@
 
 	void setPassword (Component button)
 	{
+		model.commit ();
 		try{
 			if (! passwordImg.isVisible())  return;
 			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);

@@ -69,7 +69,6 @@
 			}
 			
 			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
-			System.out.println ("target="+target);
 			if (target != null)
 			{
 				Component menuPage = Executions.createComponents("/wf/menu.zul", self, new HashMap());                      

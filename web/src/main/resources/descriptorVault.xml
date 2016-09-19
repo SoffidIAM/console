@@ -4,7 +4,7 @@
 	<datanode name="root">
 		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				 method="findFolders" >
+				 method="findFolders" if="${!directFilter}">
 				<parameter value="${filter}" />
 			</ejb-finder>
 			<new-instance-script>
@@ -23,8 +23,13 @@
 		</finder>
 		<finder name="account" type="account">
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				method="findAccounts" > <!--agent:query, application:update -->
+				method="findAccounts"  if="${!directFilter}" > <!--agent:query, application:update -->
 				<parameter value="${filter}" />
+			</ejb-finder>
+			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+				method="findAccount" if="${directFilter}"> <!--agent:query, application:update -->
+				<parameter value="${account}" />
+				<parameter value="${system}" />
 			</ejb-finder>
 			<new-instance-script>
 				bean = new es.caib.seycon.ng.comu.Account();

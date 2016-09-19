@@ -7,7 +7,34 @@
 <?component name="folderWindow" macro-uri="/vault/folder.zul"?>
 <?component name="accountWindow" macro-uri="/vault/account.zul"?>
 
-<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}">
+<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}" id="topframe">
+	<attribute name="onPerformQuery"><![CDATA[
+		Tree treebox = esquema.getFellow("lista").getFellow("treebox");	                                          
+		Treeitem firstRow = treebox.getTreechildren().getFirstChild();
+		if (firstRow != null)
+		{
+			treebox.setSelectedItem(firstRow);
+			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(firstRow);
+			pageScope.put("currentContext", ctx);
+			String path = ctx.getXPath();
+			es.caib.seycon.ng.comu.AccountType t = XPathUtils.getValue(ctx, "/@type");
+			if (t.equals (es.caib.seycon.ng.comu.AccountType.SHARED))
+			{
+				es.caib.seycon.ng.comu.AccountAccessLevelEnum level = XPathUtils.getValue(ctx, "/@accessLevel");
+				if (level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_MANAGER) ||
+						level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER))
+					Events.sendEvent (new Event("onOpenAccount", accountWindow, path));
+			}
+			else
+			{
+				model.getVariables().declareVariable("directFilter", false);
+				model.refresh();
+			}
+			
+		}
+	                                         
+	]]>
+	</attribute>
 	<datamodel id="model" rootNode="root" src="descriptorVault.xml" />
 
 	<zscript src="/comu/netejaCriteris.zul"/>
@@ -28,7 +55,19 @@
 			catch (Exception ex){}
 			
 			model.getVariables().declareVariable("filter", "");
-			
+			String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
+			String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
+			model.getVariables().declareVariable("account", requestedAccount);
+			model.getVariables().declareVariable("system", requestedSystem);
+			if (requestedAccount != null && requestedSystem != null)
+			{
+				System.out.println ("ON DEV");
+				model.getVariables().declareVariable("directFilter", true);
+				Events.postEvent(-100, "onPerformQuery", topframe, null);
+			} else {
+				model.getVariables().declareVariable("directFilter", false);
+				System.out.println ("ON TAC");
+			}
 		
 			void select() 
 			{

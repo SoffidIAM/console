@@ -403,19 +403,30 @@ public class TaskUI extends Frame implements EventListener {
     }
 
 
-    private void disableInputbox(Component componente) {
-        if (componente instanceof InputElement)
-            ((InputElement) componente).setReadonly(true);
-        else if (componente instanceof Listbox)
-            ((Listbox) componente).setDisabled(true);
-        else if (componente instanceof Button)
-            ((Button) componente).setDisabled(true);
-        else if (componente instanceof Radio)
-            ((Radio) componente).setDisabled(true);
-        else if (componente instanceof Checkbox)
-            ((Checkbox) componente).setDisabled(true);
+    private void disableInputbox(final Component componente) {
+    	componente.addEventListener("onSetReadonly", new EventListener() {
+			
+			public void onEvent(Event event) throws Exception {
+				recursiveDisable (event.getTarget());
+			}
+		});
+    	Events.postEvent("onSetReadonly", componente, null);
+    }
+    
+    private void recursiveDisable (Component component)
+    {
+        if (component instanceof InputElement)
+            ((InputElement) component).setReadonly(true);
+        else if (component instanceof Listbox)
+            ((Listbox) component).setDisabled(true);
+        else if (component instanceof Button)
+            ((Button) component).setDisabled(true);
+        else if (component instanceof Radio)
+            ((Radio) component).setDisabled(true);
+        else if (component instanceof Checkbox)
+            ((Checkbox) component).setDisabled(true);
         else {
-            for (Iterator it = componente.getChildren().iterator(); it
+            for (Iterator it = component.getChildren().iterator(); it
                     .hasNext();) {
                 Component child = (Component) it.next();
                 disableInputbox(child);

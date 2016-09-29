@@ -21,19 +21,7 @@ public class DadaUsuariEntityImpl extends es.caib.seycon.ng.model.DadaUsuariEnti
 	implements SecurityScopeEntity
 {
 	public AttributeVisibilityEnum getAttributeVisibility() {
-		AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
-		try {
-			if (autService.hasPermission(
-					Security.AUTO_USER_METADATA_UPDATE, this))
-				return AttributeVisibilityEnum.EDITABLE;
-			else if (autService.hasPermission(
-					Security.AUTO_USER_QUERY, this))
-				return AttributeVisibilityEnum.READONLY;
-			else
-				return AttributeVisibilityEnum.HIDDEN;
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
-		}
+		return getInitialVisibility();
 	}
 
 
@@ -42,9 +30,6 @@ public class DadaUsuariEntityImpl extends es.caib.seycon.ng.model.DadaUsuariEnti
 		if (Security.isDisableAllSecurityForEver())
 			return AttributeVisibilityEnum.EDITABLE;
 		
-		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
-			return AttributeVisibilityEnum.EDITABLE;
-
 		TipusDadaEntity tda = getTipusDada();
 		if (tda == null)
 			return AttributeVisibilityEnum.HIDDEN;
@@ -59,6 +44,8 @@ public class DadaUsuariEntityImpl extends es.caib.seycon.ng.model.DadaUsuariEnti
 		if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
 			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getAdminVisibility();
+		else if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
 		else if (getUsuari().isAllowed(Security.AUTO_USER_METADATA_UPDATE))
 			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getOperatorVisibility();
@@ -73,14 +60,16 @@ public class DadaUsuariEntityImpl extends es.caib.seycon.ng.model.DadaUsuariEnti
 	}
 
 	public boolean isAllowed(String permission) {
-		if (permission.equals (Security.AUTO_USER_QUERY))
+		if ( Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return true;
+		else if (permission.equals (Security.AUTO_USER_METADATA_UPDATE))
+		{
+			return true;
+		}
+		else if (permission.equals (Security.AUTO_USER_QUERY))
 		{
 			return getInitialVisibility().equals (AttributeVisibilityEnum.EDITABLE) ||
 					getInitialVisibility().equals (AttributeVisibilityEnum.READONLY) ;
-		}
-		else if (permission.equals (Security.AUTO_USER_METADATA_UPDATE))
-		{
-			return getInitialVisibility().equals (AttributeVisibilityEnum.EDITABLE)  ;
 		}
 		else
 			return Security.isUserInRole(permission+Security.AUTO_ALL);

@@ -1603,6 +1603,13 @@
 								<vbox width="99%">
 									<grid dataPath="/esquema/lista/listbox:/dada"
 										if="${canUpdateUserMetadata}" width="98%">
+										<attribute name="onNewRow">
+										<![CDATA[
+										    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
+										    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
+										    	event.data.setVisible(false);
+										]]>
+										</attribute>
 										<columns>
 											<column label="${c:l('usuaris.zul.Dadesaddicionals')}" width="250px"></column>
 											<column></column>
@@ -1616,6 +1623,13 @@
 									<grid
 										dataPath="/esquema/lista/listbox:/dada"
 										if="${!canUpdateUserMetadata}" width="98%">
+										<attribute name="onNewRow">
+										<![CDATA[
+										    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
+										    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
+										    	event.data.setVisible(false);
+										]]>
+										</attribute>
 										<columns>
 											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"  width="250px"></column>
 											<column></column>

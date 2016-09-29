@@ -1802,8 +1802,7 @@ public class UsuariServiceImpl extends
 	protected Collection<DadaUsuari> handleFindDadesUsuariByCodiUsuari(String codiUsuari)
 			throws Exception {
 		UsuariEntity usuari = getUsuariEntityDao().findByCodi(codiUsuari);
-		Collection<DadaUsuari> dades = getDadaUsuariEntityDao().
-		        toDadaUsuariList(usuari.getDadaUsuari());
+		Collection<DadaUsuariEntity> dades = usuari.getDadaUsuari();
 		LinkedList<DadaUsuari> result = new LinkedList<DadaUsuari>();
 		
 		List<TipusDadaEntity> tipusDades = getTipusDadaEntityDao().loadAll();
@@ -1814,21 +1813,22 @@ public class UsuariServiceImpl extends
 		});
 		
 		Iterator<TipusDadaEntity> tipusDadesIterator = tipusDades.iterator();
+		AutoritzacioService authSvc = getAutoritzacioService();
 		while (tipusDadesIterator.hasNext()) {
 			TipusDadaEntity tipusDada = tipusDadesIterator.next();
 			if (tipusDada.getCodi().compareTo(NIF) != 0
 					&& tipusDada.getCodi().compareTo(TELEFON) != 0 ) {
-				Iterator<DadaUsuari> dadesIterator = dades.iterator();
+				Iterator<DadaUsuariEntity> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
-					DadaUsuari dada = dadesIterator.next();
-					if (dada.getCodiDada().compareTo(NIF) != 0
-							&& dada.getCodiDada().compareTo(TELEFON) != 0 
-							&& dada.getCodiDada().compareTo(tipusDada.getCodi()) == 0)
+					DadaUsuariEntity dada = dadesIterator.next();
+					if (dada.getTipusDada().getCodi().compareTo(NIF) != 0
+							&& dada.getTipusDada().getCodi().compareTo(TELEFON) != 0 
+							&& dada.getTipusDada().getCodi().compareTo(tipusDada.getCodi()) == 0)
 					{
 						teTipusDada = true;
-						if (! dada.getVisibility().equals(AttributeVisibilityEnum.HIDDEN))
-							result.add(dada);
+						if (authSvc.hasPermission(Security.AUTO_USER_MAZINGER_QUERY, dada))
+							result.add(getDadaUsuariEntityDao().toDadaUsuari(dada));
 					}
 				}
 				if (!teTipusDada) {

@@ -227,10 +227,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 	protected List<Account> handleList(VaultFolder folder) throws Exception {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load (folder.getId());
 		folder = getVaultFolderEntityDao().toVaultFolder(entity);
-		if (!folder.getAccessLevel().equals( AccountAccessLevelEnum.ACCESS_NONE ))
-			throw new SeyconException("Insufficient permissions");
-		
 		List<Account> accounts = getAccountEntityDao().toAccountList(entity.getAccounts());
+		if (folder.getAccessLevel().equals( AccountAccessLevelEnum.ACCESS_NONE ))
+		{
+			return accounts;
+		}
+		
 		for (Iterator<Account> it = accounts.iterator(); it.hasNext();)
 		{
 			Account account = it.next();

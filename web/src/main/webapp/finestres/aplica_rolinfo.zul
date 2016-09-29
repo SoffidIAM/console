@@ -82,8 +82,6 @@
 		    }
 
 		    void start () {
-				System.out.println("ON CREATE");
-
 			    es.caib.seycon.ng.servei.ejb.AplicacioService app = es.caib.seycon.ng.EJBLocator.getAplicacioService();
 			    if (pageScope{"id"} != null)
 			    {

@@ -9,29 +9,31 @@
 		.datebox_amagatpp {background-color:white;}
 	</style>
 	
-	<hbox width="350px">
+	<hbox width="250px">
 		<attribute if="${arg.visible != null}" name="visible">${arg.visible}</attribute>
-		<attribute if="${arg.widths_custom == null}" name="widths">111px,111px,*</attribute>
+		<attribute if="${arg.widths_custom == null}" name="widths">100px,*</attribute>
 		<attribute if="${arg.widths_custom != null}" name="widths">${arg.widths_custom}</attribute>
 		<label sclass="etiqueta" value="${arg.etiqueta}"/>
-		<textbox id="textbox" sclass="textbox" value="" width="100%">
-			<attribute if="${arg.mascara != null}" name="constraint">${arg.mascara}</attribute>
-			<attribute if="${arg.lectura != null}" name="disabled">${arg.lectura}</attribute>
-			<attribute name="onChange">
-				org.zkoss.zk.ui.event.Events.postEvent(event.name, self.parent.parent, event.data);
-				if (! self.getValue().equals (datebox.getText()))
-					datebox.setText(self.getValue());
-			</attribute>
-		</textbox>
-		<datebox  sclass="datebox_amagat" id ="datebox">
-			<attribute if="${arg.bind != null}" name="bind">${arg.bind}</attribute>
-			<attribute if="${arg.format != null}" name="format">${arg.format}</attribute>
-			<attribute if="${arg.format == null}" name="format">dd/MM/yyyy</attribute>
-			<attribute name="onChange">
-				java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(self.format);
-				if (! self.getValue().equals (textbox.getText()))
-					textbox.setValue(sdf.format(self.getValue()));
-			</attribute>
-		</datebox>
+		<div>
+			<datebox style="float:right" sclass="datebox_amagat" id ="datebox">
+				<attribute if="${arg.bind != null}" name="bind">${arg.bind}</attribute>
+				<attribute if="${arg.format != null}" name="format">${arg.format}</attribute>
+				<attribute if="${arg.format == null}" name="format">dd/MM/yyyy</attribute>
+				<attribute name="onChange">
+					java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(self.format);
+					if (! self.getValue().equals (textbox.getText()))
+						textbox.setValue(sdf.format(self.getValue()));
+				</attribute>
+			</datebox>
+			<textbox id="textbox" sclass="textbox" value="" width="120px">
+				<attribute if="${arg.mascara != null}" name="constraint">${arg.mascara}</attribute>
+				<attribute if="${arg.lectura != null}" name="disabled">${arg.lectura}</attribute>
+				<attribute name="onChange">
+					org.zkoss.zk.ui.event.Events.postEvent(event.name, self.parent.parent, event.data);
+					if (! self.getValue().equals (datebox.getText()))
+						datebox.setText(self.getValue());
+				</attribute>
+			</textbox>
+		</div>
 	</hbox>
 </zk>

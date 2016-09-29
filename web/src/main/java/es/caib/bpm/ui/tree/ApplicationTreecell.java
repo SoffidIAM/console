@@ -90,7 +90,9 @@ public class ApplicationTreecell extends Treecell {
 				{
 					Executions.getCurrent().addAuResponse("setUrl", 
 							new AuScript(this, 
-									String.format("window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");",
+									String.format("try {"
+											+ "window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
+											+ "} catch (e) {}",
 											getPagina(), getLabel(), path)));
 				}
 				

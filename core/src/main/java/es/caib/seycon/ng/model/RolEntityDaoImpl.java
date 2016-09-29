@@ -1561,11 +1561,13 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
             // Actualitzem el rol a la base de dades
             create (entity);
 
-            for (RolGrant rg: role.getOwnedRoles())
-            	rg.setOwnerRol(entity.getId());
+            if (role.getOwnedRoles() != null)
+	            for (RolGrant rg: role.getOwnedRoles())
+	            	rg.setOwnerRol(entity.getId());
             
-            for (RolGrant rg: role.getOwnerRoles())
-            	rg.setIdRol(entity.getId());
+            if (role.getOwnerRoles() != null)
+	            for (RolGrant rg: role.getOwnerRoles())
+	            	rg.setIdRol(entity.getId());
             
             updateGranteeRoles(role, entity);
             

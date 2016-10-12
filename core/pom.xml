@@ -80,7 +80,7 @@
 				</executions>
 				<configuration>
 					<classesDirectory>target/test-classes</classesDirectory>
-					<finalName>${artifactId}-test-${artifactVersion}.jar</finalName>
+					<finalName>${project.artifactId}-test-${project.version}.jar</finalName>
 					<classifier>test-jar</classifier>
 				</configuration>
 			</plugin>
@@ -106,45 +106,45 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>core</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${project.build.directory}/src</outputDirectory>
 						</artifactItem>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>core-resource</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${project.build.directory}/resources</outputDirectory>
 						</artifactItem>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>core-src</classifier>
 							<type>zip</type>
 							<overWrite>false</overWrite>
 							<outputDirectory>${project.build.directory}/src-template</outputDirectory>
 						</artifactItem>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>test</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${project.build.directory}/src-test</outputDirectory>
 						</artifactItem>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>test-resource</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
@@ -252,9 +252,9 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
@@ -562,7 +562,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>scim-query</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
@@ -582,9 +582,9 @@
 			<artifactId>tomcat-catalina</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-legacy</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

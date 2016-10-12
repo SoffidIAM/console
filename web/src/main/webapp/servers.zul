@@ -103,7 +103,7 @@ void showDetall ()
 					</columns>
 					<rows>
 						<row>
-							<input_etiqueta value="${c:l('servers.zul.Name')}"/>
+							<input_etiqueta value="${c:l('servers.zul.Name')} :" />
 							<div width="100%">
 								<input_dada lectura="true" bind="@nom" maxim="50"
 												width_custom="26em" mascara="no empty"/>
@@ -111,7 +111,7 @@ void showDetall ()
 							</div>
 						</row>
 						<row>
-							<input_etiqueta value="${c:l('servers.zul.URL')}"/>
+							<input_etiqueta value="${c:l('servers.zul.URL')} :"/>
 							<div width="100%">
 								<input_dada lectura="true" bind="@url" maxim="50"
 												width_custom="26em" mascara="no empty"/>
@@ -119,7 +119,7 @@ void showDetall ()
 							</div>
 						</row>
 						<row>
-							<input_etiqueta value="${c:l('servers.zul.Type')}"/>
+							<input_etiqueta value="${c:l('servers.zul.Type')} :"/>
 							<listbox
 								disabled="${!canManageServers}" 
 								onSelect="onChangeServerType(true)"
@@ -130,8 +130,13 @@ void showDetall ()
 								</dataitem>
 							</listbox>
 						</row>
+						<row>
+							<input_etiqueta value="${c:l('servers.zul.JavaOptions')} :"/>
+							<input_dada bind="@javaOptions" maxim="256"
+												width_custom="90%" mascara="no empty"/>
+						</row>
 						<row id="useMasterDatabaseRow" visible="false">
-							<input_etiqueta value="${c:l('servers.zul.UseMasterDatabase')}"/>
+							<input_etiqueta value="${c:l('servers.zul.UseMasterDatabase')} :"/>
 							<listbox
 								disabled="${!canManageServers}" 
 								bind="@useMasterDatabase" mold="select"
@@ -149,7 +154,7 @@ void showDetall ()
 							</listbox>
 						</row>
 						<row id="backupDatabaseRow" visible="false">
-							<input_etiqueta value="${c:l('servers.zul.BackupDatabase')}"/>
+							<input_etiqueta value="${c:l('servers.zul.BackupDatabase')} :"/>
 							<listbox
 								disabled="${!canManageServers}" 
 								id="backupDatabaseListbox"

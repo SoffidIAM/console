@@ -41,7 +41,7 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 
 	private AttributeVisibilityEnum getInitialVisibility ()
 	{
-		if (Security.isDisableAllSecurityForEver())
+		if (Security.isSyncServer())
 			v = AttributeVisibilityEnum.EDITABLE;
 		else if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
 			v = AttributeVisibilityEnum.EDITABLE;

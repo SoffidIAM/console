@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.sync.servei;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
-	es.caib.seycon.ng.servei.PasswordService.class})
+	es.caib.seycon.ng.servei.PasswordService.class,
+	TenantEntity.class})
 public abstract class LogonService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

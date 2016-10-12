@@ -19,9 +19,11 @@ import es.caib.seycon.util.Base64;
 
 public class RemoteInvokerFactory {
     public Object getInvoker(URL url) throws IOException {
-        return getInvoker (url, null);
+        return getInvoker (url, null, null);
     }
-    public Object getInvoker(URL url, String authToken) throws IOException {
+    
+    
+    public Object getInvoker(URL url, String tenantName, String authToken) throws IOException {
         HttpsURLConnection c;
         // Cambiar la factoria SSL
         try {
@@ -62,7 +64,7 @@ public class RemoteInvokerFactory {
             	}
             }
             return Proxy.newProxyInstance(RemoteInvokerFactory.class.getClassLoader(),
-                    interfaces, new HttpInvokerHandler(url, authToken));
+                    interfaces, new HttpInvokerHandler(url, tenantName, authToken));
         } catch (IllegalArgumentException e) {
             throw new RemoteException ("Nested exception", e); //$NON-NLS-1$
         } catch (ClassNotFoundException e) {

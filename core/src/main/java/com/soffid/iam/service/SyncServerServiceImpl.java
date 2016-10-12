@@ -32,7 +32,10 @@ import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.ui.SeyconTask;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.util.Base64;
@@ -48,6 +51,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
@@ -63,19 +67,24 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     // Obtenim informació dels servidors de seycon
 	@Override
     protected java.util.Collection<SyncServerInfo> handleGetSyncServersStatus() throws java.lang.Exception {
-        String name = getServerList();
-        String port = getServerPort();
         LinkedList<SyncServerInfo> serversInfo = new LinkedList<SyncServerInfo>();
-        String serv[] = name.split("[ ,]+"); //$NON-NLS-1$
+        List<String> serverList = getServerList();
 
+        StringBuffer sb = new StringBuffer();
+        for ( String s: serverList) {
+        	if (sb.length() > 0)
+        		sb.append (",");
+        	sb.append (s);
+        }
+        
         try {
-            Config.configureClient(name, port);
+            Config.configureClient(sb.toString(), getServerPort());
         } catch (Throwable th) {
             // JUST IN CASE OF ACCIDENT (!!)
-            if (serv != null) {
+            if (serverList != null) {
                 // Afegim un SeyconServerInfo amb error
-                for (int i = 0; i < serv.length; i++) {
-                    URLManager m = new URLManager(serv[i]);
+                for (String server: serverList) {
+                    URLManager m = new URLManager(server);
                     Long numTasquesPendents = 0L;
                     Collection tPendents = getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost());
                     if (tPendents != null) {
@@ -93,9 +102,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             return serversInfo;
         }
 
-        for (int i = 0; i < serv.length; i++) {
-            RemoteServiceLocator rsl = createRemoteServiceLocator(serv[i]);
-            URLManager m = new URLManager(serv[i]);
+        for (String server: serverList) {
+            RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+            URLManager m = new URLManager(server);
             Long numTasquesPendents = 0L;
             Collection tPendents = getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost());
             if (tPendents != null) {
@@ -125,6 +134,17 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         RemoteServiceLocator rsl = new RemoteServiceLocator(string);
         URLManager um = new URLManager(string);
         ServerEntity server = getServerEntityDao().findByName(um.getServerURL().getHost());
+        if (server == null)
+        {
+        	// Search on master tenant
+        	Security.nestedLogin(Security.getMasterTenantName(), Security.getCurrentAccount(),
+        			new String [] { Security.AUTO_AUTHORIZATION_ALL} );
+        	try {
+                server = getServerEntityDao().findByName(um.getServerURL().getHost());
+        	} finally {
+        		Security.nestedLogoff();
+        	}
+        }
         if (server != null)
             rsl.setAuthToken(server.getAuth());
         return rsl;
@@ -364,21 +384,27 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
     }
 
-    private String getServerList() throws InternalErrorException, SQLException, NamingException {
-        ConfigurationService configuracioService = getConfigurationService();
-        Configuration parametre = configuracioService.findParameterByNameAndNetworkName("seycon.server.list", null); //$NON-NLS-1$
-        
-        if (parametre != null)
-        	return parametre.getValue();
-        
-        else
-        	return new String();
+    private List<String> getServerList() throws InternalErrorException, SQLException, NamingException {
+    	List<String> list = new LinkedList<String>();
+    	Security.nestedLogin( Security.getMasterTenantName(),
+    			Security.getCurrentAccount(),
+    			new String[] { Security.AUTO_AUTHORIZATION_ALL } );
+    	try {
+    		for ( ServerEntity server:  getServerEntityDao().loadAll())
+    		{
+    			if (server.getType().equals(ServerType.MASTERSERVER) &&
+    					server.getUrl() != null)
+    				list.add(server.getUrl());
+    		}
+    	} finally {
+    		Security.nestedLogoff();
+    	}
+		return list;
     }
 
     private String getServerPort() throws InternalErrorException, SQLException, NamingException {
-        ConfigurationService configuracioService = getConfigurationService();
-        Configuration parametre = configuracioService.findParameterByNameAndNetworkName("seycon.https.port", null); //$NON-NLS-1$
-        return parametre.getValue();
+    	String port = ConfigurationCache.getMasterProperty("seycon.https.port");
+    	return port == null ? "760": port;
     }
 
     private String tascaToString(TaskEntity tasca) {
@@ -566,12 +592,11 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 	@Override
 	protected Object handleGetServerService(String servicePath)
 			throws Exception {
-        String name = getServerList();
-        String serv[] = name.split("[ ,]+"); //$NON-NLS-1$
+        List<String> serv = getServerList();
         
         roundrobin ++;
-        for (int i = 0; i < serv.length; i++) {
-        	String serverName = serv [ (i + roundrobin) % serv.length];
+        for (int i = 0; i < serv.size(); i++) {
+        	String serverName = serv.get ( (i + roundrobin) % serv.size() );
             RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
             try {
                 Object service = rsl.getRemoteService(servicePath);
@@ -585,22 +610,18 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
 	@Override
 	protected void handleUpdateDispatcherConfiguration() throws Exception {
-        String name = getServerList();
-        if (name != null && name.trim().length() > 0)
-        {
-	        String serv[] = name.split("[ ,]+"); //$NON-NLS-1$
+        List<String> serv = getServerList();
 	        
-	        roundrobin ++;
-	        for (int i = 0; i < serv.length; i++) {
-	        	String serverName = serv [ (i + roundrobin) % serv.length];
-	            RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
-	            try {
-	                SyncStatusService service = rsl.getSyncStatusService();
-	                if (service != null)
-	                	service.reconfigureDispatchers();;
-	            } catch (Throwable e) {
-	            }
-	        }
+        roundrobin ++;
+        for (int i = 0; i < serv.size(); i++) {
+        	String serverName = serv.get( (i + roundrobin) % serv.size());
+            RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
+            try {
+                SyncStatusService service = rsl.getSyncStatusService();
+                if (service != null)
+                	service.reconfigureDispatchers();;
+            } catch (Throwable e) {
+            }
         }
 	}
 

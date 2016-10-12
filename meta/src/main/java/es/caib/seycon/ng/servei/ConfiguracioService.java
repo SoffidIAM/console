@@ -24,6 +24,17 @@ public abstract class ConfiguracioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation 
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Configuracio findMasterParameterByNameAndNetwork(
+		@Nullable java.lang.String paramter, 
+		@Nullable java.lang.String networkName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	
 	@Operation ( grantees={roles.parameter_query.class},
 			translated="getParameters")
 	@Transactional(rollbackFor={java.lang.Exception.class})

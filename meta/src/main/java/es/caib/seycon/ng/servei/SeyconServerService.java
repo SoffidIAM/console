@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ConfiguracioEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="SyncServerService",
@@ -15,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.TaskLogEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.model.ServerEntity.class, 
-	ConfiguracioService.class})
+	ConfiguracioService.class,
+	ConfiguracioEntity.class})
 public abstract class SeyconServerService {
 
 	@Operation ( grantees={roles.monitor_server_list.class},

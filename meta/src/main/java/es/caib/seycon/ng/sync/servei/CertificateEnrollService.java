@@ -21,6 +21,7 @@ public abstract class CertificateEnrollService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public long createRequest(
+		@Nullable java.lang.String tenant, 
 		java.lang.String user, 
 		java.lang.String password, 
 		@Nullable java.lang.String domain, 
@@ -31,6 +32,7 @@ public abstract class CertificateEnrollService {
 	}
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"CertificateEnrollDenied"})
 	public java.security.cert.X509Certificate getCertificate(
+		@Nullable java.lang.String tenant, 
 		java.lang.String user, 
 		java.lang.String password, 
 		@Nullable java.lang.String domain, 

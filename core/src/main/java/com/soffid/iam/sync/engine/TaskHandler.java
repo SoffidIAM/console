@@ -25,6 +25,15 @@ public class TaskHandler
 	List<TaskHandlerLog> logs;
 	boolean offlineTask;
 	boolean changed = false;
+	String tenant;
+	
+	public String getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(String tenant) {
+		this.tenant = tenant;
+	}
 
 	public boolean isChanged ()
 	{

@@ -214,7 +214,7 @@ public class AccountEntityDaoImpl extends
 	}
 
 	private AccountAccessLevelEnum getAccessLevel(AccountEntity source) throws InternalErrorException {
-		if (Security.isDisableAllSecurityForEver())
+		if (Security.isSyncServer())
 			return AccountAccessLevelEnum.ACCESS_OWNER;
 		
 		String u = Security.getCurrentUser();

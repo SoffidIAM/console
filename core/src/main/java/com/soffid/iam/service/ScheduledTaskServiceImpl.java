@@ -193,20 +193,27 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 
 	private void reconfigureTasks () throws InternalErrorException
 	{
-		String timeStamp = Long.toString(System.currentTimeMillis());
-		Configuration config = getConfigurationService().findParameterByNameAndNetworkName("soffid.schedule.timeStamp", null); //$NON-NLS-1$
-		if (config == null)
+		// Updates master configuration property
+		Security.nestedLogin("master", Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
+		try
 		{
-			config = new Configuration();
-			config.setCode("soffid.schedule.timeStamp"); //$NON-NLS-1$
-			config.setDescription("Task scheduler update time stamp"); //$NON-NLS-1$
-			config.setValue(timeStamp);
-			getConfigurationService().create(config);
-		}
-		else
-		{
-			config.setValue(timeStamp);
-			getConfigurationService().update(config);
+			String timeStamp = Long.toString(System.currentTimeMillis());
+			Configuration config = getConfigurationService().findParameterByNameAndNetworkName("soffid.schedule.timeStamp", null); //$NON-NLS-1$
+			if (config == null)
+			{
+				config = new Configuration();
+				config.setCode("soffid.schedule.timeStamp"); //$NON-NLS-1$
+				config.setDescription("Task scheduler update time stamp"); //$NON-NLS-1$
+				config.setValue(timeStamp);
+				getConfigurationService().create(config);
+			}
+			else
+			{
+				config.setValue(timeStamp);
+				getConfigurationService().update(config);
+			}
+		} finally {
+			Security.nestedLogoff();
 		}
 	}
 	

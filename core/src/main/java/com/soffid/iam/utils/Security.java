@@ -13,6 +13,7 @@ import com.soffid.iam.tomcat.SoffidPrincipal;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +47,7 @@ import javax.transaction.UserTransaction;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.openejb.loader.SystemInstance;
+import org.apache.commons.logging.LogFactory;
 import org.apache.openejb.spi.Assembler;
 import org.apache.openejb.spi.SecurityService;
 import org.apache.tomee.catalina.TomcatSecurityService.TomcatUser;
@@ -308,11 +309,12 @@ public class Security {
     public static final String AUTO_REMEMBER_PASSWORD_DELETE = "rememberPassword:delete"; //$NON-NLS-1$
     public static final String AUTO_REMEMBER_PASSWORD_QUERY = "rememberPassword:query"; //$NON-NLS-1$
     public static final String AUTO_SEU_VIEW_REMEMBER_PASSWORD = "seu:rememberPassword:show"; //$NON-NLS-1$
+	public static final String[] ALL_PERMISSIONS = new String [] { AUTO_AUTHORIZATION_ALL };
 	
     private static ThreadLocal<Stack<SoffidPrincipal>> identities = new ThreadLocal<Stack<SoffidPrincipal>>();
-    private static boolean disableAllSecurityForEver = false;
-	public static boolean isDisableAllSecurityForEver() {
-		return disableAllSecurityForEver;
+    private static boolean onSyncServer = false;
+	public static boolean isSyncServer() {
+		return onSyncServer;
 	}
 
 	private static com.soffid.iam.service.UserService userService = null;
@@ -337,7 +339,7 @@ public class Security {
     
 
     public static boolean isUserInRole(String role) {
-        if (disableAllSecurityForEver)
+        if (onSyncServer)
             return true;
 
         GenericPrincipal principal = getPrincipal ();
@@ -381,7 +383,7 @@ public class Security {
     public static GenericPrincipal getPrincipal() {
         if (!getIdentities().isEmpty()) {
             return getIdentities().peek();
-        } else if (disableAllSecurityForEver) {
+        } else if (onSyncServer) {
             String host;
             try {
                 host = Config.getConfig().getHostName();
@@ -394,26 +396,7 @@ public class Security {
             }
             return new SoffidPrincipal(host, host, Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
         } else {
-        	SystemInstance si = SystemInstance.get();
-        	if (si == null)
-        		return null;
-        	Assembler a = si.getComponent(Assembler.class);
-        	if (a == null)
-        		return null;
-            final SecurityService<?> ss = a.getSecurityService();
-            if (ss == null)
-            	return null;
-            Principal p = ss.getCallerPrincipal();
-            while (p != null)
-            {
-	            if (p instanceof TomcatUser)
-	            	p = ((TomcatUser)p).getTomcatPrincipal();
-	            else if (p instanceof GenericPrincipal)
-	            	return (GenericPrincipal) p;
-	            else
-	            	return null;
-            }
-            return null;
+        	return TomeePrincipalRetriever.getPrincipal ();
         }
     }
 
@@ -473,8 +456,8 @@ public class Security {
         getIdentities().pop();
     }
 
-    public static void disableAllSecurityForEver() {
-        disableAllSecurityForEver = true;
+    public static void onSyncServer() {
+        onSyncServer = true;
     }
 
     public static String getCurrentAccount ()
@@ -516,7 +499,7 @@ public class Security {
     			return p.getName().substring(0, i);
     	}
     	
-   		return getTenantService().getMasterTenant().getName();
+   		return getMasterTenantName();
     }
     
 
@@ -532,7 +515,7 @@ public class Security {
     	{
     		p = getIdentities().peek();
     	}
-    	else if (disableAllSecurityForEver)
+    	else if (onSyncServer)
     		return null;
     	else
     	{
@@ -593,6 +576,23 @@ public class Security {
     	return id;
     }
     
+    static HashMap<Long, String> tenantNames = new HashMap<Long,String>();
+    public static String getTenantName (Long tenantId) throws InternalErrorException {
+    	String name = tenantNames.get(tenantId);
+    	if (name == null)
+    	{
+    		Tenant tenant = tenantId == null ? 
+    			getTenantService().getMasterTenant() :
+    			getTenantService().getTenant(tenantId);
+    		if (tenant != null)
+    		{
+    			name = tenant.getName();
+    			tenantNames.put(tenantId, name);
+    		}
+    	}
+    	return name;
+    }
+
     private static StackTraceElement getCaller ()
     {
     	StackTraceElement trace[] = Thread.currentThread().getStackTrace();
@@ -620,7 +620,7 @@ public class Security {
     {
     	try {
 			if (! isMasterTenant() && ! tenant.equals( getCurrentTenantName()))
-				throw new SecurityException("Not allowed to change tenant");
+		    	AccessController.checkPermission(new NestedLoginPermission("tenant"));
 		} catch (InternalErrorException e) {
 			throw new SecurityException("Not allowed to change tenant", e);
 		}
@@ -628,7 +628,17 @@ public class Security {
 
 	public static boolean isMasterTenant() throws InternalErrorException {
 		return getCurrentTenantName() == null || 
-				getCurrentTenantName ().equals (getTenantService().getMasterTenant().getName());
+				getCurrentTenantName ().equals (getMasterTenantName());
+	}
+	
+	static String masterTenantName = null;
+	
+	public static String getMasterTenantName () throws InternalErrorException{
+		if (masterTenantName == null)
+		{
+			masterTenantName = ServiceLocator.instance().getTenantService().getMasterTenant().getName();
+		}
+		return masterTenantName;
 	}
 
 }

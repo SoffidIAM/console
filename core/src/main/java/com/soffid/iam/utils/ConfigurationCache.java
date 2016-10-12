@@ -48,7 +48,9 @@ public class ConfigurationCache {
 			String value;
 			if (!map.containsKey(property))
 			{
-				Configuration config = ServiceLocator.instance().getConfigurationService().findParameterByNameAndNetworkName(property, null);
+				Configuration config = tenant.equals(getMasterTenantName()) ?
+						ServiceLocator.instance().getConfigurationService().findMasterParameterByNameAndNetwork(property, null):
+						ServiceLocator.instance().getConfigurationService().findParameterByNameAndNetworkName(property, null);
 				if (config == null)
 				{
 					value = null;

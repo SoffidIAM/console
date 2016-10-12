@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.Locale;
 
@@ -22,10 +23,12 @@ import es.caib.seycon.util.Base64;
 public class HttpInvokerHandler implements InvocationHandler {
     private URL url;
     private String authToken;
+	private String tenantName;
     
-    public HttpInvokerHandler (URL url, String authToken)
+    public HttpInvokerHandler (URL url, String tenantName, String authToken)
     {
         this.url = url;
+        this.tenantName = tenantName;
         this.authToken = authToken;
     }
     public Object invoke(Object proxy, Method method, Object[] args)
@@ -42,7 +45,10 @@ public class HttpInvokerHandler implements InvocationHandler {
             c.setDoOutput(true);
             c.setRequestMethod("POST"); //$NON-NLS-1$
             if (authToken != null) {
-                String seu = "-seu-:"+authToken;  //$NON-NLS-1$
+                String seu = "-seu-";  //$NON-NLS-1$
+                if (tenantName != null)
+                	seu = seu + URLEncoder.encode(tenantName, "UTF-8");
+                seu = seu + ":" + authToken;
                 byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
                 String tag = "Basic "+ Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES);  //$NON-NLS-1$
                 c.addRequestProperty("Authorization", tag); //$NON-NLS-1$

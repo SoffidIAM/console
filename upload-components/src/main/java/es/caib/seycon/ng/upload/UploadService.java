@@ -1,8 +1,11 @@
 package es.caib.seycon.ng.upload;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,9 +15,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -43,16 +50,18 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 
 @Singleton(name="UploadServiceBean")
 @Startup
+@javax.ejb.TransactionManagement(value=javax.ejb.TransactionManagementType.CONTAINER)
+@javax.ejb.TransactionAttribute(value=javax.ejb.TransactionAttributeType.SUPPORTS)
 public class UploadService {
-    int scheduledInterval = 30000;
-    int maxScheduledInterval = 30000;
-    int schedulerThreads = 1;
     Log log = LogFactory.getLog(UploadService.class);
 
     
     @EJB(beanName="SoffidDeployerBean")
     DeployerService soffidDeployer;
     
+	@Resource
+	private SessionContext context;
+
 	@PostConstruct
 	public void init() throws Exception {
         try {
@@ -70,37 +79,15 @@ public class UploadService {
             	if (! soffidDeployer.isFailSafe())
             	{
             		soffidDeployer.setFailSafe(true);
-            		new Thread (new Runnable() {
-						
-						public void run() {
-							try {
-								Thread.sleep(5000);
-							} catch (InterruptedException e1) {
-							}
-							log.info("Redeploying in fail-safe mode");
-							try {
-								soffidDeployer.redeploy();
-							} catch (Exception e) {
-								log.warn ("Error deploying in fail-safe mode", e);
-							}
-						}
-					}).start();
-            		throw new Exception ("Failed to create spring context", e);
+   					context.getTimerService().createTimer(5000, "Redeploy");
+            		return ;
             	}
             }
             
-            Thread th = new Thread( new Runnable() {
-				
-				public void run() {
-					uploadComponents();
-				}
-			});
-            
+			context.getTimerService().createTimer(500, "Upload");
             
             Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
             		getBeansOfType(ApplicationBootService.class);
-            
-            th.start ();
 
             for ( Object service: beans.keySet())
             {
@@ -114,6 +101,24 @@ public class UploadService {
             log.warn(Messages.getString("UploadService.UploadFileError"), e); //$NON-NLS-1$
         }
     }
+	
+	@Timeout
+	public void timeoutProcess (Timer timer)
+	{
+		if (timer.getInfo().equals("Redeploy"))
+		{
+			log.info("Redeploying in fail-safe mode");
+			try {
+				soffidDeployer.redeploy();
+			} catch (Exception e) {
+				log.warn ("Error deploying in fail-safe mode", e);
+			}
+		}
+		if (timer.getInfo().equals("Upload"))
+		{
+			uploadComponents();
+		}
+	}
 
 	private void uploadComponents() {
 		try {
@@ -182,13 +187,25 @@ public class UploadService {
     private void uploadComponentVersion(String artifactId, String version, String packaging)
             throws IOException, InternalErrorException {
         ClassLoader cl = this.getClass().getClassLoader();
-
+        
+        URL baseUrl = cl.getResource("es/caib/seycon/ng/upload/UploadService.class");
+        String baseFile = baseUrl.getFile();
+        baseFile = baseFile.substring(0, baseFile.indexOf("!"));
+        URL fileUrl = new URL (baseFile);
+        File jarFile = new File (fileUrl.getFile());
+        File earDirectory = jarFile.getParentFile();
+        
         String file = version == null ? artifactId + "." + packaging : artifactId + "-" + version //$NON-NLS-1$ //$NON-NLS-2$
                 + "." + packaging; //$NON-NLS-1$
-
-        URL url = cl.getResource(file);
-        uploadUrl(artifactId, version, url);
-
+        
+        File candidate = new File (earDirectory, file);
+        File candidate2 = new File (earDirectory, "lib"+File.separator+file);
+        if (candidate.isFile())
+        	uploadUrl(artifactId, version, candidate.toURI().toURL());
+        else if (candidate2.isFile())
+        	uploadUrl(artifactId, version, candidate2.toURI().toURL());
+        else
+        	log.warn("Unable to loate file "+file);
     }
 
     private void uploadUrl(String artifactId, String version, URL url)

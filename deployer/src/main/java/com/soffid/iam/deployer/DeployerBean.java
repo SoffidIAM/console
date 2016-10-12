@@ -78,8 +78,9 @@ import org.xml.sax.SAXException;
 @Singleton(name="SoffidDeployerBean")
 @Local({DeployerService.class})
 @Startup
+@javax.ejb.TransactionManagement(value=javax.ejb.TransactionManagementType.CONTAINER)
+@javax.ejb.TransactionAttribute(value=javax.ejb.TransactionAttributeType.SUPPORTS)
 public class DeployerBean implements DeployerService {
-	int schedulerThreads = 1;
 	Log log = LogFactory.getLog(DeployerBean.class);
 	private File mainWarFile;
 	private File webserviceWarFile;

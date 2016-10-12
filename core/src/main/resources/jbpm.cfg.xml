@@ -21,6 +21,7 @@
   <string name="resource.parsers" value="org/jbpm/jpdl/par/jbpm.parsers.xml" />
   <string name="resource.varmapping" value="org/jbpm/context/exe/jbpm.varmapping.xml" />
   <string name="resource.mail.templates" value="jbpm.mail.templates.xml" />
+  <string name="jbpm.mail.class.name" value="com.soffid.iam.bpm.mail.Mail" />
 
   <!-- make sure the block size matches the length in ByteArray.hbm.xml -->
   <int    name="jbpm.byte.block.size" value="1024" singleton="true" />

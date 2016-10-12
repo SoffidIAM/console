@@ -7,6 +7,7 @@
 package es.caib.bpm.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ApplicationBootService;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -47,17 +48,17 @@ public abstract class BpmConfigService extends ApplicationBootService {
 		java.util.Collection<es.caib.bpm.vo.ConfigParameterVO> config)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={InternalErrorException.class})
 	public void update(
 		es.caib.bpm.vo.ConfigParameterVO config)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={InternalErrorException.class})
 	public void create(
 		es.caib.bpm.vo.ConfigParameterVO config)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={InternalErrorException.class})
 	public void delete(
 		es.caib.bpm.vo.ConfigParameterVO config)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {

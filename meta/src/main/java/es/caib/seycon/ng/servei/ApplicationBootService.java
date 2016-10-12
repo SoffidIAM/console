@@ -32,19 +32,22 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class ApplicationBootService {
 
 	@Operation(translated="syncServerBoot")
-	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"})
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,
+		rollbackForClassName={"java.lang.Exception"})
 	public void syncServerBoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
-	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"})
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,
+			rollbackForClassName={"java.lang.Exception"})
 	public void tenantBoot(Tenant tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
 
 	@Operation(translated="consoleBoot")
-	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"})
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,
+		rollbackForClassName={"java.lang.Exception"})
 	public void consoleBoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}

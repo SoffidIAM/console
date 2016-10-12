@@ -218,6 +218,13 @@ public abstract class DispatcherEntity {
 	public es.caib.seycon.ng.model.DispatcherEntity findSoffidDispatcher() {
 	 return null;
 	}
+
+
+	@DaoFinder("select dis "
+			+ "from com.soffid.iam.model.SystemEntity as dis ")
+	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findAllTenantSystems() {
+		return null;
+	}
 }
 
 @Index (name="DIS_UK_CODI",	unique=true,

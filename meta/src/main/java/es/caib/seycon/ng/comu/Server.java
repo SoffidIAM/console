@@ -37,4 +37,6 @@ public class Server {
 	@Nullable
 	public java.lang.String url;
 
+	@Nullable
+	public java.lang.String javaOptions;
 }

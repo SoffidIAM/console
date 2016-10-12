@@ -26,6 +26,7 @@ public class Config {
 	public static final String BACKUPUSER_PROPERTY = "backupuser";
 	public static final String PASSWORD_PROPERTY = "password";
 	public static final String ROL_PROPERTY = "rol";
+	public static final String JAVA_OPT_PROPERTY = "java_opt";
 	public static final String USER_PROPERTY = "user";
 	public static final String SEYCON_SERVER_STANDBY_PROPERTY = "seycon.server.standby";
 	public static final String AUTOUPDATE_PROPERTY = "autoupdate";
@@ -49,7 +50,8 @@ public class Config {
     	USER_PROPERTY,
     	BACKUPDB_PROPERTY,
     	BACKUP_PASSWORD_PROPERTY,
-    	BACKUPUSER_PROPERTY
+    	BACKUPUSER_PROPERTY,
+    	JAVA_OPT_PROPERTY
     };
     
     public void updateFromServer () throws IOException, InternalErrorException
@@ -191,8 +193,8 @@ public class Config {
 
     public String getJVMOptions() throws RemoteException,
             InternalErrorException {
-        String properties = prop.getProperty("java_opt"); //$NON-NLS-1$
-        if (properties == null) {
+        String properties = prop.getProperty(JAVA_OPT_PROPERTY); //$NON-NLS-1$
+        if (properties == null || properties.trim().length() == 0) {
             if (isServer()) {
                 properties = "-Xmx512m"; //$NON-NLS-1$
             } else {

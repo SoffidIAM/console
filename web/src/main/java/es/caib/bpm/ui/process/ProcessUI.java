@@ -314,23 +314,26 @@ public class ProcessUI extends Frame {
 
             ventanaDinamica.getChildren().clear();
             ui = engine.getUI(proc);
+            HashMap map = new HashMap();
+            map.put("processInstance", proc); //$NON-NLS-1$
+            map.put("engine", engine); //$NON-NLS-1$
             
             if (ui == null)
             {
             	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-           		Executions.createComponents(def, ventanaDinamica, null);
+           		Executions.createComponents(def, ventanaDinamica, map);
             }
             else
             {
             	try {
             		Executions.createComponentsDirectly(ui,
-                        "zul", ventanaDinamica, null); //$NON-NLS-1$
+                        "zul", ventanaDinamica, map); //$NON-NLS-1$
 	        	} catch (Exception e) {
 	        		Label l = new Label (e.toString());
 	        		l.setMultiline(true);
 	        		ventanaDinamica.appendChild(l);
 	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-	           		Executions.createComponents(def, ventanaDinamica, null);
+	           		Executions.createComponents(def, ventanaDinamica, map);
 	        	}
             }
 

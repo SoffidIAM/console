@@ -56,4 +56,8 @@ public class Aplicacio {
 	@Nullable
 	public String approvalProcess;
 
+	@Description ("Process needed for any change applied to this application roles. Null value means no approval process is needed")
+	@Nullable
+	public String roleDefinitionProcess;
+
 }

@@ -55,8 +55,8 @@ public class RoleGroupEntityDaoImpl extends
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-        tasque.setRole(rolsGrupEntity.getAssignedRole().getName());
-        tasque.setDb(rolsGrupEntity.getAssignedRole().getSystem().getName());
+        tasque.setRole(rolsGrupEntity.getGrantedRole().getName());
+        tasque.setDb(rolsGrupEntity.getGrantedRole().getSystem().getName());
         getTaskEntityDao().create(tasque);
         getSession().flush();
     }
@@ -67,15 +67,15 @@ public class RoleGroupEntityDaoImpl extends
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-        tasque.setRole(old.getAssignedRole().getName());
-        tasque.setDb(old.getAssignedRole().getSystem().getName());
+        tasque.setRole(old.getGrantedRole().getName());
+        tasque.setDb(old.getGrantedRole().getSystem().getName());
         getTaskEntityDao().create(tasque);
         super.update(rolsGrupEntity);
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-        tasque.setRole(rolsGrupEntity.getAssignedRole().getName());
-        tasque.setDb(rolsGrupEntity.getAssignedRole().getSystem().getName());
+        tasque.setRole(rolsGrupEntity.getGrantedRole().getName());
+        tasque.setDb(rolsGrupEntity.getGrantedRole().getSystem().getName());
         getTaskEntityDao().create(tasque);
         getSession().flush();
     }
@@ -86,8 +86,8 @@ public class RoleGroupEntityDaoImpl extends
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-        tasque.setRole(rolsGrupEntity.getAssignedRole().getName());
-        tasque.setDb(rolsGrupEntity.getAssignedRole().getSystem().getName());
+        tasque.setRole(rolsGrupEntity.getGrantedRole().getName());
+        tasque.setDb(rolsGrupEntity.getGrantedRole().getSystem().getName());
         getTaskEntityDao().create(tasque);
         getSession().flush();
     }
@@ -106,7 +106,7 @@ public class RoleGroupEntityDaoImpl extends
     private void toRolsGrupCustom(RoleGroupEntity sourceEntity, GroupRoles targetVO) {
         // TODO: Revisar transformaciones: se utilizan en roles de grupos de
         // seyconweb
-        String tipusDomini = sourceEntity.getAssignedRole().getDomainType();
+        String tipusDomini = sourceEntity.getGrantedRole().getDomainType();
         if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
@@ -118,10 +118,10 @@ public class RoleGroupEntityDaoImpl extends
             }
             else
             {
-                ApplicationDomainEntity dominiAplicacio = sourceEntity.getAssignedRole().getApplicationDomain();
+                ApplicationDomainEntity dominiAplicacio = sourceEntity.getGrantedRole().getApplicationDomain();
                 valorDomini = new DomainValue();
                 // Le asignamos como nombre la descripción del dominio de aplicación
-                valorDomini.setDomainName(sourceEntity.getAssignedRole().getApplicationDomain().getName());
+                valorDomini.setDomainName(sourceEntity.getGrantedRole().getApplicationDomain().getName());
             }
         	targetVO.setDomainValue(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
@@ -154,15 +154,15 @@ public class RoleGroupEntityDaoImpl extends
             // targetVO.setValorDomini(valorDomini); // No se muestra
         }
 
-        targetVO.setRoleName(sourceEntity.getAssignedRole().getName());
-        targetVO.setRoleDescription(sourceEntity.getAssignedRole().getDescription());
-        targetVO.setRoleDatabases(sourceEntity.getAssignedRole().getSystem().getName());
-        InformationSystemEntity aplicacio = sourceEntity.getAssignedRole().getInformationSystem();
+        targetVO.setRoleName(sourceEntity.getGrantedRole().getName());
+        targetVO.setRoleDescription(sourceEntity.getGrantedRole().getDescription());
+        targetVO.setRoleDatabases(sourceEntity.getGrantedRole().getSystem().getName());
+        InformationSystemEntity aplicacio = sourceEntity.getGrantedRole().getInformationSystem();
         if (aplicacio != null) {
             targetVO.setApplicationCode(aplicacio.getName());
         }
-        targetVO.setGroupCode(sourceEntity.getOwnerGroup().getName());
-        targetVO.setGroupDescription(sourceEntity.getOwnerGroup().getDescription());
+        targetVO.setGroupCode(sourceEntity.getGroup().getName());
+        targetVO.setGroupDescription(sourceEntity.getGroup().getDescription());
 
     }
 
@@ -176,8 +176,8 @@ public class RoleGroupEntityDaoImpl extends
                                                                      // el id
         contenidorRol.setType(TipusContenidorRol.ROL_GRUP);
         // Información específica:
-        RoleEntity rol = entity.getAssignedRole();
-        GroupEntity grup = entity.getOwnerGroup();
+        RoleEntity rol = entity.getGrantedRole();
+        GroupEntity grup = entity.getGroup();
         contenidorRol.setContainerInfo(String.format(Messages.getString("RoleGroupEntityDaoImpl.0"), rol.getName(), grup.getName()));
         return contenidorRol;
     }
@@ -188,8 +188,8 @@ public class RoleGroupEntityDaoImpl extends
 
     @Override
     public void toRoleGrant(RoleGroupEntity source, RoleGrant target) {
-        target.setSystem(source.getAssignedRole().getSystem().getName());
-        String tipus = source.getAssignedRole().getDomainType();
+        target.setSystem(source.getGrantedRole().getSystem().getName());
+        String tipus = source.getGrantedRole().getDomainType();
         if (TipusDomini.SENSE_DOMINI.equals(tipus)) {
             target.setHasDomain(false);
             target.setDomainValue(null);
@@ -210,13 +210,13 @@ public class RoleGroupEntityDaoImpl extends
         }
         target.setOwnerRole(null);
         target.setOwnerRoleName(null);
-        target.setOwnerGroup(source.getOwnerGroup().getName());
+        target.setOwnerGroup(source.getGroup().getName());
         target.setOwnerSystem(null);
         target.setOwnerAccountName(null);
         target.setId(source.getId());
-        target.setRoleId(source.getAssignedRole().getId());
-        target.setRoleName(source.getAssignedRole().getName());
-        target.setInformationSystem(source.getAssignedRole().getInformationSystem().getName());
+        target.setRoleId(source.getGrantedRole().getId());
+        target.setRoleName(source.getGrantedRole().getName());
+        target.setInformationSystem(source.getGrantedRole().getInformationSystem().getName());
     }
 
 }

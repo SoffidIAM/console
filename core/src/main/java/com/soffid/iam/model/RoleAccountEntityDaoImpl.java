@@ -955,7 +955,7 @@ public class RoleAccountEntityDaoImpl extends
 		rolsAnalitzar.add(rol);
 		RoleEntity rolActual = null;
 		while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-			Collection socContenidor = rolActual.getContainedRole();
+			Collection socContenidor = rolActual.getContainedRoles();
 
 			if (socContenidor != null)
 				for (Iterator it = socContenidor.iterator(); it.hasNext();) {

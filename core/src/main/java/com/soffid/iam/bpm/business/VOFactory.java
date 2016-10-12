@@ -130,6 +130,8 @@ public class VOFactory {
 		process.setId(instance.getId());
 		process.setStart(instance.getStart());
 		process.setVariables(instance.getContextInstance().getVariables());
+		if (process.getVariables() == null)
+			process.setVariables(new HashMap<String, Object>());
 		Vector comments = new Vector();
 		if (instance.getRootToken() != null &&
 				instance.getRootToken().getComments() != null)

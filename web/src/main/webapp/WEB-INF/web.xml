@@ -475,10 +475,15 @@
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/AplicacioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		
 		<local>es.caib.seycon.ng.servei.ejb.AplicacioService</local>
 	</ejb-local-ref>
 	<ejb-local-ref>
+	<ejb-ref>
+		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.VaultServiceHome</local>
+	</ejb-ref>
+	<ejb-ref>
 		<ejb-ref-name>ejb/SessioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
 		<local>es.caib.seycon.ng.servei.ejb.SessioService</local>

@@ -86,22 +86,6 @@
       </plugins>
     </pluginManagement>
   </build>
-  <modules>
-    <module>meta</module>
-    <module>deployer</module>
-    <module>common</module>
-    <module>core</module>
-    <module>tomee</module>
-    <module>web-common</module>
-    <module>bpm-sar</module>
-    <module>weblogout</module>
-    <module>web</module>
-    <module>selfservice</module>
-    <module>webservice</module>
-    <module>upload-components</module>
-    <module>ear</module>
-    <module>install</module>
-  </modules>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -429,8 +413,8 @@
     <document.manager.version>${pom.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.19-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.24-SNAPSHOT</zkdb.version>
+    <zkiblaf.version>1.19</zkiblaf.version>
+    <zkdb.version>1.25</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>
@@ -465,4 +449,44 @@
       <url>${soffid.deploy.site.url}/console</url>
     </site>
   </distributionManagement>
+  <profiles>
+     <profile>
+        <id>ear</id>
+ 		<modules>
+   			<module>meta</module>
+   			<module>common</module>
+   			<module>core</module>
+   			<module>tomee</module>
+   			<module>web-common</module>
+   			<module>weblogout</module>
+   			<module>web</module>
+   			<module>selfservice</module>
+   			<module>webservice</module>
+   			<module>upload-components</module>
+   			<module>ear</module>
+ 		</modules>
+	 </profile>
+     <profile>
+        <id>default</id>
+        <activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+  		<modules>
+    		<module>meta</module>
+    		<module>deployer</module>
+    		<module>common</module>
+    		<module>core</module>
+   			<module>tomee</module>
+   			<module>web-common</module>
+    		<module>bpm-sar</module>
+    		<module>weblogout</module>
+    		<module>web</module>
+    		<module>selfservice</module>
+    		<module>webservice</module>
+    		<module>upload-components</module>
+    		<module>ear</module>
+    		<module>install</module>
+  		</modules>
+	 </profile>
+   </profiles>
 </project>

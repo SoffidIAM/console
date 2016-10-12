@@ -205,6 +205,19 @@ public class AccountEntityDaoImpl extends
 				atts.put(vd.getAttribute(), vd.getValue());
 		}
 		
+		// Assign vault folder
+		if (source.getFolder() == null)
+		{
+			target.setVaultFolder(null);
+			target.setVaultFolderId(null);
+		}
+		else
+		{
+			target.setVaultFolder(source.getFolder().getName());
+			target.setVaultFolderId(source.getFolder().getId());
+		}
+			
+
 		try {
 			target.setAccessLevel(getAccessLevel ( source));
 		} catch (InternalErrorException e) {

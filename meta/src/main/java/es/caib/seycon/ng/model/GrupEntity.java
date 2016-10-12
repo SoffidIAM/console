@@ -87,7 +87,7 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="GRD_IDGRUP", translated="systemGroup")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupDispatcherEntity> grupDispatcher;
 
-	@ForeignKey (foreignColumn="RLG_GRUP", translated="allowedRolesToGroup")
+	@ForeignKey (foreignColumn="RLG_GRUP", translated="grantedRoles")
 	public java.util.Collection<es.caib.seycon.ng.model.RolsGrupEntity> rolsOtorgatsGrup;
 
 	@Column (name="GRU_SECPRE", length=50, translated="budgetSection")

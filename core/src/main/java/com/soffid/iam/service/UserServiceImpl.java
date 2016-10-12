@@ -131,6 +131,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -431,6 +432,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		// this.getUsuariEntityDao().findByCodi(codiUsuariCreacio);
 
 		usuariEntity.setCreationUser(codiUsuariCreacio);
+		// Comprobamos autorización del usuario
+		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
+			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
+					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
+					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
+		}
+		
 
 		getUserEntityDao().create(usuariEntity);
 
@@ -1758,8 +1766,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected Collection<UserData> handleFindUserDataByUserName(
 			String codiUsuari) throws Exception {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
-		Collection<UserData> dades = getUserDataEntityDao().toUserDataList(
-				usuari.getUserData());
+		Collection<UserDataEntity> dades = usuari.getUserData();
 		LinkedList<UserData> result = new LinkedList<UserData>();
 
 		List<MetaDataEntity> tipusDades = getMetaDataEntityDao().loadAll();
@@ -1771,22 +1778,22 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		});
 
 		Iterator<MetaDataEntity> tipusDadesIterator = tipusDades.iterator();
+		AuthorizationService authSvc = getAuthorizationService();
 		while (tipusDadesIterator.hasNext()) {
 			MetaDataEntity tipusDada = tipusDadesIterator.next();
 			if (tipusDada.getName().compareTo(NIF) != 0
 					&& tipusDada.getName().compareTo(TELEFON) != 0) {
-				Iterator<UserData> dadesIterator = dades.iterator();
+				Iterator<UserDataEntity> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
-					UserData dada = dadesIterator.next();
-					if (dada.getAttribute().compareTo(NIF) != 0
-							&& dada.getAttribute().compareTo(TELEFON) != 0
-							&& dada.getAttribute().compareTo(
-									tipusDada.getName()) == 0) {
+					UserDataEntity dada = dadesIterator.next();
+					if (dada.getDataType().getName().compareTo(NIF) != 0
+							&& dada.getDataType().getName().compareTo(TELEFON) != 0 
+							&& dada.getDataType().getName().compareTo(tipusDada.getName()) == 0)
+					{
 						teTipusDada = true;
-						if (!dada.getVisibility().equals(
-								AttributeVisibilityEnum.HIDDEN))
-							result.add(dada);
+						if (authSvc.hasPermission(Security.AUTO_USER_MAZINGER_QUERY, dada))
+							result.add(getUserDataEntityDao().toUserData(dada));
 					}
 				}
 				if (!teTipusDada) {
@@ -2703,17 +2710,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	private void populateGroupRoles(GroupEntity grup, List<RoleGrant> rols) {
 		RoleGroupEntityDao dao = getRoleGroupEntityDao();
-		for (Iterator<RoleGroupEntity> it = grup.getAllowedRolesToGroup()
+		for (Iterator<RoleGroupEntity> it = grup.getGrantedRoles()
 				.iterator(); it.hasNext();) {
 			RoleGroupEntity rg = it.next();
 			rols.add(dao.toRoleGrant(rg));
-			populateRolRoles(rg.getAssignedRole(), rols);
+			populateRolRoles(rg.getGrantedRole(), rols);
 		}
 	}
 
 	private void populateRolRoles(RoleEntity rol, List<RoleGrant> rols) {
 		RoleDependencyEntityDao dao = getRoleDependencyEntityDao();
-		for (Iterator<RoleDependencyEntity> it = rol.getContainedRole()
+		for (Iterator<RoleDependencyEntity> it = rol.getContainedRoles()
 				.iterator(); it.hasNext();) {
 			RoleDependencyEntity rarEntity = it.next();
 			RoleGrant rg = dao.toRoleGrant(rarEntity);
@@ -2745,9 +2752,16 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (account == null)
 			return null;
 
+
+		// First,check from cache
+		User u = (User) getSessionCacheService().getObject("currentUser");
+		if (u != null)
+			return u;
+		 		
+
 		String dispatcherName = getInternalPasswordService()
 				.getDefaultDispatcher();
-		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(Security.getCurrentAccount(), dispatcherName);
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account, dispatcherName);
 		if (acc == null)
 			return null;
 		else if (acc.getType().equals (AccountType.USER))
@@ -3055,7 +3069,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
 			if (getAuthorizationService().hasPermission(
-					Security.AUTO_USER_SET_PASSWORD, usuari)) {
+					Security.AUTO_USER_UPDATE_PASSWORD, usuari)) {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao()
 						.findByName(codiDominiContrasenyes);
 				PolicyCheckResult validation = getInternalPasswordService()

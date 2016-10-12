@@ -18,8 +18,38 @@
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
 		</finder>
+		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				 method="findFolders" >
+				<parameter value="${queryName}" />
+			</ejb-finder>
+		</finder>
+		<finder name="folderAccount" type="folderAccount">
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="findAccounts" > <!--agent:query, application:update -->
+				<parameter value="${queryName}" />
+			</ejb-finder>
+		</finder>
 	</datanode>
 	
+	<datanode name="folder" transient="true">
+		<finder name="folder" type="folder">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="getChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder>
+		<finder name="folderAccount" type="folderAccount">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="list">
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="folderAccount" transient="true">
+	</datanode>
+
 	<datanode name="usuari">
 		<finder name="grup" type="void"> 
 			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.SelfService"

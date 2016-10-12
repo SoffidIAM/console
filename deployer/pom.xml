@@ -44,11 +44,6 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>iam-legacy</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<scope>provided</scope>
@@ -59,6 +54,11 @@
 			<artifactId>xalan</artifactId>
 			<version>2.7.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>iam-tomee</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.openejb</groupId>

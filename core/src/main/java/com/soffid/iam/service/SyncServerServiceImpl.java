@@ -56,6 +56,8 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @see es.caib.seycon.ng.servei.SeyconServerService
  */
@@ -174,6 +176,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             return agentstatus != null ? agentstatus : new LinkedList<AgentStatusInfo>();
 
         } catch (Throwable th) {
+        	LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
             throw new SeyconException(String.format(
                     Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
         }

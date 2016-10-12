@@ -88,9 +88,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		try {
 			com.soffid.iam.api.System mainDispatcher = getDispatcherService().findSoffidDispatcher();
 			Collection<Account> accounts = new LinkedList<Account>();
-			for (Account acc: getAccountService().getUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+			for (Account acc: getAccountService().getUserAccounts(u))
 			{
-				if (!acc.getType().equals(AccountType.IGNORED))
+				if (acc.getType().equals(AccountType.USER))
 				{
 					com.soffid.iam.api.System d = getDispatcherService().findDispatcherByName(acc.getSystem());
 					if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||

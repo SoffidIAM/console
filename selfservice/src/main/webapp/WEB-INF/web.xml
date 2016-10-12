@@ -619,6 +619,15 @@
 		<home>es.caib.seycon.ng.servei.ejb.DominiUsuariServiceHome</home>
 		<remote>es.caib.seycon.ng.servei.ejb.DominiUsuariService</remote>
 	</ejb-ref>        
+
+	<ejb-ref>
+		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<home>com.soffid.iam.service.ejb.VaultServiceHome</home>
+		<remote>
+			com.soffid.iam.service.ejb.VaultServiceHome
+		</remote>
+	</ejb-ref>
 	        
 	        
 

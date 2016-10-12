@@ -44,7 +44,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 		PermissionCache pc = permissionCache.get (userId);
 		if (pc != null)
 		{
-			if (System.currentTimeMillis() - pc.evaluationDate.getTime() < 5L*60L*1000L) // 5 minutes live for ACL
+			if (System.currentTimeMillis() - pc.evaluationDate.getTime() < 30L*1000L) // 30 seconds live for ACL
 			{
 				if ( ue.getLastModificationDate().before(pc.lastModification))
 					return pc.acl;

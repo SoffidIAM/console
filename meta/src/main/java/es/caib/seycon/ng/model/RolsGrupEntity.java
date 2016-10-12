@@ -17,14 +17,14 @@ import com.soffid.mda.annotation.*;
 	es.caib.seycon.ng.model.GrupEntity.class})
 public abstract class RolsGrupEntity {
 
-	@Column (name="RLG_GRUP", translated="ownerGroup")
+	@Column (name="RLG_GRUP", translated="group")
 	public es.caib.seycon.ng.model.GrupEntity grupPosseidor;
 
 	@Column (name="RLG_ID")
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RLG_ROL", translated="assignedRole")
+	@Column (name="RLG_ROL", translated="grantedRole")
 	public es.caib.seycon.ng.model.RolEntity rolOtorgat;
 
 	@Column (name="RLG_APL_ID")

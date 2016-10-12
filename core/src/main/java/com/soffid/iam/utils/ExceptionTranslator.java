@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.LogFactory;
+
 public class ExceptionTranslator {
 	ExceptionTranslator instance = new ExceptionTranslator();	
 	
@@ -62,6 +64,7 @@ public class ExceptionTranslator {
 	}
 	
 	public static String translate(Throwable e){
+		LogFactory.getLog(ExceptionTranslator.class).warn("Internal error: ", e);
 		String sqlError = e.getMessage();
 		if(e.getCause() != null){
 			sqlError = e.getCause().getMessage();

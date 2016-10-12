@@ -21,7 +21,7 @@ public abstract class RuleEntity {
 	@Column (name="RUL_DESCRI", length=150)
 	public java.lang.String description;
 
-	@Column (name="RUL_EXPRES")
+	@Column (name="RUL_EXPRES", length=10000)
 	public java.lang.String bshExpression;
 	
 	@Column (name="RUL_TEN_ID")

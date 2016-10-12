@@ -33,8 +33,8 @@ public class RoleGroupEntityImpl
 		if (Security.isUserInRole(permission+Security.AUTO_ALL))
 			return true;
 	
-		if (getAssignedRole() != null)
-			return getAssignedRole().isAllowed(permission);
+		if (getGrantedRole() != null)
+			return getGrantedRole().isAllowed(permission);
 		
 		return false;
 	}

@@ -410,10 +410,41 @@
 							}
 							);
 				}
+				void selectParent() {
+					es.caib.zkib.component.DataTree tree = selectFolderWnd
+							.getFellow("folderTree");
+					tree.setSelectedItem(null);
+					selectFolderWnd.doHighlighted();
+				}
+				
+				void selectedParentFolder() {
+					es.caib.zkib.component.DataTree tree = selectFolderWnd
+							.getFellow("folderTree");
+					Treeitem item = tree.getSelectedItem();
+					if (item != null) {
+						es.caib.zkib.binder.BindContext ctx1 = es.caib.zkib.datasource.XPathUtils
+								.getComponentContext(item);
+						es.caib.zkib.binder.BindContext ctx2 = es.caib.zkib.datasource.XPathUtils
+								.getComponentContext(esquema.getFellow("dades").getFellow("form"));
+						es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolder",
+								es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@name"));
+						es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolderId",
+								es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@id"));
+
+					} else {
+						es.caib.zkib.binder.BindContext ctx2 = es.caib.zkib.datasource.XPathUtils
+								.getComponentContext(esquema.getFellow("dades").getFellow("form"));
+						es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolder", null);
+						es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolderId", null);
+					}
+					selectFolderWnd.setVisible(false);
+				}
 			]]>
 		</zscript>
-
-		<esquemavertical datamodel="/model" focusCriteri="queryName"
+<!-- 
+		<textbox xmlns:w="http://www.zkoss.org/2005/zk/client" value="abc123" action="onMouseOver: alert('hola');"/>
+ -->
+ 		<esquemavertical datamodel="/model" focusCriteri="queryName"
 			id="esquema" onHideFormulari="showLista()">
 			<form dataPath="/model:/query" width="100%">
 				<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()"
@@ -657,6 +688,14 @@
 													</listitem>
 												</listbox>
 											</row>
+											<row>
+												<input_etiqueta value="${c:l('vault.account.folder')}:" />
+												<div>
+													<label bind="@vaultFolder" />
+													<imageclic src="/img/root.gif" id="changeFolderButton" width="16px" height="16px" onClick="selectParent()">
+													</imageclic>
+												</div>
+											</row>
 										</rows>
 									</grid>
 									<separator />
@@ -665,8 +704,9 @@
 										<account_acl id="ownerAcl" userList="ownerUsers" groupList="ownerGroups" roleList="ownerRoles"/>
 										<label value="${c:l('accounts.manager')}" />
 										<account_acl id="managerAcl" userList="managerUsers" groupList="managerGroups" roleList="managerRoles"/>
-										<label value="${c:l('accounts.user')}" />
+										<label value="${c:l('accounts.userAccess')}" />
 										<account_acl id="userAcl" userList="grantedUsers" groupList="grantedGroups" roleList="grantedRoles"/>
+										<checkbox id="inheritNewPermissionsCheckbox" bind="@inheritNewPermissions" label="${c:l('vault.account.inheritPermissions')}"></checkbox>
 									</vbox>
 								</hbox>
 							</tabpanel>
@@ -1138,6 +1178,34 @@
 				</hbox>
 			</vbox>
 		</window>
+		<window id="selectFolderWnd" visible="false" sizable="true"
+			position="center,center" width="50%"
+			title="${c:l('vault.folder.SelectParentFolder')}">
+			<tree autocommit="false" dataPath="/model:/" fixedLayout="false"
+				width="100%" rows="10" id="folderTree">
+				<treeitemfinder bind="." open="false" path="/folder">
+					<treerow
+						onDoubleClick="if (folderTree.getSelectedCount() > 0) selectedParentFolder();">
+						<treecell>
+							<image src="/img/root.gif" height="1em" />
+							<label bind="@name"
+								style="display: inline-block; padding-bottom: 5px; padding-top: 5px;" />
+						</treecell>
+					</treerow>
+				</treeitemfinder>
+			</tree>
+			<div style="height: 5em;">
+				<label value=" "></label>
+				<div style="float:right; margin-top: 2em; height:3em;">
+					<button label="${c:l('accounts.setPassword.Cancel')}"
+						onClick="selectFolderWnd.setVisible(false);" />
+					<button id="selectButton"
+						label="${c:l('accounts.setPassword.OK')}"
+						onClick="selectedParentFolder()" />
+				</div>
+			</div>
+		</window>
+		
 	</frame>
 	<include src="rolsllista.zul" />
 	<include src="finestres/canviPassword.zul" />

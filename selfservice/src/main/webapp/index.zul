@@ -77,6 +77,9 @@
 			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
 			if (target != null)
 			{
+				if (target.startsWith("sharedAccounts/sharedAccounts.zul"))
+					target = "vault/vault.zul"+target.substring(33);
+				System.out.println("t="+target);
 				Component menuPage = Executions.createComponents("menu.zul", self, new HashMap());                      
 				Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
 				find (children, target);

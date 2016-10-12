@@ -14,6 +14,7 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.ContainerRole;
+import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -78,39 +79,6 @@ public class RoleDependencyEntityDaoImpl extends
         tasque.setRole(rol.getName());
         tasque.setDb(rol.getSystem().getName());
         getTaskEntityDao().create(tasque);
-    }
-
-    public static boolean verificaAssociacioSenseCicles(RoleDependencyEntity associacio, StringBuffer cami) {
-        RoleEntity contingut = associacio.getContained();
-        RoleEntity pare = associacio.getContainer();
-
-        // Método: Para todo T,D / T & D son RolEntity
-        // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
-        // (versión breve)
-        // exista un camino C(D1, T): D1 está contenido en T
-        //
-        // Obtenemos dónde está contenido el padre (el contenedor del rol)
-        // return true;
-        cami.append(contingut.getName() + " => "); //$NON-NLS-1$
-        return verificaAssociacioSenseCicles(contingut, pare, cami);
-    }
-
-    public static boolean verificaAssociacioSenseCicles(RoleEntity fill, RoleEntity pare, StringBuffer cami) {
-        Collection pareEsContingut = pare.getContainerRoles();
-        boolean senseCicles = true;
-        cami.append(pare.getName() + " => "); //$NON-NLS-1$
-        for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext(); ) {
-            RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
-            RoleEntity parePare = relacio.getContainer();
-            if (parePare.equals(fill)) {
-                senseCicles = false;
-                cami.append(parePare.getName());
-                return false;
-            } else {
-                senseCicles = verificaAssociacioSenseCicles(fill, parePare, cami);
-            }
-        }
-        return senseCicles;
     }
 
     public RoleDependencyEntity containerRoleToEntity(ContainerRole contenidorRol) {
@@ -234,6 +202,10 @@ public class RoleDependencyEntityDaoImpl extends
         target.setRoleName(source.getContained().getName());
         target.setSystem(source.getContained().getSystem().getName());
         target.setInformationSystem(source.getContained().getInformationSystem().getName());
+        if (source.getStatus() == null)
+        	target.setStatus (RoleDependencyStatus.STATUS_ACTIVE);
+        else
+        	target.setStatus(source.getStatus());
     }
 
 }

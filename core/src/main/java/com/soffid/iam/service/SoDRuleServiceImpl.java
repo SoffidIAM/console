@@ -14,14 +14,17 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SoDRoleEntity;
 import com.soffid.iam.model.SoDRuleEntity;
 import com.soffid.iam.model.UserEntity;
+
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRole;
 import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.exception.InternalErrorException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -292,6 +295,11 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 }
             }
         }
+		// Now check inherited rules
+		for ( RoleDependencyEntity childRole: role.getContainedRoles()) 
+		{
+			rules.addAll(doFindSodNonCompliances(childRole.getContained(), rols));
+		}
 		return rules;
 	}
 

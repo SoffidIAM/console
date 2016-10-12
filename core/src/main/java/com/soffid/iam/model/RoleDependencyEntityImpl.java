@@ -98,10 +98,11 @@ public class RoleDependencyEntityImpl
 					return false;
 			
 			// Domini aplicacio
-			if ((getGranteeApplicationDomain() !=null && rare.getGranteeApplicationDomain()==null) || (getGranteeApplicationDomain()==null && rare.getGranteeApplicationDomain()!=null) )
+			if ((getDomainApplication() !=null && rare.getDomainApplication()==null) || 
+					(getDomainApplication()==null && rare.getDomainApplication()!=null) )
 				return false;
-			if (getGranteeApplicationDomain() != null && rare.getGranteeApplicationDomain() != null
-					&& !getGranteeApplicationDomain().getId().equals(rare.getGranteeApplicationDomain().getId()))
+			if (getDomainApplication() != null && rare.getDomainApplication() != null
+					&& !getDomainApplication().getId().equals(rare.getDomainApplication().getId()))
 				return false;
 			
 			// Valor de domini

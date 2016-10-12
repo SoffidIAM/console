@@ -18,47 +18,37 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  * Entity DadaUsuariEntity implementation
  */
 public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
-	implements SecurityScopeEntity
-{
+		implements SecurityScopeEntity {
 	public AttributeVisibilityEnum getAttributeVisibility() {
-		AuthorizationService autService = com.soffid.iam.ServiceLocator.instance().getAuthorizationService();
-		try {
-			if (autService.hasPermission(
-					Security.AUTO_USER_METADATA_UPDATE, this))
-				return AttributeVisibilityEnum.EDITABLE;
-			else if (autService.hasPermission(
-					Security.AUTO_USER_QUERY, this))
-				return AttributeVisibilityEnum.READONLY;
-			else
-				return AttributeVisibilityEnum.HIDDEN;
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
-		}
+		return getInitialVisibility();
 	}
 
-
-	private AttributeVisibilityEnum getInitialVisibility ()
-	{
+	private AttributeVisibilityEnum getInitialVisibility() {
 		if (Security.isSyncServer())
 			return AttributeVisibilityEnum.EDITABLE;
-		
+
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+
 		MetaDataEntity tda = getDataType();
 		if (tda == null)
 			return AttributeVisibilityEnum.HIDDEN;
-		
+
 		String user = Security.getCurrentUser();
-		if (user != null)
-		{
+		if (user != null) {
 			if (getUser().getUserName().equals(user))
-				return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
+				return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN
+						: tda.getUserVisibility();
 		}
 
 		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
 			return AttributeVisibilityEnum.EDITABLE;
-		
+
 		if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
 			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getAdminVisibility();
+		else if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
 		else if (getUser().isAllowed(Security.AUTO_USER_METADATA_UPDATE))
 			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getOperatorVisibility();
@@ -73,17 +63,17 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 	}
 
 	public boolean isAllowed(String permission) {
-		if (permission.equals (Security.AUTO_USER_QUERY))
-		{
-			return getInitialVisibility().equals (AttributeVisibilityEnum.EDITABLE) ||
-					getInitialVisibility().equals (AttributeVisibilityEnum.READONLY) ;
-		}
-		else if (permission.equals (Security.AUTO_USER_METADATA_UPDATE))
-		{
-			return getInitialVisibility().equals (AttributeVisibilityEnum.EDITABLE)  ;
-		}
-		else
-			return Security.isUserInRole(permission+Security.AUTO_ALL);
+		if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return true;
+		else if (permission.equals(Security.AUTO_USER_METADATA_UPDATE)) {
+			return true;
+		} else if (permission.equals(Security.AUTO_USER_QUERY)) {
+			return getInitialVisibility().equals(
+					AttributeVisibilityEnum.EDITABLE)
+					|| getInitialVisibility().equals(
+							AttributeVisibilityEnum.READONLY);
+		} else
+			return Security.isUserInRole(permission + Security.AUTO_ALL);
 	}
 
 }

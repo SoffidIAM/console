@@ -1783,16 +1783,36 @@ public class BpmEngineImpl extends BpmEngineBase {
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
 			Vector resultadoFinal = new Vector();
-			for (Iterator it = context.getGraphSession()
-					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
-				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
-						.next();
-				
-				TenantModuleDefinition tm = (TenantModuleDefinition) definition.getDefinition(TenantModuleDefinition.class);
-				
-				if (tm.getTenantId().equals ( Security.getCurrentTenantId()) && 
-						(name == null || name.trim().length() == 0 || name.equals (definition.getName())))
-				{
+						
+			if (name == null || name.trim().isEmpty()) {
+				List defs = context.getGraphSession()
+						.findLatestProcessDefinitions();
+				for (Iterator it = defs.iterator(); it.hasNext();) {
+					org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
+							.next();
+
+					TenantModuleDefinition tm = (TenantModuleDefinition) definition
+							.getDefinition(TenantModuleDefinition.class);
+
+					if (tm.getTenantId().equals(Security.getCurrentTenantId())
+							&& (name == null || name.trim().length() == 0 || name
+									.equals(definition.getName()))) {
+						ProcessDefinition def = VOFactory
+								.newProcessDefinition(definition, context);
+						if (def.isEnabled() && type.equals(def.getType())) {
+							resultadoFinal.add(def);
+						}
+					}
+				}
+			} else {
+				org.jbpm.graph.def.ProcessDefinition definition = context
+						.getGraphSession().findLatestProcessDefinition(name);
+				TenantModuleDefinition tm = (TenantModuleDefinition) definition
+						.getDefinition(TenantModuleDefinition.class);
+
+				if (tm.getTenantId().equals(Security.getCurrentTenantId())
+						&& (name == null || name.trim().length() == 0 || name
+								.equals(definition.getName()))) {
 					com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
 							.newProcessDefinition(definition, context);
 					if (def.isEnabled() && type.equals(def.getType())) {

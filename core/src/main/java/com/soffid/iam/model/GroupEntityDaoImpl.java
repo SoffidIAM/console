@@ -507,7 +507,7 @@ public class GroupEntityDaoImpl extends
 		rolsAnalitzar.add(rol);
 		RoleEntity rolActual = null;
 		while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
-			Collection socContenidor = rolActual.getContainedRole();
+			Collection socContenidor = rolActual.getContainedRoles();
 				
 			if (socContenidor!=null) for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
@@ -540,7 +540,7 @@ public class GroupEntityDaoImpl extends
             Object obj = it.next();
             if (obj != null) {
                 GroupEntity g = (GroupEntity) obj;
-                Collection rolsAtorgatsG = g.getAllowedRolesToGroup();
+                Collection rolsAtorgatsG = g.getGrantedRoles();
                 if (rolsAtorgatsG != null) totRolAtorgatGrup.addAll(rolsAtorgatsG);
             }
         }
@@ -551,8 +551,8 @@ public class GroupEntityDaoImpl extends
             Object obj = it.next();
             if (obj != null) {
                 RoleGroupEntity rolgrup = (RoleGroupEntity) obj;
-                rolsPropagar.add(rolgrup.getAssignedRole());
-                Collection rolsAtorgatsRol = getRolsContingutsPerPropagar(rolgrup.getAssignedRole());
+                rolsPropagar.add(rolgrup.getGrantedRole());
+                Collection rolsAtorgatsRol = getRolsContingutsPerPropagar(rolgrup.getGrantedRole());
                 if (rolsAtorgatsRol != null) rolsPropagar.addAll(rolsAtorgatsRol);
             }
         }

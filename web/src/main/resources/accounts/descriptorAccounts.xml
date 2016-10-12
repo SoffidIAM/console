@@ -65,9 +65,24 @@
 			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
 			</ejb-finder>
 		</finder>		
+		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				 method="findFolders" >
+				<parameter value="${null}" />
+			</ejb-finder>
+		</finder>
 	</datanode>
 
 	<datanode name="query" transient="true" />
+
+	<datanode name="folder" transient="true" >
+		<finder name="folder" type="folder">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="getChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
 
 	<datanode name="type" transient="true">
 		<custom-attribute name="literal">
@@ -95,7 +110,7 @@
 			<delete-method method="removeAccount">    
 				<parameter value="${instance}" />
 			</delete-method>
-			<update-method method="updateAccount"> <!-- user:update -->
+			<update-method method="updateAccount" returnBean="true"> <!-- user:update -->
 				<parameter value="${instance}" />
 			</update-method>
 		

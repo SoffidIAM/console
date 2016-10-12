@@ -250,7 +250,7 @@ public class InformationSystemEntityDaoImpl
 			List definitions;
 			try
 			{
-				definitions = bpm.findProcessDefinitions(sourceVO.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
+				definitions = bpm.findProcessDefinitions(sourceVO.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (definitions.isEmpty())
 				{
 					throw new SeyconException(String.format("Unknown workflow '%s'", sourceVO.getApprovalProcess()));

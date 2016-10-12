@@ -6,6 +6,9 @@ import com.soffid.mda.annotation.Enumeration;
 @Enumeration()
 @Description("How the user can use the accounts")
 public class AccountAccessLevelEnum {
+	@Description("Navegate through vault folders")
+	public static String ACCESS_NAVIGATE = "N";
+
 	@Description("Only usable on single sign on engine")
 	public static String ACCESS_USER = "U";
 	

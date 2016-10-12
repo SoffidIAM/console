@@ -12,6 +12,8 @@ import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
 
+import com.soffid.iam.api.AttributeVisibilityEnum;
+
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -65,11 +67,15 @@ public class ShowAdditionalData {
 				{
 					if (! "PHONE". equals (tda.getCodi()) && ! "NIF".equals(tda.getCodi()))
 					{
-						DadaUsuari du = new DadaUsuari ();
-						du.setCodiDada(tda.getCodi());
-						du.setDataLabel(tda.getLabel());
-						dadaUsuariCollection.add(du);
-					}
+						if (tda.getOperatorVisibility() != AttributeVisibilityEnum.HIDDEN)
+						{
+							DadaUsuari du = new DadaUsuari ();
+							du.setCodiDada(tda.getCodi());
+							du.setDataLabel(tda.getLabel());
+							du.setVisibility(tda.getOperatorVisibility());
+							dadaUsuariCollection.add(du);
+						}
+					} 
 				}
 			}
 			Collections.sort(dadaUsuariCollection, new Comparator<DadaUsuari>() {

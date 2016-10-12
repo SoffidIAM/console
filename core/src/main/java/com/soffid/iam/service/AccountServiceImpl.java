@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.servei.*;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -60,6 +61,7 @@ import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
 
 import com.soffid.iam.api.Password;
+import com.soffid.iam.bpm.api.ProcessInstance;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
@@ -93,6 +95,8 @@ import java.util.Vector;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.def.ProcessDefinition;
 import org.mortbay.log.Log;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeansException;
@@ -240,14 +244,19 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			acc.setSystem(getSystemEntityDao().findByName(account.getSystem()));
 			acc.setName(account.getName());
 			acc.setType(account.getType());
+			acc.setInheritNewPermissions(account.isInheritNewPermissions());
 			UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
 			if (tu == null)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
 			acc.setPasswordPolicy( tu );
 			getAccountEntityDao().create(acc);
 			updateAcl (acc, account);
+			
+			account.setId(acc.getId());
+			account = getVaultService().addToFolder(account);
+			
 			createAccountTask(acc);
-			return getAccountEntityDao().toAccount(acc);
+			return account;
 		}
 		else
 		{
@@ -391,7 +400,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	@Override
-    protected void handleUpdateAccount(com.soffid.iam.api.Account account) throws Exception {
+    protected Account handleUpdateAccount(com.soffid.iam.api.Account account) throws Exception {
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		
 		if (! account.getType().equals( ae.getType() ) )
@@ -458,7 +467,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		else
 			updateAcl(ae, account);
 		getAccountEntityDao().update(ae);
+
+		account = getVaultService().addToFolder(account);
+
 		createAccountTask(ae);
+		
+		return account;
 	}
 
 	private void createUserTask(UserEntity ue) {
@@ -1068,7 +1082,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	 * @see es.caib.seycon.ng.servei.AccountServiceBase#handleSetHPAccountPassword(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Password, boolean)
 	 */
 	@Override
-	protected void handleSetHPAccountPassword (Account account, Password password,
+	protected boolean handleSetHPAccountPassword (Account account, Password password,
 					java.util.Date date, boolean force) throws Exception
 	{
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
@@ -1091,7 +1105,21 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
 		{
-			if (caller.getId() != ae.getId())
+			// Check if policy allows user change
+			UserDomainService dominiUsuariService = getUserDomainService();
+			PasswordPolicy politica = dominiUsuariService.findPolicyByTypeAndPasswordDomain(
+							ae.getPasswordPolicy().getName(), 
+							ae.getSystem().getPasswordDomain().getName());
+			if (politica == null)
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
+			if (!politica.isAllowPasswordChange())
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
+			PolicyCheckResult pcr = ips.checkAccountPolicy(ae, password);
+			if (!pcr.isValid())
+				throw new BadPasswordException(pcr.getReason());
+			
+			// Check user authorization
+			 			if (caller.getId() != ae.getId())
 			{
 				if (ae.getType().equals(AccountType.USER))
 				{
@@ -1115,6 +1143,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     }
 					if (!found)
 					{
+						// Try to request throw workflow
+						users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_USER);
+						found = false;
+						for (String user : users) {
+	                        if (user.equals(callerUe.getUserName())) {
+	                        	// Launch workflow
+	            				if ( startHPWorkflow(account, password, date)) 
+	            					return false;
+	                        }
+						}
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
 					}
 				}
@@ -1123,13 +1161,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotChangePasswordAccountShared"))); //$NON-NLS-1$
 				}
 			}
-			// Check if policy allows user change
-			UserDomainService dominiUsuariService = getUserDomainService();
-			PasswordPolicy politica = dominiUsuariService.findPolicyByTypeAndPasswordDomain(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
-			if (politica == null)
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
-			if (!politica.isAllowPasswordChange())
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
 		}
 		
 		if (! force )
@@ -1164,8 +1195,32 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		// Now, audit
 		audit("H", ae); //$NON-NLS-1$
 		audit("P", ae); //$NON-NLS-1$
+		
+		return true;
 	}
 	
+	private boolean startHPWorkflow(Account acc, Password p, Date until) throws InternalErrorException {
+		List def = getBpmEngine().findProcessDefinitions(null, PredefinedProcessType.PRIVILEGED_ACCOUNT);
+		if (def.isEmpty())
+			return false;
+		JbpmContext ctx = getBpmEngine().getContext();
+		try {
+			ProcessDefinition pd = (ProcessDefinition) def.get(0);
+			org.jbpm.graph.exe.ProcessInstance pi = ctx.newProcessInstance(pd.getName());
+			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
+			pi.getContextInstance().createVariable("account", acc.getId());
+			pi.getContextInstance().createVariable("accountSystem", acc.getSystem());
+			pi.getContextInstance().createVariable("accountName", acc.getName());
+			pi.getContextInstance().createVariable("password", p.toString());
+			pi.getContextInstance().createVariable("until", until);
+			pi.signal();
+			ctx.save(pi);
+			return true;
+		} finally {
+			ctx.close();
+		}
+		 	}
+
 	private UserEntity getUserForAccount(AccountEntity acc) {
 		UserEntity ue = null;
 		if (acc.getType().equals(AccountType.USER))
@@ -1230,10 +1285,24 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (accEntity == null)
 			return false;
 		
-		Account account2 = getAccountEntityDao().toAccount(accEntity);
-		account.setLastPasswordSet(account2.getLastPasswordSet());
-		account.setLastUpdated(account2.getLastUpdated());
-		account.setPasswordExpiration(account2.getPasswordExpiration());
+		Calendar c = Calendar.getInstance();
+		if (accEntity.getLastPasswordSet() != null)
+		{
+			c.setTime(accEntity.getLastPasswordSet());
+			account.setLastPasswordSet(c);
+		}
+		c = Calendar.getInstance();
+		if (accEntity.getLastUpdated() != null)
+		{
+			c.setTime(accEntity.getLastUpdated());
+			account.setLastUpdated(c);
+		}
+		c = Calendar.getInstance();
+		if (accEntity.getPasswordExpiration() != null)
+		{
+			c.setTime(accEntity.getPasswordExpiration());
+			account.setPasswordExpiration(c);
+		}
 
 		List<TaskEntity> coll = getTaskEntityDao().findByAccount(accEntity.getName(), accEntity.getSystem().getName());
 		for (TaskEntity tasque : coll) {
@@ -1419,7 +1488,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_USER);
 					boolean found = false;
 					for (String user : users) {
                         if (user.equals(callerUe.getUserName())) {

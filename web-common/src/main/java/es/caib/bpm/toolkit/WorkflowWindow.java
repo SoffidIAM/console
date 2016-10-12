@@ -1,5 +1,6 @@
 package es.caib.bpm.toolkit;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -59,14 +60,18 @@ public class WorkflowWindow extends Window {
     }
 
     public WorkflowWindow() {
-        Map arguments = Executions.getCurrent().getArg();
-        taskInstance = (TaskInstance) arguments.get("taskInstance"); //$NON-NLS-1$
-        if (taskInstance == null)
-            taskInstance = new TaskInstance();
+		Map arguments = Executions.getCurrent().getArg();
+		processInstance = (ProcessInstance) arguments.get("processInstance"); //$NON-NLS-1$
+		if (processInstance == null) {
+			processInstance = new ProcessInstance();
+			processInstance.setVariables(new HashMap());
+		}
 
-        processInstance = (ProcessInstance) arguments.get("processInstance"); //$NON-NLS-1$
-        if (processInstance == null)
-            processInstance = new ProcessInstance();
+		taskInstance = (TaskInstance) arguments.get("taskInstance"); //$NON-NLS-1$
+		if (taskInstance == null) {
+			taskInstance = new TaskInstance();
+			taskInstance.setVariables(processInstance.getVariables());
+		}
 
         engine = (BpmEngine) arguments.get("engine"); //$NON-NLS-1$
         this.addEventListener(PREPARE_TRANSITION_EVENT, new EventListener() {

@@ -1636,6 +1636,12 @@
 				<toolbarbutton image="~./img/reload-petit16b.png" label="${c:l('aplicacionsIntranet.zul.Refrescaarbre')}" onClick="onRefrescaArbreIntern(true)"/>
 			</toolbar>
 			<tree autocommit="false" dataPath="/model:/" fixedLayout="true" height="96%" id="treebox" onSelect="select()" pageSize="19" rows="${fileres}">
+				<attribute name="onNewRow"><![CDATA[
+				    Treeitem item = event.data;
+					String menu = es.caib.zkib.datasource.XPathUtils.getValue (item, "/@menu");
+					if (! "S".equals(menu))
+						item.getTreechildren().setParent(null);
+				]]></attribute>
 				<treeitemfinder bind="." open="false" path="/app">
 					<treerow  droppable="true"  onDrop="onMoureTree(event)" >
 						<treecell> 

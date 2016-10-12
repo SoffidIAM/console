@@ -7,8 +7,11 @@
 package es.caib.seycon.ng.servei;
 import java.util.List;
 
+import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.iam.service.VaultService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -46,7 +49,9 @@ import roles.account_attribute_update;
 	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
 	AuditoriaService.class,
-	BpmEngine.class})
+	BpmEngine.class,
+	VaultService.class,
+	VaultFolderEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts
@@ -144,9 +149,10 @@ public abstract class AccountService {
 	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
 			translated="updateAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void updateAccount(
+	public Account updateAccount(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
+		return null;
 	}
 	
 	/**
@@ -345,16 +351,17 @@ public abstract class AccountService {
 	
 	
 	///
-	@Description ("Sets the high privileged account password")
+	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},
 			translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void setHPAccountPassword(
+	public boolean setHPAccountPassword(
 		es.caib.seycon.ng.comu.Account account, 
 		es.caib.seycon.ng.comu.Password password, 
 		java.util.Date untilDate, 
 		boolean force)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return false;
 	}
 
 	

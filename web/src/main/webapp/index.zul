@@ -17,8 +17,8 @@
 				boolean embed = Executions.getCurrent().getNativeRequest().getParameter("embed") != null;
 			]]>
 		</zscript>
-		<style src="/css/localSEU.css"/>
 		<style src="~./styles/estil.css"/>
+		<style src="/css/localSEU.css"/>
 		<style src="/css/devices.css"/>
 		<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
 			initialPage="wf/inbox.zul"

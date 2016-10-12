@@ -165,6 +165,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
             targetVO.setGroups(grups);
         }
        	targetVO.setDatabaseReplicaId(null);
+       	targetVO.setTenant (sourceEntity.getTenant().getName());
     }
 
     /**

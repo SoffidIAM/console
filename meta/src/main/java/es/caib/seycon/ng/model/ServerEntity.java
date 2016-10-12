@@ -41,6 +41,11 @@ public abstract class ServerEntity {
 	@Nullable
 	public java.lang.String url;
 
+	@Column (name="SRV_JVMOPT", length=256)
+	@Nullable
+	public java.lang.String javaOptions;
+
+
 	@Column (name="SRV_TEN_ID")
 	@Nullable 
 	TenantEntity tenant;

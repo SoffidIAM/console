@@ -35,6 +35,14 @@ public class TenantServiceImpl extends TenantServiceBase {
 	}
 
 	@Override
+	protected Tenant handleGetTenant(Long id) throws Exception {
+		TenantEntity t = getTenantEntityDao().load(id);
+		if (t == null)
+			return null;
+		return getTenantEntityDao().toTenant(t);
+	}
+
+	@Override
 	protected Tenant handleCreate(Tenant tenant) throws Exception {
 		if (! MASTER_NAME.equals (Security.getCurrentTenantName()))
 		{

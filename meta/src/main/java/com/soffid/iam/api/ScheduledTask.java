@@ -13,6 +13,9 @@ public class ScheduledTask {
 	@Nullable
 	public java.lang.Long id;
 
+	@Nullable
+	public String tenant;
+	
 	public java.lang.String name;
 
 	@Nullable

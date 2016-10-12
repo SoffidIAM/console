@@ -26,6 +26,10 @@ public class TenantService extends Object {
 	@Description("Finds a tenant by name. Used mainly internally")
 	public Tenant getTenant (String name) { return null; }
 
+	@Operation(grantees={tenantQuery.class})
+	@Description("Finds a tenant by name. Used mainly internally")
+	public Tenant getTenant (Long id) { return null; }
+
 	@Description("Gets master tenant")
 	@Operation(grantees={tenantQuery.class})
 	public Tenant getMasterTenant () { return null; }

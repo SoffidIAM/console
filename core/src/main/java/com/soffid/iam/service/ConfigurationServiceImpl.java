@@ -285,5 +285,17 @@ public class ConfigurationServiceImpl
 			return entity.getVersion();
 		}
 	}
+
+	@Override
+	protected Configuration handleFindMasterParameterByNameAndNetwork(
+			String parameter, String networkName)
+			throws Exception {
+		ConfigEntity configuracioEntity = getConfigEntityDao().findByTenantNameAndNetwork("master", parameter, networkName);
+		if(configuracioEntity != null){
+			Configuration configuracio = getConfigEntityDao().toConfiguration(configuracioEntity);
+			return configuracio;
+		}
+		return null;		
+	}
 	
 }       

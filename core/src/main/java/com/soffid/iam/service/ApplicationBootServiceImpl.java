@@ -165,7 +165,7 @@ public class ApplicationBootServiceImpl extends
 	 * 
 	 */
 	private void loadWorkflows() {
-		String jbossHome = System.getProperty("jboss.server.home.dir"); //$NON-NLS-1$
+		String jbossHome = System.getProperty("catalina.base"); //$NON-NLS-1$
 		if (jbossHome != null) {
 			File jbossdir = new File(jbossHome); //$NON-NLS-1$
 			File soffiddir = new File(jbossdir, "soffid"); //$NON-NLS-1$

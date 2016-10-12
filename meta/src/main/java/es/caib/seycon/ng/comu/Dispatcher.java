@@ -123,4 +123,7 @@ public class Dispatcher {
 	@Nullable
 	public Long longTimeout;	
 	
+	@Nullable
+	@Description("Owner tenant")
+	public String tenant;
 }

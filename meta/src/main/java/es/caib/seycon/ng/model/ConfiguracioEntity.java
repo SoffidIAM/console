@@ -51,6 +51,22 @@ public abstract class ConfiguracioEntity {
 	 return null;
 	}
 
+
+	@Operation
+	@DaoFinder("select configuracio  \n"
+			+ "from com.soffid.iam.model.ConfigEntity as configuracio \n"
+			+ "left join configuracio.network as network \n"
+			+ "where \n"
+			+ "  configuracio.name = :name and \n"
+			+ "  configuracio.tenant.name = :tenant and \n"
+			+ " ((:networkName is null and network is null) or (network.name = :networkName))")
+	public es.caib.seycon.ng.model.ConfiguracioEntity findByTenantNameAndNetwork(
+		String tenant,
+		java.lang.String name, 
+		@Nullable java.lang.String networkName) {
+	 return null;
+	}
+
 	@DaoFinder(	"select config " + //$NON-NLS-1$
 				"from com.soffid.iam.model.ConfigEntity config " + //$NON-NLS-1$
 				"left join config.network network "+ //$NON-NLS-1$

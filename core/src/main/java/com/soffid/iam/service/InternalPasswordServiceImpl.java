@@ -561,6 +561,7 @@ public class InternalPasswordServiceImpl extends
         tasca.setStatus("P"); //$NON-NLS-1$
         try {
     		TaskHandler th = new TaskHandler();
+    		th.setTenant(Security.getCurrentTenantName());
     		th.setTask(tasca);
     		return getTaskQueue().processOBTask(th);
         } 

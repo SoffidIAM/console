@@ -39,7 +39,7 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 
 	private AttributeVisibilityEnum getInitialVisibility ()
 	{
-		if (Security.isDisableAllSecurityForEver())
+		if (Security.isSyncServer())
 			return AttributeVisibilityEnum.EDITABLE;
 		
 		MetaDataEntity tda = getDataType();

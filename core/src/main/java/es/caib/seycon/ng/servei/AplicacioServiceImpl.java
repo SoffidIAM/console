@@ -837,7 +837,7 @@ public class AplicacioServiceImpl extends
                     "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
         // Creamos la entidad asociada al VO Rol
-        rolEntity = getRolEntityDao().create(rol, true);
+        rolEntity = getRolEntityDao().create(rol, false);
 
         return getRolEntityDao().toRol(rolEntity);
     }

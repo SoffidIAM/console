@@ -41,7 +41,11 @@ public abstract class ServerPluginEntity {
 		java.lang.String name) {
 	 return null;
 	}
-	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\nagent.enableAttributeMapping\nfrom es.caib.seycon.ng.model.AgentDescriptorEntity agent \nleft join agent.plugin as p \nwhere p.id=:id")
+	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,"
+			+ "agent.enableAttributeMapping, agent.enableObjectTriggers "
+			+ "from es.caib.seycon.ng.model.AgentDescriptorEntity agent "
+			+ "left join agent.plugin as p "
+			+ "where p.id=:id")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findDadesBasiquesAgentsByServerPluginId(
 		java.lang.Long id) {
 	 return null;

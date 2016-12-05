@@ -20,6 +20,8 @@ import es.caib.seycon.ng.comu.AttributeDirection;
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.ObjectMapping;
 import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import es.caib.seycon.ng.comu.ObjectMappingTrigger;
+import es.caib.seycon.ng.comu.SoffidObjectTrigger;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
@@ -65,6 +67,7 @@ public class Importer {
 			
 			addProperties (n, ds, path);
 			addAttributes(n, ds, path);
+			addTriggers(n, ds, path);
 		}
 				
 	}
@@ -81,6 +84,21 @@ public class Importer {
 			
 			// Add object to path
 			XPathUtils.createPath(ds, path+"/property", omp);
+		}
+	}
+
+	private void addTriggers(Element mappingElement, DataSource ds, String path) throws Exception {
+		NodeList nodes = mappingElement.getElementsByTagName("trigger");
+		for (int i = 0; i < nodes.getLength(); i++)
+		{
+			Element n = (Element) nodes.item(i);
+			ObjectMappingTrigger omp = new ObjectMappingTrigger();
+			
+			omp.setTrigger(SoffidObjectTrigger.fromString(n.getAttribute("type")));
+			omp.setScript(n.getAttribute("script"));
+			
+			// Add object to path
+			XPathUtils.createPath(ds, path+"/objectMappingTrigger", omp);
 		}
 	}
 

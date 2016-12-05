@@ -22,6 +22,7 @@ import es.caib.seycon.ng.comu.AttributeDirection;
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.ObjectMapping;
 import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.jxpath.JXPathContext;
@@ -85,6 +86,12 @@ public class Exporter {
 			serializeAttribute (doc, e, ctx, p2);
 		}
 		
+		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/objectMappingTrigger");
+				it.hasNext();)
+		{
+			Pointer p2 = (Pointer) it.next();
+			serializeTrigger (doc, e, ctx, p2);
+		}
 	}
 
 	private void serializeProperty(Document doc, Element parent, JXPathContext ctx,
@@ -95,6 +102,17 @@ public class Exporter {
 		Element e = doc.createElement("property");
 		e.setAttribute("name", instance.getProperty());
 		e.setAttribute("value", instance.getValue());
+		parent.appendChild(e);
+	}
+
+	private void serializeTrigger(Document doc, Element parent, JXPathContext ctx,
+			Pointer p) {
+		DataNode dn = (DataNode) p.getValue();
+		ObjectMappingTrigger instance = (ObjectMappingTrigger) dn.getInstance();
+
+		Element e = doc.createElement("property");
+		e.setAttribute("type", instance.getTrigger().toString());
+		e.setAttribute("script", instance.getScript());
 		parent.appendChild(e);
 	}
 

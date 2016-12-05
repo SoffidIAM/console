@@ -132,6 +132,7 @@ public class ServerPluginServiceImpl extends es.caib.seycon.ng.servei.ServerPlug
 	    			agentEntity.setUserInterface(agent.getUserInterface());
 	    			agentEntity.setModule(moduleEntity);
 	    			agentEntity.setAuthoritativeSource(agent.isAuthoritativeSource());
+	    			agentEntity.setEnableObjectTriggers(agent.isEnableObjectTriggers());
 	    			agentEntity.setPlugin(plugin);
 	    			getAgentDescriptorEntityDao().create(agentEntity);
 	    			if (agent instanceof InternalAgentDescriptor && ((InternalAgentDescriptor) agent).getObjects() != null)
@@ -295,12 +296,14 @@ public class ServerPluginServiceImpl extends es.caib.seycon.ng.servei.ServerPlug
                 Boolean enable = (Boolean) obj[3];
                 Boolean authoritative = (Boolean) obj[4];
                 Boolean enableAttributeMapping = (Boolean) obj[5];
+                Boolean enableObjectTriggers = (Boolean) obj[6];
                 AgentDescriptor ag = new AgentDescriptor();
                 ag.setId((Long) obj[0]);
                 ag.setDescription((String) obj[1]);
                 ag.setClassName((String) obj[2]);
                 ag.setEnableAccessControl(enable != null ? enable.booleanValue() : false);
                 ag.setAuthoritativeSource(authoritative != null ? authoritative.booleanValue() : false);
+                ag.setEnableObjectTriggers(enableObjectTriggers != null ? enableObjectTriggers.booleanValue(): false);
                 res.add(ag);
             }
 

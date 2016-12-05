@@ -5,7 +5,12 @@
 //
 
 package es.caib.seycon.ng.sync.servei;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.comu.SoffidObjectType;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +82,29 @@ public abstract class SyncStatusService {
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void reconfigureDispatchers()
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
+	// Testar un mapper
+	public Map<String, Object> testObjectMapping(Map<String,String> sentences, String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
+
+	// Testar un mapper
+	public Exception testPropagateObject(String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
+
+	public void cancelTask (long taskId)
+	{
+		
+	}
+	
+	public void boostTask (long taskId)
+	{
+		
 	}
 }

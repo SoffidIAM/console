@@ -127,6 +127,11 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 	{
 		return attributes.keySet();
 	}
+	
+	public String toString ()
+	{
+		return attributes.toString();
+	}
 }
 
 

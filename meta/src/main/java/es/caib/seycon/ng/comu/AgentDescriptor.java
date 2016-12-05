@@ -25,4 +25,5 @@ public abstract class AgentDescriptor {
 
 	public boolean enableAttributeMapping;
 
+	public boolean enableObjectTriggers;
 }

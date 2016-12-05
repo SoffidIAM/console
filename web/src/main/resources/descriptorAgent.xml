@@ -26,6 +26,18 @@
 				return list;
 			</script-finder>
 		</finder>
+		<finder name="soffidObjectTrigger" type="soffidObjectTrigger">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				for (l: SoffidObjectTrigger.literals())
+				{
+					list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
 		<finder name="agent" type="agent">
 			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
 				method="findDispatchersByFiltre" if = "${queryEnabled}"> <!--agent:query, application:update-->
@@ -342,6 +354,25 @@
 		</ejb-handler>
 	</datanode>
 	
+	<datanode name="objectMappingTrigger">
+		<script-handler>
+			<insert-script>
+				instance.objectId=parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
 	<datanode name="objectMapping">
 		<finder name="property" type="objectProperty" refreshAfterCommit="true">
 			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
@@ -350,6 +381,16 @@
 			</ejb-finder>
 			<new-instance-bean
 				className="es.caib.seycon.ng.comu.ObjectMappingProperty">
+			</new-instance-bean>
+		</finder>	
+
+		<finder name="objectMappingTrigger" type="objectMappingTrigger" refreshAfterCommit="true">
+			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+				method="findObjectMappingTriggersByObject"> 
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.ObjectMappingTrigger">
 			</new-instance-bean>
 		</finder>	
 
@@ -441,6 +482,7 @@
 		</custom-attribute>
 
 	</datanode>
+
 	<datanode name="soffidObjectType" transient="true">
 		<custom-attribute name="literal">
 			if (instance.length() == 0)
@@ -453,6 +495,22 @@
 				return null;
 			else
 				return es.caib.seycon.ng.comu.SoffidObjectType.fromString(instance);
+		</custom-attribute>
+
+	</datanode>
+
+	<datanode name="soffidObjectTrigger" transient="true">
+		<custom-attribute name="literal">
+			if (instance.length() == 0)
+				return "- select one -";
+			else
+				return instance;
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return es.caib.seycon.ng.comu.SoffidObjectTrigger.fromString(instance);
 		</custom-attribute>
 
 	</datanode>

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.axis.components.logger.LogFactory;
@@ -35,10 +36,12 @@ import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.GrupDispatcher;
 import es.caib.seycon.ng.comu.ObjectMapping;
 import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.seycon.ng.comu.ReplicaDatabase;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.comu.ServerType;
+import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.comu.TipusUsuariDispatcher;
 import es.caib.seycon.ng.comu.Usuari;
@@ -58,6 +61,7 @@ import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.GrupEntityDao;
 import es.caib.seycon.ng.model.ObjectMappingEntity;
 import es.caib.seycon.ng.model.ObjectMappingPropertyEntity;
+import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.ServeiEntity;
@@ -71,6 +75,7 @@ import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.sync.intf.DatabaseReplicaMgr;
+import es.caib.seycon.ng.sync.servei.SyncStatusService;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 
 /**
@@ -1120,6 +1125,76 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	}
 
 	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleCreate(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected ObjectMappingTrigger handleCreate (ObjectMappingTrigger trigger) throws Exception
+	{
+		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(trigger);
+		getObjectMappingTriggerEntityDao().create(ame);
+		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		{
+			ame.getObject().getDispatcher().setTimeStamp(new Date());
+			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+		}
+        updateServers();
+		return getObjectMappingTriggerEntityDao().toObjectMappingTrigger(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleUpdate(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected ObjectMappingTrigger handleUpdate (ObjectMappingTrigger mapping) throws Exception
+	{
+		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+		getObjectMappingTriggerEntityDao().update(ame);
+		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		{
+			ame.getObject().getDispatcher().setTimeStamp(new Date());
+			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+		}
+        updateServers();
+		return getObjectMappingTriggerEntityDao().toObjectMappingTrigger(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleDelete(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected void handleDelete (ObjectMappingTrigger mapping) throws Exception
+	{
+		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
+		{
+			ame.getObject().getDispatcher().setTimeStamp(new Date());
+			getDispatcherEntityDao().update(ame.getObject().getDispatcher());
+		}
+        updateServers();
+		getObjectMappingTriggerEntityDao().remove(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleFindAttributeMappingsByDispatcher(java.lang.Long)
+	 */
+	@Override
+	protected Collection<ObjectMappingTrigger> handleFindObjectMappingTriggersByObject (
+					Long objectId) throws Exception
+	{
+		ObjectMappingEntity obj = getObjectMappingEntityDao().load(objectId);
+		List<ObjectMappingTrigger> list = getObjectMappingTriggerEntityDao().toObjectMappingTriggerList(obj.getTriggers());
+		Collections.sort(list, new Comparator<ObjectMappingTrigger>(){
+
+			public int compare (ObjectMappingTrigger o1, ObjectMappingTrigger o2)
+			{
+				return o1.getId().compareTo(o2.getId());
+			}
+			
+		});
+		return list;
+	}
+
+	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleSetDefaultMappingsByDispatcher(java.lang.Long)
 	 */
 	@Override
@@ -1377,5 +1452,26 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		if (sd == null)
 			throw new InternalErrorException("Unable to locate Soffid system descriptor");
 		return getDispatcherEntityDao().toDispatcher(sd);
+	}
+
+	@Override
+	protected Map<String, Object> handleTestObjectMapping(Map<String,String> sentences, String dispatcher, 
+					SoffidObjectType type, String object1, String object2) throws InternalErrorException {
+		SyncStatusService svc = ( SyncStatusService ) getSeyconServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.testObjectMapping(sentences, dispatcher, type, object1, object2);
+	}
+
+	@Override
+	protected Exception handleTestPropagateObject(String dispatcher,
+			SoffidObjectType type, String object1, String object2)
+			throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSeyconServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.testPropagateObject(dispatcher, type, object1, object2);
 	}
 }

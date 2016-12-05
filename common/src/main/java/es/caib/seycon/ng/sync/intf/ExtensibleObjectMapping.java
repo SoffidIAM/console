@@ -5,8 +5,14 @@ import java.util.Map;
 
 import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.ObjectMapping;
+import es.caib.seycon.ng.comu.ObjectMappingTrigger;
+import es.caib.seycon.ng.comu.SoffidObjectTrigger;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 
+/**
+ * @author gbuades
+ *
+ */
 public class ExtensibleObjectMapping extends ObjectMapping
 {
 	/**
@@ -16,7 +22,18 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	
 	Map<String,String> properties = null;
 	Collection<AttributeMapping> attributes =  null;
+	Collection<ObjectMappingTrigger> triggers =  null;
 	
+	public Collection<ObjectMappingTrigger> getTriggers()
+	{
+		return triggers;
+	}
+
+	public void setTriggers(Collection<ObjectMappingTrigger> triggers)
+	{
+		this.triggers = triggers;
+	}
+
 	public Collection<AttributeMapping> getAttributes()
 	{
 		return attributes;
@@ -55,6 +72,7 @@ public class ExtensibleObjectMapping extends ObjectMapping
 		{
 			setAttributes(((ExtensibleObjectMapping) otherBean).getAttributes());
 			setProperties(((ExtensibleObjectMapping) otherBean).getProperties());
+			setTriggers(((ExtensibleObjectMapping) otherBean).getTriggers());
 		}
 	}
 

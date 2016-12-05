@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?page id="rol" title="Nou rol d'aplicació"?>
+<?page id="rol" title="Application role details"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>

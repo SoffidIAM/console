@@ -524,8 +524,8 @@
 				newPasswordS.setMode("highlighted");
 			}else if (account.getType().equals(AccountType.PRIVILEGED)){
 				newPassword.setAttribute("acco", account);
-				Calendar dia = Calendar.getInstance();
-				dia.add(Calendar.DAY_OF_MONTH, 1);
+				java.util.Calendar dia = java.util.Calendar.getInstance();
+				dia.add(java.util.Calendar.DAY_OF_MONTH, 1);
 				newPassword.getFellow("timepwd").setValue(dia.getTime());
 				dia.clear();
 				newPassword.setVisible(true);

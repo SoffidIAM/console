@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.naming.InitialContext;
 
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listhead;
@@ -13,10 +14,13 @@ import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.servei.SeyconServerService;
 import es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome;
 import es.caib.seycon.ng.ui.SeyconTask.Estat;
+import es.caib.zkib.zkiblaf.ImageClic;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SeyconTaskRenderer implements ListitemRenderer {
 	
@@ -44,9 +48,33 @@ public class SeyconTaskRenderer implements ListitemRenderer {
 		doRender(item, data);
 	}
 
-	protected void doRender(Listitem item, Object data) throws Exception {
-		SeyconTask t = (SeyconTask) data;
-		new Listcell(t.getDescripcioTasca()).setParent(item);
+	protected void doRender(final Listitem item, Object data) throws Exception {
+		final SeyconTask t = (SeyconTask) data;
+		Listcell lc = new Listcell(t.getDescripcioTasca());
+		lc.setParent(item);
+		ImageClic icCancel = new ImageClic("/img/stop.png");
+		icCancel.setTitle("Cancel task");
+		icCancel.setParent(lc);
+		icCancel.setStyle("width: 16px; float:right");
+		icCancel.setVariable("Title", t.getDescripcioTasca(), true);
+		icCancel.setVariable("id", t.getId(), true);
+		icCancel.addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", t.getDescripcioTasca()),
+						"Cancel task",
+						new EventListener() {
+							
+							public void onEvent(Event event) throws Exception {
+								if (event.getData().equals( Missatgebox.OK) )
+								{
+									EJBLocator.getSeyconServerService()
+										.cancelTask(t.getId());
+									item.setParent(null);
+								}
+							}
+						});
+			}
+		});
 		String [] estatExecucio = t.getEstatExecucioAgents();
 		if (estatExecucio == null) {
 			// Posem l'estat com a desconegut 

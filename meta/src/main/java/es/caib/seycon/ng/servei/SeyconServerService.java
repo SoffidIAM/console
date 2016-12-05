@@ -9,6 +9,9 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import roles.agent_create;
+import roles.agent_update;
+
 @Service (translatedName="SeyconServerService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.TasqueEntity.class,
@@ -87,5 +90,20 @@ public abstract class SeyconServerService {
 	@Description("Calls synchronization servers to notify dispatcher configuration changes")
 	public void updateDispatcherConfiguration ()
 	{
+	}
+
+	
+	@Operation ( grantees={roles.monitor_server_list.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void cancelTask (long taskId)
+	{
+		
+	}
+	
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void boostTask (long taskId)
+	{
+		
 	}
 }

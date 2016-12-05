@@ -162,7 +162,7 @@
 				}
 			}
 			
-			es.caib.seycon.ng.ui.SeyconTaskComposer tasquesSeycon =
+			es.caib.seycon.ng.ui.SeyconTaskComposer tasquesSeycon  =
 					new es.caib.seycon.ng.ui.SeyconTaskComposer();
 			// Li afegim un event al header del listbox
 			org.zkoss.zk.ui.event.EventListener ssevent = new org.zkoss.zk.ui.event.EventListener()
@@ -909,16 +909,44 @@
 			<listbox dataPath="/model:/tasquesagentserver" fixedLayout="true"
 				id="listboxTasquesAgent" mold="paging" pageSize="20"
 				sclass="likeagrid doscolors" width="99%">
+				<attribute name="onNewRow"><![CDATA[
+				    Listitem item = event.getData();
+  					if ( es.caib.zkib.datasource.XPathUtils.getValue(item, "@dataProximaExecucio") == null)
+  					{
+  						item.getChildren().get(5).getChildren().get(0).setParent(null);
+  					}
+				
+				]]></attribute>
 				<listhead>
 					<listheader label="${c:l('seyconserver.zul.Tasca')}" sort="auto" width="28%"/>
 					<listheader label="${c:l('seyconserver.zul.Priority')}" sort="auto" width="55px"/>
 					<listheader label="${c:l('seyconserver.zul.Executions')}" sort="auto" width="65px"/>
 					<listheader label="${c:l('seyconserver.zul.Executiontime')}" sort="auto" width="120px"/>
 					<listheader label="${c:l('seyconserver.zul.Message')}" sort="auto" width="*"/>
-					<listheader label="${c:l('seyconserver.zul.Scheduled')}" sort="auto" width="120px"/>
+					<listheader label="${c:l('seyconserver.zul.Scheduled')}" sort="auto" width="140px"/>
 				</listhead>
 				<dataitem bind=".">
-					<listcell bind="@descripcioTasca"/>
+					<listcell bind="@descripcioTasca">
+						<imageclic src="/img/stop.png" title="Cancel task" style="width: 16px; float:right;">
+						<attribute name="onClick"><![CDATA[
+							String t = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@descripcioTasca");
+							Long tid = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@idTasca");
+							Listitem item = event.getTarget().getParent().getParent();
+              				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", new Object[]{t}),
+                  						"Cancel task",
+                  						new EventListener() {
+                  							public void onEvent(Event event) throws Exception {
+                  								if (event.getData().equals( Missatgebox.OK) )
+                  								{
+                  									es.caib.seycon.ng.EJBLocator.getSeyconServerService()
+                  										.cancelTask(tid);
+                  									item.setParent(null);
+                  								}
+                  							}
+                  						});
+						]]></attribute>
+						</imageclic>
+					</listcell>
 					<listcell bind="@prioritat" style="text-align:center;"/>
 					<listcell bind="@numExecucions" style="text-align:center;"/>
 					<listcell bind="@dataDarreraExecucio" dateFormat="dd/MM/yyyy kk:mm:ss"
@@ -953,7 +981,30 @@
 						</divVisible>
 						
 					</listcell>
-					<listcell bind="@dataProximaExecucio" dateFormat="dd/MM/yyyy kk:mm:ss"/>
+					<listcell bind="@dataProximaExecucio" dateFormat="dd/MM/yyyy kk:mm:ss">
+						<imageclic src="/img/refresca.png" title="Reschedule" style="margin-left: 4px">
+						<attribute name="onClick"><![CDATA[
+							String t = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@descripcioTasca");
+							Long tid = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@idTasca");
+							Listitem item = event.getTarget().getParent().getParent();
+              				Missatgebox.confirmaOK_CANCEL(String.format("Do you want to reschedule task %s?", new Object[]{t}),
+                  						"Cancel task",
+                  						new EventListener() {
+                  							public void onEvent(Event event) throws Exception {
+                  								if (event.getData().equals( Missatgebox.OK) )
+                  								{
+                  									es.caib.seycon.ng.EJBLocator.getSeyconServerService()
+                  										.boostTask(tid);
+                  									es.caib.zkib.datasource.XPathUtils.setValue(item,
+                  											"/@dataProximaExecucio",
+                  											java.util.Calendar.getInstance()
+                  											);
+                  								}
+                  							}
+                  						});
+						]]></attribute>
+						</imageclic>
+					</listcell>
 				</dataitem>
 			</listbox>
 			<listexportbutton acces="${canQueryAgentList}" listbox="listboxTasquesAgent"/>

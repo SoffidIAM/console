@@ -65,7 +65,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String impressora;
 
-	@Column (name="AUD_APL", length=100)
+	@Column (name="AUD_APL", length=500)
 	@Nullable
 	public java.lang.String aplicacio;
 

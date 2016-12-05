@@ -3,6 +3,8 @@
  */
 package com.soffid.iam.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +18,7 @@ import com.soffid.iam.model.ScheduledTaskHandlerEntity;
 
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
+import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.utils.Security;
@@ -181,6 +184,10 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	{
 		task.setActive(false);
 		task.setLastEnd(Calendar.getInstance());
+		try {
+			task.setServerName(Config.getConfig().getHostName());
+		} catch (IOException e) {
+		}
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "F"); //$NON-NLS-1$

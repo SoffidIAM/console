@@ -461,6 +461,18 @@
 			<version>3.0.8</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.zkib</groupId>
+			<artifactId>zkiblaf</artifactId>
+			<version>${zkiblaf.version}</version>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+		</dependency>		
+		<dependency>
+			<groupId>com.soffid.zkib</groupId>
+			<artifactId>zkdb</artifactId>
+			<version>${zkdb.version}</version>
+		</dependency>
 		<!-- per poder llançar wf des d'usuaris i sw xestib docent <dependency> 
 			<groupId>${pom.groupId}</groupId> <artifactId>bpm-core</artifactId> <version>${pom.version}</version> 
 			<scope>provided</scope> <exclusions> <exclusion> <groupId>log4j</groupId> 

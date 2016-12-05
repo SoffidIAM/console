@@ -47,9 +47,20 @@ public class ProcessInstance implements Serializable {
 	protected Map variables = null;
 	protected String currentTask = null;
 	protected Vector comments = null;
-
+	protected ClassLoader processClassLoader = null;
+	
 	// constructors
 	// /////////////////////////////////////////////////////////////
+
+	public ClassLoader getProcessClassLoader()
+	{
+		return processClassLoader;
+	}
+
+	public void setProcessClassLoader(ClassLoader processClassLoader)
+	{
+		this.processClassLoader = processClassLoader;
+	}
 
 	public String getCurrentTask() {
 		return currentTask;

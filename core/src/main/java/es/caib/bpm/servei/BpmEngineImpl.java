@@ -1122,6 +1122,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 								log.warn(String.format(Messages.getString("BpmEngineImpl.UnableLoadTask"), taskInstanceId.longValue())); //$NON-NLS-1$
 							else
 								tasques.add(VOFactory.newTaskInstance(instance));
+						} catch (InternalErrorException e) {
+							log.warn(String.format(Messages.getString("BpmEngineImpl.UnableDeserializeTask"), instance.getId()), e); //$NON-NLS-1$
 						} catch (RuntimeException e) {
 							log.warn(String.format(Messages.getString("BpmEngineImpl.UnableDeserializeTask"), instance.getId()), e); //$NON-NLS-1$
 						}

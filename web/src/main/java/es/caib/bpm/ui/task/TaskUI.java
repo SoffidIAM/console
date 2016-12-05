@@ -65,7 +65,6 @@ import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
 
 import es.caib.bpm.attachment.TaskAttachmentManager;
-import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
@@ -328,7 +327,7 @@ public class TaskUI extends Frame implements EventListener {
         }
         // Cargamos la interfaz dinamica
 
-        heavenClassLoader = this.cargarClasesUI(definicion);
+        heavenClassLoader = this.cargarClasesUI(task);
         try {
             ui = engine.getUI(task);
 
@@ -493,30 +492,13 @@ public class TaskUI extends Frame implements EventListener {
         }
     }
 
-    private static java.util.Hashtable classLoaders = new java.util.Hashtable();
-
-    public ClassLoader cargarClasesUI(ProcessDefinition def)
+    public ClassLoader cargarClasesUI(TaskInstance task)
             throws ClassNotFoundException, SQLException, IOException,
             CreateException, NamingException, InternalErrorException {
-        Map clases = null;
-        UIClassLoader loader = null;
-        BpmEngine engine = getEngine();
-        ClassLoader heavenLoader = null;
 
-        heavenLoader = Thread.currentThread().getContextClassLoader();
 
-        loader = (UIClassLoader) classLoaders.get(new Long(def.getId()));
-        if (loader == null) {
-            clases = engine.getUIClassesForTask(def);
-
-            loader = new UIClassLoader(clases, heavenLoader);
-
-            loader.cargarClases();
-
-            classLoaders.put(new Long(def.getId()), loader);
-        }
-
-        Thread.currentThread().setContextClassLoader(loader);
+    	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(task.getProcessClassLoader());
 
         return heavenLoader;
     }

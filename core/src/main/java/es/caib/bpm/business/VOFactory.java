@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.WeakHashMap;
 
+import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.bytes.ByteArray;
 import org.jbpm.graph.def.Action;
@@ -24,6 +26,7 @@ import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
+import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.dal.ProcessDefinitionPropertyDal;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.mail.Mail;
@@ -32,6 +35,7 @@ import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.Comment;
 import es.caib.bpm.vo.ConfigParameterVO;
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class VOFactory {
 	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
@@ -43,7 +47,7 @@ public class VOFactory {
 	}
 
 	public static es.caib.bpm.vo.TaskInstance newTaskInstance(
-			org.jbpm.taskmgmt.exe.TaskInstance instance) {
+			org.jbpm.taskmgmt.exe.TaskInstance instance) throws InternalErrorException {
 /**/	Timer t1=new Timer();
 		
 		es.caib.bpm.vo.TaskInstance vo = new es.caib.bpm.vo.TaskInstance();
@@ -76,6 +80,8 @@ public class VOFactory {
 		vo.setPriority(instance.getPriority());
 		vo.setSignalling(instance.isSignalling());
 		vo.setStart(instance.getStart());
+		vo.setProcessClassLoader(getClassLoader(instance.getProcessInstance().getProcessDefinition()));
+
 		SwimlaneInstance swimlane = instance.getSwimlaneInstance();
 		if (swimlane != null)
 			vo.setSwimlane(swimlane.getName());
@@ -91,23 +97,31 @@ public class VOFactory {
 			}
 			vo.setTransitions(transitions);
 		}
-		Map variables = new HashMap();
-		for (Iterator it = instance.getVariables().keySet().iterator(); it
-				.hasNext();) {
-			String key = (String) it.next();
-			Object obj = instance.getVariable(key);
-			if (obj instanceof ByteArray) {
-				try {
-					obj = new ObjectInputStream(new ByteArrayInputStream(
-							((ByteArray) obj).getBytes())).readObject();
-				} catch (final Exception e) {
-					throw new RuntimeException(e);
+		
+		ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(vo.getProcessClassLoader());
+		try {
+			Map variables = new HashMap();
+			for (Iterator it = instance.getVariables().keySet().iterator(); it
+					.hasNext();) {
+				String key = (String) it.next();
+				Object obj = instance.getVariable(key);
+				if (obj instanceof ByteArray) {
+					try {
+						obj = new ObjectInputStream(new ByteArrayInputStream(
+								((ByteArray) obj).getBytes())).readObject();
+					} catch (final Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
+				variables.put(key, obj);
 			}
-			variables.put(key, obj);
+			vo.setVariables(variables);
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldcl);
 		}
-		vo.setVariables(variables);
 
+		
 		ConfigParameterVO param = null;
         String timeThresold="1000"; //$NON-NLS-1$
         try {
@@ -123,14 +137,22 @@ public class VOFactory {
 	}
 
 	public static es.caib.bpm.vo.ProcessInstance newProcessInstance(
-			org.jbpm.graph.exe.ProcessInstance instance) {
+			org.jbpm.graph.exe.ProcessInstance instance) throws InternalErrorException {
 		es.caib.bpm.vo.ProcessInstance process = new es.caib.bpm.vo.ProcessInstance();
 		process.setEnd(instance.getEnd());
 		process.setId(instance.getId());
 		process.setStart(instance.getStart());
-		process.setVariables(instance.getContextInstance().getVariables());
-		if (process.getVariables() == null)
-			process.setVariables(new HashMap<String, Object>());
+		process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
+
+		ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
+		try {
+			process.setVariables(instance.getContextInstance().getVariables());
+			if (process.getVariables() == null)
+				process.setVariables(new HashMap<String, Object>());
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldcl);
+		}
 		Vector comments = new Vector();
 		if (instance.getRootToken() != null &&
 				instance.getRootToken().getComments() != null)
@@ -158,6 +180,7 @@ public class VOFactory {
 		{
 			process.setCurrentTask(n.getName());
 		}
+
 		return process;
 	}
 
@@ -251,7 +274,7 @@ public class VOFactory {
 		return vo;
 	}
 
-	public static Object newLightweightTaskInstance(TaskInstance instance) throws BPMException {
+	public static Object newLightweightTaskInstance(TaskInstance instance) throws BPMException, InternalErrorException {
 /**/	Timer t1=new Timer();
 		
 		es.caib.bpm.vo.LighweightTaskInstance vo = new es.caib.bpm.vo.LighweightTaskInstance();
@@ -319,6 +342,8 @@ public class VOFactory {
 //		vo.setVariables(variables);
 /** **/
 		
+		vo.setProcessClassLoader(getClassLoader(instance.getProcessInstance().getProcessDefinition()));
+
 		ConfigParameterVO param = null;
         String timeThresold="1000"; //$NON-NLS-1$
         try {
@@ -328,6 +353,13 @@ public class VOFactory {
         
 		/**/	t1.logTime("VOFactory.newLighweightTaskInstance",Integer.parseInt(timeThresold)); //$NON-NLS-1$
 		return vo;
+	}
+	
+	
+	static WeakHashMap<Long, ClassLoader> classesMap = new WeakHashMap<Long,ClassLoader> ();
+	static private ClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
+	{
+		return JbpmConfiguration.getProcessClassLoader(def);
 	}
 
 }

@@ -58,6 +58,17 @@ public class TaskInstance implements Serializable {
 	protected Set pooledActors = null;
 	protected Map variables = null;
 	protected String[] transitions = null;
+	protected ClassLoader processClassLoader = null;
+
+	public ClassLoader getProcessClassLoader()
+	{
+		return processClassLoader;
+	}
+
+	public void setProcessClassLoader(ClassLoader processClassLoader)
+	{
+		this.processClassLoader = processClassLoader;
+	}
 
 	public static long getSerialVersionUID() {
 		return serialVersionUID;

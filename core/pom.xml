@@ -472,6 +472,7 @@
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkdb</artifactId>
 			<version>${zkdb.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- per poder llançar wf des d'usuaris i sw xestib docent <dependency> 
 			<groupId>${pom.groupId}</groupId> <artifactId>bpm-core</artifactId> <version>${pom.version}</version> 

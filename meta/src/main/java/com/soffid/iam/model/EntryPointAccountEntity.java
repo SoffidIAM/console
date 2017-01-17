@@ -15,7 +15,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 	es.caib.seycon.ng.model.PuntEntradaEntity.class})
 public class EntryPointAccountEntity {
 
-	@Column (name="CPE_IDPUE")
+	@Column (name="CPE_IDPUE", composition=true)
 	public es.caib.seycon.ng.model.PuntEntradaEntity entryPoint;
 
 	@Column (name="RPC_NIVAUT", length=1)
@@ -25,7 +25,7 @@ public class EntryPointAccountEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RPC_IDROL")
+	@Column (name="RPC_IDROL", composition=true)
 	public AccountEntity account;
 
 	public java.util.List<EntryPointAccountEntity> findAll() {

@@ -21,10 +21,10 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	@Column (name="UPE_NIVAUT", length=1)
 	public java.lang.String nivellAutoritzacio;
 
-	@Column (name="UPE_IDPUE")
+	@Column (name="UPE_IDPUE", composition=true)
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
-	@Column (name="UPE_IDUSU")
+	@Column (name="UPE_IDUSU", composition=true)
 	public UsuariEntity user;
 
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity")

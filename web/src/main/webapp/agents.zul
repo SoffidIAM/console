@@ -565,7 +565,7 @@
 						onEnableManualAccount();
 						try {
 							ds = form.getDataSource(); 
-							ctx =  ds.getJXPathContext(); 
+							es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext(); 
 							registre = ctx.getValue("/");
 							form.getFellow("detall_codi").getFellow("dada").setDisabled(!registre.isNew());
 							Listbox lbTipusUsuari = form.getFellow("lbTipusUsuari");
@@ -620,7 +620,7 @@
 					void onChangeClass() {
 						//System.out.println("On change class");
 						String value=detall_nom.getValue();
-						ctx = model.getJXPathContext ();
+						es.caib.zkib.jxpath.JXPathContext ctx = model.getJXPathContext ();
 						row_authoritative.visible = false; 
 						boolean isReplica = false;
 						if (value==null || "".equals(value)) 
@@ -1075,7 +1075,7 @@
 											//Missatgebox.info ("tipus d'usuaris seleccionats "+tipusUsuariSeleccionats);
 											// Ho guardem
 											ds = form.getDataSource(); 
-											ctx =  ds.getJXPathContext();
+											es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
 											// Obtenim el valor anterior
 											tipusAnterior = ctx.getValue("@relacioLaboral");
 											boolean confirma = false;
@@ -1417,7 +1417,7 @@
 															<![CDATA[
 				if (canUpdateAgent)
 				{
-							ctx = XPathUtils.getComponentContext (event.target);
+							es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext (event.target);
 							XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 				}												]]>
 														</attribute>
@@ -1510,7 +1510,7 @@
 													<imageclic align="right" src="~./img/list-remove.gif">
 														<attribute name="onClick">
 															<![CDATA[
-						ctx = XPathUtils.getComponentContext (event.target);
+						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext (event.target);
 						XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 															]]>
 														</attribute>
@@ -1618,7 +1618,7 @@
 										<![CDATA[
 	                                  if (canUpdateAgent) 
 	                                  {
-										ctx = XPathUtils.getComponentContext (event.target);
+										es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext (event.target);
 										XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
 	                                  }
 										]]>
@@ -1638,7 +1638,7 @@
 							//Missatgebox.info ("rebudes #"+dada.length+ " dades "+dada)
 	            			modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
 	            			ds = gridControlAccess.getDataSource(); 
-	            			ctx =  ds.getJXPathContext();
+	            			es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
 	            			// codi dispatcher actual
 	            			v_codi = model.getVariables().getVariable("codiAgent");
 	            			// user: pot ésser usuari(idUsuari), usuari_generic o rol
@@ -1696,7 +1696,7 @@
 		              			ctx =  ds.getJXPathContext(); 
 		              			xpath = gridControlAccess.getXPath() + modelProxy.getBind(position); 
 		              			pointer =ctx.createPath (xpath);
-		             			ctx2 = ctx.getRelativeContext(pointer);
+		             			es.caib.zkib.jxpath.JXPathContext ctx2 = ctx.getRelativeContext(pointer);
 		             			ctx2.setValue("@nomAgent", v_codi);
 								// user: pot ésser usuari(idUsuari), usuari_generic o rol
 		            			/*if (v_idUsuari != null ) { 
@@ -1734,7 +1734,7 @@
 							// Datos: usuari, idUsuari, usuari_generic, rol, idRol, maquina, idMaquina, maquines_generic, programa, id (real o ficticia)
 	            			modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
 	            			ds = gridControlAccess.getDataSource(); 
-	            			ctx =  ds.getJXPathContext();
+	            			es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
 	            			// codi dispatcher actual
 	            			v_codi = model.getVariables().getVariable("codiAgent");
 	            			// user: pot ésser usuari(idUsuari), usuari_generic o rol
@@ -1766,7 +1766,7 @@
 	            				return;
 	            			} else { // Actualitzem
 	            				pointer = ctx.getPointer(xpath);	
-								ctx2 = ctx.getRelativeContext(pointer);
+								es.caib.zkib.jxpath.JXPathContext ctx2 = ctx.getRelativeContext(pointer);
 		             			ctx2.setValue("@nomAgent", v_codi);
 								// user: pot ésser usuari(idUsuari), usuari_generic o rol
 		            			/*if (v_idUsuari != null ) { 
@@ -1826,7 +1826,7 @@
 									elemPos = modelo.getElementAt(posicio); 
 									xpath = elemPos.getDataContext().getXPath(); 
 									ds = gridControlAccess.getDataSource();
-									ctx = ds.getJXPathContext();																												
+									es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();																												
 									
 									// Guardem el id per poder moficiar la fila que correspon
 									desktop.getPage("controlAcces").setAttribute("idCAC", ctx.getValue(xpath+"/@id"));
@@ -1890,7 +1890,7 @@
 								// verifiquem que no existisca
 								modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
 								ds = gridControlAccess.getDataSource(); 
-								ctx =  ds.getJXPathContext();
+								es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
 								xpath = gridControlAccess.getXPath() + "[@id="+random+"]";
 								boolean jaExisteix = false;
 								try {
@@ -1941,7 +1941,7 @@
 								elemPos = modelo.getElementAt(posicio); 
 								xpath = elemPos.getDataContext().getXPath(); 
 								ds = gridControlAccess.getDataSource();
-								ctx = ds.getJXPathContext();																												
+								es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();																												
 							    
 								// copia de la filera seleccionada
 								desktop.getPage("controlAcces").setAttribute("usuariGeneric", ctx.getValue(xpath+"/@usuariGeneric"));

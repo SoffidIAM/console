@@ -993,7 +993,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
 		        if (valdomAsoc == null) {
 					throw new SeyconException(String.format(
 							Messages.getString("RolEntityDaoImpl.16"),   //$NON-NLS-1$
-							granteeRole.getDominiAplicacio().getNom(),
+							grantedRole.getDominiAplicacio().getNom(),
 							currentPare.getDomainValue()));
 		        }
 		        rare.setGrantedDomainValue(valdomAsoc);

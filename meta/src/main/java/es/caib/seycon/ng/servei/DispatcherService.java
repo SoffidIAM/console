@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei;
 import java.util.Map;
 
+import com.soffid.iam.api.ReconcileTrigger;
+import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.service.ScheduledTaskService;
 import com.soffid.mda.annotation.*;
 
@@ -44,6 +46,7 @@ import roles.agent_update;
 	ScheduledTaskService.class,
 	ObjectMappingTriggerEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
+	ReconcileTriggerEntity.class,
 	SeyconServerService.class})
 public abstract class DispatcherService {
 
@@ -463,5 +466,32 @@ public abstract class DispatcherService {
 			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
 	{
 		return null;
+	}
+
+
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void delete(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ReconcileTrigger create(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ReconcileTrigger update(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( grantees={roles.agent_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<ReconcileTrigger> findReconcileTriggersByDispatcher(Long dispatcherId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
 	}
 }

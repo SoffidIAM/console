@@ -26,6 +26,21 @@
 				return list;
 			</script-finder>
 		</finder>
+
+		<finder name="soffidObjectTypeTrigger" type="soffidObjectType">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				list.add (SoffidObjectType.OBJECT_USER.toString());
+				list.add (SoffidObjectType.OBJECT_ACCOUNT.toString());
+				list.add (SoffidObjectType.OBJECT_GROUP.toString());
+				list.add (SoffidObjectType.OBJECT_ROLE.toString());
+				list.add (SoffidObjectType.OBJECT_GRANT.toString());
+				return list;
+			</script-finder>
+		</finder>
+
 		<finder name="soffidObjectTrigger" type="soffidObjectTrigger">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -261,6 +276,19 @@
 			</new-instance-bean>
 		</finder>	
 
+		<finder name="reconcileTrigger" type="reconcileTrigger" refreshAfterCommit="true">
+			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+				method="findReconcileTriggersByDispatcher"> 
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.ReconcileTrigger">
+				<bean-attribute name="objectType" value="${es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT}"></bean-attribute>
+				<bean-attribute name="trigger" value="${es.caib.seycon.ng.comu.SoffidObjectTrigger.PRE_INSERT}"></bean-attribute>
+			</new-instance-bean>
+		</finder>	
+
+
 		<finder name="metadata" type="metadata">
 			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
 				method="findSystemDataTypes">  <!--agent:query-->
@@ -358,6 +386,25 @@
 		<script-handler>
 			<insert-script>
 				instance.objectId=parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="reconcileTrigger">
+		<script-handler>
+			<insert-script>
+				instance.system=parent.instance.codi;
 			</insert-script>
 		</script-handler>
 		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">

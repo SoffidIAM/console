@@ -885,6 +885,7 @@
 				<tabs>
 					<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
 					<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
+					<tab id="r_reconcileTriggers" label="${c:l('agents.loadTriggers')}"/>
 					<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
 					<tab id="r_metadata" label="${c:l('agents.zul.accountMetadata')}"/>
 				</tabs>
@@ -1255,6 +1256,8 @@
 					</vbox>
 					</tabpanel>
 					<tabpanel id="tabAttributeMapping">
+					
+					
 						<toolbar>
 							<toolbarbutton image="/img/refresca.png" label="Create default mapping">
 								<attribute name="onClick"><![CDATA[
@@ -1627,6 +1630,65 @@
 							</datarow>
 						</grid>
 					</tabpanel>
+
+					<!--  Reconcile triggers -->
+
+					<tabpanel id="tabReconcileTriggers">
+						<grid dataPath="/esquema/lista/listbox:/reconcileTrigger" width="100%" fixedLayout="false">
+							<columns>
+								<column label="Object" width="15em" valign="top">
+								</column>
+								<column label="Trigger" width="15em" valign="top">
+								</column>
+								<column label="Script" >
+								</column>
+								<column label="" width="2em">
+									<imageclic  align="right" src="~./img/list-add.gif">
+										<attribute name="onClick"><![CDATA[
+								if (canUpdateAgent)
+								{
+															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
+															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+								}														                                   
+										]]>
+										</attribute>
+									</imageclic>
+								</column>
+							</columns>
+							<datarow height="7em">
+							
+								<listbox bind="@objectType" mold="select" dataPath="/model:/soffidObjectTypeTrigger" >
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+
+								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" 
+									style="vertical-align: top;">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+								<div height="6em" style="padding-left: 0; padding-right: 0">
+										<textbox multiline="true" rows="5"  
+											style="display:block"
+											width="100%" 
+											onChange="" 
+											height="5em" bind="@script" />
+								</div>
+								<imageclic align="right" src="~./img/list-remove.gif">
+									<attribute name="onClick">
+										<![CDATA[
+	es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext ((Component) event.target);
+	XPathUtils.removePath (ctx.getDataSource(), ctx.getXPath());
+										]]>
+									</attribute>
+								</imageclic>
+							</datarow>
+						</grid>
+					</tabpanel>
+
+
 					<tabpanel id="tabControlAcces">
 					<vbox width="${amplaria2}">
 						<checkbox bind="@controlAccess" disabled="${!canSetAccessControl}" id="c_controlAcces" label="${c:l('agents.zul.Activarcontroldacca')}" onCheck=""/>

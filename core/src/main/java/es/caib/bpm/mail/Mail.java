@@ -7,58 +7,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.webdav.lib.properties.GetContentLengthProperty;
-import org.jboss.system.server.ServerLoader;
-import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmException;
-import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.ActionHandler;
 import org.jbpm.graph.def.Event;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.jpdl.el.ELException;
 import org.jbpm.jpdl.el.VariableResolver;
 import org.jbpm.jpdl.el.impl.JbpmExpressionEvaluator;
-import org.jbpm.mail.AddressResolver;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.jbpm.util.ClassLoaderUtil;
-import org.jbpm.util.XmlUtil;
 
-import es.caib.bpm.servei.BpmConfigService;
-import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.vo.ConfigParameterVO;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.DadaUsuari;
-import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
@@ -72,7 +47,6 @@ import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 import es.caib.seycon.ng.servei.ConfiguracioService;
 import es.caib.seycon.ng.servei.GrupService;
-import es.caib.seycon.ng.servei.SeyconServiceLocator;
 import es.caib.seycon.ng.utils.MailUtils;
 import es.caib.seycon.ng.utils.Security;
 
@@ -141,36 +115,56 @@ public class Mail implements ActionHandler {
 			if (executionContext.getTask() != null)
 				executionContext.getTaskInstance().assign(executionContext);
 
-    		String subject = Messages.getString("Mail.4"); //$NON-NLS-1$
-    		
-    		InputStream in = getMailContent();
-    		InputStreamReader reader = new InputStreamReader(in);
-    		StringBuffer buffer = new StringBuffer ();
-    		int ch = reader.read();
-    		while ( ch >= 0)
-    		{
-    			buffer.append((char) ch);
-    			ch = reader.read ();
-    		}
-    		
-    		send(mailFrom, getRecipients(), evaluate(subject), evaluate (buffer.toString()));
+    		sendPredefinedMail("Mail.4");
 		}
 		if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
 		{
-    		String subject = Messages.getString("Mail.8"); //$NON-NLS-1$
-    		
-    		InputStream in = getMailContent();
-    		InputStreamReader reader = new InputStreamReader(in);
-    		StringBuffer buffer = new StringBuffer ();
-    		int ch = reader.read();
-    		while ( ch >= 0)
-    		{
-    			buffer.append((char) ch);
-    			ch = reader.read ();
-    		}
-    		
-    		send(mailFrom, getRecipients(), evaluate(subject), evaluate (buffer.toString()));
+    		sendPredefinedMail("Mail.8");
 		}
+	}
+
+	private void sendPredefinedMail(String header) throws IOException,
+			InternalErrorException, UnsupportedEncodingException {
+		
+		Locale previousLocale = MessageFactory.getThreadLocale();
+		Security.nestedLogin("mail-server", new String[] { //$NON-NLS-1$
+				Security.AUTO_USER_QUERY + Security.AUTO_ALL,
+				Security.AUTO_ROLE_QUERY + Security.AUTO_ALL,
+				Security.AUTO_GROUP_QUERY + Security.AUTO_ALL,
+				Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL,
+				Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
+				Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
+		try {
+			for (String user: getUsers())
+			{
+				
+				Usuari usuari = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(user);
+	
+				if (usuari.getUsuariSEU() != null && usuari.getUsuariSEU().getIdioma() != null)
+					MessageFactory.setThreadLocale(new Locale (usuari.getUsuariSEU().getIdioma()));
+				
+				String subject = Messages.getString(header); //$NON-NLS-1$
+				
+				InputStream in = getMailContent();
+				InputStreamReader reader = new InputStreamReader(in);
+				StringBuffer buffer = new StringBuffer ();
+				int ch = reader.read();
+				while ( ch >= 0)
+				{
+					buffer.append((char) ch);
+					ch = reader.read ();
+				}
+				
+				InternetAddress recipient = getUserAddress(usuari);
+				if (recipient != null)
+				{
+					send(mailFrom, Collections.singleton(recipient), evaluate(subject), evaluate (buffer.toString()));
+				}
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+		MessageFactory.setThreadLocale(previousLocale);
 	}
 
 	private InputStream getMailContent ()
@@ -284,32 +278,32 @@ public class Mail implements ActionHandler {
 	}
 
 	
-	public Set<InternetAddress> getRecipients () throws InternalErrorException, UnsupportedEncodingException
+	public Set<String> getUsers () throws InternalErrorException, UnsupportedEncodingException
 	{
 		TaskInstance taskInstance = executionContext.getTaskInstance();
 		if (taskInstance != null)
 		{
 			if (taskInstance.getActorId() != null)
 			{
-				return getAddress (taskInstance.getActorId());
+				return getNameUsers (taskInstance.getActorId());
 			}
 			else if (taskInstance.getSwimlaneInstance() != null)
 			{
 				SwimlaneInstance swimlane = taskInstance.getSwimlaneInstance();
-				return getSwimlaneRecipients(swimlane);
+				return getSwimlaneUsers(swimlane);
 			}
 			else if (taskInstance.getPooledActors() != null)
-				return getAddress(taskInstance.getPooledActors());
+				return getNameUsers(taskInstance.getPooledActors());
 		}
 		return null;
 	}
 
-	private Set<InternetAddress> getSwimlaneRecipients (SwimlaneInstance swimlane) throws InternalErrorException, UnsupportedEncodingException
+	private Set<String> getSwimlaneUsers (SwimlaneInstance swimlane) throws InternalErrorException, UnsupportedEncodingException
 	{
 		if (swimlane.getActorId() != null)
-			return getAddress (swimlane.getActorId());
+			return getNameUsers(swimlane.getActorId());
 		else if (swimlane.getPooledActors() != null)
-			return getAddress (swimlane.getPooledActors());
+			return getNameUsers (swimlane.getPooledActors());
 		else
 			return null;
 	}
@@ -320,9 +314,9 @@ public class Mail implements ActionHandler {
 	 * @throws InternalErrorException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	private Set<InternetAddress> getAddress (String actorId) throws InternalErrorException, UnsupportedEncodingException
+	private Set<String> getNameUsers (String actorId) throws InternalErrorException, UnsupportedEncodingException
 	{
-		HashSet<InternetAddress> result = new HashSet<InternetAddress>();
+		HashSet<String> result = new HashSet<String>();
 		if (actorId == null)
 			return result;
 		debug ("Resolving address for "+actorId);
@@ -344,7 +338,7 @@ public class Mail implements ActionHandler {
 				if (domain != null)
 					rol = rol + "/" + domain; //$NON-NLS-1$
 				rol = rol+"@"+ar.getRol().getBaseDeDades(); //$NON-NLS-1$
-				result.addAll(getAddress(rol));
+				result.addAll(getNameUsers(rol));
 			}
 			return result;
 			
@@ -363,23 +357,7 @@ public class Mail implements ActionHandler {
     			debug ("Resolving address for user "+usuari.getCodi());
     			if (usuari.getActiu().booleanValue())
     			{
-        			if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
-        			{
-        				result.add(new InternetAddress( 
-        							usuari.getNomCurt()+"@"+usuari.getDominiCorreu(),
-        							usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            			return result;
-        			}
-        			else
-        			{
-        				DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(actorId, "EMAIL"); //$NON-NLS-1$
-        				if (dada != null && dada.getValorDada() != null)
-        				{
-            				result.add(new InternetAddress(dada.getValorDada(),
-            						usuari.getFullName())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            				return result;
-        				}
-        			}
+    				result.add(usuari.getCodi());
     			}
     		}
     		else
@@ -392,7 +370,7 @@ public class Mail implements ActionHandler {
         			debug ("Resolving group members: "+grup.getCodi());
     				for (UsuariGrup ug: gs.findUsuarisPertanyenAlGrupByCodiGrup(actorId))
     				{
-    					result.addAll( getAddress(ug.getCodiUsuari()) );
+    					result.add( ug.getCodiUsuari()) ;
     				}
     				return result;
     			}
@@ -427,9 +405,9 @@ public class Mail implements ActionHandler {
 	        			debug ("Resolving role grantees: "+role.getNom()+"@"+role.getBaseDeDades());
     					for (RolGrant grant: aplicacioService.findEffectiveRolGrantsByRolId(role.getId()))
     					{
-    						if (scope == null || scope.equals (grant.getDomainValue()))
+    						if (grant.getUser() != null && (scope == null || scope.equals (grant.getDomainValue())))
     						{
-    							result.addAll(getAddress(grant.getUser()));
+    							result.add(grant.getUser());
     						}
     					}
     				}
@@ -444,24 +422,46 @@ public class Mail implements ActionHandler {
 		
 	}
 
+	
+	private InternetAddress getUserAddress (Usuari usuari) throws UnsupportedEncodingException, InternalErrorException
+	{
+		if (usuari.getNomCurt() != null && usuari.getDominiCorreu() != null)
+		{
+			return new InternetAddress( 
+						usuari.getNomCurt()+"@"+usuari.getDominiCorreu(),
+						usuari.getFullName());
+		}
+		else
+		{
+			DadaUsuari dada = ServiceLocator.instance().getUsuariService().findDadaByCodiTipusDada(usuari.getCodi(), "EMAIL"); //$NON-NLS-1$
+			if (dada != null && dada.getValorDada() != null)
+			{
+				return new InternetAddress(dada.getValorDada(),
+						usuari.getFullName());
+			}
+			else
+				return null;
+		}
+
+	}
 	/**
 	 * @param pooledActors
 	 * @return
 	 * @throws InternalErrorException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	private Set<InternetAddress> getAddress (Set<PooledActor> pooledActors) throws InternalErrorException, UnsupportedEncodingException
+	private Set<String> getNameUsers (Set<PooledActor> pooledActors) throws InternalErrorException, UnsupportedEncodingException
 	{
-		HashSet<InternetAddress> result = new HashSet<InternetAddress>();
+		HashSet<String> result = new HashSet<String>();
 		debug ("Resolving addres for actor pool");
 		for (PooledActor actor: pooledActors)
 		{
 			if (actor.getActorId() != null)
-				result.addAll(getAddress(actor.getActorId()));
+				result.addAll(getNameUsers(actor.getActorId()));
 			else if (actor.getSwimlaneInstance() != null)
 			{
 				debug ("Resolving addres for swimlane "+actor.getSwimlaneInstance().getName());
-				result.addAll(getSwimlaneRecipients(actor.getSwimlaneInstance()));
+				result.addAll(getSwimlaneUsers(actor.getSwimlaneInstance()));
 			}
 		}
 		return result;

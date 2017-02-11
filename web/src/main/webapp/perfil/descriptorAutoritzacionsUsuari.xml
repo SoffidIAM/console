@@ -9,6 +9,23 @@
 		</finder>
 	</datanode>
 
-	<datanode name="autoritzacioRol" />
+	<datanode name="autoritzacioRol" >
+		<custom-attribute name="valors">
+		    if (instance.valorDominiRolUsuari == null)
+		       return "";
+		       
+			StringBuffer sb = new StringBuffer();
+			for (es.caib.seycon.ng.comu.ValorDomini vd: instance.valorDominiRolUsuari)
+			{
+				if (vd.valor != null)
+				{
+					if (sb.length() > 0)
+						sb.append (", ");
+					sb.append (vd.valor);
+				}
+			}
+			return sb.toString (); 
+		</custom-attribute>
+	</datanode>
 
 </zkib-model>

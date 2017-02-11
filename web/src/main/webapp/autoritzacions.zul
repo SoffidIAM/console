@@ -394,7 +394,7 @@
 								String tipusDominiAutoDescription = model.getVariables().getVariable("tipusDominiSeleccionat");
 								String tipusDominiAuto = model.getVariables().getVariable("tipusDomini");
 								
-								if (tipusDominiAuto!=null && (!"".equals(tipusDominiAuto.trim())) 
+/*								if (tipusDominiAuto!=null && (!"".equals(tipusDominiAuto.trim())) 
 									&& !es.caib.seycon.util.TipusDomini.SENSE_DOMINI.equals(tipusDominiRol)) {
 									String [] td = tipusDominiAuto.split(",");
 									boolean trobat = false;
@@ -410,7 +410,7 @@
 										return;
 									}
 								}
-								
+	*/							
 								String nomRol = (String) dades[0];
 								String codiAplicacio = (String) dades[1];
 								String descripcio = (String) dades[2];

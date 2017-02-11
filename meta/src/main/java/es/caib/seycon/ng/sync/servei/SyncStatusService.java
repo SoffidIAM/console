@@ -12,6 +12,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverOnly=true,
@@ -85,6 +86,7 @@ public abstract class SyncStatusService {
 	}
 	
 	// Testar un mapper
+	@Transactional(rollbackFor={java.lang.Exception.class}, propagation=Propagation.SUPPORTS)
 	public Map<String, Object> testObjectMapping(Map<String,String> sentences, String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
 	{
@@ -92,6 +94,7 @@ public abstract class SyncStatusService {
 	}
 
 	// Testar un mapper
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public Exception testPropagateObject(String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
 	{

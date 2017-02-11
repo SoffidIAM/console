@@ -22,7 +22,10 @@ import org.apache.axis.components.logger.LogFactory;
 import org.hibernate.Hibernate;
 import org.mortbay.log.Log;
 
+import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.model.ReconcileTriggerEntity;
+import com.soffid.iam.model.ReconcileTriggerEntityDao;
 import com.soffid.iam.service.SystemScheduledTasks;
 
 import es.caib.seycon.ng.comu.ReplicaDatabase;
@@ -656,38 +659,31 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     @Override
     protected TipusUsuariDispatcher handleCreate(TipusUsuariDispatcher tipusUsuari)
             throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected void handleDelete(TipusUsuariDispatcher tipusUsuari) throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     protected GrupDispatcher handleCreate(GrupDispatcher grupDispatcher) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected void handleDelete(GrupDispatcher grupDispatcher) throws Exception {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected TipusUsuariDispatcher handleUpdate(TipusUsuariDispatcher tipusUsuari)
             throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected GrupDispatcher handleUpdate(GrupDispatcher grupDispatcher) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -1473,5 +1469,37 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
 		return svc.testPropagateObject(dispatcher, type, object1, object2);
+	}
+
+	@Override
+	protected void handleDelete(ReconcileTrigger rp) throws Exception {
+		getReconcileTriggerEntityDao().remove(rp.getId());
+	}
+
+	@Override
+	protected ReconcileTrigger handleCreate(ReconcileTrigger rp)
+			throws Exception {
+		ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
+		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
+		dao.create(entity);
+		
+		return dao.toReconcileTrigger(entity);
+	}
+
+	@Override
+	protected ReconcileTrigger handleUpdate(ReconcileTrigger rp)
+			throws Exception {
+		ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
+		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
+		dao.create(entity);
+		
+		return dao.toReconcileTrigger(entity);
+	}
+
+	@Override
+	protected Collection<ReconcileTrigger> handleFindReconcileTriggersByDispatcher(
+			Long dispatcherId) throws Exception {
+		DispatcherEntity entity = getDispatcherEntityDao().load(dispatcherId);
+		return  getReconcileTriggerEntityDao().toReconcileTriggerList(entity.getReconcileTriggers());
 	}
 }

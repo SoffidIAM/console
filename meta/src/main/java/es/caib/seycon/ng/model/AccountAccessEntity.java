@@ -19,22 +19,22 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 public abstract class AccountAccessEntity {
 
 	@Description ("Grantee role")
-	@Column (name="AAC_ROL_ID")
+	@Column (name="AAC_ROL_ID", composition=true)
 	@Nullable
 	public es.caib.seycon.ng.model.RolEntity rol;
 
 	@Description ("Grantee group")
-	@Column (name="AAC_GRU_ID")
+	@Column (name="AAC_GRU_ID", composition=true)
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity group;
 
 	@Description ("Grantee user")
-	@Column (name="AAC_USU_ID")
+	@Column (name="AAC_USU_ID", composition=true)
 	@Nullable
 	public es.caib.seycon.ng.model.UsuariEntity user;
 
 	@Description ("Granted accounte")
-	@Column (name="AAC_ACC_ID")
+	@Column (name="AAC_ACC_ID", composition=true)
 	public es.caib.seycon.ng.model.AccountEntity account;
 
 	@Description ("Access level")

@@ -1,0 +1,16 @@
+<html>
+	<body>
+		Este es un correo autom&aacute;tico. Por favor, no responda a esta direcci&oacute;n de correo.
+		<br>
+		Se le ha asignado una tarea en el sistema de gestión de identidades Soffid:
+		<br><b> ${taskInstance.name} </b> <br>
+		<pre>${taskInstance.description}</pre>
+		<br>
+		Fecha l&iacute;mite: ${taskInstance.dueDate}<br>
+		<br>
+		Siga el siguiente <a target="_new" href="http://${hostName}.${domainName}:8080/task.zul?id=${taskInstance.id}">enlace</a> para continuar.
+		<br><br>
+		Para ver la lista completa de tareas, <a href="http://${hostName}.${domainName}:8080/selfservice">pulse aqu&iacute;</a>.
+		<br>
+	</body>
+</html>

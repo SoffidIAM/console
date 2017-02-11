@@ -25,37 +25,25 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.soffid.iam.api.AccessLog;
-import com.soffid.iam.api.PrinterUser;
-import com.soffid.iam.api.User;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AutoritzacioRol;
-import es.caib.seycon.ng.comu.ContenidorRol;
-import es.caib.seycon.ng.comu.RegistreAcces;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AutoritzacioRolEntity;
 import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.GrupEntityDao;
-import es.caib.seycon.ng.model.MaquinaEntity;
-import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.model.UsuariGrupEntity;
-import es.caib.seycon.ng.model.UsuariImpressoraEntity;
 import es.caib.seycon.ng.utils.AutoritzacioSEU;
 import es.caib.seycon.ng.utils.Security;
 import es.caib.seycon.util.TipusDomini;
@@ -220,9 +208,11 @@ public class AutoritzacioServiceImpl extends
         return totsPares;
     }
 
+    Log log = LogFactory.getLog(getClass());
+    
     private List<AutoritzacioRol> getAutoritzacionsUsuari(Collection autoritzacionsRolVO,
             String codiUsuari) throws InternalErrorException {
-
+    	
         List<AutoritzacioRol> autoritzacionsUsuari = new LinkedList<AutoritzacioRol>();
 
         // ROLS de l'usuari actual (heredats -senseDomini i atorgats -ambDomini)
@@ -271,6 +261,7 @@ public class AutoritzacioServiceImpl extends
                 AutoritzacioRol autoRolVO = (AutoritzacioRol) it.next();
                 AutoritzacioSEU autoSEU = (AutoritzacioSEU) getAuthorizations()
                         .get(autoRolVO.getAutoritzacio());
+                
                 // pot ésser que aquesta auto no existisca en el XML (antigues)
                 // scope dels grups
                 String scope = autoSEU != null ? autoSEU.getScope() : null;
@@ -290,9 +281,28 @@ public class AutoritzacioServiceImpl extends
                    		RolEntity role = getRolEntityDao().load(idRol);
                    		if (role != null)
                     		tipusDomini = role.getTipusDomini();
-                    	if (rg.getDomainValue() != null && tipusDomini != null)
+                   		
+                   		boolean compatibleDomain;
+
+                   		if ( autoSEU.getTipusDomini() == null || autoSEU.getTipusDomini().trim().isEmpty() )
+                   			compatibleDomain = false;
+                   		else if (tipusDomini == null || tipusDomini.trim().isEmpty())
+                   			compatibleDomain = false;
+                   		else
+                   		{
+                   			compatibleDomain = false;
+                   			for (String s: autoSEU.getTipusDomini().split("[, ]+"))
+                   			{
+                   				if (tipusDomini.startsWith(s))
+                   				{
+                   					compatibleDomain = true;
+                   					break;
+                   				}
+                   			}
+                   		}
+                   		
+                    	if (compatibleDomain)
                 		{
-                    		
                             autoRolVO.getValorDominiRolUsuari().add(
                             	new ValorDomini(rg.getDomainValue(),tipusDomini));
                             
@@ -364,6 +374,12 @@ public class AutoritzacioServiceImpl extends
             }
 
         }
+        
+//        log.info("******************* AUTHORIZATIONS: ");
+//        for ( AutoritzacioRol au: autoritzacionsUsuari)
+//        {
+//        	log.info (" "+au.toString());
+//        }
         return autoritzacionsUsuari;
 
     }
@@ -669,7 +685,7 @@ public class AutoritzacioServiceImpl extends
      * @return
      */
     private String getCodiUsuari() {
-        return Security.getCurrentUser();
+        return Security.getCurrentAccount();
     }
 
     protected Collection<AutoritzacioRol> handleGetDescriptionUserAuthorizations()

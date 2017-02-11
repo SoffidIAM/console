@@ -392,10 +392,6 @@
    <mbean code="org.jboss.deployment.EARDeployer" name="jboss.j2ee:service=EARDeployer">
    </mbean>
 
-   <mbean code="org.jboss.varia.deployment.BeanShellSubDeployer"
-      name="jboss.scripts:service=BSHDeployer">
-   </mbean>
-
    <!-- ==================================================================== -->
    <!-- Monitoring and Management                                            -->
    <!-- ==================================================================== -->

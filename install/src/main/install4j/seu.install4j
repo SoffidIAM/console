@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.8" transformSequenceNumber="4">
+<install4j version="5.1.7" transformSequenceNumber="4">
   <directoryPresets config="../../../target" />
-  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="4473-1303-9979-7033" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="4473-1303-9979-7033" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -926,6 +926,12 @@ configurationObject.setText(hostname);</initScript>
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                      <void property="checkIfEmpty">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="enterGoesToNextScreen">
+                        <boolean>true</boolean>
+                      </void>
                       <void property="labelText">
                         <string>Domain</string>
                       </void>
@@ -1048,10 +1054,40 @@ return true;</string>
                         <boolean>false</boolean>
                       </void>
                       <void property="files">
-                        <array class="java.io.File" length="1">
+                        <array class="java.io.File" length="7">
                           <void index="0">
                             <object class="java.io.File">
                               <string>jboss/server/default/tmp</string>
+                            </object>
+                          </void>
+                          <void index="1">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/lib/bsh.jar</string>
+                            </object>
+                          </void>
+                          <void index="2">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/lib/bsh-1.3.0.jar</string>
+                            </object>
+                          </void>
+                          <void index="3">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/lib/bsh-deployer.jar:jboss/server/jetty/tmp</string>
+                            </object>
+                          </void>
+                          <void index="4">
+                            <object class="java.io.File">
+                              <string>jboss/server/jetty/lib/bsh.jar</string>
+                            </object>
+                          </void>
+                          <void index="5">
+                            <object class="java.io.File">
+                              <string>jboss/server/jetty/lib/bsh-1.3.0.jar</string>
+                            </object>
+                          </void>
+                          <void index="6">
+                            <object class="java.io.File">
+                              <string>jboss/server/jetty/lib/bsh-deployer.jar</string>
                             </object>
                           </void>
                         </array>

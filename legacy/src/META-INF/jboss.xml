@@ -6,7 +6,7 @@
 		<entity>
 			<ejb-name>SesionEJB</ejb-name>
 			<jndi-name>es.caib.loginModule.SesionEJB</jndi-name>
-			<configuration-name>Always Remote EntityBean</configuration-name>
+			<configuration-name>Always Local EntityBean</configuration-name>
 
 			<method-attributes>
 			</method-attributes>
@@ -18,8 +18,8 @@
 
 	<invoker-proxy-bindings>
 		<invoker-proxy-binding>
-			<name>remote-entity-NOSEC-http-invoker</name>
-			<invoker-mbean>jboss:service=invoker,type=http</invoker-mbean>
+			<name>local-entity-NOSEC-invoker</name>
+			<invoker-mbean>jboss:service=invoker,type=jrmp</invoker-mbean>
 			<proxy-factory>org.jboss.proxy.ejb.ProxyFactory</proxy-factory>
 			<proxy-factory-config>
 				<client-interceptors>
@@ -51,8 +51,8 @@
 
 	<container-configurations>
 		<container-configuration extends="Standard BMP EntityBean">
-			<container-name>Always Remote EntityBean</container-name>
-			<invoker-proxy-binding-name>remote-entity-NOSEC-http-invoker</invoker-proxy-binding-name>
+			<container-name>Always Local EntityBean</container-name>
+			<invoker-proxy-binding-name>local-entity-NOSEC-invoker</invoker-proxy-binding-name>
 			<container-interceptors>
 				<interceptor>org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor</interceptor>
 				<interceptor>org.jboss.ejb.plugins.LogInterceptor</interceptor>

@@ -1054,7 +1054,7 @@ return true;</string>
                         <boolean>false</boolean>
                       </void>
                       <void property="files">
-                        <array class="java.io.File" length="7">
+                        <array class="java.io.File" length="11">
                           <void index="0">
                             <object class="java.io.File">
                               <string>jboss/server/default/tmp</string>
@@ -1088,6 +1088,26 @@ return true;</string>
                           <void index="6">
                             <object class="java.io.File">
                               <string>jboss/server/jetty/lib/bsh-deployer.jar</string>
+                            </object>
+                          </void>
+                          <void index="7">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/deploy/management</string>
+                            </object>
+                          </void>
+                          <void index="8">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/deploy/jmx-console.war</string>
+                            </object>
+                          </void>
+                          <void index="9">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/deploy/jmx-invoker-adaptor-server.sar</string>
+                            </object>
+                          </void>
+                          <void index="10">
+                            <object class="java.io.File">
+                              <string>jboss/server/default/deploy/http-invoker.sar</string>
                             </object>
                           </void>
                         </array>

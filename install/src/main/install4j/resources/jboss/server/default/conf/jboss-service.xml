@@ -325,7 +325,7 @@
    <mbean code="org.jboss.invocation.jrmp.server.JRMPInvoker"
       name="jboss:service=invoker,type=jrmp">
       <attribute name="RMIObjectPort">4444</attribute>
-      <attribute name="ServerAddress">${jboss.bind.address}</attribute>
+      <attribute name="ServerAddress">127.0.0.1</attribute>
       <!--
       <attribute name="RMIClientSocketFactory">custom</attribute>
       <attribute name="RMIServerSocketFactory">custom</attribute>

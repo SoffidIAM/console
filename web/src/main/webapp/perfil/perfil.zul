@@ -20,6 +20,7 @@
 	idiomaCA = idiomaSEU != null && "ca".equals(idiomaSEU);
 	idiomaES = idiomaSEU != null && "es".equals(idiomaSEU);
 	idiomaEN = idiomaSEU != null && "en".equals(idiomaSEU);
+	idiomaNL = idiomaSEU != null && "nl".equals(idiomaSEU);
 
 	try {
 		if (darrerLoginSEU != null) {
@@ -92,6 +93,7 @@
 						<listitem label="${c:l('perfil.zul.English')}" selected="${idiomaEN}" value="en"/>
 						<listitem label="${c:l('perfil.zul.Espanol')}" selected="${idiomaES}" value="es"/>
 						<listitem label="${c:l('perfil.zul.Catala')}" selected="${idiomaCA}" value="ca"/>
+						<listitem label="Nederlandse" selected="${idiomaNL}" value="nl"/>
 					</listbox>
 					</row>
 				</rows>

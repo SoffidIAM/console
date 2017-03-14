@@ -229,6 +229,11 @@ public class ConfiguraSEU extends Vbox {
                         	idioma = l;
                         	break;
                         }
+                        else if (l.getLanguage().equalsIgnoreCase("nl"))
+                        {
+                        	idioma = l;
+                        	break;
+                        }
                 }
                 if (idioma == null)
                 {

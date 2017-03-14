@@ -21,7 +21,7 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	@Column (name="UPE_NIVAUT", length=1)
 	public java.lang.String nivellAutoritzacio;
 
-	@Column (name="UPE_IDPUE", composition=true)
+	@Column (name="UPE_IDPUE")
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
 	@Column (name="UPE_IDUSU", composition=true)

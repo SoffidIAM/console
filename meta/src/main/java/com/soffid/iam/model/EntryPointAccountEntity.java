@@ -15,7 +15,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 	es.caib.seycon.ng.model.PuntEntradaEntity.class})
 public class EntryPointAccountEntity {
 
-	@Column (name="CPE_IDPUE", composition=true)
+	@Column (name="CPE_IDPUE")
 	public es.caib.seycon.ng.model.PuntEntradaEntity entryPoint;
 
 	@Column (name="RPC_NIVAUT", length=1)

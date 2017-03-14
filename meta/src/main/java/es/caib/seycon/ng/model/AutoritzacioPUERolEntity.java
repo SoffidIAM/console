@@ -24,7 +24,7 @@ public abstract class AutoritzacioPUERolEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RPE_IDROL")
+	@Column (name="RPE_IDROL", composition=true)
 	public RolEntity role;
 
 	@DaoFinder("from es.caib.seycon.ng.model.AutoritzacioPUERolEntity")

@@ -19,6 +19,7 @@ import javax.rmi.PortableRemoteObject;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.servei.ConfiguracioService;
+import es.caib.seycon.ng.utils.MailUtils;
 
 
 public class MailServiceImpl extends MailServiceBase {
@@ -34,6 +35,19 @@ public class MailServiceImpl extends MailServiceBase {
 		} catch (Exception e) {
 		}
 		return "localhost";
+	}
+
+	String getConfigValue (String param)
+	{
+		Configuracio param1;
+		try {
+			ConfiguracioService configService = ServiceLocator.instance().getConfiguracioService();
+			param1 = configService.findParametreByCodiAndCodiXarxa(param, null); //$NON-NLS-1$
+			if (param1 != null)
+				return param1.getValor();
+		} catch (Exception e) {
+		}
+		return null;
 	}
 
 	String getFrom () throws UnknownHostException
@@ -53,11 +67,7 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendHtmlMail(String to, String subject, String body)
 			throws Exception {
-		Properties props = new Properties();
-
-		// -- Attaching to default Session, or we could start a new one --
-		props.put("mail.smtp.host", getMailHost()); //$NON-NLS-1$ //$NON-NLS-2$
-		Session session = Session.getInstance(props, null);
+		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = new MimeMessage(session);
 
@@ -95,11 +105,7 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendTextMail(String to, String subject, String body)
 			throws Exception {
-		Properties props = new Properties();
-
-		// -- Attaching to default Session, or we could start a new one --
-		props.put("mail.smtp.host", getMailHost()); //$NON-NLS-1$ //$NON-NLS-2$
-		Session session = Session.getInstance(props, null);
+		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = null;
 		msg = new MimeMessage(session);

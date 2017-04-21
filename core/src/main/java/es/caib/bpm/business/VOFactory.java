@@ -59,7 +59,7 @@ public class VOFactory {
 		vo.setCreate(instance.getCreate());
 		String d = instance.getDescription();
 		if (d == null)
-			d = instance.getTask().getDescription();
+			d = instance.getDescription();
 		if (d == null)
 			d = instance.getToken().getNode().getDescription();
 		vo.setDescription(d);
@@ -88,7 +88,7 @@ public class VOFactory {
 		if (instance.getAvailableTransitions() == null)
 			vo.setTransitions(new String[0]);
 		else {
-			List transitionList = instance.getAvailableTransitions();
+			List transitionList = instance.getToken().getNode().getLeavingTransitions();
 			String transitions[] = new String[transitionList.size()];
 			int i = 0;
 			for (Iterator it = transitionList.iterator(); it.hasNext();) {

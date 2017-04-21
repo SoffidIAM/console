@@ -483,7 +483,7 @@ public class BpmEngineImpl extends BpmEngineBase {
     						if (proc != null) {
     							resultado.add(proc);
     						}
-    					} catch (SecurityException e) {
+    					} catch (Exception e) {
     						// Ignorar
     					}
     				}

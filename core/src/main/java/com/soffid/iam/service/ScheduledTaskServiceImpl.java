@@ -11,6 +11,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.model.ScheduledTaskEntity;
@@ -29,7 +32,7 @@ import es.caib.seycon.ng.utils.Security;
  */
 public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 {
-
+	Log log = LogFactory.getLog(getClass());
 	/* (non-Javadoc)
 	 * @see com.soffid.iam.service.ScheduledTaskServiceBase#handleCreate(com.soffid.iam.api.ScheduledTaskHandler)
 	 */
@@ -182,6 +185,13 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	 */
 	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException
 	{
+		if (task.getLastLog().length() > 64000)
+		{
+			StringBuffer b = new StringBuffer();
+			b.append(task.getLastLog(), 0, 64000)
+				.append("\r\n*** TRUNCATED FILE ***");
+			task.setLastLog(b);
+		}
 		task.setActive(false);
 		task.setLastEnd(Calendar.getInstance());
 		try {

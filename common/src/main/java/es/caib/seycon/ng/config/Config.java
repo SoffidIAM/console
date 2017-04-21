@@ -19,6 +19,7 @@ import es.caib.seycon.ng.sync.servei.ServerService;
 
 public class Config {
     public static final String PORT_PROPERTY = "port";
+    public static final String LOCAL_PORT_PROPERTY = "localPort";
 	public static final String DB_PROPERTY = "db";
 	public static final String BACKUPDB_PROPERTY = "backupdb";
 	public static final String BACKUP_PASSWORD_PROPERTY = "backuppassword";
@@ -357,6 +358,19 @@ public class Config {
             return serverService.getConfig("seycon.https.port"); //$NON-NLS-1$
         else
             return prop.getProperty(PORT_PROPERTY); //$NON-NLS-1$
+    }
+
+    public String getLocalPort() throws RemoteException, InternalErrorException {
+        if (isServer())
+            return getPort(); //$NON-NLS-1$
+        else
+        {
+        	String lp = prop.getProperty(LOCAL_PORT_PROPERTY);
+        	if (lp != null)
+        		return lp;
+        	else
+        		return getPort();
+        }
     }
 
     public void setPort(String list) throws IOException {

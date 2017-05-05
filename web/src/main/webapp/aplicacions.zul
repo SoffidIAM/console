@@ -10,6 +10,10 @@
 	
 	<style>
 		.tcoth div {text-align:center !important;}
+		.appatt {display: table; padding: 5px; width: 100%}
+		.appatt_row {display: table-row}
+		.appatt_label {display: table-cell; width: 200px}
+		.appatt_input {display: table-cell}
 	</style>
 	
 	<datamodel id="model" rootNode="aplicacions" src="descriptorAplicacio.xml"/>
@@ -451,7 +455,7 @@
 					<tabpanels>
 
 						<tabpanel id="basica">
-							<grid fixedLayout="true" id="grid">
+							<grid fixedLayout="true" id="grid" sclass="noBorderGrid">
 								<columns visible="false">
 									<column label="" width="200px"/>
 									<column label=""/>
@@ -569,6 +573,9 @@
 									</row>
 								</rows>
 							</grid>
+							<div use="com.soffid.web.users.additionalData.AttributesDiv" 
+								dataPath="attributes" scope="application"
+								sclass="appatt"/>
 						
 						</tabpanel>
 						

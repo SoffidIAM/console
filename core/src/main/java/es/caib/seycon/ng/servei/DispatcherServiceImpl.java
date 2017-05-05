@@ -92,6 +92,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     protected es.caib.seycon.ng.comu.Dispatcher handleCreate(
             es.caib.seycon.ng.comu.Dispatcher dispatcher) throws java.lang.Exception {
     	
+    	soffidDispatcher = null;
         // Check dispatcher type
     	if (dispatcher.getNomCla().isEmpty())
     	{
@@ -206,6 +207,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
      */
     protected es.caib.seycon.ng.comu.Dispatcher handleUpdate(
             es.caib.seycon.ng.comu.Dispatcher dispatcher) throws java.lang.Exception {
+    	soffidDispatcher = null;
         // Obtenim el anterior per comparar els grups i els tipus d'usuari
         DispatcherEntity entityOld = getDispatcherEntityDao().findByCodi(dispatcher.getCodi());
 
@@ -426,6 +428,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected void handleDelete (es.caib.seycon.ng.comu.Dispatcher dispatcher)
 					throws java.lang.Exception
 	{
+    	soffidDispatcher = null;
 		DispatcherEntity dispatcherEntity = getDispatcherEntityDao().findByCodi(
 						dispatcher.getCodi());
 		// Esborrem les relacions existents amb d'altres taules
@@ -521,6 +524,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     }
 
     protected ControlAcces handleCreate(ControlAcces controlAcces) throws Exception {
+    	soffidDispatcher = null;
         if (AutoritzacionsUsuari.canCreateAccessControlAgent()) {
             ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(
                     controlAcces);
@@ -537,6 +541,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     }
 
     protected ControlAcces handleUpdate(ControlAcces controlAcces) throws Exception {
+    	soffidDispatcher = null;
         if (AutoritzacionsUsuari.canUpdateAccessControlAgent()) {
             ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(
                     controlAcces);
@@ -573,6 +578,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
     }
 
     protected void handleDelete(ControlAcces controlAcces) throws Exception {
+    	soffidDispatcher = null;
         ControlAccessEntity entity = getControlAccessEntityDao().controlAccesToEntity(controlAcces);
         if (entity != null)
             getControlAccessEntityDao().remove(entity);
@@ -582,6 +588,7 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
     protected Collection<ControlAcces> handleFindControlAccesByCodiAgent(String codiAgent)
             throws Exception {
+    	soffidDispatcher = null;
         if (!"%".equals(codiAgent)) { //$NON-NLS-1$
             Collection control = getControlAccessEntityDao().findByCodiAgent(codiAgent);
             return getControlAccessEntityDao().toControlAccesList(control);
@@ -836,7 +843,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ReplicaDatabase handleUpdate (ReplicaDatabase database) throws Exception
 	{
-		ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
+    	soffidDispatcher = null;
+
+    	ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
 		ReplicaDatabaseEntity entity = dao.replicaDatabaseToEntity(database);
 		dao.update(entity);
 		updateReplicaAgent(entity);
@@ -849,7 +858,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ReplicaDatabase handleCreate (ReplicaDatabase database) throws Exception
 	{
-		ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
+    	soffidDispatcher = null;
+
+    	ReplicaDatabaseEntityDao dao = getReplicaDatabaseEntityDao();
 		ReplicaDatabaseEntity entity = dao.replicaDatabaseToEntity(database);
 		if (entity.getIdSeed() == null)
 		{
@@ -917,7 +928,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected Server handleUpdate (Server server) throws Exception
 	{
-		ServerEntityDao dao = getServerEntityDao();
+    	soffidDispatcher = null;
+
+    	ServerEntityDao dao = getServerEntityDao();
 		ServerEntity entity = dao.load(server.getId());
 		server.setAuth(entity.getAuth());
 		server.setPk(entity.getPk());
@@ -937,7 +950,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (Server server) throws Exception
 	{
-		getServerEntityDao().remove(server.getId());
+    	soffidDispatcher = null;
+
+    	getServerEntityDao().remove(server.getId());
 		updateSeyconServerList();
 	}
 
@@ -947,7 +962,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (ReplicaDatabase database) throws Exception
 	{
-		ReplicaDatabaseEntity dbEntity = getReplicaDatabaseEntityDao().load(database.getId());
+    	soffidDispatcher = null;
+
+    	ReplicaDatabaseEntity dbEntity = getReplicaDatabaseEntityDao().load(database.getId());
 		DispatcherEntity dispatcher = dbEntity.getDispatcher();
 		getReplicaDatabaseEntityDao().remove(dbEntity);
 		getDispatcherEntityDao().remove(dispatcher);
@@ -1030,7 +1047,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected Server handleCreate (Server server) throws Exception
 	{
-		ServerEntityDao dao = getServerEntityDao();
+    	soffidDispatcher = null;
+
+    	ServerEntityDao dao = getServerEntityDao();
 		ServerEntity serverEntity = dao.serverToEntity(server);
 		dao.create(serverEntity);
 		updateSeyconServerList();
@@ -1056,7 +1075,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected AttributeMapping handleCreate (AttributeMapping mapping) throws Exception
 	{
-		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
+    	soffidDispatcher = null;
+
+    	AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
 		getAttributeMappingEntityDao().create(ame);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
@@ -1073,7 +1094,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected AttributeMapping handleUpdate (AttributeMapping mapping) throws Exception
 	{
-		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
+    	soffidDispatcher = null;
+
+    	AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
 		getAttributeMappingEntityDao().update(ame);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
@@ -1090,7 +1113,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (AttributeMapping mapping) throws Exception
 	{
-		AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
+    	soffidDispatcher = null;
+
+    	AttributeMappingEntity ame = getAttributeMappingEntityDao().attributeMappingToEntity(mapping);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
 			ame.getObject().getDispatcher().setTimeStamp(new Date());
@@ -1126,7 +1151,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ObjectMappingTrigger handleCreate (ObjectMappingTrigger trigger) throws Exception
 	{
-		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(trigger);
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(trigger);
 		getObjectMappingTriggerEntityDao().create(ame);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
@@ -1143,7 +1170,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ObjectMappingTrigger handleUpdate (ObjectMappingTrigger mapping) throws Exception
 	{
-		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
 		getObjectMappingTriggerEntityDao().update(ame);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
@@ -1160,7 +1189,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (ObjectMappingTrigger mapping) throws Exception
 	{
-		ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
 		if (ame.getObject() != null && ame.getObject().getDispatcher() != null)
 		{
 			ame.getObject().getDispatcher().setTimeStamp(new Date());
@@ -1249,6 +1280,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ObjectMapping handleCreate (ObjectMapping om) throws Exception
 	{
+    	soffidDispatcher = null;
+
+    	om.setId(null);
 		ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
 		getObjectMappingEntityDao().create(ome);
         ome.getDispatcher().setTimeStamp(new Date());
@@ -1267,7 +1301,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ObjectMapping handleUpdate (ObjectMapping om) throws Exception
 	{
-		ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
+    	soffidDispatcher = null;
+
+    	ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
 		getObjectMappingEntityDao().update(ome);
         ome.getDispatcher().setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getDispatcher(), "objectMappings")) //$NON-NLS-1$
@@ -1285,7 +1321,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (ObjectMapping om) throws Exception
 	{
-		ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
+    	soffidDispatcher = null;
+
+    	ObjectMappingEntity ome = getObjectMappingEntityDao().objectMappingToEntity(om);
 		for (ObjectMappingPropertyEntity ompe: ome.getProperties())
 		{
 			getObjectMappingPropertyEntityDao().remove(ompe);
@@ -1318,7 +1356,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected ObjectMappingProperty handleCreate (ObjectMappingProperty omp)
 					throws Exception
 	{
-		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
+    	soffidDispatcher = null;
+
+    	ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
 		getObjectMappingPropertyEntityDao().create(ome);
         ome.getObject().getDispatcher().setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
@@ -1337,7 +1377,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	protected ObjectMappingProperty handleUpdate (ObjectMappingProperty omp)
 					throws Exception
 	{
-		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
+    	soffidDispatcher = null;
+
+    	ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
 		getObjectMappingPropertyEntityDao().update(ome);
         ome.getObject().getDispatcher().setTimeStamp(new Date());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
@@ -1355,7 +1397,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected void handleDelete (ObjectMappingProperty omp) throws Exception
 	{
-		ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
+    	soffidDispatcher = null;
+
+    	ObjectMappingPropertyEntity ome = getObjectMappingPropertyEntityDao().objectMappingPropertyToEntity(omp);
         ome.getObject().getDispatcher().setTimeStamp(new Date());
         getDispatcherEntityDao().update(ome.getObject().getDispatcher());
         if (Hibernate.isPropertyInitialized(ome.getObject(), "properties")) //$NON-NLS-1$
@@ -1442,12 +1486,17 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
 	}
 
+	Dispatcher soffidDispatcher = null;
 	@Override
 	protected Dispatcher handleFindSoffidDispatcher() throws Exception {
+		if (soffidDispatcher != null)
+			return soffidDispatcher;
+					
 		DispatcherEntity sd = getDispatcherEntityDao().findSoffidDispatcher();
 		if (sd == null)
 			throw new InternalErrorException("Unable to locate Soffid system descriptor");
-		return getDispatcherEntityDao().toDispatcher(sd);
+		soffidDispatcher = getDispatcherEntityDao().toDispatcher(sd);
+		return soffidDispatcher;
 	}
 
 	@Override
@@ -1473,12 +1522,15 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 
 	@Override
 	protected void handleDelete(ReconcileTrigger rp) throws Exception {
-		getReconcileTriggerEntityDao().remove(rp.getId());
+    	soffidDispatcher = null;
+
+    	getReconcileTriggerEntityDao().remove(rp.getId());
 	}
 
 	@Override
 	protected ReconcileTrigger handleCreate(ReconcileTrigger rp)
 			throws Exception {
+    	soffidDispatcher = null;
 		ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
 		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
 		dao.create(entity);
@@ -1489,7 +1541,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected ReconcileTrigger handleUpdate(ReconcileTrigger rp)
 			throws Exception {
-		ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
+    	soffidDispatcher = null;
+
+    	ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
 		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
 		dao.create(entity);
 		
@@ -1499,7 +1553,9 @@ public class DispatcherServiceImpl extends es.caib.seycon.ng.servei.DispatcherSe
 	@Override
 	protected Collection<ReconcileTrigger> handleFindReconcileTriggersByDispatcher(
 			Long dispatcherId) throws Exception {
-		DispatcherEntity entity = getDispatcherEntityDao().load(dispatcherId);
+    	soffidDispatcher = null;
+
+    	DispatcherEntity entity = getDispatcherEntityDao().load(dispatcherId);
 		return  getReconcileTriggerEntityDao().toReconcileTriggerList(entity.getReconcileTriggers());
 	}
 }

@@ -6,16 +6,23 @@
 package es.caib.seycon.ng.model;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import com.soffid.iam.model.ApplicationAttributeEntity;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -133,6 +140,12 @@ public class AplicacioEntityDaoImpl
     {
 		targetVO.setGestionableWF(new Boolean(
 				sourceEntity.getGestionableWF().compareTo("S") == 0)); //$NON-NLS-1$
+		
+		targetVO.setAttributes(new HashMap<String, Object>());
+		for ( ApplicationAttributeEntity att: sourceEntity.getAttributes())
+		{
+			targetVO.getAttributes().put(att.getMetadata().getCodi(), att.getObjectValue());
+		}
     }
 
 
@@ -335,4 +348,5 @@ public class AplicacioEntityDaoImpl
 	        }
 	    }
 
+	   
 }

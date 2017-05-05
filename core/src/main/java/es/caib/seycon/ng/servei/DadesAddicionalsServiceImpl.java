@@ -10,10 +10,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AccountMetadataEntityDao;
 
@@ -44,6 +46,12 @@ public class DadesAddicionalsServiceImpl extends
 	protected java.util.Collection<TipusDada> handleGetTipusDades()
 			throws java.lang.Exception {
 		List<TipusDadaEntity> col = this.getTipusDadaEntityDao().loadAll();
+		for ( Iterator<TipusDadaEntity> it = col.iterator(); it.hasNext(); )
+		{
+			TipusDadaEntity td = it.next();
+			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER))
+				it.remove();
+		}
 		return getTipusDadaEntityDao().toTipusDadaList(col);
 	}
 
@@ -111,7 +119,9 @@ public class DadesAddicionalsServiceImpl extends
 			List<TipusDadaEntity> tipusDadaEntityList = getTipusDadaEntityDao().loadAll();
 			for(TipusDadaEntity tipusDadaEntity: tipusDadaEntityList){
 				Long orderDins = tipusDadaEntity.getOrdre();
-				if(orderDins.compareTo(order) == 0){
+				if(orderDins.compareTo(order) == 0 && 
+					tipusDadaEntity.getScope().equals(tipusDada.getScope()))
+				{
 					found = true;
 					code = tipusDadaEntity.getCodi();
 					break;
@@ -121,7 +131,7 @@ public class DadesAddicionalsServiceImpl extends
 				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationOrder"),  //$NON-NLS-1$
 								new Object[]{tipusDada.getOrdre(), tipusDada.getCodi(), code}));
 			
-			Collection tipusDadaMateixCodi = getTipusDadaEntityDao().findTipusDadesByCodi(tipusDada.getCodi());
+			Collection tipusDadaMateixCodi = getTipusDadaEntityDao().findTipusDadesByScopeAndName(tipusDada.getScope(), tipusDada.getCodi());
 			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 				throw new SeyconException(String.format(Messages.getString("DadesAddicionalsServiceImpl.IntegrityViolationCode"),  //$NON-NLS-1$
 								new Object[]{tipusDada.getCodi()}));
@@ -346,5 +356,41 @@ public class DadesAddicionalsServiceImpl extends
 		if (de == null)
 			return null;
 		return getAccountMetadataEntityDao().toTipusDadaList(de.getMetaData());
+	}
+
+	@Override
+	protected Collection<TipusDada> handleFindDataTypes(MetadataScope scope)
+			throws Exception {
+		if ( scope == MetadataScope.USER)
+			return handleGetTipusDades();
+		
+		
+		List<TipusDadaEntity> col = this.getTipusDadaEntityDao().findByScope(scope);
+		return getTipusDadaEntityDao().toTipusDadaList(col);
+	}
+
+	@Override
+	protected Collection<TipusDada> handleFindTipusDadesByScopeAndName(
+			MetadataScope scope, String name) throws Exception { 
+		List<TipusDadaEntity> col = this.getTipusDadaEntityDao().findTipusDadesByScopeAndName(scope, name);
+		for (TipusDadaEntity td: col)
+		{
+			if (td.getScope() == null)
+			{
+				td.setScope(MetadataScope.USER);
+				getTipusDadaEntityDao().update(td);
+			}
+		}
+		List<TipusDada> tipusDadaList = getTipusDadaEntityDao().toTipusDadaList(col);
+		Collections.sort(tipusDadaList, new Comparator<TipusDada>() {
+
+			public int compare(TipusDada o1, TipusDada o2) {
+				if (o1.getScope() == o2.getScope())
+					return o1.getOrdre().compareTo(o2.getOrdre());
+				else
+					return o1.getScope().compareTo(o2.getScope());
+			}
+		});
+		return tipusDadaList;
 	}
 }

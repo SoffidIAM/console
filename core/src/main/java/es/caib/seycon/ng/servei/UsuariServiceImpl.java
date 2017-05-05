@@ -47,6 +47,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Account;
@@ -1797,7 +1798,8 @@ public class UsuariServiceImpl extends
 		while (tipusDadesIterator.hasNext()) {
 			TipusDadaEntity tipusDada = tipusDadesIterator.next();
 			if (tipusDada.getCodi().compareTo(NIF) != 0
-					&& tipusDada.getCodi().compareTo(TELEFON) != 0 ) {
+					&& tipusDada.getCodi().compareTo(TELEFON) != 0 &&
+					(tipusDada.getScope() == null || tipusDada.getScope() == MetadataScope.USER)) {
 				Iterator<DadaUsuariEntity> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
@@ -1807,7 +1809,8 @@ public class UsuariServiceImpl extends
 							&& dada.getTipusDada().getCodi().compareTo(tipusDada.getCodi()) == 0)
 					{
 						teTipusDada = true;
-						if (authSvc.hasPermission(Security.AUTO_USER_MAZINGER_QUERY, dada))
+						if (Security.isDisableAllSecurityForEver() ||
+								! dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
 							result.add(getDadaUsuariEntityDao().toDadaUsuari(dada));
 					}
 				}
@@ -1815,7 +1818,8 @@ public class UsuariServiceImpl extends
 					DadaUsuariEntity dus = getDadaUsuariEntityDao().newDadaUsuariEntity();
 					dus.setUsuari(usuari);
 					dus.setTipusDada(tipusDada);
-					if (! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+					if (Security.isDisableAllSecurityForEver() ||
+							! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
 					{
 						result.add ( getDadaUsuariEntityDao().toDadaUsuari(dus));
 					}

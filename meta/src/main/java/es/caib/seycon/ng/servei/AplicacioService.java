@@ -5,9 +5,13 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +40,10 @@ import org.springframework.transaction.annotation.Transactional;
 	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.servei.SoDRuleService.class,
 	es.caib.seycon.ng.servei.AutoritzacioService.class,
-	BpmEngine.class
-	
+	BpmEngine.class,
+	ApplicationAttributeEntity.class,
+	TipusDadaEntity.class,
+	RoleAttributeEntity.class
 	}
 )
 

@@ -57,19 +57,17 @@
 				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
 						.getFellow("textbox");
 				
+				Listitem si =  esquema.getFellow("queryWindow").getFellow("queryScope").getSelectedItem ();
+				com.soffid.iam.api.MetadataScope scope = 
+						si == null || si.getValue() == null || si.getValue().isEmpty() ? 
+					null :
+					com.soffid.iam.api.MetadataScope.fromString(si.getValue ());
 				// Check enable query
-				if (codi.value.trim().length() == 0)
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
+				queryEnabled = true;
 				
 				// Add parameters to search
 				searchValues.put("codi", codi.value);
+				searchValues.put("scope", scope);
 				
 				return searchValues;
 			}
@@ -188,6 +186,17 @@
 			onOK="search()">
 		
 			<hbox width="100%">
+				<hbox width="250px" widths="100px,*">
+					<label sclass="etiqueta" value="${c:l('accounts.scope')}" />
+					<listbox id="queryScope" mold="select" >
+						<listitem value="" label="${c:l('dadesAddicionals.anyScope')}"/>
+						<listitem value="user" label="${c:l('accounts.user')}"/>
+						<listitem value="role" label="${c:l('accounts.role')}"/>
+						<listitem value="application" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+						<listitem value="group" label="${c:l('auditoria.zul.Grup')}"/>
+					</listbox>
+				</hbox>
+
 				<input_criteri etiqueta="${c:l('dadesAddicionals.zul.Codi')}" id="queryCodi"/>
 				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
 			</hbox>
@@ -195,7 +204,7 @@
 		</criteris>
 		
 		<navegador id="lista" width="100%">
-			<toolbar style="border-top:0.1px solid white;">
+			<toolbar>
 				<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="metadata"/>
 				<insertbutton acces="${canCreateMetadata}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
 				<deletebutton acces="${canDeleteMetadata}" listbox="/esquema/lista/listbox"/>
@@ -207,8 +216,9 @@
 				onSelect="select()" rows="${fileres}"
 				 onCreate="checkTruncatedList(self)">
 				<listhead>
+					<listheader label="${c:l('accounts.scope')}" sort="auto" width="20%"/>
 					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto" width="20%"/>
-					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" width="80%"/>
+					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" width="60%"/>
 				</listhead>
 				<listfoot>
 					<listfooter span="3">
@@ -216,6 +226,7 @@
 					</listfooter>
 				</listfoot>
 				<dataitem bind=".">
+					<listcell bind="@scopeLiteral"/>
 					<listcell bind="@ordre"/>
 					<listcell bind="@codi"/>
 				</dataitem>
@@ -223,7 +234,15 @@
 		</navegador>
 	
 		<detalls id="dades" width="100%">
-			<zscript>
+			<zscript> <![CDATA[
+			    void displayRestrictions ()
+			    {
+			    	com.soffid.iam.api.MetadataScope scope = XPathUtils.getValue(form, "scope");
+			    	boolean display = scope == com.soffid.iam.api.MetadataScope.USER;
+			    	form.getFellow ("visibility1").setVisible(display);
+			    	form.getFellow ("visibility2").setVisible(display);
+			    	form.getFellow ("visibility3").setVisible(display);
+			    }
 				void displayValues ()
 				{
 						ds = form.getDataSource(); 
@@ -243,11 +262,12 @@
 						es.caib.zkib.datamodel.DataNode registre = ctx.getValue("/");
 						// form.getFellow("detall_ordre").setDisabled(!registre.isNew());
 						displayValues();
+						displayRestrictions ();
 					} catch (Exception e) {
 						// form.getFellow("detall_ordre").setDisabled(true);
 					}
 				}
-			</zscript>		
+			]]></zscript>		
 			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
 				<grid width="100%">
 					<columns>
@@ -255,6 +275,22 @@
 						<column width="85%"/>
 					</columns>
 					<rows>
+						<row>
+							<input_etiqueta value="${c:l('accounts.scope')}" />
+							<zscript><![CDATA[
+								z1 = com.soffid.iam.api.MetadataScope.USER;
+								z2 = com.soffid.iam.api.MetadataScope.ROLE;
+								z3 = com.soffid.iam.api.MetadataScope.APPLICATION;
+								z4 = com.soffid.iam.api.MetadataScope.GROUP;
+							]]></zscript>
+							<listbox bind="@scope" mold="select" onSelect="displayRestrictions()">
+								<listitem value="" label="${c:l('dadesAddicionals.anyScope')}"/>
+								<listitem value="${z1}" label="${c:l('accounts.user')}"/>
+								<listitem value="${z2}" label="${c:l('accounts.role')}"/>
+								<listitem value="${z3}" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+								<listitem value="${z4}" label="${c:l('auditoria.zul.Grup')}"/>
+							</listbox>
+						</row>
 						<row>
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.Ordre')}"/>
 							
@@ -331,7 +367,7 @@
 								</datarow>
 							</grid>
 						</row>
-						<row>
+						<row id="visibility1">
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.AdminVisibility')}"/>
 							<div width="100%">
 								<listbox width="90%" visible="true" bind="@adminVisibility" mold="select" disabled="${!canModifyMetadata}"
@@ -343,7 +379,7 @@
 								<label value="*"/>
 							</div>
 						</row>
-						<row>
+						<row id="visibility2">
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.OperatorVisibility')}"/>
 							<div width="100%">
 								<listbox width="90%" visible="true" bind="@operatorVisibility" mold="select" disabled="${!canModifyMetadata}"
@@ -355,7 +391,7 @@
 								<label value="*"/>
 							</div>
 						</row>
-						<row>
+						<row id="visibility3">
 							<input_etiqueta value="${c:l('dadesAddicionals.zul.UserVisibility')}"/>
 							<div width="100%">
 								<listbox width="90%" visible="true" bind="@userVisibility" mold="select" disabled="${!canModifyMetadata}"

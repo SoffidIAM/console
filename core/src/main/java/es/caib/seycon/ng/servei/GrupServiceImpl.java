@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -19,6 +20,11 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
+
+import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Maquina;
@@ -30,6 +36,7 @@ import es.caib.seycon.ng.comu.UsuariGrup;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.GrupEntityDao;
 import es.caib.seycon.ng.model.MaquinaEntity;
@@ -38,6 +45,7 @@ import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.RolsGrupEntity;
 import es.caib.seycon.ng.model.TasqueEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.TipusUsuariEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
@@ -65,17 +73,6 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 			}
 		}
 		return grupsAmbDireccionsGenerals;
-	}
-
-	protected es.caib.seycon.ng.comu.Grup handleCreateGrup(es.caib.seycon.ng.comu.Grup grup) throws java.lang.Exception {
-
-		GrupEntity entity = getGrupEntityDao().grupToEntity(grup);
-		if (getAutoritzacioService().hasPermission(Security.AUTO_GROUP_CREATE, entity)) {
-			getGrupEntityDao().create(entity);
-			grup.setId(entity.getId());
-			return getGrupEntityDao().toGrup(entity);
-		}
-		throw new SeyconException(Messages.getString("GrupServiceImpl.0")); //$NON-NLS-1$
 	}
 
 	/*
@@ -199,6 +196,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 		GrupEntity grupEntity = getGrupEntityDao().grupToEntity(grup);
 		if (grupEntity != null) {
 			getGrupEntityDao().create(grupEntity);
+			updateGroupAttributes(grup, grupEntity);
 			return getGrupEntityDao().toGrup(grupEntity);
 		}
 		return null;
@@ -317,6 +315,7 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 	protected Grup handleUpdate(Grup grup) throws Exception {
 		GrupEntity entity = getGrupEntityDao().grupToEntity(grup);
 		getGrupEntityDao().update(entity);
+		updateGroupAttributes(grup, entity);
 		return getGrupEntityDao().toGrup(entity);
 	}
 
@@ -654,4 +653,61 @@ public class GrupServiceImpl extends es.caib.seycon.ng.servei.GrupServiceBase {
 			}
 		}
 	}
+	
+	private void updateGroupAttributes (Grup group, GrupEntity entity) throws InternalErrorException
+	{
+		if (group.getAttributes() == null)
+			group.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(group.getAttributes().keySet());
+		for ( GroupAttributeEntity att: entity.getAttributes())
+		{
+			Object v = group.getAttributes().get(att.getMetadata().getCodi());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getCodi());
+		}
+		List<TipusDadaEntity> md = getTipusDadaEntityDao().findByScope(MetadataScope.GROUP);
+		for (String key: keys)
+		{
+			Object v = group.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				GroupAttributeEntity aae = getGroupAttributeEntityDao().newGroupAttributeEntity ();
+				for ( TipusDadaEntity d: md)
+				{
+					if (d.getCodi().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setGroup(entity);
+				getGroupAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( TipusDadaEntity m: md)
+		{
+			Object o = group.getAttributes().get(m.getCodi());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					if (getGroupAttributeEntityDao().findByNameAndValue(m.getCodi(), o.toString()).size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
+
+	
 }

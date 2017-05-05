@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
 
@@ -254,6 +257,12 @@ public class GrupEntityDaoImpl extends
 			grup.setQuota(String.valueOf(entity.getQuotaGrup().longValue()));
 		} else {
 			grup.setQuota("0"); //$NON-NLS-1$
+		}
+
+		grup.setAttributes(new HashMap<String, Object>());
+		for ( GroupAttributeEntity att: entity.getAttributes())
+		{
+			grup.getAttributes().put(att.getMetadata().getCodi(), att.getObjectValue());
 		}
 	}
 

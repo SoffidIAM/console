@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.api.MetadataScope;
+
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.utils.ExceptionTranslator;
 
@@ -51,6 +53,8 @@ public class TipusDadaEntityDaoImpl extends
 			es.caib.seycon.ng.model.TipusDadaEntity sourceEntity,
 			es.caib.seycon.ng.comu.TipusDada targetVO) {
 		super.toTipusDada(sourceEntity, targetVO);
+		if (sourceEntity.getScope() == null)
+			targetVO.setScope(MetadataScope.USER);
 		if (sourceEntity.getLabel() == null)
 			targetVO.setLabel(sourceEntity.getCodi());
 		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)

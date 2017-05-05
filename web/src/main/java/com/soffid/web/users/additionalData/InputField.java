@@ -234,13 +234,13 @@ public class InputField extends Div implements XPathSubscriber{
 									+ "<imageclic src='/img/pencil.png' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" onOK=\"\" readonly=\""
 										+readonlyExpr+"\" visible='false'/>" 
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"
 									+ "<label/>"+required+"</div>";
 						} else {
 							result = "<div style='display:inline' visible='"+(!dualEdit)+"'>"
-									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" readonly=\""
+									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\"  onOK=\"\" readonly=\""
 									+readonlyExpr+"\"/>" +
 									"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"
 									+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"

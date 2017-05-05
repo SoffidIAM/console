@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -10,7 +11,9 @@ import org.apache.commons.collections.map.LRUMap;
 
 import com.soffid.iam.api.AccessControlList;
 
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
@@ -125,7 +128,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 		acl2.setUsers( new HashSet<Long>());
 		acl2.setRoles( new HashSet<Long>());
 		
-		acl2.getUsers().addAll(acl2.getUsers());
+		acl2.getUsers().addAll(acl.getUsers());
 		for (Long groupId: acl.getGroups())
 		{
 			GrupEntity ge = getGrupEntityDao().load(groupId);
@@ -149,6 +152,55 @@ public class ACLServiceImpl extends ACLServiceBase {
 		
 	}
 
+	@Override
+	protected Collection<String> handleExpandACLAccounts(AccessControlList acl)
+			throws Exception {
+		Collection<String> accounts = new HashSet<String>();
+
+		Dispatcher d = getDispatcherService().findSoffidDispatcher();
+		
+		for (Long user: acl.getUsers())
+		{
+			UsuariEntity ue = getUsuariEntityDao().load(user);
+			addUserAccounts(ue, d, accounts);
+						
+		}
+
+		for (Long groupId: acl.getGroups())
+		{
+			GrupEntity ge = getGrupEntityDao().load(groupId);
+			addGroupMembers (ge, d, accounts);
+		}
+
+		for (Long roleId: acl.getRoles())
+		{
+			for (RolGrant grant: getAplicacioService().findEffectiveRolGrantsByRolId(roleId))
+			{
+				if (grant.getOwnerDispatcher().equals(d.getCodi()))
+					accounts.add(grant.getOwnerAccountName());
+				else if ( grant.getUser() != null)
+				{
+					UsuariEntity ue = getUsuariEntityDao().findByCodi(grant.getUser());
+					if (ue != null)
+						addUserAccounts(ue, d, accounts);
+				}
+			}
+		}
+		
+		return accounts;
+		
+	}
+
+	private void addUserAccounts(UsuariEntity ue, Dispatcher d,
+			Collection<String> accounts) {
+		if (ue != null)
+		{
+			for (AccountEntity acc: getAccountEntityDao().findByUsuariAndDispatcher(ue.getCodi(), d.getCodi())) {
+				accounts.add(acc.getName());
+			}
+		}
+	}
+
 	private void addGroupMembers(GrupEntity ge, Set<Long> users) {
 		for ( UsuariEntity ue: ge.getUsuarisGrupPrimari())
 			users.add(ue.getId());
@@ -158,8 +210,19 @@ public class ACLServiceImpl extends ACLServiceBase {
 		
 		for (GrupEntity child: ge.getFills())
 			addGroupMembers(child, users);
-}
+	}
 
+
+	private void addGroupMembers(GrupEntity ge, Dispatcher d, Collection<String> accounts) {
+		for ( UsuariEntity ue: ge.getUsuarisGrupPrimari())
+			addUserAccounts(ue, d, accounts);
+
+		for ( UsuariGrupEntity ue: ge.getUsuarisGrupSecundari())
+			addUserAccounts(ue.getUsuari(), d, accounts);
+		
+		for (GrupEntity child: ge.getFills())
+			addGroupMembers(child, d, accounts);
+	}
 
 }
 

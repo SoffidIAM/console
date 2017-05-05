@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.comu;
 import java.util.Date;
+import java.util.Map;
 
 import com.soffid.mda.annotation.*;
 
@@ -72,4 +73,7 @@ public abstract class Rol {
 	@Nullable
 	public Date approvalEnd;
 
+	@Description ("Role custom attributes")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

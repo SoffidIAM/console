@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -27,7 +28,9 @@ import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 
 import com.soffid.iam.api.RoleDependencyStatus;
+import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.BpmEngine;
@@ -681,6 +684,12 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
         targetVO.setAssignacioIndirecta((rolsPosseidorsRol.size() != 0 || grupsPosseidors
                 .size() != 0) ? "*" : ""); //$NON-NLS-1$ //$NON-NLS-2$
 
+
+        targetVO.setAttributes(new HashMap<String, Object>());
+		for ( RoleAttributeEntity att: sourceEntity.getAttributes())
+		{
+			targetVO.getAttributes().put(att.getMetadata().getCodi(), att.getObjectValue());
+		}
     }
 
     /**

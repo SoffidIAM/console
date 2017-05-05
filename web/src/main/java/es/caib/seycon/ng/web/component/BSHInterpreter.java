@@ -176,7 +176,8 @@ public class BSHInterpreter extends GenericInterpreter implements
 	}
 
 	public void destroy() {
-		getOwner().getNamespace().unsetVariable(VAR_NS, false);
+		if ( getOwner() != null)
+			getOwner().getNamespace().unsetVariable(VAR_NS, false);
 
 		// bug 1814819 ,clear variable, dennis
 		try {

@@ -41,7 +41,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>-Djava.security.manager -Djava.security.policy=${project.basedir}/src/test/resources/java.policy</argLine>
+					<argLine>-Djava.security.manager -Djava.security.policy=${project.basedir}/src/test/resources/security.policy</argLine>
 				</configuration>
 			</plugin>
 			<plugin>

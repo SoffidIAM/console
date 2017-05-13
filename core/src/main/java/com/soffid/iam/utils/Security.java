@@ -613,7 +613,9 @@ public class Security {
 
     private static void assertCanSetIdentity ()
     {
-    	AccessController.checkPermission(new NestedLoginPermission("login"));
+    	SecurityManager security = System.getSecurityManager();
+    	if (security != null)
+    		AccessController.checkPermission(new NestedLoginPermission("login"));
     }
 
     private static void assertCanSetTenant (String tenant)

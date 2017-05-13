@@ -38,7 +38,6 @@
 		showProfile="false"
 		width="100%"/>	
 	<include src="menu.zul"/>
-	<div id="appletFirmaDiv"/>
     </div>
 	    <zscript><![CDATA[
 			void find ( Treechildren treechildren, String target)

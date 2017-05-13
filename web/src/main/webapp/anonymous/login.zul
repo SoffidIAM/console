@@ -22,21 +22,9 @@
 		                  
 			javax.servlet.http.HttpServletRequest req = Executions.getCurrent().getNativeRequest();
 			
-			String lastTenant = "";
+			String lastTenant = sessionScope.get("tenant");
 			String autofocus1 = "autofocus";
 			String autofocus2 = "";
-			if (req.getCookies() != null)
-			{
-				for (javax.servlet.http.Cookie cookie : req.getCookies())
-				{
-					if (cookie.getName().equals("LastTenant"))
-					{
-						lastTenant = cookie.getValue();
-						autofocus1 = "";
-						autofocus2 = "autofocus";
-					}
-				}
-			}
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
 				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
 			
@@ -67,7 +55,7 @@
 			<p>
 			
 				<div class="inputlogin">${c:l('login.lblTenant')} :
-				<input name="j_tenant" id="j_tenant" type="text" autocomplete="off" ${autofocus1} onChange="updateUsername()" value="${lastTenant}" }/></div>
+				<input name="j_tenant" id="j_tenant" type="text" autocomplete="off" ${autofocus1} onChange="updateUsername()" value="${tenant}" }/></div>
 			</p>
 			<p>
 			

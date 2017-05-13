@@ -61,11 +61,6 @@
 
 	<!-- Servlets de workflow -->
 	<servlet>
-		<description>Signature Receiver</description>
-		<servlet-name>signature-receiver</servlet-name>
-		<servlet-class>es.caib.bpm.servlet.SignatureReceiver</servlet-class>
-	</servlet>
-	<servlet>
 		<description>ErrorHandler</description>
 		<servlet-name>error467</servlet-name>
 		<servlet-class>es.caib.bpm.servlet.Error467Servlet</servlet-class>
@@ -159,6 +154,11 @@
 
 
 	<!-- mustChangePassword FILTER -->
+	<filter>
+		<filter-name>TenantFilter</filter-name>
+		<filter-class>com.soffid.iam.filter.TenantFilter</filter-class>
+	</filter>
+
 	<filter>
 		<filter-name>CheckPasswordLoginFilter</filter-name>
 		<filter-class>es.caib.loginModule.CheckPasswordLoginFilter</filter-class>

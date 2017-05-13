@@ -17,7 +17,9 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 import org.zkoss.image.*;
 import org.zkoss.zul.*;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.VaultFolder;
+import com.soffid.iam.service.ejb.SelfService;
 
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.Form;
@@ -48,9 +50,7 @@ public class SelfServiceHandler extends Frame
 
 	public SelfServiceHandler () throws CreateException, NamingException, InternalErrorException
 	{
-		es.caib.seycon.ng.servei.ejb.SelfService servei = ((SelfServiceHome)new javax.naming.InitialContext()
-			.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME))
-			.create();
+		SelfService servei = EJBLocator.getSelfService();
 		ambit = (servei.getClientHost());
 	}
 	public String getAmbit() {
@@ -196,9 +196,7 @@ public class SelfServiceHandler extends Frame
 			Account account = (Account) ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
 			if (account.getType().equals(AccountType.USER)){
 				newPasswordS.setAttribute("acco", account);
-				SelfServiceHome home = (SelfServiceHome) new javax.naming.InitialContext()
-					.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME);
-				es.caib.seycon.ng.servei.ejb.SelfService service = home.create();
+				es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
 				String afectats = service.queryOtherAffectedAccounts(account);
 				if(afectats != null){
 					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
@@ -235,9 +233,7 @@ public class SelfServiceHandler extends Frame
 			((Label)showPassword.getFellow("popupPwd")).setValue("");
 			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
 			Account account = (Account) ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
-			es.caib.seycon.ng.servei.ejb.AccountService service = ((AccountServiceHome) new javax.naming.InitialContext()
-					.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME))
-					.create();
+			es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
 			if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
 			{
 				((Label)showPassword.getFellow("qpassword")).setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
@@ -442,9 +438,7 @@ public class SelfServiceHandler extends Frame
 						{
 							javax.naming.Context ctx = new javax.naming.InitialContext();
 							es.caib.seycon.ng.servei.ejb.AccountService ejb =
-									((AccountServiceHome)
-									 ctx.lookup( es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME ))
-								.create();
+									es.caib.seycon.ng.EJBLocator.getAccountService();
 							ejb.checkinHPAccount(acc);
 							model.refresh();
 						}

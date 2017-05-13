@@ -42,7 +42,7 @@ public abstract class RolsGrupEntity {
 
 	@Operation(translated="findOwnerGroupsByRole")
 	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup "
-			+ "where rolsgrup.assignedRole = :rolOtorgat")
+			+ "where rolsgrup.grantedRole = :rolOtorgat")
 	public java.util.List<es.caib.seycon.ng.model.RolsGrupEntity> findGrupsPosseidorsRol(
 		es.caib.seycon.ng.model.RolEntity rolOtorgat) {
 	 return null;
@@ -52,7 +52,7 @@ public abstract class RolsGrupEntity {
 	}
 	@Operation(translated="findAssignedRolesByGroup")
 	@DaoFinder("select rolsgrup from com.soffid.iam.model.RoleGroupEntity rolsgrup "
-			+ "where rolsgrup.ownerGroup = :grup")
+			+ "where rolsgrup.group = :grup")
 	public java.util.List<es.caib.seycon.ng.model.RolsGrupEntity> findRolsAtorgatsGrup(
 		es.caib.seycon.ng.model.GrupEntity grup) {
 	 return null;

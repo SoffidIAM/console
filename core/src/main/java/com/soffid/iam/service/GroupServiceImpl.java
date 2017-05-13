@@ -577,7 +577,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected Collection<Role> handleGetRolesFromGroup(Group grup) throws Exception {
 		GroupEntity grupEntity = getGroupEntityDao().findByName(grup.getName());
-		Collection rolsGrupE = grupEntity.getAllowedRolesToGroup();
+		Collection rolsGrupE = grupEntity.getGrantedRoles();
 		Vector rolsGrup = new Vector(rolsGrupE);// Lo activamos
 		// NOTA: Aquí obtenemos los roles, no los roles-grupo(!!) ¿Se utiliza?
 		return getRoleEntityDao().toRoleList(rolsGrup);
@@ -585,7 +585,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected Collection<GroupRoles> handleGetRolesFromGroup(String codiGrup) throws Exception {
 		GroupEntity grupEntity = getGroupEntityDao().findByName(codiGrup);
-		Collection rolsGrupE = grupEntity.getAllowedRolesToGroup();
+		Collection rolsGrupE = grupEntity.getGrantedRoles();
 		LinkedList rolsGrup = new LinkedList(rolsGrupE);// Lo activamos
 
 		return getRoleGroupEntityDao().toGroupRolesList(rolsGrup);
@@ -598,13 +598,13 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected Collection<GroupRoles> handleGetRolesFromGroupAndParentGroup(Group grup) throws Exception {
 		GroupEntity entity = getGroupEntityDao().findByName(grup.getName());
-		Collection<RoleGroupEntity> rolsGrupE = entity.getAllowedRolesToGroup();
+		Collection<RoleGroupEntity> rolsGrupE = entity.getGrantedRoles();
 		LinkedList<RoleGroupEntity> totsRolsGrup = new LinkedList(rolsGrupE);
 
 		// Buscamos los padres del grupo actual
 		GroupEntity pare = entity.getParent();
 		while (pare != null) {
-			Collection<RoleGroupEntity> rolsGrupPare = pare.getAllowedRolesToGroup();
+			Collection<RoleGroupEntity> rolsGrupPare = pare.getGrantedRoles();
 			totsRolsGrup.addAll(rolsGrupPare);
 			pare = pare.getParent();
 		}
@@ -618,8 +618,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (grupEntity != null)
 		{
 							
-			for (RoleGroupEntity rolGrup : grupEntity.getAllowedRolesToGroup()) {
-                RoleEntity rol = rolGrup.getAssignedRole();
+			for (RoleGroupEntity rolGrup : grupEntity.getGrantedRoles()) {
+                RoleEntity rol = rolGrup.getGrantedRole();
                 TaskEntity tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
                 tasque.setTransaction(TaskHandler.UPDATE_ROLE);

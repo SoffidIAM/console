@@ -57,22 +57,22 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 			// Users
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
 				grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				roles.add(getRoleEntityDao().toRole(acl.getRol()));
+			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+				roles.add(getRoleEntityDao().toRole(acl.getRole()));
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
 				usuaris.add(getUserEntityDao().toUser(acl.getUser()));
 			// Managers
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
 				managerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerRoles.add(getRoleEntityDao().toRole(acl.getRol()));
+			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+				managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
 				managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
 			// Users
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
 				ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
-			if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerRoles.add(getRoleEntityDao().toRole(acl.getRol()));
+			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+				ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
 				ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
 		}
@@ -141,8 +141,8 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 					acl.getUsers().add(entry.getUser().getId());
 				if (entry.getGroup() != null)
 					acl.getGroups().add(entry.getGroup().getId());
-				if (entry.getRol() != null)
-					acl.getRoles().add(entry.getRol().getId());
+				if (entry.getRole() != null)
+					acl.getRoles().add(entry.getRole().getId());
 			}
 		}
 		return acl;

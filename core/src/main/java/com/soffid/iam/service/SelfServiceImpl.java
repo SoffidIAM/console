@@ -120,10 +120,10 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handleSetHPAccountPassword(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Password, java.util.Date, boolean)
 	 */
 	@Override
-	protected void handleSetHPAccountPassword (Account account, Password password,
+	protected boolean handleSetHPAccountPassword (Account account, Password password,
 					Date untilDate, boolean force) throws Exception
 	{
-		getAccountService().setHPAccountPassword(account, password, untilDate, force);
+		return getAccountService().setHPAccountPassword(account, password, untilDate, force);
 	}
 
 	/* (non-Javadoc)

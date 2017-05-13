@@ -8,28 +8,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.User;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.api.VaultFolderAccountPermissions;
 import com.soffid.iam.api.VaultFolderPermissions;
+import com.soffid.iam.model.AccountAccessEntity;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.AccountAccessEntity;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.RolEntity;
-import es.caib.seycon.ng.model.TasqueEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
-import es.caib.seycon.ng.sync.engine.TaskHandler;
 import es.caib.seycon.ng.utils.Security;
 
 public class VaultServiceImpl extends VaultServiceBase {
@@ -93,7 +92,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		AccountAccessEntity aae = getAccountAccessEntityDao().newAccountAccessEntity();
 		aae.setAccount(accountEntity);
 		aae.setGroup(folderAccess.getGroup());
-		aae.setRol(folderAccess.getRol());
+		aae.setRole(folderAccess.getRole());
 		aae.setUser(folderAccess.getUser());
 		aae.setLevel(folderAccess.getLevel());
 		return aae;
@@ -150,7 +149,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 					for (VaultFolderAccessEntity ace2: sibling.getAcl())
 					{
 						if (ace2.getGroup() == ace.getGroup() &&
-							ace2.getRol() == ace.getRol() &&
+							ace2.getRole() == ace.getRole() &&
 							ace2.getUser() == ace.getUser() )
 						{
 							remove = false;
@@ -167,7 +166,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 					VaultFolderAccessEntity ace2 = it.next();
 					if (ace2.getLevel().equals( AccountAccessLevelEnum.ACCESS_NAVIGATE ) &&
 						ace2.getGroup() == ace.getGroup() &&
-						ace2.getRol() == ace.getRol() &&
+						ace2.getRole() == ace.getRole() &&
 						ace2.getUser() == ace.getUser() )
 					{
 						checkRemoveParentAce (parent, ace2);
@@ -199,7 +198,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			{
 				if (ace2.getLevel().equals( AccountAccessLevelEnum.ACCESS_NAVIGATE ) &&
 					ace2.getGroup() == ace.getGroup() &&
-					ace2.getRol() == ace.getRol() &&
+					ace2.getRole() == ace.getRole() &&
 					ace2.getUser() == ace.getUser() )
 				{
 					add = false;
@@ -211,7 +210,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 				VaultFolderAccessEntity ace2 = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
 				ace2.setVault(parent);
 				ace2.setGroup(ace.getGroup());
-				ace2.setRol(ace.getRol());
+				ace2.setRole(ace.getRole());
 				ace2.setUser(ace.getUser());
 				ace2.setLevel(AccountAccessLevelEnum.ACCESS_NAVIGATE);
 				getVaultFolderAccessEntityDao().create(ace2);
@@ -349,7 +348,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			String userName = Security.getCurrentUser();
 			if (userName  != null)
 			{
-				UsuariEntity userEntity = getUsuariEntityDao().findByCodi(userName);
+				UserEntity userEntity = getUserEntityDao().findByUserName(userName);
 				if (userEntity != null)
 				{
 					VaultFolderEntity folder = getVaultFolderEntityDao().newVaultFolderEntity();
@@ -416,7 +415,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			folder.setManagerUsers(Collections.EMPTY_LIST);
 		if (personal)
 		{
-			folder.setOwnerUsers(Collections.singleton(getUsuariService().getCurrentUsuari()));
+			folder.setOwnerUsers(Collections.singleton(getUserService().getCurrentUser()));
 		}
 		else if (folder.getOwnerUsers() == null)
 			folder.setOwnerUsers(Collections.EMPTY_LIST);
@@ -427,22 +426,22 @@ public class VaultServiceImpl extends VaultServiceBase {
 		if (folder.getOwnerRoles() == null  || personal)
 			folder.setOwnerRoles(Collections.EMPTY_LIST);
 		@SuppressWarnings("unchecked")
-		List<Grup> newgrups []= new List[] {
-			new LinkedList<Grup>(folder.getGrantedGroups()),
-			new LinkedList<Grup>(folder.getManagerGroups()),
-			new LinkedList<Grup>(folder.getOwnerGroups())
+		List<Group> newgrups []= new List[] {
+			new LinkedList<Group>(folder.getGrantedGroups()),
+			new LinkedList<Group>(folder.getManagerGroups()),
+			new LinkedList<Group>(folder.getOwnerGroups())
 		};
 		@SuppressWarnings("unchecked")
-		List<Rol> newroles []= new List[] {
-			new LinkedList<Rol>(folder.getGrantedRoles()),
-			new LinkedList<Rol>(folder.getManagerRoles()),
-			new LinkedList<Rol>(folder.getOwnerRoles())
+		List<Role> newroles []= new List[] {
+			new LinkedList<Role>(folder.getGrantedRoles()),
+			new LinkedList<Role>(folder.getManagerRoles()),
+			new LinkedList<Role>(folder.getOwnerRoles())
 		};
 		@SuppressWarnings("unchecked")
-		List<Usuari> newusers []= new List[] {
-			new LinkedList<Usuari>(folder.getGrantedUsers()),
-			new LinkedList<Usuari>(folder.getManagerUsers()),
-			new LinkedList<Usuari>(folder.getOwnerUsers())
+		List<User> newusers []= new List[] {
+			new LinkedList<User>(folder.getGrantedUsers()),
+			new LinkedList<User>(folder.getManagerUsers()),
+			new LinkedList<User>(folder.getOwnerUsers())
 		};
 		// Remove grants
 		for (Iterator<VaultFolderAccessEntity> aclIterator = entity.getAcl().iterator(); aclIterator.hasNext();)
@@ -455,9 +454,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 					boolean found = false;
 					if (access.getGroup() != null)
 					{
-						for (Iterator<Grup> it = newgrups[index].iterator(); !found && it.hasNext();)
+						for (Iterator<Group> it = newgrups[index].iterator(); !found && it.hasNext();)
 						{
-							Grup g = it.next();
+							Group g = it.next();
 							if (g.getId().equals (access.getGroup().getId()))
 							{
 								it.remove();
@@ -465,12 +464,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 							}
 						}
 					}
-					else if (access.getRol() != null)
+					else if (access.getRole() != null)
 					{
-						for (Iterator<Rol> it = newroles[index].iterator(); !found && it.hasNext();)
+						for (Iterator<Role> it = newroles[index].iterator(); !found && it.hasNext();)
 						{
-							Rol r = it.next();
-							if (r.getId().equals (access.getRol().getId()))
+							Role r = it.next();
+							if (r.getId().equals (access.getRole().getId()))
 							{
 								it.remove();
 								found = true;
@@ -479,9 +478,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 					}
 					else if (access.getUser() != null)
 					{
-						for (Iterator<Usuari> it = newusers[index].iterator(); !found && it.hasNext();)
+						for (Iterator<User> it = newusers[index].iterator(); !found && it.hasNext();)
 						{
-							Usuari u = it.next();
+							User u = it.next();
 							if (u.getId().equals (access.getUser().getId()))
 							{
 								it.remove();
@@ -502,8 +501,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Add new groups
 		for (int index = 0 ; index < levels.length; index++)
 		{
-			for (Grup g: newgrups[index]) {
-				GrupEntity ge = getGrupEntityDao().load(g.getId());
+			for (Group g: newgrups[index]) {
+				GroupEntity ge = getGroupEntityDao().load(g.getId());
 				if (ge != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
@@ -517,12 +516,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 				}
 			}
 			// Add new roles
-			for (Rol r: newroles[index]) {
-				RolEntity re = getRolEntityDao().load(r.getId());
+			for (Role r: newroles[index]) {
+				RoleEntity re = getRoleEntityDao().load(r.getId());
 				if (re != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
-					access.setRol(re);
+					access.setRole(re);
 					access.setVault(entity);
 					access.setLevel(levels[index]);
 					getVaultFolderAccessEntityDao().create(access);
@@ -532,8 +531,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 				}
 			}
 			// Add new users
-			for (Usuari u: newusers[index]) {
-				UsuariEntity ue = getUsuariEntityDao().load(u.getId());
+			for (User u: newusers[index]) {
+				UserEntity ue = getUserEntityDao().load(u.getId());
 				if (ue != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
@@ -592,7 +591,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		if (vfae.getGroup() != aae.getGroup())
 			return false;
 		
-		if (vfae.getRol() != aae.getRol())
+		if (vfae.getRole() != aae.getRole())
 			return false;
 		
 		if (vfae.getUser() != aae.getUser())
@@ -622,11 +621,11 @@ public class VaultServiceImpl extends VaultServiceBase {
 	{
 		if (! ae.getType().equals(AccountType.IGNORED))
 		{
-			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-			tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
-			tasque.setUsuari(ae.getName());
-			tasque.setCoddis(ae.getDispatcher().getCodi());
-			getTasqueEntityDao().create(tasque);
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setTransaction(com.soffid.iam.sync.engine.TaskHandler.UPDATE_ACCOUNT);
+			tasque.setUser(ae.getName());
+			tasque.setSystemName(ae.getSystem().getName());
+			getTaskEntityDao().create(tasque);
 		}
 	}
 
@@ -650,30 +649,30 @@ public class VaultServiceImpl extends VaultServiceBase {
 		{
 			if (!perm.getLevel().equals(AccountAccessLevelEnum.ACCESS_NAVIGATE) &&
 					!perm.getLevel().equals(AccountAccessLevelEnum.ACCESS_NONE))
-				addGrantee (grantee, perm.getUser(), perm.getGroup(), perm.getRol());
+				addGrantee (grantee, perm.getUser(), perm.getGroup(), perm.getRole());
 		}
 		
 		// Sort grantees
 		Collections.sort(grantee, new Comparator<Object>() {
 			public int compare(Object o1, Object o2) {
-				if (o1 instanceof Usuari)
+				if (o1 instanceof User)
 				{
-					if (o2 instanceof Usuari)
-						return ((Usuari) o1).getNom().compareTo(((Usuari) o2).getNom());
+					if (o2 instanceof User)
+						return ((User) o1).getUserName().compareTo(((User) o2).getUserName());
 					else
 						return -1;
 				}
-				if (o1 instanceof Grup)
+				if (o1 instanceof Group)
 				{
-					if (o2 instanceof Grup)
-						return ((Grup) o1).getCodi().compareTo(((Grup) o2).getCodi());
+					if (o2 instanceof Group)
+						return ((Group) o1).getName().compareTo(((Group) o2).getName());
 					else
 						return -1;
 				}
-				if (o1 instanceof Rol)
+				if (o1 instanceof Role)
 				{
-					if (o2 instanceof Rol)
-						return ((Rol) o1).getNom().compareTo(((Rol) o2).getNom());
+					if (o2 instanceof Role)
+						return ((Role) o1).getName().compareTo(((Role) o2).getName());
 					else
 						return -1;
 				}
@@ -697,7 +696,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			ap.setPermissions(new Vector<AccountAccessLevelEnum>());
 			for (AccountAccessEntity perm : accountEntity.getAcl())
 			{
-				addPermissions (grantee, ap, perm.getUser(), perm.getGroup(), perm.getRol(), perm.getLevel());
+				addPermissions (grantee, ap, perm.getUser(), perm.getGroup(), perm.getRole(), perm.getLevel());
 			}
 			p.getAccounts().add(ap);
 		}
@@ -713,8 +712,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		return p;
 	}
 
-	private void addPermissions(Vector<Object> grantee, VaultFolderAccountPermissions ap, UsuariEntity user,
-			GrupEntity group, RolEntity rol, AccountAccessLevelEnum level) {
+	private void addPermissions(Vector<Object> grantee, VaultFolderAccountPermissions ap, UserEntity user,
+			GroupEntity group, RoleEntity rol, AccountAccessLevelEnum level) {
 		if (level.equals (AccountAccessLevelEnum.ACCESS_NONE))
 			return;
 		
@@ -732,19 +731,19 @@ public class VaultServiceImpl extends VaultServiceBase {
 		ap.getPermissions().set(index, level);
 	}
 
-	private void addGrantee(Vector<Object> grantee, UsuariEntity user,
-			GrupEntity group, RolEntity rol) {
+	private void addGrantee(Vector<Object> grantee, UserEntity user,
+			GroupEntity group, RoleEntity rol) {
 		for (Object g: grantee)
 		{
 			if (match (g, user, group, rol))
 				return;
 		}
 		if (user != null)
-			grantee.add(getUsuariEntityDao().toUsuari(user));
+			grantee.add(getUserEntityDao().toUser(user));
 		else if (group != null)
-			grantee.add(getGrupEntityDao().toGrup(group));
+			grantee.add(getGroupEntityDao().toGroup(group));
 		else if (rol != null)
-			grantee.add(getRolEntityDao().toRol(rol));
+			grantee.add(getRoleEntityDao().toRole(rol));
 	}
 
 	@Override
@@ -780,17 +779,17 @@ public class VaultServiceImpl extends VaultServiceBase {
 	}
 
 	
-	private boolean match (Object g, UsuariEntity user, GrupEntity group, RolEntity rol)
+	private boolean match (Object g, UserEntity user, GroupEntity group, RoleEntity rol)
 	{
-		if (user != null && (g instanceof Usuari) && ((Usuari) g).getId().equals(user.getId()))
+		if (user != null && (g instanceof User) && ((User) g).getId().equals(user.getId()))
 		{
 			return true;
 		}
-		if (rol != null && (g instanceof Rol) && ((Rol) g).getId().equals(rol.getId()))
+		if (rol != null && (g instanceof Role) && ((Role) g).getId().equals(rol.getId()))
 		{
 			return true;
 		}
-		if (group != null && (g instanceof Grup) && ((Grup) g).getId().equals(group.getId()))
+		if (group != null && (g instanceof Group) && ((Group) g).getId().equals(group.getId()))
 		{
 			return true;
 		}
@@ -801,7 +800,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			AccountAccessLevelEnum level) {
 		for ( AccountAccessEntity ace: account.getAcl())
 		{
-			if (match (object, ace.getUser(), ace.getGroup(), ace.getRol()))
+			if (match (object, ace.getUser(), ace.getGroup(), ace.getRole()))
 			{
 				if (! ace.getLevel().equals (level))
 				{
@@ -824,12 +823,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Create new ace
 		AccountAccessEntity ace = getAccountAccessEntityDao().newAccountAccessEntity();
 		ace.setAccount(account);
-		if (object instanceof Usuari)
-			ace.setUser( getUsuariEntityDao().load (((Usuari) object).getId()));
-		if (object instanceof Grup)
-			ace.setGroup( getGrupEntityDao().load (((Grup) object).getId()));
-		if (object instanceof Rol)
-			ace.setRol( getRolEntityDao().load (((Rol) object).getId()));
+		if (object instanceof User)
+			ace.setUser( getUserEntityDao().load (((User) object).getId()));
+		if (object instanceof Group)
+			ace.setGroup( getGroupEntityDao().load (((Group) object).getId()));
+		if (object instanceof Role)
+			ace.setRole( getRoleEntityDao().load (((Role) object).getId()));
 		ace.setLevel(level);
 		getAccountAccessEntityDao().create(ace);
 		account.getAcl().add(ace);

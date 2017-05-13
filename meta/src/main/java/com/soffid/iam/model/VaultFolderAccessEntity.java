@@ -21,7 +21,7 @@ public abstract class VaultFolderAccessEntity {
 	@Description ("Grantee role")
 	@Column (name="VFA_ROL_ID")
 	@Nullable
-	public es.caib.seycon.ng.model.RolEntity rol;
+	public es.caib.seycon.ng.model.RolEntity role;
 
 	@Description ("Grantee group")
 	@Column (name="VFA_GRU_ID")

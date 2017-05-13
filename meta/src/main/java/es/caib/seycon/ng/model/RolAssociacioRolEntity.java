@@ -93,7 +93,9 @@ public abstract class RolAssociacioRolEntity {
 		return null;
 	}
 
-	@DaoFinder("select rolAssociacioRol\nfrom com.soffid.iam.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.container = :containerRole\n")
+	@DaoFinder("select rolAssociacioRol\nfrom com.soffid.iam.model.RoleDependencyEntity rolAssociacioRol\n"
+			+ "where \n"
+			+ "rolAssociacioRol.container = :containerRole\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findByContainer(
 		es.caib.seycon.ng.model.RolEntity containerRole) {
 	 return null;

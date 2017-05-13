@@ -26,6 +26,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -646,7 +647,38 @@ public class ApplicationServiceImpl extends
                     "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.getString("ApplicationServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
         // Creamos la entidad asociada al VO Rol
-        getRoleEntityDao().create(rolEntity);
+        rolEntity = getRoleEntityDao().create(rol, false);
+
+        return getRoleEntityDao().toRole(rolEntity);
+    }
+
+    protected Role handleCreate2(Role rol) throws Exception {
+        // if (usuariPotActualitzarAplicacio(rol.getCodiAplicacio())) {
+
+        RoleEntity existingRole = getRoleEntityDao()
+                .findByNameAndSystem(rol.getName(),
+                        rol.getSystem());
+
+        // No permitim crear un rol amb el mateix nom y base de dades si ja
+        // existeix un altre
+        if (existingRole != null) {
+                String aplicacio = existingRole.getInformationSystem()
+                        .getName();
+
+				throw new SeyconException(
+						String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
+								rol.getName(), rol.getSystem(), aplicacio));
+        }
+
+        // Obtenemos la entidad asociada al VO
+        RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
+        
+        if  (! getAuthorizationService().hasPermission(Security.AUTO_ROLE_CREATE, rolEntity))
+            throw new SeyconAccessLocalException("AplicacioService", //$NON-NLS-1$
+                    "create (Rol)", "application:update, application:create", //$NON-NLS-1$ //$NON-NLS-2$
+                    Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
+        // Creamos la entidad asociada al VO Rol
+        rolEntity = getRoleEntityDao().create(rol, true);
 
         return getRoleEntityDao().toRole(rolEntity);
     }
@@ -674,7 +706,7 @@ public class ApplicationServiceImpl extends
         RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
         if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
-            getRoleEntityDao().update(rolEntity); // actualizamos cambios del rol
+            rolEntity = getRoleEntityDao().update(rol, false); // actualizamos cambios del rol
 
             return getRoleEntityDao().toRole(rolEntity);
         }
@@ -771,7 +803,7 @@ public class ApplicationServiceImpl extends
 	 */
 	private boolean needsWorkflowApprovalProcess(RoleAccountEntity RoleAccountEntity) throws InternalErrorException {
 		RoleEntity role = RoleAccountEntity.getRole();
-		if (role != null && "S".equals(role.getManageableWF()))
+		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
 			if (app != null && app.getApprovalProcess() != null)
@@ -788,12 +820,12 @@ public class ApplicationServiceImpl extends
 	 */
 	private void launchWorkflowApprovalProcess(RoleAccountEntity RoleAccountEntity) throws InternalErrorException {
 		RoleEntity role = RoleAccountEntity.getRole();
-		if (role != null && "S".equals(role.getManageableWF()))
+		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
 			if (app != null && app.getApprovalProcess() != null)
 			{
-				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_APPROVAL);
+				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (def.isEmpty())
 					throw new InternalErrorException("Approval process %s for application %s is not available", app.getApprovalProcess(), app.getName());
 				JbpmContext ctx = getBpmEngine().getContext();
@@ -1043,11 +1075,11 @@ public class ApplicationServiceImpl extends
                 if (!"S".equals(filtraResultats) || getAuthorizationService().hasPermission(Security.AUTO_ROLE_QUERY, rad.rolRol)) rgl.add(crol);
             }
             if (rad.rolGrup != null) {
-                ContainerRole cr = getRoleEntityDao().toContainerRole(rad.rolGrup.getAssignedRole());
+                ContainerRole cr = getRoleEntityDao().toContainerRole(rad.rolGrup.getGrantedRole());
                 if (rad.qualifier != null) cr.setContainerInfo(cr.getContainerInfo() + " / " + rad.qualifier.getValue());
                 if (rad.qualifierGroup != null) cr.setContainerInfo(cr.getContainerInfo() + " / " + rad.qualifierGroup.getName());
                 if (rad.qualifierAplicacio != null) cr.setContainerInfo(cr.getContainerInfo() + " / " + rad.qualifierAplicacio.getName());
-                cr.setMetaInfo(String.format(Messages.getString("ApplicationServiceImpl.RoleGrantedToGroup"), rad.rolGrup.getOwnerGroup().getName()));
+                cr.setMetaInfo(String.format(Messages.getString("ApplicationServiceImpl.RoleGrantedToGroup"), rad.rolGrup.getGroup().getName()));
                 if (!"S".equals(filtraResultats) || getAuthorizationService().hasPermission(Security.AUTO_GROUP_ROLE_QUERY, rad.rolGrup)) rgl.add(cr);
             }
         }
@@ -1088,7 +1120,7 @@ public class ApplicationServiceImpl extends
     protected Collection handleFindRolsContinguts(Role contenidor) throws Exception {
     	RoleEntity parent = getRoleEntityDao().load(contenidor.getId());
     	LinkedList<Role> children = new LinkedList<Role>();
-    	for (RoleDependencyEntity dep : parent.getContainedRole()) {
+    	for (RoleDependencyEntity dep : parent.getContainedRoles()) {
             children.add(getRoleEntityDao().toRole(dep.getContained()));
         }
     	return children;
@@ -1100,7 +1132,7 @@ public class ApplicationServiceImpl extends
         Collection<GroupEntity> grups = new ArrayList();
         for (Iterator<RoleGroupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
             RoleGroupEntity rge = it.next();
-            grups.add(rge.getOwnerGroup());
+            grups.add(rge.getGroup());
         }
         return getGroupEntityDao().toGroupList(grups);
         
@@ -1108,11 +1140,11 @@ public class ApplicationServiceImpl extends
 
     protected Collection<Role> handleFindGrantedRolesToGroupByGroup(Group grup) throws Exception {
         GroupEntity grupEntity = getGroupEntityDao().groupToEntity(grup);
-        Collection<RoleGroupEntity> rolsGrups = grupEntity.getAllowedRolesToGroup();
+        Collection<RoleGroupEntity> rolsGrups = grupEntity.getGrantedRoles();
         Collection<RoleEntity> rols = new ArrayList();
         for (Iterator<RoleGroupEntity> it = rolsGrups.iterator(); it.hasNext(); ) {
             RoleGroupEntity rge = it.next();
-            rols.add(rge.getAssignedRole());
+            rols.add(rge.getGrantedRole());
         }
         return getRoleEntityDao().toRoleList(rols);
         
@@ -1285,7 +1317,7 @@ public class ApplicationServiceImpl extends
 
     private Collection<RoleEntity> getRolsHeretatsDirectes(RoleEntity rolEntity) {
         HashMap<Long, RoleEntity> fills = new HashMap();
-        Collection rolsAsocHeretats = rolEntity.getContainedRole();
+        Collection rolsAsocHeretats = rolEntity.getContainedRoles();
         if (rolsAsocHeretats != null) {
             for (Iterator it = rolsAsocHeretats.iterator(); it.hasNext(); ) {
                 RoleDependencyEntity rar = (RoleDependencyEntity) it.next();
@@ -1412,14 +1444,14 @@ public class ApplicationServiceImpl extends
 		if (type == NONE)
 			return;
 		
-		for (RoleGroupEntity rg : grup.getAllowedRolesToGroup()) {
-            for (AccountEntity ae : getAccountsForDispatcher(originUser, null, rg.getAssignedRole().getSystem())) {
+		for (RoleGroupEntity rg : grup.getGrantedRoles()) {
+            for (AccountEntity ae : getAccountsForDispatcher(originUser, null, rg.getGrantedRole().getSystem())) {
                 RolAccountDetail n = new RolAccountDetail(rg, ae);
                 n.granteeGrup = grup;
                 if (!rad.contains(n)) {
                     if (type == DIRECT || type == ALL) rad.add(n);
                     if (type == INDIRECT || type == ALL) {
-                        for (AccountEntity acc : getAccountsForDispatcher(originUser, null, rg.getAssignedRole().getSystem())) populateRoleRoles(rad, ALL, n, originUser, acc);
+                        for (AccountEntity acc : getAccountsForDispatcher(originUser, null, rg.getGrantedRole().getSystem())) populateRoleRoles(rad, ALL, n, originUser, acc);
                     }
                 }
             }
@@ -1465,7 +1497,11 @@ public class ApplicationServiceImpl extends
 		
 		RoleEntity rol = currentRol.granted;
 		
-		for (RoleDependencyEntity ra : rol.getContainedRole()) {
+		for (RoleDependencyEntity ra : rol.getContainedRoles()) {
+			if (matchesGranteeDomainValue (currentRol, ra) && 
+					(ra.getStatus() == null || 
+					 ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) ||
+					 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
             if (matchesGranteeDomainValue(currentRol, ra)) {
                 for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getContained().getSystem())) {
                     RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
@@ -1688,11 +1724,14 @@ public class ApplicationServiceImpl extends
         }
 		
 		for (RoleDependencyEntity ra : rol.getContainerRoles()) {
-            populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null ? ra : originalGrant);
+			if (ra.getStatus() == null || 
+				ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) || 
+				ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
+					populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null ? ra : originalGrant);
         }
 
 		for (RoleGroupEntity rg : rol.getContainerGroups()) {
-            populateParentGrantsForGroup(radSet, rg.getOwnerGroup(), originalGrant == null ? rg : originalGrant);
+            populateParentGrantsForGroup(radSet, rg.getGroup(), originalGrant == null ? rg : originalGrant);
         }
 	}
 
@@ -1717,7 +1756,7 @@ public class ApplicationServiceImpl extends
 		if (originalGrant instanceof RoleDependencyEntity)
 			de = ((RoleDependencyEntity) originalGrant).getContained().getSystem();
 		else
-			de = ((RoleGroupEntity) originalGrant).getAssignedRole().getSystem();
+			de = ((RoleGroupEntity) originalGrant).getGrantedRole().getSystem();
 			
 		for (AccountEntity acc : getAccountsForDispatcher(u, null, de)) {
             if (acc != null) {
@@ -1852,6 +1891,47 @@ public class ApplicationServiceImpl extends
 		return getRoleAccountEntityDao().toRoleAccountList(getRoleAccountEntityDao().findByInformationSystem(informationSystem));
 	}
 
+	@Override
+	protected Role handleUpdate2(Role rol) throws Exception {
+        RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
+        if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
+
+        	
+            rolEntity = getRoleEntityDao().update(rol, true); // actualizamos cambios del rol
+            
+            return getRoleEntityDao().toRole(rolEntity);
+            
+        }
+
+		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getInformationSystemName()));
+	}
+
+	@Override
+	protected Role handleApproveRoleDefinition(Role rol) throws Exception {
+		RoleEntity entity = getRoleEntityDao().load(rol.getId());
+	    if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_UPDATE, entity)) {
+	    	getRoleEntityDao().commitDefinition(entity);
+	    	return getRoleEntityDao().toRole(entity);
+		}
+	    else
+	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getInformationSystemName()));
+	
+	}
+
+	@Override
+	protected Role handleDenyRoleDefinition(Role rol) throws Exception {
+		RoleEntity entity = getRoleEntityDao().load(rol.getId());
+	    if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_UPDATE, entity)) {
+	    	getRoleEntityDao().rollbackDefinition(entity);
+	    	return getRoleEntityDao().toRole(entity);
+		}
+	    else
+	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+				getPrincipal().getName(), rol.getInformationSystemName()));
+	}
+
 }
 
 class RolAccountDetail
@@ -1870,7 +1950,7 @@ class RolAccountDetail
 	String hash;
 	public RolAccountDetail(RoleGroupEntity rg, AccountEntity account) {
 		this.account = account; 
-		granted = rg.getAssignedRole();
+		granted = rg.getGrantedRole();
 		qualifier = rg.getGrantedDomainValue();
 		qualifierAplicacio = rg.getGrantedApplicationDomain();
 		qualifierGroup = rg.getGrantedGroupDomain();

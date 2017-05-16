@@ -113,7 +113,7 @@
 			<![CDATA[Logout servlet]]>
 		</description>
 		<servlet-name>logoutServlet</servlet-name>
-		<servlet-class>com.soffid.web.LogoutServlet</servlet-class>
+		<servlet-class>com.soffid.iam.web.LogoutServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>logoutServlet</servlet-name>
@@ -136,10 +136,6 @@
 	<servlet-mapping>
 		<servlet-name>error467</servlet-name>
 		<url-pattern>/error467</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>signature-receiver</servlet-name>
-		<url-pattern>/signature</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>download-servlet</servlet-name>
@@ -167,6 +163,12 @@
 			<param-value>/changepass.zul</param-value>
 		</init-param>
 	</filter>
+
+
+	<filter-mapping>
+		<filter-name>TenantFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>CheckPasswordLoginFilter</filter-name>
@@ -247,7 +249,7 @@
 			<![CDATA[Soffid Error Servlet]]>
 		</description>
 		<servlet-name>soffidErrorServlet</servlet-name>
-		<servlet-class>com.soffid.web.ErrorServlet</servlet-class>
+		<servlet-class>com.soffid.iam.web.ErrorServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>soffidErrorServlet</servlet-name>
@@ -478,12 +480,12 @@
 		<local>es.caib.seycon.ng.servei.ejb.AplicacioService</local>
 	</ejb-local-ref>
 	<ejb-local-ref>
-	<ejb-ref>
 		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
 		<local>com.soffid.iam.service.ejb.VaultServiceHome</local>
-	</ejb-ref>
-	<ejb-ref>
+	</ejb-local-ref>
+	
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/SessioEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
 		<local>es.caib.seycon.ng.servei.ejb.SessioService</local>
@@ -574,6 +576,18 @@
 		<ejb-ref-name>ejb/v2/TenantEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
 		<local>com.soffid.iam.service.ejb.TenantService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/AuthorizationEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.AuthorizationService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/DispatcherEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.DispatcherService</local>
 	</ejb-local-ref>
 
 

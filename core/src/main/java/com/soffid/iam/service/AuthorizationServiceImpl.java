@@ -19,6 +19,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.AuthorizationEntity;
@@ -299,6 +300,22 @@ public class AuthorizationServiceImpl extends
                 }
             }
 
+        }
+        // Now, remove authorizations disabled for this tenant
+        
+        Tenant tenant = getTenantService().getTenant(Security.getCurrentTenantName());
+        
+        HashSet<String> disabled = new HashSet<String> (getTenantService().getDisabledPermissions(tenant));
+        
+        for (Iterator<AuthorizationRole> it = autoritzacionsUsuari.iterator(); it.hasNext(); )
+        {
+        	AuthorizationRole auth = it.next();
+        	String name = auth.getAuthorization();
+        	int i = name.indexOf('/');
+        	if (i > 0)
+        		name = name.substring(0, i);
+        	if (disabled.contains(name))
+        		it.remove();
         }
         return autoritzacionsUsuari;
 

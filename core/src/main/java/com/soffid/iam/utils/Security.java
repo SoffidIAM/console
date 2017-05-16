@@ -226,7 +226,8 @@ public class Security {
     public static final String AUTO_AGENT_ACCESSCONTROL_QUERY = "agent:accessControl:query"; //$NON-NLS-1$
     public static final String AUTO_AGENT_ACCESSCONTROL_SET = "agent:accessControl:set"; //$NON-NLS-1$
 
-    public static final String AUTO_SERVER_MANAGE = "server:manage"; //$NON-NLS-1$
+    public static final String AUTO_SERVER_MANAGE_PROXY = "server:manage:proxy"; //$NON-NLS-1$
+    public static final String AUTO_SERVER_MANAGE_SERVER = "server:manage:server"; //$NON-NLS-1$
     public static final String AUTO_SERVER_QUERY = "server:query"; //$NON-NLS-1$
 
     public static final String AUTO_AUDIT_QUERY = "audit:query"; //$NON-NLS-1$
@@ -310,6 +311,7 @@ public class Security {
     public static final String AUTO_REMEMBER_PASSWORD_QUERY = "rememberPassword:query"; //$NON-NLS-1$
     public static final String AUTO_SEU_VIEW_REMEMBER_PASSWORD = "seu:rememberPassword:show"; //$NON-NLS-1$
 	public static final String[] ALL_PERMISSIONS = new String [] { AUTO_AUTHORIZATION_ALL };
+	public static final String AUTO_TENANT_QUERY = "tenant:query";
 	
     private static ThreadLocal<Stack<SoffidPrincipal>> identities = new ThreadLocal<Stack<SoffidPrincipal>>();
     private static boolean onSyncServer = false;
@@ -350,8 +352,8 @@ public class Security {
     	if (principal.hasRole(role))
     		return true;
     	
-    	if (principal.hasRole(AUTO_AUTHORIZATION_ALL))
-    		return true;
+//    	if (principal.hasRole(AUTO_AUTHORIZATION_ALL))
+//    		return true;
 
     	int i = role.indexOf('/');
         if (i <= 0)
@@ -560,7 +562,7 @@ public class Security {
     }
     
     static HashMap<String, Long> tenants = new HashMap<String,Long>();
-    public static Long getTenantId (String tenantName) throws InternalErrorException {
+    private static Long getTenantId (String tenantName) throws InternalErrorException {
     	Long id = tenants.get(tenantName);
     	if (id == null)
     	{

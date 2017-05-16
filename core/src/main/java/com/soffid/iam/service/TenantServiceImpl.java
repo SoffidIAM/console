@@ -1,12 +1,20 @@
 package com.soffid.iam.service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.TenantCriteria;
+import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.TenantDisabledPermissionEntity;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.model.TenantServerEntity;
 import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantServiceImpl extends TenantServiceBase {
 	private final String MASTER_NAME = "master";
@@ -80,6 +88,102 @@ public class TenantServiceImpl extends TenantServiceBase {
 		TenantEntity entity = getTenantEntityDao().tenantToEntity(tenant);
 		getTenantEntityDao().update(entity);
 		return getTenantEntityDao().toTenant(entity);
+	}
+
+	@Override
+	protected void handleDisablePermission(Tenant tenant, String permission)
+			throws Exception {
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		if (te.getName().equals("master"))
+			throw new InternalErrorException("Permissions cannot be disabled for Master tenant");
+		TenantDisabledPermissionEntity tep = getTenantDisabledPermissionEntityDao().newTenantDisabledPermissionEntity();
+		tep.setAppliesTo(te);
+		tep.setPermission(permission);
+		getTenantDisabledPermissionEntityDao().create(tep);
+	}
+
+	@Override
+	protected void handleEnablePermission(Tenant tenant, String permission)
+			throws Exception {
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		for ( TenantDisabledPermissionEntity tep: te.getDisabledPermissions())
+		{
+			if (tep.getPermission().equals(permission))
+			{
+				te.getDisabledPermissions().remove(tep);
+//				getTenantDisabledPermissionEntityDao().remove(tep);
+				break;
+			}
+		}
+	}
+
+	@Override
+	protected List<String> handleGetDisabledPermissions(Tenant tenant)
+			throws Exception {
+		List<String> result = new LinkedList<String>();
+		
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		for (TenantDisabledPermissionEntity tep: te.getDisabledPermissions())
+		{
+			result.add(tep.getPermission());
+		}
+		
+		return result;
+	}
+
+	@Override
+	protected void handleAddTenantServer(Tenant tenant, String server)
+			throws Exception {
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		ServerEntity serverEntity = getServerEntityDao().findByName(server);
+		if (serverEntity == null)
+			throw new InternalErrorException(String.format("Server %s does not exist", server));
+		TenantServerEntity tep = getTenantServerEntityDao().newTenantServerEntity();
+		tep.setServerTenant(te);
+		tep.setTenantServer(serverEntity);
+		getTenantServerEntityDao().create(tep);
+	}
+
+	@Override
+	protected List<String> handleGetTenantServers(Tenant tenant)
+			throws Exception {
+		List<String> result = new LinkedList<String>();
+		
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		for (TenantServerEntity tep: te.getServers())
+		{
+			result.add(tep.getTenantServer().getName());
+		}
+		
+		return result;
+	}
+
+	@Override
+	protected Collection<Tenant> handleListTenants() throws Exception {
+		if (Security.isUserInRole(Security.AUTO_TENANT_QUERY))
+		{
+			return getTenantEntityDao().toTenantList(
+					getTenantEntityDao().loadAll());
+		}
+		else
+		{
+			String currentTenant = Security.getCurrentTenantName();
+			return Collections.singleton(handleGetTenant(currentTenant));
+		}
+	}
+
+	@Override
+	protected void handleRemoveTenantServer(Tenant tenant, String server)
+			throws Exception {
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		for ( TenantServerEntity tep: te.getServers())
+		{
+			if (tep.getTenantServer().getName().equals(server))
+			{
+				te.getServers().remove(tep);
+				break;
+			}
+		}
 	}
 
 }

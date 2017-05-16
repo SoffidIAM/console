@@ -1,4 +1,4 @@
-package com.soffid.web.users.additionalData;
+package com.soffid.iam.web.users.additionalData;
 
 import java.util.Collection;
 import java.util.Collections;

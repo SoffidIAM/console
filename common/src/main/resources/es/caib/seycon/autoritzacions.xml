@@ -939,7 +939,16 @@
 
 
 	<autoritzacio>
-		<codi>server:manage</codi>
+		<codi>server:manage:proxy</codi>
+		<descripcio>Manage soffid Proxy synchronization servers</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			server:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>server:manage:server</codi>
 		<descripcio>Manage soffid synchronization servers</descripcio>
 		<ambit>Agents</ambit>
 		<hereta>

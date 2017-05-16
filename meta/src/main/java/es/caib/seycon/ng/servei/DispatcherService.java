@@ -5,8 +5,12 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.ScheduledTaskService;
+import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.comu.Server;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 	ScheduledTaskService.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
 	SeyconServerService.class,
-	AutoritzacioService.class})
+	AutoritzacioService.class,
+	TenantEntity.class})
 public abstract class DispatcherService {
 
 	@Operation ( grantees={roles.agent_create.class},
@@ -250,7 +255,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage_proxy.class, roles.server_manage_server.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Server update(
@@ -258,14 +263,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage_proxy.class, roles.server_manage_server.class},
 			translated="delete")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Server server)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation ( grantees={roles.server_manage.class},
+	@Operation ( grantees={roles.server_manage_proxy.class, roles.server_manage_server.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Server create(
@@ -372,5 +377,12 @@ public abstract class DispatcherService {
 		java.lang.Long objectId)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+	
+	@Operation ( grantees={roles.service_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class}, readOnly=true)
+	public String[] getServerTenants (Server server)
+	{
+		return null;
 	}
 }

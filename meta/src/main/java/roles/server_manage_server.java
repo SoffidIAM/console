@@ -7,6 +7,6 @@
 package roles;
 import com.soffid.mda.annotation.*;
 
-@Role (name="server:manage:proxy" )
-public abstract class server_manage_proxy {
+@Role (name="server:manage:server" )
+public abstract class server_manage_server {
 }

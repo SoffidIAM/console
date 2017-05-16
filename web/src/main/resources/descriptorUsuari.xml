@@ -132,7 +132,7 @@
 		</finder>
 		<finder name="dada" type="dada" executeOnNewObjects="true">  <!-- user:query -->
 			<script-finder>
-				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
 				return obj.getDadaUsuari(instance.codi); 
 			</script-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.DadaUsuari"> 
@@ -155,11 +155,11 @@
 		</finder>
 		<script-handler>
 			<insert-script>
-				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
 				obj.checkRequiredAttributes(self); 
 			</insert-script>
 			<update-script>
-				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
 				obj.checkRequiredAttributes(self); 
 			</update-script>
 		</script-handler>
@@ -193,7 +193,7 @@
 			<update-script>
 				if (instance.getCodiUsuari() == null)
 					instance.setCodiUsuari (parent.instance.getCodi());
-				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
 				obj.checkRequiredAttribute(self); 
 			</update-script>
 		</script-handler>

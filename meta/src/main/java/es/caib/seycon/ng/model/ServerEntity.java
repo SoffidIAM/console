@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -45,11 +47,6 @@ public abstract class ServerEntity {
 	@Nullable
 	public java.lang.String javaOptions;
 
-
-	@Column (name="SRV_TEN_ID")
-	@Nullable 
-	TenantEntity tenant;
-	
 	@ForeignKey (foreignColumn="SEC_IDSRV")
 	public java.util.Collection<es.caib.seycon.ng.model.SecretEntity> secrets;
 
@@ -62,10 +59,19 @@ public abstract class ServerEntity {
 		java.lang.String name) {
 	 return null;
 	}
+
+	@DaoFinder("select server "
+			+ "from com.soffid.iam.model.ServerEntity as server "
+			+ "join server.tenants as t "
+			+ "where t.serverTenant.name = :name")
+	public Collection<es.caib.seycon.ng.model.ServerEntity> findByTenant(
+		java.lang.String name) {
+	 return null;
+	}
 }
 
 @Index (name="SC_SERVER_UK1",	unique=true,
 entity=es.caib.seycon.ng.model.ServerEntity.class,
-columns={"SRV_NOM", "SRV_TEN_ID"})
+columns={"SRV_NOM"})
 abstract class ServerIndex {
 }

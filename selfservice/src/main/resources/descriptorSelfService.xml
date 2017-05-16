@@ -113,7 +113,7 @@
 			<update-script>
 				if (instance.getCodiUsuari() == null)
 					instance.setCodiUsuari (parent.instance.getCodi());
-				obj = new com.soffid.web.users.additionalData.ShowAdditionalData();
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
 				obj.checkRequiredAttribute(self); 
 			</update-script>
 		</script-handler>

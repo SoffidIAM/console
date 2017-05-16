@@ -57,6 +57,7 @@ import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.SystemGroupEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.TenantServerEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
@@ -65,6 +66,7 @@ import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -107,6 +109,8 @@ public class DispatcherServiceImpl extends
 		if (dispatcher.getUserTypes() == null) {
 			dispatcher.setUserTypes(""); //$NON-NLS-1$
 		}
+		
+		checkSystemServer (dispatcher);
 
 		SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(
 				dispatcher.getName());
@@ -134,6 +138,22 @@ public class DispatcherServiceImpl extends
 		updateServers();
 
 		return dispatcher;
+	}
+
+	private void checkSystemServer(com.soffid.iam.api.System dispatcher) throws Exception {
+		if (dispatcher.getUrl() == null ||
+				dispatcher.getUrl().isEmpty())
+			return;
+		if (dispatcher.getUrl().equals("local"))
+			return;
+		
+		for (Server s: handleFindAllServers())
+		{
+			if (s.getUrl().equals(dispatcher.getUrl()))
+				return;
+		}
+		
+		throw new InternalErrorException(String.format("Server %s does not exist", dispatcher.getUrl()));
 	}
 
 	private void updateAutomaticTasks(com.soffid.iam.api.System dispatcher,
@@ -802,12 +822,23 @@ public class DispatcherServiceImpl extends
 	@Override
 	protected Collection<Server> handleFindAllServers() throws Exception {
 		ServerEntityDao dao = getServerEntityDao();
-		List<ServerEntity> db = dao.loadAll();
-		List<Server> servers = dao.toServerList(db);
-		for (Server server : servers) {
-			server.setAuth(null);
-			server.setPk(null);
-			server.setPublicKey(null);
+		Collection<ServerEntity> db;
+		if (Security.isUserInRole(Security.AUTO_TENANT_QUERY))
+			db = dao.loadAll();
+		else
+			db = dao.findByTenant(Security.getCurrentTenantName());
+		List<Server> servers = new LinkedList<Server>(); 
+		for (ServerEntity server: db)
+		{
+			if (Security.isUserInRole(Security.AUTO_TENANT_QUERY) ||
+					server.getType() == ServerType.PROXYSERVER)
+			{
+				Server vo = getServerEntityDao().toServer(server);
+				vo.setAuth(null);
+				vo.setPk(null);
+				vo.setPublicKey(null);
+				servers.add(vo);
+			}
 		}
 		return servers;
 	}
@@ -823,16 +854,43 @@ public class DispatcherServiceImpl extends
 	protected Server handleUpdate(Server server) throws Exception {
 		ServerEntityDao dao = getServerEntityDao();
 		ServerEntity entity = dao.load(server.getId());
-		server.setAuth(entity.getAuth());
-		server.setPk(entity.getPk());
-		dao.serverToEntity(server, entity, true);
-		dao.update(entity);
-		server = dao.toServer(entity);
-		server.setAuth(null);
-		server.setPk(null);
-		server.setPublicKey(null);
-		updateSeyconServerList();
-		return server;
+		
+		if (entity.getType() == ServerType.MASTERSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_SERVER) )
+			throw new InternalErrorException("Not authorized to manage servers");
+		
+		if (entity.getType() == ServerType.PROXYSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_PROXY) )
+			throw new InternalErrorException("Not authorized to manage servers");
+
+		if (canAccess (entity))
+		{
+			server.setAuth(entity.getAuth());
+			server.setPk(entity.getPk());
+			dao.serverToEntity(server, entity, true);
+			dao.update(entity);
+			server = dao.toServer(entity);
+			server.setAuth(null);
+			server.setPk(null);
+			server.setPublicKey(null);
+			updateSeyconServerList();
+			return server;
+		} else
+			return null;
+	}
+
+	private boolean canAccess(ServerEntity entity) throws InternalErrorException {
+		if (Security.isUserInRole(Security.AUTO_TENANT_QUERY))
+			return true;
+		if (entity.getType() == ServerType.MASTERSERVER)
+			return false;
+		
+		for (TenantServerEntity st: entity.getTenants())
+		{
+			if (st.getServerTenant().getName().equals(Security.getCurrentTenantName()))
+				return true;
+		}
+		return false;
 	}
 
 	/*
@@ -844,47 +902,24 @@ public class DispatcherServiceImpl extends
 	 */
 	@Override
 	protected void handleDelete(Server server) throws Exception {
-		getServerEntityDao().remove(server.getId());
-		updateSeyconServerList();
+		ServerEntity entity = getServerEntityDao().load(server.getId());
+		
+		if (entity.getType() == ServerType.MASTERSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_SERVER) )
+			throw new InternalErrorException("Not authorized to manage servers");
+		
+		if (entity.getType() == ServerType.PROXYSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_PROXY) )
+			throw new InternalErrorException("Not authorized to manage servers");
+
+		if (canAccess (entity))
+		{
+			getServerEntityDao().remove(entity);
+			updateSeyconServerList();
+		}
 	}
 
 	protected void updateSeyconServerList() throws InternalErrorException {
-		StringBuffer serverList = null;
-		List<ServerEntity> servers = new LinkedList(getServerEntityDao()
-				.loadAll());
-		Collections.sort(servers, new Comparator<ServerEntity>() {
-
-			public int compare(ServerEntity o1, ServerEntity o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		});
-		for (ServerEntity server : servers) {
-			if (server.getType() == ServerType.MASTERSERVER) {
-				if (serverList == null)
-					serverList = new StringBuffer();
-				else
-					serverList.append(","); //$NON-NLS-1$
-				serverList.append(server.getUrl());
-			}
-		}
-		String serversString = serverList == null ? null : serverList
-				.toString();
-		ConfigurationService configSvc = getConfigurationService();
-		Configuration config = configSvc.findParameterByNameAndNetworkName(
-				"seycon.server.list", null); //$NON-NLS-1$
-		if (serversString == null) {
-			if (config != null)
-				configSvc.delete(config);
-		} else if (config == null) {
-			config = new Configuration();
-			config.setCode("seycon.server.list"); //$NON-NLS-1$
-			config.setValue(serversString);
-			config.setDescription("Synchronization servers list"); //$NON-NLS-1$
-			configSvc.create(config);
-		} else {
-			config.setValue(serversString);
-			configSvc.update(config);
-		}
 	}
 
 	/*
@@ -896,6 +931,14 @@ public class DispatcherServiceImpl extends
 	 */
 	@Override
 	protected Server handleCreate(Server server) throws Exception {
+		if (server.getType() == ServerType.MASTERSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_SERVER) )
+			throw new InternalErrorException("Not authorized to manage servers");
+		
+		if (server.getType() == ServerType.PROXYSERVER && 
+				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_PROXY) )
+			throw new InternalErrorException("Not authorized to manage servers");
+
 		ServerEntityDao dao = getServerEntityDao();
 		ServerEntity serverEntity = dao.serverToEntity(server);
 		dao.create(serverEntity);
@@ -1273,6 +1316,24 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException(
 					"Unable to locate Soffid system descriptor");
 		return getSystemEntityDao().toSystem(sd);
+	}
+
+	@Override
+	protected String[] handleGetServerTenants(Server server) throws Exception {
+		ServerEntity entity = getServerEntityDao().findByName(server.getName());
+		if (canAccess(entity))
+		{
+			List<String> tenants = new LinkedList<String>();
+			for (TenantServerEntity st: entity.getTenants())
+			{
+				if (Security.isUserInRole(Security.AUTO_TENANT_QUERY) ||
+						st.getServerTenant().getName().equals(Security.getCurrentTenantName()))
+					tenants.add(st.getServerTenant().getName());
+			}
+			return tenants.toArray(new String[tenants.size()]);
+		}
+		else
+			return null;
 	}
 
 }

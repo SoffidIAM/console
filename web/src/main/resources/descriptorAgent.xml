@@ -127,14 +127,20 @@
 		<finder name="servertype" type="servertype">
 			<script-finder>
 				v = new java.util.Vector();
-				obj = new es.caib.seycon.ng.web.PairContainer();
-				obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.server"));
-				obj.setSecond(es.caib.seycon.ng.comu.ServerType.MASTERSERVER);
-				v.add (obj);
-				obj = new es.caib.seycon.ng.web.PairContainer();
-				obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.agent"));
-				obj.setSecond(es.caib.seycon.ng.comu.ServerType.PROXYSERVER);
-				v.add(obj);
+				if (com.soffid.iam.utils.Security.isUserInRole("server:manage:server"))
+				{
+					obj = new es.caib.seycon.ng.web.PairContainer();
+					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.server"));
+					obj.setSecond(es.caib.seycon.ng.comu.ServerType.MASTERSERVER);
+					v.add (obj);
+				}
+				if (com.soffid.iam.utils.Security.isUserInRole("server:manage:proxy"))
+				{
+					obj = new es.caib.seycon.ng.web.PairContainer();
+					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.agent"));
+					obj.setSecond(es.caib.seycon.ng.comu.ServerType.PROXYSERVER);
+					v.add(obj);
+				}
 				return v;				
 			</script-finder>
 		</finder>

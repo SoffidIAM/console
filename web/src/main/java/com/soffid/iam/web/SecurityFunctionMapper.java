@@ -1,4 +1,4 @@
-package com.soffid.web;
+package com.soffid.iam.web;
 
 import java.lang.reflect.Method;
 

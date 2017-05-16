@@ -637,7 +637,8 @@ public class AutoritzacionsUsuari
 
 	public static boolean canManageServers ()
 	{
-		return Security.isUserInRole(Security.AUTO_SERVER_MANAGE);
+		return Security.isUserInRole(Security.AUTO_SERVER_MANAGE_SERVER) ||
+				Security.isUserInRole(Security.AUTO_SERVER_MANAGE_PROXY) ;
 	}
 
 	/*

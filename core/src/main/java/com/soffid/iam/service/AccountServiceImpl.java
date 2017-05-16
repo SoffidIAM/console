@@ -1240,7 +1240,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{
 			User caller = AutoritzacionsUsuari.getCurrentUsuari();
-			if (caller.getId() != usuari.getId())
+			if (caller != null && caller.getId() != usuari.getId())
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
 		UserEntity ue = getUserEntityDao().load(usuari.getId());

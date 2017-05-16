@@ -8,6 +8,10 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<style src="~./styles/estil.css"/>
+	
+	<style>
+		tr.noBorderGrid td.gc {vertical-align: top} 
+	</style>
 
 	<datamodel id="model" rootNode="root" src="descriptorTenants.xml"/>
 	
@@ -184,10 +188,25 @@
 				void onChangeDades()
 				{
 					try {
-						ds = form.getDataSource(); 
-						ctx =  ds.getJXPathContext(); 
+						es.caib.zkib.datasource.DataSource ds = form.getDataSource(); 
+						es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext(); 
 						registre = ctx.getValue("/");
 						form.getFellow("form_name").getFellow("dada").setDisabled(!registre.isNew());
+						if (registre.isNew ())
+						{
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"seu:tenant:show");
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"tenant:query");
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"seu:tenant:create");
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"seu:tenant:update");
+						}
 					} catch (Exception e) {
 						form.getFellow("form_name").getFellow("dada").setDisabled(true);
 					}
@@ -223,7 +242,7 @@
 					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
 					camp.setValue(dada);
 				</attribute>
-				<grid>
+				<grid sclass="noBorderGrid">
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('tenant.zul.name')}"/>
@@ -248,6 +267,80 @@
 							
 							<checkbox bind="@enabled" 
 									disabled="${!canUpdateTenant}"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('tenant.zul.permission')} :"/>
+							<div>
+								<grid sclass="noBorderGrid" dataPath="permissions">
+									<datarow>
+										<listbox
+											dataPath="/model:/auth" 
+											bind="/newValue"
+											disabled="${!canUpdateTenant}"
+											mold="select"
+											width="95%">
+											<dataitem bind="codi">
+												<listcell bind="codi"></listcell>
+											</dataitem>
+										</listbox>
+										<imageclic id="imgDelete" if="${canUpdateTenant}"
+											src="~./img/list-remove.gif">
+											<attribute name="onClick"><![CDATA[
+es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.getXPath());
+											]]></attribute>
+										</imageclic>
+									</datarow>
+								</grid>
+								<button
+									image="~./img/list-add.gif"
+									label="${c:l('usuaris.zul.Afegeixnou')}"
+									visible="${canUpdateTenant}">
+									<attribute name="onClick"><![CDATA[
+										es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+										es.caib.zkib.datasource.XPathUtils.createPath(
+												bindCtx.getDataSource(),
+												"/permissions");
+									]]></attribute>
+								</button>
+							</div>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('tenant.zul.servers')} :"/>
+							<div>
+								<grid sclass="noBorderGrid" dataPath="servers">
+									<datarow>
+										<listbox
+											dataPath="/model:/server" 
+											bind="/newValue"
+											disabled="${!canUpdateTenant}"
+											mold="select"
+											width="95%">
+											<dataitem bind="name">
+												<listcell bind="name"></listcell>
+											</dataitem>
+										</listbox>
+										<imageclic id="imgDelete" if="${canUpdateTenant}"
+											src="~./img/list-remove.gif">
+											<attribute name="onClick"><![CDATA[
+es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.getXPath());
+											]]></attribute>
+										</imageclic>
+									</datarow>
+								</grid>
+								<button
+									image="~./img/list-add.gif"
+									label="${c:l('usuaris.zul.Afegeixnou')}"
+									visible="${canUpdateTenant}">
+									<attribute name="onClick"><![CDATA[
+										es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+										es.caib.zkib.datasource.XPathUtils.createPath(
+												bindCtx.getDataSource(),
+												"/servers");
+									]]></attribute>
+								</button>
+							</div>
 						</row>
 					</rows>
 				</grid>

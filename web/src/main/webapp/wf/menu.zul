@@ -30,8 +30,7 @@
 	boolean canViewAccounts = AutoritzacionsUsuari.hasViewAccountsSEU();
 	boolean canViewAttributeTranslation = es.caib.seycon.ng.utils.Security.isUserInRole("seu:attributeTranslation:show");
 	com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
-	boolean canViewTenants = es.caib.seycon.ng.utils.Security.isUserInRole("seu:tenant:show") &&
-			com.soffid.iam.utils.Security.getCurrentTenantName().equals ( masterTenant.getName() );
+	boolean canViewTenants = es.caib.seycon.ng.utils.Security.isUserInRole("seu:tenant:show");
 	
 	boolean canViewRules = es.caib.seycon.ng.utils.Security.isUserInRole("seu:rules:show");
 	// Ara es mira per ACL de xarxes i màquines

@@ -1,4 +1,4 @@
-package com.soffid.web.agent;
+package com.soffid.iam.web.agent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;

@@ -24,7 +24,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
-import com.soffid.web.SecurityFunctionMapper;
+import com.soffid.iam.web.SecurityFunctionMapper;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datamodel.xml.FunctionMapperChain;
@@ -96,7 +96,7 @@ public class WorkflowInterceptor implements Filter {
 						"IE=8");
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
-				if (nestedPrincipal != null ) {
+				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
 					
 					Security.nestedLogin(nestedPrincipal);
 					try {

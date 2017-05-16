@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 import java.util.Map;
 
+import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
@@ -29,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.PasswordService.class,
 	es.caib.seycon.ng.servei.SessionCacheService.class,
 	XarxaService.class,
-	
+	TenantService.class,
 	UsuariEntity.class,
 	UsuariImpressoraEntity.class})
 public abstract class AutoritzacioService {

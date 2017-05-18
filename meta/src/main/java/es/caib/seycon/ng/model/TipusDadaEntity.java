@@ -96,8 +96,8 @@ public abstract class TipusDadaEntity {
 	 return null;
 	}
 
-	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity tipusDada "
-			+ "where (:codi is null or tipusDada.codi like :codi) "
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity tipusDada "
+			+ "where (:codi is null or tipusDada.name like :codi) "
 			+ "and   (tipusDada.scope = :scope or :scope is null ) and "
 			+ "tipusDada.tenant.id = :tenantId")
 	@Operation(translated="findDataTypesByScopeAndName")

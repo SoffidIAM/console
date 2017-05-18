@@ -224,7 +224,7 @@ public abstract class DispatcherEntity {
 			+ "from com.soffid.iam.model.SystemEntity as dis "
 			+ "join dis.tenant as tenant "
 			+ "join tenant.servers as server "
-			+ "where server.tenantServer.name = server")
+			+ "where server.tenantServer.name = :server")
 	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findServerTenants(String server) {
 		return null;
 	}

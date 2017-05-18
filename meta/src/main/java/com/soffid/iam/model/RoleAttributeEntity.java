@@ -42,7 +42,7 @@ public class RoleAttributeEntity {
 	public void setObjectValue (Object value) {}
 
 	@DaoFinder("select att from com.soffid.iam.model.RoleAttributeEntity as att "
-			+ "where att.metadata.codi = :name and att.value = :value ")
+			+ "where att.metadata.name = :name and att.value = :value ")
 	public java.util.List<RoleAttributeEntity> findByNameAndValue(
 			String name, String value) {
 		return null;

@@ -53,17 +53,17 @@
 		<ejb-handler jndi="java:comp/env/ejb/SeyconServerEJB"/>
 	</datanode>	
 	
-	<datanode name="server">
+	<datanode name="server"  transient="true">
 	</datanode>
 	
-	<datanode name="agentserver"/>
+	<datanode name="agentserver"  transient="true"/>
 	
-	<datanode name="tascaserver"/>
+	<datanode name="tascaserver" transient="true"/>
 	
-	<datanode name="tascapendent"/>
+	<datanode name="tascapendent"  transient="true"/>
 	
-	<datanode name="tascaagentserver"/>
+	<datanode name="tascaagentserver" transient="true"/>
 	
-	<datanode name="servidorsagents"/>
+	<datanode name="servidorsagents"  transient="true"/>
 
 </zkib-model>

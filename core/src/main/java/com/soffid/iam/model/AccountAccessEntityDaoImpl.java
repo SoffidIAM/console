@@ -63,8 +63,10 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 				Hibernate.isInitialized(entity.getAccount().getAcl()))
 		{
 			entity.getAccount().getAcl().remove(entity);
+			getSession().flush();
 		}
-		super.remove(entity);
+		else
+			super.remove(entity);
 		auditar("D", entity); //$NON-NLS-1$
 	}
 }

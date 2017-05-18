@@ -9,6 +9,16 @@
  */
 package com.soffid.iam.service;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ScheduledTask;
@@ -17,13 +27,8 @@ import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author bubu
@@ -31,7 +36,7 @@ import java.util.List;
  */
 public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 {
-
+	Log log = LogFactory.getLog(getClass());
 	/* (non-Javadoc)
 	 * @see com.soffid.iam.service.ScheduledTaskServiceBase#handleCreate(com.soffid.iam.api.ScheduledTaskHandler)
 	 */
@@ -184,8 +189,19 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	 */
 	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException
 	{
+		if (task.getLastLog().length() > 64000)
+		{
+			StringBuffer b = new StringBuffer();
+			b.append(task.getLastLog(), 0, 64000)
+				.append("\r\n*** TRUNCATED FILE ***");
+			task.setLastLog(b);
+		}
 		task.setActive(false);
 		task.setLastEnd(Calendar.getInstance());
+		try {
+			task.setServerName(Config.getConfig().getHostName());
+		} catch (IOException e) {
+		}
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "F"); //$NON-NLS-1$

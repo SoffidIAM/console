@@ -11,6 +11,8 @@ import com.soffid.mda.annotation.ValueObject;
 public class TaskInstance {
 	long id = 0;
 	@Nullable
+	ClassLoader processClassLoader;
+	@Nullable
 	protected String processName = null;
 	@Nullable
 	protected long processId = -1L;

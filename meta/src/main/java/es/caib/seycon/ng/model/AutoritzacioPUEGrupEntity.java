@@ -24,7 +24,7 @@ public abstract class AutoritzacioPUEGrupEntity {
 	@Column (name="GPE_IDPUE", translated="entryPoint")
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
-	@Column (name="GPE_IDGRU")
+	@Column (name="GPE_IDGRU", composition=true)
 	public GrupEntity group;
 
 }

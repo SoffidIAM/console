@@ -6,13 +6,25 @@
 
 package es.caib.seycon.ng.servei;
 import com.soffid.iam.model.TenantEntity;
+import java.util.Map;
+
+import com.soffid.iam.api.ReconcileTrigger;
+import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.service.ScheduledTaskService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Server;
+import es.caib.seycon.ng.comu.Dispatcher;
+import es.caib.seycon.ng.comu.ObjectMappingTrigger;
+import es.caib.seycon.ng.comu.SoffidObjectType;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import roles.agent_create;
+import roles.agent_update;
 
 @Service (translatedName="DispatcherService",
 	translatedPackage="com.soffid.iam.service")
@@ -34,10 +46,12 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class,
 	ScheduledTaskService.class,
+	ObjectMappingTriggerEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
 	SeyconServerService.class,
 	AutoritzacioService.class,
-	TenantEntity.class})
+	TenantEntity.class,
+	ReconcileTriggerEntity.class})
 public abstract class DispatcherService {
 
 	@Operation ( grantees={roles.agent_create.class},
@@ -303,12 +317,38 @@ public abstract class DispatcherService {
 	}
 	@Operation ( grantees={roles.agent_query.class},
 			translated="findAttributeMappingsByObject")
-	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.AttributeMapping> findAttributeMappingsByObject(
-		java.lang.Long dispatcherId)
+		java.lang.Long objectId)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	/** Trigger methods **/
+	@Operation ( grantees={roles.agent_update.class})
+	public ObjectMappingTrigger create(ObjectMappingTrigger trigger)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	@Operation ( grantees={roles.agent_update.class})
+	public ObjectMappingTrigger update(ObjectMappingTrigger trigger)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		 return null;
+		}
+
+	@Operation ( grantees={roles.agent_update.class})
+	public void delete(ObjectMappingTrigger tirger)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		}
+
+	@Operation ( grantees={roles.agent_query.class})
+	public java.util.Collection<ObjectMappingTrigger> findObjectMappingTriggersByObject(
+		java.lang.Long objectId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	
 	@Operation ( grantees={roles.agent_update.class},
 			translated="setDefaultMappingsByDispatcher")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -384,5 +424,48 @@ public abstract class DispatcherService {
 	public String[] getServerTenants (Server server)
 	{
 		return null;
+	}
+
+	@Operation (grantees={agent_create.class, agent_update.class})
+	@Description("Tests an object mapping for a real object")
+	public Map<String, Object> testObjectMapping(Map<String,String> sentences, String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
+
+	@Operation (grantees={agent_create.class, agent_update.class})
+	@Description("Tests and applies an object mapping")
+	public Exception testPropagateObject(String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
+
+
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void delete(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ReconcileTrigger create(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ReconcileTrigger update(ReconcileTrigger rp)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation ( grantees={roles.agent_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<ReconcileTrigger> findReconcileTriggersByDispatcher(Long dispatcherId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
 	}
 }

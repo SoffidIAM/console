@@ -11,6 +11,7 @@
 		principal = com.soffid.iam.utils.Security.getPrincipal();
 		app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );
 	</attribute>
+	
     <div>
 		<zscript>
 			<![CDATA[

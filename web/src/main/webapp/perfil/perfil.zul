@@ -20,6 +20,7 @@
 	idiomaCA = idiomaSEU != null && "ca".equals(idiomaSEU);
 	idiomaES = idiomaSEU != null && "es".equals(idiomaSEU);
 	idiomaEN = idiomaSEU != null && "en".equals(idiomaSEU);
+	idiomaNL = idiomaSEU != null && "nl".equals(idiomaSEU);
 
 	try {
 		if (darrerLoginSEU != null) {
@@ -92,6 +93,7 @@
 						<listitem label="${c:l('perfil.zul.English')}" selected="${idiomaEN}" value="en"/>
 						<listitem label="${c:l('perfil.zul.Espanol')}" selected="${idiomaES}" value="es"/>
 						<listitem label="${c:l('perfil.zul.Catala')}" selected="${idiomaCA}" value="ca"/>
+						<listitem label="Nederlandse" selected="${idiomaNL}" value="nl"/>
 					</listbox>
 					</row>
 				</rows>
@@ -123,14 +125,16 @@
 				<separator/>
 				<listbox autocommit="false" dataPath="/model:/autoritzacio" fixedLayout="true" height="270px" id="listbox" mold="paging" pageSize="16">
 					<listhead>
-						<listheader label="${c:l('perfil.zul.Rol')}" sort="auto" width="45%"/>
+						<listheader label="${c:l('perfil.zul.Rol')}" sort="auto" width="25%"/>
 						<listheader label="${c:l('perfil.zul.Autoritzacia[valordo')}" sort="auto" width="45%"/>
-						<listheader label="${c:l('perfil.zul.AmbitSEU')}" sort="auto"/>
+						<listheader label="${c:l('perfil.zul.AmbitSEU')}" sort="auto" width="10%"/>
+						<listheader label="${c:l('aplicacions.zul.ValordeDomini')}"/>
 					</listhead>
 					<dataitem bind=".">
 						<listcell bind="@rol/nom"/>
 						<listcell bind="@descripcio"/>
 						<listcell bind="@ambit"/>
+						<listcell bind="@valors"/>
 					</dataitem>
 				</listbox>
 				<listexportbutton acces="${true}" listbox="listbox" style="float:right"/>

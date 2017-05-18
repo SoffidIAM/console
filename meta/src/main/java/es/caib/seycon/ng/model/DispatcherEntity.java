@@ -41,47 +41,47 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String nomCla;
 
-	@Column (name="DIS_URL", length=100)
+	@Column (name="DIS_URL", length=500)
 	@Nullable
 	public java.lang.String url;
 
-	@Column (name="DIS_PARAM0", length=100)
+	@Column (name="DIS_PARAM0", length=500)
 	@Nullable
 	public java.lang.String param0;
 
-	@Column (name="DIS_PARAM1", length=100)
+	@Column (name="DIS_PARAM1", length=500)
 	@Nullable
 	public java.lang.String param1;
 
-	@Column (name="DIS_PARAM2", length=100)
+	@Column (name="DIS_PARAM2", length=500)
 	@Nullable
 	public java.lang.String param2;
 
-	@Column (name="DIS_PARAM3", length=100)
+	@Column (name="DIS_PARAM3", length=500)
 	@Nullable
 	public java.lang.String param3;
 
-	@Column (name="DIS_PARAM4", length=100)
+	@Column (name="DIS_PARAM4", length=500)
 	@Nullable
 	public java.lang.String param4;
 
-	@Column (name="DIS_PARAM5", length=100)
+	@Column (name="DIS_PARAM5", length=500)
 	@Nullable
 	public java.lang.String param5;
 
-	@Column (name="DIS_PARAM6", length=100)
+	@Column (name="DIS_PARAM6", length=500)
 	@Nullable
 	public java.lang.String param6;
 
-	@Column (name="DIS_PARAM7", length=100)
+	@Column (name="DIS_PARAM7", length=500)
 	@Nullable
 	public java.lang.String param7;
 
-	@Column (name="DIS_PARAM8", length=100)
+	@Column (name="DIS_PARAM8", length=500)
 	@Nullable
 	public java.lang.String param8;
 
-	@Column (name="DIS_PARAM9", length=100)
+	@Column (name="DIS_PARAM9", length=500)
 	@Nullable
 	public java.lang.String param9;
 

@@ -13,10 +13,10 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.sync.servei.ServerService;
 
 
-
 public class Config 
 {
     public static final String PORT_PROPERTY = com.soffid.iam.config.Config.PORT_PROPERTY;
+    public static final String LOCAL_PORT_PROPERTY = com.soffid.iam.config.Config.LOCAL_PORT_PROPERTY;
 	public static final String DB_PROPERTY = com.soffid.iam.config.Config.DB_PROPERTY;
 	public static final String BACKUPDB_PROPERTY = com.soffid.iam.config.Config.BACKUPDB_PROPERTY;
 	public static final String BACKUP_PASSWORD_PROPERTY = com.soffid.iam.config.Config.BACKUP_PASSWORD_PROPERTY;
@@ -232,12 +232,11 @@ public class Config
 		actualConfig.setHostName(list);
 	}
 
-	public String getPort() throws RemoteException, InternalErrorException
-	{
-		return actualConfig.getPort();
-	}
+	public String getLocalPort() throws RemoteException, InternalErrorException {
+		return actualConfig.getLocalPort();
+    }
 
-	public void setPort(String list) throws IOException
+    public void setPort(String list) throws IOException
 	{
 		actualConfig.setPort(list);
 	}

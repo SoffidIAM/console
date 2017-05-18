@@ -29,6 +29,7 @@
 			idiomaCA = idiomaSEU != null && "ca".equals(idiomaSEU);
 			idiomaES = idiomaSEU != null && "es".equals(idiomaSEU);
 			idiomaEN = idiomaSEU != null && "en".equals(idiomaSEU);
+			idiomaNL = idiomaSEU != null && "nl".equals(idiomaSEU);
 		
 			try {
 				if (darrerLoginSEU != null) {
@@ -47,7 +48,8 @@
 		<style src="~./styles/estil.css" />
 		<style src="/css/localSEU.css" />
 		<style>
-			.workarea span {font-size: 12px} span.u {text-decoration:underline;}
+			.workarea span {font-size: 12px} span.u
+			{text-decoration:underline;}
 		</style>
 
 		<datamodel id="model" rootNode="autoritzacionsUsuari"
@@ -60,33 +62,31 @@
 
 			<tabpanels>
 				<tabpanel id="basica" height="410px">
-					<label sclass="titolperfil"
-						value="${c:l('perfil.zul.Informaciadelusuari')}"/>
+					<label sclass="titolperfil" value="${c:l('perfil.zul.Informaciadelusuari')}" />
 					<grid if="${darrerLoginSEU!=null or darreraIPLoginSEU!=null}"
 						style="margin: 15px" width="500px">
-						
+
 						<rows>
 							<row if="${darrerLoginSEU!=null}">
 								<input_etiqueta value="${c:l('perfil.zul.DarrerloginalSEU')}" />
-								<textbox readonly="true" value="${darrerLoginSEU}" width="97%" />
+								<textbox readonly="true" value="${darrerLoginSEU}"
+									width="97%" />
 							</row>
 							<row if="${darreraIPLoginSEU!=null}">
-								<input_etiqueta
-									value="${c:l('perfil.zul.DarreraIPdeconexiaal')}" />
+								<input_etiqueta value="${c:l('perfil.zul.DarreraIPdeconexiaal')}" />
 								<textbox readonly="true" value="${darreraIPLoginSEU}"
 									width="97%" />
 							</row>
 						</rows>
 					</grid>
-					<separator
-						if="${darrerLoginSEU==null and darreraIPLoginSEU==null}" />
-						
-					<label value="${c:l('perfil.CanviarPWD')}" style="margin-right: 5px"/>
+					<separator if="${darrerLoginSEU==null and darreraIPLoginSEU==null}" />
+
+					<label value="${c:l('perfil.CanviarPWD')}" style="margin-right: 5px" />
 					<button label="${c:l('perfil.zul.Canvidecontrasenya')}"
 						onClick="canviaContrasenya()" width="200px" />
 
 					<separator height="20px" />
-					<label sclass="titolperfil" value="${c:l('perfil.zul.Preferancies')}"/>
+					<label sclass="titolperfil" value="${c:l('perfil.zul.Preferancies')}" />
 
 					<separator />
 
@@ -102,13 +102,11 @@
 									<input_etiqueta value="${c:l('perfil.zul.IdiomadelSEU')}" />
 									<listbox id="idioma" mold="select" onSelect=""
 										style="font-size: 12px" width="300px">
-										<listitem label="${c:l('perfil.zul.Predeterminat')}" value="" />
-										<listitem label="${c:l('perfil.zul.English')}"
-											selected="${idiomaEN}" value="en" />
-										<listitem label="${c:l('perfil.zul.Espanol')}"
-											selected="${idiomaES}" value="es" />
-										<listitem label="${c:l('perfil.zul.Catala')}"
-											selected="${idiomaCA}" value="ca" />
+										<listitem label="${c:l('perfil.zul.Predeterminat')}" value=""/>
+										<listitem label="${c:l('perfil.zul.English')}" selected="${idiomaEN}" value="en"/>
+										<listitem label="${c:l('perfil.zul.Espanol')}" selected="${idiomaES}" value="es"/>
+										<listitem label="${c:l('perfil.zul.Catala')}" selected="${idiomaCA}" value="ca"/>
+										<listitem label="Nederlandse" selected="${idiomaNL}" value="nl"/>
 									</listbox>
 								</row>
 							</rows>

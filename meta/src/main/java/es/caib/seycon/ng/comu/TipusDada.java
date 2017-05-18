@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="DataType",
@@ -23,6 +24,10 @@ public class TipusDada {
 
 	@Nullable
 	public java.lang.Long id;
+
+	@Column (name="TDA_SCOPE", length=50)
+	@Nullable
+	public MetadataScope scope;
 
 	@Nullable
 	public es.caib.seycon.ng.comu.TypeEnumeration type;

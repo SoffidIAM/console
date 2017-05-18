@@ -23,34 +23,11 @@ public class SignatureReceiver extends HttpServlet {
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-
-		
-		Session session = WebManager.getSession(getServletContext(), req);
-		java.io.InputStream in = req.getInputStream ();
-		java.io.ObjectInputStream oin = new java.io.ObjectInputStream (in);
-		Object object;
-		try {
-			object = oin.readObject();
-		} catch (ClassNotFoundException e) {
-			throw new ServletException(e);
-		}
-		session.setAttribute("tmp-signatura", object); //$NON-NLS-1$
+		throw new ServletException("Disabled feature");
 	}
 
 	public void service(Page page) {
-		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
-		
-		Object object;
-		try {
-			java.io.InputStream in = req.getInputStream ();
-			java.io.ObjectInputStream oin = new java.io.ObjectInputStream (in);
-			object = oin.readObject();
-		} catch (Exception e) {
-			throw new UiException (e);
-		}
-
-		Execution exec = Executions.getCurrent();
-		exec.setAttribute("signatura", object); //$NON-NLS-1$
+		throw new UiException("Disabled feature");
 	}
 
 }

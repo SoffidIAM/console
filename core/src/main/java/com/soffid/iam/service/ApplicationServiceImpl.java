@@ -23,6 +23,7 @@ import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
@@ -31,15 +32,18 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.AuthorizationEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
@@ -57,8 +61,11 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Aplicacio;
+import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRule;
+import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
@@ -129,6 +136,7 @@ public class ApplicationServiceImpl extends
         {
             getInformationSystemEntityDao().create(apl);
             aplicacio.setId(apl.getId());
+            updateApplicationAttributes(aplicacio, apl);
             return (getInformationSystemEntityDao().toApplication(apl));
         }
 		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoUserPermission"), //$NON-NLS-1$
@@ -173,6 +181,7 @@ public class ApplicationServiceImpl extends
         InformationSystemEntity aplEntity = getInformationSystemEntityDao().applicationToEntity(aplicacio);
         if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_UPDATE, aplEntity)) {
             getInformationSystemEntityDao().update(aplEntity);
+            updateApplicationAttributes(aplicacio, aplEntity);
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "update (Aplicacio)", "application:update", //$NON-NLS-1$ //$NON-NLS-2$
@@ -649,6 +658,8 @@ public class ApplicationServiceImpl extends
         // Creamos la entidad asociada al VO Rol
         rolEntity = getRoleEntityDao().create(rol, false);
 
+        updateRoleAttributes(rol, rolEntity);
+
         return getRoleEntityDao().toRole(rolEntity);
     }
 
@@ -680,6 +691,8 @@ public class ApplicationServiceImpl extends
         // Creamos la entidad asociada al VO Rol
         rolEntity = getRoleEntityDao().create(rol, true);
 
+        updateRoleAttributes(rol, rolEntity);
+        
         return getRoleEntityDao().toRole(rolEntity);
     }
 
@@ -708,6 +721,8 @@ public class ApplicationServiceImpl extends
 
             rolEntity = getRoleEntityDao().update(rol, false); // actualizamos cambios del rol
 
+            updateRoleAttributes(rol, rolEntity);
+            
             return getRoleEntityDao().toRole(rolEntity);
         }
 
@@ -1899,6 +1914,8 @@ public class ApplicationServiceImpl extends
         	
             rolEntity = getRoleEntityDao().update(rol, true); // actualizamos cambios del rol
             
+            updateRoleAttributes(rol, rolEntity);
+            
             return getRoleEntityDao().toRole(rolEntity);
             
         }
@@ -1932,6 +1949,116 @@ public class ApplicationServiceImpl extends
 				getPrincipal().getName(), rol.getInformationSystemName()));
 	}
 
+	private void updateApplicationAttributes (Application app, InformationSystemEntity entity) throws InternalErrorException
+	{
+		if (app.getAttributes() == null)
+			app.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
+		for ( ApplicationAttributeEntity att: entity.getAttributes())
+		{
+			Object v = app.getAttributes().get(att.getMetadata().getName());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getName());
+		}
+		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
+		for (String key: keys)
+		{
+			Object v = app.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				ApplicationAttributeEntity aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity ();
+				for ( MetaDataEntity d: md)
+				{
+					if (d.getName().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setInformationSystem(entity);
+				getApplicationAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( MetaDataEntity m: md)
+		{
+			Object o = app.getAttributes().get(m.getName());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					if (getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), o.toString()).size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
+
+	private void updateRoleAttributes (Role app, RoleEntity entity) throws InternalErrorException
+	{
+		if (app.getAttributes() == null)
+			app.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
+		for ( RoleAttributeEntity att: entity.getAttributes())
+		{
+			Object v = app.getAttributes().get(att.getMetadata().getName());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getName());
+		}
+		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
+		for (String key: keys)
+		{
+			Object v = app.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				RoleAttributeEntity aae = getRoleAttributeEntityDao().newRoleAttributeEntity ();
+				for ( MetaDataEntity d: md)
+				{
+					if (d.getName().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setRole(entity);
+				getRoleAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( MetaDataEntity m: md)
+		{
+			Object o = app.getAttributes().get(m.getName());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getName(), o.toString());
+					if (p.size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
 }
 
 class RolAccountDetail

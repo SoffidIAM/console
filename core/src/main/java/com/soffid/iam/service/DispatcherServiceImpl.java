@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.logging.LogFactory;
@@ -33,9 +34,12 @@ import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
+import com.soffid.iam.api.ObjectMappingTrigger;
+import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.SystemGroup;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -51,6 +55,9 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
+import com.soffid.iam.model.ObjectMappingTriggerEntity;
+import com.soffid.iam.model.ReconcileTriggerEntity;
+import com.soffid.iam.model.ReconcileTriggerEntityDao;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -64,10 +71,12 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -87,6 +96,7 @@ public class DispatcherServiceImpl extends
 	protected com.soffid.iam.api.System handleCreate(
 			com.soffid.iam.api.System dispatcher) throws java.lang.Exception {
 
+    	soffidDispatcher = null;
 		// Check dispatcher type
 		if (dispatcher.getClassName().isEmpty()) {
 			throw new IllegalArgumentException(
@@ -215,6 +225,7 @@ public class DispatcherServiceImpl extends
 	 */
 	protected com.soffid.iam.api.System handleUpdate(
 			com.soffid.iam.api.System dispatcher) throws java.lang.Exception {
+    	soffidDispatcher = null;
 		// Obtenim el anterior per comparar els grups i els tipus d'usuari
 		SystemEntity entityOld = getSystemEntityDao().findByName(
 				dispatcher.getName());
@@ -433,6 +444,7 @@ public class DispatcherServiceImpl extends
 	 */
 	protected void handleDelete(com.soffid.iam.api.System dispatcher)
 			throws java.lang.Exception {
+    	soffidDispatcher = null;
 		SystemEntity dispatcherEntity = getSystemEntityDao().findByName(
 				dispatcher.getName());
 		// Esborrem les relacions existents amb d'altres taules
@@ -1308,14 +1320,18 @@ public class DispatcherServiceImpl extends
 
 	}
 
+	com.soffid.iam.api.System soffidDispatcher = null;
 	@Override
 	protected com.soffid.iam.api.System handleFindSoffidDispatcher()
 			throws Exception {
+		if (soffidDispatcher != null)
+			return soffidDispatcher;
 		SystemEntity sd = getSystemEntityDao().findSoffidSystem();
 		if (sd == null)
 			throw new InternalErrorException(
 					"Unable to locate Soffid system descriptor");
-		return getSystemEntityDao().toSystem(sd);
+		soffidDispatcher = getSystemEntityDao().toSystem(sd);
+		return soffidDispatcher;
 	}
 
 	@Override
@@ -1336,4 +1352,140 @@ public class DispatcherServiceImpl extends
 			return null;
 	}
 
+	@Override
+	protected void handleDelete(ReconcileTrigger rp) throws Exception {
+    	soffidDispatcher = null;
+
+    	getReconcileTriggerEntityDao().remove(rp.getId());
+	}
+
+	@Override
+	protected ReconcileTrigger handleCreate(ReconcileTrigger rp)
+			throws Exception {
+    	soffidDispatcher = null;
+		ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
+		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
+		dao.create(entity);
+		
+		return dao.toReconcileTrigger(entity);
+	}
+
+	@Override
+	protected ReconcileTrigger handleUpdate(ReconcileTrigger rp)
+			throws Exception {
+    	soffidDispatcher = null;
+
+    	ReconcileTriggerEntityDao dao = getReconcileTriggerEntityDao();
+		ReconcileTriggerEntity entity = dao.reconcileTriggerToEntity(rp);
+		dao.create(entity);
+		
+		return dao.toReconcileTrigger(entity);
+	}
+
+	@Override
+	protected Collection<ReconcileTrigger> handleFindReconcileTriggersByDispatcher(
+			Long dispatcherId) throws Exception {
+    	soffidDispatcher = null;
+
+    	SystemEntity entity = getSystemEntityDao().load(dispatcherId);
+		return  getReconcileTriggerEntityDao().toReconcileTriggerList(entity.getReconcileTriggers());
+	}
+
+	@Override
+	protected Map<String, Object> handleTestObjectMapping(Map<String,String> sentences, String dispatcher, 
+					SoffidObjectType type, String object1, String object2) throws InternalErrorException {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.testObjectMapping(sentences, dispatcher, type, object1, object2);
+	}
+
+	@Override
+	protected Exception handleTestPropagateObject(String dispatcher,
+			SoffidObjectType type, String object1, String object2)
+			throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.testPropagateObject(dispatcher, type, object1, object2);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleCreate(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected ObjectMappingTrigger handleCreate (ObjectMappingTrigger trigger) throws Exception
+	{
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(trigger);
+		getObjectMappingTriggerEntityDao().create(ame);
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
+		{
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
+		}
+        updateServers();
+		return getObjectMappingTriggerEntityDao().toObjectMappingTrigger(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleUpdate(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected ObjectMappingTrigger handleUpdate (ObjectMappingTrigger mapping) throws Exception
+	{
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+		getObjectMappingTriggerEntityDao().update(ame);
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
+		{
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
+		}
+        updateServers();
+		return getObjectMappingTriggerEntityDao().toObjectMappingTrigger(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleDelete(es.caib.seycon.ng.comu.AttributeMapping)
+	 */
+	@Override
+	protected void handleDelete (ObjectMappingTrigger mapping) throws Exception
+	{
+    	soffidDispatcher = null;
+
+    	ObjectMappingTriggerEntity ame = getObjectMappingTriggerEntityDao().objectMappingTriggerToEntity(mapping);
+		if (ame.getObject() != null && ame.getObject().getSystem() != null)
+		{
+			ame.getObject().getSystem().setTimeStamp(new Date());
+			getSystemEntityDao().update(ame.getObject().getSystem());
+		}
+        updateServers();
+		getObjectMappingTriggerEntityDao().remove(ame);
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.DispatcherServiceBase#handleFindAttributeMappingsByDispatcher(java.lang.Long)
+	 */
+	@Override
+	protected Collection<ObjectMappingTrigger> handleFindObjectMappingTriggersByObject (
+					Long objectId) throws Exception
+	{
+		ObjectMappingEntity obj = getObjectMappingEntityDao().load(objectId);
+		List<ObjectMappingTrigger> list = getObjectMappingTriggerEntityDao().toObjectMappingTriggerList(obj.getTriggers());
+		Collections.sort(list, new Comparator<ObjectMappingTrigger>(){
+
+			public int compare (ObjectMappingTrigger o1, ObjectMappingTrigger o2)
+			{
+				return o1.getId().compareTo(o2.getId());
+			}
+			
+		});
+		return list;
+	}
 }

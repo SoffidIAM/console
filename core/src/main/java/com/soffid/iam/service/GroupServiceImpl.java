@@ -19,10 +19,13 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupRoles;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
@@ -34,6 +37,8 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.Grup;
+import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -44,6 +49,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -72,17 +78,6 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			}
 		}
 		return grupsAmbDireccionsGenerals;
-	}
-
-	protected com.soffid.iam.api.Group handleCreateGrup(com.soffid.iam.api.Group grup) throws java.lang.Exception {
-
-		GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
-		if (getAuthorizationService().hasPermission(Security.AUTO_GROUP_CREATE, entity)) {
-			getGroupEntityDao().create(entity);
-			grup.setId(entity.getId());
-			return getGroupEntityDao().toGroup(entity);
-		}
-		throw new SeyconException(Messages.getString("GroupServiceImpl.0")); //$NON-NLS-1$
 	}
 
 	/*
@@ -199,6 +194,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		GroupEntity grupEntity = getGroupEntityDao().groupToEntity(grup);
 		if (grupEntity != null) {
 			getGroupEntityDao().create(grupEntity);
+			updateGroupAttributes(grup, grupEntity);
 			return getGroupEntityDao().toGroup(grupEntity);
 		}
 		return null;
@@ -311,6 +307,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected Group handleUpdate(Group grup) throws Exception {
 		GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
 		getGroupEntityDao().update(entity);
+		updateGroupAttributes(grup, entity);
 		return getGroupEntityDao().toGroup(entity);
 	}
 
@@ -629,4 +626,60 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
             }
 		}
 	}
+
+	private void updateGroupAttributes (Group group, GroupEntity entity) throws InternalErrorException
+	{
+		if (group.getAttributes() == null)
+			group.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(group.getAttributes().keySet());
+		for ( GroupAttributeEntity att: entity.getAttributes())
+		{
+			Object v = group.getAttributes().get(att.getMetadata().getName());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getName());
+		}
+		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
+		for (String key: keys)
+		{
+			Object v = group.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				GroupAttributeEntity aae = getGroupAttributeEntityDao().newGroupAttributeEntity ();
+				for ( MetaDataEntity d: md)
+				{
+					if (d.getName().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setGroup(entity);
+				getGroupAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( MetaDataEntity m: md)
+		{
+			Object o = group.getAttributes().get(m.getName());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					if (getGroupAttributeEntityDao().findByNameAndValue(m.getName(), o.toString()).size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
+
 }

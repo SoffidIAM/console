@@ -45,6 +45,11 @@ public abstract class AgentDescriptorEntity {
 		defaultValue="false")
 	public boolean enableAttributeMapping;
 
+	@Column (name="ADE_OBJTRG",
+			defaultValue="false")
+	public Boolean enableObjectTriggers;
+
+
 	@ForeignKey (foreignColumn="DAM_ADE_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.DefaultObjectMappingEntity> defaultObjectMappings;
 

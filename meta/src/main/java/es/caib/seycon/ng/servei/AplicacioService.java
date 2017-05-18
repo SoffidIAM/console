@@ -9,11 +9,14 @@ package es.caib.seycon.ng.servei;
 import java.util.Collection;
 import java.util.List;
 
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.model.RolAccountEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +43,12 @@ import org.springframework.transaction.annotation.Transactional;
 		es.caib.seycon.ng.servei.AccountService.class,
 		com.soffid.iam.service.RuleEvaluatorService.class,
 		es.caib.seycon.ng.servei.SoDRuleService.class,
-		es.caib.seycon.ng.servei.AutoritzacioService.class, BpmEngine.class
-
-})
+		es.caib.seycon.ng.servei.AutoritzacioService.class, BpmEngine.class,
+	ApplicationAttributeEntity.class,
+	TipusDadaEntity.class,
+	RoleAttributeEntity.class
+	}
+)
 public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class }, translated = "getApplications")

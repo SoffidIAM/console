@@ -16,9 +16,16 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import es.caib.seycon.util.Base64;
+
 public class AlwaysTrustManager implements X509TrustManager {
 
-    /*
+    private boolean debug;
+
+	/*
      * (non-Javadoc)
      * 
      * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
@@ -36,6 +43,21 @@ public class AlwaysTrustManager implements X509TrustManager {
      */
     public void checkServerTrusted(X509Certificate[] arg0, String arg1)
             throws CertificateException {
+    	if (debug)
+    	{
+    		Log log = LogFactory.getLog(getClass());
+    		log.info("Received certificate");
+    		for (X509Certificate cert: arg0)
+    		{
+    			StringBuffer b = new StringBuffer();
+    			b.append ("-----BEGIN CERTIFICATE----- \r\n")
+    				.append(Base64.encodeBytes(cert.getEncoded()))
+    				.append("-----END CERTIFICATE-----");
+    			log.info(cert.getSubjectDN().getName()+"\r\n"+
+    				b.toString());
+    		}
+   
+    	}
     	return ;
     }
 
@@ -47,6 +69,7 @@ public class AlwaysTrustManager implements X509TrustManager {
     public AlwaysTrustManager() throws KeyStoreException,
             NoSuchAlgorithmException, CertificateException,
             FileNotFoundException, IOException {
+    	debug = "true".equals(System.getProperty("com.soffid.ssl.dump"));
     }
 
 

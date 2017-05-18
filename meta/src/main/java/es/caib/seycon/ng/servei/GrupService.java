@@ -5,7 +5,10 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.model.TipusDadaEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 	/************** Services ***************/
 	AutoritzacioService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
-	es.caib.seycon.ng.servei.AplicacioService.class
+	es.caib.seycon.ng.servei.AplicacioService.class,
+	
+	GroupAttributeEntity.class,
+	TipusDadaEntity.class
 })
 public abstract class GrupService {
 

@@ -25,7 +25,7 @@ public class EntryPointAccountEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="RPC_IDROL")
+	@Column (name="RPC_IDROL", composition=true)
 	public AccountEntity account;
 
 	public java.util.List<EntryPointAccountEntity> findAll() {

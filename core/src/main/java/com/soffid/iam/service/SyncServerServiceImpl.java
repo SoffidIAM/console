@@ -628,5 +628,44 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         }
 	}
 
+	@Override
+	protected void handleBoostTask(long taskId) throws Exception {
+		TaskEntity task = getTaskEntityDao().load(taskId);
+		
+		String server = task.getServer();
+		
+		if (server == null)
+		{
+			throw new InternalErrorException(String.format("Task %d is not scheduled yet", taskId));
+		} else {
+	        RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+	        
+	        SyncStatusService status = rsl.getSyncStatusService();
+
+	        status.boostTask(taskId);
+		}
+	}
+
+	@Override
+	protected void handleCancelTask(long taskId) throws Exception {
+		TaskEntity task = getTaskEntityDao().load(taskId);
+		if (task == null)
+			return;
+		
+		String server = task.getServer();
+		
+		if (server == null)
+		{
+			getTaskEntityDao().remove(task);
+		} else {
+	        RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+	        
+	        SyncStatusService status = rsl.getSyncStatusService();
+
+	        status.cancelTask(taskId);
+		}
+		
+	}
+
 }
 

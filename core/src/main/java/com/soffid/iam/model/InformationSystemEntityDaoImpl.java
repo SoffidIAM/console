@@ -13,12 +13,16 @@
  */
 package com.soffid.iam.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.bpm.service.BpmEngine;
-import com.soffid.iam.model.AuditEntity;
-import com.soffid.iam.model.InformationSystemEntity;
-import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
@@ -26,14 +30,6 @@ import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.*;
-
-import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @see es.caib.seycon.ng.model.AplicacioEntity
@@ -127,6 +123,12 @@ public class InformationSystemEntityDaoImpl
     
     private void toAplicacioCustom(com.soffid.iam.model.InformationSystemEntity sourceEntity, com.soffid.iam.api.Application targetVO) {
 		targetVO.setBpmEnforced(new Boolean(sourceEntity.getWfManagement().compareTo("S") == 0)); //$NON-NLS-1$
+		
+		targetVO.setAttributes(new HashMap<String, Object>());
+		for ( ApplicationAttributeEntity att: sourceEntity.getAttributes())
+		{
+			targetVO.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
+		}
     }
 
 
@@ -318,4 +320,5 @@ public class InformationSystemEntityDaoImpl
 	        }
 	    }
 
+	   
 }

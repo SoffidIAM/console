@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Vector;
+import java.util.WeakHashMap;
 
+import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.bytes.ByteArray;
 import org.jbpm.graph.def.Action;
@@ -25,14 +27,14 @@ import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
-import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.util.Timer;
-
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.bpm.api.Comment;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
+
+import es.caib.bpm.exception.BPMException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class VOFactory {
 	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
@@ -44,9 +46,7 @@ public class VOFactory {
 	}
 
 	public static com.soffid.iam.bpm.api.TaskInstance newTaskInstance(
-			org.jbpm.taskmgmt.exe.TaskInstance instance) {
-/**/	Timer t1=new Timer();
-		
+			org.jbpm.taskmgmt.exe.TaskInstance instance) throws InternalErrorException {
 		com.soffid.iam.bpm.api.TaskInstance vo = new com.soffid.iam.bpm.api.TaskInstance();
 		vo.setProcessName(instance.getProcessInstance().getProcessDefinition().getName());
 		vo.setProcessId(instance.getProcessInstance().getId());
@@ -56,7 +56,7 @@ public class VOFactory {
 		vo.setCreate(instance.getCreate());
 		String d = instance.getDescription();
 		if (d == null)
-			d = instance.getTask().getDescription();
+			d = instance.getDescription();
 		if (d == null)
 			d = instance.getToken().getNode().getDescription();
 		vo.setDescription(d);
@@ -77,13 +77,15 @@ public class VOFactory {
 		vo.setPriority(instance.getPriority());
 		vo.setSignalling(instance.isSignalling());
 		vo.setStart(instance.getStart());
+		vo.setProcessClassLoader(getClassLoader(instance.getProcessInstance().getProcessDefinition()));
+
 		SwimlaneInstance swimlane = instance.getSwimlaneInstance();
 		if (swimlane != null)
 			vo.setSwimlane(swimlane.getName());
 		if (instance.getAvailableTransitions() == null)
 			vo.setTransitions(new String[0]);
 		else {
-			List transitionList = instance.getAvailableTransitions();
+			List transitionList = instance.getToken().getNode().getLeavingTransitions();
 			String transitions[] = new String[transitionList.size()];
 			int i = 0;
 			for (Iterator it = transitionList.iterator(); it.hasNext();) {
@@ -92,24 +94,32 @@ public class VOFactory {
 			}
 			vo.setTransitions(transitions);
 		}
-		Map variables = new HashMap();
-		for (Iterator it = instance.getVariables().keySet().iterator(); it
-				.hasNext();) {
-			String key = (String) it.next();
-			Object obj = instance.getVariable(key);
-			if (obj instanceof ByteArray) {
-				try {
-					obj = new ObjectInputStream(new ByteArrayInputStream(
-							((ByteArray) obj).getBytes())).readObject();
-				} catch (final Exception e) {
-					throw new RuntimeException(e);
+		
+		ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(vo.getProcessClassLoader());
+		try {
+			Map variables = new HashMap();
+			for (Iterator it = instance.getVariables().keySet().iterator(); it
+					.hasNext();) {
+				String key = (String) it.next();
+				Object obj = instance.getVariable(key);
+				if (obj instanceof ByteArray) {
+					try {
+						obj = new ObjectInputStream(new ByteArrayInputStream(
+								((ByteArray) obj).getBytes())).readObject();
+					} catch (final Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
+				variables.put(key, obj);
 			}
-			variables.put(key, obj);
+			vo.setVariables(variables);
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldcl);
 		}
-		vo.setVariables(variables);
 
-		ConfigParameterVO param = null;
+		
+		com.soffid.iam.bpm.api.ConfigParameterVO param = null;
         String timeThresold="1000"; //$NON-NLS-1$
         try {
 			param = ServiceLocator.instance().getBpmConfigService().findFirstByAppKey("BPM","es.caib.ibkey.timer.databaseTask.milis"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -118,20 +128,26 @@ public class VOFactory {
         if(param!=null)
         	timeThresold=param.getValue();
 
-/**/	t1.logTime("VOFactory.newTaskInstance",Integer.parseInt(timeThresold)); //$NON-NLS-1$
-		
 		return vo;
 	}
 
 	public static com.soffid.iam.bpm.api.ProcessInstance newProcessInstance(
-			org.jbpm.graph.exe.ProcessInstance instance) {
+			org.jbpm.graph.exe.ProcessInstance instance) throws InternalErrorException {
 		com.soffid.iam.bpm.api.ProcessInstance process = new com.soffid.iam.bpm.api.ProcessInstance();
 		process.setEnd(instance.getEnd());
 		process.setId(instance.getId());
 		process.setStart(instance.getStart());
-		process.setVariables(instance.getContextInstance().getVariables());
-		if (process.getVariables() == null)
-			process.setVariables(new HashMap<String, Object>());
+		process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
+
+		ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
+		try {
+			process.setVariables(instance.getContextInstance().getVariables());
+			if (process.getVariables() == null)
+				process.setVariables(new HashMap<String, Object>());
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldcl);
+		}
 		Vector comments = new Vector();
 		if (instance.getRootToken() != null &&
 				instance.getRootToken().getComments() != null)
@@ -159,6 +175,7 @@ public class VOFactory {
 		{
 			process.setCurrentTask(n.getName());
 		}
+
 		return process;
 	}
 
@@ -252,9 +269,7 @@ public class VOFactory {
 		return vo;
 	}
 
-	public static Object newLightweightTaskInstance(TaskInstance instance) throws BPMException {
-/**/	Timer t1=new Timer();
-		
+	public static Object newLightweightTaskInstance(TaskInstance instance) throws BPMException, InternalErrorException {
 		com.soffid.iam.bpm.api.LighweightTaskInstance vo = new com.soffid.iam.bpm.api.LighweightTaskInstance();
 		vo.setProcessName(instance.getProcessInstance().getProcessDefinition().getName());
 		vo.setProcessId(instance.getProcessInstance().getId());
@@ -320,6 +335,8 @@ public class VOFactory {
 //		vo.setVariables(variables);
 /** **/
 		
+		vo.setProcessClassLoader(getClassLoader(instance.getProcessInstance().getProcessDefinition()));
+
 		ConfigParameterVO param = null;
         String timeThresold="1000"; //$NON-NLS-1$
         try {
@@ -327,8 +344,14 @@ public class VOFactory {
 		} catch (Exception e) {}
         if(param!=null) timeThresold=param.getValue();
         
-		/**/	t1.logTime("VOFactory.newLighweightTaskInstance",Integer.parseInt(timeThresold)); //$NON-NLS-1$
 		return vo;
+	}
+	
+	
+	static WeakHashMap<Long, ClassLoader> classesMap = new WeakHashMap<Long,ClassLoader> ();
+	static private ClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
+	{
+		return JbpmConfiguration.getProcessClassLoader(def);
 	}
 
 }

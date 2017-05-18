@@ -54,6 +54,8 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -212,6 +214,8 @@ public class AuthorizationServiceImpl extends
         return totsPares;
     }
 
+    Log log = LogFactory.getLog(getClass());
+    
     private List<AuthorizationRole> getAutoritzacionsUsuari(Collection autoritzacionsRolVO, String codiUsuari) throws InternalErrorException {
 
         List<AuthorizationRole> autoritzacionsUsuari = new LinkedList<AuthorizationRole>();
@@ -267,7 +271,27 @@ public class AuthorizationServiceImpl extends
                         String tipusDomini = null;
                         RoleEntity role = getRoleEntityDao().load(idRol);
                         if (role != null) tipusDomini = role.getDomainType();
-                        if (rg.getDomainValue() != null && tipusDomini != null) {
+                   		boolean compatibleDomain;
+
+                   		if ( autoSEU.getTipusDomini() == null || autoSEU.getTipusDomini().trim().isEmpty() )
+                   			compatibleDomain = false;
+                   		else if (tipusDomini == null || tipusDomini.trim().isEmpty())
+                   			compatibleDomain = false;
+                   		else
+                   		{
+                   			compatibleDomain = false;
+                   			for (String s: autoSEU.getTipusDomini().split("[, ]+"))
+                   			{
+                   				if (tipusDomini.startsWith(s))
+                   				{
+                   					compatibleDomain = true;
+                   					break;
+                   				}
+                   			}
+                   		}
+                   		
+                    	if (compatibleDomain)
+                        {
                             autoRolVO.getUserRoleValueDomain().add(new DomainValue(rg.getDomainValue(), tipusDomini));
                             if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
                                 Collection grupsAutoritzacio = null;

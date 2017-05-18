@@ -55,7 +55,6 @@ import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
 
 import es.caib.bpm.attachment.ProcessAttachmentManager;
-import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
@@ -309,7 +308,7 @@ public class ProcessUI extends Frame {
 
         describeTokens(proc, engine);
         // Cargamos la interfaz dinamica
-        heavenClassLoader = this.cargarClasesUI(definicion);
+        heavenClassLoader = this.cargarClasesUI(proc);
         try {
 
             ventanaDinamica.getChildren().clear();
@@ -318,23 +317,23 @@ public class ProcessUI extends Frame {
             map.put("processInstance", proc); //$NON-NLS-1$
             map.put("engine", engine); //$NON-NLS-1$
             
-            if (ui == null)
-            {
-            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
-           		Executions.createComponents(def, ventanaDinamica, map);
-            }
-            else
-            {
-            	try {
-            		Executions.createComponentsDirectly(ui,
-                        "zul", ventanaDinamica, map); //$NON-NLS-1$
-	        	} catch (Exception e) {
-	        		Label l = new Label (e.toString());
-	        		l.setMultiline(true);
-	        		ventanaDinamica.appendChild(l);
+        	try {
+	            if (ui == null)
+	            {
 	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
 	           		Executions.createComponents(def, ventanaDinamica, map);
+	            }
+	            else
+	            {
+            		Executions.createComponentsDirectly(ui,
+                        "zul", ventanaDinamica, map); //$NON-NLS-1$
 	        	}
+        	} catch (Exception e) {
+        		Label l = new Label (e.toString());
+        		l.setMultiline(true);
+        		ventanaDinamica.appendChild(l);
+            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
+           		Executions.createComponents(def, ventanaDinamica, map);
             }
 
             // Actualizar comentarios
@@ -626,29 +625,12 @@ public class ProcessUI extends Frame {
 
     private static java.util.Hashtable classLoaders = new java.util.Hashtable();
 
-    public ClassLoader cargarClasesUI(ProcessDefinition def)
+    public ClassLoader cargarClasesUI(ProcessInstance proc)
             throws ClassNotFoundException, SQLException, IOException,
             CreateException, NamingException, InternalErrorException {
-        Map clases = null;
-        UIClassLoader loader = null;
-        this.getDesktop().getSession();
-        BpmEngine engine = getEngine();
-        ClassLoader heavenLoader = null;
 
-        heavenLoader = Thread.currentThread().getContextClassLoader();
-
-        loader = (UIClassLoader) classLoaders.get(new Long(def.getId()));
-        if (loader == null) {
-            clases = engine.getUIClassesForTask(def);
-
-            loader = new UIClassLoader(def.getId(), clases, heavenLoader);
-
-            loader.cargarClases();
-
-            classLoaders.put(new Long(def.getId()), loader);
-        }
-
-        Thread.currentThread().setContextClassLoader(loader);
+    	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(proc.getProcessClassLoader());
 
         return heavenLoader;
     }

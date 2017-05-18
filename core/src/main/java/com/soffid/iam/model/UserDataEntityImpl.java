@@ -44,11 +44,11 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
 			return AttributeVisibilityEnum.EDITABLE;
 
-		if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
 			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getAdminVisibility();
-		else if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
-			return AttributeVisibilityEnum.EDITABLE;
 		else if (getUser().isAllowed(Security.AUTO_USER_METADATA_UPDATE))
 			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE
 					: tda.getOperatorVisibility();

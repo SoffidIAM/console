@@ -91,4 +91,19 @@ public abstract class SeyconServerService {
 	public void updateDispatcherConfiguration ()
 	{
 	}
+
+	
+	@Operation ( grantees={roles.monitor_server_list.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void cancelTask (long taskId)
+	{
+		
+	}
+	
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void boostTask (long taskId)
+	{
+		
+	}
 }

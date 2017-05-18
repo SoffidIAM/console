@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Application",
@@ -59,5 +61,8 @@ public class Aplicacio {
 	@Description ("Process needed for any change applied to this application roles. Null value means no approval process is needed")
 	@Nullable
 	public String roleDefinitionProcess;
-
+	
+	@Description ("Application custom attributes")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

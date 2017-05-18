@@ -3,7 +3,12 @@ package com.soffid.iam.bpm.task;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.jbpm.graph.exe.ExecutionContext;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.jpdl.el.impl.JbpmExpressionEvaluator;
 import org.jbpm.taskmgmt.def.Swimlane;
+import org.jbpm.taskmgmt.def.Task;
+import org.jbpm.taskmgmt.def.TaskController;
 import org.jbpm.taskmgmt.def.TaskMgmtDefinition;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
@@ -43,6 +48,25 @@ public class BPMTaskInstance extends TaskInstance {
 	public BPMTaskInstance(String taskName) {
 		super(taskName);
 		this.tenantId = Security.getCurrentTenantId();
+	}
+
+	@Override
+	public void setProcessInstance(ProcessInstance processInstance) {
+		super.setProcessInstance(processInstance);
+		
+		if (name != null && name.contains("#{")) {
+			org.jbpm.graph.exe.ExecutionContext executionContext = new ExecutionContext(
+					token);
+			// update the executionContext
+			executionContext.setTask(task);
+			executionContext.setTaskInstance(this);
+
+			// evaluate the description
+			Object result = JbpmExpressionEvaluator.evaluate(
+							name, executionContext);
+			name = result.toString();
+		}
+
 	}
 
 	public void setActorId(String actorId, boolean overwriteSwimlane) {

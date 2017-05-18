@@ -115,7 +115,7 @@ public class ShowAdditionalData {
 						du.getValorDadaDate() == null)
 				{
 					TipusDada tda = getDadesAddicionalsService().findTipusDadaByCodi(du.getCodiDada());
-					if (tda.isRequired())
+					if (tda != null && tda.isRequired())
 						throw new InternalErrorException (String.format (Labels.getLabel("usuaris.zul.RequiredAttribute"), tda.getLabel()));
 				}
 			}

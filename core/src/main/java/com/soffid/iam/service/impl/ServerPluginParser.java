@@ -155,6 +155,12 @@ public class ServerPluginParser {
 			if (attributeMapping == null || "".equals(attributeMapping)) //$NON-NLS-1$
 				attributeMapping = "false";//Posem N si és nul //$NON-NLS-1$
 			ad.setEnableAttributeMapping("true".equals(attributeMapping)); //$NON-NLS-1$
+
+			String objectTriggers = xpath.evaluate("enableObjectTriggers", n); //$NON-NLS-1$
+			if (objectTriggers == null || "".equals(objectTriggers)) //$NON-NLS-1$
+				objectTriggers = "false";//Posem N si és nul //$NON-NLS-1$
+			ad.setEnableObjectTriggers("true".equals(objectTriggers)); //$NON-NLS-1$
+
 			loadDefaultAttributeMappings (ad, n);
 			
 

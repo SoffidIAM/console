@@ -18,6 +18,7 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.MetaDataEntity;
@@ -35,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -49,6 +51,12 @@ public class AdditionalDataServiceImpl extends
 	 */
 	protected java.util.Collection<DataType> handleGetDataTypes() throws java.lang.Exception {
 		List<MetaDataEntity> col = this.getMetaDataEntityDao().loadAll();
+		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
+		{
+			MetaDataEntity td = it.next();
+			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER))
+				it.remove();
+		}
 		return getMetaDataEntityDao().toDataTypeList(col);
 	}
 
@@ -112,7 +120,8 @@ public class AdditionalDataServiceImpl extends
 			List<MetaDataEntity> tipusDadaEntityList = getMetaDataEntityDao().loadAll();
 			for (MetaDataEntity tipusDadaEntity : tipusDadaEntityList) {
 	            Long orderDins = tipusDadaEntity.getOrder();
-	            if (orderDins.compareTo(order) == 0) {
+	            if (orderDins.compareTo(order) == 0 && 
+						tipusDadaEntity.getScope().equals(tipusDada.getScope())) {
 	                found = true;
 	                code = tipusDadaEntity.getName();
 	                break;
@@ -121,7 +130,7 @@ public class AdditionalDataServiceImpl extends
 			if(found)
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"), new Object[]{tipusDada.getOrder(), tipusDada.getCode(), code}));
 			
-			Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByName(tipusDada.getCode());
+			Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByScopeAndName(tipusDada.getScope(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
@@ -324,5 +333,41 @@ public class AdditionalDataServiceImpl extends
 		if (de == null)
 			return null;
 		return getAccountMetadataEntityDao().toDataTypeList(de.getMetaData());
+	}
+
+	@Override
+	protected Collection<DataType> handleFindDataTypes(MetadataScope scope)
+			throws Exception {
+		if ( scope == MetadataScope.USER)
+			return handleGetDataTypes();
+		
+		
+		List<MetaDataEntity> col = this.getMetaDataEntityDao().findByScope(scope);
+		return getMetaDataEntityDao().toDataTypeList(col);
+	}
+
+	@Override
+	protected Collection<DataType> handleFindDataTypesByScopeAndName(
+			MetadataScope scope, String name) throws Exception { 
+		List<MetaDataEntity> col = this.getMetaDataEntityDao().findDataTypesByScopeAndName(scope, name);
+		for (MetaDataEntity td: col)
+		{
+			if (td.getScope() == null)
+			{
+				td.setScope(MetadataScope.USER);
+				getMetaDataEntityDao().update(td);
+			}
+		}
+		List<DataType> tipusDadaList = getMetaDataEntityDao().toDataTypeList(col);
+		Collections.sort(tipusDadaList, new Comparator<DataType>() {
+
+			public int compare(DataType o1, DataType o2) {
+				if (o1.getScope() == o2.getScope())
+					return o1.getOrder().compareTo(o2.getOrder());
+				else
+					return o1.getScope().compareTo(o2.getScope());
+			}
+		});
+		return tipusDadaList;
 	}
 }

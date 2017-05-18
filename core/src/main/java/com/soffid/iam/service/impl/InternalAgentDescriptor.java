@@ -52,10 +52,10 @@ public class InternalAgentDescriptor extends AgentDescriptor
 	 */
 	public InternalAgentDescriptor (Long id, String description, String className,
 					byte[] userInterface, boolean enableAccessControl,
-					boolean authoritativeSource, boolean enableAttributeMapping)
+					boolean authoritativeSource, boolean enableAttributeMapping, boolean enableObjectTriggers)
 	{
 		super(id, description, className, userInterface, enableAccessControl,
-						authoritativeSource, enableAttributeMapping);
+						authoritativeSource, enableAttributeMapping, enableObjectTriggers);
 	}
 
 	/**

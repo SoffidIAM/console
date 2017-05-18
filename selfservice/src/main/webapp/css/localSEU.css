@@ -14,7 +14,7 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #0e5462; backgrou
 .text-disd {color:#000 !important;}
 .titol_tancar_back {padding: 4px; float:right; border: 1px solid #BE6200; background-color:#EEEEEE;}
 .titol_tancar, .titol_tancar_fletxa {
-	font-family: Arial; font-size: 11px; font-weight: bold; color: #BE6200; cursor: pointer; 
+	font-family: sans-serif; font-size: 11px; font-weight: bold; color: #BE6200; cursor: pointer; 
 }
 .titol_tancar:hover {
 	text-decoration: underline;
@@ -306,7 +306,7 @@ tr.grid {
 
 body
 {
-	font-family: Arial;
+	font-family: sans-serif;
 	margin: 0;
 }
 
@@ -395,7 +395,7 @@ body
 }
 
 .etiquetaWsso {
-	font-family: Arial;	
+	font-family: sans-serif;	
 	font-size: 15px; 
 	font-weight: bold; 
 	margin-left:350px; 
@@ -406,7 +406,7 @@ body
 }
 
 .etiquetaWsso2 {
-	font-family: Arial;	
+	font-family: sans-serif;	
 	font-size: 14px; 
 	font-weight: bold; 
 	color: black; 

@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
@@ -27,6 +28,10 @@ public abstract class TipusDadaEntity {
 	@Column (name="TDA_ID")
 	@Identifier
 	public java.lang.Long id;
+
+	@Column (name="TDA_SCOPE", length=50)
+	@Nullable
+	public MetadataScope scope;
 
 	@Column (name="TDA_TYPE", length=50)
 	@Nullable
@@ -77,7 +82,7 @@ public abstract class TipusDadaEntity {
 
 	/********************** DAOS ************************/
 	@Operation(translated="findDataTypeByName")
-	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name and tenant.id = :tenantId")
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name and tenant.id = :tenantId and scope='user'")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
 		java.lang.String name) {
 	 return null;
@@ -90,18 +95,33 @@ public abstract class TipusDadaEntity {
 		java.lang.String name) {
 	 return null;
 	}
+
+	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity tipusDada "
+			+ "where (:codi is null or tipusDada.codi like :codi) "
+			+ "and   (tipusDada.scope = :scope or :scope is null ) and "
+			+ "tipusDada.tenant.id = :tenantId")
+	@Operation(translated="findDataTypesByScopeAndName")
+	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByScopeAndName(
+			MetadataScope scope, java.lang.String codi) {
+	 return null;
+	}
+
+	@DaoFinder
+	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findByScope(MetadataScope scope) {
+	 return null;
+	}
 }
 
 @Index (name="TAD_UK_CODE",	unique=true,
 entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
-columns={"TDA_TEN_ID", "TDA_CODI"})
+columns={"TDA_TEN_ID", "TDA_SCOPE", "TDA_CODI"})
 abstract class TipusDadaCodiIndex {
 }
 
 
 @Index (name="TDA_UK_ORDRE",	unique=true,
 entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
-columns={"TDA_TEN_ID", "TDA_ORDRE"})
+columns={"TDA_TEN_ID", "TDA_SCOPE", "TDA_ORDRE"})
 abstract class TipusDadaOrdreIndex {
 }
 

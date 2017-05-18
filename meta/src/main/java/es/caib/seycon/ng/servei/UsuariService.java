@@ -192,7 +192,7 @@ public abstract class UsuariService {
 		return null;
 	}
 
-	@Operation(translated = "findDataByTypeDataName", grantees = {
+	@Operation(translated = "findDataByUserAndCode", grantees = {
 			roles.user_query.class, roles.metadata_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.DadaUsuari findDadaByCodiTipusDada(

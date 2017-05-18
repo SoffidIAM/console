@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.api.MetadataScope;
+
 /**
  * @see es.caib.seycon.ng.model.TipusDadaEntity
  */
@@ -52,6 +54,8 @@ public class MetaDataEntityDaoImpl extends
 
 	public void toDataType(com.soffid.iam.model.MetaDataEntity sourceEntity, com.soffid.iam.api.DataType targetVO) {
 		super.toDataType(sourceEntity, targetVO);
+		if (sourceEntity.getScope() == null)
+			targetVO.setScope(MetadataScope.USER);
 		if (sourceEntity.getLabel() == null)
 			targetVO.setLabel(sourceEntity.getName());
 		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)

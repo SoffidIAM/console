@@ -99,7 +99,7 @@ public class ServerLookupServiceImpl extends
 				else
 					email = null;
 			} else {
-				UserData dadaUsuari = usuariService.findDataByTypeDataName(usuari.getUserName(), "EMAIL"); //$NON-NLS-1$
+				UserData dadaUsuari = usuariService.findDataByUserAndCode(usuari.getUserName(), "EMAIL"); //$NON-NLS-1$
 				if (dadaUsuari != null) email = dadaUsuari.getValue();
 			}
 		} 

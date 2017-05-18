@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.utils.ConfigurationCache;
 
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.RolGrant;
 
 public class ACLServiceImpl extends ACLServiceBase {
@@ -128,7 +130,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 		acl2.setUsers( new HashSet<Long>());
 		acl2.setRoles( new HashSet<Long>());
 		
-		acl2.getUsers().addAll(acl2.getUsers());
+		acl2.getUsers().addAll(acl.getUsers());
 		for (Long groupId: acl.getGroups())
 		{
 			GroupEntity ge = getGroupEntityDao().load(groupId);
@@ -152,6 +154,55 @@ public class ACLServiceImpl extends ACLServiceBase {
 		
 	}
 
+	@Override
+	protected Collection<String> handleExpandACLAccounts(AccessControlList acl)
+			throws Exception {
+		Collection<String> accounts = new HashSet<String>();
+
+		com.soffid.iam.api.System d = getDispatcherService().findSoffidDispatcher();
+		
+		for (Long user: acl.getUsers())
+		{
+			UserEntity ue = getUserEntityDao().load(user);
+			addUserAccounts(ue, d, accounts);
+						
+		}
+
+		for (Long groupId: acl.getGroups())
+		{
+			GroupEntity ge = getGroupEntityDao().load(groupId);
+			addGroupMembers (ge, d, accounts);
+		}
+
+		for (Long roleId: acl.getRoles())
+		{
+			for (RoleGrant grant: getApplicationService().findEffectiveRoleGrantsByRoleId(roleId))
+			{
+				if (grant.getOwnerSystem().equals(d.getName()))
+					accounts.add(grant.getOwnerAccountName());
+				else if ( grant.getUser() != null)
+				{
+					UserEntity ue = getUserEntityDao().findByUserName(grant.getUser());
+					if (ue != null)
+						addUserAccounts(ue, d, accounts);
+				}
+			}
+		}
+		
+		return accounts;
+		
+	}
+
+	private void addUserAccounts(UserEntity ue, com.soffid.iam.api.System d,
+			Collection<String> accounts) {
+		if (ue != null)
+		{
+			for (com.soffid.iam.model.AccountEntity acc: getAccountEntityDao().findByUserAndSystem(ue.getUserName(), d.getName())) {
+				accounts.add(acc.getName());
+			}
+		}
+	}
+
 	private void addGroupMembers(GroupEntity ge, Set<Long> users) {
 		for ( UserEntity ue: ge.getPrimaryGroupUsers())
 			users.add(ue.getId());
@@ -161,8 +212,19 @@ public class ACLServiceImpl extends ACLServiceBase {
 		
 		for (GroupEntity child: ge.getChildren())
 			addGroupMembers(child, users);
-}
+	}
 
+
+	private void addGroupMembers(GroupEntity ge, com.soffid.iam.api.System d, Collection<String> accounts) {
+		for ( UserEntity ue: ge.getPrimaryGroupUsers())
+			addUserAccounts(ue, d, accounts);
+
+		for ( UserGroupEntity ue: ge.getSecondaryGroupUsers())
+			addUserAccounts(ue.getUser(), d, accounts);
+		
+		for (GroupEntity child: ge.getChildren())
+			addGroupMembers(child, d, accounts);
+	}
 
 }
 

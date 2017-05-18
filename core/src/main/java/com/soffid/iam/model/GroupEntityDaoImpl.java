@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -251,6 +252,11 @@ public class GroupEntityDaoImpl extends
 			grup.setQuota(String.valueOf(entity.getQuotaGroup().longValue()));
 		} else {
 			grup.setQuota("0"); //$NON-NLS-1$
+		}
+		grup.setAttributes(new HashMap<String, Object>());
+		for ( GroupAttributeEntity att: entity.getAttributes())
+		{
+			grup.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
 		}
 	}
 

@@ -506,8 +506,8 @@
 		<column name='DATE_' type='TIMESTAMP'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='PARENT_' type='BIGINT'/>
-		<column name='MESSAGE_' type='VARCHAR' length='4000'/>
-		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
+		<column name='MESSAGE_' type='CLOB' length='20000'/>
+		<column name='EXCEPTION_' type='CLOB' length='20000'/>
 		<column name='ACTION_' type='BIGINT'/>
 		<column name='NODE_' type='BIGINT'/>
 		<column name='ENTER_' type='TIMESTAMP'/>
@@ -614,7 +614,7 @@
 		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='DESTINATION_' type='VARCHAR' length='255'/>
-		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
+		<column name='EXCEPTION_' type='CLOB' length='4000'/>
 		<column name='ISSUSPENDED_' type='SMALLINT'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='TEXT_' type='VARCHAR' length='255'/>

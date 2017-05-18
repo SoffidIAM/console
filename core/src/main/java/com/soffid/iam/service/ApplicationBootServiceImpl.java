@@ -10,6 +10,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.OsType;
 import com.soffid.iam.api.PasswordDomain;
@@ -381,7 +382,8 @@ public class ApplicationBootServiceImpl extends
 
 		for (com.soffid.iam.api.System dispatcher : dispatcherSvc
 				.findDispatchersByFilter(null, null, null, null, null, null)) {
-			if (!tasks.containsKey(SystemScheduledTasks.RECONCILE_DISPATCHER
+			if (dispatcher.getUrl() != null && 
+					!tasks.containsKey(SystemScheduledTasks.RECONCILE_DISPATCHER
 					+ ":" + dispatcher.getId())) {
 				ScheduledTask task = new ScheduledTask();
 				task.setActive(false);
@@ -740,6 +742,7 @@ public class ApplicationBootServiceImpl extends
 			td = new DataType();
 			td.setCode("NIF"); //$NON-NLS-1$
 			td.setOrder(new Long(1));
+			td.setScope(MetadataScope.USER);
 			tdSvc.create(td);
 		}
 

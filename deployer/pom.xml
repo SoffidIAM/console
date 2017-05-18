@@ -8,7 +8,7 @@
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>deployer</artifactId>
-	<name>SEU component deployer</name>
+	<name>Soffid component deployer</name>
 	<description>Deploys EAR</description>
 
 	<build>

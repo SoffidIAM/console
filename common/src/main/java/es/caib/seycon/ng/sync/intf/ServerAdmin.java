@@ -2,6 +2,8 @@
 // Copyright (c) 2000 Govern  de les Illes Balears
 package es.caib.seycon.ng.sync.intf;
 
+import java.util.Map;
+
 /**
  * Intefaz remota de gestión del servidor SEYCON
  * <P>
@@ -36,6 +38,7 @@ public interface ServerAdmin extends java.rmi.Remote
   public void restart () throws java.rmi.RemoteException;
   /** Detener ordenadamente el servidor */
   public void shutdown () throws java.rmi.RemoteException;
+  
 }
 
  

@@ -14,7 +14,7 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 	 */
 	private static final long serialVersionUID = 1L;
 
-	Map<String,Object> attributes = new HashMap<String, Object>();
+	protected Map<String,Object> attributes = new HashMap<String, Object>();
 	public int size()
 	{
 		return attributes.size();

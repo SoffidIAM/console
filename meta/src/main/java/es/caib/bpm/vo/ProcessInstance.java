@@ -11,6 +11,8 @@ import com.soffid.mda.annotation.ValueObject;
 public class ProcessInstance {
 	long id = 0;
 	@Nullable
+	ClassLoader processClassLoader;
+	@Nullable
 	protected Date start = null;
 	@Nullable
 	protected Date end = null;

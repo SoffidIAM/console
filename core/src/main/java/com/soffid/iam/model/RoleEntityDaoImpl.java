@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -694,6 +695,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		targetVO.setIndirectAssignment((rolsPosseidorsRol.size() != 0 || grupsPosseidors
 				.size() != 0) ? "*" : ""); //$NON-NLS-1$ //$NON-NLS-2$
 
+        targetVO.setAttributes(new HashMap<String, Object>());
+		for ( RoleAttributeEntity att: sourceEntity.getAttributes())
+		{
+			targetVO.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
+		}
 	}
 
 	/**
@@ -1015,7 +1021,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				if (valdomAsoc == null) {
 					throw new SeyconException(String.format(
 							Messages.getString("RoleEntityDaoImpl.16"),
-							granteeRole.getApplicationDomain().getName(),
+							grantedRole.getApplicationDomain().getName(),
 							grant.getDomainValue()));
 				}
 				rare.setGranteeDomainValue(valdomAsoc);

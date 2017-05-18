@@ -20,7 +20,8 @@ import com.soffid.iam.sync.service.ServerService;
 
 public class Config {
     public static final String PORT_PROPERTY = "port";
-	public static final String DB_PROPERTY = "db";
+    public static final String LOCAL_PORT_PROPERTY = "localPort";
+    public static final String DB_PROPERTY = "db";
 	public static final String BACKUPDB_PROPERTY = "backupdb";
 	public static final String BACKUP_PASSWORD_PROPERTY = "backuppassword";
 	public static final String BACKUPUSER_PROPERTY = "backupuser";
@@ -353,6 +354,19 @@ public class Config {
     public void setHostName(String list) throws IOException {
         prop.setProperty("hostname", list); //$NON-NLS-1$
         update();
+    }
+
+	public String getLocalPort() throws RemoteException, InternalErrorException {
+        if (isServer())
+            return getPort(); //$NON-NLS-1$
+        else
+        {
+        	String lp = prop.getProperty(LOCAL_PORT_PROPERTY);
+        	if (lp != null)
+        		return lp;
+        	else
+        		return getPort();
+        }
     }
 
     public String getPort() throws RemoteException, InternalErrorException {

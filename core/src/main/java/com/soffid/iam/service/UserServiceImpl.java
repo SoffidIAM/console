@@ -14,6 +14,7 @@ import com.soffid.iam.api.ExtranetCard;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailList;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.PrinterUser;
 import com.soffid.iam.api.Role;
@@ -1782,7 +1783,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		while (tipusDadesIterator.hasNext()) {
 			MetaDataEntity tipusDada = tipusDadesIterator.next();
 			if (tipusDada.getName().compareTo(NIF) != 0
-					&& tipusDada.getName().compareTo(TELEFON) != 0) {
+					&& tipusDada.getName().compareTo(TELEFON) != 0 &&
+					(tipusDada.getScope() == null || tipusDada.getScope() == MetadataScope.USER)) {
 				Iterator<UserDataEntity> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {
@@ -1792,7 +1794,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 							&& dada.getDataType().getName().compareTo(tipusDada.getName()) == 0)
 					{
 						teTipusDada = true;
-						if (authSvc.hasPermission(Security.AUTO_USER_MAZINGER_QUERY, dada))
+						if (Security.isSyncServer() ||
+								! dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
 							result.add(getUserDataEntityDao().toUserData(dada));
 					}
 				}
@@ -1801,8 +1804,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 							.newUserDataEntity();
 					dus.setUser(usuari);
 					dus.setDataType(tipusDada);
-					if (!dus.getAttributeVisibility().equals(
-							AttributeVisibilityEnum.HIDDEN)) {
+					if (Security.isSyncServer() ||
+								! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+					{
 						result.add(getUserDataEntityDao().toUserData(dus));
 					}
 				}
@@ -1812,7 +1816,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return result;
 	}
 
-	protected UserData handleFindDataByTypeDataName(String codiUsuari,
+	protected UserData handleFindDataByUserAndCode(String codiUsuari,
 			String codiTipusDada) throws Exception {
 		UserDataEntity dadaUsuariEntity = getUserDataEntityDao()
 				.findByDataType(codiUsuari, codiTipusDada);
@@ -2770,7 +2774,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				UserEntity ue = uae.getUser();
 				if (ue != null)
-					return getUserEntityDao().toUser(ue);
+				{
+					u = getUserEntityDao().toUser(ue);
+					getSessionCacheService().putObject("currentUser", u);
+					return u;
+				}
 			}
 		}
 		return null;

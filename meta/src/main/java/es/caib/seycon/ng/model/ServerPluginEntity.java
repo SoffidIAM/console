@@ -43,7 +43,7 @@ public abstract class ServerPluginEntity {
 	}
 	@Operation(translated="findAgentsBasicDataByServerPluginID")
 	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\n"
-			+ "agent.enableAttributeMapping\n"
+			+ "agent.enableAttributeMapping, agent.enableObjectTriggers \n"
 			+ "from com.soffid.iam.model.AgentDescriptorEntity agent \n"
 			+ "left join agent.plugin as p \n"
 			+ "where p.id=:id")

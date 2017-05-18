@@ -24,7 +24,7 @@ public abstract class AutoritzacioPUEUsuariEntity {
 	@Column (name="UPE_IDPUE", translated="entryPoint")
 	public es.caib.seycon.ng.model.PuntEntradaEntity puntEntrada;
 
-	@Column (name="UPE_IDUSU")
+	@Column (name="UPE_IDUSU", composition=true)
 	public UsuariEntity user;
 
 }

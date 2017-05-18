@@ -250,7 +250,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                     c.setTime((Date) value);
                     value = c;
                 }
-                UserData dada = getUserService().findDataByTypeDataName(change.getUser().getUserName(), attribute);
+                UserData dada = getUserService().findDataByUserAndCode(change.getUser().getUserName(), attribute);
                 if (dada == null && value != null) return true; else if (value == null && dada != null) return true; else if (value != null && value instanceof byte[]) {
                     if (((byte[]) value).equals(dada.getBlobDataValue())) return true;
                 } else if (value != null && value instanceof Calendar) {
@@ -487,7 +487,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 tda.setCode(attribute);
                 tda = getAdditionalDataService().create(tda);
             }
-            UserData dada = getUserService().findDataByTypeDataName(user.getUserName(), attribute);
+            UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
             if (dada == null && value != null) {
                 auditAuthoritativeChange(user.getUserName(), tracker);
                 dada = new UserData();

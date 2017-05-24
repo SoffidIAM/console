@@ -98,7 +98,7 @@ public class MailServiceImpl extends MailServiceBase {
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
@@ -138,7 +138,7 @@ public class MailServiceImpl extends MailServiceBase {
 			msg.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(to, false));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setText(body, "UTF-8"); //$NON-NLS-1$
@@ -174,7 +174,7 @@ public class MailServiceImpl extends MailServiceBase {
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO, address);
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
@@ -213,7 +213,7 @@ public class MailServiceImpl extends MailServiceBase {
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO, address);
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setContent(body, "text/plain; charset=utf-8"); //$NON-NLS-1$

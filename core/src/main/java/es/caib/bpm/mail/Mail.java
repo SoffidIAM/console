@@ -169,10 +169,6 @@ public class Mail implements ActionHandler {
 		{
     		sendPredefinedMail("Mail.8");
 		}
-		else if (getTemplate() != null ) //$NON-NLS-1$
-		{
-    		sendPredefinedMail("Mail.4");
-		}
 		else
 		{
     		sendCustomMail();
@@ -234,6 +230,13 @@ public class Mail implements ActionHandler {
 			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
+		if (in == null)
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(template+"_"+locale.getLanguage()+".html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (in == null)
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(template+".html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if ( in == null)
+			throw new RuntimeException("Cannot find mail template "+template);
+
 		return in;
 	}
 
@@ -311,6 +314,26 @@ public class Mail implements ActionHandler {
 					if ( ! t.isEmpty())
 						users.add(new InternetAddress(t));
 				}
+
+				String content;
+				if (text != null && !text.trim().isEmpty())
+					content = text;
+				else if (template != null && !template.trim().isEmpty())
+				{
+					InputStream in = getMailContent();
+					InputStreamReader reader = new InputStreamReader(in);
+					StringBuffer buffer = new StringBuffer ();
+					int ch = reader.read();
+					while ( ch >= 0)
+					{
+						buffer.append((char) ch);
+						ch = reader.read ();
+					}
+					content = buffer.toString();
+				} else {
+					content = subject;
+				}
+
 				send(from, users, evaluate(subject), evaluate (text));
 			}
 			if (actors != null)
@@ -329,7 +352,26 @@ public class Mail implements ActionHandler {
 					InternetAddress recipient = getUserAddress(usuari);
 					if (recipient != null)
 					{
-						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (text));
+						String content;
+						if (text != null && !text.trim().isEmpty())
+							content = text;
+						else if (template != null && !template.trim().isEmpty())
+						{
+							InputStream in = getMailContent();
+							InputStreamReader reader = new InputStreamReader(in);
+							StringBuffer buffer = new StringBuffer ();
+							int ch = reader.read();
+							while ( ch >= 0)
+							{
+								buffer.append((char) ch);
+								ch = reader.read ();
+							}
+							content = buffer.toString();
+						} else {
+							content = subject;
+						}
+
+						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (content));
 					}
 				}
 			}

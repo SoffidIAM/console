@@ -23,6 +23,8 @@ import javax.mail.internet.MimeUtility;
 
 import org.zkoss.util.logging.Log;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class MailUtils {
 
 	public static void sendMail(String smtpServer, String to, String from,
@@ -175,7 +177,7 @@ public class MailUtils {
 
 	public static void sendHtmlMail(String smtpServer,
 			Set<InternetAddress> to, String from,
-			String subject, String body) throws NamingException {
+			String subject, String body) throws NamingException, InternalErrorException {
 		Properties props = new Properties();
 
 		// -- Attaching to default Session, or we could start a new one --
@@ -192,7 +194,7 @@ public class MailUtils {
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, to.toArray(new InternetAddress[to.size()]));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
@@ -205,13 +207,11 @@ public class MailUtils {
 		}
 		catch (AddressException e)
 		{
-			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.warn("Error sending message to ["+to+"] :", e);
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 		catch (MessagingException e)
 		{
-			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.warn("Error sending message to ["+to+"] :", e);
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 		
 		// System.out.println("Message sent OK.");
@@ -219,7 +219,7 @@ public class MailUtils {
 
 	public static void sendMail(String smtpServer, Set<InternetAddress>  to, String from,
 			String subject, String body) throws MessagingException,
-			NamingException {
+			NamingException, InternalErrorException {
 
 		Session session = getSession(smtpServer);
 
@@ -239,7 +239,7 @@ public class MailUtils {
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, to.toArray(new InternetAddress[to.size()]));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setText(body, "UTF-8"); //$NON-NLS-1$
@@ -252,11 +252,9 @@ public class MailUtils {
 			Transport.send(msg);
 
 		} catch (AddressException e) {
-			e.printStackTrace();
-			// throw e;
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		} catch (MessagingException e) {
-			e.printStackTrace();
-			// throw e;
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 
 		//System.out.println("Message sent OK.");

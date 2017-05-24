@@ -15,13 +15,15 @@ import com.soffid.mda.annotation.Nullable;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.servei.UsuariService;
 
 @Entity (table="SC_VAUFOL")
 @Depends({VaultFolder.class,
 	GrupEntity.class,
 	RolEntity.class,
 	UsuariEntity.class,
-	ACLService.class})
+	ACLService.class,
+	UsuariService.class})
 public class VaultFolderEntity {
 	@Identifier
 	@Column(name="VAF_ID")

@@ -110,7 +110,7 @@ public class Exporter {
 		DataNode dn = (DataNode) p.getValue();
 		ObjectMappingTrigger instance = (ObjectMappingTrigger) dn.getInstance();
 
-		Element e = doc.createElement("property");
+		Element e = doc.createElement("trigger");
 		e.setAttribute("type", instance.getTrigger().toString());
 		e.setAttribute("script", instance.getScript());
 		parent.appendChild(e);

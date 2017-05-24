@@ -26,7 +26,9 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 	AttributeVisibilityEnum v = null;
 	
 	public AttributeVisibilityEnum getAttributeVisibility() {
-		AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
+		return AttributeVisibilityEnum.EDITABLE;
+
+/*		AutoritzacioService autService = ServiceLocator.instance().getAutoritzacioService();
 		try {
 			if (autService.hasPermission(
 					Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE, this))
@@ -39,6 +41,7 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
+		*/
 	}
 
 	private AttributeVisibilityEnum getInitialVisibility ()

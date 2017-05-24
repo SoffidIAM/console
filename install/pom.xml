@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
@@ -23,6 +24,12 @@
 				<includes>
 					<include>**/messages.properties</include>
 				</includes>
+			</resource>
+
+			<resource>
+				<directory>src/main/docker</directory>
+				<filtering>true</filtering>
+				<targetPath>../docker</targetPath>
 			</resource>
 		</resources>
 		<plugins>
@@ -49,26 +56,46 @@
 					</execution>
 				</executions>
 			</plugin>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>install4j</id>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<taskdef name="install4j" classname="com.install4j.Install4JTask" classpath="${env.INSTALL4J_HOME}/bin/ant.jar" />
-										<install4j projectfile="src/main/install4j/seu.install4j">
-											<variable name="seu.version" value="${pom.version}" />
-										</install4j>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install4j</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<taskdef name="install4j" classname="com.install4j.Install4JTask"
+									classpath="${env.INSTALL4J_HOME}/bin/ant.jar" />
+								<install4j projectfile="src/main/install4j/seu.install4j">
+									<variable name="seu.version" value="${pom.version}" />
+								</install4j>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>docker</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="build" />
+									<arg value="-f" />
+									<arg value="target/docker/Dockerfile" />
+									<arg value="-t" />
+									<arg value="soffid/iam-console:${pom.version}" />
+									<arg value="." />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -94,6 +121,12 @@
 									</file>
 									<type>exe</type>
 								</artifact>
+								<artifact>
+									<file>
+										target/SEU_installer_64.exe
+									</file>
+									<type>64bits.exe</type>
+								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>
@@ -102,7 +135,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -172,20 +206,20 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-  			<groupId>com.microsoft.sqlserver</groupId>
-  			<artifactId>sqljdbc4</artifactId>
- 			 <version>3.0</version>
- 			 <scope>provided</scope>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc4</artifactId>
+			<version>3.0</version>
+			<scope>provided</scope>
 		</dependency>
-	    <dependency>
-            	<groupId>${pom.groupId}</groupId>
-            	<artifactId>deployer</artifactId>
-		<version>${pom.version}</version>
-		<type>sar</type>
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>deployer</artifactId>
+			<version>${pom.version}</version>
+			<type>sar</type>
 		</dependency>
-	    <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>iam-ear</artifactId>
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>iam-ear</artifactId>
 			<version>${pom.version}</version>
 			<type>ear</type>
 		</dependency>
@@ -210,15 +244,49 @@
 		</dependency>
 	</dependencies>
 	<reporting>
-	  <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                 <skip>true</skip>
-	         <additionalJOption>-J-Xmx128m</additionalJOption>
-              </configuration>
-            </plugin>
-	  </plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+					<additionalJOption>-J-Xmx128m</additionalJOption>
+				</configuration>
+			</plugin>
+		</plugins>
 	</reporting>
+	<profiles>
+		<profile>
+			<id>noi4j</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install4j</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>nodocker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>docktr</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

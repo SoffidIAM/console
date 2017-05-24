@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_TIPDAD" )
@@ -26,6 +27,10 @@ public abstract class TipusDadaEntity {
 	@Column (name="TDA_ID")
 	@Identifier
 	public java.lang.Long id;
+
+	@Column (name="TDA_SCOPE", length=50)
+	@Nullable
+	public MetadataScope scope;
 
 	@Column (name="TDA_TYPE", length=50)
 	@Nullable
@@ -72,7 +77,7 @@ public abstract class TipusDadaEntity {
 	
 
 	/********************** DAOS ************************/
-	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi")
+	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity where codi = :codi and scope='user'")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(
 		java.lang.String codi) {
 	 return null;
@@ -82,9 +87,23 @@ public abstract class TipusDadaEntity {
 		java.lang.String codi) {
 	 return null;
 	}
+
+	@DaoFinder("from es.caib.seycon.ng.model.TipusDadaEntity tipusDada "
+			+ "where (:codi is null or tipusDada.codi like :codi) "
+			+ "and   (tipusDada.scope = :scope or :scope is null )")
+	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByScopeAndName(
+			MetadataScope scope, java.lang.String codi) {
+	 return null;
+	}
+
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> find(
 		@Nullable java.util.Collection<es.caib.seycon.ng.model.Parameter> parameters) {
+	 return null;
+	}
+
+	@DaoFinder
+	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findByScope(MetadataScope scope) {
 	 return null;
 	}
 }

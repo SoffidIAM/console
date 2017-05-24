@@ -6,10 +6,12 @@
 
 package es.caib.seycon.ng.comu;
 import java.util.Date;
+import java.util.Map;
 
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Role",
+	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
 public abstract class Rol {
 
@@ -72,4 +74,7 @@ public abstract class Rol {
 	@Nullable
 	public Date approvalEnd;
 
+	@Description ("Role custom attributes")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

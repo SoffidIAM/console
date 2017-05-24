@@ -32,6 +32,7 @@ import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zhtml.impl.AbstractTag;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
@@ -403,6 +404,9 @@ public class TaskUI extends Frame implements EventListener {
 
 
     private void disableInputbox(final Component componente) {
+    	if (componente instanceof AbstractTag)
+    		return;
+    	
     	componente.addEventListener("onSetReadonly", new EventListener() {
 			
 			public void onEvent(Event event) throws Exception {
@@ -422,6 +426,8 @@ public class TaskUI extends Frame implements EventListener {
             ((Button) component).setDisabled(true);
         else if (component instanceof Radio)
             ((Radio) component).setDisabled(true);
+        else if (component instanceof Checkbox)
+            ((Checkbox) component).setDisabled(true);
         else if (component instanceof Checkbox)
             ((Checkbox) component).setDisabled(true);
         else {

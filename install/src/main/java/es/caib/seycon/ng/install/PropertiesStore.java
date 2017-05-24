@@ -47,7 +47,7 @@ public class PropertiesStore {
                         ctx.setVariable(key, v);
                 }
             } catch (Exception e1) {
-                e1.printStackTrace();
+//                e1.printStackTrace();
             }
         }
     }

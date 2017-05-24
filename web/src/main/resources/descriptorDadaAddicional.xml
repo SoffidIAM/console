@@ -5,7 +5,8 @@
 	<datanode name="dadesAddicionals">		
 		<finder name="dadaAddicional" type="dadaAddicional">
 			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
-				method="findTipusDadesByCodi" if = "${queryEnabled}">
+				method="findTipusDadesByScopeAndName" if = "${queryEnabled}">
+				<parameter value="${scope}"/>
 				<parameter value="${codi}"/>
 			</ejb-finder>
 			<new-instance-script>
@@ -52,7 +53,20 @@
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
+		<custom-attribute name="scopeLiteral">
+			if (instance.getScope () == com.soffid.iam.api.MetadataScope.ROLE)
+			    return org.zkoss.util.resource.Labels.getLabel("accounts.role");
+			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.USER)
+			    return org.zkoss.util.resource.Labels.getLabel("accounts.user");
+			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.GROUP)
+			    return org.zkoss.util.resource.Labels.getLabel("accounts.group");
+			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.APPLICATION)
+			    return org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.zul.Aplicacia-2");
+			else
+				return "";
+		</custom-attribute>
 		<validator>
+			<attribute-validator expr="${instance.scope}" notNull="true" friendlyName="dadesAddicionals.ScopeValidation"/>
 			<attribute-validator expr="${instance.ordre}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
 			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
 		</validator>

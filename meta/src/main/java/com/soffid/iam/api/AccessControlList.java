@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 

@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @Index (name="TDA_UK_ORDRE",	unique=true,
 	entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
-	columns={"TDA_ORDRE"})
+	columns={"TDA_SCOPE", "TDA_ORDRE"})
 public abstract class TipusDadaOrdreIndex {
 }
 

@@ -6,8 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.collections.map.LRUMap;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.model.AccountAttributeEntity;
@@ -29,6 +32,8 @@ import es.caib.seycon.ng.utils.Security;
 
 public class AccountEntityDaoImpl extends AccountEntityDaoBase
 {
+	LRUMap cacheMap = new LRUMap(300);
+	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(getClass());
 
 	private void auditar (String accio, String account, String dispatcher)
 	{
@@ -52,6 +57,7 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	{
 		super.create(entity);
 		auditar("C", entity.getName(), entity.getDispatcher().getCodi()); //$NON-NLS-1$
+		cacheMap.remove(entity.getId());
 	}
 
 
@@ -69,6 +75,7 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	@Override
 	public void remove (AccountEntity entity)
 	{
+		cacheMap.remove(entity.getId());
 		getAccountAccessEntityDao().remove(new LinkedList<AccountAccessEntity>(entity.getAcl()));
 		entity.getAcl().clear();
 		getUserAccountEntityDao().remove(new LinkedList<UserAccountEntity>(entity.getUsers()));
@@ -101,119 +108,195 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	@Override
 	public void toAccount(AccountEntity source, Account target)
 	{
-		super.toAccount(source, target);
-		// Incompatible types source.dispatcher and target.dispatcher
-		// Missing attribute grantedGroups on entity
-		// Missing attribute grantedUsers on entity
-		// Missing attribute grantedRoles on entity
-		target.setDispatcher(source.getDispatcher().getCodi());
-		Collection<Grup> grups = new LinkedList<Grup>();
-		Collection<Rol> roles = new LinkedList<Rol>();
-		Collection<Usuari> usuaris = new LinkedList<Usuari>();
-		Collection<Grup> managerGrups = new LinkedList<Grup>();
-		Collection<Rol> managerRoles = new LinkedList<Rol>();
-		Collection<Usuari> managerUsers = new LinkedList<Usuari>();
-		Collection<Grup> ownerGrups = new LinkedList<Grup>();
-		Collection<Rol> ownerRoles = new LinkedList<Rol>();
-		Collection<Usuari> ownerUsers = new LinkedList<Usuari>();
-		if ( source.getType().equals (AccountType.USER))
-		{
-			for (UserAccountEntity uae: source.getUsers())
-			{
-				ownerUsers.add( getUsuariEntityDao().toUsuari(uae.getUser()));
-			}
-		}
-		else
-		{
-			for (AccountAccessEntity acl: source.getAcl())
-			{
-				// Users
-				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-					grups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-					roles.add(getRolEntityDao().toRol(acl.getRol()));
-				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-					usuaris.add(getUsuariEntityDao().toUsuari(acl.getUser()));
-				// Managers
-				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-					managerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-					managerRoles.add(getRolEntityDao().toRol(acl.getRol()));
-				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-					managerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
-				// Users
-				if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-					ownerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
-				if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-					ownerRoles.add(getRolEntityDao().toRol(acl.getRol()));
-				if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-					ownerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
-			}
-		}
-		target.setGrantedGroups(grups);
-		target.setGrantedRoles(roles);
-		target.setGrantedUsers(usuaris);
-
-		target.setManagerGroups(managerGrups);
-		target.setManagerRoles(managerRoles);
-		target.setManagerUsers(managerUsers);
-
-		target.setOwnerGroups(ownerGrups);
-		target.setOwnerRoles(ownerRoles);
-		target.setOwnerUsers(ownerUsers);
-
-		target.setPasswordPolicy(source.getPasswordPolicy().getCodi());
-		if (source.getType() == AccountType.USER)
-		{
-			for (UserAccountEntity uae: source.getUsers())
-			{
-				target.setPasswordPolicy(uae.getUser().getTipusUsuari().getCodi());
-			}
-		}
-		
-		target.setAttributes(new HashMap<String, Object>());
-		for ( AccountAttributeEntity att: source.getAttributes())
-		{
-			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
-			if (vd.getValorDadaDate() != null)
-				target.getAttributes().put(vd.getCodiDada(), vd.getValorDadaDate());
-			else if (vd.getValorDada() != null)
-				target.getAttributes().put(vd.getCodiDada(), vd.getValorDada());
-		}
-		
-		HashMap<String, Object> atts = new HashMap<String, Object>();
-		target.setAttributes(atts);
-		// Now assign attributes
-		for ( AccountAttributeEntity att: source.getAttributes())
-		{
-			DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
-			if (vd.getBlobDataValue() != null)
-				atts.put(vd.getCodiDada(), vd.getBlobDataValue());
-			else if (vd.getValorDadaDate() != null)
-				atts.put(vd.getCodiDada(), vd.getValorDadaDate());
-			else if (vd.getValorDada() != null)
-				atts.put(vd.getCodiDada(), vd.getValorDada());
-		}
-		
-		// Assign vault folder
-		if (source.getFolder() == null)
-		{
-			target.setVaultFolder(null);
-			target.setVaultFolderId(null);
-		}
-		else
-		{
-			target.setVaultFolder(source.getFolder().getName());
-			target.setVaultFolderId(source.getFolder().getId());
-		}
-		
 		try {
-			target.setAccessLevel(getAccessLevel ( source));
+			long start = System.currentTimeMillis();
+			if ( ! Security.isDisableAllSecurityForEver())
+			{
+				AccountCacheEntry entry = (AccountCacheEntry) cacheMap.get(source.getId());
+				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
+				{
+					fetchFromCache(target, entry);
+					log.info("Get from cache: "+ (System.currentTimeMillis() - start));
+					return ;
+				}
+			}
+			super.toAccount(source, target);
+			// Incompatible types source.dispatcher and target.dispatcher
+			// Missing attribute grantedGroups on entity
+			// Missing attribute grantedUsers on entity
+			// Missing attribute grantedRoles on entity
+			target.setDispatcher(source.getDispatcher().getCodi());
+			Collection<Grup> grups = new LinkedList<Grup>();
+			Collection<Rol> roles = new LinkedList<Rol>();
+			Collection<Usuari> usuaris = new LinkedList<Usuari>();
+			Collection<Grup> managerGrups = new LinkedList<Grup>();
+			Collection<Rol> managerRoles = new LinkedList<Rol>();
+			Collection<Usuari> managerUsers = new LinkedList<Usuari>();
+			Collection<Grup> ownerGrups = new LinkedList<Grup>();
+			Collection<Rol> ownerRoles = new LinkedList<Rol>();
+			Collection<Usuari> ownerUsers = new LinkedList<Usuari>();
+			if ( source.getType().equals (AccountType.USER))
+			{
+				for (UserAccountEntity uae: source.getUsers())
+				{
+					ownerUsers.add( getUsuariEntityDao().toUsuari(uae.getUser()));
+				}
+			}
+			else
+			{
+				for (AccountAccessEntity acl: source.getAcl())
+				{
+					// Users
+					if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+						grups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+					if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+						roles.add(getRolEntityDao().toRol(acl.getRol()));
+					if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
+						usuaris.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+					// Managers
+					if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+						managerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+					if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+						managerRoles.add(getRolEntityDao().toRol(acl.getRol()));
+					if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
+						managerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+					// Users
+					if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+						ownerGrups.add(getGrupEntityDao().toGrup(acl.getGroup()));
+					if (acl.getRol() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+						ownerRoles.add(getRolEntityDao().toRol(acl.getRol()));
+					if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
+						ownerUsers.add(getUsuariEntityDao().toUsuari(acl.getUser()));
+				}
+			}
+			target.setGrantedGroups(grups);
+			target.setGrantedRoles(roles);
+			target.setGrantedUsers(usuaris);
+
+			target.setManagerGroups(managerGrups);
+			target.setManagerRoles(managerRoles);
+			target.setManagerUsers(managerUsers);
+
+			target.setOwnerGroups(ownerGrups);
+			target.setOwnerRoles(ownerRoles);
+			target.setOwnerUsers(ownerUsers);
+
+			target.setPasswordPolicy(source.getPasswordPolicy().getCodi());
+			if (source.getType() == AccountType.USER)
+			{
+				for (UserAccountEntity uae: source.getUsers())
+				{
+					target.setPasswordPolicy(uae.getUser().getTipusUsuari().getCodi());
+				}
+			}
+			
+			HashMap<String, Object> atts = new HashMap<String, Object>();
+			target.setAttributes(atts);
+			// Now assign attributes
+			for ( AccountAttributeEntity att: source.getAttributes())
+			{
+				DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
+				if (vd.getBlobDataValue() != null)
+					atts.put(vd.getCodiDada(), vd.getBlobDataValue());
+				else if (vd.getValorDadaDate() != null)
+					atts.put(vd.getCodiDada(), vd.getValorDadaDate());
+				else if (vd.getValorDada() != null)
+					atts.put(vd.getCodiDada(), vd.getValorDada());
+			}
+			
+			// Assign vault folder
+			if (source.getFolder() == null)
+			{
+				target.setVaultFolder(null);
+				target.setVaultFolderId(null);
+			}
+			else
+			{
+				target.setVaultFolder(source.getFolder().getName());
+				target.setVaultFolderId(source.getFolder().getId());
+			}
+			
+
+			log.info("Get from db: "+ (System.currentTimeMillis() - start));
+			start = System.currentTimeMillis();
+			if ( ! Security.isDisableAllSecurityForEver())
+			{
+				storeCacheEntry(source, target);
+			}
+			log.info("Store in cache: "+ (System.currentTimeMillis() - start));
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	private void storeCacheEntry(AccountEntity source, Account target) throws InternalErrorException {
+		AccountCacheEntry entry = new AccountCacheEntry();
+		entry.account = new Account(target);
+		entry.timeStamp = System.currentTimeMillis();
+
+		entry.ownerAcl = new HashSet<String>(
+				getACLService()
+					.expandACLAccounts(
+							generateAcl (source, AccountAccessLevelEnum.ACCESS_OWNER)));
+		entry.managerAcl = new HashSet<String>(
+				getACLService()
+					.expandACLAccounts(
+							generateAcl (source, AccountAccessLevelEnum.ACCESS_MANAGER)));
+		entry.userAcl = new HashSet<String>(
+				getACLService()
+					.expandACLAccounts(
+							generateAcl (source, AccountAccessLevelEnum.ACCESS_USER)));
+
+		String currentUser = Security.getCurrentAccount();
+		if (entry.ownerAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
+		else if (entry.managerAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_MANAGER);
+		else if (entry.userAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
+		else
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
+
+		cacheMap.put(source.getId(), entry);
+	}
+
+	private void fetchFromCache(Account target, AccountCacheEntry entry)
+			throws InternalErrorException {
+		target.setAttributes(entry.account.getAttributes());
+		target.setDescription(entry.account.getDescription());
+		target.setDisabled(entry.account.isDisabled());
+		target.setDispatcher(entry.account.getDispatcher());
+		target.setGrantedGroups(entry.account.getGrantedGroups());
+		target.setGrantedRoles(entry.account.getGrantedRoles());
+		target.setGrantedUsers(entry.account.getGrantedUsers());
+		target.setId(entry.account.getId());
+		target.setInheritNewPermissions(entry.account.isInheritNewPermissions());
+		target.setLastPasswordSet(entry.account.getLastPasswordSet());
+		target.setLastUpdated(entry.account.getLastUpdated());
+		target.setLoginUrl(entry.account.getLoginUrl());
+		target.setManagerGroups(entry.account.getManagerGroups());
+		target.setManagerRoles(entry.account.getManagerRoles());
+		target.setManagerUsers(entry.account.getManagerUsers());
+		target.setName(entry.account.getName());
+		target.setOwnerGroups(entry.account.getOwnerGroups());
+		target.setOwnerRoles(entry.account.getOwnerRoles());
+		target.setPasswordExpiration(entry.account.getPasswordExpiration());
+		target.setPasswordPolicy(entry.account.getPasswordPolicy());
+		target.setType(entry.account.getType());
+		target.setVaultFolder(entry.account.getVaultFolder());
+		target.setVaultFolderId(entry.account.getVaultFolderId());
+		String currentUser = Security.getCurrentAccount();
+		if (entry.ownerAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
+		else if (entry.managerAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_MANAGER);
+		else if (entry.userAcl.contains(currentUser))
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
+		else
+			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
+	}
+
+	
 	private AccountAccessLevelEnum getAccessLevel(AccountEntity source) throws InternalErrorException {
 		if (Security.isDisableAllSecurityForEver())
 			return AccountAccessLevelEnum.ACCESS_OWNER;
@@ -342,8 +425,17 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	protected void handleUpdate(AccountEntity entity, String auditType)
 			throws Exception {
 		super.update(entity);
+		cacheMap.remove(entity.getId());
 		if (auditType != null)
 			auditar(auditType, entity.getName(), entity.getDispatcher().getCodi()); //$NON-NLS-1$
 	}
 
+}
+
+class AccountCacheEntry {
+	long timeStamp;
+	Account account;
+	HashSet<String> ownerAcl;
+	HashSet<String> managerAcl;
+	HashSet<String> userAcl;
 }

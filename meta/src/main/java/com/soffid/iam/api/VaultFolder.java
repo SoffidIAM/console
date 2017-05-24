@@ -6,8 +6,9 @@ import com.soffid.mda.annotation.ValueObject;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 
-@ValueObject
-public class VaultFolder {
+@ValueObject(cache=100, cacheTimeout=30000)
+public class VaultFolder 
+{
 	@Nullable
 	Long id;
 	
@@ -59,6 +60,17 @@ public class VaultFolder {
 	@Nullable
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> ownerRoles;
 
+	@Description("Groups that can navigate")
+	@Nullable
+	public java.util.Collection<Long> navigateGroups;
+
+	@Description("Users that can navigate")
+	@Nullable
+	public java.util.Collection<Long> navigateUsers;
+
+	@Description("Roles that can use the account using SSO & Self Service & Console")
+	@Nullable
+	public java.util.Collection<Long> navigateRoles;
 
 	@Description("Effective access level")
 	@Nullable

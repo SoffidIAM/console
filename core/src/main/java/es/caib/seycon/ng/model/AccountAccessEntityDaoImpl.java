@@ -65,8 +65,10 @@ public class AccountAccessEntityDaoImpl extends AccountAccessEntityDaoBase
 				Hibernate.isInitialized(entity.getAccount().getAcl()))
 		{
 			entity.getAccount().getAcl().remove(entity);
+			getSession().flush();
 		}
-		super.remove(entity);
+		else
+			super.remove(entity);
 		auditar("D", entity); //$NON-NLS-1$
 	}
 }

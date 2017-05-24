@@ -5,9 +5,12 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Group",
+	cache=300,
 	 translatedPackage="com.soffid.iam.api")
 public abstract class Grup {
 
@@ -51,4 +54,7 @@ public abstract class Grup {
 	@Attribute(translated = "section" )
 	public java.lang.String seccioPressupostaria;
 
+	@Description ("Group custom attributes")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

@@ -265,7 +265,7 @@
 			</new-instance-bean>
 		</finder>	
 
-		<finder name="objectMapping" type="objectMapping" refreshAfterCommit="true">
+		<finder name="objectMapping" type="objectMapping" refreshAfterCommit="false">
 			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
 				method="findObjectMappingsByDispatcher"> 
 				<parameter value="${instance.id}"/>

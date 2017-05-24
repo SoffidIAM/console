@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
@@ -22,13 +23,15 @@ import javax.mail.internet.MimeUtility;
 
 import org.zkoss.util.logging.Log;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class MailUtils {
 
 	public static void sendMail(String smtpServer, String to, String from,
 			String subject, String body) throws MessagingException,
 			NamingException {
 
-		Session session = getSession();
+		Session session = getSession(smtpServer);
 
 		// Properties props = new Properties();
 
@@ -71,15 +74,60 @@ public class MailUtils {
 
 	}
 
-	private static Session getSession () throws NamingException
+	public static Session getSession (String mailHost) throws NamingException
 	{
-		try {
-			return (Session) PortableRemoteObject.narrow(
-				new InitialContext().lookup("java:/es.caib.seycon.mail.smtp"), //$NON-NLS-1$
-				Session.class);
-		} catch (Exception e) {
-			return Session.getDefaultInstance(System.getProperties());
+		Properties props = new Properties();
+		javax.mail.Authenticator authenticator = null;
+
+		String protocol = getConfigValue("mail.transport.protocol", "smtp");
+		props.put("mail.transport.protocol", protocol);
+		if ("smtps".equals(protocol))
+		{
+		    props.put("mail.smtp.socketFactory.class",
+		            "javax.net.ssl.SSLSocketFactory");
 		}
+		String auth = getConfigValue("mail.auth", "false");
+		if ("true".equals(auth))
+		{
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtps.auth", "true");
+			final String user = getConfigValue("mail.user", null);
+			if (user != null)
+			{
+				props.put("mail.smtp.user", user);
+				props.put("mail.smtps.user", user);
+			}
+			final String password = getConfigValue("mail.password", null);
+			if (password != null)
+			{
+				props.put("mail.smtp.password", password);
+				props.put("mail.smtps.password", password);
+			}
+			authenticator = new javax.mail.Authenticator() {
+	            protected PasswordAuthentication getPasswordAuthentication() {
+	            	return new PasswordAuthentication(user, password);
+	            }
+			};
+		}
+		
+		String port = getConfigValue("mail.port", null); 
+		if (port != null)
+		{
+			props.put("mail.smtp.port", port);
+			props.put("mail.smtps.port", port);
+			props.put("mail.smtp.socketFactory.port", port);
+		}
+		// -- Attaching to default Session, or we could start a new one --
+		props.put("mail.smtp.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
+		props.put("mail.smtps.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
+		props.list(System.out);
+		Session session = Session.getDefaultInstance(props, authenticator);
+		session.setDebug(true);
+		return session;
+	}
+
+	private static String getConfigValue(String string, String defaultValue) {
+		return System.getProperty(string, defaultValue);
 	}
 
 	public static void sendHtmlMail(String smtpServer, String to, String from,
@@ -89,9 +137,7 @@ public class MailUtils {
 		Properties props = new Properties();
 
 		// -- Attaching to default Session, or we could start a new one --
-		String mailHost =  (smtpServer != null) ? smtpServer : "localhost";
-		props.put("mail.smtp.host", mailHost); //$NON-NLS-1$ //$NON-NLS-2$
-		Session session = getSession().getInstance(props, null);
+		Session session = getSession(smtpServer);
 
 		MimeMessage msg = new MimeMessage(session);
 
@@ -100,7 +146,7 @@ public class MailUtils {
 		try
 		{
 			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.info("Sending mail ["+subject+"] from ["+from+"] to ["+to+"] via ["+mailHost+"]");
+				.info("Sending mail ["+subject+"] from ["+from+"] to ["+to+"] via ["+smtpServer+"]");
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
 			// -- Set the subject and body text --
@@ -131,13 +177,11 @@ public class MailUtils {
 
 	public static void sendHtmlMail(String smtpServer,
 			Set<InternetAddress> to, String from,
-			String subject, String body) throws NamingException {
+			String subject, String body) throws NamingException, InternalErrorException {
 		Properties props = new Properties();
 
 		// -- Attaching to default Session, or we could start a new one --
-		String mailHost =  (smtpServer != null) ? smtpServer : "localhost";
-		props.put("mail.smtp.host", mailHost); //$NON-NLS-1$ //$NON-NLS-2$
-		Session session = getSession().getInstance(props, null);
+		Session session = getSession(smtpServer);
 
 		MimeMessage msg = new MimeMessage(session);
 
@@ -146,11 +190,11 @@ public class MailUtils {
 		try
 		{
 			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.info("Sending mail ["+subject+"] from ["+from+"] to ["+to+"] via ["+mailHost+"]");
+				.info("Sending mail ["+subject+"] from ["+from+"] to ["+to+"] via ["+smtpServer+"]");
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, to.toArray(new InternetAddress[to.size()]));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
@@ -163,13 +207,11 @@ public class MailUtils {
 		}
 		catch (AddressException e)
 		{
-			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.warn("Error sending message to ["+to+"] :", e);
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 		catch (MessagingException e)
 		{
-			org.apache.commons.logging.LogFactory.getLog(MailUtils.class)
-				.warn("Error sending message to ["+to+"] :", e);
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 		
 		// System.out.println("Message sent OK.");
@@ -177,9 +219,9 @@ public class MailUtils {
 
 	public static void sendMail(String smtpServer, Set<InternetAddress>  to, String from,
 			String subject, String body) throws MessagingException,
-			NamingException {
+			NamingException, InternalErrorException {
 
-		Session session = getSession();
+		Session session = getSession(smtpServer);
 
 		// Properties props = new Properties();
 
@@ -197,7 +239,7 @@ public class MailUtils {
 			msg.setFrom(new InternetAddress(from));
 			msg.setRecipients(Message.RecipientType.TO, to.toArray(new InternetAddress[to.size()]));
 			// -- Set the subject and body text --
-			msg.setSubject(subject);
+			msg.setSubject(subject, "UTF-8");
 
 			// enviem en mime - utf-8, que és com ho tenim al repositori
 			msg.setText(body, "UTF-8"); //$NON-NLS-1$
@@ -210,11 +252,9 @@ public class MailUtils {
 			Transport.send(msg);
 
 		} catch (AddressException e) {
-			e.printStackTrace();
-			// throw e;
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		} catch (MessagingException e) {
-			e.printStackTrace();
-			// throw e;
+			throw new InternalErrorException("Unable to send mail message to "+to, e);
 		}
 
 		//System.out.println("Message sent OK.");

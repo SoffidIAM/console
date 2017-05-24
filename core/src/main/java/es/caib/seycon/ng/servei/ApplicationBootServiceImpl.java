@@ -31,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.service.SystemScheduledTasks;
@@ -101,7 +102,7 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 	@Override
 	protected void handleConsoleBoot() throws Exception
 	{
-		SeyconServiceLocator.instance();
+		ServiceLocator.instance();
 		
 		System.setProperty("soffid.ui.maxrows", //$NON-NLS-1$
 			Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
@@ -502,7 +503,8 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 		 
 		 for (Dispatcher dispatcher: dispatcherSvc.findDispatchersByFiltre(null, null, null, null, null, null))
 		 {
-			 if (!tasks.containsKey(SystemScheduledTasks.RECONCILE_DISPATCHER+":"+dispatcher.getId())) //$NON-NLS-1$
+			 if (dispatcher.getUrl() != null &&
+					 !tasks.containsKey(SystemScheduledTasks.RECONCILE_DISPATCHER+":"+dispatcher.getId())) //$NON-NLS-1$
 			 {
 				 ScheduledTask task = new ScheduledTask();
 				 task.setActive(false);
@@ -1144,6 +1146,7 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 			td = new TipusDada();
 			td.setCodi("NIF"); //$NON-NLS-1$
 			td.setOrdre(new Long(1));
+			td.setScope(MetadataScope.USER);
 			tdSvc.create(td);
 		}
 

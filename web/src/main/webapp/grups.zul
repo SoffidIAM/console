@@ -14,6 +14,13 @@
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
+	<style>
+		.groupatt {display: table; padding: 5px; width: 100%}
+		.groupatt_row {display: table-row}
+		.groupatt_label {display: table-cell; width: 200px}
+		.groupatt_input {display: table-cell}
+	</style>
+
 	<zscript>
 		<![CDATA[
 			String requestedGroup = Executions.getCurrent().getNativeRequest().getParameter("group");
@@ -529,7 +536,11 @@
 							
 							<separator spacing="5px"/>
 							
-							<grid width="99%">
+							<grid width="99%"  sclass="noBorderGrid">
+								<columns>
+									<column width="200px"/>
+									<column />
+								</columns>
 								<rows>
 									<row>
 										<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
@@ -622,13 +633,17 @@
 										<input_etiqueta value="${c:l('grups.zul.Obsolet-2')}"/>
 										<checkbox bind="@obsolet" disabled="${!canModifyGrups}" id="obsolet" onCheck=""/>
 									</row>
-									<row>
+									<!-- row>
 										<input_etiqueta value="${c:l('grups.zul.SecciaPressupostaria-2')}"/>
 										<textbox bind="@seccioPressupostaria" disabled="${!canModifyGrups}" id="detall_secPressupost" maxlength="50" onChange="verificaSecPres(self)" sclass="textbox" width="50%"/>
-									</row>
+									</row -->
 								</rows>
 							</grid>
 
+							<separator spacing="5px"/>
+							<div use="com.soffid.web.users.additionalData.AttributesDiv" 
+								dataPath="attributes" scope="group"
+								sclass="groupatt"/>
 							<separator spacing="5px"/>
 							<vbox width="99%">
 							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" height="96%" id="gridUsuaris" if="${canQueryGroupUsers}" rows="15" sclass="likeagrid">

@@ -97,6 +97,8 @@ public class Autowildcards
 				Object value = toReplace.get(index);
 				if (value instanceof String)
 					dictionary.put(index, replaceAsteriskChar((String) value));
+				else
+					dictionary. put(index, value);
 			}
 
 			return dictionary;

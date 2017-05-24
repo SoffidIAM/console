@@ -23,8 +23,11 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleDependencyStatus;
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.comu.Account;
@@ -63,6 +66,7 @@ import es.caib.seycon.ng.model.RolAccountEntityDao;
 import es.caib.seycon.ng.model.RolAssociacioRolEntity;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.RolsGrupEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
@@ -116,6 +120,7 @@ public class AplicacioServiceImpl extends
         {
             getAplicacioEntityDao().create(apl);
             aplicacio.setId(apl.getId());
+            updateApplicationAttributes(aplicacio, apl);
             return (getAplicacioEntityDao().toAplicacio(apl));
         }
 		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.NoUserPermission"), //$NON-NLS-1$
@@ -165,6 +170,7 @@ public class AplicacioServiceImpl extends
         if (getAutoritzacioService().hasPermission(Security.AUTO_APPLICATION_UPDATE, aplEntity))
         {
             getAplicacioEntityDao().update(aplEntity);
+            updateApplicationAttributes(aplicacio, aplEntity);
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "update (Aplicacio)", "application:update", //$NON-NLS-1$ //$NON-NLS-2$
@@ -839,6 +845,8 @@ public class AplicacioServiceImpl extends
         // Creamos la entidad asociada al VO Rol
         rolEntity = getRolEntityDao().create(rol, false);
 
+        updateRoleAttributes(rol, rolEntity);
+        
         return getRolEntityDao().toRol(rolEntity);
     }
 
@@ -870,6 +878,8 @@ public class AplicacioServiceImpl extends
         // Creamos la entidad asociada al VO Rol
         rolEntity = getRolEntityDao().create(rol, true);
 
+        updateRoleAttributes(rol, rolEntity);
+        
         return getRolEntityDao().toRol(rolEntity);
     }
 
@@ -901,6 +911,8 @@ public class AplicacioServiceImpl extends
 
             rolEntity = getRolEntityDao().update(rol, false); // actualizamos cambios del rol
 
+            updateRoleAttributes(rol, rolEntity);
+            
             return getRolEntityDao().toRol(rolEntity);
         }
 
@@ -2486,7 +2498,9 @@ public class AplicacioServiceImpl extends
 
         	
             rolEntity = getRolEntityDao().update(rol, true); // actualizamos cambios del rol
-            
+
+            updateRoleAttributes(rol, rolEntity);
+
             return getRolEntityDao().toRol(rolEntity);
             
         }
@@ -2520,7 +2534,116 @@ public class AplicacioServiceImpl extends
 				getPrincipal().getName(), rol.getCodiAplicacio()));
 	}
 
+	private void updateApplicationAttributes (Aplicacio app, AplicacioEntity entity) throws InternalErrorException
+	{
+		if (app.getAttributes() == null)
+			app.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
+		for ( ApplicationAttributeEntity att: entity.getAttributes())
+		{
+			Object v = app.getAttributes().get(att.getMetadata().getCodi());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getCodi());
+		}
+		List<TipusDadaEntity> md = getTipusDadaEntityDao().findByScope(MetadataScope.APPLICATION);
+		for (String key: keys)
+		{
+			Object v = app.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				ApplicationAttributeEntity aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity ();
+				for ( TipusDadaEntity d: md)
+				{
+					if (d.getCodi().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setInformationSystem(entity);
+				getApplicationAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( TipusDadaEntity m: md)
+		{
+			Object o = app.getAttributes().get(m.getCodi());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					if (getApplicationAttributeEntityDao().findByNameAndValue(m.getCodi(), o.toString()).size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
 
+	private void updateRoleAttributes (Rol app, RolEntity entity) throws InternalErrorException
+	{
+		if (app.getAttributes() == null)
+			app.setAttributes(new HashMap<String, Object>());
+		
+		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
+		for ( RoleAttributeEntity att: entity.getAttributes())
+		{
+			Object v = app.getAttributes().get(att.getMetadata().getCodi());
+			att.setObjectValue(v);
+			keys.remove(att.getMetadata().getCodi());
+		}
+		List<TipusDadaEntity> md = getTipusDadaEntityDao().findByScope(MetadataScope.ROLE);
+		for (String key: keys)
+		{
+			Object v = app.getAttributes().get(key);
+			if ( v != null)
+			{
+				boolean found = false;
+				RoleAttributeEntity aae = getRoleAttributeEntityDao().newRoleAttributeEntity ();
+				for ( TipusDadaEntity d: md)
+				{
+					if (d.getCodi().equals(key))
+					{
+						aae.setMetadata(d);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					throw new InternalErrorException(String.format("Unknown attribute %s", key));
+				aae.setObjectValue(v);
+				aae.setRole(entity);
+				getRoleAttributeEntityDao().create(aae);
+			}
+		}
+		
+		for ( TipusDadaEntity m: md)
+		{
+			Object o = app.getAttributes().get(m.getCodi());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getCodi(), o.toString());
+					if (p.size() > 1)
+						throw new InternalErrorException(String.format("Already exists a role with %s %s",
+								m.getLabel(), o.toString()));
+				}
+			}
+		}
+	}
 }
 
 class RolAccountDetail
@@ -2622,5 +2745,5 @@ class RolAccountDetail
 		else
 			return false;
 	}
-	
+
 }

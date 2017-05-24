@@ -14,6 +14,7 @@
 			<![CDATA[
 					import es.caib.seycon.ng.comu.*;
 			 		model.getVariables().declareVariable("query", false);
+			 		boolean canUpdateUserMetadata = true;
 			]]>
 		</zscript>
 		

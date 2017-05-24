@@ -9,6 +9,13 @@
 <style src="~./styles/estil.css"/>
 <style src="/css/devices.css"/>
 
+	<style>
+		.roleatt {display: table; padding: 5px; width: 100%}
+		.roleatt_row {display: table-row}
+		.roleatt_label {display: table-cell; width: 200px}
+		.roleatt_input {display: table-cell}
+	</style>
+
 <div xmlns:h="http://www.w3.org/1999/xhtml" width="800px" 
 	onCreate="start()"> 
 
@@ -446,7 +453,11 @@
 						}
 					]]>
 				</zscript>
-				<grid >
+				<grid sclass="noBorderGrid">
+					<columns>
+						<column width="200px"/>
+						<column />
+					</columns>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
@@ -598,6 +609,10 @@
 						</row>
 					</rows>
 				</grid>
+				<div use="com.soffid.web.users.additionalData.AttributesDiv" 
+					dataPath="attributes" scope="role"
+					sclass="roleatt"/>
+				<separator spacing="5px"/>
 							<tabbox>
 								<tabs>
 									<tab

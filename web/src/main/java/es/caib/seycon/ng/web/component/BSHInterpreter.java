@@ -1,26 +1,606 @@
 package es.caib.seycon.ng.web.component;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.lang.Classes;
+import org.zkoss.lang.reflect.Fields;
+import org.zkoss.xel.Function;
+import org.zkoss.zk.scripting.HierachicalAware;
 import org.zkoss.zk.scripting.Namespace;
+import org.zkoss.zk.scripting.NamespaceChangeListener;
+import org.zkoss.zk.scripting.SerializableAware;
+import org.zkoss.zk.scripting.util.GenericInterpreter;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 
+import bsh.BshClassManager;
+import bsh.BshMethod;
 import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.NameSpace;
+import bsh.Primitive;
 import bsh.TargetError;
+import bsh.UtilEvalError;
+import bsh.Variable;
 
+public class BSHInterpreter extends GenericInterpreter implements
+		SerializableAware, HierachicalAware {
 
-public class BSHInterpreter extends org.zkoss.zk.scripting.bsh.BSHInterpreter {
 	Log log = LogFactory.getLog(getClass());
-	
+
+	/**
+	 * A variable of {@link Namespace}. The value is an instance of BeanShell's
+	 * NameSpace.
+	 */
+	private static final String VAR_NS = "z_bshnS";
+	private bsh.Interpreter _ip;
+	private GlobalNS _bshns;
+
+	public BSHInterpreter() {
+		_ip = new Interpreter();
+	}
+
+	// Deriving to override//
+	/**
+	 * Called when the top-level BeanShell namespace is created. By default, it
+	 * does nothing.
+	 * 
+	 * <p>
+	 * Note: to speed up the performance, this implementation disabled
+	 * {@link bsh.NameSpace#loadDefaultImports}. It only imports the java.lang
+	 * and java.util packages. If you want the built command and import
+	 * packages, you can override this method. For example,
+	 * 
+	 * <pre>
+	 * <code>
+	 * protected void loadDefaultImports(NameSpace bshns) {
+	 *   bshns.importCommands("/bsh/commands");
+	 * }</code>
+	 * </pre>
+	 * 
+	 * @since 3.0.2
+	 */
+	protected void loadDefaultImports(NameSpace bshns) {
+	}
+
+	protected boolean contains(String name) {
+		try {
+			return _ip.getNameSpace().getVariable(name) != Primitive.VOID;
+			// Primitive.VOID means not defined
+		} catch (UtilEvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+	}
+
+	protected Object get(String name) {
+		try {
+			return Primitive.unwrap(_ip.get(name));
+		} catch (EvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+	}
+
+	protected void set(String name, Object val) {
+		try {
+			_ip.set(name, val);
+			// unlike NameSpace.setVariable, _ip.set() handles null
+		} catch (EvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+	}
+
+	protected void unset(String name) {
+		try {
+			_ip.unset(name);
+		} catch (EvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+	}
+
+	protected boolean contains(Namespace ns, String name) {
+		if (ns != null) {
+			final NameSpace bshns = prepareNS(ns);
+			// note: we have to create NameSpace (with prepareNS)
+			// to have the correct chain
+			if (bshns != _bshns) {
+				try {
+					return bshns.getVariable(name) != Primitive.VOID;
+				} catch (UtilEvalError ex) {
+					throw UiException.Aide.wrap(ex);
+				}
+			}
+		}
+		return contains(name);
+	}
+
+	protected Object get(Namespace ns, String name) {
+		if (ns != null) {
+			final NameSpace bshns = prepareNS(ns);
+			// note: we have to create NameSpace (with prepareNS)
+			// to have the correct chain
+			if (bshns != _bshns) {
+				try {
+					return Primitive.unwrap(bshns.getVariable(name));
+				} catch (UtilEvalError ex) {
+					throw UiException.Aide.wrap(ex);
+				}
+			}
+		}
+		return get(name);
+	}
+
+	protected void set(Namespace ns, String name, Object val) {
+		if (ns != null) {
+			final NameSpace bshns = prepareNS(ns);
+			// note: we have to create NameSpace (with prepareNS)
+			// to have the correct chain
+			if (bshns != _bshns) {
+				try {
+					bshns.setVariable(name, val != null ? val : Primitive.NULL,
+							false);
+					return;
+				} catch (UtilEvalError ex) {
+					throw UiException.Aide.wrap(ex);
+				}
+			}
+		}
+		set(name, val);
+	}
+
+	protected void unset(Namespace ns, String name) {
+		if (ns != null) {
+			final NameSpace bshns = prepareNS(ns);
+			// note: we have to create NameSpace (with prepareNS)
+			// to have the correct chain
+			if (bshns != _bshns) {
+				bshns.unsetVariable(name);
+				return;
+			}
+		}
+		unset(name);
+	}
+
+	// -- Interpreter --//
+	public void init(Page owner, String zslang) {
+		super.init(owner, zslang);
+
+		_ip.setClassLoader(Thread.currentThread().getContextClassLoader());
+
+		_bshns = new GlobalNS(_ip.getClassManager(), "global");
+		_ip.setNameSpace(_bshns);
+	}
+
+	public void destroy() {
+		if ( getOwner() != null)
+			getOwner().getNamespace().unsetVariable(VAR_NS, false);
+
+		// bug 1814819 ,clear variable, dennis
+		try {
+			_bshns.clear();
+			_ip.setNameSpace(null);
+		} catch (Throwable t) { // silently ignore (in case of upgrading to new
+								// bsh)
+		}
+		
+		_ip.setClassLoader(ClassLoader.getSystemClassLoader());
+
+		_bshns = null;
+		super.destroy();
+	}
+
+	/**
+	 * Returns the native interpreter, or null if it is not initialized or
+	 * destroyed. From application's standpoint, it never returns null, and the
+	 * returned object must be an instance of {@link bsh.Interpreter}
+	 * 
+	 * @since 3.0.2
+	 */
+	public Object getNativeInterpreter() {
+		return _ip;
+	}
+
+	public Class getClass(String clsnm) {
+		try {
+			return _bshns.getClass(clsnm);
+		} catch (UtilEvalError ex) {
+			throw new UiException("Failed to load class " + clsnm, ex);
+		}
+	}
+
+	public Function getFunction(String name, Class[] argTypes) {
+		return getFunction0(_bshns, name, argTypes);
+	}
+
+	public Function getFunction(Namespace ns, String name, Class[] argTypes) {
+		return getFunction0(prepareNS(ns), name, argTypes);
+	}
+
+	private Function getFunction0(NameSpace bshns, String name, Class[] argTypes) {
+		try {
+			final BshMethod m = bshns.getMethod(name,
+					argTypes != null ? argTypes : new Class[0], false);
+			return m != null ? new BSHFunction(m) : null;
+		} catch (UtilEvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+	}
+
+	/**
+	 * Prepares the namespace for non-top-level namespace.
+	 */
+	private NameSpace prepareNS(Namespace ns) {
+		if (ns == getOwner().getNamespace())
+			return _bshns;
+
+		NSX nsx = (NSX) ns.getVariable(VAR_NS, true);
+		if (nsx != null)
+			return nsx.ns;
+
+		// bind bshns and ns
+		Namespace p = ns.getParent();
+		NameSpace bshns = // Bug 1831534: we have to pass class manager
+		new NS(p != null ? prepareNS(p) : _bshns, _ip.getClassManager(), ns);
+		// Bug 1899353: we have to use _bshns instead of null
+		// Reason: unknown
+		ns.setVariable(VAR_NS, new NSX(bshns), true);
+		return bshns;
+	}
+
+	/** Prepares the namespace for detached components. */
+	private static NameSpace prepareDetachedNS(Namespace ns) {
+		NSX nsx = (NSX) ns.getVariable(VAR_NS, true);
+		if (nsx != null)
+			return nsx.ns;
+
+		// bind bshns and ns
+		Namespace p = ns.getParent();
+		NameSpace bshns = new NS(p != null ? prepareDetachedNS(p) : null, null,
+				ns);
+		ns.setVariable(VAR_NS, new NSX(bshns), true);
+		return bshns;
+	}
+
+	// supporting classes//
+	/** The global namespace. */
+	private static abstract class AbstractNS extends NameSpace {
+		private boolean _inGet;
+
+		protected AbstractNS(NameSpace parent, BshClassManager classManager,
+				String name) {
+			super(parent, classManager, name);
+		}
+
+		/** Deriver has to override this method. */
+		abstract protected Object getFromNamespace(String name);
+
+		// super//
+		protected Variable getVariableImpl(String name, boolean recurse)
+				throws UtilEvalError {
+			// Note: getVariableImpl returns null if not defined,
+			// while getVariable return Primitive.VOID if not defined
+
+			// Tom M Yeh: 20060606:
+			// We cannot override getVariable because BeanShell use
+			// getVariableImpl to resolve a variable recusrivly
+			//
+			// setVariable will callback this method,
+			// so use _inGet to prevent dead loop
+			Variable var = super.getVariableImpl(name, recurse);
+			if (!_inGet && var == null) {
+				Object v = getFromNamespace(name);
+				if (v != UNDEFINED) {
+					// Variable has no public/protected contructor, so we have
+					// to
+					// store the value back (with setVariable) and retrieve
+					// again
+					_inGet = true;
+					try {
+						this.setVariable(name, v != null ? v : Primitive.NULL,
+								false);
+						var = super.getVariableImpl(name, false);
+						this.unsetVariable(name); // restore
+					} finally {
+						_inGet = false;
+					}
+				}
+			}
+			return var;
+		}
+
+		public void loadDefaultImports() {
+			// to speed up the formance
+		}
+	}
+
+	/** The global NameSpace. */
+	private class GlobalNS extends AbstractNS {
+		private GlobalNS(BshClassManager classManager, String name) {
+			super(null, classManager, name);
+		}
+
+		protected Object getFromNamespace(String name) {
+			return BSHInterpreter.this.getFromNamespace(name);
+		}
+
+		public void loadDefaultImports() {
+			BSHInterpreter.this.loadDefaultImports(this);
+		}
+	}
+
+	/** The per-Namespace NameSpace. */
+	private static class NS extends AbstractNS {
+		private final Namespace _ns;
+
+		private NS(NameSpace parent, BshClassManager classManager, Namespace ns) {
+			super(parent, classManager, "ns" + System.identityHashCode(ns));
+			_ns = ns;
+			_ns.addChangeListener(new NSCListener(this));
+		}
+
+		// super//
+		/** Search _ns instead. */
+		protected Object getFromNamespace(String name) {
+			final BSHInterpreter ip = getInterpreter();
+			return ip != null ? ip.getFromNamespace(_ns, name) : _ns
+					.getVariable(name, false);
+		}
+
+		private BSHInterpreter getInterpreter() {
+			Page owner = _ns.getOwnerPage();
+			if (owner != null) {
+				for (Iterator it = owner.getLoadedInterpreters().iterator(); it
+						.hasNext();) {
+					final Object ip = it.next();
+					if (ip instanceof BSHInterpreter)
+						return (BSHInterpreter) ip;
+				}
+			}
+			return null;
+		}
+	}
+
+	private static class NSCListener implements NamespaceChangeListener {
+		private final NS _bshns;
+
+		private NSCListener(NS bshns) {
+			_bshns = bshns;
+		}
+
+		public void onAdd(String name, Object value) {
+		}
+
+		public void onRemove(String name) {
+		}
+
+		public void onParentChanged(Namespace newparent) {
+			if (newparent != null) {
+				final BSHInterpreter ip = _bshns.getInterpreter();
+				_bshns.setParent(ip != null ? ip.prepareNS(newparent)
+						: prepareDetachedNS(newparent));
+				return;
+			}
+
+			_bshns.setParent(null);
+		}
+	}
+
+	/**
+	 * Non-serializable namespace. It is used to prevent itself from being
+	 * serialized
+	 */
+	private static class NSX {
+		NameSpace ns;
+
+		private NSX(NameSpace ns) {
+			this.ns = ns;
+		}
+	}
+
+	// SerializableAware//
+	public void write(java.io.ObjectOutputStream s, Filter filter)
+			throws java.io.IOException {
+		// 1. variables
+		final String[] vars = _bshns.getVariableNames();
+		for (int j = vars != null ? vars.length : 0; --j >= 0;) {
+			final String nm = vars[j];
+			if (nm != null && !"bsh".equals(nm)) {
+				final Object val = get(nm);
+				if ((val == null || (val instanceof java.io.Serializable) || (val instanceof java.io.Externalizable))
+						&& (filter == null || filter.accept(nm, val))) {
+					s.writeObject(nm);
+					s.writeObject(val);
+				}
+			}
+		}
+		s.writeObject(null); // denote end-of-vars
+
+		// 2. methods
+		final BshMethod[] mtds = _bshns.getMethods();
+		for (int j = mtds != null ? mtds.length : 0; --j >= 0;) {
+			final String nm = mtds[j].getName();
+			if (filter == null || filter.accept(nm, mtds[j])) {
+				// hack BeanShell 2.0b4 which cannot be serialized correctly
+				Field f = null;
+				boolean acs = false;
+				try {
+					f = Classes.getAnyField(BshMethod.class,
+							"declaringNameSpace");
+					acs = f.isAccessible();
+					Fields.setAccessible(f, true);
+					final Object old = f.get(mtds[j]);
+					try {
+						f.set(mtds[j], null);
+						s.writeObject(mtds[j]);
+					} finally {
+						f.set(mtds[j], old);
+					}
+				} catch (java.io.IOException ex) {
+					throw ex;
+				} catch (Throwable ex) {
+					throw UiException.Aide.wrap(ex);
+				} finally {
+					if (f != null)
+						Fields.setAccessible(f, acs);
+				}
+			}
+		}
+		s.writeObject(null); // denote end-of-mtds
+
+		// 3. imported class
+		Field f = null;
+		boolean acs = false;
+		try {
+			f = Classes.getAnyField(NameSpace.class, "importedClasses");
+			acs = f.isAccessible();
+			Fields.setAccessible(f, true);
+			final Map clses = (Map) f.get(_bshns);
+			if (clses != null)
+				for (Iterator it = clses.values().iterator(); it.hasNext();) {
+					final String clsnm = (String) it.next();
+					if (!clsnm.startsWith("bsh."))
+						s.writeObject(clsnm);
+				}
+		} catch (java.io.IOException ex) {
+			throw ex;
+		} catch (Throwable ex) {
+			throw UiException.Aide.wrap(ex);
+		} finally {
+			if (f != null)
+				Fields.setAccessible(f, acs);
+		}
+		s.writeObject(null); // denote end-of-cls
+
+		// 4. imported package
+		f = null;
+		acs = false;
+		try {
+			f = Classes.getAnyField(NameSpace.class, "importedPackages");
+			acs = f.isAccessible();
+			Fields.setAccessible(f, true);
+			final Collection pkgs = (Collection) f.get(_bshns);
+			if (pkgs != null)
+				for (Iterator it = pkgs.iterator(); it.hasNext();) {
+					final String pkgnm = (String) it.next();
+					if (!pkgnm.startsWith("java.awt")
+							&& !pkgnm.startsWith("javax.swing"))
+						s.writeObject(pkgnm);
+				}
+		} catch (java.io.IOException ex) {
+			throw ex;
+		} catch (Throwable ex) {
+			throw UiException.Aide.wrap(ex);
+		} finally {
+			if (f != null)
+				Fields.setAccessible(f, acs);
+		}
+		s.writeObject(null); // denote end-of-cls
+	}
+
+	public void read(java.io.ObjectInputStream s) throws java.io.IOException,
+			ClassNotFoundException {
+		for (;;) {
+			final String nm = (String) s.readObject();
+			if (nm == null)
+				break; // no more
+
+			set(nm, s.readObject());
+		}
+
+		try {
+			for (;;) {
+				final BshMethod mtd = (BshMethod) s.readObject();
+				if (mtd == null)
+					break; // no more
+
+				// fix declaringNameSpace
+				Field f = null;
+				boolean acs = false;
+				try {
+					f = Classes.getAnyField(BshMethod.class,
+							"declaringNameSpace");
+					acs = f.isAccessible();
+					Fields.setAccessible(f, true);
+					f.set(mtd, _bshns);
+				} catch (Throwable ex) {
+					throw UiException.Aide.wrap(ex);
+				} finally {
+					if (f != null)
+						Fields.setAccessible(f, acs);
+				}
+
+				_bshns.setMethod(mtd.getName(), mtd);
+			}
+		} catch (UtilEvalError ex) {
+			throw UiException.Aide.wrap(ex);
+		}
+
+		for (;;) {
+			final String nm = (String) s.readObject();
+			if (nm == null)
+				break; // no more
+
+			_bshns.importClass(nm);
+		}
+
+		for (;;) {
+			final String nm = (String) s.readObject();
+			if (nm == null)
+				break; // no more
+
+			_bshns.importPackage(nm);
+		}
+	}
+
+	private class BSHFunction implements Function {
+		private final bsh.BshMethod _method;
+
+		private BSHFunction(bsh.BshMethod method) {
+			if (method == null)
+				throw new IllegalArgumentException("null");
+			_method = method;
+		}
+
+		// -- Function --//
+		public Class[] getParameterTypes() {
+			return _method.getParameterTypes();
+		}
+
+		public Class getReturnType() {
+			return _method.getReturnType();
+		}
+
+		public Object invoke(Object obj, Object[] args) throws Exception {
+			return _method.invoke(args != null ? args : new Object[0], _ip);
+		}
+
+		public java.lang.reflect.Method toMethod() {
+			return null;
+		}
+	}
+
 	@Override
 	protected void exec(String script) {
 		try {
-			super.exec(script);
+			try {
+				final Namespace ns = getCurrent();
+				if (ns != null)
+					_ip.eval(script, prepareNS(ns));
+				else
+					_ip.eval(script); // unlikely (but just in case)
+			} catch (EvalError ex) {
+				throw UiException.Aide.wrap(ex);
+			}
 		} catch (RuntimeException ex) {
-			log.warn(String.format(Messages.getString("BSHInterpreter.ExecutingStringError"), ex.getMessage())); //$NON-NLS-1$
-			log.info(String.format(Messages.getString("BSHInterpreter.BadScript"), script)); //$NON-NLS-1$
-			if (ex.getCause() instanceof TargetError)
-			{
+			log.warn(String.format(
+					Messages.getString("BSHInterpreter.ExecutingStringError"), ex.getMessage())); //$NON-NLS-1$
+			log.info(String.format(
+					Messages.getString("BSHInterpreter.BadScript"), script)); //$NON-NLS-1$
+			if (ex.getCause() instanceof TargetError) {
 				TargetError e = (TargetError) ex.getCause();
 				throw new RuntimeException(e.getTarget());
 			}

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.logging.Log;
@@ -51,19 +52,72 @@ import es.caib.seycon.ng.utils.MailUtils;
 import es.caib.seycon.ng.utils.Security;
 
 public class Mail implements ActionHandler {
+	public String getActors() {
+		return actors;
+	}
+
+	public void setActors(String actors) {
+		this.actors = actors;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public Log getLog() {
+		return log;
+	}
+
+	public void setLog(Log log) {
+		this.log = log;
+	}
 	private static final long serialVersionUID = 1L;
 
 	protected ExecutionContext executionContext = null;
-
-	private String mailHost = "localhost"; //$NON-NLS-1$
-
-	private String mailFrom = "no-reply@soffid.com"; //$NON-NLS-1$
 
 	// Template can be: 
 	// Event.EVENTTYPE_TASK_ASSIGN ("task-assign")
 	// "task-reminder"
 	
 	private String template;
+
+	private String actors;
+
+	private String to;
+
+	private String subject;
+
+	private String text;
+
+	private String from;
 
 	public String getTemplate ()
 	{
@@ -76,17 +130,7 @@ public class Mail implements ActionHandler {
 	}
 
 	public void initialize() {
-		Configuracio param1;
-		try {
-			ConfiguracioService configService = ServiceLocator.instance().getConfiguracioService();
-			param1 = configService.findParametreByCodiAndCodiXarxa("mail.host", null); //$NON-NLS-1$
-			if (param1 != null)
-				mailHost = param1.getValor();
-			Configuracio param2 = configService.findParametreByCodiAndCodiXarxa("mail.from", null); //$NON-NLS-1$
-			if (param2 != null)
-				mailFrom = param2.getValor();
-		} catch (Exception e) {
-		}
+		from = System.getProperty("mail.from", "no-reply@soffid.com");
 	}
 
 	public Mail() {
@@ -96,10 +140,14 @@ public class Mail implements ActionHandler {
     public Mail(String template, String actors, String to, String subject, String text)
     {
         this.template = template;
+        this.actors = actors;
+        this.to = to;
+        this.subject = subject;
+        this.text = text;
         initialize();
     }
 
-	public void execute(ExecutionContext executionContext) throws InternalErrorException, IOException {
+	public void execute(ExecutionContext executionContext) throws InternalErrorException, IOException, AddressException {
 		debug(Messages.getString("Mail.ExecuteBegin")); //$NON-NLS-1$
 		this.__processInstanceId = executionContext.getProcessInstance().getId();
 		this.executionContext = executionContext;
@@ -108,7 +156,7 @@ public class Mail implements ActionHandler {
 	}
 
 
-	public void send() throws InternalErrorException, IOException {
+	public void send() throws InternalErrorException, IOException, AddressException {
 		
 		if (Event.EVENTTYPE_TASK_ASSIGN.equals(getTemplate()) )
 		{
@@ -116,10 +164,14 @@ public class Mail implements ActionHandler {
 				executionContext.getTaskInstance().assign(executionContext);
 
     		sendPredefinedMail("Mail.4");
-		}
-		if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
+		} 
+		else if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
 		{
     		sendPredefinedMail("Mail.8");
+		}
+		else
+		{
+    		sendCustomMail();
 		}
 	}
 
@@ -158,7 +210,7 @@ public class Mail implements ActionHandler {
 				InternetAddress recipient = getUserAddress(usuari);
 				if (recipient != null)
 				{
-					send(mailFrom, Collections.singleton(recipient), evaluate(subject), evaluate (buffer.toString()));
+					send(from, Collections.singleton(recipient), evaluate(subject), evaluate (buffer.toString()));
 				}
 			}
 		} finally {
@@ -178,6 +230,13 @@ public class Mail implements ActionHandler {
 			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
+		if (in == null)
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(template+"_"+locale.getLanguage()+".html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (in == null)
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(template+".html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if ( in == null)
+			throw new RuntimeException("Cannot find mail template "+template);
+
 		return in;
 	}
 
@@ -217,7 +276,7 @@ public class Mail implements ActionHandler {
 		
 		debug(String.format(Messages.getString("Mail.SendingMailMessage"), targetAddresses, subject)); //$NON-NLS-1$
 
-		MailUtils.sendHtmlMail(mailHost, targetAddresses, fromAddress, subject, text);
+		MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
 	}
 
 
@@ -236,6 +295,91 @@ public class Mail implements ActionHandler {
 				executionContext, variableResolver,
 				JbpmExpressionEvaluator.getUsedFunctionMapper());
 	}
+
+	private void sendCustomMail() throws IOException,
+	InternalErrorException, UnsupportedEncodingException, AddressException {
+		Security.nestedLogin("mail-server", new String[] { //$NON-NLS-1$
+				Security.AUTO_USER_QUERY + Security.AUTO_ALL,
+				Security.AUTO_ROLE_QUERY + Security.AUTO_ALL,
+				Security.AUTO_GROUP_QUERY + Security.AUTO_ALL,
+				Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL,
+				Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
+				Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
+		try {
+			if (to != null)
+			{
+				Set<InternetAddress> users = new HashSet<InternetAddress>();
+				for (String t: evaluate(to).split("[, ]+"))
+				{
+					if ( ! t.isEmpty())
+						users.add(new InternetAddress(t));
+				}
+
+				String content;
+				if (text != null && !text.trim().isEmpty())
+					content = text;
+				else if (template != null && !template.trim().isEmpty())
+				{
+					InputStream in = getMailContent();
+					InputStreamReader reader = new InputStreamReader(in);
+					StringBuffer buffer = new StringBuffer ();
+					int ch = reader.read();
+					while ( ch >= 0)
+					{
+						buffer.append((char) ch);
+						ch = reader.read ();
+					}
+					content = buffer.toString();
+				} else {
+					content = subject;
+				}
+
+				send(from, users, evaluate(subject), evaluate (text));
+			}
+			if (actors != null)
+			{
+				Set<String> users = new HashSet<String>();
+				for (String t: evaluate(actors).split("[, ]+"))
+				{
+					if ( ! t.isEmpty())
+						users.addAll( getNameUsers(t));
+				}
+				for (String user: users)
+				{
+					
+					Usuari usuari = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(user);
+			
+					InternetAddress recipient = getUserAddress(usuari);
+					if (recipient != null)
+					{
+						String content;
+						if (text != null && !text.trim().isEmpty())
+							content = text;
+						else if (template != null && !template.trim().isEmpty())
+						{
+							InputStream in = getMailContent();
+							InputStreamReader reader = new InputStreamReader(in);
+							StringBuffer buffer = new StringBuffer ();
+							int ch = reader.read();
+							while ( ch >= 0)
+							{
+								buffer.append((char) ch);
+								ch = reader.read ();
+							}
+							content = buffer.toString();
+						} else {
+							content = subject;
+						}
+
+						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (content));
+					}
+				}
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+	}
+		
 
 	class MailVariableResolver implements VariableResolver, Serializable {
 		private static final long serialVersionUID = 1L;

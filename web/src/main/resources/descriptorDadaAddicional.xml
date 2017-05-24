@@ -59,7 +59,7 @@
 			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.USER)
 			    return org.zkoss.util.resource.Labels.getLabel("accounts.user");
 			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.GROUP)
-			    return org.zkoss.util.resource.Labels.getLabel("accounts.user");
+			    return org.zkoss.util.resource.Labels.getLabel("accounts.group");
 			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.APPLICATION)
 			    return org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.zul.Aplicacia-2");
 			else

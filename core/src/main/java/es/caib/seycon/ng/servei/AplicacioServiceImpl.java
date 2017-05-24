@@ -2601,7 +2601,7 @@ public class AplicacioServiceImpl extends
 			att.setObjectValue(v);
 			keys.remove(att.getMetadata().getCodi());
 		}
-		List<TipusDadaEntity> md = getTipusDadaEntityDao().findByScope(MetadataScope.APPLICATION);
+		List<TipusDadaEntity> md = getTipusDadaEntityDao().findByScope(MetadataScope.ROLE);
 		for (String key: keys)
 		{
 			Object v = app.getAttributes().get(key);

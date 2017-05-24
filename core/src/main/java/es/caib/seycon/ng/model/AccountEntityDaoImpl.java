@@ -190,16 +190,6 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 				}
 			}
 			
-			target.setAttributes(new HashMap<String, Object>());
-			for ( AccountAttributeEntity att: source.getAttributes())
-			{
-				DadaUsuari vd = getAccountAttributeEntityDao().toDadaUsuari(att);
-				if (vd.getValorDadaDate() != null)
-					target.getAttributes().put(vd.getCodiDada(), vd.getValorDadaDate());
-				else if (vd.getValorDada() != null)
-					target.getAttributes().put(vd.getCodiDada(), vd.getValorDada());
-			}
-			
 			HashMap<String, Object> atts = new HashMap<String, Object>();
 			target.setAttributes(atts);
 			// Now assign attributes

@@ -57,7 +57,9 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	{
 		super.create(entity);
 		auditar("C", entity.getName(), entity.getDispatcher().getCodi()); //$NON-NLS-1$
-		cacheMap.remove(entity.getId());
+		synchronized (cacheMap) {
+			cacheMap.remove(entity.getId());
+		}
 	}
 
 
@@ -75,7 +77,9 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	@Override
 	public void remove (AccountEntity entity)
 	{
-		cacheMap.remove(entity.getId());
+		synchronized (cacheMap) {
+			cacheMap.remove(entity.getId());
+		}
 		getAccountAccessEntityDao().remove(new LinkedList<AccountAccessEntity>(entity.getAcl()));
 		entity.getAcl().clear();
 		getUserAccountEntityDao().remove(new LinkedList<UserAccountEntity>(entity.getUsers()));
@@ -112,7 +116,10 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			long start = System.currentTimeMillis();
 			if ( ! Security.isDisableAllSecurityForEver())
 			{
-				AccountCacheEntry entry = (AccountCacheEntry) cacheMap.get(source.getId());
+				AccountCacheEntry entry;
+				synchronized (cacheMap) {
+					entry = (AccountCacheEntry) cacheMap.get(source.getId());
+				}
 				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
 				{
 					fetchFromCache(target, entry);
@@ -256,8 +263,9 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
 		else
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
-
-		cacheMap.put(source.getId(), entry);
+		synchronized (cacheMap) {
+			cacheMap.put(source.getId(), entry);
+		}
 	}
 
 	private void fetchFromCache(Account target, AccountCacheEntry entry)
@@ -425,7 +433,9 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 	protected void handleUpdate(AccountEntity entity, String auditType)
 			throws Exception {
 		super.update(entity);
-		cacheMap.remove(entity.getId());
+		synchronized (cacheMap) {
+			cacheMap.remove(entity.getId());
+		}
 		if (auditType != null)
 			auditar(auditType, entity.getName(), entity.getDispatcher().getCodi()); //$NON-NLS-1$
 	}

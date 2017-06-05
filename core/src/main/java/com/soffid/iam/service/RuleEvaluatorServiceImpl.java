@@ -10,9 +10,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -57,6 +61,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 {
 
 	private ApplicationContext ctx;
+	private SessionFactory sessionFactory;
 
 	/**
 	 * 
@@ -310,8 +315,27 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	@Override
 	protected void handleApply (RuleEntity rule) throws Exception
 	{
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		List<Long> allUsers = new LinkedList<Long>();
 		for (UsuariEntity u: getUsuariEntityDao().loadAll())
 		{
+			allUsers.add(u.getId());
+		}
+		int i = 100;
+		for (Long l: allUsers)
+		{
+			if (i++ >= 100)
+			{
+				session.flush();
+				session.clear();
+				session.load(rule, rule.getId());
+				i = 0;
+			}
+			System.out.println("User "+l);
+			UsuariEntity u = getUsuariEntityDao().load(l);
 			apply (rule, u);
 		}
 	}

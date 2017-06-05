@@ -946,6 +946,10 @@ public class SesionEJB implements EntityBean {
         }
 
         try {
+        	if (usuario == null)
+                throw generateAuthenticationException(usuario,
+                        AuthenticationFailureException.WRONG_PASSWORD);
+
             SeyconPrincipal principal;
             principal = createIdentity(usuario);
             if (principal == null)

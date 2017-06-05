@@ -51,7 +51,7 @@ public class NASServlet extends HttpServlet {
 	
 	File getFile (HttpServletRequest req) throws ServletException, IOException
 	{
-		String base = System.getProperty("soffid.ui.docLocalPath");
+		String base = System.getProperty("soffid.ui.docPath");
 		if (base == null)
 		{
 			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");
@@ -104,12 +104,11 @@ public class NASServlet extends HttpServlet {
 				resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			} else {
 				InputStream in = req.getInputStream();
-				resp.setContentType("binary/octet-stream");
-				resp.setContentLength((int) f.length());
+				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				OutputStream out = new FileOutputStream(f);
 				byte data [] = new byte[8192];
 				int read;
-				while ( (read = in.read(data)) >= 0)
+				while ( (read = in.read(data)) > 0)
 				{
 					out.write (data,0, read);
 				}

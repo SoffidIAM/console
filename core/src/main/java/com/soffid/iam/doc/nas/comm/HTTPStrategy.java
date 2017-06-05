@@ -93,6 +93,8 @@ public class HTTPStrategy implements CommunicationStrategy
 	public void setProperties(Properties properties) throws NASException 
 	{
 		this.rootURL= properties.getProperty("soffid.ui.docServer");
+		if (!rootURL.endsWith("/"))
+			rootURL = rootURL + "/";
 		this.tempPath= properties.getProperty("soffid.ui.docTempPath");
 		
 		properties.put(JWOptions.QUIET_P, JWOptions.TRUE_P);

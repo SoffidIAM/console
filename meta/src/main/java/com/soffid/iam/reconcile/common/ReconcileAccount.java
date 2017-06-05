@@ -5,6 +5,8 @@
 //
 
 package com.soffid.iam.reconcile.common;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject 
@@ -40,5 +42,11 @@ public abstract class ReconcileAccount {
 
 	@Attribute(defaultValue = "true")
 	public boolean active;
+	
+	public Boolean newAccount;
+
+	public Boolean deletedAccount;
+
+	Map<String, Object> attributes;
 
 }

@@ -19,6 +19,7 @@ import com.soffid.iam.reconcile.common.ProposedAction;
 import com.soffid.iam.reconcile.common.ReconcileAccount;
 import com.soffid.iam.reconcile.common.ReconcileAssignment;
 import com.soffid.iam.reconcile.common.ReconcileRole;
+import com.soffid.iam.reconcile.model.ReconcileAccountAttributesEntity;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntity;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntity;
@@ -36,6 +37,7 @@ import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.comu.sso.NameParser;
@@ -43,6 +45,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.Parameter;
 import es.caib.seycon.ng.model.TasqueEntity;
@@ -77,6 +80,24 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 						.newReconcileAccountEntity();
 		getReconcileAccountEntityDao().reconcileAccountToEntity(userInfo, entity, true);
 		getReconcileAccountEntityDao().create(entity);
+		
+		if (userInfo.getAttributes() != null )
+			for (String att: userInfo.getAttributes().keySet())
+			{
+				Object value = userInfo.getAttributes().get(att);
+				if (value != null)
+				{
+					if (value instanceof String)
+					{
+						ReconcileAccountAttributesEntity at = getReconcileAccountAttributesEntityDao().newReconcileAccountAttributesEntity();
+						at.setAccount(entity);
+						at.setAttribute(att);
+						at.setValue((String) value);
+						entity.getAttributes().add(at);
+						getReconcileAccountAttributesEntityDao().create(at);
+					}
+				}
+			}
 
 		return getReconcileAccountEntityDao().toReconcileAccount(entity);
 	}
@@ -338,24 +359,60 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 
 			// Binding existing user
 			if (account.getProposedAction().equals(
-							AccountProposedAction.BIND_TO_EXISTING_USER))
+							AccountProposedAction.BIND_TO_EXISTING_USER) && account.getNewAccount().booleanValue())
 			{
 				bindExistingUser(account);
 			}
 
 			// Create new user
 			if (account.getProposedAction()
-							.equals(AccountProposedAction.CREATE_NEW_USER))
+							.equals(AccountProposedAction.CREATE_NEW_USER)
+							 && account.getNewAccount().booleanValue())
 			{
 				createNewUserAccount(account);
 			}
 
 			// Independent account
-			if (account.getProposedAction().equals(AccountProposedAction.SHARED))
+			if (account.getProposedAction().equals(AccountProposedAction.SHARED)
+					 && account.getNewAccount().booleanValue())
 			{
 				createSharedAccount(account);
 			}
+
+			if (account.getProposedAction().equals(AccountProposedAction.UPDATE_ACCOUNT)
+					 && ! account.getNewAccount().booleanValue()
+					 && ! account.getDeletedAccount().booleanValue())
+			{
+				updateAccount(account);
+			}
+
+			if (account.getProposedAction().equals(AccountProposedAction.DELETE_ACCOUNT)
+					 && ! account.getDeletedAccount().booleanValue())
+			{
+				deleteAccount(account);
+			}
 		}
+	}
+
+	private void deleteAccount(ReconcileAccount account) throws InternalErrorException {
+		Account previous = getAccountService().findAccount(account.getAccountName(), account.getDispatcher());
+		if (previous != null)
+		{
+			for ( RolAccount grant : getAplicacioService().findRolAccountByAccount(previous.getId()))
+			{
+				getAplicacioService().delete(grant);
+			}
+			getAccountService().removeAccount(previous);
+		}
+	}
+
+	private void updateAccount(ReconcileAccount account) throws InternalErrorException {
+		Account previous = getAccountService().findAccount(account.getAccountName(), account.getDispatcher());
+		if (previous == null)
+			throw new InternalErrorException("Cannot update non existing account: "+account.getAccountName());
+		previous.setDescription(account.getDescription());
+		previous.setDisabled(! account.isActive());
+		previous.getAttributes().putAll(account.getAttributes());
 	}
 
 	/**
@@ -386,7 +443,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		newAccount.setGrantedGroups(Collections.EMPTY_LIST);
 		newAccount.setGrantedRoles(Collections.EMPTY_LIST);
 		newAccount.setGrantedUsers(Collections.EMPTY_LIST);
-
+		newAccount.setAttributes(account.getAttributes());
 		// Check single shared account
 		if (account.getAccountType().equals(AccountType.USER))
 		{
@@ -443,7 +500,9 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 
 		try
 		{
-			accountServ.createAccount(user, disp, account.getAccountName());
+			UserAccount acc = accountServ.createAccount(user, disp, account.getAccountName());
+			acc.setAttributes(account.getAttributes());
+			accountServ.updateAccount(acc);
 		}
 
 		catch (AccountAlreadyExistsException ex)

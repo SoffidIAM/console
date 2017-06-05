@@ -18,4 +18,8 @@ public class AccountProposedAction {
 
 	public java.lang.String SHARED="S";
 
+	public java.lang.String UPDATE_ACCOUNT="U";
+
+	public java.lang.String DELETE_ACCOUNT="D";
+
 }

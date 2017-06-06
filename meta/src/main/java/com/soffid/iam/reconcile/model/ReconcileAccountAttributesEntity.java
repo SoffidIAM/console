@@ -5,7 +5,7 @@ import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Nullable;
 
-@Entity (table="SC_RECACO" )
+@Entity (table="SC_RECATT" )
 public class ReconcileAccountAttributesEntity {
 	@Column (name="RAA_ID")
 	@Nullable

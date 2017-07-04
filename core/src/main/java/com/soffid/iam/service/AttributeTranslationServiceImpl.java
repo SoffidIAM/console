@@ -38,7 +38,9 @@ public class AttributeTranslationServiceImpl extends
 			public int compare(AttributeTranslation o1, AttributeTranslation o2) {
 				int i = o1.getDomain().compareTo(o2.getDomain());
 				if ( i == 0)
-					i = o1.getColumn1().compareTo(o2.getColumn2());
+					i = o1.getColumn1().compareTo(o2.getColumn1());
+				if ( i == 0)
+					i = o1.getColumn2().compareTo(o2.getColumn2());
 				return i;
 			}
 			

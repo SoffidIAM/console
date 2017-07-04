@@ -306,10 +306,11 @@ public class Mail implements ActionHandler {
 				Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
 				Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
 		try {
-			if (to != null)
+			String realTo = evaluate(to);
+			if (realTo != null)
 			{
 				Set<InternetAddress> users = new HashSet<InternetAddress>();
-				for (String t: evaluate(to).split("[, ]+"))
+				for (String t: realTo.split("[, ]+"))
 				{
 					if ( ! t.isEmpty())
 						users.add(new InternetAddress(t));
@@ -397,7 +398,10 @@ public class Mail implements ActionHandler {
 					&& (templateVariables.containsKey(pName))) {
 				return templateVariables.get(pName);
 			}
-			return variableResolver.resolveVariable(pName);
+			if (pName.equals("systemProperties"))
+				return System.getProperties();
+			else
+				return variableResolver.resolveVariable(pName);
 		}
 	}
 

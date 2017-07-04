@@ -418,7 +418,7 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			{
 				getUserAccountEntityDao().propagateChanges (uac);
 			}
-    	} else {
+    	} else if (! account.getType().equals(AccountType.IGNORED)) {
     		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
     		tasque.setData(new Timestamp(System.currentTimeMillis()));
 			tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);

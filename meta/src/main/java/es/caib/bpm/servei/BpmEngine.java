@@ -441,5 +441,10 @@ public abstract class BpmEngine {
 		java.io.InputStream stream)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	
+
+	@Transactional(rollbackFor={java.lang.Exception.class},readOnly=true)
+	public boolean isUserInRole (String role)
+	{
+		return false;
+	}
 }

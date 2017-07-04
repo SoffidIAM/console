@@ -2721,6 +2721,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 				return false;
 		}
 	}
+
+	@Override
+	protected boolean handleIsUserInRole(String role) throws Exception {
+		for ( String r: getUserGroups())
+			if (r.equals(role))
+				return false;
+		return false;
+	}
 }
 
 

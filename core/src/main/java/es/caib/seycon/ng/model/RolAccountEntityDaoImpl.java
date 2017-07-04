@@ -499,6 +499,14 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         	targetVO.setRuleId(sourceEntity.getRule().getId());
         	targetVO.setRuleDescription(sourceEntity.getRule().getDescription());
         }
+        
+        targetVO.setParentGrant( sourceEntity.getParent() == null ? null : sourceEntity.getParent().getId());
+        if (sourceEntity.getParent() != null)
+        {
+        	targetVO.setRuleDescription(String.format("Granted to role %s @ %s", 
+        			sourceEntity.getParent().getRol().getNom(),
+        			sourceEntity.getParent().getRol().getBaseDeDades().getCodi()));
+        }
     }
 
     /**
@@ -690,6 +698,11 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         	if (grup == null)
         		throw new SeyconException (String.format("Unknown group %s", sourceVO.getHolderGroup()));
         	targetEntity.setHolderGroup(grup);
+        }
+        
+        if (sourceVO.getParentGrant() != null)
+        {
+        	targetEntity.setParent(load(sourceVO.getParentGrant()));
         }
     }
 

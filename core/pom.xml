@@ -264,6 +264,12 @@
 			<artifactId>jboss-cache</artifactId>
 			<version>1.2.2</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>es.caib.signatura.api</groupId>
@@ -456,6 +462,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zul</artifactId>
 			<version>3.0.8</version>
@@ -610,6 +622,34 @@
 		    <artifactId>mail</artifactId>
 		    <version>1.4.7</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.opensaml/opensaml-core -->
+		<dependency>
+		    <groupId>org.opensaml</groupId>
+		    <artifactId>opensaml-core</artifactId>
+		    <version>3.3.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.opensaml</groupId>
+		    <artifactId>opensaml-saml-api</artifactId>
+		    <version>3.3.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.opensaml</groupId>
+		    <artifactId>opensaml-saml-impl</artifactId>
+		    <version>3.3.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.9</version>
+		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		 -->
 	</dependencies>
 </project>
 

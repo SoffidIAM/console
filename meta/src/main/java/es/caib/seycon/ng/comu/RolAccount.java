@@ -10,6 +10,7 @@ import java.util.Date;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.RolAccountEntity;
 
 @ValueObject ( translatedName="RoleAccount",
 	 translatedPackage="com.soffid.iam.api")
@@ -110,4 +111,9 @@ public abstract class RolAccount {
 	@Description("Last certification date")
 	@Nullable
 	public Date certificationDate;
+	
+	@Description("Parent grant id, for optinal role to role grant")
+	@Nullable
+	public Long parentGrant;
+
 }

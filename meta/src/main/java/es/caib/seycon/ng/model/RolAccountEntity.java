@@ -91,7 +91,10 @@ public abstract class RolAccountEntity {
 	@Nullable
 	public Date certificationDate;
 	
-	
+	@Description("Parent grant. Used only in non mandatory rol to rol grants")
+	@Column(name="RLU_RLU_ID", composition=true, reverseAttribute="children")
+	@Nullable
+	public RolAccountEntity parent;
 	/**************************** DAOs ******************************/
 	@DaoFinder("select ra\nfrom es.caib.seycon.ng.model.RolAccountEntity ra\ninner join    ra.account as account\ninner join    account.users as users\ninner join    users.user as user\ninner join    ra.rol as rol\nwhere user.codi = :codiUsuari and rol.nom = :nomRol")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuariAndNomRol(

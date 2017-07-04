@@ -321,6 +321,11 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				updateAccountAccessLevel();
 				configSvc.update(cfg);
 			}
+			if (cfg.getValor().equals("12")) { //$NON-NLS-1$
+				cfg.setValor("13"); //$NON-NLS-1$
+				updateMandatoryRolGrant();
+				configSvc.update(cfg);
+			}
 		}
 		finally
 		{
@@ -384,6 +389,28 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 		{
 			executeSentence(conn, "UPDATE SC_ROLUSU SET RLU_CERDAT=? WHERE RLU_CERDAT IS NULL ",
 							new Object[] {new java.util.Date()});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateMandatoryRolGrant () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ROLROL SET RRL_MANDAT=1 WHERE RRL_MANDAT IS NULL",
+							new Object[0]);
+			executeSentence(conn, "UPDATE SC_TIPDAD SET TDA_SCOPE='U' WHERE TDA_SCOPE IS NULL",
+					new Object[0]);
 		}
 		finally
 		{

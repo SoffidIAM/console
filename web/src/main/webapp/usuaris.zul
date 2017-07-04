@@ -2245,6 +2245,13 @@ void actualitza (event) {
 											if (cell.getChildren().size() > 0 )
 												cell.getChildren().get(0).visible = false;
 										}
+										Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
+										if (parentGrant != null)
+										{
+											Listcell cell = listcells.get(9);
+											if (cell.getChildren().size() > 0 )
+												cell.getChildren().get(1).visible = true;
+										}
 										Listcell cellImage = listcells.get(0);
 										if (!cellImage.getChildren().isEmpty())
 										{

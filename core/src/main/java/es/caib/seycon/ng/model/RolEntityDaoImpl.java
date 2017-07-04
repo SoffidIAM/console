@@ -451,6 +451,7 @@ public class RolEntityDaoImpl extends es.caib.seycon.ng.model.RolEntityDaoBase {
 	private void updateRolDependency(RolAssociacioRolEntity entity, RolGrant grant) throws InternalErrorException, BPMException {
 		if (grant.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
 			deleteRolDependency(entity);
+		entity.setMandatory(grant.getMandatory());
 		// No update is allowed
 	}
 

@@ -113,6 +113,7 @@
 				dades.getFellow("detall_descripcio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio_button").setVisible(false);
+				dades.getFellow("detall_nomRol_button").setVisible(false);
 				dades.getFellow("detall_category").setReadonly(true);
 				dades.getFellow("detall_defecte").setDisabled(true);
 				dades.getFellow("detall_contrasenya").setDisabled(true);
@@ -203,6 +204,7 @@
 				dades.getFellow("detall_agent").setDisabled(modifica);
 				dades.getFellow("detall_codiAplicacio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio_button").setVisible(true);
+				dades.getFellow("detall_nomRol_button").setVisible(modifica);
 				
 				if (self.mode.compareToIgnoreCase("highlighted") != 0)
 				{
@@ -470,7 +472,8 @@
 										]]>
 									</attribute>
 								</textbox>
-								
+								<imageclic src='/img/pencil.png' onClick='self.previousSibling.readonly = false; self.visible = false; '
+									id ="detall_nomRol_button"/>
 								<label value="*" />
 							</hbox>
 						</row>
@@ -686,6 +689,16 @@
 													<textboxfilter
 														bind="@domainValue" />
 												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@dispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
+													width="2em" sort="auto">
+												</listheader>
 												<listheader id="ownedRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
 											</listhead>
@@ -702,6 +715,11 @@
 													bind="@rolName" />
 												<listcell
 													bind="@domainValue" />
+												<listcell
+													bind="@dispatcher" />
+												<listcell>
+													<checkbox bind="@mandatory" />
+												</listcell>
 												<listcell>
 													<imageclic
 														align="right" src="~./img/list-remove.gif"
@@ -784,6 +802,16 @@
 													<textboxfilter
 														bind="@domainValue" />
 												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@dispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
+													width="2em" sort="auto">
+												</listheader>
 												<listheader id="ownerRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
 												</listhead>
@@ -800,6 +828,11 @@
 													bind="@rolName" />
 												<listcell
 													bind="@domainValue" />
+												<listcell
+													bind="@dispatcher" />
+												<listcell>
+													<checkbox bind="@mandatory" />
+												</listcell>
 												<listcell>
 													<imageclic
 														align="right" src="~./img/list-remove.gif"

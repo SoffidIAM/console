@@ -58,6 +58,11 @@ public abstract class RolAssociacioRolEntity {
 	@Nullable
 	public com.soffid.iam.api.RoleDependencyStatus status;
 
+	@Description("True if the role is always granted. False if role grant is optional, and thus can be removed from user entitlements form")
+	@Column (name="RRL_MANDAT", defaultValue="true")
+	@Nullable
+	public Boolean mandatory;
+
 	@DaoFinder("select rolAssociacioRol.rolContenidor\nfrom es.caib.seycon.ng.model.RolAssociacioRolEntity rolAssociacioRol\nwhere \nrolAssociacioRol.rolContingut.nom = :nomRol and\nrolAssociacioRol.rolContingut.aplicacio.codi = :codiAplicacio and\nrolAssociacioRol.rolContingut.baseDeDades.codi = :codiBBDD\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAssociacioRolEntity> findContenidorsByNomRolCodiAplicacioCodiBBDD(
 		java.lang.String nomRol, 

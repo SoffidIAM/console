@@ -3103,7 +3103,7 @@ public class UsuariServiceImpl extends
     private void addString (String value, String hqlAttribute, String joinArray[], List<String> joins, List<String> queries, List<Parameter> params)
     {
 		String param = "param"+params.size(); //$NON-NLS-1$
-		addString2(value, param, hqlAttribute+ " like :"+param, joinArray, joins, queries, params); //$NON-NLS-1$
+		addString2(value == null? null: value.toUpperCase(), param, "upper("+hqlAttribute+ ") like :"+param, joinArray, joins, queries, params); //$NON-NLS-1$
     }
     
     private void addString2 (String value, String param, String hqlCondition, String joinArray[], List<String> joins, List<String> queries, List<Parameter> params)
@@ -3214,8 +3214,9 @@ public class UsuariServiceImpl extends
 		addString(criteria.getTipusUsuari(), "usuari.tipusUsuari.codi", null, joins, queries, params); //$NON-NLS-1$
 		addString(criteria.getUsuariCreacio(), "usuari.usuariCreacio", null, joins, queries, params); //$NON-NLS-1$
 		addString(criteria.getUsuariDarreraModificacio(), "usuari.usuariDarreraModificacio", null, joins, queries, params); //$NON-NLS-1$
-		addString2(criteria.getSecondaryGroup(), "grupSecundari",  //$NON-NLS-1$
-				"(grup.codi like :grupSecundari or grupB.codi like :grupSecundari)", //$NON-NLS-1$
+		if (criteria.getSecondaryGroup() != null)
+			addString2(criteria.getSecondaryGroup().toUpperCase(), "grupSecundari",  //$NON-NLS-1$
+				"(upper(grup.codi) like :grupSecundari or upper(grupB.codi) like :grupSecundari)", //$NON-NLS-1$
 				new String[] {"left outer join usuari.grupPrimari as grup", //$NON-NLS-1$
 							  "left outer join usuari.grupsSecundaris as grupsSecundaris", //$NON-NLS-1$
 							  "left outer join grupsSecundaris.grup as grupB" }, joins, queries, params); //$NON-NLS-1$

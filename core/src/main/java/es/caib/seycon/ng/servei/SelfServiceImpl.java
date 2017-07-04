@@ -7,10 +7,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -32,7 +37,9 @@ import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AuditoriaEntity;
+import es.caib.seycon.ng.model.DadaUsuariEntity;
 import es.caib.seycon.ng.model.DominiContrasenyaEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.utils.Security;
@@ -353,8 +360,45 @@ public class SelfServiceImpl extends SelfServiceBase
 	}
 	@Override
 	protected Collection<DadaUsuari> handleGetUserAttributes() throws Exception {
-		Usuari usuari = getUsuariService().getCurrentUsuari();
-		return getUsuariService().findDadesUsuariByCodiUsuari(usuari.getCodi());
+		UsuariEntity usuari = getUsuariEntityDao().findByCodi(Security.getCurrentUser());
+		Collection<DadaUsuariEntity> dades = usuari.getDadaUsuari();
+		LinkedList<DadaUsuari> result = new LinkedList<DadaUsuari>();
+		
+		List<TipusDadaEntity> tipusDades = getTipusDadaEntityDao().loadAll();
+		Collections.sort(tipusDades, new Comparator<TipusDadaEntity>(){
+			public int compare(TipusDadaEntity o1, TipusDadaEntity o2) {
+				return o1.getOrdre().compareTo(o2.getOrdre());
+			}	
+		});
+		
+		Iterator<TipusDadaEntity> tipusDadesIterator = tipusDades.iterator();
+		while (tipusDadesIterator.hasNext()) {
+			TipusDadaEntity tipusDada = tipusDadesIterator.next();
+			Iterator<DadaUsuariEntity> dadesIterator = dades.iterator();
+			boolean teTipusDada = false;
+			while (dadesIterator.hasNext()) {
+				DadaUsuariEntity dada = dadesIterator.next();
+				if (dada.getTipusDada().getCodi().equals(tipusDada.getCodi()))
+				{
+					teTipusDada = true;
+					if (Security.isDisableAllSecurityForEver() ||
+							! dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+						result.add(getDadaUsuariEntityDao().toDadaUsuari(dada));
+				}
+			}
+			if (!teTipusDada) {
+				DadaUsuariEntity dus = getDadaUsuariEntityDao().newDadaUsuariEntity();
+				dus.setUsuari(usuari);
+				dus.setTipusDada(tipusDada);
+				if (Security.isDisableAllSecurityForEver() ||
+						! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+				{
+					result.add ( getDadaUsuariEntityDao().toDadaUsuari(dus));
+				}
+			}
+		}
+
+		return result;
 	}
 	@Override
 	protected DadaUsuari handleUpdateUserAttribute(DadaUsuari attribute)

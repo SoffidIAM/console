@@ -27,6 +27,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.model.RuleAssignedRoleEntity;
 import com.soffid.iam.model.RuleEntity;
 
+import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.RolAccount;
@@ -84,7 +85,17 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			{
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
 			}
-			List<RolAccountEntity> roles = raDao.findAllByCodiUsuari(user.getCodi());
+			List<RolAccountEntity> roles = new LinkedList<RolAccountEntity>( raDao.findAllByCodiUsuari(user.getCodi()) ); 
+			// Remmove roles delegated by another user
+			for ( Iterator<RolAccountEntity> it = roles.iterator(); it.hasNext ();)
+			{
+				RolAccountEntity ra = it.next();
+				if (DelegationStatus.DELEGATION_ACTIVE.equals(ra.getDelegationStatus()))
+					it.remove();
+			}
+			// Add delegated roles
+			roles.addAll( raDao.findDelegatedRolAccounts(user.getCodi()));
+			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
 			{
 				for (RuleAssignedRoleEntity rar: rule.getRoles())

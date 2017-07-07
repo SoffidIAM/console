@@ -138,6 +138,10 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
     }
 
     public void update(RolAccountEntity rolsUsuaris) {
+    	handleUpdate (rolsUsuaris, "U");
+    }
+    
+    public void handleUpdate(RolAccountEntity rolsUsuaris, String auditType) {
         // Aquest mètode s'empra només en SC_RESPONSABLE de les aplicacions
         // Només es pot tindre 1 responsable, i s'actualitza l'existent (si
         // existeix)
@@ -203,7 +207,7 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
             generateTasks(rolsUsuaris);
             generateTasks(old);
             
-            auditarRolAccount("U", rolsUsuaris); //$NON-NLS-1$
+            auditarRolAccount(auditType, rolsUsuaris); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
             throw new SeyconException(String.format(
@@ -507,7 +511,15 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
         			sourceEntity.getParent().getRol().getNom(),
         			sourceEntity.getParent().getRol().getBaseDeDades().getCodi()));
         }
+        
+        if (sourceEntity.getOwnerAccount() != null)
+        	targetVO.setOwnerAccount(sourceEntity.getOwnerAccount().getName());
+
+        if (sourceEntity.getDelegateAccount() != null)
+        	targetVO.setDelegateAccount(sourceEntity.getDelegateAccount().getName());
     }
+    
+    
 
     /**
      * @see es.caib.seycon.ng.model.RolAccountEntityDao#toRolAccount(es.caib.seycon.ng.model.RolAccountEntity)

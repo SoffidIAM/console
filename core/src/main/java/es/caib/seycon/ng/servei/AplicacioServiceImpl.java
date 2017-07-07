@@ -30,6 +30,7 @@ import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.AdministracioAplicacio;
@@ -2187,6 +2188,12 @@ public class AplicacioServiceImpl extends
 			return false;
 		if (e.getStartDate() == null && e.getEndDate() == null)
 			return true;
+		if (DelegationStatus.DELEGATION_ACTIVE.equals(e.getDelegationStatus()) &&
+				e.getDelegateUntil() != null &&
+				new Date ().after(e.getDelegateUntil()))
+		{
+			return false;
+		}
 		
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR, 0);
@@ -2267,6 +2274,14 @@ public class AplicacioServiceImpl extends
 			throws Exception
 	{
 		UsuariEntity user = getUsuariEntityDao().load(userId);
+		if (user.getCodi().equals(Security.getCurrentUser()))
+		{
+			for ( RolAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
+			{
+				getEntitlementDelegationService().acceptDelegation(ra);
+			}
+			getEntitlementDelegationService().revertExpiredDelegations();
+		}
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateRoles(radSet, ALL, user);
 		LinkedList<RolGrant> rgl = new LinkedList<RolGrant>();
@@ -2566,6 +2581,21 @@ public class AplicacioServiceImpl extends
     		getAccountEntityDao().propagateChanges(toDisable.getAccount());
 		}
 
+		for (RolAccountEntity toDelegate: getRolAccountEntityDao().findAllRolAccountToStartDelegation(now))
+		{
+			toDelegate.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
+			toDelegate.setAccount(toDelegate.getDelegateAccount());
+			getRolAccountEntityDao().update(toDelegate, "l");
+		}
+
+		for (RolAccountEntity toRevert: getRolAccountEntityDao().findAllRolAccountToEndDelegation(now))
+		{
+			toRevert.setDelegationStatus(null);
+			toRevert.setAccount(toRevert.getDelegateAccount());
+			toRevert.setDelegateSince(null);
+			toRevert.setDelegateUntil(null);
+			getRolAccountEntityDao().update(toRevert, "m");
+		}
 	}
 
 	/* (non-Javadoc)

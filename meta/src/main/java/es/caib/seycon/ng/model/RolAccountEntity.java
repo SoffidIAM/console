@@ -9,6 +9,8 @@ import java.util.Date;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.common.DelegationStatus;
+
 @Entity (table="SC_ROLUSU" )
 @Depends ({
 	// Other entties
@@ -95,6 +97,33 @@ public abstract class RolAccountEntity {
 	@Column(name="RLU_RLU_ID", composition=true, reverseAttribute="children")
 	@Nullable
 	public RolAccountEntity parent;
+	
+	
+	@Description("Delegation status")
+	@Column(name="RLU_DELSTA")
+	@Nullable
+	public DelegationStatus delegationStatus;
+
+	@Description("Entitled account who delegatse to delegateAccount")
+	@Column (name="RLU_OMNACC_ID")
+	@Nullable
+	public es.caib.seycon.ng.model.AccountEntity ownerAccount;
+
+	@Description("Delegate account")
+	@Column (name="RLU_DELACC_ID")
+	@Nullable
+	public es.caib.seycon.ng.model.AccountEntity delegateAccount;
+
+	@Description("Delegate since date")
+	@Column (name="RLU_DELSIN")
+	@Nullable
+	public Date delegateSince;
+
+	@Description("Delegate until date")
+	@Column (name="RLU_DELUNT")
+	@Nullable
+	public Date delegateUntil;
+
 	/**************************** DAOs ******************************/
 	@DaoFinder("select ra\nfrom es.caib.seycon.ng.model.RolAccountEntity ra\ninner join    ra.account as account\ninner join    account.users as users\ninner join    users.user as user\ninner join    ra.rol as rol\nwhere user.codi = :codiUsuari and rol.nom = :nomRol")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuariAndNomRol(
@@ -173,6 +202,65 @@ public abstract class RolAccountEntity {
 	 return null;
 	}
 
+	@Description("Search delegations to start")
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "join ra.delegateAccount.users as userAccount "
+			   + "join userAccount.user as user "
+			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) and ra.delegationStatus = 'P' and "
+			   + "user.codi = :user")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToStartDelegation(
+		String user,
+		Date now) {
+		return null;
+	}
+
+	@Description("Search delegations to end")
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "join ra.delegateAccount.users as userAccount "
+			   + "join userAccount.user as user "
+			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null and "
+			   + "user.codi = :user")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEndDelegation(
+		String user,
+		Date now) {
+		return null;
+	}
+
+	@Description("Search delegations done by a user")
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "join ra.ownerAccount.users as userAccount "
+			   + "join userAccount.user as user "
+			   + "where ra.delegationStatus='A' and "
+			   + "user.codi = :user")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findDelegatedRolAccounts(
+		String user) {
+		return null;
+	}
+
+	@Description("Search delegations to start")
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) and ra.delegationStatus = 'P'")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToStartDelegation(
+		Date now) {
+		return null;
+	}
+
+	@Description("Search delegations to end")
+	@DaoFinder("select ra "
+			   + "from es.caib.seycon.ng.model.RolAccountEntity as ra\n"
+			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToEndDelegation(
+		Date now) {
+		return null;
+	}
+
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+	
+	@DaoOperation
+	void update(RolAccountEntity entity, String auditOperation) {}
 }

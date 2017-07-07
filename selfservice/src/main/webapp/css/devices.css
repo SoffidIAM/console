@@ -57,7 +57,7 @@ div.listbox-head th div.head-cell-inner, div.cell-inner, div.cell-inner span {fo
 div.listbox-head th, div.listbox-head th div{white-space:pre-line; word-wrap:break-word;}
 
 /*****  USER-INFO | PESTA�AS IDENTIFICACION/PERMISOS *****/
-.user-info{height:180px;}
+.user-info{min-height:180px;}
 .user-info td.tab-3d-ml-sel, 
 .user-info td.tab-3d-ml-uns,
 .user-info td[class^='tab-3d-']{background-image:none;}

@@ -2245,6 +2245,22 @@ void actualitza (event) {
 											if (cell.getChildren().size() > 0 )
 												cell.getChildren().get(0).visible = false;
 										}
+
+										// Role Delegation
+							 			es.caib.seycon.ng.common.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
+							 			if (ds != null && ds.equals (es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)) {
+											Listcell cell = listcells.get(0);
+							 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
+							 				cell.appendChild(ic);
+							 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
+							 				String since = df.format(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateSince"));
+							 				Date untilDate = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateUntil");
+							 				String until = untilDate == null ? "" :df.format(untilDate);
+							 				String owner = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "ownerAccount");
+							 				
+						 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { owner, since, until }));
+							 			}
+
 										Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
 										if (parentGrant != null)
 										{

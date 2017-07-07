@@ -144,7 +144,9 @@ public class SelfServiceImpl extends SelfServiceBase
 			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL
 		});
 		try {
-			return getAplicacioService().findRolsUsuarisByCodiUsuari(u.getCodi());
+			LinkedList<RolAccount> ra = new LinkedList<RolAccount> (getAplicacioService().findRolsUsuarisByCodiUsuari(u.getCodi()));
+			ra.addAll( getEntitlementDelegationService().findActiveDelegations() );
+			return ra;
 		} finally {
 			Security.nestedLogoff();
 		}

@@ -15,6 +15,98 @@
 					import es.caib.seycon.ng.comu.*;
 			 		model.getVariables().declareVariable("query", false);
 			 		boolean canUpdateUserMetadata = true;
+			 		boolean canDelegate = true;
+			 		void delegate (Component comp) {
+			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
+			 			pageScope{"roleToDelegate"} = ra;
+		                Window window = execution.createComponents(
+		                        "/wf/task/seleccionUsuario.zul", p_selfService, null); //$NON-NLS-1$
+		                window.doModal();
+
+		                String usuarioSeleccionado = window.getUsuarioSeleccionado(); 
+			 			pageScope{"userToDelegate"} = usuarioSeleccionado;
+		                
+		                if (usuarioSeleccionado != null && ! usuarioSeleccionado.equals(es.caib.seycon.ng.utils.Security.getCurrentUser()))
+		                {
+			                List accounts = es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().findAccountsToDelegate(ra, usuarioSeleccionado);
+			                newDelegation.getFellow("roleName").setValue(ra.getNomRol());
+			                newDelegation.getFellow("userName").setValue(usuarioSeleccionado);
+			                Listbox lb = newDelegation.getFellow("account");
+			                lb.getChildren().clear();
+			                for (String account: accounts)
+			                {
+			                	lb.appendChild(new Listitem(account, account));
+			                }
+			                lb.setSelectedIndex(0);
+			                java.util.Calendar c = java.util.Calendar.getInstance();
+			                c.set(java.util.Calendar.HOUR, 0);
+			                c.set(java.util.Calendar.MINUTE, 0);
+			                c.set(java.util.Calendar.SECOND, 0);
+			                c.set(java.util.Calendar.MILLISECOND, 0);
+			                c.add(java.util.Calendar.DAY_OF_MONTH, 1);
+			                newDelegation.getFellow("since").setValue (c.getTime());
+			                c.add(java.util.Calendar.DAY_OF_MONTH, 7);
+			                newDelegation.getFellow("until").setValue (c.getTime());
+			                newDelegation.doHighlighted ();
+		                }
+			 		}
+			 		
+			 		void cancelDelegate ()
+			 		{
+			 			newDelegation.setVisible(false);
+			 		}
+			 		
+			 		void acceptDelegate ()
+			 		{
+			 			RolAccount ra = pageScope{"roleToDelegate"};
+			 			String user = pageScope{"userToDelegate"};
+		                Listbox lb = newDelegation.getFellow("account");
+		                String account = lb.getSelectedItem() == null ? null : lb.getSelectedItem().getValue();
+		                Date since =  newDelegation.getFellow("since").getValue ();
+		                Date until = newDelegation.getFellow("until").getValue ();
+		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().delegate(ra, user, account, since, until);
+		                model.getValue("/usuari[1]/rol").refresh();
+			 			newDelegation.setVisible(false);
+			 		}
+			 		
+			 		void cancelDelegate (Component comp)
+			 		{
+			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
+		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().cancelDelegation(ra);
+		                model.getValue("/usuari[1]/rol").refresh();
+			 		}
+
+			 		void newRolAccount (Component comp)
+			 		{
+			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
+			 			if (ra.getDelegationStatus() != null) {
+			 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
+			 				Component listitem = comp.getChildren().get(6);
+			 				listitem.insertBefore(ic, listitem.getFirstChild());
+			 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
+			 				String since = df.format(ra.getDelegateSince());
+			 				String until = ra.getDelegateUntil() == null ? "" :df.format(ra.getDelegateUntil());
+			 				if (ra.getDelegationStatus() == es.caib.seycon.ng.common.DelegationStatus.DELEGATION_PENDING)
+			 				{
+			 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusPending", new Object[] { ra.getDelegateAccount(), since, until }));
+			 					listitem.getChildren().get(1).setVisible(false);
+			 					listitem.getChildren().get(2).setVisible(true);
+			 				}
+			 				else if (ra.getCodiUsuari().equals(es.caib.seycon.ng.utils.Security.getCurrentUser()) &&
+			 						ra.getDelegationStatus() == es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)
+			 				{
+			 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { ra.getOwnerAccount(), since, until }));
+			 					listitem.getChildren().get(1).setVisible(false);
+			 					listitem.getChildren().get(2).setVisible(false);
+			 				}
+			 				else
+			 				{
+			 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusActive", new Object[] { ra.getDelegateAccount(),since, until}));
+			 					listitem.getChildren().get(1).setVisible(false);
+			 					listitem.getChildren().get(2).setVisible(true);
+			 				}
+			 			}
+			 		}
 			]]>
 		</zscript>
 		
@@ -138,7 +230,7 @@
 				</div>
 				<div class="user-info">
 					<form id="fusuaris" dataPath="/model:/usuari" sclass="fons">
-						<tabbox id="panels" width="100%">
+						<tabbox id="panels" width="100%" >
 							<tabs>
 								<tab label="${c:l('selfService.Identification')}" />
 								<tab label="${c:l('selfService.ApplPermissions')}" />
@@ -206,14 +298,15 @@
 						
 								<tabpanel id="applicationPermissions" width="100%">
 									<div>
-										<listbox fixedLayout="true" dataPath="/rol"  width="100%">
+										<listbox fixedLayout="false" dataPath="/rol"  width="100%" height="300px" onNewRow="newRolAccount (event.data)">
 											<listhead>
-												<listheader label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" />
+												<listheader label="${c:l('usuaris.zul.Rol')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="15%" />
-												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="20%" />
+												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Valor')}" width="15%" />
+												<listheader width="10%"></listheader>
 											</listhead>
 											<dataitem>
 												<listcell bind="@nomRol"/>
@@ -222,6 +315,10 @@
 												<listcell bind="@codiAplicacio" />
 												<listcell bind="valorDomini/@nomDomini" />
 												<listcell bind="valorDomini/@descripcio"/>
+												<listcell>
+													<button label="${c:l('seleccionUsuario.btnDelegar') }" onClick='delegate(event.getTarget())'/>
+													<button label="${c:l('selfService.cancelDelegation') }" onClick='cancelDelegate(event.getTarget())' visible='false'/>
+												</listcell>
 											</dataitem>
 										</listbox>
 									</div>
@@ -367,6 +464,43 @@
 						onClick="onCancelPassword()" />
 				</div>
 			</vbox>
+		</window>
+		<window id="newDelegation" closable="true" sclass="new-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.NewDelegation')}" visible="false" width="34em"
+			onClose="cancelDelegate(); event.stopPropagation();">
+			<zscript>
+				<![CDATA[
+				]]>
+			</zscript>
+	 		<div style="margin-left: 2em">
+				<label value="${c:l('usuaris.zul.Rol')} :" style="min-width: 8em; display: inline-block"/>
+				<label id="roleName"/>
+			</div>
+	 		<div style="margin-left: 2em">
+				<label value="${c:l('selfService.delegateTo')} :"  style="min-width: 8em; display: inline-block"/>
+				<label id="userName"/>
+			</div>
+	 		<div style="margin-left: 2em">
+				<label value="${c:l('selfService.delegateAccount')} :" style="min-width: 8em; display: inline-block"/>
+				<listbox id="account" mold="select"/>
+			</div>
+	 		<div style="margin-left: 2em">
+				<label value="${c:l('selfService.delegateSince')} :"  style="min-width: 8em; display: inline-block"/>
+				<datebox id="since"  format="${c:l('usuaris.zul.dateFormat2')}"/>
+			</div>
+	 		<div style="margin-left: 2em">
+				<label value="${c:l('selfService.delegateUntil')} :"  style="min-width: 8em; display: inline-block"/>
+				<datebox id="until" format="${c:l('usuaris.zul.dateFormat2')}"/>
+			</div>
+				
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="acceptDelegate()" />
+				<space width="1em"/>
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="cancelDelegate()" />
+			</div>
 		</window>
 	</frame>
 </zk>

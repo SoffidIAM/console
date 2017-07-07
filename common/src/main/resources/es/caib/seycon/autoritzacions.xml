@@ -1338,4 +1338,10 @@
 		<descripcio>Manage shared accounts using self service</descripcio>
 		<ambit>SelfService</ambit>
 	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:delegate</codi>
+		<descripcio>Delegate own roles</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
 </autoritzacions>

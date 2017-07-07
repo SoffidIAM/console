@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.service.EntitlementDelegationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -43,7 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 	BpmEngine.class,
 	ApplicationAttributeEntity.class,
 	TipusDadaEntity.class,
-	RoleAttributeEntity.class
+	RoleAttributeEntity.class,
+	EntitlementDelegationService.class
 	}
 )
 

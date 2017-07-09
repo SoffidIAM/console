@@ -164,7 +164,7 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 			rolAccountEntity.setDelegateUntil(null);
 			rolAccountEntity.setDelegateAccount(null);
 			rolAccountEntity.setDelegationStatus(null);
-			getRolAccountEntityDao().update(rolAccountEntity,"l");
+			getRolAccountEntityDao().update(rolAccountEntity,"M");
 		}
 	}
 

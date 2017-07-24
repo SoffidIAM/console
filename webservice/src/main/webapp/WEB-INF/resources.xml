@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<resources>
+  <Service id="johnzon" class-name="com.soffid.iam.json.ConfigurableJohnzonProvider">
+    accessModeName = field
+  </Service>
+</resources>

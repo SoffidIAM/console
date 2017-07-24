@@ -90,12 +90,10 @@ public class AccountEntityDaoImpl extends
 		getRoleAccountEntityDao().remove(
 				new LinkedList<RoleAccountEntity>(entity.getRoles()));
 		entity.getRoles().clear();
-		for (AuditEntity aud : getAuditEntityDao().query(
-				"select aud from com.soffid.iam.model.AccountEntity as aud "
-						+ "where aud.accountAssoc.id=:id",
-				new Parameter[] { new Parameter("id", entity.getId()) })) {
-			aud.setAccountAssoc(null);
-			getAuditEntityDao().update(aud);
+		try {
+			getAuditEntityDao().unlinkAccounts(entity);
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
 		}
 		super.remove(entity);
 		auditar("D", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$

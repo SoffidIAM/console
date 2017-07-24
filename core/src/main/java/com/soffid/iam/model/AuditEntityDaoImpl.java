@@ -326,4 +326,13 @@ public class AuditEntityDaoImpl extends
 		auditoriaToEntityCustom(sourceVO, targetEntity);
 	}
 
+	@Override
+	protected void handleUnlinkAccounts(AccountEntity account) throws Exception {
+		getSession().createQuery("update com.soffid.iam.model.AuditEntityImpl "
+				+ "set accountAssoc = null "
+				+ "where accountAssoc.id = :id")
+				.setParameter("id", account.getId())
+				.executeUpdate();
+	}
+
 }

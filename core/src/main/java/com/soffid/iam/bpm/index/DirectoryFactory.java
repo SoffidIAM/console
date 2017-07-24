@@ -79,7 +79,7 @@ public class DirectoryFactory {
 
 	public static Analyzer getAnalyzer () throws IOException {
 		Reader r = new InputStreamReader ( DirectoryFactory.class.getResourceAsStream("stop-words.txt"), "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
-		Analyzer a = new StandardAnalyzer (Version.LUCENE_30, r);
+		Analyzer a = new StandardAnalyzer (Version.LUCENE_CURRENT, r);
 		return a;
 	}
 }

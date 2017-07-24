@@ -12,9 +12,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -52,12 +54,13 @@ public class Indexer {
 	public void flush(Session session) throws IOException {
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, DirectoryFactory.getAnalyzer());
+		iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
 		try {
-			w = new IndexWriter (dir, DirectoryFactory.getAnalyzer(),
-				false, MaxFieldLength.LIMITED);
+			w = new IndexWriter (dir, iwc);
 		} catch (FileNotFoundException e) {
-			w = new IndexWriter (dir, DirectoryFactory.getAnalyzer(),
-					true, MaxFieldLength.LIMITED);
+			iwc.setOpenMode(OpenMode.CREATE);
+			w = new IndexWriter (dir, iwc);
 		}
 		Document d;
 		Iterator it ;

@@ -35,18 +35,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queries.BooleanFilter;
+import org.apache.lucene.queries.FilterClause;
+import org.apache.lucene.queries.TermsFilter;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanFilter;
-import org.apache.lucene.search.FilterClause;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermRangeFilter;
-import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -364,13 +368,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 				Directory dir = DirectoryFactory.getDirectory(context
 						.getSession());
+				IndexReader reader = DirectoryReader.open(dir);
 				IndexSearcher is;
-				try {
-					is = new IndexSearcher(dir);
-				} catch (FileNotFoundException e) {
-					return resultado;
-				}
-				QueryParser qp = new QueryParser(Version.LUCENE_30,
+				is = new IndexSearcher(reader);
+				QueryParser qp = new QueryParser(Version.LUCENE_CURRENT,
 						"$contents", //$NON-NLS-1$
 						DirectoryFactory.getAnalyzer());
 				org.apache.lucene.search.Query q = null;
@@ -423,20 +424,21 @@ public class BpmEngineImpl extends BpmEngineBase {
 				boolean complexQuery = false;
 				if (startDate != null && !"".equals(startDate)) { //$NON-NLS-1$
 					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
-							dataInici, dataFi, true, true); // inclusiu
+							new BytesRef(dataInici), 
+							new BytesRef(dataFi), true, true); // inclusiu
 					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 				if (endDate != null && !"".equals(endDate)) { //$NON-NLS-1$
 					TermRangeFilter fend = new TermRangeFilter("$endDate", //$NON-NLS-1$
-							dataInici, dataFi, true, true); // inclusiu
+							new BytesRef(dataInici), 
+							new BytesRef(dataFi), true, true); // inclusiu
 					b.add(new FilterClause(fend, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 
 				if (!finished) {
-					TermsFilter f = new TermsFilter();
-					f.addTerm(new Term("$end", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+					TermsFilter f = new TermsFilter( new Term("$end", "false") );
 					b.add(new FilterClause(f, BooleanClause.Occur.MUST));
 					complexQuery = true;
 					if (complexQuery)
@@ -455,7 +457,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					int id = hits.scoreDocs[i].doc;
 					org.apache.lucene.document.Document d = is.getIndexReader()
 							.document(id);
-					Field f = d.getField("$id"); //$NON-NLS-1$
+					IndexableField f = d.getField("$id"); //$NON-NLS-1$
 					if (f != null) {
 						long processId = Long.parseLong(f.stringValue());
 						try {
@@ -468,8 +470,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 						}
 					}
 				}
-
-				is.close();
+				reader.close();
 			}
 			return resultado;
 		} catch (CorruptIndexException e) {

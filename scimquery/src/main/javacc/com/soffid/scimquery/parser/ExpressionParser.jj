@@ -12,10 +12,14 @@ public class ExpressionParser
 	static public AbstractExpression parse (String s)
 	throws ParseException, TokenMgrError
 	{
-	    
-		java.io.StringReader reader = new java.io.StringReader (s);
-		ExpressionParser p = new ExpressionParser (reader);
-		return p.Expression() ;
+	    if ( s == null || s.trim().isEmpty ())
+	    {
+			return new VoidExpression() ;
+	    } else {
+			java.io.StringReader reader = new java.io.StringReader (s == null? "": s);
+			ExpressionParser p = new ExpressionParser (reader);
+			return p.Expression() ;
+		}
 	}
 }
 PARSER_END(ExpressionParser)

@@ -31,5 +31,6 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/iam-common"/>
 	<classpathentry kind="lib" path="target/test-classes"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scimquery"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

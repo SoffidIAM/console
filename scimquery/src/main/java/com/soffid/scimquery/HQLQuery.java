@@ -63,6 +63,18 @@ public class HQLQuery {
 		return queryString;
 	}
 
+	public void setQueryString(StringBuffer queryString) {
+		this.queryString = queryString;
+	}
+
+	public void setJoinString(StringBuffer joinString) {
+		this.joinString = joinString;
+	}
+
+	public void setWhereString(StringBuffer whereString) {
+		this.whereString = whereString;
+	}
+
 	public StringBuffer getJoinString() {
 		return joinString;
 	}

@@ -271,6 +271,24 @@
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.johnzon</groupId>
+		    <artifactId>johnzon-mapper</artifactId>
+		    <version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.johnzon</groupId>
+		    <artifactId>johnzon-jaxrs</artifactId>
+		    <version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0-1</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
   <reporting>
     <plugins>

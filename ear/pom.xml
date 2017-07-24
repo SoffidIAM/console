@@ -54,7 +54,6 @@
 			<version>${pom.version}</version>
 			<type>ejb</type>
 		</dependency>
-<!--
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-webservice</artifactId>
@@ -67,7 +66,6 @@
 			<version>${pom.version}</version>
 			<type>war</type>
 		</dependency>
--->
 	</dependencies>
 	<build>
 		<resources>
@@ -93,13 +91,11 @@
 							<artifactId>iam-web</artifactId>
 							<contextRoot>/</contextRoot>
 						</webModule>
-						<!-- 
 						<webModule>
 							<groupId>${pom.groupId}</groupId>
 							<artifactId>iam-webservice</artifactId>
 							<contextRoot>/webservice</contextRoot>
 						</webModule>
-						 -->
 						<webModule>
 							<groupId>${pom.groupId}</groupId>
 							<artifactId>iam-weblogout</artifactId>

@@ -350,14 +350,13 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>3.0.1</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queries</artifactId>
-			<version>3.0.1</version>
+			<version>4.5.1</version>
 		</dependency>
-
 		<dependency> <!-- per cridar red sara verificar dades usuari NIE/DNI -->
 			<groupId>org.apache.ws.security</groupId>
 			<artifactId>wss4j</artifactId>
@@ -526,6 +525,14 @@
 				<exclusion>
 					<artifactId>bcprov-jdk14</artifactId>
 					<groupId>bouncycastle</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-databind</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-annotations</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

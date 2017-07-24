@@ -1,0 +1,295 @@
+##LOGIN
+login.lblUser= Usuari
+login.lblPassword= Password
+login.msgUsuarioPasswordIncorrectos= Usuari o contrasenya incorrectes
+login.msgIngresePassword= Per favor, introdueixi usuari i contrasenya
+login.lblProyecto=Projecte cofinanciat per la Unió Europea al marc del projecte
+
+##MAIN
+main.lblTabInbox= Safata d'entrada
+main.lblTabSupervision= Seguiment
+main.lblTabNuevoProceso= Nou procés
+main.lblLogOut= Sortida
+main.lblUsuario= Benvingut
+main.loading= Carregant pàgina ....
+main.lblSearch= Cerca de procediments
+main.lblDeploy= Administrar definició de processos
+main.lblAdmin= Tasques d'administració
+main.lblAdminJobs= Administrar tasques automàtiques
+main.lblAdminBPM= Configurar motor de tasques
+main.lblConfiguracioPersonal= Configuració personalitzada
+
+##INBOX
+inbox.lblIdentificador= Identificador
+inbox.lblTareasPendientes= Tasques pendents - Filtrar per:
+inbox.lblProcesoVersion= Procés (Versió)
+inbox.lbldefinicionTarea= Def. Tasca
+inbox.lblTarea= Tasca
+inbox.lblFecha= Data inici
+inbox.lblFechaPrevistaFin= Data fi
+inbox.lblActoresAsignados= Actors assignats
+inbox.lblDefinicionProceso= Definició
+inbox.lblMapaProceso= Registre d'accions
+inbox.lblFiltroTareas1= Les meves tasques
+inbox.lblFiltroTareas2= Altres tasques
+inbox.lblRecargar= Recarrega
+inbox.lblAnexos=Annexes
+inbox.lblProceso= Procés
+inbox.lblFiltroTareasActivado=Filtre de tasques activat
+inbox.lblFiltroTareasActivarFiltro=Activar filtre
+inbox.lblFiltroTareasDesactivado=Filtre de tasques desactivat
+inbox.lblFiltroTareasEditarFiltro=Editar filtre
+
+##DETALLE TAREA
+task.lblProceso= Procés
+task.lblContenido= Annexes
+task.lblNotas= Notes
+task.lblHistorial= Historial
+task.msgSeleccionTarea= Ha de sel·leccionar una tasca
+task.msgEjecucionExitosa= S'ha executat la tasca correctament
+task.btnDelegar= Delega
+task.btnSalvar= Guarda
+task.btnCerrar= Tanca
+task.btnTomar= Inicia
+task.msgError= Ha ocorregut el següent error al processar la petició:
+task.lblVencimiento= Tasca sense venciment
+task.addcomentari= Afegir comentari
+task.autor= Usuari
+task.data= Data i hora
+task.comentari= Comentaris
+task.estat.pendent= Pendent
+task.estat.encurs= En curs
+task.estat.fi= Finalitzada
+task.msgDeseaSalir= Voleu sortir sense guardar els canvis realitzats?
+task.titleDeseaSalir= Canvis pendents de guardar
+task.accio= Acció
+task.lblConfigFiltre=Configuració del filtre de tasques
+
+##Filtro de tareas
+task.filter.lblResumen=Sel·leccioni els grups per als que desitja ignorar tasques al llistat principal de tasques pendents
+task.filter.lblConfirmaCambios=Confirma els canvis
+task.filter.lblCancelaCambios=Cancela els canvis
+task.filter.lblVolver=Tornar
+
+##PROCESO TAREA
+process.lblProceso= Procés
+process.lblIdentificador= Identificador
+process.lblFechaInicio= Data inici
+process.lblAsignadoA= Tasca assignada a
+process.lblFechaFinalizacion= Data fi
+process.lblTarea= Tasca
+process.lblFechaCreacion= Data de la darrera tasca
+process.lblEstado= Estat
+process.lblTareas= Tasques en curs
+process.verDiagrama= Veure diagrama
+process.wndDiagrama= Diagrama del procés
+process.btnCancel= Cancel·la el procés
+process.btnUpgrade= Actualitza la definició del procés
+process.upgraderesult= Resultats de l'actualització
+process.confirmCancel= Si continua cancel·larà el procés actual. Desitja continuar?
+process.warning= Atenció
+process.lblTokens=Tokens
+
+token.lblActive=En curs
+token.lblLocked=Bloquetjat
+token.lblFinished=Finalitzat
+token.lblSuspended=Suspés
+
+
+##SUPERVISION
+sup.lblBusquedaCasos= Cerca de casos
+sup.lblProceso= Procés
+sup.lblTarea= Tasca
+sup.lblFechaInicio= Data inici
+sup.lblFechaCreacion= Data de creació
+sup.lblActorAsignado= Actor assignat
+sup.lblFinalizada= Finalitzada
+sup.btnBuscar= Cerca
+sup.lblResultadoBusqueda= Resultat de la cerca
+sup.lblMapaProceso= Mapa
+sup.resultadoVacio= No s'han trobat tasques que compleixin amb els criteris
+sup.seleccioneProceso= Ha de sel·leccionar un procés
+sup.lblIdProceso= Id Procés
+sup.lblSelect = -Sel·leccioni-
+
+##NUEVO PROCESO
+nuevoProceso.lblNuevaInstanciaProceso= Nova instància
+nuevoProceso.btnNuevoProceso= Crea
+nuevoProceso.msgCreacionProceso= S'ha creat correctament el nou proc\u00E9s amb l'id\: 
+nuevoProceso.lblDefinicionesProceso= Definicions de procés
+nuevoProceso.msgSeleccionProceso=Sel\u00B7leccioni un proc\uFFFD\uFFFDs
+nuevoProceso.lblVersion=Versió
+
+##DIALOGO SELECCION DE TRANSICION
+seleccionTransicion.lblTitulo= Sel·lecció de transició
+seleccionTransicion.lblDescripcion= Per favor, sel·leccioni una transició
+seleccionTransicion.btnAceptar= Accepta
+seleccionTransicion.btnCancelar= Cancel·la
+
+##DIALOGO SELECCION DE USUARIOS
+seleccionUsuario.lblTitulo= Selecció d'usuari
+seleccionUsuario.lblDescripcion= Per favor, sel·leccioni un usuari
+selseleccionUsuario.btnDelegar= Delega
+seleccionUsuario.btnCancelar= Cancel·la
+seleccionUsuario.lblNom= Nom
+seleccionUsuario.lblLLinatges= Llinatges
+seleccionUsuario.lblEmail= Email
+seleccionUsuario.lblCodiUsuari= Codi
+seleccionUsuario.lblDireccioGeneral= DG
+seleccionUsuario.gridTitleCerca= Cerca d'usuaris
+seleccionUsuario.gridTitleResultatsCerca= Resultats de la cerca
+
+
+##DIALOGO SELECCION DE ROLES
+seleccionRol.lblTitulo= Selecció de rols
+seleccionRol.lblDescripcion= Per favor, sel·leccioni un rol
+seleccionRol.btnAceptar= Accepta
+seleccionRol.btnCancelar= Cancel·la
+
+##CONTENIDO
+contenidoTarea.lblDocumento= Document
+contenidoTarea.lblMimeType= Mime Type
+contenidoTarea.lblPublico= Públic/Privat
+contenidoTarea.lblRoles= Rols
+contenidoTarea.btnVer= Veure
+contenidoTarea.btnDescargar= Descarrega
+contenidoTarea.btnAgregar= Agrega
+contenidoTarea.btnEliminar= Elimina
+contenidoTarea.lblDescripcion= Arxius
+contenidoTarea.lblRol= Rol
+contenidoTarea.lblCA= CA
+contenidoTarea.lblTimestamp= Timestamp
+contenidoTarea.lblCertificado= Certificat
+contenidoTarea.btnVerificar= Verifica
+contenidoTarea.lblRolesAcceso= Rols accés
+contenidoTarea.lblFirmantes= Signants
+contenidoTarea.msgSeleccionRol= Ha de sel·leccionar un rol
+contenidoTarea.msgFirmaInvalida= La firma és INVÀLIDA
+contenidoTarea.msgFirmaValida= La firma és VÀLIDA
+contenidoTarea.msgSeleccionFirma= Ha de sel·leccionar una firma
+contenidoTarea.msgEliminarRol= No ha estat possible eliminar el rol sel·leccionat
+contenidoTarea.msgSeleccionArchi= Ha de sel·leccionar un arxiu
+
+##DIALOGO ALTA DE DOCUMENTO
+altaDocumento.lblTitulo= Alta de documents
+altaDocumento.lblNombreExterno= Nom extern
+altaDocumento.lblMimeType= Mime Type
+altaDocumento.btnBrowse= Upload
+altaDocumento.btnAceptar= Accepta
+altaDocumento.btnCancelar= Cancel·la
+
+##SEGUIMIENTO
+seguimiento.lblBusquedaProcesos= Cerca de processos
+seguimiento.lblBusquedaTareas= Cerca de tasques
+
+##OBSERVACION
+observacion.lblBusquedaCasos= Cerca de casos
+observacion.lblProceso= Procés
+observacion.lblTarea= Estat
+observacion.lblFechaInicio= Data inici
+observacion.lblFechaFinalizacion= Data fi
+observacion.lblActorAsignado= Actor assignat
+observacion.lblFinalizada= Incloure finalitzades
+observacion.lblIdProceso= Id Procés
+observacion.btnBuscar= Cerca
+observacion.lblResultadoBusqueda= Resultat de la cerca
+observacion.lblMapaProceso= Mapa
+observacion.resultadoVacio= No s'han trobat processos que compleixin amb els criteris
+observacion.validacionDefinicionProceso= Ha de sel·leccionar una definició de procés
+observacion.help = Sintaxi de la cerca
+
+##BPM ERROR CODES
+error.code.1000= La tasca ja està assignada directament a un usuari
+error.code.1001= L'usuari no es troba assignat a cap grup
+error.code.2000= Un dels paràmetres és invàlid
+
+##document ERROR CODES
+document.error.code.1002= L'arxiu no és una firma digital
+
+##ERRORES
+error.lblErrorCode= Error:
+error.lblCausa= Causat per:
+error.lblOcurrioError= Ha ocorregut el següent error
+error.btnContinuar= Continua
+error.btnRecargar= Recarrega
+error.msgFirma1= Es necessària la firma electrònica
+error.msgFirma2= La firma no correspon a l'usuari
+error.msgFirma3= Falta l'annexe
+
+index.Inici=Inici
+menu.title=Menú principal
+menu.currentTasks=Feina en curs
+favorits.title=Favorits
+favorits.recent=Recents
+
+
+job.lblId=Identificador
+job.title=Detalls de la tasca automàtica
+job.name=Nom
+job.dueDate=Pròxima execució
+job.failures=Intents fallits
+job.status=Estat
+job.error=Missatge d'error
+job.button.close=Tancar
+job.button.pause=Retenir
+job.button.resume=Reanudar
+job.button.retry=Reintentar
+job.status.error=Error
+job.status.warning=Error subsanable
+job.status.pending=Pendent
+job.status.pause=Tasca retinguda
+job.lbldefinicionTarea=Tasca automàtica
+job.process.open=Obrir procés
+
+##ADMIN - DESPLIEGUE
+deploy.lblProcesosActuales= Processos desplegats
+deploy.lblProceso= Procés
+deploy.lblVersion= Versió
+deploy.lblFechaDespliegue= Data desplegament
+deploy.lblIdProceso= Id Procés
+deploy.lblNuevoProceso= Desplega nou procés
+deploy.btnDeploy= Desplega...
+deploy.lblResultadoDespliegue= Resultat del desplegament
+deploy.msgProcesoDesplegadoCorrectamente= Desplegament correcte
+deploy.msgDesplegandoProceso= Desplegant procés...
+deploy.msgErrorDesplegandoProceso= S'ha produit un error al procés de desplegament
+deploy.btnEnable= Habilita
+deploy.btnDisable= Deshabilita
+deploy.lblDisabled= Deshabilitat
+
+
+
+configure.title=Configuració de l'índex textual
+configure.luceneDir=Directori per als índexs
+configure.configure=Actualitza
+configure.reindex=Si canvia el directori dels índexs serà necessària una re-indexació global de tots els procediments.
+configure.reindexBtn=Reindexa
+configure.endIndexing=Indexació completa
+
+## SEU
+seu.recursoshumans=Recursos humans
+seu.usuaris=Usuaris
+seu.grups=Grups
+seu.tipusuorg=Tipus d'unitat organitzativa
+seu.dadesaddicionals=Dades addicionals
+seu.recursostecnologics=Recursos tecnològics
+seu.xarxes=Xarxes
+seu.maquines=Màquines
+seu.impressores=Impressores
+seu.serveis=Serveis
+seu.sistemesinformacio=Sistemes d'informació
+seu.aplciacions=Aplicacions
+seu.dominiscorreu=Dominis de correu
+seu.llistescorreu=Llistes de correu
+seu.fitxerslopd=Fitxers amb dades de caràcter personal
+seu.adminintranet=Menús d'accés a la Intranet
+seu.configaudito=Configuració i Auditoria
+seu.parametres=Paràmetres
+seu.agents=Agents
+seu.auditoria=Auditoria
+seu.registresaccess=Registres d'accés
+seu.cpd=Accés al CPD
+seu.portescpd=Portes del CPD
+seu.targetescpd=Targetes del CPD
+seu.registrescpd=Registres d'accés al CPD
+ 

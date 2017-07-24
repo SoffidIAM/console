@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="rolsLlista" title="Llista de rols"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="../comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="820px">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="rols" src="descriptorAplicacio.xml"/>
+	
+	<zscript src="/comu/checkTruncatedResults.zul" />
+	
+	<zscript>
+		<![CDATA[
+			int fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			String mode = "query";
+			boolean view_altres = false;
+			
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			queryEnabled = false;
+			retrySearch = false;
+
+			void populateDetails ()
+			{
+				mode="query";
+			}
+	
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				nom = esquemaLlista.getFellow("queryWindow").getFellow("queryNom")
+						.getFellow("textbox");
+				aplicacio = esquemaLlista.getFellow("queryWindow")
+						.getFellow("queryAplicacio").getFellow("textbox");
+				bbdd = esquemaLlista.getFellow("queryWindow").getFellow("queryBbdd")
+						.getSelectedItem();
+				descripcio = esquemaLlista.getFellow("queryWindow")
+						.getFellow("queryDescripcio").getFellow("textbox");
+				defecte = null;
+				contrasenya = null;
+				
+				// Check enable query
+				if ((nom.value.trim().length() == 0) &&
+						(aplicacio.value.trim().length() == 0) &&
+						((bbdd == null) || (bbdd.getValue() == null)) &&
+						(descripcio.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("nom", nom.value);
+				searchValues.put("aplicacio", aplicacio.value);
+				
+				if ((bbdd == null) || (bbdd.getValue() == null))
+					searchValues.put("bbdd", "");
+				
+				else
+					searchValues.put("bbdd", bbdd.value);
+				
+				searchValues.put("descripcio", descripcio.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox =	esquemaLlista.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/rol").refresh();
+					listbox.dataPath = "/model:/rol"; 
+				}
+				
+				if ((listbox.getModel().getSize() == 0) && !retrySearch)
+				{
+					retrySearch = true;
+					search();
+				}
+				
+				else
+				{
+					retrySearch = false;
+				}
+				
+				checkTruncatedList(listbox);
+			}
+			
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void cleanWindow()
+			{
+				queryWindow = esquemaLlista.getFellow("queryWindow");
+				queryWindow.getFellow("queryNom").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryBbdd").setSelectedIndex(0);
+				queryWindow.getFellow("queryAplicacio").getFellow("textbox").value = "";
+				model.getVariables().declareVariable("queryEnabled", false);
+				lista.getFellow("listbox").dataPath = "/model:/rol[false]";
+				esquemaLlista.visible=false;
+				view_altres = false;
+				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void acceptaDada()
+			{
+				//Missatgebox.info ("domini,valor #"+domini.length+"-  [0] "+domini[0]+" [1] "+domini[1]+" [2] "+domini[2]);
+				Listitem item =  esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedItem();
+				if (item != null)
+				{
+					Component formComponent = (Component) pageScope.get("contextComponent");
+					es.caib.seycon.ng.comu.Rol r = item.getValue().instance;
+					Events.postEvent ("onAfegirRolPare", formComponent, r);
+					cleanWindow();
+				}
+			}
+			
+			void seguent()
+			{
+				if (esquemaLlista.getFellow("lista").getFellow("listbox").selectedIndex != -1)
+				{
+					acceptaDada();
+				}
+			}
+		]]>
+	</zscript>
+	
+	<esquema id="esquemaLlista" width="820px" closable="true" position="center, center"
+		title="${c:l('aplica_rolsllista.Titol')}" visible="false">
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				
+				desktop.getPage("rolsLlista").setTitle(org.zkoss.util.resource.Labels.getLabel("aplica_rolsllista.Titol"));
+				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("aplica_rolsllista.Titol"));
+				
+				aplicacio = desktop.getPage("rolsLlista").getAttribute("aplicacio");
+				if (aplicacio != null)
+					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue(aplicacio);
+				else
+					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue("");
+
+				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setMode("highlighted");
+				}else{
+					self.visible = true;
+				}
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation ();
+			]]>
+		</attribute>
+		
+		<criteris id="queryWindow" onOK="search()">
+			<hbox>
+				<input_criteri id="queryNom"
+					etiqueta="${c:l('aplica_rolsllista.zul.Nom')}" 
+					onChange="self.getFellow(&quot;textbox&quot;).value=self.getFellow(&quot;textbox&quot;).value.toUpperCase()"/>
+				<input_criteri id="queryAplicacio"
+					etiqueta="${c:l('aplica_rolsllista.zul.Aplicacia')}"
+					onChange="self.getFellow(&quot;textbox&quot;).value=self.getFellow(&quot;textbox&quot;).value.toUpperCase()"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox>
+				<hbox width="250px" widths="100px,*">
+					<label sclass="etiqueta"
+						value="${c:l('aplica_rolsllista.zul.Basededades')}" />
+					<listbox id="queryBbdd" mold="select" dataPath="/model:/dispatcher">
+						<dataitem bind="@codi">
+							<listcell bind="@codi" />
+						</dataitem>
+					</listbox>
+				</hbox>
+				
+				<input_criteri id="queryDescripcio"
+					etiqueta="${c:l('aplica_rolsllista.zul.Descripcia')}"/>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista">
+			<listbox id="listbox" autocommit="false" dataPath="/model:/rol"
+				fixedLayout="true" rows="${fileres}">
+				<attribute name="onSelect">
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+				</attribute>
+				<listhead>
+					<listheader label="${c:l('aplica_rolsllista.zul.Nom-2')}" width="150px"/>
+					<listheader label="${c:l('aplica_rolsllista.zul.Basededades-2')}" width="100px"/>
+					<listheader label="${c:l('aplica_rolsllista.zul.Aplicacia-2')}" width="100px"/>
+					<listheader label="${c:l('aplica_rolsllista.zul.Descripcia-2')}" width="200px"/>
+					<listheader label="${c:l('aplica_rolsllista.zul.Domini')}" width="150px"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="4">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@nom">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
+					<listcell bind="@baseDeDades">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
+					<listcell bind="@codiAplicacio">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
+					<listcell bind="@descripcio">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
+					<listcell bind="domini/@nom">
+						<attribute name="onDoubleClick">
+							seguent();
+						</attribute>
+					</listcell>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" disabled="true" 
+				label="${c:l('aplica_rolsllista.zul.Accepta')}">
+				<attribute name="onClick">
+					<![CDATA[
+						if (!self.disabled)
+						{
+							seguent();
+						}
+					]]>
+				</attribute>
+			</button>
+			<button label="${c:l('aplica_rolsllista.zul.Cancel·la')}"
+				onClick="cleanWindow()"/>
+		</hbox>
+	</esquema>
+</div>

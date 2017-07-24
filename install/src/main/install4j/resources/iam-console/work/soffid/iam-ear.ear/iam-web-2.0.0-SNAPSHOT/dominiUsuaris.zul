@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="dominiUsuaris" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="dominiUsuaris" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="root" src="descriptorDominiUsuaris.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+
+	<zscript>
+	
+		fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+		try
+		{
+			es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+				.Labels.getLabel("dominiUsuaris.Titol"));
+		}
+		
+		catch (Exception ex) {}
+		
+		queryWindowMin = "50px";
+		queryWindowMax = "110px";
+		
+		mode = "query"; 
+		view_altres = false;
+		
+		import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+		import es.caib.seycon.ng.comu.*;
+		canCreateDominiUsuari  =  AutoritzacionsUsuari.hasCreateDominisUsuari();
+		canUpdateDominiUsuari =  AutoritzacionsUsuari.hasUpdateDominisUsuari();
+		canDeleteDominiUsuari =  AutoritzacionsUsuari.hasDeleteDominisUsuari();
+		canQueryDominiUsuari =  AutoritzacionsUsuari.hasQueryDominisUsuari();
+		canModifyDominiUsuari = canCreateDominiUsuari || canUpdateDominiUsuari;
+		
+		model.getVariables().declareVariable("queryEnabled", canQueryDominiUsuari );
+		model.getVariables().declareVariable("codi", "%");
+		model.getVariables().declareVariable("codiDomini", "-ARREL-");
+		
+		void populateDetails ()
+		{
+			mode="query";
+		}
+
+		void select () 
+		{
+			if (esquema.getFellow("lista").getFellow("treebox").selectedItem != null @and 
+				esquema.getFellow("lista").getFellow("treebox").selectedItem.value != null)
+				{
+					
+				} 
+		}
+		
+		void showLista ()  
+		{
+			  esquema.getFellow("lista").getFellow("treebox").clearSelection();
+		}
+		
+		void showDetall () 
+		{
+			esquema.showFormulari();
+		}
+		
+		imgDU = new String[][] {
+			{"DU","img/document-u.png"},
+			{"DC","img/document-c.png"},
+			{"PC","img/document-p.png"}};
+		
+		void refrescaArbre() {
+			model.getJXPathContext().getValue("/domainsRoot").refresh();
+			model.getJXPathContext().getValue("/tipusUsuariIblanc").refresh();
+			treebox.dataPath = "/model:/";
+			// Amaguem tot:
+			b_inserir = esquema.getFellow("lista").getFellow("b_inserir");
+			b_esborrar = esquema.getFellow("lista").getFellow("b_esborrar");
+			vbox_du = esquema.getFellow("dades").getFellow("form").getFellow("v_du");
+			vbox_dc = esquema.getFellow("dades").getFellow("form").getFellow("v_dc");
+			vbox_pc = esquema.getFellow("dades").getFellow("form").getFellow("v_pc");
+			b_inserir.setDisabled(true);
+			b_esborrar.setDisabled(true);
+			vbox_du.setVisible(false);
+			vbox_dc.setVisible(false);
+			vbox_pc.setVisible(false);
+			esquema.hideFormulari();
+		}
+		
+		void refrescaArbreComprova() {
+			if (esquema.isCommitPending()) {
+				Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("dominiUsuaris.RefrescaArbre"));
+				return;
+			}
+			refrescaArbre();
+		}
+		
+		import es.caib.zkib.datamodel.xml.XmlDataNode;
+		
+		int seleccionaElementListbox(Listbox llista, Object elemcodi) {
+			String codi = elemcodi!=null ? elemcodi.toString() : "";   
+			java.util.List elems =  llista.getItems();
+			for (int i=0; i &lt; elems.size(); i++) {
+				Object actual = elems.get(i).getValue();   
+				if (actual instanceof XmlDataNode) { 
+					XmlDataNode elem = (XmlDataNode) actual;
+					Object dades = elem.getInstance();
+					if (dades instanceof es.caib.seycon.ng.comu.TipusUsuari) {
+						es.caib.seycon.ng.comu.TipusUsuari tipus = (es.caib.seycon.ng.comu.TipusUsuari) dades;
+						//System.out.println ("*** tipus=" + tipus.getCodi() + " element = " + codi);
+						if (tipus.getCodi() != null &amp;&amp; tipus.getCodi().equals(codi)) {
+							llista.setSelectedIndex(i);
+							// Hem d'amagar els camps que no corresponguen..
+							Events.postEvent ("onSelect", llista, null);
+							return i;
+						} //else Missatgebox.info ("trobat codi no corresponent a "+codi+" != "+tipus.getCodi());
+					} else if (dades instanceof TipusDominiUsuariEnumeration) {
+						TipusDominiUsuariEnumeration tipus = (TipusDominiUsuariEnumeration) dades;
+						if (tipus.getValue().equals(codi)) {
+							llista.setSelectedIndex(i);
+							return i;
+						} else Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("dominiUsuaris.UsuariNoTrobat"), new Object [] {codi, tipus.getValue()}));
+					} 
+				} else if (actual instanceof String) {
+					String elem = (String) actual;
+					if (elem.equals(codi)) {
+						llista.setSelectedItem(elems.get(i));
+						return i;
+					}
+				} else if (actual instanceof TipusDominiUsuariEnumeration) {
+					TipusDominiUsuariEnumeration td = (TipusDominiUsuariEnumeration) actual;
+					TipusDominiUsuariEnumeration element = (TipusDominiUsuariEnumeration) elemcodi;
+					if (td != null &amp;&amp; td.getValue().equals(element.getValue())) {
+						llista.setSelectedIndex(i);
+							return i;
+					}
+				}
+			}
+//			Missatgebox.info ("No s'ha trobat el codi "+codi); 
+			return -1; 
+		}
+		
+		void populateDetailsTipusUsuari ()
+		{
+			mode="query";
+		}
+		
+		void selectTipusUsuari () 
+		{
+			if (esquemaTipusUsuari.getFellow("listaTipusUsuari").getFellow("listboxTipusUsuari").selectedItem != null @and 
+				esquemaTipusUsuari.getFellow("listaTipusUsuari").getFellow("listboxTipusUsuari").selectedItem.value != null)
+			{
+				populateDetailsTipusUsuari ();
+				showDetallTipusUsuari ();
+			}
+		}
+		
+		void showListaTipusUsuari ()  
+		{
+			esquemaTipusUsuari.getFellow("listaTipusUsuari").getFellow("listboxTipusUsuari").clearSelection();
+		}
+		
+		void showDetallTipusUsuari () 
+		{
+			esquemaTipusUsuari.showFormulari();
+		}
+		
+		void populateDetailsBadWords ()
+		{
+			mode="query";
+		}
+		
+		void selectBadWords () 
+		{
+			if (esquemaBadWords.getFellow("listaBadWords").getFellow("listboxBadWords").selectedItem != null @and 
+				esquemaBadWords.getFellow("listaBadWords").getFellow("listboxBadWords").selectedItem.value != null)
+			{
+				populateDetailsBadWords ();
+				showDetallBadWords ();
+			}
+		}
+		
+		void showListaBadWords ()  
+		{
+			esquemaBadWords.getFellow("listaBadWords").getFellow("listboxBadWords").clearSelection();
+		}
+		
+		void showDetallBadWords () 
+		{
+			esquemaBadWords.showFormulari();
+		}
+		
+		void establixTipusContrasenya(String tipusContrasenya) {
+			// NOTA: l'anulació d'atributs es fa a nivell VOtoEntity (!!)
+			e = esquema.getFellow("dades").getFellow("form").getFellow("v_pc");
+			// Esborrem també les dades
+			if ("A".equals(tipusContrasenya)) {
+				e.getFellow("rtempsRenovacio").setVisible(true);
+				e.getFellow("rduradaMaxima").setVisible(false);
+				//e.getFellow("pc_detall_duradaMaxima").getFellow("dada").setValue(null);
+				e.getFellow("rduradaMaximaCaducada").setVisible(false);
+				//e.getFellow("pc_detall_duradaMaximaCaducada").getFellow("dada").setValue(null);
+			} else {
+				// Manual
+				//e.getFellow("pc_detall_tempsRenovacio").getFellow("dada").setValue(null);
+				e.getFellow("rtempsRenovacio").setVisible(false);
+				e.getFellow("rduradaMaxima").setVisible(true);
+				e.getFellow("rduradaMaximaCaducada").setVisible(true);
+			}
+		}
+		
+		void passaPalabra() {
+			lb = esquema.getFellow("dades").getFellow("form").getFellow("listboxBadWordsExistents");
+			if (lb.selectedItem != null @and lb.selectedItem.value !=null) {
+				Object result = lb.selectedItem.value.instance; 
+				Events.postEvent ("onActualitza", esquema.getFellow("dades").getFellow("form"), result);
+			} else {
+				Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("dominiUsuaris.ErrorSelect"));
+			}
+		}
+		
+		void passaTotesParaules() {
+			Listbox lb = esquema.getFellow("dades").getFellow("form").getFellow("listboxBadWordsExistents");
+			for (Iterator it = lb.getItems().iterator(); it.hasNext(); ){
+				Listitem n = (Listitem) it.next();
+				Object result = n.getValue().getInstance();
+				// Els passem un per un...
+				Events.postEvent ("onActualitza", esquema.getFellow("dades").getFellow("form"), result);
+			}
+		}
+		
+		void esborraTotesPareules() {
+			Listbox dlistbox = esquema.getFellow("dades").getFellow("form").getFellow("listboxBadWordsContrasenya");
+			modelo = dlistbox.getModel();
+			dataSource = dlistbox.getDataSource();
+			context = dataSource.getJXPathContext(); 
+			
+			Iterator it = dlistbox.getItems().iterator();
+			while (it!=null @and it.hasNext()) {
+				Listitem listItem = (Listitem) it.next();
+				posicio = listItem.getIndex(); 
+				elemPos = modelo.getElementAt(posicio);
+				xpath = elemPos.getDataContext().getXPath();
+				// No demanem.. esborrem directament
+				context.removePath(xpath);
+				it = dlistbox.getItems().iterator();
+			}
+		}
+	</zscript>
+	
+	<tabbox id="tabmain" width="100%">
+		<tabs>
+			<tab id="p_usersDomain" label="${c:l('dominiUsuaris.zul.Dominisdusuari')}" width="150px"/>
+			<tab id="p_usersType" label="${c:l('dominiUsuaris.zul.Tipusdusuari')}" width="150px"/>
+			<tab id="p_badWords" label="${c:l('dominiUsuaris.zul.ParaulesProhibides')}" width="150px"/>
+		</tabs>
+		<tabpanels>
+			<tabpanel id="tp_usersDomain">
+
+				<esquema ample="${amplaria}" datamodel="/model" id="esquema" onHideFormulari="showLista()" senseCriteris="true">
+				
+					<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()" width="${amplaria}">
+					
+						<!--hbox>
+							<input_criteri id="queryCodi" etiqueta="Paràmetre:"/>
+							<input_criteri id="queryValor" etiqueta="Valor:"/>
+							<imageclic src="~./img/fletxa_cerca.gif" onClick="search()"/>
+						</hbox>
+						<hbox> 
+							<input_criteri id="queryDescripcio" etiqueta="Descripció:"/>
+							<input_criteri id="queryXarxa" etiqueta="Xarxa:"/>
+						</hbox-->
+						<vbox align="right" width="100%">
+							<label onClick="netejaCriteris()" sclass="label_link" value="${c:l('dominiUsuaris.zul.Esborra')}"/>
+						</vbox>
+					</criteris>
+					
+					<navegador id="lista" width="${amplaria}">
+						<toolbar>
+							<inserttreebutton acces="${canCreateDominiUsuari}" disabled="true" id="b_inserir" path="" tree="/esquema/lista/treebox"/>
+							<deletetreebutton acces="${canDeleteDominiUsuari}" disabled="true" id="b_esborrar" potEsborrarBranquesAmbFills="false" tree="/esquema/lista/treebox"/> 
+							<commitbutton datamodel="/model" id="boto_commit"/>
+							<undotreebutton datamodel="/model" tree="/esquema/lista/treebox"/>
+							<toolbarbutton image="~./img/reload-petit16b.png" label="${c:l('dominiUsuaris.zul.Refrescaarbre')}" onClick="refrescaArbreComprova()"/>
+						</toolbar>
+						<tree autocommit="false" dataPath="/model:/" fixedLayout="true" height="340px" id="treebox" imageBinding="${imgDU}" onClick="showDetall()" onSelect="select()" pageSize="19" rows="${fileres}">
+							<treecols>
+								<treecol label="${c:l('dominiUsuaris.zul.Domini')}"/>
+								<treecol label="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+							</treecols>
+							<treeitemfinder bind="." open="true" path="/domainsRoot">
+								<treerow>
+									<treecellimage bind="@value" image="/img/world.png"/>
+									<treecell bind="@value"/>
+								</treerow>
+							</treeitemfinder>
+							<treeitemfinder bind="." open="true" path="/userDomainRoot">
+								<treerow>
+									<treecellimage bind="@value" image="/img/document-u.png"/>
+									<treecell bind="@value"/>
+								</treerow>
+							</treeitemfinder>
+							<treeitemfinder bind="." open="true" path="/passwordDomainRoot">
+								<treerow>
+									<treecellimage bind="@value" image="/img/document-p.png"/>
+									<treecell bind="@value"/>
+								</treerow>
+							</treeitemfinder>
+							<treeitemfinder bind="." open="true" path="/dominiUsuari">
+								<treerow>
+									<treecellimage bind="@codi" image="/img/document-u.png"/>
+									<treecell bind="@descripcio"/>
+								</treerow>
+							</treeitemfinder>
+							<treeitemfinder bind="." open="true" path="/dominiContrasenya">
+								<treerow>
+									<treecellimage bind="@codi" image="/img/document-p.png"/>
+									<treecell bind="@descripcio"/>
+								</treerow>
+							</treeitemfinder>
+							<treeitemfinder bind="." open="true" path="/politica">
+								<treerow>
+									<treecellimage bind="@codi" image="/img/document-c.png"/>
+									<treecell bind="@descripcio"/>
+								</treerow>
+							</treeitemfinder>
+						</tree>
+					</navegador>
+				
+					<detalls id="dades">
+						<zscript>
+							void onChangeDades()
+							{
+								try {
+									ds = form.getDataSource(); 
+									ctx =  ds.getJXPathContext(); 
+									registre = ctx.getValue("/");
+									
+									b_inserir = esquema.getFellow("lista").getFellow("b_inserir");
+									b_esborrar = esquema.getFellow("lista").getFellow("b_esborrar");
+									vbox_du = esquema.getFellow("dades").getFellow("form").getFellow("v_du");
+									vbox_dc = esquema.getFellow("dades").getFellow("form").getFellow("v_dc");
+									vbox_pc = esquema.getFellow("dades").getFellow("form").getFellow("v_pc");
+									tab_pc = esquema.getFellow("dades").getFellow("form").getFellow("p_politiquesContrasenyas");
+									
+									// (des)habilitem els camps de codi
+									form.getFellow("du_detall_codi").getFellow("dada").setDisabled(!registre.isNew());
+									form.getFellow("dc_detall_codi").getFellow("dada").setDisabled(!registre.isNew());
+									//form.getFellow("pc_detall_codi").getFellow("dada").setDisabled(!registre.isNew());
+									treebox = esquema.getFellow("lista").getFellow("treebox");
+									
+									if (registre.isNew()) { // Nous registres
+										Object obj = registre.getInstance ();
+										// Obtenim el pare mitjançant botó d'inserir
+										b_inserir = esquema.getFellow("lista").getFellow("b_inserir");
+										if (obj instanceof DominiUsuari) {
+											if (obj.getTipus() == null) {
+												// Li posem per defecte principal
+												TipusDominiUsuariEnumeration tdp = TipusDominiUsuariEnumeration.PRINCIPAL;
+												obj.setTipus(tdp);
+											}
+										}
+									} 
+									
+									// mostrem/amaguem els botons corresponents al tipus
+									Object obj = registre.getInstance();
+									if (obj instanceof DominiUsuari) {
+											// Domini d'usuari
+											b_inserir.setDisabled(true); //crear nous DC
+											b_esborrar.setDisabled(false);
+											// seleccionem el tipus de domini d'usuaris
+											Listbox lbdu = form.getFellow("lbtipusDominiUsuari");
+											seleccionaElementListbox(form.getFellow("lbtipusDominiUsuari"),obj.getTipus());
+											vbox_du.setVisible(true);
+											vbox_dc.setVisible(false);
+											vbox_pc.setVisible(false);
+											Listbox lb = self.getFellow("lbGenerator");
+											lb.setDisabled (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SPRINGCLASS));
+											Textbox tb = self.getFellow("du_script").getFellow("dada");
+											tb.setDisabled (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SHELL));
+											
+											showDetall();
+									} else if (obj instanceof DominiContrasenya) {
+											// Domini de contrasenya
+											b_inserir.setDisabled(true); //crear nous PC
+											b_esborrar.setDisabled(false);
+											vbox_du.setVisible(false);
+											vbox_dc.setVisible(true);
+											vbox_pc.setVisible(false);
+											b_inserir.setDisabled(false);
+											b_inserir.setPath("/politica");
+											showDetall();
+									} else if (obj instanceof PoliticaContrasenya) {
+											// Política de contrasenyes
+											b_inserir.setDisabled(true);
+											b_esborrar.setDisabled(false);
+											// seleccionem el tipus d'usuari
+											Listbox lbtu = form.getFellow("lbtipusUsuari");
+											seleccionaElementListbox(form.getFellow("lbtipusUsuari"), obj.getTipusUsuari());
+											// amaguem els camps addients al tipus de contrasenya
+											Events.postEvent ("onSelect", form.getFellow("lbtipusContrasenya"), null);
+											
+											vbox_du.setVisible(false);
+											vbox_dc.setVisible(false);
+											vbox_pc.setVisible(true);
+											tab_pc.setSelected(true);
+											showDetall();
+									} else {
+										path = treebox.getSelectedItemXPath();
+										b_esborrar.setDisabled(true);
+										vbox_du.setVisible(false);
+										vbox_dc.setVisible(false);
+										vbox_pc.setVisible(false);
+										if (path.endsWith("/passwordDomainRoot[1]"))
+										{
+											b_inserir.setDisabled(false);
+											b_inserir.setPath("/dominiContrasenya");
+										} else if (path.endsWith("/userDomainRoot[1]"))
+										{
+											b_inserir.setDisabled(false);
+											b_inserir.setPath("/dominiUsuari");
+										}
+										else
+										{
+											b_inserir.setDisabled(true);
+										}
+									}
+								} catch (Exception e) {
+									//Missatgebox.info ("Error: "+e.getMessage());
+									e.printStackTrace();
+									form.getFellow("dc_detall_codi").getFellow("dada").setDisabled(true);
+									form.getFellow("du_detall_codi").getFellow("dada").setDisabled(true);
+									//form.getFellow("pc_detall_codi").getFellow("dada").setDisabled(true);
+								}
+							}
+							
+							List e_tipusDominiUsuari = es.caib.seycon.ng.web.utils.ValorTipusDominiUsuari.valorsTipusDominiUsuari;
+							
+						</zscript>
+						<form dataPath="/esquema/lista/treebox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
+							<attribute name="onActualitza">
+								obj = event.getData();
+								if (obj instanceof es.caib.seycon.ng.comu.ParaulaProhibida) {
+									es.caib.seycon.ng.comu.ParaulaProhibida dada = (es.caib.seycon.ng.comu.ParaulaProhibida) obj;
+									modelProxy = (es.caib.zkib.binder.list.ModelProxy) listboxBadWordsContrasenya.getModel();
+									ds = listboxBadWordsContrasenya.getDataSource(); 
+									ctx =  ds.getJXPathContext();
+									xpath = listboxBadWordsContrasenya.getXPath()+"[@paraulaProhibida/paraulaProhibida='"+dada.getParaulaProhibida()+"']";
+									boolean jaExisteix = true;
+									try {
+										valor = ctx.getValue(xpath);
+										// Si ja existeix no fem res.. sortim
+										return;
+									}catch(Exception e){
+										jaExisteix = false;
+									}
+									
+									// No donem missatge d'error si ja existeix... 
+									if (!jaExisteix) {
+										position = modelProxy.newInstance();
+										ds = listboxBadWordsContrasenya.getDataSource(); 
+										ctx =  ds.getJXPathContext(); 
+										xpath = listboxBadWordsContrasenya.getXPath() + modelProxy.getBind(position); 
+										pointer =ctx.createPath (xpath);
+										ctx2 = ctx.getRelativeContext(pointer);
+										
+										dsDominiUsuariMember = form.getDataSource(); 
+										ctxDUM =  dsDominiUsuariMember.getJXPathContext(); 
+										politicaContrasenya = ctxDUM.getValue(".").instance;
+										ctx2.setValue("@paraulaProhibida", dada);
+										ctx2.setValue("@politicaContrasenyaDomini", politicaContrasenya);
+											
+										pointer.invalidate ();
+									}		
+									
+								} /*else if (obj instanceof es.caib.seycon.ng.comu.ParaulaProhibida[]) {
+									es.caib.seycon.ng.comu.ParaulaProhibida[] dades = (es.caib.seycon.ng.comu.ParaulaProhibida[]) obj;
+									Missatgebox.info  ("rebudes paraules "+dades.length);
+								}*/
+								//camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+								//camp.setValue(dada);
+							</attribute>
+							<vbox id="v_du" visible="false" width="99%">
+								<label sclass="etiqueta" value="${c:l('dominiUsuaris.zul.Dominidusuaris')}"/>
+								<grid> 
+									<rows>
+										<row visible="false">
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+											<input_dada bind="@tipus" id="du_detall_tipus" lectura="${!canModifyDominiUsuari}" value="DU" width_custom="99%"/>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Codi')}"/>
+											
+											<hbox width="100%">
+												<input_dada bind="@codi" id="du_detall_codi"
+													lectura="${!canModifyDominiUsuari}" maxim="50"
+													width_custom="99%" mascara="no empty"/>
+													
+												<label value="*" />
+											</hbox>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+											<input_dada bind="@descripcio" id="du_detall_descripcio"
+												lectura="${!canModifyDominiUsuari}" maxim="100"
+												width_custom="96%"/>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+											<listbox id="lbtipusDominiUsuari" mold="select" style="font-size: 12px" width="200px">
+												<attribute name="onSelect">
+													try {
+														TipusDominiUsuariEnumeration tipus  = null; 
+														tipus = self.getSelectedItem().getValue();
+														//Missatgebox.confirmaOK_CANCEL ("sel "+tipus);
+														ds = form.getDataSource(); 
+														ctx = ds.getJXPathContext();
+														ctx.setValue("@tipus",tipus);
+														Listbox lb = self.getFellow("lbGenerator");
+														lb.setDisabled (! tipus.equals(TipusDominiUsuariEnumeration.SPRINGCLASS));
+														Textbox tb = self.getFellow("du_script").getFellow("dada");
+														tb.setDisabled (! tipus.equals(TipusDominiUsuariEnumeration.SHELL));
+														
+													} catch (Throwable th) {
+														Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("dominiUsuaris.Error"), new Object [] {th.getMessage()}));
+													}
+												</attribute>
+												<listitem forEach="${e_tipusDominiUsuari}" label="${each.desc}" value="${each.value}"/>
+											</listbox>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+											<listbox id="lbGenerator" bind="@beanGenerator" mold="select" style="font-size: 12px" width="200px"
+												dataPath="/model:/nameGenerator">
+												<dataitem bind="@text">
+													<listcell bind="@text"/>
+												</dataitem>
+											</listbox>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.script')}"/>
+											<input_dada bind="@bshExpr" id="du_script" lectura="${!canModifyDominiUsuari}" maxim="1023" 
+												width_custom="99%" rows_custom="8"/>
+										</row>
+									</rows>
+								</grid>
+							</vbox>
+							<vbox id="v_dc" visible="false" width="99%">
+								<label sclass="etiqueta" value="${c:l('dominiUsuaris.zul.Dominidecontrasenyes')}"/>
+								<grid>
+									<rows>
+										<row visible="false">
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+											<input_dada bind="@tipus" id="dc_detall_tipus" lectura="${!canModifyDominiUsuari}" value="DC" width_custom="99%"/>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Codi')}"/>
+											
+											<hbox width="100%">
+												<input_dada bind="@codi" id="dc_detall_codi"
+													lectura="${!canModifyDominiUsuari}" maxim="50"
+													width_custom="99%" mascara="no empty"/>
+													
+												<label value="*" />
+											</hbox>
+										</row>
+										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+											
+											<hbox width="100%">
+												<input_dada bind="@descripcio" id="dc_detall_descripcio"
+													lectura="${!canModifyDominiUsuari}" maxim="100"
+													width_custom="99%" mascara="no empty"/>
+													
+												<label value="*" />
+											</hbox>
+										</row>
+									</rows>
+								</grid>
+							</vbox>
+							<vbox id="v_pc" visible="false" width="99%">
+							<tabbox id="tabpol" width="100%">
+								<tabs>
+									<tab id="p_politiquesContrasenyas" label="${c:l('dominiUsuaris.zul.Polaticadecontraseny')}" width="150px"/>
+									<tab id="p_politiquesBadwords" label="${c:l('dominiUsuaris.zul.ParaulesProhibides')}" width="150px"/>
+								</tabs>
+								<tabpanels>
+									<tabpanel id="tp_politiquesContrasenyas">
+										<grid width="99%">
+											<columns visible="false">
+												<column width="150px"/>
+												<column/>
+											</columns>
+											<rows>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipusdusuari')}"/>
+													<hbox widths="*,0,0">
+														<listbox dataPath="/model:/tipusUsuariIblanc" id="lbtipusUsuari" mold="select" width="200px" bind="@tipusUsuari">
+															<dataitem bind="@codi">
+																<listcelllabel bind="@codi" labelBind="@descripcio"/>
+															</dataitem>
+														</listbox>
+														
+														<label value="*" />
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+													<input_dada bind="@descripcio" id="pc_detall_descripcio" lectura="${!canModifyDominiUsuari}" maxim="100" width_custom="99%"/>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipusdecontrasenya')}"/>
+													
+													<hbox>
+														<listbox bind="@tipus" id="lbtipusContrasenya" mold="select" width="200px">
+															<attribute name="onSelect">
+																if (self.getSelectedItem()!=null) {
+																	establixTipusContrasenya((String) self.getSelectedItem().getValue());
+																}
+															</attribute>
+															<listitem label="${c:l('dominiUsuaris.zul.')}"/>
+															<listitem label="${c:l('dominiUsuaris.zul.Introduadaperlusuar')}" value="M"/>
+															<listitem label="${c:l('dominiUsuaris.zul.GeneradaAutomaticame')}" value="A"/>
+														</listbox>
+														
+														<label value="*"/>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.AllowPasswordChange')}"/>
+													<checkbox bind="@allowPasswordChange" onCheck=""
+														disabled="${!canModifyDominiUsuari}"
+														label="${c:l('dominiUsuaris.zul.AllowPasswordChange2')}" />
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.AllowPasswordQuery')}"/>
+													<checkbox bind="@allowPasswordQuery" onCheck=""
+														disabled="${!canModifyDominiUsuari}"
+														label="${c:l('dominiUsuaris.zul.AllowPasswordQuery2')}"/>
+												</row>
+												<row id="rtempsRenovacio">
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Tempsderenovacia')}"/>
+													<input_dada id="pc_detall_tempsRenovacio"
+														bind="@tempsRenovacio"
+														lectura="${!canModifyDominiUsuari}" maxim="8"
+														width_custom="100px"/>
+												</row>
+												<row id="rduradaMaxima">
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.DuradaMaxima')}"/>
+													<input_dada id="pc_detall_duradaMaxima"
+														bind="@duradaMaxima"
+														lectura="${!canModifyDominiUsuari}" maxim="8"
+														width_custom="100px"/>
+												</row>
+												<row id="rduradaMaximaCaducada">
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.DuradaMaximaunavegad')}"/>
+													<input_dada id="pc_detall_duradaMaximaCaducada"
+														bind="@duradaMaximaCaducada"
+														lectura="${!canModifyDominiUsuari}" maxim="8"
+														width_custom="100px"/>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Longitud')}"/>
+													<hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.man')}"/>
+															<input_dada id="pc_detall_minLongitud"
+																bind="@minLongitud"
+																lectura="${!canModifyDominiUsuari}" maxim="8"
+																width_custom="100px"/>
+														</hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.max')}"/>
+															<input_dada id="pc_detall_maxLongitud"
+																bind="@maxLongitud"
+																lectura="${!canModifyDominiUsuari}" maxim="8"
+																width_custom="100px"/>
+														</hbox>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.ExpressiaRegular')}"/>
+													<input_dada bind="@expressioRegular" id="pc_detall_expressioRegular" lectura="${!canModifyDominiUsuari}" maxim="50" width_custom="99%"/>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Namerodemajascules')}"/>												
+													<hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.man')}"/>
+															<input_dada bind="@minMajuscules" id="pc_detall_minMajuscules" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+														</hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.max')}"/>
+															<input_dada bind="@maxMajuscules" id="pc_detall_maxMajuscules" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>															
+														</hbox>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Namerodeminascules')}"/>
+													<hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.man')}"/>
+															<input_dada bind="@minMinuscules" id="pc_detall_minMinuscules" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+														</hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.max')}"/>
+															<input_dada bind="@maxMinuscules" id="pc_detall_maxMinuscules" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>														
+														</hbox>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Namerodenameros')}"/>
+													<hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.man')}"/>
+															<input_dada bind="@minNumeros" id="pc_detall_minNumeros" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+														</hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.max')}"/>
+															<input_dada bind="@maxNumeros" id="pc_detall_maxNumeros" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>														
+														</hbox>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Namerodesignesdepunt')}"/>
+													<hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.man')}"/>
+															<input_dada bind="@minSignesPuntuacio" id="pc_detall_minSignesPuntuacio" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+														</hbox>
+														<hbox>
+															<input_etiqueta value="${c:l('dominiUsuaris.zul.max')}"/>
+															<input_dada bind="@maxSignesPuntuacio" id="pc_detall_maxSignesPuntuacio" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+														</hbox>
+													</hbox>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.complexity')}"/>
+													<checkbox bind="@complexPasswords" onCheck=""
+														disabled="${!canModifyDominiUsuari}"
+														label="${c:l('dominiUsuaris.zul.complexPasswords')}"/>
+												</row>
+												<row>
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Maximdevalorshistari')}"/>
+													<input_dada bind="@maxHistoric" id="pc_detall_maxHistoric" lectura="${!canModifyDominiUsuari}" maxim="8" width_custom="100px"/>
+												</row>
+												<row visible="false">
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Dominidusuaris')}"/>
+													<input_dada bind="@codiDominiUsuaris" id="pc_detall_codiDominiUsuaris" lectura="true" width_custom="99%"/>
+												</row>
+												<row visible="false">
+													<input_etiqueta value="${c:l('dominiUsuaris.zul.Dominidecontrasenyes')}"/>
+													<input_dada bind="@codiDominiContrasenya" id="pc_detall_codiDominiContrasenya" lectura="true" width_custom="99%"/>
+												</row>
+											</rows>
+										</grid>
+									</tabpanel>
+									<tabpanel id="tp_politiquesBadwords">
+										<!--label value="Paraules Prohibides" sclass="etiqueta"/-->
+										<hbox sclass="vcentre" width="100%" widths="49%,24px,*">
+											<listbox autocommit="false" dataPath="/model:/badWords" fixedLayout="true" height="315px" id="listboxBadWordsExistents" rows="${fileres}">
+												<listhead>
+													<listheader label="${c:l('dominiUsuaris.zul.Paraula')}" sort="auto"/>
+												</listhead>
+												<dataitem bind=".">
+													<listcell bind="@paraulaProhibida"/>
+												</dataitem>
+											</listbox>
+											<vbox style="padding: 4px 2px;text-align:center;" width="100%">
+												<imageclic onClick="passaPalabra()" sclass="imageclic boton" src="~./img/rightarrow.png" tooltiptext="Afegeix paraula"/>				
+												<imageclic onClick="passaTotesParaules()" sclass="imageclic boton" src="~./img/rightrightarrow.png" tooltiptext="Afegeix totes">
+												
+												</imageclic>
+												<separator height="10px"/>
+												<!--imageclic sclass="imageclic boton" src="~./img/leftarrow.png"/-->
+												<imageclic onClick="esborraTotesPareules()" sclass="imageclic boton" src="~./img/leftleftarrow.png" tooltiptext="Esborra totes"/>				
+											</vbox>
+											<listbox autocommit="false" dataPath="/esquema/lista/treebox:/badWordsContrasenya" fixedLayout="true" height="315px" id="listboxBadWordsContrasenya" rows="${fileres}">
+												<listhead>
+													<listheader label="${c:l('dominiUsuaris.zul.Paraula')}" sort="auto"/>
+													<listheader id="${canDeleteDominiUsuari}" label="${c:l('dominiUsuaris.zul.')}" width="20px"/>
+												</listhead>
+												<dataitem bind=".">
+													<listcell bind="paraulaProhibida/@paraulaProhibida"/>
+													<listcell>
+														<imageclic align="right" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																if (canDeleteDominiUsuari) {
+																	listCell = self.getParent(); 
+																	dlistbox = listCell.getListbox(); 
+																	modelo = dlistbox.getModel();
+																	listItem = listCell.getParent(); 
+																	posicio = listItem.getIndex(); 
+																	elemPos = modelo.getElementAt(posicio); 
+																	xpath = elemPos.getDataContext().getXPath(); 
+																	dataSource = dlistbox.getDataSource(); 
+																	context = dataSource.getJXPathContext();  
+																	dada = context.getValue(xpath+"/@paraulaProhibida");
+																	// No demanem.. esborrem directament
+																	context.removePath(xpath); 
+																}
+															</attribute>
+														</imageclic>
+														</listcell>
+												</dataitem>
+											</listbox>
+										</hbox>
+									</tabpanel>
+								</tabpanels>
+							</tabbox>
+							</vbox>
+						</form>
+					</detalls>
+				</esquema>
+			</tabpanel>
+			<tabpanel>
+				<esquema ample="${amplaria}" datamodel="/model" id="esquemaTipusUsuari" onHideFormulari="showListaTipusUsuari()" senseCriteris="true">
+				
+					<criteris height="${queryWindowMin}" id="queryWindowTipusUsuari" onOK="search()" width="${amplaria}">
+						<!--hbox>
+							<input_criteri id="queryCodi" etiqueta="Paràmetre:"/>
+							<input_criteri id="queryValor" etiqueta="Valor:"/>
+							<imageclic src="~./img/fletxa_cerca.gif" onClick="search()"/>
+						</hbox>
+						<hbox> 
+							<input_criteri id="queryDescripcio" etiqueta="Descripció:"/>
+							<input_criteri id="queryXarxa" etiqueta="Xarxa:"/>
+						</hbox-->
+						<vbox align="right" width="100%">
+							<label onClick="netejaCriteris()" sclass="label_link" value="${c:l('dominiUsuaris.zul.Esborra')}"/>
+						</vbox>
+					</criteris>
+					
+					<navegador id="listaTipusUsuari" width="${amplaria}">
+						<toolbar>
+							<insertbutton acces="${canCreateDominiUsuari}" listbox="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari" onClick="showDetallTipusUsuari()"/>
+							<deletebutton acces="${canDeleteDominiUsuari}" listbox="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari"/>
+							<commitbutton datamodel="/model"/>
+							<undobutton datamodel="/model" listbox="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari"/>			
+						</toolbar>
+						<listbox autocommit="false" dataPath="/model:/tipusUsuari" fixedLayout="true" height="340px" id="listboxTipusUsuari" onClick="showDetallTipusUsuari()" onSelect="selectTipusUsuari()" rows="${fileres}">
+							<listhead>
+								<listheader label="${c:l('dominiUsuaris.zul.Tipus')}" sort="auto" width="100px"/>
+								<listheader label="${c:l('dominiUsuaris.zul.Descripcia')}" sort="auto"/>
+								<listheader label="Unmanaged" sort="auto"/>
+							</listhead>
+							<dataitem bind=".">
+								<listcell bind="@codi" style="text-align:center"/>
+								<listcell bind="@descripcio"/>
+								<listcell>
+									<checkbox bind="@unmanaged" disabled="true"/>
+								</listcell>
+							</dataitem>
+						</listbox>
+					</navegador>
+				
+					<detalls id="dadesTipusUsuari">
+						<zscript>
+							void onChangeDades()
+							{
+								try {
+									ds = formTipusUsuari.getDataSource(); 
+									ctx =  ds.getJXPathContext(); 
+									registre = ctx.getValue("/");
+									formTipusUsuari.getFellow("detall_codiTipusUsuari").setDisabled(!registre.isNew());
+								} catch (Exception e) {
+									formTipusUsuari.getFellow("detall_codiTipusUsuari").setDisabled(true);
+								}
+							}
+						</zscript>
+						<form dataPath="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari:/." id="formTipusUsuari" onChangeXPath="onChangeDades()" width="100%">
+							<!--attribute name="onActualitza">
+								dada = (String)event.getData();
+								camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+								camp.setValue(dada);
+							</attribute-->
+							<grid>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('dominiUsuaris.zul.Codi')}"/>
+										<hbox width="100%">
+											<textbox bind="@codi" disabled="${!canModifyDominiUsuari}"
+												id="detall_codiTipusUsuari" maxlength="1" width="99%"
+												constraint="no empty">
+												<attribute name="onChange">
+													 self.value=self.value.toUpperCase();
+												</attribute>
+											</textbox>
+											
+											<label value="*" />
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+										<input_dada bind="@descripcio"
+											id="detall_descripcioTipusUsuari"
+											lectura="${!canModifyDominiUsuari}" maxim="50"
+											width_custom="96%"/>
+									</row>
+									<row>
+										<input_etiqueta value="Unmanaged"/>
+										<checkbox bind="@unmanaged" onCheck=""/>
+									</row>
+								</rows>
+							</grid>
+						</form>
+					</detalls>
+				</esquema>
+			</tabpanel>
+			<tabpanel>
+				<esquema ample="${amplaria}" datamodel="/model" id="esquemaBadWords" onHideFormulari="showListaBadWords()" senseCriteris="true">
+				
+					<criteris height="${queryWindowMin}" id="queryWindowBadWords" onOK="search()" width="${amplaria}">
+					
+						<!--hbox>
+							<input_criteri id="queryCodi" etiqueta="Paràmetre:"/>
+							<input_criteri id="queryValor" etiqueta="Valor:"/>
+							<imageclic src="~./img/fletxa_cerca.gif" onClick="search()"/>
+						</hbox>
+						<hbox>
+							<input_criteri id="queryDescripcio" etiqueta="Descripció:"/>
+							<input_criteri id="queryXarxa" etiqueta="Xarxa:"/>
+						</hbox-->
+						<vbox align="right" width="100%">
+							<label onClick="netejaCriteris()" sclass="label_link" value="${c:l('dominiUsuaris.zul.Esborra')}"/>
+						</vbox>
+					</criteris>
+					
+					<navegador id="listaBadWords" width="${amplaria}">
+						<toolbar>
+							<insertbutton acces="${canCreateDominiUsuari}" listbox="/esquemaBadWords/listaBadWords/listboxBadWords" onClick="showDetallBadWords()"/>
+							<deletebutton acces="${canDeleteDominiUsuari}" listbox="/esquemaBadWords/listaBadWords/listboxBadWords"/>
+							<commitbutton datamodel="/model"/>
+							<undobutton datamodel="/model" listbox="/esquemaBadWords/listaBadWords/listboxBadWords"/>
+						</toolbar>
+						<listbox autocommit="false" dataPath="/model:/badWords" fixedLayout="true" height="340px" id="listboxBadWords" onClick="showDetallBadWords()" onSelect="selectBadWords()" rows="${fileres}">
+							<listhead>
+								<listheader label="${c:l('dominiUsuaris.zul.Paraula')}" sort="auto"/>
+							</listhead>
+							<dataitem bind=".">
+								<listcell bind="@paraulaProhibida"/>
+							</dataitem>
+						</listbox>
+					</navegador>
+				
+					<detalls id="dadesBadWords">
+						<zscript>
+							void onChangeDades() { }
+						</zscript>
+						<form dataPath="/esquemaBadWords/listaBadWords/listboxBadWords:/."
+							id="formBadWords" onChangeXPath="onChangeDades()" width="100%">
+							<!--attribute name="onActualitza">
+								dada = (String)event.getData();
+								camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+								camp.setValue(dada);
+							</attribute-->
+							<grid>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('dominiUsuaris.zul.Paraula')}"/>
+										<hbox width="100%">
+											<input_dada bind="@paraulaProhibida"
+												id="detall_descripcioBadWords"
+												lectura="${!canModifyDominiUsuari}" maxim="200"
+												width_custom="99%" mascara="no empty"/>
+												
+											<label value="*" />
+										</hbox>
+									</row>
+								</rows>
+							</grid>
+						</form>
+					</detalls>
+				</esquema>
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
+</zk>

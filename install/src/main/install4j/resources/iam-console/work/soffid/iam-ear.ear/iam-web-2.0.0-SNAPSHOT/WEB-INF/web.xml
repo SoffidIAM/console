@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="SoffidWebApp" version="3.0">
+
+	<description>
+		<![CDATA[Soffid IAM]]>
+	</description>
+	<display-name>Soffid IAM Console</display-name>
+
+	<context-param>
+		<param-name>es.caib.loginModule.util.LoginPage</param-name>
+		<param-value>es.caib.loginModule.util.SEULoginPage</param-value>
+	</context-param>
+
+	<!-- /// -->
+	<!-- DSP -->
+	<servlet>
+		<description>
+			<![CDATA[The servlet loads the DSP pages.]]>
+		</description>
+		<servlet-name>dspLoader</servlet-name>
+		<servlet-class>org.zkoss.web.servlet.dsp.InterpreterServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>dspLoader</servlet-name>
+		<url-pattern>*.dsp</url-pattern>
+	</servlet-mapping>
+
+	<!-- Servlet d'execucions punt d'entrada -->
+	<servlet>
+		<description>
+			<![CDATA[Servlet d'execucions.]]>
+		</description>
+		<servlet-name>execucio</servlet-name>
+		<servlet-class>es.caib.seycon.ng.web.Execucions</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>execucio</servlet-name>
+		<url-pattern>/execucions/*</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- Servlet per a descarregar CSV de ListExport@zkiblaf - u88683 -->
+	<servlet>
+		<description>
+			<![CDATA[Servlet d'exportacio.]]>
+		</description>
+		<servlet-name>contentexport</servlet-name>
+		<servlet-class>es.caib.zkib.zkiblaf.export.ContentExportServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>contentexport</servlet-name>
+		<url-pattern>/contentexport/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- /// -->
+
+	<!-- Servlets de workflow -->
+	<servlet>
+		<description>ErrorHandler</description>
+		<servlet-name>error467</servlet-name>
+		<servlet-class>es.caib.bpm.servlet.Error467Servlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>DocumentDownload</description>
+		<servlet-name>download-servlet</servlet-name>
+		<servlet-class>es.caib.bpm.servlet.DownloadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>DocumentUpload</description>
+		<servlet-name>upload-servlet</servlet-name>
+		<servlet-class>es.caib.bpm.servlet.UploadServlet</servlet-class>
+	</servlet>
+
+
+	<!-- servlet de propiedades para el applet de firma -->
+	<!--inicio servlet para propiedades de firma del applet de firma -->
+	<servlet>
+		<description>servlet para propiedades de firma del applet de firma</description>
+		<servlet-name>SignaturaPropertiesServlet</servlet-name>
+		<servlet-class>
+			es.caib.zkib.zkiblaf.servlet.SignaturaPropertiesServlet
+		</servlet-class>
+		<run-as>
+			<role-name>BPM_INTERNAL</role-name>
+		</run-as>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SignaturaPropertiesServlet</servlet-name>
+		<url-pattern>/signaturaPropertiesServlet</url-pattern>
+	</servlet-mapping>
+	<!--fin servlet para propiedades de firma del applet de firma -->
+
+
+	<!-- servlet per obtindre logs del seycon-server -->
+	<servlet>
+		<description>servlet para propiedades de firma del applet de firma</description>
+		<servlet-name>ServerLogServlet</servlet-name>
+		<servlet-class>es.caib.seycon.ng.web.servlet.ServerLogServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ServerLogServlet</servlet-name>
+		<url-pattern>/SEU/serverlog</url-pattern>
+	</servlet-mapping>
+
+	<!--  Logout srevlet -->
+	<servlet>
+		<description>
+			<![CDATA[Logout servlet]]>
+		</description>
+		<servlet-name>logoutServlet</servlet-name>
+		<servlet-class>com.soffid.iam.web.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>logoutServlet</servlet-name>
+		<url-pattern>/prelogout</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<description>
+			<![CDATA[Document Manager Servlet]]>
+		</description>
+		<servlet-name>documentServlet</servlet-name>
+		<servlet-class>com.soffid.iam.doc.servlet.NASServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>documentServlet</servlet-name>
+		<url-pattern>/doc/*</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet-mapping>
+		<servlet-name>error467</servlet-name>
+		<url-pattern>/error467</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>download-servlet</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>upload-servlet</servlet-name>
+		<url-pattern>/upload/*</url-pattern>
+	</servlet-mapping>
+
+
+
+	<!-- mustChangePassword FILTER -->
+	<filter>
+		<filter-name>TenantFilter</filter-name>
+		<filter-class>com.soffid.iam.filter.TenantFilter</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>CheckPasswordLoginFilter</filter-name>
+		<filter-class>es.caib.loginModule.CheckPasswordLoginFilter</filter-class>
+		<init-param>
+			<param-name>changePassPage</param-name>
+			<param-value>/changepass.zul</param-value>
+		</init-param>
+	</filter>
+
+
+	<filter-mapping>
+		<filter-name>TenantFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CheckPasswordLoginFilter</filter-name>
+		<url-pattern>*.zul</url-pattern>
+		<url-pattern>*.html</url-pattern>
+	</filter-mapping>
+
+	<!-- Workflow FILTERS -->
+	<filter>
+		<filter-name>securityFilter</filter-name>
+		<filter-class>es.caib.bpm.filters.WorkflowInterceptor</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- //// -->
+
+
+	<!-- //// -->
+	<!-- ZK -->
+	<listener>
+		<description>
+			Used to cleanup when a session is destroyed
+		</description>
+		<display-name>ZK Session Cleaner</display-name>
+		<listener-class>org.zkoss.zk.ui.http.HttpSessionListener</listener-class>
+	</listener>
+	<servlet>
+		<description>ZK loader for ZUML pages</description>
+		<servlet-name>zkLoader</servlet-name>
+		<servlet-class>org.zkoss.zk.ui.http.DHtmlLayoutServlet</servlet-class>
+		<!-- Must. Specifies URI of the update engine (DHtmlUpdateServlet). It 
+			must be the same as <url-pattern> for the update engine. -->
+		<init-param>
+			<param-name>update-uri</param-name>
+			<param-value>/zkau</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>*.zul</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>*.zhtml</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>/j_security_lang</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>/j_security_check</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>/public/j_security_lang</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>/public/j_security_check</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<description>The asynchronous update engine for ZK</description>
+		<servlet-name>auEngine</servlet-name>
+		<servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>auEngine</servlet-name>
+		<url-pattern>/zkau/*</url-pattern>
+		<!-- //// -->
+	</servlet-mapping>
+
+	<servlet>
+		<description>
+			<![CDATA[Soffid Error Servlet]]>
+		</description>
+		<servlet-name>soffidErrorServlet</servlet-name>
+		<servlet-class>com.soffid.iam.web.ErrorServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>soffidErrorServlet</servlet-name>
+		<url-pattern>/anonymous/error.zul</url-pattern>
+		<!-- //// -->
+	</servlet-mapping>
+	<!-- Miscellaneous -->
+
+
+	<!-- /////////// -->
+	<session-config>
+		<session-timeout>120</session-timeout>
+	</session-config>
+
+	<!-- MIME mapping -->
+	<mime-mapping>
+		<extension>doc</extension>
+		<mime-type>application/vnd.ms-word</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>dsp</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>gif</extension>
+		<mime-type>image/gif</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>htm</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>html</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jnlp</extension>
+		<mime-type>application/x-java-jnlp-file</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jpeg</extension>
+		<mime-type>image/jpeg</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jpg</extension>
+		<mime-type>image/jpeg</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>js</extension>
+		<mime-type>application/x-javascript</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>pdf</extension>
+		<mime-type>application/pdf</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>png</extension>
+		<mime-type>image/png</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>txt</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xls</extension>
+		<mime-type>application/vnd.ms-excel</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xml</extension>
+		<mime-type>text/xml</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xul</extension>
+		<mime-type>application/vnd.mozilla.xul-xml</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>zhtml</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>zip</extension>
+		<mime-type>application/x-zip</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jar</extension>
+		<mime-type>application/x-java-archive</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>zul</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+
+	<mime-mapping>
+		<extension>ica</extension>
+		<mime-type>application/x-ica</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jnlp</extension>
+		<mime-type>application/x-java-jnlp-file</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>rdp</extension>
+		<mime-type>application/x-rdp</mime-type>
+	</mime-mapping>
+
+	<jsp-config>
+		<taglib>
+			<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+			<taglib-location>/WEB-INF/c.tld</taglib-location>
+		</taglib>
+	</jsp-config>
+
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Tot</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<web-resource-collection>
+			<web-resource-name>Public</web-resource-name>
+			<url-pattern>/public/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+		 	<role-name>PASSWORD:VALID</role-name>
+			<role-name>PASSWORD:EXPIRED</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Public</web-resource-name>
+			<url-pattern>/favicon.ico</url-pattern>
+			<url-pattern>/anonymous</url-pattern>
+			<url-pattern>/doc/*</url-pattern>
+			<url-pattern>/css/*</url-pattern>
+			<url-pattern>/zkau/web/styles/estil.css</url-pattern>
+			<url-pattern>/zkau/web/js/ext/Codepress/codepress.js</url-pattern>
+			<url-pattern>/zkau/web/js/zk/zk.js.dsp</url-pattern>
+			<url-pattern>/img/waitpacman.gif</url-pattern>
+			<url-pattern>/zkau/web/*</url-pattern>
+			<url-pattern>/zkau</url-pattern>
+			<url-pattern>/anonymous/*</url-pattern>
+		</web-resource-collection>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>Soffid IAM</realm-name>
+		<form-login-config>
+			<form-login-page>/anonymous/login.zul</form-login-page>
+			<form-error-page>/anonymous/login.zul?failed=true</form-error-page>
+		</form-login-config>
+	</login-config>
+
+	<security-role>
+		<role-name>tothom</role-name>
+	</security-role>
+
+	<security-role>
+		<role-name>BPM_INTERNAL</role-name>
+	</security-role>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/InformacioAutoritzacioEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>
+			es.caib.seycon.ng.servei.workflow.ejb.InformacioAutoritzacioService
+		</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ImpressoraEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ImpressoraService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ServeiEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ServeiService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/LlistesDeCorreuEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.LlistesDeCorreuService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/GrupEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.GrupService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/UsuariEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.UsuariService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/AltaBaixaUsuariEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.workflow.ejb.AltaBaixaUsuariService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ServidorsEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.workflow.ejb.ServidorsService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ConfiguracioEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.ConfiguracioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/XarxaEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.XarxaService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/AplicacioEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.AplicacioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.VaultServiceHome</local>
+	</ejb-local-ref>
+	
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/SessioEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.SessioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/DominiEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DominiService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/DispatcherEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DispatcherService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/AuditoriaEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.AuditoriaService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/DadesAddicionalsEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.DadesAddicionalsService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/RegistreAccesEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.RegistreAccesService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/TipusUnitatOrganitzativaEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		
+		<local>es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/PuntEntradaServiceEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.PuntEntradaService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/AutoritzacioRolsEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.AutoritzacioService</local>
+		<ejb-link>AutoritzacioService</ejb-link>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/AccountEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.AccountService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/BPMEngineBeanLocal</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.bpm.servei.ejb.BpmEngine</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/Document</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.doc.service.ejb.DocumentService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/SeyconServerEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>		
+		<local>es.caib.seycon.ng.servei.ejb.SeyconServerService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ServerPluginEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.ServerPluginService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/DominiUsuariEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>es.caib.seycon.ng.servei.ejb.DominiUsuariService</local>
+	</ejb-local-ref>
+	
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/TenantEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.TenantService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/AuthorizationEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.AuthorizationService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/DispatcherEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.DispatcherService</local>
+	</ejb-local-ref>
+
+
+	<env-entry>
+		<env-entry-name>userType</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>
+			<![CDATA[E]]>
+		</env-entry-value>
+	</env-entry>
+	<env-entry>
+		<env-entry-name>workflow/default/rol</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>
+			<![CDATA[7931]]>
+		</env-entry-value>
+	</env-entry>
+	<env-entry>
+		<env-entry-name>workflow/default/codiGrupPrimari</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>
+			<![CDATA[1009]]>
+		</env-entry-value>
+	</env-entry>
+
+	<welcome-file-list>
+		<welcome-file>index.zul</welcome-file>
+	</welcome-file-list>
+
+	<error-page>
+		<error-code>467</error-code>
+		<location>/error467</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/anonymous/forbidden.zul</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.Exception</exception-type>
+		<location>/anonymous/error.zul</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/anonymous/error.zul</location>
+	</error-page>
+
+</web-app>

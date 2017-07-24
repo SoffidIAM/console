@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?meta http-equiv="X-UA-Compatible" content="IE=8" ?>
+<?page id="index" title="Soffid Identity and Access Manager" ?>
+<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
+	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<style src="~./styles/estil.css" />
+	<style src="/css/localSEU.css" />
+
+	<zscript><![CDATA[
+		String task = Executions.getCurrent().getNativeRequest().getParameter("id");
+		org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("task.zul");
+		log.info("XX");
+		]]></zscript>
+
+	<application id="app" allowOpenMultipleTabs="false"
+		autoReload="false" favorits="//favorits/favorits" initialPage="wf/task.zul?id=${task}"
+		menu="//menu/menu" logoutPage="/logout/" mainWindowTitle="Soffid IAM"
+		width="100%">
+		<attribute name="onExit">
+			org.zkoss.zk.au.out.AuScript sc = new org.zkoss.zk.au.out.AuScript (app, "self.close();");
+			Executions.getCurrent().addAuResponse("window-close", sc);
+			Executions.sendRedirect("/");
+		</attribute>
+	</application>
+	<image src="img/waitpacman.gif" style="display:none;visibility:hidden;" />
+	<include src="wf/menu.zul" />
+	<div id="appletFirmaDiv" />
+
+</vbox> 

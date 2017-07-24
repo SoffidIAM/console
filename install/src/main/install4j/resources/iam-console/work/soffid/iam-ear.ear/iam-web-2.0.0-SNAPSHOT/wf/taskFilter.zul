@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="taskFilter" ?>
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="taskFilterFrame" title="${c:l('inbox.lblFiltroTareas')}" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+
+	<datamodel id="taskFilterFrameFilteredGroupsModel" rootNode="root" src="wf/descriptorFilteredGroups.xml">
+		<attribute name="onChange">
+			backToTaskListButton.setVisible(false);
+		</attribute>
+
+	</datamodel>
+	<zscript>    
+		taskFilterFrameFilteredGroupsModel.getVariables().declareVariable("codiUsuari", Executions.getCurrent().getUserPrincipal().getName());
+	</zscript>
+	<label value="${c:l('task.filter.lblResumen')}"/>
+
+	<tree dataPath="/taskFilterFrameFilteredGroupsModel:/" fixedLayout="true" id="filteredGroupsTree" rows="15" use="es.caib.bpm.ui.task.filter.TaskFilteringTree" vflex="false">
+		<treecols>
+			<treecol label="${c:l('taskFilter.zul.Grupo')}"/>
+		</treecols>
+		<treeitemfinder open="false" path="/tot">
+
+			<treerow>
+				<treecell>
+				
+					<checkbox bind="@ignored" logic="inverse" use="es.caib.bpm.ui.task.filter.TaskFilteringCheckbox"/>
+					<label bind="@name" use="es.caib.bpm.ui.task.filter.TaskFilterLabel"/>
+				</treecell>
+
+			</treerow>
+		</treeitemfinder>
+
+
+<!-- 	<treeitemfinder path="/grups" open="false">
+
+			<treerow>
+				<treecell>
+					<checkbox bind="@ignored" onCheck="">
+					</checkbox>
+				</treecell>
+				<treecell bind="@name">
+
+				</treecell>
+
+			</treerow>
+		</treeitemfinder>
+		<treeitemfinder path="/rolGrup" open="false">
+
+			<treerow>
+				<treecell>
+					<checkbox bind="@ignored" onCheck="">
+					</checkbox>
+				</treecell>
+				<treecell bind="@name">
+
+				</treecell>
+
+			</treerow>
+		</treeitemfinder>
+		<treeitemfinder path="/rolAplicacio" open="false">
+
+			<treerow>
+				<treecell>
+					<checkbox bind="@ignored" onCheck="">
+					</checkbox>
+				</treecell>
+				<treecell bind="@name">
+
+				</treecell>
+
+			</treerow>
+		</treeitemfinder>
+		<treeitemfinder path="/rol" open="false">
+
+			<treerow>
+				<treecell>
+					<checkbox bind="@ignored" onCheck="">
+					</checkbox>
+				</treecell>
+				<treecell bind="@name">
+
+				</treecell>
+
+			</treerow>
+		</treeitemfinder>
+ -->		
+	</tree>
+
+	<div align="right">
+		<commitbutton2 datamodel="/taskFilterFrameFilteredGroupsModel" label="${c:l('task.filter.lblConfirmaCambios')}">
+
+		</commitbutton2>
+		<undotreebutton2 datamodel="/taskFilterFrameFilteredGroupsModel" label="${c:l('task.filter.lblCancelaCambios')}">
+			<attribute name="onClick">
+					Application.setPage("wf/inbox.zul");
+			</attribute>			
+		</undotreebutton2>
+
+		<button id="backToTaskListButton" label="${c:l('task.filter.lblVolver')}">
+			<attribute name="onClick">
+				Application.setPage("wf/inbox.zul");
+			</attribute>
+		</button>
+	</div>
+</frame>

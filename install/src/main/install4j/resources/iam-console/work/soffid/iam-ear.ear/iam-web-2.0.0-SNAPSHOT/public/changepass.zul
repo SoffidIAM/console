@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="changepasspublic" title="${c:l('changepass.Titol')}" ?>
+<!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul --><zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<zscript>
+		String usuari = Executions.getCurrent().getUserPrincipal().getName();
+		String nom = Executions.getCurrent().getUserPrincipal().getFullName();
+		
+		try
+		{
+			es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource.Labels.getLabel("changepass.Titol"));
+		} catch (Exception ex){}
+		
+		javax.servlet.http.HttpServletRequest requ = (javax.servlet.http.HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		
+		import javax.servlet.http.*;
+		// Mètode per fer logout
+		void logout() {
+			Execution ex = Executions.getCurrent();
+			
+			Class c = Class.forName("es.caib.loginModule.util.SessionManager");
+			Object sessionManager = c.newInstance();
+			java.lang.reflect.Method m = c.getMethod("endSession",
+			new Class [] {
+				javax.servlet.http.HttpServletRequest.class,
+				javax.servlet.http.HttpServletResponse.class
+			});
+								
+			HttpServletRequest req = (HttpServletRequest) ex.getNativeRequest();
+			HttpServletResponse resp = (HttpServletResponse) ex.getNativeResponse();
+			m.invoke(sessionManager, 
+				new Object[] {
+				req,
+				resp
+			});
+			
+			HttpSession httpSession = req.getSession();
+			httpSession.invalidate();
+			Executions.getCurrent().sendRedirect("/logout/?logoutTo=public");
+		}		
+		
+	</zscript>
+	
+	<style>
+		p, div, span, label, a, input, textarea, button, input.button, input.file {font-size:12px !important; font-family: Arial,Helvetica,sans-serif;}
+		body { font:normal 75% Arial, Helvetica, sans-serif; color:#494949; background-color:#ebe4d0; margin:0; padding:0; }
+		#contenedor { margin:0 auto; width:60.5em; background-color: #fff; }
+		#continguts { margin:0; padding-bottom:2em; background-color:#fff; font-size:12px;}
+		#capsal { padding:0.5em 1em 0.7em 1em; background:url(../imgs/capsal/fondo.gif) repeat-x #ff8400; color:#000; border-bottom:.3em solid #be6200; }
+		div.capsalUsuari { background-color:#efefef; padding:.3em 1em .4em 1em; border-bottom:1px solid #be6200; color:#000; display:block; }
+		#continguts h1.dirPersonal, #continguts h1.avisosNovetats, #continguts h1.canviContrasenya, #continguts h1.aplicacions, #continguts h1.dirOrganismes 
+		{ position:relative; font-size:1.7em; font-weight:normal; color:#8a4700; padding:.5em .7em .5em 0.5em; margin:0; border-bottom:1px solid #fff; }
+		#continguts h1.canviContrasenya { background:url(../img/03canvicontrasenya.gif) no-repeat #fff; padding-left:4em;}
+		#continguts #titolOmbra { height:1em; font-size:.5em; background:url(../img/titolombra.gif) repeat-x #fff; }
+		#info { padding:0 1em 1em 1em; }
+		div.formCanviContrasenya { border:1px solid #ffbd77; width:60%; margin:0 auto; }
+		div.formCanviContrasenya form { margin:0; padding:0 1em; }
+		div.numUsuari {text-align:center; font-weight:bold; margin: 1em;background-color:#fff7ee; padding:.3em; }
+		a { color:#0047b2; }
+		img { border:0; }
+		input, select { vertical-align:middle; }
+		span.etiqueta {float:right; margin-right:5px;}
+		form div.separacio { display:table; clear:both; font-size:.4em; height:1em; }
+		form ul { list-style:none; margin:0; padding:0 1.5em; }
+		div.botonera { background-color:#efefef; padding:.5em; text-align:center; margin: 1em;}
+		p.atencio { background:url(../img/ico_atencio.gif) no-repeat 1em .9em #ffffe8; border:1px solid #f3f3d2; padding:1em 1em 1em 4em; font-weight:bold; text-align:justify; }
+		h1 { font-size:1.3em; margin:0 0 1em 0; background:none; }
+		h2 { font-size:1.3em; margin:1em 0; clear:left; position:relative; }
+		/* missatgebox */
+		.title td, .title .caption td {
+			font-family: Arial; font-size: 11pt; font-weight: bold;
+			padding-top: 2px; padding-bottom: 3px; margin-bottom: 10px;
+			background: #FF8400; color: white; border: none;
+		}
+		div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
+			border: 2px solid #0e5462; background: #FFF;
+		}
+		tr.vbox-sp {height: 0px !important;}
+
+		
+	</style>
+	
+	
+<html><![CDATA[
+<div id="contenedor">
+
+	<!-- capçal -->
+	<div id="capsal"><img src="/anonymous/logo.png" alt="Soffid IAM" /></div>
+]]></html>
+	<div class="capsalUsuari">
+		<label style="font-weight:bold;" value="${nom}"/>
+		${c:l('changepass.zul.(')}<label value="${usuari}"/>${c:l('changepass.zul.)')}
+	</div>
+	<html><![CDATA[ 
+	<!-- continguts -->
+	<div id="continguts">
+
+		<!-- titol -->
+		<h1 class="canviContrasenya">Canvi de contrasenya</h1>
+		<div id="titolOmbra"></div>
+
+		<!-- informacio -->
+		<div id="info">
+            
+			<p class="atencio">
+			La seva contrasenya ha caducat. Ha de canviar-la abans de continuar
+   			</p>
+
+			<p>Ompliu correctament tots els camps i polseu el botó <em>Acceptar</em>.</p>
+			]]></html>
+			<div sclass="formCanviContrasenya">
+			<form id="canviPassw" width="100%">
+			<zscript>
+			void canviaPass() {
+				// Obtenim els camps actuals
+				contraAnt = passactual.getValue();
+				contraNova1 = passnueva1.getValue();
+				contraNova2 = passnueva2.getValue();
+				
+				if (contraAnt=="" || contraNova== "" || contraNova2=="") {
+					Missatgebox.error ("Heu d'omplir els camp de les contrasenyes","Canvi de contrasenya");
+					return;
+				} 
+				if (!contraNova1.equals(contraNova2)) {
+					Missatgebox.error ("Els camps de la contrasenya nova han de coincidir","Canvi de contrasenya");
+					return;
+				}								
+				es.caib.loginModule.ChangePass thechange = new es.caib.loginModule.ChangePass();
+				try {
+					thechange.changePassword(usuari,contraAnt,contraNova1);
+					if (Missatgebox.confirmaOK ("La seva contrasenya s'ha canviat correctament.\n\nEs tancarà la seva sessió al SEU: heu d'esperar uns minuts i iniciar sessió amb la nova contrasenya.","Canvi de contrasenya")) {
+						logout();
+					}
+				} catch (es.caib.seycon.ng.exception.BadPasswordException e) {
+					Missatgebox.error ("Ha ocorregut un error en el canvi de contrasenya:\nLa seva nova contrasenya no és vàlida (revise la normativa).\n\nAvís: La contrasenya no pot coincidir a cap de les quatre anteriors que s'hagin emprat.","Password invàlid");
+				} catch (es.caib.seycon.ng.exception.InvalidPasswordException e) {
+					Missatgebox.error ("Ha ocorregut un error en el canvi de contrasenya:\nLa seva contrasenya antiga no és vàlida","Password invàlid");
+				} catch (Throwable e) {
+					String msg = e.getMessage();
+					msg = msg!=null?": "+msg:"";
+					Missatgebox.error ("Ha ocorregut un error en el canvi de contrasenya:\n"+msg);
+				}			
+			}			
+			
+			</zscript>
+				<vbox width="100%">
+					<div sclass="numUsuari"><label style="font-weight:bold;" value="${usuari}"/></div>
+					<vbox width="100%">
+						<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%"> 
+							<label sclass="etiqueta" value="${c:l('changepass.zul.Contrasenyaactual')}"/>
+							<textbox id="passactual" type="password"/>
+						</hbox>
+						<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
+							<label sclass="etiqueta" value="${c:l('changepass.zul.Novacontrasenya')}"/>
+							<textbox id="passnueva1" type="password"/>
+						</hbox>
+						<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
+							<label sclass="etiqueta" value="${c:l('changepass.zul.Repeticianovacontras')}"/>
+							<textbox id="passnueva2" onOK="canviaPass()" type="password"/>
+						</hbox>
+					</vbox>
+					<div align="center" sclass="botonera">
+						<hbox align="center" style="margin: 0 auto;">
+							<button label="${c:l('changepass.zul.Acceptar')}">
+								<attribute name="onClick">
+									canviaPass();
+								</attribute>
+							</button>
+							
+							<button label="${c:l('changepass.zul.Cancel')}">
+								<attribute name="onClick">
+									logout();
+								</attribute>
+							</button>
+						</hbox>
+					</div>
+				</vbox>
+			</form>
+			</div>
+<html><![CDATA[				
+			<h2>Normativa per a contrasenyes en xarxa</h2>
+
+			<p>Per tal de compatibilitzar els criteris de contrasenyes acceptables, la xarxa només permetrà aquelles que es conformin d'aquesta manera:</p>
+			<ul>
+				<li>Longitud mínima de 6 caràcters.</li>
+				<li>Longitud màxima de 32.</li>
+				<li>El caràcter inicial ha de ser una lletra.</li>
+				<li>Ha de tenir un número com a mínim.</li>
+				<li>Els tres primers caràcters no poden coincidir amb els tres primers caràcters del codi d'usuari.</li>
+				<li>Els tres primers caràcters no poden ser idèntics.</li>
+				<li>No es permetin contrasenyes que comencin amb el mes de l'any, ni en català ni en castellà.</li>
+
+				<li>No es permeten les contrasenyes que es permetin amb pass o sap.</li>
+				<li>No es poden utilitzar els següents caràcters: ñ, ç, !, $, %, /, *, +, ni accents.</li>
+				<li>Els cinc primers caràcters no poden coincidir amb el nom o llinatges de l'usuari.</li>
+				<li>La contrasenya no pot coincidir a cap de les quatre anteriors que s'hagin emprat.</li>
+			</ul>
+		</div>
+	</div>
+
+	<div style="border-top-color: #FF8400;border-top-style: solid;border-top-width: 0.3em;color: #000000;background-color:#ebe4d0;">
+		<div id="baixpeu" style="border-top:6px solid #be6200;padding-top: 0.5em;height: 3.5em;">
+			&copy; Govern de les Illes Balears
+		</div>
+	</div>
+	
+	</div>
+]]></html>				
+</zk>

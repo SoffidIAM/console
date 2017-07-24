@@ -1,4 +1,0 @@
-<jboss-web>
-   <security-domain>java:/jaas/jbossmq</security-domain>
-</jboss-web>
-

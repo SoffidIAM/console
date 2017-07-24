@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="task" type="task">
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService"
+				method="listTasks"> 
+			</ejb-finder>
+		</finder>
+		<finder name="server" type="server">
+			<script-finder>
+				c = new java.util.LinkedList ();
+				s = new es.caib.seycon.ng.comu.Server();
+				s.setNom ("*");
+				c.add (s);
+				home = new javax.naming.InitialContext().lookup ("java:comp/env/ejb/DispatcherEJB");
+				ejb = home.create ();
+				for (es.caib.seycon.ng.comu.Server server: ejb.findAllServers())
+				{
+					if (server.getType().equals ( es.caib.seycon.ng.comu.ServerType.MASTERSERVER ))
+						c.add (server);
+				}
+				return c;
+			</script-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="server">
+	</datanode>
+	
+	<datanode name="task">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService">
+			<update-method method="update">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.dayPattern}" notNull="true" friendlyName="schedule.dayValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.monthsPattern}" notNull="true" friendlyName="scheduled.monthValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.hoursPattern}" notNull="true" friendlyName="scheduled.hourValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.minutesPattern}" notNull="true" friendlyName="scheduled.minuteValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.dayOfWeekPattern}" notNull="true" friendlyName="scheduled.dayOfWeeValidation"/>
+		</validator>
+	</datanode>
+</zkib-model>

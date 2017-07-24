@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="printers" title="Gestió d'impressores"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="impressores" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+
+	<datamodel id="model" rootNode="impressores" src="descriptorImpressora.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+		<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.
+				setTitle(org.zkoss.util.resource.Labels.
+						getLabel("impressores.lblGestioImpressores"));
+			}
+			catch (Exception ex){}
+			
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+		
+			queryWindowMin = "50px";
+			queryWindowMax = "110px";
+			
+			mode = "query"; 
+			view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			// Autoritzacions
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			canCreatePrinter = AutoritzacionsUsuari.hasCreatePrinter();
+			canUpdatePrinter = AutoritzacionsUsuari.hasUpdatePrinter();
+			canDeletePrinter = AutoritzacionsUsuari.hasDeletePrinter();
+			canQueryPrinter = AutoritzacionsUsuari.hasQueryAllPrinter() || AutoritzacionsUsuari.hasQueryACLPrinter();
+			canModifyPrinter = canCreatePrinter || canUpdatePrinter;
+			
+			queryEnabled = false;
+			retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+	            
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi").
+						getFellow("textbox");
+				nom = esquema.getFellow("queryWindow").getFellow("queryModel").
+						getFellow("textbox");
+				servidor = esquema.getFellow("queryWindow").getFellow("queryServidor").
+						getFellow("textbox");
+				local = esquema.getFellow("queryWindow").getFellow("queryLocal").
+						getFellow("textbox");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) &&
+						(nom.value.trim().length() == 0) &&
+						(servidor.value.trim().length() == 0) &&
+						(local.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("nom", nom.value);
+				searchValues.put("servidor", servidor.value);
+				searchValues.put("local", local.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (esquema.isCommitPending())
+				{
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("impressores.AbansCercar"), 
+									org.zkoss.util.resource.Labels.getLabel("impressores.CanvisPendents"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox =	esquema.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/impressora").refresh();
+					listbox.dataPath = "/model:/impressora"; 
+				}
+				
+				if (listbox.getModel().getSize() == 1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0);
+					
+					if (elem!=null)
+						listbox.setSelectedItem(elem);
+					
+					select();
+					retrySearch = false;
+				}
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.hideFormulari(); //amaguem dades..
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+		
+			void showAltres () 
+			{
+				if (view_altres==false) {
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				} else {
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+					}
+			}						
+			
+			void showLista ()  
+			{
+				  esquema.getFellow("lista").getFellow("listbox").clearSelection();
+			}
+			
+			void showDetall () 
+			{
+				esquema.showFormulari();
+			}
+		]]>
+	</zscript>
+
+	<esquema ample="${amplaria}" datamodel="/model" focusCriteri="queryCodi" id="esquema" onHideFormulari="showLista()">
+	
+		<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()" width="${amplaria}">				
+		
+			<hbox>
+				<input_criteri etiqueta="${c:l('impressores.zul.Codi')}" id="queryCodi"/>
+				<input_criteri etiqueta="${c:l('impressores.zul.Model')}" id="queryModel"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox> 
+				<input_criteri etiqueta="${c:l('impressores.zul.ServImpressia')}" id="queryServidor"/>
+				<input_criteri etiqueta="${c:l('impressores.zul.Local')}" id="queryLocal"/>
+				<!-- <input_criteri id="queryLocal" etiqueta="Local:" mascara="/[N,S,n,s,\null]/: Introdueix S/s o N/n"/> -->
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="${amplaria}">
+			<toolbar>
+				<insertbutton acces="${canCreatePrinter}"
+					listbox="/esquema/lista/listbox" onClick="showDetall()"/>
+				<deletebutton acces="${canDeletePrinter}"
+					listbox="/esquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+				<listexporttoolbarbutton acces="${canQueryPrinter}"
+					listbox="/esquema/lista/listbox"/>
+			</toolbar>
+			<listbox id="listbox" autocommit="false" dataPath="/model:/impressora"
+				fixedLayout="true" height="96%" onClick="showDetall()"
+				onSelect="select()" rows="${fileres}">
+				<listhead>
+					<listheader label="${c:l('impressores.zul.Codi-2')}" sort="auto"
+						width="15%"/>
+					<listheader label="${c:l('impressores.zul.Model-2')}" sort="auto"
+						width="85%"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@codi"/>
+					<listcell bind="@model"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades">
+			<zscript>
+				void onChangeDades()
+				{
+					try {
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						registre = ctx.getValue("/");
+						<!-- S'ha de permetre modificar el codi d'impressora -->
+						<!-- form.getFellow("detall_codi").getFellow("dada").setDisabled(!registre.isNew()); -->
+						if (canModifyPrinter) {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(false);
+						} else {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(!registre.isNew());
+						}
+					} catch (Exception e) {
+						form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
+					}
+				}
+			</zscript>
+			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
+				<attribute name="onActualitza">
+					if (event.getData() instanceof String) {
+						dada = (String)event.getData();
+					} else {
+						dada = (String)(event.getData()[0]);
+					}									
+					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+					camp.setValue(dada);
+				</attribute>
+				   
+				<grid>
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('impressores.zul.Codi-2')}"/>
+							<!-- <input_dada id="detall_codi" bind="@codi" maxim="12" mascara="/^[A-Za-z]*[0-9]*[A-Za-z]*$/"/> -->
+							
+							<hbox width="97%">
+								<input_dada bind="@codi" id="detall_codi" maxim="12"
+									width_custom="99%" mascara="no empty"/>
+									
+								<label value="*" />
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('impressores.zul.Model-2')}"/>
+							<input_dada bind="@model" id="detall_model"
+								lectura="${!canModifyPrinter}" maxim="50" width_custom="93%"/>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('impressores.zul.ServImpressia-2')}"/>
+							<hbox width="97%" widths="100%,50px">
+								<input_dada bind="@nomMaquina" id="detall_impressio"
+									lectura="${!canModifyPrinter}" width_custom="99%"
+									mascara="no empty"/>
+									
+								<label value="*" />
+								
+								<imageclic src="~./img/printer.gif">
+									<attribute name="onClick">
+										if (canModifyPrinter) {
+											idActualitza ="detall_impressio";
+											desktop.getPage("maquinesLlistaUsuaris").setAttribute("llista","servidorImpressores");
+											Events.postEvent	("onInicia",desktop.getPage("maquinesLlistaUsuaris").getFellow("esquemaLlista"),form);
+										}
+									</attribute>
+								</imageclic>
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('impressores.zul.Restringida')}"/>
+							<hbox>
+								<checkbox bind="@local" disabled="${!canModifyPrinter}" id="local" onCheck=""/>
+								<label value="${c:l('impressores.zul.(siasmarcatnomasesmu')}"/>
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('impressores.zul.Usuaris')}"/>
+							<vbox width="100%">
+								<grid dataPath="/usuariImpressora" fixedLayout="true" height="210px" id="gridUsuaris" width="98%">							
+									<columns>
+										<column label="${c:l('impressores.zul.Usuari')}" width="20%"/>
+										<column label="${c:l('impressores.zul.Nom')}" width="*"/>
+										<column label="${c:l('impressores.zul.')}" visible="${canModifyPrinter}" width="40px"/>
+									</columns>
+									<datarow>
+										<label bind="@codiUsuari"/>	
+										<label bind="@nomComplert"/>
+										<imageclic align="middle" src="~./img/list-remove.gif">
+											<attribute name="onClick">
+												if (canModifyPrinter) {
+													dataRow = self.getParent();
+													xpath = dataRow.getXPath();
+													dataSource = gridUsuaris.getDataSource();
+													context = dataSource.getJXPathContext();
+													dada = context.getValue(xpath+"/@codiUsuari");
+													Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("impressores.SegurEsborra"), new Object [] {dada}),
+														org.zkoss.util.resource.Labels.getLabel("impressores.Esborra"),
+														new EventListener() {
+															public void onEvent(Event evt) {
+																if ("onOK".equals(evt.getName())) { 
+																	context.removePath(xpath);
+																}
+															}
+														});
+												}
+											</attribute>
+										</imageclic>
+									</datarow>
+								</grid>
+								<hbox style="float:right">
+								<gridexportbutton acces="${canQueryPrinter}" grid="gridUsuaris"/>
+								</hbox>
+							</vbox>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>		
+			
+	</esquema>
+	
+	<include src="finestres/maquinesllistaUsuari.zul"/>
+	
+</zk>

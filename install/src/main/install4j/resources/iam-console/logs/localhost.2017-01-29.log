@@ -1,0 +1,10 @@
+ene 29, 2017 8:18:12 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+ene 29, 2017 8:18:12 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+ene 29, 2017 8:18:20 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'
+ene 29, 2017 8:33:28 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
+ene 29, 2017 8:33:28 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Closing Spring root WebApplicationContext

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="registresAccesUsuari" title="Consulta dels registres d'accés d'un usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="../comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+	<datamodel id="model" rootNode="registresAcces" src="finestres/descriptorRegistreAccesUsuari.xml"/>
+		
+	<zscript>
+		import es.caib.zkib.zkiblaf.Missatgebox;
+		canQueryUser = es.caib.seycon.ng.utils.AutoritzacionsUsuari.hasQueryUser();
+	
+		fileres = es.caib.seycon.ng.web.Custom.FILERES;
+
+		mode = "query"; 
+		view_altres = false;
+		model.getVariables().declareVariable("queryEnabled", false);
+
+		void populateDetails ()
+		{ 
+			mode="query"; 
+		}
+
+		void search (boolean queryEnabled) 
+		{
+			//listbox = esquemaLlista.getFellow("lista").getFellow("listbox");
+			tbNumRegistres = esquemaLlista.getFellow("queryWindow").getFellow("queryNumRegistres").getFellow("textbox");
+			if(tbNumRegistres.value.trim().length() == 0){
+				model.getVariables().declareVariable("numRegistres", "%");
+			}else{
+				model.getVariables().declareVariable("numRegistres", tbNumRegistres.value);
+			}			
+			
+			data = esquemaLlista.getFellow("queryWindow").getFellow("queryData").getFellow("textbox");			
+			
+			if(data.value.trim().length() == 0){
+				model.getVariables().declareVariable("data", "%");
+			}else{
+				model.getVariables().declareVariable("data", data.value);
+			}
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);				
+			if (queryEnabled) {
+				model.getVariables().declareVariable("queryEnabled", true);
+				model.getJXPathContext().getValue("/registreAcces").refresh();
+				listbox.dataPath = "/model:/registreAcces"; 
+			} 
+		}
+
+		void cleanWindow(){
+			model.getVariables().declareVariable("queryEnabled", false);
+			model.getVariables().declareVariable("usuari", "-1");
+			model.getVariables().declareVariable("data", null);
+			model.getVariables().declareVariable("numRegistres", "0");
+			
+			model.getVariables().declareVariable("queryEnabled", false);
+			model.getJXPathContext().getValue("/registreAcces").refresh();
+			listbox.dataPath = "/model:/registreAcces[false]";
+			esquemaLlista.visible = false;
+			view_altres = false;							
+		}
+		
+		String calculaData() 
+		{
+			java.util.Date today = new Date();
+
+			dias = 15 * (24 * 60 * 60 * 1000);
+			resta = today.getTime() - dias;
+			java.util.Date altra = new Date(resta);
+
+			java.text.SimpleDateFormat formato = new java.text.SimpleDateFormat("dd/MM/yyyy"); 
+			String data = formato.format(altra);
+			
+			return data;
+		}
+
+	</zscript>
+
+	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('llistaRegistreAccesUsuari.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+
+			usuari = desktop.getPage("registresAccesUsuari").getAttribute("usuari");
+			//NOTA: cerquem els darrers registres (no per data):
+			//data = calculaData(); 
+			//esquemaLlista.getFellow("queryWindow").getFellow("queryData").getFellow("textbox").setValue(data);
+			
+			tbNumRegistres = esquemaLlista.getFellow("queryWindow").getFellow("queryNumRegistres").getFellow("textbox");
+			tbNumRegistres.setValue("10"); //10 darrers registres d'accés de l'usuari	
+			
+			//esquemaLlista.getFellow("queryWindow").getFellow("queryData").getFellow("textbox").setValue(data);
+			boolean errorCarga = false;
+			String errMsg = "";
+			if (usuari != null) {
+				esquemaLlista.setTitle(String.format(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.Titol2"), new Object [] {usuari}));
+				model.getVariables().declareVariable("usuari",usuari);
+				try {
+					model.getVariables().declareVariable("queryEnabled", true);
+					search(true); // Pot donar error si es supera el màxim de registres
+				} catch (Throwable th) { 
+					errorCarga = true;
+					if (th.getMessage()!=null) {
+						if (th.getMessage().indexOf(es.caib.seycon.ng.servei.Messages.getString("RegistreAccesServiceImpl.8"))!=-1) {
+							errMsg = th.getMessage();
+						} else if (th.getMessage().indexOf("Insufficient method permissions")!=-1) {
+							try {
+						    	msgE = th.getMessage();
+					    		posE = msgE.indexOf("ejbName");
+						    	posE2 = msgE.indexOf("principalRoles");
+						    	if (posE!=null @and posE != -1) {
+						    		if (posE2 !=null @and posE2 != -1) {
+						    			String.format(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.MissatgeAutoritzacio"), 
+						    							new Object [] {msgE.substring(posE+8, posE2&gt;2?posE2-2:posE2).replaceAll(",","\n")});
+						    		} 
+					    			else  {
+					    				String.format(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.MissatgeAutoritzacio"), 
+						    							new Object [] {msgE.substring(posE+8)});
+					    			}
+					    		}
+					    		errMsg = mensajeAuto;							
+							} catch (Throwable thh) {errMsg = String.format(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.Error"), new Object [] {thh.toString()});}
+						}
+					} else errMsg = String.format(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.Error"), new Object [] {th.toString()});
+				}
+			} else {
+				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.RegistreAcces"));
+			}
+				
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+			if (errorCarga) {
+				Missatgebox.error (errMsg,org.zkoss.util.resource.Labels.getLabel("llistaRegistreAccesUsuari.ErrorObtenint"));
+			}     		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>	
+		
+		<criteris height="20px" id="queryWindow" onOK="search(true)" width="99.7%">				
+			<hbox>
+				<input_criteri etiqueta="${c:l('llistaRegistreAccesUsuari.zul.NumRegistres')}" id="queryNumRegistres"/>
+				<input_criteri etiqueta="${c:l('llistaRegistreAccesUsuari.zul.DataInici')}" id="queryData" visible="false"/>
+				<imageclic onClick="search(true)" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="99%">
+			<listbox autocommit="false" dataPath="/model:/registreAcces" fixedLayout="true" id="listbox" mold="paging" pageSize="${fileres}" rows="${fileres}" width="99%">
+				<listhead>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Tipus')}" sort="auto" width="6%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Protocol')}" sort="auto" width="6%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Datainici')}" sort="auto" width="11%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Datafi')}" sort="auto" width="11%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Sessia')}" sort="auto" width="12%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Servidor')}" sort="auto" width="12%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Client')}" sort="auto" width="12%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Usuari')}" sort="auto" width="7%"/>					
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Agent')}" sort="auto" width="10%"/>
+					<listheader label="${c:l('llistaRegistreAccesUsuari.zul.Informacia')}" width="*"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@tipusAcces"/>
+					<listcell bind="@protocolAcces"/>
+					<listcell bind="@dataInici" dateFormat="dd/MM/yyyy HH:mm"/>
+					<listcell bind="@dataFi" dateFormat="dd/MM/yyyy HH:mm"/>
+					<listcell bind="@idSessio"/>
+					<listcell bind="@nomServidor"/>					
+					<listcell bind="@nomClinet"/>
+					<listcell bind="@codiUsuari"/>
+					<listcell bind="@codeAge"/>
+					<listcell bind="@informacio"/>
+				</dataitem>
+			</listbox>
+		<hbox style="padding:5px" width="100%" widths="50%,50%">
+			<div align="right">
+				<button label="${c:l('llistaRegistreAccesUsuari.zul.Accepta')}" visible="false">
+				<attribute name="onClick">
+				// No funciona !! 
+					cleanWindow();
+					event.stopPropagation ();
+				</attribute>
+				</button>
+			</div>
+			<div align="right">
+				<listexportbutton acces="${canQueryUser}" listbox="listbox"/>
+			</div>
+		</hbox>
+			
+		</navegador>
+	</window>
+	
+</zk>

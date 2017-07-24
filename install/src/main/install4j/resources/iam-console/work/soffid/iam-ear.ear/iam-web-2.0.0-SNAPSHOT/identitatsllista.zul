@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="identitatsLlista" title="Llista d'identitats"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="xarxes" src="descriptorXarxa.xml"/>
+	
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			
+			mode = "query"; 
+			view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			queryEnabled = false;
+			retrySearch = false;
+
+			void populateDetails ()
+			{
+				mode="query";
+			}	
+	
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquemaLlista.getFellow("queryWindow").getFellow("query").getFellow("textbox");
+				
+				// Check enable query
+				if (codi.value.trim().length() == 0)
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				 
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox =	esquemaLlista.getFellow("lista").getFellow("listbox");
+				if(queryEnabled){
+					model.getJXPathContext().getValue("/identitat").refresh();
+					listbox.dataPath = "/model:/identitat"; 
+				}
+				
+				if ((listbox.getModel().getSize() == 0) && !retrySearch)
+				{
+					retrySearch = true;
+					search();
+				}
+				
+				else
+				{
+					retrySearch = false;
+				}
+			}
+	
+			void showAltres () 
+			{
+				if (view_altres==false) {
+					esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				} else {
+					esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
+					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+					view_altres = false;
+				}
+			}
+			
+			void cleanWindow(){
+				queryWindow = esquemaLlista.getFellow("queryWindow");
+				queryWindow.getFellow("query").getFellow("textbox").value = "";
+				model.getVariables().declareVariable("queryEnabled", false);
+				lista.getFellow("listbox").dataPath = "/model:/identitat[false]";
+				esquemaLlista.visible=false;			
+				view_altres = false;							
+				esquemaLlista.getFellow("finishButton").disabled = true;				
+			}
+	
+			acceptaDada()
+			{
+				ds = esquemaLlista.getFellow("lista").getFellow("listbox").getDataSource();
+				ctx = ds.getJXPathContext(); 
+				xpath = esquemaLlista.getFellow("lista").getFellow("listbox").getXPath();
+				index = esquemaLlista.getFellow("lista").getFellow("listbox").getSelectedIndex();
+				pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
+				ctx2 = ctx.getRelativeContext(pointer);
+				codiUsuari = (String)ctx2.getPointer("@codiUsuari").getValue();
+				codiGrup = (String)ctx2.getPointer("@codiGrup").getValue();
+				nomRol = (String)ctx2.getPointer("@nomRol").getValue();
+				pointer.invalidate ();
+				String[] informacio = {codiUsuari, codiGrup, nomRol};
+							
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, informacio);							
+				cleanWindow();						
+			}
+		]]>
+	</zscript>
+	
+	<popup id="querytooltip">
+		<vbox>
+			<input_etiqueta value="${c:l('identitatsllista.zul.Calintroduiruncodid')}"/>
+			<input_etiqueta value="${c:l('identitatsllista.zul.Estapermasutilitzarc')}"/>
+		</vbox>
+	</popup>
+		
+	<window closable="true" id="esquemaLlista" position="center, center" sizable="true" title="${c:l('identitatsllista.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}     		
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+
+		<criteris height="20px" id="queryWindow" onOK="search()" width="99.7%">
+			<hbox align="start" widths="400px,*">
+				<input_criteri etiqueta="${c:l('identitatsllista.zul.Criteridecerca')}" id="query" widths_custom="100px,300px"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" tooltip="querytooltip"/>
+			</hbox>
+		</criteris>		
+		
+		<navegador id="lista" width="99.7%">
+			<listbox autocommit="false" dataPath="/model:/identitat" fixedLayout="true" id="listbox" rows="${fileres}">
+				<attribute name="onSelect">
+					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+				</attribute>
+				<listhead>
+					<listheader label="${c:l('identitatsllista.zul.Usuari')}" width="20%"/>
+					<listheader label="${c:l('identitatsllista.zul.Grup')}" width="20%"/>
+					<listheader label="${c:l('identitatsllista.zul.Rol')}" width="20%"/>
+					<listheader label="${c:l('identitatsllista.zul.Descripcia')}" width="*"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@codiUsuari">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@codiGrup">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@nomRol">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+					<listcell bind="@descripcio">
+						<attribute name="onDoubleClick">
+							acceptaDada();
+						</attribute>
+					</listcell>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('identitatsllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (! self.disabled) {
+						acceptaDada();
+					}
+				</attribute>
+			</button>
+			<button label="${c:l('identitatsllista.zul.Cancel·la')}" onClick="cleanWindow()"/>			
+		</hbox>
+		
+	</window>
+
+</zk>

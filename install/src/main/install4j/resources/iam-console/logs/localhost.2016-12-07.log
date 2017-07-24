@@ -1,0 +1,184 @@
+dic 07, 2016 8:00:40 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+dic 07, 2016 8:00:40 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+dic 07, 2016 8:00:47 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'
+dic 07, 2016 8:01:21 PM org.apache.catalina.core.StandardWrapperValve invoke
+GRAVE: Servlet.service() para servlet zkLoader lanzó excepción
+java.lang.NullPointerException: Attempt to invoke method getName on null value
+	at bsh.Reflect.resolveExpectedJavaMethod(Unknown Source)
+	at bsh.Reflect.invokeObjectMethod(Unknown Source)
+	at bsh.BSHPrimarySuffix.doName(Unknown Source)
+	at bsh.BSHPrimarySuffix.doSuffix(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHVariableDeclarator.eval(Unknown Source)
+	at bsh.BSHTypedVariableDeclaration.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at org.zkoss.zk.scripting.bsh.BSHInterpreter.exec(BSHInterpreter.java:100)
+	at org.zkoss.zk.scripting.util.GenericInterpreter.interpret(GenericInterpreter.java:292)
+	at org.zkoss.zk.ui.impl.PageImpl.interpret(PageImpl.java:866)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execNonComponent(UiEngineImpl.java:608)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:503)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild0(UiEngineImpl.java:546)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild(UiEngineImpl.java:520)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:481)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.createComponents(UiEngineImpl.java:667)
+	at org.zkoss.zk.ui.impl.AbstractExecution.createComponents(AbstractExecution.java:180)
+	at org.zkoss.zk.ui.Executions.createComponents(Executions.java:142)
+	at es.caib.zkib.zkiblaf.ApplicationComponent.onCreate(ApplicationComponent.java:153)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.zkoss.zk.ui.impl.EventProcessor.process0(EventProcessor.java:211)
+	at org.zkoss.zk.ui.impl.EventProcessor.process(EventProcessor.java:143)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.process0(EventProcessingThreadImpl.java:485)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.run(EventProcessingThreadImpl.java:419)
+
+dic 07, 2016 8:04:22 PM org.apache.catalina.core.StandardWrapperValve invoke
+GRAVE: Servlet.service() para servlet zkLoader lanzó excepción
+java.lang.NullPointerException: Null Pointer in Method Invocation
+	at bsh.Name.invokeMethod(Unknown Source)
+	at bsh.BSHMethodInvocation.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHVariableDeclarator.eval(Unknown Source)
+	at bsh.BSHTypedVariableDeclaration.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at org.zkoss.zk.scripting.bsh.BSHInterpreter.exec(BSHInterpreter.java:100)
+	at org.zkoss.zk.scripting.util.GenericInterpreter.interpret(GenericInterpreter.java:292)
+	at org.zkoss.zk.ui.impl.PageImpl.interpret(PageImpl.java:866)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execNonComponent(UiEngineImpl.java:608)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:503)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild0(UiEngineImpl.java:546)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild(UiEngineImpl.java:520)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:481)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.createComponents(UiEngineImpl.java:667)
+	at org.zkoss.zk.ui.impl.AbstractExecution.createComponents(AbstractExecution.java:180)
+	at org.zkoss.zk.ui.Executions.createComponents(Executions.java:142)
+	at es.caib.zkib.zkiblaf.ApplicationComponent.onCreate(ApplicationComponent.java:153)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.zkoss.zk.ui.impl.EventProcessor.process0(EventProcessor.java:211)
+	at org.zkoss.zk.ui.impl.EventProcessor.process(EventProcessor.java:143)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.process0(EventProcessingThreadImpl.java:485)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.run(EventProcessingThreadImpl.java:419)
+
+dic 07, 2016 8:04:24 PM org.apache.catalina.core.StandardWrapperValve invoke
+GRAVE: Servlet.service() para servlet zkLoader lanzó excepción
+java.lang.NullPointerException: Null Pointer in Method Invocation
+	at bsh.Name.invokeMethod(Unknown Source)
+	at bsh.BSHMethodInvocation.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHVariableDeclarator.eval(Unknown Source)
+	at bsh.BSHTypedVariableDeclaration.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at org.zkoss.zk.scripting.bsh.BSHInterpreter.exec(BSHInterpreter.java:100)
+	at org.zkoss.zk.scripting.util.GenericInterpreter.interpret(GenericInterpreter.java:292)
+	at org.zkoss.zk.ui.impl.PageImpl.interpret(PageImpl.java:866)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execNonComponent(UiEngineImpl.java:608)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:503)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild0(UiEngineImpl.java:546)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild(UiEngineImpl.java:520)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:481)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.createComponents(UiEngineImpl.java:667)
+	at org.zkoss.zk.ui.impl.AbstractExecution.createComponents(AbstractExecution.java:180)
+	at org.zkoss.zk.ui.Executions.createComponents(Executions.java:142)
+	at es.caib.zkib.zkiblaf.ApplicationComponent.onCreate(ApplicationComponent.java:153)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.zkoss.zk.ui.impl.EventProcessor.process0(EventProcessor.java:211)
+	at org.zkoss.zk.ui.impl.EventProcessor.process(EventProcessor.java:143)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.process0(EventProcessingThreadImpl.java:485)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.run(EventProcessingThreadImpl.java:419)
+
+dic 07, 2016 8:04:28 PM org.apache.catalina.core.StandardWrapperValve invoke
+GRAVE: Servlet.service() para servlet zkLoader lanzó excepción
+java.lang.NullPointerException: Null Pointer in Method Invocation
+	at bsh.Name.invokeMethod(Unknown Source)
+	at bsh.BSHMethodInvocation.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHPrimaryExpression.eval(Unknown Source)
+	at bsh.BSHVariableDeclarator.eval(Unknown Source)
+	at bsh.BSHTypedVariableDeclaration.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at bsh.Interpreter.eval(Unknown Source)
+	at org.zkoss.zk.scripting.bsh.BSHInterpreter.exec(BSHInterpreter.java:100)
+	at org.zkoss.zk.scripting.util.GenericInterpreter.interpret(GenericInterpreter.java:292)
+	at org.zkoss.zk.ui.impl.PageImpl.interpret(PageImpl.java:866)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execNonComponent(UiEngineImpl.java:608)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:503)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild0(UiEngineImpl.java:546)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreateChild(UiEngineImpl.java:520)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate0(UiEngineImpl.java:481)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execCreate(UiEngineImpl.java:465)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.createComponents(UiEngineImpl.java:667)
+	at org.zkoss.zk.ui.impl.AbstractExecution.createComponents(AbstractExecution.java:180)
+	at org.zkoss.zk.ui.Executions.createComponents(Executions.java:142)
+	at es.caib.zkib.zkiblaf.ApplicationComponent.onCreate(ApplicationComponent.java:153)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.zkoss.zk.ui.impl.EventProcessor.process0(EventProcessor.java:211)
+	at org.zkoss.zk.ui.impl.EventProcessor.process(EventProcessor.java:143)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.process0(EventProcessingThreadImpl.java:485)
+	at org.zkoss.zk.ui.impl.EventProcessingThreadImpl.run(EventProcessingThreadImpl.java:419)
+
+dic 07, 2016 8:14:19 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
+dic 07, 2016 8:14:19 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Closing Spring root WebApplicationContext
+dic 07, 2016 8:14:25 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+dic 07, 2016 8:14:25 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+dic 07, 2016 8:14:31 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'
+dic 07, 2016 9:32:49 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
+dic 07, 2016 9:32:49 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Closing Spring root WebApplicationContext
+dic 07, 2016 9:32:54 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+dic 07, 2016 9:32:54 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+dic 07, 2016 9:33:00 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'
+dic 07, 2016 9:34:00 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
+dic 07, 2016 9:34:00 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Closing Spring root WebApplicationContext
+dic 07, 2016 9:34:06 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+dic 07, 2016 9:34:06 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+dic 07, 2016 9:34:12 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'
+dic 07, 2016 9:50:13 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
+dic 07, 2016 9:50:13 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Closing Spring root WebApplicationContext
+dic 07, 2016 9:50:19 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: No Spring WebApplicationInitializer types detected on classpath
+dic 07, 2016 9:50:19 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring root WebApplicationContext
+dic 07, 2016 9:50:25 PM org.apache.catalina.core.ApplicationContext log
+INFORMACIÓN: Initializing Spring FrameworkServlet 'saml'

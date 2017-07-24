@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="debugpage" title="Debugger"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk>
+   <window border="overlapped" closable="true" id="debugwindow" mode="overlapped" title="Debugger">
+   		<caption>
+   			<toolbarbutton label="${c:l('debug.zul.Refrescar')}" onClick="tree.setModel (new es.caib.seycon.ng.web.debug.DebugModel(desktop))"/>
+   		</caption>
+		<zscript>
+			myrenderer = new es.caib.seycon.ng.web.debug.DebugRenderer ();
+			model = new es.caib.seycon.ng.web.debug.DebugModel(desktop);
+		</zscript>
+		<vbox>
+		<tree fixedLayout="true" height="400px" id="tree" model="${model}" treeitemRenderer="${myrenderer}" width="800px">
+			<treecols>
+				<treecol label="${c:l('debug.zul.Object')}"/>
+			</treecols>
+		</tree>
+		</vbox>
+	</window>
+</zk>

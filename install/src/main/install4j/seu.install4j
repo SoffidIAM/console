@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
-  <directoryPresets config="../../../target" />
-  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="4473-1303-9979-7033" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <directoryPresets config="./resources/iam-console/lib" />
+  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="seu.version" value="1.2.0-a-2-SNAPSHOT" description="" category="" />
+      <variable name="seu.version" value="2.0.0-SNAPSHOT" description="" category="" />
     </variables>
     <mergedProjects />
     <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" />
@@ -21,26 +21,20 @@
     <filesets />
     <roots />
     <mountPoints>
-      <mountPoint id="70" root="" location="jboss" mode="755" />
-      <mountPoint id="106" root="" location="jboss/server" mode="755" />
-      <mountPoint id="107" root="" location="jboss/server/default" mode="755" />
-      <mountPoint id="600" root="" location="jboss/server/default/soffid" mode="755" />
-      <mountPoint id="834" root="" location="jboss/server/default/soffid/bpm" mode="755" />
-      <mountPoint id="601" root="" location="jboss/server/default/deploy" mode="755" />
-      <mountPoint id="241" root="" location="db" mode="755" />
-      <mountPoint id="309" root="" location="docs" mode="755" />
-      <mountPoint id="310" root="" location="docs/index" mode="755" />
+      <mountPoint id="1070" root="" location="soffid" mode="755" />
+      <mountPoint id="1071" root="" location="soffid/bpm" mode="755" />
+      <mountPoint id="1072" root="" location="lib" mode="755" />
+      <mountPoint id="1073" root="" location="apps" mode="755" />
+      <mountPoint id="1069" root="" location="" mode="755" />
     </mountPoints>
     <entries>
-      <dirEntry mountPoint="834" file="../../../target/lib" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="*.jar,*.sar,*.ear" dirMode="755" overrideDirMode="true">
+      <dirEntry mountPoint="1071" file="../../../target/lib" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="*.jar,*.ear" dirMode="755" overrideDirMode="false">
         <exclude />
       </dirEntry>
-      <fileEntry mountPoint="600" file="../../../target/lib/iam-ear.ear" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="601" file="../../../target/lib/deployer.sar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <dirEntry mountPoint="70" file="../../../src/main/install4j/resources/jboss" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
-        <exclude />
-      </dirEntry>
-      <dirEntry mountPoint="241" file="../../../src/main/install4j/resources/db" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
+      <fileEntry mountPoint="1070" file="../../../target/lib/iam-ear.ear" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1072" file="../../../target/lib/iam-tomee.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1073" file="../../../target/lib/deployer.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <dirEntry mountPoint="1069" file="./resources/iam-console" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="iam-console" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude />
       </dirEntry>
     </entries>
@@ -49,7 +43,7 @@
   <launchers>
     <launcher name="soffid-iamconsole" id="467" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="soffid-iamconsole" type="1" iconSet="true" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="../server/derror.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="3" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="Soffid Console" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
-        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
+        <versionInfo include="true" fileVersion="${compiler:seu.version}" fileDescription="Soffid IAM Console" legalCopyright="(c) 2017 Soffid IAM" internalName="Soffid-IAM-Console" productName="Soffid IAM Console service" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
         <text>
@@ -57,9 +51,10 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="org.jboss.Main" vmParameters="&quot;-Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../lib/endorsed&quot; -Dorg.jboss.net.protocol.file.decodeFilePaths=true" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; -Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../endorsed&quot;&quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot;" arguments="start" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
         <classPath>
-          <archive location="jboss/bin/run.jar" failOnError="false" />
+          <archive location="bin/bootstrap.jar" failOnError="false" />
+          <archive location="bin/tomcat-juli.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories />
       </java>
@@ -69,8 +64,11 @@
         <content># Set memory constraints for console's JVM
 -Xmx1024m
 -Xms256m
--XX:PermSize=64m
--XX:MaxPermSize=500m</content>
+#-XX:PermSize=64m
+#-XX:MaxPermSize=500m
+# Uncomment to enable security manager
+# -Djava.security.manager 
+# -Djava.security.policy=${installer:sys.installationDir}/conf/catalina.policy</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -83,9 +81,9 @@
         <file path="./resources/5_Soffid_IconoWeb_4.png" />
       </iconImageFiles>
     </launcher>
-    <launcher name="run" id="989" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="run" type="1" iconSet="true" iconFile="" executableDir="" redirectStderr="false" stderrFile="../server/derror.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="Soffid Console" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
-        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
+    <launcher name="run" id="1075" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
+      <executable name="run" type="1" iconSet="true" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="../server/derror.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="Soffid Console" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+        <versionInfo include="true" fileVersion="${compiler:seu.version}" fileDescription="Soffid IAM Console" legalCopyright="(c) 2017 Soffid IAM" internalName="Soffid-IAM-Console" productName="Soffid IAM Console" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
         <text>
@@ -93,9 +91,10 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="org.jboss.Main" vmParameters="&quot;-Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../lib/endorsed&quot; -Dorg.jboss.net.protocol.file.decodeFilePaths=true" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; &quot;-Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../endorsed&quot;&quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot;" arguments="start" allowVMPassthroughParameters="false" preferredVM="server" bundleRuntime="true">
         <classPath>
-          <archive location="jboss/bin/run.jar" failOnError="false" />
+          <archive location="bin/bootstrap.jar" failOnError="false" />
+          <archive location="bin/tomcat-juli.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories />
       </java>
@@ -105,8 +104,11 @@
         <content># Set memory constraints for console's JVM
 -Xmx1024m
 -Xms256m
--XX:PermSize=64m
--XX:MaxPermSize=500m</content>
+#-XX:PermSize=64m
+-#XX:MaxPermSize=500m
+# Uncomment to enable security manager
+# -Djava.security.manager 
+# -Djava.security.policy=${installer:sys.installationDir}/conf/catalina.policy</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -123,9 +125,9 @@
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
     <customCode>
       <archive location="../../../target/install-${compiler:seu.version}.jar" />
-      <archive location="../../../target/lib/ojdbc14.jar" />
-      <archive location="../../../target/lib/mysql-connector-java.jar" />
-      <archive location="../../../target/lib/sqljdbc4.jar" />
+      <archive location="./resources/iam-console/lib/mariadb-java-client-1.2.3.jar" />
+      <archive location="./resources/iam-console/lib/sqljdbc4-3.0.jar" />
+      <archive location="./resources/iam-console/lib/ojdbc7.jar" />
     </customCode>
     <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
       <commentFiles />
@@ -845,7 +847,16 @@ copy of the Program in return for a fee.&lt;/p&gt;
           <screen name="" id="3" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen">
+                  <void property="validationScript">
+                    <object class="com.install4j.api.beans.ScriptProperty">
+                      <void property="value">
+                        <string>
+return true;</string>
+                      </void>
+                    </object>
+                  </void>
+                </object>
               </java>
             </serializedBean>
             <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
@@ -884,110 +895,6 @@ copy of the Program in return for a fee.&lt;/p&gt;
             <postActivation />
             <actions />
             <formComponents />
-          </screen>
-          <screen name="" id="112" customizedId="" beanClass="com.install4j.runtime.beans.screens.BannerFormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
-            <serializedBean>
-              <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.BannerFormScreen">
-                  <void property="title">
-                    <string>Configure Soffid IAM</string>
-                  </void>
-                </object>
-              </java>
-            </serializedBean>
-            <condition />
-            <validation>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
-
-p.save ();
-
-String hn = (String) context.getVariable("hostName");
-if (hn == null || hn.equals("")) {
-     if (context.isConsole())
-         System.out.println ("Host name is required");
-     else
-         JOptionPane.showMessageDialog(null, "Host name is required");
-    return false;
-}
-String dn = (String) context.getVariable("domainName");
-if (dn == null || dn.equals("")) {
-//    JOptionPane.showMessageDialog(null, "domain name is required");
-//    return false;
-}
-return true;
-</validation>
-            <preActivation>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
-
-p.load ();</preActivation>
-            <postActivation />
-            <actions />
-            <formComponents>
-              <formComponent name="" id="116" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineHtmlLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.MultilineHtmlLabelComponent">
-                      <void property="labelHtml">
-                        <string>Please, enter your hostname and domain name.
-</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-              <formComponent name="" id="115" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SeparatorComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.SeparatorComponent" />
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-              <formComponent name="" id="113" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                      <void property="labelText">
-                        <string>Host name</string>
-                      </void>
-                      <void property="variableName">
-                        <string>hostName</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript>String hostname = java.net.InetAddress.getLocalHost().getHostName();
-configurationObject.setText(hostname);</initScript>
-                <visibilityScript />
-              </formComponent>
-              <formComponent name="" id="114" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                      <void property="checkIfEmpty">
-                        <boolean>true</boolean>
-                      </void>
-                      <void property="enterGoesToNextScreen">
-                        <boolean>true</boolean>
-                      </void>
-                      <void property="labelText">
-                        <string>Domain</string>
-                      </void>
-                      <void property="variableName">
-                        <string>domainName</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript>String hostname = java.net.InetAddress.getLocalHost().getCanonicalHostName();
-int i = hostname.indexOf(".");
-if ( i &gt;= 0 ) {
-  configurationObject.setText(hostname.substring(i+1));
-}</initScript>
-                <visibilityScript />
-              </formComponent>
-            </formComponents>
           </screen>
           <screen name="" id="6" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="true" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
@@ -1053,23 +960,6 @@ if ( i &gt;= 0 ) {
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="373" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
-                      <void property="script">
-                        <object class="com.install4j.api.beans.ScriptProperty">
-                          <void property="value">
-                            <string>new es.caib.seycon.ng.install.NasConfigurator(context).configure(); 
-return true;</string>
-                          </void>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
               <action name="" id="537" customizedId="" beanClass="com.install4j.runtime.beans.actions.services.InstallServiceAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1085,74 +975,26 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="909" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="Cannot remove console temporary files. Is console running?">
+              <action name="" id="1156" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="backupForRollback">
-                        <boolean>false</boolean>
+                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                      <void property="destinationFile">
+                        <object class="java.io.File">
+                          <string>conf/server.xml</string>
+                        </object>
                       </void>
                       <void property="files">
-                        <array class="java.io.File" length="11">
+                        <array class="java.io.File" length="1">
                           <void index="0">
                             <object class="java.io.File">
-                              <string>jboss/server/default/tmp</string>
-                            </object>
-                          </void>
-                          <void index="1">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/lib/bsh.jar</string>
-                            </object>
-                          </void>
-                          <void index="2">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/lib/bsh-1.3.0.jar</string>
-                            </object>
-                          </void>
-                          <void index="3">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/lib/bsh-deployer.jar:jboss/server/jetty/tmp</string>
-                            </object>
-                          </void>
-                          <void index="4">
-                            <object class="java.io.File">
-                              <string>jboss/server/jetty/lib/bsh.jar</string>
-                            </object>
-                          </void>
-                          <void index="5">
-                            <object class="java.io.File">
-                              <string>jboss/server/jetty/lib/bsh-1.3.0.jar</string>
-                            </object>
-                          </void>
-                          <void index="6">
-                            <object class="java.io.File">
-                              <string>jboss/server/jetty/lib/bsh-deployer.jar</string>
-                            </object>
-                          </void>
-                          <void index="7">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/deploy/management</string>
-                            </object>
-                          </void>
-                          <void index="8">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/deploy/jmx-console.war</string>
-                            </object>
-                          </void>
-                          <void index="9">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/deploy/jmx-invoker-adaptor-server.sar</string>
-                            </object>
-                          </void>
-                          <void index="10">
-                            <object class="java.io.File">
-                              <string>jboss/server/default/deploy/http-invoker.sar</string>
+                              <string>conf/server.xml.template</string>
                             </object>
                           </void>
                         </array>
                       </void>
-                      <void property="recursive">
-                        <boolean>true</boolean>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
                       </void>
                     </object>
                   </java>
@@ -1161,6 +1003,82 @@ return true;</string>
               </action>
             </actions>
             <formComponents />
+          </screen>
+          <screen name="" id="112" customizedId="" beanClass="com.install4j.runtime.beans.screens.BannerFormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.BannerFormScreen">
+                  <void property="title">
+                    <string>Configure Soffid IAM</string>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
+p.save ();
+
+String hn = (String) context.getVariable("hostName");
+if (hn == null || hn.equals("")) {
+     if (context.isConsole())
+         System.out.println ("Host name is required");
+     else
+         JOptionPane.showMessageDialog(null, "Host name is required");
+    return false;
+}
+return true;
+</validation>
+            <preActivation>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
+p.load ();
+</preActivation>
+            <postActivation />
+            <actions />
+            <formComponents>
+              <formComponent name="" id="116" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineHtmlLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.MultilineHtmlLabelComponent">
+                      <void property="labelHtml">
+                        <string>Please, enter your hostname including domain name.
+</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="115" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SeparatorComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.SeparatorComponent" />
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="113" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                      <void property="labelText">
+                        <string>Host name</string>
+                      </void>
+                      <void property="variableName">
+                        <string>hostName</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript>if (configurationObject.getText() == null || 
+    configurationObject.getText().equals (""))
+{
+  String hostname = java.net.InetAddress.getLocalHost().getHostName();
+  configurationObject.setText(hostname);
+}</initScript>
+                <visibilityScript />
+              </formComponent>
+            </formComponents>
           </screen>
           <screen name="" id="738" customizedId="" beanClass="com.install4j.runtime.beans.screens.BannerFormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
@@ -1176,9 +1094,7 @@ return true;</string>
    return false;
 else
    return true;</condition>
-            <validation>Boolean b = (Boolean) context.getVariable("createObjects");
-if (b == null || b.booleanValue ()) {
-    Integer current = (Integer) context.getVariable("dbDriver");
+            <validation>    Integer current = (Integer) context.getVariable("dbDriver");
     Integer old = (Integer) context.getVariable("dbDriver.old");
     
     if (! current.equals(old)) 
@@ -1194,7 +1110,6 @@ if (b == null || b.booleanValue ()) {
             context.setVariable("dbPort", new Long(1433));
           }
     }
-}
 es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
 p.save ();
 return true;</validation>
@@ -1285,7 +1200,8 @@ else
 Exception exc = null;
 try
 {
-    c.test ();
+    if (context.getBooleanVariable("dbCreateUser"))
+        c.test ();
 }
 catch (Exception e)
 {
@@ -1301,6 +1217,33 @@ return true;</validation>
             <postActivation />
             <actions />
             <formComponents>
+              <formComponent name="" id="1084" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                      <void property="coupledComponentIds">
+                        <void method="add">
+                          <string>155</string>
+                        </void>
+                        <void method="add">
+                          <string>156</string>
+                        </void>
+                      </void>
+                      <void property="labelText">
+                        <string>Create new database user</string>
+                      </void>
+                      <void property="requestFocus">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="variableName">
+                        <string>dbCreateUser</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
               <formComponent name="" id="155" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1312,7 +1255,7 @@ return true;</validation>
                         <string>Database owner</string>
                       </void>
                       <void property="variableName">
-                        <string>dbUser</string>
+                        <string>dbAdminUser</string>
                       </void>
                     </object>
                   </java>
@@ -1328,7 +1271,7 @@ return true;</validation>
                         <string>Password</string>
                       </void>
                       <void property="variableName">
-                        <string>dbPassword</string>
+                        <string>dbAdminPassword</string>
                       </void>
                     </object>
                   </java>
@@ -1416,8 +1359,8 @@ if (b == null || b.booleanValue ())
     return true;
 else
     return false;</condition>
-            <validation>String p1 = (String) context.getVariable("dbSchemaPassword");
-String p2 = (String) context.getVariable("dbSchemaPassword2");
+            <validation>String p1 = (String) context.getVariable("dbPassword");
+String p2 = (String) context.getVariable("dbPassword2");
 if (p1 == null || p2 == null || ! p2.equals(p1) )
 {
     if (context.isConsole())
@@ -1444,7 +1387,7 @@ return true;</validation>
                         <string>Schema owner</string>
                       </void>
                       <void property="variableName">
-                        <string>dbSchema</string>
+                        <string>dbUser</string>
                       </void>
                     </object>
                   </java>
@@ -1460,7 +1403,7 @@ return true;</validation>
                         <string>Password</string>
                       </void>
                       <void property="variableName">
-                        <string>dbSchemaPassword</string>
+                        <string>dbPassword</string>
                       </void>
                     </object>
                   </java>
@@ -1476,7 +1419,7 @@ return true;</validation>
                         <string>Repeat password</string>
                       </void>
                       <void property="variableName">
-                        <string>dbSchemaPassword2</string>
+                        <string>dbPassword2</string>
                       </void>
                     </object>
                   </java>
@@ -1539,7 +1482,7 @@ If it already exists, the password will be changed.</string>
        component.setVisible(true);
 }
 </initScript>
-                <visibilityScript />
+                <visibilityScript>return context.getVariable("dbDriver").equals(1);</visibilityScript>
               </formComponent>
               <formComponent name="" id="249" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.IntegerTextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
@@ -1563,7 +1506,7 @@ If it already exists, the password will be changed.</string>
    component.setVisible(true);
 }
 </initScript>
-                <visibilityScript />
+                <visibilityScript>return context.getVariable("dbDriver").equals(1);</visibilityScript>
               </formComponent>
               <formComponent name="" id="252" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
@@ -1596,7 +1539,7 @@ If it already exists, the password will be changed.</string>
    component.setVisible(true);
 }
 </initScript>
-                <visibilityScript />
+                <visibilityScript>return context.getVariable("dbDriver").equals(1);</visibilityScript>
               </formComponent>
               <formComponent name="" id="253" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.IntegerTextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
@@ -1620,7 +1563,7 @@ If it already exists, the password will be changed.</string>
    component.setVisible(true);
 }
 </initScript>
-                <visibilityScript />
+                <visibilityScript>return context.getVariable("dbDriver").equals(1);</visibilityScript>
               </formComponent>
             </formComponents>
           </screen>
@@ -1673,18 +1616,7 @@ catch (Exception e)
                     </object>
                   </java>
                 </serializedBean>
-                <condition>Boolean b;
-if (context.getVariable("dbStatus") == null)
-{
-    b = (Boolean) context.getVariable("createObjects");
-}
-else
-{
-    b = (Boolean) context.getVariable("dbUpgrade") ;
-}
-
-return b != null &amp;&amp; b.booleanValue ();
-</condition>
+                <condition />
               </action>
             </actions>
             <formComponents />
@@ -1815,7 +1747,7 @@ return b != null &amp;&amp; b.booleanValue ();
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Unix Installer" id="151" customizedId="" mediaFileName="SEU_installer" installDir="soffid/iam-console" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Unix Installer" id="151" customizedId="" mediaFileName="SOFFID_console_installer" installDir="soffid/iam-console-2" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="/opt" contentFilesType="1" downloadURL="">
       <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
@@ -1831,7 +1763,7 @@ return b != null &amp;&amp; b.booleanValue ();
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="Windows" id="420" customizedId="" mediaFileName="SEU_installer" installDir="Soffid\IAM-Console" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+    <windows name="Windows" id="420" customizedId="" mediaFileName="SEU_installer" installDir="Soffid\IAM-Console-2" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
       <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
@@ -1844,7 +1776,7 @@ return b != null &amp;&amp; b.booleanValue ();
       <excludedComponents />
       <includedDownloadableComponents />
     </windows>
-    <windows name="Windows64" id="987" customizedId="" mediaFileName="SEU_installer_64" installDir="Soffid\IAM-Console" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+    <windows name="Windows64" id="987" customizedId="" mediaFileName="SEU_installer_64" installDir="Soffid\IAM-Console-2" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
       <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
@@ -1857,7 +1789,7 @@ return b != null &amp;&amp; b.booleanValue ();
       <excludedComponents />
       <includedDownloadableComponents />
     </windows>
-    <unixArchive name="Unix Archive" id="992" customizedId="" mediaFileName="Soffid-iamconsole" installDir="iam-console" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false">
+    <unixArchive name="Unix Archive" id="992" customizedId="" mediaFileName="Soffid-iamconsole" installDir="iam-console-2" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false">
       <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
@@ -1871,8 +1803,6 @@ return b != null &amp;&amp; b.booleanValue ();
   </mediaSets>
   <buildIds buildAll="false">
     <mediaSet refId="151" />
-    <mediaSet refId="420" />
-    <mediaSet refId="987" />
   </buildIds>
   <buildOptions verbose="false" faster="false" disableSigning="false" debug="false" />
 </install4j>

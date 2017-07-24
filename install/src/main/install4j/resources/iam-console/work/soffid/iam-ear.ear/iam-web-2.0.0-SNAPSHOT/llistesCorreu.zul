@@ -1,0 +1,1367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="llistesCorreu" title="Gestió de Llistes de correu"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="correu" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<?component name="input_finestra" macro-uri="comu/input_finestra.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml"> 
+	<style src="~./styles/estil.css"/>
+
+	<datamodel id="model" rootNode="llistesCorreu" src="descriptorLlistaCorreu.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+	
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.zkiblaf.*;
+		
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+					.Labels.getLabel("llistesCorreu.Titol"));
+			}
+			catch (Exception ex){}
+			
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
+	
+			queryWindowMin = "50px";
+			queryWindowMax = "110px";
+	
+			mode = "query"; 
+			boolean view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			
+			// Autoritzacions
+			canCreateCorreu =  AutoritzacionsUsuari.hasCreateMail();
+			canUpdateCorreu = AutoritzacionsUsuari.hasUpdateMail();
+			canDeleteCorreu = AutoritzacionsUsuari.hasDeleteMail();
+			canQueryCorreu = AutoritzacionsUsuari.hasQueryMail();
+			canModifyCorreu = canCreateCorreu || canUpdateCorreu;
+			
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+	             
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				nom = esquema.getFellow("queryWindow").getFellow("queryNom").getFellow("textbox");
+				domini = esquema.getFellow("queryWindow").getFellow("queryDomini").getFellow("textbox");
+				descripcio = esquema.getFellow("queryWindow").getFellow("queryDescripcio").getFellow("textbox");
+				
+				// Check enable query
+				if ((nom.value.trim().length() == 0) &&
+						(domini.value.trim().length() == 0) &&
+						(descripcio.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("nom", nom.value);
+				searchValues.put("domini", domini.value);
+				searchValues.put("descripcio", descripcio.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+ 
+				if (esquema.isCommitPending()) {
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("llistesCorreu.AbansConfirmar"), 
+									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Canvis"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox =	esquema.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/llistaCorreu").refresh();
+					listbox.dataPath = "/model:/llistaCorreu"; 
+				}
+				if (listbox.getModel().getSize() == 1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0); 
+				
+					if (elem!=null)
+						listbox.setSelectedItem(elem);
+					
+					select();
+					retrySearch = false;
+				} 
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.tancaDetalls(); //amaguem dades..
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+		
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+					}
+			}
+			
+			void showLista ()  
+			{
+				esquema.getFellow("lista").getFellow("listbox").clearSelection();
+				esquema.getFellow("lista").getFellow("listbox").setRows(fileresO);
+			}
+			
+			void showDetall () 
+			{
+				esquema.hideCriteris();
+				esquema.getFellow("lista").getFellow("listbox").setRows(5);
+				esquema.showFormulari();
+			}
+		  
+			void esborraMembre(tipus, membre)
+			{
+				switch(tipus)
+				{
+					case 1:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_usuaris");
+						break;
+					case 2:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_llistes");
+						break;
+					case 3:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_externs");
+						break;
+					case 4:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_roles");
+						break;
+					case 5:
+						camp = (DataTextbox) esquema.getFellow("dades").getFellow("form")
+							.getFellow("detall_llista_groups");
+						break;
+				}
+				
+				llistaMembres = camp.getValue();
+				cadena = llistaMembres;
+				pos = cadena.indexOf(membre);
+				if (pos > 0) 
+				{
+				 	abans = cadena.substring(0, pos);
+					/* Últim membre: haurem d'eliminar la coma anterior al membre */ 
+					if (pos+membre.length() == cadena.length())
+					{
+						ultimaComa = abans.lastIndexOf(",");
+						abans = abans.substring(0,ultimaComa);
+						resultat = abans;
+					}
+					else
+					{
+						/* Membre intermig: Eliminar la coma següent. L'1 se considera per la coma de separador */
+						despres = cadena.substring(pos + membre.length() + 1, cadena.length());
+						resultat = abans + despres;
+					}
+					camp.setValue(resultat.trim());
+				}
+				else
+				{
+					if (pos==0)
+					{
+						/* Primer membre: L'1 està posat per a que elimine la coma següent */
+						if (cadena.length() > membre.length()) {
+							despres = cadena.substring(pos + membre.length() + 1, cadena.length());
+						} else {
+							despres = "";  /* Pel cas que només hi ha un membre i per tant, no hi ha cap coma */
+						}
+						resultat = despres;
+						camp.setValue(resultat.trim());
+					}
+				}
+			}
+	
+			void afegeixUsuari(String info, String nom)
+			{
+				gridUsuaris = esquema.getFellow("dades").getFellow("form").getFellow("gridUsuaris");
+				modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridUsuaris.getModel();
+				ds = gridUsuaris.getDataSource(); 
+				ctx =  ds.getJXPathContext();
+				xpath = gridUsuaris.getXPath() + "[@codiUsuari = '" + info + "']";
+				boolean jaExisteix = true;
+				try {
+					valor = ctx.getValue(xpath);
+				} catch(Exception e) {
+					jaExisteix = false;
+				}	
+				if (jaExisteix) {
+					Missatgebox.avis(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.UsuariAssignat"), new Object [] {info}),
+									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.ErrorAfegir"));
+				} else {
+					position = modelProxy.newInstance();
+					ds = gridUsuaris.getDataSource(); 
+					ctx =  ds.getJXPathContext(); 
+					xpath = gridUsuaris.getXPath() + modelProxy.getBind(position); 
+					pointer =ctx.createPath (xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@codiUsuari", info);
+					ctx2.setValue("@nomComplert", nom);
+												
+					dsLlistaCorreu = esquema.getFellow("dades").getFellow("form").getDataSource(); 
+					ctxLlistaCorreu =  dsLlistaCorreu.getJXPathContext(); 
+					codiDomini = ctxLlistaCorreu.getValue("@codiDomini");
+					nomLlistaCorreu = ctxLlistaCorreu.getValue("@nom");
+					ctx2.setValue("@nomLlistaCorreu", nomLlistaCorreu);
+					ctx2.setValue("@codiDomini", codiDomini);
+					pointer.invalidate ();
+				}
+			}
+			
+			void afegeixRole(String role, String dispatcher, String domain, String desc)
+			{
+				com.soffid.iam.api.MailListRoleMember mlrm = new com.soffid.iam.api.MailListRoleMember ();
+				mlrm.setDispatcherName(dispatcher);
+				mlrm.setRoleDescription(desc);
+				mlrm.setRoleName(role);
+				mlrm.setScope(domain);
+				String path = es.caib.zkib.datasource.XPathUtils.createPath(gridRoles.getDataSource(), "/role", mlrm);
+			}
+
+			void afegeixGroup(String group, String description, Long id)
+			{
+				es.caib.seycon.ng.comu.Grup g = new es.caib.seycon.ng.comu.Grup();
+				g.setCodi(group);
+				g.setDescripcio(description);
+				g.setId(id);
+				String path = es.caib.zkib.datasource.XPathUtils.createPath(gridGroups.getDataSource(), "/group", g);
+			}
+
+			void esborraUsuari(String codi)
+			{
+				if (!codi.equals("")) 
+				{
+					gridUsuaris = esquema.getFellow("dades").getFellow("form").getFellow("gridUsuaris");
+					ds = gridUsuaris.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = gridUsuaris.getXPath() + "[@codiUsuari = '" + codi + "']";
+					ctx.removePath(xpath);
+				}
+			}
+	
+			void afegeixLlista(info)
+			{
+				gridLlistesCorreu = esquema.getFellow("dades").getFellow("form").getFellow("gridLlistesCorreu");
+				modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridLlistesCorreu.getModel();
+				ds = gridLlistesCorreu.getDataSource(); 
+				ctx =  ds.getJXPathContext();
+				xpath = gridLlistesCorreu.getXPath() + 
+					"["+
+						"@nomLlistaCorreuPertany = '" + info[0] + "'"+
+						" and "+
+						"@codiDominiCorreuPertany = '" + info[1] + "'"+
+					"]";
+				boolean jaExisteix = true;
+				try {
+					valor = ctx.getValue(xpath);
+				} catch(Exception e) {
+					jaExisteix = false;
+				}	
+				if (jaExisteix) {
+					Missatgebox.avis(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.LlistaAssignada"), new Object [] {info[0],info[1]}),
+									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.ErrorAfegir"));
+				} else {
+					position = modelProxy.newInstance();
+					ds = gridLlistesCorreu.getDataSource(); 
+					ctx =  ds.getJXPathContext(); 
+					xpath = gridLlistesCorreu.getXPath() + modelProxy.getBind(position); 
+					pointer =ctx.createPath (xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@nomLlistaCorreuPertany", info[0]);
+					ctx2.setValue("@codiDominiCorreuPertany", "null".equals(info[1])?"":info[1]);
+															
+					dsLlistaCorreu = form.getDataSource(); 
+					ctxLlistaCorreu =  dsLlistaCorreu.getJXPathContext(); 
+					codiDomini = ctxLlistaCorreu.getValue("@codiDomini");
+					nomLlistaCorreu = ctxLlistaCorreu.getValue("@nom");
+					ctx2.setValue("@nomLlistaCorreuConte", nomLlistaCorreu);
+					ctx2.setValue("@codiDominiCorreuConte", codiDomini==null?"":codiDomini);
+					pointer.invalidate();
+				}
+			}
+			
+			void afegeixLlistaPertany(info)
+			{
+				gridLlistesCorreuP = esquema.getFellow("dades").getFellow("form").getFellow("gridLlistesCorreuPertany");
+				modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridLlistesCorreuP.getModel();
+				ds = gridLlistesCorreuP.getDataSource(); 
+				ctx =  ds.getJXPathContext();
+				xpath = gridLlistesCorreuP.getXPath() + 
+					"["+
+						"@nomLlistaCorreuConte = '" + info[0] + "'"+
+						" and "+
+						"@codiDominiCorreuConte = '" + info[1] + "'"+
+					"]";
+				boolean jaExisteix = true;
+				try {
+					valor = ctx.getValue(xpath);
+				} catch(Exception e) {
+					jaExisteix = false;
+				}	
+				if (jaExisteix) {
+					Missatgebox.avis(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.LlistaAssignada"), new Object [] {info[0],info[1]}),
+									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.ErrorAfegir"));
+				} else {	
+					position = modelProxy.newInstance();
+					ds = gridLlistesCorreuP.getDataSource(); 
+					ctx =  ds.getJXPathContext(); 
+					xpath = gridLlistesCorreuP.getXPath() + modelProxy.getBind(position); 
+					pointer =ctx.createPath (xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@nomLlistaCorreuConte", info[0]);
+					ctx2.setValue("@codiDominiCorreuConte", "null".equals(info[1])?"":info[1]);
+					
+					dsLlistaCorreu = form.getDataSource(); 
+					ctxLlistaCorreu =  dsLlistaCorreu.getJXPathContext(); 
+					codiDomini = ctxLlistaCorreu.getValue("@codiDomini");
+					nomLlistaCorreu = ctxLlistaCorreu.getValue("@nom");
+					ctx2.setValue("@nomLlistaCorreuPertany", nomLlistaCorreu);
+					ctx2.setValue("@codiDominiCorreuPertany", codiDomini==null?"":codiDomini);
+					pointer.invalidate();
+				}
+			}
+	
+			void esborraLlista(String llista,String domini)
+			{
+				if (!llista.equals("")) 
+				{
+					gridLlistesCorreu = esquema.getFellow("dades").getFellow("form").getFellow("gridLlistesCorreu");
+					ds = gridUsuaris.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					ds = gridLlistesCorreu.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = gridLlistesCorreu.getXPath() + 
+						"["+
+							"@nomLlistaCorreuPertany = '" + llista + "'"+
+							" and "+
+							"@codiDominiCorreuPertany = '" + domini + "'"+
+						"]";
+					ctx.removePath(xpath);
+				}
+			}
+			
+			void afegeixExtern(String info)
+			{
+				gridCorreusExterns = esquema.getFellow("dades").getFellow("form").getFellow("gridCorreusExterns");
+				modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridCorreusExterns.getModel();
+				ds = gridCorreusExterns.getDataSource(); 
+				ctx =  ds.getJXPathContext();
+				xpath = gridCorreusExterns.getXPath() + "[@adreca = '" + info + "']";
+				boolean jaExisteix = true;
+				try {
+					valor = ctx.getValue(xpath);
+				} catch(Exception e) {
+					jaExisteix = false;
+				}	
+				if (jaExisteix) {
+					Missatgebox.avis(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.AdreAssignada"), new Object [] {info}),
+									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.ErrorAfegirAdre"));
+				} else {
+					position = modelProxy.newInstance();
+					ds = gridCorreusExterns.getDataSource(); 
+					ctx =  ds.getJXPathContext(); 
+					xpath = gridCorreusExterns.getXPath() + modelProxy.getBind(position); 
+					pointer =ctx.createPath (xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@adreca", info);
+										
+					dsLlistaCorreu = form.getDataSource(); 
+					ctxLlistaCorreu =  dsLlistaCorreu.getJXPathContext(); 
+					codiDomini = ctxLlistaCorreu.getValue("@codiDomini");
+					nomLlistaCorreu = ctxLlistaCorreu.getValue("@nom");
+					ctx2.setValue("@llistaCorreuNom", nomLlistaCorreu);
+					ctx2.setValue("@codiDomini", codiDomini);
+					pointer.invalidate ();
+				}
+			}
+	
+			void esborraExtern(String extern)
+			{
+				if (!extern.equals("")) 
+				{		
+					gridCorreusExterns = esquema.getFellow("dades").getFellow("form").getFellow("gridCorreusExterns");
+					ds = gridCorreusExterns.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = gridCorreusExterns.getXPath() + "[@adreca = '" + extern + "']";
+					ctx.removePath(xpath);
+				}
+			}
+			
+			void esborraRole(String role, String dispatcher, String domain, String desc)
+			{
+				if (!role.equals("")) 
+				{
+					grid = esquema.getFellow("dades").getFellow("form").getFellow("gridRoles");
+					ds = grid.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = grid.getXPath() + "[@roleName = '" + role + "' and @dispatcherName = '"+dispatcher+"' and @scope='"+domain+"']";
+					ctx.removePath(xpath);
+				}
+			}
+
+			void esborraGroup(String group, String description, Long id)
+			{
+				if (!group.equals("")) 
+				{
+					grid = esquema.getFellow("dades").getFellow("form").getFellow("gridGroups");
+					ds = grid.getDataSource(); 
+					ctx =  ds.getJXPathContext();
+					xpath = grid.getXPath() + "[@codi = '" + group + "']";
+					ctx.removePath(xpath);
+				}
+			}
+
+			String nomUsuari (String codiUsuari)
+			{
+				if (!codiUsuari.equals("")) 
+				{
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
+					
+					es.caib.seycon.ng.comu.Usuari usuario = usuariService.findUsuariByCodiUsuari(codiUsuari);
+					return usuario.getNom() + " " + usuario.getPrimerLlinatge() + " " + usuario.getSegonLlinatge();
+				} else {
+					return "";
+				}
+			}
+					
+			void changeLlista(int tipus, String membres_antic)
+			{
+				// Desactivem la modificació del nom
+				form.getFellow("detall_nom").setDisabled(true);
+			
+				LinkedList afegir = new LinkedList();
+				LinkedList esborrar = new LinkedList();
+				
+				if (!"".equals(membres_antic)) {
+					String[] old = membres_antic.split(",");
+					longitud_old = old.length;
+					membres_old = new String[longitud_old];
+					membres_old = membres_antic.split(",");
+				} else {
+					longitud_old = 0;
+					membres_old = null;
+				}
+				
+		  		switch(tipus) {
+		  			case 1:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_usuaris");
+		  				break;
+		  			case 2:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_llistes");
+		  				break;
+		  			case 3:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_externs");
+		  				break;
+		  			case 4:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_roles");
+		  				break;
+		  			case 5:
+		  				camp = (DataTextbox) esquema.getFellow("dades").getFellow("form").getFellow("detall_llista_groups");
+		  				break;
+		  		}			
+	
+				membres = (String) camp.getValue();
+				if (!"".equals(membres)) {
+					String[] now = membres.split(" *, *");
+					longitud_now = now.length;
+					membres_now = new String[longitud_now];
+					membres_now = membres.split(" *, *");
+				} else {
+					longitud_now = 0;
+					membres_now = null;
+				}
+		  		
+		  		/* Afegir */
+								
+				/* Comparar la llista nova amb la antiga per saber els nous membres afegits */
+				for (int i=0; i @lt longitud_now; i++)
+				{
+					membre_actual = membres_now[i].trim();
+					int j = 0;
+					existeix = false;
+					while ( j @lt longitud_old @and !existeix)
+					{
+						if (membre_actual.equals(membres_old[j].trim())) {
+							existeix = true;
+						}					
+						j++;
+					}
+					if (!existeix) {
+						afegir.add(membre_actual);
+					}
+				}
+					
+				Iterator it1 = afegir.iterator();
+				while (it1.hasNext())
+				{
+		  			switch(tipus) {
+		  				case 1:
+							String codi = (String) it1.next();
+							String nom = nomUsuari(codi);
+							afegeixUsuari(codi,nom);
+	  						break;
+	  					case 2:
+							String llista = (String) it1.next();
+							llistaCorreu = new String[2];
+							llistaCorreu = llista.split("@");
+							afegeixLlista(llistaCorreu);
+		  					break;
+		  				case 3:
+							String extern = (String) it1.next();
+							afegeixExtern(extern);
+	  						break;
+		  				case 4:
+							String roleName = (String) it1.next();
+							String dispatcher = "";
+							String scope = "";
+							int i = roleName.indexOf('@');
+							if ( i >= 0 )
+							{
+								dispatcher = roleName.substring (i+1);
+								roleName = roleName.substring (0, i);
+							}
+							int j = dispatcher.lastIndexOf('/');
+							if (j >= 0)
+							{
+								scope = dispatcher.substring(j+1);
+								dispatcher =  dispatcher.substring(0,j);
+							}
+							afegeixRole(roleName, dispatcher, scope, "");
+	  						break;
+		  				case 5:
+							String group = (String) it1.next();
+							afegeixGroup(group, null, null);
+	  						break;
+	  				}
+				}
+			
+				/* Esborrar */
+					
+				/* Comparar la llista antiga amb la nova per saber els membres a esborrar */
+				for (i=0;i @lt longitud_old; i++)
+				{
+					membre_actual = membres_old[i].trim();
+					int j = 0;
+					existeix = false;
+					while (j @lt longitud_now @and !existeix)
+					{
+						if (membre_actual.equals(membres_now[j].trim())) {
+							existeix = true;
+						}
+						j++;
+					}
+					if (!existeix) {
+						esborrar.add(membre_actual);
+					}
+				}
+	
+				Iterator it2 = esborrar.iterator();
+				while (it2.hasNext())
+				{
+		  			switch(tipus) {
+		  				case 1:
+							String codi = (String) it2.next();
+							esborraUsuari(codi);
+		  					break;
+		  				case 2:
+							String info = (String) it2.next();
+							String[] llista = info.split("@");
+							esborraLlista(llista[0],llista[1]);
+		  					break;
+		  				case 3:
+							String extern = (String) it2.next();
+							esborraExtern(extern);
+	  						break;
+		  				case 4:
+							String roleName = (String) it2.next();
+							String dispatcher = "";
+							String scope = "";
+							int i = roleName.indexOf('@');
+							if ( i >= 0 )
+							{
+								dispatcher = roleName.substring (i+1);
+								roleName = roleName.substring (0, i);
+							}
+							int j = dispatcher.lastIndexOf('/');
+							if (j >= 0)
+							{
+								scope = dispatcher.substring(j+1);
+								dispatcher =  dispatcher.substring(0,j);
+							}
+							esborraRole(roleName, dispatcher, scope, "");
+	  						break;
+		  				case 5:
+							String group = (String) it2.next();
+							esborraGroup(group, null, null);
+	  						break;
+	  				}
+				}
+			}
+			
+			void cloneMeNow(String nomNovaLlista) {
+				import es.caib.seycon.ng.comu.LlistaCorreu;
+				
+				// Detectar si hay un commit pending (general) y dar mensaje en este caso
+				llista = (DataListbox) esquema.getFellow("lista").getFellow("listbox");
+				/*if (llista.isCommitPending()) {
+					Missatgebox.avis("Ha de confirmar els canvis abans de poder fer una còpia d'una llista de correu");
+					return;
+				}*/
+				Listitem elem = llista.getSelectedItem();
+				Object value = elem.getValue().getInstance();
+				
+				if (value instanceof LlistaCorreu) {
+					LlistaCorreu original = (LlistaCorreu) value;
+					modelProxy = (es.caib.zkib.binder.list.ModelProxy) llista.getModel();
+					position = modelProxy.newInstance();
+					ds = llista.getDataSource(); 
+					ctx =  ds.getJXPathContext(); 
+					xpath = llista.getXPath() + modelProxy.getBind(position); 
+					pointer =ctx.createPath (xpath);
+					ctx2 = ctx.getRelativeContext(pointer);
+					ctx2.setValue("@nom", nomNovaLlista);
+					ctx2.setValue("@descripcio", original.getDescripcio());
+					ctx2.setValue("@codiDomini", original.getCodiDomini());
+					ctx2.setValue("@llistaExterns", original.getLlistaExterns());
+					ctx2.setValue("@llistaLlistes", original.getLlistaLlistes());
+					ctx2.setValue("@llistaUsuaris", original.getLlistaUsuaris());
+					ctx2.setValue("@llistaLlistesOnPertany", original.getLlistaLlistesOnPertany());
+					pointer.invalidate ();
+					llista.setSelectedIndex(position); //seleccionem l'element nou
+					
+					// Hem de procesar les llistes i afegir-les
+					usu = original.getLlistaUsuaris();
+					ext = original.getLlistaExterns();
+					lli = original.getLlistaLlistes();
+					llp = original.getLlistaLlistesOnPertany();
+					
+					String[] usus = usu.split(",");
+					String[] exts = ext.split(",");
+					String[] llis = lli.split(",");
+					String[] llps = llp.split(",");
+					
+					for (int i=0 ; i @lt usus.length; i++) {
+						String codi = usus[i].trim();
+						if (!"".equals(codi)) afegeixUsuari(codi,nomUsuari(codi));
+					}
+					for (int i=0 ; i @lt llis.length; i++) {
+						llistaCorreu = new String[2];
+						llistaCorreu = llis[i].trim().split("@");
+						if (llistaCorreu.length!=1) afegeixLlista(llistaCorreu);
+					}
+					for (int i=0 ; i @lt exts.length; i++) {
+						if (!"".equals(exts[i])) afegeixExtern(exts[i].trim());
+					}
+					for (int i=0 ; i @lt llps.length; i++) {
+						llistaCorreuP = new String[2];
+						llistaCorreuP = llps[i].trim().split("@");
+						if (llistaCorreuP.length!=1) afegeixLlistaPertany(llistaCorreuP);
+					}
+				}
+			}
+		]]>
+	</zscript>
+
+	<esquemavertical datamodel="/model" focusCriteri="queryNom" id="esquema" onHideFormulari="showLista()">
+	
+		<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()" width="${amplaria}">
+			<hbox>
+				<input_criteri etiqueta="${c:l('llistesCorreu.zul.Nom')}" id="queryNom"/>
+				<input_criteri etiqueta="${c:l('llistesCorreu.zul.Domini')}" id="queryDomini"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox>
+ 				<input_criteri etiqueta="${c:l('llistesCorreu.zul.Descripcia')}" id="queryDescripcio"/>
+			</hbox>
+		</criteris>
+		
+		<navegador id="lista" width="${amplaria}">
+			<toolbar>
+				<insertbutton acces="${canCreateCorreu}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
+				<deletebutton acces="${canDeleteCorreu}" listbox="/esquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+				<listexporttoolbarbutton acces="${canQueryCorreu}" listbox="/esquema/lista/listbox"/>
+			</toolbar>
+			<listbox id="listbox" autocommit="false" dataPath="/model:/llistaCorreu"
+				fixedLayout="true" height="96%" onClick="showDetall()"
+				onSelect="select()" rows="${fileres}">
+				<listhead>
+					<listheader label="${c:l('llistesCorreu.zul.Nom-2')}" sort="auto"
+						width="50%"/>
+					<listheader label="${c:l('llistesCorreu.zul.Domini-2')}" sort="auto"
+						width="50%"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@nom"/>
+					<listcell bind="@codiDomini"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades" width="${amplaria}">
+			<zscript>
+				void onChangeDades()
+				{
+					try {
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						registre = ctx.getValue("/");
+						t_detall_nom =form.getFellow("detall_nom");
+						if ("".equals(t_detall_nom.getValue()) @and registre.isNew()) //Quan és buit: nous
+							t_detall_nom.setDisabled(false);
+						else {
+							t_detall_nom.setDisabled(true);
+						}
+						//form.getFellow("detall_nom")/*.getFellow("dada")*/.setDisabled(!registre.isNew());
+					} catch (Exception e) {
+						form.getFellow("detall_nom")/*.getFellow("dada")*/.setDisabled(true);
+					}
+				}
+			</zscript>
+			<form id="form" dataPath="/esquema/lista/listbox:/."
+				onChangeXPath="onChangeDades()" width="99%">
+				<attribute name="onActualitza">
+					dada = (String)event.getData();
+					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+					camp.setValue(dada);
+				</attribute>
+				
+				<tabbox width="${amplaria2}">
+					<tabs>
+						<tab label="${c:l('llistesCorreu.zul.Dades')}"/>
+						<tab label="${c:l('llistesCorreu.zul.Membresdesglosat')}"/>
+						<tab label="${c:l('llistesCorreu.zul.Membresreduat')}"/>
+					</tabs>
+
+					<tabpanels>
+						<tabpanel id="basica">
+						<vbox width="100%">
+						<grid fixedLayout="true" id="gridLlistaCorreu">
+							<attribute name="onActualitza">
+								// Obtenim el nou de la nova llista (còpia)
+								dada = (String[]) event.getData();
+								if (dada[0]!=null @and !"".equals(dada[0])) {
+									cloneMeNow(dada[0].toLowerCase());
+									gridLlistaCorreu.getFellow("detall_nom").setDisabled(true);
+								} else {
+									Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Nom"));
+								}
+							</attribute>
+							<columns visible="false">
+								<column width="150px">1</column>
+								<column>2</column>
+							</columns>
+							<rows>
+								<row>
+									<input_etiqueta value="${c:l('llistesCorreu.zul.Nom-2')}"/>
+									
+									<hbox width="20%">
+										<textbox bind="@nom" id="detall_nom" maxlength="50"
+											onChange="self.value=self.value.toLowerCase()"
+											width="99%" constraint="no empty"/>
+											
+										<label value="*" />
+									</hbox>
+								</row>
+								<row>
+									<input_etiqueta value="${c:l('llistesCorreu.zul.Domini-2')}"/>
+									
+									<hbox width="22%">
+										<input_dada id="detall_domini" bind="@codiDomini"
+											lectura="${!canModifyCorreu}" width_custom="99%"/>
+										<imageclic src="~./img/domain-mail.gif">
+											<attribute name="onClick">
+												if (canModifyCorreu) {
+													idActualitza ="detall_domini";
+													desktop.getPage("dominisCorreuLlista").setAttribute("llistaObsolets",false);
+													Events.postEvent	("onInicia",desktop.getPage("dominisCorreuLlista").getFellow("esquemaLlista"),form);
+												}
+											</attribute>
+										</imageclic>
+									</hbox>
+								</row>
+								<row>
+									<input_etiqueta value="${c:l('llistesCorreu.zul.Descripcia-2')}"/>
+									<input_dada id="detall_descripcio" bind="@descripcio"
+										lectura="${!canModifyCorreu}" width_custom="98%"/>
+								</row>
+							</rows>
+						</grid>
+						<button if="${canModifyCorreu}" image="~./img/copia.png"
+							label="${c:l('llistesCorreu.zul.Creaunacapiadelallis')}">
+							<attribute name="onClick">
+								llista = (DataListbox) esquema.getFellow("lista").getFellow("listbox");
+								if (llista.isCommitPending()) {
+									Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Confirmar"));
+									return;
+								}
+								// Solicitamos valor de la nueva lista
+								desktop.getPage("finestraGenerica").setAttribute("titolFinestra",org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Nom2"));
+								desktop.getPage("finestraGenerica").setAttribute("nomCamp","Nom");
+								
+								Events.postEvent ("onInicia",desktop.getPage("finestraGenerica").getFellow("esquemaGeneric"),gridLlistaCorreu);
+							</attribute>
+						</button>
+						</vbox>
+						</tabpanel>
+					
+						<tabpanel id="desglosat">
+							<grid fixedLayout="true" width="100%">
+								<columns visible="false">
+									<column width="120px">1</column>
+									<column>1</column>
+								</columns>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('llistesCorreu.zul.Usuaris')}"/>
+											<vbox width="100%">
+												<grid dataPath="/usuari" fixedLayout="true" id="gridUsuaris" width="99%">
+													<attribute name="onActualitza">
+														afegeixUsuari((String)(event.getData()[0]),(String)(event.getData()[1]));
+														<!--  A l'afegir un nou usuari, s'ha de copiar a la llista de membres reduida -->
+														llistaActual = form.getFellow("detall_llista_usuaris").getValue();
+														if (llistaActual.equals("")) {
+															form.getFellow("detall_llista_usuaris").setValue((String)(event.getData()[0]));
+														} else {
+															form.getFellow("detall_llista_usuaris").setValue(llistaActual + "," + (String)(event.getData()[0]));
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('llistesCorreu.zul.Usuari')}" width="200px"/>
+														<column label="${c:l('llistesCorreu.zul.Nom-2')}"/>
+														<column label="${c:l('llistesCorreu.zul.')}" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@codiUsuari"/>
+														<div>
+															<label bind="@nomComplert" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String user = es.caib.zkib.datasource.XPathUtils.getValue(
+										                          						self,
+										                          						"@codiUsuari");
+										                            if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/usuaris.zul?user="+user,
+										                          				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+														</div>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridUsuaris.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	membre = context.getValue(xpath+"/@codiUsuari");
+																	if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurEsborrar"), new Object [] {membre}),
+																									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(1,membre);
+																		context.removePath(xpath);
+																	}
+																}
+															</attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+															//No deixem canviar el nom (dona error)
+															form.getFellow("detall_nom").setDisabled(true);
+															Events.postEvent	("onInicia",desktop.getPage("usuarisLlista").getFellow("esquemaLlista"), gridUsuaris);
+														</attribute>
+													</button>
+												<hbox style="float:right">
+												<gridexportbutton acces="${canQueryCorreu}" grid="gridUsuaris"/>
+												</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+									<row>
+										<input_etiqueta value="${c:l('aplicacions.zul.Rols')}"/>
+											<vbox width="100%">
+												<grid dataPath="/role" fixedLayout="true" id="gridRoles" width="99%">
+													<attribute name="onActualitza">
+														if (event.getData()[3] != null) {
+															valorDomini = (event.getData()[3])[0];
+														} else {
+															valorDomini = "";
+														}
+														desc = (String)(event.getData()[2]);
+														bbdd = (String)(event.getData()[5]);
+														role = (String)(event.getData()[0]);
+				
+
+														afegeixRole(role, bbdd, valorDomini, desc);
+														<!--  A l'afegir un nou usuari, s'ha de copiar a la llista de membres reduida -->
+														Textbox tb = form.getFellow("detall_llista_roles");
+														llistaActual = tb.getValue();
+														String tag = role+"@"+bbdd;
+														if (valorDomini.length()>0)
+															tag = tag + "/"+valorDomini;
+														if (llistaActual.equals("")) {
+															tb.setValue(tag);
+														} else {
+															tb.setValue(llistaActual + ", " + tag);
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('aplicacions.zul.Rol')}" width="15em"/>
+														<column label="${c:l('aplicacions.zul.BD')}" width="15em"/>
+														<column label="${c:l('aplicacions.zul.NomRol-2')}" width="*"/>
+														<column label="${c:l('aplicacions.zul.Domini')}" width="15em"/>
+														<column label="-" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@roleName"/>
+														<label bind="@dispatcherName"/>
+														<label bind="@roleDescription"/>
+														<label bind="@scope"/>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick"><![CDATA[
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridUsuaris.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	roleName = context.getValue(xpath+"/@roleName");
+																	dispatcher = context.getValue(xpath+"/@dispatcherName");
+																	scope = context.getValue(xpath+"/@scope");
+																	String tag = roleName+"@"+dispatcher;
+																	if (scope != null && scope.length() > 0)
+																		tag = tag + "/" + scope;
+																	if (Missatgebox.confirmaOK_CANCEL(
+																		String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurEsborrar"), 
+																				new Object [] {tag}),
+																				org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(4,tag);
+																		context.removePath(xpath);
+																	}
+																}
+															]]></attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+															desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF", "true");
+															desktop.getPage("rolsLlista").setAttribute("tipus", "wizard");
+															desktop.getPage("rolsLlista").setAttribute("usuari", "");
+															Events.postEvent("onInicia",
+																	desktop.getPage("rolsLlista").getFellow("esquemaLlista"), gridRoles);
+														</attribute>
+													</button>
+												<hbox style="float:right">
+												<gridexportbutton acces="${canQueryCorreu}" grid="gridUsuaris"/>
+												</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+									<row>
+										<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+											<vbox width="100%">
+												<grid dataPath="/group" fixedLayout="true" id="gridGroups" width="99%">
+													<attribute name="onActualitza">
+														String codi = event.getData()[0];
+														String description = event.getData()[1];
+														Long id = Long.parseLong(event.getData()[2]);
+
+														afegeixGroup(codi, description, id);
+														<!--  A l'afegir un nou usuari, s'ha de copiar a la llista de membres reduida -->
+														Textbox tb = form.getFellow("detall_llista_groups");
+														llistaActual = tb.getValue();
+														if (llistaActual.equals("")) {
+															tb.setValue((String)(event.getData()[0]));
+														} else {
+															tb.setValue(llistaActual + ", " + (String)(event.getData()[0]));
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('aplicacions.zul.Grup')}" width="15em"/>
+														<column label="${c:l('valorDomini.zul.Descripcia')}" width="*"/>
+														<column label="-" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@codi"/>
+														<div>
+															<label bind="@descripcio" style="margin-right: 1em"/>
+															<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																	String group = es.caib.zkib.datasource.XPathUtils.getValue(
+										                          						self,
+										                          						"@codi");
+										                            if (esquema.canClose())
+										                           		Executions.getCurrent().sendRedirect(
+										                           			"index.zul?embed&target=/grups.zul?group="+group,
+										                          				"soffid_popup");
+																]]>
+																</attribute>
+															</imageclic>
+														</div>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridUsuaris.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	membre = context.getValue(xpath+"/@codi");
+																	if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurEsborrar"), new Object [] {membre}),
+																									org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(5,membre);
+																		context.removePath(xpath);
+																	}
+																}
+															</attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+																	desktop.getPage("grupsLlista")
+																		.setAttribute("tipus", "");
+																	desktop.getPage("grupsLlista")
+																		.setAttribute("llistaObsolets", false);
+																	Events.postEvent("onInicia",
+																			desktop.getPage("grupsLlista")
+																				.getFellow("esquemaLlista"), gridGroups);
+														</attribute>
+													</button>
+												<hbox style="float:right">
+												<gridexportbutton acces="${canQueryCorreu}" grid="gridUsuaris"/>
+												</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+
+										<row>
+											<input_etiqueta value="${c:l('llistesCorreu.zul.Llistesdecorreuconti')}"/>
+											<vbox width="100%">
+												<grid dataPath="/llista" fixedLayout="true" id="gridLlistesCorreu" width="99%">
+													<attribute name="onActualitza">
+														afegeixLlista(event.getData());
+														<!--  A l'afegir una nova llista, s'ha de copiar a la llista de membres reduida -->
+														llistaActual = form.getFellow("detall_llista_llistes").getValue();
+														if (llistaActual.equals("")) {
+															form.getFellow("detall_llista_llistes").setValue((String)(event.getData()[0])+"@"+(String)(event.getData()[1]));
+														} else {
+															form.getFellow("detall_llista_llistes").setValue(llistaActual + "," + (String)(event.getData()[0])+"@"+(String)(event.getData()[1]));
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('llistesCorreu.zul.Llista')}" width="200px"/>
+														<column label="${c:l('llistesCorreu.zul.Domini-2')}"/>
+														<column label="${c:l('llistesCorreu.zul.')}" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@nomLlistaCorreuPertany"/>
+														<label bind="@codiDominiCorreuPertany"/>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick"><![CDATA[
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridLlistesCorreu.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	membre1 = context.getValue(xpath+"/@nomLlistaCorreuPertany");
+																	membre2 = context.getValue(xpath+"/@codiDominiCorreuPertany");
+																	membre = membre1 + "@" + membre2;
+																	if (Missatgebox.confirmaOK_CANCEL(
+																		String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurBorrar"),
+																			 new Object [] {membre}),
+																		org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(2,membre);
+																		context.removePath(xpath);
+																	}
+																}
+															]]></attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+															//No deixem canviar el nom (dona error)
+															form.getFellow("detall_nom").setDisabled(true);
+															Events.postEvent	("onInicia",desktop.getPage("llistesCorreuLlista").getFellow("esquemaLlista"),gridLlistesCorreu);
+														</attribute>
+													</button>
+													<hbox style="float:right;">
+													<gridexportbutton acces="${canQueryCorreu}"
+														grid="gridLlistesCorreu"/>
+													</hbox>
+												</hbox>
+											</vbox>
+										</row>
+
+										<row>
+											<input_etiqueta value="${c:l('llistesCorreu.zul.Llistesdecorreuonper')}"/>
+											<vbox width="100%">
+												<grid id="gridLlistesCorreuPertany"
+													dataPath="/llistaPertany" fixedLayout="true"
+													width="99%">
+													<columns>
+														<column label="${c:l('llistesCorreu.zul.Llista')}" width="200px"/>
+														<column label="${c:l('llistesCorreu.zul.Domini-2')}"/>
+													</columns>
+													<datarow>
+														<label bind="@nomLlistaCorreuConte"/>
+														<label bind="@codiDominiCorreuConte"/>
+													</datarow>
+												</grid>
+												<hbox width="99%">
+													<hbox style="float:right">
+														<gridexportbutton acces="${canQueryCorreu}"
+															grid="gridLlistesCorreuPertany"/>
+													</hbox>
+												</hbox>
+											</vbox>
+										</row>
+										
+										<row>
+											<input_etiqueta value="${c:l('llistesCorreu.zul.Correusexterns')}"/>
+											<vbox width="100%">
+												<grid id="gridCorreusExterns" dataPath="/extern"
+													fixedLayout="true" width="99%">
+													<attribute name="onActualitza">
+														afegeixExtern((String)event.getData());
+														// A l'afegir un nou correu extern, s'ha de copiar a la llista de membres reduida 
+														llistaActual = form.getFellow("detall_llista_externs").getValue();
+														if (llistaActual.equals("")) {
+															form.getFellow("detall_llista_externs").setValue((String)(event.getData()));
+														} else {
+															form.getFellow("detall_llista_externs").setValue(llistaActual + "," + (String)(event.getData()));
+														}
+													</attribute>
+													<columns>
+														<column label="${c:l('llistesCorreu.zul.Correuextern')}"/>
+														<column label="${c:l('llistesCorreu.zul.')}" width="40px"/>
+													</columns>
+													<datarow>
+														<label bind="@adreca"/>
+														<imageclic align="center" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																if (canUpdateCorreu || canDeleteCorreu) {
+																	dataRow = self.getParent();
+																	xpath = dataRow.getXPath();
+																	dataSource = gridCorreusExterns.getDataSource();
+																	context = dataSource.getJXPathContext();
+																	membre = context.getValue(xpath+"/@adreca");
+																	if (Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("llistesCorreu.SegurBorrarExtern"), new Object [] {membre}),
+																					org.zkoss.util.resource.Labels.getLabel("llistesCorreu.Borrar"))) {
+																		esborraMembre(3,membre);
+																		context.removePath(xpath);
+																	}
+																}
+															</attribute>
+														</imageclic>
+													</datarow>
+												</grid>
+												<hbox width="99%"> 
+													<button disabled="${!canModifyCorreu}"
+														image="~./img/list-add.gif"
+														label="${c:l('llistesCorreu.zul.Afegeixnou')}">
+														<attribute name="onClick">
+															//No deixem canviar el nom (dona error)
+															form.getFellow("detall_nom").setDisabled(true);
+															Events.postEvent("onInicia",desktop.getPage("correusExterns").getFellow("esquema"),gridCorreusExterns);
+														</attribute>
+													</button>
+													<hbox style="float:right;">
+														<gridexportbutton acces="${canQueryCorreu}"
+															grid="gridCorreusExterns"/>
+													</hbox>
+												</hbox>
+											</vbox>
+										</row>
+								</rows>
+							</grid>
+						</tabpanel>
+
+						<tabpanel id="reduit">
+							<grid fixedLayout="true">
+								<columns visible="false">
+									<column width="150px">title</column>
+									<column>content</column>
+								</columns>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('llistesCorreu.zul.Usuaris')}"/>
+										<textbox id="detall_llista_usuaris" bind="@llistaUsuaris"
+											readonly="${!canModifyCorreu}" sclass="textbox" width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(1,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('aplicacions.zul.Rols')}"/>
+										<textbox id="detall_llista_roles" bind="roleMembers"
+											readonly="${!canModifyCorreu}" sclass="textbox" width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(4,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+										<textbox id="detall_llista_groups" bind="@groupMembers"
+											readonly="${!canModifyCorreu}" sclass="textbox" width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(5,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('llistesCorreu.zul.Llistesdecorreuconti')}"/>
+										<textbox id="detall_llista_llistes" bind="@llistaLlistes"
+											readonly="${!canModifyCorreu}" sclass="textbox"
+											width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(2,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('llistesCorreu.zul.Correusexterns')}"/>
+										<textbox id="detall_llista_externs" bind="@llistaExterns"
+											readonly="${!canModifyCorreu}" sclass="textbox"
+											width="98%">
+											<attribute name="onFocus">
+												membres_at_moment = self.getValue(); 
+											</attribute>
+											<attribute name="onChange">
+												changeLlista(3,membres_at_moment);
+											</attribute>
+										</textbox>
+									</row>
+								</rows>
+							</grid>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+			</form>
+		</detalls>
+	</esquemavertical>
+	
+	<include src="dominisCorreullista.zul"/>
+	<include src="usuarisllista.zul"/>
+	<include src="llistesCorreullista.zul"/>
+	<include src="correusExterns.zul"/>
+	<include src="finestres/finestra_valorGeneric.zul"/>	
+	<include src="rolsllista.zul" />
+	<include src="grupsllista.zul" />
+</frame>

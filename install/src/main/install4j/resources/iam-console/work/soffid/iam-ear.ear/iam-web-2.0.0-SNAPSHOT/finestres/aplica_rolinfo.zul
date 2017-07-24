@@ -1,0 +1,919 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="rol" title="Application role details"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+
+<zk>
+<style src="/css/localSEU.css"/>
+<style src="~./styles/estil.css"/>
+<style src="/css/devices.css"/>
+
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="800px" 
+	onCreate="start()"> 
+
+	
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.zkiblaf.Missatgebox;
+			import es.caib.zkib.datasource.XPathUtils;
+			
+		    import es.caib.seycon.ng.comu.*;
+		    
+		    System.out.println ("=====================================================================================");
+		    
+		    pageScope{"roleName"} = Executions.getCurrent().getNativeRequest().getParameter("role");
+		    pageScope{"system"} = Executions.getCurrent().getNativeRequest().getParameter("system");
+		    pageScope{"id"} = Executions.getCurrent().getNativeRequest().getParameter("id");
+
+		    void open (Rol rol)
+		    {
+				System.out.println("INICIANDO "+rol);
+
+				// Grupos poseedores del rol
+				String codiAplicacio = rol.getCodiAplicacio();
+				page.setAttribute("standalone", true);
+				Component dades = esquemaRol.getFellow("dades");
+				Component dsAgents = esquemaRol.getFellow("dsAgents");
+				
+				setReadOnly ();
+				
+				esquemaRol.setClosable(false);
+				esquemaRol.setSizable(false);
+				esquemaRol.setTitle(null);
+				esquemaRol.setMode("embedded");
+				esquemaRol.setBorder(null);
+				esquemaRol.setWidth("100%");
+				esquemaRol.visible = true;
+				esquemaRol.getFellow("finishButton").setVisible(false);
+				esquemaRol.getFellow("cancelButton").setVisible(false);
+				
+				if (rol.getDomini() == null)
+					rol.setDomini( es.caib.zkib.datasource.XPathUtils.getValue(dsAgents,
+						"/domini[1]").instance );
+				if (rol.getOwnedRoles() == null)
+					rol.setOwnedRoles(new LinkedList());
+				if (rol.getOwnerGroups() == null)
+					rol.setOwnerGroups(new LinkedList());
+				if (rol.getOwnerRoles() == null)
+					rol.setOwnerRoles(new LinkedList());
+				if (rol.getContrasenya() == null)
+					rol.setContrasenya(Boolean.FALSE);
+				if (rol.getDefecte() == null)
+					rol.setDefecte(Boolean.TRUE);
+				if (rol.getGestionableWF() == null)
+					rol.setGestionableWF(Boolean.FALSE);
+				
+				dsAgents.getVariables().declareVariable("rol", rol);
+				dsAgents.getVariables().declareVariable("application",
+					codiAplicacio);
+				dsAgents.refresh();
+				
+				detall_domini=dades.getFellow("detall_domini");
+				for (Listitem item: detall_domini.getItems())
+				{
+					if (item.getValue().getInstance().getNom()
+						.equals(rol.getDomini().getNom()))
+					{
+						detall_domini.setSelectedItem (item);
+					}
+				}
+
+		    }
+
+		    void start () {
+			    es.caib.seycon.ng.servei.ejb.AplicacioService app = es.caib.seycon.ng.EJBLocator.getAplicacioService();
+			    if (pageScope{"id"} != null)
+			    {
+			    	Rol rol = app.findRolById(Long.decode(pageScope{"id"}));
+			    	if (rol != null)
+			    	{
+			    		open (rol);
+			    	}
+			    } else if ( pageScope{"roleName"} != null && pageScope{"system"} != null)
+			    {
+			    	Rol rol = app.findRoleByNameAndSystem(pageScope{"roleName"}, pageScope{"system"});
+			    	if (rol != null)
+			    		open (rol);
+			    }
+		    }
+		    
+		    void setReadOnly ()
+		    {
+				Component dades = esquemaRol.getFellow("dades");
+				dades.getFellow("detall_nom").setReadonly(true);
+				dades.getFellow("detall_agent").setDisabled(true);
+				dades.getFellow("detall_descripcio").setDisabled(true);
+				dades.getFellow("detall_codiAplicacio").setDisabled(true);
+				dades.getFellow("detall_codiAplicacio_button").setVisible(false);
+				dades.getFellow("detall_category").setReadonly(true);
+				dades.getFellow("detall_defecte").setDisabled(true);
+				dades.getFellow("detall_contrasenya").setDisabled(true);
+				dades.getFellow("detall_domini").setDisabled(true);
+				dades.getFellow("ownedRolesRemoveColumn").setVisible(false);
+				dades.getFellow("ownerRolesRemoveColumn").setVisible(false);
+				dades.getFellow("ownerGroupsRemoveColumn").setVisible(false);
+				dades.getFellow("ownedRolesAddButton").setVisible(false);
+				dades.getFellow("ownerRolesAddButton").setVisible(false);
+				dades.getFellow("ownerGroupsAddButton").setVisible(false);
+
+		    }
+
+		    String[] dadesDomini = { "", "" };
+			ArrayList c_paresRol = new ArrayList();
+			ArrayList c_fillsRol = new ArrayList();
+			ArrayList c_grupsPosseidors = new ArrayList();
+			String id_Rol = ""; // Almacenamos el id del rol actual
+			void cleanWindow() {
+				dsAgents.getVariables().undeclareVariable("rol");
+				dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/"));
+				esquemaRol.visible = false;
+			}
+			
+			void acceptaDada()
+			{
+				es.caib.zkib.datasource.DataSource ds = esquemaRol.getFellow("dsAgents");
+				es.caib.seycon.ng.comu.Rol rol = dsAgents.getVariables().getVariable("rol");
+				Component form = esquemaRol.getFellow("dades").getFellow("form");
+				boolean modifica_rol = form.getFellow("detall_nom").isDisabled();
+				Component callerForm = (Component) pageScope.get("contextComponent");
+				
+				if (rol == null || 	rol.getNom() == null ||
+						rol.getNom().trim().equals("") || rol.getDescripcio() == null ||
+						rol.getDescripcio().trim().equals("") ||
+						rol.getBaseDeDades() == null ||
+						rol.getBaseDeDades().trim().equals(""))
+				{
+					Missatgebox.error(
+						org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error"),
+						org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error2"));
+					form.getFellow("detall_nom").setFocus(true);
+					return;
+				}
+				
+				Events.postEvent("onUpdateRol", callerForm, rol);
+				cleanWindow();
+			}
+			/*
+			Object[] dadesRol1 = {nomRol, desRol, bbddRol, domRol, paresRol, id_Rol, grupsPosseidors, rolsFillAtorgats};
+			Boolean[] dadesRol2 = {defRol, conRol};
+			*/
+			
+			void onWindowClose(Event event)
+			{
+				cleanWindow();
+				event.stopPropagation();
+			}
+		]]>
+	</zscript>
+	
+	<window id="esquemaRol" closable="true" position="center, center"
+		sizable="true" title="${c:l('aplica_rolinfo.Titol')}" visible="false"
+		width="90%">
+
+		<datamodel id="dsAgents" rootNode="root" src="descriptorRol.xml"/>
+		
+		<attribute name="onInicia">
+			<![CDATA[
+				if (event.data != null)
+					pageScope.put("contextComponent", event.data);
+				
+				List newRoles = page.getAttribute("newRole");
+				
+				
+				es.caib.seycon.ng.comu.Rol rol = page.getAttribute("rol");
+				modifica = page.getAttribute("modifica");
+				
+				// Check new role modification
+				if ((newRoles != null) && !newRoles.isEmpty() &&
+						newRoles.contains(rol.getCodiAplicacio() + rol.getNom() +
+								rol.getBaseDeDades()))
+				{
+					modifica = false;
+				}
+				
+				dades.getFellow("detall_nom").setReadonly(modifica);
+				dades.getFellow("detall_agent").setDisabled(modifica);
+				dades.getFellow("detall_codiAplicacio").setDisabled(true);
+				dades.getFellow("detall_codiAplicacio_button").setVisible(true);
+				
+				if (self.mode.compareToIgnoreCase("highlighted") != 0)
+				{
+					self.setMode("highlighted");
+				}
+				
+				else
+				{
+					self.visible = true;
+				}
+				
+				if (rol.getDomini() == null)
+					rol.setDomini( es.caib.zkib.datasource.XPathUtils.getValue(dsAgents,
+						"/domini[1]").instance );
+				if (rol.getOwnedRoles() == null)
+					rol.setOwnedRoles(new LinkedList());
+				if (rol.getOwnerGroups() == null)
+					rol.setOwnerGroups(new LinkedList());
+				if (rol.getOwnerRoles() == null)
+					rol.setOwnerRoles(new LinkedList());
+				if (rol.getContrasenya() == null)
+					rol.setContrasenya(Boolean.FALSE);
+				if (rol.getDefecte() == null)
+					rol.setDefecte(Boolean.TRUE);
+				if (rol.getGestionableWF() == null)
+					rol.setGestionableWF(Boolean.FALSE);
+				if (rol.getCodiAplicacio() == null)
+					rol.setCodiAplicacio(page.getAttribute("aplicacio"));
+				
+				dsAgents.getVariables().declareVariable("rol", rol);
+				dsAgents.getVariables().declareVariable("application",
+					rol.getCodiAplicacio());
+				dsAgents.refresh();
+				page.setAttribute("originalDispatcher", rol.getBaseDeDades());
+				page.setAttribute("originalName", rol.getNom());
+				page.setAttribute("originalDomain", rol.getDomini());
+				
+				detall_domini=dades.getFellow("detall_domini");
+				for (Listitem item: detall_domini.getItems())
+				{
+					if (item.getValue().getInstance().getNom()
+						.equals(page.getAttribute("originalDomain").getNom()))
+					{
+						detall_domini.setSelectedItem (item);
+					}
+				}
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			onWindowClose(event);
+		</attribute>
+	
+		<detalls id="dades">
+			<form id="form" dataPath="/esquemaRol/dsAgents:/rol[1]"
+				onSelectDomainValue="onSelectDomainValue(event.data)">
+				<zscript>
+					<![CDATA[
+					         
+					    void addRole (es.caib.seycon.ng.comu.Rol grantedRol, Component list, String path, boolean granted)
+						{
+							es.caib.seycon.ng.comu.RolGrant rg = new es.caib.seycon.ng.comu.RolGrant();
+							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
+							rg.setDomainValue(null);
+							rg.setHasDomain(false);
+							if (granted)
+							{
+								rg.setOwnerRol(currentRol.getId());
+								rg.setOwnerRolName(currentRol.getNom());
+								rg.setOwnerDispatcher(currentRol.getBaseDeDades());
+								rg.setRolName(grantedRol.getNom());
+								rg.setDispatcher(currentRol.getBaseDeDades());
+								rg.setIdRol(grantedRol.getId());
+								
+								pageScope.put("grantedRole", grantedRol);
+								pageScope.put("grant", rg);
+								pageScope.put("granteeRole", currentRol);
+								
+							} else {
+								rg.setOwnerRol(grantedRol.getId());
+								rg.setOwnerRolName(grantedRol.getNom());
+								rg.setOwnerDispatcher(grantedRol.getBaseDeDades());
+								rg.setRolName(currentRol.getNom());
+								rg.setDispatcher(currentRol.getBaseDeDades());
+								rg.setIdRol(currentRol.getId());
+
+								pageScope.put("grantedRole", currentRol);
+								pageScope.put("grant", rg);
+								pageScope.put("granteeRole", grantedRol);
+								
+							}
+							pageScope.put("grantedDomains", null);
+							pageScope.put("granteeDomains", null);
+							pageScope.put("grantPath", path);
+							if ( ! askForDomainValue ()) {
+								createGrants ();
+							}
+						}
+					    
+					    void createGrants ()
+					    {
+					    	System.out.println ("CREATING GRANTS 1");
+					    	List grantedDomains = pageScope.get("grantedDomains");
+					    	List granteeDomains = pageScope.get("granteeDomains");
+					    	System.out.println ("CREATING GRANTS 2");
+					    	RolGrant grant = pageScope.get("grant");
+					    	String grantPath = pageScope.get("grantPath");
+
+					    	if (grantedDomains == null) grantedDomains = new LinkedList();
+					    	if (grantedDomains.isEmpty()) grantedDomains.add(null);
+					    	
+					    	if (granteeDomains == null) granteeDomains = new LinkedList();
+					    	if (granteeDomains.isEmpty()) granteeDomains.add(null);
+
+					    	System.out.println ("CREATING GRANTS 3");
+					    	for (String grantedDomain: grantedDomains)
+					    	{
+					    		for (String granteeDomain: granteeDomains)
+					    		{
+					    			RolGrant rg = new RolGrant (grant);
+					    			rg.setDomainValue(grantedDomain);
+					    			rg.setOwnerRolDomainValue(granteeDomain);
+									String newPath = es.caib.zkib.datasource.XPathUtils.createPath(dsAgents,
+											"/rol[1]/" + grantPath, rg);
+					    		}
+					    	}
+					    	System.out.println ("CREATING GRANTS 4");
+//							dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/"+path));
+					    }
+					    
+					    boolean askForDomainValue () {
+					    	RolGrant grant = pageScope.get("grant");
+					    	if (null == pageScope.get("granteeDomains")  && grant.getOwnerRolName() != null)
+					    	{
+					    		Rol granteeRole = pageScope.get("granteeRole");
+								String domain = granteeRole.getDomini().getNom();
+								if (domain!=null && ! "".equals(domain.trim()) && 
+										! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(domain)) 
+								{
+									Page p = desktop.getPage("valorsDominisRol");
+									p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+									p.setAttribute("domini", granteeRole.getDomini());
+									p.setAttribute("senseDomini", "S");
+									p.setAttribute("eventName", "onSelectDomainValue");
+									p.setAttribute("roleName", granteeRole.getNom());
+									Events.postEvent ("onInicia", p.getFellow("esquemaLlista"), form);
+									return true;
+								}
+					    	}
+					    	if (null == pageScope.get("grantedDomains") && grant.getRolName() != null)
+					    	{
+					    		Rol grantedRole = pageScope.get("grantedRole");
+					    		System.out.println("LOOKING DOMAIN FOR GRANTED ROLE "+grantedRole);
+								String domain = grantedRole.getDomini().getNom();
+								if (domain!=null && ! "".equals(domain.trim()) && 
+									! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(domain)) 
+								{
+									Page p = desktop.getPage("valorsDominisRol");
+									p.setAttribute("usuari", es.caib.seycon.ng.utils.Security.getCurrentUser());
+									p.setAttribute("domini", grantedRole.getDomini());
+									p.setAttribute("senseDomini", "S");
+									p.setAttribute("eventName", "onSelectDomainValue");
+									p.setAttribute("roleName", grantedRole.getNom());
+									Events.postEvent ("onInicia", p.getFellow("esquemaLlista"), form);
+									return true;
+								}
+					    	}
+					    	return false;
+						}
+
+					    void onSelectDomainValue (List values)
+						{
+					    	if (values != null) // Null means cancel
+					    	{
+						    	RolGrant grant = pageScope.get("grant");
+						    	
+					    		Rol granteeRole = pageScope.get("granteeRole");
+								String granteeDomain = granteeRole == null ? null: granteeRole.getDomini().getNom();
+					    		Rol grantedRole = pageScope.get("grantedRole");
+								String grantedDomain = grantedRole == null ? null: grantedRole.getDomini().getNom();
+
+					    		if ( null == pageScope.get("granteeDomains") && grant.getOwnerRolName() != null &&
+					    				granteeDomain!=null && ! "".equals(granteeDomain.trim()) && 
+										! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(granteeDomain))
+						    	{
+						    		pageScope.put("granteeDomains", values);
+						    	}
+						    	else if (null == pageScope.get("grantedDomains") && grant.getRolName() != null &&
+					    				grantedDomain!=null && ! "".equals(grantedDomain.trim()) && 
+										! es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI.equals(grantedDomain))
+						    	{
+						    		pageScope.put("grantedDomains", values);
+						    	} 
+						    	if (! askForDomainValue())
+						    		createGrants();
+					    	}
+						}
+
+					    
+						void afegirGrupPare (es.caib.seycon.ng.comu.Grup grantedGroup)
+						{
+							es.caib.seycon.ng.comu.RolGrant rg = new es.caib.seycon.ng.comu.RolGrant();
+							es.caib.seycon.ng.comu.Rol currentRol = form.getValue().instance;
+							rg.setDomainValue(null);
+							rg.setHasDomain(false);
+							rg.setOwnerGroup(grantedGroup.getCodi());
+							rg.setRolName(currentRol.getNom());
+							rg.setDispatcher(currentRol.getBaseDeDades());
+							rg.setIdRol(currentRol.getId());
+
+							pageScope.put("grantedRole", currentRol);
+							pageScope.put("grant", rg);
+							pageScope.put("granteeGroup", grantedGroup);
+							
+							pageScope.put("grantedDomains", null);
+							pageScope.put("granteeDomains", null);
+							pageScope.put("grantPath", "granteeGroups");
+							if ( ! askForDomainValue ()) {
+								createGrants ();
+							}
+						}
+						
+						void newGrantRow (Listitem item) {
+							com.soffid.iam.api.RoleDependencyStatus status = XPathUtils.getValue(item, "@status");
+							if ( com.soffid.iam.api.RoleDependencyStatus.STATUS_TOAPPROVE.equals (status))
+							{
+								for (int i: new Integer[]{1,2,3,4,5,6})
+								{
+									item.getChildren().get(i).style = "background-color: #ffffc0;";
+								}
+								Listcell cell = item.getChildren().get(0);
+								Image i = new Image ("/img/hourglass.gif");
+								i.setWidth("24px");
+								i.setHeight("24px");
+								i.setParent(cell);
+							}
+							if ( com.soffid.iam.api.RoleDependencyStatus.STATUS_TOREMOVE.equals (status))
+							{
+								for (int i: new Integer[]{1,2,3,5,6})
+								{
+									item.getChildren().get(i).style = "text-decoration: line-through;";
+								}
+								Listcell cell = item.getChildren().get(0);
+								Image i = new Image ("/img/hourglass.gif");
+								i.setWidth("24px");
+								i.setHeight("24px");
+								i.setParent(cell);
+							}
+						}
+					]]>
+				</zscript>
+				<grid >
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
+							<hbox width="100%">
+								<textbox id="detall_nom" maxlength="50" sclass="textbox"
+									width="99%" bind="@nom" constraint="no empty">
+									<attribute name="onChange">
+										<![CDATA[
+											//self.value=self.value.replaceAll(" ",""); // no permitim espais
+										]]>
+									</attribute>
+								</textbox>
+								
+								<label value="*" />
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
+							
+							<hbox>
+								<textbox bind="@codiAplicacio" maxlength="20"
+									sclass="textbox"
+									constraint="no empty" id="detall_codiAplicacio"/>
+								<imageclic src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '
+									id ="detall_codiAplicacio_button"/>
+								<label value="*" />
+							</hbox>
+								
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Descripcia')}"/>
+							
+							<hbox width="100%">
+								<textbox id="detall_descripcio" sclass="textbox" width="99%"
+									bind="@descripcio" constraint="no empty"/>
+									
+								<label value="*" />
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Basededades(Agent)')}"/>
+							
+							<hbox>
+								<listbox id="detall_agent"
+									dataPath="/esquemaRol/dsAgents:/agent" mold="select"
+									bind="@baseDeDades">
+									<dataitem bind="@codi">
+										<listcell bind="@codi"/>
+									</dataitem>
+								</listbox>
+								
+								<label value="*" />
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Category')}"/>
+							
+							<textbox id="detall_category" sclass="textbox" width="99%"
+									bind="@category" constraint="no empty"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Defecte')}"/>
+							<checkbox id="detall_defecte" onCheck="" bind="@defecte"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Contrasenya')}"/>
+							<checkbox id="detall_contrasenya" onCheck="" bind="@contrasenya"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Domini')}"/>
+							<hbox width="99%" widths="*,30px">
+								<listbox id="detall_domini" width="100%" bind="domini" dataPath="/esquemaRol/dsAgents:/domini" mold="select"> 
+									<dataitem bind=".">
+										<listcell bind="@fullName">
+										</listcell>
+									</dataitem>
+									<attribute name="onSelect">
+										<![CDATA[
+											// Si som atorgat a un rol o a un grup no es pot canviar el tipus de domini
+											d = esquemaRol.getFellow("dsAgents");
+											if (!detall_domini.getSelectedItem().getValue().getInstance().getNom().equals( page.getAttribute("originalDomain").getNom() ))
+											{
+												List ownedRoles = d.getValue ("/rol[1]/ownedRoles");
+												List ownerRoles = d.getValue ("/rol[1]/ownerRoles");
+												List ownerGroups = d.getValue ("/rol[1]/ownerGroups");
+												int numFilesGrups = ownerGroups!=null ? ownerGroups.size():0;
+												int numFilesRols = ownerRoles != null ? ownerRoles.size() :0;
+												int numFilesRolsFills = ownedRoles != null ? ownedRoles.size() :0;
+												if (numFilesRols > 0 || numFilesGrups > 0 || numFilesRolsFills > 0) {
+													Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.NoCanviarTipus"),
+														org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error2"));
+												} else {
+													// Mirem si és un rol nou o modifiquem un existent
+													es_rol_existent = desktop.getPage("rol").getAttribute("modifica");
+													Long roleID = d.getValue("/rol[1]/@id");
+													
+													// Obtenim els usuaris q tenen atorgat aquest rol (si n'hi ha cap)
+													try {
+														if (es_rol_existent && (roleID != null)) { //Només als rols ja existents
+															aplicacioService = es.caib.seycon.ng.EJBLocator.getAplicacioService();
+															// Obteniem els atributs originals:
+															Long max = new Long(15);
+															num = aplicacioService.findRolGrantByRol(roleID, max);
+															if (! num.isEmpty())
+															{
+																// Cerquem els codi d'usuaris
+																java.util.ArrayList usus = new java.util.ArrayList();
+																String msg = "";
+																for (Iterator it = num.iterator(); it.hasNext(); )  {
+																	es.caib.seycon.ng.comu.RolGrant rg = (es.caib.seycon.ng.comu.RolGrant) it.next();
+																	msg = msg + rg.getOwnerAccountName()+"\n";
+																}
+																if (num.size() == max.intValue()) {
+																	msg = msg + org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.More") + "\n";
+																}
+																String ususf = usus.toString().replaceAll("\\[","\n\t").replaceAll("\\]","\n\n").replaceAll(", ","\n\t");
+																Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Warning"), 
+																		new Object [] {msg}));
+																for (Listitem item: detall_domini.getItems()) 
+																{
+																	if (item.getValue().getInstance().getNom().equals( page.getAttribute("originalDomain").getNom()))
+																		detall_domini.setSelectedItem (item);
+																}
+																return;
+															}
+														}
+													} catch (Throwable th) {
+														Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("aplica_rolinfo.Error3"), 
+																			new Object [] {th}));
+														
+													}
+													
+												}
+											}
+										]]>
+									</attribute>
+								</listbox>
+							</hbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.createdOn')}"/>
+							<datebox bind="@approvalStart" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" width="12em" style="dateboxread" buttonVisible="false"></datebox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('aplica_rolinfo.zul.approvedOn')}"/>
+							<datebox bind="@approvalEnd" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" width="12em" style="dateboxread" buttonVisible="false"></datebox>
+						</row>
+					</rows>
+				</grid>
+							<tabbox>
+								<tabs>
+									<tab
+										label="${c:l('aplica_rolinfo.zul.Rolsquetaatorgats')}" />
+									<tab
+										label="${c:l('aplica_rolinfo.zul.Rolsqueeltenenatorga')}" />
+									<tab
+										label="${c:l('aplica_rolinfo.zul.Grupsqueeltenenatorg')}" />
+								</tabs>
+								<tabpanels>
+									<tabpanel>
+										<listbox fixedLayout="true"
+											dataPath="/ownedRoles" style="margin-bottom: 2em" rows="6"
+											width="100%" id="ownedRoles"
+											onAfegirRolPare='addRole(event.data, ownedRoles, "ownedRoles", true)'
+											onSelectedDomainValue='onSelectedDomainValue(event.data, ownedRoles, "ownedRoles", true)'
+											onNewRow="newGrantRow(event.data)">
+											<zscript>
+											<![CDATA[
+	void onDeleteGrantedRow() {
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils
+				.getComponentContext(self);
+		String dada = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
+				"/@rolName");
+		String xpath = ctx.getXPath();
+		Missatgebox.confirmaOK_CANCEL(String.format(
+				org.zkoss.util.resource.Labels
+						.getLabel("usuaris.SegurEsborrar"),
+				new Object[] { dada }), org.zkoss.util.resource.Labels
+				.getLabel("usuaris.Esborra"), new EventListener() {
+			public void onEvent(Event evt) {
+				if ("onOK".equals(evt.getName())) {
+					dsAgents.removePath(xpath);
+					dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/ownedRoles"));
+				}
+			}
+		});
+	}
+]]>
+										</zscript>
+											<listhead>
+												<listheader width="30px"></listheader>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Rol')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@ownerRolName">
+													</textboxfilter>
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@ownerDispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Domini')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@ownerRolDomainValue" />
+												</listheader>
+												<listheader label=""
+													width="30px" />
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Rol')}" width="*"
+													sort="auto">
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Domini')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@domainValue" />
+												</listheader>
+												<listheader id="ownedRolesRemoveColumn"
+													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
+											</listhead>
+											<dataitem width="100%">
+												<listcell/>
+												<listcell
+													bind="@ownerRolName" />
+												<listcell
+													bind="@ownerDispatcher" />
+												<listcell
+													bind="@ownerRolDomainValue" />
+												<listcell label="=>" />
+												<listcell
+													bind="@rolName" />
+												<listcell
+													bind="@domainValue" />
+												<listcell>
+													<imageclic
+														align="right" src="~./img/list-remove.gif"
+														onClick="onDeleteGrantedRow()">
+													</imageclic>
+												</listcell>
+											</dataitem>
+										</listbox>
+										<button
+											id="ownedRolesAddButton"
+											image="~./img/list-add.gif"
+											label="${c:l('aplica_rolinfo.zul.GrantRole')}">
+											<attribute name="onClick">
+	Events.postEvent("onInicia",
+			desktop.getPage("rolsLlista").getFellow("esquemaLlista"),
+			ownedRoles);
+</attribute>
+										</button>
+									</tabpanel>
+									<tabpanel>
+										<listbox id="ownerRolesGrid"
+											dataPath="/ownerRoles" fixedLayout="true"
+											style="margin-bottom: 2em" rows="6" width="100%"
+											onAfegirRolPare='addRole(event.data, ownerRolesGrid, "ownerRoles", false)'
+											onSelectedDomainValue='onSelectedDomainValue(event.data, ownerRolesGrid, "ownerRoles", false)'
+											onNewRow="newGrantRow(event.data)">
+											<zscript>
+											<![CDATA[
+	void onDeleteRow() {
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils
+				.getComponentContext(self);
+		String dada = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
+				"/@rolName");
+		String xpath = ctx.getXPath();
+		Missatgebox.confirmaOK_CANCEL(String.format(
+				org.zkoss.util.resource.Labels
+						.getLabel("usuaris.SegurEsborrar"),
+				new Object[] { dada }), org.zkoss.util.resource.Labels
+				.getLabel("usuaris.Esborra"), new EventListener() {
+			public void onEvent(Event evt) {
+				if ("onOK".equals(evt.getName())) {
+					dsAgents.removePath(xpath);
+					dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/ownerRoles"));
+				}
+			}
+		});
+	}
+]]>
+										</zscript>
+											<listhead>
+												<listheader width="30px"/>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Rol')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@ownerRolName">
+													</textboxfilter>
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@ownerDispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Domini')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@ownerRolDomainValue" />
+												</listheader>
+												<listheader label=""
+													width="30px" />
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Rol')}" width="*"
+													sort="auto">
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Domini')}" width="*"
+													sort="auto">
+													<textboxfilter
+														bind="@domainValue" />
+												</listheader>
+												<listheader id="ownerRolesRemoveColumn"
+													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
+												</listhead>
+											<dataitem width="100%">
+												<listcell/>
+												<listcell
+													bind="@ownerRolName" />
+												<listcell
+													bind="@ownerDispatcher" />
+												<listcell
+													bind="@ownerRolDomainValue" />
+												<listcell label="=>" />
+												<listcell
+													bind="@rolName" />
+												<listcell
+													bind="@domainValue" />
+												<listcell>
+													<imageclic
+														align="right" src="~./img/list-remove.gif"
+														onClick="onDeleteRow()">
+													</imageclic>
+												</listcell>
+											</dataitem>
+										</listbox>
+										<button
+											id="ownerRolesAddButton"
+											image="~./img/list-add.gif"
+											label="${c:l('aplica_rolinfo.zul.Atorgarelrolaunaltre')}">
+											<attribute name="onClick">
+	Events.postEvent("onInicia",
+			desktop.getPage("rolsLlista").getFellow("esquemaLlista"), ownerRolesGrid);
+</attribute>
+										</button>
+									</tabpanel>
+									<tabpanel>
+										<listbox fixedLayout="true" rows="6"
+											id="ownerGroupsGrid" dataPath="/granteeGroups"
+											style="margin-bottom: 2em"
+											onSelectedDomainValue='onSelectedDomainValue(event.data, ownerGroupsGrid, "granteeGroups", false, true)'
+											onAfegirGrupPosseidor ="afegirGrupPare((es.caib.seycon.ng.comu.Grup) event.getData())">
+											<listhead>
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Grup')}" width="30%">
+													<textboxfilter
+														bind="@ownerGroup" />
+												</listheader>
+												<listheader label=""
+													width="2em" />
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Rol')}" width="15%" />
+												<listheader
+													label="${c:l('aplica_rolinfo.zul.Domini')}" width="30%">
+													<textboxfilter
+														bind="@domainValue" />
+												</listheader>
+												<listheader
+													id="ownerGroupsRemoveColumn"
+													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
+											</listhead>
+											<dataitem width="100%">
+												<listcell
+													bind="@ownerGroup" />
+												<listcell label="=>" />
+												<listcell
+													bind="@rolName" />
+												<listcell
+													bind="@domainValue" />
+												<listcell>
+													<imageclic
+														align="right" src="~./img/list-remove.gif">
+														<attribute name="onClick">
+														<![CDATA[
+	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils
+			.getComponentContext(self);
+	dada = ctx.getDataSource().getValue(ctx.getXPath() + "/@ownerGroup");
+	String xpath = ctx.getXPath();
+Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
+																	.util.resource.Labels
+																		.getLabel("usuaris.SegurEsborrar"),
+																	new Object [] {dada}),
+																	org.zkoss.util.resource.Labels
+																		.getLabel("usuaris.Esborra"),
+																	new EventListener() {
+	public void onEvent(Event evt) {
+		if ("onOK".equals(evt.getName())) {
+			dsAgents.removePath(xpath);
+			dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/rol[1]/granteeGroups"));
+		}
+	}
+});
+]]>
+														</attribute>
+													</imageclic>
+												</listcell>
+											</dataitem>
+										</listbox>
+										<button
+											id="ownerGroupsAddButton"
+											image="~./img/list-add.gif"
+											label="${c:l('aplica_rolinfo.zul.Atorgarelrolaungrup')}">
+											<attribute name="onClick">
+	selected = form.getFellow("detall_domini").getSelectedItem().getValue();
+	String s_valor_domini = selected == null ? null : selected.getInstance()
+			.getNom();
+	desktop.getPage("grups_posseidors").setAttribute("tipusUnitatOrganizativa",
+			"");
+	desktop.getPage("grups_posseidors").setAttribute("llistaObsolets", false);
+	Events.postEvent("onInicia",
+			desktop.getPage("grups_posseidors").getFellow("esquemaLlista"),
+			ownerGroupsGrid);
+</attribute>
+										</button>
+									</tabpanel>
+								</tabpanels>
+							</tabbox>
+			</form>
+		</detalls>
+
+		<popup id="infoRolAtorgatRol" width="200px">
+			<label id="rolAtorgatRolLabel" value="${c:l('aplica_rolinfo.zul.Elsusuarisquetinguen')}"/>
+		</popup>
+		<popup id="infoRolAtorgatGrup" width="200px">
+			<label id="rolAtorgatGrupLabel" value="${c:l('aplica_rolinfo.zul.Elsusuarisquepertany')}"/>
+		</popup>
+		<popup id="infoRolsTincAtorgats" width="200px">
+			<label id="infoRolsTincAtorgatsLabel" value="${c:l('aplica_rolinfo.zul.Silusuaritaelrolact')}"/>
+		</popup>
+
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" label="${c:l('aplica_rolinfo.zul.Accepta')}">
+				<attribute name="onClick">
+					acceptaDada();
+				</attribute>
+			</button>
+			<button id="cancelButton" label="${c:l('aplica_rolinfo.zul.Cancel·la')}" onClick="onWindowClose(event)"/>
+		</hbox>
+			
+	</window>
+	
+	<include src="/agentsllista.zul"/>
+	<include src="/grups_posseidors.zul"/>
+	<include src="/finestres/aplica_rolsllista.zul"/>
+	<include src="/dominisllista.zul"/>
+	
+	<include src="/finestres/aplica_rol_valorDomini.zul"/>
+</div>
+
+
+</zk>

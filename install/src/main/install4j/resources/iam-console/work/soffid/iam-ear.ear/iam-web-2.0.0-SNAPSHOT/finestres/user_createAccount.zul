@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="createAccount"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css" />
+
+	<zscript>
+	import es.caib.zkib.zkiblaf.Missatgebox;
+<![CDATA[
+	void cleanWindow() {
+		createAccount.visible = false;
+	}
+	void onWindowClose(Event event) {
+		cleanWindow();
+		event.stopPropagation();
+	}
+	
+	void toForm2 ()
+	{
+		if ( agent.getSelectedItem() == null || agent.getSelectedItem().getValue().instance.id == null)
+		{
+			alert (org.zkoss.util.resource.Labels.getLabel("user_createaccount.selectOne"));
+		}
+		else
+		{
+			es.caib.seycon.ng.comu.Dispatcher dispatcher = agent.getSelectedItem().getValue().instance;
+			pageScope.put("dispatcher", dispatcher);
+			String domain = dispatcher.getDominiContrasenyes();
+			es.caib.zkib.datasource.DataSource ds = page.getAttribute("dataSource");
+			String path = (String) page.getAttribute("dataPath");
+			if (! path.endsWith("/"))
+				path = path + "/";
+			try {
+				Object politica = ds.getJXPathContext().getValue(path+"domini[@codi='"+dispatcher.getDominiContrasenyes()+"']/politica");
+				if (politica == null)
+				{
+					alert (org.zkoss.util.resource.Labels.getLabel("user_createaccount.invalidDispatcher"));
+				}
+				else
+				{
+							
+					es.caib.seycon.ng.servei.ejb.AccountService as = es.caib.seycon.ng.EJBLocator.getAccountService();
+					String newName = as.gessAccountName(ds.getJXPathContext().getValue(path  + "/@codi"), dispatcher.getCodi());
+					nameBox.setValue(newName);
+					form2.visible = true;
+					form1.visible = false;
+				}
+			} catch ( es.caib.zkib.jxpath.JXPathNotFoundException e ) {
+				alert (org.zkoss.util.resource.Labels.getLabel("user_createaccount.invalidDispatcher"));
+			}
+		}
+	}
+	
+	void finish ()
+	{
+		es.caib.seycon.ng.comu.Dispatcher dispatcher =  pageScope.get("dispatcher");
+		String name = nameBox.getValue();
+		
+		es.caib.zkib.datasource.DataSource ds = page.getAttribute("dataSource");
+		String path = page.getAttribute("dataPath");
+		if (! path.endsWith("/"))
+			path = path + "/";
+		String targetPath = path+"domini[@codi='"+dispatcher.getDominiContrasenyes()+"']/politica[1]/account";
+		String newPath = es.caib.zkib.datasource.XPathUtils.createPath(ds, targetPath);
+		es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();
+		es.caib.seycon.ng.comu.UserAccount acc = ctx.getValue(newPath).getInstance();
+
+		pointer = ctx.getPointer(newPath);
+		xPath = pointer.asPath();
+		pointer = ctx.getPointer(xPath+"/@user");
+		xPath = pointer.asPath();
+
+		ctx.setValue(newPath+"/@user", ctx.getValue("codi"));
+		ctx.setValue(newPath+"/@dispatcher", dispatcher.getCodi());
+		ctx.setValue(newPath+"/@name", name);
+		ctx.setValue(newPath+"/@type", es.caib.seycon.ng.comu.AccountType.USER);
+		ctx.setValue(newPath+"/@passwordPolicy", ctx.getValue("tipusUsuari"));
+		
+		cleanWindow();
+		Events.postEvent("onCreatedAccount", (Component) pageScope.get("contextComponent"), null);
+		ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, "/"));
+		
+	}
+]]>
+	</zscript>
+
+	<window closable="true" id="createAccount" position="center, center"
+		sizable="true" title="${c:l('user_createaccount.Titol')}"
+		visible="false" width="70em" onClose="onWindowClose(event)">
+
+		<!--  Event received on window popup
+			Event parameter: caller component
+			Page attributes: dataPath Datapath containing the path where the user is located 
+		-->
+		<attribute name="onInicia"><![CDATA[
+		                                    
+	if (event.data != null)
+		pageScope.put("contextComponent", event.data);
+
+	if (self.mode.compareToIgnoreCase("highlighted") != 0) {
+		self.setMode("highlighted");
+	} else {
+		self.visible = true;
+	}
+
+	dades.getFellow("agent").setSelectedIndex(0);
+	dades.getFellow("form1").visible = true;
+	dades.getFellow("form2").visible = false;
+	]]>
+		</attribute>
+
+		<datamodel id="ds" rootNode="root" src="descriptorCreateAccount.xml"/>
+
+		<detalls id="dades" width="99%">
+			<form id="form1" width="100%">
+				<grid width="99%">
+					<rows>
+						<row>
+							<input_etiqueta
+								value="${c:l('user_createaccount.System')}" />
+							<listbox id="agent" dataPath="/createAccount/ds:/agent" width="99%" mold="select">
+								<dataitem bind=".">
+									<listcell bind="@codi"/>
+								</dataitem>
+							</listbox>
+						</row>
+					</rows>
+				</grid>
+				<separator spacing="5px" />
+				<hbox style="margin-left:auto; margin-right:auto">
+					<button label="${c:l('user_createaccount.Next')}"
+						onClick="toForm2()" />
+					<button label="${c:l('user_createaccount.Close')}"
+						onClick="onWindowClose(event)" />
+				</hbox>
+			</form>
+			<form id="form2" width="100%">
+				<grid width="99%">
+					<rows>
+						<row>
+							<input_etiqueta
+								value="${c:l('user_createaccount.Name')}" />
+							<textbox id="nameBox" width="99%"/>
+						</row>
+					</rows>
+				</grid>
+				<separator spacing="5px" />
+				<hbox style="margin-left:auto; margin-right:auto">
+					<button label="${c:l('user_createaccount.Next')}"
+						onClick="finish()" />
+					<button label="${c:l('user_createaccount.Close')}"
+						onClick="onWindowClose(event)" />
+				</hbox>
+			</form>
+		</detalls>
+	</window>
+
+</zk>

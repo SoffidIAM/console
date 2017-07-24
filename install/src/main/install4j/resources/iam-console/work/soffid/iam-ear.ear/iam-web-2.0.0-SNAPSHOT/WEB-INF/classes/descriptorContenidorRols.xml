@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="contenidorsRol">		
+		<finder name="contenidorRol" type="contenidorRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findContenidorsRolByCodi" if = "${queryEnabled}">
+				<parameter value="${codi}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.ContenidorRol">
+			</new-instance-bean>			
+		</finder>
+	</datanode>	
+	
+	<datanode name="contenidorRol">
+		<finder name="contenidorRol" type="contenidorRol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findRolsContinguts">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="es.caib.seycon.ng.comu.ContenidorRol">
+			</new-instance-bean>
+		</finder>				
+	</datanode>
+	
+</zkib-model>

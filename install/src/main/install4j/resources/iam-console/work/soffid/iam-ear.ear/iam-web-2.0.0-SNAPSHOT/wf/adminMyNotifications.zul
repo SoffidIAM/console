@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+	<frame id="configNotificacionsUsuari" use="es.caib.bpm.ui.user.UserConfigNotificationsAdminWindow" width="100%">
+		<vbox id="notificacionsUsuariPannel" spacing="5" width="99%">
+			<label sclass="titolperfil" value="${c:l('adminMyNotifications.zul.Notificacions')}"/>
+			<label value="${c:l('adminMyNotifications.zul.Emailalqualsenviara')}"/>
+			<textbox id="emailNotificacions" onChanging="botoActualitza.setDisabled(false);" width="300px"/>
+
+			<separator/>
+			<hbox style="float:center;">
+				<button disabled="true" id="botoActualitza" label="${c:l('adminMyNotifications.zul.Actualitza')}">
+					<attribute name="onClick">
+						configNotificacionsUsuari.updateNotificacions();
+
+						botoActualitza.setDisabled(true);
+					</attribute>
+				</button>
+			</hbox>
+
+		</vbox>
+	</frame>
+</zk>

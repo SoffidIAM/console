@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -12,55 +15,79 @@ import com.install4j.api.context.Context;
 
 public class PropertiesStore {
 
+	static Properties p = new Properties();
+	
     public static final String DB_STATUS = "dbStatus"; //$NON-NLS-1$
 
     private static String keys[] = { "dbDriver", "dbDriverString", "dbDriverUrl", "dbDriverClass", "dbSanitySelect", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            "dbPort", "dbTableTablespaceSize", "dbIndexTablespaceSize", "hostName", "domainName", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            "dbUser", "dbHost", "dbSid", "dbSchema", "dbSchemaPassword", "dbVersion", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-            "dbTableTablespace", "dbIndexTablespace", "dbConnectionChecker", "dbExceptionSorter", DB_STATUS //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            "dbPort", "dbTableTablespaceSize", "dbIndexTablespaceSize", "hostName", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            "dbHost", "dbSid", "dbUser", "dbPassword", "dbVersion", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+            "dbTableTablespace", "dbIndexTablespace", DB_STATUS //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     };
 
     Context ctx; 
 
     public PropertiesStore(com.install4j.api.context.Context ctx) {
-    			this.ctx = ctx;
+    	this.ctx = ctx;
+    	load ();
     }
 
     public void load() {
         String s = ctx.getInstallationDirectory().getPath();
-        s += "/jboss/server/default/conf/seu.properties"; //$NON-NLS-1$
+        s += "/conf/system.properties"; //$NON-NLS-1$
         File configFile = new File(s);
-        if (configFile.isFile() && configFile.canRead()) {
-            Properties p = new Properties();
-            try {
+        try {
+            if (configFile.isFile() && configFile.canRead()) {
                 p.load(new FileInputStream(configFile));
                 Enumeration e = p.keys();
                 while (e.hasMoreElements()) {
                     String key = (String) e.nextElement();
                     String v = p.getProperty(key);
                     if (key.startsWith("i.")) //$NON-NLS-1$
-                        ctx.setVariable(key.substring(2), Integer.decode(v));
+                    {
+                    	if (ctx.getVariable(key.substring(2)) == null)
+                    		ctx.setVariable(key.substring(2), Integer.decode(v));
+                    }
                     else if (key.startsWith("l.")) //$NON-NLS-1$
-                        ctx.setVariable(key.substring(2), Long.decode(v));
+                    {
+                    	if (ctx.getVariable(key.substring(2)) == null)
+                    		ctx.setVariable(key.substring(2), Long.decode(v));
+                    }
                     else
-                        ctx.setVariable(key, v);
+                    {
+                    	if (ctx.getVariable(key) == null)
+                    		ctx.setVariable(key, v);
+                    }
                 }
-            } catch (Exception e1) {
-//                e1.printStackTrace();
-            }
-        }
+                ctx.setVariable("dbPassword2", ctx.getVariable("dbPassword"));
+	        } else {
+	            p.load(new FileInputStream(configFile+".template"));
+	            Enumeration e = p.keys();
+	            while (e.hasMoreElements()) {
+	                String key = (String) e.nextElement();
+	                String v = p.getProperty(key);
+	                if (key.startsWith("i.")) //$NON-NLS-1$
+	                    ctx.setVariable(key.substring(2), Integer.decode(v));
+	                else if (key.startsWith("l.")) //$NON-NLS-1$
+	                    ctx.setVariable(key.substring(2), Long.decode(v));
+	                else
+	                    ctx.setVariable(key, v);
+	            }
+	        }
+        } catch (Exception e1) {
+          e1.printStackTrace();
+      }
     }
 
-    public void save() {
+    public void save() throws IOException {
         String s = ctx.getInstallationDirectory().getPath();
-        s += "/jboss/server/default/conf/seu.properties"; //$NON-NLS-1$
+        s += "/conf/system.properties"; //$NON-NLS-1$
         File configFile = new File(s);
-        Properties p = new Properties();
         try {
             for (int i = 0; i < keys.length; i++) {
                 Object value = ctx.getVariable(keys[i]);
-                if (value != null) {
+                if (value != null && ! "".equals(value)) {
                     if (value instanceof Long)
                         p.setProperty("l." + keys[i], value.toString()); //$NON-NLS-1$
                     else if (value instanceof Integer)
@@ -69,9 +96,36 @@ public class PropertiesStore {
                         p.setProperty(keys[i], value.toString());
                 }
             }
-            p.store(new FileOutputStream(configFile), "Autogenerated by installer");  //$NON-NLS-1$
+            p.store(new FileOutputStream(configFile), "Autogenerated by Soffid installer");  //$NON-NLS-1$
         } catch (Exception e1) {
             e1.printStackTrace();
+        }
+        
+		String driverClass = (String) ctx.getVariable("dbDriverClass");
+        File f = new File (ctx.getInstallationDirectory().getPath()+"/conf/tomee.xml");
+        if (f.canRead() && driverClass != null && ! "".equals(driverClass))
+        {
+        	InputStreamReader reader = new InputStreamReader( new FileInputStream(f));
+        	StringBuffer sb = new StringBuffer();
+        	int ch;
+			while ((ch = reader.read()) != -1)
+				sb.append((char)ch);
+			reader.close();
+			final String pattern = "jdbcDriver";
+			int search = sb.indexOf(pattern);
+			String result;
+			if (search >= 0)
+			{
+				int end = sb.indexOf("\n", search);
+				result = sb.substring(0, search) + 
+					"jdbcDriver = "+driverClass +
+					sb.substring(end);
+			}
+			else
+				result = sb.toString();
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f));
+			writer.write(result);
+			writer.close();
         }
     }
 }

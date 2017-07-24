@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><zk xmlns:h="http://www.w3.org/1999/xhtml">
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<window id="f_log">
+<attribute name="onCreate">
+	javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) org.zkoss.zk.ui.Executions.getCurrent().getNativeRequest();
+	String why = req.getParameter("why");
+	if (why!=null @and !"".equals(why)) {
+			if ("not_allowed".equals(why)) {
+				msg = org.zkoss.util.resource.Labels.getLabel("getlogmsg.UsuariNoAutoritzat");
+			} else if ("cannot_connect".equals(why)) {
+				msg = org.zkoss.util.resource.Labels.getLabel("getlogmsg.NoConnectaSeycon");
+			} else {
+				msg = why;
+			}
+			msg2 = org.zkoss.util.resource.Labels.getLabel("getlogmsg.Error") + " " + msg;
+			Clients.evalJavaScript("alert(' " +msg2+"' )");
+	}
+</attribute>
+</window>
+</zk>

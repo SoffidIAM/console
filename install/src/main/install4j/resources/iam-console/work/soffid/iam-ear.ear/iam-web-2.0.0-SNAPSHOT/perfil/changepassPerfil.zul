@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="changepassPerfil" title="${c:l('changepass.Titol')}" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+<!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul -->
+	<frame id="p_changePassPerfil" saveContent="true" title="${c:l('changepassPerfil.Titol')}" width="99%">
+	
+		<style src="~./styles/estil.css" />
+		<style src="/css/localSEU.css" />
+	
+		<zscript>
+			<![CDATA[
+				String usuari = Executions.getCurrent().getUserPrincipal().getName();
+				String nom = Executions.getCurrent().getUserPrincipal().getFullName();
+				
+				javax.servlet.http.HttpServletRequest requ =
+					(javax.servlet.http.HttpServletRequest) Executions.getCurrent()
+						.getNativeRequest();
+				
+				v_canviVoluntari = requ.getParameter("custom");
+				canviVoluntari = false;
+				
+				if ((v_canviVoluntari != null) @and (!"".equals(v_canviVoluntari)))
+				{
+					canviVoluntari = true;
+				}
+				
+				es.caib.seycon.ng.servei.ejb.PasswordService ps = es.caib.seycon.ng.EJBLocator.getPasswordService();
+				String dispatcher = ps.getDefaultDispatcher();
+				
+				String []pds = ps.getPolicyDescription(usuari, dispatcher).split("\n");
+				StringBuffer policyDescription = new StringBuffer ();
+				for (String pd: pds)
+				{
+					if (pd.startsWith("- "))
+						policyDescription.append("    ").append (pd).append("\n");
+					
+					else
+						policyDescription.append("<LI>").append (pd).append ("</LI>");
+				}
+				
+				import javax.servlet.http.*;
+				String untrustedRoute = es.caib.loginModule.auth.ClientIPValve.getUntrustedIPRoute();
+				
+				// Mètode per fer logout
+				void logout()
+				{
+					Execution ex = Executions.getCurrent();
+					Class c = Class.forName("es.caib.loginModule.util.SessionManager");
+					Object sessionManager = c.newInstance();
+					java.lang.reflect.Method m = c.getMethod("endSession",
+					new Class [] {
+						javax.servlet.http.HttpServletRequest.class,
+						javax.servlet.http.HttpServletResponse.class
+					});
+					HttpServletRequest req = (HttpServletRequest) ex.getNativeRequest();
+					HttpServletResponse resp = (HttpServletResponse) ex.getNativeResponse();
+					try
+					{
+						m.invoke(sessionManager, new Object[] { req, resp });
+					}
+					catch (Exception e) {}
+					
+					es.caib.loginModule.auth.ControladorSesion controladorSession = new es.caib.loginModule.auth.ControladorSesion ();
+					
+					if (untrustedRoute != null)
+						controladorSession.getSesionEJB().setIPRoute(untrustedRoute);
+					
+					controladorSession.autenticar(usuari, passnueva1.getValue());
+					controladorSession.addCookie(Executions.getCurrent().getNativeResponse());
+					
+					ex.sendRedirect("/");
+					req.getSession().invalidate();
+				}
+			]]>
+		</zscript>
+
+		<div sclass="blanc">
+			<div sclass="formCanviContrasenya" width="420px">
+				<form id="canviPassw" width="100%">
+					<zscript>
+						<![CDATA[
+							void canviaPass()
+							{
+								// Obtenim els camps actuals
+								contraAnt = passactual.getValue();
+								contraNova1 = passnueva1.getValue();
+								contraNova2 = passnueva2.getValue();
+								
+								// Check void passwords
+								if ((contraAnt == "") || (contraNova == "") || (contraNova2 == ""))
+								{
+									Missatgebox.error(org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.CampsBuits"),
+										org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.Titol"));
+									
+									return;
+								}
+								
+								if (!contraNova1.equals(contraNova2))
+								{
+									Missatgebox.error (org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.CampsCoincidir"),
+										org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.Titol"));
+									
+									return;
+								}
+								
+								es.caib.loginModule.ChangePass thechange = new es.caib.loginModule.ChangePass();
+								try
+								{
+									thechange.changePassword(usuari,contraAnt,contraNova1);
+								
+									if (Missatgebox.confirmaOK(org.zkoss.util.resource
+													.Labels.getLabel("changepassPerfil.CanviOK"),
+												org.zkoss.util.resource
+													.Labels.getLabel("changepassPerfil.CanviPWD")))
+									{
+										logout();
+									}
+								}
+								
+								catch (es.caib.seycon.ng.exception.BadPasswordException e)
+								{
+									Missatgebox.error(String.format(org.zkoss.util.resource
+												.Labels.getLabel("changepassPerfil.ErrorNormativa"),
+											new Object[] { e.getMessage() }),
+										org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.PasswordInvalid"));
+								}
+								
+								catch (es.caib.seycon.ng.exception.InvalidPasswordException e)
+								{
+									Missatgebox.error(org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.ErrorCanvi"),
+										org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.PasswordInvalid"));
+								}
+								
+								catch (Exception e)
+								{
+									String msg = e.getMessage();
+									msg = (msg != null) ? ": " + msg : "";
+									Missatgebox.error(String.format(org.zkoss.util.resource
+											.Labels.getLabel("changepassPerfil.Error"),
+										new Object [] {msg}));
+								}
+							}
+						]]>
+					</zscript>
+
+					<vbox width="100%">
+						<vbox width="100%">
+							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%"> 
+								<label sclass="etiqueta" value="${c:l('login.lblUser')}"/>
+								<label style="text-weigth:bold;" value="${usuari}"/>
+							</hbox>
+
+							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%"> 
+								<label sclass="etiqueta" value="${c:l('changepassPerfil.zul.Contrasenyaactual')}"/>
+								<textbox id="passactual" type="password"/>
+							</hbox>
+
+							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
+								<label sclass="etiqueta" value="${c:l('changepassPerfil.zul.Novacontrasenya')}"/>
+								<textbox id="passnueva1" type="password"/>
+							</hbox>
+
+							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
+								<label sclass="etiqueta" value="${c:l('changepassPerfil.zul.Repeticianovacontras')}"/>
+								<textbox id="passnueva2" onOK="canviaPass()" type="password"/>
+							</hbox>
+						</vbox>
+
+						<div align="center" sclass="botonera">
+							<hbox align="center" style="margin: 0 auto;">
+								<button label="${c:l('changepassPerfil.zul.Acceptar')}">
+									<attribute name="onClick">
+										canviaPass();
+									</attribute>
+								</button> 
+	
+								<button label="${c:l('changepassPerfil.zul.Cancel·lar')}">
+									<attribute name="onClick">
+										es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul");
+									</attribute>
+								</button>
+							</hbox>
+						</div>
+					</vbox>
+				</form>
+				
+				<html>
+					<![CDATA[
+							<div id="info" style="text-align:middle";>
+								<p>${c:l('changepassPerfil.Instruccio1')} <em>${c:l('changepassPerfil.zul.Acceptar')}</em>.</p>
+								                  
+								<pre>${policyDescription}</pre>
+							</div>
+					]]>
+				</html>
+			</div>
+		</div>
+	
+		<html>
+			<![CDATA[
+				<!-- Aquí s'haurien de cridar ses polítiques de creació de contrasenyes de cada organització -->
+			]]>
+		</html>
+	</frame>
+</zk>

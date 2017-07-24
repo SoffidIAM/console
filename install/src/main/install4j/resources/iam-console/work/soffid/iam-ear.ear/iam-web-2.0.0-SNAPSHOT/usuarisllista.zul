@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="usuarisLlista" title="Llista d'usuaris"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="800px">
+
+	<datamodel id="model" rootNode="usuaris" src="descriptorUsuari.xml"/>
+	
+	<zscript src="comu/checkTruncatedResults.zul"/>
+	
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			
+			String mode = "query"; 
+			boolean view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			model.getVariables().declareVariable("restringeixCerca", true);
+			
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode = "query";
+			}
+			
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				Textbox codi = esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("queryCodi")
+						.getFellow("textbox");
+				Textbox DNI = esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("queryDNI")
+						.getFellow("textbox");
+				Textbox nom = esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("queryNom")
+						.getFellow("textbox");
+				Textbox primerLlinatge = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryPrimerLlinatge").getFellow("textbox");
+				Textbox segonLlinatge = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("querySegonLlinatge").getFellow("textbox");
+				Textbox grupPrimari = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryGrupPrimari").getFellow("textbox");
+				
+				Textbox dominiCorreu = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryWindowAltres").getFellow("queryDominiCorreu")
+						.getFellow("textbox");
+				tipusUsuari = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryWindowAltres").getFellow("queryTipusUsuari")
+						.getSelectedItem();
+				actiu = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryWindowAltres").getFellow("queryActiu")
+						.getSelectedItem();
+				grupSecundari = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryWindowAltres").getFellow("queryGrupSecundari")
+						.getFellow("textbox");
+				Textbox nomCurt = esquemaLlista.getFellow("esquema").getFellow("queryWindow")
+						.getFellow("queryWindowAltres").getFellow("queryNomCurt")
+						.getFellow("textbox");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) &&
+						(DNI.value.trim().length() == 0) &&
+						((nom == null) || (nom.value == null) ||
+						(nom.value.trim().length() == 0)) &&
+						(primerLlinatge.value.trim().length() == 0) &&
+						(segonLlinatge.value.trim().length() == 0) &&
+						(grupPrimari.value.trim().length() == 0) &&
+						(dominiCorreu.value.trim().length() == 0) &&
+						((tipusUsuari == null) || (tipusUsuari.getValue() == null)) &&
+						((actiu == null) || (actiu.getValue() == null)) &&
+						(grupSecundari.value.trim().length() == 0) &&
+						(nomCurt.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("DNI", DNI.value);
+				searchValues.put("nom", nom.value);
+				searchValues.put("primerLlinatge", primerLlinatge.value);
+				searchValues.put("segonLlinatge", segonLlinatge.value);
+				searchValues.put("grupPrimari", grupPrimari.value);
+				searchValues.put("dominiCorreu", dominiCorreu.value);
+				
+				if ((tipusUsuari == null) || (tipusUsuari.getValue() == null))
+					searchValues.put("tipusUsuari", "");
+				
+				else
+					searchValues.put("tipusUsuari", tipusUsuari.value);
+				
+				if ((actiu == null) || (actiu.getValue() == null))
+					searchValues.put("actiu", "");
+				
+				else
+					searchValues.put("actiu", actiu.value);
+				
+				searchValues.put("grupSecundari", grupSecundari.value);
+				searchValues.put("nomCurt", nomCurt.value);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				es.caib.seycon.ng.comu.UsuariCriteria criteria = new es.caib.seycon.ng.comu.UsuariCriteria();
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					if (key.equals("codi"))
+						criteria.setCodi(lista.get(key));
+					
+					if (key.equals("DNI"))
+						criteria.setNIF(lista.get(key));
+					
+					if (key.equals("nom"))
+						criteria.setNom(lista.get(key));
+					
+					if (key.equals("primerLlinatge"))
+						criteria.setPrimerLlinatge(lista.get(key));
+					
+					if (key.equals("segonLlinatge"))
+						criteria.setSegonLlinatge(lista.get(key));
+					
+					if (key.equals("grupPrimari"))
+						criteria.setCodiGrupPrimari(lista.get(key));
+					
+					if (key.equals("dominiCorreu"))
+						criteria.setDominiCorreu(lista.get(key));
+					
+					if (key.equals("tipusUsuari"))
+						criteria.setTipusUsuari(lista.get(key));
+					
+					if (key.equals("actiu"))
+					{
+						if (!lista.get(key).equals("") && !lista.get(key).equals("%"))
+							criteria.setActiu(Boolean.parseBoolean(lista.get(key)));
+					
+						else
+							criteria.setActiu(true);
+					}
+					
+					if (key.equals("grupSecundari"))
+						criteria.setSecondaryGroup(lista.get(key));
+					
+					if (key.equals("nomCurt"))
+						criteria.setNomCurt(lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("criteria", criteria);
+				model.getVariables().declareVariable("restringeixCerca", true);
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/usuari").refresh();
+					listbox.dataPath = "/model:/usuari"; 
+				}
+				
+				if ((listbox.getModel().getSize() == 0) && !retrySearch)
+				{
+					retrySearch = true;
+					search();
+				}
+				
+				else
+				{
+					retrySearch = false;
+				}
+				
+				checkTruncatedList(listbox);
+			}
+	
+			void showAltres () 
+			{
+				if (view_altres == false)
+				{
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").setHeight("120px"); 
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").setHeight("77px"); 
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquemaLlista.getFellow("esquema").getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void cleanWindow()
+			{
+				queryWindow = esquemaLlista.getFellow("esquema").getFellow("queryWindow");
+				queryWindow.getFellow("queryCodi").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryDNI").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryNom").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryPrimerLlinatge").getFellow("textbox").value = "";
+				queryWindow.getFellow("querySegonLlinatge").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryGrupPrimari").getFellow("textbox").value = "";
+				
+				queryWindow.getFellow("queryWindowAltres")
+					.getFellow("queryDominiCorreu").getFellow("textbox").value = "";
+				queryWindow.getFellow("queryWindowAltres")
+					.getFellow("queryTipusUsuari").setSelectedIndex(0);
+				queryWindow.getFellow("queryWindowAltres").getFellow("queryActiu")
+					.setSelectedIndex(0);
+				queryWindow.getFellow("queryWindowAltres")
+					.getFellow("queryGrupSecundari").getFellow("textbox").value = "";
+				
+				model.getVariables().declareVariable("queryEnabled", false);
+				model.refresh();
+				esquemaLlista.visible=false;
+				view_altres = false;
+				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void acceptaDada()
+			{
+				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
+				ctx = ds.getJXPathContext(); 
+				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
+				index = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getSelectedIndex();
+				pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
+				ctx2 = ctx.getRelativeContext(pointer);
+				String codi = (String)ctx2.getPointer("@codi").getValue();
+				String nom = (String)ctx2.getPointer("@nom").getValue();
+				String id = (String)ctx2.getPointer("@id").getValue().toString();
+				String primerLlinatge = (String)ctx2.getPointer("@primerLlinatge").getValue();
+				String segonLlinatge = (String)ctx2.getPointer("@segonLlinatge").getValue();
+				pointer.invalidate ();
+				String[] dades = {codi, nom + " " + primerLlinatge +
+						((segonLlinatge != null) ? " " + segonLlinatge : ""), id};
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, dades);
+				cleanWindow();
+			}
+		]]>
+	</zscript>
+	
+	
+	<window id="esquemaLlista" closable="true" position="center, center" sizable="true"
+		title="${c:l('usuarisllista.Titol')}" visible="false" width="850px">
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setMode("highlighted");
+				}else{
+					self.visible = true;
+				}
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation ();
+			]]>
+		</attribute>
+		 
+		<esquema id="esquema">
+			<criteris id="queryWindow" onOK="search()"> 
+				<hbox>
+					<input_criteri id="queryCodi"
+						etiqueta="${c:l('usuarisllista.zul.Codi')}"/>
+					<input_criteri id="queryNom" etiqueta="${c:l('usuarisllista.zul.Nom')}"/>
+					<input_criteri id="queryPrimerLlinatge"
+						etiqueta="${c:l('usuarisllista.zul.Primerllinatge')}"/>
+					<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+				</hbox>
+				<hbox>
+					<input_criteri id="querySegonLlinatge"
+						etiqueta="${c:l('usuarisllista.zul.Segonllinatge')}"/>
+					<input_criteri id="queryDNI"
+						etiqueta="${c:l('usuarisllista.zul.NIF')}"/>
+					<input_criteri id="queryGrupPrimari"
+						etiqueta="${c:l('usuarisllista.zul.Grupprimari')}"/>
+				</hbox>
+				
+				<hbox>
+					<input_etiqueta value="${c:l('usuarisllista.zul.Altres')}"/>
+					<imageclic id="img_altres" onClick="showAltres()" src="~./img/fletxa.gif"/>
+				</hbox>
+				<separator spacing="2px"/>
+				<altres_criteris id="queryWindowAltres" visible="false">
+					<hbox>
+						<input_criteri id="queryDominiCorreu"
+							etiqueta="${c:l('usuarisllista.zul.Dominicorreu')}"/>
+						
+						<hbox width="250px" widths="100px,*">
+							<label sclass="etiqueta"
+								value="${c:l('usuarisllista.zul.Tipususuari')}" />
+							<listbox id="queryTipusUsuari" mold="select"  
+								dataPath="/model:/tipusUsuari">
+								<dataitem bind="@codi">
+									<listcelllabel bind="@codi" labelBind="@descripcio" />
+								</dataitem>
+							</listbox>
+						</hbox>
+						
+						<hbox width="250px" widths="100px,*">
+							<label sclass="etiqueta" value="${c:l('usuarisllista.zul.Actiu')}" />
+							<listbox id="queryActiu" mold="select">
+								<listitem label=""/>
+								<listitem value="S" label="${c:l('usuaris.zul.Actiu.yes')}"/>
+								<listitem value="N" label="${c:l('usuaris.zul.Actiu.no')}"/>
+							</listbox>
+						</hbox>
+						
+						<!-- <input_criteri id="queryTipusUsuari" etiqueta="Tipus usuari:" mascara="/[I,E,i,e,\null]/: Introdueix I/i o E/e"/>
+						<input_criteri id="queryActiu" etiqueta="Actiu:" mascara="/[N,S,n,s,\null]/: Introdueix S/s o N/n"/> -->
+					</hbox>
+					<hbox>
+						<input_criteri etiqueta="${c:l('usuarisllista.zul.Grupsecundari')}" id="queryGrupSecundari"/>
+						<input_criteri etiqueta="${c:l('usuarisllista.zul.Nomcurt')}" id="queryNomCurt"/>
+					</hbox>
+				</altres_criteris>
+			</criteris>
+			
+			<navegador id="lista">
+				<listbox id="listbox" autocommit="false" dataPath="/model:/usuari"
+					fixedLayout="true" rows="${fileres}">
+					<attribute name="onSelect">
+						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+					</attribute>
+					<listhead>
+						<listheader label="${c:l('usuarisllista.zul.Codi-2')}" width="150px"/>
+						<listheader label="${c:l('usuarisllista.zul.Nom-2')}" width="150px"/>
+						<listheader label="${c:l('usuarisllista.zul.PrimerLlinatge')}" width="150px"/>
+						<listheader label="${c:l('usuarisllista.zul.SegonLlinatge')}" width="100px"/>
+						<listheader label="${c:l('usuarisllista.zul.Grup')}" width="150px"/>
+					</listhead>
+					<listfoot>
+						<listfooter span="3">
+							<label id="listboxFoot" style="margin-left: 10px;" />
+						</listfooter>
+					</listfoot>
+					<dataitem bind=".">
+						<listcell bind="@codi">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+						<listcell bind="@nom">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+						<listcell bind="@primerLlinatge">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+						<listcell bind="@segonLlinatge">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+						<listcell bind="@codiGrupPrimari">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+					</dataitem>
+				</listbox>
+			</navegador>
+			
+		</esquema>
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('usuarisllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (!self.disabled)
+						acceptaDada();
+				</attribute>
+			</button>
+			<button label="${c:l('usuarisllista.zul.Cancel·la')}" onClick="cleanWindow()"/>
+		</hbox>
+	</window>
+</div>

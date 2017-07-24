@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="comentarisTarea"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<grid dataPath="BPMdata:/taskInstance/comments" fixedLayout="true" id="comments" width="100%">
+		<columns>
+			<column label="${c:l('task.autor')}" width="20%"/>
+			<column label="${c:l('task.data')}" width="20%"/>
+			<column label="${c:l('task.comentari')}"/>
+		</columns>
+
+		<datarow>
+			<label bind="@actor"/>
+			<label bind="@time"/>
+			<label bind="@message" multiline="true"/>
+		</datarow>
+	</grid>
+</zk>

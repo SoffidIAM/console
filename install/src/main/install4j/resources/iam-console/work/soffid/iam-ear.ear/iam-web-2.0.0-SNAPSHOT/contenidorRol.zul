@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="contenidors_rols" title="Gestió de contenidors de rols"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+	
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="contenidorsRol" src="descriptorContenidorRols.xml"/>
+	<zscript>
+      	fileres = es.caib.seycon.ng.web.Custom.FILERES;
+      	fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
+      	
+		mode = "query"; 
+ 		view_altres = false;
+ 		 		
+		model.getVariables().declareVariable("queryEnabled", true);
+		model.getVariables().declareVariable("codi", "CAIB");
+		
+		void populateDetails ()
+		{	
+			mode="query";
+		}
+		
+    	void search ()
+		{ 
+			treebox =	esquema.getFellow("lista").getFellow("treebox"); 
+			codi = esquema.getFellow("queryWindow").getFellow("queryCodi").getFellow("textbox");
+			
+			queryEnabled = false;				
+			if(codi.value.trim().length() == 0){
+				model.getVariables().declareVariable("codi", "%");
+			}else{
+				queryEnabled = true;
+				model.getVariables().declareVariable("codi", codi.value);
+			}
+			
+			model.getVariables().declareVariable("queryEnabled", queryEnabled);
+			if (queryEnabled){
+				model.getJXPathContext().getValue("/").refresh();
+				treebox.setDataPath( "/model:/" );
+			}
+		}		
+		
+		void select () 
+		{
+			if (esquema.getFellow("lista").getFellow("treebox").selectedItem != null @and 
+				esquema.getFellow("lista").getFellow("treebox").selectedItem.value != null) {
+				populateDetails (); 
+				showDetall ();
+			} 
+		}		 
+				
+		void showLista ()  
+		{
+			  esquema.getFellow("lista").getFellow("treebox").clearSelection();
+			  esquema.getFellow("lista").getFellow("treebox").setRows(fileresO);			  
+		}
+		
+		void showDetall () 
+		{
+			esquema.hideCriteris();
+			esquema.getFellow("lista").getFellow("treebox").setRows(5);
+			esquema.showFormulari();
+		}	
+		
+  	</zscript>
+	<esquemavertical datamodel="/model" id="esquema" title="${c:l('contenidorRol.Titol')}">
+	
+		<criteris id="queryWindow" onOK="search()">				
+			<hbox>
+				<input_criteri etiqueta="${c:l('contenidorRol.zul.Codi')}" id="queryCodi"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+		</criteris>
+		
+		<navegador height="322px" id="lista">
+			<toolbar height="4%">
+				<inserttreebutton path="contenidorRol" tree="/esquema/lista/treebox"/>
+				<commitbutton datamodel="/model"/>
+				<undotreebutton datamodel="/model" tree="/esquema/lista/treebox"/>
+			</toolbar>					
+			<tree dataPath="/model:/" fixedLayout="true" height="96%" id="treebox" pageSize="19" rows="${fileres}">
+				<treecols>
+					<treecol label="${c:l('contenidorRol.zul.Codi-2')}" width="100px"/>
+				</treecols>
+				<treeitemfinder bind="." open="false" path="/contenidorRol">
+					<treerow>
+						<treecell bind="@codi"/>
+					</treerow>
+				</treeitemfinder>
+			</tree>
+		</navegador>
+	</esquemavertical>
+</zk>

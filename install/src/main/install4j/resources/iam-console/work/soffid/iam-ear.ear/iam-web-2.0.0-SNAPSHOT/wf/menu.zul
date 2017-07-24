@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="menu"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+    <zscript>
+    <![CDATA[
+  	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+  	import es.caib.seycon.ng.utils.Security;
+  	
+  	boolean admin = AutoritzacionsUsuari.canAdminWorkflows();
+
+	// Control d'accés del SEU
+	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
+	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
+	boolean canViewGrups =  AutoritzacionsUsuari.hasViewGrupsSEU();		
+	boolean canViewDadesAddicionals = AutoritzacionsUsuari.hasViewDadesAddicionalsSEU();		
+	boolean canViewTipusUOrganitzativa = AutoritzacionsUsuari.hasViewTipusUOSEU();
+	boolean canViewAuditoria = AutoritzacionsUsuari.hasViewAuditoriaSEU();
+	boolean canViewAutoritzacions = AutoritzacionsUsuari.hasViewAutoritzacionsSEU();
+	boolean canViewImpressores = AutoritzacionsUsuari.hasViewImpressoresSEU();
+	boolean canViewServeis = AutoritzacionsUsuari.hasViewServeisSEU();
+	boolean canViewAplicacions = AutoritzacionsUsuari.hasViewAplicacionsSEU();
+	boolean canViewCorreu = AutoritzacionsUsuari.hasViewCorreuSEU();
+	boolean canViewDominisCorreu = AutoritzacionsUsuari.hasViewDominisCorreuSEU();
+	boolean canViewParametres = AutoritzacionsUsuari.hasViewParametresSEU();
+	boolean canViewAgents = AutoritzacionsUsuari.hasViewAgentsSEU();
+	boolean canViewPlugins = AutoritzacionsUsuari.hasViewPluginsSEU();
+	boolean canViewRegistreAcces = AutoritzacionsUsuari.hasViewRegistreAccesSEU();		
+	boolean canViewSeyconServer = AutoritzacionsUsuari.hasViewSeyconServerSEU();
+	boolean canViewDominiUsuaris = AutoritzacionsUsuari.hasViewDominiUsuaris();
+	boolean canViewAccounts = AutoritzacionsUsuari.hasViewAccountsSEU();
+	boolean canViewAttributeTranslation = es.caib.seycon.ng.utils.Security.isUserInRole("seu:attributeTranslation:show");
+	com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
+	boolean canViewTenants = es.caib.seycon.ng.utils.Security.isUserInRole("seu:tenant:show");
+	
+	boolean canViewRules = es.caib.seycon.ng.utils.Security.isUserInRole("seu:rules:show");
+	// Ara es mira per ACL de xarxes i màquines
+	hasACL_xarxesMaquines = session.getAttribute("hasACLXarxes");
+	boolean canViewXarxes = AutoritzacionsUsuari.canQueryAllNetworks();
+	boolean canViewMaquines = AutoritzacionsUsuari.canQueryAllHosts();
+	// Si qualque dels dos es false, mirem els ACLS 
+	if (!canViewXarxes || !canViewMaquines) {
+		if (hasACL_xarxesMaquines == null) {
+			// Encara no s'ha mirat si té ACLs
+			hasACL_xarxesMaquines = desktop.getPage("index").getFellow("finestraSEU").teACLXarxes();
+		}
+		if (!canViewXarxes) canViewXarxes = hasACL_xarxesMaquines;
+		if (!canViewMaquines) canViewMaquines = hasACL_xarxesMaquines;	
+	}
+	
+	// I els dels menus de la intranet
+	hasACL_PUE = session.getAttribute("hasACLPUE");
+	canViewAdministracioIntranet = AutoritzacionsUsuari.hasQueryAllMenusIntranet() || AutoritzacionsUsuari.hasViewMenusIntranetSEU(); 
+	// Si és false mirem els ACLs als menús de la Intranet
+	if (!canViewAdministracioIntranet) {
+		if (hasACL_PUE == null) {
+			// Mirem els ACLs de menús de la Intranet
+			canViewAdministracioIntranet = desktop.getPage("index").getFellow("finestraSEU").teACLPUE();
+		} else {
+			canViewAdministracioIntranet = hasACL_PUE;
+		}
+	}
+	
+		
+	//showFavorites = es.caib.zkib.zkiblaf.Application.isFavoritesVisible();
+	]]>
+  </zscript>
+  <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" use="es.caib.bpm.ui.main.MainMenuWindow" visible="false" width="30em"
+  	onCall="es.caib.zkib.zkiblaf.Application.setPage(event.data);">
+    <tree fixedLayout="true" vflex="false" id="menutree">
+    	<treechildren>
+    		<treeitem>
+    			<treerow>
+    				<apptreecell langlabel="main.lblTabInbox"/>
+    			</treerow>
+		    	<treechildren>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell langlabel="inbox.lblFiltroTareas1" pagina="wf/inbox.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell langlabel="inbox.lblFiltroTareas2" pagina="wf/runningtasks.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem if="${admin}" open="false"> 
+		    			<treerow>
+		    				<apptreecell langlabel="main.lblAdminJobs" pagina="wf/jobadmin.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		     		<treeitem id="availableprocesses" open="false">
+		    			<treerow>
+		    				<treecell label="${c:l('main.lblTabNuevoProceso')}" onClick="availableprocesses.setOpen ( ! availableprocesses.isOpen() )"/>
+		    			</treerow>
+		    		 <treechildren>
+		    		 </treechildren>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell langlabel="main.lblSearch" pagina="wf/search.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    	</treechildren>
+    		</treeitem>
+    		<treeitem id="administracio">
+    			<treerow>
+    				<treecell label="${c:l('main.lblAdmin')}" onClick="administracio.setOpen ( ! administracio.isOpen() )"/>
+    			</treerow>
+    			<treechildren>
+    			<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->  
+    				<treeitem id="recursoshumans" if="${canViewUsuaris || canViewGrups || canViewTipusUOrganitzativa}" open="false">
+    					<treerow>
+    						<treecell label="${c:l('seu.recursoshumans')}" onClick="recursoshumans.setOpen ( ! recursoshumans.isOpen() )"/>
+    					</treerow>
+		    			<treechildren>
+		    				<treeitem>
+		    					<treerow>
+		    						<apptreecell if="${canViewUsuaris}" langlabel="seu.usuaris" pagina="/usuaris.zul"/>
+		    					</treerow>
+		    				</treeitem>
+		    				<treeitem>
+		    					<treerow>
+		    						<apptreecell if="${canViewGrups}" langlabel="seu.grups" pagina="/grups.zul"/>
+		    					</treerow>
+		    				</treeitem>
+		    				<treeitem>
+		    					<treerow>
+		    						<apptreecell if="${canViewTipusUOrganitzativa}" langlabel="seu.tipusuorg" pagina="/tipusUnitatsOrganitzatives.zul"/>
+		    					</treerow>
+		    				</treeitem>
+		    			</treechildren>
+    				</treeitem>
+    				<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->	
+    				<treeitem id="recursostecnologics" if="${canViewVault || canViewXarxes || canViewMaquines || canViewImpressores || canViewServeis || canViewAccounts}" open="false">
+    					<treerow>
+    						<treecell label="${c:l('seu.recursostecnologics')}" onClick="recursostecnologics.setOpen ( ! recursostecnologics.isOpen() )"/>
+    					</treerow>
+		    		<treechildren>
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewXarxes}" langlabel="seu.xarxes" pagina="/xarxes.zul"/>
+		    				</treerow>
+		    			</treeitem>
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewMaquines}" langlabel="seu.maquines" pagina="/maquines.zul"/>
+		    				</treerow>
+		    			</treeitem>
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewImpressores}" langlabel="seu.impressores" pagina="/impressores.zul"/>
+		    				</treerow>
+		    			</treeitem>
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewServeis}" langlabel="seu.serveis" pagina="/serveis.zul"/>
+		    				</treerow>
+		    			</treeitem>		    		
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewAccounts}" langlabel="seu.accounts" pagina="/accounts/accounts.zul"/>
+		    				</treerow>
+		    			</treeitem>		    		
+		    			<treeitem>
+		    				<treerow>
+		    					<apptreecell if="${canViewVault}" langlabel="seu.vault" pagina="/vault/vault.zul"/>
+		    				</treerow>
+		    			</treeitem>		    		
+		    		</treechildren>
+    				</treeitem>
+    				<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ --> 
+    				<treeitem id="sistemesinformacio" if="${canViewAplicacions || canViewDominisCorreu || canViewCorreu || canViewAdministracioIntranet || canViewRules}" open="false">
+    					<treerow>
+    						<treecell label="${c:l('seu.sistemesinformacio')}" onClick="sistemesinformacio.setOpen ( ! sistemesinformacio.isOpen() )"/>
+    					</treerow>
+			    		<treechildren>
+				    		<treeitem>
+				    			<treerow>
+				    				<apptreecell if="${canViewAplicacions}" langlabel="seu.aplciacions" pagina="/aplicacions.zul"/>
+				    			</treerow>
+				    		</treeitem>
+				    		<treeitem>
+				    			<treerow>
+				    				<apptreecell if="${canViewRules}" langlabel="seu.rules" pagina="/rules/rules.zul"/>
+				    			</treerow>
+				    		</treeitem>
+				    		<treeitem>
+				    			<treerow>
+				    				<apptreecell if="${canViewDominisCorreu}" langlabel="seu.dominiscorreu" pagina="/dominisCorreu.zul"/>
+				    			</treerow>
+				    		</treeitem>
+				    		<treeitem>
+				    			<treerow>
+				    				<apptreecell if="${canViewCorreu}" langlabel="seu.llistescorreu" pagina="/llistesCorreu.zul"/>
+				    			</treerow>
+				    		</treeitem>
+				    		<treeitem>
+				    			<treerow>
+				    				<apptreecell if="${canViewAdministracioIntranet}" langlabel="seu.adminintranet" pagina="/aplicacionsIntranet.zul"/>
+				    			</treerow>
+			    		</treeitem>		    	
+			    		</treechildren>
+    			</treeitem>
+    			</treechildren>
+		    		<!-- Aquesta ja estava comentada
+					<treeitem>
+						<treerow>
+							<apptreecell langlabel="main.lblAdminConfiguracioPersonal" pagina="wf/adminPersonalConfigs.zul"/>
+						</treerow>
+					</treeitem>
+					 -->		
+    		</treeitem>   		   		
+    	   		
+<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->    		
+    		<treeitem id="configaudito" if="${canViewParametres || canViewDadesAddicionals || canViewAgents || canViewPlugins || canViewDominiUsuaris || admin || canViewAutoritzacions || canViewAttributeTranslation}" open="false">
+    			<treerow>
+    				<treecell label="${c:l('seu.configaudito')}" onClick="configaudito.setOpen ( ! configaudito.isOpen() )"/>
+    			</treerow>
+		    	<treechildren>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewTenants}" langlabel="seu.tenants" pagina="/tenants/tenants.zul"/>
+		    			</treerow>
+		    		</treeitem>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewParametres}" langlabel="seu.parametres" pagina="/parametres.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem> 
+		    			<treerow>
+		    				<apptreecell if="${canViewDadesAddicionals}" langlabel="seu.dadesaddicionals" pagina="/dadesAddicionals.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewAgents}" langlabel="seu.agents" pagina="/agentsMain.zul"/>
+		    			</treerow>
+		    		</treeitem>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewPlugins}" langlabel="seu.plugins" pagina="/plugins.zul"/>
+		    			</treerow>
+		    		</treeitem>
+					<treeitem>
+						<treerow>
+							<apptreecell if="${canViewDominiUsuaris}" langlabel="seu.dominiUsuaris" pagina="/dominiUsuaris.zul"/>
+						</treerow>
+					</treeitem>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${admin}" langlabel="main.lblDeploy" pagina="wf/despliegue.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${admin}" langlabel="main.lblAdminBPM" pagina="wf/configureindex.zul"/>
+		    			</treerow>
+		    		</treeitem>
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewAutoritzacions}" langlabel="seu.autoritzacions" pagina="/autoritzacions.zul"/>
+		    			</treerow>
+		    		</treeitem>	    				    		
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewAttributeTranslation}" langlabel="seu.attributeTranslation" pagina="/attributeTranslation.zul"/>
+		    			</treerow>
+		    		</treeitem>	    				    		
+
+
+		    	</treechildren>
+    		</treeitem>
+    		
+   <!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->  		
+    		<treeitem id="monitoritzacio" if="${canViewAuditoria || canViewRegistreAcces || canViewSeyconServer}" open="false">
+    			<treerow>
+    				<treecell label="${c:l('seu.monitoritzacio')}" onClick="monitoritzacio.setOpen ( ! monitoritzacio.isOpen() )"/>
+    			</treerow>
+    			<treechildren>
+    				<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewAuditoria}" langlabel="seu.auditoria" pagina="/auditoria.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewRegistreAcces}" langlabel="seu.registresaccess" pagina="/registreAcces.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    		<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewSeyconServer}" langlabel="seu.seyconserver" pagina="/seyconserver.zul"/>
+		    			</treerow>
+		    		</treeitem>
+		    	</treechildren>
+    		</treeitem>
+    		
+    		<!-- <treeitem id="ajuda" open="false">
+    			<treerow>
+    				<treecell label="${c:l('seu.ajuda')}" onClick="ajuda.setOpen ( ! ajuda.isOpen() )"/>
+    			</treerow>
+    			<treechildren>
+    				<treeitem id="aboutseu" open="false"> 
+    					<treerow>
+    						<apptreecell langlabel="seu.aboutseu" pagina="/aboutseu/seu.zul"/>
+    					</treerow>
+    				</treeitem>
+    			</treechildren>
+    		</treeitem>-->
+    		<treeitem id="elmeuperfil" open="false">
+    			<treerow>
+    				<apptreecell langlabel="seu.elmeuperfil" pagina="perfil/perfil.zul"/>
+    			</treerow>
+    		</treeitem>
+    		
+    		<!--treeitem open="false" id="favorits" if="${showFavorites}">	Ja estava comentada
+    			<treerow >
+    				<treecell label="Afegir a favorits" sclass="menufavorits" onClick = '' image="~./img/star_borde2.png"/>
+    			</treerow>
+    		</treeitem-->
+    	</treechildren>
+    </tree>
+    <label id="X"/>
+    <label id="Z"/>
+    
+  </window>
+</zk>

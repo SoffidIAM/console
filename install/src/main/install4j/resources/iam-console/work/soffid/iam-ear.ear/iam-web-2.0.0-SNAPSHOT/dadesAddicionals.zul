@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="dadesAddicionals" title="Gestió de Dades addicionals"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="dadesAddicionals" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<datamodel id="model" rootNode="dadesAddicionals" src="descriptorDadaAddicional.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.datasource.XPathUtils;
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+						.Labels.getLabel("dadesAddicionals.lbl.GestioDadesAddicionals"));
+			}
+			catch (Exception ex){}
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+			
+			String queryWindowMin="50px";
+			String queryWindowMax="110px";
+			
+			String mode = "query"; 
+			boolean view_altres = false;
+			
+			// Autoritzacions
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			boolean canCreateMetadata = AutoritzacionsUsuari.hasCreateMetadata();
+			boolean canUpdateMetadata = AutoritzacionsUsuari.hasUpdateMetadata();
+			boolean canDeleteMetadata =  AutoritzacionsUsuari.hasDeleteMetadata();
+			boolean canQueryMetadata = AutoritzacionsUsuari.hasQueryMetadata();
+			
+			boolean canModifyMetadata = canCreateMetadata || canUpdateMetadata;
+			
+			model.getVariables().declareVariable("queryEnabled", canQueryMetadata);
+			model.getVariables().declareVariable("codi", "%");
+			
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode="query";
+			}
+	             
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
+						.getFellow("textbox");
+				
+				Listitem si =  esquema.getFellow("queryWindow").getFellow("queryScope").getSelectedItem ();
+				com.soffid.iam.api.MetadataScope scope = 
+						si == null || si.getValue() == null || si.getValue().isEmpty() ? 
+					null :
+					com.soffid.iam.api.MetadataScope.fromString(si.getValue ());
+				// Check enable query
+				queryEnabled = true;
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("scope", scope);
+				
+				return searchValues;
+			}
+			
+			void search()
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (esquema.isCommitPending())
+				{
+					Missatgebox.avis (org.zkoss.util.resource.Labels
+							.getLabel("dadesAddicionals.AbansConfirmar"),
+							org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.CanvisPendents"));
+					return;
+				}
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				
+				listbox = esquema.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/dadaAddicional").refresh();
+					listbox.dataPath = "/model:/dadaAddicional"; 
+				}
+				
+				if (listbox.getModel().getSize() == 1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0); 
+					if (elem!=null)
+					{
+						listbox.setSelectedItem(elem);
+					}
+					
+					select();
+					
+					retrySearch = false;
+				}
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.hideFormulari(); //amaguem dades..
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+		
+			void showAltres () 
+			{
+				if (view_altres==false) {
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				} else {
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");		  	
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null &&
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+					}
+			}						
+			
+			void showLista ()  
+			{
+				  esquema.getFellow("lista").getFellow("listbox").clearSelection();
+			}
+			
+			void showDetall () 
+			{
+				esquema.showFormulari();
+			}
+		]]>
+	</zscript>
+
+	<esquema id="esquema" ample="${amplaria}" datamodel="/model"
+		focusCriteri="queryCodi" onHideFormulari="showLista()">
+	
+		<criteris id="queryWindow" height="${queryWindowMin}"
+			onOK="search()">
+		
+			<hbox width="100%">
+				<hbox width="250px" widths="100px,*">
+					<label sclass="etiqueta" value="${c:l('accounts.scope')}" />
+					<listbox id="queryScope" mold="select" >
+						<listitem value="" label="${c:l('dadesAddicionals.anyScope')}"/>
+						<listitem value="user" label="${c:l('accounts.user')}"/>
+						<listitem value="role" label="${c:l('accounts.role')}"/>
+						<listitem value="application" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+						<listitem value="group" label="${c:l('auditoria.zul.Grup')}"/>
+					</listbox>
+				</hbox>
+
+				<input_criteri etiqueta="${c:l('dadesAddicionals.zul.Codi')}" id="queryCodi"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<separator spacing="17px"/>
+		</criteris>
+		
+		<navegador id="lista" width="100%">
+			<toolbar>
+				<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="metadata"/>
+				<insertbutton acces="${canCreateMetadata}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
+				<deletebutton acces="${canDeleteMetadata}" listbox="/esquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+			</toolbar> 
+			<listbox visible="true" id="listbox" autocommit="false" dataPath="/model:/dadaAddicional"
+				fixedLayout="true" width="100%" onClick="showDetall()"
+				onSelect="select()" rows="${fileres}"
+				 onCreate="checkTruncatedList(self)">
+				<listhead>
+					<listheader label="${c:l('accounts.scope')}" sort="auto" width="20%"/>
+					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto" width="20%"/>
+					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" width="60%"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@scopeLiteral"/>
+					<listcell bind="@ordre"/>
+					<listcell bind="@codi"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades" width="100%">
+			<zscript> <![CDATA[
+			    void displayRestrictions ()
+			    {
+			    	com.soffid.iam.api.MetadataScope scope = XPathUtils.getValue(form, "scope");
+			    	boolean display = scope == com.soffid.iam.api.MetadataScope.USER;
+			    	form.getFellow ("visibility1").setVisible(display);
+			    	form.getFellow ("visibility2").setVisible(display);
+			    	form.getFellow ("visibility3").setVisible(display);
+			    }
+				void displayValues ()
+				{
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						es.caib.seycon.ng.comu.TipusDada registre = ctx.getValue("/").getInstance();
+						if (registre.getType().equals (es.caib.seycon.ng.comu.TypeEnumeration.STRING_TYPE))
+							valuesRow.setVisible(true);
+						else
+							valuesRow.setVisible(false);
+				}
+				
+				void onChangeDades()
+				{
+					try {
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						es.caib.zkib.datamodel.DataNode registre = ctx.getValue("/");
+						// form.getFellow("detall_ordre").setDisabled(!registre.isNew());
+						displayValues();
+						displayRestrictions ();
+					} catch (Exception e) {
+						// form.getFellow("detall_ordre").setDisabled(true);
+					}
+				}
+			]]></zscript>		
+			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
+				<grid width="100%">
+					<columns>
+						<column width="15%"></column>
+						<column width="85%"/>
+					</columns>
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('accounts.scope')}" />
+							<zscript><![CDATA[
+								z1 = com.soffid.iam.api.MetadataScope.USER;
+								z2 = com.soffid.iam.api.MetadataScope.ROLE;
+								z3 = com.soffid.iam.api.MetadataScope.APPLICATION;
+								z4 = com.soffid.iam.api.MetadataScope.GROUP;
+							]]></zscript>
+							<listbox bind="@scope" mold="select" onSelect="displayRestrictions()">
+								<listitem value="" label="${c:l('dadesAddicionals.anyScope')}"/>
+								<listitem value="${z1}" label="${c:l('accounts.user')}"/>
+								<listitem value="${z2}" label="${c:l('accounts.role')}"/>
+								<listitem value="${z3}" label="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}"/>
+								<listitem value="${z4}" label="${c:l('auditoria.zul.Grup')}"/>
+							</listbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Ordre')}"/>
+							
+							<hbox width="100%" widths="25% ,2%, 20%, 15%, *, 2%">
+								<intbox bind="@ordre" id="detall_ordre" maxlength="10"
+									sclass="textbox" constraint="no empty"/>
+								<label value="*"/>
+								<separator/>
+								<input_etiqueta value="${c:l('dadesAddicionals.zul.Codi-2')}"/>
+								<input_dada bind="@codi" id="detall_codi"
+									lectura="${!canModifyMetadata}" maxim="25"
+									mascara="no empty"/>
+								<label value="*"/>
+							
+							</hbox>								
+							
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Label')}"/>
+							<textbox bind="@label" maxlength="50"
+									sclass="textbox" readonly="${!canModifyMetadata}" width="80%" onChange=""/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Type')}"/>
+								<listbox width="99%" visible="true" bind="@type" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/dataType">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Required')}"/>
+								<checkbox bind="@required" disabled="${!canModifyMetadata}" onClick="" onCheck=""/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Unique')}"/>
+								<checkbox bind="@unique" disabled="${!canModifyMetadata}" onClick="" onCheck=""/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}"/>
+								<textbox bind="@size" id="detail_size" maxlength="50"
+									sclass="textbox" readonly="${!canModifyMetadata}" width="8em" onChange=""/>
+						</row>
+						<row id="valuesRow">
+							<input_etiqueta value=""/>
+							<grid dataPath="/values" id="gridValues">
+								<columns>
+									<column label="${c:l('dadesAddicionals.zul.Values')}"></column>
+									<column visible="${canModifyMetadata}" width="2em">
+																		<imageclic align="center" src="~./img/list-add.gif">
+																			<attribute name="onClick"><![CDATA[
+	if (canModifyMetadata) {
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(form);
+		es.caib.seycon.ng.comu.TipusDada tda = XPathUtils.getValue(ctx, ".").getInstance();
+		XPathUtils.createPath(ctx.getDataSource(), "/values", "");
+	}
+	]]>
+											</attribute>
+										</imageclic>
+									</column>
+								</columns>
+								<datarow>
+									<textbox bind="."  maxlength="50"
+										sclass="textbox" readonly="false" width="80%" onChange=""/>
+									<imageclic align="center" src="~./img/list-remove.gif">
+										<attribute name="onClick"><![CDATA[
+											if (canModifyMetadata) {
+												es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
+												XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
+											}
+										]]></attribute>
+									</imageclic>
+								</datarow>
+							</grid>
+						</row>
+						<row id="visibility1">
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.AdminVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@adminVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
+						</row>
+						<row id="visibility2">
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.OperatorVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@operatorVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
+						</row>
+						<row id="visibility3">
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.UserVisibility')}"/>
+							<div width="100%">
+								<listbox width="90%" visible="true" bind="@userVisibility" mold="select" disabled="${!canModifyMetadata}"
+											style="font-size: 10px" dataPath="/model:/visibility">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>  
+								</listbox>
+								<label value="*"/>
+							</div>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>		
+			
+	</esquema>
+</zk>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="domain" type="domain" refreshAfterCommit="true"> 
+			<script-finder>
+				return "*";
+			</script-finder>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
+				method="findDomains" > 
+			</ejb-finder>
+		</finder>
+		<finder name="translation" type="translation">
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
+				method="findByExample" if = "${queryEnabled}"> <!--agent:query, application:update-->
+				<parameter value="${domain}"/>
+				<parameter value="${column1}"/>
+				<parameter value="${column2}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.AttributeTranslation">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="domain">
+		<custom-attribute name="instance">return instance;</custom-attribute>
+	</datanode>	
+	
+	<datanode name="translation">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.domain}" notNull="true" friendlyName="attributeTranslation.DomainValidation"/>
+			<attribute-validator expr="${instance.column1}" notNull="true" friendlyName="attributeTranslation.Column1Validation"/>
+			<attribute-validator expr="${instance.column2}" notNull="true" friendlyName="attributeTranslation.Column2Validation"/>
+		</validator>
+	</datanode>
+	
+</zkib-model>

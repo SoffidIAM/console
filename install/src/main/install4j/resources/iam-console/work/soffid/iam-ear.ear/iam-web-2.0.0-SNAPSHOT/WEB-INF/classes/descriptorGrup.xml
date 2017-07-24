@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="grups">
+		<finder name="grup" type="grup">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
+				if="${queryEnabled}"> <!-- grup: query -->
+				<parameter value="${codi}" />
+				<parameter value="${pare}" />
+				<parameter value="${unitatOfimatica}" />
+				<parameter value="${descripcio}" />
+				<parameter value="${tipus}" />
+				<parameter value="${obsolet}" />
+				<parameter value="${servidorOfimatic}" />
+				<parameter value="${seccioPressupostaria}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup">
+			</new-instance-bean>
+		</finder>
+
+		<finder name="tipusUnitatOrganitzativa" type="tipusUnitatOrganitzativa">
+			<script-finder>
+				obj = new
+				es.caib.seycon.ng.comu.TipusUnitatOrganitzativa();
+				obj.descripcio = "- Select group type - ";
+				return obj;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/TipusUnitatOrganitzativaEJB"
+				method="findTipusUnitatOrganitzativaByFiltre"
+				if="${isUserInRole('organizationalUnit:query')}">
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUnitatOrganitzativa">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="grup">
+		<finder name="grup" type="grup">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findSubGrupsByCodiGrup"
+				if="canQueryGroup">  <!-- group:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup">
+			</new-instance-bean>
+		</finder>
+		<finder name="pare" type="grup">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="getLlistaDePares"
+				if="canQueryGroup"> <!-- group:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup">
+			</new-instance-bean>
+		</finder>
+		<finder name="impressora" type="impressora">
+			<ejb-finder jndi="java:comp/env/ejb/ImpressoraEJB" method="findGrupImpressoresByCodiGrup">  <!-- tothom -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.GrupImpressora">
+			</new-instance-bean>
+		</finder>
+		<finder name="rolsAtorgats" type="rolsAtorgats">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="getRolsFromGrupYParesGrup"
+				if="canQueryGroupRoles"> <!-- group:role:query -->
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol">
+			</new-instance-bean>
+		</finder>
+		<finder name="usuari" type="usuari">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findUsuarisPertanyenAlGrupByCodiGrup"
+				if="canQueryGroupUsers">  <!-- group:user:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari">
+			</new-instance-bean>
+		</finder>
+		<finder name="usuarisRolGrup" type="usuarisRolGrup">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB"
+				method="findRolsUsuarisTipusDominiGrupsAndGrupsUsuari" if="canQueryGroupRoles"> <!-- group:role:query -->
+				<parameter value="${instance.codi}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.RolsUsuaris">
+			</new-instance-bean>
+		</finder>
+
+		<ejb-handler jndi="java:comp/env/ejb/GrupEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.descripcio}" notNull="true" friendlyName="groups.DescriptionValidation"/>
+			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="groups.CodeValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="impressora">
+		<ejb-handler jndi="java:comp/env/ejb/ImpressoraEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="usuari" />
+
+	<datanode name="rolsAtorgats" />
+
+	<datanode name="usuarisRolGrup" />
+
+	<datanode name="tipusUnitatOrganitzativa" />
+</zkib-model>

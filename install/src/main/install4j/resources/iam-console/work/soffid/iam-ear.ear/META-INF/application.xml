@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><application>
+  <display-name>iam-ear</display-name>
+  <description>Soffid IAM Console</description>
+  <module>
+    <web>
+      <web-uri>iam-web-2.0.0-SNAPSHOT</web-uri>
+      <context-root>/</context-root>
+    </web>
+  </module>
+  <module>
+    <web>
+      <web-uri>iam-weblogout-2.0.0-SNAPSHOT</web-uri>
+      <context-root>/logout</context-root>
+    </web>
+  </module>
+  <module>
+    <ejb>iam-core-2.0.0-SNAPSHOT.jar</ejb>
+  </module>
+  <module>
+    <ejb>upload-components-2.0.0-SNAPSHOT.jar</ejb>
+  </module>
+</application>

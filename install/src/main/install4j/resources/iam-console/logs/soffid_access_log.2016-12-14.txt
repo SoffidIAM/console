@@ -1,0 +1,10 @@
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET / HTTP/1.1" 200 2963
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/zul/css/normsaf.css.dsp;jsessionid=D3F7DE3C1C665472D9CED4DAF568FF89 HTTP/1.1" 200 5037
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/zkex/zul/css/layout.css.dsp;jsessionid=D3F7DE3C1C665472D9CED4DAF568FF89 HTTP/1.1" 200 581
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/js/zk/zk.js.dsp HTTP/1.1" 200 42341
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/js/ext/Codepress/codepress.js HTTP/1.1" 200 1643
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/js/ext/codemirror/lib/codemirror.js HTTP/1.1" 200 94256
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /zkau/web/styles/estil.css;jsessionid=D3F7DE3C1C665472D9CED4DAF568FF89 HTTP/1.1" 200 4022
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /css/localSEU.css;jsessionid=D3F7DE3C1C665472D9CED4DAF568FF89 HTTP/1.1" 200 8448
+192.168.133.1 - - [14/Dec/2016:21:04:04 +0100] "GET /anonymous/logo.png HTTP/1.1" 200 12001
+192.168.133.1 - - [14/Dec/2016:21:04:05 +0100] "GET /favicon.ico HTTP/1.1" 200 3262

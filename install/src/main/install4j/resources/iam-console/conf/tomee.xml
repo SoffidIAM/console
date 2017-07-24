@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomee>
+  <!-- see http://tomee.apache.org/containers-and-resources.html -->
+
+  <Deployments dir="apps" autoDeploy="true"/> 
+  <Resource id="jdbc/soffid" type="DataSource">
+    accessToUnderlyingConnectionAllowed = false
+    alternateUsernameAllowed = false
+    connectionProperties = 
+    defaultAutoCommit = true
+    defaultReadOnly = 
+    definition = 
+    ignoreDefaultValues = false
+    initialSize = 0
+    jdbcDriver = ${dbDriverClass}
+    jdbcUrl = ${dbDriverUrl}
+    jtaManaged = true
+    maxActive = ${dbMaxConnections}
+    maxIdle = 20
+    maxOpenPreparedStatements = 0
+    maxWaitTime = -1 millisecond
+    minEvictableIdleTime = 30 minutes
+    minIdle = 0
+    numTestsPerEvictionRun = 3
+    password = ${dbPassword}
+    passwordCipher = PlainText
+    poolPreparedStatements = false
+    serviceId = 
+    testOnBorrow = true
+    testOnReturn = false
+    testWhileIdle = false
+    timeBetweenEvictionRuns = -1 millisecond
+    userName = ${dbUser}
+    validationQuery = ${dbValidationQuery}
+   </Resource>
+
+</tomee>

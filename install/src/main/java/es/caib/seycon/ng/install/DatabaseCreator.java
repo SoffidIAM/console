@@ -52,20 +52,22 @@ public class DatabaseCreator {
     private String driverString;
     private String driverUrl;
     private String driverClass;
-    private String sanitySelect;
-    private String exceptionSorter;
-    private String connectionChecker;
 	private Connection currentConnection;
+	private Boolean createUser;
+	private String sanitySelect;
 
-    public DatabaseCreator(com.install4j.api.context.Context ctx) {
+    public DatabaseCreator(com.install4j.api.context.Context ctx) throws IOException {
         this.ctx = ctx;
-        user = (String) ctx.getVariable("dbUser"); //$NON-NLS-1$
-        password = (String) ctx.getVariable("dbPassword"); //$NON-NLS-1$
+        new PropertiesStore(ctx).load();
+        
+        user = (String) ctx.getVariable("dbAdminUser"); //$NON-NLS-1$
+        password = (String) ctx.getVariable("dbAdminPassword"); //$NON-NLS-1$
         host = (String) ctx.getVariable("dbHost"); //$NON-NLS-1$
         port = (Long) ctx.getVariable("dbPort"); //$NON-NLS-1$
         sid = (String) ctx.getVariable("dbSid"); //$NON-NLS-1$
-        schema = (String) ctx.getVariable("dbSchema"); //$NON-NLS-1$
-        schemaPassword = (String) ctx.getVariable("dbSchemaPassword"); //$NON-NLS-1$
+        schema = (String) ctx.getVariable("dbUser"); //$NON-NLS-1$
+        schemaPassword = (String) ctx.getVariable("dPassword"); //$NON-NLS-1$
+        createUser = (Boolean) ctx.getVariable("dbCreateUser"); //$NON-NLS-1$
 
         tableTablespace = (String) ctx.getVariable("dbTableTablespace"); //$NON-NLS-1$
         indexTablespace = (String) ctx.getVariable("dbIndexTablespace"); //$NON-NLS-1$
@@ -77,33 +79,26 @@ public class DatabaseCreator {
             driverUrl = "jdbc:oracle:thin:@"+host+":"+port+":"+sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             driverClass= "oracle.jdbc.driver.OracleDriver"; //$NON-NLS-1$
             sanitySelect = "select 1 from dual"; //$NON-NLS-1$
-            exceptionSorter="org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter"; //$NON-NLS-1$
-            connectionChecker="org.jboss.resource.adapter.jdbc.vendor.OracleValidConnectionChecker"; //$NON-NLS-1$
         } else if(driver == SQLSERVER_DRIVER){
         	driverString = "sqlserver"; //$NON-NLS-1$
         	driverUrl = "jdbc:sqlserver://"+host+":"+port+";databaseName=" + sid + ";"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             driverClass= "com.microsoft.sqlserver.jdbc.SQLServerDriver"; //$NON-NLS-1$
             sanitySelect = "select 1 from sysobjects"; //$NON-NLS-1$
-            exceptionSorter=""; //$NON-NLS-1$
-            connectionChecker="";
             //connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MSSQLValidConnectionChecker"; //$NON-NLS-1$
         } else {
             driverString = "mysql"; //$NON-NLS-1$
             driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            driverClass= "com.mysql.jdbc.Driver"; //$NON-NLS-1$
+            driverClass= "org.mariadb.jdbc.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
-            exceptionSorter="org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter"; //$NON-NLS-1$
-            connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"; //$NON-NLS-1$
         }
         ctx.setVariable("dbSchema", schema); //$NON-NLS-1$
         ctx.setVariable("dbDriverUrl", driverUrl); //$NON-NLS-1$
         ctx.setVariable("dbDriverClass", driverClass); //$NON-NLS-1$
         ctx.setVariable("dbDriverString", driverString); //$NON-NLS-1$
         ctx.setVariable("dbSanitySelect", sanitySelect); //$NON-NLS-1$
-        ctx.setVariable("dbConnectionChecker", connectionChecker); //$NON-NLS-1$
-        ctx.setVariable("dbExceptionSorter", exceptionSorter); //$NON-NLS-1$
         ctx.setVariable("InstallationDirectory", ctx.getInstallationDirectory().getAbsolutePath()); //$NON-NLS-1$
-        new PropertiesStore(ctx).save();
+        PropertiesStore ps = new PropertiesStore(ctx);
+        ps.save();
     }
 
     public void setScreen(Screen screen) {
@@ -151,7 +146,7 @@ public class DatabaseCreator {
         c.close();
     }
 
-    private void createSchema(Connection c) throws SQLException, UnknownHostException {
+    private void createSchema(Connection c) throws SQLException, IOException {
 
         if (schemaPassword == null) {
             generatePassword();
@@ -271,7 +266,6 @@ public class DatabaseCreator {
             executeSentence("GRANT CONTROL TO " + schema);
             pi.setPercentCompleted(9);
         }
-
         pi.setPercentCompleted(10);
     }
 
@@ -336,7 +330,7 @@ public class DatabaseCreator {
         connection.close();
     }
 
-    public void generatePassword() {
+    public void generatePassword() throws IOException {
         StringBuffer pass = new StringBuffer();
         Random r = new Random(System.currentTimeMillis());
         for (int i = 0; i < 8; i++) {
@@ -350,7 +344,7 @@ public class DatabaseCreator {
         }
 
         schemaPassword = pass.toString();
-        ctx.setVariable("dbSchemaPassword", schemaPassword); //$NON-NLS-1$
+        ctx.setVariable("dbPassword", schemaPassword); //$NON-NLS-1$
         new PropertiesStore(ctx).save();
     }
 
@@ -361,51 +355,26 @@ public class DatabaseCreator {
 
     public boolean create() throws Exception {
         ProgressInterface pi = ctx.getProgressInterface();
-        pi.setStatusMessage("Connecting ....");  //$NON-NLS-1$
-
-        if (password != null && password.length() > 0)
-            createSchema();
-
-        currentConnection = getConnection();
-        currentConnection.setAutoCommit(false);
         
-        stmt = currentConnection.createStatement();
+    	if (createUser != null && createUser.booleanValue())
+    	{
 
-        // int status = getCurrentStatus(currentConnection);
-        //long size = calculateScriptsSize(currentConnection);
-        //long progress = size * 10;
-
-        /*File f;
-        for (f = getFile(status); f.canRead(); f = getFile(status)) {
-            Reader r = new InputStreamReader(new FileInputStream(f), "UTF-8"); //$NON-NLS-1$
-
-            currentConnection.setAutoCommit(false);
-            int character;
-            buffer = new StringBuffer();
-            line = new StringBuffer();
-
-            plsql = false;
-            for (character = r.read(); character >= 0; character = r.read()) {
-                pi.setPercentCompleted((int) (progress / size));
-                processChar((char) character);
-                progress += 90;
-            }
-            r.close();
-
-            currentConnection.commit();
-            status++;
-            int status2 = getCurrentStatus(currentConnection);
-            if (status2 > status)
-            	status = status2;
-            ctx.setVariable(PropertiesStore.DB_STATUS, Integer.toString(status));
-            new PropertiesStore(ctx).save();
-        }*/
-        stmt.close();
-        currentConnection.rollback();
-        currentConnection.close();
-        pi.setStatusMessage("Done");  //$NON-NLS-1$
-        ctx.setVariable("dbStatus", "1");
-        new PropertiesStore(ctx).save();
+	        pi.setStatusMessage("Connecting ....");  //$NON-NLS-1$
+	
+            createSchema();
+	
+	        pi.setStatusMessage("Done");  //$NON-NLS-1$
+	        ctx.setVariable("dbStatus", "1");
+	        ctx.setVariable("b.dbCreateUser", "false");
+    	} else if (schemaPassword != null ) {
+	        pi.setStatusMessage("Testing connection ....");  //$NON-NLS-1$
+            PropertiesStore ps = new PropertiesStore(ctx);
+            ps.save();
+    		getConnection();
+	        ctx.setVariable("dbStatus", "1");
+    	}
+        PropertiesStore ps = new PropertiesStore(ctx);
+        ps.save();
         return true;
     }
 

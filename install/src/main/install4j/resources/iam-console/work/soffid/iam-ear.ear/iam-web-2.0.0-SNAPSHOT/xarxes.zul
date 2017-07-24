@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="xarxes"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+<frame id="f_xarxes" saveContent="true" title="${c:l('xarxes.lblGestioXarxes1')}" width="99%">
+
+	<style src="~./styles/estil.css"/>
+	<style>
+		.detall_total:hover{ text-decoration: underline;}
+	</style>
+	
+	<datamodel id="model" rootNode="xarxes" src="descriptorXarxa.xml"/>
+	
+	<zscript src="comu/netejaCriteris.zul"/>
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+	
+			queryWindowMin="50px";
+			queryWindowMax="110px";
+		
+			mode = "query"; 
+			view_altres = false;
+			model.getVariables().declareVariable("queryEnabled", false);
+			
+			// AUTORITZACIONS
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			canCreateNetwork = AutoritzacionsUsuari.hasCreateNetwork();
+			canUpdateNetwork = /*AutoritzacionsUsuari.hasUpdateNetwork() ||*/ AutoritzacionsUsuari.hasUpdateAllNetwork();
+			canDeleteNetwork = /*AutoritzacionsUsuari.hasDeleteNetwork() ||*/ AutoritzacionsUsuari.hasDeleteAllNetwork();
+			canQueryNetwork = /*AutoritzacionsUsuari.hasQueryNetwork() ||*/ AutoritzacionsUsuari.hasQueryAllNetwork();
+			
+			canModifyNetwork = canCreateNetwork || canUpdateNetwork;
+			
+			queryEnabled = false;
+			retrySearch = false;
+			
+			void populateDetails ()
+			{
+				mode="query";
+			}
+			
+			// Method to obtain the parameters to search process
+			java.util.Map getSearchParameters()
+			{
+				java.util.Map searchValues = new java.util.HashMap();
+				
+				codi = esquema.getFellow("queryWindow").getFellow("queryCodi").
+						getFellow("textbox");
+				ip = esquema.getFellow("queryWindow").getFellow("queryIP").
+						getFellow("textbox");
+				descripcio = esquema.getFellow("queryWindow").
+						getFellow("queryDescripcio").getFellow("textbox");
+				mascara = esquema.getFellow("queryWindow").getFellow("queryMascara").
+						getFellow("textbox");
+				maquina = esquema.getFellow("queryWindow").getFellow("queryMaquina").
+						getFellow("textbox");
+				
+				// Check enable query
+				if ((codi.value.trim().length() == 0) &&
+						(ip.value.trim().length() == 0) &&
+						(descripcio.value.trim().length() == 0) &&
+						(mascara.value.trim().length() == 0) &&
+						(maquina.value.trim().length() == 0))
+				{
+					queryEnabled = false;
+				}
+				
+				else
+				{
+					queryEnabled = true;
+				}
+				
+				// Add parameters to search
+				searchValues.put("codi", codi.value);
+				searchValues.put("ip", ip.value);
+				searchValues.put("descripcio", descripcio.value);
+				searchValues.put("mascara", mascara.value);
+				searchValues.put("maquina", maquina.value);
+				
+				return searchValues;
+			}
+	
+			void search () 
+			{
+				java.util.Map lista = new java.util.HashMap();
+				
+				if (esquema.isCommitPending()) {
+					Missatgebox.avis (org.zkoss.util.resource.Labels.getLabel("xarxes.AbansConfirmar"), 
+									org.zkoss.util.resource.Labels.getLabel("xarxes.CanvisPendents"));
+					return;
+				}
+				
+				normalitzada = null;
+				dhcp = null;
+				
+				if (!retrySearch)
+				{
+					lista = es.caib.seycon.ng.web.utils.
+						Autowildcards.replaceAsteriskChar(getSearchParameters());
+				}
+				
+				else
+				{
+					lista = es.caib.seycon.ng.web.utils.
+							Autowildcards.addPercentChar(getSearchParameters());
+				}
+				
+				for (String key : lista.keySet())
+				{
+					model.getVariables().declareVariable(key, lista.get(key));
+				}
+				
+				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+
+				listbox = esquema.getFellow("lista").getFellow("listbox");
+				if(queryEnabled)
+				{
+					model.getJXPathContext().getValue("/xarxa").refresh();
+					listbox.dataPath = "/model:/xarxa"; 
+				}
+				
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_lliures").setValue("0");
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_ocupades").setValue("0");
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_total").setValue("0");
+				
+				if (listbox.getModel().getSize()==1)
+				{
+					listbox.renderAll();
+					Listitem elem = listbox.getItemAtIndex(0); 
+				
+					if (elem!=null)
+						listbox.setSelectedItem(elem);
+					
+					select();
+					
+					retrySearch = false;
+				}
+				
+				else
+				{
+					if ((listbox.getModel().getSize() == 0) && !retrySearch)
+					{
+						retrySearch = true;
+						search();
+					}
+					
+					else
+					{
+						esquema.hideFormulari();
+						retrySearch = false;
+					}
+				}
+				
+				checkTruncatedList(listbox);
+			}
+		
+			void showAltres () 
+			{
+				if (view_altres==false)
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
+					view_altres = true;
+				}
+				else
+				{
+					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
+					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
+					view_altres = false;
+				}
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null)
+					{
+						populateDetails ();
+						showDetall ();
+					}
+			}
+			
+			void showLista ()  
+			{
+				  esquema.getFellow("lista").getFellow("listbox").clearSelection();
+			}
+			
+			void showDetall () 
+			{
+				esquema.showFormulari();
+			}
+			
+			void ocupacioXarxa ()
+			{
+				ds = esquema.getFellow("dades").getFellow("form").getDataSource();
+				ctx =  ds.getJXPathContext();
+				String codiXarxa = ctx.getValue("@codi");
+				
+				es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = es.caib.seycon.ng.EJBLocator.getXarxaService();	
+				if (codiXarxa == null)
+				{
+					lliures = 0;
+					ocupades = 0;
+					total = 0;
+				}
+				else
+				{
+					lliures = xarxaService.getIPsBuides(codiXarxa);
+					ocupades = xarxaService.getIPsOcupades(codiXarxa);
+					total = lliures + ocupades;
+				}
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_lliures").setValue(lliures.toString());
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_ocupades").setValue(ocupades.toString());
+				esquema.getFellow("dades").getFellow("form").getFellow("detall_total").setValue(total.toString());
+			}
+		]]>
+	</zscript>
+	
+	<esquema id="esquema" datamodel="/model"
+		focusCriteri="queryCodi" onHideFormulari="showLista()">
+	
+		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()">
+
+			<hbox>
+				<input_criteri etiqueta="${c:l('xarxes.zul.Codi')}" id="queryCodi"/>
+				<input_criteri etiqueta="${c:l('xarxes.zul.AdrecaIP')}" id="queryIP"/>
+				<input_criteri etiqueta="${c:l('xarxes.zul.Mascara')}" id="queryMascara"/>
+				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
+			</hbox>
+			<hbox>
+				<input_criteri etiqueta="${c:l('xarxes.zul.Descripcia')}" id="queryDescripcio"/>	
+				<input_criteri etiqueta="${c:l('xarxes.zul.Maquina')}" id="queryMaquina"/>
+			</hbox> 
+		</criteris>
+		
+		<navegador id="lista" >
+			<toolbar>
+				<insertbutton acces="${canCreateNetwork}" listbox="/esquema/lista/listbox" onClick="showDetall()"/>
+				<deletebutton acces="${canDeleteNetwork}" listbox="/esquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+				<listexporttoolbarbutton acces="${true}" listbox="/esquema/lista/listbox"/>
+			</toolbar>
+			
+			<listbox id="listbox" autocommit="false" dataPath="/model:/xarxa"
+				fixedLayout="true" height="96%" onClick="showDetall()" width="100%"
+				onSelect="select()" rows="${fileres}">
+				<listhead>
+					<listheader label="${c:l('xarxes.zul.Codi-2')}" sort="auto"
+						width="14%"/>
+					<listheader label="${c:l('xarxes.zul.AdrecaIP-2')}" sort="auto"
+						width="14%"/>
+					<listheader label="${c:l('xarxes.zul.Mascara-2')}" sort="auto"
+						width="14%"/>
+					<listheader label="${c:l('xarxes.zul.Descripcia-2')}" sort="auto"
+						width="58%"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="4">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				
+				<dataitem bind=".">
+					<listcell bind="@codi"/>
+					<listcell bind="@adreca"/>
+					<listcell bind="@mascara"/>
+					<listcell bind="@descripcio"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+		
+		<detalls id="dades">
+			<zscript>
+				void onChangeDades()
+				{
+					try {
+						<!-- Nivell d'ocupació de la xarxa -->
+						ocupacioXarxa();
+						ds = form.getDataSource(); 
+						ctx =  ds.getJXPathContext(); 
+						data=ctx.getValue("/");
+						<!-- S'ha de permetre modificar el codi de xarxa -->
+						<!-- form.getFellow("detall_codi").getFellow("dada").setDisabled(!data.isNew()); -->
+						if (canModifyNetwork) {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(false);
+						} else {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(!data.isNew());
+						}
+					} catch (Exception e) {
+						form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
+					}
+				}
+			</zscript>
+			
+			<form dataPath="/esquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
+				<attribute name="onActualitza">
+					try {
+						if (event.getData() instanceof String) {
+							dada = (String)event.getData();
+						} else {
+							dada = (String)(event.getData()[0]);
+						}
+						if (dada!=null) //redireció 
+							es.caib.zkib.zkiblaf.Application.call("/maquines.zul?nomMaquina="+dada);
+					} catch (Throwable th) {}
+				</attribute>
+				
+				<grid width="99%" fixedLayout="true">
+					<columns>
+						<column width="10em"></column>
+						<column width="*"></column>
+					</columns>
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Codi-2')}"/>
+							<!-- <input_dada id="detall_codi" bind="@codi" width_custom="50%" maxim="10" mascara="/^[A-Za-z]*[0-9]*[A-Za-z]*$/"/> -->
+							
+							<hbox width="50%">
+								<input_dada bind="@codi" id="detall_codi" maxim="10"
+									width_custom="98%" mascara="no empty"/>
+									
+								<label value="*"/>
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.AdrecaIP-2')}"/>
+							
+							<hbox width="100%">
+								<input_dada bind="@adreca" id="detall_ip"
+									lectura="${!canModifyNetwork}" width_custom="100%"
+									mascara="no empty"/>
+									
+								<label value="*"/>
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Descripcia-2')}"/>
+							<input_dada bind="@descripcio" id="detall_descripcio"
+								lectura="${!canModifyNetwork}" width_custom="97%"/>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Mascara-2')}"/>
+							
+							<hbox width="100%">
+								<input_dada bind="@mascara" id="detall_mascara"
+									lectura="${!canModifyNetwork}" width_custom="100%"
+									mascara="no empty" />
+									
+								<label value="*" />
+							</hbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Normalitzada')}"/>
+							<checkbox bind="@normalitzada" disabled="${!canModifyNetwork}" id="normalitzada" onCheck=""/>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.DHCP')}"/>
+							<checkbox bind="@dhcpSupport" disabled="${!canModifyNetwork}" id="check_dhcp" onCheck='detall_dhcp.getFellow("dada").setDisabled(check_dhcp.isChecked())'/>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.DHCPParams')}"/>
+							<input_dada bind="@dhcp" id="detall_dhcp" lectura="${!canModifyNetwork}" width_custom="98%"/>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Controldaccas')}"/>
+							<vbox width="100%">
+								<grid dataPath="/xarxaACL" fixedLayout="true" id="listboxACL" width="95%">
+									<attribute name="onActualitza">
+										dada = (Object[])event.getData();
+										nivell = dada[0];
+										mascara = dada[1];
+										codiIdentitat = dada[2];
+										modelProxy = (es.caib.zkib.binder.list.ModelProxy) listboxACL.getModel();
+										ds = listboxACL.getDataSource(); 
+										ctx =  ds.getJXPathContext();
+										xpath = 
+											listboxACL.getXPath() + "[" +
+											"identitat/@codiIdentitat = '" + codiIdentitat + "'" + " and " + 
+											"@mascara='"+mascara+"'"+ " and " + 
+											"@nivell='"+nivell+"'"+"]";
+										boolean jaExisteix = true;
+										try {
+											valor = ctx.getValue(xpath);
+										} catch(Exception e) {
+											jaExisteix = false;
+										}
+										if (jaExisteix) {
+											Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("xarxes.ControlExiste"),
+												org.zkoss.util.resource.Labels.getLabel("xarxes.ErrorControl"));
+										} else {
+											position = modelProxy.newInstance();
+											ds = listboxACL.getDataSource();
+											ctx =  ds.getJXPathContext(); 
+											xpath = listboxACL.getXPath() + modelProxy.getBind(position);
+											pointer =ctx.createPath (xpath);
+											ctx2 = ctx.getRelativeContext(pointer);
+											ctx2.setValue("@mascara", mascara);
+											ctx2.setValue("@nivell", nivell);
+											
+											dsXarxa = form.getDataSource(); 
+											ctxXarxa =  dsXarxa.getJXPathContext(); 
+											codiXarxa = ctxXarxa.getValue("@codi");
+											ctx2.setValue("@codiXarxa", codiXarxa);
+											
+											pointer.invalidate();
+											es.caib.seycon.ng.comu.Identitat identitat = new es.caib.seycon.ng.comu.Identitat();
+											identitat.setCodiIdentitat(codiIdentitat);
+											ctx2.setValue("/identitat", identitat);
+										}
+									</attribute>
+									
+									<columns>
+										<column label="${c:l('xarxes.zul.Nivell')}" width="25%"/>
+										<column label="${c:l('xarxes.zul.Maquines')}" width="25%"/>
+										<column label="${c:l('xarxes.zul.Identitat')}" width="*"/>
+										<column label="${c:l('xarxes.zul.')}" visible="${canModifyNetwork}" width="30px"/>
+									</columns>
+									
+									<datarow>
+										<label bind="@nivell" sclass="textarea">
+											<attribute name="onChangeXPath">
+												if (self.value.equals("-1")) {
+													self.value = "Sense accés";
+												 } else {
+												 	if (self.value.equals("0")) {
+														self.value = "Consulta";
+													} else {
+													 	if (self.value.equals("1")) {
+															self.value = "Suport";
+														} else {
+															self.value = "Administració";
+														}
+													}
+												 }
+											</attribute>
+										</label>
+										
+										<label bind="@mascara"/>
+										<label bind="/identitat/@codiIdentitat" tooltip="rolsTooltip"/>
+										<imageclic align="center" src="~./img/list-remove.gif">
+											<attribute name="onClick">
+												if (canModifyNetwork) {
+													dataRow = self.getParent();
+													xpath = dataRow.getXPath();
+													dataSource = listboxACL.getDataSource();
+													context = dataSource.getJXPathContext();
+													dada = context.getValue(xpath+"/@nivell") + " " + context.getValue(xpath+"/@mascara");												
+													Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("xarxes.SegurEsborra"), new Object [] {dada}),
+													org.zkoss.util.resource.Labels.getLabel("xarxes.Esborra"),
+														new EventListener() {
+															public void onEvent(Event evt) {
+																if ("onOK".equals(evt.getName())) { 
+																	context.removePath(xpath);
+																}
+															}
+														});
+												}
+											</attribute>
+										</imageclic>
+									</datarow>
+								</grid>
+								
+								<popup id="rolsTooltip" width="300px">
+									<attribute name="onOpen">
+										if (event.getReference() instanceof DataLabel) {
+											dataLab = event.getReference();
+											dataRow =dataLab.getParent();
+											xpath = dataRow.getXPath();
+											jxpathContext = dataRow.getJXPathContext();
+											value = jxpathContext.getValue("/identitat/@codiIdentitat");
+											rolsTooltipLabel.value = value;
+										}
+									</attribute>
+									
+									<label id="rolsTooltipLabel" value=""/>
+								</popup>
+								
+								<button image="~./img/list-add.gif" label="${c:l('xarxes.zul.Afegeixnou')}" visible="${canModifyNetwork}">
+									<attribute name="onClick">
+										Events.postEvent	("onInicia",desktop.getPage("xarxesACL").getFellow("esquemaACL"),listboxACL);
+									</attribute>
+								</button>
+							</vbox>
+						</row>
+						
+						<row>
+							<input_etiqueta value="${c:l('xarxes.zul.Nivelldocupacia')}"/>
+							<hbox>
+								<label id="detall_lliures" value=""/>
+								<input_etiqueta value="${c:l('xarxes.zul.lliures/')}"/>
+								<label id="detall_ocupades"/>
+								<input_etiqueta value="${c:l('xarxes.zul.ocupades/')}"/>
+								<label id="detall_total" sclass="detall_total" style="cursor: pointer" value="">
+									<attribute name="onClick">
+										desktop.getPage("maquinesLlista").setAttribute("llista","total");
+										codiXarxa = form.getFellow("detall_codi").getFellow("dada").getValue();
+										desktop.getPage("maquinesLlista").setAttribute("xarxa",codiXarxa);
+										Events.postEvent	("onInicia",desktop.getPage("maquinesLlista").getFellow("esquemaLlista"),form);
+									</attribute>
+								</label>
+								<input_etiqueta value="${c:l('xarxes.zul.total')}"/>
+							</hbox>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>
+	</esquema>
+
+	<include src="xarxesACL.zul"/>
+	<include src="maquinesllista.zul"/>
+</frame>
+</zk>

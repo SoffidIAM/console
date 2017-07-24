@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="comu/input_password.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css"/>
+
+	<esquema datamodel="/model" id="srvesquema" onHideFormulari="" senseCriteris="true"> 
+	
+		<zscript><![CDATA[
+void newServer() {
+	showDetall();
+}
+
+void showLista ()  
+{
+	  srvesquema.getFellow("lista").getFellow("listbox").clearSelection();
+	  
+}
+
+void showDetall () 
+{
+	srvesquema.showFormulari();
+}
+		]]></zscript>
+		<criteris visible="false">
+		</criteris>
+		
+		<navegador id="lista" width="100%">
+			<toolbar>
+				<deletebutton acces="${canManageServers}" listbox="/srvesquema/lista/listbox"/>
+				<commitbutton datamodel="/model"/>
+				<undobutton datamodel="/model" listbox="/srvesquema/lista/listbox"/>
+				<listexporttoolbarbutton acces="true"
+					listbox="/srvesquema/lista/listbox"/>
+			</toolbar>
+			<listbox id="listbox" autocommit="false" dataPath="/model:/server"
+				fixedLayout="true" height="96%" onSelect="showDetall()" 
+				rows="${fileres}" width="100%" onCreate="checkTruncatedList(self)"
+				style="">
+				<listhead>
+					<listheader label="${c:l('servers.zul.Name')}" sort="auto"
+						width="21%"/>
+					<listheader label="${c:l('servers.zul.Type')}" sort="auto"
+						width="21%"/>
+					<listheader label="${c:l('servers.zul.URL')}" sort="auto"/>
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind="." >
+					<listcell bind="@nom" onClick="showDetall()"/>
+					<listcell bind="@type" onClick="showDetall()"/>
+					<listcell bind="@url" onClick="showDetall()"/>
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades"  width="100%" style="width: 100%; min-width:30em;">
+			<zscript><![CDATA[
+			    void onChangeServerType (boolean modify)
+			    {
+			    	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(form);
+			    	es.caib.seycon.ng.comu.ServerType type = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@type");
+			    	if (type.equals( es.caib.seycon.ng.comu.ServerType.PROXYSERVER) || !canManageServers )
+			    	{
+			    		if (modify)
+					    	es.caib.zkib.datasource.XPathUtils.setValue(ctx, "@useMasterDatabase", false);
+			    		backupDatabaseListbox.setDisabled(true);
+			    		useMasterDatabaseListbox.setDisabled(true);
+			    	} else {
+			    		if (modify)
+					    	es.caib.zkib.datasource.XPathUtils.setValue(ctx, "@useMasterDatabase", true);
+			    		backupDatabaseListbox.setDisabled(false);
+			    		useMasterDatabaseListbox.setDisabled(false);
+			    	}
+			    }
+				void onChangeDades()
+				{
+					if (lista.getFellow("listbox").getSelectedItem () == null)
+					{
+						srvesquema.hideFormulari();
+					}
+					else
+					{
+						onChangeServerType (false);
+					}
+				}
+				]]>			
+			</zscript>		
+			<form dataPath="/srvesquema/lista/listbox:/." id="form" onChangeXPath="onChangeDades()" width="99%"
+				style="">
+				<grid width="100%" fixedLayout="false" style="width: 100%; mxargin-left: 5px; mxargin-right. 5px;">
+					<columns visible="false">
+						<column width="14%"/>
+						<column width="86%"/> 
+					</columns>
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('servers.zul.Name')} :" />
+							<div width="100%">
+								<input_dada lectura="true" bind="@nom" maxim="50"
+												width_custom="26em" mascara="no empty"/>
+								<label value="*" />
+							</div>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('servers.zul.URL')} :"/>
+							<div width="100%">
+								<input_dada lectura="true" bind="@url" maxim="50"
+												width_custom="26em" mascara="no empty"/>
+								<label value="*" />
+							</div>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('servers.zul.Type')} :"/>
+							<listbox
+								disabled="${!canManageServers}" 
+								onSelect="onChangeServerType(true)"
+								bind="@type" mold="select" dataPath="/model:/servertype">
+								<dataitem bind="@second">
+									<listcell
+										bind="@first" />
+								</dataitem>
+							</listbox>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('servers.zul.JavaOptions')} :"/>
+							<input_dada bind="@javaOptions" maxim="256"
+												width_custom="90%" mascara="no empty"/>
+						</row>
+						<row id="useMasterDatabaseRow" visible="false">
+							<input_etiqueta value="${c:l('servers.zul.UseMasterDatabase')} :"/>
+							<listbox
+								disabled="${!canManageServers}" 
+								bind="@useMasterDatabase" mold="select"
+								id="useMasterDatabaseListbox">
+								<listitem
+									value="${true}">
+									<listcell
+										label="${c:l('servers.zul.enabled')}" />
+								</listitem>
+								<listitem
+									value="${false}">
+									<listcell
+										label="${c:l('servers.zul.disabled')}" />
+								</listitem>
+							</listbox>
+						</row>
+						<row id="backupDatabaseRow" visible="false">
+							<input_etiqueta value="${c:l('servers.zul.BackupDatabase')} :"/>
+							<listbox
+								disabled="${!canManageServers}" 
+								id="backupDatabaseListbox"
+								bind="@backupDatabase" mold="select" dataPath="/model:/databaseSelector">
+								<dataitem bind="@id">
+									<listcell bind="@url"/>
+								</dataitem>
+							</listbox>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>		
+	</esquema>
+</zk>

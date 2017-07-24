@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="valorDomini" title="Nou valor d'un domini"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+	
+	<zscript>
+	<![CDATA[
+		void cleanWindow()
+		{
+			esquemaValor.getFellow("dades").getFellow("form").getFellow("detall_valor").setValue("");
+			esquemaValor.getFellow("dades").getFellow("form").getFellow("detall_descripcio").setValue("");
+			esquemaValor.visible=false;						
+		}
+		
+		void acceptaDada()
+		{
+			String valor = (String)esquemaValor.getFellow("dades").getFellow("form").getFellow("detall_valor").getValue();
+			String descripcio = (String)esquemaValor.getFellow("dades").getFellow("form").getFellow("detall_descripcio").getValue();
+			String[] dadesvalor = {valor,descripcio};
+			if(valor != null && !valor.trim().isEmpty()){
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, dadesvalor);							
+				cleanWindow();
+			}
+			else
+			{
+				Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("valueDomain.valueNotNull"),
+						org.zkoss.util.resource.Labels.getLabel("valueDomain.ErrorValueValidation"));
+			}
+		}
+		]]>	
+	</zscript>
+
+	<window closable="true" id="esquemaValor" position="center, center" title="${c:l('valorDomini.Titol')}" visible="false" width="800px">
+		<attribute name="onInicia">
+     		pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+	
+		<detalls id="dades" width="790px">
+			<form id="form">
+				<grid fixedLayout="true" height="52px" width="785px">
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('valorDomini.zul.Valor')}"/>
+							<textbox id="detall_valor" maxlength="30" onChange="" sclass="textbox" width="98%"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('valorDomini.zul.Descripcia')}"/>
+							<textbox id="detall_descripcio" maxlength="50" sclass="textbox" width="98%"/>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" label="${c:l('valorDomini.zul.Accepta')}">
+				<attribute name="onClick">
+					if (!esquemaValor.getFellow("dades").getFellow("detall_valor").value.equals("")) {
+						acceptaDada();
+					}
+				</attribute>
+			</button>
+			<button label="${c:l('valorDomini.zul.Cancel·la')}" onClick="cleanWindow()"/>								
+		</hbox>
+			
+	</window>
+	
+</zk>

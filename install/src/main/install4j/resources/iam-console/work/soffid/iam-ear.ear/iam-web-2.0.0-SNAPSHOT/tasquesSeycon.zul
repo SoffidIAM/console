@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="tasquesSeycon" title="Tasques de seycon"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<zscript>
+		
+		<!-- Versió d'updateTasks per només una columna al listbox
+		void updateTasks(String[] data){
+			ListModel strset = new SimpleListModel(event.data);
+			tasques.getFellow("lista").setModel(strset);
+		} -->
+		
+		public class ItemRenderer implements ListitemRenderer {
+			public void render(Listitem item, java.lang.Object data) {
+				new Listcell(data[0]).setParent(item);
+				new Listcell(data[1]).setParent(item);
+				new Listcell(data[2]).setParent(item);
+				new Listcell(data[3]).setParent(item);
+				new Listcell(data[4]).setParent(item);
+			}
+		}
+		
+		void updateTasks(String[] llista){
+			int numRows = llista.length;
+			info = new String[numRows][5];
+			columnes = new String[5];
+   			for(int j=0; j @lt numRows; ++j) {
+   				columnes = llista[j].split("#");
+   				<!-- Tasca -->
+   				if(columnes.length @gt 0){
+     				info[j][0] = columnes[0].trim();
+     			}else{
+     				info[j][0] = "";
+     			}
+     			<!-- Data -->
+   				if(columnes.length @gt 1){
+     				info[j][1] = columnes[1].trim();
+     			}else{
+     				info[j][1] = "";
+     			}
+     			<!-- Missatge -->
+     			if(columnes.length @gt 2){     			
+     				if (columnes[2].trim().equals("null")) {
+     					info[j][2] = "";
+     				} else {
+	     				info[j][2] = columnes[2].trim();
+	     			}
+     			}else{
+     				info[j][2] = "";
+     			}
+     			<!-- Rol -->
+     			if(columnes.length @gt 3){     			
+     				if (columnes[3].trim().equals("null@null")) {
+     					info[j][3] = "";
+     				} else {     			
+     					info[j][3] = columnes[3].trim();
+     				}
+     			}else{
+     				info[j][3] = "";
+     			}
+     			<!-- Agents Pendents -->
+     			if(columnes.length @gt 4){     			
+     				if (columnes[4].trim().equals("null")) {
+     					info[j][4] = "";
+     				} else {     			
+     					info[j][4] = columnes[4].trim();
+     				}
+     			}else{
+     				info[j][4] = "";
+     			}
+     			
+     		}
+			ListModel strset = new SimpleListModel(info);		
+			tasques.getFellow("lista").setModel(strset);
+			tasques.getFellow("lista").setItemRenderer(new ItemRenderer());
+		}
+		
+	</zscript>
+	
+	<style src="~./styles/estil.css"/>
+	<style>
+		.tasquesPendents .listbox-body td {
+		border-bottom: 1px solid lightgrey;
+		}
+	</style>
+
+	<window closable="true" id="tasques" position="center, center" sizable="true" title="${c:l('tasquesSeycon.Titol')}" visible="false" width="${amplefinestra}">
+		<attribute name="onInicia">
+			updateTasks(event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+		</attribute>
+		<attribute name="onClose">
+			tasques.visible=false;
+			event.stopPropagation ();
+		</attribute>
+		
+		<hbox>
+			<listbox fixedLayout="true" height="300px" id="lista" rows="10" sclass="tasquesPendents" width="100%">
+				<listhead>
+					<listheader label="${c:l('tasquesSeycon.zul.Tasca')}" width="15%"/>
+					<listheader label="${c:l('tasquesSeycon.zul.Data')}" width="120px"/>
+					<listheader label="${c:l('tasquesSeycon.zul.Missatge')}"/>
+					<listheader label="${c:l('tasquesSeycon.zul.Rol')}" width="12%"/>
+					<listheader label="${c:l('tasquesSeycon.zul.AgentsPendents')}" width="20%"/>
+				</listhead>
+			</listbox>
+		</hbox>
+		
+		<separator spacing="10px"/>
+		<separator bar="true" spacing="15px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('tasquesSeycon.zul.Accepta')}" onClick="tasques.visible = false"/>
+		</hbox>
+	</window>
+</zk>

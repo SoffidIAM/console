@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="finestraGenerica" title="Nou valor" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<style src="~./styles/estil.css"/>
+	
+	<zscript>
+	
+		void cleanWindow()
+		{
+			esquemaGeneric.getFellow("dades").getFellow("form").getFellow("campGeneric").setValue("");
+			esquemaGeneric.visible=false;						
+		}
+		
+		void acceptaDada()
+		{
+			String valor = esquemaGeneric.getFellow("dades").getFellow("form").getFellow("campGeneric").getValue();
+			String[] dades = {valor};
+			Component formComponent = (Component) pageScope.get("contextComponent");
+			Events.postEvent ("onActualitza", formComponent, dades);							
+			cleanWindow();
+		}
+		
+	</zscript>
+
+	<window closable="true" id="esquemaGeneric" position="center, center" title="${c:l('finestra_valorGeneric.Titol')}" visible="false" width="800px">
+		<attribute name="onInicia">
+     		pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+			
+			// Ponemos el título de la ventana/página
+			String titolFinestra = desktop.getPage("finestraGenerica").getAttribute("titolFinestra");
+			if (titolFinestra!=null) {
+				esquemaGeneric.setTitle(titolFinestra);
+			}
+			String nomCamp = desktop.getPage("finestraGenerica").getAttribute("nomCamp");
+			if (nomCamp!=null) {
+				esquemaGeneric.getFellow("dades").getFellow("form").getFellow("nomCampGeneric").getFellow("label").setValue(nomCamp);
+			} 
+			
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+	
+		<detalls id="dades" width="790px">
+			<form id="form">
+				<grid fixedLayout="true" width="785px">
+					<columns visible="false">
+						<column>nom</column>
+						<column width="80%">camp</column>
+					</columns>
+					<rows>
+						<row>
+							<input_etiqueta id="nomCampGeneric" value="${c:l('finestra_valorGeneric.zul.Camp')}"/>
+							<textbox id="campGeneric" onOK="acceptaDada()" sclass="textbox" width="100%"/>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" label="${c:l('finestra_valorGeneric.zul.Accepta')}">
+				<attribute name="onClick">
+					acceptaDada();
+				</attribute>
+			</button>
+			<button label="${c:l('finestra_valorGeneric.zul.Cancel·la')}" onClick="cleanWindow()"/>								
+		</hbox>
+			
+	</window>
+	
+</zk>

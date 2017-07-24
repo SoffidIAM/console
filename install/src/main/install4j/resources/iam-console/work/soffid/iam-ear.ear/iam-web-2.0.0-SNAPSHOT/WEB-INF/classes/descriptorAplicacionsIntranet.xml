@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="cerca">
+		<finder name="aplicacionsCerca" type="java.util.Collection"> <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				if="${queryEnabled}" method="getAllAplicacions">
+				<parameter value="${true}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+	<datanode name="tipusmime">
+		<finder name="tipusmime" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				if="${queryEnabled}" method="getAllTipusMimeExecucio" />
+		</finder>
+	</datanode>
+	<datanode name="appsintranet">
+		<finder name="app" type="app" refreshAfterCommit="false">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				if="${queryEnabled}" method="findPuntsEntrada">
+				<parameter value="${nom}" />
+				<parameter value="${codi}" />
+				<parameter value="${codiAplicacio}" />
+				<parameter value="${codiRol}" />
+				<parameter value="${codiGrup}" />
+				<parameter value="${codiUsuari}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
+		</finder>
+		<finder name="moure" type="moure" refreshAfterCommit="true">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="findRoot" />
+			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
+		</finder>
+		<finder name="tipusMime" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="getAllTipusMimeExecucio" />
+		</finder>
+		<finder name="aplicacions" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="getAllAplicacions">
+				<parameter value="${false}" />
+			</ejb-finder>
+		</finder>
+		<finder name="plantilles" type="String">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="getPlantillaTipusMimeExecucio">
+				<parameter value="${instance.tipusMimePlantilla}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="moure">
+		<finder name="moure" type="moure">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="findMenuChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
+		</finder>
+	</datanode>
+
+	<datanode name="app">
+		<finder name="app" type="app">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="findChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.PuntEntrada" />
+		</finder>
+		<finder name="autoritzacions" type="autoritzacions"
+			refreshAfterCommit="true">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="getAutoritzacionsPUE">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.AutoritzacioPuntEntrada" />
+		</finder>
+		<finder name="execucions" type="execucio">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+				method="getExecucions">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.ExecucioPuntEntrada" />
+		</finder>
+
+		<ejb-handler jndi="java:comp/env/ejb/PuntEntradaServiceEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+
+		<validator>
+			<attribute-validator expr="${instance.nom}"
+				notNull="true" friendlyName="appsIntranet.NameValidation" />
+		</validator>
+	</datanode>
+
+	<datanode name="java.util.Collection" />
+	<datanode name="java.lang.String" />
+
+	<datanode name="autoritzacions">
+		<ejb-handler jndi="java:comp/env/ejb/PuntEntradaServiceEJB">
+			<insert-method method="createAutoritzacio" returnBean="true">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteAutoritzacio">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="execucio">
+		<ejb-handler jndi="java:comp/env/ejb/PuntEntradaServiceEJB">
+			<insert-method method="createExecucio" returnBean="true">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</insert-method>
+			<update-method method="updateExecucio">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</update-method>
+			<delete-method method="deleteExecucio">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

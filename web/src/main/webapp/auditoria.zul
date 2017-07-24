@@ -354,7 +354,7 @@
 			
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
-					<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="audit"/>
+					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="audit"/>
 					<listexporttoolbarbutton acces="true" id="exportbutton" listbox="/esquema/lista/listbox"/>
 				</toolbar>
 				

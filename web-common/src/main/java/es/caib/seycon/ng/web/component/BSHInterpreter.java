@@ -179,6 +179,8 @@ public class BSHInterpreter extends GenericInterpreter implements
 		if ( getOwner() != null)
 			getOwner().getNamespace().unsetVariable(VAR_NS, false);
 
+		_ip.setClassLoader(ClassLoader.getSystemClassLoader());
+
 		// bug 1814819 ,clear variable, dennis
 		try {
 			_bshns.clear();
@@ -187,8 +189,6 @@ public class BSHInterpreter extends GenericInterpreter implements
 								// bsh)
 		}
 		
-		_ip.setClassLoader(ClassLoader.getSystemClassLoader());
-
 		_bshns = null;
 		super.destroy();
 	}

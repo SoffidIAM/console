@@ -36,7 +36,9 @@
 			<![CDATA[Servlet d'execucions.]]>
 		</description>
 		<servlet-name>execucio</servlet-name>
-		<servlet-class>es.caib.seycon.ng.web.Execucions</servlet-class>
+		<servlet-class>
+					com.soffid.iam.ui.Executions
+		</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>execucio</servlet-name>
@@ -63,49 +65,19 @@
 	<servlet>
 		<description>ErrorHandler</description>
 		<servlet-name>error467</servlet-name>
-		<servlet-class>es.caib.bpm.servlet.Error467Servlet</servlet-class>
+		<servlet-class>com.soffid.iam.ui.bpm.Error467Servlet</servlet-class>
 	</servlet>
 	<servlet>
 		<description>DocumentDownload</description>
 		<servlet-name>download-servlet</servlet-name>
-		<servlet-class>es.caib.bpm.servlet.DownloadServlet</servlet-class>
+		<servlet-class>com.soffid.iam.ui.bpm.DownloadServlet</servlet-class>
 	</servlet>
 	<servlet>
 		<description>DocumentUpload</description>
 		<servlet-name>upload-servlet</servlet-name>
-		<servlet-class>es.caib.bpm.servlet.UploadServlet</servlet-class>
+		<servlet-class>com.soffid.iam.ui.bpm.UploadServlet</servlet-class>
 	</servlet>
 
-
-	<!-- servlet de propiedades para el applet de firma -->
-	<!--inicio servlet para propiedades de firma del applet de firma -->
-	<servlet>
-		<description>servlet para propiedades de firma del applet de firma</description>
-		<servlet-name>SignaturaPropertiesServlet</servlet-name>
-		<servlet-class>
-			es.caib.zkib.zkiblaf.servlet.SignaturaPropertiesServlet
-		</servlet-class>
-		<run-as>
-			<role-name>BPM_INTERNAL</role-name>
-		</run-as>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>SignaturaPropertiesServlet</servlet-name>
-		<url-pattern>/signaturaPropertiesServlet</url-pattern>
-	</servlet-mapping>
-	<!--fin servlet para propiedades de firma del applet de firma -->
-
-
-	<!-- servlet per obtindre logs del seycon-server -->
-	<servlet>
-		<description>servlet para propiedades de firma del applet de firma</description>
-		<servlet-name>ServerLogServlet</servlet-name>
-		<servlet-class>es.caib.seycon.ng.web.servlet.ServerLogServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>ServerLogServlet</servlet-name>
-		<url-pattern>/SEU/serverlog</url-pattern>
-	</servlet-mapping>
 
 	<!--  Logout srevlet -->
 	<servlet>
@@ -482,7 +454,7 @@
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/VaultServiceEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
-		<local>com.soffid.iam.service.ejb.VaultServiceHome</local>
+		<local>com.soffid.iam.service.ejb.VaultService</local>
 	</ejb-local-ref>
 	
 	<ejb-local-ref>
@@ -591,27 +563,6 @@
 	</ejb-local-ref>
 
 
-	<env-entry>
-		<env-entry-name>userType</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[E]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/rol</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[7931]]>
-		</env-entry-value>
-	</env-entry>
-	<env-entry>
-		<env-entry-name>workflow/default/codiGrupPrimari</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>
-			<![CDATA[1009]]>
-		</env-entry-value>
-	</env-entry>
 
 	<welcome-file-list>
 		<welcome-file>index.zul</welcome-file>

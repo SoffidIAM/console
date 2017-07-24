@@ -486,3 +486,19 @@ div.CodeMirror-code   {
 	margin-left: 0px;
 }
 
+
+
+.search-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: lightblue;
+    height: 100%;
+    z-index: 3;
+    opacity: 0.1;
+}
+
+.search-popup {
+    z-index: 5;
+}

@@ -35,7 +35,6 @@ import es.caib.bpm.vo.BPMUser;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
-import es.caib.seycon.ng.web.utils.Autowildcards;
 
 
 public class SeleccionUsuarioUI extends Window 

@@ -52,9 +52,7 @@
 		
 		<finder name="definitionProcess" type="process">
 			<script-finder>
-				engine = new javax.naming.InitialContext()
-					.lookup ("java:comp/env/ejb/BPMEngineBeanLocal")
-					.create();
+				engine = com.soffid.iam.EJBLocator.getBpmEngine ();
 				java.util.LinkedList list = new java.util.LinkedList ();
 				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
 				tv.setTag ("-");

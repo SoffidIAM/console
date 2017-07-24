@@ -569,7 +569,7 @@
 									</row>
 								</rows>
 							</grid>
-							<div use="com.soffid.web.users.additionalData.AttributesDiv" 
+							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
 								dataPath="attributes" scope="application"
 								sclass="appatt"/>
 						
@@ -1115,7 +1115,7 @@
 							<label value="${c:l('aplicacionsIntranet.zul.Aplicacia-2')}  "></label>
 							<label bind="@codi"/>
 							<toolbar>
-								<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="gridRols" 
+								<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="gridRols" 
 									preferenceName="approle"/>
 								<toolbarbutton id="btAfegirRol" image="~./img/list-add.gif"
 									label="${c:l('aplicacions.zul.Afegeixrol')}"

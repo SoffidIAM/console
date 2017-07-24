@@ -1,4 +1,4 @@
-package com.soffid.web.zk;
+package com.soffid.iam.web.zk;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;

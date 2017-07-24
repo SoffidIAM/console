@@ -120,6 +120,11 @@
 		    				</treeitem>
 		    				<treeitem>
 		    					<treerow>
+		    						<apptreecell if="${canViewUsuaris}" langlabel="seu.usuaris" pagina="/usuaris2.zul"/>
+		    					</treerow>
+		    				</treeitem>
+		    				<treeitem>
+		    					<treerow>
 		    						<apptreecell if="${canViewGrups}" langlabel="seu.grups" pagina="/grups.zul"/>
 		    					</treerow>
 		    				</treeitem>

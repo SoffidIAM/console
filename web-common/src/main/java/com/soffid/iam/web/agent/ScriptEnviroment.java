@@ -1,4 +1,4 @@
-package com.soffid.web.agent;
+package com.soffid.iam.web.agent;
 
 import java.util.Iterator;
 

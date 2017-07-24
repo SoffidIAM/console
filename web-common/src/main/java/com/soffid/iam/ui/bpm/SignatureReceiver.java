@@ -1,4 +1,4 @@
-package es.caib.bpm.servlet;
+package com.soffid.iam.ui.bpm;
 
 import java.io.IOException;
 

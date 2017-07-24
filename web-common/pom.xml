@@ -278,6 +278,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>iam-tomee</artifactId>
+			<version>${pom.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>
 			<version>${zkiblaf.version}</version>
@@ -290,6 +296,24 @@
 			<version>3.0.8</version>
 		</dependency>
 		<dependency>
+			<groupId>org.zkoss.zk</groupId>
+			<artifactId>zhtml</artifactId>
+			<version>3.0.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.common</groupId>
+			<artifactId>zcommon</artifactId>
+			<version>3.0.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>5.0.18</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkdb</artifactId>
 			<version>${zkdb.version}</version>
@@ -299,6 +323,19 @@
 			<groupId>commons-el</groupId>
 			<artifactId>commons-el</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>iam-core</artifactId>
+			<version>${pom.version}</version>
+			<type>ejb</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.30</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<reporting>

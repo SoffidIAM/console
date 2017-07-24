@@ -1,4 +1,4 @@
-package es.caib.seycon.ng.web;
+package com.soffid.iam.ui;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -19,7 +19,7 @@ import es.caib.seycon.ng.servei.AplicacioService;
 import es.caib.seycon.ng.servei.PuntEntradaService;
 import es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome;
 
-public class Execucions extends HttpServlet {
+public class Executions extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 

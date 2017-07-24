@@ -26,7 +26,7 @@
 				method="findAccounts"  if="${!directFilter}" > <!--agent:query, application:update -->
 				<parameter value="${filter}" />
 			</ejb-finder>
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
 				method="findAccount" if="${directFilter}"> <!--agent:query, application:update -->
 				<parameter value="${account}" />
 				<parameter value="${system}" />
@@ -161,7 +161,7 @@
 	<datanode name="dispatcher" transient="true"/>
 	
 	<datanode name="account">
-		<ejb-handler jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService">
+		<ejb-handler jndi="java:comp/env/ejb/AccountEJB">
 			<insert-method method="createAccount" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -243,7 +243,7 @@
 		</finder>
 		
 		<finder name="owner" type="void">
-			<ejb-finder jndi="soffid/ejb/es.caib.seycon.ng.servei.AccountService"
+			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
 				method="getHPAccountOwner">
 				<parameter value="${instance}"/>
 			</ejb-finder>

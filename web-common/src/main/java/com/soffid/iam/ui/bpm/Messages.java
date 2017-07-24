@@ -1,11 +1,11 @@
-package es.caib.bpm.servlet;
+package com.soffid.iam.ui.bpm;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages
 {
-	private static final String BUNDLE_NAME = "es.caib.bpm.servlet.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.soffid.iam.bpm.messages"; //$NON-NLS-1$
 
 	private Messages()
 	{

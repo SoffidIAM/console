@@ -794,7 +794,7 @@
 		<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 			onHideFormulari="showLista()">
 
-			<criteris id="queryWindow" style="margin-bottom:1em; margin-top:1em" onOK="search()"
+			<criteris id="queryWindow" style="margin-bottom:1em;" onOK="search()"
 				width="${amplaria}">
 
 				<hbox>
@@ -884,7 +884,7 @@
 
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
-					<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="user"/>
+					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="user"/>
 					<insertbutton acces="${canCreateUser}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
 					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
@@ -893,7 +893,7 @@
 						listbox="/esquema/lista/listbox" />
 				</toolbar>
 				<listbox id="listbox" autocommit="false" dataPath="/model:/usuari"
-					use="com.soffid.web.UsersListbox"
+					use="com.soffid.iam.web.UsersListbox"
 					fixedLayout="true" height="96%" onClick="showDetall()"
 					onSelect="select()" rows="${fileres}">
 					<listhead>
@@ -1594,7 +1594,7 @@
 										<datarow>
 											<input_etiqueta bind="@dataLabel" width_custom="250px"
 												value="${c:l('usuaris.zul.@codiDada')}"/>
-												<div use="com.soffid.web.users.additionalData.InputField" onChange=""/>
+												<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/>
 										</datarow>
 									</grid>
 									<grid
@@ -1615,7 +1615,7 @@
 											<input_etiqueta
 												bind="@dataLabel" value="${c:l('usuaris.zul.@codiDada')}"
 												width_custom="250px" />
-												<div use="com.soffid.web.users.additionalData.InputField"/>
+												<div use="com.soffid.iam.web.users.additionalData.InputField"/>
 										</datarow>
 									</grid>
 								</vbox>
@@ -2016,7 +2016,7 @@
 							<tabpanel id="rols">
 								<div width="100%">
 									<toolbar>
-										<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="gridRols"
+										<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="gridRols"
 											preferenceName="userrole"/>
 										<toolbarbutton
 											image="~./img/list-add.gif"

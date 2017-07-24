@@ -1283,7 +1283,7 @@
 								<attribute name="onClick">
 									<![CDATA[
 	es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
-	String t = new com.soffid.web.agent.Exporter().export (listbox);
+	String t = new com.soffid.iam.web.agent.Exporter().export (listbox);
 	org.zkoss.util.media.AMedia m = new org.zkoss.util.media.AMedia("agent-config.xml",
 			null, "text/xml", t.getBytes("UTF-8"));
 	Filedownload.save(m);
@@ -1296,7 +1296,7 @@
 {
 	org.zkoss.util.media.Media m = Fileupload.get();
 	es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
-	new com.soffid.web.agent.Importer().doImport(m, listbox);
+	new com.soffid.iam.web.agent.Importer().doImport(m, listbox);
 	listbox.sendEvent( new es.caib.zkib.events.XPathRerunEvent( listbox, "/" ) );
 }
 									]]>
@@ -1354,7 +1354,7 @@
 											    		desktop.getPage("editor").getFellow("top"),
 											    		new Object[] {
 															    event.getTarget().getPreviousSibling().getFellow("dada"),
-															    new com.soffid.web.agent.ScriptEnviroment().getSoffidVars2(self)
+															    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars2(self)
 														}
 											    ));
 											]]></attribute>
@@ -1506,7 +1506,7 @@
 														    		desktop.getPage("editor").getFellow("top"),
 														    		new Object[] {
 																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.web.agent.ScriptEnviroment().getSystemVars(self)
+																		    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(self)
 																	}
 														    ));
 														]]></attribute>
@@ -1533,7 +1533,7 @@
 														    		desktop.getPage("editor").getFellow("top"),
 														    		new Object[] {
 																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.web.agent.ScriptEnviroment().getSoffidVars(self)
+																		    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(self)
 																	}
 														    ));
 														]]></attribute>
@@ -1635,7 +1635,7 @@
 														    		desktop.getPage("editor").getFellow("top"),
 														    		new Object[] {
 																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.web.agent.ScriptEnviroment().getTriggerVars(self)
+																		    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(self)
 																	}
 														    ));
 														]]></attribute>
@@ -1726,7 +1726,7 @@
 											    		desktop.getPage("editor").getFellow("top"),
 											    		new Object[] {
 															    event.getTarget().getParent().getPreviousSibling().getFirstChild(),
-															    new com.soffid.web.agent.ScriptEnviroment().getLoadTriggerVars(self)
+															    new com.soffid.iam.web.agent.ScriptEnviroment().getLoadTriggerVars(self)
 														}
 											    ));
 											]]></attribute>

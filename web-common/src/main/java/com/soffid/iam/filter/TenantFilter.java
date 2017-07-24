@@ -17,6 +17,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class TenantFilter implements Filter {
 
 	private FilterConfig filterConfig;
@@ -34,7 +36,12 @@ public class TenantFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpResp = (HttpServletResponse) response;
-		String tenantHost = new TenantExtractor().getTenant(httpReq);
+		String tenantHost;
+		try {
+			tenantHost = new TenantExtractor().getTenant(httpReq);
+		} catch (InternalErrorException e) {
+			throw new ServletException(e);
+		}
 
 		HttpSession s = httpReq.getSession(true);
 		

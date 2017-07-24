@@ -1,4 +1,4 @@
-package com.soffid.web.users.additionalData;
+package com.soffid.iam.web.users.additionalData;
 
 import java.io.IOException;
 import java.util.Collections;

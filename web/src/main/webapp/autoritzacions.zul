@@ -245,7 +245,7 @@
 		</criteris>
 		<navegador id="lista" width="${amplaria}">
 			<toolbar>
-				<toolbarbutton use="com.soffid.web.HideColumnsComponent" listbox="listbox" preferenceName="auth"/>
+				<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="auth"/>
 				<commitbutton datamodel="/model" id="boto_commit"/>
 				<undobutton datamodel="/model" id="boto_undo" listbox="/esquema/dades/gridAutoritzacions"/>
 				<listexporttoolbarbutton acces="${canQueryAuthorization}" listbox="/esquema/lista/listbox"/>

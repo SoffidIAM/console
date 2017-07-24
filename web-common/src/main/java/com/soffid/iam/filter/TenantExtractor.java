@@ -3,8 +3,12 @@ package com.soffid.iam.filter;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class TenantExtractor {
-	public String getTenant (HttpServletRequest req)
+	public String getTenant (HttpServletRequest req) throws InternalErrorException
 	{
 		String hostName = req.getServerName();
 		String baseHost = System.getProperty("hostName");
@@ -15,9 +19,9 @@ public class TenantExtractor {
 			String[] hostParts = hostName.split("\\.");
 			tenantHost = hostParts[0];
 			if (tenantHost.isEmpty())
-				tenantHost = "master";
+				tenantHost = Security.getMasterTenantName();
 		} else
-			tenantHost = "master";
+			tenantHost = Security.getMasterTenantName();
 		
 		return tenantHost;
 	}

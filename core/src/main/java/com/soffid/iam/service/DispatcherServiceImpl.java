@@ -1062,7 +1062,12 @@ public class DispatcherServiceImpl extends
 		de.getObjectMappings().clear();
 
 		AgentDescriptorEntity ad = getAgentDescriptorEntityDao().findByClass(
+				Security.getCurrentTenantName(),
 				de.getClassName());
+		if (ad == null)
+			ad = getAgentDescriptorEntityDao().findByClass(
+					Security.getMasterTenantName(),
+					de.getClassName());
 		if (ad != null) {
 			for (DefaultObjectMappingEntity dom : ad.getDefaultObjectMappings()) {
 				ObjectMappingEntity ome = getObjectMappingEntityDao()

@@ -62,6 +62,11 @@ import es.caib.seycon.ng.comu.AccountType;
 
 import com.soffid.iam.api.Password;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
@@ -89,6 +94,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -1745,4 +1751,38 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return getAccountEntityDao().toAccount(acc);
 	}
 
+	@Override
+	protected Collection<Account> handleFindAccountByJsonQuery(String query)
+			throws Exception {
+		ClassConfig config = Configuration
+				.getClassConfig(com.soffid.iam.api.Account.class);
+
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(User.class);
+		String qs = hql.getQueryString().toString();
+		if (qs.isEmpty())
+			qs = "o.system.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.tenant.id = :tenantId";
+
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[1+params.size()];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		Collection<Account> result = new LinkedList<Account>();
+		for (AccountEntity ue : getAccountEntityDao().query(hql.toString(),
+				paramArray)) {
+			Account u = getAccountEntityDao().toAccount(ue);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
+				if (getAuthorizationService().hasPermission(
+						Security.AUTO_USER_QUERY, ue)) {
+					result.add(u);
+				}
+			}
+		}
+
+		return result;
+	}
 }

@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.resource.spi.SecurityException;
+
 import com.soffid.iam.api.AgentDescriptor;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Configuration;
@@ -42,6 +44,7 @@ import com.soffid.iam.service.impl.InternalAgentDescriptor;
 import com.soffid.iam.service.impl.InternalObjectMapping;
 import com.soffid.iam.service.impl.InternalServerPluginModule;
 import com.soffid.iam.service.impl.ServerPluginParser;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.ServerPluginModuleType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -50,7 +53,7 @@ import es.caib.seycon.ng.servei.DuplicatedClassException;
 /**
  * @see es.caib.seycon.ng.servei.ServerPluginServer
  */
-public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNameBase {
+public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPluginServiceBase {
     final String versionTag = "serverBaseVersion"; //$NON-NLS-1$
     final String consoleVersionTag = "consolePluginVersion"; //$NON-NLS-1$
 
@@ -76,6 +79,14 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
     	// Test duplicated syncserver
     	testDuplicatedSyncServer (spp.getPlugin());
     	//
+    	for ( ServerPluginModule module : spp.getPlugin().getModules())
+    	{
+    		if (Security.getMasterTenantName().equals(Security.getCurrentTenantName()) &&
+    				! module.getType().equals(ServerPluginModuleType.MODULE_AGENT))
+    		{
+    			throw new SecurityException("Only connector plugins are allowed");
+    		}
+    	}
     	ServerPluginEntity plugin = getServerPluginEntityDao().findByName(spp.getPlugin().getName());
     	if (plugin == null)
     	{
@@ -85,7 +96,7 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
     		getServerPluginEntityDao().create(plugin);
     	} 
-    	else
+    	else if (plugin.getTenant().getId().equals(Security.getCurrentTenantId()))
     	{
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
     		getServerPluginEntityDao().update(plugin);
@@ -109,6 +120,8 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
     			}
     			getServerPluginModuleEntityDao().remove(module);
     		}
+    	} else {
+    		return;
     	}
     	
     	for (ServerPluginModule module: spp.getPlugin().getModules())
@@ -203,7 +216,7 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
     	}
 	}
 
-	private void testDuplicatedClasses(ServerPlugin plugin) throws DuplicatedClassException
+	private void testDuplicatedClasses(ServerPlugin plugin) throws DuplicatedClassException, InternalErrorException
 	{
 		for (ServerPluginModule module: plugin.getModules())
 		{
@@ -212,8 +225,9 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
 				for ( AgentDescriptor agent: module.getAgents())
 				{
 					AgentDescriptorEntity ad2 = getAgentDescriptorEntityDao().findByClass(
-	                    agent.getClassName());
-					if (ad2 != null && ad2.getModule() == null)
+	                    Security.getCurrentTenantName(), agent.getClassName());
+					if (ad2 != null && ad2.getModule() == null
+							&& ad2.getPlugin().getTenant().getId().equals(Security.getCurrentTenantId()))
 					{
 						// Migración de agente anterior
 						getAgentDescriptorEntityDao().remove(ad2);
@@ -221,6 +235,7 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
 					else if (ad2 != null &&
 							ad2.getModule() != null && ad2.getModule().getPlugin() != null &&
 							ad2.getModule().getPlugin().isEnabled() &&
+							ad2.getModule().getPlugin().getTenant().getId().equals(Security.getCurrentTenantId()) &&
 							!ad2.getModule().getPlugin().getName().equals(plugin.getName()))
 					{
 		                throw new DuplicatedClassException(String.format("Duplicated class %s", //$NON-NLS-1$
@@ -241,8 +256,11 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
         for (ServerPluginEntity plugin: getServerPluginEntityDao()
                 .loadAll())
         {
-        	ServerPlugin p = toServerPlugin(plugin);
-        	res.add(p);
+        	if (plugin.getTenant().getId().equals(Security.getCurrentTenantId()))
+        	{
+	        	ServerPlugin p = toServerPlugin(plugin);
+	        	res.add(p);
+        	}
         }
         return res;
     }
@@ -273,14 +291,17 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
      */
     protected void handleEnablePlugin(com.soffid.iam.api.ServerPlugin plugin, boolean status) throws java.lang.Exception {
         ServerPluginEntity entity = getServerPluginEntityDao().load(plugin.getId());
-        if (status) {
-	        ServerPlugin reloaded = toServerPlugin(entity);
-	        testDuplicatedSyncServer(plugin);
-	        testDuplicatedClasses(plugin);
+        if (entity.getTenant().getId().equals(Security.getCurrentTenantId()))
+        {
+	        if (status) {
+		        ServerPlugin reloaded = toServerPlugin(entity);
+		        testDuplicatedSyncServer(plugin);
+		        testDuplicatedClasses(plugin);
+	        }
+	        entity.setEnabled(status);
+	        getServerPluginEntityDao().update(entity);
+	        updateConfig();
         }
-        entity.setEnabled(status);
-        getServerPluginEntityDao().update(entity);
-        updateConfig();
     }
 
     /**
@@ -288,23 +309,31 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
      */
     @SuppressWarnings(value = {"rawtypes"})
     protected java.util.Collection<AgentDescriptor> handleGetPluginAgentDescriptors(com.soffid.iam.api.ServerPlugin plugin) throws java.lang.Exception {
-        Collection<ServerPluginEntity> agentsBasics = getServerPluginEntityDao().findAgentsBasicDataByServerPluginID(plugin.getId());
+        Collection<Object[]> agentsBasics = getServerPluginEntityDao().findAgentsBasicDataByServerPluginID(plugin.getId());
+        
         Collection<AgentDescriptor> res = new LinkedList<AgentDescriptor>();
         if (agentsBasics != null)
-            for (Iterator it = agentsBasics.iterator(); it.hasNext();) {
-                Object[] obj = (Object[]) it.next();
+            for (Iterator<Object[]> it = agentsBasics.iterator(); it.hasNext();) {
+                Object[] obj = it.next();
                 Boolean enable = (Boolean) obj[3];
                 Boolean authoritative = (Boolean) obj[4];
                 Boolean enableAttributeMapping = (Boolean) obj[5];
                 Boolean enableObjectTriggers = (Boolean) obj[6];
-                AgentDescriptor ag = new AgentDescriptor();
-                ag.setId((Long) obj[0]);
-                ag.setDescription((String) obj[1]);
-                ag.setClassName((String) obj[2]);
-                ag.setEnableAccessControl(enable != null ? enable.booleanValue() : false);
-                ag.setAuthoritativeSource(authoritative != null ? authoritative.booleanValue() : false);
-                ag.setEnableObjectTriggers(enableObjectTriggers != null ? enableObjectTriggers.booleanValue(): false);
-                res.add(ag);
+                String tenant = (String) obj[7];
+                
+                if (tenant.equals(Security.getMasterTenantName()) ||
+                		tenant.equals(Security.getCurrentTenantName()))
+                {
+	                AgentDescriptor ag = new AgentDescriptor();
+	                ag.setId((Long) obj[0]);
+	                ag.setDescription((String) obj[1]);
+	                ag.setClassName((String) obj[2]);
+	                ag.setEnableAttributeMapping(enableAttributeMapping != null ? enableAttributeMapping.booleanValue(): false);
+	                ag.setEnableAccessControl(enable != null ? enable.booleanValue() : false);
+	                ag.setAuthoritativeSource(authoritative != null ? authoritative.booleanValue() : false);
+	                ag.setEnableObjectTriggers(enableObjectTriggers != null ? enableObjectTriggers.booleanValue(): false);
+	                res.add(ag);
+                }
             }
 
         return res;
@@ -322,9 +351,10 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
      * @see es.caib.seycon.ng.servei.ServerPluginServer#getAgentDescriptor(java.lang.String)
      */
     protected com.soffid.iam.api.AgentDescriptor handleGetAgentDescriptor(java.lang.String className) throws java.lang.Exception {
-        AgentDescriptorEntity ade = getAgentDescriptorEntityDao().findByClass(className);
+        AgentDescriptorEntity ade = getAgentDescriptorEntityDao().findByClass(Security.getCurrentTenantName(), className);
+        if (ade == null)
+        	ade = getAgentDescriptorEntityDao().findByClass(Security.getMasterTenantName(), className);
         return getAgentDescriptorEntityDao().toAgentDescriptor(ade);
-
     }
 
     /**
@@ -336,7 +366,10 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
         for (Iterator<ServerPluginEntity> itPlugin = getServerPluginEntityDao().loadAll()
                 .iterator(); itPlugin.hasNext();) {
             ServerPluginEntity sp = (ServerPluginEntity) itPlugin.next();
-            if (sp.isEnabled()) {
+        	String tenant = sp.getTenant().getName();
+            if (sp.isEnabled() && (
+            		tenant.equals( Security.getCurrentTenantName()) ||
+        			tenant.equals(Security.getMasterTenantName()))) {
                 v.addAll(sp.getAgents());
             }
         }
@@ -360,8 +393,14 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
         ad.setDescription("%"); //$NON-NLS-1$ //$NON-NLS-2$
         ad.setEnableAccessControl(false);
         ad.setId(new Long(0));
-        v2.add(ad); 
-        v2.addAll(getAgentDescriptorEntityDao().toAgentDescriptorList(v));
+        v2.add(ad);
+        for (AgentDescriptorEntity entity: v)
+        {
+        	String tenant = entity.getPlugin().getTenant().getName();
+        	if (tenant.equals( Security.getCurrentTenantName()) ||
+        			tenant.equals(Security.getMasterTenantName()))
+        		v2.add(getAgentDescriptorEntityDao().toAgentDescriptor(entity));
+        }
         return v2;
     }
 
@@ -388,25 +427,29 @@ public class ServerPluginNameImpl extends com.soffid.iam.service.ServerPluginNam
         DefaultAttributeMappingEntityDao damed = getDefaultAttributeMappingEntityDao();
         DefaultObjectMappingPropertyEntityDao doped = getDefaultObjectMappingPropertyEntityDao();
         DefaultObjectMappingEntityDao doed = getDefaultObjectMappingEntityDao();
-        
-        for (ServerPluginModuleEntity module: spe.getModules())
+
+        ServerPluginEntity p = sped.load(plugin.getId());
+        if (p.getTenant().getId().equals(Security.getCurrentTenantId()))
         {
-        	for (AgentDescriptorEntity agent: module.getAgents())
-        	{
-        		for (DefaultObjectMappingEntity dom: agent.getDefaultObjectMappings())
-        		{
-        			for (DefaultAttributeMappingEntity dam: dom.getDefaultAttributeMappings())
-        				damed.remove(dam);
-					for (DefaultObjectMappingPropertyEntity dop: dom.getProperties())
-        				doped.remove(dop);
-					doed.remove(dom);
-        		}
-        		aded.remove(agent);
-        	}
-        	spmed.remove(module);
+	        for (ServerPluginModuleEntity module: spe.getModules())
+	        {
+	        	for (AgentDescriptorEntity agent: module.getAgents())
+	        	{
+	        		for (DefaultObjectMappingEntity dom: agent.getDefaultObjectMappings())
+	        		{
+	        			for (DefaultAttributeMappingEntity dam: dom.getDefaultAttributeMappings())
+	        				damed.remove(dam);
+						for (DefaultObjectMappingPropertyEntity dop: dom.getProperties())
+	        				doped.remove(dop);
+						doed.remove(dom);
+	        		}
+	        		aded.remove(agent);
+	        	}
+	        	spmed.remove(module);
+	        }
+	        sped.remove(plugin.getId());
+	        updateConfig();
         }
-        sped.remove(plugin.getId());
-        updateConfig();
     }
 
     

@@ -506,9 +506,14 @@ public class DeployerBean implements DeployerService {
 	}
 
 	private String removeExtension (String warFile) {
-		int i = warFile.lastIndexOf('.');
-		if ( i >= 0)
-			return warFile.substring(0,i);
+		if (warFile.toUpperCase().endsWith(".WAR"))
+		{
+			int i = warFile.lastIndexOf('.');
+			if ( i >= 0)
+				return warFile.substring(0,i);
+			else
+				return warFile;
+		}
 		else
 			return warFile;
 	}
@@ -654,6 +659,7 @@ public class DeployerBean implements DeployerService {
 				recursivelyDelete(tmpDir());
 				getTimestampFile().delete();
 				uncompressEar();
+				updateApplicationXml();
 			} else {
 				System.setProperty("soffid.fail-safe", "false");
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
@@ -681,6 +687,7 @@ public class DeployerBean implements DeployerService {
 							e);
 					recursivelyDelete(tmpDir());
 					uncompressEar();
+					updateApplicationXml();
 					getTimestampFile().delete();
 				} finally {
 					conn.close();

@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.model;
 
+import java.util.List;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -302,6 +304,7 @@ public abstract class UsuariEntity {
 	
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+	
 }
 
 @Index (name="USU_UK_CODI",	unique=true,

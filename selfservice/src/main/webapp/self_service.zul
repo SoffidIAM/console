@@ -196,7 +196,7 @@
 										<datarow>
 											<input_etiqueta bind="@dataLabel" width_custom="135px"
 												value="${c:l('usuaris.zul.@codiDada')}"/>
-											<div use="com.soffid.web.users.additionalData.InputField" twoPhaseEdit="true" onChange=""/>
+											<div use="com.soffid.iam.web.users.additionalData.InputField" twoPhaseEdit="true" onChange=""/>
 										</datarow>
 									</grid>
 									<popup id="pwd">

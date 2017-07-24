@@ -121,6 +121,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${pom.groupId}</groupId>
+			<artifactId>web-common</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
 			<artifactId>iam-core</artifactId>
 			<version>${pom.version}</version>
 			<type>ejb</type>
@@ -241,6 +246,11 @@
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zhtml</artifactId>
 			<version>3.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>web-common</artifactId>
+			<version>${pom.version}</version>
 		</dependency>
 	</dependencies>
 </project>

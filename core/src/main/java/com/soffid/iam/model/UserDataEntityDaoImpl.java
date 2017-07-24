@@ -22,6 +22,7 @@ import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
+import es.caib.seycon.util.Base64;
 
 import java.security.Principal;
 import java.text.ParseException;
@@ -49,9 +50,10 @@ public class UserDataEntityDaoImpl
 	private void assertPhoneExists ()
 	{
         org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                        .createQuery("select max (tda.order) from com.soffid.iam.model.MetaDataEntity as tda"); //$NON-NLS-1$
+                        .createQuery("select max (tda.order) from com.soffid.iam.model.MetaDataEntity as tda "
+                        		+ "where tda.tenant.id=:tenantId"); //$NON-NLS-1$
+        queryObject.setLong("tenantId", Security.getCurrentTenantId());
         java.util.List results = queryObject.list();
-       
 		
         Long nou = new Long(2);
         if (!results.isEmpty())
@@ -214,6 +216,15 @@ public class UserDataEntityDaoImpl
 	            {
 					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
 	            	targetEntity.setValue(curFormater.format(sourceVO.getDateValue().getTime()));
+	            }
+            }
+            if (TypeEnumeration.PHOTO_TYPE.equals(tipusDadaEntity.getType()) ||
+            		TypeEnumeration.BINARY_TYPE.equals(tipusDadaEntity.getType()))
+            {
+            	if (sourceVO.getValue() != null && ! sourceVO.getValue().isEmpty() &&
+            			sourceVO.getBlobDataValue() == null)
+            	{
+	            	targetEntity.setBlobDataValue(Base64.decode(sourceVO.getValue()));
 	            }
             }
         }

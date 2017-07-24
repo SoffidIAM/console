@@ -570,57 +570,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	private String comprobarXML(Document document, boolean user) {
-		String resultado = ""; //$NON-NLS-1$
-		int i = 0;
-		if (this.getValue("Nom", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") + " nom"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		// if (this.getValue("NomCurt", document) == null) {
-		// resultado += (resultado.length() == 0 ? "" : ",") + " nom curt";
-		// }
-		if (this.getValue("NIF", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") + " nif"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		if (this.getValue("PrimerLlinatge", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") //$NON-NLS-1$ //$NON-NLS-2$
-					+ Messages.getString("UserServiceImpl.FirstSurname"); //$NON-NLS-1$
-		}
-		/*
-		 * if (this.getValue("SegonLlinatge", document) == null) { resultado +=
-		 * (resultado.length() == 0 ? "" : ",") + " segón llinatge"; }
-		 */
-		if (this.getValue("UnitatOrganitzativa", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") //$NON-NLS-1$ //$NON-NLS-2$
-					+ Messages.getString("UserServiceImpl.OrgUnity"); //$NON-NLS-1$
-		} /*
-		 * else {// Cambio brújula // Modificado u93387 // Si la unidad
-		 * organizativa es la correspondiente al IBSalut, habrá que cerciorarse
-		 * // de que se ha introducido el código de usuario del IBSalut if
-		 * (this.getValue("UnitatOrganitzativa", document).equals("X")) { //
-		 * Donde X es el código correspondiente al IBSalut if
-		 * (this.getValue("CodiUsuariIBSalut", document) == null) { resultado +=
-		 * (resultado.length() == 0 ? "" : ",") + " codi usuari IBSalut"; } }//
-		 * Fin cambio brújula }
-		 */
-		if (this.getValue("CertificacioDeValidesa", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") //$NON-NLS-1$ //$NON-NLS-2$
-					+ Messages.getString("UserServiceImpl.Certification"); //$NON-NLS-1$
-		}
-		if (this.getValue("CertificacioDeCondicions", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") //$NON-NLS-1$ //$NON-NLS-2$
-					+ Messages.getString("UserServiceImpl.CondCertification"); //$NON-NLS-1$
-		}
-		if (this.getValue("TipusUsuari", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") //$NON-NLS-1$ //$NON-NLS-2$
-					+ Messages.getString("UserServiceImpl.UserType"); //$NON-NLS-1$
-		}
-		if (this.getValue("Telefon", document) == null) { //$NON-NLS-1$
-			resultado += (resultado.length() == 0 ? "" : ",") + Messages.getString("UserServiceImpl.UserPhone"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		return (resultado);
-	}
-
 	/**
 	 * Funcion que devuelve el valor de una camino de fichero xml. si no lo
 	 * encuentra devuelve null.
@@ -1691,6 +1640,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		arreglaAlias(usuari);
+		usuari.setCreatedByUser(previousUser.getCreatedByUser());
+		usuari.setCreatedDate(previousUser.getCreatedDate());
 		usuari.setModifiedByUser(Security.getCurrentAccount());
 		usuari.setModifiedDate(GregorianCalendar.getInstance());
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
@@ -3106,12 +3057,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);
-
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.tenant.id = :tenantId";
+		
+		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();
-		Parameter paramArray[] = new Parameter[params.size()];
+		Parameter paramArray[] = new Parameter[params.size()+1];
 		int i = 0;
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		LinkedList<User> result = new LinkedList<User>();
 		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
 				paramArray)) {

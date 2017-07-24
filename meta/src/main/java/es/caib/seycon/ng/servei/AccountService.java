@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roles.account_attribute_query;
 import roles.account_attribute_update;
+import roles.account_query;
 
 @Service (translatedName="AccountService", serverPath="/seycon/accountService", serverRole="agent",
 	translatedPackage="com.soffid.iam.service")
@@ -457,6 +458,14 @@ public abstract class AccountService {
 	@Description("Deletes an account attributes")
 	@Operation (grantees={account_attribute_update.class})
 	public void removeAccountAttribute (DadaUsuari attribute) {
+	}
+
+	@Operation(grantees = { account_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByJsonQuery(
+			String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
 	}
 
 }

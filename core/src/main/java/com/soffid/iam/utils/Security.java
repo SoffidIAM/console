@@ -411,6 +411,21 @@ public class Security {
     }
     
     private static void internalNestedLogin(String tenant, String user, String roles[])  {
+    	try {
+			Tenant t = getTenantService().getTenant(tenant);
+			if ( t == null)
+				throw new RuntimeException("Invalid tenant: "+tenant);
+			for ( String tp: getTenantService().getDisabledPermissions(t))
+			{
+				for ( String role: roles)
+				{
+					if (role.startsWith(tp))
+						throw new RuntimeException("Cannot elevate permission "+role);
+				}
+			}
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
+		}
         SoffidPrincipal p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
         getIdentities().push(p);
     }
@@ -640,7 +655,7 @@ public class Security {
 	public static String getMasterTenantName () throws InternalErrorException{
 		if (masterTenantName == null)
 		{
-			masterTenantName = ServiceLocator.instance().getTenantService().getMasterTenant().getName();
+			masterTenantName = getTenantService().getMasterTenant().getName();
 		}
 		return masterTenantName;
 	}

@@ -128,6 +128,9 @@ public class TenantServiceImpl extends TenantServiceBase {
 			result.add(tep.getPermission());
 		}
 		
+		if ( ! result.isEmpty())
+			result.add(Security.AUTO_AUTHORIZATION_ALL);
+		
 		return result;
 	}
 

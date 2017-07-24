@@ -9,7 +9,7 @@ import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Service (translatedName="ServerPluginName",
+@Service (translatedName="ServerPluginService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.ServerPluginModuleEntity.class,
 	es.caib.seycon.ng.model.DefaultAttributeMappingEntity.class,

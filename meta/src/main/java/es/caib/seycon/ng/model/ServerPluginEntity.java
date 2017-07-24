@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SERPLU" , translatedName="ServerPluginEntity", translatedPackage="com.soffid.iam.model")
@@ -30,6 +31,9 @@ public abstract class ServerPluginEntity {
 	@Column (name="SPL_ENABLE")
 	public boolean enabled;
 
+	@Column (name="SPL_TEN_ID")
+	public TenantEntity tenant;
+
 	@ForeignKey (foreignColumn="ADE_IDSPL")
 	public java.util.Collection<es.caib.seycon.ng.model.AgentDescriptorEntity> agents;
 
@@ -43,11 +47,12 @@ public abstract class ServerPluginEntity {
 	}
 	@Operation(translated="findAgentsBasicDataByServerPluginID")
 	@DaoFinder("select agent.id ,agent.description, agent.className, agent.enableAccessControl , agent.authoritativeSource,\n"
-			+ "agent.enableAttributeMapping, agent.enableObjectTriggers \n"
+			+ "agent.enableAttributeMapping, agent.enableObjectTriggers, "
+			+ "p.tenant.name \n"
 			+ "from com.soffid.iam.model.AgentDescriptorEntity agent \n"
 			+ "left join agent.plugin as p \n"
 			+ "where p.id=:id")
-	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findDadesBasiquesAgentsByServerPluginId(
+	public java.util.List<Object[]> findDadesBasiquesAgentsByServerPluginId(
 		java.lang.Long id) {
 	 return null;
 	}

@@ -471,7 +471,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         }
 
         String dominiCorreu = sourceVO.getMailDomain();
-        if (!sourceVO.getActive())
+        if (sourceVO.getActive () == null || !sourceVO.getActive())
         {
         	// Skip mail check
             EmailDomainEntity dominiCorreuEntity = getEmailDomainEntityDao().findByCode(dominiCorreu);

@@ -14,7 +14,7 @@
 		</columns>
 		<datarow>
 			<input_etiqueta bind="@dataLabel" width_custom="250px"/>
-			<div use="com.soffid.web.users.additionalData.InputField" onChange=""/> 
+			<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/> 
 		</datarow>
 	</grid>
 </zk>

@@ -53,9 +53,15 @@ public abstract class AgentDescriptorEntity {
 	@ForeignKey (foreignColumn="DAM_ADE_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.DefaultObjectMappingEntity> defaultObjectMappings;
 
-	@DaoFinder
+	@DaoFinder("select agentDescriptorEntity\n"
+			+ "from com.soffid.iam.model.AgentDescriptorEntity as agentDescriptorEntity\n"
+			+ "join agentDescriptorEntity.plugin as plugin "
+			+ "join plugin.tenant as tenant "
+			+ "where agentDescriptorEntity.className = :className "
+			+ " and  tenant.name = :tenant "
+			+ "order by agentDescriptorEntity.description") 
 	public es.caib.seycon.ng.model.AgentDescriptorEntity findByClass(
-		java.lang.String className) {
+		String tenant, java.lang.String className) {
 	 return null;
 	}
 	@DaoFinder

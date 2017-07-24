@@ -273,6 +273,10 @@ public abstract class AuditoriaEntity {
 		java.lang.String action) {
 	 return null;
 	}
+	
+	@Description("Unlinks audit logs from account that is going to be removed")
+	@DaoOperation
+	public void unlinkAccounts(AccountEntity account) {}
 }
 
 @Index (name="SC_AUDITO_BORRAR",	unique=false,

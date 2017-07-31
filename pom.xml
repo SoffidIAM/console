@@ -74,7 +74,7 @@
         <plugin>
           <groupId>com.soffid.tools</groupId>
           <artifactId>mda-maven-plugin</artifactId>
-          <version>2.0.26-SNAPSHOT</version>
+          <version>2.0.26</version>
           <configuration>
             <targetServer>tomee</targetServer>
             <translate>true</translate>
@@ -414,7 +414,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.20</zkiblaf.version>
-    <zkdb.version>1.28-SNAPSHOT</zkdb.version>
+    <zkdb.version>1.29</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>
@@ -474,9 +474,10 @@
   		<modules>
     		<module>meta</module>
     		<module>deployer</module>
+    		<module>scimquery</module>
     		<module>common</module>
+    		<module>tomee</module>
     		<module>core</module>
-   			<module>tomee</module>
    			<module>web-common</module>
     		<module>bpm-sar</module>
     		<module>weblogout</module>

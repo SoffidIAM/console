@@ -86,7 +86,7 @@ public class ComparisonExpression extends AbstractExpression {
 	{
 		if ("eq".equalsIgnoreCase(operator))
 		{
-			return attributeValue.equalsIgnoreCase((String)matchValue);
+			return attributeValue.equals((String)matchValue);
 		}
 		if ("gt".equalsIgnoreCase(operator))
 		{
@@ -118,7 +118,7 @@ public class ComparisonExpression extends AbstractExpression {
 		}
 		if ("co".equalsIgnoreCase(operator))
 		{
-			return attributeValue.toString().contains(matchValue);
+			return attributeValue.toString().toLowerCase().contains(matchValue.toLowerCase());
 		}
 		if ("pr".equalsIgnoreCase(operator))
 		{
@@ -324,51 +324,62 @@ public class ComparisonExpression extends AbstractExpression {
 			}
 			else
 			{
-				query.getWhereString().append(ctx.objectName);
 				if ("eq".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" =  ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("gt".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" > ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("lt".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" < ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("ge".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" >= ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("le".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" <= ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("ne".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" != ");
 					addParameter (query, value, ctx.hibernateClass);
 				}
 				else if ("sw".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append(" like ");
-					addParameter (query, value+"%", String.class);
+					query.getWhereString().append("upper(")
+						.append(ctx.objectName)
+						.append(") like ");
+					addParameter (query, value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("ew".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append(" like ");
-					addParameter (query, "%"+value, String.class);
+					query.getWhereString().append("upper(")
+					.append(ctx.objectName)
+					.append(") like ");
+					addParameter (query, "%"+value.toString().toUpperCase(), String.class);
 				}
 				else if ("co".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append(" like ");
-					addParameter (query, "%"+value+"%", String.class);
+					query.getWhereString().append("upper(")
+					.append(ctx.objectName)
+					.append(") like ");
+					addParameter (query, "%"+value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("pr".equalsIgnoreCase(operator))
 				{

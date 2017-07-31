@@ -500,5 +500,14 @@ div.CodeMirror-code   {
 }
 
 .search-popup {
+	position: absolute;
     z-index: 5;
+}
+
+
+.search-popup div.wc-search-popup-none {
+	position: relative; 
+	top: 2em; 
+	background-color:white;
+	border: 1px solid black;
 }

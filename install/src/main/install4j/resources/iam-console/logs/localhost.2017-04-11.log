@@ -1,4 +1,0 @@
-abr 11, 2017 8:59:45 AM org.apache.catalina.core.ApplicationContext log
-INFORMACIÓN: Destroying Spring FrameworkServlet 'saml'
-abr 11, 2017 8:59:45 AM org.apache.catalina.core.ApplicationContext log
-INFORMACIÓN: Closing Spring root WebApplicationContext

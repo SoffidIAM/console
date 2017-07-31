@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding='utf-8'?>
+<zk>
+	<div>
+		<radiogroup id="rg" orient="vertical">
+			<radio label="${c:l('attributeQuery.Contains')}" value="co"/><textbox id='tb1'/>
+			<radio label="${c:l('attributeQuery.StartsWith')}" value="sw"/><textbox id='tb2'/>
+			<radio label="${c:l('attributeQuery.EndsWith')}" value="ew"/><textbox id='tb3'/>
+			<radio label="${c:l('attributeQuery.Equals')}" value="eq"/><textbox id='tb4'/>
+		</radiogroup>
+	</div>
+	<div class='button-container'>
+		<div class='buttons'>
+			<button id='okbutton' label="${c:l('agentsllista.zul.Accepta') }"/>
+			<button id='cancelbutton' label="${c:l('agentsllista.zul.Cancel·la')}"/>
+		</div>
+	</div>
+</zk>

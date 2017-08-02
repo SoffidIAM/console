@@ -63,49 +63,23 @@ grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
 // Note: If tomcat-juli.jar is in ${catalina.base} and not in ${catalina.home},
 // update this section accordingly.
 //  grant codeBase "file:${catalina.base}/bin/tomcat-juli.jar" {..}
-grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
-        permission java.io.FilePermission
-         "${java.home}${file.separator}lib${file.separator}logging.properties", "read";
+grant codeBase "file:///${catalina.home}/bin/tomcat-juli.jar" {
+        permission java.security.AllPermission;
+};
 
-        permission java.io.FilePermission
-         "${catalina.base}${file.separator}conf${file.separator}logging.properties", "read";
-        permission java.io.FilePermission
-         "${catalina.base}${file.separator}logs", "read, write";
-        permission java.io.FilePermission
-         "${catalina.base}${file.separator}logs${file.separator}*", "read, write";
-
-        permission java.lang.RuntimePermission "shutdownHooks";
-        permission java.lang.RuntimePermission "getClassLoader";
-        permission java.lang.RuntimePermission "setContextClassLoader";
-
-        permission java.lang.RuntimePermission "accessClassInPackage.sun.util.logging.resources";
-
-        permission java.util.logging.LoggingPermission "control";
-
-        permission java.util.PropertyPermission "java.util.logging.config.class", "read";
-        permission java.util.PropertyPermission "java.util.logging.config.file", "read";
-        permission java.util.PropertyPermission "org.apache.juli.ClassLoaderLogManager.debug", "read";
-        permission java.util.PropertyPermission "catalina.base", "read";
-
-        // Note: To enable per context logging configuration, permit read access to
-        // the appropriate file. Be sure that the logging configuration is
-        // secure before enabling such access.
-        // E.g. for the examples web application (uncomment and unwrap
-        // the following to be on a single line):
-        // permission java.io.FilePermission "${catalina.base}${file.separator}
-        //  webapps${file.separator}examples${file.separator}WEB-INF
-        //  ${file.separator}classes${file.separator}logging.properties", "read";
+grant codeBase "file:/home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/bin/bootstrap.jar" {
+        permission java.security.AllPermission;
 };
 
 // These permissions apply to the server startup code
-grant codeBase "file:${catalina.base}/bin/bootstrap.jar" {
+grant codeBase "file://${catalina.home}/bin/bootstrap.jar" {
         permission java.security.AllPermission;
 };
 
 // These permissions apply to the servlet API classes
 // and those that are shared across all class loaders
 // located in the "lib" directory
-grant codeBase "file:${catalina.home}/lib/-" {
+grant codeBase "file://${catalina.home}/lib/-" {
         permission java.security.AllPermission;
 };
 
@@ -116,7 +90,7 @@ grant codeBase "file:${catalina.base}/lib/-" {
         permission java.security.AllPermission;
 };
 
-grant codeBase "file:/home/gbuades/soffid-2.0/test/apache-tomee-jaxrs-1.7.4/lib/*" {
+grant codeBase "file:///home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/lib/*" {
         permission java.security.AllPermission;
 };
 
@@ -168,6 +142,7 @@ grant {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat";
 
     // Precompiled JSPs need access to these packages.
+    permission java.lang.RuntimePermission "accessClassInPackage.com.sun.xml.internal.bind.v2.runtime.reflect";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.el";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission
@@ -301,4 +276,10 @@ grant codeBase "file:${catalina.home}/work/soffid/iam-ear.ear/-" {
 grant codeBase "file:${catalina.home}/work/Catalina/localhost/-" {
         permission java.security.AllPermission;
 };
+
+
+grant codeBase "file:${catalina.home}/-" {
+        permission java.security.AllPermission;
+};
+
 

@@ -239,7 +239,7 @@
         </init-param>
         <init-param>
             <param-name>development</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <load-on-startup>3</load-on-startup>
     </servlet>

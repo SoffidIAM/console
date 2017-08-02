@@ -50,7 +50,7 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>upload-components</artifactId>
 			<version>${project.version}</version>
-			<type>jar</type>
+			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -96,6 +96,10 @@
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-core</artifactId>
+						</ejbModule>
+						<ejbModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>upload-components</artifactId>
 						</ejbModule>
 						<jarModule><groupId>antlr</groupId><artifactId>antlr</artifactId></jarModule>
 						<jarModule><groupId>aopalliance</groupId><artifactId>aopalliance</artifactId></jarModule>

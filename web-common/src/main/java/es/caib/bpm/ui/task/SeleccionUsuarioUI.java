@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
@@ -29,13 +28,8 @@ import org.zkoss.zul.Window;
 
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.ui.task.SeleccionUsuarioUITemplate.SeleccionUsuarioUIItemRenderer;
-import es.caib.bpm.ui.task.SeleccionUsuarioUITemplate.StringArrayComparator;
 import es.caib.bpm.vo.BPMUser;
 import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
-
 
 public class SeleccionUsuarioUI extends Window 
 {

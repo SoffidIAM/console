@@ -1,25 +1,18 @@
 package com.soffid.iam.utils;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.rmi.PortableRemoteObject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.HeaderTokenizer;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
+import javax.naming.NamingException;
 
 public class MailUtils {
 
@@ -130,8 +123,6 @@ public class MailUtils {
 					String subject, String body) throws MessagingException,
 					NamingException
 	{
-		Properties props = new Properties();
-
 		// -- Attaching to default Session, or we could start a new one --
 		Session session = getSession(smtpServer);
 
@@ -174,7 +165,6 @@ public class MailUtils {
 	public static void sendHtmlMail(String smtpServer,
 			Set<InternetAddress> to, String from,
 			String subject, String body) throws NamingException {
-		Properties props = new Properties();
 
 		// -- Attaching to default Session, or we could start a new one --
 		Session session = getSession(smtpServer);

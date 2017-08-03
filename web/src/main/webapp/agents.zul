@@ -354,10 +354,8 @@
 									if (obj instanceof es.caib.seycon.ng.comu.Dispatcher) {
 										es.caib.seycon.ng.comu.Dispatcher agent = (es.caib.seycon.ng.comu.Dispatcher) obj;
 										String codiAgent = agent.getCodi();
-										javax.naming.Context context = new javax.naming.InitialContext();
 										es.caib.seycon.ng.servei.ejb.DispatcherService disService =
 												es.caib.seycon.ng.EJBLocator.getDispatcherService();
-												
 										disService.propagateUsuarisDispatcher(codiAgent);
 									}
 								}

@@ -1,17 +1,9 @@
 package com.soffid.iam.bpm.index;
 
-import java.io.IOException;
-
-import javax.naming.InitialContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jbpm.JbpmConfiguration;
-import org.jbpm.JbpmContext;
 
 import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.bpm.config.Configuration;
-import com.soffid.iam.bpm.index.Indexer;
 import com.soffid.iam.bpm.job.NotLoggedThread;
 import com.soffid.iam.bpm.service.BpmJobExecutor;
 

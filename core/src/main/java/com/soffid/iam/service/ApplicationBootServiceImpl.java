@@ -1,9 +1,33 @@
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.NamingException;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Application;
-import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.DataType;
@@ -27,59 +51,15 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
-import com.soffid.iam.model.TenantEntity;
-import com.soffid.iam.model.TenantEntityDao;
-import com.soffid.iam.service.AdditionalDataService;
-import com.soffid.iam.service.ApplicationService;
-import com.soffid.iam.service.AuthorizationService;
-import com.soffid.iam.service.ConfigurationService;
-import com.soffid.iam.service.EntryPointService;
-import com.soffid.iam.service.GroupService;
-import com.soffid.iam.service.NetworkService;
-import com.soffid.iam.service.SystemScheduledTasks;
-import com.soffid.iam.service.UserDomainService;
-import com.soffid.iam.service.UserService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 public class ApplicationBootServiceImpl extends
 		com.soffid.iam.service.ApplicationBootServiceBase implements
@@ -105,7 +85,6 @@ public class ApplicationBootServiceImpl extends
 	private Log log = LogFactory
 			.getLog(com.soffid.iam.service.ApplicationBootService.class);
 	private ApplicationContext applicationContext;
-	private TenantEntityDao tenantDao;
 
 	@Override
 	protected void handleSyncServerBoot() throws Exception {

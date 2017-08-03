@@ -1,8 +1,41 @@
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
-import com.soffid.iam.api.Account;
+import javax.naming.NamingException;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.jbpm.JbpmContext;
+import org.jbpm.context.exe.ContextInstance;
+import org.jbpm.graph.def.ProcessDefinition;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
@@ -15,16 +48,15 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.PrinterUser;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Session;
-import com.soffid.iam.api.Student;
 import com.soffid.iam.api.SyncServerInfo;
-import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserCriteria;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
@@ -49,7 +81,6 @@ import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
-import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -60,11 +91,7 @@ import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.model.UserProcessEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import com.soffid.iam.service.ConfigurationService;
-import com.soffid.iam.service.GroupService;
-import com.soffid.iam.service.MailListsService;
 import com.soffid.iam.service.impl.CertificateParser;
-import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
@@ -77,11 +104,6 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.comu.AccountType;
-
-import com.soffid.iam.api.Password;
-import com.soffid.iam.api.PolicyCheckResult;
-
-import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -95,53 +117,6 @@ import es.caib.signatura.cliente.ValidadorCertificados;
 import es.caib.signatura.cliente.XML;
 import es.caib.signatura.utils.BitException;
 import es.caib.signatura.validacion.ResultadoValidacion;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.regex.Pattern;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.FileProvider;
-import org.apache.catalina.realm.GenericPrincipal;
-import org.jbpm.JbpmContext;
-import org.jbpm.context.exe.ContextInstance;
-import org.jbpm.graph.def.ProcessDefinition;
-import org.jbpm.graph.exe.ProcessInstance;
-import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 //- WS verificacion de usuario red sara
 
@@ -666,7 +641,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	public String handleAddUser(Signature sig, String userType)
 			throws InternalErrorException {
 		try {
-			Context ctx = new InitialContext();
 			if (!sig.verify()) {
 				throw new InternalErrorException(
 						Messages.getString("UserServiceImpl.IncorrectCertificate")); //$NON-NLS-1$
@@ -836,7 +810,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			String userType) throws InternalErrorException,
 			java.rmi.RemoteException {
 		try {
-			Context ctx = new InitialContext();
 			X509Certificate certUser = certs[0];
 			// Validación de los certificados
 			ValidadorCertificados validador;

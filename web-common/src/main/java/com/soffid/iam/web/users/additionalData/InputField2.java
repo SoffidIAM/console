@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -34,27 +33,17 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 
 import es.caib.seycon.ng.EJBLocator;
-import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.SelfService;
-import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
-import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.events.XPathEvent;
-import es.caib.zkib.events.XPathSubscriber;
-import es.caib.zkib.events.XPathValueEvent;
-import es.caib.zkib.jxpath.JXPathNotFoundException;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField2 extends Div 
@@ -200,8 +189,6 @@ public class InputField2 extends Div
 		
 		try
 		{
-			
-			BindContext bindCtx = XPathUtils.getComponentContext(this);
 			if(dataType != null){
 				String result = "";
 				Map <String,Object> map=new HashMap<String, Object>();
@@ -326,7 +313,6 @@ public class InputField2 extends Div
 					}	
 					else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
 					{
-						Object v = XPathUtils.getValue(this, getBind());
 						if (dualEdit)
 							result= result + "<div style='display:inline-block;'><label bind='"+getBind()+"'/>"
 									+ "<imageclic src='/img/pencil.png' "
@@ -421,13 +407,6 @@ public class InputField2 extends Div
 		return result;
 	}
 
-	private boolean testEmail(String value) {
-		boolean isEmail = false;
-		if(value.contains("@"))
-			isEmail = true;
-		return isEmail;
-	}
-	
 	private boolean fileAlreadySaved(){
 		if(getValue() != null )
 			return true;

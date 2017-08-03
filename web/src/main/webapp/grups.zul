@@ -459,10 +459,7 @@
 						ds = esquema.getFellow("dades").getFellow("form").getDataSource();
 						ctx =  ds.getJXPathContext();
 						String codiGrup = ctx.getValue("@codi");
-				
-						javax.naming.Context context = new javax.naming.InitialContext();		
 						es.caib.seycon.ng.servei.ejb.GrupService grupService = es.caib.seycon.ng.EJBLocator.getGrupService();
-						
 						java.util.Collection pares = grupService.getLlistaDePares(codiGrup);
 				
 						//<!--  Esborrar la llista de pares del grup anterior -->

@@ -10,19 +10,16 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.Security;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.SessionContext;
 import javax.ejb.Singleton;
@@ -32,16 +29,12 @@ import javax.ejb.Timer;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
-import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
-import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -66,7 +59,6 @@ import org.apache.openejb.UndeployException;
 import org.apache.openejb.assembler.Deployer;
 import org.apache.openejb.assembler.DeployerEjb;
 import org.apache.openejb.assembler.classic.AppInfo;
-import org.apache.openejb.jee.jba.cmp.Datasource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -341,7 +333,6 @@ public class DeployerBean implements DeployerService {
 					|| entry.getName().equals("META-INF\\web.xml")) {
 				// Nothing to do with web.xml
 			} else {
-				String entryName = entry.getName();
 				File f = new File(warFile, entry.getName());
 				if (entry.isDirectory()) {
 					f.mkdirs();
@@ -440,7 +431,6 @@ public class DeployerBean implements DeployerService {
 		File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("Generating addon file " + coreFile);
 		FileOutputStream out = new FileOutputStream(coreFile);
-		boolean ejb = false;
 		byte b[] = new byte[4096];
 		int read;
 		while ((read = binaryStream.read(b)) > 0) {
@@ -663,8 +653,6 @@ public class DeployerBean implements DeployerService {
 			} else {
 				System.setProperty("soffid.fail-safe", "false");
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
-//				DataSource ds = (DataSource) new InitialContext()
-//						.lookup("java:jdbc/soffid"); //$NON-NLS-1$
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
 				try {

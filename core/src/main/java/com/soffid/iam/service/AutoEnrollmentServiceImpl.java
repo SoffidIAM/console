@@ -13,46 +13,12 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
-
-import com.soffid.iam.api.AnonimousUser;
-import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserData;
-import com.soffid.iam.config.Config;
-import com.soffid.iam.model.PasswordDomainEntity;
-import com.soffid.iam.model.PasswordDomainEntityDao;
-import com.soffid.iam.model.PasswordPolicyEntity;
-import com.soffid.iam.model.UserDataEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.remote.RemoteInvokerFactory;
-import com.soffid.iam.remote.URLManager;
-import com.soffid.iam.service.UserService;
-import com.soffid.iam.utils.Security;
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.Password;
-import com.soffid.iam.api.PasswordValidation;
-import com.soffid.iam.api.PolicyCheckResult;
-
-import es.caib.seycon.ng.exception.BadPasswordException;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.InvalidPasswordException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.exception.UnknownUserException;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.spi.CharsetProvider;
 import java.rmi.RemoteException;
-import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.Properties;
 
 import javax.ejb.CreateException;
 import javax.mail.Message;
@@ -62,17 +28,35 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
+
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AnonimousUser;
+import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.api.PolicyCheckResult;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserData;
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordDomainEntityDao;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.UserDataEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.BadPasswordException;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.InvalidPasswordException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 
 /**
  * @see es.caib.seycon.ng.servei.AutoEnrollmentService
  */
 public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnrollmentServiceBase {
 
-    private static final String SeyconLogon_JNDI_NAME = "es.caib.seycon.net/SeyconLogonEJB"; //$NON-NLS-1$
     private static final String SeyconLogon_PIN_ADD_CODE = "PIN"; //$NON-NLS-1$
     private static final String SeyconLogon_EMAIL_ADD_CODE = "E-MAIL CONTACTE"; //$NON-NLS-1$
 
@@ -274,8 +258,6 @@ public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnroll
 
             if (usuari == null)
                 throw new UnknownUserException();
-
-            Context context = new InitialContext();
 
             // establim l'estat de l'usuari a actiu
             usuari.setActive("S"); //$NON-NLS-1$

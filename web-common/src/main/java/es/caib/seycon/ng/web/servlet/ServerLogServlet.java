@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.servei.ejb.SeyconServerService;
-import es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome;
+import es.caib.seycon.ng.EJBLocator;
 
 public class ServerLogServlet extends HttpServlet {
 
@@ -45,12 +44,7 @@ public class ServerLogServlet extends HttpServlet {
 			}
 			
 			String urlServer = req.getParameter("urlserver"); //$NON-NLS-1$
-			javax.naming.Context context = new javax.naming.InitialContext();		
-			es.caib.seycon.ng.servei.ejb.SeyconServerService seyconServerService = 
-					(SeyconServerService) 
-					context.lookup(es.caib.seycon.ng.servei.ejb.SeyconServerServiceHome.JNDI_NAME);
-		
-			InputStream in = seyconServerService.getSeyconServerLog(urlServer);
+			InputStream in = EJBLocator.getSeyconServerService().getSeyconServerLog(urlServer);
 			
 			if (in==null) {
 				resp.sendRedirect(req.getContextPath()+"/getlogmsg.zul?why=cannot_connect"); //$NON-NLS-1$

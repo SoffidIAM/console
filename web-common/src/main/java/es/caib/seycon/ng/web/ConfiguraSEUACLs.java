@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.servei.ejb.PuntEntradaService;
 import es.caib.seycon.ng.servei.ejb.XarxaService;
 
@@ -104,34 +105,15 @@ public class ConfiguraSEUACLs extends ConfiguraSEU {
 
 	private XarxaService xarxa_service = null;
 
-	private XarxaService getXarxaService() throws NamingException,
-			CreateException, RemoteException {
-		if (xarxa_service == null) {
-			javax.naming.Context context = new javax.naming.InitialContext();
-			Object obj = context
-					.lookup(es.caib.seycon.ng.servei.ejb.XarxaServiceHome.JNDI_NAME);
-			es.caib.seycon.ng.servei.ejb.XarxaService xarxaService = (XarxaService) obj;
-			return xarxaService;
-
-		} else
-			return xarxa_service;
-
+	private XarxaService getXarxaService() throws NamingException, CreateException {
+		if (xarxa_service == null) xarxa_service = EJBLocator.getXarxaService();
+		return xarxa_service;
 	}
 
 	private PuntEntradaService PUE_service = null;
 
-	private PuntEntradaService getPUEService() throws NamingException,
-			CreateException, RemoteException {
-		if (PUE_service == null) {
-			javax.naming.Context context = new javax.naming.InitialContext();
-			Object obj = context
-					.lookup(es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome.JNDI_NAME);
-			es.caib.seycon.ng.servei.ejb.PuntEntradaService PUEService = (es.caib.seycon.ng.servei.ejb.PuntEntradaService) obj;
-			return PUEService;
-
-		} else
-			return PUE_service;
-
+	private PuntEntradaService getPUEService() throws NamingException, CreateException {
+		if (PUE_service == null) PUE_service = EJBLocator.getPuntEntradaService();
+		return PUE_service;
 	}
-
 }

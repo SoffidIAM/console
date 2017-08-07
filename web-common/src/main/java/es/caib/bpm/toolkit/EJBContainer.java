@@ -1,7 +1,6 @@
 package es.caib.bpm.toolkit;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 
@@ -9,10 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.ui.Session;
 
 import es.caib.bpm.servei.ejb.BpmConfigService;
-import es.caib.bpm.servei.ejb.BpmConfigServiceHome;
 import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.servei.ejb.BpmEngineHome;
-
+import es.caib.seycon.ng.EJBLocator;
 
 public class EJBContainer {
 	private static final String EJB_CONTAINER = "ejb-container"; //$NON-NLS-1$
@@ -64,22 +61,17 @@ public class EJBContainer {
 					LogFactory.getLog(this.getClass()).error(t.getMessage(), t);
 			}
 		}
-		if (engine == null)
-		{
-			engine = (BpmEngine) new InitialContext().lookup (BpmEngineHome.JNDI_NAME);
-		}
+		if (engine == null) engine = EJBLocator.getBpmEngine();
 		return engine;
-
 	}
 
 	public static BpmConfigService getBPMConfigBean () throws CreateException, NamingException
 	{
 		try{
-			return  (BpmConfigService) new InitialContext().lookup (BpmConfigServiceHome.JNDI_NAME);
+			return EJBLocator.getBpmConfigService();
 		}catch(NamingException e){
 			LogFactory.getLog(EJBContainer.class).error(e.getMessage(), e);
 			throw e;
 		}
 	}
-	
 }

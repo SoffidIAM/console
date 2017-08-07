@@ -1,15 +1,13 @@
 package es.caib.seycon.ng.web;
 
-import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
-import org.zkoss.zk.ui.Executions;
-
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
@@ -42,10 +40,8 @@ public class Custom {
 		return getRows("D"); //defecto //$NON-NLS-1$
 	}	
 	
-	public static UsuariService getUsuariService() throws NamingException, CreateException, RemoteException {
-		javax.naming.Context context = new javax.naming.InitialContext();
-		Object objUsuari = context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-		return (UsuariService) objUsuari;
+	public static UsuariService getUsuariService() throws NamingException, CreateException {
+		return EJBLocator.getUsuariService();
 	}
 	
 	/**

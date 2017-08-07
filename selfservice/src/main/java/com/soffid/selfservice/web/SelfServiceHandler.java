@@ -1,48 +1,55 @@
 package com.soffid.selfservice.web;
 
-import org.zkoss.zk.ui.*;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Collection;
+
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
+import org.zkoss.image.AImage;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
-import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Box;
+import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Image;
-
-import es.caib.zkib.zkiblaf.Frame;
-import es.caib.zkib.zkiblaf.Missatgebox;
-
-import org.zkoss.image.*;
-import org.zkoss.zul.*;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Listheader;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Tree;
+import org.zkoss.zul.Treecell;
+import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.Treerow;
+import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 
+import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
+import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PuntEntrada;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.ejb.AccountService;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.Form;
-import es.caib.zkib.datamodel.DataModelCollection;
-import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
-import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.seycon.ng.comu.*;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.AccountServiceHome;
-import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
-
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-
+import es.caib.zkib.zkiblaf.Frame;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SelfServiceHandler extends Frame 
 {
@@ -434,11 +441,8 @@ public class SelfServiceHandler extends Frame
 		es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account", 
 				new org.zkoss.zk.ui.event.EventListener() {
 					public void onEvent(Event evt) throws CreateException, NamingException, InternalErrorException {
-						if ("onOK".equals(evt.getName()))
-						{
-							javax.naming.Context ctx = new javax.naming.InitialContext();
-							es.caib.seycon.ng.servei.ejb.AccountService ejb =
-									es.caib.seycon.ng.EJBLocator.getAccountService();
+						if ("onOK".equals(evt.getName())) {
+							AccountService ejb = es.caib.seycon.ng.EJBLocator.getAccountService();
 							ejb.checkinHPAccount(acc);
 							model.refresh();
 						}

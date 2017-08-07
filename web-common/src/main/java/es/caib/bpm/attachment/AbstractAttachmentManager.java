@@ -6,25 +6,21 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.RemoveException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.rmi.PortableRemoteObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
-import com.soffid.iam.doc.service.ejb.DocumentServiceHome;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -80,42 +76,15 @@ public abstract class AbstractAttachmentManager {
             String originalName) throws IOException,
             NamingException, CreateException, DocumentBeanException,
             InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
-        DocumentServiceHome documentHome = null;
-        DocumentService document = null;
-        Context context = null;
-
-        log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
-        context = new InitialContext();
-
+        
+    	log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
+        DocumentService document = EJBLocator.getDocumentService();
+        
         log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
-        document = (DocumentService) PortableRemoteObject.narrow(o,
-                DocumentServiceHome.class);
         document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
-
         return document;
     }
     
-    public DocumentService createDocument(Context context,String contentType,
-            String originalName) throws IOException,
-            NamingException, CreateException, DocumentBeanException,
-            InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
-        DocumentServiceHome documentHome = null;
-        DocumentService document = null;
-
-        log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
-
-        log.debug(Messages.getString("AbstractAttachmentManager.SendToHome")); //$NON-NLS-1$
-        Object o = context.lookup(DocumentServiceHome.JNDI_NAME);
-        document = (DocumentService) PortableRemoteObject.narrow(o,
-                DocumentServiceHome.class);
-
-        log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
-        document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
-
-        return document;
-    }
-
     public void eliminarArchivo(String tag) throws Exception {
 
         removeVariable(PREFIX + tag);
@@ -153,7 +122,7 @@ public abstract class AbstractAttachmentManager {
             return null;
         else
         {
-            DocumentService doc = (DocumentService) new InitialContext().lookup(DocumentServiceHome.JNDI_NAME);
+        	DocumentService doc = EJBLocator.getDocumentService();
             doc.openDocument(ref);
             return doc;
         }

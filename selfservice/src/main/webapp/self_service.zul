@@ -252,13 +252,10 @@
 					}
 	
 					void onSetPassword() {
-						es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-								.create();
 						Window wnd = Path.getComponent("/newPassword");
 						es.caib.seycon.ng.comu.Account account = wnd.getAttribute("acco");
 						timepwd.getValue();
-						service.setHPAccountPassword(account,
+						es.caib.seycon.ng.EJBLocator.getSelfService().setHPAccountPassword(account,
 								new Password(password.getValue()), timepwd.getValue(),
 									checkpwd.isChecked());
 						es.caib.zkib.zkiblaf.Missatgebox
@@ -340,12 +337,9 @@
 					}
 					
 					void onSetPassword() {
-						es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-								.create();
 						Window wnd = Path.getComponent("/newPasswordS");
 						Account account = wnd.getAttribute("acco");
-						service.setAccountPassword(account, new Password(p1.getValue()));
+						es.caib.seycon.ng.EJBLocator.getSelfService().setAccountPassword(account, new Password(p1.getValue()));
 						model.refresh();
 						es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
 						onCancelPassword();

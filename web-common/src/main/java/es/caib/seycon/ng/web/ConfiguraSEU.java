@@ -28,10 +28,9 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.config.Config;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariSEU;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.servei.ejb.PasswordService;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
 
 /**
@@ -259,14 +258,8 @@ public class ConfiguraSEU extends Vbox {
 	private UsuariService usuari_service = null;
 	
 	private UsuariService getUsuariService() throws NamingException, CreateException, RemoteException {
-		if (usuari_service == null) {
-			javax.naming.Context context = new javax.naming.InitialContext();
-			Object objUsuari = context
-					.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-			UsuariService usuariService = (UsuariService) objUsuari;
-			return usuariService;
-		} else return usuari_service;
-		
+		if (usuari_service == null) usuari_service = EJBLocator.getUsuariService();
+		return usuari_service;
 	}
 	
 	private UsuariSEU obteUsuariSEU(String codiUsuari) {

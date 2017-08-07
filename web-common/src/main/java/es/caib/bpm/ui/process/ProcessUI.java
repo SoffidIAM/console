@@ -630,7 +630,7 @@ public class ProcessUI extends Frame {
             CreateException, NamingException, InternalErrorException {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(proc.getProcessClassLoader());
+        Thread.currentThread().setContextClassLoader(proc.getProcessClassLoader().clone(heavenLoader));
 
         return heavenLoader;
     }

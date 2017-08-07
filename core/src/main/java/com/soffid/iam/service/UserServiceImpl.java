@@ -2967,7 +2967,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		for (String join : joins) {
 			sb.append(' ').append(join);
 		}
-		sb.append ("where usuari.tenant.id = :tenantId"); //$NON-NLS-1$
+		sb.append (" where usuari.tenant.id = :tenantId"); //$NON-NLS-1$
 		params.add(new Parameter("tenantId", Security.getCurrentTenantId()));
 		boolean first = true;
 		for (String query : queries) {

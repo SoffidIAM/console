@@ -67,6 +67,7 @@ import com.soffid.iam.doc.service.ejb.DocumentService;
 import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.attachment.TaskAttachmentManager;
+import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
@@ -503,7 +504,8 @@ public class TaskUI extends Frame implements EventListener {
             CreateException, NamingException, InternalErrorException {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(task.getProcessClassLoader());
+    	UIClassLoader cl = task.getProcessClassLoader();
+        Thread.currentThread().setContextClassLoader( cl.clone(heavenLoader));
 
         return heavenLoader;
     }
@@ -939,3 +941,4 @@ public class TaskUI extends Frame implements EventListener {
                 workflowWindow,newItem.getId()));    	
     }
 }
+

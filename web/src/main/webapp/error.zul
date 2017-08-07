@@ -2,12 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
-    
-		
-    <style src="/styles/estil.css"/>
- 
- 	<window border="normal" closable="true" id="errorWindow" mode="highlighted" position="center,center" title="${c:l('error.Titol')}" width="720px">
-
+ 	<window border="normal" closable="true" id="errorWindow" mode="highlighted" position="center,center" title="${c:l('error.Titol')} (${c:l('error.Codi')} ${requestScope['javax.servlet.error.status_code']})" width="720px">
 		<div style="overflow:auto;width:695px;">
 			<zscript>
 				void showStack()
@@ -20,25 +15,17 @@
 					}
 				}
 			</zscript>
-			<vbox width="95%"> 
-				<label value="${c:l('error.Codi')}: (codi ${requestScope['javax.servlet.error.status_code']})"/>
-				<hbox><separator/><separator/><label class="etiqueta" id="missatge" multiline="true" value="" width="95%"/> </hbox>
-				<separator/>
-	
-	<!-- 
-				<label value="${c:l('error.zul.Tipusdexcepcia')}" multiline/>
-				<hbox><separator/><separator/><label id="tipus" value="" width="675px"/></hbox>
-				<separator/>
-		  -->		
-				
-				<hbox > 
-					<image id="arrow" width="16px" height="16px" src="/img/right.png" onClick="showStack();"/>
+			<vbox style="padding:7px;">
+				<hbox style="margin-left:0px;margin-top:3px;">
+					<label class="etiqueta" id="missatge" multiline="true" value="" style="font-size:120%; color:#cd6155;"/>
+				</hbox>
+				<hbox style="margin-left:-2px;margin-top:10px;">
+					<image id="arrow" width="16px" height="16px" src="/img/right.png" onClick="showStack();" style="margin-top:-1px"/>
 					<label sclass="etiqueta" value="${c:l('error.zul.Causatper')}" onClick="showStack();"/> 
 				</hbox>
 				<textbox id="exception" visible="false" readonly="true" rows="10" width="675px"/>
 			</vbox>
 		</div>		
-
 		<zscript><![CDATA[
 			void resetSession ()
 			{
@@ -68,7 +55,7 @@
 				}
 		]]></zscript>
 		<separator bar="true" spacing="10px"/>
-		<hbox style="margin-left:auto; margin-right:auto">
+		<hbox style="margin-left:auto; margin-right:auto; padding:7px;">
 			<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="spaceOwner.detach()"/>
 			<button label="${c:l('error.zul.Reinicia')}" id="resetButton">
 				<attribute name="onClick">
@@ -88,7 +75,6 @@
 				</attribute>
 			</button>
 		</hbox>	
-
 		<zscript>
 		<![CDATA[
 			Object e = requestScope.get("javax.servlet.error.exception");
@@ -165,8 +151,6 @@
 						self.getFellow("missatge").value = msg;
 					
 				} 
-					
-//				self.getFellow("tipus").value = e.getClass().getName();
 				bo = new java.io.ByteArrayOutputStream();
 				es.caib.seycon.ng.exception.SoffidStackTrace.printStackTrace(original, new java.io.PrintStream(bo));
 				bo.close ();
@@ -180,7 +164,6 @@
 			else
 			{
 				self.getFellow("missatge").value =  requestScope.get("javax.servlet.error.message");
-//				self.getFellow("tipus").value = requestScope.get("javax.servlet.error.exception_type");
 				c = requestScope.get("javax.servlet.error.exception_type") +
 						 "\n" +
 						 requestScope.get("javax.servlet.error.exception");				
@@ -189,5 +172,4 @@
 		]]>
 		</zscript>		
 	</window>
-	
 </zk>

@@ -24,11 +24,19 @@ import com.soffid.iam.api.ParentData;
  */
 public class UIClassLoader extends ClassLoader 
 {
+	
+	public UIClassLoader clone (ClassLoader parentClassLoader)
+	{
+		return new UIClassLoader(processId, mapaClases, parentClassLoader);
+	}
+	
 	private ProtectionDomain protectionDomain;
+	private Long processId;
 	public UIClassLoader(Long processId, Map mapaClases, ClassLoader parentClassLoader)
 	{
 	    super (parentClassLoader);
 	    this.mapaClases= mapaClases;
+	    this.processId = processId;
 		Policy p = Policy.getPolicy();
 	    CodeSource cs;
 		try

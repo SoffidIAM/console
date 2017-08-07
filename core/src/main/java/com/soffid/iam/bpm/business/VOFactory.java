@@ -33,6 +33,7 @@ import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 
+import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -349,9 +350,9 @@ public class VOFactory {
 	
 	
 	static WeakHashMap<Long, ClassLoader> classesMap = new WeakHashMap<Long,ClassLoader> ();
-	static private ClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
+	static private UIClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
 	{
-		return JbpmConfiguration.getProcessClassLoader(def);
+		return (UIClassLoader) JbpmConfiguration.getProcessClassLoader(def);
 	}
 
 }

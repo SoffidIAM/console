@@ -9,11 +9,12 @@ import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.Indexer;
 import com.soffid.iam.bpm.job.NotLoggedThread;
-import com.soffid.iam.bpm.service.BpmJobExecutor;
+import com.soffid.iam.bpm.service.ejb.BpmJobExecutor;
 
 public class IndexerThread extends NotLoggedThread {
 
@@ -48,7 +49,7 @@ public class IndexerThread extends NotLoggedThread {
 		while (!finish)
 		{
 			try {
-				BpmJobExecutor jobExecutor = ServiceLocator.instance().getBpmJobExecutor();
+				BpmJobExecutor jobExecutor = EJBLocator.getBpmJobExecutor();
 				jobExecutor.indexPendingProcesses();
 			} catch (Exception e) {
 				logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$

@@ -17,7 +17,7 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
   </div>
  </button>
  <a href="#" class="remove-filter" title="${c:l('criterion.remove')}" id="${self.uuid}!close">
- 	<span class="aui-iconfont-remove">x</span>
+ 	<img src="${self.imageUrl}" class="${self.sclass}-remove"/>
  </a>
 </li>
 

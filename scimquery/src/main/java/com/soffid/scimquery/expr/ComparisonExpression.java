@@ -110,11 +110,11 @@ public class ComparisonExpression extends AbstractExpression {
 		}
 		if ("sw".equalsIgnoreCase(operator))
 		{
-			return attributeValue.toString().startsWith(matchValue);
+			return attributeValue.toString().toLowerCase().startsWith(matchValue.toLowerCase());
 		}
 		if ("ew".equalsIgnoreCase(operator))
 		{
-			return attributeValue.toString().endsWith(matchValue);
+			return attributeValue.toString().toLowerCase().endsWith(matchValue.toLowerCase());
 		}
 		if ("co".equalsIgnoreCase(operator))
 		{
@@ -324,6 +324,8 @@ public class ComparisonExpression extends AbstractExpression {
 			}
 			else
 			{
+				if (ctx.objectName.contains(" "))
+					query.getWhereString().append("(");
 				if ("eq".equalsIgnoreCase(operator))
 				{
 					query.getWhereString().append(ctx.objectName);
@@ -385,6 +387,8 @@ public class ComparisonExpression extends AbstractExpression {
 				{
 					query.getWhereString().append(" is not null ");
 				}
+				if (ctx.objectName.contains(" "))
+					query.getWhereString().append(")");
 			}
 		} catch (Exception e) {
 			throw new EvalException("Error evaluating attribute "+attribute, e);
@@ -415,4 +419,11 @@ public class ComparisonExpression extends AbstractExpression {
 		query.getWhereString().append(":").append(param);
 	}
 
+	private void addParameter(HQLQuery query, Object value2, String hibernateClass) throws EvalException {
+		try {
+			addParameter(query, value2, Class.forName(hibernateClass));
+		} catch (ClassNotFoundException e) {
+			throw new EvalException("Unknown class "+hibernateClass, e);
+		}
+	}
 }

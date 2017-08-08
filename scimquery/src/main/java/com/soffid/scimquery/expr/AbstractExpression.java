@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -139,7 +141,8 @@ public abstract class AbstractExpression implements Serializable {
 		ctx.currentBean = query.getClassConfig();
 		ctx.objectName = ROOT_OBJECT_NAME;
 		ctx.hibernatePath.append(ROOT_OBJECT_NAME);
-		ctx.beanPath.append(query.getClassConfig().getClazz().getSimpleName());
+		ctx.beanPath.append(".");
+		ctx.beanPath.append(attributeReference);
 		generateHQLStringReference(query, attributeReference, ctx);
 		
 		return ctx;
@@ -185,37 +188,76 @@ public abstract class AbstractExpression implements Serializable {
 	 */
 	private void generateHibernatePart(HQLQuery query, EvaluationContext ctx,
 			String part) throws EvalException {
-		Class entityClass = ctx.hibernateClass;
+		String entityClass = ctx.hibernateClass;
+		
 		try {
-			Field f = entityClass.getDeclaredField(part);
-			if ( isPrimitive (f))
+			ClassConfig entityConfig = Configuration.getClassConfig(entityClass);
+			if (entityConfig != null && entityConfig.getAttribute(part) != null)
 			{
-				ctx.objectName = ctx.objectName+"."+part;
-			}
-			else 
-			{
-				ctx.hibernatePath.append(".").append(part);
-				String obj = query.getObjects().get(ctx.hibernatePath.toString());
-				if (obj == null)
+				AttributeConfig attConfig = entityConfig.getAttribute(part);
+				if (attConfig.isVirtualAttribute())
 				{
-					int number = query.getNextObject();
-					obj = "o"+number;
-					query.getObjects().put(obj, ctx.hibernatePath.toString());
-					query.getJoinString().append("\njoin "+ctx.objectName+"."+part+" as "+obj);
+					String obj = (ctx.objectName);
+					ctx.objectName = obj+"."+attConfig.getVirtualAttributeName()+"=? and "+obj+"."+attConfig.getVirtualAttributeValue();
+					int i = query.getNextParameter();
+					String param  = "p"+i;
+					query.getParameters().put(param, part);
+				} else {
+					ctx.objectName = ctx.objectName+"."+part;					
+					ctx.hibernateClass = attConfig.getScimType().getCanonicalName();
 				}
-				ctx.objectName = obj;
+			} else {
+				Field f = Class.forName(entityClass).getDeclaredField(part);
+				if ( isPrimitive (f))
+				{
+					ctx.objectName = ctx.objectName+"."+part;
+				}
+				else 
+				{
+					ctx.hibernatePath.append(".").append(part);
+					String obj = query.getObjects().get(ctx.hibernatePath.toString());
+					if (obj == null)
+					{
+						int number = query.getNextObject();
+						obj = "o"+number;
+						query.getObjects().put(obj, ctx.hibernatePath.toString());
+						query.getJoinString().append("\njoin "+ctx.objectName+"."+part+" as "+obj);
+					}
+					ctx.objectName = obj;
+				}
+				Class type = f.getType();
+				ctx.hibernateClass = type.getCanonicalName();
+				if (type.isAssignableFrom(Collection.class) && 
+						f.getGenericType() instanceof ParameterizedType)
+				{
+					ParameterizedType pt = (ParameterizedType) f.getGenericType();
+					Class pt0 = (Class) pt.getActualTypeArguments()[0];
+					ctx.hibernateClass = pt0.getCanonicalName();
+				}
 			}
-			ctx.hibernateClass = f.getDeclaringClass();
 		} catch (NoSuchFieldException e) {
 			throw new EvalException("Missing column "+part+" on object "+
 					(ctx.currentBean == null ? ctx.hibernateClass :
-						ctx.currentBean.getClazz())
+						ctx.currentBean.getClazz())+ctx.beanPath.toString()
 					, null);
 		} catch (SecurityException e) {
 			throw new EvalException("Missing column "+part+" on object "+
 					(ctx.currentBean == null ? ctx.hibernateClass :
 						ctx.currentBean.getClazz())
 					, e);
+		} catch (ClassNotFoundException e) {
+			throw new EvalException("Missing class "+entityClass
+					, e);
+		} catch (UnsupportedEncodingException e) {
+			throw new EvalException("Error evaluating column "+part+" on object "+
+					(ctx.currentBean == null ? ctx.hibernateClass :
+						ctx.currentBean.getClazz()),
+					e);
+		} catch (JSONException e) {
+			throw new EvalException("Error evaluating column "+part+" on object "+
+					(ctx.currentBean == null ? ctx.hibernateClass :
+						ctx.currentBean.getClazz()),
+					e);
 		}
 	}
 
@@ -230,7 +272,7 @@ public abstract class AbstractExpression implements Serializable {
 	private void generateBeanPart(HQLQuery query, EvaluationContext ctx,
 			String part) throws EvalException, UnsupportedEncodingException,
 			ClassNotFoundException, JSONException {
-		AttributeConfig attribute = ctx.currentBean.getAttributes().get(part);
+		AttributeConfig attribute = ctx.currentBean.getAttribute(part);
 		if (attribute == null)
 		{
 			ctx.hibernateClass = ctx.currentBean.getHibernateClass();
@@ -239,14 +281,29 @@ public abstract class AbstractExpression implements Serializable {
 				throw new EvalException("Missing column "+part+" on object "+ctx.currentBean.getClazz()
 						, null);
 			}
+			ctx.currentBean = null;
 			generateHibernatePart(query, ctx, part);
 		}
 		else
 		{
-			
 			ClassConfig bean = ctx.currentBean;
 			String hibernateColumn = attribute.getHibernateColumn();
-			if (hibernateColumn == null)
+			if (attribute.isVirtualAttribute())
+			{
+				String obj = query.getObjects().get(ctx.hibernatePath.toString());
+				if (obj == null)
+				{
+					int number = query.getNextObject();
+					obj = "o"+number;
+					query.getObjects().put(obj, ctx.hibernatePath.toString());
+					query.getJoinString().append("\njoin "+ctx.objectName+"."+part+" as "+obj);
+				}
+				ctx.objectName = obj+"."+attribute.getAttributeName()+"=? and "+obj+"."+attribute.getVirtualAttributeValue();
+				int i = query.getNextParameter();
+				String param  = "p"+i;
+				query.getParameters().put(param, part);
+			}
+			else if (hibernateColumn == null)
 			{
 				ctx.objectName = null;
 				ctx.nonHQLAttributeUsed  = true;
@@ -261,7 +318,7 @@ public abstract class AbstractExpression implements Serializable {
 				{
 					try 
 					{
-						cl = bean.getClazz().getDeclaredField(part).getType();
+						cl = Class.forName(bean.getClazz()).getDeclaredField(part).getType();
 					} catch (Exception e) {
 					}
 				}
@@ -270,7 +327,7 @@ public abstract class AbstractExpression implements Serializable {
 					ClassConfig cc = Configuration.getClassConfig(cl);
 					if (cc == null)
 						throw new EvalException("Missing config for class "+cl.getCanonicalName()+" for attribute "+part+" on object of type "+
-								bean.getClazz().getName(), null);
+								bean.getClazz(), null);
 					ctx.currentBean = cc;
 				}
 			}
@@ -294,6 +351,9 @@ public abstract class AbstractExpression implements Serializable {
 	 * @return true if it is a simple java object
 	 */
 	private boolean isPrimitive(Class<?> cl) {
+		if (cl.isAssignableFrom(Collection.class))
+			return false;
+		
 		return cl.isPrimitive() ||
 				cl.getPackage().getName().startsWith("java.") ||
 				cl.getPackage().getName().startsWith("javax.");
@@ -305,13 +365,13 @@ public abstract class AbstractExpression implements Serializable {
 		if (cc == null)
 			throw new EvalException("No configuration found for "+clazz.getCanonicalName(), null);
 		
-		Class hibernateClass = cc.getHibernateClass();
+		String hibernateClass = cc.getHibernateClass();
 		
 		HQLQuery query = new HQLQuery(cc);
 		query.getQueryString().append("select ")
 			.append(ROOT_OBJECT_NAME)
 			.append(" from ")
-			.append(hibernateClass.getCanonicalName())
+			.append(hibernateClass)
 			.append(" as ")
 			.append(ROOT_OBJECT_NAME);
 		generateHSQLString(query);
@@ -325,7 +385,7 @@ public abstract class AbstractExpression implements Serializable {
 class EvaluationContext {
 	boolean nonHQLAttributeUsed = false;
 	ClassConfig currentBean;
-	Class hibernateClass;
+	String hibernateClass;
 	String objectName;
 	StringBuffer hibernatePath = new StringBuffer();
 	StringBuffer beanPath = new StringBuffer();

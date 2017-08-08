@@ -1,0 +1,6 @@
+{
+   hibernateClass: "com.soffid.scimquery.test.entity.AttributeValueEntity",
+   attributes: [
+   	{name:"employee", hibernateColumn="employee"}
+   ]
+}

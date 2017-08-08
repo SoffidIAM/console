@@ -10,7 +10,29 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 --%><%@ taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" %>
 <%@ taglib uri="http://www.zkoss.org/dsp/zk/core" prefix="z" %>
 <c:set var="self" value="${requestScope.arg.self}"/>
-<span id="${self.uuid}"${self.outerAttrs}${self.innerAttrs}><ul><c:forEach var="child" items="${self.children}">
-${z:redraw(child, null)}
-</c:forEach></ul></span>
+<span id="${self.uuid}"${self.outerAttrs}${self.innerAttrs} z.type="attributesearchbox.attributesearchbox.Searchbox">
+<div style="float:right">
+	<a href="#" id="${self.uuid}!mode" class="change-mode-label">${self.changeModeLabel}</a>
+</div>
+<c:if test="${!self.advancedMode}">
+	<ul>
+		<c:forEach var="child" items="${self.attributeSearchBoxes}">
+			<li>
+			${z:redraw(child, null)}
+			</li>
+		</c:forEach>
+		${z:redraw(self.addAttributeButton, null)}
+		<img id="${self.uuid}!search" class="search-icon" src="${self.searchIconUrl}"/>
+	</ul>	
+</c:if>
+<c:if test="${self.advancedMode}">
+	${z:redraw(self.advancedSearch, null)}
+	<a href="#" class="search-link" id="${self.uuid}!search">
+		<img class="search-icon" src="${self.searchIconUrl}"/>
+	</a>
+</c:if>
+<c:forEach var="child" items="${self.otherChildren}">
+	${z:redraw(child, null)}
+</c:forEach>
+</span>
 

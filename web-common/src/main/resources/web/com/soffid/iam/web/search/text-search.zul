@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding='utf-8'?>
-<zk>
+<div style="margin: 10px">
 	<div>
-		<radiogroup id="rg" orient="vertical">
-			<radio label="${c:l('attributeQuery.Contains')}" value="co"/><textbox id='tb1'/>
-			<radio label="${c:l('attributeQuery.StartsWith')}" value="sw"/><textbox id='tb2'/>
-			<radio label="${c:l('attributeQuery.EndsWith')}" value="ew"/><textbox id='tb3'/>
-			<radio label="${c:l('attributeQuery.Equals')}" value="eq"/><textbox id='tb4'/>
+		<radiogroup id="rg">
+			<div style="margin-top: 10px">
+				<radio label="${c:l('attributeQuery.Contains')}" value="co"/><textbox style="margin-left: 2em" id='tb1'/>
+			</div>
+			<div  style="margin-top: 10px">
+				<radio label="${c:l('attributeQuery.StartsWith')}" value="sw"/><textbox style="margin-left: 2em" id='tb2'/>
+			</div>
+			<div style="margin-top: 10px">
+				<radio label="${c:l('attributeQuery.EndsWith')}" value="ew"/><textbox  style="margin-left: 2em"  id='tb3'/>
+			</div>
+			<div style="margin-top: 10px">
+				<radio label="${c:l('attributeQuery.Equals')}" value="eq"/><textbox style="margin-left: 2em"  id='tb4'/>
+			</div>
 		</radiogroup>
 	</div>
 	<div class='button-container'>
@@ -14,4 +22,4 @@
 			<button id='cancelbutton' label="${c:l('agentsllista.zul.Cancel·la')}"/>
 		</div>
 	</div>
-</zk>
+</div>

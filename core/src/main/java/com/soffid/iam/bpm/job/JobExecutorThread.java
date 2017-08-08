@@ -11,8 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.bpm.service.BpmJobExecutor;
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.bpm.service.ejb.BpmJobExecutor;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -22,7 +22,7 @@ public class JobExecutorThread extends NotLoggedThread {
 	
 	BpmJobExecutor getExecutor () throws CreateException, NamingException {
 		if (executor == null ) {
-			executor = ServiceLocator.instance().getBpmJobExecutor();
+			executor = EJBLocator.getBpmJobExecutor();
 			
 		}
 		return executor;
@@ -119,11 +119,14 @@ public class JobExecutorThread extends NotLoggedThread {
 			log.debug(String.format(Messages.getString("JobExecutorThread.Executing"), id));  //$NON-NLS-1$
 			getExecutor().executeJob(id.longValue());
 		} catch (Exception e) {
-			log.info(String.format(Messages.getString("JobExecutorThread.ExecutingJobException"), id), e);  //$NON-NLS-1$
-			try {
-				executor.anotateFailure(id.longValue(), e);
-			} catch (InternalErrorException e1) {
-				log.warn (Messages.getString("JobExecutorThread.AnotatingFailureError"), e1); //$NON-NLS-1$
+			if (isActive)
+			{
+				log.info(String.format(Messages.getString("JobExecutorThread.ExecutingJobException"), id), e);  //$NON-NLS-1$
+				try {
+					executor.anotateFailure(id.longValue(), e);
+				} catch (InternalErrorException e1) {
+					log.warn (Messages.getString("JobExecutorThread.AnotatingFailureError"), e1); //$NON-NLS-1$
+				}
 			}
 		}
 	}

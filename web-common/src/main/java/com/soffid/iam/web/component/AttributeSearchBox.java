@@ -1,9 +1,15 @@
 package com.soffid.iam.web.component;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.catalina.manager.host.HostManagerServlet;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.xml.security.keys.storage.implementations.SingleCertificateResolver;
+import org.joda.time.format.ISODateTimeFormat;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
@@ -17,6 +23,8 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Radio;
@@ -31,6 +39,8 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.zkib.zkiblaf.SignApplet;
 
 public class AttributeSearchBox extends XulElement {
+	private static final String[] STRING_TEXTBOXES = new String[] {"tb1", "tb2", "tb3", "tb4"};
+	private static final String[] DATE_DATEBOXES = new String[] {"db1", "db2"};
 	private static final String REMOVE_EVENT = "onRemove";
 	private static final String CLICK_EVENT = "onClick";
 	SearchAttributeDefinition attributeDef;
@@ -39,6 +49,8 @@ public class AttributeSearchBox extends XulElement {
 	String humanExpression;
 	int textOperation = 0;
 	String textValue = "";
+	private Date since;
+	private Date until;
 	
 	public SearchAttributeDefinition getAttributeDef() {
 		return attributeDef;
@@ -112,6 +124,10 @@ public class AttributeSearchBox extends XulElement {
 	
 	public void onRemove ()
 	{
+		if (getParent() != null && getParent() instanceof SearchBox)
+		{
+			((SearchBox)getParent()).onRemoveFilter(this);
+		}
 		setParent(null);
 		setPage(null);
 	}
@@ -126,7 +142,15 @@ public class AttributeSearchBox extends XulElement {
 		w.setSclass("search-popup");
 		w.setPosition("parent,parent");
 
-		if (attributeDef.getType().equals(TypeEnumeration.STRING_TYPE))
+		if (attributeDef.getType().equals(TypeEnumeration.DATE_TYPE) )
+		{
+			createDateSearch(w, bg);
+		}
+		else if (attributeDef.getValues() != null)
+		{
+			createSelectSearch(w, bg);
+		}
+		else
 		{
 			createTextSearch(w, bg);
 		}
@@ -145,56 +169,42 @@ public class AttributeSearchBox extends XulElement {
 	
 	private void enableTextBoxes(Radiogroup target) {
 		int i = target.getSelectedIndex();
-		((Textbox)target.getFellow("tb1")).setDisabled(i != 0);
-		((Textbox)target.getFellow("tb2")).setDisabled(i != 1);
-		((Textbox)target.getFellow("tb3")).setDisabled(i != 2);
-		((Textbox)target.getFellow("tb4")).setDisabled(i != 3);
+		for (int j = 0; j < STRING_TEXTBOXES.length; j++)
+		{
+			((Textbox)target.getFellow(STRING_TEXTBOXES[j])).setDisabled(i != j);
+		}
+		((Textbox)target.getFellow(STRING_TEXTBOXES[i])).focus();
 	}
 
 	private void doTextSearch(Window w, Div bg, Radiogroup rg) {
-		int i = rg.getSelectedIndex();
-		String t = null;
-		if ( i == 0)
-			t = ((Textbox)w.getFellow("tb1")).getText();
-		else if ( i == 1)
-			t = ((Textbox)w.getFellow("tb2")).getText();
-		else if ( i == 2)
-			t = ((Textbox)w.getFellow("tb3")).getText();
-		else
-			t = ((Textbox)w.getFellow("tb4")).getText();
-		if (t == null || t.isEmpty())
+		textOperation = rg.getSelectedIndex();
+		textValue = null;
+		textValue = ((Textbox)w.getFellow(STRING_TEXTBOXES[textOperation])).getText();
+		if (textValue == null || textValue.isEmpty())
 		{
 			queryExpression = null;
-			Labels.getLabel("attributeQuery.all");		
+			humanExpression = Labels.getLabel("attributeQuery.all");		
 		}
 		else
 		{
 			queryExpression = attributeDef.getName()+" "+
 					rg.getSelectedItem().getValue()+" \""+
-					t+"\"";
+					textValue+"\"";
 			humanExpression = rg.getSelectedItem().getLabel()+" \""+
-					t+"\"";
+					textValue+"\"";
 		}
+		w.detach();
+		bg.detach();
 		invalidate();
 	}
 
 	private void createTextSearch(final Window w, final Div bg) {
 		Executions.createComponents("~./com/soffid/iam/web/search/text-search.zul",
 				w, new HashMap<String, String>());
-		((Button)w.getFellow("okbutton")).setLabel(Labels.getLabel("agentsllista.zul.Accepta"));
-		((Button)w.getFellow("cancelbutton")).setLabel(Labels.getLabel("agentsllista.zul.Cancel·la"));
-
 		final Radiogroup rg = ((Radiogroup) w.getFellow("rg"));
 		rg.setSelectedIndex(textOperation);
 		enableTextBoxes(rg);
-		if ( textOperation == 0)
-			((Textbox)w.getFellow("tb1")).setText(textValue);
-		else if ( textOperation == 1)
-			((Textbox)w.getFellow("tb2")).setText(textValue);
-		else if ( textOperation == 2)
-			((Textbox)w.getFellow("tb3")).setText(textValue);
-		else
-			((Textbox)w.getFellow("tb4")).setText(textValue);
+		((Textbox)w.getFellow(STRING_TEXTBOXES[textOperation])).setText(textValue);
 		
 		rg.addEventListener("onCheck", new EventListener() {
 			@Override
@@ -207,7 +217,7 @@ public class AttributeSearchBox extends XulElement {
 			}
 
 		});
-		for (String id: new String[] {"tb1", "tb2", "tb3", "tb4"})
+		for (String id: STRING_TEXTBOXES)
 		{
 			w.getFellow(id).addEventListener("onOK", new EventListener() {
 				@Override
@@ -224,8 +234,171 @@ public class AttributeSearchBox extends XulElement {
 		});
 		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
 			public void onEvent(Event event) throws Exception {
+				textOperation = 0;
+				textValue = "";
+				queryExpression = null;
+				humanExpression = Labels.getLabel("attributeQuery.all");		
 				w.detach();
 				bg.detach();
+				invalidate();
+			}
+		});
+	}
+
+	private void doDateSearch(Window w, Div bg) {
+		Datebox db1 = (Datebox)w.getFellow("db1");
+		since = db1.getValue();
+		Datebox db2 = (Datebox)w.getFellow("db2");
+		until = db2.getValue();
+		if (since == null && until == null)
+		{
+			queryExpression = null;
+			humanExpression = Labels.getLabel("attributeQuery.all");		
+		}
+		else if (since == null)
+		{
+			queryExpression = attributeDef.getName()+" le \""+
+					ISODateTimeFormat.dateTime().print(until.getTime())+
+					"\"";
+			humanExpression = Labels.getLabel("attributeQuery.Until")+" \""+
+					db2.getText()+"\"";
+		}
+		else if (until == null)
+		{
+			queryExpression = attributeDef.getName()+" ge \""+
+					ISODateTimeFormat.dateTime().print(since.getTime())+
+					"\"";
+			humanExpression = Labels.getLabel("attributeQuery.Since")+" \""+
+					db2.getText()+"\"";
+		}
+		else
+		{
+			String s = Labels.getLabel("attributeQuery.Between");
+			queryExpression = attributeDef.getName()+" ge \""+
+					ISODateTimeFormat.dateTime().print(since.getTime())+
+					"\""+
+					" and "+
+					attributeDef.getName()+" le \""+
+					ISODateTimeFormat.dateTime().print(until.getTime())+
+					"\"";
+			humanExpression = String.format(s,"\""+db1.getText()+"\"", "\""+db2.getText()+"\"");
+		}
+		w.detach();
+		bg.detach();
+		invalidate();
+	}
+
+	private void createDateSearch(final Window w, final Div bg) {
+		Executions.createComponents("~./com/soffid/iam/web/search/text-search.zul",
+				w, new HashMap<String, String>());
+		((Datebox)w.getFellow("db1")).setValue( since );
+		((Datebox)w.getFellow("db1")).setValue( until );
+		
+		for (String id: DATE_DATEBOXES)
+		{
+			w.getFellow(id).addEventListener("onOK", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					doDateSearch(w, bg);
+				}
+		
+			});
+		}
+		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				doDateSearch(w, bg);
+			}
+		});
+		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				textOperation = 0;
+				since = null;
+				until = null;
+				queryExpression = null;
+				humanExpression = Labels.getLabel("attributeQuery.all");		
+				w.detach();
+				bg.detach();
+				invalidate();
+			}
+		});
+	}
+
+	private void doSelectSearch(Window w, Div bg, Div div) {
+		selectedValues.clear();
+		for (Component child: (List<Component>)div.getChildren())
+		{
+			Checkbox cb = (Checkbox) child.getFirstChild();
+			if (cb.isChecked())
+				selectedValues.add((String) cb.getAttribute("value"));
+		}
+		
+		if (selectedValues.isEmpty())
+		{
+			queryExpression = null;
+			humanExpression = Labels.getLabel("attributeQuery.all");		
+		}
+		else
+		{
+			StringBuffer sb = new StringBuffer();
+			StringBuffer sb2 = new StringBuffer();
+			for (String value: selectedValues)
+			{
+				if (sb.length() == 0)
+					sb.append("(");
+				else {
+					sb.append(" or ");
+					sb2.append(", ");
+				}
+				sb.append(attributeDef.getName())
+					.append(" eq ")
+					.append('"')
+					.append(value)
+					.append('"');
+				sb2.append(value);
+			}
+			sb.append(")");
+			queryExpression = sb.toString();
+			humanExpression = sb2.toString();
+		}
+		w.detach();
+		bg.detach();
+		invalidate();
+	}
+
+	private void createSelectSearch(final Window w, final Div bg) {
+		Executions.createComponents("~./com/soffid/iam/web/search/select-search.zul",
+				w, new HashMap<String, String>());
+		final Div div = ((Div) w.getFellow("searchBoxParent"));
+		div.getChildren().clear();
+		Iterator<String> itl = attributeDef.getLabels().iterator();
+		Iterator<String> itv = attributeDef.getValues().iterator();
+		while (itv.hasNext() && itl.hasNext())
+		{
+			String value = itv.next();
+			String label = itl.next();
+			Div d2 = new Div();
+			d2.setStyle("margin-top: 10px");
+			div.appendChild(d2);
+			Checkbox cb = new Checkbox(label);
+			cb.setAttribute("value", value);
+			d2.appendChild(cb);
+			if (selectedValues.contains(value))
+				cb.setChecked(true);
+		}
+		
+		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				doSelectSearch(w, bg, div);
+			}
+		});
+		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				selectedValues.clear();
+				queryExpression = null;
+				humanExpression = Labels.getLabel("attributeQuery.all");		
+				w.detach();
+				bg.detach();
+				invalidate();
 			}
 		});
 	}
@@ -237,4 +410,9 @@ public class AttributeSearchBox extends XulElement {
 		return super.getCommand(cmdId);
 	}
 
+	public String getImageUrl()
+	{
+		return Executions.encodeURL("~./img/remove.png");
+	}
+	
 }

@@ -13,6 +13,7 @@ import javax.ejb.EJBException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.JbpmException;
 import org.jbpm.db.JobSession;
@@ -36,8 +37,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		synchronized (lock) {
 			log.debug(Messages.getString("BpmJobExecutorImpl.AcquiringJobs")); //$NON-NLS-1$
 			List jobsToLock = Collections.EMPTY_LIST;
-			JbpmContext jbpmContext = Configuration.getConfig()
-					.createJbpmContext();
+			JbpmContext jbpmContext = getContext();
 			try {
 				JobSession jobSession = jbpmContext.getJobSession();
 				log.debug(Messages.getString("BpmJobExecutorImpl.QueryingAcquirableJob")); //$NON-NLS-1$
@@ -75,10 +75,13 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		}
 		return jobs;
 	}
+	private JbpmContext getContext() {
+		return Configuration.getConfig().createJbpmContext();
+	}
 
 	@Override
 	protected void handleExecuteJob(long id) throws Exception {
-		JbpmContext jbpmContext = Configuration.getConfig().createJbpmContext();
+		JbpmContext jbpmContext = getContext();
 		try {
 			JobSession jobSession = jbpmContext.getJobSession();
 			Job job = jobSession.loadJob(id);
@@ -96,7 +99,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 
 	@Override
 	protected void handleAnotateFailure(long id, Exception e) throws Exception {
-		JbpmContext jbpmContext = Configuration.getConfig().createJbpmContext();
+		JbpmContext jbpmContext = getContext();
 		try {
 			JobSession jobSession = jbpmContext.getJobSession();
 			Job job = jobSession.loadJob(id);
@@ -116,7 +119,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 
 	@Override
 	protected Date handleGetNextDueDate(String lockOwner) throws Exception {
-		JbpmContext jbpmContext = Configuration.getConfig().createJbpmContext();
+		JbpmContext jbpmContext = getContext();
 		try {
 			Date nextDueDate = null;
 			JobSession jobSession = jbpmContext.getJobSession();
@@ -132,7 +135,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 
 	@Override
 	protected void handleUnlockOverdueJobs(Date threshold) throws Exception {
-		JbpmContext jbpmContext = Configuration.getConfig().createJbpmContext();
+		JbpmContext jbpmContext = getContext();
 		try {
 			JobSession jobSession = jbpmContext.getJobSession();
 
@@ -156,7 +159,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 	@Override
 	protected void handleIndexPendingProcesses() throws Exception {
 		Indexer i = Indexer.getIndexer ();
-		JbpmContext ctx = Configuration.getConfig().createJbpmContext();
+		JbpmContext ctx = getContext();
 		try {
 			i.flush(ctx.getSession());
 		} catch (Exception e) {

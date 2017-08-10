@@ -139,6 +139,7 @@ public class AttributeSearchBox extends XulElement {
 		final Div bg = new Div();
 
 		getParent().insertBefore(w, this);
+		getParent().invalidate();
 		w.setSclass("search-popup");
 		w.setPosition("parent,parent");
 
@@ -269,7 +270,7 @@ public class AttributeSearchBox extends XulElement {
 					ISODateTimeFormat.dateTime().print(since.getTime())+
 					"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Since")+" \""+
-					db2.getText()+"\"";
+					db1.getText()+"\"";
 		}
 		else
 		{
@@ -289,10 +290,10 @@ public class AttributeSearchBox extends XulElement {
 	}
 
 	private void createDateSearch(final Window w, final Div bg) {
-		Executions.createComponents("~./com/soffid/iam/web/search/text-search.zul",
+		Executions.createComponents("~./com/soffid/iam/web/search/date-search.zul",
 				w, new HashMap<String, String>());
 		((Datebox)w.getFellow("db1")).setValue( since );
-		((Datebox)w.getFellow("db1")).setValue( until );
+		((Datebox)w.getFellow("db2")).setValue( until );
 		
 		for (String id: DATE_DATEBOXES)
 		{

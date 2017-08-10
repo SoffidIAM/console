@@ -71,6 +71,7 @@ import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
@@ -82,6 +83,7 @@ import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PolicyCheckResult;
 
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -99,6 +101,7 @@ import es.caib.signatura.validacion.ResultadoValidacion;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
@@ -138,6 +141,7 @@ import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.json.JSONException;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -3052,8 +3056,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	@Override
 	protected Collection<User> handleFindUserByJsonQuery(String query)
 			throws Exception {
-		ClassConfig config = Configuration
-				.getClassConfig(com.soffid.iam.api.User.class);
+		
+		
+		ClassConfig config = getJsonConfiguration();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);
@@ -3083,5 +3088,38 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		return result;
+	}
+
+	private ClassConfig getJsonConfiguration()
+			throws UnsupportedEncodingException, JSONException, ClassNotFoundException 
+	{
+		ClassConfig cc = Configuration
+				.getClassConfig(UserDataEntity.class);
+		
+/*		for (MetaDataEntity att: getMetaDataEntityDao().findByScope(MetadataScope.USER))
+		{
+			if (att.getType().equals(TypeEnumeration.DATE_TYPE))
+			{
+				AttributeConfig attributeConfig = new AttributeConfig();
+				attributeConfig.setVirtualAttribute(true);
+				attributeConfig.setVirtualAttributeValue("dateValue");
+				attributeConfig.setVirtualAttributeName("attribute.name");
+				attributeConfig.setAttributeName(att.getName());
+				cc.getAttributes().put(att.getName(), attributeConfig );
+			}
+		}
+*/
+		if (cc == null)
+		{
+			cc = new ClassConfig();
+			AttributeConfig attributeConfig = new AttributeConfig();
+			attributeConfig.setVirtualAttribute(true);
+			attributeConfig.setVirtualAttributeValue("value");
+			attributeConfig.setVirtualAttributeName("attribute.name");
+			cc.setDefaultVirtualAttribute(attributeConfig);
+			Configuration.registerClass(cc);
+		}
+
+		return Configuration.getClassConfig(com.soffid.iam.api.User.class);
 	}
 }

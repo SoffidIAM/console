@@ -17,4 +17,5 @@ public class SearchAttributeDefinition {
 	TypeEnumeration type;
 	
 	@Nullable List<String> values;
+	@Nullable List<String> labels;
 }

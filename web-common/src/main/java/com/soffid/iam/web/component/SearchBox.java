@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zhtml.Textarea;
 import org.zkoss.zk.au.AuRequest;
@@ -25,6 +28,7 @@ import org.zkoss.zul.Textbox;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -36,13 +40,23 @@ public class SearchBox extends HtmlBasedComponent {
 	public static final String CHANGE_MODE_EVENT = "onChangeMode";
 	public static final String SEARCH_EVENT = "onSearch";
 	SearchDictionary dictionary;
+	String jsonObject;
 	private Button addAttributeButton;
 	private Textbox advancedSearch;
 	private Menupopup menu;
 	boolean advancedMode = false;
 	String variableName;
 	String dataPath;
+	private String defaultAttributes;
 	
+	public String getJsonObject() {
+		return jsonObject;
+	}
+
+	public void setJsonObject(String jsonObject) {
+		this.jsonObject = jsonObject;
+	}
+
 	public String getDataPath() {
 		return dataPath;
 	}
@@ -134,8 +148,16 @@ public class SearchBox extends HtmlBasedComponent {
 		advancedSearch.setVisible(advancedMode);
 	}
 	
-	public void onCreate ()
+	public void onCreate () throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
+		if (jsonObject != null && dictionary == null)
+			dictionary = SearchDictionaryBuilder.build(jsonObject);
+		
+		for (String att: defaultAttributes.split("[ ,]+"))
+		{
+			addAttribute(att);
+		}
+
 		advancedSearch = new Textbox();
 		advancedSearch.setMultiline(true);
 		appendChild(advancedSearch);
@@ -173,10 +195,7 @@ public class SearchBox extends HtmlBasedComponent {
 	
 	public void setDefaultAttributes (String s)
 	{
-		for (String att: s.split("[ ,]+"))
-		{
-			addAttribute(att);
-		}
+		this.defaultAttributes = s;
 	}
 
 	private void addAttribute(String att) {
@@ -238,23 +257,28 @@ public class SearchBox extends HtmlBasedComponent {
 
 	public String getQueryString ()
 	{
-		StringBuffer qs = new StringBuffer();
-		for (Object child: getChildren())
+		if (advancedMode)
+			return advancedSearch.getText();
+		else
 		{
-			if (child instanceof AttributeSearchBox)
+			StringBuffer qs = new StringBuffer();
+			for (Object child: getChildren())
 			{
-				String q = ((AttributeSearchBox) child).getQueryExpression();
-				if ( q != null && ! q.isEmpty())
+				if (child instanceof AttributeSearchBox)
 				{
-					if (qs.length() > 0)
-						qs.append(" and ");
-					qs.append("(")
-						.append(q)
-						.append(")");
+					String q = ((AttributeSearchBox) child).getQueryExpression();
+					if ( q != null && ! q.isEmpty())
+					{
+						if (qs.length() > 0)
+							qs.append(" and ");
+						qs.append("(")
+							.append(q)
+							.append(")");
+					}
 				}
 			}
+			return qs.toString();
 		}
-		return qs.toString();
 	}
 
 

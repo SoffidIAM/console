@@ -4,15 +4,9 @@
 
 	<datanode name="usuaris"> <!--user:query o mail:query, despres es restringeixen-->
 		<finder name="usuari" type="usuari">
-		<!--	handleFindUsuariByCriteri(String codi, String nom,
-			String primerLlinatge, String nomCurt, String dataCreacio,
-			String usuariCreacio, String actiu, String segonLlinatge,
-			String multiSessio, String comentari, String tipusUsuari,
-			String servidorPerfil, String servidorHome, String servidorCorreu,
-			String codiGrupPrimari, String dni, String dominiCorreu, String grupSecundari)-->
 			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
-				method="findUserByCriteria" if = "${queryEnabled}">
-				<parameter value="${criteria}"/>
+				method="findUserByJsonQuery" if = "${query != null}">
+				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari">
 				<bean-attribute name="servidorCorreu" value="null"/>

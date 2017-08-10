@@ -52,15 +52,19 @@ public class Usuari {
 	public java.lang.String comentari;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute="userType.name")
 	@Attribute(translated = "userType" )
 	public java.lang.String tipusUsuari;
 
+	@JsonAttribute(hibernateAttribute="profileServer.name")
 	@Attribute(translated = "profileServer" )
 	public java.lang.String servidorPerfil;
 
+	@JsonAttribute(hibernateAttribute="homeServer.name")
 	@Attribute(translated = "homeServer" )
 	public java.lang.String servidorHome;
 
+	@JsonAttribute(hibernateAttribute="mailServer.name")
 	@Attribute(translated = "mailServer" )
 	public java.lang.String servidorCorreu;
 
@@ -68,6 +72,7 @@ public class Usuari {
 	public java.lang.Long passwordMaxAge;
 
 	@Attribute(translated = "primaryGroup" )
+	@JsonAttribute(hibernateAttribute="primaryGroup.name")
 	public java.lang.String codiGrupPrimari;
 
 	@Nullable
@@ -94,6 +99,7 @@ public class Usuari {
 	public java.lang.String aliesCorreu;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute="mailDomain.name")
 	@Attribute(translated = "mailDomain" )
 	public java.lang.String dominiCorreu;
 
@@ -103,6 +109,7 @@ public class Usuari {
 
 	@Nullable
 	@Attribute(translated = "primaryGroupDescription" )
+	@JsonAttribute(hibernateAttribute="primaryGroup.description")
 	public java.lang.String descripcioGrupPrimari;
 
 	@Nullable

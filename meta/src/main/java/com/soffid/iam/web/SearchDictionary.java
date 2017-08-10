@@ -7,4 +7,5 @@ import com.soffid.mda.annotation.ValueObject;
 @ValueObject
 public class SearchDictionary {
 	List<SearchAttributeDefinition> attributes;
+	long timestamp;
 }

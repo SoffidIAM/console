@@ -511,3 +511,41 @@ div.CodeMirror-code   {
 	background-color:white;
 	border: 1px solid black;
 }
+
+
+.attribute-search-box-remove {
+	width:1em;
+	opacity:0.2;
+}
+
+.search-icon {
+	width:2em;
+	opacity:0.5;
+}
+
+.attribute-search-box-remove:hover, .search-icon:hover {
+	opacity: 1;
+}
+
+.button-container {
+	margin-top: 1em;
+}
+
+.button-container .buttons {
+	text-align: right;
+}
+
+span.search-box ul li {
+	display: inline;
+}
+
+a.remove-filter, a.remove-filter:hover, a.remove-filter:active,a.remove-filter:visited,
+a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited 
+{
+	text-decoration:none
+}
+
+.search-box textarea {
+	width: 80%
+}
+

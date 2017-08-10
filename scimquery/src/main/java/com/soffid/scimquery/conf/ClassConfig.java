@@ -1,27 +1,41 @@
 package com.soffid.scimquery.conf;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ClassConfig {
-	Class clazz;
+	String clazz;
 	
-	Class hibernateClass;
+	String hibernateClass;
 	
-	public Class getHibernateClass() {
+	Map<String, AttributeConfig> attributes = new HashMap<String, AttributeConfig>();
+
+	AttributeConfig defaultVirtualAttribute;
+
+	
+	public AttributeConfig getAttribute (String attName)
+	{
+		if (attributes.containsKey(attName))
+			return attributes.get(attName);
+		else
+			return defaultVirtualAttribute;
+					
+	}
+	
+	public String getHibernateClass() {
 		return hibernateClass;
 	}
 
-	public void setHibernateClass(Class hibernateClass) {
+	public void setHibernateClass(String hibernateClass) {
 		this.hibernateClass = hibernateClass;
 	}
 
-	Map<String, AttributeConfig> attributes;
 
-	public Class getClazz() {
+	public String getClazz() {
 		return clazz;
 	}
 
-	public void setClazz(Class clazz) {
+	public void setClazz(String clazz) {
 		this.clazz = clazz;
 	}
 
@@ -32,4 +46,12 @@ public class ClassConfig {
 	public void setAttributes(Map<String, AttributeConfig> attributes) {
 		this.attributes = attributes;
 	}
+	public AttributeConfig getDefaultVirtualAttribute() {
+		return defaultVirtualAttribute;
+	}
+
+	public void setDefaultVirtualAttribute(AttributeConfig defaultVirtualAttribute) {
+		this.defaultVirtualAttribute = defaultVirtualAttribute;
+	}
+
 }

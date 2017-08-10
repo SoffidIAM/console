@@ -2,9 +2,9 @@ package com.soffid.scimquery.test.entity;
 
 import java.util.Collection;
 
-public class AccountEntity {
-	String nameColumn;
+public class AttributeEntity {
+	String name;
 	String descriptionColumn;
 	UserEntity userColumn;
-	Collection<AttributeValueEntity> attributes;
+	Collection<AttributeValueEntity> values;
 }

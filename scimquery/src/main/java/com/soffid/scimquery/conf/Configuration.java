@@ -13,15 +13,19 @@ import org.json.JSONTokener;
 
 public class Configuration {
 	
-	static Map<Class, ClassConfig> currentConfig = new HashMap<Class, ClassConfig>();
+	static Map<String, ClassConfig> currentConfig = new HashMap<String, ClassConfig>();
 	
-	public static ClassConfig getClassConfig (Class clazz) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
+	public static ClassConfig getClassConfig (Class<?> clazz) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
 	{
-		ClassConfig cc = currentConfig.get(clazz);
+		return getClassConfig(clazz.getCanonicalName());
+	}
+
+	public static ClassConfig getClassConfig (String resourceName) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
+	{
+		ClassConfig cc = currentConfig.get(resourceName);
 		if (cc != null)
 			return cc;
 		
-		String resourceName = clazz.getCanonicalName();
 		if (resourceName == null)
 			return null;
 		
@@ -39,8 +43,8 @@ public class Configuration {
 			cc = new ClassConfig();
 			
 			String hibernateClass = obj.getString("hibernateClass");
-			cc.setClazz(clazz);
-			cc.setHibernateClass(Class.forName(hibernateClass));
+			cc.setClazz(resourceName);
+			cc.setHibernateClass(hibernateClass);
 			cc.setAttributes(new HashMap<String, AttributeConfig>());
 			
 			JSONArray array = obj.getJSONArray("attributes");
@@ -64,6 +68,11 @@ public class Configuration {
 		} catch (JSONException e ) {
 			throw new JSONException("Error parsing resource "+resourceName+": "+e.getMessage());
 		}
+	}
+	
+	public static void registerClass (ClassConfig classConfig)
+	{
+		currentConfig.put(classConfig.getClazz(), classConfig);
 	}
 
 }

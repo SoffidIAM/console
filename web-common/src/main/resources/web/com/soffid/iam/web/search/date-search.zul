@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding='utf-8'?>
+<div style="margin: 10px">
+	<div>
+		<div style="margin-top: 10px">
+			<label value="${c:l('attributeQuery.Since')} :"/><datebox style="margin-left: 2em" id='db1'  format="${c:l('accounts.dateFormat') }" width="10em"/>
+		</div>
+		<div  style="margin-top: 10px">
+			<label value="${c:l('attributeQuery.Until')} :"/><datebox style="margin-left: 2em" id='db2' format="${c:l('accounts.dateFormat') }"  width="10em"/>
+		</div>
+	</div>
+	<div class='button-container'>
+		<div class='buttons'>
+			<button id='okbutton' label="${c:l('agentsllista.zul.Accepta') }"/>
+			<button id='cancelbutton' label="${c:l('agentsllista.zul.Cancel·la')}"/>
+		</div>
+	</div>
+</div>
+

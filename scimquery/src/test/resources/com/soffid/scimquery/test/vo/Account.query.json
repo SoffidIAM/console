@@ -4,6 +4,7 @@
    	 {name:"name", hibernateName: "nameColumn"},
    	 {name:"description", hibernateName: "descriptionColumn"},
    	 {name:"user", hibernateName: "userColumn"},
-   	 {name:"owner"}
+   	 {name:"owner"},
+   	 {name:"attributes", hibernateName: "attributes"}
    ]
 }

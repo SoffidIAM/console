@@ -7,9 +7,12 @@ import org.json.JSONException;
 
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.test.entity.AttributeEntity;
+import com.soffid.scimquery.test.entity.AttributeValueEntity;
 import com.soffid.scimquery.test.vo.Account;
 import com.soffid.scimquery.test.vo.User;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -25,7 +28,7 @@ public class ParseTest extends TestCase {
 		ClassConfig config = Configuration.getClassConfig(User.class);
 		assertNotNull(config);
 		System.out.println ("config for "+config.getClass().getName());
-		System.out.println ("Hibernate class = "+config.getHibernateClass().getName());
+		System.out.println ("Hibernate class = "+config.getHibernateClass());
 		for (String key: config.getAttributes().keySet())
 		{
 			System.out.println (key+" => "+config.getAttributes().get(key).getHibernateColumn());
@@ -85,4 +88,43 @@ public class ParseTest extends TestCase {
 			throw e;
 		}
 	}
+
+	/*
+	 * Attributes special join
+	 * 
+	 * Account.class:
+	 * 
+	 *  name eq "abc" => select o from AccountEntity o where o.name = "abc"
+	 *  user.name eq "abc" => select o from AccountEntity o join o.user as u where u.name = "abc"
+	 *  attributes.employee eq "abc" =>
+	 *  			select o from AccountEntity o 
+	 *  			join o.attributes as o1 
+	 *              where o1.value = "abc" and o1.attribute.name="employee" 
+	 */
+	public void testAttribute () throws ParseException, EvalException, UnsupportedEncodingException, ClassNotFoundException, TokenMgrError, JSONException 
+	{
+		ClassConfig config = new ClassConfig();
+		config.setClazz(AttributeValueEntity.class.getCanonicalName());
+		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
+		AttributeConfig attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("numericValue");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		attributeConfig.setAttributeName("employee");
+		config.getAttributes().put("employee", attributeConfig );
+
+		attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("value");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		config.setDefaultVirtualAttribute(attributeConfig);
+
+		Configuration.registerClass(config);
+		
+		expressionTester("attributes.employee eq \"value\"", Account.class);
+
+		expressionTester("attributes.employee eq \"value\" and not (attributes.hire eq \"now\")", Account.class);
+
+		expressionTester("userColumn.nameColumn gt \"a\" and name eq \"abc\" and attributes.employee eq \"value\" and not (attributes.hire eq \"now\")", Account.class);
+}
 }

@@ -22,6 +22,9 @@ import org.jbpm.job.Job;
 
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.Indexer;
+import com.soffid.iam.bpm.model.TenantModule;
+
+import es.caib.seycon.ng.utils.Security;
 
 public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 	static Integer lock = new Integer(10001);
@@ -85,9 +88,18 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		try {
 			JobSession jobSession = jbpmContext.getJobSession();
 			Job job = jobSession.loadJob(id);
-			boolean success = job.execute(jbpmContext);
-			if (success)
-				jobSession.deleteJob(job);
+			ProcessInstance pi = job.getProcessInstance();
+			TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
+			String tenant = tm == null? Security.getTenantName(tm.getTenantId()): Security.getMasterTenantName();
+			Security.nestedLogin(tenant, "Process "+pi.getId(), Security.ALL_PERMISSIONS);
+			try
+			{
+				boolean success = job.execute(jbpmContext);
+				if (success)
+					jobSession.deleteJob(job);
+			} finally {
+				Security.nestedLogoff();
+			}
 		} finally {
 			try {
 				jbpmContext.close();

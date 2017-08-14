@@ -6,7 +6,7 @@
 <vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
 	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
-	style="overflow: visible">
+	style="overflow: hidden">
 	<attribute name="onCreate">
 		principal = com.soffid.iam.utils.Security.getPrincipal();
 		app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );

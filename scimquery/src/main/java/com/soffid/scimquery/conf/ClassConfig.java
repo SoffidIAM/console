@@ -8,6 +8,8 @@ public class ClassConfig {
 	
 	String hibernateClass;
 	
+	Class beanClass;
+	
 	Map<String, AttributeConfig> attributes = new HashMap<String, AttributeConfig>();
 
 	AttributeConfig defaultVirtualAttribute;
@@ -52,6 +54,14 @@ public class ClassConfig {
 
 	public void setDefaultVirtualAttribute(AttributeConfig defaultVirtualAttribute) {
 		this.defaultVirtualAttribute = defaultVirtualAttribute;
+	}
+
+	public Class getBeanClass() {
+		return beanClass;
+	}
+
+	public void setBeanClass(Class beanClass) {
+		this.beanClass = beanClass;
 	}
 
 }

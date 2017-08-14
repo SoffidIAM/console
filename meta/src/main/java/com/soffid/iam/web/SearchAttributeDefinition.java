@@ -15,6 +15,7 @@ public class SearchAttributeDefinition {
 	@Nullable String labelName;
 	
 	TypeEnumeration type;
+	Class javaType;
 	
 	@Nullable List<String> values;
 	@Nullable List<String> labels;

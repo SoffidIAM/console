@@ -114,7 +114,7 @@
 	]]>
 	</zscript>
 	
-	<esquema closable="true" id="esquemaLlista" position="center, center" ample="800px" title="${c:l('aplica_rol_valorDomini.Titol')}" visible="false">
+	<esquema closable="true" id="esquemaLlista" position="center, center" ample="100%" title="${c:l('aplica_rol_valorDomini.Titol')}" visible="false">
 		<attribute name="onInicia"><![CDATA[
 			pageScope.put("contextComponent", event.data);
 

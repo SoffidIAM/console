@@ -8,8 +8,10 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 	it will be useful, but WITHOUT ANY WARRANTY.
 }}IS_RIGHT
 --%><%@ taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" %>
+<%@ taglib uri="http://www.zkoss.org/dsp/zk/core" prefix="z" %>
 <c:set var="self" value="${requestScope.arg.self}"/>
 <li id="${self.uuid}"${self.outerAttrs}${self.innerAttrs} z.type="attributesearchbox.attributesearchbox.Attributesearchbox">
+ <c:forEach var="child" items="${self.children}">${z:redraw(child, null)}</c:forEach>
  <button type="button" class="criteria-selector" id="${self.uuid}!button">
   <div class="criteria-wrap">
    <span class="fieldLabel">${self.fieldLabel}</span>

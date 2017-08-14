@@ -3,6 +3,8 @@ package com.soffid.iam.web.component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,74 +30,97 @@ public class SearchDictionaryBuilder {
 	public static SearchDictionary build (String clazz) throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
 		SearchDictionary sd = map.get(clazz);
-		if (sd == null || System.currentTimeMillis() - sd.getTimestamp() > 600000 ) // 10 minutes cache
+		if (sd == null)
 		{
-			sd = new SearchDictionary();
-			sd.setAttributes(new LinkedList<SearchAttributeDefinition>());
-			sd.setTimestamp(System.currentTimeMillis());
-			Class<?> cl = Class.forName(clazz);
-			for (Field f: cl.getDeclaredFields())
-			{
-				SearchAttributeDefinition sad = new SearchAttributeDefinition();
-				sad.setName(f.getName());
-				String labelName = clazz+"."+f.getName();
-				try {
-					Labels.getRequiredLabel(labelName);
-					sad.setLabelName(labelName);
-				} catch (Exception e) {
-					sad.setLocalizedName(f.getName());
-				}
-				if (! Modifier.isStatic(f.getModifiers()))
-				{
-					Class t = f.getType();
-					if (Date.class.isAssignableFrom(t) ||
-							Calendar.class.isAssignableFrom(t))
-					{
-						sad.setType(TypeEnumeration.DATE_TYPE);
-					}
-					else if (String.class.isAssignableFrom(t) ||
-							Integer.class.isAssignableFrom(t) || 
-							Long.class.isAssignableFrom(t))
-					{
-						sad.setType(TypeEnumeration.STRING_TYPE);
-					}
-					else if (Boolean.class.isAssignableFrom(t))
-					{
-						sad.setType(TypeEnumeration.STRING_TYPE);
-						LinkedList<String> l = new LinkedList<String>();
-						l.add("true");
-						l.add("false");
-						sad.setValues(l);
-						l = new LinkedList<String>();
-						l.add("True");
-						l.add("False");
-						sad.setLabels(l);
-					}
-					else
-					{
-						try {
-							List<String> names = (List<String>) cl.getMethod("names").invoke(null);
-							List<String> values = (List<String>) cl.getMethod("values").invoke(null);
-							sad.setValues(values);
-							sad.setLabels(names);
-							sad.setType(TypeEnumeration.STRING_TYPE);
-						} catch (Exception e) {
-							sad = null;
-						}
-					}
-					
-					if (sad != null)
-						sd.getAttributes().add(sad);
-				}
-			}
+			sd = generateDefaultBuilder(clazz);
+			if (clazz.equals("com.soffid.iam.api.User"))
+				addUserJoins (sd);
 			map.put(clazz, sd);
 		}
 		if (clazz.equals("com.soffid.iam.api.User"))
 			sd = addUserAttributes (sd);
 		return sd;
 	}
+	
+	private static void addUserJoins(SearchDictionary sd) {
+		addJoin (sd, "accounts.account.name", "auditoria.zul.account", TypeEnumeration.STRING_TYPE);
+		addJoin (sd, "accounts.account.roles.role.name", "auditoria.zul.rol", TypeEnumeration.STRING_TYPE);
+		
+	}
+	private static void addJoin(SearchDictionary sd, String name, String labelName, TypeEnumeration type) {
+		SearchAttributeDefinition sad = new SearchAttributeDefinition();
+		sad.setName(name);
+		sad.setLabelName(labelName);
+		sad.setType(type);
+		sd.getAttributes().add(sad);
+	}
+	
+	private static SearchDictionary generateDefaultBuilder(String clazz) throws ClassNotFoundException {
+		SearchDictionary sd;
+		sd = new SearchDictionary();
+		sd.setAttributes(new LinkedList<SearchAttributeDefinition>());
+		sd.setTimestamp(System.currentTimeMillis());
+		Class<?> cl = Class.forName(clazz);
+		for (Field f: cl.getDeclaredFields())
+		{
+			SearchAttributeDefinition sad = new SearchAttributeDefinition();
+			sad.setName(f.getName());
+			String labelName = clazz+"."+f.getName();
+			try {
+				Labels.getRequiredLabel(labelName);
+				sad.setLabelName(labelName);
+			} catch (Exception e) {
+				sad.setLocalizedName(f.getName());
+			}
+			if (! Modifier.isStatic(f.getModifiers()) && ! f.getName().equals("id"))
+			{
+				Class t = f.getType();
+				sad.setJavaType(t);
+				if (Date.class.isAssignableFrom(t) ||
+						Calendar.class.isAssignableFrom(t))
+				{
+					sad.setType(TypeEnumeration.DATE_TYPE);
+				}
+				else if (String.class.isAssignableFrom(t) ||
+						Integer.class.isAssignableFrom(t) || 
+						Long.class.isAssignableFrom(t))
+				{
+					sad.setType(TypeEnumeration.STRING_TYPE);
+				}
+				else if (Boolean.class.isAssignableFrom(t))
+				{
+					sad.setType(TypeEnumeration.STRING_TYPE);
+					LinkedList<String> l = new LinkedList<String>();
+					l.add("true");
+					l.add("false");
+					sad.setValues(l);
+					l = new LinkedList<String>();
+					l.add("True");
+					l.add("False");
+					sad.setLabels(l);
+				}
+				else 
+				{
+					try {
+						List<String> names = (List<String>) cl.getMethod("names").invoke(null);
+						List<String> values = (List<String>) cl.getMethod("values").invoke(null);
+						sad.setValues(values);
+						sad.setLabels(names);
+						sad.setType(TypeEnumeration.STRING_TYPE);
+					} catch (Exception e) {
+						sad = null;
+					}
+				}
+				
+				if (sad != null)
+					sd.getAttributes().add(sad);
+			}
+		}
+		return sd;
+	}
 	private static SearchDictionary addUserAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
+		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
 		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypes(MetadataScope.USER))
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&

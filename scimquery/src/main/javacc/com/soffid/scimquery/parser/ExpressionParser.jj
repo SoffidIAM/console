@@ -86,39 +86,36 @@ Object Constant ():
 ComparisonExpression Comparison () : 
 {
 	Token i1 = null;
-	Object i2;
+	Object i2 = null;
 	Token operator = null;
 	ComparisonExpression ce = new ComparisonExpression ();
 }
 {
 	i1 = <IDENTIFIER>
 	(
-		( operator = <EQ> |
-		  operator = <GT> |
-		  operator = <GE> |
-		  operator = <LT> |
-		  operator = <SW> |
-		  operator = <EW> |
-		  operator = <CO> |
-		  operator = <NE> |
-		  operator = <LE>)
-		i2 = Constant ()
-		{
-			ce.setAttribute (i1.image);
-			ce.setValue (i2);
-			ce.setOperator (operator.image);
-			
-			return ce;
-		}
-	) | (
-		<PR> 
-		{
-			ce.setAttribute (i1.image);
-			ce.setOperator (operator.image);
-			
-			return ce;
-		}
+		(
+			( operator = <EQ> |
+			  operator = <GT> |
+			  operator = <GE> |
+			  operator = <LT> |
+			  operator = <SW> |
+			  operator = <EW> |
+			  operator = <CO> |
+			  operator = <NE> |
+			  operator = <LE>)
+			i2 = Constant ()
+		) | 
+		(
+			operator = <PR> 
+		)
 	)
+	{
+		ce.setAttribute (i1.image);
+		ce.setValue (i2);
+		ce.setOperator (operator.image);
+		
+		return ce;
+	}
 	
 }
 

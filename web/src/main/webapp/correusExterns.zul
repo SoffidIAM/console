@@ -26,7 +26,7 @@
 		]]>	
 	</zscript>
 	
-	<window closable="true" id="esquema" position="center, center" title="${c:l('correusExterns.Titol')}" visible="false" width="800px">
+	<window closable="true" id="esquema" position="center, center" title="${c:l('correusExterns.Titol')}" visible="false" width="80%">
 		<attribute name="onInicia">
 		<![CDATA[
      		pageScope.put("contextComponent", event.data);

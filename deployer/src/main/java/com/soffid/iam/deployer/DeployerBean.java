@@ -283,19 +283,16 @@ public class DeployerBean implements DeployerService {
 			InstanceNotFoundException, ReflectionException, MBeanException, IntrospectionException, AttributeNotFoundException {
 		final ObjectName objectNameQuery = new ObjectName("*:type=Connector,*");
 		MBeanServer mbeanServer = null;
-		ObjectName objectName = null;
 		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory
 				.findMBeanServer(null)) {
-			if (server.queryNames(objectNameQuery, null).size() > 0) {
+			for (ObjectName objectName: server.queryNames(objectNameQuery, null)) {
 				mbeanServer = server;
-				objectName = (ObjectName) server.queryNames(objectNameQuery,
-						null).toArray()[0];
 				Object v = mbeanServer.getAttribute(objectName, "stateName");
 				log.info("MBEAN "+objectName.getCanonicalName()+ "STATUS: "+v);
 				if ("STARTED".equals (v))
 				{
 					log.info("Stopping");
-					mbeanServer.invoke(objectName, "stop", null, null);
+					mbeanServer.invoke(objectName, "pause", null, null);
 				}
 			}
 		}
@@ -305,20 +302,14 @@ public class DeployerBean implements DeployerService {
 			ReflectionException, MBeanException, MalformedObjectNameException, AttributeNotFoundException {
 		final ObjectName objectNameQuery = new ObjectName("*:type=Connector,*");
 		MBeanServer mbeanServer = null;
-		ObjectName objectName = null;
 		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory
 				.findMBeanServer(null)) {
-			if (server.queryNames(objectNameQuery, null).size() > 0) {
+			for (ObjectName objectName: server.queryNames(objectNameQuery, null)) {
 				mbeanServer = server;
-				objectName = (ObjectName) server.queryNames(objectNameQuery,
-						null).toArray()[0];
 				Object v = mbeanServer.getAttribute(objectName, "stateName");
 				log.info("MBEAN "+objectName.getCanonicalName()+ "STATUS: "+v);
-				if ("STOPPED".equals (v))
-				{
-					log.info("Starting");
-					mbeanServer.invoke(objectName, "start", null, null);
-				}
+				log.info("Resuming");
+				mbeanServer.invoke(objectName, "resume", null, null);
 			}
 		}
 	}

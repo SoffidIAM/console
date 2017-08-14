@@ -126,5 +126,10 @@ public class ParseTest extends TestCase {
 		expressionTester("attributes.employee eq \"value\" and not (attributes.hire eq \"now\")", Account.class);
 
 		expressionTester("userColumn.nameColumn gt \"a\" and name eq \"abc\" and attributes.employee eq \"value\" and not (attributes.hire eq \"now\")", Account.class);
-}
+	}
+
+	public void testPr () throws ParseException, EvalException, UnsupportedEncodingException, ClassNotFoundException, TokenMgrError, JSONException 
+	{
+		expressionTester("nameColumn pr", Account.class);
+	}
 }

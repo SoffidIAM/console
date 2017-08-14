@@ -36,7 +36,8 @@ public class Usuari {
 	public java.lang.String usuariCreacio;
 
 	@Nullable
-	@Attribute(translated = "active" )
+	@Attribute(translated = "active")
+	@JsonAttribute(hibernateAttribute="-")
 	public java.lang.Boolean actiu;
 
 	@Nullable

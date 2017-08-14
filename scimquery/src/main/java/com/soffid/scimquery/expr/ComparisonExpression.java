@@ -1,5 +1,6 @@
 package com.soffid.scimquery.expr;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -43,7 +44,12 @@ public class ComparisonExpression extends AbstractExpression {
 
 	@Override
 	public boolean evaluate(Object object) throws EvalException {
-		Object v = getReference(object, attribute);
+		Object v;
+		try {
+			v = getReference(object, attribute);
+		} catch (EvalException e) {
+			return true; // Hibernate attribute
+		}
 		if (v instanceof Collection<?>) 
 		{
 			for (Object v2: (Collection<?>)v)
@@ -75,6 +81,11 @@ public class ComparisonExpression extends AbstractExpression {
 		{
 			DateTimeFormatter df = ISODateTimeFormat.dateTimeParser();
 			return compareDate ((Date) v2, df.parseDateTime(value.toString()).toDate());
+		}
+		else if (v2 instanceof Calendar)
+		{
+			DateTimeFormatter df = ISODateTimeFormat.dateTimeParser();
+			return compareDate (((Calendar) v2).getTime(), df.parseDateTime(value.toString()).toDate());
 		}
 		else if (v2 instanceof Boolean)
 			return compareBoolean ((Boolean) v2, Boolean.parseBoolean(value.toString()));
@@ -385,6 +396,7 @@ public class ComparisonExpression extends AbstractExpression {
 				}
 				else if ("pr".equalsIgnoreCase(operator))
 				{
+					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" is not null ");
 				}
 				if (ctx.objectName.contains(" "))

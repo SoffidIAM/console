@@ -25,7 +25,7 @@
 		
 	</zscript>
 
-	<window closable="true" id="esquemaGeneric" position="center, center" title="${c:l('finestra_valorGeneric.Titol')}" visible="false" width="800px">
+	<window closable="true" id="esquemaGeneric" position="center, center" title="${c:l('finestra_valorGeneric.Titol')}" visible="false" width="80%">
 		<attribute name="onInicia">
      		pageScope.put("contextComponent", event.data);
 			if(self.mode.compareToIgnoreCase("highlighted") != 0){

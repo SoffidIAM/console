@@ -53,7 +53,14 @@ public class JobExecutorThread extends NotLoggedThread {
 		currentIdleInterval = idleInterval;
 		while (isActive) {
 			try {//org.jboss.security.SecurityAssociation.getSubject()
-				List acquiredJobs = getExecutor().getJobs(getName());
+				BpmJobExecutor exec = null;
+				try {
+					exec = getExecutor();
+				} catch (Exception e) {
+					isActive = false;
+					log.error("Unable to get JobExecutor bean. Exiting", e);
+				}
+				List acquiredJobs = exec.getJobs(getName());
 				
 				if (!acquiredJobs.isEmpty()) {
 					Iterator iter = acquiredJobs.iterator();
@@ -68,8 +75,8 @@ public class JobExecutorThread extends NotLoggedThread {
 					}
 
 				} else { // no jobs acquired
-					log.info(Messages.getString("JobExecutorThread.NoJobToExecute")); //$NON-NLS-1$
 					if (isActive) {
+						log.info(Messages.getString("JobExecutorThread.NoJobToExecute")); //$NON-NLS-1$
 						long waitPeriod = getWaitPeriod();
 						if (waitPeriod > 0) {
 							synchronized (jobExecutor) {

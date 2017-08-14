@@ -9,7 +9,7 @@
 <style src="~./styles/estil.css"/>
 <style src="/css/devices.css"/>
 
-<div xmlns:h="http://www.w3.org/1999/xhtml" width="800px" 
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" 
 	onCreate="start()"> 
 
 	

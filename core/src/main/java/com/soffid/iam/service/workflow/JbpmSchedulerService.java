@@ -1,6 +1,7 @@
 package com.soffid.iam.service.workflow;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
@@ -60,8 +61,8 @@ public class JbpmSchedulerService {
 		}
 	}
 
-	@PreRemove
-	protected void stopService() throws Exception {
+	@PreDestroy
+	public void stopService() throws Exception {
 		if (indexerThread != null)
 			indexerThread.setFinish(true);
 		if (scheduler != null) {

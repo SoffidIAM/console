@@ -8,11 +8,12 @@ import java.util.Date;
 import java.util.LinkedList;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -20,21 +21,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.ws.ResponseWrapper;
 
 import com.soffid.iam.api.Password;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.service.ejb.AccountService;
-import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.service.ejb.AdditionalDataService;
 import com.soffid.iam.service.ejb.ApplicationService;
+import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.webservice.user.ExtendedUser;
 import com.soffid.iam.webservice.user.JsonAccount;
@@ -46,7 +43,8 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.util.Base64;
 
 @Path("/scim/User")
-@Produces({"text/xml", "application/json"})
+@Produces({"application/scim+json","application/json"})
+@Consumes({"application/scim+json","application/json"})
 public class UserSvc {
 	@EJB UserService svc;
 	
@@ -60,7 +58,7 @@ public class UserSvc {
 
 	@Path("")
     @GET
-    public UserQuery list(@QueryParam("query") @DefaultValue("") String query,
+    public UserQuery list(@QueryParam("filter") @DefaultValue("") String query,
     		@QueryParam("attributes") String atts) throws InternalErrorException {
         UserQuery uq = new UserQuery();
         uq.setResources (toExtendedUserList (svc.findUserByJsonQuery(query)));
@@ -104,7 +102,7 @@ public class UserSvc {
 		meta.setLocation(getClass(), u.getId().toString());
 		meta.setCreated(u.getCreatedDate().getTime());
 		meta.setLastModified(u.getModifiedDate().getTime());
-		meta.setResourceType("User");
+		meta.setResourceType("User"); //$NON-NLS-1$
 		return eu;
 	}
 
@@ -117,16 +115,19 @@ public class UserSvc {
 	    	{
 				updateAccounts(user, newUser);
 		    	updateAttributes(user, newUser, true);
-				ExtendedUser u = toExtendedUser(newUser);
-	    		return Response
-	    				.created( new URI (u.getMeta().getLocation()))
-	    				.entity(u)
-	    				.build();
+				ExtendedUser eu = toExtendedUser(newUser);
+	    		return SCIMResponseBuilder.responseOk(eu, new URI (eu.getMeta().getLocation()));
 	    	}
 	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+		} catch (EJBException e) {
+			if (e.getMessage().contains("porque ya existe uno con este código.")) { //$NON-NLS-1$
+				String message = e.getMessage().substring(e.getMessage().indexOf("No es posible")); //$NON-NLS-1$
+	    		return SCIMResponseBuilder.errorCustom(Status.CONFLICT, message);
+			}
+			return SCIMResponseBuilder.errorGeneric(e);
 		} catch (Exception e) {
-    		return new ExceptionBuilder(e).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
@@ -139,30 +140,29 @@ public class UserSvc {
 		try {
 			user = svc.findUserByUserId(id);
 	    	if (user != null)
-	    		return Response.ok( toExtendedUser( user )).build();
+	    		return SCIMResponseBuilder.responseOk(toExtendedUser(user));
 	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 		} catch (Exception e) {
-    		return new ExceptionBuilder(e).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
     @Path("/{id}")
     @DELETE
-    public Response delete(@PathParam("id") long id
-    		)  {
+    public Response delete(@PathParam("id") long id) {
         User user;
 		try {
 			user = svc.findUserByUserId(id);
-	    	if (user != null)
-	    	{
+	    	if (user != null) {
 	    		svc.delete(user);
-	    		return Response.status(Status.NO_CONTENT).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NO_CONTENT);
+	    	} else {
+	    		String message = String.format(Messages.getString("UserSvc.userNotFound"), id); //$NON-NLS-1$
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
 	    	}
-	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
 		} catch (Exception e) {
-    		return new ExceptionBuilder(e).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
@@ -174,8 +174,8 @@ public class UserSvc {
         User user2;
 		try {
 			user2 = svc.findUserByUserId(id);
-	    	if (user2 == null)
-	    		return Response.status(Status.NOT_FOUND).build();
+	    	if (user2 == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	
 	    	user2.setActive(user.getActive());
 	    	user2.setComments(user.getComments());
 	    	user2.setConsoleProperties(user.getConsoleProperties());
@@ -206,12 +206,12 @@ public class UserSvc {
 	    	user2.setUserType(user.getUserType());
 	    	svc.update(user2);
 	    	if (user.getPassword() != null)
-	    		svc.changePassword(user.getUserName(), "DEFAULT", new Password (user.getPassword()));
+	    		svc.changePassword(user.getUserName(), "DEFAULT", new Password (user.getPassword())); //$NON-NLS-1$
 	    	updateAttributes(user, user2, true);
 			updateAccounts(user, user2);
-	    	return Response.ok().entity( toExtendedUser(user2) ).build();
+	    	return SCIMResponseBuilder.responseOk(toExtendedUser(user2));
 		} catch (Exception e) {
-    		return new ExceptionBuilder(e).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
     
@@ -223,8 +223,8 @@ public class UserSvc {
         User user2;
 		try {
 			user2 = svc.findUserByUserId(id);
-	    	if (user2 == null)
-	    		return Response.status(Status.NOT_FOUND).build();
+	    	if (user2 == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+
 	    	if (user.getActive() != null) user2.setActive(user.getActive());
 	    	if (user.getComments() !=null) user2.setComments(user.getComments());
 	    	if (user.getConsoleProperties() != null) user2.setConsoleProperties(user.getConsoleProperties());
@@ -255,12 +255,12 @@ public class UserSvc {
 	    	if (user.getUserType () !=null) user2.setUserType(user.getUserType());
 	    	svc.update(user2);
 	    	if (user.getPassword() != null)
-	    		svc.changePassword(user2.getUserName(), "DEFAULT", new Password (user.getPassword()));
+	    		svc.changePassword(user2.getUserName(), "DEFAULT", new Password (user.getPassword())); //$NON-NLS-1$
 			updateAccounts(user, user2);
 	    	updateAttributes(user, user2, false);
-	    	return Response.ok().entity( toExtendedUser(user2) ).build();
+	    	return SCIMResponseBuilder.responseOk(toExtendedUser(user2));
 		} catch (Exception e) {
-    		return new ExceptionBuilder(e).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
     

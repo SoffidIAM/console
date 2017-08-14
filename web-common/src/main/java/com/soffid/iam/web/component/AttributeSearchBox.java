@@ -27,6 +27,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
@@ -284,15 +285,15 @@ public class AttributeSearchBox extends XulElement {
 		int i = target.getSelectedIndex();
 		for (int j = 0; j < INT_TEXTBOXES.length; j++)
 		{
-			((Textbox)target.getFellow(INT_TEXTBOXES[j])).setDisabled(i != j);
+			((Intbox)target.getFellow(INT_TEXTBOXES[j])).setDisabled(i != j);
 		}
-		((Textbox)target.getFellow(INT_TEXTBOXES[i])).focus();
+		((Intbox)target.getFellow(INT_TEXTBOXES[i])).focus();
 	}
 
 	private void doIntSearch(Window w, Div bg, Radiogroup rg) {
 		textOperation = rg.getSelectedIndex();
 		textValue = null;
-		textValue = ((Textbox)w.getFellow(INT_TEXTBOXES[textOperation])).getText();
+		textValue = ((Intbox)w.getFellow(INT_TEXTBOXES[textOperation])).getText();
 		if (textValue == null || textValue.isEmpty())
 		{
 			queryExpression = null;
@@ -318,7 +319,7 @@ public class AttributeSearchBox extends XulElement {
 		final Radiogroup rg = ((Radiogroup) w.getFellow("rg"));
 		rg.setSelectedIndex(textOperation);
 		enableIntBoxes(rg);
-		((Textbox)w.getFellow(INT_TEXTBOXES[textOperation])).setText(textValue);
+		((Intbox)w.getFellow(INT_TEXTBOXES[textOperation])).setText(textValue);
 		
 		rg.addEventListener("onCheck", new EventListener() {
 			@Override

@@ -158,12 +158,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
 
-		// Esborrem les associacions amb llistes de correu
-		// S'esborren les llistes de correu òrfenes i les seves associacions
-		User usu = getUserEntityDao().toUser(usuariEntity);
-		usu.setMailAlias("");//Per esborrarles //$NON-NLS-1$
-		arreglaAlias(usu);
-
 		/*
 		 * Se eliminan los roles de los usuarios
 		 */
@@ -181,17 +175,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		 * Se elimina la asociación con el grupo primario y se le pone como
 		 * grupo primario "portal"
 		 */
-		GroupEntity grupEntity = getGroupEntityDao().findByName("portal"); //$NON-NLS-1$
+		GroupEntity grupEntity = getGroupEntityDao().findByName("World"); //$NON-NLS-1$
 		usuariEntity.setPrimaryGroup(grupEntity);
-
-		/*
-		 * Se elimina el dato adicional CODI_USUARI_IBSALUT
-		 */
-		UserDataEntity dadaCodiIBSALUT = getUserDataEntityDao().findByDataType(
-				codiUsuari, "CODI_USUARI_IBSALUT"); //$NON-NLS-1$
-		if (dadaCodiIBSALUT != null) {
-			getUserDataEntityDao().remove(dadaCodiIBSALUT);
-		}
 
 		/*
 		 * Se eliminan las asociaciones d'impressora
@@ -230,14 +215,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		usuariEntity.setMailDomain(null);
 
 		/*
-		 * Se eliminan las tarjetas
-		 */
-		/*
-		 * Collection targetes = usuariEntity.getTargetesCPD(); if (targetes !=
-		 * null) { getTarjaCPDEntityDao().remove(targetes); }
-		 */
-
-		/*
 		 * Se eliminan las referencias desde aplicaciones como persona de
 		 * contacto
 		 */
@@ -254,16 +231,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		/*
-		 * Se asigna usuario de tipo externo
-		 */
-		// TODO: En principi ha d'existir el tipus d'usuari (E)xtern
-		UserTypeEntity tipusE = getUserTypeEntityDao().findByName("E"); //$NON-NLS-1$
-		usuariEntity.setUserType(tipusE);
-
-		/*
 		 * Se pone en activo
 		 */
-		usuariEntity.setActive("S"); //$NON-NLS-1$
+		usuariEntity.setActive("N"); //$NON-NLS-1$
 
 		/*
 		 * Se actualiza el usuario
@@ -1213,6 +1183,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			// els usuaris mai s'eliminen, es fa un downgrade
 			disableUser(usuari.getUserName());
 			removeOldAlias(usuari);
+			getUserDataEntityDao().remove(usuariEntity.getUserData());
+			getUserEntityDao().remove(usuariEntity);
 		}
 	}
 

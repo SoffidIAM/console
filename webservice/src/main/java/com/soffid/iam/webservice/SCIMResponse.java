@@ -1,5 +1,7 @@
 package com.soffid.iam.webservice;
 
+import javax.ws.rs.core.Response.Status;
+
 public class SCIMResponse {
 	final static String [] SCHEMAS = new String[]{"urn:ietf:params:scim:api:messages:2.0:Error"};
 	
@@ -7,11 +9,18 @@ public class SCIMResponse {
 	String status;
 	String[] schemas;
 	
-	public SCIMResponse(Exception e)
+	public SCIMResponse(String message)
 	{
 		schemas = SCHEMAS;
-		detail = e.toString();
+		detail = message;
 		status = "500";
+	}
+
+	public SCIMResponse(String message, Status status)
+	{
+		schemas = SCHEMAS;
+		detail = message;
+		this.status = String.valueOf(status.getStatusCode());
 	}
 
 	public String getDetail() {
@@ -37,5 +46,4 @@ public class SCIMResponse {
 	public void setSchemas(String[] schemas) {
 		this.schemas = schemas;
 	}
-	
 }

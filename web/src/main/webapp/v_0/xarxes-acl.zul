@@ -21,7 +21,7 @@
 		</vbox>
 	</popup> -->
 	
-	<window closable="true" contentStyle="background:white" id="window" title="${c:l('xarxes-acl.Titol')}" visible="false" width="800px">
+	<window closable="true" contentStyle="background:white" id="window" title="${c:l('xarxes-acl.Titol')}" visible="false" width="80%">
 		<attribute name="onInicia">
 			pageScope.put("contextComponent", event.data);
 		    Path.getComponent("/window/criterisWnd/query").value = "";

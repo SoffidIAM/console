@@ -14,7 +14,7 @@
 
 	<style src="~./styles/estil.css"/>
 	
-	<window closable="true" id="esquemaLlista" position="center, center" title="${c:l('getmazingerconfig.Titol')}" visible="false" width="800px" height="400px">
+	<window closable="true" id="esquemaLlista" position="center, center" title="${c:l('getmazingerconfig.Titol')}" visible="false" width="80%" height="400px">
 		<attribute name="onInicia">
 		<![CDATA[
 			pageScope.put("contextComponent", event.data);

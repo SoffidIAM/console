@@ -167,7 +167,7 @@
 
 	<window id="esquemaLlista" closable="true" position="center, center"
 		sizable="true" title="${c:l('impressoresllista.Titol')}" visible="false"
-		width="800px">
+		width="80%">
 		<attribute name="onInicia">
      		pageScope.put("contextComponent", event.data);
 			if(self.mode.compareToIgnoreCase("highlighted") != 0){

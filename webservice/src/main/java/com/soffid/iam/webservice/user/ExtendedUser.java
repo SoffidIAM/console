@@ -7,10 +7,10 @@ import java.util.Map;
 
 import com.soffid.iam.api.User;
 import com.soffid.iam.webservice.ScimMeta;
-import com.soffid.iam.webservice.account.RoleDomain;
 
 public class ExtendedUser extends User
 {
+	private static final long serialVersionUID = 1L;
 	ScimMeta meta = new ScimMeta();
 	
 	public ScimMeta getMeta() {

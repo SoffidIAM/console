@@ -1,15 +1,14 @@
 package com.soffid.iam.webservice.account;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.soffid.iam.api.Account;
-import com.soffid.iam.api.User;
 import com.soffid.iam.webservice.ScimMeta;
 
 public class ExtendedAccount extends Account
 {
+	private static final long serialVersionUID = 4544784110341469069L;
+
 	public ExtendedAccount() {
 		super ();
 	}

@@ -2,9 +2,6 @@ package com.soffid.iam.webservice.user;
 
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement()
 public class UserQuery {
 	public String[] getSchemas() {
 		return schemas;

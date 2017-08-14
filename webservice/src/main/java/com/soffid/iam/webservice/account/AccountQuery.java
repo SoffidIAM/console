@@ -2,9 +2,6 @@ package com.soffid.iam.webservice.account;
 
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement()
 public class AccountQuery {
 	public String[] getSchemas() {
 		return schemas;

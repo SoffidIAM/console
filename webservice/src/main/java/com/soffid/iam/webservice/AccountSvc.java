@@ -18,27 +18,19 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.ws.ResponseWrapper;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
-import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserAccount;
-import com.soffid.iam.api.UserData;
 import com.soffid.iam.service.ejb.AccountService;
-import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.service.ejb.ApplicationService;
+import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.webservice.account.AccountQuery;
 import com.soffid.iam.webservice.account.ExtendedAccount;
 import com.soffid.iam.webservice.account.RoleDomain;
-import com.soffid.iam.webservice.user.ExtendedUser;
-import com.soffid.iam.webservice.user.JsonAccount;
-import com.soffid.iam.webservice.user.UserQuery;
 
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;

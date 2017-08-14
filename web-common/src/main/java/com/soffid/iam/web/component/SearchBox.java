@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
@@ -48,6 +51,8 @@ public class SearchBox extends HtmlBasedComponent {
 	String variableName;
 	String dataPath;
 	private String defaultAttributes;
+	boolean auto=false;
+	private String lastQuery = "";
 	
 	public String getJsonObject() {
 		return jsonObject;
@@ -101,8 +106,10 @@ public class SearchBox extends HtmlBasedComponent {
 							.getLabel("usuaris.CanvisPendents"));
 				return;
 			}
+			
+			lastQuery  = getQueryString();
 
-			ds.getJXPathContext().getVariables().declareVariable(variableName, getQueryString());
+			ds.getJXPathContext().getVariables().declareVariable(variableName, lastQuery);
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)
 			{
@@ -160,6 +167,7 @@ public class SearchBox extends HtmlBasedComponent {
 
 		advancedSearch = new Textbox();
 		advancedSearch.setMultiline(true);
+		advancedSearch.setRows(2);
 		appendChild(advancedSearch);
 
 		addAttributeButton = new Button(Labels.getLabel("searchBox.addAttribute"));
@@ -177,6 +185,13 @@ public class SearchBox extends HtmlBasedComponent {
 		invalidate();
 	}
 
+	public void onChangeFilter () 
+	{
+		String newQuery = getQueryString();
+		if (auto && ! lastQuery.equals(newQuery) && !newQuery.isEmpty())
+			search();
+	}
+	
 	public boolean isAdvancedMode() {
 		return advancedMode;
 	}
@@ -198,12 +213,13 @@ public class SearchBox extends HtmlBasedComponent {
 		this.defaultAttributes = s;
 	}
 
-	private void addAttribute(String att) {
+	private AttributeSearchBox addAttribute(String att) {
 		for (SearchAttributeDefinition def: dictionary.getAttributes())
 		{
 			if (def.getName().equals(att))
-				addAttribute (def);
+				return addAttribute (def);
 		}
+		return null;
 	}
 
 	public SearchDictionary getDictionary() {
@@ -214,7 +230,7 @@ public class SearchBox extends HtmlBasedComponent {
 		this.dictionary = dictionary;
 	}
 
-	private void addAttribute(SearchAttributeDefinition def) {
+	private AttributeSearchBox addAttribute(SearchAttributeDefinition def) {
 		AttributeSearchBox asb = new AttributeSearchBox();
 		asb.setAttributeDef(def);
 		insertBefore(asb, addAttributeButton);
@@ -247,12 +263,14 @@ public class SearchBox extends HtmlBasedComponent {
 				addAttributeButton.setVisible(false);
 		}
 		invalidate();
+		return asb;
 	}
 
 	
 	public void onRemoveFilter (AttributeSearchBox asb)
 	{
 		addAttributeButton.setVisible(true);
+		onChangeFilter();
 	}
 
 	public String getQueryString ()
@@ -284,6 +302,7 @@ public class SearchBox extends HtmlBasedComponent {
 
 	private void selectAttributeToAdd() {
 		menu.getChildren().clear();
+		LinkedList<Menuitem> items = new LinkedList<Menuitem>();
 		for (final SearchAttributeDefinition def: dictionary.getAttributes())
 		{
 			boolean found = false;
@@ -309,12 +328,22 @@ public class SearchBox extends HtmlBasedComponent {
 				item.addEventListener("onClick", new EventListener() {
 					@Override
 					public void onEvent(Event event) throws Exception {
-						addAttribute(def.getName());
+						AttributeSearchBox att = addAttribute(def.getName());
+						if (att != null)
+							att.onClick();
 					}
 				});
-				menu.appendChild(item);
+				items.add(item);
 			}
 		}
+		Collections.sort( items, new Comparator<Menuitem>()
+				{
+					public int compare(Menuitem o1, Menuitem o2) {
+						return o1.getLabel().compareTo(o2.getLabel());
+					}
+			
+				});
+		menu.getChildren().addAll(items);
 		appendChild(menu);
 		menu.open(addAttributeButton);
 	}
@@ -324,8 +353,20 @@ public class SearchBox extends HtmlBasedComponent {
 		List<AttributeSearchBox> l = new LinkedList<AttributeSearchBox>();
 		for (Component c:(List<Component>)getChildren())
 		{
-			if (c instanceof AttributeSearchBox)
+			if (c instanceof AttributeSearchBox )
 				l.add((AttributeSearchBox) c);
+		}
+		return l;
+	}
+
+	public List<Component> getAttributeSearchBoxesAndPopups ()
+	{
+		List<Component> l = new LinkedList<Component>();
+		for (Component c:(List<Component>)getChildren())
+		{
+			if (c instanceof AttributeSearchBox ||
+					c instanceof Window)
+				l.add((Component) c);
 		}
 		return l;
 	}
@@ -337,7 +378,8 @@ public class SearchBox extends HtmlBasedComponent {
 		{
 			if (c != addAttributeButton && 
 					c != advancedSearch &&
-					!(c instanceof AttributeSearchBox))
+					!(c instanceof AttributeSearchBox) &&
+					!(c instanceof Window))
 				l.add(c);
 		}
 		return l;
@@ -403,5 +445,13 @@ public class SearchBox extends HtmlBasedComponent {
 	public String getSearchIconUrl()
 	{
 		return Executions.encodeURL("~./img/search.png");
+	}
+
+	public boolean isAuto() {
+		return auto;
+	}
+
+	public void setAuto(boolean auto) {
+		this.auto = auto;
 	}
 }

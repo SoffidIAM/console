@@ -2,6 +2,7 @@ package com.soffid.iam.web.component;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -39,12 +40,13 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.zkib.zkiblaf.SignApplet;
 
 public class AttributeSearchBox extends XulElement {
+	private static final String[] INT_TEXTBOXES = new String[] {"ib1", "ib2", "ib3"};
 	private static final String[] STRING_TEXTBOXES = new String[] {"tb1", "tb2", "tb3", "tb4"};
 	private static final String[] DATE_DATEBOXES = new String[] {"db1", "db2"};
 	private static final String REMOVE_EVENT = "onRemove";
 	private static final String CLICK_EVENT = "onClick";
 	SearchAttributeDefinition attributeDef;
-	Set<String> selectedValues;
+	Set<String> selectedValues = new HashSet<String>();
 	String queryExpression;
 	String humanExpression;
 	int textOperation = 0;
@@ -124,6 +126,7 @@ public class AttributeSearchBox extends XulElement {
 	
 	public void onRemove ()
 	{
+		queryExpression = "";
 		if (getParent() != null && getParent() instanceof SearchBox)
 		{
 			((SearchBox)getParent()).onRemoveFilter(this);
@@ -138,7 +141,7 @@ public class AttributeSearchBox extends XulElement {
 		final Window w = new Window();
 		final Div bg = new Div();
 
-		getParent().insertBefore(w, this);
+		insertBefore(w, this);
 		getParent().invalidate();
 		w.setSclass("search-popup");
 		w.setPosition("parent,parent");
@@ -151,6 +154,14 @@ public class AttributeSearchBox extends XulElement {
 		{
 			createSelectSearch(w, bg);
 		}
+		else if (attributeDef.getJavaType() != null && 
+				(Integer.class.isAssignableFrom(attributeDef.getJavaType()) ||
+				 Long.class.isAssignableFrom(attributeDef.getJavaType()) ||
+				 Float.class.isAssignableFrom(attributeDef.getJavaType()) ||
+			  	 Double.class.isAssignableFrom(attributeDef.getJavaType())))
+		{
+			createIntSearch(w, bg);
+		}
 		else
 		{
 			createTextSearch(w, bg);
@@ -158,7 +169,7 @@ public class AttributeSearchBox extends XulElement {
 			
 		w.doEmbedded();
 
-		getParent().insertBefore(bg, this);
+		insertBefore(bg, this);
 		bg.setSclass("search-background");
 		bg.addEventListener("onClick", new EventListener() {
 			public void onEvent(Event event) throws Exception {
@@ -197,6 +208,14 @@ public class AttributeSearchBox extends XulElement {
 		w.detach();
 		bg.detach();
 		invalidate();
+		notifyParent();
+	}
+
+	private void notifyParent() {
+		if (getParent() != null && getParent() instanceof SearchBox)
+		{
+			((SearchBox)getParent()).onChangeFilter();
+		}
 	}
 
 	private void createTextSearch(final Window w, final Div bg) {
@@ -227,6 +246,20 @@ public class AttributeSearchBox extends XulElement {
 				}
 		
 			});
+			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					textOperation = 0;
+					textValue = "";
+					queryExpression = null;
+					humanExpression = Labels.getLabel("attributeQuery.all");		
+					w.detach();
+					bg.detach();
+					invalidate();
+					notifyParent();
+				}
+		
+			});
 		}
 		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
 			public void onEvent(Event event) throws Exception {
@@ -242,6 +275,101 @@ public class AttributeSearchBox extends XulElement {
 				w.detach();
 				bg.detach();
 				invalidate();
+				notifyParent();
+			}
+		});
+	}
+
+	private void enableIntBoxes(Radiogroup target) {
+		int i = target.getSelectedIndex();
+		for (int j = 0; j < INT_TEXTBOXES.length; j++)
+		{
+			((Textbox)target.getFellow(INT_TEXTBOXES[j])).setDisabled(i != j);
+		}
+		((Textbox)target.getFellow(INT_TEXTBOXES[i])).focus();
+	}
+
+	private void doIntSearch(Window w, Div bg, Radiogroup rg) {
+		textOperation = rg.getSelectedIndex();
+		textValue = null;
+		textValue = ((Textbox)w.getFellow(INT_TEXTBOXES[textOperation])).getText();
+		if (textValue == null || textValue.isEmpty())
+		{
+			queryExpression = null;
+			humanExpression = Labels.getLabel("attributeQuery.all");		
+		}
+		else
+		{
+			queryExpression = attributeDef.getName()+" "+
+					rg.getSelectedItem().getValue()+" \""+
+					textValue+"\"";
+			humanExpression = rg.getSelectedItem().getLabel()+" \""+
+					textValue+"\"";
+		}
+		w.detach();
+		bg.detach();
+		invalidate();
+		notifyParent();
+	}
+
+	private void createIntSearch(final Window w, final Div bg) {
+		Executions.createComponents("~./com/soffid/iam/web/search/int-search.zul",
+				w, new HashMap<String, String>());
+		final Radiogroup rg = ((Radiogroup) w.getFellow("rg"));
+		rg.setSelectedIndex(textOperation);
+		enableIntBoxes(rg);
+		((Textbox)w.getFellow(INT_TEXTBOXES[textOperation])).setText(textValue);
+		
+		rg.addEventListener("onCheck", new EventListener() {
+			@Override
+			public void onEvent(Event event) throws Exception {
+				Component target = event.getTarget();
+				if (target instanceof Radiogroup)
+					enableIntBoxes((Radiogroup) target);
+				else if (target instanceof Radio)
+					enableIntBoxes(((Radio) target).getRadiogroup());
+			}
+
+		});
+		for (String id: INT_TEXTBOXES)
+		{
+			w.getFellow(id).addEventListener("onOK", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					doIntSearch(w, bg, rg);
+				}
+		
+			});
+			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					textOperation = 0;
+					textValue = "";
+					queryExpression = null;
+					humanExpression = Labels.getLabel("attributeQuery.all");		
+					w.detach();
+					bg.detach();
+					invalidate();
+					notifyParent();
+				}
+		
+			});
+		}
+		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				doIntSearch(w, bg, rg);
+			}
+		});
+		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+			public void onEvent(Event event) throws Exception {
+				textOperation = 0;
+				textValue = "";
+				queryExpression = null;
+				humanExpression = Labels.getLabel("attributeQuery.all");		
+				w.detach();
+				bg.detach();
+				invalidate();
+				notifyParent();
 			}
 		});
 	}
@@ -287,6 +415,7 @@ public class AttributeSearchBox extends XulElement {
 		w.detach();
 		bg.detach();
 		invalidate();
+		notifyParent();
 	}
 
 	private void createDateSearch(final Window w, final Div bg) {
@@ -301,6 +430,21 @@ public class AttributeSearchBox extends XulElement {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					doDateSearch(w, bg);
+				}
+		
+			});
+			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					textOperation = 0;
+					since = null;
+					until = null;
+					queryExpression = null;
+					humanExpression = Labels.getLabel("attributeQuery.all");		
+					w.detach();
+					bg.detach();
+					invalidate();
+					notifyParent();
 				}
 		
 			});
@@ -320,12 +464,13 @@ public class AttributeSearchBox extends XulElement {
 				w.detach();
 				bg.detach();
 				invalidate();
+				notifyParent();
 			}
 		});
 	}
 
 	private void doSelectSearch(Window w, Div bg, Div div) {
-		selectedValues.clear();
+		selectedValues = new HashSet<String>();
 		for (Component child: (List<Component>)div.getChildren())
 		{
 			Checkbox cb = (Checkbox) child.getFirstChild();
@@ -364,6 +509,7 @@ public class AttributeSearchBox extends XulElement {
 		w.detach();
 		bg.detach();
 		invalidate();
+		notifyParent();
 	}
 
 	private void createSelectSearch(final Window w, final Div bg) {
@@ -400,6 +546,7 @@ public class AttributeSearchBox extends XulElement {
 				w.detach();
 				bg.detach();
 				invalidate();
+				notifyParent();
 			}
 		});
 	}

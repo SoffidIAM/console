@@ -221,7 +221,7 @@ public abstract class AbstractExpression implements Serializable {
 						int number = query.getNextObject();
 						obj = "o"+number;
 						query.getObjects().put(obj, ctx.hibernatePath.toString());
-						query.getJoinString().append("\njoin "+ctx.objectName+"."+part+" as "+obj);
+						query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
 					}
 					ctx.objectName = obj;
 				}
@@ -296,14 +296,14 @@ public abstract class AbstractExpression implements Serializable {
 					int number = query.getNextObject();
 					obj = "o"+number;
 					query.getObjects().put(obj, ctx.hibernatePath.toString());
-					query.getJoinString().append("\njoin "+ctx.objectName+"."+part+" as "+obj);
+					query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
 				}
 				ctx.objectName = obj+"."+attribute.getAttributeName()+"=? and "+obj+"."+attribute.getVirtualAttributeValue();
 				int i = query.getNextParameter();
 				String param  = "p"+i;
 				query.getParameters().put(param, part);
 			}
-			else if (hibernateColumn == null)
+			else if (hibernateColumn == null || hibernateColumn.isEmpty() || hibernateColumn.equals("-"))
 			{
 				ctx.objectName = null;
 				ctx.nonHQLAttributeUsed  = true;
@@ -314,12 +314,12 @@ public abstract class AbstractExpression implements Serializable {
 				ctx.currentBean = null;
 				generateHQLStringReference(query, hibernateColumn, ctx);
 				Class cl = attribute.getScimType();
-				if (cl == null)
+				if (cl == null && bean.getBeanClass() != null)
 				{
-					try 
-					{
-						cl = Class.forName(bean.getClazz()).getDeclaredField(part).getType();
-					} catch (Exception e) {
+					try {
+						cl = bean.getBeanClass().getDeclaredField(part).getType();
+					} catch (NoSuchFieldException e) {
+					} catch (SecurityException e) {
 					}
 				}
 				if (cl != null && ! isPrimitive(cl))
@@ -368,7 +368,7 @@ public abstract class AbstractExpression implements Serializable {
 		String hibernateClass = cc.getHibernateClass();
 		
 		HQLQuery query = new HQLQuery(cc);
-		query.getQueryString().append("select ")
+		query.getQueryString().append("select distinct ")
 			.append(ROOT_OBJECT_NAME)
 			.append(" from ")
 			.append(hibernateClass)

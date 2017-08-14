@@ -16,7 +16,7 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 </div>
 <c:if test="${!self.advancedMode}">
 	<ul>
-		<c:forEach var="child" items="${self.attributeSearchBoxes}">
+		<c:forEach var="child" items="${self.attributeSearchBoxesAndPopups}">
 			<li>
 			${z:redraw(child, null)}
 			</li>

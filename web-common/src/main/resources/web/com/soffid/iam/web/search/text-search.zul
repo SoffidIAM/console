@@ -3,16 +3,16 @@
 	<div>
 		<radiogroup id="rg">
 			<div style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.Contains')}" value="co"/><textbox style="margin-left: 2em" id='tb1'/>
+				<radio label="${c:l('attributeQuery.Contains')}:" value="co"/><textbox style="margin-left: 2em" id='tb1'/>
 			</div>
 			<div  style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.StartsWith')}" value="sw"/><textbox style="margin-left: 2em" id='tb2'/>
+				<radio label="${c:l('attributeQuery.StartsWith')}:" value="sw"/><textbox style="margin-left: 2em" id='tb2'/>
 			</div>
 			<div style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.EndsWith')}" value="ew"/><textbox  style="margin-left: 2em"  id='tb3'/>
+				<radio label="${c:l('attributeQuery.EndsWith')}:" value="ew"/><textbox  style="margin-left: 2em"  id='tb3'/>
 			</div>
 			<div style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.Equals')}" value="eq"/><textbox style="margin-left: 2em"  id='tb4'/>
+				<radio label="${c:l('attributeQuery.Equals')}:" value="eq"/><textbox style="margin-left: 2em"  id='tb4'/>
 			</div>
 		</radiogroup>
 	</div>

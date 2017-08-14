@@ -80,7 +80,8 @@ public class JobExecutor {
 			Thread thread = (Thread) iter.next();
 			thread.join();
 		}
-		lockMonitorThread.join();
+		if (lockMonitorThread != null)
+			lockMonitorThread.join();
 	}
 
 	protected synchronized void startThread() {

@@ -52,14 +52,15 @@ public class IndexerThread extends NotLoggedThread {
 			try
 			{
 				jobExecutor = EJBLocator.getBpmJobExecutor();
+				try {
+					jobExecutor.indexPendingProcesses();
+				} catch (Exception e) {
+					if (!finish)
+						logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$
+				}
 			} catch (Exception e) {
-				logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$
-				return;
-			}
-			try {
-				jobExecutor.indexPendingProcesses();
-			} catch (Exception e) {
-				logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$
+				if (!finish)
+					logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$
 			}
 			if (!finish) {
 				try {

@@ -1404,7 +1404,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			llistaCorreuUsuari.setMailListName(alies);
 			llistaCorreuUsuari.setUserCode(codiUsuari);
 			getMailListsService().create(llistaCorreuUsuari);
-		}
+		} else {
+            throw new InternalErrorException(String.format("%s is not a valid email address", aliesDeCorreu));
+        }
 	}
 
 	private boolean aliesIguals(String aliesDeCorreuNou,

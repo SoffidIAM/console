@@ -2,6 +2,8 @@ package es.caib.bpm.business;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,12 +37,22 @@ import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.Comment;
 import es.caib.bpm.vo.ConfigParameterVO;
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.utils.Security;
 
 public class VOFactory {
 	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
 		Comment c = new Comment();
-		c.setActor(instance.getActorId());
+		String actorId = instance.getActorId();
+		Security.nestedLogin(Security.getCurrentAccount(), new String[] {Security.AUTO_USER_QUERY+Security.AUTO_ALL});
+		try {
+			actorId = actorId+" "+ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(actorId).getFullName();
+		} catch (Exception e) {
+		} finally {
+			Security.nestedLogoff();
+		}
+		c.setActor(actorId);
 		c.setMessage(instance.getMessage());
 		c.setTime(instance.getTime());
 		return c;
@@ -153,15 +165,13 @@ public class VOFactory {
 		} finally {
 			Thread.currentThread().setContextClassLoader(oldcl);
 		}
-		Vector comments = new Vector();
-		if (instance.getRootToken() != null &&
-				instance.getRootToken().getComments() != null)
-		{
-			for (Iterator it = instance.getRootToken().getComments().iterator(); it
-					.hasNext();) {
-				comments.add(newComment((org.jbpm.graph.exe.Comment) it.next()));
+		Vector<Comment> comments = new Vector<Comment>();
+		populateTokenComments(instance.getRootToken(), comments);
+		Collections.sort(comments, new Comparator<Comment>() {
+			public int compare(Comment o1, Comment o2) {
+				return o1.getTime().compareTo(o2.getTime());
 			}
-		}
+		});
 		process.setComments(comments);
 		Token t = instance.getRootToken();
 		Node n = t.getNode();
@@ -182,6 +192,23 @@ public class VOFactory {
 		}
 
 		return process;
+	}
+
+	private static void populateTokenComments(Token token, Vector<Comment> comments) {
+		if (token != null && token.getComments() != null)
+		{
+			for (Iterator it = token.getComments().iterator(); it
+					.hasNext();) {
+				comments.add(newComment((org.jbpm.graph.exe.Comment) it.next()));
+			}
+		}
+		if (token != null && token.getChildren() != null)
+		{
+			for (Token child: token.getChildren().values())
+			{
+				populateTokenComments(child, comments);
+			}
+		}
 	}
 
 	public static es.caib.bpm.vo.ProcessDefinition newProcessDefinition(

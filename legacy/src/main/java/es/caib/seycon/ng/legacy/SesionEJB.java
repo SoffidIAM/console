@@ -85,6 +85,7 @@ import es.caib.loginModule.client.SessionIdentifier;
 import es.caib.loginModule.client.SeyconPrincipal;
 import es.caib.loginModule.jmx.SesionData;
 import es.caib.loginModule.jmx.SeyconRealmServerMBean;
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.RegistreAcces;
@@ -950,25 +951,38 @@ public class SesionEJB implements EntityBean {
                 throw generateAuthenticationException(usuario,
                         AuthenticationFailureException.WRONG_PASSWORD);
 
-            SeyconPrincipal principal;
-            principal = createIdentity(usuario);
-            if (principal == null)
-                throw generateAuthenticationException(usuario,
-                        AuthenticationFailureException.WRONG_PASSWORD);
-
-            // Validamos credenciales
-            if (validarCredenciales(principal, password)) {
-                if (log.isDebugEnabled())
-                    log.debug(Messages.getString("SesionEJB.AccessOK")); //$NON-NLS-1$
+        	String samlPrincipal = 
+        			ServiceLocator.instance().getSamlService().checkAuthenticationToken(new String [] {usuario, password});
+        	if (samlPrincipal != null)
+        	{
+	            SeyconPrincipal principal;
+	            principal = createIdentity(samlPrincipal);
                 generarClaveSesion();
                 logAutenticacion(ConstantesAutenticacion.AUTH_USUARIO, principal.getIntranetUser(),
                         principal.getIntranetUser(), ConstantesAutenticacion.OK, null);
                 return sesionInfo.getClaveSesion();
+        	} else {
 
-            } else {
-                throw generateAuthenticationException(usuario,
-                        AuthenticationFailureException.WRONG_PASSWORD);
-            }
+	            SeyconPrincipal principal;
+	            principal = createIdentity(usuario);
+	            if (principal == null)
+	                throw generateAuthenticationException(usuario,
+	                        AuthenticationFailureException.WRONG_PASSWORD);
+	
+	            // Validamos credenciales
+	            if (validarCredenciales(principal, password)) {
+	                if (log.isDebugEnabled())
+	                    log.debug(Messages.getString("SesionEJB.AccessOK")); //$NON-NLS-1$
+	                generarClaveSesion();
+	                logAutenticacion(ConstantesAutenticacion.AUTH_USUARIO, principal.getIntranetUser(),
+	                        principal.getIntranetUser(), ConstantesAutenticacion.OK, null);
+	                return sesionInfo.getClaveSesion();
+	
+	            } else {
+	                throw generateAuthenticationException(usuario,
+	                        AuthenticationFailureException.WRONG_PASSWORD);
+	            }
+        	}
         } catch (NamingException e) {
             throw generateAuthenticationException(usuario, e);
         } catch (InternalErrorException e) {

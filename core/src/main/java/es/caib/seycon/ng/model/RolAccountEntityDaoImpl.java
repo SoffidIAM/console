@@ -217,36 +217,39 @@ public class RolAccountEntityDaoImpl extends es.caib.seycon.ng.model.RolAccountE
     }
 
     private void generateTasks(RolAccountEntity grant) throws InternalErrorException {
-		TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
-		tasque.setData(new Timestamp(System.currentTimeMillis()));
-		tasque.setTransa(TaskHandler.UPDATE_ROLE);
-		tasque.setRole(grant.getRol().getNom());
-		tasque.setBd(grant.getRol().getBaseDeDades().getCodi());
-		getTasqueEntityDao().create(tasque);
-		
-        if (grant.getAccount().getType().equals (AccountType.USER))
-        {
-        	for (UserAccountEntity ua: grant.getAccount().getUsers())
-        	{
+    	if (! grant.getAccount().getType().equals(AccountType.IGNORED))
+    	{
+			TasqueEntity tasque = getTasqueEntityDao().newTasqueEntity();
+			tasque.setData(new Timestamp(System.currentTimeMillis()));
+			tasque.setTransa(TaskHandler.UPDATE_ROLE);
+			tasque.setRole(grant.getRol().getNom());
+			tasque.setBd(grant.getRol().getBaseDeDades().getCodi());
+			getTasqueEntityDao().create(tasque);
+			
+	        if (grant.getAccount().getType().equals (AccountType.USER))
+	        {
+	        	for (UserAccountEntity ua: grant.getAccount().getUsers())
+	        	{
+			        tasque = getTasqueEntityDao().newTasqueEntity();
+			        tasque.setData(new Timestamp(System.currentTimeMillis()));
+			        tasque.setTransa(TaskHandler.UPDATE_USER);
+			        tasque.setUsuari(ua.getUser().getCodi());
+			        getTasqueEntityDao().create(tasque);
+	        	}
+	        }
+	        else
+	        { 
 		        tasque = getTasqueEntityDao().newTasqueEntity();
 		        tasque.setData(new Timestamp(System.currentTimeMillis()));
-		        tasque.setTransa(TaskHandler.UPDATE_USER);
-		        tasque.setUsuari(ua.getUser().getCodi());
+		        tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
+		        tasque.setCoddis(grant.getAccount().getDispatcher().getCodi());
+		        tasque.setBd(grant.getAccount().getDispatcher().getCodi());
+		        tasque.setUsuari(grant.getAccount().getName());
 		        getTasqueEntityDao().create(tasque);
-        	}
-        }
-        else
-        { 
-	        tasque = getTasqueEntityDao().newTasqueEntity();
-	        tasque.setData(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransa(TaskHandler.UPDATE_ACCOUNT);
-	        tasque.setCoddis(grant.getAccount().getDispatcher().getCodi());
-	        tasque.setBd(grant.getAccount().getDispatcher().getCodi());
-	        tasque.setUsuari(grant.getAccount().getName());
-	        getTasqueEntityDao().create(tasque);
-        }
-
-		getRolEntityDao().updateMailLists(grant.getRol());
+	        }
+	
+			getRolEntityDao().updateMailLists(grant.getRol());
+    	}
 
     }
 

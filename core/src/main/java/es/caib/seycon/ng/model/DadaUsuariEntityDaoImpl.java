@@ -16,6 +16,7 @@ import java.util.Iterator;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountAttributeEntity;
 
 import es.caib.seycon.ng.PrincipalStore;
@@ -40,38 +41,10 @@ public class DadaUsuariEntityDaoImpl
 	 */
 	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
 
-	private void assertPhoneExists ()
-	{
-        org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                        .createQuery("select max (tda.ordre) from es.caib.seycon.ng.model.TipusDadaEntity as tda"); //$NON-NLS-1$
-        java.util.List results = queryObject.list();
-       
-		
-        Long nou = new Long(2);
-        if (!results.isEmpty())
-        {
-        	Long last =  (Long) results.get(0);
-        	if (last != null && last.longValue() >= 2)
-        		nou = new Long(last.longValue()+1);
-        }
-		//Trobar el major ordre existent
-        TipusDadaEntity tda = getTipusDadaEntityDao().findTipusDadaByCodi("PHONE"); //$NON-NLS-1$
-    	if (tda == null)
-    	{
-    		tda = getTipusDadaEntityDao().newTipusDadaEntity();
-    		tda.setCodi("PHONE"); //$NON-NLS-1$
-    		tda.setOrdre(nou);
-
-    		getTipusDadaEntityDao().create(tda);
-    	}
-	}
-	
 	public void create(
 			es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari)
 			throws RuntimeException {
 		try {
-			assertPhoneExists();
-			
 	    	if (dadaUsuari.getTipusDada().getUnique() != null &&
 	    			dadaUsuari.getTipusDada().getUnique().booleanValue() )
 	    	{
@@ -99,8 +72,6 @@ public class DadaUsuariEntityDaoImpl
 	
 	public void update(DadaUsuariEntity dadaUsuariEntity) {
 		try {
-			assertPhoneExists();
-			
 	    	if (dadaUsuariEntity.getTipusDada().getUnique() != null &&
 	    			dadaUsuariEntity.getTipusDada().getUnique().booleanValue() )
 	    	{
@@ -206,7 +177,6 @@ public class DadaUsuariEntityDaoImpl
             es.caib.seycon.ng.comu.DadaUsuari sourceVO,
             es.caib.seycon.ng.model.DadaUsuariEntity targetEntity)
         {    	
-    		assertPhoneExists();
             UsuariEntity usuariEntity = getUsuariEntityDao().findByCodi(sourceVO.getCodiUsuari());
             if(usuariEntity == null){
             	throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.3"), sourceVO.getCodiUsuari()));  //$NON-NLS-1$

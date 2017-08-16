@@ -769,6 +769,7 @@ public class InternalPasswordServiceImpl extends
                         .getActiu().equals("E"))) { //$NON-NLS-1$
             if (digest.equals(contra.getContrasenya())) {
                 if (new Date().before(contra.getDataCaducitat())) {
+                	updateAccountLastLogin(user, passwordDomain);
                     return PasswordValidation.PASSWORD_GOOD;
                 } else if (checkExpired) {
                     return PasswordValidation.PASSWORD_GOOD_EXPIRED;
@@ -793,6 +794,8 @@ public class InternalPasswordServiceImpl extends
 	                    th.wait(timeToWait);
 	                }
 	            }
+	            if (th.isValidated())
+                	updateAccountLastLogin(user, passwordDomain);
 	            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
                     : PasswordValidation.PASSWORD_WRONG;
         	}
@@ -810,7 +813,10 @@ public class InternalPasswordServiceImpl extends
 				{
 					PasswordValidation status = validatePasswordOnServer(ae, password);
 					if (status.equals (PasswordValidation.PASSWORD_GOOD))
+					{
+	                	updateAccountLastLogin(user, passwordDomain);
 						return status;
+					}
 				}
 			}
 		}
@@ -818,7 +824,20 @@ public class InternalPasswordServiceImpl extends
         return PasswordValidation.PASSWORD_WRONG;
     }
 
-    /**
+    private void updateAccountLastLogin(UsuariEntity user, DominiContrasenyaEntity passwordDomain) {
+    	for (UserAccountEntity uac: user.getAccounts())
+    	{
+    		DispatcherEntity dispatcher = uac.getAccount().getDispatcher();
+			if (dispatcher.isMainDispatcher() &&
+    				dispatcher.getDomini() == passwordDomain)
+    		{
+    			uac.getAccount().setLastLogin(new Date());
+    			getAccountEntityDao().update(uac.getAccount());
+    		}
+    	}
+	}
+
+	/**
      * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPin(es.caib.seycon.ng.model.UsuariEntity,
      *      java.lang.String)
      */
@@ -1204,6 +1223,7 @@ public class InternalPasswordServiceImpl extends
 	                        .getActive().equals("E"))) { //$NON-NLS-1$
 	            if (digest.equals(contra.getPassword())) {
 	                if (new Date().before(contra.getExpirationDate())) {
+	                	updateLastLogin(account);
 	                    return PasswordValidation.PASSWORD_GOOD;
 	                } else if (checkExpired) {
 	                    return PasswordValidation.PASSWORD_GOOD_EXPIRED;
@@ -1227,6 +1247,9 @@ public class InternalPasswordServiceImpl extends
 		                    th.wait(timeToWait);
 		                }
 		            }
+		            if (th.isValidated())
+	                	updateLastLogin(account);
+
 		            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
 	                    : PasswordValidation.PASSWORD_WRONG;
 	        	}
@@ -1241,6 +1264,14 @@ public class InternalPasswordServiceImpl extends
 	        }
 	
 	        return PasswordValidation.PASSWORD_WRONG;
+		}
+	}
+
+	private void updateLastLogin(AccountEntity account) {
+		if (account.getDispatcher().isMainDispatcher())
+		{
+			account.setLastLogin(new Date());
+			getAccountEntityDao().update(account);
 		}
 	}
 

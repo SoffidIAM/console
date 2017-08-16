@@ -29,6 +29,27 @@
 		<servlet-name>dspLoader</servlet-name>
 		<url-pattern>*.dsp</url-pattern>
 	</servlet-mapping>
+	
+	<!--  SAML Login -->
+	<servlet>
+		<description>
+			<![CDATA[SAML service provider endpoint]]>
+		</description>
+		<servlet-name>samlServlet</servlet-name>
+		<servlet-class>
+			com.soffid.web.saml.SAMLLoginRequester
+		</servlet-class>
+	</servlet>
+		
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml/*</url-pattern>
+	</servlet-mapping>
 
 	<!-- Servlet d'execucions punt d'entrada -->
 	<servlet>
@@ -411,6 +432,8 @@
 			<url-pattern>/zkau/web/*</url-pattern>
 			<url-pattern>/zkau</url-pattern>
 			<url-pattern>/anonymous/*</url-pattern>
+			<url-pattern>/saml</url-pattern>
+			<url-pattern>/saml/*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>	
 

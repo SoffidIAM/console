@@ -123,7 +123,6 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
 				{
 					fetchFromCache(target, entry);
-					log.info("Get from cache: "+ (System.currentTimeMillis() - start));
 					return ;
 				}
 			}
@@ -224,13 +223,11 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			}
 			
 
-			log.info("Get from db: "+ (System.currentTimeMillis() - start));
 			start = System.currentTimeMillis();
 			if ( ! Security.isDisableAllSecurityForEver())
 			{
 				storeCacheEntry(source, target);
 			}
-			log.info("Store in cache: "+ (System.currentTimeMillis() - start));
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}

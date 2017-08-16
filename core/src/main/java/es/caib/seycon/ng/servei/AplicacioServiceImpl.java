@@ -1080,7 +1080,7 @@ public class AplicacioServiceImpl extends
 		       			}
 		       		}
 		       	}
-		       	if (first)
+		       	if (first && ! account.getType().equals(AccountType.IGNORED))
 		       		getAccountEntityDao().propagateChanges(account);
 		    }
 		    
@@ -1228,7 +1228,11 @@ public class AplicacioServiceImpl extends
         if (getAutoritzacioService().hasPermission(Security.AUTO_USER_ROLE_DELETE,  rolsUsuarisEntity)) {
 
         	if (rolsUsuarisEntity.getRule() != null)
-                throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
+        	{
+        		if (Security.isDisableAllSecurityForEver()) // SYNC SERVER
+            		return;
+        		throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
+        	}
             // Disable assigning roles to himself
         	UsuariEntity user = null;
             for (UserAccountEntity ua: rolsUsuarisEntity.getAccount().getUsers())

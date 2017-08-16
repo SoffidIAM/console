@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.hibernate.Query;
+
 import es.caib.seycon.ng.sync.engine.TaskHandler;
 
 /**
@@ -17,6 +19,9 @@ import es.caib.seycon.ng.sync.engine.TaskHandler;
 public class TasqueEntityDaoImpl extends es.caib.seycon.ng.model.TasqueEntityDaoBase {
     @Override
     public void create(TasqueEntity tasqueEntity) {
+    	if (checkDuplicate(tasqueEntity))
+    		return;
+    	
         if (tasqueEntity.getStatus() == null)
             tasqueEntity.setStatus("P"); //$NON-NLS-1$
         if (tasqueEntity.getPrioritat() == null)
@@ -51,7 +56,50 @@ public class TasqueEntityDaoImpl extends es.caib.seycon.ng.model.TasqueEntityDao
         super.create(tasqueEntity);
     }
 
-    /**
+    private boolean checkDuplicate(TasqueEntity tasqueEntity) {
+    	if (tasqueEntity.getTransa().equals( TaskHandler.UPDATE_USER))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from es.caib.seycon.ng.model.TasqueEntity as t "
+    				+ "where t.server is null and t.coddis is null and t.transa=? and t.usuari=?" );
+    		q.setString(0, tasqueEntity.getTransa());
+    		q.setString(1, tasqueEntity.getUsuari());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransa().equals( TaskHandler.UPDATE_GROUP))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from es.caib.seycon.ng.model.TasqueEntity as t "
+    				+ "where t.server is null and t.coddis is null and t.transa=? and t.grup=?" );
+    		q.setString(0, tasqueEntity.getTransa());
+    		q.setString(1, tasqueEntity.getGrup());
+//    		q.setString(2, tasqueEntity.getBd());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransa().equals( TaskHandler.UPDATE_ROLE))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from es.caib.seycon.ng.model.TasqueEntity as t "
+    				+ "where t.server is null and t.coddis is null and t.transa=? and t.role=? and t.bd=?" );
+    		q.setString(0, tasqueEntity.getTransa());
+    		q.setString(1, tasqueEntity.getRole());
+    		q.setString(2, tasqueEntity.getBd());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransa().equals( TaskHandler.UPDATE_ACCOUNT))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from es.caib.seycon.ng.model.TasqueEntity as t "
+    				+ "where t.server is null and t.transa=? and t.usuari=? and t.coddis=?" );
+    		q.setString(0, tasqueEntity.getTransa());
+    		q.setString(1, tasqueEntity.getUsuari());
+    		q.setString(2, tasqueEntity.getCoddis());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+		return false;
+	}
+
+	/**
      * @see es.caib.seycon.ng.model.TasqueEntityDao#toTasca(es.caib.seycon.ng.model.TasqueEntity,
      *      es.caib.seycon.ng.comu.Tasca)
      */

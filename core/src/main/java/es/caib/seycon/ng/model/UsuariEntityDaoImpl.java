@@ -187,7 +187,7 @@ public class UsuariEntityDaoImpl extends es.caib.seycon.ng.model.UsuariEntityDao
 
     public void update(es.caib.seycon.ng.model.UsuariEntity usuari) throws RuntimeException {
         try {
-            UsuariEntity actualUsuari = load (usuari.getId());
+    		super.update(usuari);
 
             auditarUsuari("U", usuari.getCodi(), usuari.getGrupPrimari()); //$NON-NLS-1$
 

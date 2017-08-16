@@ -1177,6 +1177,16 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 			tdSvc.create(td);
 		}
 
+		td = tdSvc.findTipusDadaByCodi("PHONE"); //$NON-NLS-1$
+		if (td == null)
+		{
+			td = new TipusDada();
+			td.setCodi("PHONE"); //$NON-NLS-1$
+			td.setOrdre(new Long(2));
+			td.setScope(MetadataScope.USER);
+			tdSvc.create(td);
+		}
+
 		Usuari usu = usuariSvc.findUsuariByCodiUsuari("admin"); //$NON-NLS-1$
 		if (usu == null)
 		{

@@ -1935,6 +1935,8 @@
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@lastUpdated")));
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																XPathUtils.concat(prefix, "/@lastLogin")));
+														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@lastPasswordSet")));
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@passwordExpiration")));
@@ -1962,6 +1964,7 @@
 												label="${c:l('usuaris.zul.Dominidecontrasenyes')}" />
 											<treecol label="${c:l('usuaris.zul.Account')}" />
 											<treecol label="${c:l('usuaris.zul.DataUpdate')}" />
+											<treecol label="${c:l('accounts.lastLogin')}" />
 											<treecol label="${c:l('usuaris.zul.DataAssignacia')}"
 												width="110px" />
 											<treecol label="${c:l('usuaris.zul.DataCaducitat')}"
@@ -2001,6 +2004,11 @@
 												</treecell>
 												<treecell>
 													<datebox bind="@lastUpdated" buttonVisible="false"
+														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+														sclass="dateboxreadnoborder" width="100%" />
+												</treecell>
+												<treecell>
+													<datebox bind="@lastLogin" buttonVisible="false"
 														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
 														sclass="dateboxreadnoborder" width="100%" />
 												</treecell>

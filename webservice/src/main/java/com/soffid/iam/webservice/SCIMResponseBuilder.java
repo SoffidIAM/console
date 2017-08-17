@@ -5,8 +5,6 @@ import java.net.URI;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.soffid.iam.webservice.user.ExtendedUser;
-
 public class SCIMResponseBuilder
 {
 	/**
@@ -33,14 +31,14 @@ public class SCIMResponseBuilder
 	/**
 	 * Normal response with HTTP 200 and the JSON with data
 	 */
-	public static Response responseOk(ExtendedUser user) {
-		return Response.ok().entity(user).build();
+	public static Response responseOk(Object obj) {
+		return Response.ok().entity(obj).build();
 	}
 	
 	/**
 	 * Normal response with HTTP 200 and URI and the JSON with data
 	 */
-	public static Response responseOk(ExtendedUser user, URI uri) {
-		return Response.created(uri).entity(user).build();
+	public static Response responseOk(Object obj, URI uri) {
+		return Response.created(uri).entity(obj).build();
 	}
 }

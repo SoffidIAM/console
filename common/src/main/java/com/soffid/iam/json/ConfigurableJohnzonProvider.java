@@ -27,6 +27,8 @@ import org.apache.johnzon.mapper.MapperBuilder;
 import org.apache.johnzon.mapper.access.AccessMode;
 import org.apache.johnzon.mapper.internal.ConverterAdapter;
 
+import es.caib.seycon.ng.comu.AccountType;
+
 @Provider
 @Produces({"application/scim+json","application/json"})
 @Consumes({"application/scim+json","application/json"})
@@ -35,6 +37,7 @@ public class ConfigurableJohnzonProvider<T> implements MessageBodyWriter<T>, Mes
 		super();
 		builder.addAdapter(Calendar.class, String.class, new ConverterAdapter<Calendar>(new CalendarConverter()));
 		builder.addAdapter(Date.class, String.class, new ConverterAdapter<Date>(new DateConverter()));
+		builder.addAdapter(AccountType.class, String.class, new ConverterAdapter<AccountType>(new AccountTypeConverter()));
 	}
 
 	// build/configuration

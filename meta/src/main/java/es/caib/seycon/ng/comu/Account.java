@@ -7,8 +7,15 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonObject;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.ValueObject;
 
+import es.caib.seycon.ng.model.AccountEntity;
+
+@JsonObject (hibernateClass=AccountEntity.class)
 @ValueObject ( translatedName="Account",
 	 translatedPackage="com.soffid.iam.api")
 public class Account {

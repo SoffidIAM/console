@@ -251,33 +251,35 @@ public class AccountSvc {
 	    		}
     		}
     	}
-		for ( RoleDomain ua2: src.getRoles())
-    	{
-    		boolean found = false;
-        	for (RoleAccount ua: accounts)
-    		{
-    			Role role = appSvc.findRoleByNameAndSystem(ua.getRoleName(), ua.getSystem());
-    			if (ua2.getRole() == role.getId().longValue())
-    			{
-    				if (ua2.getDomainValue() == null || ua2.getDomainValue().trim().isEmpty() ?
-    						ua.getDomainValue().getValue() == null :
-    						ua2.getDomainValue().equals(ua.getDomainValue().getValue()))
-    				{
-	    				found = true;
-	    				break;
-    				}
-    			}
-    		}
-    		if (!found)
-    		{
-    			Role role = appSvc.findRoleById(ua2.getRole());
-    			RoleAccount ra = new RoleAccount();
-    			ra.setAccountName(target.getName());
-    			ra.setSystem(target.getSystem());
-    			ra.setRoleName(role.getName());
-    			ra.setInformationSystemName(role.getInformationSystemName());
-    			ra.setAccountSystem(target.getSystem());
-    		}
+    	if (null != src.getRoles()) {
+    		for ( RoleDomain ua2: src.getRoles())
+	    	{
+	    		boolean found = false;
+	        	for (RoleAccount ua: accounts)
+	    		{
+	    			Role role = appSvc.findRoleByNameAndSystem(ua.getRoleName(), ua.getSystem());
+	    			if (ua2.getRole() == role.getId().longValue())
+	    			{
+	    				if (ua2.getDomainValue() == null || ua2.getDomainValue().trim().isEmpty() ?
+	    						ua.getDomainValue().getValue() == null :
+	    						ua2.getDomainValue().equals(ua.getDomainValue().getValue()))
+	    				{
+		    				found = true;
+		    				break;
+	    				}
+	    			}
+	    		}
+	    		if (!found)
+	    		{
+	    			Role role = appSvc.findRoleById(ua2.getRole());
+	    			RoleAccount ra = new RoleAccount();
+	    			ra.setAccountName(target.getName());
+	    			ra.setSystem(target.getSystem());
+	    			ra.setRoleName(role.getName());
+	    			ra.setInformationSystemName(role.getInformationSystemName());
+	    			ra.setAccountSystem(target.getSystem());
+	    		}
+	    	}
     	}
     }
 }

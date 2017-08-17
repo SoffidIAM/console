@@ -3,7 +3,6 @@ package com.soffid.iam.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -34,7 +33,6 @@ import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.json.JSONException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -100,9 +98,6 @@ import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
-import com.soffid.scimquery.conf.AttributeConfig;
-import com.soffid.scimquery.conf.ClassConfig;
-import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
@@ -2998,12 +2993,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected Collection<User> handleFindUserByJsonQuery(String query)
-			throws Exception {
-		
-		
-		ClassConfig config = getJsonConfiguration();
-
+	protected Collection<User> handleFindUserByJsonQuery(String query) throws Exception {
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);
 		String qs = hql.getWhereString().toString();
@@ -3011,7 +3001,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			qs = "o.tenant.id = :tenantId";
 		else
 			qs = "("+qs+") and o.tenant.id = :tenantId";
-		
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();
 		Parameter paramArray[] = new Parameter[params.size()+1];
@@ -3030,40 +3019,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 			}
 		}
-
 		return result;
-	}
-
-	private ClassConfig getJsonConfiguration()
-			throws UnsupportedEncodingException, JSONException, ClassNotFoundException 
-	{
-		ClassConfig cc = Configuration
-				.getClassConfig(UserDataEntity.class);
-		
-/*		for (MetaDataEntity att: getMetaDataEntityDao().findByScope(MetadataScope.USER))
-		{
-			if (att.getType().equals(TypeEnumeration.DATE_TYPE))
-			{
-				AttributeConfig attributeConfig = new AttributeConfig();
-				attributeConfig.setVirtualAttribute(true);
-				attributeConfig.setVirtualAttributeValue("dateValue");
-				attributeConfig.setVirtualAttributeName("attribute.name");
-				attributeConfig.setAttributeName(att.getName());
-				cc.getAttributes().put(att.getName(), attributeConfig );
-			}
-		}
-*/
-		if (cc == null)
-		{
-			cc = new ClassConfig();
-			AttributeConfig attributeConfig = new AttributeConfig();
-			attributeConfig.setVirtualAttribute(true);
-			attributeConfig.setVirtualAttributeValue("value");
-			attributeConfig.setVirtualAttributeName("attribute.name");
-			cc.setDefaultVirtualAttribute(attributeConfig);
-			Configuration.registerClass(cc);
-		}
-
-		return Configuration.getClassConfig(com.soffid.iam.api.User.class);
 	}
 }

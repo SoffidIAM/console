@@ -178,6 +178,7 @@ public class AccountSvc {
 	    	account.setSystem(extendedAccount.getSystem());
 	    	account.setVaultFolder(extendedAccount.getVaultFolder());
 	    	account.setVaultFolderId(extendedAccount.getVaultFolderId());
+	    	account.setType(extendedAccount.getType());
 	    	
 	    	account = svc.updateAccount(account);
 	    	updateRoles(extendedAccount, account);
@@ -220,6 +221,7 @@ public class AccountSvc {
 	    	if (extendedAccount.getSystem() != null) account.setSystem(extendedAccount.getSystem());
 	    	if (extendedAccount.getVaultFolder() != null) account.setVaultFolder(extendedAccount.getVaultFolder());
 	    	if (extendedAccount.getVaultFolderId() != null) account.setVaultFolderId(extendedAccount.getVaultFolderId());
+	    	if (extendedAccount.getType() != null) account.setType(extendedAccount.getType());
 	    	
 	    	account = svc.updateAccount(account);
 	    	updateRoles(extendedAccount, account);

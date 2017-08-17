@@ -174,8 +174,12 @@ public class UserSvc {
         User user2;
 		try {
 			user2 = svc.findUserByUserId(id);
-	    	if (user2 == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
-	    	
+	    	if (user2 == null)
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (null != user.getId() && id != user.getId())
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
+	    				String.format(Messages.getString("UserSvc.userNotEquals"), id, user.getId()));
+
 	    	user2.setActive(user.getActive());
 	    	user2.setComments(user.getComments());
 	    	user2.setConsoleProperties(user.getConsoleProperties());
@@ -223,7 +227,11 @@ public class UserSvc {
         User user2;
 		try {
 			user2 = svc.findUserByUserId(id);
-	    	if (user2 == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (user2 == null)
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (null != user.getId() && id != user.getId())
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
+	    				String.format(Messages.getString("UserSvc.userNotEquals"), id, user.getId()));
 
 	    	if (user.getActive() != null) user2.setActive(user.getActive());
 	    	if (user.getComments() !=null) user2.setComments(user.getComments());
@@ -233,7 +241,6 @@ public class UserSvc {
 	    	if (user.getFirstName () !=null) user2.setFirstName(user.getFirstName());
 	    	if (user.getFullName () !=null) user2.setFullName(user.getFullName());
 	    	if (user.getHomeServer () !=null) user2.setHomeServer(user.getHomeServer());
-	    	if (user.getId () !=null) user2.setId( user.getId() );
 	    	if (user.getLastName () !=null) user2.setLastName(user.getLastName());
 	    	if (user.getMailAlias () !=null) user2.setMailAlias(user.getMailAlias());
 	    	if (user.getMailDomain () !=null) user2.setMailDomain(user.getMailDomain());

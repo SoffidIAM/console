@@ -137,7 +137,7 @@ public class AccountSvc {
 	    		svc.removeAccount(user);
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NO_CONTENT);
 	    	} else {
-	    		String message = String.format(Messages.getString("AccountSvc.userNotFound"), id); //$NON-NLS-1$
+	    		String message = String.format(Messages.getString("AccountSvc.accountNotFound"), id); //$NON-NLS-1$
 	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
 	    	}
 		} catch (InternalErrorException e) {
@@ -151,9 +151,13 @@ public class AccountSvc {
         Account account;
 		try {
 			account = svc.findAccountById(id);
-	    	if (extendedAccount == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (account == null)
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (id != extendedAccount.getId())
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
+	    				String.format(Messages.getString("AccountSvc.accountNotEquals"), id, extendedAccount.getId()));
 	    	
-	    	account.setAccessLevel(extendedAccount.getAccessLevel() );
+	    	account.setAccessLevel(extendedAccount.getAccessLevel());
 	    	account.setAttributes(extendedAccount.getAttributes());
 	    	account.setDescription(extendedAccount.getDescription());
 	    	account.setDisabled(extendedAccount.isDisabled());
@@ -190,7 +194,11 @@ public class AccountSvc {
         Account account;
 		try {
 			account = svc.findAccountById(id);
-	    	if (extendedAccount == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (account == null)
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	if (null != extendedAccount.getId() && id != extendedAccount.getId())
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
+	    				String.format(Messages.getString("AccountSvc.accountNotEquals"), id, extendedAccount.getId()));
 	    	
 	    	if (extendedAccount.getAccessLevel() != null) account.setAccessLevel(extendedAccount.getAccessLevel() );
 	    	if (extendedAccount.getAttributes() != null) account.setAttributes(extendedAccount.getAttributes());
@@ -199,7 +207,6 @@ public class AccountSvc {
 	    	if (extendedAccount.getGrantedGroups() != null) account.setGrantedGroups(extendedAccount.getGrantedGroups());
 	    	if (extendedAccount.getGrantedRoles() != null) account.setGrantedRoles(extendedAccount.getGrantedRoles());
 	    	if (extendedAccount.getGrantedRoles() != null) account.setGrantedUsers(extendedAccount.getGrantedUsers());
-	    	if (extendedAccount.getId() != null) account.setId(extendedAccount.getId());
 	    	if (extendedAccount.isInheritNewPermissions() != account.isInheritNewPermissions()) account.setInheritNewPermissions(extendedAccount.isInheritNewPermissions());
 	    	if (extendedAccount.getLoginUrl() != null) account.setLoginUrl(extendedAccount.getLoginUrl());
 	    	if (extendedAccount.getManagerGroups() != null) account.setManagerGroups(extendedAccount.getManagerGroups());

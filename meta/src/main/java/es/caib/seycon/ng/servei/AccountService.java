@@ -7,12 +7,17 @@
 package es.caib.seycon.ng.servei;
 import java.util.List;
 
-import com.soffid.iam.api.VaultFolder;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.VaultService;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Account;
@@ -20,9 +25,6 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Usuari;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import roles.account_attribute_query;
 import roles.account_attribute_update;
 import roles.account_query;
@@ -463,7 +465,7 @@ public abstract class AccountService {
 	@Operation(grantees = { account_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByJsonQuery(
-			String query)
+			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

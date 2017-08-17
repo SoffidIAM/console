@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -36,8 +37,9 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
-@Path("/scim/account")
-@Produces({"text/xml", "application/json"})
+@Path("/scim/Account")
+@Produces({"application/scim+json","application/json"})
+@Consumes({"application/scim+json","application/json"})
 public class AccountSvc {
 	@EJB UserService userSvc;
 	
@@ -49,10 +51,10 @@ public class AccountSvc {
 
 	@Path("")
     @GET
-    public AccountQuery list(@QueryParam("query") @DefaultValue("") String query,
+    public AccountQuery list(@QueryParam("filter") @DefaultValue("") String query,
     		@QueryParam("attributes") String atts) throws InternalErrorException {
         AccountQuery uq = new AccountQuery();
-        uq.setResources (toExtendedAccountList (svc.findAccountByJsonQuery(query)));
+        uq.setResources(toExtendedAccountList(svc.findAccountByJsonQuery(query)));
         uq.setTotalResults( uq.getResources().size() );
         return uq;
     }
@@ -73,12 +75,19 @@ public class AccountSvc {
 		for (RoleAccount data: appSvc.findRoleAccountByAccount(acc.getId()))
 		{
 			RoleDomain perm = new RoleDomain();
-			perm.setDomainValue(data.getDomainValue().getValue());
+			if (data.getDomainValue() != null)
+				perm.setDomainValue(data.getDomainValue().getValue());
 			Role r = appSvc.findRoleByNameAndSystem(data.getRoleName(), data.getSystem());
 			perm.setRole(r.getId());
 			perms.add(perm);
 		}
 		eacc.setRoles(perms);
+
+		ScimMeta meta = eacc.getMeta();
+		meta.setLocation(getClass(), acc.getId().toString());
+		meta.setResourceType("Account"); //$NON-NLS-1$
+		eacc.setMeta(meta);
+
 		return eacc;
 	}
 
@@ -89,17 +98,13 @@ public class AccountSvc {
 			Account newAccount = svc.createAccount(account);
 	    	if (newAccount != null)
 	    	{
-	    		ExtendedAccount a = toExtendedAccount(newAccount);
-	    		return Response
-	    				.created( new URI(a.getMeta().getLocation()))
-	    				.entity( a )
-	    				.build();
-	    		
+	    		ExtendedAccount ea = toExtendedAccount(newAccount);
+	    		return SCIMResponseBuilder.responseOk(ea, new URI (ea.getMeta().getLocation()));
 	    	}
 	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 		} catch (Exception e) {
-    		return Response.serverError().entity(e.toString()).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
@@ -112,11 +117,11 @@ public class AccountSvc {
 		try {
 			user = svc.findAccountById(id);
 	    	if (user != null)
-	    		return Response.ok( toExtendedAccount(user)).build();
+	    		return SCIMResponseBuilder.responseOk(toExtendedAccount(user));
 	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 		} catch (InternalErrorException e) {
-    		return Response.serverError().entity(e.toString()).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
@@ -130,53 +135,91 @@ public class AccountSvc {
 	    	if (user != null)
 	    	{
 	    		svc.removeAccount(user);
-	    		return Response.status(Status.NO_CONTENT).build();
+	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NO_CONTENT);
+	    	} else {
+	    		String message = String.format(Messages.getString("AccountSvc.userNotFound"), id); //$NON-NLS-1$
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
 	    	}
-	    	else
-	    		return Response.status(Status.NOT_FOUND).build();
 		} catch (InternalErrorException e) {
-    		return Response.serverError().entity(e.toString()).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
 
     @Path("/{id}")
     @PUT
-    public Response update(@PathParam("id") long id,
-    		ExtendedAccount user
-    		)  {
-        Account user2;
+    public Response update(@PathParam("id") long id, ExtendedAccount extendedAccount)  {
+        Account account;
 		try {
-			user2 = svc.findAccountById(id);
-	    	if (user == null)
-	    		return Response.status(Status.NOT_FOUND).build();
-	    	user2.setAccessLevel(user.getAccessLevel() );
-	    	user2.setAttributes(user.getAttributes());
-	    	user2.setDescription(user.getDescription());
-	    	user2.setDisabled(user.isDisabled());
-	    	user2.setGrantedGroups(user.getGrantedGroups());
-	    	user2.setGrantedRoles(user.getGrantedRoles());
-	    	user2.setGrantedUsers(user.getGrantedUsers());
-	    	user2.setId(user.getId());
-	    	user2.setInheritNewPermissions(user.isInheritNewPermissions());
-	    	user2.setLoginUrl(user.getLoginUrl());
-	    	user2.setManagerGroups(user.getManagerGroups());
-	    	user2.setManagerRoles(user.getManagerRoles());
-	    	user2.setManagerUsers(user.getManagerUsers());
-	    	user2.setName(user.getName());
-	    	user2.setOwnerGroups(user.getOwnerGroups());
-	    	user2.setOwnerRoles(user.getOwnerRoles());
-	    	user2.setOwnerUsers(user.getOwnerUsers());
-	    	user2.setPasswordPolicy(user.getPasswordPolicy());
-	    	user2.setSystem(user.getSystem());
-	    	user2.setVaultFolder(user.getVaultFolder());
-	    	user2.setVaultFolderId(user.getVaultFolderId());
-	    	user2 = svc.updateAccount(user2);
+			account = svc.findAccountById(id);
+	    	if (extendedAccount == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 	    	
-	    	updateRoles(user, user2);
+	    	account.setAccessLevel(extendedAccount.getAccessLevel() );
+	    	account.setAttributes(extendedAccount.getAttributes());
+	    	account.setDescription(extendedAccount.getDescription());
+	    	account.setDisabled(extendedAccount.isDisabled());
+	    	account.setGrantedGroups(extendedAccount.getGrantedGroups());
+	    	account.setGrantedRoles(extendedAccount.getGrantedRoles());
+	    	account.setGrantedUsers(extendedAccount.getGrantedUsers());
+	    	account.setId(extendedAccount.getId());
+	    	account.setInheritNewPermissions(extendedAccount.isInheritNewPermissions());
+	    	account.setLoginUrl(extendedAccount.getLoginUrl());
+	    	account.setManagerGroups(extendedAccount.getManagerGroups());
+	    	account.setManagerRoles(extendedAccount.getManagerRoles());
+	    	account.setManagerUsers(extendedAccount.getManagerUsers());
+	    	account.setName(extendedAccount.getName());
+	    	account.setOwnerGroups(extendedAccount.getOwnerGroups());
+	    	account.setOwnerRoles(extendedAccount.getOwnerRoles());
+	    	account.setOwnerUsers(extendedAccount.getOwnerUsers());
+	    	account.setPasswordPolicy(extendedAccount.getPasswordPolicy());
+	    	account.setSystem(extendedAccount.getSystem());
+	    	account.setVaultFolder(extendedAccount.getVaultFolder());
+	    	account.setVaultFolderId(extendedAccount.getVaultFolderId());
 	    	
-	    	return Response.ok().entity( toExtendedAccount(user2)).build();
+	    	account = svc.updateAccount(account);
+	    	updateRoles(extendedAccount, account);
+	    	
+	    	return SCIMResponseBuilder.responseOk(toExtendedAccount(account));
 		} catch (Exception e) {
-    		return Response.serverError().entity(e.toString()).build();
+    		return SCIMResponseBuilder.errorGeneric(e);
+		}
+    }
+    
+    @Path("/{id}")
+    @PATCH
+    public Response patch(@PathParam("id") long id,ExtendedAccount extendedAccount)  {
+        Account account;
+		try {
+			account = svc.findAccountById(id);
+	    	if (extendedAccount == null) return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
+	    	
+	    	if (extendedAccount.getAccessLevel() != null) account.setAccessLevel(extendedAccount.getAccessLevel() );
+	    	if (extendedAccount.getAttributes() != null) account.setAttributes(extendedAccount.getAttributes());
+	    	if (extendedAccount.getDescription() != null) account.setDescription(extendedAccount.getDescription());
+	    	if (extendedAccount.isDisabled() !=  account.isDisabled()) account.setDisabled(extendedAccount.isDisabled());
+	    	if (extendedAccount.getGrantedGroups() != null) account.setGrantedGroups(extendedAccount.getGrantedGroups());
+	    	if (extendedAccount.getGrantedRoles() != null) account.setGrantedRoles(extendedAccount.getGrantedRoles());
+	    	if (extendedAccount.getGrantedRoles() != null) account.setGrantedUsers(extendedAccount.getGrantedUsers());
+	    	if (extendedAccount.getId() != null) account.setId(extendedAccount.getId());
+	    	if (extendedAccount.isInheritNewPermissions() != account.isInheritNewPermissions()) account.setInheritNewPermissions(extendedAccount.isInheritNewPermissions());
+	    	if (extendedAccount.getLoginUrl() != null) account.setLoginUrl(extendedAccount.getLoginUrl());
+	    	if (extendedAccount.getManagerGroups() != null) account.setManagerGroups(extendedAccount.getManagerGroups());
+	    	if (extendedAccount.getManagerRoles() != null) account.setManagerRoles(extendedAccount.getManagerRoles());
+	    	if (extendedAccount.getManagerUsers() != null) account.setManagerUsers(extendedAccount.getManagerUsers());
+	    	if (extendedAccount.getName() != null) account.setName(extendedAccount.getName());
+	    	if (extendedAccount.getOwnerGroups() != null) account.setOwnerGroups(extendedAccount.getOwnerGroups());
+	    	if (extendedAccount.getOwnerRoles() != null) account.setOwnerRoles(extendedAccount.getOwnerRoles());
+	    	if (extendedAccount.getOwnerUsers() != null) account.setOwnerUsers(extendedAccount.getOwnerUsers());
+	    	if (extendedAccount.getPasswordPolicy() != null) account.setPasswordPolicy(extendedAccount.getPasswordPolicy());
+	    	if (extendedAccount.getSystem() != null) account.setSystem(extendedAccount.getSystem());
+	    	if (extendedAccount.getVaultFolder() != null) account.setVaultFolder(extendedAccount.getVaultFolder());
+	    	if (extendedAccount.getVaultFolderId() != null) account.setVaultFolderId(extendedAccount.getVaultFolderId());
+	    	
+	    	account = svc.updateAccount(account);
+	    	updateRoles(extendedAccount, account);
+	    	
+	    	return SCIMResponseBuilder.responseOk(toExtendedAccount(account));
+		} catch (Exception e) {
+    		return SCIMResponseBuilder.errorGeneric(e);
 		}
     }
     

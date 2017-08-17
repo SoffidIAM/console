@@ -17,8 +17,8 @@ public class ExtendedAccount extends Account
 	}
 	String password;
 	List<RoleDomain> roles;
-	ScimMeta meta;
-	
+	ScimMeta meta = new ScimMeta();
+
 	public ScimMeta getMeta() {
 		return meta;
 	}

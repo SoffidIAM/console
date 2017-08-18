@@ -410,10 +410,10 @@
   </dependencyManagement>
   <properties>
     <!-- Workflows dependencies -->
-    <document.manager.version>${pom.version}</document.manager.version>
+    <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.20</zkiblaf.version>
+    <zkiblaf.version>1.21-SNAPSHOT</zkiblaf.version>
     <zkdb.version>1.29</zkdb.version>
   </properties>
   <pluginRepositories>

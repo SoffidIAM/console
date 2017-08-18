@@ -75,7 +75,7 @@ public class GroupSvc {
 			} else
 				return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 		} catch (EJBException e) {
-			return SCIMResponseBuilder.errorCustom(Status.CONFLICT, e.getMessage());
+			return SCIMResponseBuilder.errorCustom(Status.CONFLICT, e);
 		} catch (Exception e) {
 			return SCIMResponseBuilder.errorGeneric(e);
 		}
@@ -87,11 +87,9 @@ public class GroupSvc {
 		try {
 			Group group = groupSvc.findGroupById(id);
 			if (group != null) {
-				String message = Messages.getString("GroupSvc.deleteNotAllowed");
-				return SCIMResponseBuilder.errorCustom(Status.INTERNAL_SERVER_ERROR, message); // $NON-NLS-1$
+				return SCIMResponseBuilder.errorCustom(Status.INTERNAL_SERVER_ERROR, "GroupSvc.deleteNotAllowed"); // $NON-NLS-1$
 			} else {
-				String message = String.format(Messages.getString("GroupSvc.groupNotFound"), id); //$NON-NLS-1$
-				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
+				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "GroupSvc.groupNotFound", id); //$NON-NLS-1$
 			}
 		} catch (Exception e) {
 			return SCIMResponseBuilder.errorGeneric(e);
@@ -107,8 +105,7 @@ public class GroupSvc {
 			if (group == null)
 				return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 			if (null != extendedGroup.getId() && id != extendedGroup.getId())
-				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-						String.format(Messages.getString("GroupSvc.groupNotEquals"), id, extendedGroup.getId())); //$NON-NLS-1$
+				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,"GroupSvc.groupNotEquals", id, extendedGroup.getId()); //$NON-NLS-1$
 
 			// Update only the attributes requested
 			if (extendedGroup.getObsolete() != null)
@@ -151,8 +148,7 @@ public class GroupSvc {
 			if (group == null)
 				return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 			if (null != extendedGroup.getId() && id != extendedGroup.getId())
-				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-						String.format(Messages.getString("GroupSvc.groupNotEquals"), id, extendedGroup.getId())); // $NON-NLS-1$
+				return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "GroupSvc.groupNotEquals", id, extendedGroup.getId()); // $NON-NLS-1$
 
 			// Update only the attributes requested
 			group.setObsolete(extendedGroup.getObsolete());

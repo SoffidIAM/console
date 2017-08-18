@@ -6,6 +6,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class SCIMResponseBuilder {
+
 	/**
 	 * In the case the only the HTTP code status is required
 	 */
@@ -23,8 +24,15 @@ public class SCIMResponseBuilder {
 	/**
 	 * Custom error
 	 */
-	public static Response errorCustom(Status status, String message) {
-		return Response.status(status).entity(new SCIMResponse(message, status)).build();
+	public static Response errorCustom(Status status, Exception e) {
+		return Response.status(status).entity(new SCIMResponse(getOriginalMessage(e), status)).build();
+	}
+
+	/**
+	 * Custom error
+	 */
+	public static Response errorCustom(Status status, String keyMessage, Object... args) {
+		return Response.status(status).entity(new SCIMResponse(String.format(Messages.getString(keyMessage), args), status)).build();
 	}
 
 	/**

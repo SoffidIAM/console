@@ -121,11 +121,7 @@ public class UserSvc {
 	    	else
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 		} catch (EJBException e) {
-			if (e.getMessage().contains("porque ya existe uno con este código.")) { //$NON-NLS-1$
-				String message = e.getMessage().substring(e.getMessage().indexOf("No es posible")); //$NON-NLS-1$
-	    		return SCIMResponseBuilder.errorCustom(Status.CONFLICT, message);
-			}
-			return SCIMResponseBuilder.errorGeneric(e);
+	    	return SCIMResponseBuilder.errorCustom(Status.CONFLICT, e);
 		} catch (Exception e) {
     		return SCIMResponseBuilder.errorGeneric(e);
 		}
@@ -158,8 +154,7 @@ public class UserSvc {
 	    		svc.delete(user);
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NO_CONTENT);
 	    	} else {
-	    		String message = String.format(Messages.getString("UserSvc.userNotFound"), id); //$NON-NLS-1$
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "UserSvc.userNotFound", id); //$NON-NLS-1$
 	    	}
 		} catch (Exception e) {
     		return SCIMResponseBuilder.errorGeneric(e);
@@ -177,8 +172,7 @@ public class UserSvc {
 	    	if (user2 == null)
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 	    	if (null != user.getId() && id != user.getId())
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-	    				String.format(Messages.getString("UserSvc.userNotEquals"), id, user.getId()));
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "UserSvc.userNotEquals", id, user.getId()); //$NON-NLS-1$
 
 	    	user2.setActive(user.getActive());
 	    	user2.setComments(user.getComments());
@@ -230,8 +224,7 @@ public class UserSvc {
 	    	if (user2 == null)
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 	    	if (null != user.getId() && id != user.getId())
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-	    				String.format(Messages.getString("UserSvc.userNotEquals"), id, user.getId()));
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "UserSvc.userNotEquals", id, user.getId()); //$NON-NLS-1$
 
 	    	if (user.getActive() != null) user2.setActive(user.getActive());
 	    	if (user.getComments() !=null) user2.setComments(user.getComments());

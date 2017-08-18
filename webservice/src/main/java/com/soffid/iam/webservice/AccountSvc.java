@@ -137,8 +137,7 @@ public class AccountSvc {
 	    		svc.removeAccount(user);
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NO_CONTENT);
 	    	} else {
-	    		String message = String.format(Messages.getString("AccountSvc.accountNotFound"), id); //$NON-NLS-1$
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, message);
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "AccountSvc.accountNotFound", id); //$NON-NLS-1$
 	    	}
 		} catch (InternalErrorException e) {
     		return SCIMResponseBuilder.errorGeneric(e);
@@ -154,8 +153,7 @@ public class AccountSvc {
 	    	if (account == null)
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 	    	if (id != extendedAccount.getId())
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-	    				String.format(Messages.getString("AccountSvc.accountNotEquals"), id, extendedAccount.getId()));
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,"AccountSvc.accountNotEquals", id, extendedAccount.getId()); //$NON-NLS-1$
 	    	
 	    	account.setAccessLevel(extendedAccount.getAccessLevel());
 	    	account.setAttributes(extendedAccount.getAttributes());
@@ -198,8 +196,7 @@ public class AccountSvc {
 	    	if (account == null)
 	    		return SCIMResponseBuilder.responseOnlyHTTP(Status.NOT_FOUND);
 	    	if (null != extendedAccount.getId() && id != extendedAccount.getId())
-	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND,
-	    				String.format(Messages.getString("AccountSvc.accountNotEquals"), id, extendedAccount.getId()));
+	    		return SCIMResponseBuilder.errorCustom(Status.NOT_FOUND, "AccountSvc.accountNotEquals", id, extendedAccount.getId()); //$NON-NLS-1$
 	    	
 	    	if (extendedAccount.getAccessLevel() != null) account.setAccessLevel(extendedAccount.getAccessLevel() );
 	    	if (extendedAccount.getAttributes() != null) account.setAttributes(extendedAccount.getAttributes());

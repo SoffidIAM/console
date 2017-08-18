@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.soffid.iam.api.User;
 import com.soffid.iam.webservice.ScimMeta;
+import com.soffid.iam.webservice.group.JsonSecundaryGroup;
 
 public class ExtendedUser extends User
 {
@@ -46,5 +47,15 @@ public class ExtendedUser extends User
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	List<JsonSecundaryGroup> secundaryGroups = new LinkedList<JsonSecundaryGroup>();
+
+	public List<JsonSecundaryGroup> getSecundaryGroups() {
+		return secundaryGroups;
+	}
+
+	public void setSecundaryGroups(List<JsonSecundaryGroup> secundaryGroups) {
+		this.secundaryGroups = secundaryGroups;
 	}
 }

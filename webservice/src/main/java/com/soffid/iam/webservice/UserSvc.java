@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -32,7 +34,9 @@ import com.soffid.iam.service.ejb.AccountService;
 import com.soffid.iam.service.ejb.AdditionalDataService;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.DispatcherService;
+import com.soffid.iam.service.ejb.GroupService;
 import com.soffid.iam.service.ejb.UserService;
+import com.soffid.iam.webservice.group.JsonSecundaryGroup;
 import com.soffid.iam.webservice.user.ExtendedUser;
 import com.soffid.iam.webservice.user.JsonAccount;
 import com.soffid.iam.webservice.user.UserQuery;
@@ -56,6 +60,9 @@ public class UserSvc {
 
 	@EJB AdditionalDataService dataSvc;
 
+	@EJB
+	GroupService groupSvc;
+
 	@Path("")
     @GET
     public UserQuery list(@QueryParam("filter") @DefaultValue("") String query,
@@ -77,10 +84,12 @@ public class UserSvc {
 	}
 
 	private ExtendedUser toExtendedUser(User u) throws InternalErrorException {
+
+		// Final user to include in the response
 		ExtendedUser eu = new ExtendedUser(u);
 
-		for (UserData data: svc.findUserDataByUserName(u.getUserName()))
-		{
+		// Include user attributes
+		for (UserData data : svc.findUserDataByUserName(u.getUserName())) {
 			if (data.getDateValue() != null)
 				eu.getAttributes().put(data.getAttribute(), data.getDateValue().getTime());
 			else if (data.getBlobDataValue() != null)
@@ -88,21 +97,30 @@ public class UserSvc {
 			else
 				eu.getAttributes().put(data.getAttribute(), data.getValue());
 		}
-		
-		for (UserAccount acc: accountSvc.getUserAccounts(u))
-		{
+
+		// Include user accounts
+		for (UserAccount acc : accountSvc.getUserAccounts(u)) {
 			JsonAccount js = new JsonAccount();
 			js.setName(acc.getName());
 			js.setId(acc.getId());
 			js.setSystem(acc.getSystem());
 			eu.getAccounts().add(js);
 		}
-		
+
+		// Include user accounts
 		ScimMeta meta = eu.getMeta();
 		meta.setLocation(getClass(), u.getId().toString());
 		meta.setCreated(u.getCreatedDate().getTime());
 		meta.setLastModified(u.getModifiedDate().getTime());
 		meta.setResourceType("User"); //$NON-NLS-1$
+
+		// Include secundary groups
+		List<JsonSecundaryGroup> secundaryGroupsList = new LinkedList<JsonSecundaryGroup>();
+		for (GroupUser secundaryGroup : groupSvc.findUsersGroupByUserName(eu.getUserName())) {
+			secundaryGroupsList.add(new JsonSecundaryGroup(secundaryGroup));
+		}
+		eu.setSecundaryGroups(secundaryGroupsList);
+
 		return eu;
 	}
 

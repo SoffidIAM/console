@@ -59,14 +59,14 @@ public class AccountSvc {
         return uq;
     }
 
-    private Collection<ExtendedAccount> toExtendedAccountList(
-			Collection<Account> list) throws InternalErrorException {
-    	LinkedList<ExtendedAccount> r = new LinkedList<ExtendedAccount>();
-		for ( Account u : list)
-    	{
-    		r.add(toExtendedAccount(u));
-    	}
-		return r;
+	private Collection<ExtendedAccount> toExtendedAccountList(Collection<Account> accountList) throws InternalErrorException {
+		LinkedList<ExtendedAccount> extendedAccountList = new LinkedList<ExtendedAccount>();
+		if (null != accountList && !accountList.isEmpty()) {
+			for (Account account : accountList) {
+				extendedAccountList.add(toExtendedAccount(account));
+			}
+		}
+		return extendedAccountList;
 	}
 
 	private ExtendedAccount toExtendedAccount(Account acc) throws InternalErrorException {

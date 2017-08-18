@@ -66,14 +66,14 @@ public class UserSvc {
         return uq;
     }
 
-    private Collection<ExtendedUser> toExtendedUserList(
-			Collection<User> list) throws InternalErrorException {
-    	LinkedList<ExtendedUser> r = new LinkedList<ExtendedUser>();
-		for ( User u : list)
-    	{
-    		r.add(toExtendedUser(u));
-    	}
-		return r;
+	private Collection<ExtendedUser> toExtendedUserList(Collection<User> userList) throws InternalErrorException {
+		LinkedList<ExtendedUser> extendedUserList = new LinkedList<ExtendedUser>();
+		if (null != userList && !userList.isEmpty()) {
+			for (User user : userList) {
+				extendedUserList.add(toExtendedUser(user));
+			}
+		}
+		return extendedUserList;
 	}
 
 	private ExtendedUser toExtendedUser(User u) throws InternalErrorException {

@@ -284,4 +284,11 @@ public abstract class GrupService {
 		java.lang.String codiGrup)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

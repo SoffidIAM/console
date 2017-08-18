@@ -13,7 +13,20 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.Vector;
 
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupRoles;
@@ -26,6 +39,7 @@ import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
@@ -33,30 +47,16 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
-
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
 
 /**
  * @see es.caib.seycon.ng.servei.GrupService
@@ -682,4 +682,37 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 	}
 
+	@Override
+	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws Exception {
+
+		// Prepare query HQL
+		AbstractExpression expression = ExpressionParser.parse(query);
+		HQLQuery hql = expression.generateHSQLString(Group.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "(" + qs + ") and o.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
+
+		// Include HQL parameters
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size() + 1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+
+		// Execute HQL and generate result
+		LinkedList<Group> result = new LinkedList<Group>();
+		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray)) {
+			Group g = getGroupEntityDao().toGroup(ge);
+			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
+				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, ge)) {
+					result.add(g);
+				}
+			}
+		}
+		return result;
+	}
 }

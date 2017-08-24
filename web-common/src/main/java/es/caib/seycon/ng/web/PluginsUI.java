@@ -247,7 +247,7 @@ public class PluginsUI extends Window implements AfterCompose {
 		String fileContent = "File to check reset console"; //$NON-NLS-1$
 		File file = new File(fileName);
 		FileWriter wr = new FileWriter(file, true);
-		String home = System.getProperty ("jboss.server.home.dir"); //$NON-NLS-1$
+		String home = System.getProperty ("catalina.home"); //$NON-NLS-1$
 		File addonFolder = new File(new File(home, "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		try

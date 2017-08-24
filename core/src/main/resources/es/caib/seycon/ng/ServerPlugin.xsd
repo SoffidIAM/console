@@ -7,15 +7,13 @@
 				minOccurs="1">
 			</element>
             <element name="version" type="string"></element>
-            <all minOccurs="0" maxOccurs="unbounded">
-            	<element name="syncengine" type="tns:SyncEngineType" />
-            	<element name="agents" type="tns:AgentType" />
-            	<element name="common" type="tns:CommonType" />
-            	<element name="core" type="tns:CoreType" />
-            	<element name="web" type="tns:WebType" />
-            	<element name="selfService" type="tns:WebType"></element>
-            	<element name="webService" type="tns:WebServiceType" />
-            </all>
+           	<element name="syncengine" type="tns:SyncEngineType" minOccurs="0" maxOccurs="unbounded"/>
+           	<element name="agents" type="tns:AgentType" minOccurs="0" maxOccurs="unbounded"/>
+           	<element name="common" type="tns:CommonType" minOccurs="0" maxOccurs="unbounded"/>
+           	<element name="core" type="tns:CoreType" minOccurs="0" maxOccurs="unbounded"/>
+           	<element name="web" type="tns:WebType" minOccurs="0" maxOccurs="unbounded"/>
+           	<element name="selfService" type="tns:WebType" minOccurs="0" maxOccurs="unbounded"></element>
+           	<element name="webService" type="tns:WebServiceType" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 		<attribute name="name" type="string" use="required" />
 		<attribute name="version" type="string" use="required" />

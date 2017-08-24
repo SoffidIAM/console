@@ -12,6 +12,7 @@ package com.soffid.iam.service;
 import bsh.EvalError;
 import bsh.Interpreter;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleAccount;
@@ -336,6 +337,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			interpreter.set("groups", groups); //$NON-NLS-1$
 			interpreter.set("groupsList", groups.keySet()); //$NON-NLS-1$
 			interpreter.set("applicationContext", ctx); //$NON-NLS-1$
+			interpreter.set("serviceLocator", ServiceLocator.instance()); //$NON-NLS-1$
 			
 			return interpreter;
 		}

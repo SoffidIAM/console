@@ -13,4 +13,9 @@ public class AccountNameGeneratorImpl extends com.soffid.iam.service.account.Acc
 		return user.getUserName();
 	}
 
+	@Override
+	protected boolean handleNeedsAccount(UserEntity user, SystemEntity dispatcher) throws Exception {
+		return false;
+	}
+
 }

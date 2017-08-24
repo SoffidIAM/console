@@ -20,4 +20,12 @@ public abstract class AccountNameGenerator {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public boolean needsAccount(
+		es.caib.seycon.ng.model.UsuariEntity user, 
+		es.caib.seycon.ng.model.DispatcherEntity dispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return false;
+	}
 }

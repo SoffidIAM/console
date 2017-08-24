@@ -30,6 +30,9 @@ public class DominiUsuari {
 	public java.lang.String bshExpr;
 
 	@Nullable
+	public java.lang.String bshExprCreate;
+
+	@Nullable
 	public java.lang.String beanGenerator;
 
 }

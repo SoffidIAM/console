@@ -34,9 +34,13 @@ public abstract class DominiUsuariEntity {
 	@ForeignKey (foreignColumn="DIS_DOU_ID", translated="systems")
 	public java.util.Collection<es.caib.seycon.ng.model.DispatcherEntity> dispatchers;
 
-	@Column (name="DOU_EXPRES", length=1024)
+	@Column (name="DOU_EXPRES", length=4097)
 	@Nullable
 	public java.lang.String bshExpr;
+
+	@Column (name="DOU_EXPCRE", length=4097)
+	@Nullable
+	public java.lang.String bshExprCreate;
 
 	@Column (name="DOU_GENERA", length=64)
 	@Nullable

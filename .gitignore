@@ -6,3 +6,6 @@ web/src/main/webapp/codetest/
 /tomee/.settings/org.eclipse.core.resources.prefs
 /selfservice/_LOCAL_5475.project
 /selfservice/_REMOTE_5475.project
+/webservice/.settings/org.eclipse.wst.common.component
+/webservice/.settings/org.eclipse.wst.common.project.facet.core.xml
+/webservice/.settings/org.eclipse.wst.validation.prefs

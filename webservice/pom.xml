@@ -43,7 +43,6 @@
 								</includes>
 							</sources>
 							<source />
-							1.5
 							<target>1.5</target>
 						</configuration>
 					</execution>
@@ -85,13 +84,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- plugin> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-jspc-maven-plugin</artifactId> 
-				<version>9.2.6.v20141205</version> <executions> <execution> <id>jspc</id> 
-				<goals> <goal>jspc</goal> </goals> </execution> </executions> <configuration> 
-				<useProvidedScope>true</useProvidedScope> <keepSources>true</keepSources> 
-				</configuration> </plugin -->
 			<plugin>
-
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
@@ -162,6 +155,25 @@
 										<ignore />
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo.jspc
+										</groupId>
+										<artifactId>
+											jspc-maven-plugin
+										</artifactId>
+										<versionRange>
+											[2.0-alpha-3,)
+										</versionRange>
+										<goals>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -169,87 +181,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<dependencies>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>iam-core</artifactId>
-			<version>${pom.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>axis</groupId>
-					<artifactId>axis-jaxrpc</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ws.commons.axiom</groupId>
-			<artifactId>axiom-impl</artifactId>
-			<version>1.2.13</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-transport-http</artifactId>
-			<version>1.6.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-json</artifactId>
-			<version>1.6.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2</artifactId>
-			<version>1.6.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>jasper-runtime</artifactId>
-			<version>5.5.12</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>5.5.12</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.johnzon</groupId>
-		    <artifactId>johnzon-mapper</artifactId>
-		    <version>1.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.johnzon</groupId>
-		    <artifactId>johnzon-jaxrs</artifactId>
-		    <version>1.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomee</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>7.0-1</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+	<dependencies></dependencies>
 </project>

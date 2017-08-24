@@ -8,12 +8,13 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<style src="~./styles/estil.css"/>
+	<script src='~./js/codemirror/java-classes.js'/>
 	
 	<datamodel id="model" rootNode="root" src="descriptorDominiUsuaris.xml"/>
 	
 	<zscript src="comu/netejaCriteris.zul"/>
 
-	<zscript>
+	<zscript><![CDATA[
 	
 		fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
 		try
@@ -102,7 +103,7 @@
 		int seleccionaElementListbox(Listbox llista, Object elemcodi) {
 			String codi = elemcodi!=null ? elemcodi.toString() : "";   
 			java.util.List elems =  llista.getItems();
-			for (int i=0; i &lt; elems.size(); i++) {
+			for (int i=0; i < elems.size(); i++) {
 				Object actual = elems.get(i).getValue();   
 				if (actual instanceof XmlDataNode) { 
 					XmlDataNode elem = (XmlDataNode) actual;
@@ -110,7 +111,7 @@
 					if (dades instanceof es.caib.seycon.ng.comu.TipusUsuari) {
 						es.caib.seycon.ng.comu.TipusUsuari tipus = (es.caib.seycon.ng.comu.TipusUsuari) dades;
 						//System.out.println ("*** tipus=" + tipus.getCodi() + " element = " + codi);
-						if (tipus.getCodi() != null &amp;&amp; tipus.getCodi().equals(codi)) {
+						if (tipus.getCodi() != null && tipus.getCodi().equals(codi)) {
 							llista.setSelectedIndex(i);
 							// Hem d'amagar els camps que no corresponguen..
 							Events.postEvent ("onSelect", llista, null);
@@ -132,7 +133,7 @@
 				} else if (actual instanceof TipusDominiUsuariEnumeration) {
 					TipusDominiUsuariEnumeration td = (TipusDominiUsuariEnumeration) actual;
 					TipusDominiUsuariEnumeration element = (TipusDominiUsuariEnumeration) elemcodi;
-					if (td != null &amp;&amp; td.getValue().equals(element.getValue())) {
+					if (td != null && td.getValue().equals(element.getValue())) {
 						llista.setSelectedIndex(i);
 							return i;
 					}
@@ -248,6 +249,7 @@
 				it = dlistbox.getItems().iterator();
 			}
 		}
+		]]>
 	</zscript>
 	
 	<tabbox id="tabmain" width="100%">
@@ -262,16 +264,6 @@
 				<esquema ample="${amplaria}" datamodel="/model" id="esquema" onHideFormulari="showLista()" senseCriteris="true">
 				
 					<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()" width="${amplaria}">
-					
-						<!--hbox>
-							<input_criteri id="queryCodi" etiqueta="Paràmetre:"/>
-							<input_criteri id="queryValor" etiqueta="Valor:"/>
-							<imageclic src="~./img/fletxa_cerca.gif" onClick="search()"/>
-						</hbox>
-						<hbox> 
-							<input_criteri id="queryDescripcio" etiqueta="Descripció:"/>
-							<input_criteri id="queryXarxa" etiqueta="Xarxa:"/>
-						</hbox-->
 						<vbox align="right" width="100%">
 							<label onClick="netejaCriteris()" sclass="label_link" value="${c:l('dominiUsuaris.zul.Esborra')}"/>
 						</vbox>
@@ -330,7 +322,7 @@
 					</navegador>
 				
 					<detalls id="dades">
-						<zscript>
+						<zscript><![CDATA[
 							void onChangeDades()
 							{
 								try {
@@ -378,10 +370,17 @@
 											vbox_pc.setVisible(false);
 											Listbox lb = self.getFellow("lbGenerator");
 											lb.setDisabled (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SPRINGCLASS));
-											Textbox tb = self.getFellow("du_script").getFellow("dada");
-											tb.setDisabled (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SHELL));
-											
+
 											showDetall();
+											
+											com.soffid.codemirror.Codemirror cm = self.getFellow("du_script1");
+											cm.setReadonly (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SHELL));
+
+											com.soffid.codemirror.Codemirror cm = self.getFellow("du_script2");
+											cm.setReadonly (! obj.getTipus().equals(TipusDominiUsuariEnumeration.SHELL));
+
+											dades.invalidate();
+
 									} else if (obj instanceof DominiContrasenya) {
 											// Domini de contrasenya
 											b_inserir.setDisabled(true); //crear nous PC
@@ -438,10 +437,11 @@
 							
 							List e_tipusDominiUsuari = es.caib.seycon.ng.web.utils.ValorTipusDominiUsuari.valorsTipusDominiUsuari;
 							
-						</zscript>
+						]]></zscript>
 						<form dataPath="/esquema/lista/treebox:/." id="form" onChangeXPath="onChangeDades()" width="100%">
 							<attribute name="onActualitza">
-								obj = event.getData();
+							<![CDATA[
+							    obj = event.getData();
 								if (obj instanceof es.caib.seycon.ng.comu.ParaulaProhibida) {
 									es.caib.seycon.ng.comu.ParaulaProhibida dada = (es.caib.seycon.ng.comu.ParaulaProhibida) obj;
 									modelProxy = (es.caib.zkib.binder.list.ModelProxy) listboxBadWordsContrasenya.getModel();
@@ -481,7 +481,7 @@
 								}*/
 								//camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
 								//camp.setValue(dada);
-							</attribute>
+							]]></attribute>
 							<vbox id="v_du" visible="false" width="99%">
 								<label sclass="etiqueta" value="${c:l('dominiUsuaris.zul.Dominidusuaris')}"/>
 								<grid> 
@@ -510,7 +510,7 @@
 										<row>
 											<input_etiqueta value="${c:l('dominiUsuaris.zul.Tipus')}"/>
 											<listbox id="lbtipusDominiUsuari" mold="select" style="font-size: 12px" width="200px">
-												<attribute name="onSelect">
+												<attribute name="onSelect"><![CDATA[
 													try {
 														TipusDominiUsuariEnumeration tipus  = null; 
 														tipus = self.getSelectedItem().getValue();
@@ -520,12 +520,17 @@
 														ctx.setValue("@tipus",tipus);
 														Listbox lb = self.getFellow("lbGenerator");
 														lb.setDisabled (! tipus.equals(TipusDominiUsuariEnumeration.SPRINGCLASS));
-														Textbox tb = self.getFellow("du_script").getFellow("dada");
-														tb.setDisabled (! tipus.equals(TipusDominiUsuariEnumeration.SHELL));
+
+														com.soffid.codemirror.Codemirror cm = self.getFellow("du_script1");
+														cm.setReadonly (! tipus.equals(TipusDominiUsuariEnumeration.SHELL));
+			
+														com.soffid.codemirror.Codemirror cm = self.getFellow("du_script2");
+														cm.setReadonly (! tipus.equals(TipusDominiUsuariEnumeration.SHELL));
 														
 													} catch (Throwable th) {
 														Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("dominiUsuaris.Error"), new Object [] {th.getMessage()}));
 													}
+													]]>
 												</attribute>
 												<listitem forEach="${e_tipusDominiUsuari}" label="${each.desc}" value="${each.value}"/>
 											</listbox>
@@ -540,9 +545,28 @@
 											</listbox>
 										</row>
 										<row>
+											<input_etiqueta value="${c:l('dominiUsuaris.zul.scriptCreate')}"/>
+											<codemirror bind="@bshExprCreate" id="du_script1" 
+												readonly="${!canModifyDominiUsuari}"
+												linenumbers="true" 
+												language="java" 
+												width="99%" height="8em">
+												<attribute name='onCreate'><![CDATA[
+						self.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getDomainVars());
+												]]></attribute>
+											</codemirror>
+										</row>
+										<row>
 											<input_etiqueta value="${c:l('dominiUsuaris.zul.script')}"/>
-											<input_dada bind="@bshExpr" id="du_script" lectura="${!canModifyDominiUsuari}" maxim="1023" 
-												width_custom="99%" rows_custom="8"/>
+											<codemirror bind="@bshExpr" id="du_script2"
+												linenumbers="true" 
+												readonly="${!canModifyDominiUsuari}"
+												language="java" 
+												width="99%" height="8em">
+												<attribute name='onCreate'><![CDATA[
+						self.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getDomainVars());
+												]]></attribute>
+											</codemirror>
 										</row>
 									</rows>
 								</grid>
@@ -858,7 +882,7 @@
 				
 					<detalls id="dadesTipusUsuari">
 						<zscript>
-							void onChangeDades()
+							void onChangeDadesTU()
 							{
 								try {
 									ds = formTipusUsuari.getDataSource(); 
@@ -870,7 +894,7 @@
 								}
 							}
 						</zscript>
-						<form dataPath="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari:/." id="formTipusUsuari" onChangeXPath="onChangeDades()" width="100%">
+						<form dataPath="/esquemaTipusUsuari/listaTipusUsuari/listboxTipusUsuari:/." id="formTipusUsuari" onChangeXPath="onChangeDadesTU()" width="100%">
 							<!--attribute name="onActualitza">
 								dada = (String)event.getData();
 								camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
@@ -947,10 +971,10 @@
 				
 					<detalls id="dadesBadWords">
 						<zscript>
-							void onChangeDades() { }
+							void onChangeDadesBW() { }
 						</zscript>
 						<form dataPath="/esquemaBadWords/listaBadWords/listboxBadWords:/."
-							id="formBadWords" onChangeXPath="onChangeDades()" width="100%">
+							id="formBadWords" onChangeXPath="onChangeDadesBW()" width="100%">
 							<!--attribute name="onActualitza">
 								dada = (String)event.getData();
 								camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");

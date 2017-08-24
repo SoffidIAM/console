@@ -673,6 +673,7 @@ public class ApplicationBootServiceImpl extends
 		if (x == null) {
 			x = new Network();
 			x.setCode("loopback"); //$NON-NLS-1$
+			x.setDescription("loopback");
 			x.setIp("127.0.0.0"); //$NON-NLS-1$
 			x.setMask("255.255.255.0"); //$NON-NLS-1$
 			x.setLanAccess(new Boolean(false));

@@ -10,6 +10,21 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 	<frame id="p_usuaris" saveContent="true"
 		title="${c:l('usuaris.lblGestionUsuarios1')}" width="99%">
+		<attribute name="onCreate">
+		<![CDATA[
+				if (pageScope{"requestedUser"} != null)
+				{
+					qw = esquema.getFellow("queryWindow");
+					searchBox = qw.getFellow("searchBox");
+					searchBox.addAttribute("userName").setSearchFilter(requestedUser);
+					searchBox.search();
+					esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
+					showDetall();
+					esquema.removeCriteria();
+					esquema.removeList();
+				}
+		]]>
+		</attribute>
 		<style>
 			span.etiqueta {white-space:nowrap !important;}
 			.dataListcelldestacada div { background-color: #FF0000; }
@@ -538,12 +553,12 @@
 			]]>
 		</zscript>
 
-		<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
+		<esquemavertical id="esquema" datamodel="/model"
 			onHideFormulari="showLista()">
 
-			<criteris id="queryWindow" style="margin-bottom:1em;" onOK="search()"
+			<criteris id="queryWindow" style="margin-bottom:1em;" 
 				width="100%" height="">
-				<searchbox auto="true"
+				<searchbox auto="true" id="searchBox"
 					jsonObject="com.soffid.iam.api.User" 
 					defaultAttributes="userName, firstName, lastName, primaryGroup"
 					dataPath="/model:/usuari" variableName="query"></searchbox>
@@ -2722,16 +2737,4 @@ void actualitza (event) {
 		</window>
 
 	</frame>
-	<zscript>
-	<![CDATA[
-			if (pageScope{"requestedUser"} != null)
-			{
-				qw = esquema.getFellow("queryWindow");
-				qw.getFellow("queryCodi").getFellow("textbox").setValue (requestedUser);
-				Events.postEvent ("onOK", qw, null );				
-				esquema.removeCriteria();
-				esquema.removeList();
-			}
-	]]>
-	</zscript>
 </zk>

@@ -44,6 +44,7 @@ import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.model.RoleAttributeEntityImpl;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
@@ -55,6 +56,12 @@ import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.SoffidAuthorization;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.AttributeConfig;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
@@ -67,12 +74,14 @@ import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -83,6 +92,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
@@ -90,6 +100,7 @@ import java.util.Vector;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.AplicacioService Versió remixed, remade &
@@ -2059,6 +2070,77 @@ public class ApplicationServiceImpl extends
 			}
 		}
 	}
+
+	@Override
+	protected Collection<Role> handleFindRoleByJsonQuery(String query)
+			throws Exception {
+		
+		
+		ClassConfig config = getRoleJsonConfiguration();
+
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(Role.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.system.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.system.tenant.id = :tenantId";
+		
+		hql.setWhereString(new StringBuffer(qs));
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size()+1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		LinkedList<Role> result = new LinkedList<Role>();
+		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
+				paramArray)) {
+			Role u = getRoleEntityDao().toRole(ue);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
+				if (getAuthorizationService().hasPermission(
+						Security.AUTO_ROLE_QUERY, ue)) {
+					result.add(u);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private ClassConfig getRoleJsonConfiguration()
+			throws UnsupportedEncodingException, JSONException, ClassNotFoundException 
+	{
+		ClassConfig cc = Configuration
+				.getClassConfig(RoleAttributeEntityImpl.class);
+		
+		if (cc == null)
+		{
+			cc = new ClassConfig();
+			AttributeConfig attributeConfig = new AttributeConfig();
+			attributeConfig.setVirtualAttribute(true);
+			attributeConfig.setVirtualAttributeValue("value");
+			attributeConfig.setVirtualAttributeName("attribute.name");
+			cc.setDefaultVirtualAttribute(attributeConfig);
+			Configuration.registerClass(cc);
+		}
+
+		return Configuration.getClassConfig(com.soffid.iam.api.Role.class);
+	}
+
+	@Override
+	protected Collection<Role> handleFindRoleByText(String text) throws Exception {
+		LinkedList<Role> result = new LinkedList<Role>();
+		for (RoleEntity ue : getRoleEntityDao().findByText(text)) {
+			Role u = getRoleEntityDao().toRole(ue);
+			if (getAuthorizationService().hasPermission(
+					Security.AUTO_ROLE_QUERY, ue)) {
+				result.add(u);
+			}
+		}
+
+		return result;
+	}
 }
 
 class RolAccountDetail
@@ -2158,4 +2240,5 @@ class RolAccountDetail
 			return false;
 	}
 	
+
 }

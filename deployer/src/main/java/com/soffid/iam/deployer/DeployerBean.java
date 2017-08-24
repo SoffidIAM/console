@@ -67,7 +67,6 @@ import org.apache.openejb.UndeployException;
 import org.apache.openejb.assembler.Deployer;
 import org.apache.openejb.assembler.DeployerEjb;
 import org.apache.openejb.assembler.classic.AppInfo;
-import org.apache.openejb.jee.jba.cmp.Datasource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -261,7 +260,7 @@ public class DeployerBean implements DeployerService {
 						if (type.equals("X")) //$NON-NLS-1$ //Web service
 						{
 							try {
-								extractWebServiceAddon(Long.toString(id),
+								extractWebServiceAddon(Long.toString(id), name,
 										rset.getBinaryStream(5));
 							} catch (Exception e) {
 								throw new IOException(e);
@@ -459,20 +458,50 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
-	protected void extractWebServiceAddon(String name, InputStream binaryStream)
+	protected void extractWebServiceAddon(String name, String originalName, InputStream binaryStream)
 			throws Exception {
 
-		File wsFile = new File(webserviceWarFile,
-				"WEB-INF/services/plugin-" + name + ".aar"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		log.info("Generating webservice file " + wsFile);
-		FileOutputStream out = new FileOutputStream(wsFile);
-		byte b[] = new byte[4096];
-		int read;
-		while ((read = binaryStream.read(b)) > 0) {
-			out.write(b, 0, read);
+		if (originalName.endsWith(".aar"))
+		{
+			File wsFile = new File(webserviceWarFile,
+					"WEB-INF/services/plugin-" + name + ".aar"); //$NON-NLS-1$ //$NON-NLS-2$
+	
+			log.info("Generating webservice file " + wsFile);
+			FileOutputStream out = new FileOutputStream(wsFile);
+			byte b[] = new byte[4096];
+			int read;
+			while ((read = binaryStream.read(b)) > 0) {
+				out.write(b, 0, read);
+			}
+			out.close();
 		}
-		out.close();
+		else
+		{
+			File classesDir = new File(webserviceWarFile,
+					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
+			File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.info("Generating web service file " + coreFile);
+			FileOutputStream out = new FileOutputStream(coreFile);
+			boolean ejb = false;
+			byte b[] = new byte[4096];
+			int read;
+			while ((read = binaryStream.read(b)) > 0) {
+				out.write(b, 0, read);
+			}
+			out.close();
+			ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
+			ZipEntry entry;
+			while ((entry = zin.getNextEntry()) != null) {
+				File f = new File(classesDir, entry.getName());
+				if (entry.isDirectory()) {
+					f.mkdirs();
+				} else {
+					f.getParentFile().mkdirs();
+					extractFile(zin, f);
+				}
+			}
+			coreFile.delete();			
+		}
 	}
 
 	private void uncompressEar() throws Exception {

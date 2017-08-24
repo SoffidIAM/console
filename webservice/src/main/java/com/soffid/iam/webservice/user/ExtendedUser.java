@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.johnzon.mapper.JohnzonIgnore;
+
 import com.soffid.iam.api.User;
 import com.soffid.iam.webservice.ScimMeta;
 import com.soffid.iam.webservice.group.JsonSecundaryGroup;
@@ -58,4 +60,10 @@ public class ExtendedUser extends User
 	public void setSecundaryGroups(List<JsonSecundaryGroup> secundaryGroups) {
 		this.secundaryGroups = secundaryGroups;
 	}
+
+	/**
+	 * This field is deprecated and it doesn't be managed in the SCIM REST request/responses
+	 */
+	@JohnzonIgnore
+	private Long passwordMaxAge;
 }

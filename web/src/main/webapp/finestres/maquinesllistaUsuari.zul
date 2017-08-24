@@ -59,23 +59,7 @@
 					.getFellow("queryWindowAltres").getFellow("queryDhcp")
 					.getFellow("textbox");
 				
-				if ((nom.value.trim().length() == 0) &&
-						(ip.value.trim().length() == 0) &&
-						(xarxa.value.trim().length() == 0) &&
-						(descripcio.value.trim().length() == 0) &&
-						((so == null) || (so.getValue() == null)) &&
-						(usuari.value.trim().length() == 0) &&
-						(alies.value.trim().length() == 0) &&
-						(mac.value.trim().length() == 0) &&
-						(dhcp.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
+				queryEnabled = true;
 				
 				// Add parameters to search
 				searchValues.put("nom", nom.value);
@@ -97,7 +81,7 @@
 				return searchValues;
 			}
 			
-			void search (boolean queryEnabled) 
+			void search (boolean retrySearch) 
 			{
 				java.util.Map lista = new java.util.HashMap();
 				
@@ -278,7 +262,7 @@
 			event.stopPropagation ();
 		</attribute>
 		
-		<criteris height="${queryWindowMin}" id="queryWindow" onOK="search(false)" width="99.7%">
+		<criteris id="queryWindow" onOK="search(false)" width="99.7%">
 			<hbox>
 				<input_criteri etiqueta="${c:l('maquinesllistaUsuari.zul.Nom')}" id="queryNom"/>
 				<input_criteri etiqueta="${c:l('maquinesllistaUsuari.zul.IP')}" id="queryIP"/>

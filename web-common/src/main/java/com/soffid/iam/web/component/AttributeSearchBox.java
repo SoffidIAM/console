@@ -55,6 +55,25 @@ public class AttributeSearchBox extends XulElement {
 	private Date since;
 	private Date until;
 	
+	private String escape(String s)
+	{
+		return s.replaceAll("\\\\", "\\\\\\\\")
+				  .replaceAll("\"", "\\\\\"");
+	}
+	
+	public void setSearchFilter(String search)
+	{
+		if (search == null || search.isEmpty())
+		{
+			queryExpression = "";
+			humanExpression = Labels.getLabel("attributeQuery.all");
+		} else {
+			queryExpression = attributeDef.getName()+" eq \""+escape(search)+"\"";
+			humanExpression = "eq \""+search +"\"";
+		}
+		invalidate();
+	}
+	
 	public SearchAttributeDefinition getAttributeDef() {
 		return attributeDef;
 	}
@@ -186,7 +205,9 @@ public class AttributeSearchBox extends XulElement {
 		{
 			((Textbox)target.getFellow(STRING_TEXTBOXES[j])).setDisabled(i != j);
 		}
-		((Textbox)target.getFellow(STRING_TEXTBOXES[i])).focus();
+		Textbox textBox = (Textbox)target.getFellow(STRING_TEXTBOXES[i]);
+		textBox.focus();
+		textBox.setSelectionRange(0, textBox.getText().length());
 	}
 
 	private void doTextSearch(Window w, Div bg, Radiogroup rg) {
@@ -202,7 +223,7 @@ public class AttributeSearchBox extends XulElement {
 		{
 			queryExpression = attributeDef.getName()+" "+
 					rg.getSelectedItem().getValue()+" \""+
-					textValue+"\"";
+					escape(textValue)+"\"";
 			humanExpression = rg.getSelectedItem().getLabel()+" \""+
 					textValue+"\"";
 		}
@@ -303,7 +324,7 @@ public class AttributeSearchBox extends XulElement {
 		{
 			queryExpression = attributeDef.getName()+" "+
 					rg.getSelectedItem().getValue()+" \""+
-					textValue+"\"";
+					escape(textValue)+"\"";
 			humanExpression = rg.getSelectedItem().getLabel()+" \""+
 					textValue+"\"";
 		}
@@ -499,7 +520,7 @@ public class AttributeSearchBox extends XulElement {
 				sb.append(attributeDef.getName())
 					.append(" eq ")
 					.append('"')
-					.append(value)
+					.append(escape(value))
 					.append('"');
 				sb2.append(value);
 			}

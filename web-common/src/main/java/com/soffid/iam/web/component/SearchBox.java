@@ -213,7 +213,7 @@ public class SearchBox extends HtmlBasedComponent {
 		this.defaultAttributes = s;
 	}
 
-	private AttributeSearchBox addAttribute(String att) {
+	public AttributeSearchBox addAttribute(String att) {
 		for (SearchAttributeDefinition def: dictionary.getAttributes())
 		{
 			if (def.getName().equals(att))
@@ -230,7 +230,29 @@ public class SearchBox extends HtmlBasedComponent {
 		this.dictionary = dictionary;
 	}
 
-	private AttributeSearchBox addAttribute(SearchAttributeDefinition def) {
+	public AttributeSearchBox getAttributeSearchBox (String tag, boolean create)
+	{
+		for (AttributeSearchBox asb: getAttributeSearchBoxes())
+		{
+			if (asb.getAttributeDef() != null &&
+					asb.getAttributeDef().getName().equals(tag))
+				return asb;
+		}
+		return addAttribute(tag);
+	}
+	
+	public AttributeSearchBox getAttributeSearchBox (String tag)
+	{
+		return getAttributeSearchBox(tag, true);
+	}
+
+	protected AttributeSearchBox addAttribute(SearchAttributeDefinition def) {
+		for (AttributeSearchBox asb: getAttributeSearchBoxes())
+		{
+			if (asb.getAttributeDef() == def)
+				return asb;
+		}
+
 		AttributeSearchBox asb = new AttributeSearchBox();
 		asb.setAttributeDef(def);
 		insertBefore(asb, addAttributeButton);
@@ -245,8 +267,8 @@ public class SearchBox extends HtmlBasedComponent {
 				{
 					if (component instanceof AttributeSearchBox)
 					{
-						asb = (AttributeSearchBox) component;
-						if (asb.attributeDef == def2)
+						AttributeSearchBox asb2 = (AttributeSearchBox) component;
+						if (asb2.attributeDef == def2)
 						{
 							found = true;
 							break;

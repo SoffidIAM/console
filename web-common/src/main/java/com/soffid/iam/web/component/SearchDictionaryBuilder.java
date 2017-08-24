@@ -35,10 +35,14 @@ public class SearchDictionaryBuilder {
 			sd = generateDefaultBuilder(clazz);
 			if (clazz.equals("com.soffid.iam.api.User"))
 				addUserJoins (sd);
+			if (clazz.equals("com.soffid.iam.api.Role"))
+				addRoleJoins (sd);
 			map.put(clazz, sd);
 		}
 		if (clazz.equals("com.soffid.iam.api.User"))
-			sd = addUserAttributes (sd);
+			sd = addAttributes (sd, MetadataScope.USER);
+		if (clazz.equals("com.soffid.iam.api.Role"))
+			sd = addAttributes (sd, MetadataScope.ROLE);
 		return sd;
 	}
 	
@@ -47,6 +51,7 @@ public class SearchDictionaryBuilder {
 		addJoin (sd, "accounts.account.roles.role.name", "auditoria.zul.rol", TypeEnumeration.STRING_TYPE);
 		
 	}
+
 	private static void addJoin(SearchDictionary sd, String name, String labelName, TypeEnumeration type) {
 		SearchAttributeDefinition sad = new SearchAttributeDefinition();
 		sad.setName(name);
@@ -118,10 +123,15 @@ public class SearchDictionaryBuilder {
 		}
 		return sd;
 	}
-	private static SearchDictionary addUserAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
+
+	private static void addRoleJoins(SearchDictionary sd) {
+		addJoin (sd, "accounts.account.name", "auditoria.zul.account", TypeEnumeration.STRING_TYPE);
+	}
+
+	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
 		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
-		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypes(MetadataScope.USER))
+		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypes(scope))
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
 				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()))

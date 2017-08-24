@@ -392,4 +392,85 @@ public class ScriptEnviroment {
 				new AuScript(null, "CodeMirrorJavaTypes[\"groupAttributes\"]={"+sb.toString()+"};")); 
 		
 	}
+
+	/**
+	 * Calculate available vars for rules evaluation
+	 * 
+	 * @param c
+	 * @return
+	 * @throws CreateException 
+	 * @throws NamingException 
+	 * @throws InternalErrorException 
+	 */
+	public String getRuleVars () throws InternalErrorException, NamingException, CreateException
+	{
+		defineUserAttributes(null);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("\"clear\":\"void\", ")
+			.append("\"containsKey\":\"boolean\",")
+			.append("\"containsValue\":\"boolean\",")
+			.append("\"entrySet\":\"java.util.Set\",")
+			.append("\"equals\":\"boolean\",")
+			.append("\"get\":\"com.soffid.iam.api.Group\",")
+			.append("\"hashCode\":\"int\",")
+			.append("\"isEmpty\":\"boolean\",")
+			.append("\"keySet\":\"java.util.Set\",")
+			.append("\"put\":\"null\",")
+			.append("\"putAll\":\"void\",")
+			.append("\"remove\":\"null\",")
+			.append("\"size\":\"int\",")
+			.append("\"values\":\"java.util.Collection<com.soffid.iam.api.Group>\"");
+		
+		Executions.getCurrent().addAuResponse(null,
+				new AuScript(null, "CodeMirrorJavaTypes[\"java.util.Map<String,com.soffid.iam.api.Group>\"]={"+sb.toString()+"};")); 
+
+		return "{\"user\":\"com.soffid.iam.api.User\","
+				+ "\"attributes\":\"userAttributes\","
+				+ "\"groups\":\"java.util.Map<String,com.soffid.iam.api.Group>\","
+				+ "\"groupsList\":\"java.util.Collection<com.soffid.iam.api.Group>\","
+				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\"}";
+	}
+	/**
+	 * Calculate available vars for user domains
+	 * 
+	 * @param c
+	 * @return
+	 * @throws CreateException 
+	 * @throws NamingException 
+	 * @throws InternalErrorException 
+	 */
+	public String getDomainVars () throws InternalErrorException, NamingException, CreateException
+	{
+		defineUserAttributes(null);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("\"clear\":\"void\", ")
+			.append("\"containsKey\":\"boolean\",")
+			.append("\"containsValue\":\"boolean\",")
+			.append("\"entrySet\":\"java.util.Set\",")
+			.append("\"equals\":\"boolean\",")
+			.append("\"get\":\"com.soffid.iam.api.Group\",")
+			.append("\"hashCode\":\"int\",")
+			.append("\"isEmpty\":\"boolean\",")
+			.append("\"keySet\":\"java.util.Set\",")
+			.append("\"put\":\"null\",")
+			.append("\"putAll\":\"void\",")
+			.append("\"remove\":\"null\",")
+			.append("\"size\":\"int\",")
+			.append("\"values\":\"java.util.Collection<com.soffid.iam.api.Group>\"");
+		
+		Executions.getCurrent().addAuResponse(null,
+				new AuScript(null, "CodeMirrorJavaTypes[\"java.util.Map<String,com.soffid.iam.api.Group>\"]={"+sb.toString()+"};")); 
+
+		return "{\"user\":\"com.soffid.iam.api.User\","
+				+ "\"attributes\":\"userAttributes\","
+				+ "\"userDomain\":\"com.soffid.iam.api.UserDomain\","
+				+ "\"system\":\"com.soffid.iam.api.System\","
+				+ "\"groups\":\"java.util.Map<String,com.soffid.iam.api.Group>\","
+				+ "\"groupsList\":\"java.util.Collection<com.soffid.iam.api.Group>\","
+				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\"}";
+	}
+
 }
+

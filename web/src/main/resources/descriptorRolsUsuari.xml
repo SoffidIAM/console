@@ -26,7 +26,19 @@
 		</finder>
 	</datanode>	
 	
-	<datanode name="rolUsuari"/>
+	<datanode name="rolUsuari">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete" >  <!-- user:role:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> 
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
 	<datanode name="jerarquiaRolUsuari"/>
 	
 </zkib-model>

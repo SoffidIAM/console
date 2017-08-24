@@ -59,11 +59,29 @@
 		}
 
 		void cleanWindow(){
-			model.getVariables().declareVariable("queryEnabled", false);
-//			listbox.dataPath = "/model:/void";
-			esquemaLlista.visible=false;
-			tabmenow.setSelectedIndex(0);
-			view_altres = false;							
+			if (model.isCommitPending())
+			{
+				es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(
+						org.zkoss.util.resource.Labels.getLabel("aplica_usuarisRolllista.zul.Confirm"),
+						new org.zkoss.zk.ui.event.EventListener() {
+							public void onEvent(Event evt) {
+								if ("onOK".equals(evt.getName())) {
+									model.commit();
+								}
+								model.getVariables().declareVariable("queryEnabled", false);
+								esquemaLlista.visible=false;
+								view_altres = false;
+							}
+						});	
+			}
+			else
+			{
+				model.getVariables().declareVariable("queryEnabled", false);
+	//			listbox.dataPath = "/model:/void";
+				esquemaLlista.visible=false;
+				tabmenow.setSelectedIndex(0);
+				view_altres = false;
+			}
 		}		
 				
 	]]></zscript>
@@ -121,6 +139,7 @@
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.Bbdd')}" width="10%"/>
 						<listheader label="${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}" width="24%"/>
 						<listheader label="${c:l('usuaris.zul.recertification')}"/>
+						<listheader label="" width=""/>
 					</listhead>
 					<dataitem bind=".">
 						<listcell bind="@accountName"/>
@@ -173,6 +192,27 @@
 								]]></attribute>
 							</imageclic>
 						</listcell>
+						<listcell>
+							<imageclic align="right" src="~./img/list-remove.gif">
+							<attribute name="onClick"><![CDATA[
+								es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.getTarget());							                                   
+								String xpath = ctx.getXPath();
+								es.caib.zkib.datasource.DataSource dataSource = ctx.getDataSource();
+								String dada = XPathUtils.getValue(ctx, "codiUsuari");
+								Missatgebox.confirmaOK_CANCEL(String.format(
+										org.zkoss.util.resource.Labels
+												.getLabel("aplica_usuarisRolllista.zul.Remove"),
+										new Object[] { dada }), 
+								new EventListener() {
+									public void onEvent(Event evt) {
+										if ("onOK".equals(evt.getName())) {
+											XPathUtils.removePath(dataSource, xpath);
+										}
+									}
+								});
+							]]></attribute>
+							</imageclic>
+						</listcell>
 					</dataitem>
 				</listbox>
 				<popup id="tvalorDomini" width="200px">
@@ -198,13 +238,43 @@
 					</attribute>
 					<label id="rolsValorDomini" value=""/>
 				</popup>
-				
-				<div align="right">
+				<div>
 					<div style="float:right">
 					<button label="${c:l('aplica_usuarisRolllista.zul.Accepta')}" onClick="cleanWindow()"/>
 					</div>
-					<div style="float:left">
+					<div>
 						<listexportbutton acces="true" listbox="listbox"/>
+						<button image="~./img/list-add.gif"
+								label="${c:l('usuaris.zul.Afegeixnou')}" >
+						<attribute name="onClick"><![CDATA[
+           					Page p = desktop.getPage("identity");
+           					p.setVariable("types",
+           								new com.soffid.iam.web.component.Identity.Type[] {
+           										com.soffid.iam.web.component.Identity.Type.USER
+           								}
+           							);
+           					p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("aplicacions.zul.Afegeixrol"));
+           					p.setVariable("invoker", self);
+           					Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+						]]></attribute>
+						<attribute name="onIdentity"><![CDATA[
+							for (com.soffid.iam.web.component.Identity id: event.getData()) {
+								es.caib.seycon.ng.comu.RolAccount ra = new es.caib.seycon.ng.comu.RolAccount();
+								ra.setAccountDispatcher( bbdd );
+								ra.setNomRol( nomRol );
+								ra.setBaseDeDades(bbdd);
+								ra.setCodiAplicacio(codiApl);
+								ra.setCodiUsuari(id.getObject().getUserName());
+								ra.setCertificationDate(new Date());
+								ra.setCodiGrupUsuari(id.getObject().getPrimaryGroup());
+								ra.setEnabled(true);
+								ra.setNomComplertUsuari(id.getObject().getFullName());
+								ra.setStartDate(new Date());
+								ra.setValorDomini(new es.caib.seycon.ng.comu.ValorDomini());
+								XPathUtils.createPath(model, "/rolUsuari", ra);
+							}
+						]]></attribute>
+						</button>
 					</div>
 				</div>
 				</vbox>			
@@ -223,13 +293,11 @@
 						<listcell bind="@metaInfo"/>						
 					</dataitem>
 				</listbox>
-				<div align="right">
-				<div style="float:right">
-					<button label="${c:l('aplica_usuarisRolllista.zul.Accepta')}" onClick="cleanWindow()"/>
+				<div>
+					<div style="float:right">
+						<button label="${c:l('aplica_usuarisRolllista.zul.Accepta')}" onClick="cleanWindow()"/>
 					</div>
-					<div style="float:left">
-						<listexportbutton acces="true" listbox="listboxjerarquia"/>
-					</div>
+							<listexportbutton acces="true" listbox="listboxjerarquia"/>
 				</div>
 				</vbox>									
 			</tabpanel>
@@ -239,4 +307,6 @@
 		</vbox>
 	</window>
 
+
+	<include src="finestres/identity.zul" />
 </zk>

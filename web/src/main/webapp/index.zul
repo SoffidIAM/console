@@ -9,7 +9,11 @@
 	style="overflow: hidden">
 	<attribute name="onCreate">
 		principal = com.soffid.iam.utils.Security.getPrincipal();
-		app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );
+		try {
+			app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );
+		} catch (ComponentNotFoundException e) {
+		}
+			
 	</attribute>
 	
     <div>

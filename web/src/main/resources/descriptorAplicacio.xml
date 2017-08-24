@@ -344,15 +344,9 @@
 
 	<datanode name="rols">
 		<finder name="rol" type="rol">
-			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRolsByFiltre"
-				if="${queryEnabled}"> <!--tothom i application:query i user:role:query[aplicacions] -->
-				<parameter value="${nom}" />
-				<parameter value="${descripcio}" />
-				<parameter value="${defecte}" />
-				<parameter value="${bbdd}" />
-				<parameter value="${contrasenya}" />
-				<parameter value="${aplicacio}" />
-				<parameter value="${gestionableWF}" />
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRoleByJsonQuery"
+				if="${queryEnabled}"> 
+				<parameter value="${roleQuery}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Rol">
 			</new-instance-bean>

@@ -25,130 +25,14 @@
 	
 			void populateDetails ()
 			{
-				mode = "query";
 			}
 	
-			// Method to obtain the parameters to search process
-			java.util.Map getSearchParameters()
-			{
-				java.util.Map searchValues = new java.util.HashMap();
-				
-				nom = esquemaLlista.getFellow("queryWindow").getFellow("queryNom")
-						.getFellow("textbox");
-				aplicacio = esquemaLlista.getFellow("queryWindow")
-						.getFellow("queryAplicacio").getFellow("textbox");
-				bbdd = esquemaLlista.getFellow("queryWindow").getFellow("queryBbdd")
-						.getSelectedItem();
-				descripcio = esquemaLlista.getFellow("queryWindow")
-						.getFellow("queryDescripcio").getFellow("textbox");
-				defecte = null;
-				contrasenya = null;
-				
-				// Check enable query
-				if ((nom.value.trim().length() == 0) &&
-						(aplicacio.value.trim().length() == 0) &&
-						((bbdd == null) || (bbdd.getValue() == null)) &&
-						(descripcio.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
-				
-				// Add parameters to search
-				searchValues.put("nom", nom.value);
-				searchValues.put("aplicacio", aplicacio.value);
-				
-				if ((bbdd == null) || (bbdd.getValue() == null))
-					searchValues.put("bbdd", "");
-				
-				else
-					searchValues.put("bbdd", bbdd.getValue());
-				
-				searchValues.put("descripcio", descripcio.value);
-				
-				return searchValues;
-			}
-			
-			void search()
-			{
-				java.util.Map lista = new java.util.HashMap();
-				
-				if (!retrySearch)
-				{
-					lista = es.caib.seycon.ng.web.utils.
-						Autowildcards.replaceAsteriskChar(getSearchParameters());
-				}
-				
-				else
-				{
-					lista = es.caib.seycon.ng.web.utils.
-							Autowildcards.addPercentChar(getSearchParameters());
-				}
-				
-				for (String key : lista.keySet())
-				{
-					model.getVariables().declareVariable(key, lista.get(key));
-				}
-				
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
-				
-				listbox = esquemaLlista.getFellow("lista").getFellow("listbox");
-				if(queryEnabled)
-				{
-					model.getJXPathContext().getValue("/rol").refresh();
-					listbox.dataPath = "/model:/rol"; 
-				}
-				
-				if ((listbox.getModel().getSize() == 0) && !retrySearch)
-				{
-					retrySearch = true;
-					search();
-				}
-				
-				else
-				{
-					retrySearch = false;
-				}
-				
-				checkTruncatedList(listbox);
-			}
-			
-			void showAltres () 
-			{
-				if (view_altres == false)
-				{
-					esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
-					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
-					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
-					view_altres = true;
-				}
-				else
-				{
-					esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
-					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
-					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
-					view_altres = false;
-				}
-			}
-			
 			void cleanWindow()
 			{
-				queryWindow = esquemaLlista.getFellow("queryWindow");
-				queryWindow.getFellow("queryNom").getFellow("textbox").value = "";
-				queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
-				queryWindow.getFellow("queryBbdd").setSelectedIndex(0);
-				queryWindow.getFellow("queryAplicacio").getFellow("textbox").value = "";
-				model.getVariables().declareVariable("queryEnabled", false);
 				model.refresh();
-//				lista.getFellow("listbox").dataPath = "/model:/rol[false]"; //tothom
-				esquemaLlista.visible=false;
-				view_altres = false;
-				usuari = "";
+				esquemaLlista.getFellow("lista").getFellow("listbox").setSelectedItem(null);
 				esquemaLlista.getFellow("finishButton").disabled = true;
+				esquemaLlista.setVisible(false);
 			}
 	
 			void acceptaDada(Object valorDomini)
@@ -231,23 +115,19 @@
 						.getAttribute("mostraGestionableWF");
 				aplicacio = desktop.getPage("rolsLlista").getAttribute("aplicacio");
 				if (aplicacio != null)
-					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue(aplicacio);
+					queryWindow.getFellow("searchBox").getAttributeSearchBox("informationSystemName")
+						.setSearchFilter(aplicacio);
 				else
-					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue("");
+					queryWindow.getFellow("searchBox").getAttributeSearchBox("informationSystemName")
+						.setSearchFilter(null);
 				
+				queryWindow.getFellow("searchBox").getAttributeSearchBox("system")
+					.setSearchFilter(rol_bbdd);
+
 				if (tipus.equals("wizard"))
 				{
 					esquemaLlista.setTitle(org.zkoss.util.resource
 							.Labels.getLabel("rolsllista.Wizard"));
-					if (rol_bbdd != null)
-					{
-						tb_bbdd = esquemaLlista.getFellow("queryWindow")
-								.getFellow("queryBbdd");
-						
-						tb_bbdd.setDisabled(true);
-						setSelectedItem(tb_bbdd, rol_bbdd);
-					}
-					
 					wizard = true;
 				}
 				
@@ -255,12 +135,6 @@
 					esquemaLlista.setTitle(String.format(org.zkoss.util.resource
 							.Labels.getLabel("rolsllista.WizardAgent"),
 						new Object [] {rol_bbdd}));
-					tb_bbdd = esquemaLlista.getFellow("queryWindow")
-							.getFellow("queryBbdd");
-					tb_bbdd.setDisabled(true);
-					
-					setSelectedItem(tb_bbdd, rol_bbdd);
-					
 					wizard = false;
 				}
 				
@@ -268,10 +142,6 @@
 				{
 					esquemaLlista.setTitle(org.zkoss.util.resource
 							.Labels.getLabel("rolsllista.Titol"));
-					tb_bbdd = esquemaLlista.getFellow("queryWindow")
-							.getFellow("queryBbdd");
-					
-					setSelectedItem(tb_bbdd, rol_bbdd);
 					wizard = false;
 				}
 				
@@ -294,6 +164,7 @@
 					model.getVariables().declareVariable("gestionableWF", null);
 				}
 				
+				model.getVariables().declareVariable("queryEnabled", true);
 				if ("rol_bbdd".equals(tipus))
 					search();
 			]]>
@@ -311,27 +182,15 @@
 			]]>
 		</attribute>
 		
-		<criteris id="queryWindow" height="60px" onOK="search()" width="99%">
-			<hbox>
-				<input_criteri id="queryNom" etiqueta="${c:l('rolsllista.zul.Nom')}" />
-				<input_criteri id="queryAplicacio"
-					etiqueta="${c:l('rolsllista.zul.Aplicacia')}"
-					onChange="self.getFellow(&quot;textbox&quot;).value=self.getFellow(&quot;textbox&quot;).value.toUpperCase()"/>
-				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
-			</hbox>
-			<hbox>
-				<hbox width="250px" widths="100px,*">
-					<label sclass="etiqueta" value="${c:l('rolsllista.zul.Basededades')}" />
-					<listbox id="queryBbdd" mold="select" dataPath="/model:/dispatcher">
-						<dataitem bind="@codi">
-							<listcell bind="@codi" />
-						</dataitem>
-					</listbox>
-				</hbox>
-				<input_criteri id="queryDescripcio"
-					etiqueta="${c:l('rolsllista.zul.Descripcia')}" />
-			</hbox>
+		<criteris id="queryWindow" style="margin-bottom:1em;" 
+			width="100%" height="">
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Role" 
+				defaultAttributes="name, description, informationSystemName, system"
+				dataPath="/model:/rol" variableName="roleQuery"></searchbox>
+
 		</criteris>
+
 		
 		<navegador id="lista" width="99%">
 			<listbox id="listbox" autocommit="false" dataPath="/model:/rol"
@@ -381,7 +240,7 @@
 							seguent();
 						</attribute>
 					</listcell>
-					<listcell bind="domini/@nom">
+					<listcell bind="domainName">
 						<attribute name="onDoubleClick">
 							seguent();
 						</attribute>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="identity" title="Search for identities"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+
+<zk>
+
+	<style src="/css/localSEU.css"></style>
+	<zscript><![CDATA[
+//		String title = "";
+//		com.soffid.iam.web.component.Identity.Type[] types= null;
+//		Component invoker = null;
+//		List currentIdentities = null;
+	]]></zscript>
+	<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" > 
+	
+	
+	
+	<window id="identityWindow" closable="true" position="center, center"
+		sizable="false" 
+		style="min-width: 60em; width:60%"
+		title="${c:l('identity.title')}" 
+		visible="false">
+		<attribute name="onDisplay"><![CDATA[
+		    // Variables to set:
+		    // title: window title
+		    // types: Array of identity types
+		    // invoker: Invoker component
+		    // currentIdentities: identities pre-loaded
+			start();
+		]]></attribute>
+
+		<zscript><![CDATA[		                  
+		void start () {		                  
+			identityWindow.setTitle( title );
+			identityWindow.doHighlighted();
+			selected.getChildren().clear();
+			if ( currentIdentities != null && currentIdentities != void)
+			{
+				for (com.soffid.iam.web.component.Identity id: currentIdentities) {
+					selected.appendChild(id.generateTag(true) );
+				}
+			}
+			textbox.setValue("");
+			result.getChildren().clear();
+		}
+		
+		void cancel()
+		{
+			currentIdentities = null;
+			identityWindow.setVisible(false);
+		}
+		
+		void accept()
+		{
+			List identities = new LinkedList();
+			for ( Component div: selected.getChildren())
+			{
+				com.soffid.iam.web.component.Identity id = div.getAttribute("identity");
+				identities.add(id);
+			}
+			currentIdentities = null;
+			identityWindow.setVisible(false);
+			Events.sendEvent(new Event("onIdentity", invoker, identities));
+			
+		}
+		
+		void search(String t) throws Exception
+		{
+			List ids = new LinkedList();
+			for (com.soffid.iam.web.component.Identity.Type type: types)
+			{
+				if (type == com.soffid.iam.web.component.Identity.Type.USER)
+				{
+					searchUsers(t, ids);
+				}
+				if (type == com.soffid.iam.web.component.Identity.Type.ACCOUNT)
+				{
+					searchAccounts(t, ids);
+				}
+				if (type == com.soffid.iam.web.component.Identity.Type.ROLE)
+				{
+					searchRoles(t, ids);
+				}
+				if (type == com.soffid.iam.web.component.Identity.Type.GROUP)
+				{
+					searchGroups(t, ids);
+				}
+			}
+
+			Collections.sort(ids, com.soffid.iam.web.component.Identity.getComparator());
+			result.getChildren().clear();
+			for (com.soffid.iam.web.component.Identity id: ids)
+			{
+				Div d = id.generateSelector(t);
+				result.appendChild(d);
+				d.addEventListener("onClick", new org.zkoss.zk.ui.event.EventListener(){
+					public void onEvent(Event e)
+					{
+						com.soffid.iam.web.component.Identity id = e.getTarget().getAttribute("identity");
+						e.getTarget().detach();
+						for (Component child: selected.getChildren())
+						{
+							com.soffid.iam.web.component.Identity id2 = child.getAttribute("identity");
+							if (id.equals(id2))
+								return;
+						}
+						selected.appendChild(id.generateTag(true) );
+						textbox.focus();
+						textbox.setSelectionRange(0, textbox.getText().length());
+					}
+				});
+			}
+}
+		
+		void searchUsers (String t, List ids) {
+			Collection users = com.soffid.iam.EJBLocator.getUserService().findUserByText(t);
+			for (com.soffid.iam.api.User user: users) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(user);
+				ids.add(id);				
+			}
+		}
+		                  
+		void searchAccounts (String t, List ids) {
+			Collection accounts = com.soffid.iam.EJBLocator.getAccountService().findAccountByText(t);
+			for (com.soffid.iam.api.Account acc: accounts) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(acc);
+				ids.add(id);
+			}
+		}
+		
+		void searchRoles (String t, List ids) {
+			Collection roles = com.soffid.iam.EJBLocator.getApplicationService().findRoleByText(t);
+			for (com.soffid.iam.api.Role role: roles) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role);
+				ids.add(id);
+			}
+		}
+
+		void searchGroups (String t, List ids) {
+			Collection groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByText(t);
+			for (com.soffid.iam.api.Group group: groups) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(group);
+				ids.add(id);
+			}
+		}
+
+		]]></zscript>
+
+		<div style="padding: 3em">
+			<div id="selected" style="display: inline"/>
+			<textbox style="display:inline-block; width:100%; min-width: 20em; border: none; border-bottom: solid darkgrey 1px; outline:none" id="textbox">
+			<attribute name="onChanging"><![CDATA[
+			    search (event.value);                            
+			]]></attribute>
+			</textbox>
+			<div id="result"/>
+		</div>
+		
+		<div style="float: right;">
+			<button label="${c:l('agentsllista.zul.Accepta') }" onClick="accept()"/>
+			<button label="${c:l('agentsllista.zul.Cancel·la') }" onClick="cancel()"/>
+		</div>
+		
+		<div style="clear: both;"/>
+
+	</window>
+	
+	<include src="/finestres/aplica_rolsllista.zul"/>
+	<include src="/dominisllista.zul"/>
+	
+	<include src="/finestres/aplica_rol_valorDomini.zul"/>
+</div>
+
+</zk>

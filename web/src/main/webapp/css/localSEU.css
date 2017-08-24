@@ -516,6 +516,7 @@ div.CodeMirror-code   {
 .attribute-search-box-remove {
 	width:1em;
 	opacity:0.2;
+	vertical-align: text-top;
 }
 
 .search-icon {
@@ -555,4 +556,87 @@ a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited
 
 .capsa_cerca {
 	height: inherit !important;
+}
+
+li.attribute-search-box {
+	background-color: white;
+    border: 1px solid #9EC73C;
+    border-image: none;
+    padding: 0px;
+    padding-right: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #7F9FC2;
+}
+
+li.attribute-search-box button {
+	background-color: transparent;
+    border: none;
+    border-image: none;
+    padding: 4px;
+    margin: 0px;
+    color: #7F9FC2;
+    cursor: pointer;
+}
+
+li.attribute-search-box:hover {
+	background-color: #9EC73C;
+    color: white;
+    cursor: pointer;
+}
+
+div.identity-tag-user {
+    background-color: blue;
+    border-radius: 4px;
+    padding: 4px;
+    color: white;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-user span {
+    color: white;
+    margin-right: 2em;
+}
+
+div.identity-tag-user img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-user img.imageclic:hover {
+	opacity: 1;
+}
+
+div.identity-selector {
+	cursor:pointer
+}
+
+div.identity-selector:hover {
+	text-decoration: underline
+}
+
+div.identity-tag-role {
+    background-color: #fff080;
+    border-radius: 4px;
+    padding: 4px;
+    color: black;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-role span {
+    color: black;
+    margin-right: 2em;
+}
+
+div.identity-tag-role img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-role img.imageclic:hover {
+	opacity: 1;
 }

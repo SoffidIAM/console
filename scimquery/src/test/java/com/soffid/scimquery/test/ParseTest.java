@@ -48,6 +48,11 @@ public class ParseTest extends TestCase {
 		assertTrue (e.evaluate(acc));
 		
 
+		acc.setName("na\"me");
+		e = ExpressionParser.parse("name eq \"na\\\"me\"");
+		
+		assertTrue (e.evaluate(acc));
+
 		e = ExpressionParser.parse("name eq \"name2\"");
 		
 		assertFalse (e.evaluate(acc));
@@ -132,4 +137,5 @@ public class ParseTest extends TestCase {
 	{
 		expressionTester("nameColumn pr", Account.class);
 	}
+	
 }

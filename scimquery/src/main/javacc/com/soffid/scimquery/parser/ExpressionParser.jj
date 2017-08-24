@@ -47,7 +47,9 @@ TOKEN : { < DOUBLE : (["0"-"9"])*"."(["0"-"9"])+ > }
 TOKEN : { < TRUE : "true" > }
 TOKEN : { < FALSE : "false" > }
 TOKEN : { < IDENTIFIER : ["A"-"Z","a"-"z",".","_"](["A"-"Z","a"-"z",".","_","0"-"9"])* > }
-TOKEN : { < QUOTEDTEXT : ["\""](~["\""])*["\""] > }
+TOKEN : { < QUOTEDTEXT : ["\""]
+			(  ["\\"] ~[] | ~["\"", "\\"] )*
+			["\""] > }
 
 Object Constant ():
 {

@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.mda.annotation.*;
@@ -289,6 +290,10 @@ public abstract class RolEntity {
 	@DaoOperation
 	public void rollbackDefinition (RolEntity role)
 	{ return ; }
+
+
+	@DaoFinder("from com.soffid.iam.model.AccountEntity  where :text is null")
+	public Collection<RolEntity>findByText (String text) { return null; }
 }
 
 

@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.model;
 
+import java.util.Collection;
+
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
@@ -147,6 +149,10 @@ public abstract class AccountEntity {
 	{
 		
 	}
+
+	@DaoFinder("from com.soffid.iam.model.AccountEntity where :text is null")
+	public Collection<AccountEntity>findByText (String text) { return null; }
+	
 }
 
 @Index (name="SC_ACCOUN_NAME",	unique=true,

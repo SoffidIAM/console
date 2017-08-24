@@ -484,7 +484,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 + " com.soffid.iam.model.SessionEntity sessio " //$NON-NLS-1$
                 + " right outer join sessio.host as maquina " //$NON-NLS-1$
                 + " left outer join sessio.user as usuari" + //$NON-NLS-1$
-                " where maquina.deleted = false "; //$NON-NLS-1$
+                " where maquina.deleted = false and maquina.tenant.id = :tenantId "; //$NON-NLS-1$
+        params.add(new Parameter("tenantId", Security.getCurrentTenantId())); //$NON-NLS-1$
         if (nom != null ) {
             query = query + "and maquina.name like :nom "; //$NON-NLS-1$
             params.add(new Parameter("nom", nom)); //$NON-NLS-1$
@@ -1262,10 +1263,11 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             String query = "select distinct maquina.network " //$NON-NLS-1$
                     + "from com.soffid.iam.model.HostEntity maquina " //$NON-NLS-1$
             		+ "where " //$NON-NLS-1$ 
-                    + "maquina.name like :maquina and "
+                    + "maquina.name like :maquina and maquina.tenant.id=:tenantId and "
             		+ "maquina.network.name in (" + xarxes + ") " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     + "order by maquina.network.name"; //$NON-NLS-1$
-            Parameter parametres[] = { new Parameter("maquina", maquina) }; //$NON-NLS-1$
+            Parameter parametres[] = { new Parameter("maquina", maquina), 
+            		new Parameter("tenantId", Security.getCurrentTenantId()) }; //$NON-NLS-1$
             List<NetworkEntity> xarxesList = getNetworkEntityDao().query(query, parametres);
             return getNetworkEntityDao().toNetworkList(xarxesList);
         }
@@ -1277,8 +1279,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 + "com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC where " //$NON-NLS-1$
                 + "xarxaAC.role.name = :nom and " //$NON-NLS-1$
                 + "xarxaAC.role.system.name = :dispatcher and " //$NON-NLS-1$
+                + "xarxaAC.role.system.tenant.id = :tenantId and " //$NON-NLS-1$
                 + "xarxaAC.role.informationSystem.name = :aplicacio"; //$NON-NLS-1$
-        Parameter[] parametres = {new Parameter("nom", rol.getName()), new Parameter("dispatcher", rol.getSystem()), new Parameter("aplicacio", rol.getInformationSystemName())}; //$NON-NLS-1$
+        Parameter[] parametres = {new Parameter("nom", rol.getName()), 
+    			new Parameter("tenantId", Security.getCurrentTenantId()), 
+        			new Parameter("dispatcher", rol.getSystem()), 
+        			new Parameter("aplicacio", rol.getInformationSystemName())}; //$NON-NLS-1$
         Collection<NetworkAuthorizationEntity> xarxaACsTrobades = getNetworkAuthorizationEntityDao().query(query, parametres);
         if (xarxaACsTrobades != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxaACsTrobades);
@@ -1368,17 +1374,29 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 + "and (:mac is null or maquina.mac like :mac) and " //$NON-NLS-1$
                 + "(:descripcio is null or maquina.description like :descripcio) and " //$NON-NLS-1$
                 + "(:xarxa is null or maquina.network.name like :xarxa) and " //$NON-NLS-1$
-                + "(:codiUsuari is null  or (usuari is not null and  usuari.userName like :codiUsuari))" //$NON-NLS-1$
-                + "and (:servidorImpressores is null or maquina.printers like :servidorImpressores) " //$NON-NLS-1$
+                + "(:codiUsuari is null  or (usuari is not null and  usuari.userName like :codiUsuari)) " //$NON-NLS-1$
+                + "and (:servidorImpressores is null or maquina.printersServer like :servidorImpressores) " //$NON-NLS-1$
+                + "and (maquina.tenant.id = :tenantId) " //$NON-NLS-1$
                 + "order by maquina.name "; //$NON-NLS-1$
 
-        Parameter[] params = new Parameter[] { new Parameter("nom", nom), //$NON-NLS-1$
+/*        query = "select distinct maquina from " //$NON-NLS-1$
+                + " com.soffid.iam.model.HostEntity as maquina " //$NON-NLS-1$
+                + " where "
+                + "(:ofimatica is null or maquina.folders like :ofimatica) and " //$NON-NLS-1$
+                + "(maquina.tenant.id = :tenantId) " //$NON-NLS-1$
+                + "order by maquina.name "; //$NON-NLS-1$
+*/
+        Parameter[] params = new Parameter[] {
+        		new Parameter("nom", nom), //$NON-NLS-1$
                 new Parameter("sistemaOperatiu", sistemaOperatiu), new Parameter("adreca", adreca), //$NON-NLS-1$ //$NON-NLS-2$
                 new Parameter("dhcp", dhcp), new Parameter("correu", correu), //$NON-NLS-1$ //$NON-NLS-2$
-                new Parameter("ofimatica", ofimatica), new Parameter("mac", mac), //$NON-NLS-1$ //$NON-NLS-2$
+                new Parameter("ofimatica", ofimatica), 
+                new Parameter("mac", mac), //$NON-NLS-1$ //$NON-NLS-2$
                 new Parameter("descripcio", descripcio), new Parameter("xarxa", xarxa), //$NON-NLS-1$ //$NON-NLS-2$
                 new Parameter("codiUsuari", codiUsuari), //$NON-NLS-1$
-                new Parameter("servidorImpressores", servidorImpressores) }; //$NON-NLS-1$
+                new Parameter("tenantId", Security.getCurrentTenantId()), //$NON-NLS-1$
+                new Parameter("servidorImpressores", servidorImpressores) 
+                }; //$NON-NLS-1$
         maquines = getHostEntityDao().query(query, params);
 
         // Filtramos por alias (si se ha especificado algún valor)

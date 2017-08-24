@@ -453,7 +453,33 @@ public class AccountEntityDaoImpl extends
 		if (auditType != null)
 			auditar(auditType, entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
+
+
+	@Override
+	public Collection<AccountEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
+		String[] split = text.trim().split(" +");
+		Parameter[] params = new Parameter[split.length + 1];
+		
+		StringBuffer sb = new StringBuffer("select u "
+				+ "from com.soffid.iam.model.AccountEntity as u "
+				+ "where u.system.tenant.id = :tenantId");
+		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
+		for (int i = 0; i < split.length; i++)
+		{
+			sb.append(" and ");
+			params[i+1] = new Parameter("param"+i, "%"+split[i].toUpperCase()+"%");
+			sb.append("(upper(u.name) like :param")
+				.append(i)
+				.append(" or upper(u.description) like :param")
+				.append(i)
+				.append(" or upper(u.system.name) like :param")
+				.append(i)
+				.append(")");
+		}
+		return query(sb.toString(), params);
+	}
 }
+
 
 class AccountCacheEntry {
 	long timeStamp;

@@ -42,6 +42,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
@@ -1263,6 +1264,32 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		    }
 		}
 		
+	}
+
+	@Override
+	public Collection<UserEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
+		String[] split = text.trim().split(" +");
+		Parameter[] params = new Parameter[split.length + 1];
+		
+		StringBuffer sb = new StringBuffer("select u "
+				+ "from com.soffid.iam.model.UserEntity as u "
+				+ "where u.tenant.id = :tenantId");
+		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
+		for (int i = 0; i < split.length; i++)
+		{
+			sb.append(" and ");
+			params[i+1] = new Parameter("param"+i, "%"+split[i].toUpperCase()+"%");
+			sb.append("(upper(u.userName) like :param")
+				.append(i)
+				.append(" or upper(u.firstName) like :param")
+				.append(i)
+				.append(" or upper(u.lastName) like :param")
+				.append(i)
+				.append(" or upper(u.middleName) like :param")
+				.append(i)
+				.append(")");
+		}
+		return query(sb.toString(), params);
 	}
     
     

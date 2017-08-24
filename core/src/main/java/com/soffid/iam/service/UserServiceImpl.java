@@ -3096,19 +3096,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		ClassConfig cc = Configuration
 				.getClassConfig(UserDataEntity.class);
 		
-/*		for (MetaDataEntity att: getMetaDataEntityDao().findByScope(MetadataScope.USER))
-		{
-			if (att.getType().equals(TypeEnumeration.DATE_TYPE))
-			{
-				AttributeConfig attributeConfig = new AttributeConfig();
-				attributeConfig.setVirtualAttribute(true);
-				attributeConfig.setVirtualAttributeValue("dateValue");
-				attributeConfig.setVirtualAttributeName("attribute.name");
-				attributeConfig.setAttributeName(att.getName());
-				cc.getAttributes().put(att.getName(), attributeConfig );
-			}
-		}
-*/
 		if (cc == null)
 		{
 			cc = new ClassConfig();
@@ -3121,5 +3108,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		return Configuration.getClassConfig(com.soffid.iam.api.User.class);
+	}
+
+	@Override
+	protected Collection<User> handleFindUserByText(String text) throws Exception {
+		LinkedList<User> result = new LinkedList<User>();
+		for (UserEntity ue : getUserEntityDao().findByText(text)) {
+			User u = getUserEntityDao().toUser(ue);
+			if (getAuthorizationService().hasPermission(
+					Security.AUTO_USER_QUERY, ue)) {
+				result.add(u);
+			}
+		}
+
+		return result;
 	}
 }

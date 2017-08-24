@@ -22,6 +22,7 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.User;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
@@ -680,6 +681,21 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				}
 			}
 		}
+	}
+
+
+	@Override
+	protected Collection<Group> handleFindGroupByText(String text) throws Exception {
+		LinkedList<Group> result = new LinkedList<Group>();
+		for (GroupEntity ue : getGroupEntityDao().findByText(text)) {
+			Group u = getGroupEntityDao().toGroup(ue);
+			if (getAuthorizationService().hasPermission(
+					Security.AUTO_GROUP_QUERY, ue)) {
+				result.add(u);
+			}
+		}
+
+		return result;
 	}
 
 }

@@ -232,13 +232,24 @@ public abstract class AccountService {
 	/////////////
 	@Description("Generates the account name for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
-			translated="gessAccountName")
+			translated="guessAccountName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String gessAccountName(
 		java.lang.String userName, 
 		java.lang.String dispatcherName)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+	
+	@Description("Checks if an account should be created for a user and system")
+	@Operation ( grantees={roles.agent_update.class},
+			translated="needsAccount")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public boolean needsAccount(
+		java.lang.String userName, 
+		java.lang.String dispatcherName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return false;
 	}
 	
 	//////////
@@ -468,4 +479,11 @@ public abstract class AccountService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.account_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByText(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

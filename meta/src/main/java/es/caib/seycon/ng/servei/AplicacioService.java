@@ -158,7 +158,7 @@ public abstract class AplicacioService {
 		return null;
 	}
 
-	@Operation(grantees = { roles.application_query.class }, translated = "findRolesByFilter")
+	@Operation(grantees = { roles.role_query.class }, translated = "findRolesByFilter")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByFiltre(
 			@Nullable java.lang.String nom,
@@ -529,4 +529,19 @@ public abstract class AplicacioService {
 	public void revokeRolesHoldedOnGroup(long userId, long groupId) {
 	}
 
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByJsonQuery(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByText(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

@@ -55,7 +55,6 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
@@ -143,11 +142,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     protected UserAccount handleCreateAccount(User usuari, com.soffid.iam.api.System dispatcher, String name) throws Exception {
 		UserEntity ue = getUser(usuari.getUserName());
 		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
-		UserAccountEntity uae = generateAccount(name, ue, de);
+		UserAccountEntity uae = generateAccount(name, ue, de, true);
 		return getUserAccountEntityDao().toUserAccount(uae);
 	}
 
-	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de) throws NeedsAccountNameException, EvalError, InternalErrorException, AccountAlreadyExistsException {
+	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de, boolean force) throws NeedsAccountNameException, EvalError, InternalErrorException, AccountAlreadyExistsException {
 		boolean nullName = false;
 		if (name == null)
 		{
@@ -157,7 +156,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
 			// Search if already has a user name for this user domain
 			
-			name = gessAccountName(ue.getUserName(), de.getName());
+			if (!force && ! needsAccount(ue.getUserName(), de.getName()))
+				return null;
+			
+			name = guessAccountName(ue.getUserName(), de.getName());
 							
 			if (name == null)
 				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")+" ("+ue.getUserName()+" / "+de.getName()+") "); //$NON-NLS-1$
@@ -601,7 +603,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user)) {
                     if (accs.isEmpty()) {
                         try {
-                            generateAccount(null, ue, disEntity);
+                            generateAccount(null, ue, disEntity, false);
                         } catch (Exception e) {
                             LogFactory.getLog(getClass()).warn(String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getName()), e);
                         }
@@ -675,7 +677,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	@Override
-	protected String handleGessAccountName(String userName, String dispatcherName)
+	protected String handleGuessAccountName(String userName, String dispatcherName)
 			throws Exception
 	{
 		SystemEntity dispatcher = getSystemEntityDao().findByName(dispatcherName);
@@ -693,7 +695,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return userName;
 		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
-			return evalExpression(du, ue, dispatcherName);
+			Object o = evalExpression(du, ue, dispatcherName, du.getBshExpr());
+			if (o != null && ! (o instanceof String))
+				throw new InternalErrorException(
+						String.format("Create expression for domain %s returned a non String object: %s",
+								du.getName(), o.toString()));
+			return (String) o;
 		}
 		else if (du.getType().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
 		{
@@ -710,7 +717,54 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return null;
 	}
 
-	private String evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName) throws EvalError, MalformedURLException {
+	@Override
+	protected boolean handleNeedsAccount(String userName, String dispatcherName)
+			throws Exception
+	{
+		SystemEntity dispatcher = getSystemEntityDao().findByName(dispatcherName);
+		if (dispatcher.getManualAccountCreation() != null && dispatcher.getManualAccountCreation().booleanValue())
+			return false;
+		
+		UserDomainEntity du = getUserDomainEntityDao().findBySytem(dispatcherName);
+		// Search if already has a user name for this user domain
+		
+		UserEntity ue = getUserEntityDao().findByUserName(userName);
+		if (ue == null)
+			return false;
+
+		if (du.getType().equals(TipusDominiUsuariEnumeration.PRINCIPAL))
+			return true;
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
+		{
+			if (du.getBshExprCreate() == null || 
+					du.getBshExprCreate().replace('\r', ' ').replace('\t', ' ').replace('\n', ' ').isEmpty())
+				return true;
+			Object o = evalExpression(du, ue, dispatcherName, du.getBshExprCreate());
+			if (o == null || ! (o instanceof Boolean))
+				throw new InternalErrorException(
+						String.format("Create expression for domain %s returned a non boolean object: %s",
+								du.getName(), o == null ? "null": o.toString()));
+			return (Boolean) o;
+						
+		}
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
+		{
+			Object obj = applicationContext.getBean(du.getBeanGenerator());
+			if (obj == null)
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getName())); //$NON-NLS-1$
+			if (! (obj instanceof AccountNameGenerator))
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
+			AccountNameGenerator generator = (AccountNameGenerator) obj;
+			SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
+			return generator.needsAccount(ue, de);
+		}
+		else
+			return false;
+	}
+
+
+	private Object evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName,
+			String expression) throws EvalError, MalformedURLException {
 		User userVO = getUserEntityDao().toUser(ue);
 		SecureInterpreter interpreter = new SecureInterpreter();
 		SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
@@ -740,7 +794,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		interpreter.set("system", getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
 		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
 				
-		return (String) interpreter.eval(du.getBshExpr());
+		return interpreter.eval(expression);
 	}
 
 	@Override
@@ -1780,6 +1834,20 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						Security.AUTO_USER_QUERY, ue)) {
 					result.add(u);
 				}
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	protected Collection<Account> handleFindAccountByText(String text) throws Exception {
+		LinkedList<Account> result = new LinkedList<Account>();
+		for (AccountEntity ue : getAccountEntityDao().findByText(text)) {
+			Account u = getAccountEntityDao().toAccount(ue);
+			if (getAuthorizationService().hasPermission(
+					Security.AUTO_ACCOUNT_QUERY, ue)) {
+				result.add(u);
 			}
 		}
 

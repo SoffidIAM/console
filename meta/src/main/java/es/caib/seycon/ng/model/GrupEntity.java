@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -236,6 +238,9 @@ public abstract class GrupEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+
+	@DaoFinder("from com.soffid.iam.model.GroupEntity   where :text is null")
+	public Collection<GrupEntity>findByText (String text) { return null; }
 }
 
 

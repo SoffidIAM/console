@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.soffid.iam.model.TenantEntity;
@@ -175,6 +176,9 @@ public abstract class UsuariEntity {
 		return null;
 	}
 
+	@DaoFinder("from com.soffid.iam.model.UserEntity  where :text is null")
+	public Collection<UsuariEntity>findByText (String text) { return null; }
+	
 	@Operation(translated = "generateUserName")
 	@DaoFinder
 	public String generaCodiUsuari() {

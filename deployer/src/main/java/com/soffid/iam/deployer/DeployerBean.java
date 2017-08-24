@@ -452,7 +452,7 @@ public class DeployerBean implements DeployerService {
 
 		if (originalName.endsWith(".aar"))
 		{
-			File wsFile = new File(webserviceWarFile,
+			File wsFile = new File(new File (removeExtension(webserviceWarFile.getPath())),
 					"WEB-INF/services/plugin-" + name + ".aar"); //$NON-NLS-1$ //$NON-NLS-2$
 	
 			log.info("Generating webservice file " + wsFile);
@@ -466,7 +466,7 @@ public class DeployerBean implements DeployerService {
 		}
 		else
 		{
-			File classesDir = new File(webserviceWarFile,
+			File classesDir = new File(new File (removeExtension(webserviceWarFile.getPath())),
 					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
 			File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 			log.info("Generating web service file " + coreFile);
@@ -664,6 +664,9 @@ public class DeployerBean implements DeployerService {
 		lastModified = initialEarFile().lastModified();
 
 		try {
+			coreModules = new LinkedList<String>();
+			javaModules = new LinkedList<String>();
+
 			if (failSafe) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
@@ -690,20 +693,26 @@ public class DeployerBean implements DeployerService {
 						}
 					} else
 						generateEar(qh);
-				} catch (Exception e) {
-					log.warn(
-							"Error generating Soffid IAM ear. Generating fail-safe console",
-							e);
-					recursivelyDelete(tmpDir());
-					uncompressEar();
-					updateApplicationXml();
-					getTimestampFile().delete();
 				} finally {
 					conn.close();
 				}
 			}
 
 			try {
+				log.info("Deploying "+deployDir().getPath());
+				appInfo = deployer.deploy(deployDir().getPath());
+			} catch (Exception e) {
+				coreModules = new LinkedList<String>();
+				javaModules = new LinkedList<String>();
+				log.warn(
+						"Error generating Soffid IAM ear. Generating fail-safe console",
+						e);
+				System.setProperty("soffid.fail-safe", "true");
+				log.info("Deploying on fail-safe mode");
+				recursivelyDelete(tmpDir());
+				getTimestampFile().delete();
+				uncompressEar();
+				updateApplicationXml();
 				log.info("Deploying "+deployDir().getPath());
 				appInfo = deployer.deploy(deployDir().getPath());
 			} finally {

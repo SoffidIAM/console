@@ -2,8 +2,7 @@ package com.soffid.iam.webservice.group;
 
 import com.soffid.iam.api.GroupUser;
 
-@SuppressWarnings("serial")
-public class JsonSecundaryGroup extends GroupUser {
+public class JsonSecundaryGroup {
 
 	private Long id = null;
 	private String group = null;

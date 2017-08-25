@@ -3,49 +3,31 @@ package es.caib.bpm.attachment;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.ejb.CreateException;
-import javax.ejb.EJBContext;
 import javax.ejb.EJBException;
 import javax.ejb.RemoveException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.rmi.PortableRemoteObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.media.Media;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
-import org.zkoss.zul.Messagebox;
 
 import com.soffid.iam.doc.exception.DocumentBeanException;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TaskAttachmentManager extends AbstractAttachmentManager {
     TaskInstance task;
-
-    private static final String PREFIX = "attachment/"; //$NON-NLS-1$
 
     public TaskAttachmentManager(TaskInstance task) {
         super();
@@ -111,8 +93,6 @@ public class TaskAttachmentManager extends AbstractAttachmentManager {
                 .getEngine();
         engine.update(task);
     }
-
-    private static Log log = LogFactory.getLog(TaskAttachmentManager.class);
 
     protected void putVariable(String key, Object value) {
         task.getVariables().put(key, value);

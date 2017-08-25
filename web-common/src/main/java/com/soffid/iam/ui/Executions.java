@@ -4,20 +4,15 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Iterator;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.caib.seycon.ng.ServiceLocator;
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
 import es.caib.seycon.ng.comu.PuntEntrada;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AplicacioService;
-import es.caib.seycon.ng.servei.PuntEntradaService;
-import es.caib.seycon.ng.servei.ejb.PuntEntradaServiceHome;
 
 public class Executions extends HttpServlet {
 
@@ -49,11 +44,7 @@ public class Executions extends HttpServlet {
 			}
 		} else {
 			try {
-				es.caib.seycon.ng.servei.ejb.PuntEntradaService puntEntradaService = 
-						(es.caib.seycon.ng.servei.ejb.PuntEntradaService) new InitialContext()
-							.lookup(PuntEntradaServiceHome.JNDI_NAME);
-				PuntEntrada pe;
-				pe = puntEntradaService.findPuntEntradaById(Long.decode(id).longValue());
+				PuntEntrada pe = EJBLocator.getPuntEntradaService().findPuntEntradaById(Long.decode(id).longValue());
 				if (pe != null)
 				{
 					for (Iterator<ExecucioPuntEntrada> it = pe.getExecucions().iterator(); it.hasNext();)

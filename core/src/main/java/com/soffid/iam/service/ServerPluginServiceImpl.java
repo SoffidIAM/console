@@ -81,7 +81,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     	//
     	for ( ServerPluginModule module : spp.getPlugin().getModules())
     	{
-    		if (Security.getMasterTenantName().equals(Security.getCurrentTenantName()) &&
+    		if (! Security.getMasterTenantName().equals(Security.getCurrentTenantName()) &&
     				! module.getType().equals(ServerPluginModuleType.MODULE_AGENT))
     		{
     			throw new SecurityException("Only connector plugins are allowed");

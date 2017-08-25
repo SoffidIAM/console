@@ -56,9 +56,7 @@
 			showPassword.getFellow("popupPwd").setValue("");
 			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
 			Account account = XPathUtils.getValue(ctx, ".").getInstance().getActualAccount();
-			es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-					.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME)
-					.create();
+			es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
 			if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
 			{
 				showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
@@ -114,9 +112,7 @@
 			Account account = XPathUtils.getValue(ctx, ".").getInstance().getActualAccount();
 			if (account.getType().equals(AccountType.USER)){
 				newPasswordS.setAttribute("acco", account);
-				es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-					.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-					.create();
+				es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
 				String afectats = service.queryOtherAffectedAccounts(account);
 				if(afectats != null){
 					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
@@ -156,8 +152,7 @@
 					public void onEvent(Event evt) {
 						if ("onOK".equals(evt.getName()))
 						{
-							javax.naming.Context ctx = new javax.naming.InitialContext();
-							es.caib.seycon.ng.servei.ejb.AccountService ejb = ctx.lookup( es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME ).create();
+							es.caib.seycon.ng.servei.ejb.AccountService ejb = es.caib.seycon.ng.EJBLocator.getAccountService();
 							ejb.checkinHPAccount(acc);
 							ownerRow.setVisible (false);
 						}
@@ -319,9 +314,7 @@
 				}
 
 				void onSetPassword() {
-					es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-							.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-							.create();
+					es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
 					Account account = newPassword.getAttribute("acco");
 					timepwd.getValue();
 					boolean done = service.setHPAccountPassword(account,
@@ -414,9 +407,7 @@
 				}
 				
 				void onSetPassword() {
-					es.caib.seycon.ng.servei.ejb.SelfService service = new javax.naming.InitialContext()
-							.lookup(es.caib.seycon.ng.servei.ejb.SelfServiceHome.JNDI_NAME)
-							.create();
+					es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
 					Account account = newPasswordS.getAttribute("acco");
 					service.setAccountPassword(account, new Password(p1.getValue()));
 					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));

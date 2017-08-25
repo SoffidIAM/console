@@ -13,12 +13,22 @@
  */
 package com.soffid.iam.model;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.soffid.iam.api.AnonimousUser;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.bpm.api.BPMUser;
 import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Identity;
-import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
@@ -43,39 +53,17 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+
+import com.soffid.iam.bpm.api.BPMUser;
+
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.*;
-
-import java.security.Principal;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-
-import org.hibernate.Hibernate;
 
 /**
  * @see es.caib.seycon.ng.model.UsuariEntity
@@ -234,7 +222,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             if (grupPrimari != null)
                 totGrup.add(grupPrimari);
             Collection grupsSecundaris = usuari.getSecondaryGroups();
-            if (grupsSecundaris != null)
+            if (grupsSecundaris != null && !grupsSecundaris.isEmpty())
                 totGrup.add(grupsSecundaris);
             HashSet rolsAPropagar = new HashSet();
             for (Iterator it = totGrup.iterator(); it.hasNext(); ) {
@@ -242,7 +230,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                 if (obj != null) {
                     GroupEntity g = (GroupEntity) obj;
                     Collection rolsAtorgatsGrupISubgrups = getRolsAtorgatsGrupIParesGrup(g);
-                    if (rolsAtorgatsGrupISubgrups != null) rolsAPropagar.addAll(rolsAtorgatsGrupISubgrups);
+                    if (rolsAtorgatsGrupISubgrups != null  && !rolsAtorgatsGrupISubgrups.isEmpty())
+                    	rolsAPropagar.addAll(rolsAtorgatsGrupISubgrups);
                 }
             }
             super.remove(usuari);

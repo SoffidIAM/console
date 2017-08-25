@@ -214,25 +214,21 @@
 
 		<script-handler>
 			<update-script>
-				ah = new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
-				as = ah.create ();
+				as = es.caib.seycon.ng.EJBLocator.getAccountService();
 				as.renameAccount(instance);
 			</update-script>
 			<insert-script>
 				usuari = parent.parent.parent.instance;
-				dh = new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei.ejb.DispatcherServiceHome.JNDI_NAME);
-				ds = dh.create ();
+				ds = es.caib.seycon.ng.EJBLocator.getDispatcherService();
 				dispatcher = ds.findDispatcherByCodi(instance.dispatcher);
-				ah = new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
-				as = ah.create ();
+				as = es.caib.seycon.ng.EJBLocator.getAccountService();
 				account = as.createAccount(usuari, dispatcher, instance.name);
 				instance.id = account.id;
 				instance.type = account.type;
 				instance.name = account.name;
 			</insert-script>
 			<delete-script>
-				ah = new javax.naming.InitialContext().lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
-				as = ah.create ();
+				as = es.caib.seycon.ng.EJBLocator.getAccountService();
 				as.removeAccount(instance);
 			</delete-script>
 		</script-handler>

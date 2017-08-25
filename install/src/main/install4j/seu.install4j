@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
-  <directoryPresets config="./resources/iam-console/lib" />
+  <directoryPresets config="../../../target/lib" />
   <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -33,6 +33,9 @@
       </dirEntry>
       <fileEntry mountPoint="1070" file="../../../target/lib/iam-ear.ear" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/iam-tomee.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1072" file="../../../target/lib/mariadb-java-client.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1072" file="../../../target/lib/ojdbc7.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1072" file="../../../target/lib/sqljdbc4.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1073" file="../../../target/lib/deployer.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="1069" file="./resources/iam-console" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="iam-console" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude />
@@ -125,9 +128,9 @@
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
     <customCode>
       <archive location="../../../target/install-${compiler:seu.version}.jar" />
-      <archive location="./resources/iam-console/lib/mariadb-java-client-1.2.3.jar" />
-      <archive location="./resources/iam-console/lib/sqljdbc4-3.0.jar" />
-      <archive location="./resources/iam-console/lib/ojdbc7.jar" />
+      <archive location="../../../target/lib/ojdbc7.jar" />
+      <archive location="../../../target/lib/mariadb-java-client.jar" />
+      <archive location="../../../target/lib/sqljdbc4.jar" />
     </customCode>
     <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
       <commentFiles />
@@ -1122,7 +1125,7 @@ return;</preActivation>
               <formComponent name="" id="787" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent" id="CheckboxComponent0">
                       <void property="checkboxText">
                         <string>Configure database connection</string>
                       </void>
@@ -1220,7 +1223,7 @@ return true;</validation>
               <formComponent name="" id="1084" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent" id="CheckboxComponent0">
                       <void property="coupledComponentIds">
                         <void method="add">
                           <string>155</string>

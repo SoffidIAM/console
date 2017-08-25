@@ -7,43 +7,34 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
-import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.zkib.datamodel.DataModelCollection;
-import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 
 public class ShowAdditionalData {
 	
 	private UsuariService usuariServ;
 	private DadesAddicionalsService dadesAddicionalsService;
-	private DadesAddicionalsService getDadesAddicionalsService () throws CreateException, NamingException
-	{
-		if (dadesAddicionalsService == null)
-		{
-			dadesAddicionalsService = (DadesAddicionalsService) 
-					new InitialContext().lookup (DadesAddicionalsServiceHome.JNDI_NAME);
-		}
+	
+	private DadesAddicionalsService getDadesAddicionalsService () throws CreateException, NamingException {
+		if (dadesAddicionalsService == null) dadesAddicionalsService = EJBLocator.getDadesAddicionalsService();
 		return dadesAddicionalsService;
 	}
 	
 	public ShowAdditionalData() throws NamingException, CreateException{
-		usuariServ = (UsuariService) new InitialContext().lookup (UsuariServiceHome.JNDI_NAME);
-		
+		usuariServ = EJBLocator.getUsuariService();
 	}
-
 	
 	private long getOrder (Collection<TipusDada> tdaList, String attName)
 	{
@@ -54,7 +45,7 @@ public class ShowAdditionalData {
 		}
 		return -1;
 	}
-	@SuppressWarnings("unchecked")
+	
 	public List<DadaUsuari> getDadaUsuari(String codiUsuari) throws InternalErrorException, CreateException, NamingException{
 			final Collection<TipusDada> tipusDadaList =  getDadesAddicionalsService().findTipusDadesByCodi("%");
 			List<DadaUsuari> dadaUsuariCollection;

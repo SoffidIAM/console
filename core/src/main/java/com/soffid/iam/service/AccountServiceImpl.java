@@ -1,14 +1,32 @@
 package com.soffid.iam.service;
 
-import es.caib.bpm.vo.PredefinedProcessType;
-import es.caib.seycon.ng.servei.*;
-import bsh.EvalError;
-import bsh.Interpreter;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.LogFactory;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.def.ProcessDefinition;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Role;
@@ -16,16 +34,12 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
-import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
-import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
-import com.soffid.iam.model.AccountAttributeEntityDao;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
-import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
@@ -44,13 +58,9 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
-import com.soffid.iam.reconcile.common.ReconcileAccount;
-import com.soffid.iam.remote.URLManager;
-import com.soffid.iam.service.UserDomainService;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.util.NameParser;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -62,11 +72,14 @@ import es.caib.seycon.ng.comu.AccountType;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.scimquery.HQLQuery;
-import com.soffid.scimquery.conf.ClassConfig;
-import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
+import bsh.EvalError;
+import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.AccountCriteria;
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -74,39 +87,8 @@ import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.NotAllowedException;
-import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.sync.servei.SecretStoreService;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
-
-import java.net.MalformedURLException;
-import java.security.Principal;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.naming.NamingException;
-
-import org.apache.commons.logging.LogFactory;
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.def.ProcessDefinition;
-import org.mortbay.log.Log;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBase implements ApplicationContextAware
 {
@@ -1806,19 +1788,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	@Override
-	protected Collection<Account> handleFindAccountByJsonQuery(String query)
-			throws Exception {
-		ClassConfig config = Configuration
-				.getClassConfig(com.soffid.iam.api.Account.class);
-
+	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws Exception {
 		AbstractExpression expr = ExpressionParser.parse(query);
-		HQLQuery hql = expr.generateHSQLString(User.class);
-		String qs = hql.getQueryString().toString();
+		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
+		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
 			qs = "o.system.tenant.id = :tenantId";
 		else
-			qs = "("+qs+") and o.tenant.id = :tenantId";
-
+			qs = "("+qs+") and o.system.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();
 		Parameter paramArray[] = new Parameter[1+params.size()];
 		int i = 0;
@@ -1836,7 +1814,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				}
 			}
 		}
-
 		return result;
 	}
 

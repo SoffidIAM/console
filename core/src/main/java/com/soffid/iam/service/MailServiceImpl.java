@@ -1,5 +1,21 @@
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Group;
@@ -13,28 +29,6 @@ import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.rmi.PortableRemoteObject;
-
-import org.jbpm.taskmgmt.exe.PooledActor;
 
 public class MailServiceImpl extends MailServiceBase {
 
@@ -302,7 +296,6 @@ public class MailServiceImpl extends MailServiceBase {
     			Group grup = getGroupService().findGroupByGroupName(actorId);
     			if (grup != null)
     			{
-    				StringBuffer sb = new StringBuffer();
     				for (GroupUser ug: getGroupService().findUsersBelongtoGroupByGroupName(actorId))
     				{
     					result.add( ug.getUser()) ;

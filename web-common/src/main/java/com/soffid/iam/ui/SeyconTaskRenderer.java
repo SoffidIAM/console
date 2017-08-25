@@ -1,19 +1,8 @@
 package com.soffid.iam.ui;
 
-import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.SyncAgentTaskLog;
-import com.soffid.iam.service.ejb.SyncServerService;
-import com.soffid.iam.service.ejb.SyncServerServiceHome;
-import com.soffid.iam.ui.SeyconTask.Estat;
-
-import es.caib.zkib.zkiblaf.ImageClic;
-import es.caib.zkib.zkiblaf.Missatgebox;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.naming.InitialContext;
 
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -23,6 +12,12 @@ import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.SyncAgentTaskLog;
+import com.soffid.iam.ui.SeyconTask.Estat;
+
+import es.caib.zkib.zkiblaf.ImageClic;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SeyconTaskRenderer implements ListitemRenderer {
 	
@@ -101,8 +96,7 @@ public class SeyconTaskRenderer implements ListitemRenderer {
                     if (estatExecucio[i].equals(Estat.ERROR) && t.getUrlAgent() != null) {
                         c.setLabel(estatExecucio[i] + "*");
                         String taskAgent = this.agentsHeader.toArray()[i].toString();
-                        com.soffid.iam.service.ejb.SyncServerService svc = (SyncServerService) new InitialContext().lookup(SyncServerServiceHome.JNDI_NAME);
-                        Iterator<SyncAgentTaskLog> taskIterator = svc.getAgentTasks(t.getUrlAgent(), taskAgent).iterator();
+                        Iterator<SyncAgentTaskLog> taskIterator = EJBLocator.getSyncServerService().getAgentTasks(t.getUrlAgent(), taskAgent).iterator();
                         while (taskIterator.hasNext()) {
                             com.soffid.iam.api.SyncAgentTaskLog log = taskIterator.next();
                             if (log.getTaskId().equals(t.getId())) {

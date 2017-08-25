@@ -2,10 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
-    
-		
- 	<window border="normal" closable="true" id="errorWindow" mode="highlighted" position="center,center" title="${c:l('error.Titol')}" width="720px">
-
+ 	<window border="normal" closable="true" id="errorWindow" mode="highlighted" position="center,center" title="${c:l('error.Titol')} (${c:l('error.Codi')} ${requestScope['javax.servlet.error.status_code']})" width="720px">
 		<div style="overflow:auto;width:695px;">
 			<zscript>
 				void showStack()
@@ -18,25 +15,17 @@
 					}
 				}
 			</zscript>
-			<vbox width="95%">
-				<label value="${c:l('error.Codi')}: (codi ${requestScope['javax.servlet.error.status_code']})"/>
-				<hbox><separator/><separator/><label class="etiqueta" id="missatge" multiline="true" value="" width="95%"/> </hbox>
-				<separator/>
-	
-	<!-- 
-				<label value="${c:l('error.zul.Tipusdexcepcia')}" multiline/>
-				<hbox><separator/><separator/><label id="tipus" value="" width="675px"/></hbox>
-				<separator/>
-		  -->		
-				
-				<hbox > 
-					<image id="arrow" width="16px" height="16px" src="/img/right.png" onClick="showStack();"/>
+			<vbox style="padding:7px;">
+				<hbox style="margin-left:0px;margin-top:3px;">
+					<label class="etiqueta" id="missatge" multiline="true" value="" style="font-size:120%; color:#cd6155;"/>
+				</hbox>
+				<hbox style="margin-left:-2px;margin-top:10px;">
+					<image id="arrow" width="16px" height="16px" src="/img/right.png" onClick="showStack();" style="margin-top:-1px"/>
 					<label sclass="etiqueta" value="${c:l('error.zul.Causatper')}" onClick="showStack();"/> 
 				</hbox>
 				<textbox id="exception" visible="false" readonly="true" rows="10" width="675px"/>
 			</vbox>
 		</div>		
-
 		<zscript><![CDATA[
 			void resetSession ()
 			{
@@ -65,9 +54,8 @@
 					httpSession.invalidate();
 				}
 		]]></zscript>
-
 		<separator bar="true" spacing="10px"/>
-		<hbox style="margin-left:auto; margin-right:auto">
+		<hbox style="margin-left:auto; margin-right:auto; padding:7px;">
 			<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="spaceOwner.detach()"/>
 			<button label="${c:l('error.zul.Reinicia')}" id="resetButton">
 				<attribute name="onClick">
@@ -82,12 +70,11 @@
 			<button label="${c:l('error.zul.Reinicia')}" id="resetButton2" visible="false">
 				<attribute name="onClick">
 				<![CDATA[
-					resetSession();
+					resetSession ();
 				]]>
 				</attribute>
 			</button>
 		</hbox>	
-
 		<zscript>
 		<![CDATA[
 			Object e = requestScope.get("javax.servlet.error.exception");
@@ -129,8 +116,9 @@
 					self.getFellow("closeButton").setVisible(false);
 					self.getFellow("resetButton").setVisible(false);
 					self.getFellow("resetButton2").setVisible(true);
-					resetSession();
+					resetSession ();
 					return;
+					
 				} else // Canviem el missatge per les autoritzacions quan no té permis
 				    if (noTeAutoritzacions) {
 				    	try {
@@ -157,25 +145,25 @@
 					msg = e.getMessage();
 					if (msg == null)
 						msg = e.toString();
-					self.getFellow("missatge").value = msg;
+					if (original != e && original instanceof es.caib.seycon.ng.exception.InternalErrorException)
+						self.getFellow("missatge").value = e.getMessage()+": "+msg;
+					else
+						self.getFellow("missatge").value = msg;
 					
 				} 
-					
-//				self.getFellow("tipus").value = e.getClass().getName();
 				bo = new java.io.ByteArrayOutputStream();
 				es.caib.seycon.ng.exception.SoffidStackTrace.printStackTrace(original, new java.io.PrintStream(bo));
 				bo.close ();
 				c = bo.toString();
-				log = org.apache.commons.logging.LogFactory.getLog ("com.soffid.iam.web");
+ 		     	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("HtmlError");
 				execution = desktop.getExecution ();
-				log.warning (org.zkoss.util.resource.Labels.getLabel("error.NoPrevist")+ " " +desktop.getRequestPath()+" ["+execution.getUserPrincipal().getName()+"] "+
+				log.warn (org.zkoss.util.resource.Labels.getLabel("error.NoPrevist")+ " " +desktop.getRequestPath()+" ["+execution.getUserPrincipal().getName()+"] "+
 					"[Remote="+execution.getRemoteAddr()+"]",
 					original);
 			}
 			else
 			{
 				self.getFellow("missatge").value =  requestScope.get("javax.servlet.error.message");
-//				self.getFellow("tipus").value = requestScope.get("javax.servlet.error.exception_type");
 				c = requestScope.get("javax.servlet.error.exception_type") +
 						 "\n" +
 						 requestScope.get("javax.servlet.error.exception");				
@@ -184,5 +172,4 @@
 		]]>
 		</zscript>		
 	</window>
-	
 </zk>

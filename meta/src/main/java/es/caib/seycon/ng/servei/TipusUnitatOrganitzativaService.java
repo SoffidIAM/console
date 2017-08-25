@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="OrganizationalUnitTypeService",
@@ -48,7 +50,7 @@ public abstract class TipusUnitatOrganitzativaService {
 	@Operation ( grantees={roles.organizationalUnit_query.class},
 	translated="findOUTypeByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection findTipusUnitatOrganitzativaByFiltre(
+	public java.util.Collection<TipusUnitatOrganitzativa> findTipusUnitatOrganitzativaByFiltre(
 		@Nullable java.lang.String codi, 
 		@Nullable java.lang.String descripcio)
 		throws es.caib.seycon.ng.exception.InternalErrorException {

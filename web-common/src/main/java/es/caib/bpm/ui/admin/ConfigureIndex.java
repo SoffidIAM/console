@@ -1,32 +1,28 @@
 package es.caib.bpm.ui.admin;
 
-import java.beans.EventSetDescriptor;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.dom4j.Text;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Textbox;
 
+import com.soffid.iam.doc.exception.NASException;
+
+import es.caib.bpm.toolkit.BPMApplication;
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.ConfiguracioService;
-import es.caib.seycon.ng.servei.ejb.ConfiguracioServiceHome;
-import es.caib.zkib.zkiblaf.Missatgebox;
-
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listitem;
-import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.zkib.zkiblaf.Frame;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class ConfigureIndex extends Frame
 {
@@ -244,9 +240,7 @@ public class ConfigureIndex extends Frame
 	private void clearNotUserProperty(String key) throws NamingException,
 		CreateException, InternalErrorException
 	{
-		ConfiguracioService ejb =
-				(ConfiguracioService) new InitialContext()
-					.lookup(ConfiguracioServiceHome.JNDI_NAME);
+		ConfiguracioService ejb = EJBLocator.getConfiguracioService();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);
@@ -269,9 +263,7 @@ public class ConfigureIndex extends Frame
 	private void saveParameter(String key, String value)
 		throws NamingException, CreateException, InternalErrorException
 	{
-		ConfiguracioService ejb =
-			(ConfiguracioService) new InitialContext()
-				.lookup(ConfiguracioServiceHome.JNDI_NAME);
+		ConfiguracioService ejb = EJBLocator.getConfiguracioService();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);
@@ -305,9 +297,7 @@ public class ConfigureIndex extends Frame
 	private String getDocumentMngParameter(String key) throws NamingException,
 		CreateException, InternalErrorException
 	{
-		ConfiguracioService ejb =
-				(ConfiguracioService) new InitialContext()
-					.lookup(ConfiguracioServiceHome.JNDI_NAME);
+		ConfiguracioService ejb = EJBLocator.getConfiguracioService();
 		
 		Collection<Configuracio> result =
 			ejb.findConfiguracioByFiltre(key, null, null, null);

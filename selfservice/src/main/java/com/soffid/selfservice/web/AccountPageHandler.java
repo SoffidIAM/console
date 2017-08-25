@@ -9,18 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.soffid.iam.utils.ConfigurationCache;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.servei.ejb.SelfService;
-import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class AccountPageHandler {
-	private SelfService ejb;
 	
 	String getSystem (Account acc) 
 	{
@@ -34,11 +31,8 @@ public class AccountPageHandler {
 	public Collection<SystemName> find (String filter, String account, String system) 
 			throws CreateException, InternalErrorException, NamingException, UnsupportedEncodingException
 	{
-		ejb = (SelfService) new InitialContext().lookup(SelfServiceHome.JNDI_NAME);
-		
 		Map<String,SystemName> systems = new HashMap<String, SystemName>();
-		
-		List<Account> accounts = ejb.getSharedAccounts(filter);
+		List<Account> accounts = EJBLocator.getSelfService().getSharedAccounts(filter);
 		if (account != null && system != null)
 		{
 			for (Account acc:accounts)

@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -36,14 +35,12 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.SelfService;
-import es.caib.seycon.ng.servei.ejb.SelfServiceHome;
-import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
@@ -52,7 +49,6 @@ import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
 import es.caib.zkib.events.XPathValueEvent;
-import es.caib.zkib.jxpath.JXPathNotFoundException;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField extends Div implements XPathSubscriber{
@@ -162,8 +158,7 @@ public class InputField extends Div implements XPathSubscriber{
 				l.setValue("");
 			else
 			{
-				UsuariService ejb = (UsuariService) new InitialContext(). lookup (UsuariServiceHome.JNDI_NAME);
-				Usuari u = ejb.findUsuariByCodiUsuari(user);
+				Usuari u = EJBLocator.getUsuariService().findUsuariByCodiUsuari(user);
 				if (u == null)
 				{
 					l.setValue("?");
@@ -188,9 +183,7 @@ public class InputField extends Div implements XPathSubscriber{
 		
 		try
 		{
-			
-			SelfService ejb = (SelfService)  new InitialContext().lookup (SelfServiceHome.JNDI_NAME);
-			
+			SelfService ejb = EJBLocator.getSelfService();
 			BindContext bindCtx = XPathUtils.getComponentContext(this);
 			String dataType = (String) XPathUtils.getValue(bindCtx, "@codiDada");
 			String systemName = (String) XPathUtils.getValue(bindCtx, "@systemName");

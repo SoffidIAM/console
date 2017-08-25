@@ -1,20 +1,16 @@
 package com.soffid.iam.web;
 
-import javax.naming.InitialContext;
-
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.ext.AfterCompose;
-import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listheader;
-import org.zkoss.zul.Listitem;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
-import es.caib.seycon.ng.servei.ejb.DadesAddicionalsServiceHome;
 import es.caib.zkib.component.DataDatebox;
 import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.component.DataListcell;
@@ -23,7 +19,7 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 
 	public void afterCompose() {
 		try {
-			DadesAddicionalsService bean = (DadesAddicionalsService) new InitialContext().lookup(DadesAddicionalsServiceHome.JNDI_NAME);
+			DadesAddicionalsService bean = EJBLocator.getDadesAddicionalsService();
 			for (TipusDada tda: bean.findTipusDadesByCodi("%") )
 			{
 				if (( AttributeVisibilityEnum.EDITABLE.equals(tda.getOperatorVisibility()) ||

@@ -7,12 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
@@ -21,22 +19,15 @@ import org.zkoss.zul.AbstractListModel;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
 
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.vo.BPMUser;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.zkib.zkiblaf.Missatgebox;
-
 
 public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate 
 {
@@ -48,11 +39,8 @@ public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate
 	protected String buttonLabel=""; //$NON-NLS-1$
 	public ListModelList listModel=new ListModelList();	
 	public ListitemRenderer listRenderer=new SeleccionUsuarioUIItemRenderer();
-	private UsuariService usuariService;
 	
-	public SeleccionUsuarioUI2() throws CreateException, NamingException {
-		usuariService = (UsuariService) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
-
+	public SeleccionUsuarioUI2() throws CreateException, NamingException {	
 		cmpAsc[3]=new StringArrayComparator(true,3);
 		cmpAsc[2]=new StringArrayComparator(true,2);
 		cmpAsc[1]=new StringArrayComparator(true,1);
@@ -62,8 +50,6 @@ public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate
 		cmpDsc[2]=new StringArrayComparator(false,2);
 		cmpDsc[1]=new StringArrayComparator(false,1);
 		cmpDsc[0]=new StringArrayComparator(false,0);
-			
-
 	}
 
 	

@@ -1,11 +1,16 @@
 package com.soffid.iam.json;
 
-import org.apache.johnzon.jaxrs.JohnzonProvider;
-import org.apache.johnzon.mapper.MapperBuilder;
-import org.apache.johnzon.mapper.access.AccessMode;
-import org.apache.johnzon.mapper.converter.StringConverter;
-import org.apache.johnzon.mapper.internal.AdapterKey;
-import org.apache.johnzon.mapper.internal.ConverterAdapter;
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 import javax.json.JsonReaderFactory;
 import javax.json.stream.JsonGeneratorFactory;
@@ -17,26 +22,22 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import org.apache.johnzon.jaxrs.JohnzonProvider;
+import org.apache.johnzon.mapper.MapperBuilder;
+import org.apache.johnzon.mapper.access.AccessMode;
+import org.apache.johnzon.mapper.internal.ConverterAdapter;
 
-import static java.util.Arrays.asList;
+import es.caib.seycon.ng.comu.AccountType;
 
 @Provider
-@Produces("application/json")
-@Consumes("application/json")
+@Produces({"application/scim+json","application/json"})
+@Consumes({"application/scim+json","application/json"})
 public class ConfigurableJohnzonProvider<T> implements MessageBodyWriter<T>, MessageBodyReader<T> {
     public ConfigurableJohnzonProvider() {
 		super();
 		builder.addAdapter(Calendar.class, String.class, new ConverterAdapter<Calendar>(new CalendarConverter()));
+		builder.addAdapter(Date.class, String.class, new ConverterAdapter<Date>(new DateConverter()));
+		builder.addAdapter(AccountType.class, String.class, new ConverterAdapter<AccountType>(new AccountTypeConverter()));
 	}
 
 	// build/configuration
@@ -44,7 +45,6 @@ public class ConfigurableJohnzonProvider<T> implements MessageBodyWriter<T>, Mes
     private List<String> ignores;
 
     // runtime
-    private AtomicReference<JohnzonProvider<T>> delegate = new AtomicReference<JohnzonProvider<T>>();
     private JohnzonProvider<T> instance = null;
     
     private JohnzonProvider<T> instance() {

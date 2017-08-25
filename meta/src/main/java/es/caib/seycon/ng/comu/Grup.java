@@ -7,8 +7,15 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonObject;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.ValueObject;
 
+import es.caib.seycon.ng.model.GrupEntity;
+
+@JsonObject (hibernateClass=GrupEntity.class)
 @ValueObject ( translatedName="Group",
 	cache=300,
 	 translatedPackage="com.soffid.iam.api")

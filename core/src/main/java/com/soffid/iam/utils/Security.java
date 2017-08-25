@@ -1,56 +1,31 @@
 package com.soffid.iam.utils;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
+import javax.transaction.UserTransaction;
+
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.commons.collections.map.LRUMap;
+
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
-import com.soffid.iam.service.TenantServiceImpl;
-import com.soffid.iam.service.ejb.UserServiceHome;
 import com.soffid.iam.tomcat.SoffidPrincipal;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.security.AccessController;
-import java.security.Principal;
-import java.security.acl.Group;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
-import javax.ejb.CreateException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.security.auth.Subject;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
-
-import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.logging.LogFactory;
-import org.apache.openejb.spi.Assembler;
-import org.apache.openejb.spi.SecurityService;
-import org.apache.tomee.catalina.TomcatSecurityService.TomcatUser;
 
 // import org.jboss.security.SecurityAssociation;
 

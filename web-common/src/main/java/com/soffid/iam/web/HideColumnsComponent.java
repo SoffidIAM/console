@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
@@ -12,19 +11,16 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Menu;
 import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Toolbarbutton;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.UsuariService;
-import es.caib.seycon.ng.servei.ejb.UsuariServiceHome;
 import es.caib.zkib.binder.list.DataListItemRenderer;
 
 public class HideColumnsComponent extends Toolbarbutton
@@ -150,15 +146,10 @@ public class HideColumnsComponent extends Toolbarbutton
 			}
 		}
 	}
-
-	private UsuariService getUsuariService () throws NamingException, CreateException
-	{
-		return (UsuariService) new InitialContext().lookup(UsuariServiceHome.JNDI_NAME);
-	}
 	
 	private boolean[] getCurrentPreferences () throws InternalErrorException, NamingException, CreateException
 	{
-		Usuari u = getUsuariService().getCurrentUsuari();
+		Usuari u = EJBLocator.getUsuariService().getCurrentUsuari();
 		if (u == null)
 			return null;
 		UsuariSEU us = u.getUsuariSEU();
@@ -194,14 +185,14 @@ public class HideColumnsComponent extends Toolbarbutton
 				mask = mask << 1;
 			}
 		}
-		Usuari u = getUsuariService().getCurrentUsuari();
+		Usuari u = EJBLocator.getUsuariService().getCurrentUsuari();
 		if (u == null)
 			return;
 		UsuariSEU us = u.getUsuariSEU();
 		if (us == null)
 			return;
 		us.getPreferenciesSEU().put("hcc-"+preferenceName, Long.toString(l));
-		getUsuariService().update(us);
+		EJBLocator.getUsuariService().update(us);
 	}
 	
 }

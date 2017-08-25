@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.Iterator;
 
 import javax.ejb.CreateException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.zkoss.util.media.Media;
@@ -25,10 +24,9 @@ import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.ServerPlugin;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.ServerPluginService;
-import es.caib.seycon.ng.servei.ejb.ServerPluginServiceHome;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree;
 import es.caib.zkib.datamodel.DataNode;
@@ -88,15 +86,14 @@ public class PluginsUI extends Window implements AfterCompose {
             os.close();
             data = os.toByteArray();
         }
-        getPluginService().deployPlugin(data);
+        EJBLocator.getServerPluginService().deployPlugin(data);
         refresh();
     }
 
     public void disable() throws Exception {
         ServerPlugin sp = getSelectedPlugin();
         if (sp != null) {
-            ServerPluginService ps = getPluginService();
-            ps.enablePlugin(sp, false);
+            EJBLocator.getServerPluginService().enablePlugin(sp, false);
             refresh();
         }
     }
@@ -108,9 +105,7 @@ public class PluginsUI extends Window implements AfterCompose {
                 
                 public void onEvent(Event event) throws Exception {
                     if (event.getName() == "onYes") { //$NON-NLS-1$
-                        ServerPluginService ps = getPluginService();
-                        ServerPlugin sp = getSelectedPlugin();
-                        ps.deletePlugin(sp);
+                        EJBLocator.getServerPluginService().deletePlugin(getSelectedPlugin());
                         refresh();
                     }
                 }
@@ -128,8 +123,7 @@ public class PluginsUI extends Window implements AfterCompose {
     public void enable() throws Exception {
         ServerPlugin sp = getSelectedPlugin();
         if (sp != null) {
-            ServerPluginService ps = getPluginService();
-            ps.enablePlugin(sp, true);
+            EJBLocator.getServerPluginService().enablePlugin(sp, true);
             refresh();
         }
     }
@@ -187,13 +181,7 @@ public class PluginsUI extends Window implements AfterCompose {
             }
         }
     }
-
-    private ServerPluginService getPluginService() throws CreateException,
-            NamingException, InternalErrorException {
-        return (ServerPluginService) new InitialContext()
-                .lookup("java:comp/env/ejb/ServerPluginEJB"); //$NON-NLS-1$
-    }
-
+    
     public void afterCompose() {
     	try {
     		refreshBaseVersion();
@@ -205,8 +193,7 @@ public class PluginsUI extends Window implements AfterCompose {
     private void refreshBaseVersion() throws InternalErrorException {
         try {
             Label l = (Label) getNavegador().getFellow("serverVersion"); //$NON-NLS-1$
-            ServerPluginService sps = getPluginService();
-            String version = sps.getServerVersion();
+            String version = EJBLocator.getServerPluginService().getServerVersion();
             if (version != null)
                 l.setValue(version);
         } catch (NamingException e) {

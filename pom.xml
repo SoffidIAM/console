@@ -410,11 +410,11 @@
   </dependencyManagement>
   <properties>
     <!-- Workflows dependencies -->
-    <document.manager.version>${pom.version}</document.manager.version>
+    <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.21-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.29-SNAPSHOT</zkdb.version>
+    <zkdb.version>1.29</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>
@@ -475,9 +475,10 @@
     		<module>meta</module>
 		<module>scimquery</module>
     		<module>deployer</module>
+    		<module>scimquery</module>
     		<module>common</module>
+    		<module>tomee</module>
     		<module>core</module>
-   			<module>tomee</module>
    			<module>web-common</module>
     		<module>bpm-sar</module>
     		<module>weblogout</module>

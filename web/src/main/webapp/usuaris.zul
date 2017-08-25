@@ -171,11 +171,7 @@
 
 				es.caib.seycon.ng.servei.ejb.UsuariService getUsuariService()
 				{
-					if (_usuariService == null) {
-						javax.naming.Context context = new javax.naming.InitialContext();
-						_usuariService = context
-								.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					}
+					if (_usuariService == null) _usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					return _usuariService;
 				}
 				
@@ -253,11 +249,7 @@
 					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
 					ctx = ds.getJXPathContext();
 					String codiUsuari = ctx.getValue("@codi");
-			
-					javax.naming.Context context = new javax.naming.InitialContext();
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
-							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-			
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					String[] tasquesSeycon = usuariService.refreshCanvis(codiUsuari);
 					tasques.visible = true;
 					tasques.mode = "overlapped";
@@ -269,11 +261,7 @@
 					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
 					ctx = ds.getJXPathContext();
 					String codiUsuari = ctx.getValue("@codi");
-			
-					javax.naming.Context context = new javax.naming.InitialContext();
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
-							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					String[] tasquesSeycon = usuariService.getTasques(codiUsuari);
 					tasques.visible = true;
 					tasques.mode = "overlapped";
@@ -290,11 +278,7 @@
 					ds = esquema.getFellow("dades").getFellow("form").getDataSource();
 					ctx = ds.getJXPathContext();
 					String codiUsuari = ctx.getValue("@codi");
-			
-					javax.naming.Context context = new javax.naming.InitialContext();
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = context
-							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-			
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					String seguentCodi = usuariService.getSeguentCodi();
 					esquema.getFellow("dades").getFellow("form").getFellow("codi")
 							.setValue(seguentCodi);
@@ -343,10 +327,7 @@
 				
 				public void verificaNIF_WS (nif)  //No s'emplea.. s'emplea en el DAO(create,update[nom-llinatges-dni]
 				{
-					javax.naming.Context context = new javax.naming.InitialContext();
-					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = 
-							context.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
-					
+					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					vnom = esquema.getFellow("dades").getFellow("form").getFellow("nom").getFellow("dada").value;
 					vprimerLlinatge = esquema.getFellow("dades").getFellow("form").getFellow("primerLlinatge").getFellow("dada").value;
 					vsegonLlinatge = esquema.getFellow("dades").getFellow("form").getFellow("segonLlinatge").getFellow("dada").value;
@@ -2031,13 +2012,8 @@ void actualitza (event) {
 											{
 												groups.add(it.next());
 											}
-											
-											es.caib.seycon.ng.servei.ejb.GrupService gs = 
-													new javax.naming.InitialContext()
-														.lookup (es.caib.seycon.ng.servei.ejb.GrupServiceHome.JNDI_NAME);
-											es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus =
-													new javax.naming.InitialContext()
-														.lookup (es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaServiceHome.JNDI_NAME);
+											es.caib.seycon.ng.servei.ejb.GrupService gs = es.caib.seycon.ng.EJBLocator.getGrupService();
+											es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus = es.caib.seycon.ng.EJBLocator.getTipusUnitatOrganitzativaService();
 											for (String group: groups)
 											{
 												Grup grup = gs.findGrupByCodiGrup(group);
@@ -2642,8 +2618,7 @@ void actualitza (event) {
 					
 					void onSetPassword()
 					{
-						es.caib.seycon.ng.servei.ejb.AccountService service = new javax.naming.InitialContext()
-								.lookup(es.caib.seycon.ng.servei.ejb.AccountServiceHome.JNDI_NAME);
+						es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
 						model.commit();
 				
 						es.caib.zkib.datasource.DataSource ds = newPassword.getAttribute("ds");
@@ -2703,8 +2678,7 @@ void actualitza (event) {
 					void onSetPassword()
 					{
 						model.commit();
-						es.caib.seycon.ng.servei.ejb.UsuariService service = new javax.naming.InitialContext()
-							.lookup(es.caib.seycon.ng.servei.ejb.UsuariServiceHome.JNDI_NAME);
+						es.caib.seycon.ng.servei.ejb.UsuariService service = es.caib.seycon.ng.EJBLocator.getUsuariService();
 						String user = newPassword2.getAttribute("user");
 						String domain = newPassword2.getAttribute("domain");
 						if (generationType.selectedItem == generationSet)

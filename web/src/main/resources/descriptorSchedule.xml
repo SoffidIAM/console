@@ -13,8 +13,7 @@
 				s = new es.caib.seycon.ng.comu.Server();
 				s.setNom ("*");
 				c.add (s);
-				home = new javax.naming.InitialContext().lookup ("java:comp/env/ejb/DispatcherEJB");
-				ejb = home.create ();
+				ejb = es.caib.seycon.ng.EJBLocator.getDispatcherService();
 				for (es.caib.seycon.ng.comu.Server server: ejb.findAllServers())
 				{
 					if (server.getType().equals ( es.caib.seycon.ng.comu.ServerType.MASTERSERVER ))

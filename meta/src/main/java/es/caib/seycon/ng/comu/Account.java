@@ -65,6 +65,10 @@ public class Account {
 	@Attribute(translated = "system" )
 	public java.lang.String dispatcher;
 
+	@Description("Time stamp when the account was last used on target system")
+	@Nullable
+	public java.util.Calendar lastLogin;
+
 	@Description("Time stamp when the account was last updated on target system")
 	@Nullable
 	public java.util.Calendar lastUpdated;

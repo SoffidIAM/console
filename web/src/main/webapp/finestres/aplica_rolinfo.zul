@@ -8,9 +8,16 @@
 <style src="/css/localSEU.css"/>
 <style src="~./styles/estil.css"/>
 <style src="/css/devices.css"/>
+	<style>
+		.roleatt {display: table; padding: 5px; width: 100%}
+		.roleatt_row {display: table-row}
+		.roleatt_label {display: table-cell; width: 200px}
+		.roleatt_input {display: table-cell}
+	</style>
 
 <div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" 
 	onCreate="start()"> 
+
 
 	
 	<zscript>
@@ -106,6 +113,7 @@
 				dades.getFellow("detall_descripcio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio_button").setVisible(false);
+				dades.getFellow("detall_nomRol_button").setVisible(false);
 				dades.getFellow("detall_category").setReadonly(true);
 				dades.getFellow("detall_defecte").setDisabled(true);
 				dades.getFellow("detall_contrasenya").setDisabled(true);
@@ -196,6 +204,7 @@
 				dades.getFellow("detall_agent").setDisabled(modifica);
 				dades.getFellow("detall_codiAplicacio").setDisabled(true);
 				dades.getFellow("detall_codiAplicacio_button").setVisible(true);
+				dades.getFellow("detall_nomRol_button").setVisible(modifica);
 				
 				if (self.mode.compareToIgnoreCase("highlighted") != 0)
 				{
@@ -446,7 +455,11 @@
 						}
 					]]>
 				</zscript>
-				<grid >
+				<grid sclass="noBorderGrid">
+					<columns>
+						<column width="200px"/>
+						<column />
+					</columns>
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
@@ -459,7 +472,8 @@
 										]]>
 									</attribute>
 								</textbox>
-								
+								<imageclic src='/img/pencil.png' onClick='self.previousSibling.readonly = false; self.visible = false; '
+									id ="detall_nomRol_button"/>
 								<label value="*" />
 							</hbox>
 						</row>
@@ -596,6 +610,10 @@
 						</row>
 					</rows>
 				</grid>
+				<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
+					dataPath="attributes" scope="role"
+					sclass="roleatt"/>
+				<separator spacing="5px"/>
 							<tabbox>
 								<tabs>
 									<tab
@@ -669,6 +687,16 @@
 													<textboxfilter
 														bind="@domainValue" />
 												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@dispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
+													width="2em" sort="auto">
+												</listheader>
 												<listheader id="ownedRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
 											</listhead>
@@ -685,6 +713,11 @@
 													bind="@rolName" />
 												<listcell
 													bind="@domainValue" />
+												<listcell
+													bind="@dispatcher" />
+												<listcell>
+													<checkbox bind="@mandatory" />
+												</listcell>
 												<listcell>
 													<imageclic
 														align="right" src="~./img/list-remove.gif"
@@ -767,6 +800,16 @@
 													<textboxfilter
 														bind="@domainValue" />
 												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Basededades-2')}"
+													width="*" sort="auto">
+													<textboxfilter
+														bind="@dispatcher" />
+												</listheader>
+												<listheader
+													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
+													width="2em" sort="auto">
+												</listheader>
 												<listheader id="ownerRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
 												</listhead>
@@ -783,6 +826,11 @@
 													bind="@rolName" />
 												<listcell
 													bind="@domainValue" />
+												<listcell
+													bind="@dispatcher" />
+												<listcell>
+													<checkbox bind="@mandatory" />
+												</listcell>
 												<listcell>
 													<imageclic
 														align="right" src="~./img/list-remove.gif"

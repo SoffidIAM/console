@@ -82,7 +82,10 @@ void showMessage (Image img)
 	String name = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name");
 	if (sb.length() > 8000)
 	{                              
-		org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(name+".txt", null, "binary/octet-stream; charset=utf-8", sb.toString().getBytes("UTF-8"));
+		org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(name+".txt", null, "binary/octet-stream; charset=utf-8", 
+				sb.toString()
+				.replaceAll("\n", "\r\n")
+				.getBytes("UTF-8"));
 	    downloadWindow.setContent(media);
     	downloadWindow.invalidate();
 	}

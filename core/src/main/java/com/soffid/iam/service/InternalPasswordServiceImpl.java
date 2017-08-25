@@ -726,7 +726,8 @@ public class InternalPasswordServiceImpl extends
         if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") || contra.getActive().equals("E"))) { //$NON-NLS-1$
             if (digest.equals(contra.getPassword())) {
                 if (new Date().before(contra.getExpirationDate())) {
-                    return PasswordValidation.PASSWORD_GOOD;
+                	updateAccountLastLogin(user, passwordDomain);
+                	return PasswordValidation.PASSWORD_GOOD;
                 } else if (checkExpired) {
                     return PasswordValidation.PASSWORD_GOOD_EXPIRED;
                 } else {
@@ -749,6 +750,8 @@ public class InternalPasswordServiceImpl extends
 	                    th.wait(timeToWait);
 	                }
 	            }
+	            if (th.isValidated())
+                	updateAccountLastLogin(user, passwordDomain);
 	            return th.isValidated() ? PasswordValidation.PASSWORD_GOOD
                     : PasswordValidation.PASSWORD_WRONG;
         	}
@@ -763,13 +766,30 @@ public class InternalPasswordServiceImpl extends
                 AccountEntity ae = userAccount.getAccount();
                 if (!ae.isDisabled() && ae.getSystem().getPasswordDomain() == passwordDomain) {
                     PasswordValidation status = validatePasswordOnServer(ae, password);
-                    if (status.equals(PasswordValidation.PASSWORD_GOOD)) return status;
+                    if (status.equals(PasswordValidation.PASSWORD_GOOD))
+                    {
+                    	updateAccountLastLogin(user, passwordDomain);
+                    	return status;
+                    }
                 }
             }
 		}
 
         return PasswordValidation.PASSWORD_WRONG;
     }
+
+    private void updateAccountLastLogin(UserEntity user, PasswordDomainEntity passwordDomain) {
+    	for (UserAccountEntity uac: user.getAccounts())
+    	{
+    		SystemEntity dispatcher = uac.getAccount().getSystem();
+			if (dispatcher.isMainSystem() &&
+    				dispatcher.getPasswordDomain() == passwordDomain)
+    		{
+    			uac.getAccount().setLastLogin(new Date());
+    			getAccountEntityDao().update(uac.getAccount());
+    		}
+    	}
+	}
 
     /**
      * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPin(es.caib.seycon.ng.model.UsuariEntity,

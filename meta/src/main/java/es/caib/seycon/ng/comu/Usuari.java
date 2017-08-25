@@ -11,6 +11,7 @@ import es.caib.seycon.ng.model.UsuariEntity;
 
 @JsonObject (hibernateClass=UsuariEntity.class)
 @ValueObject ( translatedName="User",
+	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
 public class Usuari {
 

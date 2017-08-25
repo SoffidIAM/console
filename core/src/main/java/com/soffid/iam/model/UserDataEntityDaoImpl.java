@@ -47,36 +47,8 @@ public class UserDataEntityDaoImpl
 	 */
 	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
 
-	private void assertPhoneExists ()
-	{
-        org.hibernate.Query queryObject = getSessionFactory().getCurrentSession()
-                        .createQuery("select max (tda.order) from com.soffid.iam.model.MetaDataEntity as tda "
-                        		+ "where tda.tenant.id=:tenantId"); //$NON-NLS-1$
-        queryObject.setLong("tenantId", Security.getCurrentTenantId());
-        java.util.List results = queryObject.list();
-		
-        Long nou = new Long(2);
-        if (!results.isEmpty())
-        {
-        	Long last =  (Long) results.get(0);
-        	if (last != null && last.longValue() >= 2)
-        		nou = new Long(last.longValue()+1);
-        }
-		//Trobar el major ordre existent
-        MetaDataEntity tda = getMetaDataEntityDao().findDataTypeByName("PHONE"); //$NON-NLS-1$
-    	if (tda == null)
-    	{
-    		tda = getMetaDataEntityDao().newMetaDataEntity();
-    		tda.setName("PHONE"); //$NON-NLS-1$
-    		tda.setOrder(nou);
-
-    		getMetaDataEntityDao().create(tda);
-    	}
-	}
-	
 	public void create(com.soffid.iam.model.UserDataEntity dadaUsuari) throws RuntimeException {
 		try {
-			assertPhoneExists();
 			
 	    	if (dadaUsuari.getDataType().getUnique() != null &&
 	    			dadaUsuari.getDataType().getUnique().booleanValue() )
@@ -103,7 +75,6 @@ public class UserDataEntityDaoImpl
 	
 	public void update(UserDataEntity dadaUsuariEntity) {
 		try {
-			assertPhoneExists();
 			
 	    	if (dadaUsuariEntity.getDataType().getUnique() != null &&
 	    			dadaUsuariEntity.getDataType().getUnique().booleanValue() )
@@ -195,7 +166,6 @@ public class UserDataEntityDaoImpl
 
     
     private void dadaUsuariToEntityCustom(com.soffid.iam.api.UserData sourceVO, com.soffid.iam.model.UserDataEntity targetEntity) {    	
-    		assertPhoneExists();
             UserEntity usuariEntity = getUserEntityDao().findByUserName(sourceVO.getUser());
             if(usuariEntity == null){
             	throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.3"), sourceVO.getUser()));  //$NON-NLS-1$

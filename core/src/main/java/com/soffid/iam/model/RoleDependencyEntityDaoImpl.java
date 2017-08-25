@@ -206,6 +206,7 @@ public class RoleDependencyEntityDaoImpl extends
         	target.setStatus (RoleDependencyStatus.STATUS_ACTIVE);
         else
         	target.setStatus(source.getStatus());
+        target.setMandatory(source.getMandatory());
     }
 
 }

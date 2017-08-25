@@ -221,11 +221,8 @@ public class ConfigureIndex extends Frame
 		{
 			saveParameter("soffid.ui.docServer", server); //$NON-NLS-1$
 			
-			if (!docStrategy.equals("es.caib.bpm.nas.comm.HTTPStrategy")) //$NON-NLS-1$
-			{
-				saveParameter("soffid.ui.docUsername", username); //$NON-NLS-1$
-				saveParameter("soffid.ui.docUserPassword", userPassword); //$NON-NLS-1$
-			}
+			saveParameter("soffid.ui.docUsername", username); //$NON-NLS-1$
+			saveParameter("soffid.ui.docUserPassword", userPassword); //$NON-NLS-1$
 		}
 		
 		else

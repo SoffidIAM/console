@@ -381,6 +381,7 @@
 								es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
 								
 								String prefix = ctx.getXPath();
+								ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, XPathUtils.concat(prefix,"/@lastLogin")));
 								ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, XPathUtils.concat(prefix,"/@lastUpdated")));
 								ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, XPathUtils.concat(prefix,"/@lastPasswordSet")));
 								ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, XPathUtils.concat(prefix,"/@passwordExpiration")));
@@ -523,6 +524,7 @@
 						<listheader label="${c:l('accounts.type')}" sort="auto"  visible="false"/>
 						<listheader label="${c:l('accounts.policy')}" sort="auto"  visible="false"/>
 						<listheader label="${c:l('accounts.lastUpdated')}" sort="auto"  visible="false"/>
+						<listheader label="${c:l('accounts.lastLogin')}" sort="auto"  visible="false"/>
 						<listheader label="${c:l('accounts.lastPasswordSet')}" sort="auto"  visible="false"/>
 						<listheader label="${c:l('accounts.passwordExpiration')}" sort="auto"  visible="false"/>
 						<listheader label="${c:l('accounts.status')}" sort="auto" visible="false"/>
@@ -554,6 +556,7 @@
 													
 						</listcell>
 						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastUpdated" format="${c:l('usuaris.zul.dateFormat')}" /></listcell>
+						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastLogin" format="${c:l('usuaris.zul.dateFormat')}" /></listcell>
 						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastPasswordSet"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
 						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@passwordExpiration"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
 						<listcell>
@@ -656,6 +659,13 @@
 													value="${c:l('accounts.lastUpdated')}:" />
 												<datebox readonly="true" disabled="true"
 													bind="@lastUpdated" width="10em" 
+													format="${c:l('usuaris.zul.dateFormat')}" />
+											</row>
+											<row>
+												<input_etiqueta
+													value="${c:l('accounts.lastLogin')}:" />
+												<datebox readonly="true" disabled="true"
+													bind="@lastLogin" width="10em" 
 													format="${c:l('usuaris.zul.dateFormat')}" />
 											</row>
 											<row>

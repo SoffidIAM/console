@@ -67,6 +67,7 @@ import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.vo.PredefinedProcessType;
+import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Rol;
@@ -75,6 +76,7 @@ import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -742,7 +744,7 @@ public class ApplicationServiceImpl extends
     }
 
     protected RoleAccount handleCreate(RoleAccount rolsUsuaris) throws Exception {
-        String codiAplicacio = rolsUsuaris.getInformationSystemName();
+        rolsUsuaris.setParentGrant(null);
         
         if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
         {
@@ -750,8 +752,31 @@ public class ApplicationServiceImpl extends
         	if (acc != null)
         		rolsUsuaris.setAccountId(acc.getId());
         }
+        	
+        List<RoleAccount> grantsToCreate = new LinkedList<RoleAccount>();
+        grantsToCreate.add(rolsUsuaris);
+        boolean first = true;
+        while ( ! grantsToCreate.isEmpty())
+        {
+        	RoleAccount ra = grantsToCreate.get(0);
+        	grantsToCreate.remove(0);
+        	ra = performCreateRolAccount(rolsUsuaris, ra, grantsToCreate, first);
+        	if (first)
+        		rolsUsuaris = ra;
+            first = false;
+        }
+        return rolsUsuaris;
+    }
+
+	private RoleAccount performCreateRolAccount(RoleAccount inital,
+			RoleAccount ra,
+			List<RoleAccount> grantsToCreate, boolean first)
+			throws InternalErrorException, NeedsAccountNameException,
+			AccountAlreadyExistsException, UnknownUserException {
+    	String codiAplicacio = inital.getInformationSystemName();
+        boolean skip = false;
         // Verify the user has one account
-        if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getUserCode() != null)
+        if (ra.getAccountId() == null && ra.getUserCode() != null)
         {
            	Account account = null;
         	Security.nestedLogin(Security.getCurrentAccount(), new String[] { 
@@ -761,17 +786,20 @@ public class ApplicationServiceImpl extends
         		Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL, 
         		Security.AUTO_ACCOUNT_CREATE+Security.AUTO_ALL});
            	try {
-           		List<UserAccount> accounts = getAccountService().findUsersAccounts(rolsUsuaris.getUserCode(), rolsUsuaris.getSystem());
+           		List<UserAccount> accounts = getAccountService().findUsersAccounts(ra.getUserCode(), ra.getSystem());
            		if (accounts.size() > 1)
            		{
-           			throw new NeedsAccountNameException();
+           			if (first)
+						throw new NeedsAccountNameException(String.format("Please, specify account for user %s on system %s",
+								ra.getUserCode(), ra.getSystem()));
            		}
            		else if (accounts.size() == 0)
            		{
-           			User usu = getUserService().findUserByUserName(rolsUsuaris.getUserCode());
-           			SystemEntity dispatcher = getSystemEntityDao().findByName(rolsUsuaris.getSystem());
+           			User usu = getUserService().findUserByUserName(inital.getUserCode());
+           			SystemEntity dispatcher = getSystemEntityDao().findByName(inital.getSystem());
            			if (dispatcher == null)
-           				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UnknownSystem"), rolsUsuaris.getSystem()));
+           				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UnknownSystem"), 
+           						inital.getSystem()));
            			account = getAccountService().createAccount(usu, getSystemEntityDao().toSystem(dispatcher), null);
            		}
            		else
@@ -781,49 +809,105 @@ public class ApplicationServiceImpl extends
            	} finally {
            		Security.nestedLogoff();
            	}
-        	rolsUsuaris.setAccountId(account.getId());
+        	ra.setAccountId(account.getId());
         }
         	
         // Check group holder
-        checkGroupHolder (rolsUsuaris);
-        	
-        RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().roleAccountToEntity(rolsUsuaris);
-        // Enable or disable on dates
-        rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
+        checkGroupHolder (ra);
         // Check for Sod Rules
-        SoDRule rule = getSoDRuleService().isAllowed(rolsUsuaris);
+        SoDRule rule = getSoDRuleService().isAllowed(ra);
         if (rule != null && rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
         {
-           	throw new InternalErrorException (String.format(Messages.getString("ApplicationServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
+        	if (first)
+        		throw new InternalErrorException (String.format(Messages.getString("ApplicationServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
            					, rule.getName()));
+        	else
+        		skip = true;
         }
-        // Launch workflow approval process
-        boolean nwap = needsWorkflowApprovalProcess(rolsUsuarisEntity);
-            
-        rolsUsuarisEntity.setApprovalPending(nwap);
-           	
-       	
-       	if (!getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_CREATE, rolsUsuarisEntity))
-    		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    				Messages.getString("ApplicationServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
+        if (!skip)
+        {
+		    RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao()
+		            .roleAccountToEntity(ra);
+		    // Enable or disable on dates
+		    rolsUsuarisEntity.setEnabled(getEnableState(rolsUsuarisEntity));
+		    // Launch workflow approval process
+		    boolean nwap = first && needsWorkflowApprovalProcess(rolsUsuarisEntity);
+		    
+		   	rolsUsuarisEntity.setApprovalPending(nwap);
+		   	
+		   	if (first && 
+		   			! getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_CREATE, rolsUsuarisEntity))
+				throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						Messages.getString("AplicacioServiceImpl.UnableCreateRol"), codiAplicacio)); //$NON-NLS-1$
 
-
-        getRoleAccountEntityDao().create(rolsUsuarisEntity);
-        AccountEntity account = rolsUsuarisEntity.getAccount();
-        account.getRoles().add(rolsUsuarisEntity);
-        rolsUsuaris = getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity);
+		   	// Test if role is already granted
+		   	for (RoleAccountEntity rg: new LinkedList<RoleAccountEntity> ( rolsUsuarisEntity.getAccount().getRoles()))
+		   	{
+		   		if (rg.getRole().getName().equals(ra.getRoleName()) && 
+		   				rg.getRole().getSystem().getName().equals(ra.getSystem()))
+		   		{
+		   			if (rg.isEnabled())
+		   				return getRoleAccountEntityDao().toRoleAccount(rg);
+		   			else
+		   			{
+		   				deleteRoleAccountEntity(rolsUsuarisEntity, null);
+		   				rolsUsuarisEntity.getAccount().getRoles().remove(rolsUsuarisEntity);
+		   			}
+		   		}
+		   	}
+		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
+		    AccountEntity account = rolsUsuarisEntity.getAccount();
+		    account.getRoles().add(rolsUsuarisEntity);
+		    
+		    if (first)
+		    	inital = getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity);
+			
+		    if (nwap)
+		    	launchWorkflowApprovalProcess(rolsUsuarisEntity);
+		    else
+		    {
+		       	if ( ! nwap )
+		       	{
+		       		for ( RoleDependencyEntity grantedRole: rolsUsuarisEntity.getRole().getContainedRoles())
+		       		{
+		       			if (grantedRole.getMandatory() != null && ! grantedRole.getMandatory().booleanValue())
+		       			{
+		       				if (ra.getUserCode() != null || 
+		       						rolsUsuarisEntity.getAccount().getSystem() == grantedRole.getContained().getSystem())
+		       				{
+		           				RoleAccount ra2 = new RoleAccount();
+		           				ra2.setAccountSystem( grantedRole.getContained().getSystem().getName() );
+		           				ra2.setApprovalPending(false);
+		           				ra2.setSystem(grantedRole.getContained().getSystem().getName() );
+		           				ra2.setCertificationDate(new Date ());
+		           				ra2.setInformationSystemName(grantedRole.getContained().getInformationSystem().getName());
+		           				ra2.setUserGroupCode(inital.getUserGroupCode());
+		           				ra2.setUserCode(inital.getUserCode());
+		           				ra2.setRoleDescription(grantedRole.getContained().getDescription());
+		           				ra2.setStartDate(inital.getStartDate());
+		           				ra2.setEndDate(inital.getEndDate());
+		           				ra2.setHolderGroup(inital.getHolderGroup());
+		           				ra2.setRoleName(grantedRole.getContained().getName());
+		           				ra2.setParentGrant(rolsUsuarisEntity.getId());
+		           				ra2.setDomainValue(inital.getDomainValue());
+		           				grantsToCreate.add(ra2);
+		       				}
+		       			}
+		       		}
+		       	}
+		       	if (first & ! account.getType().equals(AccountType.IGNORED))
+		       		getAccountEntityDao().propagateChanges(account);
+		    }
+		    
+		    enableOrDisableOnDates (inital, rolsUsuarisEntity);
+		    return getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity);
+		}
+		else
+			return null;
         	
-        if (nwap)
-        	launchWorkflowApprovalProcess(rolsUsuarisEntity);
-        else
-         	getAccountEntityDao().propagateChanges(account);
-            
-        enableOrDisableOnDates (rolsUsuaris, rolsUsuarisEntity);
-            
-        return rolsUsuaris;
     }
 
-    /**
+    	/**
      * @param RoleAccountEntity
      * @throws InternalErrorException 
 	 */
@@ -950,7 +1034,11 @@ public class ApplicationServiceImpl extends
         if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_DELETE, rolsUsuarisEntity)) {
 
         	if (rolsUsuarisEntity.getRule() != null)
-                throw new InternalErrorException(Messages.getString("ApplicationServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
+        	{
+        		if (Security.isSyncServer()) // SYNC SERVER
+            		return;
+        		throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
+        	}
             // Disable assigning roles to himself
         	UserEntity user = null;
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
@@ -989,6 +1077,12 @@ public class ApplicationServiceImpl extends
 			} finally {
 				ctx.close();
 			}
+		}
+		List<RoleAccountEntity> list = new LinkedList<RoleAccountEntity>();
+		list.add(rolsUsuarisEntity);
+		if (rolsUsuarisEntity.getParent() != null)
+		{
+			rolsUsuarisEntity.getChildren().remove(rolsUsuarisEntity);
 		}
 		getRoleAccountEntityDao().remove(rolsUsuarisEntity);
 		
@@ -1043,6 +1137,41 @@ public class ApplicationServiceImpl extends
     		{
         		getRoleAccountEntityDao().update(roleAccountEntity);
         	
+	        	// Create non mandatory role - role dependencies first time the grant is enabled
+	        	if (oldRolsUsuaris.isApprovalPending() && ! rolsUsuaris.isApprovalPending())
+	        	{
+	        		LinkedList<RoleAccount> grantsToCreate = new LinkedList<RoleAccount>();
+		       		for ( RoleDependencyEntity grantedRole: roleAccountEntity.getRole().getContainedRoles())
+		       		{
+		       			if (grantedRole.getMandatory() != null && ! grantedRole.getMandatory().booleanValue())
+		       			{
+		       				if (rolsUsuaris.getUserCode() != null || 
+		       						roleAccountEntity.getAccount().getSystem() == grantedRole.getContained().getSystem())
+		       				{
+		           				RoleAccount ra2 = new RoleAccount();
+		           				ra2.setAccountSystem( grantedRole.getContained().getSystem().getName() );
+		           				ra2.setApprovalPending(false);
+		           				ra2.setSystem(grantedRole.getContained().getSystem().getName() );
+		           				ra2.setCertificationDate(new Date ());
+		           				ra2.setInformationSystemName(grantedRole.getContained().getInformationSystem().getName());
+		           				ra2.setUserGroupCode(rolsUsuaris.getUserGroupCode());
+		           				ra2.setUserCode(rolsUsuaris.getUserCode());
+		           				ra2.setRoleDescription(grantedRole.getContained().getDescription());
+		           				ra2.setEndDate(rolsUsuaris.getEndDate());
+		           				ra2.setHolderGroup(rolsUsuaris.getHolderGroup());
+		           				ra2.setRoleName(grantedRole.getContained().getName());
+		           				ra2.setParentGrant(roleAccountEntity.getId());
+		           				grantsToCreate.add(ra2);
+		       				}
+		       			}
+		       		}
+		       		while ( ! grantsToCreate.isEmpty())
+		       		{
+		       			RoleAccount ra = grantsToCreate.get(0);
+		       			grantsToCreate.remove(0);
+			       		performCreateRolAccount(rolsUsuaris, ra, grantsToCreate, false);
+		       		}
+	        	}
             	// Actualitzem darrera actualització de l'usuari
             	getAccountEntityDao().propagateChanges(roleAccountEntity.getAccount());
             
@@ -1524,7 +1653,8 @@ public class ApplicationServiceImpl extends
 		RoleEntity rol = currentRol.granted;
 		
 		for (RoleDependencyEntity ra : rol.getContainedRoles()) {
-			if (matchesGranteeDomainValue (currentRol, ra) && 
+			if ((ra.getMandatory() == null || ra.getMandatory().booleanValue()) &&
+					matchesGranteeDomainValue (currentRol, ra) && 
 					(ra.getStatus() == null || 
 					 ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) ||
 					 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
@@ -1533,7 +1663,7 @@ public class ApplicationServiceImpl extends
                     RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
                     n.granteeRol = rol;
                     n.generateHash();
-                    if (!rad.contains(n)) {
+                    if (! rad.contains(n)) {
                         if (type == DIRECT || type == ALL) rad.add(n);
                         if (type == INDIRECT || type == ALL) populateRoleRoles(rad, ALL, n, originUser, originAccount);
                     }
@@ -1575,6 +1705,12 @@ public class ApplicationServiceImpl extends
 			return false;
 		if (e.getStartDate() == null && e.getEndDate() == null)
 			return true;
+		if (DelegationStatus.DELEGATION_ACTIVE.equals(e.getDelegationStatus()) &&
+				e.getDelegateUntil() != null &&
+				new Date ().after(e.getDelegateUntil()))
+		{
+			return false;
+		}
 		
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR, 0);
@@ -1592,7 +1728,7 @@ public class ApplicationServiceImpl extends
 	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user) {
 		for (RoleAccountEntity ra : account.getRoles()) {
             RolAccountDetail n = new RolAccountDetail(ra, account);
-            if (!rad.contains(n)) {
+            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
                 if (type == DIRECT || type == ALL) rad.add(n);
                 if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
             }
@@ -1636,6 +1772,14 @@ public class ApplicationServiceImpl extends
 	@Override
     protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUser(long userId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
+		if (user.getUserName().equals(Security.getCurrentUser()))
+		{
+			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
+			{
+				getEntitlementDelegationService().acceptDelegation(ra);
+			}
+			getEntitlementDelegationService().revertExpiredDelegations();
+		}
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateRoles(radSet, ALL, user);
 		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
@@ -1750,9 +1894,11 @@ public class ApplicationServiceImpl extends
         }
 		
 		for (RoleDependencyEntity ra : rol.getContainerRoles()) {
-			if (ra.getStatus() == null || 
+			if ((ra.getStatus() == null || 
 				ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) || 
-				ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
+				ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)) && 
+					(ra.getMandatory() == null || ra.getMandatory().booleanValue()))
+				populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null? ra: originalGrant);
 					populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null ? ra : originalGrant);
         }
 
@@ -1865,7 +2011,21 @@ public class ApplicationServiceImpl extends
             getRoleAccountEntityDao().update(toDisable);
             getAccountEntityDao().propagateChanges(toDisable.getAccount());
         }
+		for (RoleAccountEntity toDelegate: getRoleAccountEntityDao().findAllRolAccountToStartDelegation(now))
+		{
+			toDelegate.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
+			toDelegate.setAccount(toDelegate.getDelegateAccount());
+			getRoleAccountEntityDao().update(toDelegate, "l");
+		}
 
+		for (RoleAccountEntity toRevert: getRoleAccountEntityDao().findAllRolAccountToEndDelegation(now))
+		{
+			toRevert.setDelegationStatus(null);
+			toRevert.setAccount(toRevert.getDelegateAccount());
+			toRevert.setDelegateSince(null);
+			toRevert.setDelegateUntil(null);
+			getRoleAccountEntityDao().update(toRevert, "m");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -2027,7 +2187,7 @@ public class ApplicationServiceImpl extends
 			att.setObjectValue(v);
 			keys.remove(att.getMetadata().getName());
 		}
-		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
+		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 		for (String key: keys)
 		{
 			Object v = app.getAttributes().get(key);

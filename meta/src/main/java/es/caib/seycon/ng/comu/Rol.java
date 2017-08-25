@@ -13,6 +13,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.model.RolEntity;
 
 @ValueObject ( translatedName="Role",
+	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
 @JsonObject(hibernateClass=RolEntity.class)
 public class Rol {

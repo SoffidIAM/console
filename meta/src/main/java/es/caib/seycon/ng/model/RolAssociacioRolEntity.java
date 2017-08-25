@@ -59,6 +59,11 @@ public abstract class RolAssociacioRolEntity {
 	@Nullable
 	public com.soffid.iam.api.RoleDependencyStatus status;
 
+	@Description("True if the role is always granted. False if role grant is optional, and thus can be removed from user entitlements form")
+	@Column (name="RRL_MANDAT", defaultValue="true")
+	@Nullable
+	public Boolean mandatory;
+
 	@Operation(translated = "findContainerByRoleNameAndApplicationCodeAndDBCode")
 	@DaoFinder("select rolAssociacioRol.container\n"
 			+ "from com.soffid.iam.model.RoleDependencyEntity rolAssociacioRol\n"

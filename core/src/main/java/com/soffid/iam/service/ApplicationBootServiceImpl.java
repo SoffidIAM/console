@@ -276,10 +276,37 @@ public class ApplicationBootServiceImpl extends
 						Security.AUTO_AUTHORIZATION_ALL });
 		try {
 			configureTenantDatabase();
+			
+			Configuration cfg = configSvc.findParameterByNameAndNetworkName(
+					"versionLevel", null); //$NON-NLS-1$
+			if (cfg.getValue().equals("100")) { //$NON-NLS-1$
+				cfg.setValue("101"); //$NON-NLS-1$
+				updateMandatoryRolGrant();
+				configSvc.update(cfg);
+			}
 		} finally {
 			Security.nestedLogoff();
 		}
 	}
+
+	private void updateMandatoryRolGrant () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ROLROL SET RRL_MANDAT=1 WHERE RRL_MANDAT IS NULL",
+							new Object[0]);
+			executeSentence(conn, "UPDATE SC_TIPDAD SET TDA_SCOPE='U' WHERE TDA_SCOPE IS NULL",
+					new Object[0]);
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
 
 	private void configureTenantDatabase() throws SystemException,
 			NotSupportedException, InternalErrorException, RollbackException,
@@ -293,6 +320,8 @@ public class ApplicationBootServiceImpl extends
 		if (firstSetup) {
 			createInitialData();
 			configureDocumentManager();
+			cfg = new Configuration("versionLevel", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+			configSvc.create(cfg);
 		}
 	}
 
@@ -541,7 +570,7 @@ public class ApplicationBootServiceImpl extends
 				null, null);
 
 		if (result.isEmpty()) {
-			String installDir = System.getProperty("jboss.home.dir") + "../.."; //$NON-NLS-1$ //$NON-NLS-2$
+			String installDir = System.getProperty("catalina.home"); //$NON-NLS-1$ //$NON-NLS-2$
 			File f = new File(installDir).getCanonicalFile();
 			File rootPath = new File(f, "/docs/data"); //$NON-NLS-1$
 			Configuration configuracio = new Configuration();
@@ -747,6 +776,15 @@ public class ApplicationBootServiceImpl extends
 			tdSvc.create(td);
 		}
 
+		td = tdSvc.findDataTypeByName("PHONE"); //$NON-NLS-1$
+		if (td == null) {
+			td = new DataType();
+			td.setCode("PHONE"); //$NON-NLS-1$
+			td.setOrder(new Long(2));
+			td.setScope(MetadataScope.USER);
+			tdSvc.create(td);
+		}
+
 		User usu = usuariSvc.findUserByUserName("admin"); //$NON-NLS-1$
 		if (usu == null) {
 			usu = new User();
@@ -818,8 +856,19 @@ public class ApplicationBootServiceImpl extends
 			configSvc.create(cfg2);
 		}
 
-		cfg = new Configuration("versionLevel", "200"); //$NON-NLS-1$ //$NON-NLS-2$
-		configSvc.create(cfg);
+		
+		cfg = configSvc.findParameterByNameAndNetworkName(
+				"tenantDbLevel", null); //$NON-NLS-1$
+		if (cfg == null)
+		{
+			cfg = new Configuration("tenantDbLevel", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+			configSvc.create(cfg);
+		}
+		else
+		{
+			cfg.setValue("1");
+			configSvc.update(cfg);
+		}
 
 	}
 
@@ -887,15 +936,7 @@ public class ApplicationBootServiceImpl extends
 						Security.AUTO_INTRANETMENUS_ADMIN,
 						Security.AUTO_AUTHORIZATION_ALL });
 		try {
-			Configuration cfg = configSvc.findParameterByNameAndNetworkName(
-					"versionLevel", null); //$NON-NLS-1$
-			boolean firstSetup = (cfg == null);
-			if (firstSetup) {
-				createInitialData();
-				cfg = new Configuration("versionLevel", "100"); //$NON-NLS-1$ //$NON-NLS-2$
-				configSvc.create(cfg);
-			}
-
+			configureTenantDatabase();
 		} finally {
 			Security.nestedLogoff();
 		}

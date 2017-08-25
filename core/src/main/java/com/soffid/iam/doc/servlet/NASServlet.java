@@ -53,7 +53,7 @@ public class NASServlet extends HttpServlet {
 	
 	File getFile (HttpServletRequest req) throws ServletException, IOException
 	{
-		String base = ConfigurationCache.getProperty("soffid.ui.docLocalPath");
+		String base = ConfigurationCache.getProperty("soffid.ui.docPath");
 		if (base == null)
 		{
 			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");

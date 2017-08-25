@@ -68,7 +68,11 @@ public abstract class AccountEntity {
 	@Nullable
 	public java.util.Date passwordExpiration;
 
-	@Column(name = "ACC_SECRET", length = 65000)
+	@Column (name="ACC_LASLOG")
+	@Nullable
+	public java.util.Date lastLogin;
+
+	@Column (name="ACC_SECRET", length=65000)
 	@Nullable
 	public java.lang.String secrets;
 

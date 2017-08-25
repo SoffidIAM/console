@@ -1595,6 +1595,8 @@
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@lastUpdated")));
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																XPathUtils.concat(prefix, "/@lastLogin")));
+														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@lastPasswordSet")));
 														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
 																XPathUtils.concat(prefix, "/@passwordExpiration")));
@@ -1622,6 +1624,7 @@
 												label="${c:l('usuaris.zul.Dominidecontrasenyes')}" />
 											<treecol label="${c:l('usuaris.zul.Account')}" />
 											<treecol label="${c:l('usuaris.zul.DataUpdate')}" />
+											<treecol label="${c:l('accounts.lastLogin')}" />
 											<treecol label="${c:l('usuaris.zul.DataAssignacia')}"
 												width="110px" />
 											<treecol label="${c:l('usuaris.zul.DataCaducitat')}"
@@ -1661,6 +1664,11 @@
 												</treecell>
 												<treecell>
 													<datebox bind="@lastUpdated" buttonVisible="false"
+														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+														sclass="dateboxreadnoborder" width="100%" />
+												</treecell>
+												<treecell>
+													<datebox bind="@lastLogin" buttonVisible="false"
 														disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
 														sclass="dateboxreadnoborder" width="100%" />
 												</treecell>
@@ -1904,6 +1912,29 @@ void actualitza (event) {
 											cell = event.data.getChildren().get(10);
 											if (cell.getChildren().size() > 0 )
 												cell.getChildren().get(0).visible = false;
+										}
+
+										// Role Delegation
+							 			es.caib.seycon.ng.common.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
+							 			if (ds != null && ds.equals (es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)) {
+											Listcell cell = listcells.get(0);
+							 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
+							 				cell.appendChild(ic);
+							 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
+							 				String since = df.format(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateSince"));
+							 				Date untilDate = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateUntil");
+							 				String until = untilDate == null ? "" :df.format(untilDate);
+							 				String owner = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "ownerAccount");
+							 				
+						 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { owner, since, until }));
+							 			}
+
+										Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
+										if (parentGrant != null)
+										{
+											Listcell cell = listcells.get(9);
+											if (cell.getChildren().size() > 0 )
+												cell.getChildren().get(1).visible = true;
 										}
 										Listcell cellImage = listcells.get(0);
 										if (!cellImage.getChildren().isEmpty())

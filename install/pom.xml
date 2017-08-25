@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
@@ -64,8 +63,7 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<taskdef name="install4j" classname="com.install4j.Install4JTask"
-									classpath="${env.INSTALL4J_HOME}/bin/ant.jar" />
+								<taskdef name="install4j" classname="com.install4j.Install4JTask" classpath="${env.INSTALL4J_HOME}/bin/ant.jar" />
 								<install4j projectfile="src/main/install4j/seu.install4j">
 									<variable name="seu.version" value="${pom.version}" />
 								</install4j>
@@ -75,7 +73,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<execution>
+					<!-- execution>
 						<id>docker</id>
 						<phase>package</phase>
 						<configuration>
@@ -93,7 +91,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-					</execution>
+					</execution -->
 				</executions>
 			</plugin>
 			<plugin>

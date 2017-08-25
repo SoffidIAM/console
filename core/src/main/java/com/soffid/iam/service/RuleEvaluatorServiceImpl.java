@@ -35,6 +35,7 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -48,9 +49,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * @author bubu
@@ -60,6 +64,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 {
 
 	private ApplicationContext ctx;
+	private SessionFactory sessionFactory;
 
 	/**
 	 * 
@@ -81,7 +86,17 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			{
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
 			}
-			List<RoleAccountEntity> roles = raDao.findAllByUserName(user.getUserName());
+			List<RoleAccountEntity> roles = new LinkedList<RoleAccountEntity>( raDao.findAllByUserName(user.getUserName()));
+			// Remmove roles delegated by another user
+			for ( Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext ();)
+			{
+				RoleAccountEntity ra = it.next();
+				if (DelegationStatus.DELEGATION_ACTIVE.equals(ra.getDelegationStatus()))
+					it.remove();
+			}
+			// Add delegated roles
+			roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
+			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
 			{
 				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
@@ -273,9 +288,29 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	@Override
 	protected void handleApply (RuleEntity rule) throws Exception
 	{
-		for (UserEntity u : getUserEntityDao().loadAll()) {
-            apply(rule, u);
-        }
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		List<Long> allUsers = new LinkedList<Long>();
+		for (UserEntity u: getUserEntityDao().loadAll())
+		{
+			allUsers.add(u.getId());
+		}
+		int i = 100;
+		for (Long l: allUsers)
+		{
+			if (i++ >= 100)
+			{
+				session.flush();
+				session.clear();
+				session.load(rule, rule.getId());
+				i = 0;
+			}
+			System.out.println("User "+l);
+			UserEntity u = getUserEntityDao().load(l);
+			apply (rule, u);
+		}
 	}
 
 	private Object evaluate (String expression, InterpreterEnvironment env) throws EvalError

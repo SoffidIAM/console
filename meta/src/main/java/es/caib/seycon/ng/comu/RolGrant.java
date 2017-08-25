@@ -78,4 +78,9 @@ public class RolGrant {
 	
 	@Nullable
 	public RoleDependencyStatus status;
+	
+	@Description("True if the role is always granted. False if role grant is optional, and thus can be removed from user entitlements form")
+	@Column (name="RRL_MANDAT", defaultValue="true")
+	@Nullable
+	public Boolean mandatory;
 }

@@ -18,13 +18,17 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.hibernate.Query;
+
 /**
  * @see es.caib.seycon.ng.model.TasqueEntity
  */
 public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     @Override
     public void create(TaskEntity tasqueEntity) {
-        if (tasqueEntity.getStatus() == null)
+    	if (checkDuplicate(tasqueEntity))
+    		return;
+    	
             tasqueEntity.setStatus("P"); //$NON-NLS-1$
         if (tasqueEntity.getPriority() == null)
         {
@@ -57,6 +61,50 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
         }
         super.create(tasqueEntity);
     }
+
+    private boolean checkDuplicate(TaskEntity tasqueEntity) {
+    	if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_USER))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.user=?" );
+    		q.setString(0, tasqueEntity.getTransaction());
+    		q.setString(1, tasqueEntity.getUser());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_GROUP))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.group=?" );
+    		q.setString(0, tasqueEntity.getTransaction());
+    		q.setString(1, tasqueEntity.getGroup());
+//    		q.setString(2, tasqueEntity.getBd());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_ROLE))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.role=? and t.db=?" );
+    		q.setString(0, tasqueEntity.getTransaction());
+    		q.setString(1, tasqueEntity.getRole());
+    		q.setString(2, tasqueEntity.getDb());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_ACCOUNT))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
+    				+ "where t.server is null and t.transaction=? and t.user=? and t.systemName=?" );
+    		q.setString(0, tasqueEntity.getTransaction());
+    		q.setString(1, tasqueEntity.getUser());
+    		q.setString(2, tasqueEntity.getSystemName());
+    		if (! q.list().isEmpty())
+    			return true;
+    	}
+		return false;
+	}
+
 
     /**
      * @see es.caib.seycon.ng.model.TasqueEntityDao#toTasca(es.caib.seycon.ng.model.TasqueEntity,

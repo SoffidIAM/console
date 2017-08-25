@@ -93,7 +93,7 @@ public class WorkflowInterceptor implements Filter {
 				}
 
 				((HttpServletResponse) response).addHeader("X-UA-Compatible",
-						"IE=8");
+						"IE=Edge;IE=8");
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {

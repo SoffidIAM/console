@@ -203,10 +203,10 @@
 			<hbox>
 				<input_criteri id="queryNom"
 					etiqueta="${c:l('aplica_rolsllista.zul.Nom')}" 
-					onChange="self.getFellow(&quot;textbox&quot;).value=self.getFellow(&quot;textbox&quot;).value.toUpperCase()"/>
+					onChange=""/>
 				<input_criteri id="queryAplicacio"
 					etiqueta="${c:l('aplica_rolsllista.zul.Aplicacia')}"
-					onChange="self.getFellow(&quot;textbox&quot;).value=self.getFellow(&quot;textbox&quot;).value.toUpperCase()"/>
+					onChange=""/>
 				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
 			</hbox>
 			<hbox>

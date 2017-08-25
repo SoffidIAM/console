@@ -25,6 +25,12 @@ public abstract class ReconcileAccountEntity {
 	@Column (name="RAC_PROCID")
 	public java.lang.Long processId;
 
+	@Column (name="RAC_ISNEW")
+	public Boolean newAccount;
+
+	@Column (name="RAC_DELETED")
+	public Boolean deletedAccount;
+
 	@Column (name="RAC_ACTION")
 	public com.soffid.iam.reconcile.common.AccountProposedAction proposedAction;
 

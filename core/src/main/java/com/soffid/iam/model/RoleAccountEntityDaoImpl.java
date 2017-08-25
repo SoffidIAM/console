@@ -149,6 +149,10 @@ public class RoleAccountEntityDaoImpl extends
 	}
 
 	public void update(RoleAccountEntity rolsUsuaris) {
+    	handleUpdate (rolsUsuaris, "U");
+    }
+    
+    public void handleUpdate(RoleAccountEntity rolsUsuaris, String auditType) {
 		// Aquest mètode s'empra només en SC_RESPONSABLE de les aplicacions
 		// Només es pot tindre 1 responsable, i s'actualitza l'existent (si
 		// existeix)
@@ -217,7 +221,7 @@ public class RoleAccountEntityDaoImpl extends
 			generateTasks(rolsUsuaris);
 			generateTasks(old);
 
-			auditarRolAccount("U", rolsUsuaris); //$NON-NLS-1$
+			auditarRolAccount(auditType, rolsUsuaris); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
@@ -229,33 +233,36 @@ public class RoleAccountEntityDaoImpl extends
 
 	private void generateTasks(RoleAccountEntity grant)
 			throws InternalErrorException {
-		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-		tasque.setDate(new Timestamp(System.currentTimeMillis()));
-		tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-		tasque.setRole(grant.getRole().getName());
-		tasque.setDb(grant.getRole().getSystem().getName());
-		getTaskEntityDao().create(tasque);
-
-		if (grant.getAccount().getType().equals(AccountType.USER)) {
-			for (com.soffid.iam.model.UserAccountEntity ua : grant.getAccount()
-					.getUsers()) {
+		if (! grant.getAccount().getType().equals(AccountType.IGNORED))
+	   	{
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setDate(new Timestamp(System.currentTimeMillis()));
+			tasque.setTransaction(TaskHandler.UPDATE_ROLE);
+			tasque.setRole(grant.getRole().getName());
+			tasque.setDb(grant.getRole().getSystem().getName());
+			getTaskEntityDao().create(tasque);
+	
+			if (grant.getAccount().getType().equals(AccountType.USER)) {
+				for (com.soffid.iam.model.UserAccountEntity ua : grant.getAccount()
+						.getUsers()) {
+					tasque = getTaskEntityDao().newTaskEntity();
+					tasque.setDate(new Timestamp(System.currentTimeMillis()));
+					tasque.setTransaction(TaskHandler.UPDATE_USER);
+					tasque.setUser(ua.getUser().getUserName());
+					getTaskEntityDao().create(tasque);
+				}
+			} else {
 				tasque = getTaskEntityDao().newTaskEntity();
 				tasque.setDate(new Timestamp(System.currentTimeMillis()));
-				tasque.setTransaction(TaskHandler.UPDATE_USER);
-				tasque.setUser(ua.getUser().getUserName());
+				tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
+				tasque.setSystemName(grant.getAccount().getSystem().getName());
+				tasque.setDb(grant.getAccount().getSystem().getName());
+				tasque.setUser(grant.getAccount().getName());
 				getTaskEntityDao().create(tasque);
 			}
-		} else {
-			tasque = getTaskEntityDao().newTaskEntity();
-			tasque.setDate(new Timestamp(System.currentTimeMillis()));
-			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
-			tasque.setSystemName(grant.getAccount().getSystem().getName());
-			tasque.setDb(grant.getAccount().getSystem().getName());
-			tasque.setUser(grant.getAccount().getName());
-			getTaskEntityDao().create(tasque);
-		}
 
-		getRoleEntityDao().updateMailLists(grant.getRole());
+			getRoleEntityDao().updateMailLists(grant.getRole());
+	   	}
 
 	}
 
@@ -519,6 +526,20 @@ public class RoleAccountEntityDaoImpl extends
 			targetVO.setRuleId(sourceEntity.getRule().getId());
 			targetVO.setRuleDescription(sourceEntity.getRule().getDescription());
 		}
+
+        targetVO.setParentGrant( sourceEntity.getParent() == null ? null : sourceEntity.getParent().getId());
+        if (sourceEntity.getParent() != null)
+        {
+        	targetVO.setRuleDescription(String.format("Granted to role %s @ %s", 
+        			sourceEntity.getParent().getRole().getName(),
+        			sourceEntity.getParent().getRole().getSystem().getName()));
+        }
+
+        if (sourceEntity.getOwnerAccount() != null)
+        	targetVO.setOwnerAccount(sourceEntity.getOwnerAccount().getName());
+
+        if (sourceEntity.getDelegateAccount() != null)
+        	targetVO.setDelegateAccount(sourceEntity.getDelegateAccount().getName());
 	}
 
 	/**
@@ -718,6 +739,11 @@ public class RoleAccountEntityDaoImpl extends
 						sourceVO.getHolderGroup()));
 			targetEntity.setHolderGroup(grup);
 		}
+        
+        if (sourceVO.getParentGrant() != null)
+        {
+        	targetEntity.setParent(load(sourceVO.getParentGrant()));
+        }
 	}
 
 	private DomainValueEntity findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(

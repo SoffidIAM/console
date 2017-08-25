@@ -222,6 +222,48 @@ public class VaultServiceImpl extends VaultServiceBase {
 			return false;
 	}
 
+	/**
+	 * Creates a "Navigate" ACE into parent, if needed
+	 * 
+	 * It would be possible if no other sibling folder has a similar ACE.
+	 * 
+	 * @param entity
+	 * @param ace Current access control entry
+	 * @return
+	 */
+	private boolean checkAddAce(VaultFolderEntity parent,
+			AccountAccessEntity ace) {
+		boolean add = true;
+		if (parent != null)
+		{
+			for (VaultFolderAccessEntity ace2: parent.getAcl())
+			{
+				if (! ace2.getLevel().equals( AccountAccessLevelEnum.ACCESS_NONE ) &&
+					ace2.getGroup() == ace.getGroup() &&
+					ace2.getRole() == ace.getRole() &&
+					ace2.getUser() == ace.getUser() )
+				{
+					add = false;
+					break;
+				}
+			}
+			if (add)
+			{
+				VaultFolderAccessEntity ace2 = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
+				ace2.setVault(parent);
+				ace2.setGroup(ace.getGroup());
+				ace2.setRole(ace.getRole());
+				ace2.setUser(ace.getUser());
+				ace2.setLevel(AccountAccessLevelEnum.ACCESS_NAVIGATE);
+				getVaultFolderAccessEntityDao().create(ace2);
+				parent.getAcl().add(ace2);
+				checkAddParentAce(parent, ace2);
+			}
+			return add;
+		} else
+			return false;
+	}
+
 	@Override
 	protected List<Account> handleList(VaultFolder folder) throws Exception {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load (folder.getId());
@@ -685,7 +727,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 		Collections.sort(accounts, new Comparator<AccountEntity>() {
 
 			public int compare(AccountEntity o1, AccountEntity o2) {
-				return o1.getDescription().compareTo(o2.getDescription());
+				return o1.getDescription() == null && o2.getDescription() == null ? 0:
+					o1.getDescription() == null ? -1 :
+						o2.getDescription() == null ? 1 :
+							o1.getDescription().compareTo(o2.getDescription());
 			}
 		});
 		

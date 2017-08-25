@@ -20,9 +20,14 @@
 	<style src="/css/localSEU.css" />
 		<zscript><![CDATA[
 		                  
-			javax.servlet.http.HttpServletRequest req = Executions.getCurrent().getNativeRequest();
-			
-			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(execution.getNativeRequest());
+			javax.servlet.http.HttpServletRequest req = execution.getNativeRequest();
+			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
+			String[] token = session.getAttribute("samlLoginToken");
+			String user = token != null && token.length == 2 ? token[0]: "";
+			String password = token != null && token.length == 2 ? token [1]: "";
+
+			boolean autoLogin = !user.isEmpty() && !password.isEmpty();
+
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
 				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
 			
@@ -41,15 +46,16 @@
 			} catch (Throwable th) {
 			}		    
 		]]></zscript>
-		<html><![CDATA[
+		<html id="htmlData"><![CDATA[
+		
    		
 		<div class="login">
         		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
 			<div class="loginbox"> 
 			<p>${c:l('configure.header')}</p>
-			<form method="post" action="/j_security_check" accept-charset="UTF-8">
+			<form method="post" action="/j_security_check" id='loginForm' accept-charset="UTF-8">
 			<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
-			<input name="j_username" id="j_username" type="hidden">
+			<input name="j_username" id="j_username" type="hidden" value="${user }">
 			<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>
 			<p>
 			
@@ -58,7 +64,7 @@
 			</p>
 			<p>
 				<div class="inputlogin">${c:l('login.lblPassword')} :
-				<input name="j_password" id="j_password" type="password" autocomplete="off" /></div>
+				<input name="j_password" id="j_password" type="password" autocomplete="off" value="${password }"/></div>
 			</p>
 			<p style="color:red;">${error}</p>
 				<input name="formUCboton" type="submit" value="${c:l('configure.Login')}"/>
@@ -66,4 +72,11 @@
 			</div>
 		</div>
 		]]></html>
+		<html if="${autoLogin}"><![CDATA[
+			<script type="text/javascript">
+			// <!--
+			document.getElementById('loginForm').submit();
+			// -->
+			</script>
+   		]]></html>
 </zk>

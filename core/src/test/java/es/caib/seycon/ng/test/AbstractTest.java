@@ -89,6 +89,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 	{
 		
 		System.setProperty("jboss.home.dir", "target/server");
+		System.setProperty("catalina.home", "target/server");
 		deleteDir (new File("target/docs"));
 		
 		

@@ -14,6 +14,7 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
@@ -25,8 +26,10 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.service.EntryPointService;
 import com.soffid.iam.service.NetworkService;
@@ -42,6 +45,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -142,7 +147,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		User u = getCurrentUser();
 		Security.nestedLogin(u.getUserName(), new String[]{Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL});
 		try {
-			return getApplicationService().findUserRolesByUserName(u.getUserName());
+			LinkedList<RoleAccount> ra = new LinkedList<RoleAccount> (getApplicationService().findUserRolesByUserName(u.getUserName()));
+			ra.addAll( getEntitlementDelegationService().findActiveDelegations() );
+			return ra;
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -335,8 +342,44 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	}
 	@Override
     protected Collection<UserData> handleGetUserAttributes() throws Exception {
-		User usuari = getUserService().getCurrentUser();
-		return getUserService().findUserDataByUserName(usuari.getUserName());
+		UserEntity usuari = getUserEntityDao().findByUserName(Security.getCurrentUser());
+		Collection<UserDataEntity> dades = usuari.getUserData();
+		LinkedList<UserData> result = new LinkedList<UserData>();
+		
+		List<MetaDataEntity> tipusDades = getMetaDataEntityDao().loadAll();
+		Collections.sort(tipusDades, new Comparator<MetaDataEntity>(){
+			public int compare(MetaDataEntity o1, MetaDataEntity o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}	
+		});
+		
+		Iterator<MetaDataEntity> tipusDadesIterator = tipusDades.iterator();
+		while (tipusDadesIterator.hasNext()) {
+			MetaDataEntity metaData = tipusDadesIterator.next();
+			Iterator<UserDataEntity> dadesIterator = dades.iterator();
+			boolean teMetaData = false;
+			while (dadesIterator.hasNext()) {
+				UserDataEntity dada = dadesIterator.next();
+				if (dada.getDataType().getName().equals(metaData.getName()))
+				{
+					teMetaData = true;
+					if (Security.isSyncServer() ||
+							! dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+						result.add(getUserDataEntityDao().toUserData(dada));
+				}
+			}
+			if (!teMetaData) {
+				UserDataEntity dus = getUserDataEntityDao().newUserDataEntity();
+				dus.setUser(usuari);
+				dus.setDataType(metaData);
+				if (! dus.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+				{
+					result.add ( getUserDataEntityDao().toUserData(dus));
+				}
+			}
+		}
+
+		return result;
 	}
 	@Override
     protected UserData handleUpdateUserAttribute(UserData attribute) throws Exception {

@@ -802,7 +802,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		try {
 			org.jbpm.graph.exe.ProcessInstance process = context
 					.loadProcessInstance(instanceVO.getId());
-			Vector parsedLogs = new Vector();
+			LinkedList parsedLogs = new LinkedList();
 			parseLog(context, process, parsedLogs, process.getRootToken());
 			Collections.sort(parsedLogs, new Comparator() {
 				public int compare(Object arg0, Object arg1) {
@@ -820,7 +820,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	private void parseLog(JbpmContext context,
-			org.jbpm.graph.exe.ProcessInstance process, Vector parsedLogs,
+			org.jbpm.graph.exe.ProcessInstance process, LinkedList parsedLogs,
 			org.jbpm.graph.exe.Token t) {
 		Criteria criteria = null;
 
@@ -844,11 +844,19 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	private void parseLog(org.jbpm.graph.exe.ProcessInstance process,
-			Vector parsedLogs, org.jbpm.logging.log.ProcessLog pl) {
+			LinkedList parsedLogs, org.jbpm.logging.log.ProcessLog pl) {
 		ProcessLog logLine = new ProcessLog();
 		logLine.setDate(pl.getDate());
 		logLine.setProcessId(process.getId());
 		logLine.setUser(pl.getActorId());
+		Security.nestedLogin(Security.getCurrentAccount(), new String[] {Security.AUTO_USER_QUERY+Security.AUTO_ALL});
+		try {
+			if (pl.getActorId() != null && ! pl.getActorId().isEmpty())
+				logLine.setUser(pl.getActorId()+" "+getUserService().findUserByUserName(pl.getActorId()).getFullName());
+		} catch (Exception e) {
+		} finally {
+			Security.nestedLogoff();
+		}
 		StringBuffer b = new StringBuffer();
 		org.jbpm.logging.log.ProcessLog pl2 = pl.getParent();
 		while (pl2 != null) {
@@ -2756,4 +2764,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 				return false;
 		}
 	}
+ 	protected boolean handleIsUserInRole(String role) throws Exception {
+ 		for ( String r: getUserGroups())
+ 			if (r.equals(role))
+				return true;
+ 		return false;
+ 	}
 }

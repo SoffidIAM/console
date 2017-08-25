@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.service.EntitlementDelegationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -46,7 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 		es.caib.seycon.ng.servei.AutoritzacioService.class, BpmEngine.class,
 	ApplicationAttributeEntity.class,
 	TipusDadaEntity.class,
-	RoleAttributeEntity.class
+	RoleAttributeEntity.class,
+	EntitlementDelegationService.class
 	}
 )
 public abstract class AplicacioService {

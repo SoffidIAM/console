@@ -28,6 +28,7 @@ import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.ServiceLocator;
 
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.io.IOException;
@@ -176,10 +177,6 @@ public class Mail implements ActionHandler {
 		{
     		sendPredefinedMail("Mail.8");
 		}
-		else if (getTemplate() != null ) //$NON-NLS-1$
-		{
-    		sendPredefinedMail("Mail.4");
-		}
 		else
 		{
     		sendCustomMail();
@@ -310,14 +307,35 @@ public class Mail implements ActionHandler {
 				Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
 				Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
 		try {
-			if (to != null)
+			String realTo = evaluate(to);
+			if (realTo != null)
 			{
 				Set<InternetAddress> users = new HashSet<InternetAddress>();
-				for (String t: evaluate(to).split("[, ]+"))
+				for (String t: realTo.split("[, ]+"))
 				{
 					if ( ! t.isEmpty())
 						users.add(new InternetAddress(t));
 				}
+
+				String content;
+				if (text != null && !text.trim().isEmpty())
+					content = text;
+				else if (template != null && !template.trim().isEmpty())
+				{
+					InputStream in = getMailContent();
+					InputStreamReader reader = new InputStreamReader(in);
+					StringBuffer buffer = new StringBuffer ();
+					int ch = reader.read();
+					while ( ch >= 0)
+					{
+						buffer.append((char) ch);
+						ch = reader.read ();
+					}
+					content = buffer.toString();
+				} else {
+					content = subject;
+				}
+
 				send(from, users, evaluate(subject), evaluate (text));
 			}
 			if (actors != null)
@@ -336,7 +354,26 @@ public class Mail implements ActionHandler {
 					InternetAddress recipient = getUserAddress(usuari);
 					if (recipient != null)
 					{
-						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (text));
+						String content;
+						if (text != null && !text.trim().isEmpty())
+							content = text;
+						else if (template != null && !template.trim().isEmpty())
+						{
+							InputStream in = getMailContent();
+							InputStreamReader reader = new InputStreamReader(in);
+							StringBuffer buffer = new StringBuffer ();
+							int ch = reader.read();
+							while ( ch >= 0)
+							{
+								buffer.append((char) ch);
+								ch = reader.read ();
+							}
+							content = buffer.toString();
+						} else {
+							content = subject;
+						}
+
+						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (content));
 					}
 				}
 			}
@@ -362,7 +399,10 @@ public class Mail implements ActionHandler {
 					&& (templateVariables.containsKey(pName))) {
 				return templateVariables.get(pName);
 			}
-			return variableResolver.resolveVariable(pName);
+			if (pName.equals("systemProperties"))
+				return System.getProperties();
+			else
+				return variableResolver.resolveVariable(pName);
 		}
 	}
 

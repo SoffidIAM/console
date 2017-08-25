@@ -24,8 +24,8 @@ public class ApplicationAttributeEntityImpl extends com.soffid.iam.model.Applica
 		{
 			setValue(null);
 			setBlobDataValue(null);
-		}
-		if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+		} 
+		else if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
 				getMetadata().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			setBlobDataValue( (byte[]) value);

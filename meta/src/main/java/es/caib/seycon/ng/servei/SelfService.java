@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import java.util.Collection;
 import java.util.List;
 
+import com.soffid.iam.service.EntitlementDelegationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
@@ -15,6 +16,9 @@ import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.model.AuditoriaEntity;
+import es.caib.seycon.ng.model.DadaUsuariEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.servei.DispatcherService.class,
+	UsuariEntity.class,
+	DadaUsuariEntity.class,
+	TipusDadaEntity.class,
 	DadesAddicionalsService.class,
-	AuditoriaService.class})
+	AutoritzacioService.class,
+	AuditoriaService.class,
+	EntitlementDelegationService.class})
 public abstract class SelfService {
 
 	@Operation(translated="getUserAccounts")

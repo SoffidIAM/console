@@ -9,7 +9,9 @@ import java.util.Date;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.RolAccountEntity;
 
 @ValueObject ( translatedName="RoleAccount",
 	 translatedPackage="com.soffid.iam.api")
@@ -111,4 +113,30 @@ public class RolAccount {
 	@Description("Last certification date")
 	@Nullable
 	public Date certificationDate;
+	
+	@Description("Parent grant id, for optinal role to role grant")
+	@Nullable
+	public Long parentGrant;
+
+	@Description("Delegation status")
+	@Column(name="RLU_DELSTA")
+	@Nullable
+	public DelegationStatus delegationStatus;
+
+	@Description("Entitled account who delegatse to delegateAccount")
+	@Nullable
+	public String ownerAccount;
+
+	@Description("Delegate account")
+	@Nullable
+	public String delegateAccount;
+
+	@Description("Delegate since date")
+	@Nullable
+	public Date delegateSince;
+
+	@Description("Delegate until date")
+	@Nullable
+	public Date delegateUntil;
+
 }

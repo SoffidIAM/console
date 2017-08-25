@@ -7,7 +7,7 @@
 	
 	<window border="normal" closable="true" height="420px" id="win"
 		mode="highlighted" position="center, center"
-		title="${c:l('seleccionTransicion.lblTitulo')}"
+		title="${c:l('seleccionUsuario.lblTitulo')}"
 		use="es.caib.bpm.ui.task.SeleccionUsuarioUI" width="${amplefinestra}">
 
 		<vbox height="100%" id="SearchWindow" width="100%">

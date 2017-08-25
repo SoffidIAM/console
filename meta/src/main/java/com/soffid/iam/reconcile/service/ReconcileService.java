@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.reconcile.service;
+import com.soffid.iam.reconcile.model.ReconcileAccountAttributesEntity;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AplicacioService.class,
 	es.caib.seycon.ng.servei.DispatcherService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
-	es.caib.seycon.ng.model.UsuariEntity.class})
+	es.caib.seycon.ng.model.UsuariEntity.class,
+	ReconcileAccountAttributesEntity.class})
 public abstract class ReconcileService {
 
 	@Operation ( grantees={com.soffid.iam.reconcile.user_reconcile.class})

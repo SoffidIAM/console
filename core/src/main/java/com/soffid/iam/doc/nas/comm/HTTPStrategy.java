@@ -94,9 +94,12 @@ public class HTTPStrategy implements CommunicationStrategy
 	public void setProperties() throws NASException 
 	{
 		this.rootURL= ConfigurationCache.getMasterProperty("soffid.ui.docServer");
+		if (!rootURL.endsWith("/"))
+			rootURL = rootURL + "/";
 		this.tempPath= ConfigurationCache.getMasterProperty("soffid.ui.docTempPath");
 		
 		Properties properties = new Properties();
+		this.tempPath= properties.getProperty("soffid.ui.docTempPath");
 		
 		properties.put(JWOptions.QUIET_P, JWOptions.TRUE_P);
 		this.user = ConfigurationCache.getMasterProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$

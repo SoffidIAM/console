@@ -200,7 +200,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
     public void update(com.soffid.iam.model.UserEntity usuari) throws RuntimeException {
         try {
-            UserEntity actualUsuari = load(usuari.getId());
+            super.update(usuari);
 
             auditarUsuari("U", usuari.getUserName(), usuari.getPrimaryGroup()); //$NON-NLS-1$
 

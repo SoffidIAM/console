@@ -181,5 +181,24 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<dependencies></dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-json</artifactId>
+			<version>1.6.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>jasper-runtime</artifactId>
+			<version>5.5.12</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0-1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 </project>

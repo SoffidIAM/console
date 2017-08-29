@@ -24,13 +24,17 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class SearchDictionaryBuilder {
+	private static final String COM_SOFFID_IAM_API_CUSTOM_OBJECT = "com.soffid.iam.api.CustomObject#";
 	static Map<String, SearchDictionary> map = new HashMap<String, SearchDictionary>();
 	public static SearchDictionary build (String clazz) throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
 		SearchDictionary sd = map.get(clazz);
 		if (sd == null)
 		{
-			sd = generateDefaultBuilder(clazz);
+			if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
+				sd = generateDefaultBuilder("com.soffid.iam.api.CustomObject");
+			else
+				sd = generateDefaultBuilder(clazz);
 			if (clazz.equals("com.soffid.iam.api.User")) {
 				addUserJoins(sd);
 			} else if (clazz.equals("com.soffid.iam.api.Role")) {
@@ -47,6 +51,8 @@ public class SearchDictionaryBuilder {
 		} else if (clazz.equals("com.soffid.iam.api.Application")) {
 			sd = addAttributes (sd, MetadataScope.APPLICATION);
 		}
+		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
+			sd = addAttributes (sd, MetadataScope.CUSTOM, clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()));
 		return sd;
 	}
 	
@@ -158,5 +164,29 @@ public class SearchDictionaryBuilder {
 
 	private static void addApplicationJoins(SearchDictionary sd) {
 		addJoin (sd, "roles.name", "auditoria.zul.rol", TypeEnumeration.STRING_TYPE);
+	}
+
+	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope, String objectType) throws InternalErrorException, NamingException, CreateException {
+		SearchDictionary sd2 = new SearchDictionary(sd1);
+		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
+		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName(objectType, null))
+		{
+			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
+				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()))
+			{
+				SearchAttributeDefinition sad = new SearchAttributeDefinition();
+				sad.setLocalizedName(att.getLabel());
+				sad.setType(att.getType());
+				sad.setName("attributes."+att.getCode());
+				if (att.getValues() != null && ! att.getValues().isEmpty())
+				{
+					sad.setLabels(att.getValues());
+					sad.setValues(att.getValues());
+				}
+				sd2.getAttributes().add(sad);
+			}
+				
+		}
+		return sd2;
 	}
 }

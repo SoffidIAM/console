@@ -37,6 +37,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	MetadataScope scope;
 	String dataPath;
 	boolean readonly;
+	String objectType; 
 	
 	public boolean isReadonly() {
 		return readonly;
@@ -66,7 +67,16 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	private void updateMetadata() {
 		try {
-			dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(this.scope));
+			if (scope == null)
+				return;
+			else if (scope == MetadataScope.CUSTOM)
+			{
+				if (objectType == null)
+					return;
+				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
+			}
+			else
+				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(this.scope));
 			Collections.sort(dataTypes, new Comparator<TipusDada>() {
 				public int compare(TipusDada o1, TipusDada o2) {
 					return o1.getOrdre().compareTo(o2.getOrdre());
@@ -141,6 +151,15 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	public String getXPath() {
 		return binder.getXPath();
+	}
+
+	public String getObjectType() {
+		return objectType;
+	}
+
+	public void setObjectType(String objectType) {
+		this.objectType = objectType;
+		updateMetadata();
 	}
 
 }

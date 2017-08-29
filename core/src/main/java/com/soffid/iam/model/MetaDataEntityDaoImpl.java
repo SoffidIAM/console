@@ -76,6 +76,8 @@ public class MetaDataEntityDaoImpl extends
 			}
 			targetVO.setValues(values);
 		}
+		if (sourceEntity.getObjectType() != null)
+			targetVO.setCustomObjectType(sourceEntity.getObjectType().getName());
 	}
 
 	/**
@@ -135,6 +137,14 @@ public class MetaDataEntityDaoImpl extends
 				}
 			}
 			targetEntity.setValues(b.toString());
+		}
+		
+		if (sourceVO.getScope() == MetadataScope.CUSTOM)
+		{
+			CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(sourceVO.getCustomObjectType());
+			if (cot == null)
+				throw new RuntimeException("Invalid custom object type "+sourceVO.getCustomObjectType());
+			targetEntity.setObjectType(cot);
 		}
 	}
 	

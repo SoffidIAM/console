@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.*;
@@ -13,6 +15,7 @@ import com.soffid.mda.annotation.*;
 @Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.comu.TipusDada.class,
+	CustomObjectTypeEntity.class,
 	es.caib.seycon.ng.model.DadaUsuariEntity.class})
 public abstract class TipusDadaEntity {
 
@@ -77,6 +80,10 @@ public abstract class TipusDadaEntity {
 	public Boolean unique;
 	
 	
+	@Column (name="TDA_COT_ID", reverseAttribute="attributes", composition=true)
+	@Nullable
+	CustomObjectTypeEntity objectType;
+
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;
 
@@ -103,6 +110,15 @@ public abstract class TipusDadaEntity {
 	@Operation(translated="findDataTypesByScopeAndName")
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findTipusDadesByScopeAndName(
 			MetadataScope scope, java.lang.String codi) {
+	 return null;
+	}
+
+	@DaoFinder("from com.soffid.iam.model.MetaDataEntity tipusDada "
+			+ "where (:codi is null or tipusDada.name like :codi) "
+			+ "and   (tipusDada.objectType.name = :type or :type is null ) and "
+			+ "tipusDada.tenant.id = :tenantId")
+	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findByObjectTypeAndName(
+			String type, java.lang.String codi) {
 	 return null;
 	}
 

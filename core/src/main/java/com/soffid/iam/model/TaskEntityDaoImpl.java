@@ -66,39 +66,43 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_USER))
     	{
     		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
-    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.user=?" );
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.user=? and t.tenant.id=?" );
     		q.setString(0, tasqueEntity.getTransaction());
     		q.setString(1, tasqueEntity.getUser());
+    		q.setLong(2, tasqueEntity.getTenant().getId());
     		if (! q.list().isEmpty())
     			return true;
     	}
     	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_GROUP))
     	{
     		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
-    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.group=?" );
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.group=?  and t.tenant.id=?" );
     		q.setString(0, tasqueEntity.getTransaction());
     		q.setString(1, tasqueEntity.getGroup());
 //    		q.setString(2, tasqueEntity.getBd());
+    		q.setLong(2, tasqueEntity.getTenant().getId());
     		if (! q.list().isEmpty())
     			return true;
     	}
     	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_ROLE))
     	{
     		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
-    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.role=? and t.db=?" );
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.role=? and t.db=?  and t.tenant.id=?" );
     		q.setString(0, tasqueEntity.getTransaction());
     		q.setString(1, tasqueEntity.getRole());
     		q.setString(2, tasqueEntity.getDb());
+    		q.setLong(3, tasqueEntity.getTenant().getId());
     		if (! q.list().isEmpty())
     			return true;
     	}
     	else if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_ACCOUNT))
     	{
     		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
-    				+ "where t.server is null and t.transaction=? and t.user=? and t.systemName=?" );
+    				+ "where t.server is null and t.transaction=? and t.user=? and t.systemName=?  and t.tenant.id=?" );
     		q.setString(0, tasqueEntity.getTransaction());
     		q.setString(1, tasqueEntity.getUser());
     		q.setString(2, tasqueEntity.getSystemName());
+    		q.setLong(3, tasqueEntity.getTenant().getId());
     		if (! q.list().isEmpty())
     			return true;
     	}

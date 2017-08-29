@@ -9,4 +9,5 @@ public class MetadataScope {
 	public static String APPLICATION = "application";
 	public static String GROUP = "group";
 	public static String ACCOUNT = "account";
+	public static String CUSTOM = "custom";
 }

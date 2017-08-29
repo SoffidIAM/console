@@ -867,6 +867,7 @@
 	<include src="finestres/maquinesllistaUsuari.zul"/>
 	<include src="impressoresllista.zul"/>
 	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
+	<include src="usuarisllista.zul"/>
 	
 	
 </frame>

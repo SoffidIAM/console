@@ -60,11 +60,13 @@
 		}
 	}
 	
-		
+
 	//showFavorites = es.caib.zkib.zkiblaf.Application.isFavoritesVisible();
 	]]>
   </zscript>
-  <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" use="es.caib.bpm.ui.main.MainMenuWindow" visible="false" width="30em"
+  <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" 
+  	use="es.caib.bpm.ui.main.MainMenuWindow" 
+  	visible="false" width="30em"
   	onCall="es.caib.zkib.zkiblaf.Application.setPage(event.data);">
     <tree fixedLayout="true" vflex="false" id="menutree">
     	<treechildren>
@@ -169,7 +171,9 @@
 		    		</treechildren>
     				</treeitem>
     				<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ --> 
-    				<treeitem id="sistemesinformacio" if="${canViewAplicacions || canViewDominisCorreu || canViewCorreu || canViewAdministracioIntranet || canViewRules}" open="false">
+    				<treeitem id="sistemesinformacio" 
+    					if="${canViewAplicacions || canViewDominisCorreu || canViewCorreu || canViewAdministracioIntranet || canViewRules}" 
+    					open="false">
     					<treerow>
     						<treecell label="${c:l('seu.sistemesinformacio')}" onClick="sistemesinformacio.setOpen ( ! sistemesinformacio.isOpen() )"/>
     					</treerow>
@@ -200,15 +204,15 @@
 				    			</treerow>
 			    		</treeitem>		    	
 			    		</treechildren>
-    			</treeitem>
+	    			</treeitem>
+		     		<treeitem id="customObjectTypes" open="false">
+		    			<treerow>
+		    				<treecell label="${c:l('main.lblCustomObjectTypes')}" />
+		    			</treerow>
+			    		 <treechildren>
+			    		 </treechildren>
+		    		</treeitem>
     			</treechildren>
-		    		<!-- Aquesta ja estava comentada
-					<treeitem>
-						<treerow>
-							<apptreecell langlabel="main.lblAdminConfiguracioPersonal" pagina="wf/adminPersonalConfigs.zul"/>
-						</treerow>
-					</treeitem>
-					 -->		
     		</treeitem>   		   		
     	   		
 <!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->    		

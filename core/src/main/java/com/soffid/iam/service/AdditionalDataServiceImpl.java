@@ -17,16 +17,26 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -37,7 +47,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -369,5 +381,73 @@ public class AdditionalDataServiceImpl extends
 			}
 		});
 		return tipusDadaList;
+	}
+
+	@Override
+	protected CustomObjectType handleCreateCustomObjectType(CustomObjectType obj) throws Exception {
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().newCustomObjectTypeEntity();
+		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
+		getCustomObjectTypeEntityDao().create(entity);
+		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
+	}
+
+	@Override
+	protected void handleDelete(CustomObjectType obj) throws Exception {
+		getCustomObjectTypeEntityDao().remove(obj.getId());
+	}
+
+	@Override
+	protected Collection<CustomObjectType> handleFindCustomObjectTypeByJsonQuery(String query) throws Exception {
+		ClassConfig config = Configuration.getClassConfig(CustomObjectType.class);
+
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(CustomObjectType.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.tenant.id = :tenantId";
+		
+		hql.setWhereString(new StringBuffer(qs));
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size()+1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		Collection<CustomObjectType> result = new LinkedList<CustomObjectType>();
+		for (CustomObjectTypeEntity ue : getCustomObjectTypeEntityDao().query(hql.toString(),
+				paramArray)) 
+		{
+			CustomObjectType u = getCustomObjectTypeEntityDao().toCustomObjectType(ue);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
+				result.add(u);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName(String objectType, String code)
+			throws Exception {
+		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, code);
+		return getMetaDataEntityDao().toDataTypeList(r);
+	}
+
+	@Override
+	protected CustomObjectType handleUpdateCustomObjectType(CustomObjectType obj) throws Exception {
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().load(obj.getId());
+		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
+		getCustomObjectTypeEntityDao().create(entity);
+		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
+	}
+
+	@Override
+	protected CustomObjectType handleFindCustomObjectTypeByName(String name) throws Exception {
+		CustomObjectTypeEntity o = getCustomObjectTypeEntityDao().findByName(name);
+		if ( o == null)
+			return null;
+		else
+			return getCustomObjectTypeEntityDao().toCustomObjectType(o);
 	}
 }

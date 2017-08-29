@@ -109,7 +109,7 @@
 							<artifacts>
 								<artifact>
 									<file>
-										target/SEU_installer.sh
+										target/SOFFID_console_installer.sh
 									</file>
 									<type>sh</type>
 								</artifact>

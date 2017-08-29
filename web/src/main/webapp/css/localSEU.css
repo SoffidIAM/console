@@ -532,7 +532,7 @@ div.CodeMirror-code   {
 }
 
 .button-container {
-	margin-top: 1em;
+	margin-top: 7px;
 }
 
 .button-container .buttons {
@@ -569,7 +569,7 @@ li.attribute-search-box {
     color: #7F9FC2;
 }
 
-li.attribute-search-box button {
+li.attribute-search-box > button {
 	background-color: transparent;
     border: none;
     border-image: none;
@@ -583,6 +583,10 @@ li.attribute-search-box:hover {
 	background-color: #9EC73C;
     color: white;
     cursor: pointer;
+}
+
+li.attribute-search-box  > button:hover {
+    color: white;
 }
 
 div.identity-tag-user {
@@ -639,4 +643,21 @@ div.identity-tag-role img.imageclic {
 
 div.identity-tag-role img.imageclic:hover {
 	opacity: 1;
+}
+
+input[type="radio"] {
+    vertical-align: -3px;
+}
+
+div.menupopup {
+	border: 1px solid
+}
+
+div.menupopup table {
+	padding: 5px
+}
+
+div.menupopup td {
+	padding-bottom: 5px;
+	padding-left: 7px
 }

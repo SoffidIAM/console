@@ -2,22 +2,28 @@
 <div style="margin: 10px">
 	<div>
 		<radiogroup id="rg">
-			<div style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.Equals')}:" value="eq"/><intbox style="margin-left: 2em"  id='ib1'/>
-			</div>
-			<div style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.GreaterThan')}:" value="gt"/><intbox style="margin-left: 2em" id='ib2'/>
-			</div>
-			<div  style="margin-top: 10px">
-				<radio label="${c:l('attributeQuery.LessThan')}:" value="lt"/><intbox style="margin-left: 2em" id='ib3'/>
-			</div>
+			<grid style="border: 0px solid">
+	       		<rows>
+	       			<row style="margin-top: 10px; border: 0px solid">
+	       				<radio label="${c:l('attributeQuery.Equals')}:" value="eq" />
+	       				<intbox style="margin-left: 2em"  id='ib1'/>
+	       			</row>
+	       			<row style="margin-top: 10px; border: 0px solid">
+	       				<radio label="${c:l('attributeQuery.GreaterThan')}:" value="gt" />
+	       				<intbox style="margin-left: 2em" id='ib2'/>
+	       			</row>
+	       			<row style="margin-top: 10px; border: 0px solid">
+	       				<radio label="${c:l('attributeQuery.LessThan')}:" value="lt" />
+	       				<intbox style="margin-left: 2em" id='ib3'/>
+	       			</row>
+	       		</rows>
+			</grid>
 		</radiogroup>
 	</div>
 	<div class='button-container'>
 		<div class='buttons'>
 			<button id='okbutton' label="${c:l('agentsllista.zul.Accepta') }"/>
-			<button id='cancelbutton' label="${c:l('agentsllista.zul.Cancel·la')}"/>
+			<button id='cancelbutton' label="${c:l('agents.zul.Esborra')}"/>
 		</div>
 	</div>
 </div>
-

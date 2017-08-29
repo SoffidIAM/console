@@ -11,7 +11,7 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 <%@ taglib uri="http://www.zkoss.org/dsp/zk/core" prefix="z" %>
 <c:set var="self" value="${requestScope.arg.self}"/>
 <span id="${self.uuid}"${self.outerAttrs}${self.innerAttrs} z.type="attributesearchbox.attributesearchbox.Searchbox">
-<div style="float:right">
+<div style="float:right; padding-top:4px; padding-right:8px;">
 	<a href="#" id="${self.uuid}!mode" class="change-mode-label">${self.changeModeLabel}</a>
 </div>
 <c:if test="${!self.advancedMode}">

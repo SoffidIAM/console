@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding='utf-8'?>
 <div style="margin: 10px">
-	<div id="searchBoxParent">
-	</div>
+	<div id="searchBoxParent"></div>
 	<div class='button-container'>
 		<div class='buttons'>
 			<button id='okbutton' label="${c:l('agentsllista.zul.Accepta') }"/>
-			<button id='cancelbutton' label="${c:l('agentsllista.zul.Cancel·la')}"/>
+			<button id='cancelbutton' label="${c:l('agents.zul.Esborra')}"/>
 		</div>
 	</div>
 </div>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="grups" title="Gestió de Grups"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="grups" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" onCreate="onCreateFrame()">
+	<style src="~./styles/estil.css"/>
+	
+	<datamodel id="model" rootNode="objects" src="descriptorCustomObject.xml"
+		onChange="showCancelButton()"/>
+	
+
+	<style>
+		.objectatt {display: table; padding: 0px; width: 100%}
+		.objectatt_row {display: table-row}
+		.objectatt_label {display: table-cell; width: 12em}
+		.objectatt_input {display: table-cell}
+	</style>
+
+	<zscript src="comu/checkTruncatedResults.zul"/>
+
+	<zscript>
+		<![CDATA[
+			import es.caib.zkib.zkiblaf.Missatgebox;
+			String objectType = Executions.getCurrent().getNativeRequest().getParameter("type");
+			pageScope.put("objectType", objectType);
+			
+			model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
+			
+			void onCreateFrame () {
+				com.soffid.iam.api.CustomObjectType cot =
+					com.soffid.iam.EJBLocator.getAdditionalDataService()
+						.findCustomObjectTypeByName((String) pageScope.get("objectType"));
+				es.caib.zkib.zkiblaf.Application.setTitle(cot.getDescription());				
+			}
+			
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_GRUPS;
+				
+			// Autoritzacions
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			import com.soffid.iam.utils.Security;
+			boolean canCreate = Security.isUserInRole("customObject:create");
+			boolean canUpdate = Security.isUserInRole("customObject:update");
+			boolean canDelete = Security.isUserInRole("customObject:delete");
+			
+			void select ()
+			{
+				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null && 
+					esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null) {
+					showDetall ();
+				} 
+			}
+			
+			void showLista ()  
+			{
+				esquema.getFellow("lista").getFellow("listbox").clearSelection();
+				esquema.getFellow("lista").getFellow("listbox").setRows(18);
+			}
+			
+			void showDetall () 
+			{
+				esquema.getFellow("lista").getFellow("listbox").setRows(5);
+				esquema.showFormulari();
+			}
+			
+			void onInserir ()
+			{
+				arbre = esquema.getFellow("lista").getFellow("listbox");
+				if (arbre.getSelectedCount()!=0) {// si no dóna error mostrem detalls
+					showDetall();
+				}
+			}
+			
+			void showCancelButton()
+			{
+				b_cancel = esquema.getFellow("lista").getFellow("b_cancel");
+				b_cancel.setVisible(true);
+			}
+			
+			void hiddeButtons()
+			{
+				b_commit = esquema.getFellow("lista").getFellow("b_commit");
+				b_cancel = esquema.getFellow("lista").getFellow("b_cancel");
+				
+				b_commit.setVisible(false);
+				b_cancel.setVisible(false);
+			}
+		]]>
+	</zscript>
+
+	<esquemavertical id="esquema" datamodel="/model"
+		hideSearchToolbar="true"
+		onHideFormulari="showLista()">
+	
+		<criteris id="queryWindow" style="margin-bottom:1em;" 
+			width="100%" height="">
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.CustomObject#${objectType}" 
+				defaultAttributes="name, description"
+				dataPath="/model:/object" variableName="query"></searchbox>
+
+		</criteris>
+		
+		<navegador id="lista" width="100%">
+			<toolbar>
+				<insertbutton id="b_inserir" acces="${canCreate}"
+					onClick='Events.postEvent("onSelect", listbox, null)' 
+					listbox="/esquema/lista/listbox"/>
+				<deletebutton listbox="/esquema/lista/listbox" acces="${canDelete}"/> 
+				<commitbutton id="b_commit" datamodel="/model"/>
+				<toolbarbutton id="b_cancel" image="~./img/document-undo.gif"
+					visible="${false}"
+					label="${c:l('grups.zul.CancelChanges')}" />
+			</toolbar>
+			<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" 
+				 onSelect="select()" rows="${fileres}" autocommit="false">
+				<listhead>
+					<listheader label="${c:l('com.soffid.iam.api.CustomObjectType.name')}"
+						sort="auto" width="20%" />
+					<listheader
+						label="${c:l('com.soffid.iam.api.CustomObjectType.description')}"
+						sort="auto" width="20%" />
+				</listhead>
+				<listfoot>
+					<listfooter span="3">
+						<label id="listboxFoot" style="margin-left: 10px;" />
+					</listfooter>
+				</listfoot>
+				<dataitem bind=".">
+					<listcell bind="@name" />
+					<listcell bind="@description" />
+				</dataitem>
+			</listbox>
+		</navegador>
+	
+		<detalls id="dades" width="100%" style="padding: 6px">
+			<toolbar if="${requestedGroup != null }"  height="20px">
+				<commitbutton id="b_commit" datamodel="/model"/>
+				<toolbarbutton label="" ></toolbarbutton>
+			</toolbar>
+			
+			<form dataPath="/esquema/lista/listbox:/" id="form" width="99%" onOK="">
+				<div>
+					<div>
+						<label style="width:12em; display:inline-block" value="${c:l('com.soffid.iam.api.CustomObjectType.name')} :"></label>
+						<textbox bind="@name" width="15em" id="objectTypeName"  onChange="" />
+					</div>
+					<div>
+						<label style="width:12em; display:inline-block"  value="${c:l('com.soffid.iam.api.CustomObjectType.description')} :"></label>
+						<textbox bind="@description" width="30em" id="objectTypeDescription"  onChange="" />
+					</div>
+						<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
+							dataPath="attributes" scope="custom" objectType='${objectType}'
+							sclass="objectatt"/>
+				</div>
+			</form>
+		</detalls>
+	</esquemavertical>
+	
+	<include src="grupsllista.zul"/>
+	<include src="finestres/maquinesllistaUsuari.zul"/>
+	<include src="impressoresllista.zul"/>
+	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
+	<include src="usuarisllista.zul"/>
+	
+	
+</frame>

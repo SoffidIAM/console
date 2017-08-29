@@ -138,4 +138,9 @@ public class Auditoria {
 	@Nullable
 	public java.util.Calendar calendar;
 
+	@Nullable
+	public java.lang.String customObjectName;
+	
+	@Nullable
+	public java.lang.String customObjectType;
 }

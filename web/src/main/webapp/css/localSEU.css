@@ -640,3 +640,73 @@ div.identity-tag-role img.imageclic {
 div.identity-tag-role img.imageclic:hover {
 	opacity: 1;
 }
+
+button img {
+	height: 1em;
+}
+
+span.highlight {
+	color: #70a3cc;
+}
+
+
+/* The animation code */
+@keyframes slide-in-r {
+    from {left: 120%; opacity: 0}
+    to {left: 0px; opacity: 1}
+}
+
+@keyframes slide-in-l {
+    from {left: -120%; opacity: 0}
+    to {left: 0px; opacity: 1}
+}
+
+@keyframes slide-out-r {
+    from {left: 0; opacity: 1; }
+    to {left: 120%; opacity: 0;}
+}
+
+@keyframes slide-out-l {
+    from {left: 0; opacity: 1; }
+    to {left: -120%; opacity: 0; }
+}
+
+/* The element to apply the animation to */
+div.hidden {
+	display:none;
+}
+
+div.hideRight {
+	position:absolute;
+	left:150%;
+    animation-name: slide-out-r ;
+    animation-duration: 1s;
+    width: 100%;
+    opacity:0;
+}
+
+div.hideLeft {
+    width: 100%;
+	left:-150%;
+	display:block;
+	position:absolute;
+    animation-name: slide-out-l ;
+    animation-duration: 1s;
+    opacity:0;
+}
+
+div.displayedFromRight {
+    width: 100%;
+	display:block;
+	position:absolute;
+    animation-name: slide-in-r;
+    animation-duration: 1s;
+}
+
+div.displayedFromLeft {
+    width: 100%;
+	display:block;
+	position:absolute;
+    animation-name: slide-in-l;
+    animation-duration: 1s;
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="objects">
+		<finder name="object" type="object">
+			<ejb-finder jndi="java:comp/env/ejb/v2/CustomObjectEJB" method="findCustomObjectByJsonQuery"
+			 if = "${query != null}">
+				<parameter value="${objectType}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.CustomObject">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="object">
+		<script-handler>
+			<insert-script>
+				instance.type = datasource.getJXPathContext().getVariables().getVariable("objectType");
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:comp/env/ejb/v2/CustomObjectEJB">
+			<insert-method method="createCustomObject" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteCustomObject">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updateCustomObject">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

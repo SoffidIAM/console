@@ -6,10 +6,15 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.util.Collection;
 import java.util.List;
 
+import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.CustomObjectEntity;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.TipusDada;
@@ -20,6 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roles.ALL;
 import roles.Tothom;
+import roles.customObjectType_create;
+import roles.customObjectType_delete;
+import roles.customObjectType_query;
+import roles.customObjectType_update;
+import roles.customObject_create;
+import roles.customObject_delete;
+import roles.customObject_query;
+import roles.customObject_update;
 
 @Service(serverPath = "/seycon/DadesAddicionalsService", serverRole = "agent", translatedName = "AdditionalDataService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.TipusDadaEntity.class,
@@ -27,7 +40,9 @@ import roles.Tothom;
 		es.caib.seycon.ng.model.UsuariEntity.class,
 		AccountMetadataEntity.class, DispatcherEntity.class,
 		com.soffid.iam.service.RuleEvaluatorService.class,
-		AuditoriaService.class})
+		AuditoriaService.class,
+		CustomObjectTypeEntity.class,
+		CustomObjectEntity.class})
 public abstract class DadesAddicionalsService {
 
 	@Operation(translated = "getDataTypes", grantees={Tothom.class})
@@ -79,7 +94,16 @@ public abstract class DadesAddicionalsService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findTipusDadesByScopeAndName(
 			@Nullable MetadataScope scope,
-			java.lang.String codi)
+			@Nullable java.lang.String codi)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.metadata_query.class, Tothom.class }, translated = "findDataTypesByObjectTypeAndName")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findDataTypesByObjectTypeAndName(
+			String objectType,
+			@Nullable java.lang.String codi)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -133,4 +157,18 @@ public abstract class DadesAddicionalsService {
 		return null;
 	}
 
+	@Operation(grantees={customObjectType_query.class})
+	public Collection<CustomObjectType> findCustomObjectTypeByJsonQuery (@Nullable String query) { return null;}
+	
+	@Operation(grantees={customObjectType_query.class})
+	public CustomObjectType findCustomObjectTypeByName (String name) { return null;}
+
+	@Operation(grantees={customObjectType_create.class})
+	public CustomObjectType createCustomObjectType (CustomObjectType obj) { return null;}
+
+	@Operation(grantees={customObjectType_update.class})
+	public CustomObjectType updateCustomObjectType (CustomObjectType obj) { return null;}
+
+	@Operation(grantees={customObjectType_delete.class})
+	public void delete (CustomObjectType obj) { }
 }

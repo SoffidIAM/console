@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <zkib-model>
-
 	<datanode name="dadesAddicionals">		
 		<finder name="dadaAddicional" type="dadaAddicional">
 			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
@@ -15,6 +14,13 @@
 				return obj;
 			</new-instance-script>
 		</finder>
+		
+		<finder name="customObject" type="objectType">
+			<custom-finder className="com.soffid.iam.web.metadata.ObjectCustomFinder"/>
+			<new-instance-bean className="com.soffid.iam.api.CustomObjectType">
+			</new-instance-bean>
+		</finder>
+		
 		<finder name="dataType" type="dataType">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -40,6 +46,32 @@
 			</script-finder>
 		</finder>
 	</datanode>	
+	
+	<datanode name="objectType">
+		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
+			<insert-method method="createCustomObjectType" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteCustomObjectType">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updateCustomObjectType">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<finder name="dadaAddicional" type="dadaAddicional">
+			<custom-finder className="com.soffid.iam.web.metadata.MetadataCustomFinder"/>
+			<new-instance-script>
+				obj = new es.caib.seycon.ng.comu.TipusDada();
+				obj.setValues ( new java.util.LinkedList());
+				return obj;
+			</new-instance-script>
+		</finder>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="com.soffid.iam.api.CustomObjectType.name"/>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="com.soffid.iam.api.CustomObjectType.description"/>
+		</validator>
+	</datanode>
 	
 	<datanode name="dadaAddicional">
 		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">

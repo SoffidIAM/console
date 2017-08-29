@@ -142,6 +142,14 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String scheduledTask;
 	
+	@Column (name="AUD_CUOBNA")
+	@Nullable
+	public java.lang.String customObjectName;
+	
+	@Column (name="AUD_CUOBTY")
+	@Nullable
+	public java.lang.String customObjectType;
+	
 	@Column (name="AUD_TEN_ID")
 	public TenantEntity tenant;
 

@@ -30,6 +30,9 @@ public class TipusDada {
 	public MetadataScope scope;
 
 	@Nullable
+	public String customObjectType;
+
+	@Nullable
 	public es.caib.seycon.ng.comu.TypeEnumeration type;
 
 	@Nullable

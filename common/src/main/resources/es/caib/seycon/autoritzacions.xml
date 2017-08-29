@@ -1392,4 +1392,34 @@
 		<descripcio>Delegate own roles</descripcio>
 		<ambit>SelfService</ambit>
 	</autoritzacio>
+
+	
+	<autoritzacio>
+		<codi>customObject:query</codi>
+		<descripcio>Query custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+	
+	<autoritzacio>
+		<codi>customObject:create</codi>
+		<descripcio>Create custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>customObject:update</codi>
+		<descripcio>Update custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>customObject:delete</codi>
+		<descripcio>Delete custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+
 </autoritzacions>

@@ -73,6 +73,7 @@ public class AuditEntityDaoImpl extends
 				if (ue != null)
 					auditoria.setUser(ue.getUserName());
 			}
+			auditoria.setDate(new Date());
 			super.create(auditoria);
 			getSession(false).flush();
 			

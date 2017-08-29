@@ -663,8 +663,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			throws Exception
 	{
 		SystemEntity dispatcher = getSystemEntityDao().findByName(dispatcherName);
-		if (dispatcher.getManualAccountCreation() != null && dispatcher.getManualAccountCreation().booleanValue())
-			return null;
 		
 		UserDomainEntity du = getUserDomainEntityDao().findBySytem(dispatcherName);
 		// Search if already has a user name for this user domain

@@ -2,22 +2,14 @@
 
 <zkib-model>
 	<datanode name="aplicacions">
+
 		<finder name="aplicacio" type="aplicacio">
-			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findAplicacioByCriteri"
-				if="${queryEnabled}">  <!-- application:query -->
-				<parameter value="${codi}" />
-				<parameter value="${nom}" />
-				<parameter value="${fonts}" />
-				<parameter value="${resp}" />
-				<parameter value="${exe}" />
-				<parameter value="${bbdd}" />
-				<parameter value="${rol}" />
-				<parameter value="${gestionableWF}" />
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findApplicationByJsonQuery" if = "${query != null}">
+				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Aplicacio">
-			</new-instance-bean>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Aplicacio"></new-instance-bean>
 		</finder>
-		
+
 		<finder name="risk" type="risk">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;

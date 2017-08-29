@@ -33,9 +33,6 @@
 			}
 			catch (Exception ex){}
 			
-			queryWindowMin = "75px";
-			queryWindowMax = "92px";
-			
 			mode = "query"; 
 			boolean view_altres = false;
 			model.getVariables().declareVariable("queryEnabled", false);
@@ -57,142 +54,7 @@
 			{
 				mode = "query";
 			}
-			
-			// Method to obtain the parameters to search process
-			java.util.Map getSearchParameters()
-			{
-				java.util.Map searchValues = new java.util.HashMap();
-				
-				codi = esquema.getFellow("queryWindow").getFellow("queryCodi").
-						getFellow("textbox");
-				nom = esquema.getFellow("queryWindow").getFellow("queryNom").
-						getFellow("textbox");
-				bbdd = esquema.getFellow("queryWindow").getFellow("queryBbdd").
-						getFellow("textbox");
-				fonts = esquema.getFellow("queryWindow").getFellow("queryFonts").
-						getFellow("textbox");
-				exe = esquema.getFellow("queryWindow").getFellow("queryExe").
-						getFellow("textbox");
-				resp = esquema.getFellow("queryWindow").getFellow("queryContacte").
-						getFellow("textbox");
-				rol = esquema.getFellow("queryWindow").getFellow("queryRol").
-						getFellow("textbox");
-				
-				// Check enable query
-				if ((codi.value.trim().length() == 0) &&
-						(nom.value.trim().length() == 0) &&
-						(fonts.value.trim().length() == 0) &&
-						(exe.value.trim().length() == 0) &&
-						(resp.value.trim().length() == 0) &&
-						(bbdd.value.trim().length() == 0) &&
-						(rol.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
-				
-				// Add parameters to search
-				searchValues.put("codi", codi.value);
-				searchValues.put("nom", nom.value);
-				searchValues.put("fonts", fonts.value);
-				searchValues.put("exe", exe.value);
-				searchValues.put("resp", resp.value);
-				searchValues.put("bbdd", bbdd.value);
-				searchValues.put("rol", rol.value);
-				
-				return searchValues;
-			}
-			
-			void search()
-			{
-				java.util.Map lista = new java.util.HashMap(); 
-				
-				if (esquema.isCommitPending()) {
-					Missatgebox.avis (org.zkoss.util.resource.Labels
-							.getLabel("aplicacions.AbansConfirmar"),
-						org.zkoss.util.resource.Labels
-							.getLabel("aplicacions.CanvisPendents"));
-					return;
-				}
-				
-				if (!retrySearch)
-				{
-					lista = es.caib.seycon.ng.web.utils.
-						Autowildcards.replaceAsteriskChar(getSearchParameters());
-				}
-				
-				else
-				{
-					lista = es.caib.seycon.ng.web.utils.
-							Autowildcards.addPercentChar(getSearchParameters());
-				}
-				
-				for (String key : lista.keySet())
-				{
-					model.getVariables().declareVariable(key, lista.get(key));
-				}
-				
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
-				model.getVariables().declareVariable("gestionableWF", null);
-				listbox = esquema.getFellow("lista").getFellow("listbox");
-				if(queryEnabled)
-				{
-					model.getJXPathContext().getValue("/aplicacio").refresh();
-					listbox.dataPath = "/model:/aplicacio"; 
-				}
-				
-				if (listbox.getModel().getSize() == 1)
-				{
-					listbox.renderAll();
-					Listitem elem = listbox.getItemAtIndex(0); 
-					if (elem!=null)
-						listbox.setSelectedItem(elem);
-					
-					select();
-					retrySearch = false;
-				}
-				
-				else
-				{
-					if ((listbox.getModel().getSize() == 0) && !retrySearch)
-					{
-						retrySearch = true;
-						search();
-					}
-					
-					else
-					{
-						esquema.tancaDetalls(); //amaguem dades..
-						retrySearch = false;
-					}
-				}
-				
-				checkTruncatedList(listbox);
-			}
-		
-			void showAltres () 
-			{
-				if (view_altres == false)
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
-					view_altres = true;
-				}
-				
-				else
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
-					view_altres = false;
-				}
-			}
-				
+
 			void select () 
 			{
 				if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null && 
@@ -211,7 +73,6 @@
 			
 			void showDetall ()
 			{
-				esquema.hideCriteris();
 				esquema.getFellow("lista").getFellow("listbox").setRows(5);
 				esquema.showFormulari();
 			}
@@ -329,41 +190,16 @@
 	
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 		onHideFormulari="showLista()">
-	
-		<criteris id="queryWindow" height="${queryWindowMin}" width="${amplaria}"
-			onOK="search()">
 
-			<hbox>
-				<input_criteri id="queryCodi" etiqueta="${c:l('aplicacions.zul.Codi')}">
-				</input_criteri>
-				<input_criteri etiqueta="${c:l('aplicacions.zul.Nom')}" id="queryNom"/>
-				<input_criteri etiqueta="${c:l('aplicacions.zul.NomRol')}" id="queryRol">
-				</input_criteri>
-				
-				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
-			</hbox>
-			<hbox>
-				<input_criteri id="queryBbdd" visible="false"
-					etiqueta="${c:l('aplicacions.zul.BDAplicacia')}"/>
-				<input_criteri id="queryFonts" visible="false"
-					etiqueta="${c:l('aplicacions.zul.Directorifonts')}"/>
-				<input_criteri id="queryExe" visible="false"
-					etiqueta="${c:l('aplicacions.zul.Directoriexecutables')}"/>
-			</hbox>
-			
-			<hbox visible="false">
-				<input_etiqueta value="${c:l('aplicacions.zul.Altres')}"/>
-				<imageclic id="img_altres" onClick="showAltres()" src="~./img/fletxa.gif"/>
-			</hbox>
-			<separator spacing="2px"/>
-			<altres_criteris id="queryWindowAltres" visible="false">
-				<hbox>
-					<input_criteri etiqueta="${c:l('aplicacions.zul.Contacte')}" id="queryContacte"
-						visible="false"/>
-				</hbox>
-			</altres_criteris>
+		<criteris id="queryWindow" style="margin-bottom:1em;"
+			width="100%" height="">
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Application"
+				defaultAttributes="name, description" dataPath="/model:/aplicacio"
+				variableName="query">
+			</searchbox>
 		</criteris>
-		
+
 		<navegador id="lista" width="${amplaria}">
 			<toolbar>
 				<insertbutton acces="${canCreateAplicacio}"

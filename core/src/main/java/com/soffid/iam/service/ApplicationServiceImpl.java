@@ -13,7 +13,25 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.json.JSONException;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -53,8 +71,9 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.conf.AttributeConfig;
@@ -62,47 +81,19 @@ import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
-import com.soffid.iam.utils.AutoritzacionsUsuari;
-import com.soffid.iam.utils.DateUtils;
-import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRule;
-import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Vector;
-
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.exe.ProcessInstance;
-import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.AplicacioService Versió remixed, remade &
@@ -2299,6 +2290,40 @@ public class ApplicationServiceImpl extends
 			}
 		}
 
+		return result;
+	}
+
+	@Override
+	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
+
+		// Prepare query HQL
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(Application.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "(" + qs + ") and o.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
+
+		// Include HQL parameters
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size() + 1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+
+		// Execute HQL and generate result
+		LinkedList<Application> result = new LinkedList<Application>();
+		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray)) {
+			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(ApplicationVO)) {
+				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, applicationEntity)) {
+					result.add(ApplicationVO);
+				}
+			}
+		}
 		return result;
 	}
 }

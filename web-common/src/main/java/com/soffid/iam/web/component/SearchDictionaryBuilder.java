@@ -3,8 +3,6 @@ package com.soffid.iam.web.component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,16 +31,22 @@ public class SearchDictionaryBuilder {
 		if (sd == null)
 		{
 			sd = generateDefaultBuilder(clazz);
-			if (clazz.equals("com.soffid.iam.api.User"))
-				addUserJoins (sd);
-			if (clazz.equals("com.soffid.iam.api.Role"))
-				addRoleJoins (sd);
+			if (clazz.equals("com.soffid.iam.api.User")) {
+				addUserJoins(sd);
+			} else if (clazz.equals("com.soffid.iam.api.Role")) {
+				addRoleJoins(sd);
+			} else if (clazz.equals("com.soffid.iam.api.Application")) {
+				addApplicationJoins(sd);
+			}
 			map.put(clazz, sd);
 		}
-		if (clazz.equals("com.soffid.iam.api.User"))
+		if (clazz.equals("com.soffid.iam.api.User")) {
 			sd = addAttributes (sd, MetadataScope.USER);
-		if (clazz.equals("com.soffid.iam.api.Role"))
+		} else if (clazz.equals("com.soffid.iam.api.Role")) {
 			sd = addAttributes (sd, MetadataScope.ROLE);
+		} else if (clazz.equals("com.soffid.iam.api.Application")) {
+			sd = addAttributes (sd, MetadataScope.APPLICATION);
+		}
 		return sd;
 	}
 	
@@ -150,5 +154,9 @@ public class SearchDictionaryBuilder {
 				
 		}
 		return sd2;
+	}
+
+	private static void addApplicationJoins(SearchDictionary sd) {
+		addJoin (sd, "roles.name", "auditoria.zul.rol", TypeEnumeration.STRING_TYPE);
 	}
 }

@@ -7,10 +7,16 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonObject;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.ValueObject;
 
-@ValueObject ( translatedName="Application",
-	 translatedPackage="com.soffid.iam.api")
+import es.caib.seycon.ng.model.AplicacioEntity;
+
+@JsonObject(hibernateClass = AplicacioEntity.class)
+@ValueObject(translatedName = "Application", translatedPackage = "com.soffid.iam.api")
 public class Aplicacio {
 
 	@Attribute(translated = "name" )

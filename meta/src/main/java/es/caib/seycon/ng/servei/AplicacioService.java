@@ -6,20 +6,19 @@
 
 package es.caib.seycon.ng.servei;
 
-import java.util.Collection;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.service.EntitlementDelegationService;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.bpm.servei.BpmEngine;
-import es.caib.seycon.ng.comu.RolAccount;
-import es.caib.seycon.ng.model.RolAccountEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service(translatedName = "ApplicationService", translatedPackage = "com.soffid.iam.service")
 @Depends({
@@ -524,7 +523,6 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
-	
 
 	@Operation
 	@Transactional(rollbackFor = { java.lang.Exception.class })
@@ -543,6 +541,14 @@ public abstract class AplicacioService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByText(
 			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
+			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

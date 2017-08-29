@@ -635,7 +635,7 @@
 							</grid>
 
 							<separator spacing="5px"/>
-							<div use="com.soffid.web.users.additionalData.AttributesDiv" 
+							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 								dataPath="attributes" scope="group"
 								sclass="groupatt"/>
 							<separator spacing="5px"/>

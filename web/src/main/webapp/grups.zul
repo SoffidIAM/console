@@ -25,7 +25,6 @@
 		<![CDATA[
 			String requestedGroup = Executions.getCurrent().getNativeRequest().getParameter("group");
 			pageScope{"requestedGroup"} = requestedGroup;
-			
 			import es.caib.zkib.zkiblaf.Missatgebox;
 			try
 			{
@@ -38,9 +37,6 @@
 				
 			String mode = "query";
 			boolean view_altres = false;
-			
-			queryWindowMin = "75px";
-			queryWindowMax = "105px";
 			
 			// Autoritzacions
 			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
@@ -82,140 +78,6 @@
 				mode="query";
 			}
 			
-			// Method to obtain the parameters to search process
-			java.util.Map getSearchParameters()
-			{
-				java.util.Map searchValues = new java.util.HashMap();
-				
-				Textbox codi = esquema.getFellow("queryWindow").getFellow("queryCodi").
-						getFellow("textbox");
-				Textbox descripcio = esquema.getFellow("queryWindow").
-						getFellow("queryDescripcio").getFellow("textbox");
-				Textbox unitat = esquema.getFellow("queryWindow").
-						getFellow("queryUnitatOfimatica").getFellow("textbox");
-				tipus = esquema.getFellow("queryWindow").getFellow("queryTipus")
-						.getSelectedItem();
-				Textbox pare = esquema.getFellow("queryWindow").getFellow("queryPare").
-						getFellow("textbox");
-				Textbox obsolet = esquema.getFellow("queryWindow").getFellow("queryObsolet").
-						getFellow("textbox");
-				Textbox servidorOfimatic = esquema.getFellow("queryWindow").
-						getFellow("queryServidorOfimatic").getFellow("textbox");
-				Textbox seccioPressupostaria = esquema.getFellow("queryWindow").
-						getFellow("querySeccioPressupostaria").getFellow("textbox");
-				
-				// Check enable query
-				if ((codi.value.trim().length() == 0) &&
-						(descripcio.value.trim().length() == 0) &&
-						(unitat.value.trim().length() == 0) &&
-						((tipus == null) || (tipus.getValue() == null)) &&
-						(pare.value.trim().length() == 0) &&
-						(obsolet.value.trim().length() == 0) &&
-						(servidorOfimatic.value.trim().length() == 0) &&
-						(seccioPressupostaria.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
-				
-				// Add parameters to search
-				searchValues.put("codi", codi.value);
-				searchValues.put("descripcio", descripcio.value);
-				searchValues.put("unitatOfimatica", unitat.value);
-				
-				if ((tipus == null) || (tipus.getValue() == null))
-					searchValues.put("tipus", "");
-				
-				else
-					searchValues.put("tipus", tipus.getValue());
-				
-				searchValues.put("pare", pare.value);
-				searchValues.put("obsolet", obsolet.value);
-				searchValues.put("servidorOfimatic", servidorOfimatic.value);
-				searchValues.put("seccioPressupostaria", seccioPressupostaria.value);
-				
-				return searchValues;
-			}
-			
-			void search ()
-			{
-				java.util.Map lista = new java.util.HashMap();
-				
-				if (esquema.isCommitPending())
-				{
-					Missatgebox.avis (org.zkoss.util.resource
-							.Labels.getLabel("grups.AbansConfirmar"),
-						org.zkoss.util.resource.Labels.getLabel("grups.CanvisPendents"));
-					return;
-				}
-				 
-				if (!retrySearch)
-				{
-					lista = es.caib.seycon.ng.web.utils.
-						Autowildcards.replaceAsteriskChar(getSearchParameters());
-				}
-				
-				else
-				{
-					lista = es.caib.seycon.ng.web.utils.
-							Autowildcards.addPercentChar(getSearchParameters());
-				}
-				
-				for (String key : lista.keySet())
-				{
-					model.getVariables().declareVariable(key, lista.get(key));
-				}
-				
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
-				
-				treebox = esquema.getFellow("lista").getFellow("treebox");
-				if (queryEnabled)
-				{
-					model.getJXPathContext().getValue("/grup").refresh();
-//					treebox.setDataPath( "/model:/" );
-				}
-				
-				if ((treebox.getItemCount() == 0) && !retrySearch)
-				{
-					retrySearch = true;
-					search();
-				}
-				
-				else
-				{
-					esquema.tancaDetalls(); //amaguem dades..
-					retrySearch = false;
-				}
-				
-				checkTruncatedTree(treebox);
-				if (requestedGroup != null)
-				{
-					Events.postEvent(new Event("onAutoQuery", esquema));
-				}
-			}
-	
-			void showAltres () 
-			{
-				if (view_altres == false)
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
-					view_altres = true;
-				}
-				else
-				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
-					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
-					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
-					view_altres = false;
-				}
-			}
-			
 			void select () 
 			{
 				if (esquema.getFellow("lista").getFellow("treebox").selectedItem != null && 
@@ -233,7 +95,6 @@
 			
 			void showDetall () 
 			{
-				esquema.hideCriteris();
 				esquema.getFellow("lista").getFellow("treebox").setRows(5);
 				esquema.showFormulari();
 			}
@@ -299,8 +160,14 @@
 		]]>
 	</zscript>
 
-	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
-		onHideFormulari="showLista()">
+	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi" hideSearchToolbar="true" onHideFormulari="showLista()">
+
+		<attribute name="onCreate">
+		<![CDATA[
+			if (pageScope{"requestedGroup"} != null)
+				Events.postEvent("onAutoQuery", esquema, null);
+		]]></attribute>
+
 		<attribute name="onAutoQuery">
 		<![CDATA[
 			esquema.getFellow("queryWindow").parent.parent.setVisible(false);
@@ -315,51 +182,18 @@
 			}
 			esquema.removeCriteria();
 		]]></attribute>
-	
-		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()">
-			<hbox>
-				<input_criteri id="queryCodi" etiqueta="${c:l('grups.zul.Codi')}"
-					value="${initialGrup}"/>
-				<input_criteri id="queryDescripcio"
-					etiqueta="${c:l('grups.zul.Descripcia')}" />
-				<input_criteri id="queryPare" etiqueta="${c:l('grups.zul.Pare')}" />
-				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
-			</hbox>
-			<hbox>
-				<input_criteri id="queryUnitatOfimatica"
-					etiqueta="${c:l('grups.zul.Unitatofimatica')}" />
-				
-				<hbox width="250px" widths="100px,*">
-					<label sclass="etiqueta"
-						value="${c:l('grups.zul.TipusdUnitatOrganiz')}" />
-					<listbox id="queryTipus" mold="select"  
-						dataPath="/model:/tipusUnitatOrganitzativa">
-						<dataitem bind="@codi">
-							<listcell bind="@descripcio" />
-						</dataitem>
-					</listbox>
-				</hbox>
-				
-				<input_criteri id="queryObsolet"
-					etiqueta="${c:l('grups.zul.Obsolet')}" />
-			</hbox>
 
-			<hbox>
-				<input_etiqueta value="${c:l('grups.zul.Altres')}"/>
-				<imageclic id="img_altres" onClick="showAltres()"
-					src="~./img/fletxa.gif"/>
-			</hbox>
-			<separator spacing="2px"/>
-			<altres_criteris id="queryWindowAltres" visible="false">
-				<hbox>
-					<input_criteri id="queryServidorOfimatic"
-						etiqueta="${c:l('grups.zul.Servidorofimatic')}" />
-					<input_criteri id="querySeccioPressupostaria"
-						etiqueta="${c:l('grups.zul.SecciaPressupostaria')}" />
-				</hbox>
-			</altres_criteris>
+		<criteris id="queryWindow" style="margin-bottom:1em;" width="100%" height="">
+			<attribute name="onCreate"><![CDATA[
+				searchBox.addAttribute("name").setSearchFilter("World");
+			]]></attribute>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Group"
+				defaultAttributes="name, description" dataPath="/model:/grup"
+				variableName="query">
+			</searchbox>
 		</criteris>
-		
+
 		<navegador id="lista" width="${amplaria}">
 			<toolbar>
 				<inserttreebutton id="b_inserir" acces="${canCreateGroup}"

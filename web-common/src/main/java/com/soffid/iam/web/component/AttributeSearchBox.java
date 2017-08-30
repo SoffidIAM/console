@@ -7,28 +7,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.catalina.manager.host.HostManagerServlet;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.xml.security.keys.storage.implementations.SingleCertificateResolver;
 import org.joda.time.format.ISODateTimeFormat;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
 import org.zkoss.zk.au.ComponentCommand;
-import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Intbox;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
@@ -38,9 +31,10 @@ import org.zkoss.zul.impl.XulElement;
 import com.soffid.iam.web.SearchAttributeDefinition;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.zkib.zkiblaf.SignApplet;
 
 public class AttributeSearchBox extends XulElement {
+
+	private static final long serialVersionUID = -1434804713564643330L;
 	private static final String[] INT_TEXTBOXES = new String[] {"ib1", "ib2", "ib3"};
 	private static final String[] STRING_TEXTBOXES = new String[] {"tb1", "tb2", "tb3", "tb4"};
 	private static final String[] DATE_DATEBOXES = new String[] {"db1", "db2"};
@@ -63,13 +57,16 @@ public class AttributeSearchBox extends XulElement {
 	
 	public void setSearchFilter(String search)
 	{
-		if (search == null || search.isEmpty())
-		{
+		if (search == null || search.isEmpty()) {
 			queryExpression = "";
 			humanExpression = Labels.getLabel("attributeQuery.all");
+			textValue = "";
+			textOperation = 0;
 		} else {
 			queryExpression = attributeDef.getName()+" eq \""+escape(search)+"\"";
-			humanExpression = "eq \""+search +"\"";
+			humanExpression = Labels.getLabel("attributeQuery.Equals")+": \""+search +"\"";
+			textValue = search;
+			textOperation = 0;
 		}
 		invalidate();
 	}
@@ -191,7 +188,7 @@ public class AttributeSearchBox extends XulElement {
 
 		insertBefore(bg, this);
 		bg.setSclass("search-background");
-		bg.addEventListener("onClick", new EventListener() {
+		bg.addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				w.detach();
 				bg.detach();
@@ -283,12 +280,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				doTextSearch(w, bg, rg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				textValue = "";
@@ -377,12 +374,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				doIntSearch(w, bg, rg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				textValue = "";
@@ -471,12 +468,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				doDateSearch(w, bg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				since = null;
@@ -555,12 +552,12 @@ public class AttributeSearchBox extends XulElement {
 				cb.setChecked(true);
 		}
 		
-		w.getFellow("okbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				doSelectSearch(w, bg, div);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener("onClick", new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
 			public void onEvent(Event event) throws Exception {
 				selectedValues.clear();
 				queryExpression = null;

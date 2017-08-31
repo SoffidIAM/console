@@ -4,17 +4,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zhtml.Textarea;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
 import org.zkoss.zk.au.ComponentCommand;
-import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
@@ -33,10 +30,8 @@ import com.soffid.iam.web.SearchDictionary;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
-import es.caib.zkib.component.DataModel;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datasource.DataSource;
-import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SearchBox extends HtmlBasedComponent {
@@ -182,6 +177,11 @@ public class SearchBox extends HtmlBasedComponent {
 		menu = new Menupopup();
 		appendChild(menu);
 		setChildrenVisibility();
+
+		// Button to add attributes. Only we show it if there are attributes to select
+		if (!areAttributesToAdd())
+			addAttributeButton.setVisible(false);
+
 		invalidate();
 	}
 
@@ -368,6 +368,23 @@ public class SearchBox extends HtmlBasedComponent {
 		menu.getChildren().addAll(items);
 		appendChild(menu);
 		menu.open(addAttributeButton);
+	}
+
+	private boolean areAttributesToAdd() {
+		for (final SearchAttributeDefinition def : dictionary.getAttributes()) {
+			boolean found = false;
+			for (Component component : (List<Component>) getChildren()) {
+				if (component instanceof AttributeSearchBox) {
+					AttributeSearchBox asb = (AttributeSearchBox) component;
+					if (asb.attributeDef == def) {
+						found = true;
+						break;
+					}
+				}
+			}
+			if (!found) return true;
+		}
+		return false;
 	}
 
 	public List<AttributeSearchBox> getAttributeSearchBoxes ()

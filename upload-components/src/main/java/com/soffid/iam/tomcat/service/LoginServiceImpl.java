@@ -1,9 +1,7 @@
 package com.soffid.iam.tomcat.service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,14 +71,19 @@ public class LoginServiceImpl implements LoginService {
 				PasswordService ps = ServiceLocator.instance().getPasswordService();
 
 				String dispatcher = ps.getDefaultDispatcher();
-				Account acc = as.findAccount(account, dispatcher);
+				Account acc = null;
+				try {
+					acc = as.findAccount(account, dispatcher);
+				} catch (IllegalArgumentException e) {
+					log.info("Login rejected: username and/or credentials are empty");
+					return null;
+				}
 				if (acc == null) {
 					log.info(username + " login rejected. Unknown account");
 					return null;
 				}
 
 				SoffidPrincipal principal;
-
 				String passwordDomain = ps.getDefaultDispatcher();
 				if (ps.checkPassword(account, passwordDomain, new Password(
 						credentials), true, false)) {

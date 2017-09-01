@@ -54,6 +54,7 @@ import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.ServiceLocator;
@@ -117,6 +118,8 @@ public class ApplicationBootServiceImpl extends
 		configureWildcards();
 
 		configureMaxRowsToLists();
+
+		configureGlobalTimeOut();
 
 		configureSystemProperties();
 
@@ -194,6 +197,19 @@ public class ApplicationBootServiceImpl extends
 		else {
 			System.setProperty("soffid.ui.maxrows", result.iterator().next()
 					.getValue());
+		}
+	}
+
+	private void configureGlobalTimeOut() throws InternalErrorException {
+		Collection<Configuration> result = configSvc.findConfigurationByFilter(TimeOutUtils.PROPERTY_TIMEOUT, null, null, null);
+		if (result.isEmpty()) {
+			Configuration configuracio = new Configuration();
+			configuracio.setCode(TimeOutUtils.PROPERTY_TIMEOUT);
+			configuracio.setValue("10000"); //$NON-NLS-1$
+			configuracio.setDescription(Messages.getString("ApplicationBootServiceImpl.globalTimeOutDescription")); //$NON-NLS-1$
+			configSvc.create(configuracio);
+		} else {
+			System.setProperty(TimeOutUtils.PROPERTY_TIMEOUT, result.iterator().next().getValue());
 		}
 	}
 

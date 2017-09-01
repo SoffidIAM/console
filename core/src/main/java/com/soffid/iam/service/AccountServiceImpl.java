@@ -64,13 +64,7 @@ import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
-import es.caib.seycon.ng.comu.AccountCriteria;
-import es.caib.seycon.ng.comu.AccountType;
-
-import com.soffid.iam.api.Password;
-import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -1786,7 +1780,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	@Override
-	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws Exception {
+	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws InternalErrorException, Exception {
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();
@@ -1802,8 +1796,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		Collection<Account> result = new LinkedList<Account>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (AccountEntity ue : getAccountEntityDao().query(hql.toString(),
 				paramArray)) {
+			tou.checkTimeOut();
 			Account u = getAccountEntityDao().toAccount(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(

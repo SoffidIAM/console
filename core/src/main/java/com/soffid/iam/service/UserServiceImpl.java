@@ -99,6 +99,7 @@ import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
@@ -2999,7 +3000,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	@Override
 	protected Collection<User> handleFindUserByJsonQuery(String query)
-			throws Exception {
+			throws InternalErrorException, Exception {
 		
 		
 		ClassConfig config = getJsonConfiguration();
@@ -3020,8 +3021,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		LinkedList<User> result = new LinkedList<User>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
 				paramArray)) {
+			tou.checkTimeOut();
 			User u = getUserEntityDao().toUser(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(

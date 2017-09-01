@@ -13,25 +13,22 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
 
-import com.soffid.iam.api.Application;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.model.GroupTypeEntity;
-import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
-import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * Servei per a accedir a TipusUnitatOrganitzativa Created on 01/06/2009
@@ -99,7 +96,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	}
 
 	@Override
-	protected Collection<OUType> handleFindOrganizationalUnitByJsonQuery(String query) throws Exception {
+	protected Collection<OUType> handleFindOrganizationalUnitByJsonQuery(String query) throws InternalErrorException, Exception {
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
@@ -120,8 +117,10 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		// Execute HQL and generate result
+		TimeOutUtils tou = new TimeOutUtils();
 		LinkedList<OUType> result = new LinkedList<OUType>();
 		for (GroupTypeEntity e : getGroupTypeEntityDao().query(hql.toString(), paramArray)) {
+			tou.checkTimeOut();
 			OUType vo = getGroupTypeEntityDao().toOUType(e);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(vo)) {
 				//if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, e)) {

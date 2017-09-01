@@ -35,7 +35,6 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
-import com.soffid.iam.api.User;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
@@ -50,6 +49,7 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -699,7 +699,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	@Override
-	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws Exception {
+	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
@@ -721,7 +721,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		// Execute HQL and generate result
 		LinkedList<Group> result = new LinkedList<Group>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray)) {
+			tou.checkTimeOut();
 			Group g = getGroupEntityDao().toGroup(ge);
 			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, ge)) {

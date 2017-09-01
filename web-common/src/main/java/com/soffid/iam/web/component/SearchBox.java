@@ -189,7 +189,7 @@ public class SearchBox extends HtmlBasedComponent {
 	public void onChangeFilter () 
 	{
 		String newQuery = getQueryString();
-		if (auto && ! lastQuery.equals(newQuery) && !newQuery.isEmpty())
+		if (auto && !lastQuery.equals(newQuery))
 			search();
 	}
 	

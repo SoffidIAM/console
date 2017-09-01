@@ -173,6 +173,7 @@ public class SearchBox extends HtmlBasedComponent {
 				selectAttributeToAdd();
 			}
 		});
+		addAttributeButton.setClass("searchbox-addcriteria");
 		appendChild(addAttributeButton);
 		menu = new Menupopup();
 		appendChild(menu);

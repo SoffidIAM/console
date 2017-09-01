@@ -133,7 +133,6 @@
 				
 				void showDetall()
 				{
-//					esquema.hideCriteris();
 					esquema.getFellow("lista").getFellow("listbox").setRows(5);
 					esquema.showFormulari();
 				}
@@ -535,7 +534,7 @@
 		</zscript>
 
 		<esquemavertical id="esquema" datamodel="/model"
-			onHideFormulari="showLista()">
+			onHideFormulari="showLista()" hideSearchToolbar="true">
 
 			<criteris id="queryWindow" style="margin-bottom:1em;" 
 				width="100%" height="">

@@ -29,12 +29,11 @@
 package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.User;
 
 import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.AttributeMapping;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -46,11 +45,13 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  * @version $Revision: 1.1.2.2 $
  */
  
-public interface ExtensibleObjectMgr extends java.rmi.Remote {
-
-  public void configureMappings (Collection<ExtensibleObjectMapping> objects)
-		    throws java.rmi.RemoteException, 
+public interface CustomObjectMgr extends java.rmi.Remote {
+  public void updateCustomObject (CustomObject obj) 
+    throws java.rmi.RemoteException, 
             InternalErrorException;
-  
+
+  public void removeCustomObject (CustomObject obj) 
+		    throws java.rmi.RemoteException, 
+		            InternalErrorException;
 }
 

@@ -685,6 +685,17 @@
 						c.getFellow("testRowButton2").setVisible(false);						
 						c.getFellow("testRowButton3").setVisible(false);						
 					}
+					
+					void selectObjectType (Event event)
+					{
+						
+					}
+					
+					void createObjectTypes (Event event)
+					{
+						
+					}
+					
 					void displayTestRow (Event event)
 					{
 						Component c = event.getTarget();
@@ -1338,12 +1349,10 @@
 									<div>
 										<input_dada bind="@systemObject" width_custom ="15%"></input_dada>
 										<label value="based on" width="10%"></label>
-										<listbox bind="@soffidObject" mold="select" dataPath="/model:/soffidObjectType" width="15%"
-											onSelect="hideTestRow(event)">
-											<dataitem bind="@value">
-												<listcell bind="@literal"/>
-											</dataitem>
-										</listbox>
+										<listbox use="com.soffid.iam.web.agent.CustomTypeListbox"
+											bind="." 
+											mold="select" 
+											width="15%"/>
 										<label value="Condition: " width="10%"></label>
 										<input_dada bind="@condition" width_custom ="45%"></input_dada>
 										<imageclic src="/img/pencil.png" width="1em" >
@@ -2103,4 +2112,5 @@
 	<include src="grupsllista.zul"/>
 	<include src="controlAcces.zul"/>
  	<include src="finestres/editor.zul"/>
+ 	<debugwindow/>
 </zk>

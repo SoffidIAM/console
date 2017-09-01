@@ -414,7 +414,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.21-SNAPSHOT</zkiblaf.version>
-    <zkdb.version>1.29</zkdb.version>
+    <zkdb.version>1.29-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>

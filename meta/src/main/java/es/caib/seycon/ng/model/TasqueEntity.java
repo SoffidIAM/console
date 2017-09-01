@@ -123,6 +123,14 @@ public abstract class TasqueEntity {
 	@Nullable
 	public java.lang.Long primaryKeyValue;
 	
+	@Column(name = "TAS_CUOBTY", length = 100)
+	@Nullable
+	public java.lang.String customObjectType;
+
+	@Column(name = "TAS_CUOBNA", length = 50)
+	@Nullable
+	public String customObjectName;
+	
 	@Column(name = "TAS_TEN_ID")
 	public TenantEntity tenant;
 

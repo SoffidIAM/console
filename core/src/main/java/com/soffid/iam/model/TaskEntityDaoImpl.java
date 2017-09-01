@@ -26,6 +26,7 @@ import org.hibernate.Query;
 public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     @Override
     public void create(TaskEntity tasqueEntity) {
+		tasqueEntity.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
     	if (checkDuplicate(tasqueEntity))
     		return;
     	

@@ -32,6 +32,12 @@ public class CustomObjectEntity {
 	
 	@DaoFinder("-")
 	public Collection<CustomObjectEntity> findByText(String objectType, String text) {return null;}
+
+	@DaoFinder("select o "
+			+ "from com.soffid.iam.model.CustomObjectEntity as o "
+			+ "where o.type.name = :objectType and "
+			+ "o.name = :name")
+	public CustomObjectEntity findByTypeAndName(String objectType, String name) {return null;}
 }
 
 @Index(columns={"COB_COT_ID", "COT_NAME"}, unique=true, name="SC_CUOBTY_UK", entity=CustomObjectEntity.class)

@@ -8,7 +8,9 @@ package es.caib.seycon.ng.sync.servei;
 import java.util.Collection;
 
 import com.soffid.iam.api.AttributeTranslation;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.service.AttributeTranslationService;
+import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.DispatcherService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,
+	CustomObjectService.class,
 	AttributeTranslationService.class})
 public abstract class ServerService {
 
@@ -425,10 +428,12 @@ public abstract class ServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	public CustomObject getCustomObject(String type, String name) { return null;}
 	
 	/** Attribute translation services **/
 	public String translate (String domain, String column1) { return null ; }
 	public String reverseTranslate (String domain, String column2) { return null; }
 	public Collection<AttributeTranslation> translate2 (String domain, String column1) { return null ; }
 	public Collection<AttributeTranslation> reverseTranslate2 (String domain, String column2) { return null ; }
+	
 }

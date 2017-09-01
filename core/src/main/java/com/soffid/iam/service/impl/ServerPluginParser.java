@@ -403,6 +403,9 @@ public class ServerPluginParser {
 			Node n = nodes.item(i);
 			InternalAgentDescriptor ad = new InternalAgentDescriptor();
 			ad.setClassName(xpath.evaluate("javaClass", n)); //$NON-NLS-1$
+			String v2class = xpath.evaluate("javaClassV2", n);
+			if (v2class != null)
+				ad.setClassName(v2class);
 			ad.setDescription(xpath.evaluate( "name", n)); //$NON-NLS-1$
 			String resource = xpath.evaluate("userInterface", n); //$NON-NLS-1$
 			if (resource == null || "".equals(resource)) //$NON-NLS-1$

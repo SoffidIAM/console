@@ -16,10 +16,15 @@ public class ObjectMapping {
 	public java.lang.String systemObject;
 
 	public SoffidObjectType soffidObject;
+	
+	@Nullable
+	public String soffidCustomObject;
 
 	@Nullable
 	public java.lang.String condition;
 
 	public java.lang.Long dispatcherId;
 
+	@Description("Data on target system must be considered as authoritative")
+	public boolean authoritative;
 }

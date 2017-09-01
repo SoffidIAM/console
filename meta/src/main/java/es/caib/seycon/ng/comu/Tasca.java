@@ -105,4 +105,9 @@ public class Tasca {
 	@Nullable
 	public java.lang.Long primaryKeyValue;
 
+	@Nullable
+	public java.lang.String customObjectType;
+
+	@Nullable
+	public String customObjectName;
 }

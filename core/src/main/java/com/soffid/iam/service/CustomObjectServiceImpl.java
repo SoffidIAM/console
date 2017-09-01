@@ -119,6 +119,11 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		CustomObjectEntity entity = getCustomObjectEntityDao().load(obj.getId());
 		if (entity == null)
 			throw new InternalErrorException("Custom object "+obj.getId()+" not found");
+		
+		if (! entity.getName().equals(obj.getName()))
+		{
+			generateTask(entity);
+		}
 		getCustomObjectEntityDao().customObjectToEntity(obj, entity, true);
 		getCustomObjectEntityDao().create(entity);
 		updateAttributes(obj, entity);
@@ -188,6 +193,8 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		TaskEntity task = getTaskEntityDao().newTaskEntity();
 		task.setTransaction(TaskHandler.UPDATE_OBJECT);
 		task.setPrimaryKeyValue(entity.getId());
+		task.setCustomObjectName(entity.getName());
+		task.setCustomObjectType(entity.getType().getName());
 		task.setStatus("P");
 		task.setTenant(entity.getType().getTenant());
 		task.setDate( new Timestamp( System.currentTimeMillis()));
@@ -206,5 +213,12 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
+	}
+
+	@Override
+	protected CustomObject handleFindCustomObjectByTypeAndName(String objectType, String name)
+			throws Exception {
+		CustomObjectEntity o = getCustomObjectEntityDao().findByTypeAndName(objectType, name);
+		return getCustomObjectEntityDao().toCustomObject(o);
 	}
 }

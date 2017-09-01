@@ -535,6 +535,7 @@
 		</zscript>
 
 		<esquemavertical id="esquema" datamodel="/model"
+			hideSearchToolbar="true"
 			onHideFormulari="showLista()">
 
 			<criteris id="queryWindow" style="margin-bottom:1em;" 

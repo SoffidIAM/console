@@ -2,6 +2,11 @@
 
 <zkib-model>
 	<datanode name="agents">
+		<finder name="customObjectType" type="objectType">
+			<ejb-finder jndi="java:comp/env/ejb/v2/AdditionalDataServiceEJB" method="findCustomObjectTypeByJsonQuery">
+				<parameter value=""/>
+			</ejb-finder>
+		</finder>
 		<finder name="attributeDirection" type="attributeDirection">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -14,6 +19,7 @@
 				return list;
 			</script-finder>
 		</finder>
+		<!-- 
 		<finder name="soffidObjectType" type="soffidObjectType">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -26,7 +32,7 @@
 				return list;
 			</script-finder>
 		</finder>
-
+ -->
 		<finder name="soffidObjectTypeTrigger" type="soffidObjectType">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -215,6 +221,9 @@
 			</script-finder>
 		</finder>
 	</datanode>
+
+	<datanode name="objectType" transient="true"/>
+
 
 	<datanode name="authoritativeProcess"></datanode>	
 	

@@ -557,7 +557,7 @@ a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited
 
 .capsa_cerca {
 	height: inherit !important;
-	padding-bottom: 0px
+	padding-bottom: 0px !important
 }
 
 li.attribute-search-box {

@@ -51,6 +51,6 @@ public class SamlServiceImpl extends SamlServiceBase {
 
 	@Override
 	protected List<String> handleFindIdentityProviders() throws Exception {
-		return delegate.findIdentityProviders();
+		return getDelegate().findIdentityProviders();
 	}
 }

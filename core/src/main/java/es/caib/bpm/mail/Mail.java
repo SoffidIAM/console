@@ -601,7 +601,7 @@ public class Mail implements ActionHandler {
 	private Set<String> getNameUsers (Set<PooledActor> pooledActors) throws InternalErrorException, UnsupportedEncodingException
 	{
 		HashSet<String> result = new HashSet<String>();
-		debug ("Resolving addres for actor pool");
+		debug ("Resolving address for actor pool");
 		for (PooledActor actor: pooledActors)
 		{
 			if (actor.getActorId() != null)

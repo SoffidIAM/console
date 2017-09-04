@@ -20,6 +20,7 @@ import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -511,7 +512,8 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 				c.setTime( (Date) value);
 				value = c;
 			}
-			TipusDada tda = getDadesAddicionalsService().findTipusDadaByCodi(attribute);
+			Collection<TipusDada> l = getDadesAddicionalsService().findTipusDadesByScopeAndName(MetadataScope.USER,attribute);
+			TipusDada tda =  l == null || l.isEmpty() ? null : l.iterator().next();
 			if (tda == null)
 			{
 				long i = 100;
@@ -524,6 +526,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 				auditAuthoritativeChange(user.getCodi(), tracker);
 				tda.setOrdre(i);
 				tda.setCodi(attribute);
+				tda.setScope(MetadataScope.USER);
 				tda = getDadesAddicionalsService().create(tda);
 			}
 			DadaUsuari dada = getUsuariService().findDadaByCodiTipusDada(user.getCodi(), attribute);

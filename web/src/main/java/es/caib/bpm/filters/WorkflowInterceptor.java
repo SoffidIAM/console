@@ -74,7 +74,7 @@ public class WorkflowInterceptor implements Filter
 					sesion.removeAttribute("user"); //$NON-NLS-1$
 				}
 				
-				((HttpServletResponse) response).addHeader("X-UA-Compatible", "IE=8");
+				((HttpServletResponse) response).addHeader("X-UA-Compatible", "IE=11;IE=8");
 
 				String uri = ((HttpServletRequest) request).getRequestURI();
 //				if (uri.endsWith("/js/zul/sel.js" ) || uri.endsWith("/js/zul/grid.js" ))

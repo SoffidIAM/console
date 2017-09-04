@@ -152,7 +152,12 @@ public class ProcessUI extends Frame {
 
         if (processId > 0) {
 			ProcessInstance pi = BPMApplication.getEngine().getProcess(processId);
-			openProcessInstance(pi);
+			try {
+				openProcessInstance(pi);
+			} catch (Exception e)
+			{
+				log.warn("Error opening process", e);
+			}
 		}
         
         addEventListener("onReturn", new EventListener() { //$NON-NLS-1$

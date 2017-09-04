@@ -184,6 +184,7 @@ public class ScriptEnviroment {
 				.append(", \"accountDisabled\" : \"java.lang.String\"")
 				.append(", \"active\" : \"java.lang.Boolean\"")
 				.append(", \"type\" : \"java.lang.String\"")
+				.append(", \"lastLogon\" : \"java.util.Calendar\"")
 				.append(", \"lastUpdate\" : \"java.util.Calendar\"")
 				.append(", \"lastPasswordUpdate\" : \"java.util.Calendar\"")
 				.append(", \"passwordExpiration\" : \"java.util.Calendar\"")

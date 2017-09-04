@@ -205,45 +205,50 @@ public class ConfiguraSEU extends Vbox {
 		// Si l'usuari no té com a preferència l'idioma, agafem el de
 		// el navegador o de la pàgina de login
 		if (idioma == null)  {
-			HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
-					.getCurrent().getNativeRequest();
-            if (idioma == null)
-            {
-    			// Medium priority, web browser preferences ( if any )
-                Enumeration e = req.getLocales();
-                while (e.hasMoreElements())
-                {
-                        Locale l = (Locale) e.nextElement();
-                        if (l.getLanguage().equalsIgnoreCase("ca"))
-                        {
-                        	idioma = l;
-                        	break;
-                        }
-                        else if (l.getLanguage().equalsIgnoreCase("es"))
-                        {
-                        	idioma = l;
-                        	break;
-                        }
-                        else if (l.getLanguage().equalsIgnoreCase("en"))
-                        {
-                        	idioma = l;
-                        	break;
-                        }
-                        else if (l.getLanguage().equalsIgnoreCase("nl"))
-                        {
-                        	idioma = l;
-                        	break;
-                        }
-                }
-                if (idioma == null)
-                {
-                    // Low priority, default language
-        			if (System.getProperty("soffid.language.default") == null)
-        				idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
-        			else
-        				idioma = new Locale (System.getProperty("soffid.language.default"));
-        		
-                }
+			if (System.getProperty("soffid.language") != null)
+				idioma = new Locale(System.getProperty("soffid.language"));
+			else
+			{
+				HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
+						.getCurrent().getNativeRequest();
+	            if (idioma == null)
+	            {
+	    			// Medium priority, web browser preferences ( if any )
+	                Enumeration e = req.getLocales();
+	                while (e.hasMoreElements())
+	                {
+	                        Locale l = (Locale) e.nextElement();
+	                        if (l.getLanguage().equalsIgnoreCase("ca"))
+	                        {
+	                        	idioma = l;
+	                        	break;
+	                        }
+	                        else if (l.getLanguage().equalsIgnoreCase("es"))
+	                        {
+	                        	idioma = l;
+	                        	break;
+	                        }
+	                        else if (l.getLanguage().equalsIgnoreCase("en"))
+	                        {
+	                        	idioma = l;
+	                        	break;
+	                        }
+	                        else if (l.getLanguage().equalsIgnoreCase("nl"))
+	                        {
+	                        	idioma = l;
+	                        	break;
+	                        }
+	                }
+	                if (idioma == null)
+	                {
+	                    // Low priority, default language
+	        			if (System.getProperty("soffid.language.default") == null)
+	        				idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
+	        			else
+	        				idioma = new Locale (System.getProperty("soffid.language.default"));
+	        		
+	                }
+	            }
             	
             }
 

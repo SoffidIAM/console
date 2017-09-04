@@ -28,6 +28,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
@@ -177,7 +178,15 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	    		acc.setPasswordPolicy( ue.getTipusUsuari() );
 
 	    		Dispatcher dispatcher = getDispatcherService().findDispatcherByCodi(de.getCodi());
-	    		acc.setDisabled( ! getDispatcherService().isUserAllowed(dispatcher, ue.getCodi()));
+	    		if (getDispatcherService().isUserAllowed(dispatcher, ue.getCodi()))
+	    		{
+	    			acc.setDisabled( false );
+	    			acc.setStatus(AccountStatus.ACTIVE);
+	    		} else {
+	    			acc.setDisabled( true );
+	    			if (acc.getStatus() == AccountStatus.ACTIVE)
+	    				acc.setStatus(AccountStatus.DISABLED);
+	    		}
 	    		
 	    		getAccountEntityDao().update(acc);
 			}
@@ -192,7 +201,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     		acc.setName(name);
     		acc.setType(AccountType.USER);
     		acc.setPasswordPolicy( ue.getTipusUsuari() );
-    		acc.setDisabled(! "S".equals(ue.getActiu()));
+    		if ( "S".equals(ue.getActiu()) )
+    		{
+	    		acc.setDisabled(false);
+	    		acc.setStatus(AccountStatus.ACTIVE);
+    		} else {
+	    		acc.setDisabled(true);
+	    		acc.setStatus(AccountStatus.REMOVED);
+    		}
     		getAccountEntityDao().create(acc);
 		}
 
@@ -656,11 +672,13 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					if (acc.isDisabled() && "S".equals(ue.getActiu())) // Enable account
 					{
 						acc.setDisabled(false);
+						acc.setStatus(AccountStatus.ACTIVE);
 						getAccountEntityDao().update(acc);
 					}
 					if (! acc.isDisabled() && ! "S".equals(ue.getActiu())) // Disable account
 					{
 						acc.setDisabled(true);
+						acc.setStatus(AccountStatus.DISABLED);
 						getAccountEntityDao().update(acc);
 					}
 				}
@@ -694,6 +712,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     						if (acc.isDisabled() || ! description.equals (acc.getDescription()))
     						{
     							acc.setDisabled(false);
+    							acc.setStatus(AccountStatus.ACTIVE);
     							acc.setDescription(description);
     							getAccountEntityDao().update(acc);
     						}
@@ -707,6 +726,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
     					if (! acc.isDisabled() || ! description.equals (acc.getDescription()))
     					{
     						acc.setDisabled(true);
+    						acc.setStatus(AccountStatus.DISABLED);
     						acc.setDescription(description);
     						getAccountEntityDao().update(acc);
     					}

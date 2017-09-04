@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="Account",
@@ -81,9 +82,14 @@ public abstract class Account {
 	@Nullable
 	public java.util.Calendar passwordExpiration;
 
-	@Description("True if the account is disabled")
+	@Description("True if the account is disabled. Better use status attribute")
 	@Attribute(defaultValue = "false")
 	public boolean disabled;
+
+	@Description("Account status: active / disabled / removed")
+	@Column (name="ACC_STATUS")
+	@Nullable
+	public AccountStatus status;
 
 	@Description("Account's user type. It is directly bound to a password policy depending on the system's password domain")
 	public java.lang.String passwordPolicy;

@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
@@ -76,7 +77,12 @@ public abstract class AccountEntity {
 
 	@Column (name="ACC_DISABL",
 		defaultValue="false")
+	@Description("Do not use. Use status instead")
 	public boolean disabled;
+
+	@Column (name="ACC_STATUS")
+	@Nullable
+	public AccountStatus status;
 
 	@Column (name="ACC_VAF_ID", reverseAttribute="accounts")
 	@Nullable
@@ -119,7 +125,10 @@ public abstract class AccountEntity {
 		es.caib.seycon.ng.model.AccountEntity account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@DaoFinder("select acc\nfrom es.caib.seycon.ng.model.AccountEntity acc\njoin acc.users as users\njoin users.user as user with user.codi=:user\nwhere acc.dispatcher.domini.codi=:domain and acc.type='U'")
+	@DaoFinder("select acc\nfrom es.caib.seycon.ng.model.AccountEntity acc\n"
+			+ "join acc.users as users\n"
+			+ "join users.user as user with user.codi=:user\n"
+			+ "where acc.dispatcher.domini.codi=:domain and acc.type='U'")
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByUserAndDomain(
 		java.lang.String user, 
 		java.lang.String domain) {

@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.collections.map.LRUMap;
 
 import com.soffid.iam.api.AccessControlList;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.model.AccountAttributeEntity;
 
 import es.caib.seycon.ng.comu.Account;
@@ -223,6 +224,14 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			}
 			
 
+			if (target.getStatus() == null)
+			{
+				target.setStatus( target.isDisabled() ? AccountStatus.DISABLED : AccountStatus.ACTIVE);
+			}
+			else
+			{
+				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE);
+			}
 			start = System.currentTimeMillis();
 			if ( ! Security.isDisableAllSecurityForEver())
 			{
@@ -357,6 +366,14 @@ public class AccountEntityDaoImpl extends AccountEntityDaoBase
 			boolean copyIfNull)
 	{
 		super.accountToEntity(source, target, copyIfNull);
+		if (target.getStatus() == null)
+		{
+			target.setStatus( target.isDisabled() ? AccountStatus.DISABLED : AccountStatus.ACTIVE);
+		}
+		else
+		{
+			target.setDisabled( target.getStatus() != AccountStatus.ACTIVE);
+		}
 		DispatcherEntity dispatcher = getDispatcherEntityDao().findByCodi(source.getDispatcher());
 		if (dispatcher == null)
 			throw new IllegalArgumentException(String.format(Messages.getString("AccountEntityDaoImpl.WrongDispatcher"),  //$NON-NLS-1$

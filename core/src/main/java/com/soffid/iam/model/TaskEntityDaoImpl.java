@@ -10,6 +10,7 @@
 package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
+import es.caib.seycon.ng.utils.Security;
 
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -26,10 +27,11 @@ import org.hibernate.Query;
 public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     @Override
     public void create(TaskEntity tasqueEntity) {
+    	tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
     	if (checkDuplicate(tasqueEntity))
     		return;
     	
-            tasqueEntity.setStatus("P"); //$NON-NLS-1$
+        tasqueEntity.setStatus("P"); //$NON-NLS-1$
         if (tasqueEntity.getPriority() == null)
         {
     		String transactionCode = tasqueEntity.getTransaction();
@@ -190,6 +192,8 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	@Override
     protected void handleCreateNoFlush(TaskEntity tasque) throws Exception {
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
+    	if (checkDuplicate(tasque))
+    		return;
 		this.getHibernateTemplate().save(tasque);
 	}
 

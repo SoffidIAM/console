@@ -195,7 +195,7 @@
 			width="100%" height="">
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Application"
-				defaultAttributes="name, description" dataPath="/model:/aplicacio"
+				defaultAttributes="name, description, roles.name" dataPath="/model:/aplicacio"
 				variableName="query">
 			</searchbox>
 		</criteris>

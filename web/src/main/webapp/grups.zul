@@ -189,7 +189,7 @@
 			]]></attribute>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Group"
-				defaultAttributes="name, description" dataPath="/model:/grup"
+				defaultAttributes="name, description, type" dataPath="/model:/grup"
 				variableName="query">
 			</searchbox>
 		</criteris>

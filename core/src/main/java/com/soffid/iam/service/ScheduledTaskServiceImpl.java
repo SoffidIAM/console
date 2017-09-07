@@ -11,6 +11,7 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -257,5 +258,12 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 			return null;
 		else
 			return getScheduledTaskEntityDao().toScheduledTask(st);
+	}
+
+	@Override
+	protected List<ScheduledTask> handleListServerTasks(String server) throws Exception {
+		Collection<ScheduledTaskEntity> entities = getScheduledTaskEntityDao().findAllByServer(server);
+		List<ScheduledTask> tasks = getScheduledTaskEntityDao().toScheduledTaskList(entities);
+		return tasks;
 	}
 }

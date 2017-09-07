@@ -43,6 +43,7 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 		else
 			target.setServerName(source.getServer().getName());
 		target.setHandlerName(source.getHandler().getName());
+		target.setTenant(source.getTenant().getName());
 	}
 
 	@Override

@@ -33,21 +33,21 @@ public abstract class SyncStatusService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	@Operation(translated="getSyncAgentsInfo")
-	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getSeyconAgentsInfo()
+	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getSeyconAgentsInfo(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
 	
 	@Operation(translated="getSyncServerStatus")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerStatus()
+	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerStatus(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
 
 	@Operation(translated="getSyncServerInfo")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerInfo()
+	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerInfo(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

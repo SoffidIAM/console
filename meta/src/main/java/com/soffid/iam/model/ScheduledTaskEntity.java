@@ -5,6 +5,8 @@
 //
 
 package com.soffid.iam.model;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SCHTAS" )
@@ -66,6 +68,18 @@ public abstract class ScheduledTaskEntity {
 		java.lang.String name) {
 	 return null;
 	}
+
+	@DaoFinder("select ste "
+			+ "from  com.soffid.iam.model.ScheduledTaskEntity as ste "
+			+ "join ste.tenant as tenant "
+			+ "join tenant.servers as servers "
+			+ "join servers.tenantServer as server "
+			+ "where server.name=:server")
+	public Collection<com.soffid.iam.model.ScheduledTaskEntity> findAllByServer(
+		java.lang.String server) {
+	 return null;
+	}
+
 	@DaoFinder("select ste\n"
 			+ "from  com.soffid.iam.model.ScheduledTaskEntity as ste\n"
 			+ "join ste.handler as handler\n"

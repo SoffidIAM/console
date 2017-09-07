@@ -56,9 +56,15 @@ public abstract class ServerPluginEntity {
 		java.lang.Long id) {
 	 return null;
 	}
+
 	@Operation(translated="findAllBasicData")
 	@DaoFinder("select id, version, name, enabled from com.soffid.iam.model.ServerPluginEntity as serverPluginEntity")
 	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findAllOnlyDadesBasiques() {
+	 return null;
+	}
+
+	@DaoFinder("select serverPluginEntity from com.soffid.iam.model.ServerPluginEntity as serverPluginEntity")
+	public java.util.List<es.caib.seycon.ng.model.ServerPluginEntity> findAll() {
 	 return null;
 	}
 }

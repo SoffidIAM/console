@@ -251,10 +251,6 @@
 					String codiUsuari = ctx.getValue("@codi");
 					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					String[] tasquesSeycon = usuariService.refreshCanvis(codiUsuari);
-					tasques.visible = true;
-					tasques.mode = "overlapped";
-					Events.postEvent("onInicia", desktop.getPage("tasquesSeycon")
-							.getFellow("tasques"), tasquesSeycon);
 				}
 				
 				void llistaTasquesPendents() {

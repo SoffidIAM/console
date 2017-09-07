@@ -26,6 +26,7 @@ public class TaskHandler
 	boolean offlineTask;
 	boolean changed = false;
 	String tenant;
+	Long tenantId;
 	
 	public String getTenant() {
 		return tenant;
@@ -60,6 +61,7 @@ public class TaskHandler
 	Collection<RoleGrant> grants;
 
 	private final long ONE_DAY = 24 * 60 * 60 * 1000;
+	private boolean rejected;
 
 	public static final String PROPAGATE_PASSWORD = "PropagatePassword"; //$NON-NLS-1$
 	public static final String UPDATE_PROPAGATED_PASSWORD = "UpdatePropagatedPassword"; //$NON-NLS-1$
@@ -372,6 +374,7 @@ public class TaskHandler
 		else
 			hash = Long.toString(task.getId());
 
+		hash = tenant + ":"+ hash;
 		if (hash.length() > 200)
 		{
 			try
@@ -412,5 +415,22 @@ public class TaskHandler
 	{
 		cancelled = true;
 		changed = true;
+	}
+
+	public Long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(Long tenantId) {
+		this.tenantId = tenantId;
+	}
+
+	public void reject() {
+		rejected = true;
+		changed = true;
+	}
+
+	public boolean isRejected() {
+		return rejected;
 	}
 }

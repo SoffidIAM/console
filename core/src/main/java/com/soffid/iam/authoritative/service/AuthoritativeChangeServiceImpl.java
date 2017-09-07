@@ -12,6 +12,7 @@ package com.soffid.iam.authoritative.service;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
@@ -507,6 +508,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 auditAuthoritativeChange(tracker);
                 tda.setOrder(i);
                 tda.setCode(attribute);
+				tda.setScope(MetadataScope.USER);
                 tda = getAdditionalDataService().create(tda);
             }
             UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);

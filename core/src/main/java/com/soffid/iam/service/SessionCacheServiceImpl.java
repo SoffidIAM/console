@@ -59,7 +59,7 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 		Map<String, Object> sessionMap = currentMap.get();
 		if (sessionMap == null)
 			return null;
-		return sessionMap.get(tag);
+		return sessionMap.get(Security.getCurrentTenantName()+"/"+tag);
 	}
 
 	/* (non-Javadoc)
@@ -70,7 +70,7 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 	{
 		Map<String, Object> sessionMap = currentMap.get();
 		if (sessionMap != null)
-			sessionMap.put(tag, value);
+			sessionMap.put(Security.getCurrentTenantName()+"/"+tag, value);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class SessionCacheServiceImpl extends com.soffid.iam.service.SessionCache
 		String id;
 		do
 		{
-			id = Security.getCurrentAccount()+"_"+random.nextLong();
+			id = Security.getCurrentTenantName()+"_"+Security.getCurrentAccount()+"_"+random.nextLong();
 		} while (map.containsKey(id));
 		Map<String,Object> sessionMap = new HashMap<String, Object>();
 		currentSession.set(id);

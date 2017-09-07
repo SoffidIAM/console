@@ -562,6 +562,7 @@ public class InternalPasswordServiceImpl extends
         try {
     		TaskHandler th = new TaskHandler();
     		th.setTenant(Security.getCurrentTenantName());
+    		th.setTenantId(Security.getCurrentTenantId());
     		th.setTask(tasca);
     		return getTaskQueue().processOBTask(th);
         } 

@@ -19,6 +19,7 @@ import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.SystemEntity;
@@ -120,7 +121,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             }
             try {
                 SyncStatusService status = rsl.getSyncStatusService();
-                SyncServerInfo info = status.getSyncServerStatus();
+                SyncServerInfo info = status.getSyncServerStatus(Security.getCurrentTenantName());
                 info.setNumberOfPendingTasks("" + numTasquesPendents);
                 serversInfo.add(info);
             } catch (Throwable e) {
@@ -140,7 +141,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         {
         	// Search on master tenant
         	Security.nestedLogin(Security.getMasterTenantName(), Security.getCurrentAccount(),
-        			new String [] { Security.AUTO_AUTHORIZATION_ALL} );
+        			new String [] { Security.AUTO_AGENT_QUERY} );
         	try {
                 server = getServerEntityDao().findByName(um.getServerURL().getHost());
         	} finally {
@@ -148,7 +149,10 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         	}
         }
         if (server != null)
+        {
+        	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
             rsl.setAuthToken(server.getAuth());
+        }
         return rsl;
     }
 
@@ -166,7 +170,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             SyncStatusService status = rsl.getSyncStatusService();
 
             // Obtenin tots els agents del servidor
-            Collection<AgentStatusInfo> agentstatus = status.getSyncAgentsInfo();
+            Collection<AgentStatusInfo> agentstatus = status.getSyncAgentsInfo(Security.getCurrentTenantName());
 
             // Hem de contar les tasques pendents realment en cada agent
             // hem de tindre: url server[url], codiAgent[nomAgent]
@@ -367,11 +371,17 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
                                 + url.getHost());
 
             if (server.getAuth() != null) {
-                String seu = "-seu-:" + server.getAuth(); //$NON-NLS-1$
+                String seu = "-seu-" +
+                		Security.getCurrentTenantName()+
+                		"\\"+
+                		Security.getCurrentAccount()+
+                		":" + 
+                		server.getAuth(); //$NON-NLS-1$
                 byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
                 String tag = "Basic " //$NON-NLS-1$
                         + Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES);
                 c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
+                c.addRequestProperty("Accept-Language", MessageFactory.getLocale().getLanguage());
 
             }
             c.connect();
@@ -391,7 +401,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     	List<String> list = new LinkedList<String>();
     	Security.nestedLogin( Security.getMasterTenantName(),
     			Security.getCurrentAccount(),
-    			new String[] { Security.AUTO_AUTHORIZATION_ALL } );
+    			Security.ALL_PERMISSIONS);
     	try {
     		for ( ServerEntity server:  getServerEntityDao().loadAll())
     		{
@@ -449,6 +459,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
         if (transactionCode.equals(TaskHandler.UPDATE_LIST_ALIAS)) //$NON-NLS-1$
             result = result + " " + tasca.getAlias() + "@" + tasca.getMailDomain(); //$NON-NLS-1$ //$NON-NLS-2$
+
+        if (transactionCode.equals(TaskHandler.UPDATE_OBJECT)) //$NON-NLS-1$
+            result = result + " " + tasca.getCustomObjectType() + " " + tasca.getCustomObjectName(); //$NON-NLS-1$ //$NON-NLS-2$
 
         return result;
 
@@ -520,76 +533,6 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         return serversInfo;
     }
 
-    // Funció per cridar diferents mètodes de seycon-server
-    protected Collection<Object> handleGetSeyconServerInfo(String url, String quinaInfo,
-            String[] params) throws Exception {
-
-        URLManager m = new URLManager(url);
-        RemoteServiceLocator rsl = createRemoteServiceLocator(url);
-//        rsl.setAuthToken(quinaInfo);
-
-        if ("serverinfo".equalsIgnoreCase(quinaInfo)) { //$NON-NLS-1$
-            LinkedList<Object> serversInfo = new LinkedList<Object>();
-            try {
-                // Obtenim informació del servidor
-                SyncStatusService status = rsl.getSyncStatusService();
-
-                // Obtenim informació del servidor
-                Object obj = status.getSyncServerInfo();
-                if (obj instanceof SyncServerInfo) {
-                    SyncServerInfo info = (SyncServerInfo) obj;
-                    serversInfo.add(info);
-                }
-            } catch (Throwable th) {
-                // th.printStackTrace();
-                // url, versio, estat, numAgents, numTasquesPendents, sso,
-                // jetty, ssoDaemon, taskGenerator, caducitatRootCertificate,
-                // caducitatMainCertificate, dataActualServer,
-                // databaseConnections, serverAgentHostsURL)
-                /*
-                 * serversInfo.add(new SeyconServerInfo(url, "ERROR", "ERROR",
-                 * "ERROR", "ERROR", "ERROR", "ERROR", "ERROR", "ERROR", null,
-                 * null, null, "ERROR"));
-                 */
-              /*  throw new SeyconException(String.format(
-                        Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$*/
-            	throw new SeyconException(Messages.getString("SeyconServerServiceImpl.NoConnectionToServer")); //$NON-NLS-1$
-            }
-
-            return serversInfo;
-        } else if ("agentServersInfo".equalsIgnoreCase(quinaInfo)) { //$NON-NLS-1$
-            // Obtenim les urls dels servidors
-            SyncStatusService status = rsl.getSyncStatusService();
-
-            Object obj = status.getServerAgentHostsURL();
-            if (obj instanceof Collection) {
-                return (Collection) obj;
-            }
-        } else if ("reset".equalsIgnoreCase(quinaInfo)) { //$NON-NLS-1$
-            LinkedList<Object> result = new LinkedList();
-            if (params != null && params.length == 1) {
-                SyncStatusService status = rsl.getSyncStatusService();
-
-                if ("agents".equals(params[0])) { //$NON-NLS-1$
-                    String res = status.resetAllServer();
-                    result.add(res);
-                } else {
-                    String res = status.resetServerAgents(params[0]);
-                    result.add(res);
-                }
-                return result;
-            } else {
-                throw new SeyconException(Messages.getString("SeyconServerServiceImpl.ServerNotAdded")); //$NON-NLS-1$
-            }
-
-        } else if ("dbpool".equalsIgnoreCase(quinaInfo)) { //$NON-NLS-1$
-            LinkedList<Object> result = new LinkedList();
-            SyncStatusService status = rsl.getSyncStatusService();
-            result.add(status.getDBConnectionStatus());
-            return result;
-        }
-        return null;
-    }
 
     int roundrobin = 0;
 	@Override
@@ -665,6 +608,30 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 	        status.cancelTask(taskId);
 		}
 		
+	}
+
+	@Override
+	protected SyncServerInfo handleGetSyncServerInfo(String url) throws Exception {
+        URLManager m = new URLManager(url);
+        RemoteServiceLocator rsl = createRemoteServiceLocator(url);
+
+        SyncStatusService status = rsl.getSyncStatusService();
+
+        return status.getSyncServerInfo(Security.getCurrentTenantName());
+	}
+
+	@Override
+	protected void handleResetSyncServer(String url, String agent) throws Exception {
+		URLManager m = new URLManager(url);
+        RemoteServiceLocator rsl = createRemoteServiceLocator(url);
+        
+        SyncStatusService status = rsl.getSyncStatusService();
+
+        if (agent == null) { //$NON-NLS-1$
+            status.resetAllServer();
+        } else {
+            status.resetServerAgents(agent);
+        }
 	}
 
 }

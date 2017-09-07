@@ -8,11 +8,14 @@ package es.caib.seycon.ng.model;
 
 import java.util.Collection;
 
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
 
-@Entity(table = "SC_ACCOUN", translatedName = "AccountEntity", translatedPackage = "com.soffid.iam.model")
+@Entity(table = "SC_ACCOUN", translatedName = "AccountEntity", translatedPackage = "com.soffid.iam.model",
+	tenantFilter="system.tenant.id"
+)
 @Depends({ es.caib.seycon.ng.model.DispatcherEntity.class,
 		es.caib.seycon.ng.comu.Account.class,
 		es.caib.seycon.ng.model.RolEntity.class,
@@ -77,7 +80,12 @@ public abstract class AccountEntity {
 	public java.lang.String secrets;
 
 	@Column(name = "ACC_DISABL", defaultValue = "false")
+	@Description("Do not use. Use status instead")
 	public boolean disabled;
+
+	@Column (name="ACC_STATUS")
+	@Nullable
+	public AccountStatus status;
 
 	@Column (name="ACC_VAF_ID", reverseAttribute="accounts")
 	@Nullable
@@ -133,10 +141,12 @@ public abstract class AccountEntity {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
-	@DaoFinder("select acc\n" + "from com.soffid.iam.model.AccountEntity acc\n"
-			+ "join acc.users as users\n"
-			+ "join users.user as user with user.userName=:user\n"
-			+ "where acc.system.passwordDomain.name=:domain and acc.type='U'")
+	@DaoFinder("select acc\n" 
+			+ "from com.soffid.iam.model.AccountEntity acc\n"
+			+ "join acc.users as users "
+			+ "join users.user as user "
+			+ "where user.userName=:user and user.tenant.id=:tenantId and "
+			+ " acc.system.passwordDomain.name=:domain and acc.type='U'")
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByUserAndDomain(
 			java.lang.String user, java.lang.String domain) {
 		return null;

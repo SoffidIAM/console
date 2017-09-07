@@ -85,6 +85,8 @@ public class Password extends com.soffid.iam.api.Password
 
 	public static Password toPassword(com.soffid.iam.api.Password password2)
 	{
+		if (password2 == null)
+			return null;
 		Password p = new Password ();
 		p.password = password2.toString();
 		return p;

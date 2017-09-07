@@ -296,6 +296,8 @@ public class Password extends Object implements Serializable {
 
 	public static Password toPassword(es.caib.seycon.ng.comu.Password password2)
 	{
+		if (password2 == null)
+			return null;
 		Password p = new Password ();
 		p.password = password2.toString();
 		return p;

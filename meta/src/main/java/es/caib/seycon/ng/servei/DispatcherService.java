@@ -269,6 +269,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.server_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.Server> findTenantServers()
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.server_manage_proxy.class, roles.server_manage_server.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})

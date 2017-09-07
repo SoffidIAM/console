@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.DispatcherEntity;
 
-@Entity(table = "SC_ACCMET")
+@Entity(table = "SC_ACCMET", tenantFilter="system.tenant.id")
 @Depends({ es.caib.seycon.ng.model.AuditoriaEntity.class,
 		es.caib.seycon.ng.comu.TipusDada.class})
 public abstract class AccountMetadataEntity {

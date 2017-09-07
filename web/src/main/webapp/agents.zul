@@ -2112,5 +2112,4 @@
 	<include src="grupsllista.zul"/>
 	<include src="controlAcces.zul"/>
  	<include src="finestres/editor.zul"/>
- 	<debugwindow/>
 </zk>

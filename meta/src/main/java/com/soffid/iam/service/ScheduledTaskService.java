@@ -67,12 +67,21 @@ public abstract class ScheduledTaskService {
 		com.soffid.iam.api.ScheduledTask task)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
 	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<com.soffid.iam.api.ScheduledTask> listTasks()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List<com.soffid.iam.api.ScheduledTask> listServerTasks(String server)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void registerStartTask(
 		com.soffid.iam.api.ScheduledTask task)

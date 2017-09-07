@@ -17,7 +17,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 
-@Entity(table = "SC_APPATT")
+@Entity(table = "SC_APPATT", tenantFilter="informationSystem.tenant.id")
 @Depends({AutoritzacioService.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class })
 public class ApplicationAttributeEntity {

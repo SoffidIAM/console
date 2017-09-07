@@ -140,7 +140,7 @@ public class ConfigurationServiceImpl
 	protected Configuration handleUpdate(Configuration configuracio) throws Exception {
 		ConfigEntity configuracioEntity = getConfigEntityDao().configurationToEntity(configuracio);
 		
-		System.setProperty(configuracio.getCode(), configuracio.getValue()); //$NON-NLS-1$
+//		System.setProperty(configuracio.getCode(), configuracio.getValue()); //$NON-NLS-1$
 		
 		getConfigEntityDao().update(configuracioEntity);
 		configuracio = getConfigEntityDao().toConfiguration(configuracioEntity);

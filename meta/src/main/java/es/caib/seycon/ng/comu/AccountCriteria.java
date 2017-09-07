@@ -7,7 +7,7 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
-@Criteria 
+@Criteria() 
 public class AccountCriteria {
 
 	@Nullable

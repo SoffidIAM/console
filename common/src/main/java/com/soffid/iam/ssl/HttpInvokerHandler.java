@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -17,6 +18,8 @@ import javax.net.ssl.SSLSocketFactory;
 import org.mortbay.jetty.HttpHeaders;
 
 import com.soffid.iam.lang.MessageFactory;
+import com.soffid.iam.remote.HeadersFactory;
+import com.soffid.iam.remote.RemoteInvokerFactory;
 
 import es.caib.seycon.util.Base64;
 
@@ -24,6 +27,7 @@ public class HttpInvokerHandler implements InvocationHandler {
     private URL url;
     private String authToken;
 	private String tenantName;
+	private List<HeadersFactory> headersFactory = null;
     
     public HttpInvokerHandler (URL url, String tenantName, String authToken)
     {
@@ -53,6 +57,11 @@ public class HttpInvokerHandler implements InvocationHandler {
                 String tag = "Basic "+ Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES);  //$NON-NLS-1$
                 c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
                 
+            }
+            if (headersFactory != null)
+            {
+            	for ( HeadersFactory h: headersFactory)
+            		h.addHeaders(c);
             }
             
             Locale locale = MessageFactory.getLocale();
@@ -104,5 +113,9 @@ public class HttpInvokerHandler implements InvocationHandler {
         }
             
     }
+	public void setHeadersFactory(List<HeadersFactory> headersFactory) {
+		this.headersFactory  = headersFactory;
+		
+	}
 
 }

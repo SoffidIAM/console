@@ -1380,6 +1380,10 @@ public class SesionEJB implements EntityBean {
 
             String dispatcher = ps.getDefaultDispatcher();
             Account acc = as.findAccount(cod, dispatcher);
+            if (acc == null)
+                acc = as.findAccount(cod.toUpperCase(), dispatcher);
+            if (acc == null)
+                acc = as.findAccount(cod.toLowerCase(), dispatcher);
             Usuari usuari = null;
             if (acc == null)
             {

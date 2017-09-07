@@ -1394,24 +1394,48 @@
 
 	<autoritzacio>
 		<codi>customObject:query</codi>
-		<descripcio>Query custom objects</descripcio>
+		<descripcio>Query custom object types</descripcio>
 		<ambit>Custom objects</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>customObject:create</codi>
-		<descripcio>Create custom objects</descripcio>
+		<descripcio>Create custom object types</descripcio>
 		<ambit>Custom objects</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>customObject:update</codi>
-		<descripcio>Update custom objects</descripcio>
+		<descripcio>Update custom object types</descripcio>
 		<ambit>Custom objects</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>customObject:delete</codi>
+		<descripcio>Delete custom object types</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>customObjectType:query</codi>
+		<descripcio>Query custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>customObjectType:create</codi>
+		<descripcio>Create custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>customObjectType:update</codi>
+		<descripcio>Update custom objects</descripcio>
+		<ambit>Custom objects</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>customObjectType:delete</codi>
 		<descripcio>Delete custom objects</descripcio>
 		<ambit>Custom objects</ambit>
 	</autoritzacio>

@@ -56,4 +56,11 @@ public abstract class TipusUnitatOrganitzativaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation(grantees = {roles.organizationalUnit_query.class})
+	@Transactional(rollbackFor = {java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.TipusUnitatOrganitzativa> findOrganizationalUnitByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

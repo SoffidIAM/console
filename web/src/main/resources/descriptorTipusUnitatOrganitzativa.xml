@@ -3,14 +3,10 @@
 <zkib-model>
 	<datanode name="tipusUnitatsOrganitzatives">
 		<finder name="tipusUnitatOrganitzativa" type="tipusUnitatOrganitzativa">
-			<ejb-finder jndi="java:comp/env/ejb/TipusUnitatOrganitzativaEJB"
-				method="findTipusUnitatOrganitzativaByFiltre" if = "${queryEnabled}">
-				<parameter value="${codi}"/>
-				<parameter value="${descripcio}"/>
+			<ejb-finder jndi="java:comp/env/ejb/TipusUnitatOrganitzativaEJB" method="findOrganizationalUnitByJsonQuery" if="${query != null}">
+				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean
-				className="es.caib.seycon.ng.comu.TipusUnitatOrganitzativa">
-			</new-instance-bean>
+			<new-instance-bean className="es.caib.seycon.ng.comu.TipusUnitatOrganitzativa"></new-instance-bean>
 		</finder>
 	</datanode>
 	

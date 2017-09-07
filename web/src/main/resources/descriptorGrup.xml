@@ -3,20 +3,34 @@
 <zkib-model>
 
 	<datanode name="grups">
+
 		<finder name="grup" type="grup">
-			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
-				if="${queryEnabled}"> <!-- grup: query -->
-				<parameter value="${codi}" />
-				<parameter value="${pare}" />
-				<parameter value="${unitatOfimatica}" />
-				<parameter value="${descripcio}" />
-				<parameter value="${tipus}" />
-				<parameter value="${obsolet}" />
-				<parameter value="${servidorOfimatic}" />
-				<parameter value="${seccioPressupostaria}" />
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByJsonQuery" if = "${query != null}">
+				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Grup">
-			</new-instance-bean>
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
+				if="${query == null &amp;&amp; codi == null}"> <!-- grup: query -->
+				<parameter value="World" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+			</ejb-finder>
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
+				if="${query == null &amp;&amp; codi != null}"> <!-- grup: query -->
+				<parameter value="${codi}" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+				<parameter value="%" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"></new-instance-bean>
 		</finder>
 
 		<finder name="tipusUnitatOrganitzativa" type="tipusUnitatOrganitzativa">

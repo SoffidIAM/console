@@ -75,6 +75,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.SoffidAuthorization;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
@@ -2224,7 +2225,7 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	protected Collection<Role> handleFindRoleByJsonQuery(String query)
-			throws Exception {
+			throws InternalErrorException, Exception {
 		
 		
 		ClassConfig config = getRoleJsonConfiguration();
@@ -2245,8 +2246,10 @@ public class ApplicationServiceImpl extends
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		LinkedList<Role> result = new LinkedList<Role>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
 				paramArray)) {
+			tou.checkTimeOut();
 			Role u = getRoleEntityDao().toRole(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(

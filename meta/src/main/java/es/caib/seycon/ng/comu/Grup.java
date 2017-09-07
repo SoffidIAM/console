@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonAttribute;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
@@ -51,10 +52,12 @@ public class Grup {
 
 	@Nullable
 	@Attribute(defaultValue = "false", translated = "obsolete" )
+	@JsonAttribute(hibernateAttribute="-")
 	public java.lang.Boolean obsolet;
 
 	@Nullable
 	@Attribute(translated = "organizational" )
+	@JsonAttribute(hibernateAttribute="-")
 	public java.lang.Boolean organitzatiu;
 
 	@Nullable

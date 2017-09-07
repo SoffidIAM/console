@@ -56,7 +56,6 @@
 											build-helper-maven-plugin
 										</artifactId>
 										<versionRange>
-											[1.7,)
 										</versionRange>
 										<goals>
 											<goal>add-test-source</goal>
@@ -70,7 +69,7 @@
 									<pluginExecutionFilter>
 										<groupId></groupId>
 										<artifactId></artifactId>
-										<versionRange>[,)</versionRange>
+										<versionRange></versionRange>
 										<goals>
 											<goal></goal>
 										</goals>

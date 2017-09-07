@@ -133,7 +133,6 @@
 				
 				void showDetall()
 				{
-//					esquema.hideCriteris();
 					esquema.getFellow("lista").getFellow("listbox").setRows(5);
 					esquema.showFormulari();
 				}

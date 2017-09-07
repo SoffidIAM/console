@@ -541,6 +541,11 @@ div.CodeMirror-code   {
 
 span.search-box ul li {
 	display: inline-block;
+	margin-bottom: 5px
+}
+
+.searchbox-addcriteria {
+	margin-bottom: 5px
 }
 
 a.remove-filter, a.remove-filter:hover, a.remove-filter:active,a.remove-filter:visited,
@@ -556,6 +561,7 @@ a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited
 
 .capsa_cerca {
 	height: inherit !important;
+	padding-bottom: 0px !important
 }
 
 li.attribute-search-box {

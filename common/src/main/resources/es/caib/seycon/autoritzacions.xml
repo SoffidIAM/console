@@ -826,8 +826,17 @@
 		<hereta>
 			agent:update,
 			agent:query,
+			agent:queryObjects,
 			group:query,
 			plugins:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>agent:queryObjects</codi>
+		<descripcio>Create target system objects</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
 		</hereta>
 	</autoritzacio>
 

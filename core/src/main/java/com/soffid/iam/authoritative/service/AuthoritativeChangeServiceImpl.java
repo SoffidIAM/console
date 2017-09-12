@@ -464,8 +464,8 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 
 	private boolean compareUsers(User user, User oldUser) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		boolean anyChange = false;
-		for (String att : new String[]{"Active", "MailAlias", "PrimaryGroupName", "Comments", "MailDomain", "MultiSession", 
-				"nationalID", "Name", "ShortName", "FirstName", "SecondName", "MailServer", "ProfileServer", 
+		for (String att : new String[]{"Active", "MailAlias", "PrimaryGroup", "Comments", "MailDomain", "MultiSession", 
+				"NationalID", "LastName", "ShortName", "FirstName", "MiddleName", "MailServer", "ProfileServer", 
 				"HomeServer", "PhoneNumber", "UserType"}) {
             Method getter = User.class.getMethod("get" + att);
             Method setter = User.class.getMethod("set" + att, getter.getReturnType());

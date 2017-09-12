@@ -32,6 +32,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.SoffidObjectType;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AttributeMapping;
@@ -51,6 +52,9 @@ public interface ExtensibleObjectMgr extends java.rmi.Remote {
   public void configureMappings (Collection<ExtensibleObjectMapping> objects)
 		    throws java.rmi.RemoteException, 
             InternalErrorException;
-  
+
+  public ExtensibleObject getNativeObject (SoffidObjectType type, String object1, String object2) throws RemoteException, InternalErrorException;
+
+  public ExtensibleObject getSoffidObject (SoffidObjectType type, String object1, String object2) throws RemoteException, InternalErrorException;
 }
 

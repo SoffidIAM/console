@@ -119,7 +119,20 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 	{
 		return attributes.keySet();
 	}
-	
+
+	public static ExtensibleObject toExtensibleObject(es.caib.seycon.ng.sync.intf.ExtensibleObject o1)
+	{
+		if (o1 == null)
+			return null;
+		
+		ExtensibleObject o2 = new ExtensibleObject();
+		o2.objectType = o1.getObjectType();
+		for (String att: o1.getAttributes())
+		{
+			o2.attributes.put(att, o1.get(att));
+		}
+		return o2;
+	}
 }
 
 

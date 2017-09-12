@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.sync.servei;
 import java.util.Map;
 
+import com.soffid.iam.api.ScheduledTask;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.SoffidObjectType;
@@ -115,4 +116,17 @@ public abstract class SyncStatusService {
 	{
 		
 	}
+	
+	public void startScheduledTask (ScheduledTask t)
+	{
+		
+	}
+	
+	public Map<String,Object> getNativeObject (String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2)
+	{ return null; }
+
+	public Map<String,Object> getSoffidObject (String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2)
+	{ return null; }
 }

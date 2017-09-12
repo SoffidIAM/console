@@ -16,6 +16,7 @@ public class AuthoritativeChange {
 	@Nullable
 	AuthoritativeChangeIdentifier id;
 	
+	@Nullable
 	SoffidObjectType objectType;
 	
 	@Nullable

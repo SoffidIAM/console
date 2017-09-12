@@ -2,6 +2,8 @@ package es.caib.seycon.ng.exception;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
 import javax.ejb.EJBException;
@@ -10,19 +12,55 @@ public class SoffidStackTrace
 {
     public static String getStackTrace (Throwable t)
     {
-    	ByteArrayOutputStream out = new ByteArrayOutputStream();
-    	try
-		{
-			printStackTrace(t, new PrintStream(out, true, "UTF-8"));
-			return out.toString("UTF-8");
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			return e.toString();
-		}
+    	StringWriter out = new StringWriter();
+		printStackTrace(t, new PrintWriter(out));
+		return out.toString();
     }
     
     public static void printStackTrace(Throwable e, PrintStream s) {
+        synchronized (s) {
+        	printStackTrace(e, new PrintWriter(s));
+        }
+    }
+
+    private static boolean displayStackTrace (StackTraceElement stackElement)
+    {
+    	String cn = stackElement.getClassName();
+    	if (cn.startsWith("org.hibernate.") || //$NON-NLS-1$
+    			cn.startsWith("org.jboss.") || //$NON-NLS-1$
+    			cn.startsWith("org.springframework.") || //$NON-NLS-1$
+    			cn.startsWith("org.apache.catalina.") || //$NON-NLS-1$
+    			cn.startsWith("org.zkoss.") ||  //$NON-NLS-1$
+    			cn.startsWith("com.sun.net.") ||  //$NON-NLS-1$
+    			cn.startsWith("java.net.") ||  //$NON-NLS-1$
+    			cn.startsWith("org.mortbay.") ||  //$NON-NLS-1$
+    			cn.startsWith("sun.") ||  //$NON-NLS-1$
+    			cn.startsWith("javax.servlet.") ||  //$NON-NLS-1$
+    			cn.startsWith("java.lang.") ||  //$NON-NLS-1$
+    			cn.startsWith("$") ||  //$NON-NLS-1$
+    			cn.startsWith("bsh.") ) //$NON-NLS-1$
+    		return false;
+    	if (cn.endsWith("DaoBase") || cn.endsWith("ServiceBase")) //$NON-NLS-1$ //$NON-NLS-2$
+    		return false;
+   		return true;
+    }
+
+    private static Throwable getCause( Throwable th)
+    {
+    	Throwable cause = null;
+    	if (th instanceof EJBException)
+    	{
+    		cause = ((EJBException) th).getCausedByException();
+    	}
+    	if (cause == null)
+    		cause = th.getCause();
+    	if (cause == th)
+    		return null;
+    	else
+    		return cause;
+    }
+    
+	public static void printStackTrace(Throwable e, PrintWriter s) {
         synchronized (s) {
             StackTraceElement[] trace = e.getStackTrace();
             Throwable ourCause = getCause(e);
@@ -54,54 +92,16 @@ public class SoffidStackTrace
                 	printStackTrace (trace[i], s);
                 }
             }
+            s.flush();
         }
-    }
+	}
 
-    private static boolean displayStackTrace (StackTraceElement stackElement)
-    {
-    	String cn = stackElement.getClassName();
-    	if (cn.startsWith("org.hibernate.") || //$NON-NLS-1$
-    			cn.startsWith("org.jboss.") || //$NON-NLS-1$
-    			cn.startsWith("org.springframework.") || //$NON-NLS-1$
-    			cn.startsWith("org.apache.catalina.") || //$NON-NLS-1$
-    			cn.startsWith("org.zkoss.") ||  //$NON-NLS-1$
-    			cn.startsWith("com.sun.net.") ||  //$NON-NLS-1$
-    			cn.startsWith("java.net.") ||  //$NON-NLS-1$
-    			cn.startsWith("org.mortbay.") ||  //$NON-NLS-1$
-    			cn.startsWith("sun.") ||  //$NON-NLS-1$
-    			cn.startsWith("javas.servlet.") ||  //$NON-NLS-1$
-    			cn.startsWith("java.lang.") ||  //$NON-NLS-1$
-    			cn.startsWith("$") ||  //$NON-NLS-1$
-    			cn.startsWith("bsh.") ) //$NON-NLS-1$
-    		return false;
-    	if (cn.endsWith("DaoBase") || cn.endsWith("ServiceBase")) //$NON-NLS-1$ //$NON-NLS-2$
-    		return false;
-   		return true;
-    }
-
-    private static void printStackTrace(StackTraceElement stackTraceElement,
-			PrintStream s)
-	{
+	private static void printStackTrace(StackTraceElement stackTraceElement, PrintWriter s) {
     	s.println("\t"); //$NON-NLS-1$
         s.printf(Messages.getString("InternalErrorException.at"), stackTraceElement.toString()); //$NON-NLS-1$    	
 	}
 
-    private static Throwable getCause( Throwable th)
-    {
-    	Throwable cause = null;
-    	if (th instanceof EJBException)
-    	{
-    		cause = ((EJBException) th).getCausedByException();
-    	}
-    	if (cause == null)
-    		cause = th.getCause();
-    	if (cause == th)
-    		return null;
-    	else
-    		return cause;
-    }
-    
-	private static void printStackTraceAsCauseSeycon(Throwable th, PrintStream s,
+	private static void printStackTraceAsCauseSeycon(Throwable th, PrintWriter s,
             StackTraceElement[] causedTrace) {
         if (th == null)
             return;
@@ -150,6 +150,7 @@ public class SoffidStackTrace
 	        }
 	
         }
+        s.flush();
     }
 
 

@@ -20,14 +20,22 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
+import com.soffid.iam.doc.api.DocumentReference;
+import com.soffid.iam.doc.service.DocumentService;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
+import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.remote.RemoteServiceLocator;
+import com.soffid.iam.remote.URLManager;
+import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -178,7 +186,16 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
 		entity.setActive(true);
 		entity.setLastExecution(new Date());
-		entity.setLastLog(null);
+		if (entity.getLogReferenceID() != null)
+		{
+			try {
+				DocumentService ds = ServiceLocator.instance().getDocumentService();
+				ds.deleteDocument(new DocumentReference( entity.getLogReferenceID()) );
+			} catch (Exception e) {
+				
+			}
+		}
+		entity.setLogReferenceID(null);
 		entity.setError(false);
 		getScheduledTaskEntityDao().update(entity);
 		getScheduledTaskEntityDao().toScheduledTask(entity, task);
@@ -190,14 +207,8 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	 */
 	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException
 	{
-		if (task.getLastLog().length() > 64000)
-		{
-			StringBuffer b = new StringBuffer();
-			b.append(task.getLastLog(), 0, 64000)
-				.append("\r\n*** TRUNCATED FILE ***");
-			task.setLastLog(b);
-		}
 		task.setActive(false);
+		task.setLogReferenceID(task.getLogReferenceID());
 		task.setLastEnd(Calendar.getInstance());
 		try {
 			task.setServerName(Config.getConfig().getHostName());
@@ -266,4 +277,33 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		List<ScheduledTask> tasks = getScheduledTaskEntityDao().toScheduledTaskList(entities);
 		return tasks;
 	}
+
+	@Override
+	protected void handleStartNow(ScheduledTask task) throws Exception {
+		if (task.getServerName().equals("*"))
+		{
+			
+		}
+        RemoteServiceLocator rsl = createRemoteServiceLocator(task.getServerName());
+        if (rsl == null)
+        	throw new InternalErrorException("Not allowed to execute task on "+task.getServerName());
+        SyncStatusService status = rsl.getSyncStatusService();
+        status.startScheduledTask(task);
+	}
+
+    private RemoteServiceLocator createRemoteServiceLocator(String serverName) throws IOException, InternalErrorException {
+        for (ServerEntity server:  getServerEntityDao().findByTenant(Security.getCurrentTenantName()))
+        {
+        	if (server.getType() == ServerType.MASTERSERVER && 
+        			("*".equals(serverName) || server.getName().equals(serverName)))
+        	{
+                RemoteServiceLocator rsl = new RemoteServiceLocator(serverName);
+                URLManager um = new URLManager(serverName);
+            	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+                rsl.setAuthToken(server.getAuth());
+                return rsl;
+        	}
+        }
+        return null;
+    }
 }

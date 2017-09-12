@@ -42,9 +42,9 @@ public abstract class ScheduledTaskEntity {
 	@Nullable
 	public java.util.Date lastEnd;
 
-	@Column (name="SCT_LASLOG", length=128000)
+	@Column (name="SCT_LOGDOC")
 	@Nullable
-	public java.lang.String lastLog;
+	public java.lang.String logReferenceID;
 
 	@Column (name="SCT_ERROR",
 		defaultValue="false")

@@ -2,7 +2,7 @@
 
 <zkib-model>
 	<datanode name="root">
-		<finder name="task" type="task">
+		<finder name="task" type="task" refreshAfterCommit="true">
 			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService"
 				method="listTasks"> 
 			</ejb-finder>

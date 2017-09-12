@@ -4,6 +4,8 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
+import com.soffid.iam.sync.intf.ExtensibleObject;
+
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
@@ -27,6 +29,7 @@ public class TaskHandler
 	boolean changed = false;
 	String tenant;
 	Long tenantId;
+	ExtensibleObject result;
 	
 	public String getTenant() {
 		return tenant;
@@ -432,5 +435,13 @@ public class TaskHandler
 
 	public boolean isRejected() {
 		return rejected;
+	}
+
+	public ExtensibleObject getResult() {
+		return result;
+	}
+
+	public void setResult(ExtensibleObject result) {
+		this.result = result;
 	}
 }

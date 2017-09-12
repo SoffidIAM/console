@@ -1516,4 +1516,24 @@ public class DispatcherServiceImpl extends
 		});
 		return list;
 	}
+
+	@Override
+	protected Map<String, Object> handleGetNativeObject(String dispatcher, SoffidObjectType type, String object1,
+			String object2) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.getNativeObject(dispatcher, type, object1, object2);
+	}
+
+	@Override
+	protected Map<String, Object> handleGetSoffidObject(String dispatcher, SoffidObjectType type, String object1,
+			String object2) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.getSoffidObject(dispatcher, type, object1, object2);
+	}
 }

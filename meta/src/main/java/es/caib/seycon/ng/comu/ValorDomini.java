@@ -5,7 +5,12 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.model.AplicacioEntity;
+import es.caib.seycon.ng.model.RolEntity;
 
 @ValueObject ( translatedName="DomainValue",
 	 translatedPackage="com.soffid.iam.api")

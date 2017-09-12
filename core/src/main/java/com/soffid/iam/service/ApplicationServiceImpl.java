@@ -40,6 +40,8 @@ import com.soffid.iam.api.ApplicationAdministration;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
+import com.soffid.iam.api.Domain;
+import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.NetworkAuthorization;
@@ -838,7 +840,19 @@ public class ApplicationServiceImpl extends
 		   		if (rg.getRole().getName().equals(ra.getRoleName()) && 
 		   				rg.getRole().getSystem().getName().equals(ra.getSystem()))
 		   		{
-		   			if (rg.isEnabled())
+		   			// Granted on another group
+		   			if (rg.getGroup() != null && 
+		   					! rg.getGroup().getName().equals( ra.getDomainValue().getValue()))
+		   				continue ;
+		   			// Granted on another information system
+		   			else if (rg.getInformationSystem() != null && 
+		   					! rg.getInformationSystem().getName().equals( ra.getDomainValue().getValue()))
+		   				continue;
+		   			// Granted on another custom domain value
+		   			else if (rg.getDomainValue() != null && 
+		   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
+		   				continue ;
+		   			else if (rg.isEnabled())
 		   				return getRoleAccountEntityDao().toRoleAccount(rg);
 		   			else
 		   			{
@@ -2285,12 +2299,15 @@ public class ApplicationServiceImpl extends
 	@Override
 	protected Collection<Role> handleFindRoleByText(String text) throws Exception {
 		LinkedList<Role> result = new LinkedList<Role>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (RoleEntity ue : getRoleEntityDao().findByText(text)) {
 			Role u = getRoleEntityDao().toRole(ue);
 			if (getAuthorizationService().hasPermission(
 					Security.AUTO_ROLE_QUERY, ue)) {
 				result.add(u);
 			}
+			if (tou.timedOut())
+				return result;
 		}
 
 		return result;
@@ -2327,6 +2344,37 @@ public class ApplicationServiceImpl extends
 				}
 			}
 		}
+		return result;
+	}
+
+	@Override
+	protected Collection<Application> handleFindApplicationByText(String text) throws Exception {
+		LinkedList<Application> result = new LinkedList<Application>();
+		TimeOutUtils tou = new TimeOutUtils();
+		for (InformationSystemEntity ue : getInformationSystemEntityDao().findByText(text)) {
+			Application u = getInformationSystemEntityDao().toApplication(ue);
+			if (getAuthorizationService().hasPermission(
+					Security.AUTO_ROLE_QUERY, ue)) {
+				result.add(u);
+			}
+			if (tou.timedOut())
+				return result;
+		}
+
+		return result;
+	}
+
+	@Override
+	protected Collection<DomainValue> handleFindDomainValueByText(Domain domain, String text) throws Exception {
+		LinkedList<DomainValue> result = new LinkedList<DomainValue>();
+		TimeOutUtils tou = new TimeOutUtils();
+		for (DomainValueEntity ue : getDomainValueEntityDao().findByText(domain, text)) {
+			DomainValue u = getDomainValueEntityDao().toDomainValue(ue);
+			result.add(u);
+			if (tou.timedOut())
+				return result;
+		}
+
 		return result;
 	}
 }

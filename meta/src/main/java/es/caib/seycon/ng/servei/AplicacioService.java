@@ -18,7 +18,10 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.bpm.servei.BpmEngine;
+import es.caib.seycon.ng.comu.Domini;
+import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.model.TipusDadaEntity;
+import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
 @Service(translatedName = "ApplicationService", translatedPackage = "com.soffid.iam.service")
 @Depends({
@@ -37,6 +40,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 		es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
 		es.caib.seycon.ng.model.AplicacioEntity.class,
 		es.caib.seycon.ng.model.RolEntity.class,
+		ValorDominiAplicacioEntity.class,
 		// Services
 		es.caib.seycon.ng.servei.UsuariService.class,
 		es.caib.seycon.ng.servei.GrupService.class,
@@ -552,4 +556,22 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByText(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.ValorDomini> findDomainValueByText(
+			Domini domain,
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 }

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -138,6 +140,9 @@ public abstract class AplicacioEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+
+	@DaoFinder("from com.soffid.iam.model.AccountEntity  where :text is null")
+	public Collection<AplicacioEntity>findByText (String text) { return null; }
 }
 
 @Index (name="APL_UK_CODI",	unique=true,

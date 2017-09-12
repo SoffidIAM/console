@@ -14,19 +14,24 @@ import org.zkoss.zul.Label;
 
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Application;
+import com.soffid.iam.api.DomainValue;
+
 import es.caib.zkib.zkiblaf.ImageClic;
 
 public class Identity implements Comparable<Identity>{
 	public enum Type {
-		USER, ACCOUNT, ROLE, GROUP
+		USER, ACCOUNT, ROLE, GROUP, GRANT
 	} ;
 	
 	Type type;
 	
 	String label;
+	String selectorLabel;
 	
 	Object object;
 
@@ -50,6 +55,60 @@ public class Identity implements Comparable<Identity>{
 		type = Type.GROUP;
 		label = g.getName()+" - "+g.getDescription();
 		object = g;
+	}
+
+	public Identity (Role role, DomainValue domainValue)
+	{
+		type = Type.GRANT;
+		if (domainValue == null)
+		{
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription();
+		} else {
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+				+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+			selectorLabel = role.getName()+" @ "+role.getSystem()
+				+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		}
+		RoleAccount ra = generateRoleAccount(role);
+		ra.setDomainValue(domainValue);
+		object = ra;
+	}
+
+	public Identity (Role role, Group g)
+	{
+		type = Type.GRANT;
+		DomainValue domainValue = new DomainValue();
+		domainValue.setDescription(g.getDescription());
+		domainValue.setValue(g.getName());
+		label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+			+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		RoleAccount ra = generateRoleAccount(role);
+		ra.setDomainValue(domainValue);
+		object = ra;
+	}
+
+	private RoleAccount generateRoleAccount(Role role) {
+		RoleAccount ra = new RoleAccount();
+		ra.setRoleName(role.getName());
+		ra.setRoleDescription(role.getDescription());
+		ra.setRoleCategory(role.getCategory());
+		ra.setSystem(role.getSystem());
+		ra.setRoleCategory(role.getCategory());
+		ra.setInformationSystemName(role.getInformationSystemName());
+		return ra;
+	}
+
+	public Identity (Role role, Application app)
+	{
+		type = Type.GRANT;
+		DomainValue domainValue = new DomainValue();
+		domainValue.setDescription(app.getDescription());
+		domainValue.setValue(app.getName());
+		label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+			+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		RoleAccount ra = generateRoleAccount(role);
+		ra.setDomainValue(domainValue);
+		object = ra;
 	}
 
 	public Identity (Role r)
@@ -91,27 +150,30 @@ public class Identity implements Comparable<Identity>{
 		Image img = new Image (type == Type.USER ? "/img/user.png" :
 			type == Type.GROUP ? "/img/group.png" :
 			type == Type.ROLE ? "/img/key.png":
+			type == Type.GRANT ? "/img/key.png":
 				"/img/account.png");
 		d.appendChild(img);
-		if (search == null || search.trim().isEmpty() || label.length() == 0)
+		String l = selectorLabel == null ? label: selectorLabel;
+		
+		if (search == null || search.trim().isEmpty() || l.length() == 0)
 		{
-			Label l = new Label(label);
-			d.appendChild(l);
+			Label label = new Label(l);
+			d.appendChild(label);
 		}
 		else
 		{
-			boolean[] highlight = new boolean [label.length()];
+			boolean[] highlight = new boolean [l.length()];
 			for (int i = 0; i < highlight.length; i++)
 				highlight[i] = false;
 			
 			for (String s: search.trim().split(" +"))
 			{
-				int i = label.toUpperCase().indexOf(s.toUpperCase());
+				int i = l.toUpperCase().indexOf(s.toUpperCase());
 				while ( i >= 0)
 				{
 					for (int j = 0; j < s.length() && j + i < label.length(); j++)
 						highlight[i + j] = true;
-					i = label.toUpperCase().indexOf(s.toUpperCase(), i+1);
+					i = l.toUpperCase().indexOf(s.toUpperCase(), i+1);
 				}
 			}
 			
@@ -121,9 +183,9 @@ public class Identity implements Comparable<Identity>{
 			{
 				if (position == highlight.length || highlight[position] != highlight[start])
 				{
-					Label l = new Label(label.substring(start, position));
-					if (highlight[start]) l.setStyle("font-weight: bold");
-					d.appendChild(l);
+					Label label = new Label(l.substring(start, position));
+					if (highlight[start]) label.setStyle("font-weight: bold");
+					d.appendChild(label);
 					start = position;
 				}
 			}
@@ -137,10 +199,12 @@ public class Identity implements Comparable<Identity>{
 		d.setSclass(type == Type.USER ? "identity-tag-user" :
 			type == Type.GROUP ? "identity-tag-group" :
 			type == Type.ROLE ? "identity-tag-role":
+			type == Type.GRANT ? "identity-tag-role":
 				"identity-tag-account");
 		d.setAttribute("identity", this);
 		Image img = new Image (type == Type.USER ? "/img/user.png" :
 			type == Type.GROUP ? "/img/group.png" :
+			type == Type.GRANT ? "/img/key.png":
 			type == Type.ROLE ? "/img/key.png":
 				"/img/account.png");
 		d.appendChild(img);

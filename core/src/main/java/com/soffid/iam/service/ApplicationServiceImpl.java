@@ -13,7 +13,6 @@
  */
 package com.soffid.iam.service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -31,7 +30,6 @@ import java.util.Vector;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
-import org.json.JSONException;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -77,9 +75,6 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
-import com.soffid.scimquery.conf.AttributeConfig;
-import com.soffid.scimquery.conf.ClassConfig;
-import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
@@ -2226,9 +2221,9 @@ public class ApplicationServiceImpl extends
 	@Override
 	protected Collection<Role> handleFindRoleByJsonQuery(String query)
 			throws InternalErrorException, Exception {
-		
-		
-		ClassConfig config = getRoleJsonConfiguration();
+
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(RoleAttributeEntityImpl.class);
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(Role.class);
@@ -2262,26 +2257,6 @@ public class ApplicationServiceImpl extends
 		return result;
 	}
 
-	private ClassConfig getRoleJsonConfiguration()
-			throws UnsupportedEncodingException, JSONException, ClassNotFoundException 
-	{
-		ClassConfig cc = Configuration
-				.getClassConfig(RoleAttributeEntityImpl.class);
-		
-		if (cc == null)
-		{
-			cc = new ClassConfig();
-			AttributeConfig attributeConfig = new AttributeConfig();
-			attributeConfig.setVirtualAttribute(true);
-			attributeConfig.setVirtualAttributeValue("value");
-			attributeConfig.setVirtualAttributeName("attribute.name");
-			cc.setDefaultVirtualAttribute(attributeConfig);
-			Configuration.registerClass(cc);
-		}
-
-		return Configuration.getClassConfig(com.soffid.iam.api.Role.class);
-	}
-
 	@Override
 	protected Collection<Role> handleFindRoleByText(String text) throws Exception {
 		LinkedList<Role> result = new LinkedList<Role>();
@@ -2298,6 +2273,9 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
+
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(ApplicationAttributeEntity.class);
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);

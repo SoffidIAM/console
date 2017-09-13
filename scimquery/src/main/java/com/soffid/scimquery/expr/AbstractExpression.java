@@ -3,13 +3,10 @@ package com.soffid.scimquery.expr;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 import org.json.JSONException;
 
@@ -200,7 +197,7 @@ public abstract class AbstractExpression implements Serializable {
 					String obj = (ctx.objectName);
 					int i = query.getNextParameter();
 					String param  = "p"+i;
-					ctx.objectCondition = obj+"."+attConfig.getVirtualAttributeName()+"=:"+param;
+					ctx.objectCondition = obj+"."+attConfig.getVirtualAttributeName()+"=:"+param+" and ";
 					ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 					query.getParameters().put(param, part);
 				} else {
@@ -357,7 +354,8 @@ public abstract class AbstractExpression implements Serializable {
 		
 		return cl.isPrimitive() ||
 				cl.getPackage().getName().startsWith("java.") ||
-				cl.getPackage().getName().startsWith("javax.");
+				cl.getPackage().getName().startsWith("javax.") ||
+				cl.getName().equals("es.caib.seycon.ng.comu.AccountType");
 	}
 
 	public HQLQuery generateHSQLString (Class clazz) throws EvalException, UnsupportedEncodingException, ClassNotFoundException, JSONException

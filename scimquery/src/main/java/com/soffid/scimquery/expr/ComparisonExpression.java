@@ -378,23 +378,23 @@ public class ComparisonExpression extends AbstractExpression {
 				}
 				else if ("sw".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-						.append(ctx.objectName)
-						.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("ew".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-					.append(ctx.objectName)
-					.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, "%"+value.toString().toUpperCase(), String.class);
 				}
 				else if ("co".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-					.append(ctx.objectName)
-					.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, "%"+value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("pr".equalsIgnoreCase(operator))

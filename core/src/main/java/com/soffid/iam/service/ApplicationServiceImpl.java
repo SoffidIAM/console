@@ -2237,7 +2237,7 @@ public class ApplicationServiceImpl extends
 			throws InternalErrorException, Exception {
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(RoleAttributeEntityImpl.class);
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(RoleAttributeEntityImpl.class, "metadata.name", "value");
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(Role.class);
@@ -2292,7 +2292,7 @@ public class ApplicationServiceImpl extends
 	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(ApplicationAttributeEntity.class);
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value");
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);

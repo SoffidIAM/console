@@ -2998,7 +2998,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			throws InternalErrorException, Exception {
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(UserDataEntity.class);
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);

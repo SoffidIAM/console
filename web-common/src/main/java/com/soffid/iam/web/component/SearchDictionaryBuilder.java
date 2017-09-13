@@ -65,7 +65,7 @@ public class SearchDictionaryBuilder {
 			map.put(clazz, sd);
 		}
 		if (clazz.equals("com.soffid.iam.api.User")) {
-			sd = addAttributes (sd, MetadataScope.USER);
+			sd = addUserAttributes (sd, MetadataScope.USER);
 		} else if (clazz.equals("com.soffid.iam.api.Role")) {
 			sd = addAttributes (sd, MetadataScope.ROLE);
 		} else if (clazz.equals("com.soffid.iam.api.Application")) {
@@ -76,7 +76,7 @@ public class SearchDictionaryBuilder {
 			sd = addAccountAttributes (sd);
 		}
 		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
-			sd = addAttributes (sd, MetadataScope.CUSTOM, clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()));
+			sd = addCustomAttributes (sd, MetadataScope.CUSTOM, clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()));
 		return sd;
 	}
 
@@ -147,6 +147,14 @@ public class SearchDictionaryBuilder {
 	}
 
 	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope) throws InternalErrorException, NamingException, CreateException {
+		return addAttributes(sd1, scope, "attributes");
+	}
+
+	private static SearchDictionary addUserAttributes(SearchDictionary sd1, MetadataScope scope) throws InternalErrorException, NamingException, CreateException {
+		return addAttributes(sd1, scope, "userData");
+	}
+
+	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope, String attributesPath) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
 		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
 		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypes(scope))
@@ -157,7 +165,7 @@ public class SearchDictionaryBuilder {
 				SearchAttributeDefinition sad = new SearchAttributeDefinition();
 				sad.setLocalizedName(att.getLabel());
 				sad.setType(att.getType());
-				sad.setName("attributes."+att.getCode());
+				sad.setName(attributesPath+"."+att.getCode());
 				if (att.getValues() != null && ! att.getValues().isEmpty())
 				{
 					sad.setLabels(att.getValues());
@@ -223,7 +231,9 @@ public class SearchDictionaryBuilder {
 		sd.getAttributes().add(sad);
 	}
 
-	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope, String objectType) throws InternalErrorException, NamingException, CreateException {
+
+
+	private static SearchDictionary addCustomAttributes(SearchDictionary sd1, MetadataScope scope, String objectType) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
 		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
 		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName(objectType, null))

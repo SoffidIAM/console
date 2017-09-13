@@ -448,7 +448,6 @@
 		<dependency>
 			<groupId>org.jbpm.jbpm3</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
-			<version>3.3.1.GA</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jackrabbit-core</artifactId>
@@ -479,7 +478,6 @@
 		<dependency>
 			<groupId>org.beanshell</groupId>
 			<artifactId>bsh</artifactId>
-			<version>2.0b4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -574,7 +572,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>iam-tomee</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

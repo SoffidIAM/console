@@ -54,7 +54,6 @@
 		<dependency>
 			<artifactId>jbpm-jpdl</artifactId>
 			<groupId>org.jbpm.jbpm3</groupId>
-			<version>3.3.1.GA</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>

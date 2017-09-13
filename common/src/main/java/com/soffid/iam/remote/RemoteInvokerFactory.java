@@ -7,6 +7,8 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.rmi.RemoteException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -34,7 +36,7 @@ public class RemoteInvokerFactory {
             c.setDoOutput(false);
             c.setAllowUserInteraction(false);
             if (authToken != null) {
-                String seu = "-seu-:"+authToken; //$NON-NLS-1$
+                String seu = "-seu-"+tenantName+":"+authToken; //$NON-NLS-1$
                 byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
                 String tag = "Basic "+ Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES); //$NON-NLS-1$
                 c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
@@ -63,8 +65,11 @@ public class RemoteInvokerFactory {
 	                		Thread.currentThread().getContextClassLoader());
             	}
             }
-            return Proxy.newProxyInstance(RemoteInvokerFactory.class.getClassLoader(),
-                    interfaces, new HttpInvokerHandler(url, tenantName, authToken));
+            HttpInvokerHandler invoker = new HttpInvokerHandler(url, tenantName, authToken);
+            invoker.setHeadersFactory(headersFactory);
+            
+			return Proxy.newProxyInstance(RemoteInvokerFactory.class.getClassLoader(),
+                    interfaces, invoker);
         } catch (IllegalArgumentException e) {
             throw new RemoteException ("Nested exception", e); //$NON-NLS-1$
         } catch (ClassNotFoundException e) {
@@ -72,4 +77,13 @@ public class RemoteInvokerFactory {
         }
     }
 
+    public static List<HeadersFactory> headersFactory = new LinkedList<HeadersFactory>();
+    public static void addHeadersFactory(HeadersFactory f)
+    {
+    	headersFactory.add(f);
+    }
+    public static final List<HeadersFactory> getHeadersFactory()
+    {
+    	return headersFactory;
+    }
 }

@@ -2,6 +2,7 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
@@ -241,13 +242,21 @@ public class AccountEntityDaoImpl extends
 			} catch (InternalErrorException e) {
 				throw new RuntimeException(e);
 			}
-			log.info("Get from db: "+ (System.currentTimeMillis() - start));
+
+			if (target.getStatus() == null)
+			{
+				target.setStatus( target.isDisabled() ? AccountStatus.DISABLED : AccountStatus.ACTIVE);
+			}
+			else
+			{
+				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE);
+			}
+
 			start = System.currentTimeMillis();
 			if ( ! Security.isSyncServer())
 			{
 				storeCacheEntry(source, target);
 			}
-			log.info("Store in cache: "+ (System.currentTimeMillis() - start));
 	
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
@@ -310,6 +319,7 @@ public class AccountEntityDaoImpl extends
 		target.setType(entry.account.getType());
 		target.setVaultFolder(entry.account.getVaultFolder());
 		target.setVaultFolderId(entry.account.getVaultFolderId());
+		target.setStatus(entry.account.getStatus());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
@@ -376,6 +386,14 @@ public class AccountEntityDaoImpl extends
 	public void accountToEntity(Account source,
 			com.soffid.iam.model.AccountEntity target, boolean copyIfNull) {
 		super.accountToEntity(source, target, copyIfNull);
+		if (target.getStatus() == null)
+		{
+			target.setStatus( target.isDisabled() ? AccountStatus.DISABLED : AccountStatus.ACTIVE);
+		}
+		else
+		{
+			target.setDisabled( target.getStatus() != AccountStatus.ACTIVE);
+		}
 		SystemEntity dispatcher = getSystemEntityDao().findByName(
 				source.getSystem());
 		if (dispatcher == null)

@@ -61,6 +61,10 @@
 				import es.caib.zkib.datasource.XPathUtils;
 				import es.caib.seycon.ng.comu.*;
 				
+				statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
+				statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
+				statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
+
 				model.getJXPathContext().getVariables().declareVariable("queryEnabled", false);
 
 				String requestedAccount = Executions.getCurrent().getNativeRequest().getParameter("account");
@@ -515,13 +519,16 @@
 						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@lastPasswordSet"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
 						<listcell ><datebox readonly="true" sclass="dateboxreadnoborder" buttonVisible="false" bind="@passwordExpiration"  format="${c:l('usuaris.zul.dateFormat')}"/></listcell>
 						<listcell>
-												<listbox bind="@disabled" disabled="true"
+												<listbox bind="@status" disabled="true"
 													mold="label">
-													<listitem value="${false}">
+													<listitem value="${statusEnabled}">
 														<listcell label="${c:l('accounts.Enabled')}" />
 													</listitem>
-													<listitem value="${true}">
+													<listitem value="${statusDisabled}">
 														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+													<listitem value="${statusRemoved}">
+														<listcell label="${c:l('accounts.Removed')}" />
 													</listitem>
 												</listbox>
 						</listcell>
@@ -643,13 +650,16 @@
 											</row>
 											<row>
 												<input_etiqueta value="${c:l('accounts.status')}:" />
-												<listbox bind="@disabled" id="lbAccountDisabled"
+												<listbox bind="@status" id="lbAccountDisabled"
 													mold="select">
-													<listitem value="${false}">
+													<listitem value="${statusEnabled}">
 														<listcell label="${c:l('accounts.Enabled')}" />
 													</listitem>
-													<listitem value="${true}">
+													<listitem value="${statusDisabled}">
 														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+													<listitem value="${statusRemoved}">
+														<listcell label="${c:l('accounts.Removed')}" />
 													</listitem>
 												</listbox>
 											</row>

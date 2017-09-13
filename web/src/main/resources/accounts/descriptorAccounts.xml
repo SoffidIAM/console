@@ -53,6 +53,7 @@
 				bean.setOwnerUsers ( new LinkedList()) ;
 				bean.setOwnerRoles (new LinkedList());
 				bean.setOwnerGroups (new LinkedList());
+				bean.setStatus(com.soffid.iam.api.AccountStatus.ACTIVE);
 				return bean;
 			</new-instance-script>
 			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService"

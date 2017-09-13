@@ -31,7 +31,12 @@
 			start();
 		]]></attribute>
 
-		<zscript><![CDATA[		                  
+		<zscript><![CDATA[		 
+		// Used for grants		                  
+		com.soffid.iam.api.Role currentRole = null;
+		String currentRolePrefix = null;
+		boolean grantMode = false;
+		
 		void start () {		                  
 			identityWindow.setTitle( title );
 			identityWindow.doHighlighted();
@@ -41,6 +46,12 @@
 				for (com.soffid.iam.web.component.Identity id: currentIdentities) {
 					selected.appendChild(id.generateTag(true) );
 				}
+			}
+			grantMode = false;
+			for (com.soffid.iam.web.component.Identity.Type type: types)
+			{
+				if (type == com.soffid.iam.web.component.Identity.Type.GRANT)
+					grantMode = true;
 			}
 			textbox.setValue("");
 			result.getChildren().clear();
@@ -65,10 +76,64 @@
 			Events.sendEvent(new Event("onIdentity", invoker, identities));
 			
 		}
+
+		void selectCandidate (Event e)
+		{
+			com.soffid.iam.web.component.Identity id = e.getTarget().getAttribute("identity");
+			e.getTarget().detach();
+			for (Component child: selected.getChildren())
+			{
+				com.soffid.iam.web.component.Identity id2 = child.getAttribute("identity");
+				if (id.equals(id2))
+					return;
+			}
+			if (grantMode && id.getObject() instanceof com.soffid.iam.api.Role)
+			{
+				com.soffid.iam.api.Role role = id.getObject(); 
+				if (id.getObject().getDomain() == null ||
+						id.getObject().getDomain().getName().equals(es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI))
+					id = new com.soffid.iam.web.component.Identity( role, (com.soffid.iam.api.DomainValue) null);
+				else
+				{
+					currentRolePrefix = role.getName()+" @ "+role.getSystem()+" / ";
+					currentRole = role;
+					textbox.setValue(currentRolePrefix);
+					textbox.focus();
+					textbox.setSelectionRange(currentRolePrefix.length(), currentRolePrefix.length());
+					result.getChildren().clear();
+					if (role.getDomain().getExternalCode() != null)
+						search(currentRolePrefix);
+					return;
+				}
+			}
+				
+			selected.appendChild(id.generateTag(true) );
+			textbox.focus();
+			textbox.setSelectionRange(0, textbox.getText().length());
+		}
 		
 		void search(String t) throws Exception
 		{
 			List ids = new LinkedList();
+			searchSomething (t, ids);
+
+			Collections.sort(ids, com.soffid.iam.web.component.Identity.getComparator());
+			result.getChildren().clear();
+			for (com.soffid.iam.web.component.Identity id: ids)
+			{
+				Div d = id.generateSelector(t);
+				result.appendChild(d);
+				d.addEventListener("onClick", new org.zkoss.zk.ui.event.EventListener(){
+					public void onEvent(Event e)
+					{
+						selectCandidate(e);
+					}
+				});
+			}
+		}
+		
+		void searchSomething (String t, List ids)
+		{
 			for (com.soffid.iam.web.component.Identity.Type type: types)
 			{
 				if (type == com.soffid.iam.web.component.Identity.Type.USER)
@@ -87,32 +152,12 @@
 				{
 					searchGroups(t, ids);
 				}
+				if (type == com.soffid.iam.web.component.Identity.Type.GRANT)
+				{
+					searchGrants(t, ids);
+				}
 			}
-
-			Collections.sort(ids, com.soffid.iam.web.component.Identity.getComparator());
-			result.getChildren().clear();
-			for (com.soffid.iam.web.component.Identity id: ids)
-			{
-				Div d = id.generateSelector(t);
-				result.appendChild(d);
-				d.addEventListener("onClick", new org.zkoss.zk.ui.event.EventListener(){
-					public void onEvent(Event e)
-					{
-						com.soffid.iam.web.component.Identity id = e.getTarget().getAttribute("identity");
-						e.getTarget().detach();
-						for (Component child: selected.getChildren())
-						{
-							com.soffid.iam.web.component.Identity id2 = child.getAttribute("identity");
-							if (id.equals(id2))
-								return;
-						}
-						selected.appendChild(id.generateTag(true) );
-						textbox.focus();
-						textbox.setSelectionRange(0, textbox.getText().length());
-					}
-				});
-			}
-}
+		}
 		
 		void searchUsers (String t, List ids) {
 			Collection users = com.soffid.iam.EJBLocator.getUserService().findUserByText(t);
@@ -146,6 +191,72 @@
 			}
 		}
 
+		void searchGroups (com.soffid.iam.api.Role role, String t, List ids) {
+			Collection groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByText(t);
+			for (com.soffid.iam.api.Group group: groups) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, group);
+				ids.add(id);
+			}
+		}
+
+		void searchApplications (com.soffid.iam.api.Role role, String t, List ids) {
+			Collection apps = com.soffid.iam.EJBLocator.getGroupService().findApplicationsByText(t);
+			for (com.soffid.iam.api.Application app: apps) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, app);
+				ids.add(id);
+			}
+		}
+
+		void searchGrants (String t, List ids) {
+			
+			if ( currentRole == null || currentRolePrefix == null)
+				searchRoles(t, ids);
+			else if (t.startsWith(currentRolePrefix))
+			{
+
+				String t2 = t.substring(currentRolePrefix.length());
+				if (currentRole.getDomain().getExternalCode() != null)
+				{
+					searchDomainValues (currentRole, currentRole.getDomain(), t2, ids);
+				}
+				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.APLICACIONS))
+				{
+					searchApplications (currentRole, t2, ids);
+				}
+				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS))
+				{
+					searchGroups(currentRole, t2, ids);
+				}
+				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS_USUARI))
+				{
+					searchGroups(currentRole, t2, ids);
+				}
+			} else {
+				if (currentRolePrefix.startsWith(t))
+				{
+					currentRole = null;
+					currentRolePrefix = null;
+
+					textbox.setValue("");
+
+					
+					page.getFellow("identityWindow").getFellow("result").getChildren().clear();
+				} else {
+					currentRole = null;
+					currentRolePrefix = null;
+				}
+			}
+		}
+		                  
+		void searchDomainValues (com.soffid.iam.api.Role role,
+				com.soffid.iam.api.Domain domain, String t, List ids) {
+			Collection values = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByText(domain, t);
+			for (com.soffid.iam.api.DomainValue dv: values) {
+				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, dv);
+				ids.add(id);
+			}
+		}
+
 		]]></zscript>
 
 		<div style="padding: 3em">
@@ -155,7 +266,7 @@
 			    search (event.value);                            
 			]]></attribute>
 			</textbox>
-			<div id="result"/>
+			<div id="result" style="max-height:12em; overflow-x:hidden; overflow-y:auto"/>
 		</div>
 		
 		<div style="float: right;">

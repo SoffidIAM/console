@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingTrigger;
 import com.soffid.iam.api.SoffidObjectType;
 
 public class ExtensibleObjectMapping extends ObjectMapping
@@ -16,7 +17,8 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	
 	Map<String,String> properties = null;
 	Collection<AttributeMapping> attributes =  null;
-	
+	Collection<ObjectMappingTrigger> triggers =  null;
+
 	public Collection<AttributeMapping> getAttributes()
 	{
 		return attributes;
@@ -43,9 +45,16 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	}
 
 	public ExtensibleObjectMapping(Long id, String systemObject,
-			SoffidObjectType soffidObject, String condition, Long dispatcherId)
+			SoffidObjectType soffidObject, String condition, Long dispatcherId, boolean authoritative)
 	{
-		super(id, systemObject, soffidObject, condition, dispatcherId);
+		super(id, systemObject, soffidObject, null, condition, dispatcherId, false);
+	}
+
+	public ExtensibleObjectMapping(Long id, String systemObject,
+			SoffidObjectType soffidObject, String customObjectType,
+			String condition, Long dispatcherId)
+	{
+		super(id, systemObject, soffidObject, customObjectType, condition, dispatcherId, false);
 	}
 
 	public ExtensibleObjectMapping(ObjectMapping otherBean)
@@ -56,7 +65,7 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	public ExtensibleObjectMapping(String systemObject,
 			SoffidObjectType soffidObject, Long dispatcherId)
 	{
-		super(systemObject, soffidObject, dispatcherId);
+		super(systemObject, soffidObject, dispatcherId, false); 
 	}
 	
 	public static ExtensibleObjectMapping toExtensibleObjectMapping (es.caib.seycon.ng.sync.intf.ExtensibleObjectMapping other)
@@ -81,6 +90,16 @@ public class ExtensibleObjectMapping extends ObjectMapping
 				target.add ( toExtensibleObjectMapping(obj));
 		}
 		return target;
+	}
+
+	public Collection<ObjectMappingTrigger> getTriggers()
+	{
+		return triggers;
+	}
+
+	public void setTriggers(Collection<ObjectMappingTrigger> triggers)
+	{
+		this.triggers = triggers;
 	}
 
 }

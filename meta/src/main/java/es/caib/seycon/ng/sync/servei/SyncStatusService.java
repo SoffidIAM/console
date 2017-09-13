@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.sync.servei;
 import java.util.Map;
 
+import com.soffid.iam.api.ScheduledTask;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.SoffidObjectType;
@@ -33,21 +34,21 @@ public abstract class SyncStatusService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	@Operation(translated="getSyncAgentsInfo")
-	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getSeyconAgentsInfo()
+	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getSeyconAgentsInfo(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
 	
 	@Operation(translated="getSyncServerStatus")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerStatus()
+	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerStatus(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
 
 	@Operation(translated="getSyncServerInfo")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerInfo()
+	public es.caib.seycon.ng.comu.SeyconServerInfo getSeyconServerInfo(String tenant)
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.io.IOException, es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -115,4 +116,17 @@ public abstract class SyncStatusService {
 	{
 		
 	}
+	
+	public void startScheduledTask (ScheduledTask t)
+	{
+		
+	}
+	
+	public Map<String,Object> getNativeObject (String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2)
+	{ return null; }
+
+	public Map<String,Object> getSoffidObject (String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2)
+	{ return null; }
 }

@@ -202,10 +202,10 @@
 									"tenant:query");
 							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
 									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
-									"seu:tenant:create");
+									"tenant:create");
 							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
 									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
-									"seu:tenant:update");
+									"tenant:update");
 						}
 					} catch (Exception e) {
 						form.getFellow("form_name").getFellow("dada").setDisabled(true);

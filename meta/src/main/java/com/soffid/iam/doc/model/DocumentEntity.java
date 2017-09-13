@@ -1,5 +1,6 @@
 package com.soffid.iam.doc.model;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Entity;
@@ -26,6 +27,12 @@ public class DocumentEntity {
 	@Column(name="DOC_FS_PATH", length=128)
 	@Nullable
 	String fsPath;
+	
+	@Column(name="DOC_TEN_ID")
+	@Nullable
+	TenantEntity tenant;
+	
+	
 	
 	public String getApplication () {return null;}
 	public int getYear() { return 0;}

@@ -1,6 +1,7 @@
 package com.soffid.iam.authoritative.service;
 
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
+import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Operation;
@@ -10,6 +11,7 @@ import es.caib.bpm.servei.BpmConfigService;
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
+import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.DadesAddicionalsService;
 import es.caib.seycon.ng.servei.GrupService;
@@ -24,7 +26,9 @@ import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
 	GrupService.class,
 	AuditoriaEntity.class,
 	UsuariService.class,
-	DadesAddicionalsService.class
+	DadesAddicionalsService.class,
+	CustomObjectService.class,
+	GrupEntity.class
 })
 @Service(internal=true) 
 public class AuthoritativeChangeService {

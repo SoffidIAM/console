@@ -3034,12 +3034,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	@Override
 	protected Collection<User> handleFindUserByText(String text) throws Exception {
 		LinkedList<User> result = new LinkedList<User>();
+		TimeOutUtils tou = new TimeOutUtils();
 		for (UserEntity ue : getUserEntityDao().findByText(text)) {
 			User u = getUserEntityDao().toUser(ue);
 			if (getAuthorizationService().hasPermission(
 					Security.AUTO_USER_QUERY, ue)) {
 				result.add(u);
 			}
+			if (tou.timedOut())
+				return result;
 		}
 
 		return result;

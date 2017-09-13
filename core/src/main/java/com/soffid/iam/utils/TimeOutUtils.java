@@ -17,10 +17,15 @@ public class TimeOutUtils {
 		initialTime = Calendar.getInstance();
 	}
 
-	public void checkTimeOut() throws InternalErrorException {
+	public boolean timedOut ()
+	{
 		Calendar currentTime = Calendar.getInstance();
 		long miliseconds = currentTime.getTimeInMillis() - initialTime.getTimeInMillis();
-		if (miliseconds > GLOBAL_TIMEOUT)
+		return miliseconds > GLOBAL_TIMEOUT;
+	}
+	
+	public void checkTimeOut() throws InternalErrorException {
+		if (timedOut())
 			throw new InternalErrorException(String.format(Messages.getString(MESSAGE_RAISETIMEOUT), GLOBAL_TIMEOUT));
 	}
 

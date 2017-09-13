@@ -8,6 +8,8 @@ package com.soffid.iam.service;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ServerEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( translatedName="ScheduledTaskService",
@@ -16,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 	com.soffid.iam.model.ScheduledTaskEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
-	es.caib.seycon.ng.servei.ConfiguracioService.class})
+	es.caib.seycon.ng.servei.ConfiguracioService.class,
+	ServerEntity.class})
 public abstract class ScheduledTaskService {
 
 	@Description("Finds a scheduled task by handler and params")
@@ -67,12 +70,21 @@ public abstract class ScheduledTaskService {
 		com.soffid.iam.api.ScheduledTask task)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
 	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<com.soffid.iam.api.ScheduledTask> listTasks()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List<com.soffid.iam.api.ScheduledTask> listServerTasks(String server)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void registerStartTask(
 		com.soffid.iam.api.ScheduledTask task)
@@ -83,4 +95,7 @@ public abstract class ScheduledTaskService {
 		com.soffid.iam.api.ScheduledTask task)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
+	public void startNow(ScheduledTask task) {}
 }

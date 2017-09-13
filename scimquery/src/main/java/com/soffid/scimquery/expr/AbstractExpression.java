@@ -198,9 +198,10 @@ public abstract class AbstractExpression implements Serializable {
 				if (attConfig.isVirtualAttribute())
 				{
 					String obj = (ctx.objectName);
-					ctx.objectName = obj+"."+attConfig.getVirtualAttributeName()+"=? and "+obj+"."+attConfig.getVirtualAttributeValue();
 					int i = query.getNextParameter();
 					String param  = "p"+i;
+					ctx.objectCondition = obj+"."+attConfig.getVirtualAttributeName()+"=:"+param;
+					ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 					query.getParameters().put(param, part);
 				} else {
 					ctx.objectName = ctx.objectName+"."+part;					
@@ -383,6 +384,7 @@ public abstract class AbstractExpression implements Serializable {
 
 
 class EvaluationContext {
+	public String objectCondition;
 	boolean nonHQLAttributeUsed = false;
 	ClassConfig currentBean;
 	String hibernateClass;

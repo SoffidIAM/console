@@ -835,15 +835,10 @@ public class DispatcherServiceImpl extends
 	protected Collection<Server> handleFindAllServers() throws Exception {
 		ServerEntityDao dao = getServerEntityDao();
 		Collection<ServerEntity> db;
-		if (Security.isUserInRole(Security.AUTO_TENANT_QUERY))
-			db = dao.loadAll();
-		else
-			db = dao.findByTenant(Security.getCurrentTenantName());
 		List<Server> servers = new LinkedList<Server>(); 
-		for (ServerEntity server: db)
+		if (Security.isMasterTenant() && Security.isUserInRole(Security.AUTO_TENANT_QUERY))
 		{
-			if (Security.isUserInRole(Security.AUTO_TENANT_QUERY) ||
-					server.getType() == ServerType.PROXYSERVER)
+			for (ServerEntity server: dao.loadAll())
 			{
 				Server vo = getServerEntityDao().toServer(server);
 				vo.setAuth(null);
@@ -852,9 +847,37 @@ public class DispatcherServiceImpl extends
 				servers.add(vo);
 			}
 		}
+		else
+		{
+			for (ServerEntity server: dao.findByTenant(Security.getCurrentTenantName()))
+			{
+				Server vo = getServerEntityDao().toServer(server);
+				vo.setAuth(null);
+				vo.setPk(null);
+				vo.setPublicKey(null);
+				servers.add(vo);
+			}
+		}
+		
 		return servers;
 	}
 
+	@Override
+	protected Collection<Server> handleFindTenantServers() throws Exception {
+		ServerEntityDao dao = getServerEntityDao();
+		Collection<ServerEntity> db;
+		List<Server> servers = new LinkedList<Server>(); 
+		for (ServerEntity server: dao.findByTenant(Security.getCurrentTenantName()))
+		{
+			Server vo = getServerEntityDao().toServer(server);
+			vo.setAuth(null);
+			vo.setPk(null);
+			vo.setPublicKey(null);
+			servers.add(vo);
+		}
+		
+		return servers;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1317,7 +1340,7 @@ public class DispatcherServiceImpl extends
 			updateRole.setTransaction("UpdateGroup");
 			updateRole.setGroup(g.getName());
 			updateRole.setTaskDate(Calendar.getInstance());
-			updateRole.setSystemName(codiAgent);
+			updateRole.setDatabase(codiAgent);
 			updateRole.setStatus("P");
 			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
 			getTaskEntityDao().createNoFlush(tasca);
@@ -1492,5 +1515,25 @@ public class DispatcherServiceImpl extends
 			
 		});
 		return list;
+	}
+
+	@Override
+	protected Map<String, Object> handleGetNativeObject(String dispatcher, SoffidObjectType type, String object1,
+			String object2) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.getNativeObject(dispatcher, type, object1, object2);
+	}
+
+	@Override
+	protected Map<String, Object> handleGetSoffidObject(String dispatcher, SoffidObjectType type, String object1,
+			String object2) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.getSoffidObject(dispatcher, type, object1, object2);
 	}
 }

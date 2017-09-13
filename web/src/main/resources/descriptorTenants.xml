@@ -37,6 +37,7 @@
 			<script-finder>
 				server = new com.soffid.iam.api.Server ();
 				server.setName ("- Select -");
+				return server;
 			</script-finder>
 			<ejb-finder jndi="java:comp/env/ejb/v2/DispatcherEJB"
 				method="findAllServers"> <!-- parameter:query -->

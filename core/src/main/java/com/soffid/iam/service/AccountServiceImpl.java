@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
@@ -151,7 +152,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		acc.setPasswordPolicy(ue.getUserType());
 
 	    		com.soffid.iam.api.System dispatcher = getDispatcherService().findDispatcherByName(de.getName());
-	    		acc.setDisabled( ! getDispatcherService().isUserAllowed(dispatcher, ue.getUserName()));
+	    		if (getDispatcherService().isUserAllowed(dispatcher, ue.getUserName()))
+	    		{
+	    			acc.setDisabled( false );
+	    			acc.setStatus(AccountStatus.ACTIVE);
+	    		} else {
+	    			acc.setDisabled( true );
+	    			if (acc.getStatus() == AccountStatus.ACTIVE)
+	    				acc.setStatus(AccountStatus.DISABLED);
+	    		}
 	    		
 	    		getAccountEntityDao().update(acc);
 			}
@@ -164,7 +173,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     		acc.setName(name);
     		acc.setType(AccountType.USER);
     		acc.setPasswordPolicy(ue.getUserType());
-    		acc.setDisabled(! "S".equals(ue.getActive()));
+    		acc.setPasswordPolicy( ue.getUserType() );
+    		if ( "S".equals(ue.getActive()) )
+    		{
+	    		acc.setDisabled(false);
+	    		acc.setStatus(AccountStatus.ACTIVE);
+    		} else {
+	    		acc.setDisabled(true);
+	    		acc.setStatus(AccountStatus.REMOVED);
+    		}
     		getAccountEntityDao().create(acc);
 		}
 
@@ -564,10 +581,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 for (AccountEntity acc : accs) {
                     if (acc.isDisabled() && "S".equals(ue.getActive())) {
                         acc.setDisabled(false);
+						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
                     }
                     if (!acc.isDisabled() && !"S".equals(ue.getActive())) {
                         acc.setDisabled(true);
+						acc.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(acc);
                     }
                 }
@@ -588,6 +607,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                             if (acc.isDisabled() || !description.equals(acc.getDescription())) {
                                 acc.setDisabled(false);
                                 acc.setDescription(description);
+    							acc.setStatus(AccountStatus.ACTIVE);
                                 getAccountEntityDao().update(acc);
                             }
                         }
@@ -596,6 +616,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     for (AccountEntity acc : accs) {
                         if (!acc.isDisabled() || !description.equals(acc.getDescription())) {
                             acc.setDisabled(true);
+    						acc.setStatus(AccountStatus.DISABLED);
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
                         }

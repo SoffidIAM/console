@@ -363,7 +363,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     protected java.util.Collection<AgentDescriptor> handleGetAgentDescriptors()
             throws java.lang.Exception {
         LinkedList<AgentDescriptorEntity> v = new LinkedList<AgentDescriptorEntity>();
-        for (Iterator<ServerPluginEntity> itPlugin = getServerPluginEntityDao().loadAll()
+        for (Iterator<ServerPluginEntity> itPlugin = getServerPluginEntityDao().findAll()
                 .iterator(); itPlugin.hasNext();) {
             ServerPluginEntity sp = (ServerPluginEntity) itPlugin.next();
         	String tenant = sp.getTenant().getName();

@@ -109,7 +109,6 @@
 							retrySearch = true;
 							search();
 						}
-						
 						else
 						{
 							esquema.tancaDetalls(); //amaguem dades..
@@ -157,12 +156,14 @@
 						view_search_criteria = true;
 					}
 				}
+
 				void select () {
-							if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and
-								esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null) {
-								showDetall ();
-							}
-						}
+					if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null &&
+						esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null) {
+						showDetall ();
+					}
+				}
+				
 				void updateFormFields() {
 					if (canCreateRules
 							&& esquema.getFellow("lista").getFellow("listbox").selectedItem != null
@@ -177,6 +178,7 @@
 					}
 					esquema.getFellow("dades").getFellow("ru_script").refresh();
 				}
+
 				void showLista() {
 					esquema.getFellow("lista").getFellow("listbox").clearSelection();
 					esquema.getFellow("lista").getFellow("listbox").setRows(fileresO);

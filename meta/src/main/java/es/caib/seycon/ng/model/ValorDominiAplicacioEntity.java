@@ -5,9 +5,12 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
 import java.util.List;
 
 import com.soffid.mda.annotation.*;
+
+import es.caib.seycon.ng.comu.Domini;
 
 @Entity (table="SC_VALOR_DOMINI", translatedName="DomainValueEntity", translatedPackage="com.soffid.iam.model"  )
 @Depends ({es.caib.seycon.ng.comu.ValorDomini.class,
@@ -72,6 +75,9 @@ public abstract class ValorDominiAplicacioEntity {
 		java.lang.String domain) {
 	 return null;
 	}
+
+	@DaoFinder("-")
+	public Collection<ValorDominiAplicacioEntity>findByText (Domini domain, String text) { return null; }
 }
 
 @Index (name="UNIQUE_VALOR_DOMINI",	unique=true,

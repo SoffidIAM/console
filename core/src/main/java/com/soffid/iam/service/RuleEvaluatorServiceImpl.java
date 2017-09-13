@@ -74,9 +74,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	}
 
 	protected void doApply(RuleEntity rule, UserEntity user, InterpreterEnvironment env) throws Exception {
-		Security.nestedLogin(Security.getCurrentAccount(), new String [] {
-			Security.AUTO_AUTHORIZATION_ALL
-		});
+		Security.nestedLogin(Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
 		try {
 			RoleAccountEntityDao raDao = getRoleAccountEntityDao();
 			Object result = null;

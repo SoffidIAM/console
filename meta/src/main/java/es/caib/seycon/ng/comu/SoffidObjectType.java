@@ -32,4 +32,6 @@ public class SoffidObjectType {
 
 	public java.lang.String OBJECT_MAIL_LIST="mailList";
 
+	public java.lang.String OBJECT_CUSTOM="custom";
+
 }

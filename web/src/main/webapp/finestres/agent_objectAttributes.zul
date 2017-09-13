@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="objectAttributes"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<style src="~./styles/estil.css" />
+
+
+	<window closable="true" id="objectAttributesWindow" position="center, center"
+		sizable="true" title="${c:l('agets.zul.ObjectDetails')}"
+		onStart="onStart(event)"
+		style="min-width:40em"
+		visible="false"  onClose="onWindowClose(event)">
+	<zscript>
+<![CDATA[
+	import es.caib.zkib.zkiblaf.Missatgebox;
+	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
+	boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+	
+	void cleanWindow() {
+		objectAttributesWindow.visible = false;
+	}
+	void onWindowClose(Event event) {
+		cleanWindow();
+		event.stopPropagation();
+	}
+	void onStart(Event event) 
+	{
+		String objectName = event.getData()[0];
+		Map attributes = event.getData()[1];
+		objectAttributesWindow.doHighlighted();
+		
+		objectAttributesWindow.getFellow("detall_nom").setValue(objectName);
+		Grid grid = objectAttributesWindow.getFellow("attributeGrid");
+		grid.getRows().getChildren().clear();
+		boolean blue=true;
+		for (String key: attributes.keySet())
+		{
+			Row row = new Row();
+			if (blue) row.setStyle("background-color: #d0d0ff;");
+			blue = ! blue;
+			row.appendChild(new Label(key));
+			Label l = new Label(attributes.get(key));
+			l.setMultiline(true);
+			row.appendChild(l);
+			grid.getRows().appendChild(row);			
+		}
+		
+	}
+]]>
+	</zscript>
+
+			<div id="form">
+				<grid fixedLayout="false" sclass = "noBorderGrid fonsBlanc">
+					<columns>
+						<column width="200px"/>
+						<column />
+					</columns>
+					<rows>
+						<row>
+							<label
+								value="${c:l('user_renameaccount.Nom')}"/>
+							<label id="detall_nom" 
+								multiline="true" />
+
+						</row>
+					</rows>
+				</grid>
+				<grid 
+					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  fixedLayout="false">
+					<columns>
+						<column width="200px"/>
+						<column />
+					</columns>
+					<rows/>
+				</grid>
+			</div>
+			<separator spacing="5px" />
+			<hbox style="margin-left:auto; margin-right:auto">
+				<button label="${c:l('user_renameaccount.Accept')}"
+					onClick="cleanWindow()" />
+			</hbox>
+	</window>
+
+</zk>

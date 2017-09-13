@@ -19,6 +19,7 @@ import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
@@ -249,4 +250,29 @@ public class DomainValueEntityDaoImpl extends
             }
         }
     }
+	@Override
+	public Collection<DomainValueEntity> findByText(CriteriaSearchConfiguration criteria, Domain domain, String text) {
+		String[] split = text.trim().split(" +");
+		Parameter[] params = new Parameter[split.length + 3];
+		
+		StringBuffer sb = new StringBuffer("select u "
+				+ "from com.soffid.iam.model.DomainValueEntity as u "
+				+ "join u.domain as domain "
+				+ "join domain.informationSystem as s "
+				+ "where s.tenant.id = :tenantId and s.name=:appName and domain.name=:domainName");
+		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
+		params[1] = new Parameter("appName", domain.getExternalCode());
+		params[2] = new Parameter("domainName",domain.getName());
+		for (int i = 0; i < split.length; i++)
+		{
+			sb.append(" and ");
+			params[i+3] = new Parameter("param"+i, "%"+split[i].toUpperCase()+"%");
+			sb.append("(upper(u.value) like :param")
+				.append(i)
+				.append(" or upper(u.description) like :param")
+				.append(i)
+				.append(")");
+		}
+		return query(sb.toString(), params);
+	}
 }

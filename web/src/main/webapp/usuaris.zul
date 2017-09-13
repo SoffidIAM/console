@@ -250,10 +250,6 @@
 					String codiUsuari = ctx.getValue("@codi");
 					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					String[] tasquesSeycon = usuariService.refreshCanvis(codiUsuari);
-					tasques.visible = true;
-					tasques.mode = "overlapped";
-					Events.postEvent("onInicia", desktop.getPage("tasquesSeycon")
-							.getFellow("tasques"), tasquesSeycon);
 				}
 				
 				void llistaTasquesPendents() {
@@ -534,7 +530,8 @@
 		</zscript>
 
 		<esquemavertical id="esquema" datamodel="/model"
-			onHideFormulari="showLista()" hideSearchToolbar="true">
+			hideSearchToolbar="true"
+			onHideFormulari="showLista()">
 
 			<criteris id="queryWindow" style="margin-bottom:1em;" 
 				width="100%" height="">
@@ -1371,14 +1368,40 @@
 										<button
 											image="~./img/list-add.gif"
 											label="${c:l('usuaris.zul.Afegeixnou')}"
-											visible="${canCreateUserGroup}">
-											<attribute name="onClick">
-	desktop.getPage("grupsLlista").setAttribute("tipus", "");
-	desktop.getPage("grupsLlista").setAttribute("llistaObsolets", false);
-	Events.postEvent("onInicia",
-			desktop.getPage("grupsLlista").getFellow("esquemaLlista"),
-			gridGrups);
-</attribute>
+											visible="${canCreateUserGroup}"
+											id="addNewGroupButton"
+											onClick="addGroup()" onIdentity="selectedGroup(event.data)">
+											<zscript><![CDATA[
+							  				void addGroup() {
+												Page p = desktop.getPage("identity");
+												p.setVariable("types",
+															new com.soffid.iam.web.component.Identity.Type[] {
+																	com.soffid.iam.web.component.Identity.Type.GROUP
+															}
+														);
+												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.addGroup"));
+												p.setVariable("invoker", addNewGroupButton);
+												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+											}
+
+											void selectedGroup(List identities) {
+												for (com.soffid.iam.web.component.Identity id: identities)
+												{
+													es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(addNewGroupButton);
+													group = id.getObject();
+													String path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/grup");
+													es.caib.zkib.jxpath.JXPathContext xpathContext = 
+															ctx.getDataSource().getJXPathContext();
+													xpathContext.setValue(path+"/@codiGrup", group.getName());
+
+													campCodiUsuari = (DataTextbox) form.getFellow("codi");
+													codiUsuari = campCodiUsuari.getValue();
+													xpathContext.setValue(path+"/@codiUsuari", codiUsuari);
+													xpathContext.setValue(path+"/@descripcioGrup", group.getDescription());
+													xpathContext.setValue(path+"/@nomComplet", nomUsuari());
+												}
+											}
+											]]></zscript>
 										</button>
 										<popup id="grupsTooltip"
 											width="200px">
@@ -1690,17 +1713,133 @@
 										<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="gridRols"
 											preferenceName="userrole"/>
 										<toolbarbutton
+											id="addNewRoleButton"
 											image="~./img/list-add.gif"
 											label="${c:l('usuaris.zul.Afegeixnou')}"
-											visible="${canCreateUserRole}">
-											<attribute name="onClick">
-	desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF", "true");
-	desktop.getPage("rolsLlista").setAttribute("tipus", "wizard");
-	desktop.getPage("rolsLlista").setAttribute("usuari",
-			form.getFellow("codi").getValue());
-	Events.postEvent("onInicia",
-			desktop.getPage("rolsLlista").getFellow("esquemaLlista"), gridRols);
-</attribute>
+											visible="${canCreateUserRole}"
+											onClick="addRole()"
+											onIdentity="selectedRole(event.data)">
+											<zscript><![CDATA[
+							  				void addRole() {
+												Page p = desktop.getPage("identity");
+												p.setVariable("types",
+															new com.soffid.iam.web.component.Identity.Type[] {
+																	com.soffid.iam.web.component.Identity.Type.GRANT
+															}
+														);
+												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("aplicacions.zul.Afegeixrol"));
+												p.setVariable("invoker", addNewRoleButton);
+												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+											}
+
+											void selectedRole(List identities) {
+												modelProxy = gridRols.getModel();
+												for (com.soffid.iam.web.component.Identity id: identities)
+												{
+													com.soffid.iam.api.RoleAccount ra = id.getObject();
+													ds = gridRols.getDataSource(); 
+													ctx =  ds.getJXPathContext();
+													if (ra.getDomainValue() != null) {
+														valorDomini = ra.getDomainValue().getValue();
+														bbdd = ra.getSystem();
+														xpath = "/rol" + 
+															"[@nomRol = '" + ra.getRoleName() + "' and @baseDeDades = '" + bbdd + "' and valorDomini/@valor = '" + valorDomini + "']";
+													} else {
+														valorDomini = "";
+														bbdd = ra.getSystem();
+														xpath = "/rol" + 
+															"[@nomRol = '" + ra.getRoleName() + "' and @baseDeDades = '" + bbdd + "']";
+													}
+
+													// Test if more than one account is applicable
+													list = new LinkedList();
+													dispatcher = ra.getSystem();
+													for (it = form.getJXPathContext().iterate("/domini/politica/account[@dispatcher='"+dispatcher+"']");
+														it.hasNext();)
+													{
+														list.add(it.next());
+													}
+
+													boolean jaExisteix = false;
+													boolean hasAccount = ! list.isEmpty();
+													boolean multipleAccounts = list.size() > 1;
+													try{
+														for (it = ctx.iterate(xpath); it.hasNext();)
+														{
+														
+															grant = it.next();
+															if (grant{"accountName"} == null)
+																jaExisteix = true;
+															else
+															{
+																for (it2 = list.iterator(); it2.hasNext();)
+																{
+																	account = it2.next();
+																	if (account{"name"}.equals (grant{"accountName"}))
+																	{
+																		it2.remove();
+																	}
+																}
+															}
+														}
+														if (list.isEmpty() && hasAccount)
+															jaExisteix = true;
+															
+													} catch(Exception e){
+														alert(e);
+														jaExisteix = false;
+													}
+													// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
+													if(jaExisteix) {
+														Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.RolAssignat"), 
+																new Object [] {dada,bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
+													} else {
+														position = modelProxy.newInstance();
+														ds = gridRols.getDataSource(); 
+														ctx =  ds.getJXPathContext(); 
+														xpath = gridRols.getXPath() + modelProxy.getBind(position); 
+														pointer = ctx.createPath (xpath);
+														ctx2 = ctx.getRelativeContext(pointer);
+															
+														campCodiUsuari = (DataTextbox) form.getFellow("codi");
+														codiUsuari = campCodiUsuari.getValue();
+									
+														ctx2.setValue("@codiUsuari", codiUsuari);
+														ctx2.setValue("@nomRol", ra.getRoleName());
+														ctx2.setValue("@roleCategory", ra.getRoleCategory());
+														ctx2.setValue("@baseDeDades", dispatcher);
+														ctx2.setValue("@codiAplicacio", ra.getInformationSystemName());
+														ctx2.setValue("@descripcioRol", ra.getRoleDescription());
+														ctx2.setValue("@nomComplertUsuari", nomUsuari());
+														ctx2.setValue("@startDate", new Date());
+														
+														if (ra.getDomainValue() != null) {
+															es.caib.seycon.ng.comu.ValorDomini valor = ValorDomini.toValorDomini(ra.getDomainValue());
+															ctx2.setValue("/valorDomini", valor);
+														}
+														
+														pointer.invalidate ();
+														
+														
+														if (multipleAccounts)
+														{
+															Listbox select = selectAccountWnd.getFellow("select");
+															select.getItems().clear();
+															for (Object c: list)
+															{
+																Listitem item = new Listitem (c{"name"}, c{"name"});
+																select.getItems().add(item);
+															}
+															selectAccountWnd.setAttribute("context", ds);
+															selectAccountWnd.setAttribute("xpath", xpath);
+															selectAccountWnd.setMode("highlighted");
+														}
+													}
+												}
+											}
+											]]></zscript>
+
+
 										</toolbarbutton>
 										<toolbarbutton
 											image="~./img/list-remove.gif"
@@ -2601,6 +2740,7 @@ void actualitza (event) {
 		<include src="finestres/usu_nouProces.zul" />
 		<include src="finestres/user_renameAccount.zul" />
 		<include src="finestres/user_createAccount.zul" />
+		<include src="finestres/identity.zul" />
 
 		<window closable="true" id="newPassword" position="center, center"
 			sizable="true" title="${c:l('accounts.setPassword.title')}"

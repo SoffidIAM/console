@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.SeyconServerInfo;
 import es.caib.seycon.ng.model.ConfiguracioEntity;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -68,15 +69,20 @@ public abstract class SeyconServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={roles.monitor_server_list.class},
-			translated="getSeyconServerInfo")
+	
+	@Operation ( grantees={roles.monitor_server_list.class} )
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<java.lang.Object> getSeyconServerInfo(
-		java.lang.String url, 
-		java.lang.String quinaInfo, 
-		java.lang.String[] params)
+	public SeyconServerInfo getSyncServerInfo(
+		java.lang.String url)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+	
+	@Operation ( grantees={roles.monitor_server_list.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void resetSyncServer(
+		java.lang.String url, @Nullable String server)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
 	@Operation

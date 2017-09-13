@@ -13,6 +13,8 @@ import com.soffid.mda.annotation.JsonAttribute;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
+import com.soffid.iam.api.AccountStatus;
+import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.AccountEntity;
 
@@ -91,9 +93,14 @@ public class Account {
 	@Nullable
 	public java.util.Calendar passwordExpiration;
 
-	@Description("True if the account is disabled")
+	@Description("True if the account is disabled. Better use status attribute")
 	@Attribute(defaultValue = "false")
 	public boolean disabled;
+
+	@Description("Account status: active / disabled / removed")
+	@Column (name="ACC_STATUS")
+	@Nullable
+	public AccountStatus status;
 
 	@Description("Account's user type. It is directly bound to a password policy depending on the system's password domain")
 	@JsonAttribute(hibernateAttribute="passwordPolicy.name")

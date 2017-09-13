@@ -179,7 +179,7 @@
 			event.stopPropagation ();
 		</attribute>
 
-		<criteris height="60px" id="queryWindow" onOK="search(false)" width="99%">
+		<criteris height="" id="queryWindow" onOK="search(false)" width="99%">
 			<hbox>
 				<input_criteri etiqueta="${c:l('valorsDominisllistaAmbCerca.zul.Codi')}" id="queryCodi"/>
 				<imageclic onClick="search(false)" src="~./img/fletxa_cerca.gif"/>

@@ -24,9 +24,7 @@ public class CustomObject {
 
 	public String type;
 
-	public boolean builtin;
-
-	@Description ("Role custom attributes")
+	@Description ("Object custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
 	@Nullable
 	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")

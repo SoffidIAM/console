@@ -59,6 +59,7 @@ import com.soffid.iam.utils.TimeOutUtils;
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
@@ -264,12 +265,7 @@ public class ApplicationBootServiceImpl extends
 			HeuristicMixedException, HeuristicRollbackException,
 			NeedsAccountNameException, AccountAlreadyExistsException,
 			BPMException, IOException, NamingException, SQLException {
-		Security.nestedLogin("master\\Anonymous", new String[] { //$NON-NLS-1$
-				Security.AUTO_APPLICATION_CREATE + Security.AUTO_ALL,
-						Security.AUTO_USER_CREATE + Security.AUTO_ALL,
-						Security.AUTO_HOST_ALL_CREATE,
-						Security.AUTO_INTRANETMENUS_ADMIN,
-						Security.AUTO_AUTHORIZATION_ALL });
+		Security.nestedLogin("master\\Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase();
 			
@@ -389,6 +385,7 @@ public class ApplicationBootServiceImpl extends
 			task.setMinutesPattern("0"); //$NON-NLS-1$
 			task.setMonthsPattern("*"); //$NON-NLS-1$
 			task.setName("Expire untrusted passwords"); //$NON-NLS-1$
+			task.setTenant(Security.getCurrentTenantName());
 			getScheduledTaskService().create(task);
 		}
 
@@ -769,6 +766,7 @@ public class ApplicationBootServiceImpl extends
 			td.setCode("NIF"); //$NON-NLS-1$
 			td.setOrder(new Long(1));
 			td.setScope(MetadataScope.USER);
+			td.setType(TypeEnumeration.STRING_TYPE);
 			tdSvc.create(td);
 		}
 
@@ -778,6 +776,7 @@ public class ApplicationBootServiceImpl extends
 			td.setCode("PHONE"); //$NON-NLS-1$
 			td.setOrder(new Long(2));
 			td.setScope(MetadataScope.USER);
+			td.setType(TypeEnumeration.STRING_TYPE);
 			tdSvc.create(td);
 		}
 
@@ -925,12 +924,7 @@ public class ApplicationBootServiceImpl extends
 	protected void handleTenantBoot(Tenant tenant) throws Exception {
 		loadServiceHandlers();
 		
-		Security.nestedLogin(tenant.getName(),  "Anonymous", new String[] { //$NON-NLS-1$
-				Security.AUTO_APPLICATION_CREATE + Security.AUTO_ALL,
-						Security.AUTO_USER_CREATE + Security.AUTO_ALL,
-						Security.AUTO_HOST_ALL_CREATE,
-						Security.AUTO_INTRANETMENUS_ADMIN,
-						Security.AUTO_AUTHORIZATION_ALL });
+		Security.nestedLogin(tenant.getName(),  "Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase();
 		} finally {

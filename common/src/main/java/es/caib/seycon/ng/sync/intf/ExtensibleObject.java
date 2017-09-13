@@ -4,11 +4,9 @@ public class ExtensibleObject extends com.soffid.iam.sync.intf.ExtensibleObject
 {
 	public static ExtensibleObject toExtensibleObject ( com.soffid.iam.sync.intf.ExtensibleObject source)
 	{
-		ExtensibleObject target = new ExtensibleObject();
-		target.putAll(source);
-		target.setObjectType(source.getObjectType());
-		return target;
+		return new WrappedExtensibleObject(source);
 	}
+	
 	
 	public String toString ()
 	{

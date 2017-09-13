@@ -32,6 +32,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.zkiblaf.Esquema;
+import es.caib.zkib.zkiblaf.EsquemaVertical;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SearchBox extends HtmlBasedComponent {
@@ -113,11 +115,32 @@ public class SearchBox extends HtmlBasedComponent {
 				} catch (Exception e) {
 					throw new UiException(e);
 				}
+				showForm(((DataModelCollection) v).getSize() == 1);
+					
 			}
 			binder.setDataPath(null);
 		}
 	}
 
+
+	private void showForm(boolean show) {
+		Component parent = this;
+		for (int i = 0; parent != null && i < 4; i++)
+			parent = parent.getParent();
+		if (parent != null)
+		{
+			if (parent instanceof Esquema)
+			{
+				if (show) ((Esquema) parent).showFormulari();
+				else ((Esquema) parent).hideFormulari();
+			}
+			if (parent instanceof EsquemaVertical)
+			{
+				if (show) ((EsquemaVertical) parent).showFormulari();
+				else ((EsquemaVertical) parent).hideFormulari();
+			}
+		}
+	}
 
 	private void changeMode() {
 		advancedMode = ! advancedMode;

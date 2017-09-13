@@ -87,7 +87,7 @@
 
 	<window closable="true" id="tasques" position="center, center" sizable="true" title="${c:l('tasquesSeycon.Titol')}" visible="false" width="${amplefinestra}">
 		<attribute name="onInicia">
-			updateTasks(event.data);
+//			updateTasks(event.data);
 			if(self.mode.compareToIgnoreCase("highlighted") != 0){
 				self.setMode("highlighted");
 			}else{

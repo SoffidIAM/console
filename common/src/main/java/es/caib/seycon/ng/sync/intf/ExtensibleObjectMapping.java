@@ -65,7 +65,14 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	public ExtensibleObjectMapping(Long id, String systemObject,
 			SoffidObjectType soffidObject, String condition, Long dispatcherId)
 	{
-		super(id, systemObject, soffidObject, condition, dispatcherId);
+		super(id, systemObject, soffidObject, null, condition, dispatcherId, false);
+	}
+
+	public ExtensibleObjectMapping(Long id, String systemObject,
+			SoffidObjectType soffidObject, String customObjectType,
+			String condition, Long dispatcherId)
+	{
+		super(id, systemObject, soffidObject, customObjectType, condition, dispatcherId, false);
 	}
 
 	public ExtensibleObjectMapping(ObjectMapping otherBean)
@@ -82,7 +89,7 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	public ExtensibleObjectMapping(String systemObject,
 			SoffidObjectType soffidObject, Long dispatcherId)
 	{
-		super(systemObject, soffidObject, dispatcherId);
+		super(systemObject, soffidObject, dispatcherId, false);
 	}
 	
 	public static ExtensibleObjectMapping toExtensibleObjectMapping (com.soffid.iam.sync.intf.ExtensibleObjectMapping other)

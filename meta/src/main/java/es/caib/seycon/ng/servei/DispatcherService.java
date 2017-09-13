@@ -24,6 +24,7 @@ import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import roles.agent_create;
+import roles.agent_queryObjects;
 import roles.agent_update;
 
 @Service (translatedName="DispatcherService",
@@ -269,6 +270,14 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.server_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.Server> findTenantServers()
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.server_manage_proxy.class, roles.server_manage_server.class},
 			translated="update")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -442,6 +451,22 @@ public abstract class DispatcherService {
 		return null;
 	}
 
+	@Operation (grantees={agent_create.class, agent_update.class})
+	@Description("Loads system object and transforms into Soffid Object")
+	public Map<String, Object> getSoffidObject(String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
+
+
+	@Operation (grantees={agent_create.class, agent_update.class, agent_queryObjects.class})
+	@Description("Loads system object attributes")
+	public Map<String, Object> getNativeObject(String dispatcher, 
+			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
+	{
+		return null;
+	}
 
 	@Operation ( grantees={roles.agent_update.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})

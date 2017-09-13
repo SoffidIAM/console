@@ -6,8 +6,11 @@ import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -385,23 +388,45 @@ public class Security {
     	return tenantService;
     }
     
+    private static Collection<SoffidAuthorization> auths = null;
     private static void internalNestedLogin(String tenant, String user, String roles[])  {
+    	SoffidPrincipal p;
     	try {
 			Tenant t = getTenantService().getTenant(tenant);
 			if ( t == null)
 				throw new RuntimeException("Invalid tenant: "+tenant);
-			for ( String tp: getTenantService().getDisabledPermissions(t))
+			if (roles == Security.ALL_PERMISSIONS)
 			{
-				for ( String role: roles)
+				if (auths == null)
+					auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
+				
+				List<String> dp = getTenantService().getDisabledPermissions(t);
+				LinkedList<String> auths2 = new LinkedList<String>();
+				for (SoffidAuthorization a: auths)
+					auths2.add(a.getCodi());
+				for (Iterator<String> it = auths2.iterator(); it.hasNext();)
 				{
-					if (role.startsWith(tp))
-						throw new RuntimeException("Cannot elevate permission "+role);
+					String a = it.next();
+					if (dp.contains(a))
+						it.remove();
 				}
+		        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
+			}
+			else
+			{
+				for ( String tp: getTenantService().getDisabledPermissions(t))
+				{
+					for ( String role: roles)
+					{
+						if (role.startsWith(tp))
+							throw new RuntimeException("Cannot elevate permission "+role);
+					}
+				}
+		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
 			}
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
-        SoffidPrincipal p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
         getIdentities().push(p);
     }
 

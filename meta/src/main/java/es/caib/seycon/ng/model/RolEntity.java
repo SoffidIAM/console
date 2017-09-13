@@ -15,7 +15,8 @@ import com.soffid.mda.annotation.*;
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Rol;
 
-@Entity(table = "SC_ROLES", translatedName = "RoleEntity", translatedPackage = "com.soffid.iam.model")
+@Entity(table = "SC_ROLES", tenantFilter="system.tenant.id",
+	translatedName = "RoleEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({ es.caib.seycon.ng.model.AplicacioEntity.class,
 		es.caib.seycon.ng.model.ValorDominiAplicacioEntity.class,
 		es.caib.seycon.ng.model.GrupEntity.class,

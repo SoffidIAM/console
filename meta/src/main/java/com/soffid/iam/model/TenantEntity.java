@@ -36,6 +36,15 @@ public class TenantEntity {
 	{
 		return null;
 	}
+
+	@DaoFinder("select t "
+			+ "from com.soffid.iam.model.TenantEntity as t "
+			+ "join t.servers as s "
+			+ "where s.tenantServer.name=:server")
+	public List<TenantEntity> findByServer (String server)
+	{
+		return null;
+	}
 }
 
 @Index (columns="TEN_NAME", unique = true, entity = TenantEntity.class, name = "SC_TEN_NAME_UK")

@@ -14,6 +14,7 @@ import org.zkoss.zul.Grid;
 
 import bsh.Primitive;
 
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 
@@ -170,6 +171,7 @@ public class ScriptEnviroment {
 		defineUserAttributes(c);
 		defineGroupAttributes(c);
 		defineRoleAttributes(c);
+		defineCustomObjectAttributes(c);
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\",\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
@@ -184,6 +186,7 @@ public class ScriptEnviroment {
 				.append(", \"accountDisabled\" : \"java.lang.String\"")
 				.append(", \"active\" : \"java.lang.Boolean\"")
 				.append(", \"type\" : \"java.lang.String\"")
+				.append(", \"lastLogon\" : \"java.util.Calendar\"")
 				.append(", \"lastUpdate\" : \"java.util.Calendar\"")
 				.append(", \"lastPasswordUpdate\" : \"java.util.Calendar\"")
 				.append(", \"passwordExpiration\" : \"java.util.Calendar\"")
@@ -293,6 +296,14 @@ public class ScriptEnviroment {
 			.append(", \"grantedRoleNames\" : \"java.util.List\"")
 			.append(", \"attributes\" : \"groupAttributes\"");
 		}
+		else if (type == SoffidObjectType.OBJECT_GROUP)
+		{
+			SoffidObjectType customType = (SoffidObjectType) XPathUtils.getValue(c, "@soffidCustomObject");
+			sb.append(", \"id\" : \"java.lang.Long\"")
+			.append(", \"name\" : \"java.lang.String\"")
+			.append(", \"description\" : \"java.lang.String\"")
+			.append(", \"attributes\" : \"customAttributes").append(customType).append("\"");
+		}
 		sb.append("}");
 		return sb.toString();
 	}
@@ -367,6 +378,37 @@ public class ScriptEnviroment {
 		}
 		Executions.getCurrent().addAuResponse(null,
 				new AuScript(null, "CodeMirrorJavaTypes[\"roleAttributes\"]={"+sb.toString()+"};")); 
+		
+	}
+
+	private void defineCustomObjectAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	{
+		StringBuffer sb = new StringBuffer();
+		
+		for (CustomObjectType ot: EJBLocator.getDadesAddicionalsService().findCustomObjectTypeByJsonQuery(null))
+		{
+			sb.append("CodeMirrorJavaTypes[\"customAttributes")
+				.append(ot.getName())
+				.append("\"]={");
+			for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(ot.getName(), null))
+			{
+				if ( sb.length() > 0)
+					sb.append(",");
+				sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+				TypeEnumeration t = td.getType();
+				if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
+					sb.append("byte");
+				else if (t == TypeEnumeration.DATE_TYPE)
+					sb.append("java.util.Calendar");
+				else
+					sb.append("java.lang.String");
+				sb.append("\"");
+			}
+			sb.append("};");
+			
+		}
+		Executions.getCurrent().addAuResponse(null,
+				new AuScript(null, sb.toString())); 
 		
 	}
 

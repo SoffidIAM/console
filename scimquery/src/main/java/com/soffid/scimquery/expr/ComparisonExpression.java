@@ -338,8 +338,8 @@ public class ComparisonExpression extends AbstractExpression {
 			}
 			else
 			{
-				if (ctx.objectName.contains(" "))
-					query.getWhereString().append("(");
+				if (ctx.objectCondition != null)
+					query.getWhereString().append("(").append(ctx.objectCondition);
 				if ("eq".equalsIgnoreCase(operator))
 				{
 					query.getWhereString().append(ctx.objectName);
@@ -402,7 +402,7 @@ public class ComparisonExpression extends AbstractExpression {
 					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" is not null ");
 				}
-				if (ctx.objectName.contains(" "))
+				if (ctx.objectCondition != null)
 					query.getWhereString().append(")");
 			}
 		} catch (Exception e) {

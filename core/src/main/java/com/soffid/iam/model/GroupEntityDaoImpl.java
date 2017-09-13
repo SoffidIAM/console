@@ -676,7 +676,7 @@ public class GroupEntityDaoImpl extends
 		
 		StringBuffer sb = new StringBuffer("select u "
 				+ "from com.soffid.iam.model.GroupEntity as u "
-				+ "where u.tenant.id = :tenantId");
+				+ "where u.tenant.id = :tenantId and u.obsolete='N'");
 		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
 		for (int i = 0; i < split.length; i++)
 		{

@@ -29,6 +29,9 @@ public class CustomObjectService {
 	@Operation(grantees={customObject_query.class})
 	public Collection<CustomObject> findCustomObjectByText (String objectType, @Nullable String query) { return null;}
 
+	@Operation(grantees={customObject_query.class})
+	public CustomObject findCustomObjectByTypeAndName (String objectType, String name) { return null;}
+
 	@Operation(grantees={customObject_create.class})
 	public CustomObject createCustomObject (CustomObject obj) { return null;}
 

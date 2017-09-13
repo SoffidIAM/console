@@ -135,7 +135,14 @@ public class ServerPluginParser {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node n = nodes.item(i);
 			InternalAgentDescriptor ad = new InternalAgentDescriptor();
-			ad.setClassName(xpath.evaluate("javaClass", n)); //$NON-NLS-1$
+			String classV2 = xpath.evaluate("javaClassV2", n);
+			if ("-".equals(classV2))
+				continue;
+			if (classV2 == null || classV2.isEmpty())
+				classV2 = xpath.evaluate("javaClass", n);
+			if (classV2 == null || classV2.isEmpty())
+				continue;
+			ad.setClassName(classV2); //$NON-NLS-1$
 			ad.setDescription(xpath.evaluate( "name", n)); //$NON-NLS-1$
 			String resource = xpath.evaluate("userInterface", n); //$NON-NLS-1$
 			if (resource == null || "".equals(resource)) //$NON-NLS-1$
@@ -402,7 +409,14 @@ public class ServerPluginParser {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node n = nodes.item(i);
 			InternalAgentDescriptor ad = new InternalAgentDescriptor();
-			ad.setClassName(xpath.evaluate("javaClass", n)); //$NON-NLS-1$
+			String classV2 = xpath.evaluate("javaClassV2", n);
+			if ("-".equals(classV2))
+				continue;
+			if (classV2 == null || classV2.isEmpty())
+				classV2 = xpath.evaluate("javaClass", n);
+			if (classV2 == null || classV2.isEmpty())
+				continue;
+			ad.setClassName(classV2); //$NON-NLS-1$
 			ad.setDescription(xpath.evaluate( "name", n)); //$NON-NLS-1$
 			String resource = xpath.evaluate("userInterface", n); //$NON-NLS-1$
 			if (resource == null || "".equals(resource)) //$NON-NLS-1$

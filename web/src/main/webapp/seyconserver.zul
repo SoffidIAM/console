@@ -78,7 +78,6 @@
 					t_tasques.setVisible(false);
 					t_tasquesagent.setVisible(false);
 					t_seyconInfo.setVisible(false);
-					t_reset.setVisible(false);
 					t_dbpool.setVisible(false);
 					t_agents.setVisible(true);
 					t_agents.setSelected(true);
@@ -89,7 +88,6 @@
 					t_agents.setVisible(false);
 					t_tasquesagent.setVisible(false);
 					t_seyconInfo.setVisible(false);
-					t_reset.setVisible(false);
 					t_dbpool.setVisible(false);
 					t_tasques.setVisible(true);
 					t_tasques.setSelected(true);
@@ -99,7 +97,6 @@
 					t_tasques.setVisible(false);
 					t_seyconInfo.setVisible(false);
 					t_tasquesagent.setVisible(true);
-					t_reset.setVisible(false);
 					t_dbpool.setVisible(false);
 					t_agents.setVisible(true);
 					t_tasquesagent.setSelected(true);
@@ -111,7 +108,6 @@
 					t_tasques.setVisible(true);
 					t_tasquesagent.setVisible(true);
 					t_agents.setVisible(false);
-					t_reset.setVisible(false);
 					t_dbpool.setVisible(false);
 					t_tasquesagent.setSelected(true);
 					titoltasques.setVisible(true);
@@ -121,7 +117,6 @@
 					t_tasques.setVisible(false);
 					t_tasquesagent.setVisible(false);
 					t_agents.setVisible(false);
-					t_reset.setVisible(false);
 					t_dbpool.setVisible(false);
 					t_seyconInfo.setVisible(true);
 					t_seyconInfo.setSelected(true);
@@ -134,8 +129,6 @@
 					t_agents.setVisible(false);
 					t_seyconInfo.setVisible(false);
 					t_dbpool.setVisible(false);
-					t_reset.setVisible(true);
-					t_reset.setSelected(true);
 					titoltasques.setVisible(true);
 					panels.setWidth("100%");
 					panels.setVisible(true);
@@ -143,7 +136,6 @@
 					t_tasques.setVisible(false);
 					t_tasquesagent.setVisible(false);
 					t_agents.setVisible(false);
-					t_reset.setVisible(false);
 					t_seyconInfo.setVisible(true);
 					t_dbpool.setVisible(true);
 					t_dbpool.setSelected(true);
@@ -380,14 +372,14 @@
 				
 				if ((infoServer != null) @and (infoServer.size() > 0))
 				{
-					es.caib.seycon.ng.comu.SeyconServerInfo info = infoServer.get(0);
+					com.soffid.iam.api.SyncServerInfo info = infoServer.get(0);
 					//dadaserverurl = context.getValue(xpath+"/@serverAgentHostsURL");
 					
 					// Posem info del server
-					ss_versio.setValue(info.getVersio());
-					cadMain = info.getCaducitatMainCertificate();
-					cadRoot = info.getCaducitatRootCertificate();
-					dataAct= info.getDataActualServer();
+					ss_versio.setValue(info.getVersion());
+					cadMain = info.getExpirationMainCertificate();
+					cadRoot = info.getExpirationRootCertificate();
+					dataAct= info.getCurrentServerDate();
 					
 					// Per tindre la url del servidor actual
 					urlServerInfo.setValue(dadaurl);
@@ -751,7 +743,6 @@
 		<tab id="t_tasques" label="${c:l('seyconserver.zul.Tasques')}" visible="false"/>
 		<tab id="t_tasquesagent" label="${c:l('seyconserver.zul.TasquesAgent')}" visible="false"/>
 		<tab id="t_seyconInfo" label="${c:l('seyconserver.zul.Informacia')}" visible="false"/>
-		<tab id="t_reset" label="${c:l('seyconserver.zul.Reinicideservidors')}" visible="${canRestartAgent}"/>
 		<tab id="t_dbpool" label="${c:l('seyconserver.zul.ConsultesSQL')}" visible="false"/>
 	</tabs>
 	<tabpanels width="100%">
@@ -1014,48 +1005,6 @@
 					</rows>
 				</grid>
 			</vbox>
-		</tabpanel>
-		
-		<tabpanel id="tReset" width="100%">
-			<hbox width="100%">
-				<listbox dataPath="/model:/servidorsagents" fixedLayout="true"
-					id="listboxReset" sclass="likeagrid" width="99%">
-					<listhead>
-						<listheader sort="auto">Servidor</listheader>
-						<listheader width="100px">-</listheader>
-					</listhead>
-					<dataitem bind=".">
-						<listcell bind="@descripcio"/>
-						<listcellnolabel bind="@url">
-							<button if="${canRestartAgent}" width="99%"
-								label="${c:l('seyconserver.zul.reiniciar')}">
-								<attribute name="onClick">
-									if (canRestartAgent) {
-										listCell = self.getParent(); 
-										dlistbox = listCell.getListbox();
-										modelo = dlistbox.getModel(); 
-										listItem = listCell.getParent();  
-										posicio = listItem.getIndex(); 
-										elemPos = modelo.getElementAt(posicio); 
-										xpathActual = elemPos.getXPath();
-										ds = dlistbox.getDataSource();
-										ctx = ds.getJXPathContext();
-										url = ctx.getValue(xpathActual + "/@url");
-										urlserver= model.getVariables().getVariable("urlserver");
-										result = getSeyconServerService().getSeyconServerInfo(urlserver,"reset",new String[]{url});
-										if (result!=null  @and result instanceof Collection) {
-											String res = (String) ((Collection) result).iterator().next();
-											if (res!=null @and "".equals(res.trim()))
-												res = org.zkoss.util.resource.Labels.getLabel("seyconServer.NoAgent");
-											Missatgebox.info (res);
-										}
-									}							
-								</attribute>
-							</button>
-						</listcellnolabel>
-					</dataitem>
-				</listbox>
-			</hbox>
 		</tabpanel>
 		
 		<tabpanel id="tb_dbpool" width="100%">

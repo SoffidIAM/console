@@ -10,15 +10,13 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
 	<style>
-		.tcoth div {text-align:center !important;}
-		tr.seld td div.cell-inner input.text {
-			background-color: #D3D3D3;
-		}
+		.tcoth div {text-align:center !important;} tr.seld td
+		div.cell-inner input.text { background-color: #D3D3D3; }
 		.readonly {background-color: transparent !important}
 	</style>
 
-	<script src='~./js/codemirror/java-classes.js'/>
-	<script src='comu/syncserver-classes.js'/>
+	<script src='~./js/codemirror/java-classes.js' />
+	<script src='comu/syncserver-classes.js' />
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
@@ -684,7 +682,20 @@
 						c.getFellow("testRowButton1").setVisible(true);
 						c.getFellow("testRowButton2").setVisible(false);						
 						c.getFellow("testRowButton3").setVisible(false);						
+						c.getFellow("testRowButton4").setVisible(false);						
+						c.getFellow("testRowButton5").setVisible(false);						
 					}
+					
+					void selectObjectType (Event event)
+					{
+						
+					}
+					
+					void createObjectTypes (Event event)
+					{
+						
+					}
+					
 					void displayTestRow (Event event)
 					{
 						Component c = event.getTarget();
@@ -696,6 +707,8 @@
 						c.getFellow("testRowButton1").setVisible(false);
 						c.getFellow("testRowButton2").setVisible(true);						
 						c.getFellow("testRowButton3").setVisible(true);						
+						c.getFellow("testRowButton4").setVisible(true);						
+						c.getFellow("testRowButton5").setVisible(true);						
 						if (type.equals(es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT))
 						{
 							c.getFellow("testRowLabel1").setValue("Account: ");
@@ -756,6 +769,8 @@
 							c.getFellow("testRowTextbox1").setVisible(false);						
 							c.getFellow("testRowButton2").setVisible(false);						
 							c.getFellow("testRowButton3").setVisible(false);						
+							c.getFellow("testRowButton4").setVisible(true);						
+							c.getFellow("testRowButton5").setVisible(true);						
 						}
 					}
 					
@@ -799,11 +814,18 @@
 						for ( Row r: g.getRows().getChildren())
 						{
 							Textbox sys = r.getChildren().get(0);
+							Listbox direction = r.getChildren().get(2);
 							Div rdiv = r.getChildren().get(5);
 							Label result = rdiv.getFirstChild();
 							es.caib.zkib.zkiblaf.ImageClic image = rdiv.getLastChild();
 							Object obj = map.get(sys.getValue());
-							if (obj == null)
+							if (direction.getSelectedItem() == null ||
+									direction.getSelectedIndex() == 0 )
+							{
+								result.setValue("");
+								image.setVisible(false);
+							}
+							else if (obj == null)
 							{
 								result.setValue("");
 								image.setVisible(false);
@@ -819,10 +841,135 @@
 							}
 							else
 							{
+								
+								result.setValue(stringify(obj, ""));
+								image.setVisible(false);
+							}
+						}
+					}
+
+					
+					String stringify (Object obj, String indent)
+					{
+						if (obj == null) return "";
+						
+						if (obj instanceof java.util.Calendar)
+						{
+							return new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("selfService.Format"))
+									.format(obj.getTime());
+						}
+						if (obj instanceof java.util.Date)
+						{
+							return new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("selfService.Format"))
+									.format(obj);
+						}
+						if (obj instanceof java.util.Collection)
+						{
+							String r = "";
+							for ( Object obj2 : obj) {
+								if (r.isEmpty()) r = "[";
+								else r = r + ",\n"+indent;
+								r = r + stringify(obj2, indent+"  ");
+							}
+							return r + "]";
+						}
+						if (obj instanceof java.util.Map)
+						{
+							String r = "";
+							for ( Object k : obj.keyset) {
+								if (r.isEmpty()) r = "{";
+								else r = r + ", ";
+								r = r + stringify(k, indent+" ") + ": "+stringify (obj.get(k), indent+"  ");
+							}
+							return r + "}";
+						}
+						if (obj.getClass().isArray())
+						{
+							String r = "";
+							for ( Object obj2 : obj) {
+								if (r.isEmpty()) r = "[";
+								else r = r + ",\n"+indent;
+								r = r + stringify(obj2, indent+"  ");
+							}
+							return r + "]";
+						}
+						return obj.toString();
+					}
+
+					void doLoadTest (Event event)
+					{
+						Grid g = event.getTarget().getFellow ("attributesGrid");
+						es.caib.seycon.ng.servei.ejb.DispatcherService svc = es.caib.seycon.ng.EJBLocator.getDispatcherService();
+						String o1 = g.getFellow("testRowTextbox1").getValue();
+						if (o1 == null || o1.trim().length() == 0)
+							o1 = "-";
+						String o2 = g.getFellow("testRowTextbox2").getValue();
+						if (o2 == null || o2.trim().length() == 0)
+							o2 = "-";
+						Map map = svc.getSoffidObject(
+								XPathUtils.getValue(g, "../../@codi"),
+								XPathUtils.getValue(g, "../@soffidObject"),
+								o1, o2);
+						g.getFellow("testColumn").setVisible(true);
+						for ( Row r: g.getRows().getChildren())
+						{
+							Textbox sys = r.getChildren().get(3);
+							Listbox direction = r.getChildren().get(2);
+							Div rdiv = r.getChildren().get(5);
+							Label result = rdiv.getFirstChild();
+							es.caib.zkib.zkiblaf.ImageClic image = rdiv.getLastChild();
+							Object obj = map == null ? null: map.get(sys.getValue());
+							if (direction.getSelectedItem() == null ||
+									direction.getSelectedIndex() == 2)
+							{
+								result.setValue("");
+								image.setVisible(false);
+							}
+							else if (obj == null)
+							{
+								result.setValue("");
+								image.setVisible(false);
+							}
+							else if (obj instanceof Exception)
+							{
+								result.setValue(obj.getClass().getName());
+								image.setVisible(true);
+								if (obj instanceof es.caib.seycon.ng.exception.InternalErrorException)
+									image.setTitle(((Exception)obj).getMessage());
+								else
+									image.setTitle(obj.toString());
+							}
+							else
+							{
 								result.setValue(obj.toString());
 								image.setVisible(false);
 							}
 						}
+					}
+
+					void doQueryTest (Event event)
+					{
+						Grid g = event.getTarget().getFellow ("attributesGrid");
+						es.caib.seycon.ng.servei.ejb.DispatcherService svc = es.caib.seycon.ng.EJBLocator.getDispatcherService();
+						String o1 = g.getFellow("testRowTextbox1").getValue();
+						if (o1 == null || o1.trim().length() == 0)
+							o1 = "-";
+						String o2 = g.getFellow("testRowTextbox2").getValue();
+						if (o2 == null || o2.trim().length() == 0)
+							o2 = "-";
+						Map map = svc.getNativeObject(
+								XPathUtils.getValue(g, "../../@codi"),
+								XPathUtils.getValue(g, "../@soffidObject"),
+								o1, o2);
+						Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+						for (String key: map.keySet())
+						{
+							map.put(key, stringify(map.get(key), ""));
+						}
+						Events.postEvent("onStart", c, new Object[]{
+								o1,
+								map
+						});
 					}
 
 					void doFullTest (Event event)
@@ -1338,12 +1485,10 @@
 									<div>
 										<input_dada bind="@systemObject" width_custom ="15%"></input_dada>
 										<label value="based on" width="10%"></label>
-										<listbox bind="@soffidObject" mold="select" dataPath="/model:/soffidObjectType" width="15%"
-											onSelect="hideTestRow(event)">
-											<dataitem bind="@value">
-												<listcell bind="@literal"/>
-											</dataitem>
-										</listbox>
+										<listbox use="com.soffid.iam.web.agent.CustomTypeListbox"
+											bind="." 
+											mold="select" 
+											width="15%"/>
 										<label value="Condition: " width="10%"></label>
 										<input_dada bind="@condition" width_custom ="45%"></input_dada>
 										<imageclic src="/img/pencil.png" width="1em" >
@@ -1556,8 +1701,14 @@
 												<textbox id="testRowTextbox1" visible="false" onOK="testRowTextbox1OK(event)"/>
 												<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
 												<textbox id="testRowTextbox2" visible="false" onOK="doTest(event)"/>
-												<button id="testRowButton2" label="Test expression" onClick="doTest(event)" visible="false"/>
-												<button id="testRowButton3" label="Full test" onClick="doFullTest(event)" visible="false"/>
+												<button id="testRowButton2" label="${c:l('agents.zul.TestExpression') }" 
+												onClick="doTest(event)" visible="false"/>
+												<button id="testRowButton3" label="${c:l('agents.zul.TestFull') }" 
+													onClick="doFullTest(event)" visible="false"/>
+												<button id="testRowButton4" label="${c:l('agents.zul.TestQuery') }"
+													onClick="doQueryTest(event)" visible="false"/>
+												<button id="testRowButton5" label="${c:l('agents.zul.TestLoad') }" 
+													onClick="doLoadTest(event)" visible="false"/>
 											</div>
 											<div style="height: 20px;" />
 										</div>
@@ -2103,4 +2254,6 @@
 	<include src="grupsllista.zul"/>
 	<include src="controlAcces.zul"/>
  	<include src="finestres/editor.zul"/>
+ 	<include src="finestres/editor.zul"/>
+ 	<include src="finestres/agent_objectAttributes.zul"/>
 </zk>

@@ -36,5 +36,19 @@
     userName = soffid
     validationQuery = select 1
    </Resource>
-
+	<Container id="myStatelessContainer" type="STATELESS">
+	    accessTimeout = 30 seconds
+	    callbackThreads = 5
+	    closeTimeout = 5 minutes
+	    garbageCollection = false
+	    idleTimeout = 0 minutes
+	    maxAge = 0 hours
+	    maxAgeOffset = -1
+	    maxSize = 250
+	    minSize = 20
+	    replaceAged = true
+	    replaceFlushed = false
+	    strictPooling = true
+	    sweepInterval = 5 minutes
+	</Container>
 </tomee>

@@ -33,7 +33,7 @@ public class ScheduledTask {
 	public java.util.Calendar lastEnd;
 
 	@Nullable
-	public java.lang.StringBuffer lastLog;
+	public java.lang.String logReferenceID;
 
 	public java.lang.String dayPattern;
 

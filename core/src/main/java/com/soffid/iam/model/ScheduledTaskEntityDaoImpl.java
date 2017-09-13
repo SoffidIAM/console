@@ -33,16 +33,12 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 		if (split.length > 4)
 			target.setDayOfWeekPattern(split[4]);
 		
-		if (source.getLastLog() == null)
-			target.setLastLog(new StringBuffer());
-		else
-			target.setLastLog(new StringBuffer (source.getLastLog()));
-		
 		if (source.getServer() == null)
 			target.setServerName("*"); //$NON-NLS-1$
 		else
 			target.setServerName(source.getServer().getName());
 		target.setHandlerName(source.getHandler().getName());
+		target.setTenant(source.getTenant().getName());
 	}
 
 	@Override
@@ -62,9 +58,6 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 			.append(source.getDayOfWeekPattern().replace(' ', ','));
 		target.setSchedulePattern(pattern.toString());
 		
-		target.setLastLog(source.getLastLog() == null || source.getLastLog().length() == 0? 
-						null: 
-						source.getLastLog().toString());
 		target.setHandler(getScheduledTaskHandlerEntityDao().findByName(source.getHandlerName()));
 		
 		if (source.getServerName() == null || "*".equals(source.getServerName())) //$NON-NLS-1$

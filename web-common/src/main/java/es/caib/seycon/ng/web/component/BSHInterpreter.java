@@ -586,24 +586,28 @@ public class BSHInterpreter extends GenericInterpreter implements
 	@Override
 	protected void exec(String script) {
 		try {
-			try {
-				final Namespace ns = getCurrent();
-				if (ns != null)
-					_ip.eval(script, prepareNS(ns));
-				else
-					_ip.eval(script); // unlikely (but just in case)
-			} catch (EvalError ex) {
-				throw UiException.Aide.wrap(ex);
-			}
-		} catch (RuntimeException ex) {
-			log.warn(String.format(
-					Messages.getString("BSHInterpreter.ExecutingStringError"), ex.getMessage())); //$NON-NLS-1$
+			final Namespace ns = getCurrent();
+			if (ns != null)
+				_ip.eval(script, prepareNS(ns));
+			else
+				_ip.eval(script); // unlikely (but just in case)
+		} catch (TargetError ex) {
+			log.warn("BSH Script error: "+ex.getMessage()+" at "+ex.getErrorSourceFile()+":"+ex.getErrorLineNumber());
+			log.warn("Stack trace: "+ex.getErrorText()+" at "+ex.getScriptStackTrace());
 			log.info(String.format(
 					Messages.getString("BSHInterpreter.BadScript"), script)); //$NON-NLS-1$
-			if (ex.getCause() instanceof TargetError) {
-				TargetError e = (TargetError) ex.getCause();
-				throw new RuntimeException(e.getTarget());
-			}
+			throw UiException.Aide.wrap(ex);
+		} catch (EvalError ex) {
+			log.info(String.format(
+					Messages.getString("BSHInterpreter.BadScript"), script)); //$NON-NLS-1$
+			log.warn(String.format(
+					Messages.getString("BSHInterpreter.ExecutingStringError"), ex)); //$NON-NLS-1$
+			throw UiException.Aide.wrap(ex);
+		} catch (RuntimeException ex) {
+			log.info(String.format(
+					Messages.getString("BSHInterpreter.BadScript"), script)); //$NON-NLS-1$
+			log.warn(String.format(
+					Messages.getString("BSHInterpreter.ExecutingStringError"), ex)); //$NON-NLS-1$
 			throw ex;
 		}
 	}

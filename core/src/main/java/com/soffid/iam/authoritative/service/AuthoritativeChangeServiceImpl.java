@@ -12,10 +12,13 @@ package com.soffid.iam.authoritative.service;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.intf.AuthoritativeChange;
@@ -351,11 +354,18 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			ProcessTracker tracker = new ProcessTracker();
 			tracker.change = change;
 			tracker.auditGenerated = false;
-    		User user = applyUserChange(tracker);
-    		if (change.getAttributes() != null)
-    			applyAttributesChange (user, tracker);
-    		if (change.getGroups() != null)
-    			applyGroupChange (user, tracker);
+			if (change.getObjectType() == null || change.getObjectType() == SoffidObjectType.OBJECT_USER)
+			{
+	    		User user = applyUserChange(tracker);
+	    		if (change.getAttributes() != null)
+	    			applyAttributesChange (user, tracker);
+	    		if (change.getGroups() != null)
+	    			applyGroupChange (user, tracker);
+			}
+			else if (change.getObjectType() == SoffidObjectType.OBJECT_GROUP)
+			{
+				applyGroupChange (tracker);
+			}
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -378,26 +388,37 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
             if (actualGroups.contains(ug.getGroup())) {
                 actualGroups.remove(ug.getGroup());
             } else {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 getGroupService().removeGroupFormUser(user.getUserName(), ug.getGroup());
             }
         }
 		
 		for (String group : actualGroups) {
-            auditAuthoritativeChange(user.getUserName(), tracker);
+            auditAuthoritativeChange(tracker);
             getGroupService().addGroupToUser(user.getUserName(), group);
         }
 		
 	}
 
-	private void auditAuthoritativeChange (String user, ProcessTracker tracker)
+	private void auditAuthoritativeChange (ProcessTracker tracker)
 	{
 		if (!tracker.auditGenerated)
 		{
             AuditEntity auditoria = getAuditEntityDao().newAuditEntity();
             auditoria.setAction("U");
             auditoria.setDate(new Date());
-            auditoria.setUser(user);
+            if (tracker.change.getUser() != null)
+                auditoria.setUser(tracker.change.getUser().getUserName());
+            if (tracker.change.getGroup() != null)
+            {
+            	GroupEntity g = getGroupEntityDao().findByName(tracker.change.getGroup().getName());
+            	auditoria.setGroup(g);
+            }
+            if (tracker.change.getObject() != null)
+            {
+                auditoria.setCustomObjectName(tracker.change.getObject().getName());
+                auditoria.setCustomObjectType(tracker.change.getObject().getType());
+            }
             auditoria.setObject("AUTH_IDENT");
             auditoria.setDb(tracker.change.getSourceSystem());
             getAuditEntityDao().create(auditoria);
@@ -434,7 +455,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			boolean anyChange = !compareUsers(user, oldUser);
 			if (anyChange)
 			{
-				auditAuthoritativeChange(oldUser.getUserName(), tracker);
+				auditAuthoritativeChange(tracker);
 				getUserService().update(oldUser);
 			}
 		}
@@ -443,7 +464,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 
 	private boolean compareUsers(User user, User oldUser) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		boolean anyChange = false;
-		for (String att : new String[]{"Actiu", "AliesCorreu", "CodiGrupPrimari", "Comentari", "DominiCorreu", "MultiSessio", "NIF", "Nom", "NomCurt", "PrimerLlinatge", "SegonLlinatge", "ServidorCorreu", "ServidorPerfil", "ServidorHome", "Telefon", "TipusUsuari"}) {
+		for (String att : new String[]{"Active", "MailAlias", "PrimaryGroup", "Comments", "MailDomain", "MultiSession", 
+				"NationalID", "LastName", "ShortName", "FirstName", "MiddleName", "MailServer", "ProfileServer", 
+				"HomeServer", "PhoneNumber", "UserType"}) {
             Method getter = User.class.getMethod("get" + att);
             Method setter = User.class.getMethod("set" + att, getter.getReturnType());
             Object value = getter.invoke(user);
@@ -482,32 +505,33 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 for (DataType tda2 : getAdditionalDataService().getDataTypes()) {
                     if (tda2.getOrder().longValue() >= i) i = tda2.getOrder().longValue() + 1;
                 }
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 tda.setOrder(i);
                 tda.setCode(attribute);
+				tda.setScope(MetadataScope.USER);
                 tda = getAdditionalDataService().create(tda);
             }
             UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
             if (dada == null && value != null) {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 dada = new UserData();
                 dada.setAttribute(tda.getCode());
                 dada.setUser(user.getUserName());
                 if (value instanceof byte[]) dada.setBlobDataValue((byte[]) value); else if (value instanceof Calendar) dada.setDateValue((Calendar) value); else if (value != null) dada.setValue(value.toString());
                 getAdditionalDataService().create(dada);
             } else if (value == null && dada != null) {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 getAdditionalDataService().delete(dada);
             } else if (value != null && value instanceof byte[] && !((byte[]) value).equals(dada.getBlobDataValue())) {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 dada.setBlobDataValue((byte[]) value);
                 getAdditionalDataService().update(dada);
             } else if (value != null && value instanceof Calendar && !((Calendar) value).equals(dada.getBlobDataValue())) {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 dada.setDateValue((Calendar) value);
                 getAdditionalDataService().update(dada);
             } else if (value != null && !value.equals(dada.getValue())) {
-                auditAuthoritativeChange(user.getUserName(), tracker);
+                auditAuthoritativeChange(tracker);
                 dada.setValue(value.toString());
                 getAdditionalDataService().update(dada);
             }
@@ -537,6 +561,71 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
     		return current;
 		}
 	}
+
+
+	private Group applyGroupChange(ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		AuthoritativeChange change = tracker.change;
+		Group g = change.getGroup();
+		Group oldGroup = getGroupService().findGroupByGroupName(g.getName()); 
+		if (oldGroup == null)
+		{
+			if (g.getParentGroup() == null) g.setParentGroup("World");
+			if (g.getDescription() == null) g.setDescription("?");
+			if (g.getObsolete() == null) g.setObsolete(false);
+			oldGroup = getGroupService().create(g);
+		} else {
+			boolean anyChange = !compareGroups(g, oldGroup);
+			if (anyChange)
+			{
+				auditAuthoritativeChange(tracker);
+				getGroupService().update(oldGroup);
+			}
+		}
+		return oldGroup;
+	}
+
+	private boolean compareGroups(Group g, Group oldGroup) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		boolean anyChange = false;
+		for (String att : new String[]{"Description", "DriveLetter", "DriveServerName", "Name", "Obsolete", 
+				"Organizational", "ParentGroup", "Queta", "Section", "Type"}) {
+            Method getter = Group.class.getMethod("get" + att);
+            Method setter = Group.class.getMethod("set" + att, getter.getReturnType());
+            Object value = getter.invoke(g);
+            if ("".equals(value)) value = null;
+            if (value != null) {
+                Object oldValue = getter.invoke(oldGroup);
+                if ("".equals(oldValue)) oldValue = null;
+                if (oldValue == null || !oldValue.equals(value)) {
+                    log.info("Received change on attribute " + att);
+                    setter.invoke(oldGroup, value);
+                    anyChange = true;
+                }
+            }
+        }
+		
+		for (String attribute : g.getAttributes().keySet()) {
+            Object value = g.getAttributes().get(attribute);
+            if (value != null && value instanceof Date) {
+                Calendar c = Calendar.getInstance();
+                c.setTime((Date) value);
+                value = c;
+            }
+            Object oldValue = oldGroup.getAttributes().get(attribute);
+            if (oldValue != null && oldValue instanceof Date) {
+                Calendar c = Calendar.getInstance();
+                c.setTime((Date) oldValue);
+                oldValue = c;
+            }
+            if (oldValue == null && value != null ||
+            		oldValue != null && ! oldValue.equals(value))
+            {
+            	oldGroup.getAttributes().put(attribute, value);
+            	anyChange = true;
+            }
+		}
+		return ! anyChange;
+	} 
+
 }
 
 class ProcessTracker {

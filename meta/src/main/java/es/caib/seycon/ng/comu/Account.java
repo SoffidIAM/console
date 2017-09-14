@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonAttribute;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
@@ -32,6 +33,7 @@ public class Account {
 	public java.lang.String description;
 
 	@Description("Account type")
+	@JsonAttribute(hibernateAttribute="type")
 	public es.caib.seycon.ng.comu.AccountType type;
 
 	@Description("Groups that can use the account using SSO")
@@ -72,6 +74,7 @@ public class Account {
 
 	@Description("System where the acounts lives")
 	@Attribute(translated = "system" )
+	@JsonAttribute(hibernateAttribute="system.name")
 	public java.lang.String dispatcher;
 
 	@Description("Time stamp when the account was last used on target system")
@@ -100,10 +103,12 @@ public class Account {
 	public AccountStatus status;
 
 	@Description("Account's user type. It is directly bound to a password policy depending on the system's password domain")
+	@JsonAttribute(hibernateAttribute="passwordPolicy.name")
 	public java.lang.String passwordPolicy;
 
 	@Description ("Account attributes")
 	@Nullable
+	@JsonAttribute(hibernateJoin="attributes")
 	Map<String, Object> attributes;
 	
 	@Description("Read only attribute. Access level. See access level constants")

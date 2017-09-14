@@ -6,19 +6,13 @@
 	<parent>
 		<groupId>es.caib.seycon.ng</groupId>
 		<artifactId>seycon</artifactId>
-		<version>${pom.version}</version>
+		<version>${project.version}</version>
 	</parent>
 	<artifactId>seycon-legacy-client</artifactId>
 	<packaging>jar</packaging>
-	<version>${pom.version}</version>
+	<version>${project.version}</version>
 	<name>SEYCON Core Business Tier Client</name>
 	<dependencies>
-		<!--dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>seycon-base</artifactId>
-			<version>${seycon-base.version}</version>
-			<classifier>client</classifier>
-		</dependency-->
 		<dependency>
 			<groupId>jboss</groupId>
 			<artifactId>jboss-j2ee</artifactId>

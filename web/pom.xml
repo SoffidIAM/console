@@ -25,6 +25,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
 					<filteringDeploymentDescriptors>
 						true
@@ -32,7 +33,7 @@
 					<webResources>
 						<resource>
 							<directory>
-								${pom.basedir}/src/main/webapp/
+								${project.basedir}/src/main/webapp/
 							</directory>
 							<filtering>true</filtering>
 							<includes>
@@ -41,7 +42,7 @@
 						</resource>
 						<resource>
 							<directory>
-								${pom.basedir}/src/main/resources
+								${project.basedir}/src/main/resources
 							</directory>
 							<filtering>true</filtering>
 							<includes>
@@ -49,23 +50,13 @@
 							</includes>
 						</resource>				
 					</webResources>
-                                        <archive>
-                                                <manifest>
-                                                        <addClasspath>true</addClasspath>
-                                                </manifest>
-                                        </archive>
-                                        <attachClasses>true</attachClasses>
-                                        <classesClassifier>classes</classesClassifier>
-                                        <!-- 
-                                        <overlays>
-                                                <overlay />
-                                                <overlay>
-                                                        <groupId>com.soffid.zkib</groupId>
-                                                        <artifactId>zkiblaf</artifactId>
-                                                        <type>war</type>
-                                                </overlay>
-                                        </overlays>
-                                         -->
+                    <archive>
+                            <manifest>
+                                    <addClasspath>true</addClasspath>
+                            </manifest>
+                    </archive>
+                    <attachClasses>true</attachClasses>
+                    <classesClassifier>classes</classesClassifier>
 				</configuration>
 			</plugin>
 		<plugin>
@@ -115,15 +106,15 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-core</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 			<scope>provided</scope>
 		</dependency>
@@ -192,14 +183,14 @@
 			<scope>provided</scope>
 		</dependency>		
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>web-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-weblogout</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
@@ -238,7 +229,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>iam-tomee</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

@@ -54,7 +54,6 @@
 		<dependency>
 			<artifactId>jbpm-jpdl</artifactId>
 			<groupId>org.jbpm.jbpm3</groupId>
-			<version>3.3.1.GA</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -84,9 +83,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-core</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

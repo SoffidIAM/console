@@ -6,11 +6,11 @@
 	<parent>
 		<groupId>es.caib.seycon.ng</groupId>
 		<artifactId>seycon</artifactId>
-		<version>${pom.version}</version>
+		<version>${project.version}</version>
 	</parent>
 	<artifactId>seycon-core-client</artifactId>
 	<packaging>jar</packaging>
-	<version>${pom.version}</version>
+	<version>${project.version}</version>
 	<name>SEYCON Core Business Tier Client</name>
 	<dependencies>
 		<dependency>

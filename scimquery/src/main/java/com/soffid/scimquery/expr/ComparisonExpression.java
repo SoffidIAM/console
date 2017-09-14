@@ -11,6 +11,9 @@ import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 
 public class ComparisonExpression extends AbstractExpression {
+
+	private static final long serialVersionUID = 5932617296223973952L;
+
 	String attribute;
 	
 	String operator;
@@ -375,23 +378,23 @@ public class ComparisonExpression extends AbstractExpression {
 				}
 				else if ("sw".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-						.append(ctx.objectName)
-						.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("ew".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-					.append(ctx.objectName)
-					.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, "%"+value.toString().toUpperCase(), String.class);
 				}
 				else if ("co".equalsIgnoreCase(operator))
 				{
-					query.getWhereString().append("upper(")
-					.append(ctx.objectName)
-					.append(") like ");
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") like ");
 					addParameter (query, "%"+value.toString().toUpperCase()+"%", String.class);
 				}
 				else if ("pr".equalsIgnoreCase(operator))
@@ -424,6 +427,27 @@ public class ComparisonExpression extends AbstractExpression {
 				query.getParameters().put(param, d);
 			}
 		}
+		else if (Boolean.class.isAssignableFrom(hibernateClass))
+		{
+			if (value2 instanceof Boolean)
+				query.getParameters().put(param, value2);
+			else
+				query.getParameters().put(param, Boolean.parseBoolean(value2.toString()));
+		}
+		else if (Long.class.isAssignableFrom(hibernateClass))
+		{
+			if (value2 instanceof Long)
+				query.getParameters().put(param, value2);
+			else
+				query.getParameters().put(param, Long.parseLong(value2.toString()));
+		}
+		else if (Integer.class.isAssignableFrom(hibernateClass))
+		{
+			if (value2 instanceof Integer)
+				query.getParameters().put(param, value2);
+			else
+				query.getParameters().put(param, Integer.parseInt(value2.toString()));
+		}
 		else
 		{
 			query.getParameters().put(param, value2);
@@ -433,7 +457,14 @@ public class ComparisonExpression extends AbstractExpression {
 
 	private void addParameter(HQLQuery query, Object value2, String hibernateClass) throws EvalException {
 		try {
-			addParameter(query, value2, Class.forName(hibernateClass));
+			if ("boolean".equals(hibernateClass))
+				addParameter(query, value2, Boolean.class);
+			else if ("long".equals(hibernateClass))
+				addParameter(query, value2, Long.class);
+			else if ("int".equals(hibernateClass))
+				addParameter(query, value2, Integer.class);
+			else
+				addParameter(query, value2, Class.forName(hibernateClass));
 		} catch (ClassNotFoundException e) {
 			throw new EvalException("Unknown class "+hibernateClass, e);
 		}

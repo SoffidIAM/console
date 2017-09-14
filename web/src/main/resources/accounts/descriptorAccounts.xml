@@ -56,6 +56,11 @@
 				bean.setStatus(com.soffid.iam.api.AccountStatus.ACTIVE);
 				return bean;
 			</new-instance-script>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService"
+					method="findAccountByJsonQuery" if="${query != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Account"></new-instance-bean>
 		</finder>
 		<finder name="tipusUsuari" type="tipusUsuari">
 			<script-finder>

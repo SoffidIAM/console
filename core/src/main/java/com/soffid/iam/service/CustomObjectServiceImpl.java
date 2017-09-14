@@ -1,6 +1,5 @@
 package com.soffid.iam.service;
 
-import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -9,8 +8,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONException;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObject;
@@ -23,9 +20,6 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
-import com.soffid.scimquery.conf.AttributeConfig;
-import com.soffid.scimquery.conf.ClassConfig;
-import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
@@ -58,7 +52,9 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 
 	@Override
 	protected Collection<CustomObject> handleFindCustomObjectByJsonQuery(String objectType, String query) throws Exception {
-		ClassConfig config = getJsonConfiguration();
+
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value");
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
@@ -86,26 +82,6 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			}
 		}
 		return result;
-	}
-
-	private ClassConfig getJsonConfiguration()
-			throws  ClassNotFoundException, UnsupportedEncodingException, JSONException 
-	{
-		ClassConfig cc = Configuration
-				.getClassConfig(CustomObject.class);
-		
-		if (cc == null)
-		{
-			cc = new ClassConfig();
-			AttributeConfig attributeConfig = new AttributeConfig();
-			attributeConfig.setVirtualAttribute(true);
-			attributeConfig.setVirtualAttributeValue("value");
-			attributeConfig.setVirtualAttributeName("attribute.name");
-			cc.setDefaultVirtualAttribute(attributeConfig);
-			Configuration.registerClass(cc);
-		}
-
-		return Configuration.getClassConfig(com.soffid.iam.api.CustomObject.class);
 	}
 
 	@Override

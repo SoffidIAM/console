@@ -1814,6 +1814,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	@Override
 	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws InternalErrorException, Exception {
+
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
+
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();

@@ -355,7 +355,6 @@
 					esquema.getFellow("lista").getFellow("listbox").setRows(fileresO);
 				}
 				void showDetall() {
-					esquema.hideCriteris();
 					esquema.getFellow("lista").getFellow("listbox").setRows(5);
 					esquema.showFormulari();
 				}
@@ -450,59 +449,15 @@
 		<textbox xmlns:w="http://www.zkoss.org/2005/zk/client" value="abc123" action="onMouseOver: alert('hola');"/>
  -->
  		<esquemavertical datamodel="/model" focusCriteri="queryName"
-			id="esquema" onHideFormulari="showLista()">
-			<form dataPath="/model:/query" width="100%">
-				<criteris height="${queryWindowMin}" id="queryWindow" onOK="search()"
-					width="${amplaria}">
-					<vbox>
-						<hbox>
-							<input_criteri id="queryName" etiqueta="${c:l('accounts.name')}"
-								bind="name" />
-							<input_criteri id="queryDescription"
-								etiqueta="${c:l('accounts.description')}" bind="@description" />
-							<hbox width="250px" widths="100px,*">
-								<label sclass="etiqueta" value="${c:l('accounts.dispatcher')}" />
-								<combobox bind="@dispatcher" id="queryDispatcher"
-									dataPath="/model:/dispatcher" value="%">
-									<datacomboitem bind="@codi" labelBind="@codi">
-									</datacomboitem>
-								</combobox>
-							</hbox>
-							<imageclic onClick="search()" src="~./img/fletxa_cerca.gif" />
-						</hbox>
-						<hbox>
-							<hbox width="250px" widths="100px,*">
-								<label sclass="etiqueta" value="${c:l('accounts.type')}" />
-								<listbox id="queryAccountType" bind="@type" mold="select" 
-									dataPath="/model:/type">
-									<dataitem bind="@value">
-										<listcell bind="@literal" />
-									</dataitem>
-								</listbox>
-							</hbox>
-							<hbox width="250px" widths="100px,*">
-								<label sclass="etiqueta"
-									value="${c:l('accounts.excludeType')}" />
-								<listbox bind="@excludeType" id="queryIgnore"
-									mold="select" dataPath="/model:/type">
-									<dataitem bind="@value">
-										<listcell bind="@literal" />
-									</dataitem>
-								</listbox>
-							</hbox>
-						</hbox>
-						<hbox>
-							<input_criteri id="queryGrantedUsers"
-								etiqueta="${c:l('accounts.user')}" bind="@grantedUsers" />
-							<input_criteri id="queryGrantedGroups"
-								etiqueta="${c:l('accounts.group')}" bind="@grantedGroups" />
-							<input_criteri id="queryGrantedRoles"
-								etiqueta="${c:l('accounts.role')}" bind="@grantedRoles" />
-						</hbox>
-					</vbox>
-					<separator spacing="9px" />
-				</criteris>
-			</form>
+			id="esquema" onHideFormulari="showLista()" hideSearchToolbar="true">
+
+			<criteris id="queryWindow" style="margin-bottom:1em;" width="100%" height="">
+				<searchbox auto="true" id="searchBox"
+					jsonObject="com.soffid.iam.api.Account"
+					defaultAttributes="name, description" dataPath="/model:/account"
+					variableName="query">
+				</searchbox>
+			</criteris>
 
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>

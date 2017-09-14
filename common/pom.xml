@@ -46,9 +46,9 @@
 		<configuration>
 			<artifactItems>
 				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
+					<version>${project.version}</version>
 					<classifier>common</classifier>
 					<type>zip</type>
 					<overWrite>true</overWrite>
@@ -182,7 +182,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -209,14 +208,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jbpm.jbpm3</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
-			<version>3.3.1.GA</version>
 			<optional>true</optional>
 			<exclusions>
 				<exclusion>
@@ -259,14 +252,12 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<scope>provided</scope>
-			<version>2.4.5</version>
 			<type>jar</type>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.4.5</version>
 			<type>jar</type>
 			<scope>provided</scope>
 			<optional>true</optional>

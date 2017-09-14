@@ -47,9 +47,9 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>common</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
@@ -183,7 +183,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -207,11 +206,6 @@
 			<groupId>java.sun.com</groupId>
 			<artifactId>plugin.jar</artifactId>
 			<version>1.5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -259,28 +253,26 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<scope>provided</scope>
-			<version>2.4.5</version>
 			<type>jar</type>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.4.5</version>
 			<type>jar</type>
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-tomee</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -316,7 +308,6 @@
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkdb</artifactId>
-			<version>${zkdb.version}</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
@@ -327,14 +318,13 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>iam-core</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.30</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

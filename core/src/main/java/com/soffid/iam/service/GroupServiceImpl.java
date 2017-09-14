@@ -701,6 +701,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	@Override
 	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value");
+
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
 		HQLQuery hql = expression.generateHSQLString(Group.class);

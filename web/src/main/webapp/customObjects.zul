@@ -117,10 +117,10 @@
 			<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" 
 				 onSelect="select()" rows="${fileres}" autocommit="false">
 				<listhead>
-					<listheader label="${c:l('com.soffid.iam.api.CustomObjectType.name')}"
+					<listheader label="${c:l('com.soffid.iam.api.CustomObject.name')}"
 						sort="auto" width="20%" />
 					<listheader
-						label="${c:l('com.soffid.iam.api.CustomObjectType.description')}"
+						label="${c:l('com.soffid.iam.api.CustomObject.description')}"
 						sort="auto" width="20%" />
 				</listhead>
 				<listfoot>
@@ -144,11 +144,11 @@
 			<form dataPath="/esquema/lista/listbox:/" id="form" width="99%" onOK="">
 				<div>
 					<div>
-						<label style="width:12em; display:inline-block" value="${c:l('com.soffid.iam.api.CustomObjectType.name')} :"></label>
+						<label style="width:12em; display:inline-block" value="${c:l('com.soffid.iam.api.CustomObject.name')} :"></label>
 						<textbox bind="@name" width="15em" id="objectTypeName"  onChange="" />
 					</div>
 					<div>
-						<label style="width:12em; display:inline-block"  value="${c:l('com.soffid.iam.api.CustomObjectType.description')} :"></label>
+						<label style="width:12em; display:inline-block"  value="${c:l('com.soffid.iam.api.CustomObject.description')} :"></label>
 						<textbox bind="@description" width="30em" id="objectTypeDescription"  onChange="" />
 					</div>
 						<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 

@@ -46,9 +46,9 @@
 		<configuration>
 			<artifactItems>
 				<artifactItem>
-					<groupId>${pom.groupId}</groupId>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>iam-meta</artifactId>
-					<version>${pom.version}</version>
+					<version>${project.version}</version>
 					<classifier>common</classifier>
 					<type>zip</type>
 					<overWrite>true</overWrite>
@@ -205,11 +205,6 @@
 			<groupId>java.sun.com</groupId>
 			<artifactId>plugin.jar</artifactId>
 			<version>1.5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

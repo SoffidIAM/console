@@ -23,7 +23,7 @@
 			<type>ejb</type>
 			<exclusions>
 				<exclusion>
-					<groupId>axis</groupId>
+					<groupId>org.apache.axis</groupId>
 					<artifactId>axis-jaxrpc</artifactId>
 				</exclusion>
 			</exclusions>
@@ -106,9 +106,6 @@
 						<jarModule><groupId>asm</groupId><artifactId>asm</artifactId></jarModule>
 						<jarModule><groupId>asm</groupId><artifactId>asm-attrs</artifactId></jarModule>
 						<jarModule><groupId>cglib</groupId><artifactId>cglib</artifactId></jarModule>
-<!--						<jarModule><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId></jarModule>
-						<jarModule><groupId>commons-collections</groupId><artifactId>commons-collections</artifactId></jarModule>
--->
 						<jarModule><groupId>commons-digester</groupId><artifactId>commons-digester</artifactId></jarModule>
 						<jarModule><groupId>commons-discovery</groupId><artifactId>commons-discovery</artifactId></jarModule>
 						<jarModule><groupId>commons-lang</groupId><artifactId>commons-lang</artifactId></jarModule>

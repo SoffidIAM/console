@@ -109,9 +109,9 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -120,9 +120,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>com.soffid.iam</groupId> <artifactId>mda</artifactId> 
-			<version>${mda.version}</version> <classifier>webservice</classifier> <type>war</type> 
-			</dependency> -->
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-jaxws</artifactId>

@@ -40,12 +40,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.20</version>
 				<configuration>
 					<argLine>-Djava.security.manager -Djava.security.policy=${project.basedir}/src/test/resources/security.policy</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ejb-plugin</artifactId>
+				<version>3.0.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -265,7 +268,7 @@
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
-			<version>1.4</version>
+			<version>1.4.7</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -370,9 +373,6 @@
 					<groupId>xalan</groupId>
 					<artifactId>xalan</artifactId>
 				</exclusion>
-				<!--exclusion> <groupId>xml-apis</groupId> <artifactId>xml-apis</artifactId> 
-					</exclusion> <exclusion> <groupId>org.apache.santuario</groupId> <artifactId>xmlsec</artifactId> 
-					</exclusion -->
 				<exclusion>
 					<!-- provoca conflictos -->
 					<groupId>bouncycastle</groupId>
@@ -403,12 +403,12 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>axis</groupId>
+			<groupId>org.apache.axis</groupId>
 			<artifactId>axis-jaxrpc</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>axis</groupId>
+			<groupId>org.apache.axis</groupId>
 			<artifactId>axis-saaj</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -418,8 +418,6 @@
 			<version>136</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>com.oracle</groupId> <artifactId>ojdbc14</artifactId> 
-			<version>10.2.0.4.0</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>es.caib.signatura.valcert</groupId>
 			<artifactId>valcert-client-axis</artifactId>
@@ -439,7 +437,6 @@
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
@@ -596,11 +593,6 @@
 		    <groupId>jaxen</groupId>
 		    <artifactId>jaxen</artifactId>
 		    <version>1.1.6</version>
-		</dependency>
-		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
-		    <version>1.4.7</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.opensaml</groupId>

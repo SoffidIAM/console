@@ -47,9 +47,9 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${pom.groupId}</groupId>
+							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-meta</artifactId>
-							<version>${pom.version}</version>
+							<version>${project.version}</version>
 							<classifier>common</classifier>
 							<type>zip</type>
 							<overWrite>true</overWrite>
@@ -209,11 +209,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jbpm.jbpm3</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
 			<optional>true</optional>
@@ -269,15 +264,15 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-common</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-tomee</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -323,7 +318,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>iam-core</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 			<scope>provided</scope>
 		</dependency>

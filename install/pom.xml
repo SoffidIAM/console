@@ -65,7 +65,7 @@
 							<tasks>
 								<taskdef name="install4j" classname="com.install4j.Install4JTask" classpath="${env.INSTALL4J_HOME}/bin/ant.jar" />
 								<install4j projectfile="src/main/install4j/seu.install4j">
-									<variable name="seu.version" value="${pom.version}" />
+									<variable name="seu.version" value="${project.version}" />
 								</install4j>
 							</tasks>
 						</configuration>
@@ -73,25 +73,6 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<!-- execution>
-						<id>docker</id>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<exec failonerror="true" executable="docker" dir="${project.basedir}">
-									<arg value="build" />
-									<arg value="-f" />
-									<arg value="target/docker/Dockerfile" />
-									<arg value="-t" />
-									<arg value="soffid/iam-console:${pom.version}" />
-									<arg value="." />
-								</exec>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution -->
 				</executions>
 			</plugin>
 			<plugin>
@@ -207,15 +188,15 @@
 			<version>3.0</version>
 		</dependency>
 	    <dependency>
-           	<groupId>${pom.groupId}</groupId>
+           	<groupId>${project.groupId}</groupId>
            	<artifactId>deployer</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-ear</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>
 		<dependency>

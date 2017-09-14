@@ -131,6 +131,10 @@ public abstract class TasqueEntity {
 	@Nullable
 	public String customObjectName;
 	
+	@Column(name = "TAS_SOURCE", length = 50)
+	@Nullable
+	public String sourceTransaction;
+
 	@Column(name = "TAS_TEN_ID")
 	public TenantEntity tenant;
 
@@ -206,9 +210,37 @@ public abstract class TasqueEntity {
 		java.lang.String host) {
 	 return null;
 	}
+
+	@DaoFinder("select t "
+			+ "from com.soffid.iam.model.TaskEntity as t "
+			+ "where t.server is null and t.tenant.id=:tenantId")
+	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findUnscheduled() {
+	 return null;
+	}
 	
 	@DaoOperation
 	public void createNoFlush(es.caib.seycon.ng.model.TasqueEntity tasque)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@DaoOperation
+	public String startVirtualSourceTransaction()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@DaoOperation
+	public void finishVirtualSourceTransaction(String virtualTransactionId)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@DaoOperation
+	public void releaseAll()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@DaoOperation
+	public void cancelUnscheduled()
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 }

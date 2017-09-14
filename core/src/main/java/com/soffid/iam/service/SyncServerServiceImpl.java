@@ -18,6 +18,7 @@ import com.soffid.iam.api.AgentStatusInfo;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
+import com.soffid.iam.api.Task;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.Parameter;
@@ -632,6 +633,44 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         } else {
             status.resetServerAgents(agent);
         }
+	}
+
+	@Override
+	protected Collection<SeyconTask> handleFindUnscheduledTasks() throws Exception {
+		List<TaskEntity> l = getTaskEntityDao().findUnscheduled();
+		List<SeyconTask> l2 = new LinkedList<SeyconTask>();
+		for (TaskEntity e: l)
+		{
+			SeyconTask st = new SeyconTask(e.getId(), tascaToString(e));
+			st.setStatus(e.getStatus().equals("P") ? SeyconTask.Estat.PENDING :
+				e.getStatus().equals("E") ? SeyconTask.Estat.ERROR :
+				e.getStatus().equals("X") ? SeyconTask.Estat.PAUSED :
+				 SeyconTask.Estat.UNKNOWN
+				);
+			l2.add(st);
+		}
+		
+		return l2;
+	}
+
+	@Override
+	protected void handleReleaseAllTasks() throws Exception {
+		getTaskEntityDao().releaseAll();		
+	}
+
+	@Override
+	protected void handleCancelUnscheduledTasks() throws Exception {
+		getTaskEntityDao().cancelUnscheduled();		
+	}
+
+	@Override
+	protected void handleReleaseTask(long taskId) throws Exception {
+		TaskEntity t = getTaskEntityDao().load(taskId);
+		if ( t != null && t.getStatus().equals("X"))
+		{
+			t.setStatus("P");
+			getTaskEntityDao().update(t);
+		}
 	}
 
 }

@@ -5,10 +5,14 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.ui.SeyconTask;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.SeyconServerInfo;
+import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.model.ConfiguracioEntity;
+
+import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +41,15 @@ public abstract class SeyconServerService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Collection<SeyconTask> findUnscheduledTasks () { return null; }
+
 	@Operation ( grantees={roles.monitor_server_list.class},
 			translated="getServerTasks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<java.lang.Object> getServerTasks(
+	public java.util.Collection<Object> getServerTasks(
 		java.lang.String url)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -109,6 +118,27 @@ public abstract class SeyconServerService {
 	@Operation ( grantees={roles.monitor_server_list.class} )
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void boostTask (long taskId)
+	{
+		
+	}
+
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void releaseTask (long taskId)
+	{
+		
+	}
+
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void releaseAllTasks ()
+	{
+		
+	}
+
+	@Operation ( grantees={roles.monitor_server_list.class} )
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void cancelUnscheduledTasks ()
 	{
 		
 	}

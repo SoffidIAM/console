@@ -14,7 +14,9 @@ import es.caib.seycon.ng.utils.Security;
 
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -30,8 +32,10 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
     	if (checkDuplicate(tasqueEntity))
     		return;
-    	
-        tasqueEntity.setStatus("P"); //$NON-NLS-1$
+
+		tasqueEntity.setStatus("P"); //$NON-NLS-1$
+
+		tooMuchTasks(tasqueEntity);
         if (tasqueEntity.getPriority() == null)
         {
     		String transactionCode = tasqueEntity.getTransaction();
@@ -186,6 +190,61 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
         getSession().flush();
     }
 
+    static ThreadLocal<TransactionStatus> transactionStatus = new ThreadLocal<TransactionStatus>();
+    static String transactionSeed = Long.toString(System.currentTimeMillis())+"/";
+    static int virtualCounter = 0;
+    
+    private TransactionStatus currentTransactionStatus () {
+    	TransactionStatus current = transactionStatus.get();
+    	if (current == null)
+    	{
+    		current = new TransactionStatus();
+    		current.transactionHash = "";
+    		transactionStatus.set(current);
+    	}
+    	
+    	if (current.virtualId == null)
+    	{
+    		String hash = transactionSeed + getSession().getTransaction().hashCode();
+    		if (! hash.equals(current.transactionHash)) 
+    		{
+    			current.transactionHash = hash;
+    			current.count = 0;
+    			current.exceeded = false;
+    		}
+    	}
+    	return current;
+    }
+    
+    private boolean tooMuchTasks (TaskEntity entity)
+    {
+    	TransactionStatus c = currentTransactionStatus();
+    	if (c.exceeded)
+    	{
+    		entity.setStatus("X");
+    		return true;
+    	}
+    	c.count ++ ;
+    	entity.setSourceTransaction(c.virtualId == null ? c.transactionHash: c.virtualId);
+    	String limit = ConfigurationCache.getProperty("soffid.task.limit");
+    	if (limit == null)
+    		return false;
+    	if ( c.count > Integer.parseInt(limit))
+    	{
+    		c.exceeded = true;
+    		getSession().flush();
+    		Query q = getSession().createQuery(
+    				"update com.soffid.iam.model.TaskEntity "
+    				+ "set status='X' "
+    				+ "where sourceTransaction=:sourceTransaction and tenant.id=:tenantId");
+    		q.setParameter("sourceTransaction", c.virtualId == null ? c.transactionHash: c.virtualId);
+    		q.setParameter("tenantId", Security.getCurrentTenantId());
+    		q.executeUpdate();
+    		entity.setStatus("X");
+    	}
+    	return c.exceeded;
+    }
+    
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.model.TasqueEntityDaoBase#handleCreateNoFlush(es.caib.seycon.ng.model.TasqueEntity)
 	 */
@@ -194,7 +253,64 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
     	if (checkDuplicate(tasque))
     		return;
+		tasque.setStatus("P");
+
+		tooMuchTasks(tasque);
 		this.getHibernateTemplate().save(tasque);
 	}
 
+	@Override
+	protected void handleFinishVirtualSourceTransaction(String virtualTransactionId) throws Exception {
+		TransactionStatus c = currentTransactionStatus();
+		if (c.virtualId != null && c.virtualId.equals(virtualTransactionId))
+		{
+			c.transactionHash = null;
+			c.virtualId = null;
+			c.count = 0;
+		}
+	}
+
+	@Override
+	protected String handleStartVirtualSourceTransaction() throws Exception {
+		TransactionStatus c = currentTransactionStatus();
+		if (c.virtualId == null)
+		{
+			synchronized (transactionSeed)
+			{
+				c.virtualId = transactionSeed + "#" + virtualCounter;
+				virtualCounter ++;
+			}
+			c.transactionHash = null;
+			c.count = 0;
+			return c.virtualId;
+		} else {
+			return c.virtualId+"#nested";
+		}
+	}
+
+	@Override
+	protected void handleReleaseAll() throws Exception {
+		Query q = getSession().createQuery(
+				"update com.soffid.iam.model.TaskEntityImpl "
+				+ "set status='P' "
+				+ "where status='X' and tenant.id=:tenantId");
+		q.setLong("tenantId", Security.getCurrentTenantId());
+		q.executeUpdate();
+	}
+
+	@Override
+	protected void handleCancelUnscheduled() throws Exception {
+		Query q = getSession().createQuery(
+				"delete from com.soffid.iam.model.TaskEntityImpl "
+				+ "where server is null and tenant.id=:tenantId");
+		q.setLong("tenantId", Security.getCurrentTenantId());
+		q.executeUpdate();
+	}
+}
+
+class TransactionStatus {
+	String virtualId;
+	String transactionHash;
+	int count;
+	boolean exceeded;
 }

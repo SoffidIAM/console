@@ -123,6 +123,17 @@
 					titoltasques.setVisible(true);
 					panels.setWidth("100%");
 					panels.setVisible(true);
+				} else if ("unscheduled".equals(quin)) {
+					t_tasques.setVisible(false);
+					t_tasquesagent.setVisible(false);
+					t_agents.setVisible(false);
+					t_dbpool.setVisible(false);
+					t_seyconInfo.setVisible(false);
+					t_unscheduled.setVisible(true);
+					t_unscheduled.setSelected(true);
+					titoltasques.setVisible(true);
+					panels.setWidth("100%");
+					panels.setVisible(true);
 				} else if ("serverReset".equals(quin)) {
 					t_tasques.setVisible(false);
 					t_tasquesagent.setVisible(false);
@@ -345,6 +356,24 @@
 				}
 			}
 			
+			// Functionality to show server tasks info
+			void viewUnscheduledTasks()
+			{
+				if (canQueryAgentList)
+				{
+					model.getVariables().declareVariable("queryUnscheduledEnabled", true);
+					model.getJXPathContext().getValue("/unscheduled").refresh();
+					l_tasquesAgent.setValue(org.zkoss.util.resource.Labels.getLabel("seyconserver.zul.Unscheduled"));
+					l_tasquesAgentURL.setValue("");
+					mostraPanel("unscheduled");
+				}
+				
+				else
+				{
+					mostraPanel("cap");
+				}
+			}
+
 			Component serverInfoComponent = null;
 			// Functionality to view server additional info
 			void viewServerAdditionalInfo(self)
@@ -713,8 +742,14 @@
 					<label bind="@numAgents"/>
 				</listcell>
 				<listcell>
-					<hbox width="100%" widths="*">
-					<label bind="@numTasquesPendents"/>
+					<hbox width="100%" widths="*, 85px">
+						<label bind="@numTasquesPendents"/>
+						<button if="${canQueryAgentList}"
+							label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
+							<attribute name="onClick">
+								viewUnscheduledTasks();
+							</attribute>
+						</button>
 					</hbox>
 				</listcell>
 				<listcell/>
@@ -744,6 +779,7 @@
 		<tab id="t_tasquesagent" label="${c:l('seyconserver.zul.TasquesAgent')}" visible="false"/>
 		<tab id="t_seyconInfo" label="${c:l('seyconserver.zul.Informacia')}" visible="false"/>
 		<tab id="t_dbpool" label="${c:l('seyconserver.zul.ConsultesSQL')}" visible="false"/>
+		<tab id="t_unscheduled" label="${c:l('seyconserver.zul.TasquesAgent')}" visible="false"/>
 	</tabs>
 	<tabpanels width="100%">
 		<tabpanel id="tagents" width="100%">
@@ -1017,6 +1053,93 @@
 				</attribute>
 			</button>
 		</tabpanel>
+
+		<tabpanel id="tunscheduled" width="100%">
+			<vbox width="100%">
+			<hbox sclass="taulaagents" width="99%">
+				<hbox>
+					<div sclass="titolpagina">
+						${c:l('seyconserver.zul.Unscheduled')}
+					</div>
+				</hbox>
+				
+				<div style="float:right">
+					<image sclass="reloadtasks" src="/images/reload-petit.png"
+						tooltiptext="${c:l('seyconserver.RefrescaAgent')}">
+						<attribute name="onClick">
+							model.getValue("/unscheduled").refresh();
+						</attribute>
+					</image>
+				</div>
+			</hbox>
+			<listbox dataPath="/model:/unscheduled" fixedLayout="true"
+				id="listboxUnscheduled" mold="paging" pageSize="20"
+				sclass="likeagrid doscolors" width="99%">
+				<attribute name="onNewRow"><![CDATA[
+				    Listitem item = event.getData();
+					String status = es.caib.zkib.datasource.XPathUtils.getValue(item, "@status");
+					if (! status.equals("HELD"))
+						item.getChildren().get(1).getChildren().get(0).setVisible(false);
+				]]></attribute>
+				<listhead>
+					<listheader label="${c:l('seyconserver.zul.Tasca')}" sort="auto" />
+					<listheader label="${c:l('seyconserver.zul.Estat')}" sort="auto" />
+					<listheader sort="auto" width="24px"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@descripcioTasca">
+					</listcell>
+					<listcell bind="@status" style="text-align:center;">
+						<imageclic src="/img/play.png" title="${c:l('seyconserver.zul.ReleaseAll') }" style="margin-left:32px; width: 16px;">
+						<attribute name="onClick"><![CDATA[
+							Long tid = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@id");
+							es.caib.seycon.ng.EJBLocator.getSeyconServerService().releaseTask(tid);
+							es.caib.zkib.datasource.XPathUtils.setValue(event.getTarget(), "@status", "PENDING");
+							self.setVisible(false);
+						]]></attribute>
+						</imageclic>
+					</listcell>
+					<listcell>
+						<imageclic src="/img/stop.png" title="Cancel task" style="width: 16px; float:right;">
+						<attribute name="onClick"><![CDATA[
+							String t = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@descripcioTasca");
+							Long tid = es.caib.zkib.datasource.XPathUtils.getValue(event.getTarget(), "@id");
+							Listitem item = event.getTarget().getParent().getParent();
+              				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", new Object[]{t}),
+                  						"Cancel task",
+                  						new EventListener() {
+                  							public void onEvent(Event event) throws Exception {
+                  								if (event.getData().equals( Missatgebox.OK) )
+                  								{
+                  									es.caib.seycon.ng.EJBLocator.getSeyconServerService()
+                  										.cancelTask(tid);
+                  									item.setParent(null);
+                  								}
+                  							}
+                  						});
+						]]></attribute>
+						</imageclic>
+					</listcell>
+				</dataitem>
+			</listbox>
+			<div>
+				<listexportbutton acces="${canQueryAgentList}" listbox="listboxUnscheduled"/>
+				<button image="/img/play.png" label="${c:l('seyconserver.zul.ReleaseAll') }">
+						<attribute name="onClick"><![CDATA[
+							es.caib.seycon.ng.EJBLocator.getSeyconServerService().releaseAllTasks();
+							model.getJXPathContext().getValue("/unscheduled").refresh();
+						]]></attribute>
+				</button>
+				<button image="/img/stop.png" label="${c:l('seyconserver.zul.CancelAll') }">
+						<attribute name="onClick"><![CDATA[
+							es.caib.seycon.ng.EJBLocator.getSeyconServerService().cancelUnscheduledTasks();
+							model.getJXPathContext().getValue("/unscheduled").refresh();
+						]]></attribute>
+				</button>
+			</div>
+			</vbox>
+		</tabpanel>
+
 	</tabpanels>
 	</tabbox>
 </frame>

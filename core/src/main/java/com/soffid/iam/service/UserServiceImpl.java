@@ -419,13 +419,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		crearLlistaCorreu(usuari);
 
-		/*
-		 * String contrasenya = getContrasenyaEntityDao().generaPasswordInicial(
-		 * usuariEntity.getCodi(), usuariEntity.getId());
-		 * getContrasenyaEntityDao().assignaPassword(usuariEntity.getCodi(),
-		 * usuariEntity.getId(), contrasenya);
-		 */
-
 		usuari.setId(usuariEntity.getId());
 		/* Se devuelve la instancia de usuario creada */
 		getAccountService().generateUserAccounts(usuari.getUserName());
@@ -434,6 +427,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		GroupService service = getGroupService();
 		service.propagateRolsChangesToDispatcher(usuari.getPrimaryGroup());
 
+		if ( usuari.getActive().booleanValue())
+		{
+			auditChange("E", usuari.getUserName(), null);
+			getRuleEvaluatorService().applyRules(usuariEntity);
+		}
 		getRuleEvaluatorService().applyRules(usuariEntity);
 
 		return getUserEntityDao().toUser(usuariEntity);
@@ -1514,27 +1512,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					Messages.getString("UserServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
 		}
 
-		/*
-		 * // Comprobamos que no exista ya el usuario a crear (puede haber ya
-		 * varios) String NIF = usuari.getNIF(); if (NIF!=null &&
-		 * !"".equals(NIF.trim())) { //$NON-NLS-1$ NIF = NIF.trim(); Collection
-		 * usuarisMateixNIF = getUserEntityDao().findUsersByNationalID(NIF); if
-		 * (usuarisMateixNIF!=null) { if (usuarisMateixNIF.size()==1)
-		 * {//comprobamos que no sea al mismo !! UserEntity usuariExist =
-		 * (UserEntity) usuarisMateixNIF.iterator().next(); if
-		 * (!usuari.getId().equals(usuariExist.getId())) throw new
-		 * SeyconException
-		 * (String.format(Messages.getString("UserServiceImpl.ExistsUser"),
-		 * usuariExist.getUserName())); } else if (usuarisMateixNIF.size()!=0) {
-		 * // hay más de 1 String codiUsuaris=""; //$NON-NLS-1$ for (Iterator it
-		 * = usuarisMateixNIF.iterator(); it.hasNext(); ) { codiUsuaris += "\'"
-		 * + ((UserEntity) it.next()).getUserName() + "\', "; } codiUsuaris =
-		 * codiUsuaris.substring(0,codiUsuaris.length()-2); throw new
-		 * SeyconException
-		 * (String.format(Messages.getString("UserServiceImpl.ExistsUser"),
-		 * //$NON-NLS-1$ codiUsuaris)); } } }
-		 */
-
 		// Ara hem de comprovar que si es modifica l'usuari [nom,llinatges o
 		// DNI, es verifique que siga correcte]
 		UserEntity usuariAbans = usuari.getId() != null ? getUserEntityDao()
@@ -1559,6 +1536,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 												.getLastModificationDate())));
 			}
 		}
+
+		
+		if (previousUser.getActive().booleanValue() && !usuari.getActive().booleanValue())
+		{
+			auditChange("e", previousUser.getUserName(), null);
+		}
+
+		if (! previousUser.getActive().booleanValue() && usuari.getActive().booleanValue())
+		{
+			auditChange("E", previousUser.getUserName(), null);
+		}
+
 		// Verifiquem si hem de fer la comprovació de la identitat:
 		// s'ha modifcat el nif de l'usuari??
 		UserDataEntity nifAnterior = getUserDataEntityDao().findByDataType(
@@ -1987,9 +1976,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	private void auditaCanviPassword(String codiUsuariAuditat,
 			String codiDominiContrasenyes) {
+		auditChange ("P", codiUsuariAuditat, codiDominiContrasenyes);
+	}
+	
+	private void auditChange(String action, String codiUsuariAuditat, String codiDominiContrasenyes) {
 		String codiUsuari = Security.getCurrentAccount();
 		Audit auditoria = new Audit();
-		auditoria.setAction("P"); //$NON-NLS-1$
+		auditoria.setAction(action); //$NON-NLS-1$
 		auditoria.setUser(codiUsuariAuditat);
 		auditoria.setAuthor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(

@@ -11,6 +11,13 @@
 				className="es.caib.seycon.ng.comu.SeyconServerInfo">
 			</new-instance-bean>			
 		</finder>
+		
+		<finder name="unscheduled" type="tascapendent">
+			<ejb-finder jndi="java:comp/env/ejb/SeyconServerEJB"
+				method="findUnscheduledTasks" if = "${queryUnscheduledEnabled}">  <!-- monitor:agent:list  -->
+			</ejb-finder>
+		</finder>		
+
 		<finder name="tasquespendents" type="tascapendent">
 			<ejb-finder jndi="java:comp/env/ejb/SeyconServerEJB"
 				method="getPendingTasksInfo" if = "${queryEnabled}">  <!-- monitor:agent:list  -->

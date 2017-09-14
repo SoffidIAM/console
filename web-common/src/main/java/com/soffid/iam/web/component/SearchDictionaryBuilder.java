@@ -39,6 +39,7 @@ public class SearchDictionaryBuilder {
 		 add("com.soffid.iam.api.Application.ownerName");
 		 add("com.soffid.iam.api.Group.driveServerName");
 		 add("com.soffid.iam.api.Group.section");
+		 add("com.soffid.iam.api.CustomObject.type");
 	}};
 	private static Map<String, SearchDictionary> map = new HashMap<String, SearchDictionary>();
 

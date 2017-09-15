@@ -26,31 +26,34 @@ function configure {
 	    exit 1
 	fi
 
+	if [[ "$JAVA_OPT" == "" ]]
+	then
+	    echo "-Xmx1024m" >/opt/soffid/iam-console-2/bin/run.vmoptions
+	    echo "-Xms256m" >>/opt/soffid/iam-console-2/bin/run.vmoptions
+	else
+	    echo "$JAVA_OPT" >/opt/soffid/iam-console-2/bin/run.vmoptions
+	fi
     
-	(	echo "dbExceptionSorter=org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter"
-		echo "dbSchemaPassword=$MARIADB_PASS"
-		echo "dbConnectionChecker=org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker"
-		echo "dbSanitySelect=SET GLOBAL max_allowed_packet = 128000000;"
-		echo "dbDriverClass=com.mysql.jdbc.Driver"
-		echo "dbHost=$MARIADB_HOST"
-		echo "i.dbDriver=0"
-		echo "dbDriverUrl=jdbc\:mysql\://$MARIADB_HOST\:$MARIADB_PORT/$MARIADB_DB"
-		echo "dbSchema=$MARIADB_USER"
-		echo "dbStatus=1"
-		echo "l.dbPort=$MARIADB_PORT"
-		echo "dbSid=$MARIADB_DB"
+	(
+		echo 'tomee.serialization.class.blacklist = *'
 		echo "dbUser=$MARIADB_USER"
+		echo "dbPassword=$MARIADB_PASS"
+		echo "dbValidationQuery=select 1"
 		echo "dbDriverString=mysql"
-	) > /opt/soffid/iam-console/jboss/server/default/conf/seu.properties		
+		echo "dbDriverUrl=jdbc\:mysql\://$MARIADB_HOST\:$MARIADB_PORT/$MARIADB_DB"
+	) > /opt/soffid/iam-console-2/conf/system.properties		
+
+	touch /opt/soffid/iam-console-2/conf/configured 
+	
 	true
 }
 
 
 
-if [[ ! -f /opt/soffid/iam-console/jboss/server/default/conf/seu.properties ]]
+if [[ ! -f /opt/soffid/iam-console-2/conf/configured ]]
 then
    configure || exit 1
 fi
 
 
- exec /opt/soffid/iam-console/run
+ exec /opt/soffid/iam-console-2/bin/run

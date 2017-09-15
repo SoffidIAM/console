@@ -680,9 +680,25 @@ public class DeployerBean implements DeployerService {
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
 				try {
-					List<Object[]> result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
+					List<Object[]> result = null;
+					try {
+						 result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
 							"SC_CONFIG WHERE CON_CODI='plugin.timestamp'"); //$NON-NLS-1$
-					if (!result.isEmpty()) {
+					} catch (SQLException e) {
+						// Maybe first execution
+					}
+					if (result == null)
+					{
+						// First time
+						System.setProperty("soffid.fail-safe", "true");
+						log.info("Deploying on fail-safe mode");
+						recursivelyDelete(tmpDir());
+						getTimestampFile().delete();
+						uncompressEar();
+						updateApplicationXml();
+					}
+					else if ( !result.isEmpty()) 
+					{
 						Long ts = Long.decode(result.iterator().next()[0]
 								.toString());
 						if (mustUpdate(ts)) {

@@ -230,7 +230,7 @@ public class InputField extends Div implements XPathSubscriber{
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"
 									+ "<label/>"+required+"</div>";
 						} else {
-							result = "<div style='display:inline' visible='"+(!dualEdit)+"'>"
+							result = "<div style='display:inline' visible='true'>"
 									+ "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\"  onOK=\"\" readonly=\""
 									+readonlyExpr+"\"/>" +
 									"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" onClick='self.parent.parent.onSelectUser(event)' onActualitza='self.parent.parent.onActualitza(event)'/>"

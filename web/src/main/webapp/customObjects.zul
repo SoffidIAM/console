@@ -10,7 +10,6 @@
 	
 	<datamodel id="model" rootNode="objects" src="descriptorCustomObject.xml"
 		onChange="showCancelButton()"/>
-	
 
 	<style>
 		.objectatt {display: table; padding: 0px; width: 100%}
@@ -23,6 +22,9 @@
 
 	<zscript>
 		<![CDATA[
+			// Recover the custom object code to open directly the Details box
+			String requestedCustomObject = Executions.getCurrent().getNativeRequest().getParameter("customobject");
+
 			import es.caib.zkib.zkiblaf.Missatgebox;
 			String objectType = Executions.getCurrent().getNativeRequest().getParameter("type");
 			pageScope.put("objectType", objectType);
@@ -94,6 +96,21 @@
 		hideSearchToolbar="true"
 		onHideFormulari="showLista()">
 	
+		<attribute name="onCreate">
+			<![CDATA[
+				if (requestedCustomObject != null) {
+					qw = esquema.getFellow("queryWindow");
+					searchBox = qw.getFellow("searchBox");
+					searchBox.addAttribute("name").setSearchFilter(requestedCustomObject);
+					searchBox.search();
+					esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
+					showDetall();
+					esquema.removeCriteria();
+					esquema.removeList();
+				}
+			]]>
+		</attribute>
+
 		<criteris id="queryWindow" style="margin-bottom:1em;" 
 			width="100%" height="">
 			<searchbox auto="true" id="searchBox"
@@ -136,11 +153,6 @@
 		</navegador>
 	
 		<detalls id="dades" width="100%" style="padding: 6px">
-			<toolbar if="${requestedGroup != null }"  height="20px">
-				<commitbutton id="b_commit" datamodel="/model"/>
-				<toolbarbutton label="" ></toolbarbutton>
-			</toolbar>
-			
 			<form dataPath="/esquema/lista/listbox:/" id="form" width="99%" onOK="">
 				<div>
 					<div>
@@ -156,6 +168,9 @@
 							sclass="objectatt"/>
 				</div>
 			</form>
+			<toolbar if="${requestedCustomObject != null}" class="toolbarOnlyDetails">
+				<commitbutton id="b_commit" datamodel="/model" />
+			</toolbar>
 		</detalls>
 	</esquemavertical>
 	

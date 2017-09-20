@@ -614,9 +614,6 @@
 			</navegador>
 
 			<detalls id="dades" width="${amplaria}" style="border:none">
-				<toolbar if="${requestedUser != null }" height="22px">
-					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
-				</toolbar>
 				<zscript>
 				<![CDATA[
 					void onChangeTipus (Listbox listbox)
@@ -2669,6 +2666,9 @@ void actualitza (event) {
 						</tabpanels>
 					</tabbox>
 				</form>
+				<toolbar if="${requestedUser != null}" class="toolbarOnlyDetails">
+					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
+				</toolbar>
 			</detalls>
 		</esquemavertical>
 
@@ -2730,6 +2730,8 @@ void actualitza (event) {
 		<include src="usuarisllista.zul" />
 		<include src="dominisCorreullista.zul" />
 		<include src="grupsllista.zul" />
+		<include src="aplicacionsllista.zul" />
+		<include src="customObjectsllista.zul" />
 		<include src="finestres/maquinesllistaUsuari.zul" />
 		<include src="impressoresllista.zul" />
 		<include src="rolsllista.zul" />

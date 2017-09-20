@@ -229,10 +229,7 @@
 		</navegador>
 	
 		<detalls id="dades" width="${amplaria}" style="border:none">
-			<toolbar if="${requestedGroup != null }"  height="20px">
-				<commitbutton id="b_commit" datamodel="/model"/>
-				<toolbarbutton label="" ></toolbarbutton>
-			</toolbar>
+
 			<zscript>
 				<![CDATA[
 					void onChangeDades()
@@ -694,6 +691,9 @@
 					<label id="rolsNomTooltipLabel" value=""/>
 				</popup>
 			</form>
+			<toolbar if="${requestedGroup != null}" class="toolbarOnlyDetails">
+				<commitbutton id="b_commit" datamodel="/model" />
+			</toolbar>
 		</detalls>
 	</esquemavertical>
 	

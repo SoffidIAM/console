@@ -10,10 +10,12 @@
 	
 	<style>
 		.tcoth div {text-align:center !important;}
-		.appatt {display: table; padding: 5px; width: 100%}
+		.appatt {display: table; padding: 0px; width: 100%}
 		.appatt_row {display: table-row}
-		.appatt_label {display: table-cell; width: 200px}
-		.appatt_input {display: table-cell}
+		.appatt_row span {padding-left:5px}
+		.appatt_label {display: table-cell; width: 202px}
+		.appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		.ourcheck input {vertical-align:-7px}
 	</style>
 	
 	<datamodel id="model" rootNode="aplicacions" src="descriptorAplicacio.xml"/>
@@ -367,11 +369,11 @@
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.GestionableperWorkfl')}"/>
 										<checkbox id="gestionable_wf" bind="@gestionableWF"
-												disabled="${!canModifyAplicacio}" onCheck=""/>
+												disabled="${!canModifyAplicacio}" onCheck="" class="ourcheck"/>
 									</row>
 									<row>
 											<input_etiqueta value="${c:l('aplicacions.zul.Process')}"/>
-											<listbox mold="select" bind="@approvalProcess" dataPath="/model:/approvalProcess" width="20em" disabled="${!canModifyAplicacio}" >
+											<listbox mold="select" bind="@approvalProcess" dataPath="/model:/approvalProcess" width="20em" disabled="${!canModifyAplicacio}">
 												<dataitem bind="@value">
 													<listcell bind="@tag"></listcell>
 												</dataitem>
@@ -387,7 +389,7 @@
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.Correunotificacions')}"/>
-										<textbox bind="@correusNotificacions" disabled="${!canModifyAplicacio}" id="detall_correuNotifica" maxlength="512" width="98%">
+										<textbox bind="@correusNotificacions" disabled="${!canModifyAplicacio}" id="detall_correuNotifica" maxlength="512" width="98%" style="padding-right:4px">
 											<attribute name="onChange">
 												valor = self.value;
 												if (valor==null || "".equals(valor.trim())) return;
@@ -1475,6 +1477,9 @@ void removeSodRule (Component button)
 	<include src="finestres/aplica_rolinfo.zul"/>
 	<include src="domini.zul"/>
 	<include src="usuarisllista.zul"/>
+	<include src="grupsllista.zul"/>
+	<include src="aplicacionsllista.zul" />
+	<include src="customObjectsllista.zul" />
 	<include src="valorDomini.zul"/>	
 	<include src="dominisllista.zul"/>
 	<include src="finestres/aplica_usuarisRolllista.zul"/>

@@ -506,7 +506,7 @@ public class InputField2 extends Div
 											+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='self.parent.parent.changeData()'/>"
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
 						else
-							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\""+getBind()+"\" onChange=\"\" width='100%' "
+							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\""+getBind()+"\" onChange=\"\" width='98%' "
 									+ "readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 					} else { // Listbox
 						result = "<listbox mold=\"select\" bind=\""+getBind()+"\" onChange=\"\" "

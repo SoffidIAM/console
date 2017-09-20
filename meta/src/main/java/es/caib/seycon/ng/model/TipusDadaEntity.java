@@ -6,11 +6,19 @@
 
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
-import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.TenantEntity;
-import com.soffid.iam.api.MetadataScope;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Column;
+import com.soffid.mda.annotation.DaoFinder;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Entity;
+import com.soffid.mda.annotation.ForeignKey;
+import com.soffid.mda.annotation.Identifier;
+import com.soffid.mda.annotation.Index;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
 
 @Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
@@ -80,9 +88,15 @@ public abstract class TipusDadaEntity {
 	public Boolean unique;
 	
 	
+	@Description("Object type acting as owner of the attribute")
 	@Column (name="TDA_COT_ID", reverseAttribute="attributes", composition=true)
 	@Nullable
 	CustomObjectTypeEntity objectType;
+
+	@Description("Object type instances acting as value of the attribute, for custom object type attributes")
+	@Column (name="TDA_COT_VAL_ID", reverseAttribute="referencedBy", composition=true)
+	@Nullable
+	CustomObjectTypeEntity dataObjectType;
 
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;

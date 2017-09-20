@@ -9,13 +9,6 @@
  */
 package com.soffid.iam.model;
 
-import es.caib.seycon.ng.model.*;
-
-import com.soffid.iam.model.MetaDataEntity;
-import com.soffid.iam.utils.ExceptionTranslator;
-
-import es.caib.seycon.ng.exception.SeyconException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -25,6 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.utils.ExceptionTranslator;
+
+import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.seycon.ng.exception.SeyconException;
 
 /**
  * @see es.caib.seycon.ng.model.TipusDadaEntity
@@ -78,6 +75,8 @@ public class MetaDataEntityDaoImpl extends
 		}
 		if (sourceEntity.getObjectType() != null)
 			targetVO.setCustomObjectType(sourceEntity.getObjectType().getName());
+		if (sourceEntity.getDataObjectType() != null)
+			targetVO.setDataObjectType(sourceEntity.getDataObjectType().getName());
 	}
 
 	/**
@@ -145,6 +144,14 @@ public class MetaDataEntityDaoImpl extends
 			if (cot == null)
 				throw new RuntimeException("Invalid custom object type "+sourceVO.getCustomObjectType());
 			targetEntity.setObjectType(cot);
+		}
+
+		if (sourceVO.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+		{
+			CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(sourceVO.getDataObjectType());
+			if (cot == null)
+				throw new RuntimeException("Invalid custom object type "+sourceVO.getCustomObjectType());
+			targetEntity.setDataObjectType(cot);
 		}
 	}
 	

@@ -5,12 +5,15 @@
 //
 
 package es.caib.seycon.ng.comu;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.MetadataScope;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Column;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.ValueObject;
 
 @ValueObject ( translatedName="DataType",
 	 translatedPackage="com.soffid.iam.api")
@@ -30,9 +33,13 @@ public class TipusDada {
 	public MetadataScope scope;
 
 	@Nullable
+	@Description("Object type acting as owner of the attribute")
 	public String customObjectType;
 
+	@Description("Object type instances acting as value of the attribute, for custom object type attributes")
 	@Nullable
+	public String dataObjectType;
+
 	public es.caib.seycon.ng.comu.TypeEnumeration type;
 
 	@Nullable

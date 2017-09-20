@@ -71,7 +71,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 				return;
 			else if (scope == MetadataScope.CUSTOM)
 			{
-				if (objectType == null)
+				if (objectType == null || objectType.trim().isEmpty())
 					return;
 				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
 			}

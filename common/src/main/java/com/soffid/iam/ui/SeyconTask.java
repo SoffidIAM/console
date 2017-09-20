@@ -17,6 +17,8 @@ public class SeyconTask implements Serializable, Comparable {
 	// El estat d'execució de la tasca als diferents agents
 	String[] estatExecucioAgents;
 	
+	String status;
+	
 	// URL agent
 	private String urlAgent;
 	
@@ -25,6 +27,7 @@ public class SeyconTask implements Serializable, Comparable {
 		public static String DONE = "DONE"; //$NON-NLS-1$
 		public static String ERROR = "ERROR"; //$NON-NLS-1$
 		public static String UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
+		public static String PAUSED = "HELD"; //$NON-NLS-1$
 	}
 
 	public SeyconTask(Long id, String descripcioTasca) {
@@ -130,6 +133,14 @@ public class SeyconTask implements Serializable, Comparable {
 	public void setUrlAgent (String urlAgent)
 	{
 		this.urlAgent = urlAgent;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

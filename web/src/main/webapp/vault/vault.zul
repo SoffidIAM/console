@@ -7,7 +7,7 @@
 <?component name="folderWindow" macro-uri="/vault/folder.zul"?>
 <?component name="accountWindow" macro-uri="/vault/account.zul"?>
 
-<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}" id="topframe">
+<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}" id="topframe" width="100%">
 	<attribute name="onPerformQuery"><![CDATA[
 		Tree treebox = esquema.getFellow("lista").getFellow("treebox");	                                          
 		Treeitem firstRow = treebox.getTreechildren().getFirstChild();

@@ -499,7 +499,7 @@
 			Account account = XPathUtils.getValue(ctx, ".").getInstance();
 			if (account.getType().equals(AccountType.USER)){
 				newPasswordS.setAttribute("acco", account);
-				es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService()
+				es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
 				String afectats = service.queryOtherAffectedAccounts(account);
 				if(afectats != null){
 					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),

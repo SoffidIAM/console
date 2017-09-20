@@ -123,7 +123,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return getUserAccountEntityDao().toUserAccount(uae);
 	}
 
-	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de, boolean force) throws NeedsAccountNameException, EvalError, InternalErrorException, AccountAlreadyExistsException {
+	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de, boolean force) throws Exception {
 		boolean nullName = false;
 		if (name == null)
 		{
@@ -191,6 +191,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		getUserAccountEntityDao().create(uae);
 		acc.getUsers().add(uae);
 		ue.getAccounts().add(uae);
+
+		if (! acc.isDisabled())
+			audit("E", acc);
+
 		createAccountTask(uae.getAccount());
 		return uae;
 	}
@@ -256,6 +260,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			account.setId(acc.getId());
 			account = getVaultService().addToFolder(account);
 			
+			if (! acc.isDisabled())
+				audit("E", acc);
+
 			createAccountTask(acc);
 			return account;
 		}
@@ -455,6 +462,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 			ae.setType(account.getType());
 		}
+
+		if (! ae.isDisabled() && account.isDisabled())
+			audit("e", ae);
+		if (ae.isDisabled() && !account.isDisabled())
+			audit("E", ae);
 
 		if (! account.getName().equals(ae.getName()))
 		{

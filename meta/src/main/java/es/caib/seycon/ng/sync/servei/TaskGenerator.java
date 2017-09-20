@@ -86,4 +86,17 @@ public abstract class TaskGenerator {
 	
 	@Transactional(readOnly=true)
 	public Set<Long> getActiveTenants() { return null; }
+	
+	@Transactional(readOnly=true)
+	public String startVirtualSourceTransaction()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Transactional(readOnly=true)
+	public void finishVirtualSourceTransaction(String virtualTransactionId)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+
 }

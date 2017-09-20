@@ -15,10 +15,12 @@
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
 	<style>
-		.groupatt {display: table; padding: 5px; width: 100%}
+		.groupatt {display: table; padding: 0px; width: 100%}
 		.groupatt_row {display: table-row}
-		.groupatt_label {display: table-cell; width: 200px}
-		.groupatt_input {display: table-cell}
+		.groupatt_row span {padding-left:5px}
+		.groupatt_label {display: table-cell; width: 202px}
+		.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		.ourcheck input {vertical-align:-7px}
 	</style>
 
 	<zscript>
@@ -433,7 +435,6 @@
 										<hbox>
 											<input_dada id="detall_codiPare" bind="@codiPare"
 												lectura="${!canModifyGrups}"/>
-											<label value="*" />
 											<imageclic align="right" src="~./img/grup.gif">
 												<attribute name="onClick">
 													<![CDATA[
@@ -456,7 +457,7 @@
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('grups.zul.Obsolet-2')}"/>
-										<checkbox bind="@obsolet" disabled="${!canModifyGrups}" id="obsolet" onCheck=""/>
+										<checkbox bind="@obsolet" disabled="${!canModifyGrups}" id="obsolet" class="ourcheck" onCheck=""/>
 									</row>
 									<!-- row>
 										<input_etiqueta value="${c:l('grups.zul.SecciaPressupostaria-2')}"/>
@@ -464,12 +465,10 @@
 									</row -->
 								</rows>
 							</grid>
-
-							<separator spacing="5px"/>
 							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 								dataPath="attributes" scope="group"
 								sclass="groupatt"/>
-							<separator spacing="5px"/>
+							<separator spacing="10px"/>
 							<vbox width="99%">
 							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" height="96%" id="gridUsuaris" if="${canQueryGroupUsers}" rows="15" sclass="likeagrid">
 								<listhead>
@@ -702,6 +701,7 @@
 	<include src="impressoresllista.zul"/>
 	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
 	<include src="usuarisllista.zul"/>
-	
+	<include src="aplicacionsllista.zul" />
+	<include src="customObjectsllista.zul" />
 	
 </frame>

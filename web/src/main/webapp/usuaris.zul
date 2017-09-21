@@ -1734,6 +1734,8 @@
 												for (com.soffid.iam.web.component.Identity id: identities)
 												{
 													com.soffid.iam.api.RoleAccount ra = id.getObject();
+													String bbdd = null;
+													String valorDomini = null;
 													ds = gridRols.getDataSource(); 
 													ctx =  ds.getJXPathContext();
 													if (ra.getDomainValue() != null) {
@@ -1789,7 +1791,7 @@
 													// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
 													if(jaExisteix) {
 														Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.RolAssignat"), 
-																new Object [] {dada,bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
+																new Object [] {ra.getRoleName(),bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
 													} else {
 														position = modelProxy.newInstance();
 														ds = gridRols.getDataSource(); 

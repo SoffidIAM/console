@@ -149,7 +149,7 @@ abstract class TipusDadaCodiIndex {
 }
 
 
-@Index (name="TDA_UK_ORDRE",	unique=true,
+@Index (name="TDA_UK_ORDRE",	unique=false,
 entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
 columns={"TDA_TEN_ID", "TDA_SCOPE", "TDA_ORDRE"})
 abstract class TipusDadaOrdreIndex {

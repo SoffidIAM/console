@@ -169,7 +169,7 @@ public class AdditionalDataServiceImpl extends
 			dataTypeVO.setOrder(next);
 		} else {
 			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
-				if (dataTypeEntity.getOrder().compareTo(dataTypeVO.getOrder()) == 0) {
+				if (dataTypeVO.getId().compareTo(dataTypeEntity.getId())!=0 && dataTypeEntity.getOrder().compareTo(dataTypeVO.getOrder()) == 0) {
 					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
 							dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
 				}
@@ -183,13 +183,12 @@ public class AdditionalDataServiceImpl extends
 	private void validateUniqueOrderForMetaData(DataType dataTypeVO) {
 		List<MetaDataEntity> dataTypeEntityList = null;
 		if (dataTypeVO.getScope().equals(MetadataScope.CUSTOM)) {
-			//dataTypeEntityList = getMetaDataEntityDao().findDataTypesByScopeAndName(dataTypeVO.getScope(), dataTypeVO.getCustomObjectType());
 			dataTypeEntityList = getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null);
 		} else {
 			dataTypeEntityList = getMetaDataEntityDao().findByScope(dataTypeVO.getScope());
 		}
 		for (MetaDataEntity dataTypeEntity : dataTypeEntityList) {
-			if (dataTypeVO.getOrder().compareTo(dataTypeEntity.getOrder()) == 0) {
+			if (dataTypeVO.getId().compareTo(dataTypeEntity.getId())!=0 && dataTypeVO.getOrder().compareTo(dataTypeEntity.getOrder())==0) {
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
 						dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
 			}

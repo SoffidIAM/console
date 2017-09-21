@@ -172,7 +172,8 @@ public class CustomDataTypeListbox extends Listbox implements XPathSubscriber {
 				Listitem li = new Listitem(cot.getName(),
 						new String[] {TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue(), cot.getName()});
 				appendChild(li);
-				if (currentType.getValue().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())
+				if (currentType != null &&
+						currentType.getValue().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())
 						&& cot.getName().equals(currentCustomType))
 					setSelectedItem(li);
 			}

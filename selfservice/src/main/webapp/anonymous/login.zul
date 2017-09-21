@@ -53,7 +53,7 @@
         		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
 			<div class="loginbox"> 
 			<p>${c:l('configure.header')}</p>
-			<form method="post" action="/j_security_check" id='loginForm' accept-charset="UTF-8">
+			<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8">
 			<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 			<input name="j_username" id="j_username" type="hidden" value="${user }">
 			<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>

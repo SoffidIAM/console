@@ -64,9 +64,16 @@
 						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 						{
 							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-							if (page.equals(atc.getPagina()))
+							String menuPage=atc.getPagina();
+							if (menuPage != null)
 							{
-								app.setInitialPage(target);
+								i = menuPage.indexOf('?');
+								if ( i > 0)
+									menuPage = menuPage.substring(0, i);
+								if (page.equals(menuPage))
+								{
+									app.setInitialPage(target);
+								}
 							}
 						}
 					}

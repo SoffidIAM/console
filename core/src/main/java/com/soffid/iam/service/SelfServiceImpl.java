@@ -9,7 +9,15 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
@@ -18,7 +26,9 @@ import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Network;
+import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.System;
@@ -31,26 +41,11 @@ import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.service.EntryPointService;
-import com.soffid.iam.service.NetworkService;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
-
-import com.soffid.iam.api.Password;
-
 import es.caib.seycon.ng.exception.InternalErrorException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author bubu
@@ -346,7 +341,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		Collection<UserDataEntity> dades = usuari.getUserData();
 		LinkedList<UserData> result = new LinkedList<UserData>();
 		
-		List<MetaDataEntity> tipusDades = getMetaDataEntityDao().loadAll();
+		List<MetaDataEntity> tipusDades = getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.USER, null);
 		Collections.sort(tipusDades, new Comparator<MetaDataEntity>(){
 			public int compare(MetaDataEntity o1, MetaDataEntity o2) {
 				return o1.getOrder().compareTo(o2.getOrder());
@@ -360,12 +355,11 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 			boolean teMetaData = false;
 			while (dadesIterator.hasNext()) {
 				UserDataEntity dada = dadesIterator.next();
-				if (dada.getDataType().getName().equals(metaData.getName()))
-				{
-					teMetaData = true;
-					if (Security.isSyncServer() ||
-							! dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN))
+				if (dada.getDataType().getName().equals(metaData.getName())) {
+					if (Security.isSyncServer() || !dada.getAttributeVisibility().equals(AttributeVisibilityEnum.HIDDEN)) {
+						teMetaData = true;
 						result.add(getUserDataEntityDao().toUserData(dada));
+					}
 				}
 			}
 			if (!teMetaData) {

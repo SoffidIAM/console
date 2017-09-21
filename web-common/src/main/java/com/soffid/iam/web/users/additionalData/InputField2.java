@@ -298,7 +298,7 @@ public class InputField2 extends Div
 					l.setValue("?");
 					return false;
 				}
-				l.setValue(co.getName());
+				l.setValue(co.getDescription());
 			}
 		} catch (Exception e) {}
 		return true;

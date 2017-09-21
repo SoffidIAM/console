@@ -287,7 +287,7 @@ public class InputField extends Div implements XPathSubscriber
 					l.setValue("?");
 					return false;
 				}
-				l.setValue(co.getName());
+				l.setValue(co.getDescription());
 			}
 		} catch (Exception e) {}
 		return true;

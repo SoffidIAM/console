@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.util.Collection;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.ApplicationAttributeEntity;
@@ -19,8 +21,10 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Domini;
+import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.model.TipusDadaEntity;
+import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
 @Service(translatedName = "ApplicationService", translatedPackage = "com.soffid.iam.service")
@@ -40,6 +44,7 @@ import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 		es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
 		es.caib.seycon.ng.model.AplicacioEntity.class,
 		es.caib.seycon.ng.model.RolEntity.class,
+		UserAccountEntity.class,
 		ValorDominiAplicacioEntity.class,
 		// Services
 		es.caib.seycon.ng.servei.UsuariService.class,
@@ -573,5 +578,17 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation (grantees={roles.application_update.class})
+	@Description("Generates a report to view the changes that a role change will generat")
+	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
+	public String generateChangesReport(Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation
+	@Transactional(readOnly=true)
+	protected Collection<String> findRoleNames(String systemName) throws Exception { return null; }
 
 }

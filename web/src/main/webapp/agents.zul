@@ -763,6 +763,16 @@
 							c.getFellow("testRowLabel2").setVisible(false);
 							c.getFellow("testRowTextbox2").setVisible(false);						
 						}
+						else if (type.equals(es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_CUSTOM))
+						{
+							String t = XPathUtils.getValue(c, "@soffidCustomObject");
+							c.getFellow("testRowLabel1").setValue("Object type: ");
+							c.getFellow("testRowTextbox1").setValue (t); 
+							c.getFellow("testRowLabel2").setVisible(true);						
+							c.getFellow("testRowTextbox2").setVisible(true);						
+							c.getFellow("testRowLabel2").setValue("Object name: ");						
+							c.getFellow("testRowTextbox2").focus(); 
+						}
 						else
 						{
 							c.getFellow("testRowLabel1").setVisible(false);
@@ -876,7 +886,7 @@
 						if (obj instanceof java.util.Map)
 						{
 							String r = "";
-							for ( Object k : obj.keyset) {
+							for ( Object k : obj.keySet()) {
 								if (r.isEmpty()) r = "{";
 								else r = r + ", ";
 								r = r + stringify(k, indent+" ") + ": "+stringify (obj.get(k), indent+"  ");
@@ -910,6 +920,11 @@
 								XPathUtils.getValue(g, "../../@codi"),
 								XPathUtils.getValue(g, "../@soffidObject"),
 								o1, o2);
+						if (map == null)
+						{
+							es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
+							return;
+						}
 						g.getFellow("testColumn").setVisible(true);
 						for ( Row r: g.getRows().getChildren())
 						{
@@ -961,6 +976,11 @@
 								XPathUtils.getValue(g, "../../@codi"),
 								XPathUtils.getValue(g, "../@soffidObject"),
 								o1, o2);
+						if (map == null)
+						{
+							es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
+							return;
+						}
 						Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
 						for (String key: map.keySet())
 						{
@@ -1148,16 +1168,19 @@
 							</row>
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.ManualAccountCreation')}"/>
-								<checkbox bind="@manualAccountCreation" disabled="${!canModifyAgent}" id="detall_manual" onCheck="onEnableManualAccount()"/>
+								<checkbox bind="@manualAccountCreation" disabled="${!canModifyAgent}" id="detall_manual" 
+									onCheck="onEnableManualAccount(); missatge.setVisible(true);"/>
 							</row>
 							<row id="rols_row">
 								<input_etiqueta value="${c:l('agents.zul.Basatenrols')}"/>
-								<checkbox bind="@basRol" disabled="${!canModifyAgent}" id="detall_basatRols" onCheck=""/>
+								<checkbox bind="@basRol" disabled="${!canModifyAgent}" id="detall_basatRols" 
+									onCheck="missatge.setVisible(true);"/>
 							</row>
 							<row id="groups_row">
 								<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
 								<hbox widths="90%,10%">
-									<input_dada bind="@grups" id="grups" lectura="${!canModifyAgent}" width_custom="98%"/>
+									<input_dada bind="@grups" id="grups" lectura="${!canModifyAgent}" width_custom="98%"
+										onChange="missatge.setVisible(true);"/>
 									<imageclic id="select_group" src="~./img/grup.gif">
 										<attribute name="onClick">
 											if (canModifyAgent) {
@@ -1173,7 +1196,8 @@
 							<row id="userdomain_row">
 								<input_etiqueta value="${c:l('agents.zul.Dominidusuaris')}"/>
 								<hbox width="50%" widths="*,*">
-									<listbox mold="select" bind="@dominiUsuaris" dataPath="/model:/dominisUsuari" id="cbDominiUsuaris" width="90%">
+									<listbox mold="select" bind="@dominiUsuaris" dataPath="/model:/dominisUsuari" id="cbDominiUsuaris" width="90%"
+										onSelect="missatge.setVisible(true);">
 										<dataitem bind="@codi">
 											<listcell bind="@descripcio"/>
 										</dataitem>
@@ -1186,7 +1210,8 @@
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.DominideContrasenyes')}"/>
 								<hbox width="50%" widths="*,*">
-									<listbox mold="select" bind="@dominiContrasenyes" dataPath="/model:/dominisContrasenya" id="cbDominiContrasenyes" width="90%">
+									<listbox mold="select" bind="@dominiContrasenyes" dataPath="/model:/dominisContrasenya" 
+										id="cbDominiContrasenyes" width="90%">
 										<dataitem bind="@codi">
 											<listcell bind="@descripcio"/>
 										</dataitem>
@@ -1249,7 +1274,19 @@
 										</dataitem>
 									</listbox>
 									<!--label id="lb_tipusUsuari" bind="@relacioLaboral"/--> 
-									<label id="missatge" value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;" visible="false"/>
+									<div id="missatge" visible="false">
+										<label value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;"/>
+										<button label="${c:l('rules.preview')}">
+											<attribute name="onClick">
+												es.caib.seycon.ng.comu.Dispatcher d = form.getJXPathContext().getValue("/").getInstance();
+												es.caib.seycon.ng.servei.ejb.DispatcherService svc =
+													es.caib.seycon.ng.EJBLocator.getDispatcherService();
+												String file = svc.generateChangesReport(d);
+												previewWindow.getFellow("previewDiv").setSrc(file);
+												previewWindow.doHighlighted();
+											</attribute>
+										</button>
+									</div>
 								</hbox>		
 							</row>
 						</rows>
@@ -1824,6 +1861,11 @@
 					<!--  Reconcile triggers -->
 
 					<tabpanel id="tabReconcileTriggers">
+						<div>
+							<input_etiqueta value="${c:l('agents.zul.fullReconcile')}"/>
+							<checkbox bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile2') }" onCheck=""/>
+						</div>
+					
 						<grid dataPath="/esquema/lista/listbox:/reconcileTrigger" width="100%" fixedLayout="false">
 							<columns>
 								<column label="Object" width="15em" valign="top">
@@ -2251,9 +2293,25 @@
 			</form>
 		</detalls>
 	</esquemavertical>
+
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+				</attribute>
+			</button>
+		</div>
+		
+	</window>
 	<include src="grupsllista.zul"/>
 	<include src="controlAcces.zul"/>
- 	<include src="finestres/editor.zul"/>
  	<include src="finestres/editor.zul"/>
  	<include src="finestres/agent_objectAttributes.zul"/>
 </zk>

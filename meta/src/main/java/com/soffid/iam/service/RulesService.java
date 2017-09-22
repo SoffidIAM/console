@@ -5,7 +5,10 @@
 //
 
 package com.soffid.iam.service;
+import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.mda.annotation.*;
+
+import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ public abstract class RulesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.Rule update(
@@ -32,6 +36,7 @@ public abstract class RulesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
@@ -72,10 +77,19 @@ public abstract class RulesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void apply(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Operation ( grantees={roles.rule_admin.class})
+	@Transactional(readOnly=true,noRollbackFor={java.lang.Exception.class})
+	@Description("Generates an excel file with expected changes")
+	public String generateChangesReport(
+		com.soffid.iam.api.Rule rule,
+		Collection<RuleAssignedRole> grants)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
 }

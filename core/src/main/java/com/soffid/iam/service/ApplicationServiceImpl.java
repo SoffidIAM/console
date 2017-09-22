@@ -13,6 +13,7 @@
  */
 package com.soffid.iam.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -39,6 +40,7 @@ import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
 import com.soffid.iam.api.Domain;
+import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
@@ -68,9 +70,11 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserAccountEntityImpl;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.service.impl.RolGrantDiffReport;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
@@ -1329,7 +1333,10 @@ public class ApplicationServiceImpl extends
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		populateParentGrantsForRol(radSet, theRol, null);
 		for (RolAccountDetail rad : radSet) {
-            if (rad.granteeRol != null) {
+			if (rad.account != null && rad.account.getId() == null)
+			{
+				// Ignore
+			} else if (rad.granteeRol != null) {
                 if (rad.account.getType().equals(AccountType.USER)) {
                     for (UserAccountEntity uae : rad.account.getUsers()) {
                         ContainerRole cr = new ContainerRole();
@@ -1857,11 +1864,18 @@ public class ApplicationServiceImpl extends
 		populateParentGrantsForRol(radSet, rol, null);
 		for (RolAccountDetail rad : radSet) {
             RoleGrant grant;
-            if (rad.rolAccount != null) grant = getRoleAccountEntityDao().toRoleGrant(rad.rolAccount); else if (rad.rolRol != null) {
+            if (rad.rolAccount != null) 
+            	grant = getRoleAccountEntityDao().toRoleGrant(rad.rolAccount); 
+            else if (rad.rolRol != null) 
+            {
                 grant = getRoleDependencyEntityDao().toRoleGrant(rad.rolRol);
-                if (rad.qualifier != null) grant.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) grant.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) grant.setDomainValue(rad.qualifierGroup.getName());
-            } else grant = getRoleGroupEntityDao().toRoleGrant(rad.rolGrup);
-            if (rad.account != null) {
+                if (rad.qualifier != null) 
+                	grant.setDomainValue(rad.qualifier.getValue());
+                else if (rad.qualifierAplicacio != null) 
+                	grant.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) grant.setDomainValue(rad.qualifierGroup.getName());
+            } else 
+            	grant = getRoleGroupEntityDao().toRoleGrant(rad.rolGrup);
+            if (rad.account != null && rad.account.getId() != null) {
                 grant.setOwnerAccountName(rad.account.getName());
                 grant.setOwnerSystem(rad.account.getSystem().getName());
                 if (rad.account.getType().equals(AccountType.USER)) {
@@ -1931,29 +1945,59 @@ public class ApplicationServiceImpl extends
 		else
 			de = ((RoleGroupEntity) originalGrant).getGrantedRole().getSystem();
 			
-		for (AccountEntity acc : getAccountsForDispatcher(u, null, de)) {
+		
+		List<AccountEntity> accounts = getAccountsForDispatcher(u, null, de);
+		for (AccountEntity acc : accounts) {
             if (acc != null) {
-                RolAccountDetail rad;
-                if (originalGrant instanceof RoleAccountEntity) 
-                {
-                	rad = new RolAccountDetail((RoleAccountEntity) originalGrant, acc);
-                }
-                else if (originalGrant instanceof RoleGroupEntity)
-                {
-                	rad = new RolAccountDetail((RoleGroupEntity) originalGrant, acc);
-                }
-				else if (originalGrant instanceof RoleDependencyEntity)
-                {
-                	rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, acc, null);
-                }
-				else
-					rad = null;
-                if (rad != null && !radSet.contains(rad)) {
-					rad.granteeGrup = granteeGroup;
-                    radSet.add(rad);
-                }
+                addAccountGrant(acc, radSet, originalGrant, granteeGroup);
             }
+            else
+            {
+				AccountEntity dummyAccount;
+				try {
+					String accName = getAccountService().guessAccountName(u.getUserName(), de.getName());
+					if (accName != null)
+					{
+						dummyAccount = getAccountEntityDao().newAccountEntity();
+						dummyAccount.setName(accName);
+						dummyAccount.setDescription(u.getUserName());
+						dummyAccount.setDisabled(false);
+						dummyAccount.setSystem(de);
+						dummyAccount.setType(AccountType.USER);
+						UserAccountEntity uac = getUserAccountEntityDao().newUserAccountEntity();
+						uac.setUser(u);
+						uac.setAccount(dummyAccount);
+						dummyAccount.getUsers().add(uac);
+					    addAccountGrant(dummyAccount, radSet, originalGrant, granteeGroup);
+					}
+				} catch (InternalErrorException e) {
+					// Ignore
+				}
+			}
         }
+	}
+
+	private void addAccountGrant(AccountEntity account, HashSet<RolAccountDetail> radSet, Object originalGrant,
+			GroupEntity granteeGroup) {
+		RolAccountDetail rad;
+		if (originalGrant instanceof RoleAccountEntity) 
+		{
+			rad = new RolAccountDetail((RoleAccountEntity) originalGrant, account);
+		}
+		else if (originalGrant instanceof RoleGroupEntity)
+		{
+			rad = new RolAccountDetail((RoleGroupEntity) originalGrant, account);
+		}
+		else if (originalGrant instanceof RoleDependencyEntity)
+		{
+			rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, account, null);
+		}
+		else
+			rad = null;
+		if (rad != null && !radSet.contains(rad)) {
+			rad.granteeGrup = granteeGroup;
+		    radSet.add(rad);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -2355,6 +2399,209 @@ public class ApplicationServiceImpl extends
 
 		return result;
 	}
+
+	@Override
+	protected String handleGenerateChangesReport(Role rol) throws Exception {
+		
+		// Get current grantees
+		Collection<RoleGrant> list1 ;
+		list1 = handleFindEffectiveRoleGrantsByRoleId(rol.getId());
+		
+		// Get now grantees
+		LinkedList<RoleGrant> list2 = new LinkedList<RoleGrant>();
+
+		computeNewGrantees(rol, list2);
+
+		RolGrantDiffReport report = new RolGrantDiffReport ();
+		report.setAccountEntityDao(getAccountEntityDao());
+		report.setUserEntityDao(getUserEntityDao());
+		File f = report.generateReport (list1, list2);
+		
+		return f.getAbsolutePath();
+	}
+
+	private void computeNewGrantees(Role rol, LinkedList<RoleGrant> rg) {
+		RoleEntity dummyEntity ;
+		if (rol.getId() == null)
+			dummyEntity = getRoleEntityDao().newRoleEntity();
+		else
+			dummyEntity = getRoleEntityDao().load(rol.getId());
+		getRoleEntityDao().roleToEntity(rol, dummyEntity, true);
+
+		dummyEntity.getContainedRoles().clear();
+		dummyEntity.getContainerRoles().clear();
+		dummyEntity.getContainerGroups().clear();
+		
+		for (RoleGrant grantedRole: rol.getOwnedRoles())
+		{
+			RoleDependencyEntity rde = toGrantedRoleEntity(grantedRole, dummyEntity);
+			dummyEntity.getContainedRoles().add(rde);
+		}
+		
+		for (RoleGrant grantedRole: rol.getOwnerRoles())
+		{
+			RoleDependencyEntity rde = toGranteeRoleEntity(grantedRole, dummyEntity);
+			dummyEntity.getContainerRoles().add(rde);
+		}
+		
+		for (RoleGrant granteeGroup: rol.getGranteeGroups())
+		{
+			RoleGroupEntity rge = toRoleGroupEntity(granteeGroup, dummyEntity);
+			dummyEntity.getContainerGroups().add(rge );
+		}
+		
+		
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+				
+		populateParentGrantsForRol(radSet, dummyEntity, null);
+		for (RolAccountDetail rad : radSet) {
+            RoleGrant grant;
+            if (rad.rolAccount != null) 
+            	grant = getRoleAccountEntityDao().toRoleGrant(rad.rolAccount); 
+            else if (rad.rolRol != null) 
+            {
+                grant = getRoleDependencyEntityDao().toRoleGrant(rad.rolRol);
+                if (rad.qualifier != null) 
+                	grant.setDomainValue(rad.qualifier.getValue()); 
+                else if (rad.qualifierAplicacio != null) 
+                	grant.setDomainValue(rad.qualifierAplicacio.getName()); 
+                else if (rad.qualifierGroup != null) 
+                	grant.setDomainValue(rad.qualifierGroup.getName());
+            } 
+            else grant = getRoleGroupEntityDao().toRoleGrant(rad.rolGrup);
+            if (rad.account != null) {
+                grant.setOwnerAccountName(rad.account.getName());
+                grant.setOwnerSystem(rad.account.getSystem().getName());
+                if (rad.account.getType().equals(AccountType.USER)) {
+                    for (UserAccountEntity ua : rad.account.getUsers()) {
+                        grant.setUser(ua.getUser().getUserName());
+                    }
+                }
+            }
+            rg.add(grant);
+        }
+	}
+
+	private RoleGroupEntity toRoleGroupEntity(RoleGrant granteeGroup, RoleEntity dummyEntity) {
+		RoleGroupEntity target = getRoleGroupEntityDao().newRoleGroupEntity();
+		
+		target.setGrantedRole(dummyEntity);
+		target.setGroup( getGroupEntityDao().findByName(granteeGroup.getOwnerGroup()));
+		generateGrantedDomainValue(granteeGroup, target);
+
+		return target;
+	}
+
+	private RoleDependencyEntity toGrantedRoleEntity(RoleGrant source, RoleEntity dummyEntity) {
+		RoleDependencyEntity target = getRoleDependencyEntityDao().newRoleDependencyEntity();
+		getRoleDependencyEntityDao().roleGrantToEntity(source, target, true);
+		target.setContained( getRoleEntityDao().load(source.getRoleId()));
+		target.setContainer(dummyEntity);
+		
+		assignRoleDependencyDomainValue(source, target);
+
+		return target;
+	}
+
+	private RoleDependencyEntity toGranteeRoleEntity(RoleGrant source, RoleEntity dummyEntity) {
+		RoleDependencyEntity target = getRoleDependencyEntityDao().newRoleDependencyEntity();
+		getRoleDependencyEntityDao().roleGrantToEntity(source, target, true);
+		target.setContainer( getRoleEntityDao().load(source.getOwnerRole()));
+		target.setContained(dummyEntity);
+		
+		assignRoleDependencyDomainValue(source, target);
+
+		return target;
+	}
+
+	private void assignRoleDependencyDomainValue(RoleGrant source, RoleDependencyEntity target) {
+		generateGrantedDomainValue(source, target);
+
+		generateGranteeDomainValue(source, target);
+	}
+
+	private void generateGranteeDomainValue(RoleGrant source, RoleDependencyEntity target) {
+		if (source.getOwnerRolDomainValue() != null && target.getContainer() != null)
+		{
+			if (target.getContainer().getDomainType().equals(DomainType.APLICACIONS))
+			{
+				target.setGranteeApplicationDomain(
+						getInformationSystemEntityDao().findByCode(source.getOwnerRolDomainValue()));
+			}
+			if (target.getContainer().getDomainType().equals(DomainType.GRUPS) ||
+					target.getContained().getDomainType().equals(DomainType.GRUPS_USUARI))
+			{
+				target.setGranteeGroupDomain(
+						getGroupEntityDao().findByName(source.getOwnerRolDomainValue()));
+			}
+			if (target.getContainer().getDomainType().equals(DomainType.DOMINI_APLICACIO))
+			{
+				target.setGranteeDomainValue(
+						getDomainValueEntityDao().findByApplicationDomainValue(
+								target.getContainer().getInformationSystem().getName(), 
+								target.getContainer().getApplicationDomain().getName(), 
+								source.getOwnerRolDomainValue()));
+			}
+		}
+	}
+
+	private void generateGrantedDomainValue(RoleGrant source, RoleDependencyEntity target) {
+		if (source.getDomainValue() != null && target.getContained() != null)
+		{
+			if (target.getContained().getDomainType().equals(DomainType.APLICACIONS))
+			{
+				target.setDomainApplication(
+						getInformationSystemEntityDao().findByCode(source.getDomainValue()));
+			}
+			if (target.getContained().getDomainType().equals(DomainType.GRUPS) ||
+					target.getContained().getDomainType().equals(DomainType.GRUPS_USUARI))
+			{
+				target.setDomainGroup(
+						getGroupEntityDao().findByName(source.getDomainValue()));
+			}
+			if (target.getContained().getDomainType().equals(DomainType.DOMINI_APLICACIO))
+			{
+				target.setDomainApplicationValue(
+						getDomainValueEntityDao().findByApplicationDomainValue(
+								target.getContained().getInformationSystem().getName(), 
+								target.getContained().getApplicationDomain().getName(), 
+								source.getDomainValue()));
+			}
+		}
+	}
+
+	private void generateGrantedDomainValue(RoleGrant source, RoleGroupEntity target) {
+		if (source.getDomainValue() != null && target.getGrantedRole() != null)
+		{
+			if (target.getGrantedRole().getDomainType().equals(DomainType.APLICACIONS))
+			{
+				target.setGrantedApplicationDomain(
+						getInformationSystemEntityDao().findByCode(source.getDomainValue()));
+			}
+			if (target.getGrantedRole().getDomainType().equals(DomainType.GRUPS) ||
+					target.getGrantedRole().getDomainType().equals(DomainType.GRUPS_USUARI))
+			{
+				target.setGrantedGroupDomain(
+						getGroupEntityDao().findByName(source.getDomainValue()));
+			}
+			if (target.getGrantedRole().getDomainType().equals(DomainType.DOMINI_APLICACIO))
+			{
+				target.setGrantedDomainValue(
+						getDomainValueEntityDao().findByApplicationDomainValue(
+								target.getGrantedRole().getInformationSystem().getName(), 
+								target.getGrantedRole().getApplicationDomain().getName(), 
+								source.getDomainValue()));
+			}
+		}
+	}
+
+	@Override
+	protected Collection<String> handleFindRoleNames(String systemName) throws Exception {
+		return getRoleEntityDao().findRoleNames(systemName);
+	}
+
+
+
 }
 
 class RolAccountDetail

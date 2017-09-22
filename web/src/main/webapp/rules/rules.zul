@@ -338,8 +338,24 @@
 							</div>
 						</div>
 						<div style="float: right">
+							<button label="${c:l('rules.preview')}">
+								<attribute name="onClick">
+									com.soffid.iam.api.Rule r = form.getJXPathContext().getValue("/").getInstance();
+									List roles = new LinkedList();
+									for (Iterator it = form.getJXPathContext().iterate("/ruleAssignedRole");
+										it.hasNext();)
+									{
+										roles.add(it.next().getInstance());
+									}
+									com.soffid.iam.service.ejb.RulesService svc = com.soffid.iam.EJBLocator.getRulesService();
+									String file = svc.generateChangesReport(r, roles);
+									previewWindow.getFellow("previewDiv").setSrc(file);
+									previewWindow.doHighlighted();
+								</attribute>
+							</button>
 							<button label="${c:l('rules.apply')}">
 								<attribute name="onClick">
+									model.commit();
 									com.soffid.iam.service.ejb.RulesService svc = es.caib.seycon.ng.EJBLocator.getRulesService();
 									svc.apply(form.getJXPathContext().getValue("/").getInstance());
 								</attribute>
@@ -489,6 +505,32 @@ self.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getRuleVars()
 		</div>
 	</form>
 	</window>
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+				</attribute>
+			</button>
+			<button label="${c:l('rules.apply')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+					model.commit();
+					Component form = esquema.getFellow("esquema").getFellow("dades").getFellow("form");
+					com.soffid.iam.service.ejb.RulesService svc = es.caib.seycon.ng.EJBLocator.getRulesService();
+					svc.apply(form.getJXPathContext().getValue("/").getInstance());
+				</attribute>
+			</button>
+		</div>
+		
+	</window>
+	
 	<include src="rolsllista.zul" />
 	<include src="finestres/identity.zul" />
 </zk>

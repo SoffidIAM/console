@@ -14,6 +14,7 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.ContainerRole;
+import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.DomainValueEntity;

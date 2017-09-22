@@ -133,15 +133,16 @@
 			ArrayList c_grupsPosseidors = new ArrayList();
 			String id_Rol = ""; // Almacenamos el id del rol actual
 			void cleanWindow() {
-				dsAgents.getVariables().undeclareVariable("rol");
-				dsAgents.sendEvent(new es.caib.zkib.events.XPathRerunEvent(dsAgents, "/"));
+				es.caib.zkib.datasource.DataSource ds = esquemaRol.getFellow("dsAgents");
+				ds.getVariables().undeclareVariable("rol");
+				ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds, "/"));
 				esquemaRol.visible = false;
 			}
 			
 			void acceptaDada()
 			{
 				es.caib.zkib.datasource.DataSource ds = esquemaRol.getFellow("dsAgents");
-				es.caib.seycon.ng.comu.Rol rol = dsAgents.getVariables().getVariable("rol");
+				es.caib.seycon.ng.comu.Rol rol = ds.getVariables().getVariable("rol");
 				Component form = esquemaRol.getFellow("dades").getFellow("form");
 				boolean modifica_rol = form.getFellow("detall_nom").isDisabled();
 				Component callerForm = (Component) pageScope.get("contextComponent");
@@ -945,6 +946,16 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 
 		<separator spacing="5px"/>
 		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('rules.preview')}">
+				<attribute name="onClick">
+					Rol r = dades.getFellow("form").getJXPathContext().getValue("/").getInstance();
+					es.caib.seycon.ng.servei.ejb.AplicacioService svc =
+						es.caib.seycon.ng.EJBLocator.getAplicacioService();
+					String file = svc.generateChangesReport(r);
+					previewWindow.getFellow("previewDiv").setSrc(file);
+					previewWindow.doHighlighted();
+				</attribute>
+			</button>
 			<button id="finishButton" label="${c:l('aplica_rolinfo.zul.Accepta')}">
 				<attribute name="onClick">
 					acceptaDada();
@@ -953,6 +964,28 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 			<button id="cancelButton" label="${c:l('aplica_rolinfo.zul.Cancel·la')}" onClick="onWindowClose(event)"/>
 		</hbox>
 			
+	</window>
+	<window visible="false" style="min-width: 50em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+				</attribute>
+			</button>
+			<button label="${c:l('rules.apply')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+					acceptaDada();
+				</attribute>
+			</button>
+		</div>
+		
 	</window>
 	
 	<include src="/agentsllista.zul"/>

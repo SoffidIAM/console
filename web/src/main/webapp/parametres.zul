@@ -10,6 +10,7 @@
 	<style src="~./styles/estil.css"/>
 
 	<datamodel id="model" rootNode="parametres" src="descriptorParametre.xml"/>
+	<datamodel id="samlmodel" class="com.soffid.web.saml.SamlDataModel"/>
 	
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
@@ -195,8 +196,15 @@
 			}
 		]]>
 	</zscript>
-
-	<esquema id="esquema" datamodel="/model"
+	
+	<tabbox>
+		<tabs>
+			<tab label="${c:l('parametres.zul.Advanced')}"></tab>
+			<tab label="${c:l('parametres.zul.authentication')}"></tab>
+		</tabs>
+		<tabpanels>
+			<tabpanel>
+				<esquema id="esquema" datamodel="/model"
 		 focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
 		<criteris id="queryWindow" height="${queryWindowMin}" 
@@ -327,6 +335,90 @@
 			</form>
 		</detalls>
 	</esquema>
-
+			</tabpanel>
+			<tabpanel >
+				<form dataPath="/samlmodel:/conf" id="samlform">
+					<zscript><![CDATA[
+					                  
+					void refreshIDP ()
+					{
+						String md = es.caib.zkib.datasource.XPathUtils.getValue(samlform, "metadata");
+						samlmodel.getVariables().declareVariable("metadata", md);
+						samlmodel.getValue("/idps").refresh();
+						idpselect.setSelectedIndex(0);
+					}
+					
+					
+					void downloadMetadata()
+					{
+						String hostName = Executions.getCurrent().getNativeRequest().getHeader("Host");
+						String md = com.soffid.iam.EJBLocator.getSamlService().generateMetadata(hostName);
+						Filedownload.save (md, "text/plain", "soffid-metadata.xml");
+					}
+					]]>
+					</zscript>
+					<grid sclass="noBorderGrid">
+						<rows>
+							<row>
+								<label value="${c:l('parametres.zul.classicMethod')}"/>
+								<label/>
+							</row>
+							<row>
+								<label/>
+								<div width="100%">
+									<checkbox bind="classicMethod" label="${c:l('deploy.lblEnable')}"
+										style="display: block"></checkbox>
+									<checkbox bind="trustedAuthentication" 
+										label="${c:l('parametres.zul.trustedAuthentication')}"
+										style="display: block"></checkbox>
+								</div>
+							</row>
+							<row>
+								<label value="${c:l('parametres.zul.samlMethod')}"/>
+								<label/>
+							</row>
+							<row>
+								<label/>
+								<div  width="100%">
+									<div>
+										<checkbox bind="samlMethod" label="${c:l('deploy.lblEnable') }" 
+											style="display:block"/> 
+										<div>
+											<label value="${c:l('parametres.zul.hostName')}: "/>
+											<textbox bind="hostName" width="30em"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.metadataURL')}: "/>
+											<textbox bind="metadata" width="30em"
+												onChange="refreshIDP()"
+												onOK=""/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.cacheLimit')}: "/>
+											<intbox bind="cache"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.IDP')}: "/>
+											<listbox mold="select" bind="idp" id="idpselect"
+												dataPath="/samlmodel:/idps">
+												<dataitem bind="/value">
+													<listcell bind="/value"/>
+												</dataitem>
+											</listbox>
+										</div>
+										<div style="margin-top: 2em">
+											<button label="${c:l('parametres.zul.downloadMetadata') }" onClick="downloadMetadata()"/>
+											<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="samlmodel.commit()"
+												style="text-align:right"/>
+										</div>
+									</div>
+								</div>
+							</row>
+						</rows>
+					</grid>
+				</form>				
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
 	<include src="xarxesllista.zul"/>
 </zk>

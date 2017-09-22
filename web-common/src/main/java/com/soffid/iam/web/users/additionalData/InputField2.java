@@ -323,11 +323,7 @@ public class InputField2 extends Div
 				updateGroup = false;
 				updateApplication = false;
 				updateCustomObject = false;
-				boolean dualEdit = twoPhaseEdit && ! readonly;
-				String readonlyExpr = readonly ? 
-						"true" : "false";
-	
-				
+				String readonlyExpr = readonly ? "true" : "false";
 				TypeEnumeration type = dataType.getType();
 				String stringType = new String();
 				if(type!=null)
@@ -343,20 +339,7 @@ public class InputField2 extends Div
 					if(TypeEnumeration.USER_TYPE.equals(type))
 					{
 						updateUser = true;
-						if (dualEdit)
-						{
-							result= "<div style='display:inline;'>"
-									+ "<label bind=\""+getBind()+"\" />"
-									+ "<imageclic src='/img/pencil.png' "
-										+ "onClick='self.visible = self.previousSibling.visible = false; "
-											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" bind=\""+getBind()+"\" "
-											+ "onChange=\"self.parent.parent.updateUser()\" readonly=\""
-										+readonlyExpr+"\" visible='false'/>" 
-									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"
-									+ "<label/>"+required+"</div>";
-						} else {
-							result = "<div style='display:inline' visible='"+(!dualEdit)+"'>"
+							result = "<div style='display:inline' visible='true'>"
 									+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
 											+ "bind=\""+getBind()+"\" "
 													+ "onChange=\"self.parent.parent.updateUser()\" readonly=\""
@@ -366,61 +349,39 @@ public class InputField2 extends Div
 											+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
 									+ required+"</div>";
-						}
 					}
 					else if(TypeEnumeration.GROUP_TYPE.equals(type))
 					{
 						updateGroup = true;
-						if (dualEdit)
-						{
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div>dualEdit id pending</div>");
-							result = sb.toString();
-						} else {
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateGroup()' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/grup.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectGroup(event)' onActualitza='self.parent.parent.onActualitzaGroup(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()'/>");
-							sb.append(required+"</div>");
-							result = sb.toString();
-						}
+						StringBuffer sb = new StringBuffer();
+						sb.append("<div style='display:inline' visible='true'>");
+						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateGroup()' onOK='' readonly='"+readonlyExpr+"'/>");
+						sb.append("<imageclic src='/zkau/web/img/grup.gif' visible='true' onClick='self.parent.parent.onSelectGroup(event)' onActualitza='self.parent.parent.onActualitzaGroup(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()'/>");
+						sb.append(required+"</div>");
+						result = sb.toString();
 					}
 					else if(TypeEnumeration.APPLICATION_TYPE.equals(type))
 					{
 						updateApplication = true;
-						if (dualEdit)
-						{
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div>dualEdit id pending</div>");
-							result = sb.toString();
-						} else {
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateApplication()' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectApplication(event)' onActualitza='self.parent.parent.onActualitzaApplication(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()'/>");
-							sb.append(required+"</div>");
-							result = sb.toString();
-						}
+						StringBuffer sb = new StringBuffer();
+						sb.append("<div style='display:inline' visible='true'>");
+						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateApplication()' onOK='' readonly='"+readonlyExpr+"'/>");
+						sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' visible='true' onClick='self.parent.parent.onSelectApplication(event)' onActualitza='self.parent.parent.onActualitzaApplication(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()'/>");
+						sb.append(required+"</div>");
+						result = sb.toString();
 					}
 					else if(TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(type))
 					{
 						updateCustomObject = true;
-						if (dualEdit)
-						{
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div>dualEdit id pending</div>");
-							result = sb.toString();
-						} else {
-							StringBuffer sb = new StringBuffer();
-							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateCustomObject()' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectCustomObject(event)' onActualitza='self.parent.parent.onActualitzaCustomObject(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()'/>");
-							sb.append(required+"</div>");
-							result = sb.toString();
-						}
+						StringBuffer sb = new StringBuffer();
+						sb.append("<div style='display:inline' visible='true'>");
+						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.updateCustomObject()' onOK='' readonly='"+readonlyExpr+"'/>");
+						sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' visible='true' onClick='self.parent.parent.onSelectCustomObject(event)' onActualitza='self.parent.parent.onActualitzaCustomObject(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()'/>");
+						sb.append(required+"</div>");
+						result = sb.toString();
 					}
 					else if(TypeEnumeration.BINARY_TYPE.equals(type))
 					{
@@ -449,35 +410,15 @@ public class InputField2 extends Div
 					}
 					else if(TypeEnumeration.DATE_TYPE.equals(type))
 					{
-						result = "<zk><datebox bind=\""+getBind()+"\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='"+(!dualEdit)+"' />"+required+"</zk>"; 
-						if (dualEdit)
-						{
-							result= "<div style='display:inline-block;'><datebox bind=\""+getBind()+"\" disabled='true' format=\"${c:l('usuaris.zul.dateFormat2')}\""
-									+ " onChange=\"\" onOK='' />"
-									+ "<imageclic src='/img/pencil.png' "
-										+ "onClick='self.visible = self.previousSibling.visible = false; "
-											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ result
-									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/></div>";
-						}
+						result = "<zk><datebox bind=\""+getBind()+"\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' />"+required+"</zk>"; 
 					}
 					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 					{
-						result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\" bind=\""+getBind()+"\" onChange=\"\" width='100%' visible='"+(!dualEdit)+"' "
+						result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\" bind=\""+getBind()+"\" onChange=\"\" width='100%' visible='true' "
 									+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\"/>";
-						if (dualEdit)
+						if (required.length() > 0)
 						{
-							result= "<div style='display:inline-block;'><label bind='"+getBind()+"'/>"
-									+ "<imageclic src='/img/pencil.png' "
-										+ "onClick='self.visible = self.previousSibling.visible = false; "
-											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ result
-									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
-						}
-						else if (required.length() > 0)
-						{
-							result = "<zk>"+result+required+"</zk>"; 
-								
+							result = "<zk>"+result+required+"</zk>";
 						}
 					}	
 					else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
@@ -497,20 +438,11 @@ public class InputField2 extends Div
 					}	
 					else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
 					{
-						if (dualEdit)
-							result= result + "<div style='display:inline-block;'><label bind='"+getBind()+"'/>"
-									+ "<imageclic src='/img/pencil.png' "
-										+ "onClick='self.visible = self.previousSibling.visible = false; "
-											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox sclass=\"textbox\" bind=\""+getBind()+"\" maxlength=\"" + size +"\" width='70%' "
-											+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='self.parent.parent.changeData()'/>"
-									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
-						else
 							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\""+getBind()+"\" onChange=\"\" width='98%' "
 									+ "readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 					} else { // Listbox
 						result = "<listbox mold=\"select\" bind=\""+getBind()+"\" onChange=\"\" "
-								+ "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"'>";
+								+ "disabled=\""+readonlyExpr+"\" visible='true'>";
 						result = result + "<listitem value=\"\"/>";
 						for (String v: dataType.getValues())
 						{
@@ -518,16 +450,7 @@ public class InputField2 extends Div
 							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
 						}
 						result = result + "</listbox>";
-						if (dualEdit)
-						{
-							result= "<div style='display:inline-block;'><label bind='"+getBind()+"'/>"
-									+ "<imageclic src='/img/pencil.png' "
-										+ "onClick='self.visible = self.previousSibling.visible = false; onOK=''  "
-											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ result
-									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()'/>"+required+"</div>";
-						}
-						else if (required.length() > 0)
+						if (required.length() > 0)
 						{
 							result = "<zk>"+result+required+"</zk>"; 
 								

@@ -35,7 +35,11 @@ td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 
 .text, .textbox {
     box-sizing: content-box;
-    padding: 2px;
+    padding-bottom: 1px;
+    padding-top: 2px;
+    padding-left: 3px;
+    padding-right: 2px;
+    font-size: 11px
 }
 
 .finestraTimeout {
@@ -492,4 +496,18 @@ button.small-button img {
 	vertical-align: baseline;
 }
 
+img.pencil {
+    padding-left: 4px;
+    padding-right: 4px;
+    vertical-align: -1px;
+    height: 14px;
+    cursor: pointer;
+}
 
+img.pencil-ok {
+    padding-left: 4px;
+    padding-right: 4px;
+    vertical-align: -3px;
+    height: 13px;
+    cursor: pointer;
+}

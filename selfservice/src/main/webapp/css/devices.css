@@ -146,3 +146,18 @@ input[type="button"]:hover {
 	background-color: #9EC73C;
 	color: white;
 }	
+
+/* Home attribute name of user */
+div.cell-inner span.etiqueta {
+	color: #7F9FC2;
+	font-weight: bold;
+	font-size: 14px
+}
+
+/* Home label additinal data component */
+div.cell-inner span.component-description {
+	color: #708e29;
+	font-size: 13px;
+	font-weight: normal;
+	font-style: italic;
+}

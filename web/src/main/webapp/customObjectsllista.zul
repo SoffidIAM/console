@@ -33,7 +33,7 @@
 			}
 
 			void cleanWindow() {
-				//model.getVariables().declareVariable("queryEnabled", false);
+				model.getVariables().declareVariable("queryEnabled", false);
 				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/customObject[false]";
 				esquemaLlista.visible=false;
 				esquemaLlista.getFellow("finishButton").disabled = true;
@@ -82,6 +82,9 @@
 						label="${c:l('grups.zul.CancelChanges')}" />
 				</toolbar>
 				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="${fileres}" autocommit="false">
+					<attribute name="onSelect">
+						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+					</attribute>
 					<listhead>
 						<listheader label="${c:l('com.soffid.iam.api.CustomObject.name')}"
 							sort="auto" width="20%" />

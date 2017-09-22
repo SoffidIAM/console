@@ -34,10 +34,14 @@
 	
 				autoLogin = !user.isEmpty() && !password.isEmpty();
 				session.removeAttribute("samlLoginToken");
-				if (!classic)
+				if (!autoLogin)
 				{
-					System.out.println(rootPath);
-					execution.sendRedirect("/saml");
+					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
+					if (!classic)
+					{
+						System.out.println(rootPath);
+						execution.sendRedirect("/saml");
+					}
 				}
 			}
 		

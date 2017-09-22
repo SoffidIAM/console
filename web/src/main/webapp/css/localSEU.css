@@ -770,3 +770,25 @@ div.displayedFromLeft {
     animation-name: slide-in-l;
     animation-duration: 1s;
 }
+
+/* Styles for the button "Confirm changes" when a page is open directly showing a entity in the detail */
+.toolbarOnlyDetails {
+	background-color:white;
+	height:40px
+}
+.toolbarOnlyDetails a {
+	background-color:white;
+	color:#7F9FC2;
+	border:solid 1px #9EC73C;
+	padding:7px;
+	margin-left:7px;
+	vertical-align:-26px;
+	text-decoration: none
+}
+.toolbarOnlyDetails a:hover {
+	background-color:#9EC73C;
+	color:white
+}
+.toolbarOnlyDetails a img {
+	vertical-align:-3px
+}

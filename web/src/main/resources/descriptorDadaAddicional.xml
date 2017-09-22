@@ -2,25 +2,11 @@
 
 <zkib-model>
 	<datanode name="dadesAddicionals">		
-		<finder name="dadaAddicional" type="dadaAddicional">
-			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
-				method="findTipusDadesByScopeAndName" if = "${queryEnabled}">
-				<parameter value="${scope}"/>
-				<parameter value="${codi}"/>
-			</ejb-finder>
-			<new-instance-script>
-				obj = new es.caib.seycon.ng.comu.TipusDada();
-				obj.setValues ( new java.util.LinkedList());
-				return obj;
-			</new-instance-script>
-		</finder>
-		
 		<finder name="customObject" type="objectType">
 			<custom-finder className="com.soffid.iam.web.metadata.ObjectCustomFinder"/>
 			<new-instance-bean className="com.soffid.iam.api.CustomObjectType">
 			</new-instance-bean>
 		</finder>
-		
 		<finder name="dataType" type="dataType">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -96,6 +82,9 @@
 			    return org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.zul.Aplicacia-2");
 			else
 				return "";
+		</custom-attribute>
+		<custom-attribute name="typeDescription">
+			return org.zkoss.util.resource.Labels.getLabel("typeDadaAddicional."+instance.type);
 		</custom-attribute>
 		<validator>
 			<attribute-validator expr="${instance.scope}" notNull="true" friendlyName="dadesAddicionals.ScopeValidation"/>

@@ -614,9 +614,6 @@
 			</navegador>
 
 			<detalls id="dades" width="${amplaria}" style="border:none">
-				<toolbar if="${requestedUser != null }" height="22px">
-					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
-				</toolbar>
 				<zscript>
 				<![CDATA[
 					void onChangeTipus (Listbox listbox)
@@ -1737,6 +1734,8 @@
 												for (com.soffid.iam.web.component.Identity id: identities)
 												{
 													com.soffid.iam.api.RoleAccount ra = id.getObject();
+													String bbdd = null;
+													String valorDomini = null;
 													ds = gridRols.getDataSource(); 
 													ctx =  ds.getJXPathContext();
 													if (ra.getDomainValue() != null) {
@@ -1792,7 +1791,7 @@
 													// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
 													if(jaExisteix) {
 														Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.RolAssignat"), 
-																new Object [] {dada,bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
+																new Object [] {ra.getRoleName(),bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
 													} else {
 														position = modelProxy.newInstance();
 														ds = gridRols.getDataSource(); 
@@ -2669,6 +2668,9 @@ void actualitza (event) {
 						</tabpanels>
 					</tabbox>
 				</form>
+				<toolbar if="${requestedUser != null}" class="toolbarOnlyDetails">
+					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
+				</toolbar>
 			</detalls>
 		</esquemavertical>
 
@@ -2730,6 +2732,8 @@ void actualitza (event) {
 		<include src="usuarisllista.zul" />
 		<include src="dominisCorreullista.zul" />
 		<include src="grupsllista.zul" />
+		<include src="aplicacionsllista.zul" />
+		<include src="customObjectsllista.zul" />
 		<include src="finestres/maquinesllistaUsuari.zul" />
 		<include src="impressoresllista.zul" />
 		<include src="rolsllista.zul" />

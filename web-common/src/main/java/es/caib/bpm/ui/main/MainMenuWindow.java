@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treechildren;
 import org.zkoss.zul.Treeitem;
@@ -18,19 +19,14 @@ import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.bpm.ui.tree.ApplicationTreecell;
 import es.caib.bpm.vo.ProcessDefinition;
 
-public class MainMenuWindow extends Window {
-	/**
-	 * 
-	 */
+public class MainMenuWindow extends Window implements AfterCompose {
+
 	private static final long serialVersionUID = 1L;
 
-	public void onCreate() {
-		createProcesses();
-		createCustomObjects();
-	}
-
 	private void createCustomObjects() {
-		Treeitem item = (Treeitem) getFellow("customObjectTypes"); //$NON-NLS-1$
+		Treeitem item = (Treeitem) getFellowIfAny("customObjectTypes"); //$NON-NLS-1$
+		if (null == item) // In selfserver "customObjectTypes" doesn't exist
+			return;
 		Treechildren children = item.getTreechildren();
 		boolean visible = false;
 
@@ -106,9 +102,15 @@ public class MainMenuWindow extends Window {
 
 	public boolean setVisible(boolean visible) {
 		if (visible) {
-			onCreate();
+			afterCompose();
 		}
 
 		return super.setVisible(visible);
+	}
+
+	@Override
+	public void afterCompose() {
+		createProcesses();
+		createCustomObjects();
 	}
 }

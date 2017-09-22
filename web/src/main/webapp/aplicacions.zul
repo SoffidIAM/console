@@ -10,10 +10,12 @@
 	
 	<style>
 		.tcoth div {text-align:center !important;}
-		.appatt {display: table; padding: 5px; width: 100%}
+		.appatt {display: table; padding: 0px; width: 100%}
 		.appatt_row {display: table-row}
-		.appatt_label {display: table-cell; width: 200px}
-		.appatt_input {display: table-cell}
+		.appatt_row span {padding-left:5px}
+		.appatt_label {display: table-cell; width: 202px}
+		.appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		.ourcheck input {vertical-align:-7px}
 	</style>
 	
 	<datamodel id="model" rootNode="aplicacions" src="descriptorAplicacio.xml"/>
@@ -23,6 +25,9 @@
 
 	<zscript>
 		<![CDATA[
+			// Recover the application code to open directly the Details box
+			String requestedApplication = Executions.getCurrent().getNativeRequest().getParameter("application");
+
 		    import es.caib.zkib.datasource.XPathUtils;
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
@@ -191,6 +196,21 @@
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 		onHideFormulari="showLista()" hideSearchToolbar="true">
 
+		<attribute name="onCreate">
+			<![CDATA[
+				if (requestedApplication != null) {
+					qw = esquema.getFellow("queryWindow");
+					searchBox = qw.getFellow("searchBox");
+					searchBox.addAttribute("name").setSearchFilter(requestedApplication);
+					searchBox.search();
+					esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
+					showDetall();
+					esquema.removeCriteria();
+					esquema.removeList();
+				}
+			]]>
+		</attribute>
+
 		<criteris id="queryWindow" style="margin-bottom:1em;"
 			width="100%" height="">
 			<searchbox auto="true" id="searchBox"
@@ -232,7 +252,8 @@
 			</listbox>
 		</navegador>
 		
-		<detalls id="dades" width="${amplaria}">
+		<detalls id="dades" width="${amplaria}" style="border:none">
+
 			<zscript>
 				void onChangeDades()
 				{
@@ -246,8 +267,7 @@
 					}
 				}
 			</zscript>
-			<form id="form" dataPath="/esquema/lista/listbox:/." width="99%"
-				onChangeXPath="onChangeDades()">
+			<form id="form" dataPath="/esquema/lista/listbox:/." width="99%" onChangeXPath="onChangeDades()">
 				<attribute name="onActualitza">
 					if (event.getData() instanceof String)
 					{
@@ -270,7 +290,7 @@
 					}
 				</attribute>
 				
-				<tabbox width="${amplaria2}">
+				<tabbox width="${amplaria2}" class="thicktabbox">
 					<tabs>
 						<tab label="${c:l('aplicacions.zul.Dades')}"/>
 						<tab label="${c:l('aplicacions.zul.Responsables')}" visible="false"/>
@@ -349,11 +369,11 @@
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.GestionableperWorkfl')}"/>
 										<checkbox id="gestionable_wf" bind="@gestionableWF"
-												disabled="${!canModifyAplicacio}" onCheck=""/>
+												disabled="${!canModifyAplicacio}" onCheck="" class="ourcheck"/>
 									</row>
 									<row>
 											<input_etiqueta value="${c:l('aplicacions.zul.Process')}"/>
-											<listbox mold="select" bind="@approvalProcess" dataPath="/model:/approvalProcess" width="20em" disabled="${!canModifyAplicacio}" >
+											<listbox mold="select" bind="@approvalProcess" dataPath="/model:/approvalProcess" width="20em" disabled="${!canModifyAplicacio}">
 												<dataitem bind="@value">
 													<listcell bind="@tag"></listcell>
 												</dataitem>
@@ -369,7 +389,7 @@
 									</row>
 									<row>
 										<input_etiqueta value="${c:l('aplicacions.zul.Correunotificacions')}"/>
-										<textbox bind="@correusNotificacions" disabled="${!canModifyAplicacio}" id="detall_correuNotifica" maxlength="512" width="98%">
+										<textbox bind="@correusNotificacions" disabled="${!canModifyAplicacio}" id="detall_correuNotifica" maxlength="512" width="98%" style="padding-right:4px">
 											<attribute name="onChange">
 												valor = self.value;
 												if (valor==null || "".equals(valor.trim())) return;
@@ -1448,12 +1468,18 @@ void removeSodRule (Component button)
 					</tabpanels>
 				</tabbox>
 			</form>
+			<toolbar if="${requestedApplication != null}" class="toolbarOnlyDetails">
+				<commitbutton id="b_commit" datamodel="/model" />
+			</toolbar>
 		</detalls>
 	</esquemavertical>
 
 	<include src="finestres/aplica_rolinfo.zul"/>
 	<include src="domini.zul"/>
 	<include src="usuarisllista.zul"/>
+	<include src="grupsllista.zul"/>
+	<include src="aplicacionsllista.zul" />
+	<include src="customObjectsllista.zul" />
 	<include src="valorDomini.zul"/>	
 	<include src="dominisllista.zul"/>
 	<include src="finestres/aplica_usuarisRolllista.zul"/>

@@ -13,15 +13,22 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
-import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
@@ -40,17 +47,6 @@ import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * @see es.caib.seycon.ng.servei.DadesAddicionalsService
@@ -85,33 +81,7 @@ public class AdditionalDataServiceImpl extends
 
 		if (tipusDada.getSystemName() != null && tipusDada.getSystemName().trim().length() > 0)
 		{
-			Long order = tipusDada.getOrder();
-			String code = new String();
-			boolean found = false;
-			List<AccountMetadataEntity> tipusDadaEntityList = getAccountMetadataEntityDao().findBySystem(tipusDada.getSystemName());
-			if (order == 0)
-			{
-				long next = 10;
-				for(AccountMetadataEntity tipusDadaEntity: tipusDadaEntityList){
-					if (tipusDadaEntity.getOrder().longValue() >= next)
-						next = tipusDadaEntity.getOrder().longValue() + 1;
-				}
-				tipusDada.setOrder(next);
-			}
-			else
-			{
-				for(AccountMetadataEntity tipusDadaEntity: tipusDadaEntityList){
-					Long orderDins = tipusDadaEntity.getOrder();
-					if(orderDins.compareTo(order) == 0){
-						found = true;
-						code = tipusDadaEntity.getName();
-						break;
-					}
-				}
-			}
-			if(found)
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"), new Object[]{tipusDada.getOrder(), tipusDada.getCode(), code}));
-			
+			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaMateixCodi = getAccountMetadataEntityDao().findByName(tipusDada.getSystemName(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null)
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
@@ -124,25 +94,8 @@ public class AdditionalDataServiceImpl extends
 		}
 		else
 		{
-			// Create user data
-			Long order = tipusDada.getOrder();
-			String code = new String();
-			boolean found = false;
-
-			List<MetaDataEntity> tipusDadaEntityList = getMetaDataEntityDao().loadAll();
-			for (MetaDataEntity tipusDadaEntity : tipusDadaEntityList) {
-	            Long orderDins = tipusDadaEntity.getOrder();
-	            if (orderDins.compareTo(order) == 0 && 
-						tipusDadaEntity.getScope().equals(tipusDada.getScope())) {
-	                found = true;
-	                code = tipusDadaEntity.getName();
-	                break;
-	            }
-	        }
-			if(found)
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"), new Object[]{tipusDada.getOrder(), tipusDada.getCode(), code}));
-			
-			Collection tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByScopeAndName(tipusDada.getScope(), tipusDada.getCode());
+			validateUniqueOrderForMetaData(tipusDada);
+			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByScopeAndName(tipusDada.getScope(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
@@ -175,6 +128,7 @@ public class AdditionalDataServiceImpl extends
 	protected com.soffid.iam.api.DataType handleUpdate(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
 		{
+			validateUniqueOrderForMetaData(tipusDada);
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
 		
 			if (tipusDadaEntity.getAdminVisibility() == null)
@@ -187,6 +141,7 @@ public class AdditionalDataServiceImpl extends
 			getMetaDataEntityDao().update(tipusDadaEntity);
 			return getMetaDataEntityDao().toDataType(tipusDadaEntity);
 		} else {
+			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().dataTypeToEntity(tipusDada);
 			
 			if (tipusDadaEntity.getAdminVisibility() == null)
@@ -198,6 +153,45 @@ public class AdditionalDataServiceImpl extends
 	
 			getAccountMetadataEntityDao().update(tipusDadaEntity);
 			return getAccountMetadataEntityDao().toDataType(tipusDadaEntity);
+		}
+	}
+
+	/**
+	 * Validate unique order for different custom objects types
+	 */
+	private void validateUniqueOrderForAccountMetadata(DataType dataTypeVO) {
+		List<AccountMetadataEntity> dataTypeEntityList = getAccountMetadataEntityDao().findBySystem(dataTypeVO.getSystemName());
+		if (dataTypeVO.getOrder() == 0) {
+			long next = 10;
+			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
+				if (dataTypeEntity.getOrder().longValue() >= next) next = dataTypeEntity.getOrder().longValue() + 1;
+			}
+			dataTypeVO.setOrder(next);
+		} else {
+			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
+				if (dataTypeVO.getId().compareTo(dataTypeEntity.getId())!=0 && dataTypeEntity.getOrder().compareTo(dataTypeVO.getOrder()) == 0) {
+					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
+							dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Validate unique order for different custom objects types
+	 */
+	private void validateUniqueOrderForMetaData(DataType dataTypeVO) {
+		List<MetaDataEntity> dataTypeEntityList = null;
+		if (dataTypeVO.getScope().equals(MetadataScope.CUSTOM)) {
+			dataTypeEntityList = getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null);
+		} else {
+			dataTypeEntityList = getMetaDataEntityDao().findByScope(dataTypeVO.getScope());
+		}
+		for (MetaDataEntity dataTypeEntity : dataTypeEntityList) {
+			if (dataTypeVO.getId().compareTo(dataTypeEntity.getId())!=0 && dataTypeVO.getOrder().compareTo(dataTypeEntity.getOrder())==0) {
+				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
+						dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
+			}
 		}
 	}
 

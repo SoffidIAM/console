@@ -239,7 +239,7 @@
 								<tabpanel id="identification"  width="100%">
 									<grid sclass="fonsBlanc" width="100%" fixedLayout="true">
 										<columns>
-											<column width="135px"/>
+											<column width="250px"/>
 											<column width="*"/>
 										</columns>
 										<rows>
@@ -282,11 +282,11 @@
 									<grid sclass="fonsBlanc" dataPath="/dada"  onNewRow="event.data.getChildren().get(1).onCreate()"
 										fixedLayout="true" width="100%"> 
 										<columns>
-											<column width="135px"/>
+											<column width="250px"/>
 											<column width="*"/>
 										</columns>
 										<datarow>
-											<input_etiqueta bind="@dataLabel" width_custom="135px"
+											<input_etiqueta bind="@dataLabel" width_custom="250px"
 												value="${c:l('usuaris.zul.@codiDada')}"/>
 											<div use="com.soffid.iam.web.users.additionalData.InputField" twoPhaseEdit="true" onChange=""/>
 										</datarow>

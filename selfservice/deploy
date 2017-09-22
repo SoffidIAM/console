@@ -6,3 +6,4 @@ cp -r /home/gbuades/soffid-2.0/console/selfservice/src/main/resources/* /home/gb
 
 #rsync -vauz -e ssh /home/gbuades/soffid/console2/console/web/src/main/webapp/* root@bubu.test.lab:/opt/soffid/iam-console/jboss/server/default/tmp/soffid/iam-ear.ear/iam-web-*.war
 #rsync  -vauz -e ssh /home/gbuades/soffid/console2/console/web/src/main/resources/* root@bubu.test.lab:/opt/soffid/iam-console/jboss/server/default/tmp/soffid/iam-ear.ear/iam-web-*.war/WEB-INF/classes
+

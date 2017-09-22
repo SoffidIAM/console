@@ -3040,4 +3040,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		return result;
 	}
+
+	@Override
+	protected Collection<String> handleFindUserNames() throws Exception {
+		return getUserEntityDao().findUserNames();
+	}
 }

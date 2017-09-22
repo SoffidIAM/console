@@ -89,6 +89,9 @@ public class Dispatcher {
 	@Attribute(defaultValue = "false")
 	public boolean readOnly;
 
+	@Attribute(defaultValue = "false")
+	public boolean fullReconciliation;
+
 	@Nullable
 	public java.lang.Long databaseReplicaId;
 

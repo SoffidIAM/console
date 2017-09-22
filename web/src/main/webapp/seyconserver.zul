@@ -447,19 +447,19 @@
 						
 						es.caib.seycon.ng.remote.URLManager m = new es.caib.seycon.ng
 								.remote.URLManager(dadaurl);
-						url = m.getServerURL().getHost();
+						url = m.getServerURL();
 					
 						if (es.caib.zkib.zkiblaf.Missatgebox.
 								confirmaOK_CANCEL(String.format(org.zkoss.util.resource
 										.Labels.getLabel("seyconServer.DesitjaReiniciar"),
 								new Object [] {url})))
 						{
-							result = getSeyconServerService().getSeyconServerInfo(dadaurl,
-									"reset", new String[]{url});
+							com.soffid.iam.EJBLocator.getSyncServerService().resetSyncServer(
+										url.toString(), null);
 							
-							if (Missatgebox.confirmaOK (result.iterator().next(),
+							if (Missatgebox.confirmaOK (
 									String.format(org.zkoss.util.resource
-											.Labels.getLabel("seyconServer.ResultatReinici"), 
+											.Labels.getLabel("seyconServer.Restarting"), 
 									new Object [] {url})))
 							{
 								refrescaServidors(); //refresquem estat
@@ -553,17 +553,18 @@
 									.Labels.getLabel("seyconServer.VolReiniciar"),
 							new Object [] {url})))
 					{
-						result = getSeyconServerService().getSeyconServerInfo(urlserver,
-								"reset", new String[]{url});
-						Missatgebox.info (result.iterator().next(), 
+						com.soffid.iam.EJBLocator.getSyncServerService().
+								resetSyncServer(urlserver, url);
+						Missatgebox.info ( 
 							String.format(org.zkoss.util.resource
-									.Labels.getLabel("seyconServer.ResultatReinici"),
+									.Labels.getLabel("seyconServer.Restarting"),
 							new Object [] {url}));
 					}
 				}
 				
 				catch (Throwable th)
 				{
+					th.printStackTrace();
 					Missatgebox.error (String.format(org.zkoss.util.resource
 							.Labels.getLabel("seyconServer.ErrorReinici"),
 						new Object [] {th.getMessage()}));

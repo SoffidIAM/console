@@ -5,16 +5,16 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
-<frame xmlns:h="http://www.w3.org/1999/xhtml" onCreate="onCreateFrame()">
-	<style src="~./styles/estil.css"/>
-	
+<frame xmlns:h="http://www.w3.org/1999/xhtml" onCreate="onCreateFrame()" width="100%">
+
 	<datamodel id="model" rootNode="objects" src="descriptorCustomObject.xml"
 		onChange="showCancelButton()"/>
 
 	<style>
 		.objectatt {display: table; padding: 0px; width: 100%}
-		.objectatt_row {display: table-row}
-		.objectatt_label {display: table-cell; width: 12em}
+		.objectatt_row {display: table-row;}
+		.objectatt_row div {padding-top: 6px}
+		.objectatt_label {display: table-cell; width: 15em}
 		.objectatt_input {display: table-cell}
 	</style>
 
@@ -151,19 +151,20 @@
 				</dataitem>
 			</listbox>
 		</navegador>
-	
-		<detalls id="dades" width="100%" style="padding: 6px">
+
+		<detalls id="dades" width="100%" style="border:none;">
 			<form dataPath="/esquema/lista/listbox:/" id="form" width="99%" onOK="">
-				<div>
-					<div>
-						<label style="width:12em; display:inline-block" value="${c:l('com.soffid.iam.api.CustomObject.name')} :"></label>
-						<textbox bind="@name" width="15em" id="objectTypeName"  onChange="" />
+				<div style="border: 3px solid #637792; padding:13px">
+					<div class="objectatt_row">
+						<label value="${c:l('com.soffid.iam.api.CustomObject.name')}" sclass="objectatt_label"/>
+						<textbox bind="@name" width="250px" id="objectTypeName" onChange=""/>
 					</div>
-					<div>
-						<label style="width:12em; display:inline-block"  value="${c:l('com.soffid.iam.api.CustomObject.description')} :"></label>
-						<textbox bind="@description" width="30em" id="objectTypeDescription"  onChange="" />
+					<div style="padding-top:6px"></div>
+					<div class="objectatt_row">
+						<label value="${c:l('com.soffid.iam.api.CustomObject.description')}" sclass="objectatt_label"/>
+						<textbox bind="@description" width="250px" id="objectTypeDescription" onChange="" />
 					</div>
-						<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
+					<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 							dataPath="attributes" scope="custom" objectType='${objectType}'
 							sclass="objectatt"/>
 				</div>

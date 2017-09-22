@@ -9,6 +9,7 @@
  */
 package com.soffid.iam.authoritative.service;
 
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
@@ -99,6 +100,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			change.getGroups().remove(change.getUser().getPrimaryGroup());
 		
 		if (dispatcher.getAuthoritativeProcess() == null || dispatcher.getAuthoritativeProcess().isEmpty())
+		{
+			applyChange(change);
+			return true;
+		}
+		else if (change.getUser() == null)
 		{
 			applyChange(change);
 			return true;
@@ -362,9 +368,13 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	    		if (change.getGroups() != null)
 	    			applyGroupChange (user, tracker);
 			}
-			else if (change.getObjectType() == SoffidObjectType.OBJECT_GROUP)
+			else if (change.getObjectType() == SoffidObjectType.OBJECT_GROUP && change.getGroup() != null)
 			{
 				applyGroupChange (tracker);
+			}
+			else if (change.getObjectType() == SoffidObjectType.OBJECT_CUSTOM && change.getObject() != null)
+			{
+				applyObjectChange (tracker);
 			}
 		} finally {
 			Security.nestedLogoff();
@@ -584,6 +594,25 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		return oldGroup;
 	}
 
+	private CustomObject applyObjectChange(ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		AuthoritativeChange change = tracker.change;
+		CustomObject g = change.getObject();
+		CustomObject oldObject = getCustomObjectService().findCustomObjectByTypeAndName(g.getType(), g.getName()); 
+		if (oldObject == null)
+		{
+			if (g.getDescription() == null) g.setDescription(g.getName());
+			oldObject = getCustomObjectService().createCustomObject(g);
+		} else {
+			boolean anyChange = !compareCustomObjects(g, oldObject);
+			if (anyChange)
+			{
+				auditAuthoritativeChange(tracker);
+				getCustomObjectService().updateCustomObject(oldObject);
+			}
+		}
+		return oldObject;
+	}
+
 	private boolean compareGroups(Group g, Group oldGroup) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		boolean anyChange = false;
 		for (String att : new String[]{"Description", "DriveLetter", "DriveServerName", "Name", "Obsolete", 
@@ -626,6 +655,46 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		return ! anyChange;
 	} 
 
+	private boolean compareCustomObjects(CustomObject g, CustomObject oldGroup) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		boolean anyChange = false;
+		for (String att : new String[]{"Name", "Type", "Description"}) {
+            Method getter = CustomObject.class.getMethod("get" + att);
+            Method setter = CustomObject.class.getMethod("set" + att, getter.getReturnType());
+            Object value = getter.invoke(g);
+            if ("".equals(value)) value = null;
+            if (value != null) {
+                Object oldValue = getter.invoke(oldGroup);
+                if ("".equals(oldValue)) oldValue = null;
+                if (oldValue == null || !oldValue.equals(value)) {
+                    log.info("Received change on attribute " + att);
+                    setter.invoke(oldGroup, value);
+                    anyChange = true;
+                }
+            }
+        }
+		
+		for (String attribute : g.getAttributes().keySet()) {
+            Object value = g.getAttributes().get(attribute);
+            if (value != null && value instanceof Date) {
+                Calendar c = Calendar.getInstance();
+                c.setTime((Date) value);
+                value = c;
+            }
+            Object oldValue = oldGroup.getAttributes().get(attribute);
+            if (oldValue != null && oldValue instanceof Date) {
+                Calendar c = Calendar.getInstance();
+                c.setTime((Date) oldValue);
+                oldValue = c;
+            }
+            if (oldValue == null && value != null ||
+            		oldValue != null && ! oldValue.equals(value))
+            {
+            	oldGroup.getAttributes().put(attribute, value);
+            	anyChange = true;
+            }
+		}
+		return ! anyChange;
+	} 
 }
 
 class ProcessTracker {

@@ -97,6 +97,7 @@ public class ExtensibleObjectMapping extends ObjectMapping
 		ExtensibleObjectMapping eom = new ExtensibleObjectMapping();
 		eom.attributes = AttributeMapping.toAttributeMappingList(other.getAttributes());
 		eom.properties = other.getProperties();
+		eom.triggers = ObjectMappingTrigger.toObjectMappingTriggerList(other.getTriggers());
 		ObjectMapping.toObjectMapping(other, eom);
 		return eom;
 	}
@@ -116,4 +117,22 @@ public class ExtensibleObjectMapping extends ObjectMapping
 		return target;
 	}
 
+
+	public boolean appliesToSoffidObject (ExtensibleObject soffidObject)
+	{
+		if (getSoffidObject().getValue().equals(soffidObject.getObjectType()))
+			return ( ! getSoffidObject().equals(SoffidObjectType.OBJECT_CUSTOM) ||
+				getSoffidCustomObject().equals(soffidObject.get("type")));
+		else
+			return false;
+	}
+
+	public boolean appliesToSystemObject (ExtensibleObject soffidObject)
+	{
+		if (getSoffidObject().getValue().equals(soffidObject.getObjectType()))
+			return ( ! getSoffidObject().equals(SoffidObjectType.OBJECT_CUSTOM) ||
+				getSoffidCustomObject().equals(soffidObject.get("type")));
+		else
+			return false;
+	}
 }

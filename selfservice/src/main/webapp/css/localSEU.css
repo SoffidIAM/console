@@ -468,6 +468,16 @@ tr.noBorderGrid td.gc, tr.noBorderGrid { background-color: white;}
 
 
 /* Botons */
+input[type="submit"] {
+    background-color: white;
+    border: 1px solid #9EC73C;
+    border-image: none;
+    padding: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #7F9FC2;
+}
+
 button.small-button {
 	background-color: white;
 	border: 1px solid #9EC73C;

@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -91,6 +93,7 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
 import org.opensaml.saml.common.binding.BindingDescriptor;
 import org.opensaml.saml.common.xml.SAMLConstants;
+import org.opensaml.saml.metadata.criteria.entity.EvaluableEntityDescriptorCriterion;
 import org.opensaml.saml.metadata.resolver.impl.HTTPMetadataResolver;
 import org.opensaml.saml.saml2.assertion.ConditionValidator;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
@@ -130,7 +133,10 @@ import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.UsageType;
 import org.opensaml.security.credential.impl.CollectionCredentialResolver;
 import org.opensaml.security.criteria.UsageCriterion;
+import org.opensaml.security.httpclient.HttpClientSecurityParameters;
+import org.opensaml.security.trust.TrustEngine;
 import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.EncryptionParameters;
 import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.encryption.EncryptedData;
@@ -212,7 +218,7 @@ public class SAMLServiceInternal {
 		builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 	}
 	
-	public String[] authenticate(String protocol, Map<String, String> response) throws ParserConfigurationException, SAXException, IOException, UnmarshallingException, AssertionValidationException, CertificateException, ResolverException, InternalErrorException, ComponentInitializationException {
+	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws ParserConfigurationException, SAXException, IOException, UnmarshallingException, AssertionValidationException, CertificateException, ResolverException, InternalErrorException, ComponentInitializationException {
 
 		String samlResponse = response.get("SAMLResponse");
 		
@@ -232,7 +238,7 @@ public class SAMLServiceInternal {
 		// Marshall the Subject
 		Response saml2Response = (Response) marshaller.unmarshall(doc.getDocumentElement());
 
-		if (! validateResponse(saml2Response))
+		if (! validateResponse(hostName, saml2Response))
 			return null;
 
 		String originalrequest = saml2Response.getInResponseTo();
@@ -250,9 +256,9 @@ public class SAMLServiceInternal {
 
 		for ( Assertion assertion: saml2Response.getAssertions())
 		{
-			if (validateAssertion(assertion))
+			if (validateAssertion(hostName, assertion))
 			{
-				return createAuthenticationRecord(requestEntity, assertion);
+				return createAuthenticationRecord(hostName, requestEntity, assertion);
 			}
 		}
 		
@@ -261,7 +267,7 @@ public class SAMLServiceInternal {
 	}
 
 	
-	private String[] createAuthenticationRecord(SamlRequestEntity requestEntity, Assertion assertion) {
+	private String[] createAuthenticationRecord(String hostName, SamlRequestEntity requestEntity, Assertion assertion) {
 		Subject subject = assertion.getSubject();
 		if (subject == null)
 		{
@@ -308,10 +314,10 @@ public class SAMLServiceInternal {
 		return null;
 	}
 
-	public String generateMetadata() throws MarshallingException, InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+	public String generateMetadata(String hostName) throws MarshallingException, InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
 		EntityDescriptor idp = new EntityDescriptorBuilder().buildObject();
 		// Generate entity descriptor
-		idp.setEntityID(getEntityId());		
+		idp.setEntityID(getEntityId(hostName));		
 
 		SPSSODescriptor spsso = new SPSSODescriptorBuilder().buildObject();
 		idp.getRoleDescriptors().add(spsso);
@@ -331,30 +337,41 @@ public class SAMLServiceInternal {
 		AssertionConsumerService acs = new AssertionConsumerServiceBuilder().buildObject();
 		spsso.getAssertionConsumerServices().add(acs);
 		acs.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-		acs.setLocation(getBaseURL()+"saml/log/post");
+		acs.setLocation(getBaseURL(hostName)+"saml/log/post");
 		acs.setIndex(0);
 		
 		acs = new AssertionConsumerServiceBuilder().buildObject();
 		spsso.getAssertionConsumerServices().add(acs);
-		acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
-		acs.setLocation(getBaseURL()+"saml/log/simple-post");
+		acs.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+		acs.setLocation(getBaseURL(hostName)+"selfservice/saml/log/post");
 		acs.setIndex(1);
+
+		acs = new AssertionConsumerServiceBuilder().buildObject();
+		spsso.getAssertionConsumerServices().add(acs);
+		acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
+		acs.setLocation(getBaseURL(hostName)+"saml/log/simple-post");
+		acs.setIndex(2);
 		
+		acs = new AssertionConsumerServiceBuilder().buildObject();
+		spsso.getAssertionConsumerServices().add(acs);
+		acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
+		acs.setLocation(getBaseURL(hostName)+"selfservice/saml/log/simple-post");
+		acs.setIndex(3);
 		// Generate logout service
 		SingleLogoutService sls = new SingleLogoutServiceBuilder().buildObject();
 		spsso.getSingleLogoutServices().add(sls);
 		sls.setBinding(SAMLConstants.SAML2_SOAP11_BINDING_URI);
-		sls.setLocation(getBaseURL()+"saml/slo/soap");
+		sls.setLocation(getBaseURL(hostName)+"saml/slo/soap");
 
 		sls = new SingleLogoutServiceBuilder().buildObject();
 		spsso.getSingleLogoutServices().add(sls);
 		sls.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-		sls.setLocation(getBaseURL()+"saml/slo/post");
+		sls.setLocation(getBaseURL(hostName)+"saml/slo/post");
 
 		sls = new SingleLogoutServiceBuilder().buildObject();
 		spsso.getSingleLogoutServices().add(sls);
 		sls.setBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
-		sls.setLocation(getBaseURL()+"saml/slo/redirect");
+		sls.setLocation(getBaseURL(hostName)+"saml/slo/redirect");
 
 		// Generates name-id format
 		NameIDFormat nid = new NameIDFormatBuilder().buildObject();
@@ -407,16 +424,16 @@ public class SAMLServiceInternal {
 			return null;
 		if (!requestEntity.getKey().equals(token[1]))
 			return null;
-		return requestEntity.getUser();
+		return requestEntity.getHostName()+"\\"+requestEntity.getUser();
 	}
 
-	public SamlRequest generateSamlRequest() throws InternalErrorException {
+	public SamlRequest generateSamlRequest(String hostName, String path) throws InternalErrorException {
 		try {
 			RandomIdentifierGenerationStrategy idGenerator = new RandomIdentifierGenerationStrategy();
 			// Get the assertion builder based on the assertion element name
 			SAMLObjectBuilder<AuthnRequest> builder = (SAMLObjectBuilder<AuthnRequest>) builderFactory.getBuilder(AuthnRequest.DEFAULT_ELEMENT_NAME);
 			 
-			EntityDescriptor idp = getIdpMetadata();
+			EntityDescriptor idp = getIdpMetadata(hostName);
 			if (idp == null)
 				throw new InternalErrorException(String.format("Unable to find Identity Provider metadata"));
 			IDPSSODescriptor idpssoDescriptor = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
@@ -448,34 +465,27 @@ public class SAMLServiceInternal {
 			if (r.getUrl() == null)
 				throw new InternalErrorException(String.format("Unable to find a suitable endpoint for IdP %s"), idp.getEntityID());
 
-			req.setAssertionConsumerServiceURL(getBaseURL()+"saml/log/post");
+			if (path.startsWith("/")) path = path.substring(1);
+			if (!path.isEmpty() && ! path.endsWith("/")) path = path + "/";
+			req.setAssertionConsumerServiceURL(getBaseURL(hostName)+path+"saml/log/post");
 			req.setForceAuthn(false);
 			req.setID(newID);
 			req.setIssueInstant(new DateTime ());
 			Issuer issuer = ( (SAMLObjectBuilder<Issuer>) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME)).buildObject();
-			issuer.setValue(getEntityId());
+			issuer.setValue(getEntityId(hostName));
 			
 			req.setIssuer( issuer );
 			
 			Element xml = sign (builderFactory, req);
 			
-			
-			/*
-			// Get the marshaller factory
-			MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-			 
-			// Get the Subject marshaller
-			Marshaller marshaller = marshallerFactory.getMarshaller(req);
-			 
-			// Marshall the Subject
-			Element xml = marshaller.marshall(req);
-			*/			
 			String xmlString = generateString(xml);
 			
 			r.getParameters().put("RelayState", newID);
 			r.getParameters().put("SAMLRequest", Base64.encodeBytes(xmlString.getBytes("UTF-8")));
+//			encryptAssertion(req, r, idp, idpssoDescriptor);
 			
 			SamlRequestEntity reqEntity = requestDao.newSamlRequestEntity();
+			reqEntity.setHostName(hostName);
 			reqEntity.setDate(new Date());
 			reqEntity.setExternalId(newID);
 			reqEntity.setFinished(false);
@@ -491,28 +501,32 @@ public class SAMLServiceInternal {
 
 	}
 	private void encryptAssertion(AuthnRequest req, SamlRequest r,
+			EntityDescriptor entityDescriptor,
 			IDPSSODescriptor idpssoDescriptor) throws CertificateException,
 			EncryptionException {
+		
+		
 		for (KeyDescriptor key: idpssoDescriptor.getKeyDescriptors())
 		{
 			X509Certificate cert = getCert(key);
-			if (cert != null)
+			if (cert != null && (
+					key.getUse() == UsageType.ENCRYPTION || key.getUse() == UsageType.UNSPECIFIED))
 			{
 				DataEncryptionParameters encParams = new DataEncryptionParameters();
-				encParams.setAlgorithm(EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES128);
+				encParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15);
 				         
 				KeyEncryptionParameters kekParams = new KeyEncryptionParameters();
 				kekParams.setEncryptionCredential(new BasicX509Credential(cert));
-				kekParams.setAlgorithm(cert.getSigAlgName());
+				kekParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15);
 
-				
-				KeyName keyName = (KeyName) buildXMLObject(KeyName.DEFAULT_ELEMENT_NAME);
-				keyName.setValue(key.getKeyInfo().getKeyNames().get(0).getValue());
-				KeyInfo keyInfo = (KeyInfo) buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME);
-				keyInfo.getKeyNames().add(keyName);
-				encParams.setKeyInfoGenerator(new StaticKeyInfoGenerator(keyInfo));
+				BasicX509Credential cred = new BasicX509Credential(cert);
+				cred.setEntityId(entityDescriptor.getEntityID());
+				cred.setUsageType(key.getUse());
+
+				encParams.setKeyInfoGenerator(new StaticKeyInfoGenerator(key.getKeyInfo()));
+				encParams.setEncryptionCredential( cred );
 				Encrypter encrypter = new Encrypter(encParams, kekParams);
-				EncryptedData encObject = encrypter.encryptElement(req, encParams);
+				EncryptedData encObject = encrypter.encryptElement(req, encParams, kekParams);
 				 
 				r.getParameters().put("Encrypted", encObject.toString());
 			}
@@ -577,7 +591,7 @@ public class SAMLServiceInternal {
 		return marshallerFactory.getMarshaller(req).marshall(req);
 
 	}
-	
+
 	private String generateString(Element xml)
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException {
@@ -592,24 +606,24 @@ public class SAMLServiceInternal {
 		return xmlString;
 	}
 
-	private String getBaseURL() 
+	private String getBaseURL(String hostName) 
 	{
-		String url = ConfigurationCache.getProperty("soffid.externalURL");
+		String url = ConfigurationCache.getTenantProperty(hostName, "soffid.externalURL");
 		if (url == null)
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null)
 		{
-			String host = System.getProperty("hostName");
-			return "http://"+host+":8080/";
+			url = "http://"+hostName;
 		}
 		if (! url.endsWith("/"))
 			url = url + "/";
+
 		return url;
 	}
 
-	private String getEntityId() 
+	private String getEntityId(String hostName) 
 	{
-		return getBaseURL()+"soffid-iam-console";
+		return getBaseURL(hostName)+"soffid-iam-console";
 	}
 
 	private KeyStore getKeyStore () throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, InternalErrorException, InvalidKeyException, IllegalStateException, NoSuchProviderException, SignatureException
@@ -676,60 +690,67 @@ public class SAMLServiceInternal {
     }
     
     
-    HTTPMetadataResolver resolver = null;
-    private EntityDescriptor getIdpMetadata () throws ResolverException, InternalErrorException, ComponentInitializationException
+    Map<String,HTTPMetadataResolver> resolver = new HashMap<String, HTTPMetadataResolver>();
+    
+    private EntityDescriptor getIdpMetadata (String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException
     {
-    	String metadataUrl = ConfigurationCache.getProperty("soffid.saml.metadata.url");
-    	String metadataCache = ConfigurationCache.getProperty("soffid.saml.metadata.cache");
+    	String metadataUrl = ConfigurationCache.getTenantProperty(tenant, "soffid.saml.metadata.url");
+    	String metadataCache = ConfigurationCache.getTenantProperty(tenant, "soffid.saml.metadata.cache");
     	if (metadataCache == null) metadataCache="600";
-    	String metadataIdp = ConfigurationCache.getProperty("soffid.saml.idp");
+    	String metadataIdp = ConfigurationCache.getTenantProperty(tenant, "soffid.saml.idp");
     	
     	if (metadataUrl == null)
     		throw new InternalErrorException("Metadata URL is not configured");
     	if (metadataIdp == null)
     		throw new InternalErrorException("Identity provider ID is not configured");
     	
-    	if ( resolver == null)
+    	HTTPMetadataResolver r = resolver.get(tenant);
+    	if ( r == null)
     	{
-    		configureMetadataResolver(metadataUrl, metadataCache);
+    		r = configureMetadataResolver(metadataUrl, metadataCache);
+    		resolver.put(tenant, r);
     	}
     	
     	CriteriaSet criteria = new CriteriaSet();
     	criteria.add( new EntityIdCriterion (metadataIdp));
-		EntityDescriptor entity = resolver.resolveSingle(criteria );
+		EntityDescriptor entity = r.resolveSingle(criteria );
     	return entity;
     }
 
-	private void configureMetadataResolver(String metadataUrl, String metadataCache)
+	private HTTPMetadataResolver configureMetadataResolver(String metadataUrl, String metadataCache)
 			throws ResolverException, ComponentInitializationException {
 		HttpClient client = HttpClients.createDefault();
 		HTTPMetadataResolver r = new HTTPMetadataResolver(client, metadataUrl);
 		r.setMinRefreshDelay(Long.parseLong(metadataCache) * 1000L);
 		r.setId(metadataUrl);
+		r.setResolveViaPredicatesOnly(true);
+		r.setUseDefaultPredicateRegistry(true);
 		BasicParserPool pool = new BasicParserPool();
 		pool.initialize();
 		r.setParserPool(pool);
 		r.initialize();
 		
-		resolver = r;
+		return r;
 	}
     
     Log log = LogFactory.getLog(getClass());
     
-    private boolean validateAssertion (Assertion assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
+    private boolean validateAssertion (String hostName, Assertion assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
     {
-    	SAML20AssertionValidator validator = getValidator();
+    	SAML20AssertionValidator validator = getValidator(hostName);
     	
     	HashMap<String, Object> params = new HashMap<String, Object>();
     	params.put(
                 SAML2AssertionValidationParameters.COND_VALID_AUDIENCES, 
-                	Collections.singleton(getEntityId()));
+                	Collections.singleton(getEntityId(hostName)));
     	Set<String> set = new HashSet<String>();
-    	set.add(getBaseURL()+"saml/log/post");
-    	set.add(getBaseURL()+"saml/log/simple-post");
-    	set.add(getBaseURL()+"saml/slo/soap");
-    	set.add(getBaseURL()+"saml/slo/post");
-    	set.add(getBaseURL()+"saml/slo/redirect");
+    	set.add(getBaseURL(hostName)+"saml/log/post");
+    	set.add(getBaseURL(hostName)+"saml/log/simple-post");
+    	set.add(getBaseURL(hostName)+"selfservice/saml/log/post");
+    	set.add(getBaseURL(hostName)+"selfservice/saml/log/simple-post");
+    	set.add(getBaseURL(hostName)+"saml/slo/soap");
+    	set.add(getBaseURL(hostName)+"saml/slo/post");
+    	set.add(getBaseURL(hostName)+"saml/slo/redirect");
     	params.put (SAML2AssertionValidationParameters.SC_VALID_RECIPIENTS, set);
 
     	org.opensaml.saml.common.assertion.ValidationContext ctx = new ValidationContext(params);
@@ -781,8 +802,8 @@ public class SAMLServiceInternal {
 		return true;
 	}
 
-	private SAML20AssertionValidator getValidator() throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
-		EntityDescriptor md = getIdpMetadata();
+	private SAML20AssertionValidator getValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
+		EntityDescriptor md = getIdpMetadata(tenant);
 
 		List<ConditionValidator> conditionValidators = new LinkedList<ConditionValidator>();
 		conditionValidators.add( new AudienceRestrictionConditionValidator() );
@@ -828,9 +849,9 @@ public class SAMLServiceInternal {
     	return new SAML20AssertionValidator(conditionValidators, subjectConfirmationValidators, statementValidators, signatureTrustEngine, signaturePrevalidator);
 	}
 
-    private boolean validateResponse (Response assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
+    private boolean validateResponse (String tenant, Response assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
     {
-    	SAML20ResponseValidator validator = getResponseValidator();
+    	SAML20ResponseValidator validator = getResponseValidator(tenant);
     	
     	org.opensaml.saml.common.assertion.ValidationContext ctx = new ValidationContext();
     	
@@ -857,8 +878,8 @@ public class SAMLServiceInternal {
     	
     }
 
-    private SAML20ResponseValidator getResponseValidator() throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
-		EntityDescriptor md = getIdpMetadata();
+    private SAML20ResponseValidator getResponseValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
+		EntityDescriptor md = getIdpMetadata(tenant);
 
 		List<ConditionValidator> conditionValidators = new LinkedList<ConditionValidator>();
     	List<SubjectConfirmationValidator> subjectConfirmationValidators = new LinkedList<SubjectConfirmationValidator>();
@@ -910,17 +931,46 @@ public class SAMLServiceInternal {
     	if (metadataUrl == null)
     		throw new InternalErrorException("Metadata URL is not configured");
     	
-		configureMetadataResolver(metadataUrl, metadataCache);
+    	String tenant = com.soffid.iam.utils.Security.getCurrentTenantName();
+		HTTPMetadataResolver r = resolver.get(tenant);
+    	if ( r == null)
+    	{
+    		r = configureMetadataResolver(metadataUrl, metadataCache);
+    		resolver.put(tenant, r);
+    	}
+    	CriteriaSet criteria = new CriteriaSet();
+    	String metadataIdp = ConfigurationCache.getProperty("soffid.saml.idp");
+    	criteria.add( new EvaluableEntityDescriptorCriterion() {
+			@Override
+			public boolean apply(EntityDescriptor input) {
+				return input.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) != null;
+			}
+		});
+		List<String> ids = new LinkedList<String>();
+		for (EntityDescriptor ed: r.resolve(criteria ))
+		{
+			ids.add(ed.getEntityID());
+		}
+    	return ids;
+	}
+	
+	public List<String> findIdentityProviders(String url) throws InternalErrorException, ResolverException, ComponentInitializationException {
+		HTTPMetadataResolver r = configureMetadataResolver(url, "5");
     	
     	CriteriaSet criteria = new CriteriaSet();
-    	criteria.add( new SatisfyAnyCriterion());
-		List<String> ids = new LinkedList<String>();
-		for (EntityDescriptor ed: resolver.resolve(criteria ))
-		{
-			if (ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) != null) {
-				ids.add(ed.getEntityID());
+    	criteria.add( new EvaluableEntityDescriptorCriterion() {
+			@Override
+			public boolean apply(EntityDescriptor input) {
+				return input.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) != null;
 			}
+		});
+		List<String> ids = new LinkedList<String>();
+		for (EntityDescriptor ed: r.resolve(criteria ))
+		{
+			ids.add(ed.getEntityID());
 		}
+		r.destroy();
+		
     	return ids;
 	}
 	

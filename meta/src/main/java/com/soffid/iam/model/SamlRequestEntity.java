@@ -29,6 +29,9 @@ public class SamlRequestEntity {
 	@Column (name="REQ_FINISHED")
 	public boolean finished;
 	
+	@Column (name="REQ_HOST")
+	public String hostName;
+
 	@Column (name="REQ_USER")
 	@Nullable
 	public String user;

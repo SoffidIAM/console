@@ -98,6 +98,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public Boolean manualAccountCreation;
 
+	@Description("Full reconciliation")
+	@Column (name="DIS_FULREC", length=1)
+	@Nullable
+	public Boolean fullReconciliation;
+
 	@Column (name="DIS_TEN_ID")
 	public TenantEntity tenant;
 	

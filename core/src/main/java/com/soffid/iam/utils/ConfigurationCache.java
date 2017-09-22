@@ -33,8 +33,23 @@ public class ConfigurationCache {
 			throw new RuntimeException(e);
 		}
 	}
-
-	private static String getProperty (String tenant, String property) throws InternalErrorException, NamingException, CreateException 
+	
+	public static String getTenantProperty (String tenant, String property) 
+	{
+		String t;
+		try {
+			t = Security.getCurrentTenantName();
+			if (t.equals(tenant) || Security.isMasterTenant())
+				return getProperty (tenant, property);
+			else
+				return null;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
+	private static String getProperty (String tenant, String property) throws InternalErrorException, NamingException, CreateException 	
 	{
 		
 			if (tenant == null)
@@ -48,17 +63,10 @@ public class ConfigurationCache {
 			String value;
 			if (!map.containsKey(property))
 			{
-				Configuration config = tenant.equals(getMasterTenantName()) ?
-						ServiceLocator.instance().getConfigurationService().findMasterParameterByNameAndNetwork(property, null):
-						ServiceLocator.instance().getConfigurationService().findParameterByNameAndNetworkName(property, null);
-				if (config == null)
-				{
-					value = null;
-				}
+				if (Security.isSyncServer())
+					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
 				else
-				{
-					value = config.getValue();
-				}
+					value = ServiceLocator.instance().getConfigurationService().findTenantParameter(tenant, property);
 				map.put(property, value);
 			}
 			else

@@ -1,6 +1,7 @@
 package es.caib.seycon.ng.test;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -38,14 +39,21 @@ public class SAMLTest extends AbstractTest
 	{
 		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
 		try {
+			String hostName = InetAddress.getLocalHost().getHostName();
 			ConfigurationCache.setProperty("soffid.saml.metadata.url", "https://iam.soffid.com:760/SAML/metadata.xml");
 			ConfigurationCache.setProperty("soffid.saml.idp", "https://www.soffid.com/soffid-idp");
 			SamlService svc = ServiceLocator.instance().getSamlService();
 			
-			String metadata = svc.generateMetadata();
+			System.out.println("Identity providers:");
+			for (String s: svc.findIdentityProviders())
+			{
+				System.out.println(s);
+			}
+			String metadata = svc.generateMetadata(hostName);
 			System.out.println(metadata);
-			SamlRequest r = svc.generateSamlRequest();
+			SamlRequest r = svc.generateSamlRequest(hostName, "/");
 			System.out.println (r);
+			System.out.println(new String(Base64.decode(r.getParameters().get("SAMLRequest"))));
 			System.out.println(new String(Base64.decode(r.getParameters().get("SAMLRequest"))));
 		} catch (Exception e) {
 			e.printStackTrace();

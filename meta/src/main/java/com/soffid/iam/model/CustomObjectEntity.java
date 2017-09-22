@@ -1,6 +1,7 @@
 package com.soffid.iam.model;
 
 import java.util.Collection;
+import java.util.Date;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.mda.annotation.Column;
@@ -10,6 +11,7 @@ import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Index;
+import com.soffid.mda.annotation.Nullable;
 
 @Entity(table="SC_CUSOBJ")
 @Depends({CustomObject.class})
@@ -38,8 +40,15 @@ public class CustomObjectEntity {
 			+ "where o.type.name = :objectType and "
 			+ "o.name = :name")
 	public CustomObjectEntity findByTypeAndName(String objectType, String name) {return null;}
+
+	@DaoFinder("select o.name "
+			+ "from com.soffid.iam.model.CustomObjectEntity as o "
+			+ "where o.type.name=:type")
+	public java.util.List<String> findCustomObjectNames(String type) {
+		return null;
+	}
 }
 
-@Index(columns={"COB_COT_ID", "COT_NAME"}, unique=true, name="SC_CUOBTY_UK", entity=CustomObjectEntity.class)
+@Index(columns={"COB_COT_ID", "COB_NAME"}, unique=true, name="SC_CUSOBJ_UK", entity=CustomObjectEntity.class)
 class CustomObjectEntityKey {
 }

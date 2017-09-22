@@ -241,6 +241,11 @@ public abstract class GrupEntity {
 
 	@DaoFinder("from com.soffid.iam.model.GroupEntity   where :text is null")
 	public Collection<GrupEntity>findByText (String text) { return null; }
+
+	@DaoFinder("select g.name "
+			+ "from com.soffid.iam.model.GroupEntity as g "
+			+ "where g.obsolete = 'N'")
+	public Collection<String>findGroupNames () { return null; }
 }
 
 

@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 
 import java.util.Collection;
+import java.util.Date;
 
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.model.VaultFolderEntity;
@@ -58,6 +59,10 @@ public abstract class AccountEntity {
 	@Column(name = "ACC_DESCRI", length = 255)
 	@Nullable
 	public java.lang.String description;
+
+	@Column(name = "ACC_CREATE", defaultValue="new java.util.Date()")
+	@Nullable
+	public java.util.Date created;
 
 	@Column(name = "ACC_LASUPD")
 	@Nullable
@@ -155,6 +160,15 @@ public abstract class AccountEntity {
 	@DaoFinder
 	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByCriteria(
 			es.caib.seycon.ng.comu.AccountCriteria criteria) {
+		return null;
+	}
+	
+	@DaoFinder("select account.name "
+			+ "from com.soffid.iam.model.AccountEntity as account "
+			+ "where account.system.name=:systemName and "
+			+ "(account.status is null or account.status = 'a' or account.status='d')")
+	public java.util.List<String> findAcountNames(
+			String systemName) {
 		return null;
 	}
 	

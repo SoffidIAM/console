@@ -8,9 +8,13 @@ package es.caib.seycon.ng.servei;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.model.AccountEntity;
+
+import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -627,4 +631,12 @@ public abstract class UsuariService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation
+	@Transactional(readOnly=true)
+	public java.util.Collection<String> findUserNames()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 }

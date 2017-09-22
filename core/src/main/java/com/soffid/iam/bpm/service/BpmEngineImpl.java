@@ -2678,7 +2678,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	 */
 	@Override
 	protected void handleUpgradeParFile(InputStream stream) throws Exception {
-		File f = File.createTempFile("soffid", "par"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f = File.createTempFile("soffid", ".par"); //$NON-NLS-1$ //$NON-NLS-2$
 		FileOutputStream out = new FileOutputStream(f);
 
 		byte b[] = new byte[4096];
@@ -2723,6 +2723,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 
 		deployProcessParDefinition(f);
+		f.delete();
 	}
 
 	/**

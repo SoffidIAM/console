@@ -79,6 +79,39 @@
 		<servlet-class>com.soffid.iam.ui.bpm.UploadServlet</servlet-class>
 	</servlet>
 	
+	<!--  SAML Login -->
+	<servlet>
+		<description>
+			<![CDATA[SAML service provider endpoint]]>
+		</description>
+		<servlet-name>samlServlet</servlet-name>
+		<servlet-class>
+			com.soffid.iam.web.SAMLLoginRequester
+		</servlet-class>
+	</servlet>
+
+	<!-- Logout servlet -->		
+	<servlet>
+		<description>
+			<![CDATA[Logout servlet]]>
+		</description>
+		<servlet-name>logoutServlet</servlet-name>
+		<servlet-class>com.soffid.iam.web.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>logoutServlet</servlet-name>
+		<url-pattern>/prelogout</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml/*</url-pattern>
+	</servlet-mapping>
 	
 
 	<servlet-mapping>
@@ -348,6 +381,8 @@
 			<url-pattern>/img/waitpacman.gif</url-pattern>
 			<url-pattern>/zkau/web/*</url-pattern>
 			<url-pattern>/anonymous/*</url-pattern>
+			<url-pattern>/saml</url-pattern>
+			<url-pattern>/saml/*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>	
 

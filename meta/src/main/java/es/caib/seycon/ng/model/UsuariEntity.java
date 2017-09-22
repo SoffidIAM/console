@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import com.soffid.iam.model.TenantEntity;
@@ -306,6 +307,13 @@ public abstract class UsuariEntity {
 		return null;
 	}
 	
+	@DaoFinder("select u.userName "
+			+ "from com.soffid.iam.model.UserEntity as u "
+			+ "where u.active='S'")
+	public java.util.List<String> findUserNames() {
+		return null;
+	}
+
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 	

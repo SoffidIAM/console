@@ -73,6 +73,25 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>docker</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="build" />
+									<arg value="-f" />
+									<arg value="target/docker/Dockerfile" />
+									<arg value="-t" />
+									<arg value="soffid/iam-console:${pom.version}" />
+									<arg value="." />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -256,7 +275,7 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>docktr</id>
+								<id>docker</id>
 								<phase>none</phase>
 							</execution>
 						</executions>

@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +91,13 @@ public abstract class AccountService {
 		es.caib.seycon.ng.comu.Usuari usuari, 
 		es.caib.seycon.ng.comu.Dispatcher dispatcher, 
 		@Nullable java.lang.String name)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.NeedsAccountNameException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
+	 return null;
+	}
+	
+	@Operation
+	@Transactional(readOnly = true, noRollbackFor={java.lang.Exception.class})
+	public String predictAccountName(Long userId, String dispatcher, Long domainId)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.NeedsAccountNameException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 	 return null;
 	}
@@ -485,6 +493,13 @@ public abstract class AccountService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByText(
 			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation
+	@Transactional(readOnly=true)
+	public java.util.Collection<String> findAccountNames(String system)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

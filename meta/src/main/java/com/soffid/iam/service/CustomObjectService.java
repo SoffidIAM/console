@@ -1,6 +1,9 @@
 package com.soffid.iam.service;
 
 import java.util.Collection;
+import java.util.Date;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
@@ -11,6 +14,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -40,4 +44,9 @@ public class CustomObjectService {
 
 	@Operation(grantees={customObject_delete.class})
 	public void deleteCustomObject (CustomObject obj) { }
+
+	@Operation
+	@Transactional(readOnly=true)
+	public java.util.Collection<String> findCustomObjectNames(String objectType) { return null; }
+
 }

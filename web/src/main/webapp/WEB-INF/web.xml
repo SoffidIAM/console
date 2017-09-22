@@ -37,7 +37,7 @@
 		</description>
 		<servlet-name>samlServlet</servlet-name>
 		<servlet-class>
-			com.soffid.web.saml.SAMLLoginRequester
+			com.soffid.iam.web.SAMLLoginRequester
 		</servlet-class>
 	</servlet>
 		
@@ -111,6 +111,19 @@
 	<servlet-mapping>
 		<servlet-name>logoutServlet</servlet-name>
 		<url-pattern>/prelogout</url-pattern>
+	</servlet-mapping>
+
+	<!-- servlet per obtindre logs del seycon-server -->
+	<servlet>
+		<description>servlet para propiedades de firma del applet de firma</description>
+		<servlet-name>ServerLogServlet</servlet-name>
+		<servlet-class>
+			es.caib.seycon.ng.web.servlet.ServerLogServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ServerLogServlet</servlet-name>
+		<url-pattern>/SEU/serverlog</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

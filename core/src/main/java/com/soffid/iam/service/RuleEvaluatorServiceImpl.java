@@ -16,6 +16,7 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -32,6 +33,8 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.service.impl.RuleDryRunMethod;
+import com.soffid.iam.service.impl.RuleEvaluatorGrantRevokeMethod;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
 
@@ -42,6 +45,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +77,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	{
 	}
 
-	protected void doApply(RuleEntity rule, UserEntity user, InterpreterEnvironment env) throws Exception {
+	protected void doApply(RuleEntity rule, UserEntity user, InterpreterEnvironment env,
+			RuleEvaluatorGrantRevokeMethod method) throws Exception {
 		Security.nestedLogin(Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
 		try {
 			RoleAccountEntityDao raDao = getRoleAccountEntityDao();
@@ -108,30 +113,13 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                             if (obj != null) stringValue = obj.toString();
                         }
                     }
-                    assignRole(rule, roles, user, rar.getRole(), stringValue);
+                    assignRole(rule, roles, user, rar.getRole(), stringValue, method);
                 }
 			}
 			// Now remove unneded roles
 			for (RoleAccountEntity role : roles) {
-                if (role.getRule() == rule) {
-                    RoleAccount r = getRoleAccountEntityDao().toRoleAccount(role);
-                    getApplicationService().update(r);
-                    raDao.remove(role);
-                    Task updateRole = new Task();
-                    updateRole.setTransaction("UpdateRole");
-                    updateRole.setTaskDate(Calendar.getInstance());
-                    updateRole.setStatus("P");
-                    updateRole.setRole(r.getRoleName());
-                    updateRole.setDatabase(r.getSystem());
-                    TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
-                    getTaskEntityDao().create(tasca);
-                    Task updateUser = new Task();
-                    updateUser.setTransaction(TaskHandler.UPDATE_USER);
-                    updateUser.setTaskDate(Calendar.getInstance());
-                    updateUser.setStatus("P");
-                    updateUser.setUser(user.getUserName());
-                    TaskEntity tasca2 = getTaskEntityDao().taskToEntity(updateUser);
-                    getTaskEntityDao().create(tasca2);
+                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
+                    method.revoke(user, role);
                 }
             }
 		} catch (Exception e) {
@@ -147,7 +135,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 */
 	@Override
     protected void handleApply(RuleEntity rule, UserEntity user) throws Exception {
-		doApply(rule, user, new InterpreterEnvironment(user));
+		doApply(rule, user, new InterpreterEnvironment(user), new ActualUpdateMethod());
 	}
 		
 	/**
@@ -155,11 +143,13 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 * @param roles
 	 * @param role
 	 * @param stringValue
+	 * @param method 
 	 * @throws InternalErrorException 
 	 * @throws AccountAlreadyExistsException 
 	 * @throws NeedsAccountNameException 
 	 */
-	private void assignRole(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user, RoleEntity role, String stringValue) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+	private void assignRole(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user, 
+			RoleEntity role, String stringValue, RuleEvaluatorGrantRevokeMethod method) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
 		// First. Test if role is already assigned
 		for (Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext(); ) {
             RoleAccountEntity ra = it.next();
@@ -182,30 +172,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
         }
 		
 		// Second. Assign now
-		List<AccountEntity> accounts = getAccountsForRole(user, role);
-		RoleAccount ra = generateRolAccount(rule, role, stringValue);
-		if (accounts.isEmpty())
-		{
-			UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
-			ra.setAccountId(account.getId());
-			ra.setAccountName(account.getName());
-			Security.nestedLogin(Security.getCurrentAccount (), new String[] {
-				Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL
-			});
-			try {
-				getApplicationService().create(ra);
-			} finally {
-				Security.nestedLogoff();
-			}
-		} else {
-			for (AccountEntity account : accounts) {
-                ra.setAccountId(account.getId());
-                ra.setAccountName(account.getName());
-                getApplicationService().create(ra);
-            }
-		}
+		method.grant(rule, user, role, stringValue);
 		
 	}
+
 
 	/**
 	 * @param rule 		
@@ -268,7 +238,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
     		InterpreterEnvironment env = new InterpreterEnvironment(user);
     		for (RuleEntity rule: rules)
     		{
-    			doApply (rule, user, env);
+    			doApply (rule, user, env, new ActualUpdateMethod());
     		}
 		}
 		
@@ -376,6 +346,86 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		}
 		
 	}
+	
+	class ActualUpdateMethod implements RuleEvaluatorGrantRevokeMethod {
+		@Override
+		public void revoke(UserEntity user, RoleAccountEntity role) throws InternalErrorException {
+            RoleAccount r = getRoleAccountEntityDao().toRoleAccount(role);
+            getApplicationService().update(r);
+            Task updateRole = new Task();
+            updateRole.setTransaction("UpdateRole");
+            updateRole.setTaskDate(Calendar.getInstance());
+            updateRole.setStatus("P");
+            updateRole.setRole(r.getRoleName());
+            updateRole.setDatabase(r.getSystem());
+            TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
+            getTaskEntityDao().create(tasca);
+            Task updateUser = new Task();
+            updateUser.setTransaction(TaskHandler.UPDATE_USER);
+            updateUser.setTaskDate(Calendar.getInstance());
+            updateUser.setStatus("P");
+            updateUser.setUser(user.getUserName());
+            TaskEntity tasca2 = getTaskEntityDao().taskToEntity(updateUser);
+            getTaskEntityDao().create(tasca2);
+
+            getRoleAccountEntityDao().remove(role);
+		}
+		
+		@Override
+		public void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue)
+				throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+			List<AccountEntity> accounts = getAccountsForRole(user, role);
+			RoleAccount ra = generateRolAccount(rule, role, domainValue);
+			if (accounts.isEmpty())
+			{
+				UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
+				ra.setAccountId(account.getId());
+				ra.setAccountName(account.getName());
+				Security.nestedLogin(Security.getCurrentAccount (), new String[] {
+					Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL
+				});
+				try {
+					getApplicationService().create(ra);
+				} finally {
+					Security.nestedLogoff();
+				}
+			} else {
+				for (AccountEntity account : accounts) {
+	                ra.setAccountId(account.getId());
+	                ra.setAccountName(account.getName());
+	                getApplicationService().create(ra);
+	            }
+			}
+		}
+	}
+
+	@Override
+	protected File handleDryRun(RuleEntity rule) throws Exception {
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		List<Long> allUsers = new LinkedList<Long>();
+		for (UserEntity u: getUserEntityDao().loadAll())
+		{
+			allUsers.add(u.getId());
+		}
+		int i = 100;
+		RuleDryRunMethod report = new RuleDryRunMethod();
+		for (Long l: allUsers)
+		{
+			if (i++ >= 100)
+			{
+//				session.flush();
+//				session.clear();
+				i = 0;
+			}
+			System.out.println("User "+l);
+			UserEntity u = getUserEntityDao().load(l);
+			
+			doApply(rule, u, new InterpreterEnvironment(u), report);
+		}
+		report.close();
+		return report.getFile();
+	};
 }
-
-

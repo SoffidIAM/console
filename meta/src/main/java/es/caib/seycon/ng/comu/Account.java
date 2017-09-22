@@ -7,12 +7,6 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
-import com.soffid.mda.annotation.Attribute;
-import com.soffid.mda.annotation.Description;
-import com.soffid.mda.annotation.JsonAttribute;
-import com.soffid.mda.annotation.JsonObject;
-import com.soffid.mda.annotation.Nullable;
-import com.soffid.mda.annotation.ValueObject;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.mda.annotation.*;
 
@@ -76,6 +70,10 @@ public class Account {
 	@Attribute(translated = "system" )
 	@JsonAttribute(hibernateAttribute="system.name")
 	public java.lang.String dispatcher;
+
+	@Description("Creation date")
+	@Nullable
+	public java.util.Date created;
 
 	@Description("Time stamp when the account was last used on target system")
 	@Nullable

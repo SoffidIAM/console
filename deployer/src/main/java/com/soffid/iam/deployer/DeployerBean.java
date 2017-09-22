@@ -656,12 +656,17 @@ public class DeployerBean implements DeployerService {
 
 	AppInfo failedWarInfo = null;
 	private AppInfo appInfo = null;
+	private static boolean ongoing = false;
 	private void deploy(boolean firstTime) throws Exception {
 
+		if (ongoing)
+			return;
+
+		ongoing = true;
 		File home = getJbossHomeDir();
 		File failedWar = new File(new File(home, "soffid"), "failed.ear");
 
-		lastModified = initialEarFile().lastModified();
+		lastModified = calculateLastModified();
 
 		try {
 			coreModules = new LinkedList<String>();
@@ -680,9 +685,25 @@ public class DeployerBean implements DeployerService {
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
 				try {
-					List<Object[]> result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
+					List<Object[]> result = null;
+					try {
+						 result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
 							"SC_CONFIG WHERE CON_CODI='plugin.timestamp'"); //$NON-NLS-1$
-					if (!result.isEmpty()) {
+					} catch (SQLException e) {
+						// Maybe first execution
+					}
+					if (result == null)
+					{
+						// First time
+						System.setProperty("soffid.fail-safe", "true");
+						log.info("Deploying on fail-safe mode");
+						recursivelyDelete(tmpDir());
+						getTimestampFile().delete();
+						uncompressEar();
+						updateApplicationXml();
+					}
+					else if ( !result.isEmpty()) 
+					{
 						Long ts = Long.decode(result.iterator().next()[0]
 								.toString());
 						if (mustUpdate(ts)) {
@@ -726,6 +747,8 @@ public class DeployerBean implements DeployerService {
 			} catch (Exception e2) {
 				log.warn(e2);
 			}
+		} finally {
+			ongoing = false;
 		}
 	}
 
@@ -752,24 +775,30 @@ public class DeployerBean implements DeployerService {
 				doDeploy ();
 			else
 			{
-				long last = initialEarFile().lastModified();
-				File addonsDir = new File(
-						new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (addonsDir.isDirectory()) {
-					for (File f : addonsDir.listFiles()) {
-						if (f.lastModified() > last)
-							last = f.lastModified();
-					}
-				}
+				long last = calculateLastModified();
 		
-				if (last > lastModified) {
+				if (last > lastModified && !ongoing) {
 					failSafe = false;
 					redeploy();
+					lastModified = last;
 				}
 			}
 		} catch (Exception e) {
 			log.info("Error on deployer timer", e);
 		}
+	}
+
+	private long calculateLastModified() {
+		long last = initialEarFile().lastModified();
+		File addonsDir = new File(
+				new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (addonsDir.isDirectory()) {
+			for (File f : addonsDir.listFiles()) {
+				if (f.lastModified() > last)
+					last = f.lastModified();
+			}
+		}
+		return last;
 	}
 
 }

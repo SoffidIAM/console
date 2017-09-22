@@ -1,4 +1,4 @@
-package com.soffid.web.saml;
+package com.soffid.iam.web;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml.common.xml.SAMLConstants;
 
 import com.soffid.iam.api.SamlRequest;
+import com.soffid.iam.filter.TenantExtractor;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -44,7 +45,11 @@ public class SAMLLoginRequester extends HttpServlet {
 	}
 
 	protected void initialRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
-		SamlRequest saml = EJBLocator.getSamlService().generateSamlRequest();
+		String hostName = new TenantExtractor().getTenant(req);
+		String context = req.getContextPath();
+
+		SamlRequest saml = EJBLocator.getSamlService().generateSamlRequest(hostName, context);
+		
 		if (saml.getMethod().equals(SAMLConstants.SAML2_REDIRECT_BINDING_URI))
 		{
 			StringBuffer url = new StringBuffer(saml.getUrl()) ;
@@ -68,10 +73,11 @@ public class SAMLLoginRequester extends HttpServlet {
 			out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
 			out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
-			out.println("<body onload='document.getElementById(\"f\").submit();'><form id='f' action='");
+			out.println("<body onload='document.getElementById(\"s\").setAttribute(\"style\",\"display:none\");document.getElementById(\"f\").submit();'>");
+			out.print("<form id='f' action='");
 			out.print(saml.getUrl());
 			out.print("' method='POST'>");
-			out.println("Press button to continue");
+			out.println("<p>Redirecting to "+saml.getUrl()+"... </p>");
 			for (String key : saml.getParameters().keySet())
 			{
 				String value = saml.getParameters().get(key);
@@ -81,13 +87,16 @@ public class SAMLLoginRequester extends HttpServlet {
 				out.print(encodeAttribute(value));
 				out.println("'/>");
 			}
-			out.print("<input type='submit' value='Continue'/>");
+			out.print("<input id='s' type='submit' value='Continue'/>");
+
 			out.print("</form></body></html>");
 		}
 	}
 
 	protected void dumpMetadata(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
-		String metadata = EJBLocator.getSamlService().generateMetadata();
+		String hostName = new TenantExtractor().getTenant(req);
+
+		String metadata = EJBLocator.getSamlService().generateMetadata(hostName);
 
 		resp.setContentType("application/xml");
 		resp.setCharacterEncoding("UTF-8");
@@ -104,8 +113,10 @@ public class SAMLLoginRequester extends HttpServlet {
 	}
 
 	protected void authenticate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
-		SamlRequest saml = EJBLocator.getSamlService().generateSamlRequest();
-
+		String hostName = new TenantExtractor().getTenant(req);
+		
+		String context = req.getContextPath();
+		
 		Map<String,String> params = new HashMap<String, String>();
 		for ( Enumeration e = req.getParameterNames(); e.hasMoreElements(); )
 		{
@@ -113,13 +124,13 @@ public class SAMLLoginRequester extends HttpServlet {
 			String value = req.getParameter(tag);
 			params.put(tag, value);
 		}
-		String[] token = EJBLocator.getSamlService().authenticate(SAMLConstants.SAML2_POST_BINDING_URI, params);
+		String[] token = EJBLocator.getSamlService().authenticate(hostName, context, SAMLConstants.SAML2_POST_BINDING_URI, params);
 		if (token == null)
 			resp.sendRedirect("..");
 		else
 		{
 			req.getSession().setAttribute("samlLoginToken", token);
-			resp.sendRedirect("/");
+			resp.sendRedirect( context );
 		}
 	}
 }

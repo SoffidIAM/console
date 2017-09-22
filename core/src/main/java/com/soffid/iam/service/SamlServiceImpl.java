@@ -28,14 +28,14 @@ public class SamlServiceImpl extends SamlServiceBase {
 
 	
 	@Override
-	protected String[] handleAuthenticate(String protocol, Map<String, String> response)
+	protected String[] handleAuthenticate(String hostName, String path, String protocol, Map<String, String> response)
 			throws Exception {
-		return getDelegate().authenticate(protocol, response);
+		return getDelegate().authenticate(hostName, path, protocol, response);
 	}
 
 	@Override
-	protected String handleGenerateMetadata() throws Exception {
-		return getDelegate().generateMetadata();
+	protected String handleGenerateMetadata(String hostName) throws Exception {
+		return getDelegate().generateMetadata(hostName);
 	}
 
 	@Override
@@ -45,12 +45,17 @@ public class SamlServiceImpl extends SamlServiceBase {
 	}
 
 	@Override
-	protected SamlRequest handleGenerateSamlRequest() throws Exception {
-		return getDelegate().generateSamlRequest();
+	protected SamlRequest handleGenerateSamlRequest(String hostName, String path) throws Exception {
+		return getDelegate().generateSamlRequest(hostName, path);
 	}
 
 	@Override
 	protected List<String> handleFindIdentityProviders() throws Exception {
 		return getDelegate().findIdentityProviders();
+	}
+
+	@Override
+	protected List<String> handleFindIdentityProviders(String url) throws Exception {
+		return getDelegate().findIdentityProviders(url);
 	}
 }

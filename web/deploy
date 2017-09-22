@@ -1,5 +1,5 @@
 #!/bin/bash
-cp -r /home/svives/git/console-2/web/src/main/webapp/*     /opt/soffid/iam-console-2/work/soffid/iam-ear.ear/iam-web-2.0.0-SNAPSHOT/
+cp -r /home/svives/git/console-2/web/src/main/webapp/*    /opt/soffid/iam-console-2/work/soffid/iam-ear.ear/iam-web-2.0.0-SNAPSHOT/
 cp -r /home/svives/git/console-2/web/src/main/resources/* /opt/soffid/iam-console-2/work/soffid/iam-ear.ear/iam-web-2.0.0-SNAPSHOT/WEB-INF/classes/
  
 #rsync -vauz -e ssh /home/gbuades/soffid/console2/console/web/src/main/webapp/*		root@bubu.test.lab:/opt/soffid/iam-console/jboss/server/default/tmp/soffid/iam-ear.ear/iam-web-*.war

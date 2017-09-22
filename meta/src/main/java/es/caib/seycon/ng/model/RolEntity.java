@@ -295,6 +295,14 @@ public abstract class RolEntity {
 
 	@DaoFinder("from com.soffid.iam.model.AccountEntity  where :text is null")
 	public Collection<RolEntity>findByText (String text) { return null; }
+
+	@DaoFinder("select u.name "
+			+ "from com.soffid.iam.model.RoleEntity as u "
+			+ "join u.system as s "
+			+ "where s.name = :system")
+	public java.util.List<String> findRoleNames(String system) {
+		return null;
+	}
 }
 
 

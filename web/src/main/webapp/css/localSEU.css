@@ -466,7 +466,16 @@ button.small-button {
 }	
 
 /* Buttons */
-button:hover, input[type="button"]:hover {
+input[type="submit"] {
+    background-color: white;
+    border: 1px solid #9EC73C;
+    border-image: none;
+    padding: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #7F9FC2;
+}
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 	background-color: #9EC73C;
 	color: white;
 }
@@ -590,6 +599,7 @@ li.attribute-search-box:hover {
     color: white;
     cursor: pointer;
 }
+
 
 li.attribute-search-box  > button:hover {
     color: white;

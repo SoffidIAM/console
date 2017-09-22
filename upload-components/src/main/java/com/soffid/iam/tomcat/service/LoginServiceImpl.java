@@ -18,6 +18,7 @@ import com.soffid.iam.api.Tenant;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.service.SamlService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.tomcat.LoginService;
@@ -36,11 +37,20 @@ public class LoginServiceImpl implements LoginService {
 
 	public SoffidPrincipal authenticate(String username, String credentials) {
 		try {
+			boolean samlAuthorized = false;
+			
 			String account;
 			Tenant tenant;
 			log.info(username + " logging in");
 			ServiceLocator locator = ServiceLocator.instance();
 
+			SamlService saml = locator.getSamlService();
+			String samlPrincipal = saml.checkAuthenticationToken(new String[] {username, credentials});
+			if (samlPrincipal != null)
+			{
+				samlAuthorized = true;
+				username = samlPrincipal;
+			}
 			int i = username.indexOf('\\');
 			if (i < 0) {
 				tenant = locator.getTenantService().getMasterTenant();
@@ -82,10 +92,15 @@ public class LoginServiceImpl implements LoginService {
 					log.info(username + " login rejected. Unknown account");
 					return null;
 				}
+				if (acc.isDisabled()) {
+					log.info(username + " login rejected. Disabled account");
+					return null;
+				}
 
 				SoffidPrincipal principal;
 				String passwordDomain = ps.getDefaultDispatcher();
-				if (ps.checkPassword(account, passwordDomain, new Password(
+				if (samlAuthorized ||
+						ps.checkPassword(account, passwordDomain, new Password(
 						credentials), true, false)) {
 					List<String> roles = getRoles(acc);
 					roles.add("PASSWORD:VALID");

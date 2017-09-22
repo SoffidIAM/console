@@ -35,6 +35,7 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
+import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
@@ -695,9 +696,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		// Search if already has a user name for this user domain
 		
 		UserEntity ue = getUserEntityDao().findByUserName(userName);
+		return guessAccountName(dispatcherName, du, ue);
+	}
+
+	private String guessAccountName(String dispatcherName, UserDomainEntity du, UserEntity ue)
+			throws EvalError, MalformedURLException, InternalErrorException {
 		if (ue == null)
 			return null;
 
+		String userName = ue.getUserName();
+		
 		if (du.getType().equals(TipusDominiUsuariEnumeration.PRINCIPAL))
 			return userName;
 		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
@@ -733,40 +741,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return false;
 		
 		UserDomainEntity du = getUserDomainEntityDao().findBySytem(dispatcherName);
-		// Search if already has a user name for this user domain
-		
 		UserEntity ue = getUserEntityDao().findByUserName(userName);
-		if (ue == null)
-			return false;
-
-		if (du.getType().equals(TipusDominiUsuariEnumeration.PRINCIPAL))
-			return true;
-		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
-		{
-			if (du.getBshExprCreate() == null || 
-					du.getBshExprCreate().replace('\r', ' ').replace('\t', ' ').replace('\n', ' ').isEmpty())
-				return true;
-			Object o = evalExpression(du, ue, dispatcherName, du.getBshExprCreate());
-			if (o == null || ! (o instanceof Boolean))
-				throw new InternalErrorException(
-						String.format("Create expression for domain %s returned a non boolean object: %s",
-								du.getName(), o == null ? "null": o.toString()));
-			return (Boolean) o;
-						
-		}
-		else if (du.getType().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
-		{
-			Object obj = applicationContext.getBean(du.getBeanGenerator());
-			if (obj == null)
-				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getName())); //$NON-NLS-1$
-			if (! (obj instanceof AccountNameGenerator))
-				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
-			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
-			return generator.needsAccount(ue, de);
-		}
-		else
-			return false;
+		
+		return needsAccount(dispatcherName, du, ue);
 	}
 
 
@@ -1860,5 +1837,61 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 
 		return result;
+	}
+
+	@Override
+	protected String handlePredictAccountName(Long userId, String dispatcher, Long domainId) throws Exception {
+		UserDomainEntity du = getUserDomainEntityDao().load(domainId);
+		// Search if already has a user name for this user domain
+		
+		UserEntity ue = getUserEntityDao().load(userId);
+		boolean needs = false;
+		
+		needs = needsAccount(dispatcher, du, ue);
+		if (needs)
+			return guessAccountName(dispatcher, du, ue);
+		else
+			return null;
+	}
+
+	private boolean needsAccount(String dispatcher, UserDomainEntity du, UserEntity ue)
+			throws EvalError, MalformedURLException, InternalErrorException {
+		boolean needs = false;
+		if (ue == null)
+			needs = false;
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.PRINCIPAL))
+			needs = true;
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
+		{
+			if (du.getBshExprCreate() == null || 
+					du.getBshExprCreate().replace('\r', ' ').replace('\t', ' ').replace('\n', ' ').isEmpty())
+				needs = true;
+			else
+			{
+				Object o = evalExpression(du, ue, dispatcher, du.getBshExprCreate());
+				if (o == null || ! (o instanceof Boolean))
+					throw new InternalErrorException(
+							String.format("Create expression for domain %s returned a non boolean object: %s",
+									du.getName(), o == null ? "null": o.toString()));
+				needs = ((Boolean)o).booleanValue();
+			}
+		}
+		else if (du.getType().equals(TipusDominiUsuariEnumeration.SPRINGCLASS))
+		{
+			Object obj = applicationContext.getBean(du.getBeanGenerator());
+			if (obj == null)
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.UknownBeanForDomain"), du.getBeanGenerator(), du.getName())); //$NON-NLS-1$
+			if (! (obj instanceof AccountNameGenerator))
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
+			AccountNameGenerator generator = (AccountNameGenerator) obj;
+			SystemEntity de = getSystemEntityDao().findByName(dispatcher);
+			needs = generator.needsAccount(ue, de);
+		}
+		return needs;
+	}
+
+	@Override
+	protected Collection<String> handleFindAccountNames(String system) throws Exception {
+		return getAccountEntityDao().findAcountNames(system);
 	}
 }

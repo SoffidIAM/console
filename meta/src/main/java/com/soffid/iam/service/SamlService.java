@@ -10,6 +10,7 @@ import com.soffid.iam.model.SamlAssertionEntity;
 import com.soffid.iam.model.SamlRequestEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.servei.ConfiguracioService;
@@ -20,13 +21,13 @@ import es.caib.seycon.ng.servei.ConfiguracioService;
 	SamlAssertionEntity.class})
 public class SamlService {
 	@Description("Generates a SAML request to formard to the IdP")
-	SamlRequest generateSamlRequest () {return null;}
+	SamlRequest generateSamlRequest (String hostName, @Nullable String app) {return null;}
 	
 	@Description("Generates SAML metadata to publish to SAML federation discovery database")
-	String generateMetadata () {return null;}
+	String generateMetadata (String hostName) {return null;}
 			
 	@Description("Validates the SAML response, and returns a single use username and password")
-	String[] authenticate(String protocol, Map<String,String> response) {return null;}
+	String[] authenticate(String hostName, @Nullable String app, String protocol, Map<String,String> response) {return null;}
 
 	@Description("Validates the single use username and password generated on previous step. Returns the underlying account name")
 	String checkAuthenticationToken (String token[]) {return null;}
@@ -34,4 +35,6 @@ public class SamlService {
 	@Description("Gets the list of Identity Providers from medatata URL")
 	List<String> findIdentityProviders () {return null;}
 	
+	@Description("Gets the list of Identity Providers from arbitrary URL")
+	List<String> findIdentityProviders (String url) {return null;}
 }

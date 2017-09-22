@@ -10,6 +10,8 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.TipusDadaEntity;
 
+import java.util.Collection;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="GroupService",
@@ -298,4 +300,7 @@ public abstract class GrupService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Transactional(readOnly=true)
+	public Collection<String>findGroupNames () { return null; }
 }

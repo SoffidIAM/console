@@ -25,6 +25,15 @@ public abstract class ConfiguracioService {
 	 return null;
 	}
 
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(readOnly=true)
+	public String findTenantParameter(
+		String tenant, String parameter)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+
 	@Operation 
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Configuracio findMasterParameterByNameAndNetwork(

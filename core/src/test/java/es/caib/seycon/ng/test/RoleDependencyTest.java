@@ -1,5 +1,6 @@
 package es.caib.seycon.ng.test;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -105,6 +106,12 @@ public class RoleDependencyTest extends AbstractTest
 			rg.setDomainValue(null);
 			rg.setHasDomain(false);
 			rol4.getGranteeGroups().add(rg);
+			
+			String f = appSvc.generateChangesReport(rol4);
+			System.out.println("Generated changes report "+f);
+			File file = new File(f);
+			assertTrue(file.exists());;
+			file.delete();
 			appSvc.update(rol4);
 
 

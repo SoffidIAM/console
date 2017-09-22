@@ -19,6 +19,8 @@ import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.AccountEntity;
+import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,9 @@ import roles.agent_update;
 	es.caib.seycon.ng.model.AttributeMappingEntity.class,
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingEntity.class,
+	AccountEntity.class,
+	DominiUsuariEntity.class,
+	
 	ScheduledTaskService.class,
 	ObjectMappingTriggerEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
@@ -63,6 +68,15 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class}, readOnly=true)
+	public String generateChangesReport(
+		es.caib.seycon.ng.comu.Dispatcher dispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.agent_update.class,
 			roles.agent_accessControl_set.class,
 			roles.agent_accessControl_delete.class,

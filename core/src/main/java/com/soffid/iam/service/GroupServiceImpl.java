@@ -736,4 +736,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 		return result;
 	}
+
+	@Override
+	protected Collection<String> handleFindGroupNames() throws Exception {
+		return getGroupEntityDao().findGroupNames();
+	}
 }

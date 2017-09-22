@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,6 +29,12 @@ import java.util.Vector;
 
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.soffid.iam.api.AccessControl;
 import com.soffid.iam.api.AttributeMapping;
@@ -65,12 +72,17 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.SystemGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TenantServerEntity;
+import com.soffid.iam.model.UserDomainEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
+import com.soffid.iam.service.RuleEvaluatorServiceImpl.InterpreterEnvironment;
+import com.soffid.iam.service.impl.AccountDiffReport;
+import com.soffid.iam.service.impl.RuleDryRunMethod;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.intf.ExtensibleObject;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -78,7 +90,9 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ServerType;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 
@@ -86,7 +100,8 @@ import es.caib.seycon.ng.exception.SeyconException;
  * @see es.caib.seycon.ng.servei.DispatcherService
  */
 public class DispatcherServiceImpl extends
-		com.soffid.iam.service.DispatcherServiceBase {
+		com.soffid.iam.service.DispatcherServiceBase 
+		implements ApplicationContextAware {
 	org.apache.commons.logging.Log log = LogFactory
 			.getLog(getClass().getName());
 
@@ -96,58 +111,64 @@ public class DispatcherServiceImpl extends
 	protected com.soffid.iam.api.System handleCreate(
 			com.soffid.iam.api.System dispatcher) throws java.lang.Exception {
 
-    	soffidDispatcher = null;
-		// Check dispatcher type
-		if (dispatcher.getClassName().isEmpty()) {
-			throw new IllegalArgumentException(
-					Messages.getString("DispatcherServiceImpl.AgentTypeRequired")); //$NON-NLS-1$
+		String t = getTaskEntityDao().startVirtualSourceTransaction();
+		try
+		{
+	    	soffidDispatcher = null;
+			// Check dispatcher type
+			if (dispatcher.getClassName().isEmpty()) {
+				throw new IllegalArgumentException(
+						Messages.getString("DispatcherServiceImpl.AgentTypeRequired")); //$NON-NLS-1$
+			}
+	
+			// Check user domain
+			if (dispatcher.getUsersDomain().isEmpty()) {
+				throw new IllegalArgumentException(
+						Messages.getString("DispatcherServiceImpl.UserDomainRequired")); //$NON-NLS-1$
+			}
+	
+			// Check password domain
+			if (dispatcher.getPasswordsDomain().isEmpty()) {
+				throw new IllegalArgumentException(
+						Messages.getString("DispatcherServiceImpl.PasswordDomainRequired")); //$NON-NLS-1$
+			}
+	
+			// Check user type
+			if (dispatcher.getUserTypes() == null) {
+				dispatcher.setUserTypes(""); //$NON-NLS-1$
+			}
+			
+			checkSystemServer (dispatcher);
+	
+			SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(
+					dispatcher.getName());
+			if (dispatchersSameCode != null)
+				throw new SeyconException(String.format(Messages
+						.getString("DipatcherServiceImpl.CodeDispatcherExists"),
+						dispatcher.getName()));
+	
+			SystemEntity dispatcherEntity = getSystemEntityDao().systemToEntity(
+					dispatcher);
+			dispatcherEntity
+					.setMainSystem(getSystemEntityDao().loadAll().isEmpty());
+			dispatcherEntity.setTimeStamp(new Date());
+			getSystemEntityDao().create(dispatcherEntity);
+			dispatcher.setId(dispatcherEntity.getId());
+	
+			updateAutomaticTasks(dispatcher, false);
+	
+			handleSetDefaultMappingsByDispatcher(dispatcher.getId());
+	
+			updateTipusAndGrups(dispatcher, dispatcherEntity);
+	
+			dispatcher = getSystemEntityDao().toSystem(dispatcherEntity);
+	
+			updateServers();
+	
+			return dispatcher;
+		} finally {
+			getTaskEntityDao().finishVirtualSourceTransaction(t);
 		}
-
-		// Check user domain
-		if (dispatcher.getUsersDomain().isEmpty()) {
-			throw new IllegalArgumentException(
-					Messages.getString("DispatcherServiceImpl.UserDomainRequired")); //$NON-NLS-1$
-		}
-
-		// Check password domain
-		if (dispatcher.getPasswordsDomain().isEmpty()) {
-			throw new IllegalArgumentException(
-					Messages.getString("DispatcherServiceImpl.PasswordDomainRequired")); //$NON-NLS-1$
-		}
-
-		// Check user type
-		if (dispatcher.getUserTypes() == null) {
-			dispatcher.setUserTypes(""); //$NON-NLS-1$
-		}
-		
-		checkSystemServer (dispatcher);
-
-		SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(
-				dispatcher.getName());
-		if (dispatchersSameCode != null)
-			throw new SeyconException(String.format(Messages
-					.getString("DipatcherServiceImpl.CodeDispatcherExists"),
-					dispatcher.getName()));
-
-		SystemEntity dispatcherEntity = getSystemEntityDao().systemToEntity(
-				dispatcher);
-		dispatcherEntity
-				.setMainSystem(getSystemEntityDao().loadAll().isEmpty());
-		dispatcherEntity.setTimeStamp(new Date());
-		getSystemEntityDao().create(dispatcherEntity);
-		dispatcher.setId(dispatcherEntity.getId());
-
-		updateAutomaticTasks(dispatcher, false);
-
-		handleSetDefaultMappingsByDispatcher(dispatcher.getId());
-
-		updateTipusAndGrups(dispatcher, dispatcherEntity);
-
-		dispatcher = getSystemEntityDao().toSystem(dispatcherEntity);
-
-		updateServers();
-
-		return dispatcher;
 	}
 
 	private void checkSystemServer(com.soffid.iam.api.System dispatcher) throws Exception {
@@ -225,28 +246,35 @@ public class DispatcherServiceImpl extends
 	 */
 	protected com.soffid.iam.api.System handleUpdate(
 			com.soffid.iam.api.System dispatcher) throws java.lang.Exception {
-    	soffidDispatcher = null;
-		// Obtenim el anterior per comparar els grups i els tipus d'usuari
-		SystemEntity entityOld = getSystemEntityDao().findByName(
-				dispatcher.getName());
-
-		// fem còpia dels antics per comparar
-		Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(
-				entityOld.getUserType());
-		HashSet<SystemGroupEntity> grupsOld = new HashSet<SystemGroupEntity>(
-				entityOld.getSystemGroup());
-
-		// Obtenim el nou entity
-		SystemEntity entity = getSystemEntityDao().systemToEntity(dispatcher);
-		entity.setTimeStamp(new Date());
-
-		updateAutomaticTasks(dispatcher, false);
-
-		updateTipusAndGrups(dispatcher, entity);
-
-		updateServers();
-
-		return getSystemEntityDao().toSystem(entity);
+		
+		String t = getTaskEntityDao().startVirtualSourceTransaction();
+		try
+		{
+	    	soffidDispatcher = null;
+			// Obtenim el anterior per comparar els grups i els tipus d'usuari
+			SystemEntity entityOld = getSystemEntityDao().findByName(
+					dispatcher.getName());
+	
+			// fem còpia dels antics per comparar
+			Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(
+					entityOld.getUserType());
+			HashSet<SystemGroupEntity> grupsOld = new HashSet<SystemGroupEntity>(
+					entityOld.getSystemGroup());
+	
+			// Obtenim el nou entity
+			SystemEntity entity = getSystemEntityDao().systemToEntity(dispatcher);
+			entity.setTimeStamp(new Date());
+	
+			updateAutomaticTasks(dispatcher, false);
+	
+			updateTipusAndGrups(dispatcher, entity);
+	
+			updateServers();
+	
+			return getSystemEntityDao().toSystem(entity);
+		} finally {
+			getTaskEntityDao().finishVirtualSourceTransaction(t);
+		}
 	}
 
 	private void updateTipusAndGrups(com.soffid.iam.api.System dispatcher,
@@ -259,7 +287,7 @@ public class DispatcherServiceImpl extends
 			SystemEntity entity) throws InternalErrorException, Exception {
 		UserTypeEntityDao tipusDao = getUserTypeEntityDao();
 		com.soffid.iam.service.AccountService accService = getAccountService();
-		String[] tipus = dispatcher.getUserTypes().split(","); //$NON-NLS-1$
+		String[] tipus = dispatcher.getUserTypes().split("[, ]+"); //$NON-NLS-1$
 		Collection<UserTypeEntity> tipusUsuariToGenerateAccounts = new LinkedList<UserTypeEntity>();
 		for (int i = 0; i < tipus.length; i++) {
 			String t = tipus[i].trim();
@@ -354,7 +382,7 @@ public class DispatcherServiceImpl extends
 		GroupEntityDao grupDao = getGroupEntityDao();
 		com.soffid.iam.service.AccountService accService = getAccountService();
 		String[] grups = dispatcher.getGroups() == null ? new String[0]
-				: dispatcher.getGroups().split(","); //$NON-NLS-1$
+				: dispatcher.getGroups().split("[, ]+"); //$NON-NLS-1$
 
 		Collection<GroupEntity> groupsToGenerateAccounts = new HashSet<GroupEntity>();
 		boolean emptyGrups = grups.length == 0 || grups.length == 1
@@ -1349,6 +1377,7 @@ public class DispatcherServiceImpl extends
 	}
 
 	com.soffid.iam.api.System soffidDispatcher = null;
+	private ApplicationContext ctx;
 	@Override
 	protected com.soffid.iam.api.System handleFindSoffidDispatcher()
 			throws Exception {
@@ -1524,7 +1553,12 @@ public class DispatcherServiceImpl extends
 		
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
-		return svc.getNativeObject(dispatcher, type, object1, object2);
+		Map<String, Object> o = svc.getNativeObject(dispatcher, type, object1, object2);
+		Map<String,Object> r = new HashMap<String, Object>();
+
+		fill ("", "", r, o);
+		
+		return r;
 	}
 
 	@Override
@@ -1534,6 +1568,148 @@ public class DispatcherServiceImpl extends
 		
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
-		return svc.getSoffidObject(dispatcher, type, object1, object2);
+		Map<String, Object> o = svc.getSoffidObject(dispatcher, type, object1, object2);
+		Map<String,Object> r = new HashMap<String, Object>();
+		fill ("", "", r, o);
+		
+		return r;
+	}
+
+	private void fill(String prefix, String suffix, Map<String, Object> r, Map<String, Object> o) {
+		for (String s: o.keySet())
+		{
+			Object v = o.get(s);
+			if (v instanceof Map)
+			{
+				fill(prefix+s+suffix+"{\"", "\"}", r, (Map<String, Object>) v);
+			}
+			else
+			{
+				r.put(prefix+s+suffix, v);
+			}
+		}
+	}
+
+	@Override
+	protected String handleGenerateChangesReport(com.soffid.iam.api.System dispatcher) throws Exception {
+		SessionFactory sessionFactory;
+		sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+		
+		HashSet<String> groups = new HashSet<String>();
+		if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
+		{
+			for (String s: dispatcher.getGroups().split("[, ]+"))
+			{
+				groups.add(s);
+			}
+		}
+
+		HashSet<String> types = new HashSet<String>();
+		if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
+		{
+			for (String s: dispatcher.getUserTypes().split("[, ]+"))
+			{
+				types.add(s);
+			}
+		}
+
+		List<Long> allUsers = new LinkedList<Long>();
+		for (UserEntity u: getUserEntityDao().loadAll())
+		{
+			allUsers.add(u.getId());
+		}
+		
+		UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
+		if (ud == null)
+			throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
+		
+		AccountDiffReport report = new AccountDiffReport();
+		report.generateHeader ();
+		for (Long l: allUsers)
+		{
+			System.out.println("User "+l);
+			UserEntity u = getUserEntityDao().load(l);
+
+			analyze (u, dispatcher, groups, types, ud,
+					report);
+		}
+		report.close();
+		return report.getFile().getAbsolutePath();
+	}
+
+	private void analyze(UserEntity u, com.soffid.iam.api.System dispatcher, HashSet<String> groups,
+			HashSet<String> userTypes,
+			UserDomainEntity ud, AccountDiffReport report) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+		boolean match = true;
+		match = matchGroup(u, groups);
+		match = match && matchUserType(u, userTypes);
+
+		List<AccountEntity> accounts = getAccountEntityDao().findByUserAndSystem(u.getUserName(), dispatcher.getName());
+		if (accounts.isEmpty())
+		{
+			if (! Boolean.TRUE.equals(dispatcher.getRolebased()) && 
+					! Boolean.TRUE.equals(dispatcher.getManualAccountCreation()))
+			{
+				String accountName = getAccountService().predictAccountName(u.getId(), dispatcher.getName(), ud.getId());
+				if (accountName != null)
+					report.createAccount(u, accountName);
+			}
+		} else {
+			for (AccountEntity acc: accounts)
+			{
+				boolean willBeEnabled = match && 
+						(! Boolean.TRUE.equals( dispatcher.getRolebased() ) || ! acc.getRoles().isEmpty());
+				if (! acc.isDisabled() && ! willBeEnabled)
+				{
+					report.disableAccount (u, acc.getName());
+				}
+				if (acc.isDisabled() && willBeEnabled)
+				{
+					report.createAccount (u, acc.getName());
+				}
+			}
+		}
+	}
+
+	private boolean matchUserType(UserEntity u, HashSet<String> userTypes) {
+		return (userTypes.contains( u.getUserType().getName()));
+	}
+
+	private boolean matchGroup(UserEntity u, HashSet<String> groups) {
+		if (groups.isEmpty())
+			return true;
+		else
+		{
+			if (matchGroup (u.getPrimaryGroup(), groups))
+				return true;
+			else
+			{
+				for (UserGroupEntity ug: u.getSecondaryGroups())
+				{
+					if (matchGroup(ug.getGroup(), groups))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean matchGroup(GroupEntity primaryGroup, HashSet<String> groups) {
+		GroupEntity g = primaryGroup;
+		do {
+			if (groups.contains(g.getName()))
+				return true;
+			else
+				g  = g.getParent();
+		} while (g != null);
+		return false;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.ctx = applicationContext;
 	}
 }

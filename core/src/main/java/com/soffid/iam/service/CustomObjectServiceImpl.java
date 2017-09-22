@@ -43,8 +43,6 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		CustomObjectEntity entity = getCustomObjectEntityDao().load(obj.getId());
 		if (entity == null)
 			return;
-		getCustomObjectAttributeEntityDao().remove(entity.getAttributes());
-		entity.getAttributes().clear();
 		getCustomObjectEntityDao().remove(entity);
 		generateAudit(entity, "D");
 		generateTask(entity);
@@ -195,6 +193,13 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	protected CustomObject handleFindCustomObjectByTypeAndName(String objectType, String name)
 			throws Exception {
 		CustomObjectEntity o = getCustomObjectEntityDao().findByTypeAndName(objectType, name);
+		if (o == null)
+			return null;
 		return getCustomObjectEntityDao().toCustomObject(o);
+	}
+
+	@Override
+	protected Collection<String> handleFindCustomObjectNames(String objectType) throws Exception {
+		return getCustomObjectEntityDao().findCustomObjectNames(objectType);
 	}
 }

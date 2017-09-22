@@ -18,6 +18,7 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -166,4 +167,19 @@ public class RulesServiceImpl extends RulesServiceBase
         auditoria.setObject("SC_RULROL"); //$NON-NLS-1$
         getAuditEntityDao().create(getAuditEntityDao().auditToEntity(auditoria));
     }
+
+	@Override
+	protected String handleGenerateChangesReport(Rule rule, Collection<RuleAssignedRole> grants) throws Exception {
+		RuleEntity ruleEntity = getRuleEntityDao().newRuleEntity();
+		getRuleEntityDao().ruleToEntity(rule, ruleEntity, true);
+		ruleEntity.setId(rule.getId());
+		for (RuleAssignedRole rar: grants)
+		{
+			RuleAssignedRoleEntity rare = getRuleAssignedRoleEntityDao().newRuleAssignedRoleEntity();
+			getRuleAssignedRoleEntityDao().ruleAssignedRoleToEntity(rar, rare, true);
+			ruleEntity.getRoles().add(rare);
+		}
+		File f = getRuleEvaluatorService().dryRun(ruleEntity);
+		return f.getAbsolutePath();
+	}
 }

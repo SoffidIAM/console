@@ -94,10 +94,9 @@ void showMessage (Image img)
 	
 	if (read == b.length)
 	{                              
-		org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(name+".txt", null, "text/plain; charset=utf-8", 
-				new com.soffid.iam.doc.api.DocumentInputStream(doc));
-	    downloadWindow.setContent(media);
-    	downloadWindow.invalidate();
+		Filedownload.save(new com.soffid.iam.doc.api.DocumentInputStream(doc),
+				"text/plain; charset=utf-8",
+				name+".txt");
 	}
 	else if (read <= 0)
 	{
@@ -183,5 +182,5 @@ void startNow(Image img)
 		<textbox id="tb" width="100%" height="100%" multiline="true"/>
 	</window>
 	
-    <iframe height="1" id="downloadWindow" visible="true" width="1"/>
+    <iframe height="1" id="downloadWindow" visible="false" width="1"/>
 </frame>

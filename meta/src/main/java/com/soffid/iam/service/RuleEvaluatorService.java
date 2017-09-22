@@ -5,7 +5,11 @@
 //
 
 package com.soffid.iam.service;
+import com.soffid.iam.api.Rule;
+import com.soffid.iam.model.RuleEntity;
 import com.soffid.mda.annotation.*;
+
+import java.io.File;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +39,17 @@ public abstract class RuleEvaluatorService {
 		es.caib.seycon.ng.model.UsuariEntity user)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void apply(
 		com.soffid.iam.model.RuleEntity rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(readOnly=true,noRollbackFor={java.lang.Exception.class})
+	public File dryRun(
+		RuleEntity rule)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
 	}
 }

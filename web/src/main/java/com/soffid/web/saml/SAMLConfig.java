@@ -6,6 +6,10 @@ public class SAMLConfig {
 	public boolean trustedAuthentication;
 	public String metadata;
 	public String idp;
+	public int cache;
+	public boolean alwaysTrust;
+	public String hostName;
+	
 	public boolean isClassicMethod() {
 		return classicMethod;
 	}
@@ -35,5 +39,29 @@ public class SAMLConfig {
 	}
 	public void setIdp(String idp) {
 		this.idp = idp;
+	}
+	
+	public int getCache() {
+		return cache;
+	}
+	
+	public void setCache(int cache) {
+		this.cache = cache;
+	}
+	
+	public boolean isAlwaysTrust() {
+		return alwaysTrust;
+	}
+	
+	public void setAlwaysTrust(boolean alwaysTrust) {
+		this.alwaysTrust = alwaysTrust;
+	}
+	
+	public String getHostName() {
+		return hostName;
+	}
+	
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
 	}
 }

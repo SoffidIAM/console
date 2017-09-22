@@ -3,19 +3,21 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
-
 <zk>
-<style src="/css/localSEU.css"/>
-<style src="~./styles/estil.css"/>
-<style src="/css/devices.css"/>
+
 	<style>
-		.roleatt {display: table; padding: 5px; width: 100%}
+		.roleatt {display: table; padding: 0px; width: 100%}
 		.roleatt_row {display: table-row}
+		.roleatt_row div {padding-top: 5px}
 		.roleatt_label {display: table-cell; width: 200px}
 		.roleatt_input {display: table-cell}
+		.gc {padding-left: 0px !important}
+		.etiqueta {margin-left: 0px !important}
+		.textbox {width: 300px !important}
+		tr.vbox-sp {height: 0px !important;}
 	</style>
 
-<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" 
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%"
 	onCreate="start()"> 
 
 
@@ -257,8 +259,7 @@
 		<attribute name="onClose">
 			onWindowClose(event);
 		</attribute>
-	
-		<detalls id="dades">
+		<detalls id="dades" style="padding:13px;border:none">
 			<form id="form" dataPath="/esquemaRol/dsAgents:/rol[1]"
 				onSelectDomainValue="onSelectDomainValue(event.data)">
 				<zscript>
@@ -464,9 +465,9 @@
 					<rows>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
-							<hbox width="100%">
+							<hbox>
 								<textbox id="detall_nom" maxlength="50" sclass="textbox"
-									width="99%" bind="@nom" constraint="no empty">
+									bind="@nom" constraint="no empty">
 									<attribute name="onChange">
 										<![CDATA[
 											//self.value=self.value.replaceAll(" ",""); // no permitim espais
@@ -480,7 +481,6 @@
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
-							
 							<hbox>
 								<textbox bind="@codiAplicacio" maxlength="20"
 									sclass="textbox"
@@ -489,37 +489,31 @@
 									id ="detall_codiAplicacio_button"/>
 								<label value="*" />
 							</hbox>
-								
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Descripcia')}"/>
-							
-							<hbox width="100%">
-								<textbox id="detall_descripcio" sclass="textbox" width="99%"
+							<hbox>
+								<textbox id="detall_descripcio" sclass="textbox"
 									bind="@descripcio" constraint="no empty"/>
-									
 								<label value="*" />
 							</hbox>
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Basededades(Agent)')}"/>
-							
 							<hbox>
-								<listbox id="detall_agent"
+								<listbox id="detall_agent" width="305px"
 									dataPath="/esquemaRol/dsAgents:/agent" mold="select"
 									bind="@baseDeDades">
 									<dataitem bind="@codi">
 										<listcell bind="@codi"/>
 									</dataitem>
 								</listbox>
-								
 								<label value="*" />
 							</hbox>
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Category')}"/>
-							
-							<textbox id="detall_category" sclass="textbox" width="99%"
+							<textbox id="detall_category" sclass="textbox"
 									bind="@category" constraint="no empty"/>
 						</row>
 						<row>
@@ -532,8 +526,8 @@
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Domini')}"/>
-							<hbox width="99%" widths="*,30px">
-								<listbox id="detall_domini" width="100%" bind="domini" dataPath="/esquemaRol/dsAgents:/domini" mold="select"> 
+							<hbox>
+								<listbox id="detall_domini" bind="domini" dataPath="/esquemaRol/dsAgents:/domini" mold="select" width="305px"> 
 									<dataitem bind=".">
 										<listcell bind="@fullName">
 										</listcell>
@@ -603,18 +597,18 @@
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.createdOn')}"/>
-							<datebox bind="@approvalStart" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" width="12em" style="dateboxread" buttonVisible="false"></datebox>
+							<datebox bind="@approvalStart" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" style="dateboxread" buttonVisible="false"></datebox>
 						</row>
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.approvedOn')}"/>
-							<datebox bind="@approvalEnd" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" width="12em" style="dateboxread" buttonVisible="false"></datebox>
+							<datebox bind="@approvalEnd" format="${c:l('usuaris.zul.dateFormat')}" disabled="true" style="dateboxread" buttonVisible="false"></datebox>
 						</row>
 					</rows>
 				</grid>
 				<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
 					dataPath="attributes" scope="role"
 					sclass="roleatt"/>
-				<separator spacing="5px"/>
+				<separator spacing="15px"/>
 							<tabbox>
 								<tabs>
 									<tab
@@ -627,7 +621,7 @@
 								<tabpanels>
 									<tabpanel>
 										<listbox fixedLayout="true"
-											dataPath="/ownedRoles" style="margin-bottom: 2em" rows="6"
+											dataPath="/ownedRoles" style="margin-bottom:13px" rows="6"
 											width="100%" id="ownedRoles"
 											onAfegirRolPare='addRole(event.data, ownedRoles, "ownedRoles", true)'
 											onSelectedDomainValue='onSelectedDomainValue(event.data, ownedRoles, "ownedRoles", true)'
@@ -933,7 +927,6 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 							</tabbox>
 			</form>
 		</detalls>
-
 		<popup id="infoRolAtorgatRol" width="200px">
 			<label id="rolAtorgatRolLabel" value="${c:l('aplica_rolinfo.zul.Elsusuarisquetinguen')}"/>
 		</popup>
@@ -944,7 +937,6 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 			<label id="infoRolsTincAtorgatsLabel" value="${c:l('aplica_rolinfo.zul.Silusuaritaelrolact')}"/>
 		</popup>
 
-		<separator spacing="5px"/>
 		<hbox style="margin-left:auto; margin-right:auto">
 			<button label="${c:l('rules.preview')}">
 				<attribute name="onClick">
@@ -963,7 +955,7 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 			</button>
 			<button id="cancelButton" label="${c:l('aplica_rolinfo.zul.Cancel·la')}" onClick="onWindowClose(event)"/>
 		</hbox>
-			
+		<separator spacing="18px"/>	
 	</window>
 	<window visible="false" style="min-width: 50em" title="${c:l('rules.preview') }" id="previewWindow"
 		closable="true"

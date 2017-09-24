@@ -64,7 +64,6 @@
 
 			<criteris id="queryWindow">
 				<attribute name="onCreate"><![CDATA[
-					searchBox.addAttribute("name").setSearchFilter("World");
 				]]></attribute>
 				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.Group"
 						defaultAttributes="name, description, type"

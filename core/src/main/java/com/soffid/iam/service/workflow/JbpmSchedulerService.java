@@ -23,9 +23,6 @@ import com.soffid.iam.deployer.DeployerService;
 public class JbpmSchedulerService {
 	Log log = LogFactory.getLog(JbpmSchedulerService.class);
 
-	@EJB(beanName = "SoffidDeployerBean")
-	DeployerService soffidDeployer;
-
 	@Resource
 	private SessionContext context;
 

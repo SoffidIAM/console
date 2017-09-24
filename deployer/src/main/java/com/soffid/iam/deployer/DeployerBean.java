@@ -26,6 +26,10 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -206,7 +210,9 @@ public class DeployerBean implements DeployerService {
 		boolean isEJB = false;
 		while (!isEJB && (entry = zin.getNextEntry()) != null) {
 			if (entry.getName().equals("META-INF/ejb-jar.xml") || //$NON-NLS-1$
-					entry.getName().equals("META-INF\\ejb-jar.xml")) //$NON-NLS-1$
+					entry.getName().equals("META-INF\\ejb-jar.xml") ||
+					entry.getName().equals("META-INF/openejb-jar.xml") || //$NON-NLS-1$
+					entry.getName().equals("META-INF\\openejb-jar.xml")) //$NON-NLS-1$
 			{
 				isEJB = true;
 			}
@@ -229,12 +235,12 @@ public class DeployerBean implements DeployerService {
 						log.info("Parsing database addon " + name);
 						if (type.equals("W")) //$NON-NLS-1$
 						{
-							extractWarAddon(mainWarFile, name,
+							extractWarAddon(removeFileExtension(mainWarFile), name,
 									rset.getBinaryStream(5));
 						}
 						if (type.equals("E")) //$NON-NLS-1$
 						{
-							extractWarAddon(selfServiceWarFile, name,
+							extractWarAddon(removeFileExtension (selfServiceWarFile), name,
 									rset.getBinaryStream(5));
 						}
 						if (type.equals("C") || type.equals("V")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -273,7 +279,7 @@ public class DeployerBean implements DeployerService {
 				if (f.getName().endsWith(".war"))
 					extractWarAddon(mainWarFile, simpleName,
 							new FileInputStream(f));
-				else
+				else if (f.getName().endsWith(".jar"))
 					extractCoreAddon(simpleName, new FileInputStream(f));
 			}
 		}
@@ -431,18 +437,14 @@ public class DeployerBean implements DeployerService {
 		if (isEjbModule(coreFile)) {
 			coreModules.add(coreFile.getPath());
 		} else {
-			ZipInputStream zin = new ZipInputStream(new FileInputStream(
-					coreFile));
-			ZipEntry entry;
-			while ((entry = zin.getNextEntry()) != null) {
-				File f = new File(deployDir(), entry.getName());
-				if (entry.isDirectory()) {
-					f.mkdirs();
-				} else {
-					f.getParentFile().mkdirs();
-					extractFile(zin, f);
-				}
+			File commonFile = new File(deployDir(), "lib/plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
+			InputStream in = new FileInputStream(coreFile);
+			out = new FileOutputStream(commonFile);
+			while ((read = in.read(b)) > 0) {
+				out.write(b, 0, read);
 			}
+			in.close();
+			out.close();
 			coreFile.delete();
 		}
 	}
@@ -528,6 +530,21 @@ public class DeployerBean implements DeployerService {
 		else
 			return warFile;
 	}
+
+	private File removeFileExtension (File warFile) {
+		String s = warFile.getPath();
+		if (s.toUpperCase().endsWith(".WAR"))
+		{
+			int i = s.lastIndexOf('.');
+			if ( i >= 0)
+				return new File(s.substring(0,i));
+			else
+				return warFile;
+		}
+		else
+			return warFile;
+	}
+
 	private void extractWar(InputStream in, File warFile)
 			throws FileNotFoundException, IOException {
 		log.info("Exploding war " + warFile.getPath());
@@ -769,6 +786,7 @@ public class DeployerBean implements DeployerService {
 	private long lastModified = 0;
 
 	@Timeout
+	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public void timeOutHandler(Timer timer) throws Exception {
 		try {
 			if (lastModified  == 0)

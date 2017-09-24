@@ -1576,16 +1576,19 @@ public class DispatcherServiceImpl extends
 	}
 
 	private void fill(String prefix, String suffix, Map<String, Object> r, Map<String, Object> o) {
-		for (String s: o.keySet())
+		if (o != null)
 		{
-			Object v = o.get(s);
-			if (v instanceof Map)
+			for (String s: o.keySet())
 			{
-				fill(prefix+s+suffix+"{\"", "\"}", r, (Map<String, Object>) v);
-			}
-			else
-			{
-				r.put(prefix+s+suffix, v);
+				Object v = o.get(s);
+				if (v instanceof Map)
+				{
+					fill(prefix+s+suffix+"{\"", "\"}", r, (Map<String, Object>) v);
+				}
+				else
+				{
+					r.put(prefix+s+suffix, v);
+				}
 			}
 		}
 	}

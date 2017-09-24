@@ -3,6 +3,7 @@ package com.soffid.iam.utils;
 import java.util.HashMap;
 
 import javax.ejb.CreateException;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.soffid.iam.EJBLocator;
@@ -49,6 +50,7 @@ public class ConfigurationCache {
 	}
 	
 	
+	static private Boolean ejb;
 	private static String getProperty (String tenant, String property) throws InternalErrorException, NamingException, CreateException 	
 	{
 		
@@ -63,10 +65,10 @@ public class ConfigurationCache {
 			String value;
 			if (!map.containsKey(property))
 			{
-				if (Security.isSyncServer())
-					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
-				else
+				if (System.getProperty("java.naming.factory.initial") == null)
 					value = ServiceLocator.instance().getConfigurationService().findTenantParameter(tenant, property);
+				else
+					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
 				map.put(property, value);
 			}
 			else

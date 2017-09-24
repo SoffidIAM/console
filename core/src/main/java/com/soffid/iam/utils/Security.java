@@ -344,7 +344,7 @@ public class Security {
         }
         else
         {
-        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL));
+        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL))
         		return true;
         }
         
@@ -374,7 +374,9 @@ public class Security {
                     host = "root"; //$NON-NLS-1$
                 }
             }
-            return new SoffidPrincipal(host, host, Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
+            return new SoffidPrincipal(Security.getMasterTenantName()+"\\"+host, 
+            		host, 
+            		Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
         } else {
         	return TomeePrincipalRetriever.getPrincipal ();
         }
@@ -652,10 +654,14 @@ public class Security {
 	
 	static String masterTenantName = null;
 	
-	public static String getMasterTenantName () throws InternalErrorException{
+	public static String getMasterTenantName () {
 		if (masterTenantName == null)
 		{
-			masterTenantName = getTenantService().getMasterTenant().getName();
+			try {
+				masterTenantName = getTenantService().getMasterTenant().getName();
+			} catch (InternalErrorException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return masterTenantName;
 	}

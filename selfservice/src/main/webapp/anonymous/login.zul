@@ -45,8 +45,11 @@
 				}
 			}
 		
-			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
+			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
+			{
+				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.V2LabelLocator());
 				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+			}
 			
 			String failed = req.getParameter("failed");
 			String error = "";

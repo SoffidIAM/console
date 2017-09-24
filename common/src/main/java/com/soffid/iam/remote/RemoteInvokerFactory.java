@@ -24,6 +24,9 @@ public class RemoteInvokerFactory {
         return getInvoker (url, null, null);
     }
     
+    public Object getInvoker(URL url, String authToken) throws IOException {
+    	return getInvoker(url, null, authToken);
+    }
     
     public Object getInvoker(URL url, String tenantName, String authToken) throws IOException {
         HttpsURLConnection c;

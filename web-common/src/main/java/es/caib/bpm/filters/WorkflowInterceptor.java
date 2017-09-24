@@ -69,7 +69,10 @@ public class WorkflowInterceptor implements Filter {
 			FilterChain filter) throws IOException, ServletException {
 		if (!configured) {
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
+			{
+				Labels.register(new es.caib.bpm.ui.V2LabelLocator());
 				Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+			}
 			Interpreters.add(
 					"java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
 			FunctionMapperChain.addFunctionMapper(new SecurityFunctionMapper());

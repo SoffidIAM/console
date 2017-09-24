@@ -390,10 +390,12 @@ public class ScriptEnviroment {
 			sb.append("CodeMirrorJavaTypes[\"customAttributes")
 				.append(ot.getName())
 				.append("\"]={");
+			boolean first = true;
 			for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(ot.getName(), null))
 			{
-				if ( sb.length() > 0)
+				if ( !first )
 					sb.append(",");
+				first = false;
 				sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
 				TypeEnumeration t = td.getType();
 				if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)

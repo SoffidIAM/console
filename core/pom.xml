@@ -491,7 +491,7 @@
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>5.5.2</version>
+			<version>6.4.0</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-collections</artifactId>

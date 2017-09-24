@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -41,6 +42,8 @@ import java.util.TimeZone;
 import java.util.Timer;
 
 import javax.annotation.Nonnull;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,6 +68,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.xml.security.algorithms.JCEMapper.Algorithm;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
@@ -103,12 +107,14 @@ import org.opensaml.saml.saml2.assertion.SubjectConfirmationValidator;
 import org.opensaml.saml.saml2.assertion.impl.AudienceRestrictionConditionValidator;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter.KeyPlacement;
 import org.opensaml.saml.saml2.metadata.AssertionConsumerService;
@@ -129,6 +135,7 @@ import org.opensaml.saml.saml2.metadata.impl.SingleLogoutServiceBuilder;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import org.opensaml.security.SecurityException;
+import org.opensaml.security.credential.BasicCredential;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.UsageType;
 import org.opensaml.security.credential.impl.CollectionCredentialResolver;
@@ -138,14 +145,18 @@ import org.opensaml.security.trust.TrustEngine;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.EncryptionParameters;
+import org.opensaml.xmlsec.algorithm.AlgorithmSupport;
 import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.encryption.EncryptedData;
 import org.opensaml.xmlsec.encryption.support.DataEncryptionParameters;
+import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import org.opensaml.xmlsec.encryption.support.EncryptionConstants;
 import org.opensaml.xmlsec.encryption.support.EncryptionException;
 import org.opensaml.xmlsec.encryption.support.KeyEncryptionParameters;
 import org.opensaml.xmlsec.impl.BasicEncryptionConfiguration;
+import org.opensaml.xmlsec.keyinfo.KeyInfoCredentialResolver;
 import org.opensaml.xmlsec.keyinfo.KeyInfoGeneratorFactory;
+import org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver;
 import org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoGenerator;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.KeyName;
@@ -164,6 +175,7 @@ import org.opensaml.xmlsec.signature.support.SignaturePrevalidator;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.opensaml.xmlsec.signature.support.Signer;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -218,7 +230,7 @@ public class SAMLServiceInternal {
 		builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 	}
 	
-	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws ParserConfigurationException, SAXException, IOException, UnmarshallingException, AssertionValidationException, CertificateException, ResolverException, InternalErrorException, ComponentInitializationException {
+	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws Exception {
 
 		String samlResponse = response.get("SAMLResponse");
 		
@@ -254,6 +266,14 @@ public class SAMLServiceInternal {
 			return null;
 		}
 
+		for ( EncryptedAssertion encryptedAssertion: saml2Response.getEncryptedAssertions())
+		{
+			Assertion assertion = decrypt (encryptedAssertion);
+			if (validateAssertion(hostName, assertion))
+			{
+				return createAuthenticationRecord(hostName, requestEntity, assertion);
+			}
+		}
 		for ( Assertion assertion: saml2Response.getAssertions())
 		{
 			if (validateAssertion(hostName, assertion))
@@ -267,6 +287,29 @@ public class SAMLServiceInternal {
 	}
 
 	
+	private Assertion decrypt(EncryptedAssertion encryptedAssertion) throws Exception {		
+		KeyStore ks = getKeyStore();
+		X509Certificate cert = (X509Certificate) ks.getCertificate(SAML_KEY);
+		PrivateKey privateKey = null;
+		privateKey = (PrivateKey) ks.getKey(SAML_KEY, KEYSTORE_PASSWORD.toCharArray());
+
+        KeyInfoCredentialResolver keyResolver = new StaticKeyInfoCredentialResolver(
+        		new BasicCredential(cert.getPublicKey(), privateKey));
+
+	    org.opensaml.xmlsec.encryption.EncryptedKey key = encryptedAssertion.getEncryptedData().
+	                getKeyInfo().getEncryptedKeys().get(0);
+	    
+        Decrypter decrypter = new Decrypter(null, keyResolver, null);
+	    SecretKey dkey = (SecretKey) decrypter.decryptKey(key, encryptedAssertion.getEncryptedData().
+	                getEncryptionMethod().getAlgorithm());
+	    
+        Credential shared = new BasicCredential(dkey);
+        
+	    decrypter = new Decrypter(new StaticKeyInfoCredentialResolver(shared), null, null);
+	    decrypter.setRootInNewDocument(true);
+	    return decrypter.decrypt(encryptedAssertion);
+	}
+
 	private String[] createAuthenticationRecord(String hostName, SamlRequestEntity requestEntity, Assertion assertion) {
 		Subject subject = assertion.getSubject();
 		if (subject == null)
@@ -329,9 +372,14 @@ public class SAMLServiceInternal {
 		KeyDescriptor kd = new KeyDescriptorBuilder ().buildObject();
 		spsso.getKeyDescriptors().add(kd);
 		kd.setUse(UsageType.SIGNING);
-
 		KeyInfo keyInfo = generateKeyInfo();
 		kd.setKeyInfo(keyInfo);
+
+		KeyDescriptor kdCrypt = new KeyDescriptorBuilder ().buildObject();
+		spsso.getKeyDescriptors().add(kdCrypt);
+		kdCrypt.setUse(UsageType.ENCRYPTION);
+		KeyInfo keyInfoCrypt = generateKeyInfo();
+		kdCrypt.setKeyInfo(keyInfoCrypt);
 
 		// Generate Login services
 		AssertionConsumerService acs = new AssertionConsumerServiceBuilder().buildObject();
@@ -503,8 +551,7 @@ public class SAMLServiceInternal {
 	private void encryptAssertion(AuthnRequest req, SamlRequest r,
 			EntityDescriptor entityDescriptor,
 			IDPSSODescriptor idpssoDescriptor) throws CertificateException,
-			EncryptionException {
-		
+			EncryptionException, NoSuchAlgorithmException, KeyException {
 		
 		for (KeyDescriptor key: idpssoDescriptor.getKeyDescriptors())
 		{
@@ -512,19 +559,22 @@ public class SAMLServiceInternal {
 			if (cert != null && (
 					key.getUse() == UsageType.ENCRYPTION || key.getUse() == UsageType.UNSPECIFIED))
 			{
-				DataEncryptionParameters encParams = new DataEncryptionParameters();
-				encParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15);
-				         
-				KeyEncryptionParameters kekParams = new KeyEncryptionParameters();
-				kekParams.setEncryptionCredential(new BasicX509Credential(cert));
-				kekParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15);
-
 				BasicX509Credential cred = new BasicX509Credential(cert);
 				cred.setEntityId(entityDescriptor.getEntityID());
 				cred.setUsageType(key.getUse());
 
-				encParams.setKeyInfoGenerator(new StaticKeyInfoGenerator(key.getKeyInfo()));
-				encParams.setEncryptionCredential( cred );
+				KeyEncryptionParameters kekParams = new KeyEncryptionParameters();
+				kekParams.setEncryptionCredential(cred);
+				kekParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSA15);
+//				kekParams.setKeyInfoGenerator(new StaticKeyInfoGenerator(key.getKeyInfo()));
+
+				Credential symmetricCredential = AlgorithmSupport.generateSymmetricKeyAndCredential(EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES128); 
+				
+				DataEncryptionParameters encParams = new DataEncryptionParameters();
+				encParams.setAlgorithm(EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES256);
+//				encParams.setKeyInfoGenerator(new StaticKeyInfoGenerator(key.getKeyInfo()));
+				encParams.setEncryptionCredential( symmetricCredential );
+
 				Encrypter encrypter = new Encrypter(encParams, kekParams);
 				EncryptedData encObject = encrypter.encryptElement(req, encParams, kekParams);
 				 

@@ -88,7 +88,7 @@ import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.SoDRisk;
-import es.caib.seycon.ng.comu.SoDRule;
+import com.soffid.iam.api.SoDRule;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;

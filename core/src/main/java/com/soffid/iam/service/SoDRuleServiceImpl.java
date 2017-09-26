@@ -21,8 +21,8 @@ import com.soffid.iam.model.SoDRuleEntity;
 import com.soffid.iam.model.UserEntity;
 
 import es.caib.seycon.ng.comu.SoDRisk;
-import es.caib.seycon.ng.comu.SoDRole;
-import es.caib.seycon.ng.comu.SoDRule;
+import com.soffid.iam.api.SoDRole;
+import com.soffid.iam.api.SoDRule;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.util.Collection;

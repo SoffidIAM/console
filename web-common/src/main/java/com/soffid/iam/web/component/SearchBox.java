@@ -50,13 +50,20 @@ public class SearchBox extends HtmlBasedComponent {
 	private String defaultAttributes;
 	boolean auto=false;
 	private String lastQuery = "";
+	private boolean initialized = false;
 	
 	public String getJsonObject() {
 		return jsonObject;
 	}
 
-	public void setJsonObject(String jsonObject) {
+	public void setJsonObject(String jsonObject) throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
 		this.jsonObject = jsonObject;
+		if (initialized)
+		{
+			dictionary = null;
+			initialize();
+		}
+		
 	}
 
 	public String getDataPath() {
@@ -175,6 +182,14 @@ public class SearchBox extends HtmlBasedComponent {
 	
 	public void onCreate () throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
+		initialize();
+		initialized  = true;
+	}
+
+	private void initialize() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
+		
+		getChildren().clear();
+		
 		if (jsonObject != null && dictionary == null)
 			dictionary = SearchDictionaryBuilder.build(jsonObject);
 		

@@ -109,6 +109,7 @@ public class InputField extends Div implements XPathSubscriber
 	private boolean updateGroup;
 	private boolean updateApplication;
 	private boolean updateCustomObject;
+	private TipusDada metaData;
 	
 	public void onSelectUser(Event event) {
 		Page p = getDesktop().getPage("usuarisLlista");
@@ -129,7 +130,7 @@ public class InputField extends Div implements XPathSubscriber
 
 	public void onSelectCustomObject(Event event) {
 		Page p = getDesktop().getPage("customObjectsLlista");
-		p.setAttribute("type", "Device");
+		p.setAttribute("type", metaData.getDataObjectType());
 		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 	}
 
@@ -181,7 +182,7 @@ public class InputField extends Div implements XPathSubscriber
 	}
 
 	public void openCustomObject() {
-		String type = "Device";
+		String type = metaData.getDataObjectType();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + binder.getValue(), "_new");
 	}
 
@@ -286,7 +287,7 @@ public class InputField extends Div implements XPathSubscriber
 			if (customObject == null)
 				l.setValue("");
 			else {
-				CustomObject co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName("Device", customObject);
+				CustomObject co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName(metaData.getDataObjectType(), customObject);
 				if (co == null) {
 					l.setValue("?");
 					return false;
@@ -314,6 +315,8 @@ public class InputField extends Div implements XPathSubscriber
 			String dataType = (String) XPathUtils.getValue(bindCtx, "@codiDada");
 			String systemName = (String) XPathUtils.getValue(bindCtx, "@systemName");
 			if(dataType != null){
+
+				
 				String result = "";
 				Map <String,Object> map=new HashMap<String, Object>();
 				updateUser = false;
@@ -327,20 +330,19 @@ public class InputField extends Div implements XPathSubscriber
 				String readonlyExpr = readonly ? 
 						"true" : "${!canUpdateUserMetadata}";
 	
-				TipusDada typeData;
-				typeData = ejb.getDataTypeDescription(systemName, dataType);
+				metaData = ejb.getDataTypeDescription(systemName, dataType);
 					
 				
 				
-				TypeEnumeration type = typeData.getType();
+				TypeEnumeration type = metaData.getType();
 				String stringType = new String();
 				if(type!=null)
 					stringType = type.toString();
 				int size = 0;
-				if(typeData.getSize() != null)
-					size = typeData.getSize();
+				if(metaData.getSize() != null)
+					size = metaData.getSize();
 				String required = "";
-				if (typeData.isRequired())
+				if (metaData.isRequired())
 					required = "*";
 					
 				if(stringType != null && !stringType.trim().isEmpty()){
@@ -525,7 +527,7 @@ public class InputField extends Div implements XPathSubscriber
 								
 						}
 					}	
-					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
+					else if (metaData.getValues() == null || metaData.getValues().isEmpty())//String
 					{
 						if (dualEdit)
 							result= result + "<div style='display:inline-block;'><label bind='@valorDada'/>"
@@ -542,7 +544,7 @@ public class InputField extends Div implements XPathSubscriber
 						result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" "
 								+ "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"'>";
 						result = result + "<listitem value=\"\"/>";
-						for (String v: typeData.getValues())
+						for (String v: metaData.getValues())
 						{
 							String s = v.replaceAll("\"", "&quot;");
 							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";

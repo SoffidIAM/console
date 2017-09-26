@@ -34,7 +34,7 @@ public class RoleDependencyTest extends AbstractTest
 	public void testMultiRole () throws InternalErrorException
 	{
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
-		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
 			
@@ -291,7 +291,7 @@ public class RoleDependencyTest extends AbstractTest
 	public void testRoleHolder () throws InternalErrorException
 	{
 		
-		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			System.setProperty("soffid.entitlement.group.holder", "optional");
 			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
@@ -385,7 +385,7 @@ public class RoleDependencyTest extends AbstractTest
 
 	public void testTranistive () throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException
 	{
-		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
 			

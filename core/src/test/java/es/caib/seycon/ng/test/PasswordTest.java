@@ -27,8 +27,7 @@ public class PasswordTest extends AbstractTest
 	{
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
-		Security.nestedLogin("Test", new String[] { 
-				Security.AUTO_AUTHORIZATION_ALL });
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			PoliticaContrasenya pc = dominiSvc.findPoliticaByTipusAndDominiContrasenyas("I", "DEFAULT");
 			pc.setMinMajuscules(1L);
@@ -53,8 +52,7 @@ public class PasswordTest extends AbstractTest
 
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
-		Security.nestedLogin("Test", new String[] { 
-				Security.AUTO_AUTHORIZATION_ALL });
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {	
 			PoliticaContrasenya pc = dominiSvc.findPoliticaByTipusAndDominiContrasenyas("I", "DEFAULT");
 			pc.setMinMajuscules(1L);

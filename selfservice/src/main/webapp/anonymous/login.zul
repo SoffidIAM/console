@@ -22,7 +22,7 @@
    			javax.servlet.http.HttpServletRequest req = execution.getNativeRequest();
    			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
 			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
-			boolean autoLogin = false;		                  
+			boolean autoLogin = false;
 			String user = "";
 			String password = "";
 			String rootPath = req.getContextPath();
@@ -31,7 +31,7 @@
 				String[] token = session.getAttribute("samlLoginToken");
 				user = token != null && token.length == 2 ? token[0]: "";
 				password = token != null && token.length == 2 ? token [1]: "";
-	
+
 				autoLogin = !user.isEmpty() && !password.isEmpty();
 				session.removeAttribute("samlLoginToken");
 				if (!autoLogin)

@@ -344,7 +344,8 @@ public class Security {
         }
         else
         {
-        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL))
+        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL) ||
+                principal.hasRole(role.substring(0, i)) )
         		return true;
         }
         

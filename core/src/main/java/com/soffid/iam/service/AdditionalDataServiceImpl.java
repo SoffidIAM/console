@@ -169,7 +169,8 @@ public class AdditionalDataServiceImpl extends
 			dataTypeVO.setOrder(next);
 		} else {
 			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
-				if (dataTypeVO.getId().compareTo(dataTypeEntity.getId())!=0 && dataTypeEntity.getOrder().compareTo(dataTypeVO.getOrder()) == 0) {
+				if ((dataTypeVO.getId()==null || !dataTypeEntity.getId().equals(dataTypeVO.getId())) && 
+						dataTypeVO.getOrder().equals(dataTypeEntity.getOrder())) {
 					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
 							dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
 				}

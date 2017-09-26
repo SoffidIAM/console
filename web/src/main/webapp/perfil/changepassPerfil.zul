@@ -41,35 +41,11 @@
 				}
 				
 				import javax.servlet.http.*;
-				String untrustedRoute = es.caib.loginModule.auth.ClientIPValve.getUntrustedIPRoute();
 				
 				// Mètode per fer logout
 				void logout()
 				{
 					Execution ex = Executions.getCurrent();
-					Class c = Class.forName("es.caib.loginModule.util.SessionManager");
-					Object sessionManager = c.newInstance();
-					java.lang.reflect.Method m = c.getMethod("endSession",
-					new Class [] {
-						javax.servlet.http.HttpServletRequest.class,
-						javax.servlet.http.HttpServletResponse.class
-					});
-					HttpServletRequest req = (HttpServletRequest) ex.getNativeRequest();
-					HttpServletResponse resp = (HttpServletResponse) ex.getNativeResponse();
-					try
-					{
-						m.invoke(sessionManager, new Object[] { req, resp });
-					}
-					catch (Exception e) {}
-					
-					es.caib.loginModule.auth.ControladorSesion controladorSession = new es.caib.loginModule.auth.ControladorSesion ();
-					
-					if (untrustedRoute != null)
-						controladorSession.getSesionEJB().setIPRoute(untrustedRoute);
-					
-					controladorSession.autenticar(usuari, passnueva1.getValue());
-					controladorSession.addCookie(Executions.getCurrent().getNativeResponse());
-					
 					ex.sendRedirect("/");
 					req.getSession().invalidate();
 				}
@@ -119,7 +95,7 @@
 												org.zkoss.util.resource
 													.Labels.getLabel("changepassPerfil.CanviPWD")))
 									{
-										logout();
+//										logout();
 									}
 								}
 								

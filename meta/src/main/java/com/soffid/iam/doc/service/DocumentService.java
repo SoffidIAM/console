@@ -5,6 +5,9 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import roles.Tothom;
 import roles.anonymous;
 
@@ -17,6 +20,7 @@ import com.soffid.iam.doc.model.FileSystem;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.signatura.api.Signature;
 
 @Depends({DocumentEntity.class, FileSystem.class, DocSign.class})
@@ -25,8 +29,10 @@ public class DocumentService
 {
 	public void openDocument(DocumentReference reference) {}
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void createDocument(String mimeType, String externalName, String application) {}
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void closeDocument () {};
 	
 	public String getMimeType() {return null;}
@@ -41,18 +47,25 @@ public class DocumentService
 	
 	public void addSign(Signature firma)  throws NASException {};
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void openUploadTransfer() throws DocumentBeanException {};
 	
+	@Transactional(readOnly=true)
 	public void openDownloadTransfer() throws DocumentBeanException {};
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void nextUploadPackage(byte[] filePackage, int length)  throws DocumentBeanException {};
 	
+	@Transactional(readOnly=true)
 	public byte[] nextDownloadPackage(int length) throws DocumentBeanException {return null;};
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void endUploadTransfer() throws DocumentBeanException {};
 	
+	@Transactional(readOnly=true)
 	public void endDownloadTransfer() throws DocumentBeanException {};
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW, noRollbackFor={InternalErrorException.class})
 	public void deleteDocument(DocumentReference reference) {}
 	
 }

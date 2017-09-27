@@ -35,14 +35,19 @@ public class ScheduledTask {
 	@Nullable
 	public java.lang.String logReferenceID;
 
+	@Attribute(defaultValue="\"*\"")
 	public java.lang.String dayPattern;
 
+	@Attribute(defaultValue="\"0\"")
 	public java.lang.String hoursPattern;
 
+	@Attribute(defaultValue="\"*\"")
 	public java.lang.String monthsPattern;
 
+	@Attribute(defaultValue="\"*\"")
 	public java.lang.String dayOfWeekPattern;
 
+	@Attribute(defaultValue="\"0\"")
 	public java.lang.String minutesPattern;
 
 	public boolean error;

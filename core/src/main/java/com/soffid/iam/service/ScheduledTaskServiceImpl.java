@@ -222,8 +222,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	private void reconfigureTasks () throws InternalErrorException
 	{
 		// Updates master configuration property
-		Security.nestedLogin("master", Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
-		try
+		if (Security.isMasterTenant())
 		{
 			String timeStamp = Long.toString(System.currentTimeMillis());
 			Configuration config = getConfigurationService().findParameterByNameAndNetworkName("soffid.schedule.timeStamp", null); //$NON-NLS-1$
@@ -240,8 +239,6 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 				config.setValue(timeStamp);
 				getConfigurationService().update(config);
 			}
-		} finally {
-			Security.nestedLogoff();
 		}
 	}
 	

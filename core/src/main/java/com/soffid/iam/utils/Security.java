@@ -379,7 +379,11 @@ public class Security {
             		host, 
             		Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
         } else {
-        	return TomeePrincipalRetriever.getPrincipal ();
+        	try {
+        		return TomeePrincipalRetriever.getPrincipal ();
+        	} catch (Throwable th) {
+        		return null;
+        	}
         }
     }
 
@@ -477,6 +481,8 @@ public class Security {
     }
 
     public static void onSyncServer() {
+    	if (System.getSecurityManager() != null)
+    		AccessController.checkPermission(new NestedLoginPermission("tenant"));
         onSyncServer = true;
     }
 

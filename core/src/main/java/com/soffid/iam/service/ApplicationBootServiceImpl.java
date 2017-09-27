@@ -312,7 +312,7 @@ public class ApplicationBootServiceImpl extends
 		if (firstSetup) {
 			createInitialData();
 			configureDocumentManager();
-			cfg = new Configuration("versionLevel", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+			cfg = new Configuration("versionLevel", "101"); //$NON-NLS-1$ //$NON-NLS-2$
 			configSvc.create(cfg);
 		}
 	}

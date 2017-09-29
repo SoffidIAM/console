@@ -88,8 +88,10 @@ public class ScriptEnviroment {
 		defineRoleAttributes(c);
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\",\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
-				+ "\"serviceLocator\":\"es.caib.seycon.ng.ServiceLocator\",\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"");
+		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\","
+				+ "\"remoteServiceLocator\":\"cam.soffid.iam.remote.RemoteServiceLocator\","
+				+ "\"serviceLocatorV1\":\"es.caib.seycon.ng.ServiceLocator\","
+				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\",\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"");
 
 		if (type == SoffidObjectType.OBJECT_ACCOUNT)
 		{
@@ -142,8 +144,11 @@ public class ScriptEnviroment {
 		defineGroupAttributes(c);
 		defineRoleAttributes(c);
 
-		return "{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\",\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
-				+ "\"serviceLocator\":\"es.caib.seycon.ng.ServiceLocator\",\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"}";
+		return "{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\","
+				+ "\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
+				+ "\"serviceLocatorV1\":\"es.caib.seycon.ng.ServiceLocator\","
+				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\","
+				+ "\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"}";
 	}
 
 	/**
@@ -174,8 +179,11 @@ public class ScriptEnviroment {
 		defineCustomObjectAttributes(c);
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\",\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
-				+ "\"serviceLocator\":\"es.caib.seycon.ng.ServiceLocator\",\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"");
+		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\","
+				+ "\"remoteServiceLocator\":\"es.caib.seycon.ng.remote.RemoteServiceLocator\","
+				+ "\"serviceLocatorV1\":\"es.caib.seycon.ng.ServiceLocator\","
+				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\","
+				+ "\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"");
 
 		if (type == SoffidObjectType.OBJECT_ACCOUNT)
 		{

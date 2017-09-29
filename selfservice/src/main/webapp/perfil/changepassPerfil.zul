@@ -6,9 +6,6 @@
 <!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul -->
 	<frame id="p_changePassPerfil" saveContent="true" title="${c:l('changepassPerfil.Titol')}" width="99%">
 	
-		<style src="~./styles/estil.css" />
-		<style src="/css/localSEU.css" />
-	
 		<zscript>
 			<![CDATA[
 				String usuari = com.soffid.iam.utils.Security.getCurrentAccount();

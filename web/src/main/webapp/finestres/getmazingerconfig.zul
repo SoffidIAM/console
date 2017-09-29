@@ -12,8 +12,6 @@
 		
 	</zscript> 
 
-	<style src="~./styles/estil.css"/>
-	
 	<window closable="true" id="esquemaLlista" position="center, center" title="${c:l('getmazingerconfig.Titol')}" visible="false" width="80%" height="400px">
 		<attribute name="onInicia">
 		<![CDATA[

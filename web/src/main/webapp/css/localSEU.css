@@ -258,7 +258,7 @@ tr.seld td.UNKNOWN {
 	white-space: nowrap;
 	max-width: 50%;
 	overflow: hidden;
-	height: auto;
+	height: auto !important;
 }
 
 .col_izq {

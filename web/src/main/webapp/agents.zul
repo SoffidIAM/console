@@ -908,6 +908,12 @@
 
 					void doLoadTest (Event event)
 					{
+						if (esquema.isCommitPending()) {
+							Missatgebox.avis (org.zkoss.util.resource.Labels
+								.getLabel("agents.Avis"),
+								org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+							return;
+						}
 						Grid g = event.getTarget().getFellow ("attributesGrid");
 						es.caib.seycon.ng.servei.ejb.DispatcherService svc = es.caib.seycon.ng.EJBLocator.getDispatcherService();
 						String o1 = g.getFellow("testRowTextbox1").getValue();
@@ -925,41 +931,15 @@
 							es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
 							return;
 						}
-						g.getFellow("testColumn").setVisible(true);
-						for ( Row r: g.getRows().getChildren())
+						Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+						for (String key: map.keySet())
 						{
-							Textbox sys = r.getChildren().get(3);
-							Listbox direction = r.getChildren().get(2);
-							Div rdiv = r.getChildren().get(5);
-							Label result = rdiv.getFirstChild();
-							es.caib.zkib.zkiblaf.ImageClic image = rdiv.getLastChild();
-							Object obj = map == null ? null: map.get(sys.getValue());
-							if (direction.getSelectedItem() == null ||
-									direction.getSelectedIndex() == 2)
-							{
-								result.setValue("");
-								image.setVisible(false);
-							}
-							else if (obj == null)
-							{
-								result.setValue("");
-								image.setVisible(false);
-							}
-							else if (obj instanceof Exception)
-							{
-								result.setValue(obj.getClass().getName());
-								image.setVisible(true);
-								if (obj instanceof es.caib.seycon.ng.exception.InternalErrorException)
-									image.setTitle(((Exception)obj).getMessage());
-								else
-									image.setTitle(obj.toString());
-							}
-							else
-							{
-								result.setValue(obj.toString());
-								image.setVisible(false);
-							}
+							map.put(key, stringify(map.get(key), ""));
 						}
+						Events.postEvent("onStart", c, new Object[]{
+								o1,
+								map
+						});
 					}
 
 					void doQueryTest (Event event)
@@ -1861,9 +1841,9 @@
 					<!--  Reconcile triggers -->
 
 					<tabpanel id="tabReconcileTriggers">
-						<div>
-							<input_etiqueta value="${c:l('agents.zul.fullReconcile')}"/>
-							<checkbox bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile2') }" onCheck=""/>
+						<div style="margin-bottom: 32px">
+							<checkbox bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile') }" onCheck=""/>
+							<input_etiqueta value="${c:l('agents.zul.fullReconcile2')}" style="display:block; width: 100%"/>
 						</div>
 					
 						<grid dataPath="/esquema/lista/listbox:/reconcileTrigger" width="100%" fixedLayout="false">

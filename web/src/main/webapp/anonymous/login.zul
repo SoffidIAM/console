@@ -18,6 +18,7 @@
 		</script>
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
+	<style src="/css/devices.css"/>
 		<zscript><![CDATA[
    			javax.servlet.http.HttpServletRequest req = execution.getNativeRequest();
    			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);

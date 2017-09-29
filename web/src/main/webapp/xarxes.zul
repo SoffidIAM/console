@@ -6,7 +6,6 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 <frame id="f_xarxes" saveContent="true" title="${c:l('xarxes.lblGestioXarxes1')}" width="99%">
 
-	<style src="~./styles/estil.css"/>
 	<style>
 		.detall_total:hover{ text-decoration: underline;}
 	</style>

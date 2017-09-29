@@ -4,9 +4,6 @@
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<style src="~./styles/estil.css" />
-
-
 	<window closable="true" id="objectAttributesWindow" position="center, center"
 		sizable="true" title="${c:l('agets.zul.ObjectDetails')}"
 		onStart="onStart(event)"

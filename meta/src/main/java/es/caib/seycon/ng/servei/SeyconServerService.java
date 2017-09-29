@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.ui.SeyconTask;
 import com.soffid.mda.annotation.*;
 
@@ -21,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Depends ({es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.TaskLogEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
-	es.caib.seycon.ng.model.ServerEntity.class, 
+	es.caib.seycon.ng.model.ServerEntity.class,
+	TenantEntity.class,
 	ConfiguracioService.class,
 	ConfiguracioEntity.class})
 public abstract class SeyconServerService {

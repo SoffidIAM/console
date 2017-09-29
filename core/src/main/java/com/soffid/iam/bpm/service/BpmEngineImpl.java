@@ -2640,20 +2640,20 @@ public class BpmEngineImpl extends BpmEngineBase {
 		p.add (new Parameter("tenantId", Security.getCurrentTenantId()));
 		
 		if (userName != null) {
-			clauses.add("usuari.userName like :userName"); //$NON-NLS-1$
-			p.add(new Parameter("userName", userName)); //$NON-NLS-1$
+			clauses.add("upper(usuari.userName) like :userName"); //$NON-NLS-1$
+			p.add(new Parameter("userName", userName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (givenName != null) {
-			clauses.add("usuari.fistName like :givenName"); //$NON-NLS-1$
-			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
+			clauses.add("upper(usuari.firstName) like :givenName"); //$NON-NLS-1$
+			p.add(new Parameter("givenName", givenName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add("concat(usuari.primerLlinatge,' ',usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
-			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
+			clauses.add("upper(concat(usuari.lastName,' ',usuari.middleName)) like :surName"); //$NON-NLS-1$
+			p.add(new Parameter("surName", surName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (group != null) {
-			clauses.add("usuari.primaryGroup.name like :group"); //$NON-NLS-1$
-			p.add(new Parameter("group", group)); //$NON-NLS-1$
+			clauses.add("upper(usuari.primaryGroup.name) like :group"); //$NON-NLS-1$
+			p.add(new Parameter("group", group.toUpperCase())); //$NON-NLS-1$
 		}
 		for (String subClause : clauses) {
 			clause.append(" and "); //$NON-NLS-1$
@@ -2663,7 +2663,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 				p.toArray(new Parameter[p.size()]));
 		if (result.isEmpty()) {
 			for (Parameter param : p) {
-				param.setValue("%" + param.getValue() + "%");
+				if (param.getValue() instanceof String)
+					param.setValue("%" + param.getValue() + "%");
 			}
 		}
 		result = getUserEntityDao().query(clause.toString(),

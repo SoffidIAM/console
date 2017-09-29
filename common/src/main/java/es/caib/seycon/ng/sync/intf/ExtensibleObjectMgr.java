@@ -30,8 +30,7 @@ package es.caib.seycon.ng.sync.intf;
 
 import java.util.Collection;
 
-import com.soffid.iam.api.SoffidObjectType;
-
+import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 /** 

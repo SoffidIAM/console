@@ -38,11 +38,11 @@
 				import es.caib.seycon.ng.comu.*;
 				list = new java.util.LinkedList();
 				list.add (new String(""));
-				list.add (SoffidObjectType.OBJECT_USER.toString());
-				list.add (SoffidObjectType.OBJECT_ACCOUNT.toString());
-				list.add (SoffidObjectType.OBJECT_GROUP.toString());
-				list.add (SoffidObjectType.OBJECT_ROLE.toString());
-				list.add (SoffidObjectType.OBJECT_GRANT.toString());
+				list.add (com.soffid.iam.api.SoffidObjectType.OBJECT_USER.toString());
+				list.add (com.soffid.iam.api.SoffidObjectType.OBJECT_ACCOUNT.toString());
+				list.add (com.soffid.iam.api.SoffidObjectType.OBJECT_GROUP.toString());
+				list.add (com.soffid.iam.api.SoffidObjectType.OBJECT_ROLE.toString());
+				list.add (com.soffid.iam.api.SoffidObjectType.OBJECT_GRANT.toString());
 				return list;
 			</script-finder>
 		</finder>
@@ -297,7 +297,7 @@
 			</ejb-finder>
 			<new-instance-bean
 				className="com.soffid.iam.api.ReconcileTrigger">
-				<bean-attribute name="objectType" value="${es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT}"></bean-attribute>
+				<bean-attribute name="objectType" value="${com.soffid.iam.api.SoffidObjectType.OBJECT_ACCOUNT}"></bean-attribute>
 				<bean-attribute name="trigger" value="${es.caib.seycon.ng.comu.SoffidObjectTrigger.PRE_INSERT}"></bean-attribute>
 			</new-instance-bean>
 		</finder>	
@@ -555,7 +555,7 @@
 			if (instance.length() == 0)
 				return null;
 			else
-				return es.caib.seycon.ng.comu.SoffidObjectType.fromString(instance);
+				return com.soffid.iam.api.SoffidObjectType.fromString(instance);
 		</custom-attribute>
 
 	</datanode>

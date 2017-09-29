@@ -82,4 +82,7 @@ public abstract class ConfiguracioEntity {
 			String value, String description) {
 		 return null;
 	}
+
+	@DaoOperation
+	public void createMasterConfig(ConfiguracioEntity entity) {}
 }

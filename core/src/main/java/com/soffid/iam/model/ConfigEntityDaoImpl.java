@@ -21,6 +21,7 @@ import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
 
@@ -230,6 +231,17 @@ public class ConfigEntityDaoImpl extends
                 this.remove(config);
             }
         }
+	}
+
+	@Override
+	protected void handleCreateMasterConfig(ConfigEntity entity) throws Exception {
+		if (! entity.getName().equals("soffid.schedule.timeStamp"))
+			throw new InternalErrorException("Not allowed to create master configuration "+entity.getName());
+		entity.setTenant( getTenantEntityDao().findByName("master"));
+		getSession().save(entity);
+		getSession(false).flush();
+		String parametre = entity.getName();
+		auditarConfiguracio("C", parametre); //$NON-NLS-1$
 	}
 
 }

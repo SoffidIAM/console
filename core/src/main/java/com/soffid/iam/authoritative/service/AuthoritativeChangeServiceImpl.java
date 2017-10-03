@@ -26,6 +26,7 @@ import com.soffid.iam.sync.intf.AuthoritativeChange;
 import com.soffid.iam.sync.intf.AuthoritativeChangeIdentifier;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -519,6 +520,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 tda.setOrder(i);
                 tda.setCode(attribute);
 				tda.setScope(MetadataScope.USER);
+				tda.setType(TypeEnumeration.STRING_TYPE);
                 tda = getAdditionalDataService().create(tda);
             }
             UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);

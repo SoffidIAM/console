@@ -44,6 +44,10 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String url;
 
+	@Column (name="DIS_URL2", length=500)
+	@Nullable
+	public java.lang.String url2;
+
 	@Column (name="DIS_PARAM0", length=500)
 	@Nullable
 	public java.lang.String param0;
@@ -179,7 +183,14 @@ public abstract class DispatcherEntity {
 	Long longTimeout;	
 	
 	/************************ DAOS *******************************/
-	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity\nwhere\n(:codi is null or upper(codi) like upper(:codi)) and\n(:nomCla is null or upper(nomCla) like upper(:nomCla)) and\n(:url is null or upper(url) like upper(:url)) and\n(:basRol is null or upper(basRol) = upper(:basRol)) and\n(:segur is null or segur = :segur) and\n(:actiu is null or url is not null)")
+	@DaoFinder("from es.caib.seycon.ng.model.DispatcherEntity\n"
+			+ "where\n"
+			+ "(:codi is null or upper(codi) like upper(:codi)) and\n"
+			+ "(:nomCla is null or upper(nomCla) like upper(:nomCla)) and\n"
+			+ "(:url is null or upper(url) like upper(:url) or upper(url2) like upper(:url)) and\n"
+			+ "(:basRol is null or upper(basRol) = upper(:basRol)) and\n"
+			+ "(:segur is null or segur = :segur) and\n"
+			+ "(:actiu is null or url is not null)")
 	public java.util.List<es.caib.seycon.ng.model.DispatcherEntity> findDispatchersByFiltre(
 		java.lang.String codi, 
 		java.lang.String nomCla, 

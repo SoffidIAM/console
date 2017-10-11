@@ -189,12 +189,11 @@ public class DadaUsuariEntityDaoImpl
             targetEntity.setTipusDada(tipusDadaEntity);
             if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()))
             {
-            	if (sourceVO.getValorDadaDate() == null && sourceVO.getValorDada() != null)
+            	if (sourceVO.getValorDadaDate() == null)
             	{
-            		sourceVO.setValorDadaDate(parseDate(sourceVO.getValorDada()));
-            	}
-            	if (sourceVO.getValorDadaDate() != null)
-	            {
+            		sourceVO.setValorDada(null);
+	            	targetEntity.setValorDada(null);
+            	} else {
 					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
 	            	targetEntity.setValorDada(curFormater.format(sourceVO.getValorDadaDate().getTime()));
 	            }

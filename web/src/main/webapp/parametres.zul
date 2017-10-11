@@ -10,6 +10,7 @@
 	<style src="~./styles/estil.css"/>
 
 	<datamodel id="model" rootNode="parametres" src="descriptorParametre.xml"/>
+	<datamodel id="samlmodel" class="com.soffid.web.saml.SamlDataModel"/>
 	
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
@@ -195,8 +196,15 @@
 			}
 		]]>
 	</zscript>
-
-	<esquema id="esquema" datamodel="/model"
+	
+	<tabbox>
+		<tabs>
+			<tab label="${c:l('parametres.zul.Advanced')}"></tab>
+			<tab label="${c:l('parametres.zul.authentication')}"></tab>
+		</tabs>
+		<tabpanels>
+			<tabpanel>
+				<esquema id="esquema" datamodel="/model"
 		 focusCriteri="queryCodi" onHideFormulari="showLista()">
 	
 		<criteris id="queryWindow" height="${queryWindowMin}" 
@@ -327,6 +335,38 @@
 			</form>
 		</detalls>
 	</esquema>
+			</tabpanel>
+			<tabpanel >
+				<form dataPath="/samlmodel:/conf[1]">
+					<div>
+						<label value="${c:l('parametres.zul.classicMethod')}" style="font-weight: bold;"/>
+					</div>
+					<div>
+						<checkbox bind="classicMethod" label="${c:l('parametres.zul.enabled')}" style="display:block"></checkbox>
+						<checkbox bind="trustedAuthentication" label="${c:l('parametres.zul.trustedAuthentication')}" style="display:block"></checkbox>
+					</div>
+					<div>
+						<label value="${c:l('parametres.zul.samlMethod')}" style="font-weight: bold;"/>
+					</div>
+					<div>
+						<checkbox bind="samlMethod"  label="${c:l('parametres.zul.enabled')}"></checkbox>
+					</div>
+					<div> 
+						<label value="${c:l('parametres.zul.metadataURL')}" width="30em"/>
+						<textbox bind="metadata"/>
+					</div>
+					<div>
+						<label value="${c:l('parametres.zul.IDP')}"/>
+						<listbox mold="select" bind="idp" dataPath="/idps">
+							<dataitem bind="/">
+								<listcell bind="/"/>
+							</dataitem>
+						</listbox>
+					</div>
+				</form>				
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
 
 	<include src="xarxesllista.zul"/>
 </zk>

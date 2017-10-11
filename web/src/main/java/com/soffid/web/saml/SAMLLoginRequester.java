@@ -68,10 +68,10 @@ public class SAMLLoginRequester extends HttpServlet {
 			out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
 			out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
-			out.println("<body onload='document.getElementById(\"f\").submit();'><form id='f' action='");
+			out.println("<body onload='document.getElementById(\"s\").setAttribute(\"style\",\"display:none\");document.getElementById(\"f\").submit();'><form id='f' action='");
 			out.print(saml.getUrl());
 			out.print("' method='POST'>");
-			out.println("Press button to continue");
+			out.println("<p>Redirecting to "+saml.getUrl()+"... </p>");
 			for (String key : saml.getParameters().keySet())
 			{
 				String value = saml.getParameters().get(key);
@@ -81,7 +81,7 @@ public class SAMLLoginRequester extends HttpServlet {
 				out.print(encodeAttribute(value));
 				out.println("'/>");
 			}
-			out.print("<input type='submit' value='Continue'/>");
+			out.print("<input id='s' type='submit' value='Continue'/>");
 			out.print("</form></body></html>");
 		}
 	}
@@ -119,7 +119,7 @@ public class SAMLLoginRequester extends HttpServlet {
 		else
 		{
 			req.getSession().setAttribute("samlLoginToken", token);
-			resp.sendRedirect("/");
+			resp.sendRedirect( req.getContextPath());
 		}
 	}
 }

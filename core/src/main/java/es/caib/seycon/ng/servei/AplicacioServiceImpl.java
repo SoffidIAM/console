@@ -1031,7 +1031,19 @@ public class AplicacioServiceImpl extends
 		   		if (rg.getRol().getNom().equals(ra.getNomRol()) && 
 		   				rg.getRol().getBaseDeDades().getCodi().equals(ra.getBaseDeDades()))
 		   		{
-		   			if (rg.isEnabled())
+		   			// Granted on another group
+		   			if (rg.getGrup() != null && 
+		   					! rg.getGrup().getCodi().equals( ra.getValorDomini().getValor()))
+		   				continue ;
+		   			// Granted on another information system
+		   			else if (rg.getAplicacioAdministrada() != null && 
+		   					! rg.getAplicacioAdministrada().getCodi().equals( ra.getValorDomini().getValor()))
+		   				continue;
+		   			// Granted on another custom domain value
+		   			else if (rg.getValorDominiAplicacio() != null && 
+		   					! rg.getValorDominiAplicacio().getValor().equals( ra.getValorDomini().getValor()))
+		   				continue ;
+		   			else if (rg.isEnabled())
 		   				return getRolAccountEntityDao().toRolAccount(rg);
 		   			else
 		   			{

@@ -7,4 +7,5 @@ encoding//src/main/resources/iam-label.properties=UTF-8
 encoding//src/main/resources/iam-label_ca.properties=UTF-8
 encoding//src/main/resources/iam-label_es.properties=UTF-8
 encoding//src/main/resources/iam-label_nl.properties=UTF-8
+encoding//src/test/java=UTF-8
 encoding/<project>=UTF-8

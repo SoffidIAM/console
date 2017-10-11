@@ -391,25 +391,6 @@ public class UsuariServiceImpl extends
 			throw new SeyconException (Messages.getString("UsuariServiceImpl.UserTypeNotEspecified")); //$NON-NLS-1$
 		}
 		
-		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
-		/*
-		String NIF = usuari.getNIF();
-		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
-			NIF = NIF.trim();
-			Parameter params[] = new Parameter[]{new Parameter("nif", NIF)}; //$NON-NLS-1$
-			Collection usuarisMateixNIF = getUsuariEntityDao().query("select usuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari where usuari = dadaUsuari.usuari and dadaUsuari.tipusDada.codi = 'NIF' and dadaUsuari.valorDada = :nif", params); //$NON-NLS-1$
-			if (usuarisMateixNIF!=null && usuarisMateixNIF.size()!=0) {
-				String codiUsuaris=""; //$NON-NLS-1$
-				for (Iterator it = usuarisMateixNIF.iterator(); it.hasNext();) {
-					codiUsuaris+= "'"+((UsuariEntity) it.next()).getCodi()+"', "; //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				codiUsuaris = codiUsuaris.substring(0,codiUsuaris.length()-2);
-				throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.ExistsUser"), //$NON-NLS-1$
-						codiUsuaris)); 
-			}
-		}
-		*/
-		
 		UsuariEntity usersSameCode = getUsuariEntityDao().findByCodi(usuari.getCodi());
 		if(usersSameCode != null)
 			throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.CodeUserExists"),  //$NON-NLS-1$
@@ -503,7 +484,11 @@ public class UsuariServiceImpl extends
 		GrupService service = getGrupService();
 		service.propagateRolsChangesToDispatcher(usuari.getCodiGrupPrimari());
 		
-		getRuleEvaluatorService().applyRules(usuariEntity);
+		if ( usuari.getActiu().booleanValue())
+		{
+			auditChange("E", usuari.getCodi(), null);
+			getRuleEvaluatorService().applyRules(usuariEntity);
+		}
 				
 		return getUsuariEntityDao().toUsuari(usuariEntity);
 	}
@@ -1610,37 +1595,19 @@ public class UsuariServiceImpl extends
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate"));			 //$NON-NLS-1$
 		}
 
-		/*
-		// Comprobamos que no exista ya el usuario a crear (puede haber ya varios)
-		String NIF = usuari.getNIF();
-		if (NIF!=null && !"".equals(NIF.trim())) { //$NON-NLS-1$
-			NIF = NIF.trim();
-			Parameter params[] = new Parameter[]{new Parameter("nif",NIF)}; //$NON-NLS-1$
-			Collection usuarisMateixNIF = getUsuariEntityDao().query("select usuari from es.caib.seycon.ng.model.UsuariEntity usuari, es.caib.seycon.ng.model.DadaUsuariEntity dadaUsuari where usuari = dadaUsuari.usuari and dadaUsuari.tipusDada.codi = 'NIF' and dadaUsuari.valorDada = :nif", params); //$NON-NLS-1$
-			if (usuarisMateixNIF!=null) {
-				if (usuarisMateixNIF.size()==1) {//comprobamos que no sea al mismo !!
-					UsuariEntity usuariExist = (UsuariEntity) usuarisMateixNIF.iterator().next();
-					if (!usuari.getId().equals(usuariExist.getId()))
-						throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.ExistsUser"), //$NON-NLS-1$
-								usuariExist.getCodi())); 
-				} else if (usuarisMateixNIF.size()!=0) { // hay más de 1
-					String codiUsuaris=""; //$NON-NLS-1$
-					for (Iterator it = usuarisMateixNIF.iterator(); it.hasNext();) {
-						codiUsuaris+= "'"+((UsuariEntity) it.next()).getCodi()+"', "; //$NON-NLS-1$ //$NON-NLS-2$
-					}
-					codiUsuaris = codiUsuaris.substring(0,codiUsuaris.length()-2);
-					throw new SeyconException(String.format(Messages.getString("UsuariServiceImpl.ExistsUser"), //$NON-NLS-1$
-							codiUsuaris)); 
-				}
-			}
-		}
-		*/
-		
 		// Ara hem de comprovar que si es modifica l'usuari [nom,llinatges o DNI, es verifique que siga correcte]
 		UsuariEntity usuariAbans = usuari.getId() != null ?  
 			getUsuariEntityDao().load(usuari.getId()) : 
 			getUsuariEntityDao().findByCodi(usuari.getCodi());
 		Usuari previousUser = getUsuariEntityDao().toUsuari(usuariAbans);
+		if (previousUser.getActiu().booleanValue() && !usuari.getActiu().booleanValue())
+		{
+			auditChange("e", previousUser.getCodi(), null);
+		}
+		if (! previousUser.getActiu().booleanValue() && usuari.getActiu().booleanValue())
+		{
+			auditChange("E", previousUser.getCodi(), null);
+		}
 		// Verifiquem si hem de fer la comprovació de la identitat:
 		// s'ha modifcat el nif de l'usuari??
 		DadaUsuariEntity nifAnterior = getDadaUsuariEntityDao().findDadaByCodiTipusDada(usuari.getCodi(), "NIF"); //$NON-NLS-1$
@@ -2086,9 +2053,13 @@ public class UsuariServiceImpl extends
 	
 
 	private void auditaCanviPassword(String codiUsuariAuditat, String codiDominiContrasenyes) {
+		auditChange ("P", codiUsuariAuditat, codiDominiContrasenyes);
+	}
+	
+	private void auditChange(String action, String codiUsuariAuditat, String codiDominiContrasenyes) {
 		String codiUsuari = Security.getCurrentAccount();
 		Auditoria auditoria = new Auditoria();
-		auditoria.setAccio("P"); //$NON-NLS-1$
+		auditoria.setAccio(action); //$NON-NLS-1$
 		auditoria.setUsuari(codiUsuariAuditat);
 		auditoria.setAutor(codiUsuari);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(

@@ -289,6 +289,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			account.setId(acc.getId());
 			account = getVaultService().addToFolder(account);
 			
+			if (! account.isDisabled())
+				audit("E", acc);
+
 			createAccountTask(acc);
 			return account;
 		}
@@ -328,8 +331,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			return account.getOwnerRoles();
 	}
 
-	private void updateAcl(AccountEntity acc, es.caib.seycon.ng.comu.Account account)
+	private boolean updateAcl(AccountEntity acc, es.caib.seycon.ng.comu.Account account)
 	{
+		boolean anyChange = false;
+		
 		AccountAccessLevelEnum levels[] = new AccountAccessLevelEnum[] {AccountAccessLevelEnum.ACCESS_USER,
 				AccountAccessLevelEnum.ACCESS_MANAGER, AccountAccessLevelEnum.ACCESS_OWNER
 		};
@@ -416,6 +421,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					}
 					if (!found)
 					{
+						anyChange = true;
 						aclIterator.remove();
 						notifyAccountPasswordChange(access.getAccount(),
 							access.getGroup(), access.getRol(), access.getUser());
@@ -428,9 +434,12 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		for (int index = 0 ; index < levels.length; index++)
 		{
 			for (Grup g: newgrups[index]) {
+				
 				GrupEntity ge = getGrupEntityDao().load(g.getId());
 				if (ge != null)
 				{
+					anyChange = true;
+
 					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
 					access.setGroup(ge);
 					access.setAccount(acc);
@@ -446,6 +455,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				RolEntity re = getRolEntityDao().load(r.getId());
 				if (re != null)
 				{
+					anyChange = true;
+
 					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
 					access.setRol(re);
 					access.setAccount(acc);
@@ -461,6 +472,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				UsuariEntity ue = getUsuariEntityDao().load(u.getId());
 				if (ue != null)
 				{
+					anyChange = true;
+
 					AccountAccessEntity access = getAccountAccessEntityDao().newAccountAccessEntity();
 					access.setUser(ue);
 					access.setAccount(acc);
@@ -472,16 +485,31 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				}
 			}
 		}
+		
+		return anyChange;
 	}
 
 	@Override
 	protected Account handleUpdateAccount(es.caib.seycon.ng.comu.Account account)
 			throws Exception
 	{
+		boolean anyChange = false;
+		
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		
+		if (! ae.isDisabled() && account.isDisabled())
+		{
+			anyChange = true;
+			audit("e", ae);
+		}
+		if (ae.isDisabled() && !account.isDisabled())
+		{
+			audit("E", ae);
+			anyChange = true;
+		}
 		if (! account.getType().equals( ae.getType() ) )
 		{
+			anyChange = true;
 			if (ae.getType().equals(AccountType.USER))
 			{
 				account.setOwnerUsers(new LinkedList<Usuari>());
@@ -541,18 +569,31 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				throw new AccountAlreadyExistsException(
 						String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), //$NON-NLS-1$
 						account.getName()+"@"+ae.getDispatcher().getCodi()));
+			anyChange = true;
 		}
+		if (! ae.getDescription().equals( account.getDescription()) ||
+				! ae.getStatus().equals(account.getStatus()) ||
+				ae.isDisabled() != account.isDisabled() ||
+				! ae.getLoginUrl().equals(account.getLoginUrl()) ||
+				! ae.getPasswordPolicy().equals(account.getPasswordPolicy()))
+			anyChange = true;
+		
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
 		if (account.getType().equals(AccountType.USER))
 			removeAcl (ae);
 		else
-			updateAcl(ae, account);
+		{
+			anyChange = anyChange || updateAcl(ae, account);
+		}
+			
+		
 		getAccountEntityDao().update(ae);
 
 		account = getVaultService().addToFolder(account);
 
-		createAccountTask(ae);
+		if (anyChange)
+			createAccountTask(ae);
 		
 		return account;
 	}

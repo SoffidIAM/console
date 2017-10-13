@@ -572,10 +572,10 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 			anyChange = true;
 		}
 		if (! ae.getDescription().equals( account.getDescription()) ||
-				! ae.getStatus().equals(account.getStatus()) ||
+				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
 				ae.isDisabled() != account.isDisabled() ||
-				! ae.getLoginUrl().equals(account.getLoginUrl()) ||
-				! ae.getPasswordPolicy().equals(account.getPasswordPolicy()))
+				(ae.getLoginUrl() == null ? account.getLoginUrl() != null : ! ae.getLoginUrl().equals(account.getLoginUrl())) ||
+				! ae.getPasswordPolicy().getCodi().equals(account.getPasswordPolicy()))
 			anyChange = true;
 		
 		getAccountEntityDao().accountToEntity(account, ae, false);

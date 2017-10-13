@@ -326,6 +326,11 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 				updateMandatoryRolGrant();
 				configSvc.update(cfg);
 			}
+			if (cfg.getValor().equals("13")) { //$NON-NLS-1$
+				cfg.setValor("14"); //$NON-NLS-1$
+				updateAccountStatus();
+				configSvc.update(cfg);
+			}
 		}
 		finally
 		{
@@ -396,6 +401,27 @@ public class ApplicationBootServiceImpl extends ApplicationBootServiceBase imple
 		}
 	}
 
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void updateAccountStatus () throws SQLException
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_ACCOUN SET ACC_STATUS='a' WHERE ACC_STATUS IS NULL AND ACC_DISABL=0",
+							new Object[0]);
+			executeSentence(conn, "UPDATE SC_ACCOUN SET ACC_STATUS='d' WHERE ACC_STATUS IS NULL AND ACC_DISABL=1",
+					new Object[0]);
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
 	/**
 	 * @throws SQLException 
 	 * 

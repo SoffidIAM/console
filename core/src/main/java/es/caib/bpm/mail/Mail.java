@@ -207,6 +207,7 @@ public class Mail implements ActionHandler {
 					ch = reader.read ();
 				}
 				
+				text = buffer.toString();
 				InternetAddress recipient = getUserAddress(usuari);
 				if (recipient != null)
 				{
@@ -286,8 +287,8 @@ public class Mail implements ActionHandler {
 			String subject, String text) throws Exception {
 		
 		debug(String.format(Messages.getString("Mail.SendingMailMessage"), targetAddresses, subject)); //$NON-NLS-1$
-
-		MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
+		if (text != null && ! text.isEmpty())
+			MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
 	}
 
 

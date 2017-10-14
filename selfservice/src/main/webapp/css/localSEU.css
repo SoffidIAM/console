@@ -106,6 +106,12 @@ div.wc-highlighted, div.wc-highlighted-none {
 	background-color: #FFF7EE;
 }
 
+p, div, span, label, a, input, textarea, button, input.button, input.file,
+div.head-cell-inner, div.cell-inner,
+.maintitle, .etiqueta, .text, .textbox {
+	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
+}
+
 div.head-cell-inner {
 	text-align: left;
 }

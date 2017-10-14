@@ -20,6 +20,12 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #22B9D8; backgrou
 .titol_tancar:hover {
 	text-decoration: underline;
 }
+p, div, span, label, a, input, textarea, button, input.button, input.file,
+div.head-cell-inner, div.cell-inner,
+.maintitle, .etiqueta, .text, .textbox {
+	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
+}
+
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:left;}
 .dateboxinp  {

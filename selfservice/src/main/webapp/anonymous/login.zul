@@ -10,7 +10,6 @@
 			{
 				document.getElementById("j_username").value = account;
 			} else {
-				document.cookie = "LastTenant=" +tenant + "; Duration=3650;";
 				document.getElementById("j_username").value = tenant + "\\" + account;
 			}
 			

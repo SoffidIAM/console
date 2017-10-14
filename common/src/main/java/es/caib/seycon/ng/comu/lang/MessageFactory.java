@@ -24,9 +24,6 @@ public class MessageFactory
 
 	public static Locale getLocale () {
 		
-		if (System.getProperty("soffid.language") != null)
-			return new Locale (System.getProperty("soffid.language"));
-		
 		Locale l = currentLocale.get();
 	
 		if (l == null)

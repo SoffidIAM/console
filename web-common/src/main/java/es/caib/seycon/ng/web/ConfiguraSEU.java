@@ -27,6 +27,7 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.config.Config;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Usuari;
@@ -76,24 +77,6 @@ public class ConfiguraSEU extends Vbox {
 		
 		// Obtenim informació de l'usuariSEU
 		configuraUsuariSEU();
-	}
-	
-	/**
-	 * Mètode per obtindre la IP des de la que es
-	 * connecta l'usuari
-	 * @return
-	 */
-	private String getClientIPValue() {
-		try {
-			Class c = Class.forName("es.caib.loginModule.auth.ClientIPValve"); //$NON-NLS-1$
-			Method m = c.getMethod("getClientIP",new Class[]{}); //$NON-NLS-1$
-			Object res = m.invoke(null, new Object[] {});
-			if (res instanceof String)
-				return (String) res;
-		} catch (Throwable th) {
-		}
-
-		return ""; // No l'hem trobat //$NON-NLS-1$
 	}
 	
 	/**
@@ -205,8 +188,8 @@ public class ConfiguraSEU extends Vbox {
 		// Si l'usuari no té com a preferència l'idioma, agafem el de
 		// el navegador o de la pàgina de login
 		if (idioma == null)  {
-			if (System.getProperty("soffid.language") != null)
-				idioma = new Locale(System.getProperty("soffid.language"));
+			if (ConfigurationCache.getProperty("soffid.language") != null)
+				idioma = new Locale(ConfigurationCache.getProperty("soffid.language"));
 			else
 			{
 				HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
@@ -242,10 +225,10 @@ public class ConfiguraSEU extends Vbox {
 	                if (idioma == null)
 	                {
 	                    // Low priority, default language
-	        			if (System.getProperty("soffid.language.default") == null)
+	        			if (ConfigurationCache.getProperty("soffid.language.default") == null)
 	        				idioma = new Locale("en","US"); //$NON-NLS-1$ //$NON-NLS-2$
 	        			else
-	        				idioma = new Locale (System.getProperty("soffid.language.default"));
+	        				idioma = new Locale (ConfigurationCache.getProperty("soffid.language.default"));
 	        		
 	                }
 	            }
@@ -256,7 +239,7 @@ public class ConfiguraSEU extends Vbox {
 		
 		// Con esto, el zk establece el idioma:
 		sessio.setAttribute("px_preferred_locale", idioma); //$NON-NLS-1$
-		org.zkoss.util.Locales.setThreadLocal(idioma);
+//		org.zkoss.util.Locales.setThreadLocal(idioma);
 		return idioma;
 	}
 	
@@ -311,12 +294,7 @@ public class ConfiguraSEU extends Vbox {
 		if (user == null)
 		{
 			Locale l = configuraLocale(null);
-			sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
-			String currentIPUsuari = getClientIPValue();
-			if (currentIPUsuari!=null) {
-				sessio.setAttribute(SESSIO_CURRENT_IP_SEU, currentIPUsuari);
-			}
-			
+			sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());			
 			return;
 		}
 		
@@ -364,14 +342,6 @@ public class ConfiguraSEU extends Vbox {
 				// Actualitzem el seu darrer login
 				usuariSEU.setDataDarrerLogin(Calendar.getInstance());
 				
-				// I guardem la seua ip a les preferències de l'usuari
-				String currentIPUsuari = getClientIPValue();
-				if (currentIPUsuari!=null) {
-					usuariSEU.getPreferenciesSEU().put(SEU_LAST_IP, currentIPUsuari);
-					// Per a que es puga emprar des dels workflows
-					sessio.setAttribute(SESSIO_CURRENT_IP_SEU, currentIPUsuari);
-				}
-				
 				// Guardem la versió e la sessioó
 				sessio.setAttribute(SESSIO_VERSIO_SEU, versio);
 
@@ -388,15 +358,7 @@ public class ConfiguraSEU extends Vbox {
 				usuariSEU.setDataDarrerLogin(Calendar.getInstance());
 				// Guardem la ip de conexio:
 				// I guardem la seua ip
-				String currentIPUsuari = getClientIPValue();
 				HashMap prefs = new HashMap();
-				
-				if (currentIPUsuari!=null) {
-					// Només tenim una preferència: la IP
-					prefs.put(SEU_LAST_IP, currentIPUsuari);
-					// Per a que es puga emprar des dels workflows
-					sessio.setAttribute(SESSIO_CURRENT_IP_SEU, currentIPUsuari);
-				}
 				
 				// Guardem els favorits encara que siga buit
 				usuariSEU.setPreferenciesSEU(prefs);

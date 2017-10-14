@@ -10,6 +10,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Tenant;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -20,7 +21,7 @@ public class ConfigurationCache {
 	private static String getMasterTenantName () throws InternalErrorException
 	{
 		if (masterTenantName == null)
-			masterTenantName = ServiceLocator.instance().getTenantService().getMasterTenant().getName();
+			masterTenantName = Security.getMasterTenantName();
 		return masterTenantName;
 	}
 	

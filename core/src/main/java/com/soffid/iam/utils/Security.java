@@ -27,6 +27,7 @@ import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -345,7 +346,7 @@ public class Security {
         else
         {
         	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL) ||
-                principal.hasRole(role.substring(0, i)) )
+                principal.hasRole(role) )
         		return true;
         }
         
@@ -410,12 +411,12 @@ public class Security {
 				List<String> dp = getTenantService().getDisabledPermissions(t);
 				LinkedList<String> auths2 = new LinkedList<String>();
 				for (SoffidAuthorization a: auths)
-					auths2.add(a.getCodi());
-				for (Iterator<String> it = auths2.iterator(); it.hasNext();)
 				{
-					String a = it.next();
-					if (dp.contains(a))
-						it.remove();
+					if (!dp.contains(a))
+					{
+						auths2.add(a.getCodi());
+						auths2.add(a.getCodi()+Security.AUTO_ALL);
+					}
 				}
 		        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
 			}

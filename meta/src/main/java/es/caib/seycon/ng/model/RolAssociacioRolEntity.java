@@ -8,6 +8,8 @@ package es.caib.seycon.ng.model;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.RolGrant;
+
 @Entity(table = "SC_ROLROL", translatedName = "RoleDependencyEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({ es.caib.seycon.ng.comu.RolGrant.class,
 		es.caib.seycon.ng.comu.ContenidorRol.class,
@@ -105,6 +107,17 @@ public abstract class RolAssociacioRolEntity {
 		es.caib.seycon.ng.model.RolEntity containerRole) {
 	 return null;
 	}
+
+	
+	@DaoOperation
+	public void assignDomainValue(RolAssociacioRolEntity entity,
+			@Nullable RolGrant valueObject, @Nullable RolEntity grantedRole,
+			@Nullable RolEntity granteeRole) {}
+
+	@DaoOperation
+	public void assignGranteeDomainValue(RolAssociacioRolEntity entity,
+			@Nullable RolGrant valueObject, @Nullable RolEntity grantedRole,
+			@Nullable RolEntity granteeRole) {}
 
 	public java.lang.String toString() {
 		return null;

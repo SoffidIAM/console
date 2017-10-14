@@ -1331,7 +1331,7 @@ public class ApplicationServiceImpl extends
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
-		populateParentGrantsForRol(radSet, theRol, null);
+		populateParentGrantsForRol(radSet, theRol, null, null);
 		for (RolAccountDetail rad : radSet) {
 			if (rad.account != null && rad.account.getId() == null)
 			{
@@ -1861,7 +1861,12 @@ public class ApplicationServiceImpl extends
 		if (rol == null)
 			return rg;
 		
-		populateParentGrantsForRol(radSet, rol, null);
+		populateParentGrantsForRol(radSet, rol, null, null);
+		toRoleGrantList(radSet, rg);
+		return rg;
+	}
+
+	private void toRoleGrantList(HashSet<RolAccountDetail> radSet, LinkedList<RoleGrant> rg) {
 		for (RolAccountDetail rad : radSet) {
             RoleGrant grant;
             if (rad.rolAccount != null) 
@@ -1886,10 +1891,13 @@ public class ApplicationServiceImpl extends
             }
             rg.add(grant);
         }
-		return rg;
 	}
 
-	private void populateParentGrantsForRol(HashSet<RolAccountDetail> radSet, RoleEntity rol, RoleDependencyEntity originalGrant) {
+	private void populateParentGrantsForRol(HashSet<RolAccountDetail> radSet, 
+			RoleEntity rol, 
+			RoleDependencyEntity originalGrant,
+			RoleEntity roleToAddOrUpdate) {
+		
 		for (RoleAccountEntity rac : rol.getAccounts()) {
             if (shouldBeEnabled(rac)) {
                 RolAccountDetail rad;
@@ -1907,14 +1915,18 @@ public class ApplicationServiceImpl extends
                 }
             }
         }
-		
+
+		if (rol != null && roleToAddOrUpdate != null && rol.getId().equals( roleToAddOrUpdate.getId()))
+			rol = roleToAddOrUpdate; // Use new role configuration			
+
 		for (RoleDependencyEntity ra : rol.getContainerRoles()) {
 			if ((ra.getStatus() == null || 
 				ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) || 
 				ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)) && 
 					(ra.getMandatory() == null || ra.getMandatory().booleanValue()))
-				populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null? ra: originalGrant);
-					populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null ? ra : originalGrant);
+			{
+				populateParentGrantsForRol(radSet, ra.getContainer(), originalGrant == null ? ra: originalGrant, roleToAddOrUpdate);
+			}
         }
 
 		for (RoleGroupEntity rg : rol.getContainerGroups()) {
@@ -2400,18 +2412,81 @@ public class ApplicationServiceImpl extends
 		return result;
 	}
 
+	
+	private void findEffectiveRoleGrantsRecursively (RoleEntity r,
+			String domainValue,
+			RoleEntity roleToModify,
+			Set<RolAccountDetail> radSet) throws Exception
+	{
+		
+		HashSet<RolAccountDetail> s = new HashSet<RolAccountDetail>();
+		populateParentGrantsForRol(s, r, null, roleToModify);
+		
+		for (RolAccountDetail rg: s) 
+		{
+			if (domainValue == null ||
+					rg.qualifier != null && rg.qualifier.getValue().equals(domainValue) ||
+					rg.qualifierAplicacio != null && rg.qualifierAplicacio.getName().equals( domainValue ) ||
+					rg.qualifierGroup != null && rg.qualifierGroup.getName().equals( domainValue) )
+			{
+				radSet.add(rg);
+			}
+		}
+		
+		
+		for ( RoleDependencyEntity rg: r.getContainedRoles())
+		{
+			if (rg.getMandatory() != null && rg.getMandatory().booleanValue())
+			{
+				if (rg.getDomainApplicationValue() != null)
+					findEffectiveRoleGrantsRecursively(rg.getContained(),
+							rg.getDomainApplicationValue().getValue(), 
+							roleToModify,
+							radSet);
+				else if (rg.getDomainApplication() != null)
+					findEffectiveRoleGrantsRecursively(rg.getContained(), rg.getDomainApplicationValue().getValue(), roleToModify, radSet);
+				else if (rg.getDomainGroup() != null)
+					findEffectiveRoleGrantsRecursively(rg.getContained(), rg.getDomainGroup().getName(), roleToModify, radSet);
+				else if (rg.getContained().getDomainType().equals(r.getDomainType()) )
+					findEffectiveRoleGrantsRecursively(rg.getContained(), domainValue, roleToModify, radSet);
+				else
+					findEffectiveRoleGrantsRecursively(rg.getContained(), null, roleToModify, radSet);
+			}
+		}
+	}
+	
 	@Override
-	protected String handleGenerateChangesReport(Role rol) throws Exception {
-		
+	protected String handleGenerateChangesReport(Role rol) throws Exception {			
 		// Get current grantees
-		Collection<RoleGrant> list1 ;
-		list1 = handleFindEffectiveRoleGrantsByRoleId(rol.getId());
+		HashSet<RolAccountDetail> set1 = new HashSet<RolAccountDetail>();
+		if (rol.getId() != null)
+		{
+			RoleEntity entity = getRoleEntityDao().load(rol.getId());
+			findEffectiveRoleGrantsRecursively(entity, null, null, set1);
+		}
+		// Now look for existing grants on new dependencies
+		for ( RoleGrant rg: rol.getOwnedRoles())
+		{
+			if (rg.getMandatory() != null && rg.getMandatory().booleanValue())
+			{
+				RoleEntity role = getRoleEntityDao().findByNameAndSystem(rg.getRoleName(), rg.getSystem());
+				if (role != null)
+				{
+					findEffectiveRoleGrantsRecursively(role, rg.getDomainValue(), null, set1);
+				}
+			}
+		}
 		
-		// Get now grantees
+		
+		LinkedList<RoleGrant> list1 = new LinkedList<RoleGrant>();
+		toRoleGrantList(set1, list1);
+		
+		// Get new grantees
+		HashSet<RolAccountDetail> set2 = new HashSet<RolAccountDetail>();
+		computeNewGrantees(rol, set2 );
 		LinkedList<RoleGrant> list2 = new LinkedList<RoleGrant>();
-
-		computeNewGrantees(rol, list2);
-
+		toRoleGrantList(set2, list2);
+		
 		RolGrantDiffReport report = new RolGrantDiffReport ();
 		report.setAccountEntityDao(getAccountEntityDao());
 		report.setUserEntityDao(getUserEntityDao());
@@ -2420,12 +2495,23 @@ public class ApplicationServiceImpl extends
 		return f.getAbsolutePath();
 	}
 
-	private void computeNewGrantees(Role rol, LinkedList<RoleGrant> rg) {
+	private void computeNewGrantees(Role rol, HashSet<RolAccountDetail> radSet) throws Exception {
+		
 		RoleEntity dummyEntity ;
 		if (rol.getId() == null)
+		{
 			dummyEntity = getRoleEntityDao().newRoleEntity();
+		}
 		else
+		{
+			// Calculate grants for children, removing current link
 			dummyEntity = getRoleEntityDao().load(rol.getId());
+			for (RoleDependencyEntity containedRole: dummyEntity.getContainedRoles())
+			{
+				containedRole.getContained().getContainerRoles().remove(containedRole);
+				findEffectiveRoleGrantsRecursively(dummyEntity, null, dummyEntity, radSet);				
+			}
+		}
 		getRoleEntityDao().roleToEntity(rol, dummyEntity, true);
 
 		dummyEntity.getContainedRoles().clear();
@@ -2450,36 +2536,7 @@ public class ApplicationServiceImpl extends
 			dummyEntity.getContainerGroups().add(rge );
 		}
 		
-		
-		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-				
-		populateParentGrantsForRol(radSet, dummyEntity, null);
-		for (RolAccountDetail rad : radSet) {
-            RoleGrant grant;
-            if (rad.rolAccount != null) 
-            	grant = getRoleAccountEntityDao().toRoleGrant(rad.rolAccount); 
-            else if (rad.rolRol != null) 
-            {
-                grant = getRoleDependencyEntityDao().toRoleGrant(rad.rolRol);
-                if (rad.qualifier != null) 
-                	grant.setDomainValue(rad.qualifier.getValue()); 
-                else if (rad.qualifierAplicacio != null) 
-                	grant.setDomainValue(rad.qualifierAplicacio.getName()); 
-                else if (rad.qualifierGroup != null) 
-                	grant.setDomainValue(rad.qualifierGroup.getName());
-            } 
-            else grant = getRoleGroupEntityDao().toRoleGrant(rad.rolGrup);
-            if (rad.account != null) {
-                grant.setOwnerAccountName(rad.account.getName());
-                grant.setOwnerSystem(rad.account.getSystem().getName());
-                if (rad.account.getType().equals(AccountType.USER)) {
-                    for (UserAccountEntity ua : rad.account.getUsers()) {
-                        grant.setUser(ua.getUser().getUserName());
-                    }
-                }
-            }
-            rg.add(grant);
-        }
+		findEffectiveRoleGrantsRecursively(dummyEntity, null, dummyEntity, radSet);
 	}
 
 	private RoleGroupEntity toRoleGroupEntity(RoleGrant granteeGroup, RoleEntity dummyEntity) {
@@ -2497,6 +2554,8 @@ public class ApplicationServiceImpl extends
 		getRoleDependencyEntityDao().roleGrantToEntity(source, target, true);
 		target.setContained( getRoleEntityDao().load(source.getRoleId()));
 		target.setContainer(dummyEntity);
+		target.setMandatory(source.getMandatory());
+		target.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
 		
 		assignRoleDependencyDomainValue(source, target);
 
@@ -2508,6 +2567,8 @@ public class ApplicationServiceImpl extends
 		getRoleDependencyEntityDao().roleGrantToEntity(source, target, true);
 		target.setContainer( getRoleEntityDao().load(source.getOwnerRole()));
 		target.setContained(dummyEntity);
+		target.setMandatory(source.getMandatory());
+		target.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
 		
 		assignRoleDependencyDomainValue(source, target);
 

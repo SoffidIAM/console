@@ -26,7 +26,9 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.TipusContenidorRol;
 
+import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
 
@@ -35,6 +37,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.hibernate.Hibernate;
 
 /**
  * @see es.caib.seycon.ng.model.RolAssociacioRolEntity
@@ -209,5 +213,137 @@ public class RoleDependencyEntityDaoImpl extends
         	target.setStatus(source.getStatus());
         target.setMandatory(source.getMandatory());
     }
+
+	@Override
+	public void roleGrantToEntity(RoleGrant grant, RoleDependencyEntity entity, boolean copyIfNull) {
+        RoleEntity ownerRole = grant.getOwnerRole() == null ? null: getRoleEntityDao().load (grant.getOwnerRole()); 
+        RoleEntity ownedRole = grant.getRoleId() == null ? null: getRoleEntityDao().load (grant.getRoleId()); 
+	        
+        entity.setContained(ownedRole);
+        entity.setContainer(ownerRole);
+ 
+        try {
+			assignDomainValue(entity, grant, ownedRole,
+					ownerRole);
+ 
+			assignGranteeDomainValue(entity, grant, ownedRole,
+					ownerRole);
+		} catch (InternalErrorException e) {
+			throw new RuntimeException (e);
+		}
+ 
+        if ( Hibernate.isInitialized(ownedRole.getContainerRoles()))
+        	ownedRole.getContainerRoles().add(entity);
+        
+        if ( Hibernate.isInitialized(ownerRole.getContainedRoles()))
+        	ownerRole.getContainedRoles().add(entity);
+ 
+	}
+
+	public void handleAssignDomainValue(RoleDependencyEntity rare,
+			RoleGrant currentPare, com.soffid.iam.model.RoleEntity grantedRole,
+			RoleEntity granteeRole) {
+		// Añadimos la relación con el padre
+		if (granteeRole != null) {
+			// Podemos tener dos casos: que el Role no tenga Dominio
+			// o que si tenga
+			String tipusDominiAsoc = grantedRole.getDomainType();
+			// Primer mirem que no siga sense valor domini (si té
+			// valor de domini)
+			if (currentPare.getDomainValue() == null
+					|| currentPare.getDomainValue().trim().length() == 0
+					|| tipusDominiAsoc == null
+					|| TipusDomini.SENSE_DOMINI.equals(tipusDominiAsoc)) {
+			} else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
+					|| TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
+				GroupEntity grupAsoc = getGroupEntityDao().findByName(
+						currentPare.getDomainValue());
+				if (grupAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.14"), //$NON-NLS-1$
+							currentPare.getDomainValue()));
+				}
+				rare.setDomainGroup(grupAsoc);
+			} else if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
+				InformationSystemEntity appAsoc = getInformationSystemEntityDao()
+						.findByCode(currentPare.getDomainValue());
+				if (appAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.15"), //$NON-NLS-1$
+							currentPare.getDomainValue()));
+				}
+				rare.setDomainApplication(appAsoc);
+			} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
+				DomainValueEntity valdomAsoc = getDomainValueEntityDao()
+						.findByRoleAndValue(grantedRole.getId(),
+								currentPare.getDomainValue());
+				if (valdomAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.16"),
+							granteeRole.getApplicationDomain().getName(),
+							currentPare.getDomainValue()));
+				}
+				rare.setDomainApplicationValue(valdomAsoc);
+			}
+		} else {
+			throw new SeyconException(String.format(
+					Messages.getString("RoleEntityDaoImpl.17"),
+					currentPare.getOwnerRoleName(), currentPare.getOwnerRole(),
+					currentPare.getOwnerSystem()));
+		}
+	}
+
+	public void handleAssignGranteeDomainValue(RoleDependencyEntity rare,
+			RoleGrant grant, com.soffid.iam.model.RoleEntity grantedRole,
+			RoleEntity granteeRole) {
+		// Añadimos la relación con el padre
+		if (granteeRole != null) {
+			// Podemos tener dos casos: que el Role no tenga Dominio
+			// o que si tenga
+			String tipusDominiAsoc = granteeRole.getDomainType();
+			// Primer mirem que no siga sense valor domini (si té
+			// valor de domini)
+			if (grant.getOwnerRolDomainValue() == null
+					|| grant.getOwnerRolDomainValue().trim().length() == 0
+					|| tipusDominiAsoc == null
+					|| TipusDomini.SENSE_DOMINI.equals(tipusDominiAsoc)) {
+			} else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
+					|| TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
+				GroupEntity grupAsoc = getGroupEntityDao().findByName(
+						grant.getOwnerRolDomainValue());
+				if (grupAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.14"), //$NON-NLS-1$
+							grant.getDomainValue()));
+				}
+				rare.setGranteeGroupDomain(grupAsoc);
+			} else if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
+				InformationSystemEntity appAsoc = getInformationSystemEntityDao()
+						.findByCode(grant.getOwnerRolDomainValue());
+				if (appAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.15"), //$NON-NLS-1$
+							grant.getDomainValue()));
+				}
+				rare.setGranteeApplicationDomain(appAsoc);
+			} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
+				DomainValueEntity valdomAsoc = getDomainValueEntityDao()
+						.findByRoleAndValue(granteeRole.getId(),
+								grant.getOwnerRolDomainValue());
+				if (valdomAsoc == null) {
+					throw new SeyconException(String.format(
+							Messages.getString("RoleEntityDaoImpl.16"),
+							grantedRole.getApplicationDomain().getName(),
+							grant.getDomainValue()));
+				}
+				rare.setGranteeDomainValue(valdomAsoc);
+			}
+		} else {
+			throw new SeyconException(String.format(
+					Messages.getString("RoleEntityDaoImpl.17"),
+					grant.getOwnerRoleName(), grant.getOwnerRole(),
+					grant.getOwnerSystem()));
+		}
+	}
 
 }

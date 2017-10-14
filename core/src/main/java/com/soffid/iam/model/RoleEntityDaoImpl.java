@@ -362,26 +362,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	 
 	private void createRoleDependency(RoleGrant grant) throws InternalErrorException, BPMException {
 		StringBuffer path = new StringBuffer();
-        RoleEntity ownerRole = load (grant.getOwnerRole()); 
+
+		RoleEntity ownerRole = load (grant.getOwnerRole()); 
         RoleEntity ownedRole = load (grant.getRoleId()); 
         
         if (checkNoCycles( grant, path)) {
         	RoleDependencyEntity entity = getRoleDependencyEntityDao().newRoleDependencyEntity();
         	
-	        entity.setContained(ownedRole);
-	        entity.setContainer(ownerRole);
-	 
-	        assignDomainValue(entity, grant, ownedRole,
-            		ownerRole);
-	 
-            assignGranteeDomainValue(entity, grant, ownedRole,
-            		ownerRole);
-	 
-            if ( Hibernate.isInitialized(ownedRole.getContainerRoles()))
-            	ownedRole.getContainerRoles().add(entity);
-            
-            if ( Hibernate.isInitialized(ownerRole.getContainedRoles()))
-            	ownerRole.getContainedRoles().add(entity);
+        	getRoleDependencyEntityDao().roleGrantToEntity(grant, entity, true);
 	 
             if (startApprovalProcess(ownerRole))
             	entity.setStatus(RoleDependencyStatus.STATUS_TOAPPROVE);
@@ -807,33 +795,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 	}
 
-	private void updateEntityGranteeRoles(com.soffid.iam.api.Role sourceVO,
-			com.soffid.iam.model.RoleEntity targetEntity) {
-		Collection<RoleDependencyEntity> rolAssociacioRolSocContingut = new HashSet<RoleDependencyEntity>();
-		// Los que somos el contenedor (socContenidor) no aparece en el VO
-		if (sourceVO.getOwnerRoles() != null) {
-			// Creamos las relaciones nuevas
-			for (Iterator<RoleGrant> iterator = sourceVO.getOwnerRoles()
-					.iterator(); iterator.hasNext();) {
-				RoleGrant currentGrant = iterator.next();
-				if (currentGrant != null) {
-					RoleEntity RoleEntityFound = load(currentGrant
-							.getOwnerRole());
-					RoleDependencyEntity rare = getRoleDependencyEntityDao()
-							.newRoleDependencyEntity();
-					rare.setContained(targetEntity);
-					rare.setContainer(RoleEntityFound);
-					assignDomainValue(rare, currentGrant, targetEntity,
-							RoleEntityFound);
-					assignGranteeDomainValue(rare, currentGrant, targetEntity,
-							RoleEntityFound);
-					rolAssociacioRolSocContingut.add(rare);
-				}
-			}
-			targetEntity.setContainerRoles(rolAssociacioRolSocContingut);
-		}
-	}
-
 	private void updateEntityGranteeGroups(com.soffid.iam.api.Role sourceVO,
 			com.soffid.iam.model.RoleEntity targetEntity) {
 		Collection<Group> grupsPosseidors = sourceVO.getOwnerGroups();
@@ -929,111 +890,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 	}
 
-	private void assignDomainValue(RoleDependencyEntity rare,
-			RoleGrant currentPare, com.soffid.iam.model.RoleEntity grantedRole,
-			RoleEntity granteeRole) {
-		// Añadimos la relación con el padre
-		if (granteeRole != null) {
-			// Podemos tener dos casos: que el Role no tenga Dominio
-			// o que si tenga
-			String tipusDominiAsoc = grantedRole.getDomainType();
-			// Primer mirem que no siga sense valor domini (si té
-			// valor de domini)
-			if (currentPare.getDomainValue() == null
-					|| currentPare.getDomainValue().trim().length() == 0
-					|| tipusDominiAsoc == null
-					|| TipusDomini.SENSE_DOMINI.equals(tipusDominiAsoc)) {
-			} else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
-					|| TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
-				GroupEntity grupAsoc = getGroupEntityDao().findByName(
-						currentPare.getDomainValue());
-				if (grupAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.14"), //$NON-NLS-1$
-							currentPare.getDomainValue()));
-				}
-				rare.setDomainGroup(grupAsoc);
-			} else if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
-				InformationSystemEntity appAsoc = getInformationSystemEntityDao()
-						.findByCode(currentPare.getDomainValue());
-				if (appAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.15"), //$NON-NLS-1$
-							currentPare.getDomainValue()));
-				}
-				rare.setDomainApplication(appAsoc);
-			} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
-				DomainValueEntity valdomAsoc = getDomainValueEntityDao()
-						.findByRoleAndValue(grantedRole.getId(),
-								currentPare.getDomainValue());
-				if (valdomAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.16"),
-							granteeRole.getApplicationDomain().getName(),
-							currentPare.getDomainValue()));
-				}
-				rare.setDomainApplicationValue(valdomAsoc);
-			}
-		} else {
-			throw new SeyconException(String.format(
-					Messages.getString("RoleEntityDaoImpl.17"),
-					currentPare.getOwnerRoleName(), currentPare.getOwnerRole(),
-					currentPare.getOwnerSystem()));
-		}
-	}
-
-	private void assignGranteeDomainValue(RoleDependencyEntity rare,
-			RoleGrant grant, com.soffid.iam.model.RoleEntity grantedRole,
-			RoleEntity granteeRole) {
-		// Añadimos la relación con el padre
-		if (granteeRole != null) {
-			// Podemos tener dos casos: que el Role no tenga Dominio
-			// o que si tenga
-			String tipusDominiAsoc = granteeRole.getDomainType();
-			// Primer mirem que no siga sense valor domini (si té
-			// valor de domini)
-			if (grant.getOwnerRolDomainValue() == null
-					|| grant.getOwnerRolDomainValue().trim().length() == 0
-					|| tipusDominiAsoc == null
-					|| TipusDomini.SENSE_DOMINI.equals(tipusDominiAsoc)) {
-			} else if (TipusDomini.GRUPS.equals(tipusDominiAsoc)
-					|| TipusDomini.GRUPS_USUARI.equals(tipusDominiAsoc)) {
-				GroupEntity grupAsoc = getGroupEntityDao().findByName(
-						grant.getOwnerRolDomainValue());
-				if (grupAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.14"), //$NON-NLS-1$
-							grant.getDomainValue()));
-				}
-				rare.setGranteeGroupDomain(grupAsoc);
-			} else if (TipusDomini.APLICACIONS.equals(tipusDominiAsoc)) {
-				InformationSystemEntity appAsoc = getInformationSystemEntityDao()
-						.findByCode(grant.getOwnerRolDomainValue());
-				if (appAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.15"), //$NON-NLS-1$
-							grant.getDomainValue()));
-				}
-				rare.setGranteeApplicationDomain(appAsoc);
-			} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDominiAsoc)) {
-				DomainValueEntity valdomAsoc = getDomainValueEntityDao()
-						.findByRoleAndValue(granteeRole.getId(),
-								grant.getOwnerRolDomainValue());
-				if (valdomAsoc == null) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.16"),
-							grantedRole.getApplicationDomain().getName(),
-							grant.getDomainValue()));
-				}
-				rare.setGranteeDomainValue(valdomAsoc);
-			}
-		} else {
-			throw new SeyconException(String.format(
-					Messages.getString("RoleEntityDaoImpl.17"),
-					grant.getOwnerRoleName(), grant.getOwnerRole(),
-					grant.getOwnerSystem()));
-		}
-	}
 
 	private ApplicationDomainEntity findDominiByNomAndCodiApliacio(String nom,
 			String codiAplicacio) {

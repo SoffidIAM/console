@@ -145,15 +145,18 @@
 					model.commit();
 					es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(
 							esquema.getFellow("lista").getFellow("listbox").getSelectedItem());
-					Long idUsuari = (Long) es.caib.zkib.datasource.XPathUtils.getValue(bindCtx, "@id");
-					
-					if(idUsuari != null)
-					{				
-						esquema.getFellow("dades").getFellow("form").getFellow("panels").getFellow("basica")
-							.getFellow("codi").setDisabled(true);
-						esquema.getFellow("dades").getFellow("form").getJXPathContext().getPointer("@dataDarreraModificacioUsuari").invalidate();
+					if (bindCtx != null)
+					{
+						Long idUsuari = (Long) es.caib.zkib.datasource.XPathUtils.getValue(bindCtx, "@id");
+						
+						if(idUsuari != null)
+						{				
+							esquema.getFellow("dades").getFellow("form").getFellow("panels").getFellow("basica")
+								.getFellow("codi").setDisabled(true);
+							esquema.getFellow("dades").getFellow("form").getJXPathContext().getPointer("@dataDarreraModificacioUsuari").invalidate();
+						}
+						event.stopPropagation();
 					}
-					event.stopPropagation();
 				}
 				/*boolean launchVNC(Long sessioId)
 				 {
@@ -1242,9 +1245,17 @@
 										if="${canUpdateUserMetadata}" width="98%">
 										<attribute name="onNewRow">
 										<![CDATA[
-										    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
-										    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
-										    	event.data.setVisible(false);
+										       
+										    try 
+										    {
+											    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
+											    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
+											    	event.data.setVisible(false);
+										    }
+										    catch (Exception e)
+										    {
+										    	// Received event on detached element
+										    }
 										]]>
 										</attribute>
 										<columns>
@@ -1558,20 +1569,23 @@
 											es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils
 													.getComponentContext(r);
 											try {
-												instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
-												if (instance instanceof Account) {
-													disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
-															"/@disabled");
-													if (disabled != null && disabled) {
-														it = r.getChildren().iterator();
-														while (it.hasNext()) {
-															Component c = it.next();
-															if (c instanceof HtmlBasedComponent) {
-																c.setStyle("text-decoration:line-through;");
+												if (r != null)
+												{
+													Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
+													if (instance instanceof Account) {
+														disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
+																"/@disabled");
+														if (disabled != null && disabled) {
+															it = r.getChildren().iterator();
+															while (it.hasNext()) {
+																Component c = it.next();
+																if (c instanceof HtmlBasedComponent) {
+																	c.setStyle("text-decoration:line-through;");
+																}
 															}
 														}
+														checkIsUpdatePending(r.treerow);
 													}
-													checkIsUpdatePending(r.treerow);
 												}
 											} catch (Throwable e) {}
 										}
@@ -1579,30 +1593,33 @@
 											try{
 												es.caib.zkib.binder.BindContext ctx = XPathUtils
 													.getComponentContext(item);
-												es.caib.zkib.datamodel.DataNode dn = XPathUtils.getValue(ctx, ".");
-												if (dn != null) {
-													Account acc = dn.getInstance();
-													if (acc != null && acc.getId() != null)
-													{
-														es.caib.seycon.ng.servei.AccountService accountService = es.caib.seycon.ng.ServiceLocator
-															.instance().getAccountService();
-													
-														Treerow treeitem = item;
-														Image img = treeitem.getChildren().get(1).getChildren().get(0)
-																.getChildren().get(2);
-														img.setVisible(accountService.isUpdatePending(acc));
+												if (ctx != null)
+												{
+													es.caib.zkib.datamodel.DataNode dn = XPathUtils.getValue(ctx, ".");
+													if (dn != null) {
+														Account acc = dn.getInstance();
+														if (acc != null && acc.getId() != null)
+														{
+															es.caib.seycon.ng.servei.AccountService accountService = es.caib.seycon.ng.ServiceLocator
+																.instance().getAccountService();
 														
-														es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
-														
-														String prefix = ctx.getXPath();
-														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
-																XPathUtils.concat(prefix, "/@lastUpdated")));
-														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
-																XPathUtils.concat(prefix, "/@lastLogin")));
-														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
-																XPathUtils.concat(prefix, "/@lastPasswordSet")));
-														ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
-																XPathUtils.concat(prefix, "/@passwordExpiration")));
+															Treerow treeitem = item;
+															Image img = treeitem.getChildren().get(1).getChildren().get(0)
+																	.getChildren().get(2);
+															img.setVisible(accountService.isUpdatePending(acc));
+															
+															es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
+															
+															String prefix = ctx.getXPath();
+															ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																	XPathUtils.concat(prefix, "/@lastUpdated")));
+															ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																	XPathUtils.concat(prefix, "/@lastLogin")));
+															ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																	XPathUtils.concat(prefix, "/@lastPasswordSet")));
+															ds.sendEvent(new es.caib.zkib.events.XPathRerunEvent(ds,
+																	XPathUtils.concat(prefix, "/@passwordExpiration")));
+														}
 													}
 												}
 											}catch(Exception e){
@@ -2020,7 +2037,9 @@ void actualitza (event) {
 									void newRolRow ()
 									{
 										List listcells = event.data.getChildren ();
-										ctx = XPathUtils.getComponentContext(event.data);
+										es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.data);
+										if (ctx == null)
+											return;
 										Long rule = XPathUtils.getValue(ctx, "@ruleId");
 										if (rule != null)
 										{

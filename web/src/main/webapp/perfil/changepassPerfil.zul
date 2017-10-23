@@ -92,6 +92,7 @@
 												org.zkoss.util.resource
 													.Labels.getLabel("changepassPerfil.CanviPWD")))
 									{
+										es.caib.zkib.zkiblaf.Application.setPage("/perfil.zul");
 //										logout();
 									}
 								}

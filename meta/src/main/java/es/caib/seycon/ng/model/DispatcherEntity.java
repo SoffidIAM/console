@@ -45,6 +45,10 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.lang.String url;
 
+	@Column (name="DIS_URL2", length=500)
+	@Nullable
+	public java.lang.String url2;
+
 	@Column (name="DIS_PARAM0", length=500)
 	@Nullable
 	public java.lang.String param0;
@@ -187,7 +191,7 @@ public abstract class DispatcherEntity {
 	@DaoFinder("from com.soffid.iam.model.SystemEntity se "
 			+ "where (:name is null or se.name like :name) and "
 			+ "(:className is null or se.className like :className) and "
-			+ "(:url is null or se.url like :url) and "
+			+ "(:url is null or upper(url) like upper(:url) or upper(url2) like upper(:url)) and\n"
 			+ "(:roleBased is null or se.roleBased = :roleBased) and "
 			+ "(:trusted is null or se.trusted = :trusted) and "
 			+ "(:active is null or se.url is not null) and "

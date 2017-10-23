@@ -661,6 +661,7 @@
 						}
 						
 						detall_url.setDisabled(isReplica);
+						detall_url2.setDisabled(isReplica);
 						detall_segur.setDisabled (isReplica);
 						detall_readonly.setDisabled(isReplica);
 						detall_basatRols.setDisabled(isReplica);
@@ -1106,19 +1107,32 @@
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Server')}"/>
 								<div width="90%">
+									<div>
+										<listbox
+											disabled="${!canModifyAgent}"
+											width="40%"
+											bind="@url" mold="select"
+											dataPath="/model:/serverSelector"
+											id="detall_url"
+											style="margin-right: 2em">
+											<dataitem bind="@url">
+												<listcell bind="@nom"/>
+											</dataitem>
+										</listbox>
+										<label value=" ${c:l('agents.zul.sharedThread')}:" />
+										<checkbox bind="@sharedDispatcher" />
+									</div>
 									<listbox
 										disabled="${!canModifyAgent}"
 										width="40%"
-										bind="@url" mold="select"
+										bind="@url2" mold="select"
 										dataPath="/model:/serverSelector"
-										id="detall_url"
+										id="detall_url2"
 										style="margin-right: 2em">
 										<dataitem bind="@url">
 											<listcell bind="@nom"/>
 										</dataitem>
 									</listbox>
-									<label value=" ${c:l('agents.zul.sharedThread')}:" />
-									<checkbox bind="@sharedDispatcher" />
 								</div>
 							</row>
 							<row>

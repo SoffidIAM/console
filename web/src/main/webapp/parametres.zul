@@ -418,5 +418,6 @@
 			</tabpanel>
 		</tabpanels>
 	</tabbox>
+
 	<include src="xarxesllista.zul"/>
 </zk>

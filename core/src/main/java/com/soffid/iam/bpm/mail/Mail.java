@@ -215,10 +215,22 @@ public class Mail implements ActionHandler {
 					ch = reader.read ();
 				}
 				
+				text = buffer.toString();
 				InternetAddress recipient = getUserAddress(usuari);
 				if (recipient != null)
 				{
-					send(from, Collections.singleton(recipient), evaluate(subject), evaluate (buffer.toString()));
+					String fromDescription = null;
+					String sender = Security.getCurrentUser();
+					if (sender != null)
+					{
+						Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+						if (u != null)
+							fromDescription = u.getFullName();
+					}
+					send(from, 
+							Collections.singleton(recipient), 
+							evaluate(subject, recipient.getPersonal(), fromDescription), 
+							evaluate (text, recipient.getPersonal(), fromDescription));
 				}
 			}
 		} finally {
@@ -276,20 +288,22 @@ public class Mail implements ActionHandler {
 			String subject, String text) throws Exception {
 		
 		debug(String.format(Messages.getString("Mail.SendingMailMessage"), targetAddresses, subject)); //$NON-NLS-1$
-
-		MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
+		if (text != null && ! text.isEmpty())
+			MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
 	}
 
 
 
-	String evaluate(String expression) {
+	String evaluate(String expression, String from, String to) {
 		if (expression == null) {
 			return null;
 		}
 		VariableResolver variableResolver = JbpmExpressionEvaluator
 				.getUsedVariableResolver();
 		if (variableResolver != null) {
-			variableResolver = new MailVariableResolver(System.getProperties(),
+			variableResolver = new MailVariableResolver(
+					from, to,
+					System.getProperties(),
 					variableResolver);
 		}
 		return (String) JbpmExpressionEvaluator.evaluate(expression,
@@ -307,7 +321,7 @@ public class Mail implements ActionHandler {
 				Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL,
 				Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL});
 		try {
-			String realTo = evaluate(to);
+			String realTo = evaluate(to, null, null);
 			if (realTo != null)
 			{
 				Set<InternetAddress> users = new HashSet<InternetAddress>();
@@ -336,12 +350,26 @@ public class Mail implements ActionHandler {
 					content = subject;
 				}
 
-				send(from, users, evaluate(subject), evaluate (text));
+				for (InternetAddress user: users)
+				{
+					String fromDescription = null;
+					String sender = Security.getCurrentUser();
+					if (sender != null)
+					{
+						Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+						if (u != null)
+							fromDescription = u.getFullName();
+					}
+					send(from, 
+							Collections.singleton(user), 
+							evaluate(subject, user.getPersonal(), fromDescription), 
+							evaluate (text, user.getPersonal(), fromDescription));
+				}
 			}
 			if (actors != null)
 			{
 				Set<String> users = new HashSet<String>();
-				for (String t: evaluate(actors).split("[, ]+"))
+				for (String t: evaluate(actors, null, null).split("[, ]+"))
 				{
 					if ( ! t.isEmpty())
 						users.addAll( getNameUsers(t));
@@ -373,7 +401,18 @@ public class Mail implements ActionHandler {
 							content = subject;
 						}
 
-						send(from, Collections.singleton(recipient), evaluate(subject), evaluate (content));
+						String fromDescription = null;
+						String sender = Security.getCurrentUser();
+						if (sender != null)
+						{
+							Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+							if (u != null)
+								fromDescription = u.getFullName();
+						}
+						send(from, 
+								Collections.singleton(recipient), 
+								evaluate(subject, recipient.getPersonal(), fromDescription), 
+								evaluate (content, recipient.getPersonal(), fromDescription));
 					}
 				}
 			}
@@ -387,11 +426,18 @@ public class Mail implements ActionHandler {
 		private static final long serialVersionUID = 1L;
 		Map templateVariables = null;
 		VariableResolver variableResolver = null;
+		private String to;
+		private String from;
 
-		public MailVariableResolver(Map templateVariables,
+		public MailVariableResolver(
+				String from,
+				String to,
+				Map templateVariables,
 				VariableResolver variableResolver) {
 			this.templateVariables = templateVariables;
 			this.variableResolver = variableResolver;
+			this.from = from;
+			this.to = to;
 		}
 
 		public Object resolveVariable(String pName) throws ELException {
@@ -401,6 +447,10 @@ public class Mail implements ActionHandler {
 			}
 			if (pName.equals("systemProperties"))
 				return System.getProperties();
+			else if (pName.equals("from"))
+				return from;
+			else if (pName.equals("to"))
+				return to;
 			else
 				return variableResolver.resolveVariable(pName);
 		}

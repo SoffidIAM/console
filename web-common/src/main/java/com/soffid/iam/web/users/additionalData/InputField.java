@@ -596,7 +596,7 @@ public class InputField extends Div implements XPathSubscriber
 				//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			// Ignore
 		} finally {
 			disableRecursive = false;

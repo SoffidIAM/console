@@ -754,11 +754,12 @@ public class SAMLServiceInternal {
     	if (metadataIdp == null)
     		throw new InternalErrorException("Identity provider ID is not configured");
     	
-    	HTTPMetadataResolver r = resolver.get(tenant);
+    	String entryName = tenant + " " + metadataUrl + " " + metadataIdp;
+    	HTTPMetadataResolver r = resolver.get(entryName);
     	if ( r == null)
     	{
     		r = configureMetadataResolver(metadataUrl, metadataCache);
-    		resolver.put(tenant, r);
+    		resolver.put(entryName, r);
     	}
     	
     	CriteriaSet criteria = new CriteriaSet();
@@ -982,12 +983,9 @@ public class SAMLServiceInternal {
     		throw new InternalErrorException("Metadata URL is not configured");
     	
     	String tenant = com.soffid.iam.utils.Security.getCurrentTenantName();
-		HTTPMetadataResolver r = resolver.get(tenant);
-    	if ( r == null)
-    	{
-    		r = configureMetadataResolver(metadataUrl, metadataCache);
-    		resolver.put(tenant, r);
-    	}
+
+    	HTTPMetadataResolver r = configureMetadataResolver(metadataUrl, metadataCache);
+
     	CriteriaSet criteria = new CriteriaSet();
     	String metadataIdp = ConfigurationCache.getProperty("soffid.saml.idp");
     	criteria.add( new EvaluableEntityDescriptorCriterion() {
@@ -1001,6 +999,7 @@ public class SAMLServiceInternal {
 		{
 			ids.add(ed.getEntityID());
 		}
+		r.destroy();
     	return ids;
 	}
 	

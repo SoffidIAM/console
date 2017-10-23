@@ -1,5 +1,6 @@
 package com.soffid.iam.web.component;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Textbox;
@@ -138,13 +140,41 @@ public class SearchBox extends HtmlBasedComponent {
 		{
 			if (parent instanceof Esquema)
 			{
-				if (show) ((Esquema) parent).showFormulari();
-				else ((Esquema) parent).hideFormulari();
+				if (show)
+					((Esquema) parent).showFormulari();
+				else 
+					((Esquema) parent).hideFormulari();
+				selectFirstRow(parent);
 			}
 			if (parent instanceof EsquemaVertical)
 			{
-				if (show) ((EsquemaVertical) parent).showFormulari();
-				else ((EsquemaVertical) parent).hideFormulari();
+				if (show)
+					((EsquemaVertical) parent).showFormulari();
+				else 
+					((EsquemaVertical) parent).hideFormulari();
+				selectFirstRow(parent);
+			}
+		}
+	}
+
+	private void selectFirstRow(Component parent) {
+		if (parent.getChildren().size() >= 2)
+		{
+			Component listHolder = (Component) parent.getChildren().get(1);
+			if (listHolder != null)
+			{
+				for (Component navigator: (Collection<Component>)listHolder.getChildren())
+				{
+					Component c = navigator.getFellowIfAny("listbox");
+					if (c instanceof Listbox)
+					{
+						Listbox lb = (Listbox) c;
+						if (lb.getItemCount() > 0 && lb.getSelectedItem() == null)
+						{
+							lb.setSelectedIndex(0);
+						}
+					}
+				}
 			}
 		}
 	}

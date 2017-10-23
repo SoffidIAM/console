@@ -28,7 +28,10 @@ public class EventThreadInit extends TomeeThreadInit {
 	@Override
 	public boolean init(Component comp, Event event) throws Exception {
 		super.init(comp, event);
-		ejb.setSession(cacheSession);
+		if (cacheSession == null)
+			ejb.clearSession();
+		else
+			ejb.setSession(cacheSession);
 		if (currentIdentity != null)
 		{
 			Security.nestedLogin(currentIdentity);

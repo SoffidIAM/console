@@ -119,8 +119,21 @@ public class WorkflowInterceptor implements Filter {
 					} finally {
 						Security.nestedLogoff();
 					}
-				} else
+				} 
+				else if (principal == null)
+				{
+					String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+					Security.nestedLogin(tenant, "anonymous", new String[0]);
+					try {
+						filter.doFilter(request, response);
+					} finally {
+						Security.nestedLogoff();
+					}
+				}
+				else
+				{
 					filter.doFilter(request, response);
+				}
 
 			} catch (Exception e) {
 				throw new ServletException(

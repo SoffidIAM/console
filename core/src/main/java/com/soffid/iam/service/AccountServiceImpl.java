@@ -300,7 +300,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return account.getOwnerRoles();
 	}
 
-	private boolean updateAcl(AccountEntity acc, com.soffid.iam.api.Account account) {
+	private boolean updateAcl(AccountEntity acc, com.soffid.iam.api.Account account) 
 	{
 		boolean anyChange = false;
 		
@@ -372,8 +372,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 }
             }
         }
-	// Add new groups
-	for (int index = 0; index < levels.length; index++) {
+		// Add new groups
+		for (int index = 0; index < levels.length; index++) {
             for (Group g : newgrups[index]) {
                 GroupEntity ge = getGroupEntityDao().load(g.getId());
                 if (ge != null) {
@@ -504,7 +504,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
 				ae.isDisabled() != account.isDisabled() ||
 				(ae.getLoginUrl() == null ? account.getLoginUrl() != null : ! ae.getLoginUrl().equals(account.getLoginUrl())) ||
-				! ae.getPasswordPolicy().getCodi().equals(account.getPasswordPolicy()))
+				! ae.getPasswordPolicy().getName().equals(account.getPasswordPolicy()))
 			anyChange = true;
 		
 		getAccountEntityDao().accountToEntity(account, ae, false);

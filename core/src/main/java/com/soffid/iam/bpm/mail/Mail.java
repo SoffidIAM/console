@@ -223,7 +223,7 @@ public class Mail implements ActionHandler {
 					String sender = Security.getCurrentUser();
 					if (sender != null)
 					{
-						Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+						User u = ServiceLocator.instance().getUserService().findUserByUserName(sender);
 						if (u != null)
 							fromDescription = u.getFullName();
 					}
@@ -356,7 +356,7 @@ public class Mail implements ActionHandler {
 					String sender = Security.getCurrentUser();
 					if (sender != null)
 					{
-						Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+						User u = ServiceLocator.instance().getUserService().findUserByUserName(sender);
 						if (u != null)
 							fromDescription = u.getFullName();
 					}
@@ -405,7 +405,7 @@ public class Mail implements ActionHandler {
 						String sender = Security.getCurrentUser();
 						if (sender != null)
 						{
-							Usuari u = ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(sender);
+							User u = ServiceLocator.instance().getUserService().findUserByUserName(sender);
 							if (u != null)
 								fromDescription = u.getFullName();
 						}

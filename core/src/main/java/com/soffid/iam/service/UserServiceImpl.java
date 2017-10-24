@@ -425,7 +425,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if ( usuari.getActive().booleanValue())
 		{
 			auditChange("E", usuari.getUserName(), null);
-			getRuleEvaluatorService().applyRules(usuariEntity);
 		}
 		getRuleEvaluatorService().applyRules(usuariEntity);
 

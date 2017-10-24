@@ -169,7 +169,7 @@
 			</div>
 			<separator spacing="5px" />
 			<hbox style="margin-left:auto; margin-right:auto">
-				<button label="${c:l('vault.details)')}"
+				<button label="${c:l('vault.details')}"
 					onClick="doQuery()" />
 				<button label="${c:l('user_renameaccount.Accept')}"
 					onClick="onChange()" />

@@ -24,6 +24,7 @@ import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.service.GroupService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.ServiceLocator;
@@ -138,7 +139,8 @@ public class Mail implements ActionHandler {
 	}
 
 	public void initialize() {
-		from = System.getProperty("mail.from", "no-reply@soffid.com");
+		from = ConfigurationCache.getProperty("mail.from");
+		if (from == null) from = "no-reply@soffid.com";
 	}
 
 	public Mail() {
@@ -168,10 +170,12 @@ public class Mail implements ActionHandler {
 		
 		if (Event.EVENTTYPE_TASK_ASSIGN.equals(getTemplate()) )
 		{
-			if (executionContext.getTask() != null)
+			if (executionContext.getTask() != null && 
+					executionContext.getTaskInstance().getActorId() == null &&
+					executionContext.getTaskInstance().getPooledActors().isEmpty() )
 				executionContext.getTaskInstance().assign(executionContext);
-
-    		sendPredefinedMail("Mail.4");
+			else
+				sendPredefinedMail("Mail.4");
 		} 
 		else if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
 		{

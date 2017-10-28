@@ -451,37 +451,50 @@ public class DeployerBean implements DeployerService {
 
 	protected void extractWebServiceAddon(String name, String originalName, InputStream binaryStream)
 			throws Exception {
+		File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
+		log.info("Generating web service file " + coreFile);
+		FileOutputStream out = new FileOutputStream(coreFile);
+		boolean ejb = false;
+		byte b[] = new byte[4096];
+		int read;
+		while ((read = binaryStream.read(b)) > 0) {
+			out.write(b, 0, read);
+		}
+		out.close();
 
-		if (originalName.endsWith(".aar"))
+		// Search for services.xml file
+		boolean axisService = false;
+		ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
+		ZipEntry entry;
+		while ((entry = zin.getNextEntry()) != null) {
+			if (entry.getName().equals("META-INF/services.xml") ||
+					entry.getName().equals("META-INF\\services.xml") )
+				axisService = true;
+		}
+		zin.close();
+		
+		if ( axisService)
 		{
 			File wsFile = new File(new File (removeExtension(webserviceWarFile.getPath())),
 					"WEB-INF/services/plugin-" + name + ".aar"); //$NON-NLS-1$ //$NON-NLS-2$
 	
-			log.info("Generating webservice file " + wsFile);
-			FileOutputStream out = new FileOutputStream(wsFile);
-			byte b[] = new byte[4096];
-			int read;
-			while ((read = binaryStream.read(b)) > 0) {
-				out.write(b, 0, read);
+			log.info("Moving to " + wsFile);
+			FileOutputStream out2 = new FileOutputStream(wsFile);
+			FileInputStream in2 = new FileInputStream (coreFile);
+			while ((read = in2.read(b)) > 0) {
+				out2.write(b, 0, read);
 			}
-			out.close();
+			out2.close();
+			in2.close();
+			
+			coreFile.delete();
 		}
 		else
 		{
 			File classesDir = new File(new File (removeExtension(webserviceWarFile.getPath())),
 					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
-			File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
-			log.info("Generating web service file " + coreFile);
-			FileOutputStream out = new FileOutputStream(coreFile);
-			boolean ejb = false;
-			byte b[] = new byte[4096];
-			int read;
-			while ((read = binaryStream.read(b)) > 0) {
-				out.write(b, 0, read);
-			}
-			out.close();
-			ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
-			ZipEntry entry;
+			log.info("Extracting to " + classesDir);
+			zin = new ZipInputStream( new FileInputStream(coreFile));
 			while ((entry = zin.getNextEntry()) != null) {
 				File f = new File(classesDir, entry.getName());
 				if (entry.isDirectory()) {

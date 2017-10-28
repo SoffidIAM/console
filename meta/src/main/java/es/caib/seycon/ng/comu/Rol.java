@@ -84,6 +84,7 @@ public class Rol {
 
 	@Description ("Role custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
 	@Nullable
 	public Map<String,Object> attributes; 
 }

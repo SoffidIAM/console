@@ -33,9 +33,9 @@
 				obj.label = " - Select - ";
 				return obj;
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB" method="findTipusDadesByCodi"
+			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB" method="findDataTypes"
 				if='${isUserInRole("usersDomain:query")}'>
-					<parameter value="%"/>
+					<parameter value="${com.soffid.iam.api.MetadataScope.USER}"/>
 			</ejb-finder> 
 		</finder>
 	</datanode>

@@ -66,5 +66,7 @@ public class Grup {
 
 	@Description ("Group custom attributes")
 	@Nullable
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
 	public Map<String,Object> attributes; 
 }

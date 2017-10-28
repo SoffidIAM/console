@@ -8,7 +8,9 @@ package es.caib.seycon.ng.comu;
 import java.util.Map;
 
 import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonAttribute;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
@@ -69,6 +71,8 @@ public class Aplicacio {
 	public String roleDefinitionProcess;
 	
 	@Description ("Application custom attributes")
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
 	@Nullable
 	public Map<String,Object> attributes; 
 }

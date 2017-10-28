@@ -12,6 +12,7 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.DadaUsuari;
@@ -47,7 +48,7 @@ public class ShowAdditionalData {
 	}
 	
 	public List<DadaUsuari> getDadaUsuari(String codiUsuari) throws InternalErrorException, CreateException, NamingException{
-			final Collection<TipusDada> tipusDadaList =  getDadesAddicionalsService().findTipusDadesByCodi("%");
+			final Collection<TipusDada> tipusDadaList =  getDadesAddicionalsService().findDataTypes(MetadataScope.USER);
 			List<DadaUsuari> dadaUsuariCollection;
 			if (codiUsuari != null) 
 				dadaUsuariCollection = new LinkedList<DadaUsuari> (usuariServ.findDadesUsuariByCodiUsuari(codiUsuari));

@@ -166,16 +166,28 @@ public class Mail implements ActionHandler {
 	}
 
 
-	public void send() throws InternalErrorException, IOException, AddressException {
+	private ThreadLocal<Object> recursiveLock = new ThreadLocal<Object>();
+	public void send() throws InternalErrorException, IOException, AddressException 
+	{
+		// Prevent recursive lock
+		if (recursiveLock.get() != null)
+			return;
 		
 		if (Event.EVENTTYPE_TASK_ASSIGN.equals(getTemplate()) )
 		{
-			if (executionContext.getTask() != null && 
+			if (executionContext.getTaskInstance() != null && 
+					executionContext.getTask() != null &&
 					executionContext.getTaskInstance().getActorId() == null &&
 					executionContext.getTaskInstance().getPooledActors().isEmpty() )
-				executionContext.getTaskInstance().assign(executionContext);
-			else
-				sendPredefinedMail("Mail.4");
+			{
+				recursiveLock.set(this);
+				try {
+					executionContext.getTaskInstance().assign(executionContext);
+				} finally {
+					recursiveLock.remove();
+				}
+			}
+			sendPredefinedMail("Mail.4");
 		} 
 		else if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
 		{

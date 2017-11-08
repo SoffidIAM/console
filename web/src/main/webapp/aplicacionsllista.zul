@@ -31,9 +31,9 @@
 
 			void cleanWindow() {
 				model.getVariables().declareVariable("queryEnabled", false);
-				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/aplicacio[false]";
+//				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/aplicacio[false]";
 				esquemaLlista.visible=false;
-				esquemaLlista.getFellow("finishButton").disabled = true;
+//				esquemaLlista.getFellow("finishButton").disabled = true;
 			}
 		]]>
 	</zscript>

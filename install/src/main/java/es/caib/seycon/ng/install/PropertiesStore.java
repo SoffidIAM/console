@@ -19,7 +19,8 @@ public class PropertiesStore {
 	
     public static final String DB_STATUS = "dbStatus"; //$NON-NLS-1$
 
-    private static String keys[] = { "dbDriver", "dbDriverString", "dbDriverUrl", "dbDriverClass", "dbSanitySelect", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    private static String keys[] = { "dbDriver", "dbDriverString", "dbDriverUrl", "dbDriverClass", "dbValidationQuery", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    		"dbSanitySelect", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             "dbPort", "dbTableTablespaceSize", "dbIndexTablespaceSize", "hostName", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             "dbHost", "dbSid", "dbUser", "dbPassword", "dbVersion", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
             "dbTableTablespace", "dbIndexTablespace", DB_STATUS //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

@@ -673,6 +673,7 @@ public class DeployerBean implements DeployerService {
 			public Void run() {
 				try {
 					pauseConnector();
+					Thread.sleep(2000);
 					undeploy();
 					deploy(false);
 					resumeConnector();

@@ -507,6 +507,10 @@ div.CodeMirror-code   {
 }
 
 
+pre.CodeMirror-line {font-size: 12px; font-family: monospace, "Courier new"} 
+pre.CodeMirror-line span {font-size: 12px; font-family: monospace, "Courier new"} 
+div.CodeMirror-linenumber {font-size: 12px} 
+
 
 .search-background {
     position: absolute;

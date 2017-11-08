@@ -26,6 +26,7 @@
       <mountPoint id="1072" root="" location="lib" mode="755" />
       <mountPoint id="1073" root="" location="apps" mode="755" />
       <mountPoint id="1069" root="" location="" mode="755" />
+      <mountPoint id="1219" root="" location="temp" mode="755" />
     </mountPoints>
     <entries>
       <dirEntry mountPoint="1071" file="../../../target/lib" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="*.jar,*.ear" dirMode="755" overrideDirMode="false">

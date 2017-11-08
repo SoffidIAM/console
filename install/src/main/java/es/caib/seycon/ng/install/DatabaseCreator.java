@@ -96,6 +96,7 @@ public class DatabaseCreator {
         ctx.setVariable("dbDriverClass", driverClass); //$NON-NLS-1$
         ctx.setVariable("dbDriverString", driverString); //$NON-NLS-1$
         ctx.setVariable("dbSanitySelect", sanitySelect); //$NON-NLS-1$
+        ctx.setVariable("dbValidationQuery", sanitySelect); //$NON-NLS-1$
         ctx.setVariable("InstallationDirectory", ctx.getInstallationDirectory().getAbsolutePath()); //$NON-NLS-1$
         PropertiesStore ps = new PropertiesStore(ctx);
         ps.save();

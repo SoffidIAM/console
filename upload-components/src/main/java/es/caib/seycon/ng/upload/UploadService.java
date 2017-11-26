@@ -50,8 +50,13 @@ public class UploadService extends ServiceMBeanSupport implements UploadServiceM
         try {
             log.info(Messages.getString("UploadService.StartingUploadInfo")); //$NON-NLS-1$
             try {
-            	log.info ("Verifying database schema");
-            	updateDatabase();
+            	if ( "false".equals(System.getProperty("soffid.db.uprade")))
+	            	log.info ("Skipping database schema check");
+            	else
+            	{
+	            	log.info ("Verifying database schema");
+	            	updateDatabase();
+            	}
             } catch (Exception e)
             {
             	log.warn("Error updating database schema", e);

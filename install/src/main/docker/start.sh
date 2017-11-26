@@ -28,7 +28,7 @@ function configure {
 
 	if [[ "$JAVA_OPT" == "" ]]
 	then
-	    echo "-Xmx1024m" >/opt/soffid/iam-console-2/bin/run.vmoptions
+	    echo "-XX:MaxRAMFraction=0.7" >/opt/soffid/iam-console-2/bin/run.vmoptions
 	    echo "-Xms256m" >>/opt/soffid/iam-console-2/bin/run.vmoptions
 	else
 	    echo "$JAVA_OPT" >/opt/soffid/iam-console-2/bin/run.vmoptions

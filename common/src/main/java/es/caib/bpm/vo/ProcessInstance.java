@@ -44,6 +44,7 @@ public class ProcessInstance implements Serializable {
 	long id = 0;
 	protected Date start = null;
 	protected Date end = null;
+	protected String description = null;
 	protected Map variables = null;
 	protected String currentTask = null;
 	protected Vector comments = null;
@@ -111,6 +112,16 @@ public class ProcessInstance implements Serializable {
 
 	public void setComments(Vector comments) {
 		this.comments = comments;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 }

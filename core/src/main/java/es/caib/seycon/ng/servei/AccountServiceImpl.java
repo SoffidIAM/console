@@ -170,8 +170,14 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		AccountEntity acc = getAccountEntityDao().findByNameAndDispatcher(name, de.getCodi());
 		if (acc != null)
 		{
-			if (acc.getType().equals (AccountType.IGNORED) && acc.getAcl().isEmpty() &&
-				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE))
+			if (acc.getType().equals (AccountType.IGNORED) && /* Unmanaged account with no owner */ 
+				acc.getAcl().isEmpty() &&
+				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE) ||
+				
+				acc.getAcl().size() == 1  &&  /* Account already belongs to the user and only to the user*/
+				acc.getAcl().iterator().next().getUser() == ue &&
+				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER )
+
 			{
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
@@ -1319,7 +1325,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				{
 					if (callerUe == null)
 						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_OWNER);
 					boolean found = false;
 					for ( String user: users)
 					{
@@ -1332,7 +1338,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 					if (!found)
 					{
 						// Try to request throw workflow
-						users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_USER);
+						users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 						found = false;
 						for (String user : users) {
 	                        if (user.equals(callerUe.getCodi())) {

@@ -393,7 +393,7 @@ public class AuthorizationServiceImpl extends
                 for (DomainValue vdNew : novaAutoHereta.getUserRoleValueDomain()) {
                     boolean isNewDomainValue = true;
                     for (DomainValue vdOld : au.getUserRoleValueDomain()) {
-                        if (vdOld.getValue().equals(vdNew.getValue())) {
+                        if (vdOld.getValue() == null ? vdNew == null || vdOld.equals(vdNew.getValue())) {
                             isNewDomainValue = false;
                             break;
                         }

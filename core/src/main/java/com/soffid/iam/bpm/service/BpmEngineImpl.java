@@ -976,7 +976,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected List handleFindMyTasks() throws Exception {
 		JbpmContext context = getContext();
 		try {
-			Vector resultadoFinal = new Vector();
+			Vector<TaskInstance> resultadoFinal = new Vector<TaskInstance>();
 			// u88683: solucionem problema de oracle quan n'hi ha més de 1000
 			// elements
 			// és una restricció ORA-01795: maximum number of expressions in a
@@ -1027,7 +1027,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					}
 
 			}
-
+			
 			return resultadoFinal;
 		} finally {
 			flushContext(context);

@@ -37,7 +37,10 @@
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>com.jaspersoft.studio.babel.editor.rbeNature</nature>
+<<<<<<< HEAD
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
+=======
+>>>>>>> a1dd520838817fe509f30884aec817e08199c05f
 	</natures>
 </projectDescription>

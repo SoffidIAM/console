@@ -21,9 +21,12 @@ import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.def.Transition;
+import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.graph.exe.Token;
 import org.jbpm.graph.node.TaskNode;
 import org.jbpm.job.Job;
+import org.jbpm.jpdl.el.VariableResolver;
+import org.jbpm.jpdl.el.impl.JbpmExpressionEvaluator;
 import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
@@ -184,6 +187,23 @@ public class VOFactory {
 		else if (n != null)
 		{
 			process.setCurrentTask(n.getName());
+		}
+		
+		if (process.getVariables().containsKey("$title"))
+			process.setDescription((String) process.getVariables().get("$title"));
+		else
+		{
+			String def = instance.getProcessDefinition().getDescription();
+			if (def != null && !def.trim().isEmpty()) {
+				VariableResolver variableResolver = JbpmExpressionEvaluator
+						.getUsedVariableResolver();
+				process.setDescription( (String) JbpmExpressionEvaluator.evaluate(def,
+						new ExecutionContext( instance.getRootToken()),
+						variableResolver,
+						JbpmExpressionEvaluator.getUsedFunctionMapper()) );
+			}
+			else
+				process.setDescription(instance.getProcessDefinition().getName());
 		}
 
 		return process;

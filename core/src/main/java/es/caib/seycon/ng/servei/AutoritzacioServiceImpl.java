@@ -503,7 +503,7 @@ public class AutoritzacioServiceImpl extends
 					boolean isNewDomainValue =  true;
 					for (ValorDomini vdOld: au.getValorDominiRolUsuari())
 					{
-						if (vdOld.getValor().equals(vdNew.getValor()))
+						if (vdOld.getValor() == null ? vdNew == null: vdOld.getValor().equals(vdNew.getValor()))
 						{
 							isNewDomainValue = false;
 							break;

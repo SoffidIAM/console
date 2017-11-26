@@ -121,10 +121,10 @@ public class InboxHandler extends Frame {
 							return 1;
 						else if (t0.getCreate().getTime() < t1.getCreate()
 								.getTime())
-							return -1;
+							return +1;
 						else if (t0.getCreate().getTime() > t1.getCreate()
 								.getTime())
-							return +1;
+							return -1;
 						else
 							return 0;
 					}

@@ -13,6 +13,8 @@ public class ProcessInstance {
 	@Nullable
 	es.caib.bpm.classloader.UIClassLoader processClassLoader;
 	@Nullable
+	String description;
+	@Nullable
 	protected Date start = null;
 	@Nullable
 	protected Date end = null;

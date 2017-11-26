@@ -660,7 +660,15 @@ public class DeployerBean implements DeployerService {
 	}
 
 	public boolean isFailSafe() {
-		return failSafe;
+		if (getFailSafeFile().exists())
+			return true;
+		else
+			return failSafe;
+	}
+
+	private File getFailSafeFile() {
+		return new File(
+				new File(getJbossHomeDir(), "soffid"), "fail-safe"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public void setFailSafe(boolean failSafe) {
@@ -703,13 +711,14 @@ public class DeployerBean implements DeployerService {
 			coreModules = new LinkedList<String>();
 			javaModules = new LinkedList<String>();
 
-			if (failSafe) {
+			if (isFailSafe()) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
 				recursivelyDelete(tmpDir());
 				getTimestampFile().delete();
 				uncompressEar();
 				updateApplicationXml();
+				getFailSafeFile().delete();
 			} else {
 				System.setProperty("soffid.fail-safe", "false");
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
@@ -805,12 +814,12 @@ public class DeployerBean implements DeployerService {
 		try {
 			if (lastModified  == 0)
 				doDeploy ();
-			else
+			else if (!ongoing)
 			{
+				failSafe = false;
 				long last = calculateLastModified();
 		
-				if (last > lastModified && !ongoing) {
-					failSafe = false;
+				if (last > lastModified) {
 					redeploy();
 					lastModified = last;
 				}
@@ -824,10 +833,17 @@ public class DeployerBean implements DeployerService {
 		long last = initialEarFile().lastModified();
 		File addonsDir = new File(
 				new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		File failSafeFile = getFailSafeFile();
+		if (failSafeFile.exists() && failSafeFile.lastModified() > last)
+			last = failSafeFile.lastModified();
+		
 		if (addonsDir.isDirectory()) {
 			for (File f : addonsDir.listFiles()) {
 				if (f.lastModified() > last)
+				{
 					last = f.lastModified();
+				}
 			}
 		}
 		return last;

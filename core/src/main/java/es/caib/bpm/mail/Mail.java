@@ -288,7 +288,12 @@ public class Mail implements ActionHandler {
 		
 		debug(String.format(Messages.getString("Mail.SendingMailMessage"), targetAddresses, subject)); //$NON-NLS-1$
 		if (text != null && ! text.isEmpty())
+		{
+			while (subject != null && 
+					(subject.startsWith(" ") || subject.startsWith("\t")))
+					subject = subject.substring(1);
 			MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
+		}
 	}
 
 

@@ -374,6 +374,7 @@ public class AuthorizationServiceImpl extends
                 }
                 boolean found = isAuthorizationAlreadyPresent(autoritzacionsUsuari, novaAutoHereta);
                 if (!found) {
+                	System.out.println("Adding "+novaAutoHereta);
                     autoritzacionsUsuari.add(novaAutoHereta);
                     addInheriedAuthorizations(autoritzacionsUsuari, novaAutoHereta, (SoffidAuthorization) getAuthorizations().get(novaAutoHereta.getAuthorization()));
                 }
@@ -393,7 +394,7 @@ public class AuthorizationServiceImpl extends
                 for (DomainValue vdNew : novaAutoHereta.getUserRoleValueDomain()) {
                     boolean isNewDomainValue = true;
                     for (DomainValue vdOld : au.getUserRoleValueDomain()) {
-                        if (vdOld.getValue() == null ? vdNew == null || vdOld.equals(vdNew.getValue())) {
+                        if (vdOld.getValue() == null ? vdNew.getValue() == null : vdOld.getValue().equals(vdNew.getValue()) ) {
                             isNewDomainValue = false;
                             break;
                         }

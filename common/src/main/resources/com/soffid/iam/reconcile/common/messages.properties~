@@ -1,0 +1,14 @@
+ReconcileAccountProposedAction.B=Bind to existing user
+ReconcileAccountProposedAction.I=Ignore
+ReconcileAccountProposedAction.S=Create shared account
+ReconcileAccountProposedAction.N=Create new user
+ReconcileAccountProposedAction.U=Update account
+ReconcileAccountProposedAction.D=Delete account
+ReconcileProposedAction.L=LOAD
+ReconcileProposedAction.I=IGNORE
+ReconcileProposedAction.U=UPDATE
+ReconcileProposedAction.D=DELETE
+ReconcileProposedAction.SelectUserType= - Select user type - 
+AccountType.S=Shared
+AccountType.P=Privileged
+AccountType.I=Ignored

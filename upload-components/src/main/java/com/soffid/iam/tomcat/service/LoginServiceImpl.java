@@ -44,6 +44,9 @@ public class LoginServiceImpl implements LoginService {
 	public SoffidPrincipal authenticate(String username, String credentials) {
 		try {
 			boolean samlAuthorized = false;
+		
+			if (username == null || username.trim().isEmpty())
+				return null;
 			
 			String account;
 			Tenant tenant;

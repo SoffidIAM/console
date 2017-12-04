@@ -26,6 +26,9 @@ public class SamlRequestEntity {
 	@Column (name="REQ_DATE")
 	public Date date;
 
+	@Column (name="REQ_EXPDAT")
+	public Date expirationDate;
+
 	@Column (name="REQ_FINISHED")
 	public boolean finished;
 	

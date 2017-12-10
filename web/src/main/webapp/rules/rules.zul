@@ -491,7 +491,7 @@ self.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getRuleVars()
 					<label style="display:table-cell;" value="${c:l('rules.var3')}"/>
 				</div>
 				<div style="dislay: table-row;">
-					<label style="display:table-cell;  width:10em;" value="roupsList:"/>
+					<label style="display:table-cell;  width:10em;" value="groupsList:"/>
 					<label style="display:table-cell;" value="${c:l('rules.var4')}"/>
 				</div>
 				<div style="dislay: table-row;">

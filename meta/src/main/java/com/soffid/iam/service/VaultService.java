@@ -45,6 +45,9 @@ public class VaultService {
 	public List<VaultFolder> getRootFolders () {return null;}
 	
 	@Operation(grantees={Tothom.class})
+	public List<VaultFolder> getPublicRootFolders () {return null;}
+	
+	@Operation(grantees={Tothom.class})
 	public List<VaultFolder> getChildren (VaultFolder parent)  {return null;}
 
 	@Operation(grantees={Tothom.class})

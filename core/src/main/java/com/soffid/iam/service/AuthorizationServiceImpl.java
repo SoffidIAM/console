@@ -374,7 +374,6 @@ public class AuthorizationServiceImpl extends
                 }
                 boolean found = isAuthorizationAlreadyPresent(autoritzacionsUsuari, novaAutoHereta);
                 if (!found) {
-                	System.out.println("Adding "+novaAutoHereta);
                     autoritzacionsUsuari.add(novaAutoHereta);
                     addInheriedAuthorizations(autoritzacionsUsuari, novaAutoHereta, (SoffidAuthorization) getAuthorizations().get(novaAutoHereta.getAuthorization()));
                 }
@@ -684,7 +683,6 @@ public class AuthorizationServiceImpl extends
     		if((authorizations != null && !authorizations.isEmpty()) || (codiList != null && !codiList.isEmpty()))
     			authorizations = compareLists(authorizations, codiList);
     		 
-    		System.out.println(authorizations);
     		Collections.sort(authorizations, new ComparaAutos()); 
     		return authorizations;
 		}

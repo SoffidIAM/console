@@ -61,6 +61,6 @@ public class VaultFolderEntity {
 	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
 			+ "join v.acl as acl "
 			+ "join acl.user as user "
-			+ "where v.parent is null and v.personal = true and user.codi=:user")
+			+ "where v.parent is null and v.personal = true and user.userName=:user")
 	public List<VaultFolderEntity> findPersonalFolders (String user) { return null; }
 }

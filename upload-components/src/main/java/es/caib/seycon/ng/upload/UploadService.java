@@ -132,7 +132,7 @@ public class UploadService {
 			uploadComponentCurrent("com.soffid.iam.console", "dbtools", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("org.jbpm.jbpm3", "jbpm-jpdl", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("jasperreports","jasperreports", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("spring", "1.2.7", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("hibernate", "3.2.6.ga", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -145,6 +145,27 @@ public class UploadService {
 			uploadComponentVersion("asm-attrs", "1.5.3", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("antlr", "2.7.6", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cron4j", "2.2.5", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			
+			uploadComponentVersion("opensaml-core", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-xmlsec-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-security-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-messaging-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-soap-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-profile-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-storage-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-saml-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-saml-impl", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-security-impl", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-xmlsec-impl", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("opensaml-soap-impl", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("java-support", "7.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("guava", "19.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("joda-time", "2.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("metrics-core", "3.1.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("xmlsec", "1.4.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("cryptacular", "1.1.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("commons-codec", "1.9", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 			uploadComponentForResource("javamail", "javax/mail/Message.class"); //$NON-NLS-1$ //$NON-NLS-2$
 			uploadComponentForResource("j2ee", "javax/ejb/EJBObject.class"); //$NON-NLS-1$ //$NON-NLS-2$
 			uploadComponentForResource("signatura", "es/caib/signatura/api/Signature.class"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,7 +212,7 @@ public class UploadService {
 
     private void uploadComponentVersion(String artifactId, String version, String packaging)
             throws IOException, InternalErrorException {
-        ClassLoader cl = this.getClass().getClassLoader();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         
         URL baseUrl = cl.getResource("es/caib/seycon/ng/upload/UploadService.class");
         String baseFile = baseUrl.getFile();
@@ -274,7 +295,7 @@ public class UploadService {
     }
 
     private String getCurrentVersion(String groupId, String artifactId) throws IOException {
-        ClassLoader cl = this.getClass().getClassLoader();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Properties prop = new Properties();
         InputStream in = cl.getResourceAsStream("META-INF/maven/" + groupId + "/" + artifactId //$NON-NLS-1$ //$NON-NLS-2$
                 + "/pom.properties"); //$NON-NLS-1$

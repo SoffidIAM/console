@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 import javax.naming.NamingException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -489,6 +491,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				&& certificacioDeCondicionsXML.contains("usuari"); //$NON-NLS-1$
 	}
 
+	protected Log log = LogFactory.getLog(getClass());
 	// Cridat des del workflow per donar d'alta usuaris
 	public User handleCreateUser(byte[] peticio,
 			es.caib.signatura.api.Signature signatura) throws Exception {
@@ -503,8 +506,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				throw new UnsupportedOperationException();
 			}
 		} catch (Exception e) {
-			System.out.println(Messages.getString("UserServiceImpl.Error") + e); //$NON-NLS-1$
-			e.printStackTrace();
+			log.warn(Messages.getString("UserServiceImpl.Error"), e); //$NON-NLS-1$
 			throw new SeyconException(e.getMessage());
 		}
 	}

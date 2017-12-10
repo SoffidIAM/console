@@ -401,8 +401,6 @@ public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnroll
             // throw e;
         }
 
-        System.out.println("Message sent OK."); //$NON-NLS-1$
-
     }
 
     /**

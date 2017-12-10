@@ -32,7 +32,7 @@ public class MessageFactory
 			{
 				try
 				{
-					localesClass = Class.forName("org.zkoss.util.Locales"); //$NON-NLS-1$
+					localesClass = Thread.currentThread().getContextClassLoader().loadClass("org.zkoss.util.Locales"); //$NON-NLS-1$
 					if (localesClass != null)
 						getCurrentMethod = localesClass.getMethod("getCurrent"); //$NON-NLS-1$
 				}

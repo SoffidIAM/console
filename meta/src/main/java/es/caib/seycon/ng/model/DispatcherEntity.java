@@ -229,7 +229,7 @@ public abstract class DispatcherEntity {
 	}
 
 
-	@DaoFinder("select dis "
+	@DaoFinder("select distinct dis "
 			+ "from com.soffid.iam.model.SystemEntity as dis "
 			+ "join dis.tenant as tenant "
 			+ "join tenant.servers as server "

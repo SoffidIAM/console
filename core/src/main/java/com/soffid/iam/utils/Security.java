@@ -294,8 +294,14 @@ public class Security {
 	
     private static ThreadLocal<Stack<SoffidPrincipal>> identities = new ThreadLocal<Stack<SoffidPrincipal>>();
     private static boolean onSyncServer = false;
+    private static boolean onSyncProxy = false;
+    
 	public static boolean isSyncServer() {
 		return onSyncServer;
+	}
+
+	public static boolean isSyncProxy() {
+		return onSyncProxy;
 	}
 
 	private static com.soffid.iam.service.UserService userService = null;
@@ -389,18 +395,14 @@ public class Security {
     }
 
     private static TenantService tenantService = null;
-    private static Boolean isTenantServiceAvailable = null;
-    
     private static TenantService getTenantService ()
     {
-    	if (tenantService == null && isTenantServiceAvailable == null)
+    	if (onSyncProxy)
+    		return null;
+    	
+    	if (tenantService == null)
     	{
-    		try {
-        		tenantService = ServiceLocator.instance().getTenantService ();
-        		isTenantServiceAvailable = Boolean.TRUE;
-    		} catch (Exception e) {
-        		isTenantServiceAvailable = Boolean.FALSE;
-    		}
+       		tenantService = ServiceLocator.instance().getTenantService ();
     	}
     	return tenantService;
     }
@@ -499,6 +501,13 @@ public class Security {
     	if (System.getSecurityManager() != null)
     		AccessController.checkPermission(new NestedLoginPermission("tenant"));
         onSyncServer = true;
+    }
+
+    public static void onSyncProxy() {
+    	if (System.getSecurityManager() != null)
+    		AccessController.checkPermission(new NestedLoginPermission("tenant"));
+        onSyncServer = true;
+        onSyncProxy = true;
     }
 
     public static String getCurrentAccount ()
@@ -602,11 +611,12 @@ public class Security {
     
     static HashMap<String, Long> tenants = new HashMap<String,Long>();
     private static Long getTenantId (String tenantName) throws InternalErrorException {
-    	Long id = tenants.get(tenantName);
+		if (onSyncProxy)
+			throw new InternalErrorException("Tenant service is not available in proxy servers");
+
+		Long id = tenants.get(tenantName);
     	if (id == null)
     	{
-    		if (getTenantService() == null)
-    			throw new InternalErrorException("Tenant service is not available in proxy servers");
     		
     		Tenant tenant = tenantName == null ? 
     			getTenantService().getMasterTenant() :
@@ -622,12 +632,12 @@ public class Security {
     
     static HashMap<Long, String> tenantNames = new HashMap<Long,String>();
     public static String getTenantName (Long tenantId) throws InternalErrorException {
-    	String name = tenantNames.get(tenantId);
+		if (onSyncProxy)
+			throw new InternalErrorException("Tenant service is not available in proxy servers");
+
+		String name = tenantNames.get(tenantId);
     	if (name == null)
     	{
-    		if (getTenantService() == null)
-    			throw new InternalErrorException("Tenant service is not available in proxy servers");
-
     		Tenant tenant = tenantId == null ? 
     			getTenantService().getMasterTenant() :
     			getTenantService().getTenant(tenantId);
@@ -686,7 +696,11 @@ public class Security {
 		if (masterTenantName == null)
 		{
 			try {
-				masterTenantName = getTenantService().getMasterTenant().getName();
+				TenantService tenantService = getTenantService();
+				if (tenantService == null)
+					masterTenantName = "master";
+				else
+					masterTenantName = tenantService.getMasterTenant().getName();
 			} catch (InternalErrorException e) {
 				throw new RuntimeException(e);
 			}

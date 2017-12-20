@@ -540,6 +540,10 @@
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bcprov-jdk14</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bctsp-jdk14</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -662,7 +666,6 @@
     		<groupId>org.bouncycastle</groupId>
     		<artifactId>bcprov-jdk15on</artifactId>
     		<version>1.51</version>
-    		<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

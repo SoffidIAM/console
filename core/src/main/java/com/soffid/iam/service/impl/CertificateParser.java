@@ -1,18 +1,27 @@
 package com.soffid.iam.service.impl;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.commons.collections.map.HashedMap;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
-import org.bouncycastle.asn1.x509.X509Name;
 
 
 public class CertificateParser {
@@ -23,8 +32,6 @@ public class CertificateParser {
 	String surName;
 	String issuer;
 	private boolean personaJuridica;
-
-	private static DERObjectIdentifier NIFOID = new DERObjectIdentifier ("1.3.6.1.4.1.18838.1.1"); //$NON-NLS-1$
 
 	public CertificateParser(X509Certificate cert) throws CertificateEncodingException, IOException {
 		super();
@@ -95,42 +102,36 @@ public class CertificateParser {
 	 * @throws IOException
 	 */
 	private void parse(byte[] cert) throws IOException {
-		ASN1InputStream asn1is = new ASN1InputStream ( cert );
-		DERObject obj = asn1is.readObject ();
-		X509CertificateStructure certificate = new X509CertificateStructure ((ASN1Sequence) obj);
-		// Procesar el SUBJECT NAME
-		X509Name certIssuer = certificate.getIssuer();
-		issuer = ""; //$NON-NLS-1$
-		java.util.Vector v = certIssuer.getOIDs ();
-		java.util.Vector value = certIssuer.getValues ();
-		for ( int i = 0; i < v.size(); i++)
-		{
-			if (v.get(i).equals (X509Name.CN))
+		try {
+			CertificateFactory fac=CertificateFactory.getInstance("X509");
+			ByteArrayInputStream in=new ByteArrayInputStream(cert);
+			X509Certificate certificate=(X509Certificate)fac.generateCertificate(in);
+
+			personaJuridica = false;
+			
+			X500Principal i = certificate.getIssuerX500Principal();
+			HashMap<String,String> map = new HashMap<String, String>();
+			for ( String s: i.getName().split(", *"))
 			{
-				issuer = value.get(i).toString ();
+				if (s.toLowerCase().startsWith("cn="))
+					issuer = s.substring(3);
 			}
-		}
-		
-		X509Name name = certificate.getSubject();
-		personaJuridica = false;
-		v = name.getOIDs ();
-		value = name.getValues ();
-		for ( int i = 0; i < v.size(); i++)
-		{
-			if (v.get(i).equals (X509Name.CN))
-				processName (value.get(i).toString());
-			if (v.get(i).equals (X509Name.SURNAME) && surName == null)
-				surName = value.get(i).toString();
-			if (v.get(i).equals (X509Name.GIVENNAME) && givenName == null)
-				givenName = value.get(i).toString();
-			if (v.get(i).equals (X509Name.SN))
+			
+			Principal name = certificate.getSubjectDN();
+			personaJuridica = false;
+			for ( String s: name.getName().split(", *"))
 			{
-				nif = value.get(i).toString();
+				if (s.toLowerCase().startsWith("cn="))
+					processName (s.substring(3));
+				if (s.toLowerCase().startsWith("sn="))
+					surName = s.substring(3);
+				if (s.toLowerCase().startsWith("givenname="))
+					givenName = s.substring(10);
+				if (s.toLowerCase().startsWith("sn="))
+					nif = s.substring(3);
 			}
-			if (v.get(i).equals (NIFOID))
-			{
-				personaJuridica = true;
-			}
+		} catch (CertificateException e) {
+			throw new IOException(e);
 		}
 	}
 

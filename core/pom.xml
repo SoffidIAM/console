@@ -412,12 +412,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>bouncycastle</groupId>
-			<artifactId>bcprov-jdk15</artifactId>
-			<version>136</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>es.caib.signatura.valcert</groupId>
 			<artifactId>valcert-client-axis</artifactId>
 			<version>1.6.6</version>
@@ -538,6 +532,14 @@
 					<artifactId>jackson-annotations</artifactId>
 					<groupId>com.fasterxml.jackson.core</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcmail-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk14</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -612,6 +614,12 @@
 		    <groupId>org.opensaml</groupId>
 		    <artifactId>opensaml-saml-api</artifactId>
 		    <version>3.3.0</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.bouncycastle</groupId>
+		    		<artifactId>bcprov-jdk15on</artifactId>
+		    	</exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>org.opensaml</groupId>
@@ -638,6 +646,23 @@
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+    		<groupId>org.bouncycastle</groupId>
+    		<artifactId>bcpkix-jdk15on</artifactId>
+    		<version>1.51</version>
+    		<exclusions>
+    			<exclusion>
+		    		<groupId>org.bouncycastle</groupId>
+		    		<artifactId>bcprov-jdk15on</artifactId>
+    			</exclusion>
+    		</exclusions>
+		</dependency>
+		<dependency>
+    		<groupId>org.bouncycastle</groupId>
+    		<artifactId>bcprov-jdk15on</artifactId>
+    		<version>1.51</version>
+    		<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

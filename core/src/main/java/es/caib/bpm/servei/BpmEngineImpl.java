@@ -340,7 +340,13 @@ public class BpmEngineImpl extends BpmEngineBase {
 			org.jbpm.graph.exe.ProcessInstance instance = context
 					.getProcessInstance(process.getId());
 			startAuthenticationLog(instance.getRootToken());
+			
+			org.jbpm.graph.exe.Token token = instance.getRootToken();
+
+			cancelJobs(context, token);
+
 			instance.end();
+
 			for (Iterator it = instance.getTaskMgmtInstance()
 					.getTaskInstances().iterator(); it.hasNext();) {
 				org.jbpm.taskmgmt.exe.TaskInstance taskInstance = (org.jbpm.taskmgmt.exe.TaskInstance) it
@@ -350,12 +356,24 @@ public class BpmEngineImpl extends BpmEngineBase {
 					taskInstance.cancel();
 				}
 			}
+			
 			endAuthenticationLog(instance.getRootToken());
 			context.save(instance);
 			return VOFactory.newProcessInstance(instance);
 		} finally {
 			flushContext(context);
 		}
+	}
+
+	private void cancelJobs(JbpmContext context, org.jbpm.graph.exe.Token token) {
+		List l = context.getJobSession().findJobsByToken(token);
+		for (Iterator it = l.iterator(); it.hasNext();) {
+			org.jbpm.job.Job j = (org.jbpm.job.Job) it.next();
+			context.getJobSession().deleteJob(j);
+		}
+		
+		for (org.jbpm.graph.exe.Token t: token.getChildren().values())
+			cancelJobs(context, t);
 	}
 
 	/* (non-Javadoc)

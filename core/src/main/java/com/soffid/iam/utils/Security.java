@@ -389,10 +389,19 @@ public class Security {
     }
 
     private static TenantService tenantService = null;
+    private static Boolean isTenantServiceAvailable = null;
+    
     private static TenantService getTenantService ()
     {
-    	if (tenantService == null)
-    		tenantService = ServiceLocator.instance().getTenantService ();
+    	if (tenantService == null && isTenantServiceAvailable == null)
+    	{
+    		try {
+        		tenantService = ServiceLocator.instance().getTenantService ();
+        		isTenantServiceAvailable = Boolean.TRUE;
+    		} catch (Exception e) {
+        		isTenantServiceAvailable = Boolean.FALSE;
+    		}
+    	}
     	return tenantService;
     }
     
@@ -400,38 +409,43 @@ public class Security {
     private static void internalNestedLogin(String tenant, String user, String roles[])  {
     	SoffidPrincipal p;
     	try {
-			Tenant t = getTenantService().getTenant(tenant);
-			if ( t == null)
-				throw new RuntimeException("Invalid tenant: "+tenant);
-			if (roles == Security.ALL_PERMISSIONS)
-			{
-				if (auths == null)
-					auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
-				
-				List<String> dp = getTenantService().getDisabledPermissions(t);
-				LinkedList<String> auths2 = new LinkedList<String>();
-				for (SoffidAuthorization a: auths)
-				{
-					if (!dp.contains(a))
-					{
-						auths2.add(a.getCodi());
-						auths2.add(a.getCodi()+Security.AUTO_ALL);
-					}
-				}
-		        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
-			}
-			else
-			{
-				for ( String tp: getTenantService().getDisabledPermissions(t))
-				{
-					for ( String role: roles)
-					{
-						if (role.startsWith(tp))
-							throw new RuntimeException("Cannot elevate permission "+role);
-					}
-				}
+    		if (getTenantService() == null) // For proxy servers
+    		{
 		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
-			}
+    		} else {
+				Tenant t = getTenantService().getTenant(tenant);
+				if ( t == null)
+					throw new RuntimeException("Invalid tenant: "+tenant);
+				if (roles == Security.ALL_PERMISSIONS)
+				{
+					if (auths == null)
+						auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
+					
+					List<String> dp = getTenantService().getDisabledPermissions(t);
+					LinkedList<String> auths2 = new LinkedList<String>();
+					for (SoffidAuthorization a: auths)
+					{
+						if (!dp.contains(a))
+						{
+							auths2.add(a.getCodi());
+							auths2.add(a.getCodi()+Security.AUTO_ALL);
+						}
+					}
+			        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
+				}
+				else
+				{
+					for ( String tp: getTenantService().getDisabledPermissions(t))
+					{
+						for ( String role: roles)
+						{
+							if (role.startsWith(tp))
+								throw new RuntimeException("Cannot elevate permission "+role);
+						}
+					}
+			        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
+				}
+    		}
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
@@ -591,6 +605,9 @@ public class Security {
     	Long id = tenants.get(tenantName);
     	if (id == null)
     	{
+    		if (getTenantService() == null)
+    			throw new InternalErrorException("Tenant service is not available in proxy servers");
+    		
     		Tenant tenant = tenantName == null ? 
     			getTenantService().getMasterTenant() :
     			getTenantService().getTenant(tenantName);
@@ -608,6 +625,9 @@ public class Security {
     	String name = tenantNames.get(tenantId);
     	if (name == null)
     	{
+    		if (getTenantService() == null)
+    			throw new InternalErrorException("Tenant service is not available in proxy servers");
+
     		Tenant tenant = tenantId == null ? 
     			getTenantService().getMasterTenant() :
     			getTenantService().getTenant(tenantId);

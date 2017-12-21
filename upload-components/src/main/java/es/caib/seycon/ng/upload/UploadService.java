@@ -165,6 +165,8 @@ public class UploadService {
 			uploadComponentVersion("xmlsec", "1.4.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cryptacular", "1.1.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("commons-codec", "1.9", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("bcprov-jdk15on", "1.51", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("bcpkix-jdk15on", "1.51", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			uploadComponentForResource("javamail", "javax/mail/Message.class"); //$NON-NLS-1$ //$NON-NLS-2$
 			uploadComponentForResource("j2ee", "javax/ejb/EJBObject.class"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -220,16 +222,20 @@ public class UploadService {
         URL fileUrl = new URL (baseFile);
         File jarFile = new File (fileUrl.getFile());
         File earDirectory = jarFile.getParentFile();
+        File catalinaHome = new File(System.getProperty("catalina.home"));
         
         String file = version == null ? artifactId + "." + packaging : artifactId + "-" + version //$NON-NLS-1$ //$NON-NLS-2$
                 + "." + packaging; //$NON-NLS-1$
         
         File candidate = new File (earDirectory, file);
         File candidate2 = new File (earDirectory, "lib"+File.separator+file);
+        File candidate3 = new File (catalinaHome, "lib"+File.separator+file);
         if (candidate.isFile())
         	uploadUrl(artifactId, version, candidate.toURI().toURL());
         else if (candidate2.isFile())
         	uploadUrl(artifactId, version, candidate2.toURI().toURL());
+        else if (candidate3.isFile())
+        	uploadUrl(artifactId, version, candidate3.toURI().toURL());
         else
         	log.warn("Unable to loate file "+file);
     }

@@ -162,7 +162,7 @@ public class UploadService {
 			uploadComponentVersion("guava", "19.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("joda-time", "2.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("metrics-core", "3.1.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("xmlsec", "1.4.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("xmlsec", "2.0.6", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cryptacular", "1.1.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("commons-codec", "1.9", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("bcprov-jdk15on", "1.51", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

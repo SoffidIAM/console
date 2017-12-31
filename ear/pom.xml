@@ -30,6 +30,10 @@
 		    		<groupId>org.bouncycastle</groupId>
 		    		<artifactId>bcprov-jdk15on</artifactId>
 				</exclusion>
+				<exclusion>
+		    		<groupId>org.apache.santuario</groupId>
+		    		<artifactId>xmlsec</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

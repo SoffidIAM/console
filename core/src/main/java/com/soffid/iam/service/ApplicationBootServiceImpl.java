@@ -52,6 +52,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
@@ -615,7 +616,7 @@ public class ApplicationBootServiceImpl extends
 			Configuration configuracio = new Configuration();
 			configuracio.setCode("soffid.ui.docStrategy"); //$NON-NLS-1$
 			configuracio
-					.setValue("es.caib.bpm.nas.comm.LocalFileSystemStrategy"); //$NON-NLS-1$
+					.setValue( DatabaseStrategy.class.getName());
 			configSvc.create(configuracio);
 		}
 

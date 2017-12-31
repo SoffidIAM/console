@@ -18,6 +18,7 @@ import com.soffid.iam.doc.nas.comm.FTPStrategy;
 import com.soffid.iam.doc.nas.sign.CAIBStrategy;
 import com.soffid.iam.utils.ConfigurationCache;
 
+import es.caib.seycon.ng.utils.Security;
 import es.caib.signatura.api.Signature;
 
 /**
@@ -192,7 +193,7 @@ public class NASManager
 		
 		do
 		{
-			path= "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
+			path= "/" + Security.getCurrentTenantId() + "/" + application + "/" + year + this.getPathForNumber(number); //$NON-NLS-1$ //$NON-NLS-2$
 
 			try {
 				File f = this.comStrategy.retreiveFile(path);

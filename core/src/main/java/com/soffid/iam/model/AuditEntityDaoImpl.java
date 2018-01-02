@@ -23,6 +23,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
@@ -220,6 +221,7 @@ public class AuditEntityDaoImpl extends
 					}
 				}
 			}
+			Auditoria auditoria = Auditoria.toAuditoria(targetVO);
 			StringBuffer result = new StringBuffer();
 			int processed = 0;
 			do
@@ -239,8 +241,14 @@ public class AuditEntityDaoImpl extends
 					if (property != null)
 						result.append(property.toString());
 				} catch (Exception e) { 
-					logger.debug(String.format(Messages.getString("AuditEntityDaoImpl.UnknownVariable"), variable, key)); //$NON-NLS-1$
-					result.append ("${").append (variable).append("}"); //$NON-NLS-1$ //$NON-NLS-2$
+					try {
+						Object property = BeanUtils.getProperty(auditoria, variable);
+						if (property != null)
+							result.append(property.toString());
+					} catch (Exception e2) { 
+						logger.debug(String.format(Messages.getString("AuditEntityDaoImpl.UnknownVariable"), variable, key)); //$NON-NLS-1$
+						result.append ("${").append (variable).append("}"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			} while (true);
 			result.append(msg.substring(processed));

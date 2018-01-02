@@ -33,9 +33,9 @@
 			}
 			void cleanWindow() {
 				model.getVariables().declareVariable("queryEnabled", false);
-				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/grup[false]";
+//				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/grup[false]";
 				esquemaLlista.visible = false;
-				esquemaLlista.getFellow("finishButton").disabled = true;
+//				esquemaLlista.getFellow("finishButton").disabled = true;
 			}
 		]]>
 	</zscript>
@@ -64,7 +64,6 @@
 
 			<criteris id="queryWindow">
 				<attribute name="onCreate"><![CDATA[
-					searchBox.addAttribute("name").setSearchFilter("World");
 				]]></attribute>
 				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.Group"
 						defaultAttributes="name, description, type"

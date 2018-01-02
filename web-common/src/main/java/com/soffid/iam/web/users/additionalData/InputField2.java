@@ -118,7 +118,7 @@ public class InputField2 extends Div
 
 	public void onSelectCustomObject(Event event) {
 		Page p = getDesktop().getPage("customObjectsLlista");
-		p.setAttribute("type", "Device");
+		p.setAttribute("type", dataType.getDataObjectType());
 		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 	}
 
@@ -186,7 +186,7 @@ public class InputField2 extends Div
 	}
 
 	public void openCustomObject() {
-		String type = "Device";
+		String type = dataType.getDataObjectType();
 		String customObject = (String) getValue();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new");
 	}
@@ -293,7 +293,7 @@ public class InputField2 extends Div
 			if (customObject == null)
 				l.setValue("");
 			else {
-				CustomObject co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName("Device", customObject);
+				CustomObject co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName(dataType.getDataObjectType(), customObject);
 				if (co == null) {
 					l.setValue("?");
 					return false;

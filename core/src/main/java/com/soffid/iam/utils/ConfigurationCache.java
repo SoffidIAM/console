@@ -3,12 +3,14 @@ package com.soffid.iam.utils;
 import java.util.HashMap;
 
 import javax.ejb.CreateException;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Tenant;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -19,7 +21,7 @@ public class ConfigurationCache {
 	private static String getMasterTenantName () throws InternalErrorException
 	{
 		if (masterTenantName == null)
-			masterTenantName = ServiceLocator.instance().getTenantService().getMasterTenant().getName();
+			masterTenantName = Security.getMasterTenantName();
 		return masterTenantName;
 	}
 	
@@ -49,6 +51,7 @@ public class ConfigurationCache {
 	}
 	
 	
+	static private Boolean ejb;
 	private static String getProperty (String tenant, String property) throws InternalErrorException, NamingException, CreateException 	
 	{
 		
@@ -63,10 +66,10 @@ public class ConfigurationCache {
 			String value;
 			if (!map.containsKey(property))
 			{
-				if (Security.isSyncServer())
-					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
-				else
+				if (System.getProperty("java.naming.factory.initial") == null)
 					value = ServiceLocator.instance().getConfigurationService().findTenantParameter(tenant, property);
+				else
+					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
 				map.put(property, value);
 			}
 			else

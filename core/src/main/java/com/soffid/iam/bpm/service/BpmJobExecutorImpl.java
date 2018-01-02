@@ -13,6 +13,7 @@ import javax.ejb.EJBException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Query;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.JbpmException;
@@ -168,16 +169,21 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		}
 	}
 
+	long last = System.currentTimeMillis();
+
 	@Override
 	protected void handleIndexPendingProcesses() throws Exception {
+		long newExecution = System.currentTimeMillis();
 		Indexer i = Indexer.getIndexer ();
 		JbpmContext ctx = getContext();
+		
 		try {
-			i.flush(ctx.getSession());
+			i.flush(ctx.getSession(), last, newExecution);
 		} catch (Exception e) {
 			log.warn(Messages.getString("BpmJobExecutorImpl.IndexingError"), e); //$NON-NLS-1$
 		} finally {
 			ctx.close();
 		}
 	}
+
 }

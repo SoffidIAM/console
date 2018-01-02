@@ -31,13 +31,17 @@ public class RolGrantDiffReport {
 		HashMap<String, RoleGrant> grantees = new HashMap<String, RoleGrant>();
 		for (RoleGrant pr: list1)
 		{
-			grantees.put(pr.getOwnerAccountName()+" / "+pr.getDomainValue(), pr);
+			grantees.put(pr.getOwnerAccountName()+" => "+
+					pr.getRoleName()+" @ "+pr.getSystem()+" / "+
+					pr.getDomainValue(), pr);
 		}
 
 		HashMap<String, RoleGrant> newGrantees = new HashMap<String, RoleGrant>();
 		for (RoleGrant pr: list2)
 		{
-			String n = pr.getOwnerAccountName()+" / "+pr.getDomainValue();
+			String n = pr.getOwnerAccountName()+" => "+
+					pr.getRoleName()+" @ "+pr.getSystem()+" / "+
+					pr.getDomainValue();
 			if (grantees.containsKey(n))
 				grantees.remove(n);
 			else

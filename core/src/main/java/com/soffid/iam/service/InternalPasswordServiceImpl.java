@@ -1182,7 +1182,7 @@ public class InternalPasswordServiceImpl extends
     	if ("S".equals(account.getSystem().getTrusted()))
     	{
         	try {
-        		ConsoleLogonService ls = getConsoleLogonService();
+        		ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService().getServerService(ConsoleLogonService.REMOTE_PATH);
         	    if (ls != null)
         	    	return ls.validatePassword(account.getName(), account.getSystem().getName(), password.getPassword());
         	}

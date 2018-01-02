@@ -6,12 +6,9 @@
 <!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul -->
 	<frame id="p_changePassPerfil" saveContent="true" title="${c:l('changepassPerfil.Titol')}" width="99%">
 	
-		<style src="~./styles/estil.css" />
-		<style src="/css/localSEU.css" />
-	
 		<zscript>
 			<![CDATA[
-				String usuari = Executions.getCurrent().getUserPrincipal().getName();
+				String usuari = com.soffid.iam.utils.Security.getCurrentAccount();
 				String nom = Executions.getCurrent().getUserPrincipal().getFullName();
 				
 				javax.servlet.http.HttpServletRequest requ =
@@ -41,35 +38,10 @@
 				}
 				
 				import javax.servlet.http.*;
-				String untrustedRoute = es.caib.loginModule.auth.ClientIPValve.getUntrustedIPRoute();
-				
 				// Mètode per fer logout
 				void logout()
 				{
 					Execution ex = Executions.getCurrent();
-					Class c = Class.forName("es.caib.loginModule.util.SessionManager");
-					Object sessionManager = c.newInstance();
-					java.lang.reflect.Method m = c.getMethod("endSession",
-					new Class [] {
-						javax.servlet.http.HttpServletRequest.class,
-						javax.servlet.http.HttpServletResponse.class
-					});
-					HttpServletRequest req = (HttpServletRequest) ex.getNativeRequest();
-					HttpServletResponse resp = (HttpServletResponse) ex.getNativeResponse();
-					try
-					{
-						m.invoke(sessionManager, new Object[] { req, resp });
-					}
-					catch (Exception e) {}
-					
-					es.caib.loginModule.auth.ControladorSesion controladorSession = new es.caib.loginModule.auth.ControladorSesion ();
-					
-					if (untrustedRoute != null)
-						controladorSession.getSesionEJB().setIPRoute(untrustedRoute);
-					
-					controladorSession.autenticar(usuari, passnueva1.getValue());
-					controladorSession.addCookie(Executions.getCurrent().getNativeResponse());
-					
 					ex.sendRedirect("/");
 					req.getSession().invalidate();
 				}
@@ -119,7 +91,8 @@
 												org.zkoss.util.resource
 													.Labels.getLabel("changepassPerfil.CanviPWD")))
 									{
-										logout();
+										es.caib.zkib.zkiblaf.Application.setPage("/perfil.zul");
+//										logout();
 									}
 								}
 								

@@ -26,6 +26,7 @@ import com.soffid.iam.sync.intf.AuthoritativeChange;
 import com.soffid.iam.sync.intf.AuthoritativeChangeIdentifier;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -360,7 +361,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			ProcessTracker tracker = new ProcessTracker();
 			tracker.change = change;
 			tracker.auditGenerated = false;
-			if (change.getObjectType() == null || change.getObjectType() == SoffidObjectType.OBJECT_USER)
+			if (change.getUser() != null)
 			{
 	    		User user = applyUserChange(tracker);
 	    		if (change.getAttributes() != null)
@@ -368,11 +369,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	    		if (change.getGroups() != null)
 	    			applyGroupChange (user, tracker);
 			}
-			else if (change.getObjectType() == SoffidObjectType.OBJECT_GROUP && change.getGroup() != null)
+			else if (change.getGroup() != null)
 			{
 				applyGroupChange (tracker);
 			}
-			else if (change.getObjectType() == SoffidObjectType.OBJECT_CUSTOM && change.getObject() != null)
+			else if (change.getObject() != null)
 			{
 				applyObjectChange (tracker);
 			}
@@ -519,6 +520,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 tda.setOrder(i);
                 tda.setCode(attribute);
 				tda.setScope(MetadataScope.USER);
+				tda.setType(TypeEnumeration.STRING_TYPE);
                 tda = getAdditionalDataService().create(tda);
             }
             UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
@@ -616,7 +618,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private boolean compareGroups(Group g, Group oldGroup) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		boolean anyChange = false;
 		for (String att : new String[]{"Description", "DriveLetter", "DriveServerName", "Name", "Obsolete", 
-				"Organizational", "ParentGroup", "Queta", "Section", "Type"}) {
+				"Organizational", "ParentGroup", "Quota", "Section", "Type"}) {
             Method getter = Group.class.getMethod("get" + att);
             Method setter = Group.class.getMethod("set" + att, getter.getReturnType());
             Object value = getter.invoke(g);

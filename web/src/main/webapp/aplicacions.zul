@@ -6,8 +6,6 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('aplicacions.lblGestioAplicacions') }">
-	<style src="~./styles/estil.css"/>
-	
 	<style>
 		.tcoth div {text-align:center !important;}
 		.appatt {display: table; padding: 0px; width: 100%}

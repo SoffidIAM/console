@@ -10,13 +10,7 @@
 	
 	<zscript>
 		<![CDATA[
-			String objectType = Executions.getCurrent().getNativeRequest().getParameter("type");
 			
-			// Lo forzamos para probar
-			objectType = "Device";
-			
-			pageScope.put("objectType", objectType);
-			model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
 			
 			void acceptaDada() {
 				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
@@ -47,6 +41,16 @@
 		<attribute name="onInicia">
 			<![CDATA[
 				pageScope.put("contextComponent", event.data);
+				
+				String objectType = page.getAttribute("type");
+				model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
+				
+				esquema.getFellow("queryWindow").getFellow("searchBox").
+					setJsonObject("com.soffid.iam.api.CustomObject#"+objectType);
+				
+				model.getVariables().declareVariable("query", null);
+				model.refresh();
+
 				if(self.mode.compareToIgnoreCase("highlighted") != 0){
 					self.setMode("highlighted");
 				}else{
@@ -64,7 +68,7 @@
 		<esquemavertical id="esquema" hideSearchToolbar="true" style="margin:10px">
 		
 			<criteris id="queryWindow">
-				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.CustomObject#${objectType}" 
+				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.CustomObject" 
 					defaultAttributes="name, description"
 					dataPath="/model:/object" variableName="query">
 				</searchbox>

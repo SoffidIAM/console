@@ -4,8 +4,6 @@
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <div xmlns:h="http://www.w3.org/1999/xhtml" width="100%">
 
-	<style src="~./styles/estil.css"/>
-	
 	<datamodel id="model" rootNode="root" src="accounts/descriptorAccounts.xml"/>
 	
 	<zscript src="/comu/checkTruncatedResults.zul"/>

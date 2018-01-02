@@ -5,8 +5,6 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 	
-	<style src="~./styles/estil.css"/>
-	
 	<datamodel id="model" rootNode="contenidorsRol" src="descriptorContenidorRols.xml"/>
 	<zscript>
       	fileres = es.caib.seycon.ng.web.Custom.FILERES;

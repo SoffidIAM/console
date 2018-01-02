@@ -66,8 +66,6 @@
 			auditoria.setCanClose(true);//no es poden fer canvis
 		</attribute> 
 		
-		<style src="~./styles/estil.css"/>
-		
 		<style>
 			.menubar img {padding-bottom: 2px;}
 		</style>

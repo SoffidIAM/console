@@ -27,6 +27,7 @@ import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.service.DocumentService;
+import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
 import com.soffid.iam.model.ServerEntity;
@@ -222,26 +223,21 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	private void reconfigureTasks () throws InternalErrorException
 	{
 		// Updates master configuration property
-		Security.nestedLogin("master", Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
-		try
+		String timeStamp = Long.toString(System.currentTimeMillis());
+		ConfigEntity c = getConfigEntityDao().findByTenantNameAndNetwork(Security.getMasterTenantName(), "soffid.schedule.timeStamp", null);
+		if (c == null)
 		{
-			String timeStamp = Long.toString(System.currentTimeMillis());
-			Configuration config = getConfigurationService().findParameterByNameAndNetworkName("soffid.schedule.timeStamp", null); //$NON-NLS-1$
-			if (config == null)
-			{
-				config = new Configuration();
-				config.setCode("soffid.schedule.timeStamp"); //$NON-NLS-1$
-				config.setDescription("Task scheduler update time stamp"); //$NON-NLS-1$
-				config.setValue(timeStamp);
-				getConfigurationService().create(config);
-			}
-			else
-			{
-				config.setValue(timeStamp);
-				getConfigurationService().update(config);
-			}
-		} finally {
-			Security.nestedLogoff();
+			c = getConfigEntityDao().newConfigEntity();
+			c.setName("soffid.schedule.timeStamp"); //$NON-NLS-1$
+			c.setDescription("Task scheduler update time stamp"); //$NON-NLS-1$
+			c.setValue(timeStamp);
+			getConfigEntityDao().createMasterConfig(c);
+			
+		}
+		else
+		{
+			c.setValue(timeStamp);
+			getConfigEntityDao().update(c);
 		}
 	}
 	

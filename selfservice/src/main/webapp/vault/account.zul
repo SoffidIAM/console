@@ -857,8 +857,8 @@
 						es.caib.zkib.zkiblaf.Missatgebox
 							.confirmaOK(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
-						BindContext ctx = XPathUtils.getComponentContext(form);
-						XPathUtils.getValue(ctx, "/owner").refresh();
+						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(form);
+						es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/owner").refresh();
 						innerWindow.getFellow("ownerRow").setVisible (true);
 					}
 					else

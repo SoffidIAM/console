@@ -2,6 +2,8 @@ package com.soffid.iam.utils;
 
 import java.util.Calendar;
 
+import com.soffid.iam.utils.ConfigurationCache;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TimeOutUtils {

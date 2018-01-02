@@ -26,6 +26,8 @@ import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TaskLogEntity;
+import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.model.TenantServerEntity;
 import com.soffid.iam.remote.RemoteInvokerFactory;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.remote.URLManager;
@@ -138,23 +140,14 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         RemoteServiceLocator rsl = new RemoteServiceLocator(string);
         URLManager um = new URLManager(string);
         ServerEntity server = getServerEntityDao().findByName(um.getServerURL().getHost());
-        if (server == null)
-        {
-        	// Search on master tenant
-        	Security.nestedLogin(Security.getMasterTenantName(), Security.getCurrentAccount(),
-        			new String [] { Security.AUTO_AGENT_QUERY} );
-        	try {
-                server = getServerEntityDao().findByName(um.getServerURL().getHost());
-        	} finally {
-        		Security.nestedLogoff();
-        	}
-        }
         if (server != null)
         {
         	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
             rsl.setAuthToken(server.getAuth());
+            return rsl;
         }
-        return rsl;
+        else
+        	throw new InternalErrorException("Unknown server "+string);
     }
 
     /**
@@ -400,18 +393,12 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
     private List<String> getServerList() throws InternalErrorException, SQLException, NamingException {
     	List<String> list = new LinkedList<String>();
-    	Security.nestedLogin( Security.getMasterTenantName(),
-    			Security.getCurrentAccount(),
-    			Security.ALL_PERMISSIONS);
-    	try {
-    		for ( ServerEntity server:  getServerEntityDao().loadAll())
-    		{
-    			if (server.getType().equals(ServerType.MASTERSERVER) &&
-    					server.getUrl() != null)
-    				list.add(server.getUrl());
-    		}
-    	} finally {
-    		Security.nestedLogoff();
+    	
+    	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
+    	for (TenantServerEntity s: tenant.getServers())
+    	{
+    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER)
+    			list.add(s.getTenantServer().getUrl());
     	}
 		return list;
     }

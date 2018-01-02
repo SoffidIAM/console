@@ -178,12 +178,10 @@ public class UserDataEntityDaoImpl
             targetEntity.setDataType(tipusDadaEntity);
             if (tipusDadaEntity != null && TypeEnumeration.DATE_TYPE.equals(tipusDadaEntity.getType()))
             {
-            	if (sourceVO.getDateValue() == null && sourceVO.getValue() != null)
+            	if (sourceVO.getDateValue() == null)
             	{
-            		sourceVO.setDateValue(parseDate(sourceVO.getValue()));
-            	}
-            	if (sourceVO.getDateValue() != null)
-	            {
+            		targetEntity.setValue(null);
+            	} else {
 					SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
 	            	targetEntity.setValue(curFormater.format(sourceVO.getDateValue().getTime()));
 	            }

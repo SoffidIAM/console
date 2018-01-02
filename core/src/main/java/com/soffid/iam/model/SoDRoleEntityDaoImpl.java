@@ -7,7 +7,7 @@ package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
 
-import es.caib.seycon.ng.comu.SoDRole;
+import com.soffid.iam.api.SoDRole;
 
 /**
  * DAO SoDRoleEntity implementation

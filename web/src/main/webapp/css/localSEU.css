@@ -20,6 +20,12 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid #22B9D8; backgrou
 .titol_tancar:hover {
 	text-decoration: underline;
 }
+p, div, span, label, a, input, textarea, button, input.button, input.file,
+div.head-cell-inner, div.cell-inner,
+.maintitle, .etiqueta, .text, .textbox {
+	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
+}
+
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:left;}
 .dateboxinp  {
@@ -74,10 +80,10 @@ td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 /* tindre en compte le pre-carrega index... */
 
 .z-loading-indicator {
-	display: block;
     border-color: #0e5462 !important;
     padding: 20px 25px 10px 25px !important;
-	background-image:url('../img/waitpacman.gif') !important; 
+	background-image:url('../img/wait.gif') !important; 
+	background-size: 26px; 
 	background-repeat: no-repeat;
 	background-position: 15px 15px;
 	height: 26px !important;
@@ -258,6 +264,7 @@ tr.seld td.UNKNOWN {
 	white-space: nowrap;
 	max-width: 50%;
 	overflow: hidden;
+	height: auto !important;
 }
 
 .col_izq {
@@ -500,6 +507,10 @@ div.CodeMirror-code   {
 }
 
 
+pre.CodeMirror-line {font-size: 12px; font-family: monospace, "Courier new"} 
+pre.CodeMirror-line span {font-size: 12px; font-family: monospace, "Courier new"} 
+div.CodeMirror-linenumber {font-size: 12px} 
+
 
 .search-background {
     position: absolute;
@@ -573,7 +584,7 @@ a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited
 
 
 .capsa_cerca {
-	height: inherit !important;
+	height: auto !important;
 	padding-bottom: 0px !important
 }
 

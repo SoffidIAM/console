@@ -8,8 +8,6 @@
 <frame id="f_plugins" xmlns:h="http://www.w3.org/1999/xhtml" saveContent="true"
 	title="${c:l('plugins.Titol')}" width="99%">
 
-	<style src="~./styles/estil.css"/>
-	
 	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>
 	
 	<zscript>

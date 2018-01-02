@@ -6,7 +6,6 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?page title="Gestió d'autoritzacions" ?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
-	<style src="~./styles/estil.css"/>
 	<xmldatasource id="autoritzacions" src="/es/caib/seycon/autoritzacions.xml"/>
 	
 	<datamodel id="model" rootNode="autoritzacions"

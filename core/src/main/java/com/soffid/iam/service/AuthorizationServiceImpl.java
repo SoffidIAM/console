@@ -393,7 +393,7 @@ public class AuthorizationServiceImpl extends
                 for (DomainValue vdNew : novaAutoHereta.getUserRoleValueDomain()) {
                     boolean isNewDomainValue = true;
                     for (DomainValue vdOld : au.getUserRoleValueDomain()) {
-                        if (vdOld.getValue().equals(vdNew.getValue())) {
+                        if (vdOld.getValue() == null ? vdNew.getValue() == null : vdOld.getValue().equals(vdNew.getValue()) ) {
                             isNewDomainValue = false;
                             break;
                         }
@@ -683,7 +683,6 @@ public class AuthorizationServiceImpl extends
     		if((authorizations != null && !authorizations.isEmpty()) || (codiList != null && !codiList.isEmpty()))
     			authorizations = compareLists(authorizations, codiList);
     		 
-    		System.out.println(authorizations);
     		Collections.sort(authorizations, new ComparaAutos()); 
     		return authorizations;
 		}

@@ -184,9 +184,6 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		{
                     throw new SeyconException(Messages.getString("GroupServiceImpl.3")); //$NON-NLS-1$
 		}
-		// Verifiquem el codi (lletres i números)
-		if (!grup.getName().matches("[a-zA-Z0-9\\-]*")) //$NON-NLS-1$
-			throw new SeyconException(Messages.getString("GroupServiceImpl.4")); //$NON-NLS-1$
 		
 		GroupEntity groupsSameCode = getGroupEntityDao().findByName(grup.getName());
 		if(groupsSameCode != null)

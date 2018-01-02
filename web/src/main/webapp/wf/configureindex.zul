@@ -33,6 +33,16 @@
 							
 							break;
 							
+						case "com.soffid.iam.doc.nas.comm.DatabaseStrategy":	// Local file system
+							
+							parent.getFellow("rowServer").setVisible(false);
+							parent.getFellow("rowPath").setVisible(false);
+							parent.getFellow("rowtempPath").setVisible(false);
+							parent.getFellow("rowUsername").setVisible(false);
+							parent.getFellow("rowUserPassword").setVisible(false);
+							
+							break;
+							
 						case "es.caib.bpm.nas.comm.CIFSStrategy":	// CIFS
 							
 							parent.getFellow("rowServer").setVisible(true);
@@ -95,6 +105,8 @@
 							value="es.caib.bpm.nas.comm.FTPStrategy"/>
 						<listitem id="itemHTTP" label="${c:l('configure.HTTP')}"
 							value="es.caib.bpm.nas.comm.HTTPStrategy"/>
+						<listitem id="itemDatabase" label="${c:l('configure.Database')}"
+							value="com.soffid.iam.doc.nas.comm.DatabaseStrategy"/>
 					</listbox>
 				</row>
 				

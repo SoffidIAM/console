@@ -384,8 +384,7 @@
 				
 				try
 				{
-					infoServer = getSeyconServerService().getSeyconServerInfo(dadaurl,
-							"serverinfo", new String[]{});
+					infoServer = getSeyconServerService().getSyncServerInfo(dadaurl);
 				}
 				
 				catch (Throwable th)
@@ -603,10 +602,9 @@
 			
 			void checkRefreshPage()
 			{
-				String numAgents = model.getJXPathContext().getValue("/server[1]/@numAgents");
-				
-				try
-				{
+				try {
+					String numAgents = model.getJXPathContext().getValue("/server[1]/@numAgents");
+					
 					int agents = Integer.parseInt(numAgents);
 					
 					if (agents >= 10)
@@ -614,8 +612,7 @@
 						refreshPage = false;
 						refresh_button(false);
 					}
-				}
-				
+				}				
 				catch (Exception e){}
 			}
 			

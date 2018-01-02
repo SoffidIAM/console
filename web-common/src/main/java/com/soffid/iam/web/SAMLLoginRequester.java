@@ -46,7 +46,7 @@ public class SAMLLoginRequester extends HttpServlet {
 
 	protected void initialRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
 		String hostName = new TenantExtractor().getTenant(req);
-		String context = req.getContextPath();
+		String context = getContext(req);
 
 		SamlRequest saml = EJBLocator.getSamlService().generateSamlRequest(hostName, context);
 		
@@ -115,7 +115,7 @@ public class SAMLLoginRequester extends HttpServlet {
 	protected void authenticate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
 		String hostName = new TenantExtractor().getTenant(req);
 		
-		String context = req.getContextPath();
+		String context = getContext(req);
 		
 		Map<String,String> params = new HashMap<String, String>();
 		for ( Enumeration e = req.getParameterNames(); e.hasMoreElements(); )
@@ -126,11 +126,18 @@ public class SAMLLoginRequester extends HttpServlet {
 		}
 		String[] token = EJBLocator.getSamlService().authenticate(hostName, context, SAMLConstants.SAML2_POST_BINDING_URI, params);
 		if (token == null)
-			resp.sendRedirect("..");
+			resp.sendRedirect( context );
 		else
 		{
 			req.getSession().setAttribute("samlLoginToken", token);
 			resp.sendRedirect( context );
 		}
+	}
+
+	private String getContext(HttpServletRequest req) {
+		String context = req.getContextPath();
+		if (context.isEmpty())
+			context = "/";
+		return context;
 	}
 }

@@ -1402,6 +1402,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:custemObject:show</codi>
+		<descripcio>Open custom objects page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>customObject:query</codi>
 		<descripcio>Query custom object types</descripcio>
 		<ambit>Custom objects</ambit>

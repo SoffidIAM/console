@@ -31,8 +31,6 @@
 			]]>
 		</attribute>
 		
-		<style src="~./styles/estil.css"/>
-		<style src="/css/localSEU.css"/>
 		<!-- canviem els estils per a la missatgebox, perquè la contrasenya aparega més clara 0s i Os -->
 		<style>
 			span.missatge {font-family: Verdana;}

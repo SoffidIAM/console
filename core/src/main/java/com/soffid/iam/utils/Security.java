@@ -27,6 +27,7 @@ import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -293,8 +294,14 @@ public class Security {
 	
     private static ThreadLocal<Stack<SoffidPrincipal>> identities = new ThreadLocal<Stack<SoffidPrincipal>>();
     private static boolean onSyncServer = false;
+    private static boolean onSyncProxy = false;
+    
 	public static boolean isSyncServer() {
 		return onSyncServer;
+	}
+
+	public static boolean isSyncProxy() {
+		return onSyncProxy;
 	}
 
 	private static com.soffid.iam.service.UserService userService = null;
@@ -344,7 +351,8 @@ public class Security {
         }
         else
         {
-        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL));
+        	if (principal.hasRole(role.substring(0, i)+Security.AUTO_ALL) ||
+                principal.hasRole(role) )
         		return true;
         }
         
@@ -374,17 +382,28 @@ public class Security {
                     host = "root"; //$NON-NLS-1$
                 }
             }
-            return new SoffidPrincipal(host, host, Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
+            return new SoffidPrincipal(Security.getMasterTenantName()+"\\"+host, 
+            		host, 
+            		Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
         } else {
-        	return TomeePrincipalRetriever.getPrincipal ();
+        	try {
+        		return TomeePrincipalRetriever.getPrincipal ();
+        	} catch (Throwable th) {
+        		return null;
+        	}
         }
     }
 
     private static TenantService tenantService = null;
     private static TenantService getTenantService ()
     {
+    	if (onSyncProxy)
+    		return null;
+    	
     	if (tenantService == null)
-    		tenantService = ServiceLocator.instance().getTenantService ();
+    	{
+       		tenantService = ServiceLocator.instance().getTenantService ();
+    	}
     	return tenantService;
     }
     
@@ -392,38 +411,43 @@ public class Security {
     private static void internalNestedLogin(String tenant, String user, String roles[])  {
     	SoffidPrincipal p;
     	try {
-			Tenant t = getTenantService().getTenant(tenant);
-			if ( t == null)
-				throw new RuntimeException("Invalid tenant: "+tenant);
-			if (roles == Security.ALL_PERMISSIONS)
-			{
-				if (auths == null)
-					auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
-				
-				List<String> dp = getTenantService().getDisabledPermissions(t);
-				LinkedList<String> auths2 = new LinkedList<String>();
-				for (SoffidAuthorization a: auths)
-					auths2.add(a.getCodi());
-				for (Iterator<String> it = auths2.iterator(); it.hasNext();)
-				{
-					String a = it.next();
-					if (dp.contains(a))
-						it.remove();
-				}
-		        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
-			}
-			else
-			{
-				for ( String tp: getTenantService().getDisabledPermissions(t))
-				{
-					for ( String role: roles)
-					{
-						if (role.startsWith(tp))
-							throw new RuntimeException("Cannot elevate permission "+role);
-					}
-				}
+    		if (getTenantService() == null) // For proxy servers
+    		{
 		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
-			}
+    		} else {
+				Tenant t = getTenantService().getTenant(tenant);
+				if ( t == null)
+					throw new RuntimeException("Invalid tenant: "+tenant);
+				if (roles == Security.ALL_PERMISSIONS)
+				{
+					if (auths == null)
+						auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
+					
+					List<String> dp = getTenantService().getDisabledPermissions(t);
+					LinkedList<String> auths2 = new LinkedList<String>();
+					for (SoffidAuthorization a: auths)
+					{
+						if (!dp.contains(a))
+						{
+							auths2.add(a.getCodi());
+							auths2.add(a.getCodi()+Security.AUTO_ALL);
+						}
+					}
+			        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
+				}
+				else
+				{
+					for ( String tp: getTenantService().getDisabledPermissions(t))
+					{
+						for ( String role: roles)
+						{
+							if (role.startsWith(tp))
+								throw new RuntimeException("Cannot elevate permission "+role);
+						}
+					}
+			        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
+				}
+    		}
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
@@ -474,7 +498,16 @@ public class Security {
     }
 
     public static void onSyncServer() {
+    	if (System.getSecurityManager() != null)
+    		AccessController.checkPermission(new NestedLoginPermission("tenant"));
         onSyncServer = true;
+    }
+
+    public static void onSyncProxy() {
+    	if (System.getSecurityManager() != null)
+    		AccessController.checkPermission(new NestedLoginPermission("tenant"));
+        onSyncServer = true;
+        onSyncProxy = true;
     }
 
     public static String getCurrentAccount ()
@@ -578,9 +611,13 @@ public class Security {
     
     static HashMap<String, Long> tenants = new HashMap<String,Long>();
     private static Long getTenantId (String tenantName) throws InternalErrorException {
-    	Long id = tenants.get(tenantName);
+		if (onSyncProxy)
+			throw new InternalErrorException("Tenant service is not available in proxy servers");
+
+		Long id = tenants.get(tenantName);
     	if (id == null)
     	{
+    		
     		Tenant tenant = tenantName == null ? 
     			getTenantService().getMasterTenant() :
     			getTenantService().getTenant(tenantName);
@@ -595,7 +632,10 @@ public class Security {
     
     static HashMap<Long, String> tenantNames = new HashMap<Long,String>();
     public static String getTenantName (Long tenantId) throws InternalErrorException {
-    	String name = tenantNames.get(tenantId);
+		if (onSyncProxy)
+			throw new InternalErrorException("Tenant service is not available in proxy servers");
+
+		String name = tenantNames.get(tenantId);
     	if (name == null)
     	{
     		Tenant tenant = tenantId == null ? 
@@ -652,10 +692,18 @@ public class Security {
 	
 	static String masterTenantName = null;
 	
-	public static String getMasterTenantName () throws InternalErrorException{
+	public static String getMasterTenantName () {
 		if (masterTenantName == null)
 		{
-			masterTenantName = getTenantService().getMasterTenant().getName();
+			try {
+				TenantService tenantService = getTenantService();
+				if (tenantService == null)
+					masterTenantName = "master";
+				else
+					masterTenantName = tenantService.getMasterTenant().getName();
+			} catch (InternalErrorException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return masterTenantName;
 	}

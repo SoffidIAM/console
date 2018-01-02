@@ -22,6 +22,9 @@ public class Dispatcher {
 	public java.lang.String url;
 
 	@Nullable
+	public java.lang.String url2;
+
+	@Nullable
 	public java.lang.String param0;
 
 	@Nullable

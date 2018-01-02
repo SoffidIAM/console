@@ -2,8 +2,11 @@ package com.soffid.iam.tomcat.service;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -16,6 +19,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.service.AccountService;
+import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.PasswordService;
 import com.soffid.iam.service.SamlService;
@@ -32,12 +36,17 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class LoginServiceImpl implements LoginService {
 	Log log = LogFactory.getLog(getClass());
 
+	static Set<String> tenants = new HashSet<String>();
+	
 	public LoginServiceImpl() {
 	}
 
 	public SoffidPrincipal authenticate(String username, String credentials) {
 		try {
 			boolean samlAuthorized = false;
+		
+			if (username == null || username.trim().isEmpty())
+				return null;
 			
 			String account;
 			Tenant tenant;
@@ -117,6 +126,20 @@ public class LoginServiceImpl implements LoginService {
 				} else {
 					log.info(username + " login rejected. Invalid password");
 					return null;
+				}
+		
+				if ( ! tenants.contains(tenant.getName()))
+				{
+		            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
+		            		getBeansOfType(ApplicationBootService.class);
+
+		            for ( Object service: beans.keySet())
+		            {
+		            	log.info ("Executing startup bean: " + service);
+		            	
+		            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
+		            }
+		            tenants.add(tenant.getName());
 				}
 				
 				principal.setAccountId(acc.getId());

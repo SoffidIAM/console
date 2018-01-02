@@ -3,6 +3,7 @@ package es.caib.bpm.filters;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -18,11 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.web.Attributes;
 import org.zkoss.zk.scripting.Interpreters;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SecurityFunctionMapper;
 
@@ -69,13 +73,17 @@ public class WorkflowInterceptor implements Filter {
 			FilterChain filter) throws IOException, ServletException {
 		if (!configured) {
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
+			{
+				Labels.register(new es.caib.bpm.ui.V2LabelLocator());
 				Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+			}
 			Interpreters.add(
 					"java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
 			FunctionMapperChain.addFunctionMapper(new SecurityFunctionMapper());
 			configured = true;
 		}
-		if (request instanceof HttpServletRequest) {
+		if (request instanceof HttpServletRequest) 
+		{
 			HttpSession sesion = ((HttpServletRequest) request).getSession();
 			try {
 				Principal principal = ((HttpServletRequest) request)
@@ -96,6 +104,13 @@ public class WorkflowInterceptor implements Filter {
 						"IE=11;IE=8");
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
+				
+				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
+				if (forcedLocale != null)
+				{
+					sesion.setAttribute(Attributes.PREFERRED_LOCALE, new Locale(forcedLocale));
+				}
+
 				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
 					
 					Security.nestedLogin(nestedPrincipal);
@@ -104,8 +119,22 @@ public class WorkflowInterceptor implements Filter {
 					} finally {
 						Security.nestedLogoff();
 					}
-				} else
+				} 
+				else if (principal == null)
+				{
+					String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+					Security.nestedLogin(tenant, "anonymous", new String[0]);
+					try {
+						filter.doFilter(request, response);
+					} finally {
+						Security.nestedLogoff();
+					}
+				}
+				else
+				{
 					filter.doFilter(request, response);
+				}
+
 			} catch (Exception e) {
 				throw new ServletException(
 						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 

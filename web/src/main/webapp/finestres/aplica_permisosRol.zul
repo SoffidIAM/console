@@ -6,6 +6,7 @@
 
 	<style src="~./styles/estil.css"/>
 	<style src="/css/localSEU.css"/>
+	<style src="/css/devices.css"/>
 	
 	<datamodel id="model" rootNode="permisosUsuaris" src="finestres/descriptorPermisosRols.xml"/>
 	

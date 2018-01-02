@@ -3,6 +3,8 @@ package com.soffid.iam.bpm.index;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -44,14 +46,21 @@ public class Indexer {
 		return theIndexer;
 	}
 	
-	public void enqueue (Document d) 
-	{
-		synchronized( documents ) {
-			documents.addLast(d);
-		}
+	private Collection<ProcessInstance> getProcesses(Session session, long then, long now) {
+		return session
+				.createQuery("select distinct pi "
+					+ "from org.jbpm.logging.log.ProcessLog as pl "
+					+ "join pl.token as token "
+					+ "join token.processInstance as pi "
+					+ "where pl.date between :then and :now")
+				.setDate("then", new Date(then))
+				.setDate("now", new Date(now))
+				.list();
 	}
 
-	public void flush(Session session) throws IOException {
+	public void flush(Session session, long then, long now) throws IOException {
+		Collection<ProcessInstance> p = getProcesses (session, then, now);
+		
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, DirectoryFactory.getAnalyzer());
@@ -63,31 +72,21 @@ public class Indexer {
 			w = new IndexWriter (dir, iwc);
 		}
 		Document d;
-		Iterator it ;
-		boolean goon ;
 		try { 
-			synchronized (documents) {
-				it = documents.iterator();
-				goon = it.hasNext();
-			}
-			
-			while ( goon )
+			synchronized (documents) 
 			{
-				synchronized (documents)
-				{
-					d = (Document) it.next();
-					goon = it.hasNext();
-				}
+				documents.clear();
+			}
+
+			for (ProcessInstance process: p)
+			{
+				d = generateDocument(process);
 				log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 				// Delete pre-existing document
 				w.deleteDocuments(new Term ("$id", d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 				// Create new document
 				log.debug(String.format(Messages.getString("Indexer.AddingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 				w.addDocument(d);
-				synchronized (documents)
-				{
-					it.remove();
-				}
 				log.debug(String.format(Messages.getString("Indexer.DoneDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		} finally {
@@ -126,24 +125,32 @@ public class Indexer {
 	}
 
 	public void index(ProcessInstance pi) throws IOException {
-		enqueue(generateDocument(pi));
+//		enqueue(generateDocument(pi));
 	}
 
 	private StringBuffer addTokenInfo(Document d, ContextInstance ci, Token token, StringBuffer contents) {
 		String prefix = token.isRoot()? "": token.getFullName()+"/"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		Map m = ci.getVariables(token);
-		for (Iterator it = m.keySet().iterator(); it.hasNext(); )
-		{
-			String key = (String) it.next();
-			Object value = m.get(key);
-			if (value != null) {
-				d.add(new Field (prefix+key, 
-						value.toString(),
-						Field.Store.NO, Field.Index.ANALYZED));
-				contents.append(" "); //$NON-NLS-1$
-				contents.append(value.toString());
+		try {
+			Map m = ci.getVariables(token);
+			for (Iterator it = m.keySet().iterator(); it.hasNext(); )
+			{
+				String key = (String) it.next();
+				try {
+					Object value = m.get(key);
+					if (value != null) {
+						d.add(new Field (prefix+key, 
+								value.toString(),
+								Field.Store.NO, Field.Index.ANALYZED));
+						contents.append(" "); //$NON-NLS-1$
+						contents.append(value.toString());
+					}
+				} catch (Throwable t) {
+					// Error deserializing data
+				}
 			}
+		} catch (Throwable e) {
+			// Error deserializing data
 		}
 		StringBuffer comments= new StringBuffer();
 		if (token.getComments() != null)
@@ -177,26 +184,10 @@ public class Indexer {
 	public void reindexAll ( ) throws IOException {
 		JbpmContext ctx = Configuration.getConfig().createJbpmContext();
 		synchronized (documents) {
-			documents.clear();
 			DirectoryFactory.clearDirectory(ctx.getSession());
 		}
 		try {
-			Iterator itDef = ctx.getGraphSession().findAllProcessDefinitions().iterator();
-			while (itDef.hasNext())
-			{
-				ProcessDefinition def = (ProcessDefinition) itDef.next();
-				Iterator itProc = ctx.getGraphSession().findProcessInstances(def.getId()).iterator();
-				while (itProc.hasNext())
-				{
-					ProcessInstance pi = (ProcessInstance) itProc.next();
-					try {
-						Document d = generateDocument(pi);
-						enqueue(d);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			flush (ctx.getSession(), 0, System.currentTimeMillis());
 		} finally {
 			ctx.close();
 		}

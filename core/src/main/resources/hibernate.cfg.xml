@@ -261,14 +261,5 @@
   
   <collection-cache collection="org.jbpm.taskmgmt.def.TaskMgmtDefinition.swimlanes" usage="nonstrict-read-write" />
   <collection-cache collection="org.jbpm.taskmgmt.def.TaskMgmtDefinition.tasks" usage="nonstrict-read-write" />
-  <event type="pre-insert">
-            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
-  </event>
-  <event type="pre-update">
-            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
-  </event>
-  <event type="flush">
-            <listener class="com.soffid.iam.bpm.model.IndexEventListener"/>
-  </event>
 </session-factory>
 </hibernate-configuration>

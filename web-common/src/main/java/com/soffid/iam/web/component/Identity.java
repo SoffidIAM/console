@@ -77,11 +77,17 @@ public class Identity implements Comparable<Identity>{
 	public Identity (Role role, Group g)
 	{
 		type = Type.GRANT;
-		DomainValue domainValue = new DomainValue();
-		domainValue.setDescription(g.getDescription());
-		domainValue.setValue(g.getName());
-		label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
-			+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		DomainValue domainValue = null;
+		if (g == null)
+		{
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription();
+		} else {
+			domainValue = new DomainValue();
+			domainValue.setDescription(g.getDescription());
+			domainValue.setValue(g.getName());
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+				+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		}
 		RoleAccount ra = generateRoleAccount(role);
 		ra.setDomainValue(domainValue);
 		object = ra;
@@ -101,11 +107,17 @@ public class Identity implements Comparable<Identity>{
 	public Identity (Role role, Application app)
 	{
 		type = Type.GRANT;
-		DomainValue domainValue = new DomainValue();
-		domainValue.setDescription(app.getDescription());
-		domainValue.setValue(app.getName());
-		label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
-			+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		DomainValue domainValue = null;
+		if (app == null)
+		{
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription();
+		} else {
+			domainValue = new DomainValue();
+			domainValue.setDescription(app.getDescription());
+			domainValue.setValue(app.getName());
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+				+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();
+		}
 		RoleAccount ra = generateRoleAccount(role);
 		ra.setDomainValue(domainValue);
 		object = ra;

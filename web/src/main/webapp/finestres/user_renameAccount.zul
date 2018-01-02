@@ -4,8 +4,6 @@
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<style src="~./styles/estil.css" />
-
 	<zscript>
 <![CDATA[
 	import es.caib.zkib.zkiblaf.Missatgebox;
@@ -171,7 +169,7 @@
 			</div>
 			<separator spacing="5px" />
 			<hbox style="margin-left:auto; margin-right:auto">
-				<button label="${c:l('vault.details)')}"
+				<button label="${c:l('vault.details')}"
 					onClick="doQuery()" />
 				<button label="${c:l('user_renameaccount.Accept')}"
 					onClick="onChange()" />

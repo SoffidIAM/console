@@ -43,13 +43,24 @@ public class VaultFolderEntity {
 	@Column(name="VAF_PERSON", defaultValue="false")
 	Boolean personal;
 	
-	@DaoFinder("select v from com.soffid.iam.model.VaultFolderEntity as v "
+	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
 			+ "where v.parent is null")
 	public List<VaultFolderEntity> findRoots () { return null; }
 
+	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
+			+ "where v.parent is null and v.personal = false")
+	public List<VaultFolderEntity> findPublicRoots () { return null; }
+
+
 	public List<VaultFolderEntity> findByParent (VaultFolderEntity parent) { return null; }
 
-	@DaoFinder("select v from com.soffid.iam.model.VaultFolderEntity as v "
+	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
 			+ "where v.name like :name")
 	public List<VaultFolderEntity> findByName (String name) { return null; }
+
+	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
+			+ "join v.acl as acl "
+			+ "join acl.user as user "
+			+ "where v.parent is null and v.personal = true and user.userName=:user")
+	public List<VaultFolderEntity> findPersonalFolders (String user) { return null; }
 }

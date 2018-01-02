@@ -18,9 +18,11 @@ public class ReconcileAccountAttributesEntity {
 	@Column (name="RAA_ATTRIB")
 	public java.lang.String attribute;
 
+	@Nullable
 	@Column (name="RAA_VALUE")
 	public java.lang.String value;
 
+	@Nullable
 	@Column (name="RAA_DATE")
 	public java.util.Date dateValue;
 

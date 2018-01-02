@@ -32,7 +32,7 @@ public class Rol {
 	public java.lang.Boolean defecte;
 
 	@Nullable
-	@JsonAttribute(hibernateAttribute="name", hibernateJoin="system")
+	@JsonAttribute(hibernateAttribute="system.name")
 	@Attribute(translated = "system" )
 	public java.lang.String baseDeDades;
 
@@ -40,7 +40,7 @@ public class Rol {
 	@Attribute(translated = "password" )
 	public java.lang.Boolean contrasenya;
 
-	@JsonAttribute(hibernateAttribute="name", hibernateJoin="informationSystem")
+	@JsonAttribute(hibernateAttribute="informationSystem.name")
 	@Attribute(translated = "informationSystemName" )
 	public java.lang.String codiAplicacio;
 
@@ -52,15 +52,15 @@ public class Rol {
 	public es.caib.seycon.ng.comu.Domini domini;
 
 	@Nullable
-	@JsonAttribute(hibernateJoin="containerRoles", hibernateAttribute="container")
+	@JsonAttribute(hibernateAttribute="containerRoles.container")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownerRoles;
 
 	@Nullable
-	@JsonAttribute(hibernateJoin="containerRoles", hibernateAttribute="container")
+	@JsonAttribute(hibernateJoin="", hibernateAttribute="containerGroups.group.name")
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> ownerGroups;
 
 	@Nullable
-	@JsonAttribute(hibernateJoin="containerGroups", hibernateAttribute="group")
+	@JsonAttribute(hibernateJoin="", hibernateAttribute="containerGroups.group.name")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> granteeGroups;
 
 	@Nullable
@@ -84,6 +84,7 @@ public class Rol {
 
 	@Description ("Role custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
 	@Nullable
 	public Map<String,Object> attributes; 
 }

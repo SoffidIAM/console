@@ -189,7 +189,7 @@ public class AdditionalDataServiceImpl extends
 			dataTypeEntityList = getMetaDataEntityDao().findByScope(dataTypeVO.getScope());
 		}
 		for (MetaDataEntity dataTypeEntity : dataTypeEntityList) {
-			if ((dataTypeVO.getId()==null || !dataTypeEntity.getId().equals(dataTypeVO.getId())) && 
+			if ((dataTypeVO.getId() == null || ! dataTypeVO.getId().equals(dataTypeEntity.getId())) && 
 					dataTypeVO.getOrder().equals(dataTypeEntity.getOrder())) {
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
 						dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));

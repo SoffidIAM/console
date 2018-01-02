@@ -11,6 +11,7 @@ public class ReconcileTrigger {
 	@Nullable
 	public java.lang.Long id;
 
+	@Nullable
 	public SoffidObjectType objectType;
 
 	public SoffidObjectTrigger trigger;

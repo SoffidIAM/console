@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>2.0.2-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-meta</artifactId>
@@ -62,20 +62,20 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId></groupId>
-										<artifactId></artifactId>
-										<versionRange></versionRange>
+										<groupId />
+										<artifactId />
+										<versionRange />
 										<goals>
-											<goal></goal>
+											<goal />
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

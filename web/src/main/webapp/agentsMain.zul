@@ -11,7 +11,6 @@
 
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<style src="~./styles/estil.css"/>
 	<style>
 		.tcoth div {text-align:center !important;}
 		tr.seld td div.cell-inner input.text {

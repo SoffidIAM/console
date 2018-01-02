@@ -6,13 +6,6 @@
 
 <zk>
 
-	<style src="/css/localSEU.css"></style>
-	<zscript><![CDATA[
-//		String title = "";
-//		com.soffid.iam.web.component.Identity.Type[] types= null;
-//		Component invoker = null;
-//		List currentIdentities = null;
-	]]></zscript>
 	<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" > 
 	
 	

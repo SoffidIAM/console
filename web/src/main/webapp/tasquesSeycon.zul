@@ -78,7 +78,6 @@
 		
 	</zscript>
 	
-	<style src="~./styles/estil.css"/>
 	<style>
 		.tasquesPendents .listbox-body td {
 		border-bottom: 1px solid lightgrey;

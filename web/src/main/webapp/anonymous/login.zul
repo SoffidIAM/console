@@ -10,7 +10,6 @@
 			{
 				document.getElementById("j_username").value = account;
 			} else {
-				document.cookie = "LastTenant=" +tenant + "; Duration=3650;";
 				document.getElementById("j_username").value = tenant + "\\" + account;
 			}
 			
@@ -18,6 +17,7 @@
 		</script>
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
+	<style src="/css/devices.css"/>
 		<zscript><![CDATA[
    			javax.servlet.http.HttpServletRequest req = execution.getNativeRequest();
    			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
@@ -34,15 +34,22 @@
 	
 				autoLogin = !user.isEmpty() && !password.isEmpty();
 				session.removeAttribute("samlLoginToken");
-				if (!classic)
+				if (!autoLogin)
 				{
-					System.out.println(rootPath);
-					execution.sendRedirect("/saml");
+					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
+					if (!classic)
+					{
+						System.out.println(rootPath);
+						execution.sendRedirect("/saml");
+					}
 				}
 			}
 		
-			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
+			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
+			{
+				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.V2LabelLocator());
 				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+			}
 			
 			String failed = req.getParameter("failed");
 			String error = "";

@@ -4,8 +4,6 @@
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
 <div xmlns:h="http://www.w3.org/1999/xhtml" width="820px">
 
-	<style src="~./styles/estil.css"/>
-	
 	<datamodel id="model" rootNode="rols" src="descriptorAplicacio.xml"/>
 	
 	<zscript src="/comu/checkTruncatedResults.zul" />
@@ -21,130 +19,10 @@
 			queryEnabled = false;
 			retrySearch = false;
 
-			void populateDetails ()
-			{
-				mode="query";
-			}
-	
-			// Method to obtain the parameters to search process
-			java.util.Map getSearchParameters()
-			{
-				java.util.Map searchValues = new java.util.HashMap();
-				
-				nom = esquemaLlista.getFellow("queryWindow").getFellow("queryNom")
-						.getFellow("textbox");
-				aplicacio = esquemaLlista.getFellow("queryWindow")
-						.getFellow("queryAplicacio").getFellow("textbox");
-				bbdd = esquemaLlista.getFellow("queryWindow").getFellow("queryBbdd")
-						.getSelectedItem();
-				descripcio = esquemaLlista.getFellow("queryWindow")
-						.getFellow("queryDescripcio").getFellow("textbox");
-				defecte = null;
-				contrasenya = null;
-				
-				// Check enable query
-				if ((nom.value.trim().length() == 0) &&
-						(aplicacio.value.trim().length() == 0) &&
-						((bbdd == null) || (bbdd.getValue() == null)) &&
-						(descripcio.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
-				
-				// Add parameters to search
-				searchValues.put("nom", nom.value);
-				searchValues.put("aplicacio", aplicacio.value);
-				
-				if ((bbdd == null) || (bbdd.getValue() == null))
-					searchValues.put("bbdd", "");
-				
-				else
-					searchValues.put("bbdd", bbdd.value);
-				
-				searchValues.put("descripcio", descripcio.value);
-				
-				return searchValues;
-			}
-			
-			void search()
-			{
-				java.util.Map lista = new java.util.HashMap();
-				
-				if (!retrySearch)
-				{
-					lista = es.caib.seycon.ng.web.utils.
-						Autowildcards.replaceAsteriskChar(getSearchParameters());
-				}
-				
-				else
-				{
-					lista = es.caib.seycon.ng.web.utils.
-							Autowildcards.addPercentChar(getSearchParameters());
-				}
-				
-				for (String key : lista.keySet())
-				{
-					model.getVariables().declareVariable(key, lista.get(key));
-				}
-				
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
-				
-				listbox =	esquemaLlista.getFellow("lista").getFellow("listbox");
-				if(queryEnabled)
-				{
-					model.getJXPathContext().getValue("/rol").refresh();
-					listbox.dataPath = "/model:/rol"; 
-				}
-				
-				if ((listbox.getModel().getSize() == 0) && !retrySearch)
-				{
-					retrySearch = true;
-					search();
-				}
-				
-				else
-				{
-					retrySearch = false;
-				}
-				
-				checkTruncatedList(listbox);
-			}
-			
-			void showAltres () 
-			{
-				if (view_altres == false)
-				{
-					esquemaLlista.getFellow("queryWindow").setHeight("120px"); 
-					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
-					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
-					view_altres = true;
-				}
-				else
-				{
-					esquemaLlista.getFellow("queryWindow").setHeight("77px"); 
-					esquemaLlista.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
-					esquemaLlista.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
-					view_altres = false;
-				}
-			}
 			
 			void cleanWindow()
 			{
-				queryWindow = esquemaLlista.getFellow("queryWindow");
-				queryWindow.getFellow("queryNom").getFellow("textbox").value = "";
-				queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
-				queryWindow.getFellow("queryBbdd").setSelectedIndex(0);
-				queryWindow.getFellow("queryAplicacio").getFellow("textbox").value = "";
-				model.getVariables().declareVariable("queryEnabled", false);
-				lista.getFellow("listbox").dataPath = "/model:/rol[false]";
-				esquemaLlista.visible=false;
-				view_altres = false;
-				esquemaLlista.getFellow("finishButton").disabled = true;
+				esquemaLlista.setVisible(false);
 			}
 			
 			void acceptaDada()
@@ -180,16 +58,15 @@
 				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("aplica_rolsllista.Titol"));
 				
 				aplicacio = desktop.getPage("rolsLlista").getAttribute("aplicacio");
-				if (aplicacio != null)
-					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue(aplicacio);
-				else
-					esquemaLlista.getFellow("queryWindow").getFellow("queryAplicacio").getFellow("textbox").setValue("");
+				esquemaLlista.getFellow("queryWindow").getFellow("searchBox").
+						getAttributeSearchBox("informationSystemName") .setSearchFilter(aplicacio);										
 
 				if(self.mode.compareToIgnoreCase("highlighted") != 0){
 					self.setMode("highlighted");
 				}else{
 					self.visible = true;
 				}
+				model.getVariables().declareVariable("queryEnabled", true);
 			]]>
 		</attribute>
 		<attribute name="onClose">
@@ -200,29 +77,10 @@
 		</attribute>
 		
 		<criteris id="queryWindow" onOK="search()">
-			<hbox>
-				<input_criteri id="queryNom"
-					etiqueta="${c:l('aplica_rolsllista.zul.Nom')}" 
-					onChange=""/>
-				<input_criteri id="queryAplicacio"
-					etiqueta="${c:l('aplica_rolsllista.zul.Aplicacia')}"
-					onChange=""/>
-				<imageclic onClick="search()" src="~./img/fletxa_cerca.gif"/>
-			</hbox>
-			<hbox>
-				<hbox width="250px" widths="100px,*">
-					<label sclass="etiqueta"
-						value="${c:l('aplica_rolsllista.zul.Basededades')}" />
-					<listbox id="queryBbdd" mold="select" dataPath="/model:/dispatcher">
-						<dataitem bind="@codi">
-							<listcell bind="@codi" />
-						</dataitem>
-					</listbox>
-				</hbox>
-				
-				<input_criteri id="queryDescripcio"
-					etiqueta="${c:l('aplica_rolsllista.zul.Descripcia')}"/>
-			</hbox>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Role" 
+				defaultAttributes="name, description, informationSystemName, system"
+				dataPath="/model:/rol" variableName="roleQuery"></searchbox>
 		</criteris>
 		
 		<navegador id="lista">

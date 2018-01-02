@@ -9,7 +9,7 @@ import com.soffid.iam.bpm.job.NotLoggedThread;
 import com.soffid.iam.bpm.service.ejb.BpmJobExecutor;
 
 public class IndexerThread extends NotLoggedThread {
-
+	
 	public IndexerThread() {
 		super();
 		setName("IndexerThread"); //$NON-NLS-1$

@@ -52,7 +52,6 @@ public class TenantFilter implements Filter {
 			s.invalidate();
 			httpResp.sendRedirect(httpReq.getContextPath());
 		} else {
-			
 			String previousTenant = (String) s.getAttribute("tenant");
 			if (previousTenant == null)
 			{

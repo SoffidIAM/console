@@ -71,21 +71,26 @@ public class DocumentOutputStream extends OutputStream {
 	}
 
 
+	boolean closed = false;
 	@Override
 	public void close() throws IOException {
-		flush ();
-		try {
-			if (documentService != null)
-				documentService.endUploadTransfer();
-			if (ejbDocumentService != null)
-				ejbDocumentService.endUploadTransfer();
-			
-		} catch (InternalErrorException e) {
-			throw new IOException("Cannot upload document", e);
-		} catch (DocumentBeanException e) {
-			throw new IOException("Cannot upload document", e);
+		if (!closed)
+		{
+			closed = true;
+			flush ();
+			try {
+				if (documentService != null)
+					documentService.endUploadTransfer();
+				if (ejbDocumentService != null)
+					ejbDocumentService.endUploadTransfer();
+				
+			} catch (InternalErrorException e) {
+				throw new IOException("Cannot upload document", e);
+			} catch (DocumentBeanException e) {
+				throw new IOException("Cannot upload document", e);
+			}
+			super.close();
 		}
-		super.close();
 	}
 
 

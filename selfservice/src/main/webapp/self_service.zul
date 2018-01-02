@@ -28,7 +28,8 @@
 		                
 		                if (usuarioSeleccionado != null && ! usuarioSeleccionado.equals(es.caib.seycon.ng.utils.Security.getCurrentUser()))
 		                {
-			                List accounts = es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().findAccountsToDelegate(ra, usuarioSeleccionado);
+		                	com.soffid.iam.api.RoleAccount ra2 = com.soffid.iam.api.RoleAccount.toRoleAccount(ra);
+			                List accounts = es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().findAccountsToDelegate(ra2, usuarioSeleccionado);
 			                newDelegation.getFellow("roleName").setValue(ra.getNomRol());
 			                newDelegation.getFellow("userName").setValue(usuarioSeleccionado);
 			                Listbox lb = newDelegation.getFellow("account");
@@ -59,12 +60,13 @@
 			 		void acceptDelegate ()
 			 		{
 			 			RolAccount ra = pageScope{"roleToDelegate"};
+	                	com.soffid.iam.api.RoleAccount ra2 = com.soffid.iam.api.RoleAccount.toRoleAccount(ra);
 			 			String user = pageScope{"userToDelegate"};
 		                Listbox lb = newDelegation.getFellow("account");
 		                String account = lb.getSelectedItem() == null ? null : lb.getSelectedItem().getValue();
 		                Date since =  newDelegation.getFellow("since").getValue ();
 		                Date until = newDelegation.getFellow("until").getValue ();
-		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().delegate(ra, user, account, since, until);
+		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().delegate(ra2, user, account, since, until);
 		                model.getValue("/usuari[1]/rol").refresh();
 			 			newDelegation.setVisible(false);
 			 		}
@@ -72,7 +74,8 @@
 			 		void cancelDelegate (Component comp)
 			 		{
 			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
-		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().cancelDelegation(ra);
+	                	com.soffid.iam.api.RoleAccount ra2 = com.soffid.iam.api.RoleAccount.toRoleAccount(ra);
+		                es.caib.seycon.ng.EJBLocator.getEntitlementDelegationService().cancelDelegation(ra2);
 		                model.getValue("/usuari[1]/rol").refresh();
 			 		}
 

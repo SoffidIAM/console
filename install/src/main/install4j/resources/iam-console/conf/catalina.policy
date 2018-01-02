@@ -67,10 +67,6 @@ grant codeBase "file:///${catalina.home}/bin/tomcat-juli.jar" {
         permission java.security.AllPermission;
 };
 
-grant codeBase "file:/home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/bin/bootstrap.jar" {
-        permission java.security.AllPermission;
-};
-
 // These permissions apply to the server startup code
 grant codeBase "file://${catalina.home}/bin/bootstrap.jar" {
         permission java.security.AllPermission;
@@ -87,10 +83,6 @@ grant codeBase "file://${catalina.home}/lib/-" {
 // If using a per instance lib directory, i.e. ${catalina.base}/lib,
 // then the following permission will need to be uncommented
 grant codeBase "file:${catalina.base}/lib/-" {
-        permission java.security.AllPermission;
-};
-
-grant codeBase "file:///home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/lib/*" {
         permission java.security.AllPermission;
 };
 

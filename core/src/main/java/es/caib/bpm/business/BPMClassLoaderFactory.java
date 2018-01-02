@@ -2,6 +2,8 @@ package es.caib.bpm.business;
 
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class BPMClassLoaderFactory implements ProcessClassLoaderFactory, Seriali
 
 	HashMap<Long, WeakReference<ClassLoader> > loaders = new HashMap<Long, WeakReference<ClassLoader> >();
 	
-	public ClassLoader getProcessClassLoader(ProcessDefinition processDefinition) {
+	public ClassLoader getProcessClassLoader(final ProcessDefinition processDefinition) {
 		ClassLoader cl = null;
 		WeakReference<ClassLoader> wcl = loaders.get(processDefinition.getId());
 		if (wcl != null)
@@ -27,7 +29,7 @@ public class BPMClassLoaderFactory implements ProcessClassLoaderFactory, Seriali
 		{
 			FileDefinition fd = processDefinition.getFileDefinition();
 			Map map = fd.getBytesMap();
-			Map newMap = new HashMap();
+			final Map newMap = new HashMap();
 			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
 				String key = (String) it.next();
 				if (key.startsWith("classes/")) {  //$NON-NLS-1$
@@ -38,7 +40,14 @@ public class BPMClassLoaderFactory implements ProcessClassLoaderFactory, Seriali
 					}
 				}
 			}
-			cl = new UIClassLoader(processDefinition.getId(), newMap, ClassLoaderUtil.getClassLoader());
+			cl = AccessController.doPrivileged(
+					new PrivilegedAction<ClassLoader>() {
+						@Override
+						public ClassLoader run() {
+							return new UIClassLoader(processDefinition.getId(), newMap, ClassLoaderUtil.getClassLoader());
+						}
+					}
+			);
 			loaders.put(processDefinition.getId(), new WeakReference<ClassLoader>(cl));
 		}
 		return cl;

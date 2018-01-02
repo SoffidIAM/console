@@ -976,7 +976,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected List handleFindMyTasks() throws Exception {
 		JbpmContext context = getContext();
 		try {
-			Vector resultadoFinal = new Vector();
+			Vector<TaskInstance> resultadoFinal = new Vector<TaskInstance>();
 			// u88683: solucionem problema de oracle quan n'hi ha més de 1000
 			// elements
 			// és una restricció ORA-01795: maximum number of expressions in a
@@ -1027,7 +1027,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					}
 
 			}
-
+			
 			return resultadoFinal;
 		} finally {
 			flushContext(context);
@@ -1756,8 +1756,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
-	@Override
-	protected List handleFindProcessDefinitions(String name, boolean onlyEnabled)
+	protected List findProcessDefinitionsByRole(String name, boolean onlyEnabled)
 			throws Exception {
 		JbpmContext context = getContext();
 		try {
@@ -1774,6 +1773,36 @@ public class BpmEngineImpl extends BpmEngineBase {
 				if (tm.getTenantId().equals ( Security.getCurrentTenantId()) &&
 					business
 						.isUserAuthorized(name, getUserGroups(), definition)) {
+					com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
+							.newProcessDefinition(definition, context);
+					if (def.isEnabled() || !onlyEnabled)
+						resultadoFinal.add(def);
+				}
+			}
+			return resultadoFinal;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected List handleFindProcessDefinitions(String name, boolean onlyEnabled)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			Vector resultadoFinal = new Vector();
+			for (Iterator it = context.getGraphSession()
+					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
+				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
+						.next();
+
+				TenantModuleDefinition tm = (TenantModuleDefinition) definition.getDefinition(TenantModuleDefinition.class);
+				
+				if (tm.getTenantId().equals ( Security.getCurrentTenantId()) &&
+						(name == null || name.isEmpty() || name.equals(definition.getName())))
+				{
 					com.soffid.iam.bpm.api.ProcessDefinition def = VOFactory
 							.newProcessDefinition(definition, context);
 					if (def.isEnabled() || !onlyEnabled)
@@ -1996,17 +2025,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	@Override
 	protected List handleFindInitiatorProcessDefinitions() throws Exception {
-		return findProcessDefinitions(INITIATOR_ROLE, true);
+		return findProcessDefinitionsByRole(INITIATOR_ROLE, true);
 	}
 
 	@Override
 	protected List handleFindObserverProcessDefinitions() throws Exception {
-		return findProcessDefinitions(OBSERVER_ROLE, true);
+		return findProcessDefinitionsByRole(OBSERVER_ROLE, true);
 	}
 
 	@Override
 	protected List handleFindSupervisorProcessDefinitions() throws Exception {
-		return findProcessDefinitions(SUPERVISOR_ROLE, true);
+		return findProcessDefinitionsByRole(SUPERVISOR_ROLE, true);
 	}
 
 	@Override
@@ -2640,20 +2669,20 @@ public class BpmEngineImpl extends BpmEngineBase {
 		p.add (new Parameter("tenantId", Security.getCurrentTenantId()));
 		
 		if (userName != null) {
-			clauses.add("usuari.userName like :userName"); //$NON-NLS-1$
-			p.add(new Parameter("userName", userName)); //$NON-NLS-1$
+			clauses.add("upper(usuari.userName) like :userName"); //$NON-NLS-1$
+			p.add(new Parameter("userName", userName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (givenName != null) {
-			clauses.add("usuari.fistName like :givenName"); //$NON-NLS-1$
-			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
+			clauses.add("upper(usuari.firstName) like :givenName"); //$NON-NLS-1$
+			p.add(new Parameter("givenName", givenName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add("concat(usuari.primerLlinatge,' ',usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
-			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
+			clauses.add("upper(concat(usuari.lastName,' ',usuari.middleName)) like :surName"); //$NON-NLS-1$
+			p.add(new Parameter("surName", surName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (group != null) {
-			clauses.add("usuari.primaryGroup.name like :group"); //$NON-NLS-1$
-			p.add(new Parameter("group", group)); //$NON-NLS-1$
+			clauses.add("upper(usuari.primaryGroup.name) like :group"); //$NON-NLS-1$
+			p.add(new Parameter("group", group.toUpperCase())); //$NON-NLS-1$
 		}
 		for (String subClause : clauses) {
 			clause.append(" and "); //$NON-NLS-1$
@@ -2663,7 +2692,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 				p.toArray(new Parameter[p.size()]));
 		if (result.isEmpty()) {
 			for (Parameter param : p) {
-				param.setValue("%" + param.getValue() + "%");
+				if (param.getValue() instanceof String)
+					param.setValue("%" + param.getValue() + "%");
 			}
 		}
 		result = getUserEntityDao().query(clause.toString(),

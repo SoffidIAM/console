@@ -13,6 +13,8 @@ import com.soffid.iam.service.AttributeTranslationService;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.servei.PasswordService;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverOnly=true,
@@ -51,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.DispatcherService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,
+	PasswordService.class,
 	CustomObjectService.class,
 	AttributeTranslationService.class})
 public abstract class ServerService {

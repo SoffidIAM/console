@@ -35,8 +35,6 @@
 </zscript>
 
 <frame id="p_perfil" title="${c:l('perfil.Titol')}" width="99%">
-	<style src="~./styles/estil.css"/>
-	<style src="/css/localSEU.css"/>
 	<style>
 		.workarea span {font-size: 12px}
 		span.u {text-decoration: underline;}

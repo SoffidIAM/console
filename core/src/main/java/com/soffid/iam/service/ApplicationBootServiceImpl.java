@@ -52,6 +52,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
@@ -92,10 +93,10 @@ public class ApplicationBootServiceImpl extends
 	@Override
 	protected void handleSyncServerBoot() throws Exception {
 		loadServiceHandlers();
-		System.setProperty(
+		ConfigurationCache.setProperty(
 				"soffid.ui.maxrows", Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 		configureSystemProperties();
-		System.setProperty(
+		ConfigurationCache.setProperty(
 				"soffid.ui.maxrows", Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 	}
 
@@ -271,7 +272,19 @@ public class ApplicationBootServiceImpl extends
 			
 			Configuration cfg = configSvc.findParameterByNameAndNetworkName(
 					"versionLevel", null); //$NON-NLS-1$
-			if (cfg.getValue().equals("100")) { //$NON-NLS-1$
+			if (cfg == null)
+			{
+				cfg = new Configuration("masterVersionLevel", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+				configSvc.create(cfg);				
+			}
+			int version = Integer.parseInt(cfg.getValue()); 
+			if ( version > 0 && version < 100)
+			{
+				updateFromVersion1 ();
+				cfg.setValue("100"); //$NON-NLS-1$
+				configSvc.update(cfg);
+			}
+			if (version < 101) { //$NON-NLS-1$
 				cfg.setValue("101"); //$NON-NLS-1$
 				updateMandatoryRolGrant();
 				configSvc.update(cfg);
@@ -307,13 +320,66 @@ public class ApplicationBootServiceImpl extends
 			BPMException, IOException, NamingException, SQLException {
 
 		Configuration cfg = configSvc.findParameterByNameAndNetworkName(
-				"versionLevel", null); //$NON-NLS-1$
+				"tenantVersionLevel", null); //$NON-NLS-1$
 		boolean firstSetup = (cfg == null);
 		if (firstSetup) {
 			createInitialData();
 			configureDocumentManager();
-			cfg = new Configuration("versionLevel", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+			cfg = new Configuration("tenantVersionLevel", "101"); //$NON-NLS-1$ //$NON-NLS-2$
 			configSvc.create(cfg);
+		} 
+	}
+
+	private void updateFromVersion1() throws SQLException 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			Long tenantId = Security.getCurrentTenantId();
+			String[] tables = { "BPM_DOCUMENT", "DOC_TEN_ID", 
+					"SC_ATTTRA", "ATT_TEN_ID",
+					"SC_CUOBTY", "COT_TEN_ID",
+					"SC_RULE", "RUL_TEN_ID",
+					"SC_SCHTAS", "SCT_TEN_ID",
+					"SC_APLICA", "APL_TEN_ID",
+					"SC_AUDITO", "AUD_TEN_ID",
+					"SC_AUTROL", "AUR_TEN_ID",
+					"SC_CONFIG", "CON_TEN_ID",
+					"SC_DISPAT", "DIS_TEN_ID",
+					"SC_DOMCON", "DCN_TEN_ID",
+					"SC_DOMCOR", "DCO_TEN_ID",
+					"SC_DOMUSU", "DOU_TEN_ID",
+					"SC_GRUPS", "GRU_TEN_ID",
+					"SC_IMPRES", "IMP_TEN_ID",
+					"SC_LLICOR", "LCO_TEN_ID",
+					"SC_MAQUIN", "MAQ_TEN_ID",
+					"SC_PUNENT", "PUE_TEN_ID",
+					"SC_REGACC", "RAC_TEN_ID",
+					"SC_SERVEI", "SER_TEN_ID",
+					"SC_SERPLU", "SPL_TEN_ID",
+					"SC_SODRUL", "SOD_TEN_ID",
+					"SC_TASQUE", "TAS_TEN_ID",
+					"SC_TIPDAD", "TDA_TEN_ID",
+					"SC_TIPUSUO", "TUO_TEN_ID",
+					"SC_TIPUSU", "TUS_TEN_ID",
+					"SC_USUARI", "USU_TEN_ID",
+					"SC_XARXES", "XAR_TEN_ID"
+					};
+			for (int i = 0; i < tables.length; i += 2)
+			{
+				executeSentence(conn, "UPDATE "+tables[i]+" SET "+tables[i+1]+"=? WHERE "+tables[i+1]+" IS NULL",
+								new Object[] {tenantId});
+			}
+			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
+					+ "SELECT SRV_ID, ?, SRV_ID "
+					+ "FROM SC_SERVER",
+					new Object[] {tenantId});
+		}
+		finally
+		{
+			conn.close();
 		}
 	}
 
@@ -550,7 +616,7 @@ public class ApplicationBootServiceImpl extends
 			Configuration configuracio = new Configuration();
 			configuracio.setCode("soffid.ui.docStrategy"); //$NON-NLS-1$
 			configuracio
-					.setValue("es.caib.bpm.nas.comm.LocalFileSystemStrategy"); //$NON-NLS-1$
+					.setValue( DatabaseStrategy.class.getName());
 			configSvc.create(configuracio);
 		}
 

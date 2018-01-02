@@ -6,6 +6,7 @@
 package com.soffid.iam.model;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -21,5 +22,12 @@ public class SamlRequestEntityDaoImpl extends SamlRequestEntityDaoBase
 		{
 			remove(as);
 		}
+	}
+
+	@Override
+	public void create(SamlRequestEntity entity) {
+		if (entity.getExpirationDate() == null)
+			entity.setExpirationDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 )); // 1 hour
+		super.create(entity);
 	}
 }

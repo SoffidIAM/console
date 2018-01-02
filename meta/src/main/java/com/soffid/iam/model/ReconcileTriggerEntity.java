@@ -26,6 +26,7 @@ public class ReconcileTriggerEntity {
 	public java.lang.String script;
 
 	@Column (name="RPA_TYPE")
+	@Nullable
 	public SoffidObjectType objectType;
 
 	@Column (name="RPA_DIS_ID", reverseAttribute="reconcileTriggers", composition=true)

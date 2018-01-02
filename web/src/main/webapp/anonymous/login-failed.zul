@@ -3,6 +3,7 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
+	<style src="/css/devices.css"/>
 		<zscript><![CDATA[
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)		                  
 				org.zkoss.util.resource.Labels.register(new es.caib.bpm.ui.BPMLabelLocator());

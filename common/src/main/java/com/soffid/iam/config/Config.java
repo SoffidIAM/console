@@ -369,9 +369,14 @@ public class Config {
         }
     }
 
+	public String port = null;
     public String getPort() throws RemoteException, InternalErrorException {
         if (isServer())
-            return serverService.getConfig("seycon.https.port"); //$NON-NLS-1$
+        {
+        	if (port == null)
+                port = serverService.getConfig("seycon.https.port"); //$NON-NLS-1$
+        	return port;
+        }
         else
             return prop.getProperty(PORT_PROPERTY); //$NON-NLS-1$
     }

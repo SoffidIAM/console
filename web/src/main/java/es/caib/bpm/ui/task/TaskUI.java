@@ -346,6 +346,7 @@ public class TaskUI extends Frame implements EventListener {
 	                    disableInputbox(componenteGenerado);
                 } catch (Exception e) {
 	        		Label l = new Label (e.toString());
+	        		l.setStyle("color: red");
 	        		l.setMultiline(true);
 	                ventanaDinamica.getChildren().clear();
 	        		ventanaDinamica.appendChild(l);
@@ -372,7 +373,31 @@ public class TaskUI extends Frame implements EventListener {
                 window.setEngine(engine);
                 window.setSignatureHandler(new SignatureManager(window));
 
-                Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
+                try {
+                	Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
+                } catch (Exception e) {
+	            	window.detach();;                	
+
+	            	Label l = new Label (e.toString());
+	        		l.setStyle("color: red");
+	        		l.setMultiline(true);
+	                ventanaDinamica.getChildren().clear();
+	        		ventanaDinamica.appendChild(l);
+	            	PageDefinition def = Executions.getCurrent().getPageDefinition("/wf/process/default.zul"); //$NON-NLS-1$
+	            	Executions.createComponents(def, ventanaDinamica, null);
+	            	window = getWorkflowWindow();
+	            	if (window != null)
+	            	{
+		            	window.setTask(task);
+		                window.setProcessInstance(instanciaProceso);
+		                window.setEngine(engine);
+		                window.setSignatureHandler(new SignatureManager(window));
+		                try {
+		                	Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
+		                } catch (Throwable th ) {
+		                }
+	            	}
+                }
 
                 tabAnexos.setVisible(
                         window.isShowAttachments() && canManage);

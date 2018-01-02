@@ -340,7 +340,13 @@ public class BpmEngineImpl extends BpmEngineBase {
 			org.jbpm.graph.exe.ProcessInstance instance = context
 					.getProcessInstance(process.getId());
 			startAuthenticationLog(instance.getRootToken());
+			
+			org.jbpm.graph.exe.Token token = instance.getRootToken();
+
+			cancelJobs(context, token);
+
 			instance.end();
+
 			for (Iterator it = instance.getTaskMgmtInstance()
 					.getTaskInstances().iterator(); it.hasNext();) {
 				org.jbpm.taskmgmt.exe.TaskInstance taskInstance = (org.jbpm.taskmgmt.exe.TaskInstance) it
@@ -350,12 +356,24 @@ public class BpmEngineImpl extends BpmEngineBase {
 					taskInstance.cancel();
 				}
 			}
+			
 			endAuthenticationLog(instance.getRootToken());
 			context.save(instance);
 			return VOFactory.newProcessInstance(instance);
 		} finally {
 			flushContext(context);
 		}
+	}
+
+	private void cancelJobs(JbpmContext context, org.jbpm.graph.exe.Token token) {
+		List l = context.getJobSession().findJobsByToken(token);
+		for (Iterator it = l.iterator(); it.hasNext();) {
+			org.jbpm.job.Job j = (org.jbpm.job.Job) it.next();
+			context.getJobSession().deleteJob(j);
+		}
+		
+		for (org.jbpm.graph.exe.Token t: token.getChildren().values())
+			cancelJobs(context, t);
 	}
 
 	/* (non-Javadoc)
@@ -990,7 +1008,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected List handleFindMyTasks() throws Exception {
 		JbpmContext context = getContext();
 		try {
-			Vector resultadoFinal = new Vector();
+			Vector<TaskInstance> resultadoFinal = new Vector<TaskInstance>();
 			// u88683: solucionem problema de oracle quan n'hi ha més de 1000
 			// elements
 			// és una restricció ORA-01795: maximum number of expressions in a
@@ -1036,7 +1054,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					}
 
 			}
-
+			
 			return resultadoFinal;
 		} finally {
 			flushContext(context);
@@ -2593,20 +2611,20 @@ public class BpmEngineImpl extends BpmEngineBase {
 		List<String> clauses = new LinkedList<String>();
 		StringBuffer query = new StringBuffer(); 
 		if (userName != null) {
-			clauses.add ("usuari.codi like :userName"); //$NON-NLS-1$
-			p.add(new Parameter("userName", userName)); //$NON-NLS-1$
+			clauses.add ("upper(usuari.codi) like :userName"); //$NON-NLS-1$
+			p.add(new Parameter("userName", userName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (givenName != null) {
-			clauses.add ("usuari.nom like :givenName"); //$NON-NLS-1$
-			p.add(new Parameter("givenName", givenName)); //$NON-NLS-1$
+			clauses.add ("upper(usuari.nom) like :givenName"); //$NON-NLS-1$
+			p.add(new Parameter("givenName", givenName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add ("concat(usuari.primerLlinatge,' ',usuari.segonLlinatge) like :surName"); //$NON-NLS-1$
-			p.add(new Parameter("surName", surName)); //$NON-NLS-1$
+			clauses.add ("upper(concat(usuari.primerLlinatge),' ',usuari.segonLlinatge)) like :surName"); //$NON-NLS-1$
+			p.add(new Parameter("surName", surName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (group != null) {
-			clauses.add ("usuari.grupPimari.codi like :group"); //$NON-NLS-1$
-			p.add(new Parameter("group", group)); //$NON-NLS-1$
+			clauses.add ("upper(usuari.grupPimari.codi) like :group"); //$NON-NLS-1$
+			p.add(new Parameter("group", group.toUpperCase())); //$NON-NLS-1$
 		}
 		StringBuffer clause = new StringBuffer ();
 		clause.append("select usuari " + //$NON-NLS-1$

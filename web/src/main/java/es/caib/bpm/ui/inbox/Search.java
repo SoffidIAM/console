@@ -119,11 +119,10 @@ public class Search extends Frame
 				ProcessInstance instance = (ProcessInstance)it.next();
 				if (chkFinalizada.isChecked() || instance.getEnd() == null)
 				{
-					ProcessDefinition definition = engine.getProcessDefinition(instance);
 					item= new Listitem();
 					item.setValue(instance);
 					item.appendChild(new Listcell(Long.toString(instance.getId())));
-					item.appendChild(new Listcell(definition.getName()));
+					item.appendChild(new Listcell(instance.getDescription()));
 					item.appendChild(new Listcell(instance.getCurrentTask()));
 					item.appendChild(new Listcell(instance.getStart() != null? formatConHora.format(instance.getStart()): ""));
 					item.appendChild(new Listcell((instance.getEnd()!= null) ?

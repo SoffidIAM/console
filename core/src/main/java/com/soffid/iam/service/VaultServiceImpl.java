@@ -372,7 +372,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 	
 	@Override
 	protected List<VaultFolder> handleGetRootFolders() throws Exception {
-		List<VaultFolderEntity> list = getVaultFolderEntityDao().findRoots();
+		List<VaultFolderEntity> list = getVaultFolderEntityDao().findPublicRoots();
+		if (Security.getCurrentUser() != null)
+			list.addAll( getVaultFolderEntityDao().findPersonalFolders(Security.getCurrentUser()) );
+		
 		List<VaultFolder> folders = getVaultFolderEntityDao().toVaultFolderList(list);
 		filterFolders(folders);
 		
@@ -946,5 +949,26 @@ public class VaultServiceImpl extends VaultServiceBase {
 			return null;
 		else
 			return folder;
+	}
+
+	@Override
+	protected List<VaultFolder> handleGetPublicRootFolders() throws Exception {
+		List<VaultFolderEntity> list = getVaultFolderEntityDao().findPublicRoots();
+		List<VaultFolder> folders = getVaultFolderEntityDao().toVaultFolderList(list);
+		filterFolders(folders);
+		
+		
+		Collections.sort(folders, new Comparator<VaultFolder>() {
+			public int compare(VaultFolder o1, VaultFolder o2) {
+				if (o1.isPersonal() && ! o2.isPersonal())
+					return -1;
+				else if (! o1.isPersonal() && o2.isPersonal())
+					return +1;
+				else
+					return o1.getName().compareTo(o2.getName());
+			}
+		});
+		
+		return folders;
 	}
 }

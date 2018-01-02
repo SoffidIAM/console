@@ -35,8 +35,9 @@
 					
 						</vbox>
 			
-						<hbox id="newCommentBox" width="100%">
-							<textbox id="newComment" multiline="true" rows="3" width="80%"/>
+						<hbox id="newCommentBox" width="100%" widths="20%,80%">
+							<label value="${c:l('task.addcomentari')}"/>
+							<textbox id="newComment" multiline="true" width="100%" rows="3"/>
 						</hbox>
 					</form>
 				</tabpanel>

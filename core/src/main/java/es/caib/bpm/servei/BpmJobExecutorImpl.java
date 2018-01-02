@@ -153,12 +153,16 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		}
 	}
 
+	long last = System.currentTimeMillis();
+
 	@Override
 	protected void handleIndexPendingProcesses() throws Exception {
+		long newExecution = System.currentTimeMillis();
 		Indexer i = Indexer.getIndexer ();
 		JbpmContext ctx = Configuration.getConfig().createJbpmContext();
 		try {
-			i.flush(ctx.getSession());
+			i.flush(ctx.getSession(), last, newExecution);
+			last = newExecution;
 		} catch (Exception e) {
 			log.warn(Messages.getString("BpmJobExecutorImpl.IndexingError"), e); //$NON-NLS-1$
 		} finally {

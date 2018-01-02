@@ -66,58 +66,14 @@ public class IndexEventListener
 	private Log log = LogFactory.getLog(IndexEventListener.class);
 	
 	public boolean onPreInsert(PreInsertEvent event) {
-		process (event.getSource(), event.getEntity());
 		return false;
 	}
 
 	public boolean onPreUpdate(PreUpdateEvent event) {
-		process (event.getSource(), event.getEntity());
 		return false;
 	}
 
-	private void process(SessionImplementor sessionImplementor, Object entity) {
-		
-		if (entity instanceof ProcessInstance)
-		{
-			ProcessInstance pi = (ProcessInstance) entity;
-			index(sessionImplementor, pi);
-		}
-		if (entity instanceof VariableInstance)
-		{
-			VariableInstance vi = (VariableInstance) entity;
-			index(sessionImplementor, vi.getProcessInstance());
-		}
-	}
-
-	private void index(SessionImplementor sessionImplementor, ProcessInstance processInstance) {
-		IndexSession s = IndexSession.getSesion(sessionImplementor);
-		s.getProcesses().add(processInstance);
-	}
-
 	public void onFlush(FlushEvent event) throws HibernateException {
-		IndexSession s = IndexSession.getSesion(event.getSession());
-		try {
-			s.setInFlush(true);
-			flushDefault.onFlush(event);
-			try {
-				Indexer indexer = Indexer.getIndexer();
-				for ( Iterator it = s.getProcesses().iterator(); it.hasNext();)
-				{
-					ProcessInstance processInstance = (ProcessInstance) it.next();
-					Document d = indexer.generateDocument(processInstance); 
-					s.getDocuments().add( d );
-					it.remove();
-				}
-			} catch (Throwable e) {
-				log.warn(e);
-			}
-			Indexer indexer = Indexer.getIndexer();
-			for ( Iterator it = s.getDocuments().iterator(); it.hasNext(); )
-			{
-				indexer.enqueue((Document) it.next());
-			}
-		} finally {
-			s.clear(event.getSession());
-		}
+		flushDefault.onFlush(event);
 	}
 }

@@ -295,8 +295,10 @@ public class DadesAddicionalsServiceImpl extends
 	public DadaUsuari handleUpdate(DadaUsuari dadaUsuari) throws InternalErrorException {
 		if (dadaUsuari.getId() != null) {
 			auditChange(dadaUsuari);
-			if (dadaUsuari.getValorDada() == null
-					|| "".equals(dadaUsuari.getValorDada().trim())) { //$NON-NLS-1$
+			if (dadaUsuari.getValorDadaDate() == null && 
+					dadaUsuari.getBlobDataValue() == null && 
+					( dadaUsuari.getValorDada() == null || equals(dadaUsuari.getValorDada().trim().isEmpty())))
+			{ 
 				delete(dadaUsuari); // esborrar dada
 				dadaUsuari.setId(null);
 				return dadaUsuari;

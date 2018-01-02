@@ -176,7 +176,9 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 				
 				acc.getAcl().size() == 1  &&  /* Account already belongs to the user and only to the user*/
 				acc.getAcl().iterator().next().getUser() == ue &&
-				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER )
+				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER  ||
+				
+				acc.getStatus().equals (AccountStatus.REMOVED) )
 
 			{
 				acc.setType(AccountType.USER);

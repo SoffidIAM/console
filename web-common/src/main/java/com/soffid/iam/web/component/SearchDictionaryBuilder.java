@@ -3,6 +3,8 @@ package com.soffid.iam.web.component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -278,6 +281,31 @@ public class SearchDictionaryBuilder {
 					sd2.getAttributes().add(sad);
 				}
 			}
+		}
+		// Replace system attribute
+		try {
+			Collection<com.soffid.iam.api.System> list = EJBLocator.getDispatcherService().findDispatchersByFilter(null, null, null, null, null, null);
+			if (list.size() < 25)
+			{
+				for ( SearchAttributeDefinition sad: sd2.getAttributes())
+				{
+					if (sad.getName().equals("system"))
+					{
+						sd2.getAttributes().remove(sad);
+						sad = new SearchAttributeDefinition(sad);
+						List<String> dispatchers = new LinkedList<String>();
+						for (com.soffid.iam.api.System s: list) {
+							dispatchers.add(s.getName());
+						}
+						Collections.sort(dispatchers);
+						sad.setValues(dispatchers);
+						sad.setLabels(dispatchers);
+						sd2.getAttributes().add(sad);
+					}
+				}
+			}
+		} catch (Exception e) {
+			// Cannot retrieve accounts list
 		}
 		return sd2;
 	}

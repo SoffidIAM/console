@@ -76,10 +76,10 @@ public abstract class PuntEntradaEntity {
 	@Column(name = "PUE_IDAPL", translated = "applicationID")
 	public java.lang.Long idAplicacio;
 
-	@ForeignKey(foreignColumn = "PPE_IDPEFI", translated = "childrenEntryPointTree")
+	@ForeignKey(foreignColumn = "PPE_IDPEFI", translated = "parentEntryPointTree")
 	public java.util.Collection<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> arbrePuntEntradaSocFill;
 
-	@ForeignKey(foreignColumn = "PPE_IDPEPA", translated = "parentEntryPointTree")
+	@ForeignKey(foreignColumn = "PPE_IDPEPA", translated = "childrenEntryPointTree")
 	public java.util.Collection<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> arbrePuntEntradaSocPare;
 
 	@Column(name = "PUE_XML", length = 64000, translated = "xmlEntryPoint")

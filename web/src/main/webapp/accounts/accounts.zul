@@ -693,6 +693,8 @@
 										fixedLayout="true" height="400px" sclass="likeagrid">
 										<attribute name="onNewRow"><![CDATA[
 											ctx = XPathUtils.getComponentContext(event.data);
+											if (ctx == null)
+												return;
 											Listcell cellImage = event.data.getChildren().get(0);
 											Image image = cellImage.getChildren().get(0);
 											es.caib.seycon.ng.comu.SoDRisk risk = XPathUtils.getValue (ctx, "@sodRisk");

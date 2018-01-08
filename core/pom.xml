@@ -676,6 +676,12 @@
     		<artifactId>xmlsec</artifactId>
     		<version>2.0.6</version>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>dbtools</artifactId>
+			<version>1.16</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
 

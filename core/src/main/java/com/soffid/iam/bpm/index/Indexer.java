@@ -3,10 +3,12 @@ package com.soffid.iam.bpm.index;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -139,11 +141,12 @@ public class Indexer {
 				try {
 					Object value = m.get(key);
 					if (value != null) {
+						String s = toString(value);
 						d.add(new Field (prefix+key, 
-								value.toString(),
+								s,
 								Field.Store.NO, Field.Index.ANALYZED));
 						contents.append(" "); //$NON-NLS-1$
-						contents.append(value.toString());
+						contents.append(s);
 					}
 				} catch (Throwable t) {
 					// Error deserializing data
@@ -179,6 +182,47 @@ public class Indexer {
 			}
 		}
 		return contents;
+	}
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH24:mm");
+	
+	private String toString(Object value) {
+		if (value == null)
+			return "";
+		else if (value instanceof Date)
+		{
+			return sdf.format(value);
+		}
+		else if (value instanceof Calendar)
+		{
+			return sdf.format(value);
+		}
+		else if (value instanceof Map)
+		{
+			String s = "";
+			for ( Object t: ((Map) value).entrySet())
+			{
+				if (s.length() > 0)
+					s = s + " ";
+				s = s + toString(t);
+			}
+				
+			return s;
+		}
+		else if (value instanceof Collection)
+		{
+			String s = "";
+			for ( Object t: (Collection) value)
+			{
+				if (s.length() > 0)
+					s = s + " ";
+				s = s + toString(t);
+			}
+				
+			return s;
+		}
+		else
+			return value.toString();
 	}
 	
 	public void reindexAll ( ) throws IOException {

@@ -56,31 +56,33 @@
 				for (Iterator it = children.iterator(); it.hasNext();)
 				{
 					Treeitem item  = it.next();
-					Treerow row = item.getTreerow();
-					Collection grandchildren = row.getChildren();
-					for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
+					if (! "availableprocesses".equals (item.getId())) 
 					{
-						Component c = it2.next();
-						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
+						Treerow row = item.getTreerow();
+						Collection grandchildren = row.getChildren();
+						for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
 						{
-							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-							String menuPage=atc.getPagina();
-							if (menuPage != null)
+							Component c = it2.next();
+							if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 							{
-								i = menuPage.indexOf('?');
-								if ( i > 0)
-									menuPage = menuPage.substring(0, i);
-								if (page.equals(menuPage))
+								es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
+								String menuPage=atc.getPagina();
+								if (menuPage != null)
 								{
-									app.setInitialPage(target);
+									i = menuPage.indexOf('?');
+									if ( i > 0)
+										menuPage = menuPage.substring(0, i);
+									if (page.equals(menuPage))
+									{
+										app.setInitialPage(target);
+									}
 								}
 							}
 						}
-					}
-					if (item.getTreechildren() != null)
-						find (item.getTreechildren(), target);
+						if (item.getTreechildren() != null)
+							find (item.getTreechildren(), target);
 						
-							
+					}							
 				}
 			}
 			

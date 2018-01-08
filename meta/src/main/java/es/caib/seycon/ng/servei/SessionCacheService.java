@@ -13,6 +13,7 @@ import roles.Tothom;
 
 @Depends({ConfiguracioService.class})
 @Service (grantees={Tothom.class},
+		simple=true,
 		translatedName="SessionCacheService",
 		translatedPackage="com.soffid.iam.service")
 public abstract class SessionCacheService {

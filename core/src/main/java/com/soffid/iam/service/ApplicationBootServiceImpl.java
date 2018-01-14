@@ -357,7 +357,19 @@ public class ApplicationBootServiceImpl extends
 					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" IS NULL",
 							new Object[] {tenantId});
 	    			
+					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" = 0",
+							new Object[] {tenantId});
 	    		}
+	    	}
+	    	try {
+				executeSentence(conn, "UPDATE JBPM_MODULEDEFINITION SET TENANT_=?  WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+				executeSentence(conn, "UPDATE JBPM_MODULEINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+				executeSentence(conn, "UPDATE JBPM_TASKINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+	    	} catch (SQLException e) {
+	    		// Those tables do not exists during test cases
 	    	}
 			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
 					+ "SELECT SRV_ID, ?, SRV_ID "

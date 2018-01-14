@@ -272,10 +272,6 @@
 
 	</window>
 	
-	<include src="/finestres/aplica_rolsllista.zul"/>
-	<include src="/dominisllista.zul"/>
-	
-	<include src="/finestres/aplica_rol_valorDomini.zul"/>
 </div>
 
 </zk>

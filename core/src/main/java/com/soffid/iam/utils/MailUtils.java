@@ -14,6 +14,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.LogFactory;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class MailUtils {
@@ -111,14 +113,19 @@ public class MailUtils {
 		// -- Attaching to default Session, or we could start a new one --
 		props.put("mail.smtp.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
 		props.put("mail.smtps.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
-		props.list(System.out);
+		LogFactory.getLog(MailUtils.class).info("Mail host: "+props.getProperty("mail.smtp.host"));
 		Session session = Session.getDefaultInstance(props, authenticator);
 		session.setDebug(true);
 		return session;
 	}
+	
+	
 
 	private static String getConfigValue(String string, String defaultValue) {
-		return System.getProperty(string, defaultValue);
+		String v = ConfigurationCache.getProperty(string);
+		if (v == null)
+			v = defaultValue;
+		return v;
 	}
 
 	public static void sendHtmlMail(String smtpServer, String to, String from,

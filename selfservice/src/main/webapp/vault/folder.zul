@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?component name="account_acl" macro-uri="/accounts/accountAcl.zul"?>
+<?component name="account_acl" macro-uri="/accounts/accountAcl2.zul"?>
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
@@ -36,7 +36,8 @@
 		Events.sendEvent(new Event("onEnable", innerWindow.getFellow("userAcl"), true));
 		innerWindow.setTitle(org.zkoss.util.resource.Labels.getLabel("vault.folder.new"));
 		// Add current user as owner
-		es.caib.seycon.ng.comu.Usuari current = es.caib.seycon.ng.EJBLocator.getUsuariService().getCurrentUsuari();
+		com.soffid.iam.api.User current = com.soffid.iam.EJBLocator.getUserService().getCurrentUser();
+		
 		if (current != null)
 		{
 			es.caib.zkib.datasource.XPathUtils.createPath(model, path+"/ownerUsers", current);
@@ -156,24 +157,24 @@
 			col.setAlign("center");
 			col.setSclass("center-column");
 			Component ic = null;
-			if (obj instanceof es.caib.seycon.ng.comu.Grup)
+			if (obj instanceof com.soffid.iam.api.Group)
 			{
 				new Image ("/img/group.png").setParent(col);
-				new Label ( obj.getCodi ()).setParent (col);
+				new Label ( obj.getName ()).setParent (col);
 				ic = new es.caib.zkib.zkiblaf.ImageClic ("/img/link.png");
-       			ic.setAttribute("jmpUrl", "index.zul?embed&target=/grups.zul?group="+obj.getCodi());
+       			ic.setAttribute("jmpUrl", "index.zul?embed&target=/grups.zul?group="+obj.getName());
 			}
-			if (obj instanceof es.caib.seycon.ng.comu.Usuari)
+			if (obj instanceof com.soffid.iam.api.User)
 			{
 				new Image ("/img/user.png").setParent(col);
-				new Label ( obj.getCodi ()).setParent (col);
+				new Label ( obj.getUserName ()).setParent (col);
 				ic = new es.caib.zkib.zkiblaf.ImageClic ("/img/link.png");
-				ic.setAttribute("jumpUrl", "index.zul?embed&target=/usuaris.zul?user="+obj.getCodi());
+				ic.setAttribute("jumpUrl", "index.zul?embed&target=/usuaris.zul?user="+obj.getUserName());
 			}
-			if (obj instanceof es.caib.seycon.ng.comu.Rol)
+			if (obj instanceof com.soffid.iam.api.Role)
 			{
 				new Image ("/img/key.png").setParent(col);
-				new Label ( obj.getNom ()).setParent (col);
+				new Label ( obj.getName ()).setParent (col);
 			}
 			if (ic != null)
 			{
@@ -317,13 +318,13 @@
 			<div width="48%" style="float: left" id="aclDiv">
 				<label value="${c:l('accounts.owner')}" width="100%" />
 				<account_acl id="ownerAcl" userList="ownerUsers"  width="100%"
-					groupList="ownerGroups" roleList="ownerRoles" />
+					groupList="ownerGroups" roleList="ownerRoles" newApi="true"/>
 				<label value="${c:l('accounts.manager')}"  width="100%"/>
 				<account_acl id="managerAcl" userList="managerUsers"  width="100%"
-					groupList="managerGroups" roleList="managerRoles" />
+					groupList="managerGroups" roleList="managerRoles"  newApi="true"/>
 				<label value="${c:l('accounts.userAccess')}"  width="100%" />
 				<account_acl id="userAcl" userList="grantedUsers"  width="100%"
-					groupList="grantedGroups" roleList="grantedRoles" />
+					groupList="grantedGroups" roleList="grantedRoles"  newApi="true"/>
 			</div>
 		</div>
 		

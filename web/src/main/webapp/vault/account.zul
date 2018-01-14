@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?component name="account_acl" macro-uri="/accounts/accountAcl.zul"?>
+<?component name="account_acl" macro-uri="/accounts/accountAcl2.zul"?>
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
@@ -8,13 +8,14 @@
 <zk>
 	<zscript><![CDATA[
 	                 
-	import es.caib.seycon.ng.comu.Account;
+	import com.soffid.iam.api.Account;
 	import es.caib.seycon.ng.comu.AccountType;
-	import es.caib.seycon.ng.comu.Password;
+	import com.soffid.iam.api.Password;
 	
 	boolean canUpdateUserMetadata = false;
 	Component macro = self;
-	String ssoSystem = System.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+	String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+	String ssoPolicy = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOPolicy"); //$NON-NLS-1$
 
 	macro.addEventListener("onNewAccount", new org.zkoss.zk.ui.event.EventListener() {
 	void onEvent (Event evt) {
@@ -28,6 +29,11 @@
 	});
 	
 	void onNewAccount (String path) {
+		if (ssoSystem == null)
+			throw new UiException ("Configuration parameter AutoSSOSystem is not defined. Please, configure it");
+		if (ssoPolicy == null)
+			throw new UiException ("Configuration parameter AutoSSOPolicy is not defined. Please, configure it");
+		
 		canUpdateUserMetadata = true;
 
 		es.caib.zkib.component.Form form = innerWindow.getFellow("form");
@@ -62,8 +68,7 @@
 				es.caib.zkib.datasource.XPathUtils.createPath(model, path+"/"+pathToCopy, obj);
 			}
 		}
-		String ssoPolicy = System.getProperty("AutoSSOPolicy"); //$NON-NLS-1$
-		es.caib.zkib.datasource.XPathUtils.setValue(model, path+"/@dispatcher", ssoSystem);
+		es.caib.zkib.datasource.XPathUtils.setValue(model, path+"/@system", ssoSystem);
 		es.caib.zkib.datasource.XPathUtils.setValue(model, path+"/@passwordPolicy", ssoPolicy);
 		es.caib.zkib.datasource.XPathUtils.setValue(model, path+"/@type", es.caib.seycon.ng.comu.AccountType.SHARED);
 		// Create additional data
@@ -111,7 +116,7 @@
 		innerWindow.getFellow("inheritNewPermissionsCheckbox").setVisible( ! personal && isAdmin);
 		
 
-		if (ssoSystem. equals (es.caib.zkib.datasource.XPathUtils.getValue(model, path+"/@dispatcher")))
+		if (ssoSystem. equals (es.caib.zkib.datasource.XPathUtils.getValue(model, path+"/@system")))
 		{
 			String accountAttributeXPath = findNameAttribute();
 			if (accountAttributeXPath != null)
@@ -213,7 +218,7 @@
 		es.caib.seycon.ng.utils.Security.nestedLogin(es.caib.seycon.ng.utils.Security.getCurrentAccount(),
 				new String [] { es.caib.seycon.ng.utils.Security.AUTO_ACCOUNT_QUERY+es.caib.seycon.ng.utils.Security.AUTO_ALL});
 		try {
-			es.caib.seycon.ng.servei.AccountService accountService = es.caib.seycon.ng.ServiceLocator.instance()
+			com.soffid.iam.service.AccountService accountService = com.soffid.iam.ServiceLocator.instance()
 					.getAccountService();
 			long bits = 0;
 			long attempt = 1;
@@ -222,7 +227,7 @@
 			 */
 			do
 			{
-				es.caib.seycon.ng.comu.Account acc = accountService.findAccount(""+attempt, system);
+				Account acc = accountService.findAccount(""+attempt, system);
 				if (acc == null) break;
 				top = attempt;
 				attempt = attempt + attempt;
@@ -238,7 +243,7 @@
 			{
 				step = step / 2;
 				attempt = top + step;
-				es.caib.seycon.ng.comu.Account acc = accountService.findAccount(""+attempt, system);
+				Account acc = accountService.findAccount(""+attempt, system);
 				if (acc != null) top = attempt;
 				bits --;
 			}
@@ -255,22 +260,25 @@
 					.getDadesAddicionalsService();
 		Map map = new HashMap();
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(innerWindow.getFellow("form"));
-		List metadata = new LinkedList(dataService.findSystemDataTypes(ssoSystem));
-		Collections.sort(metadata, new Comparator() {
-		    int compare(Object td1, Object td2)
-		    {
-		    	return td1.ordre.compareTo(td2.ordre);
-		    }
-
-		});
-		for ( es.caib.seycon.ng.comu.TipusDada td: metadata)
+		if (ssoSystem != null && !ssoSystem.isEmpty())
 		{
-			es.caib.seycon.ng.comu.DadaUsuari du = new es.caib.seycon.ng.comu.DadaUsuari();
-			du.setCodiDada(td.getCodi());
-			du.setDataLabel(td.getLabel());
-			du.setSystemName(ssoSystem);
-			du.setVisibility(com.soffid.iam.api.AttributeVisibilityEnum.EDITABLE);
-			es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/attribute", du);
+			List metadata = new LinkedList(dataService.findSystemDataTypes(ssoSystem));
+			Collections.sort(metadata, new Comparator() {
+			    int compare(Object td1, Object td2)
+			    {
+			    	return td1.ordre.compareTo(td2.ordre);
+			    }
+	
+			});
+			for ( es.caib.seycon.ng.comu.TipusDada td: metadata)
+			{
+				es.caib.seycon.ng.comu.DadaUsuari du = new es.caib.seycon.ng.comu.DadaUsuari();
+				du.setCodiDada(td.getCodi());
+				du.setDataLabel(td.getLabel());
+				du.setSystemName(ssoSystem);
+				du.setVisibility(com.soffid.iam.api.AttributeVisibilityEnum.EDITABLE);
+				es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/attribute", du);
+			}
 		}
 		pageScope.put("accountNameOnAttribute", null);
 		pageScope.put("newAccount", Boolean.TRUE);
@@ -356,7 +364,7 @@
 	void onApply() {
 
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(innerWindow.getFellow("form"));
-		String system = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@dispatcher");
+		String system = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@system");
 		if (pageScope.get("newAccount"))
 		{
 			String currentName = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@name");
@@ -417,7 +425,7 @@
 				if (acc != null)
 					
 				{
-					es.caib.seycon.ng.servei.AccountService accountService = es.caib.seycon.ng.ServiceLocator.instance().getAccountService();
+					com.soffid.iam.service.AccountService accountService = com.soffid.iam.ServiceLocator.instance().getAccountService();
 					form.getFellow("updateIndicator").setVisible ( accountService.isUpdatePending(acc));
 					es.caib.zkib.datasource.DataSource ds = ctx.getDataSource();
 					
@@ -441,7 +449,7 @@
 			showPassword.getFellow("popupPwd").setValue("");
 			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
 			Account account = XPathUtils.getValue(ctx, ".").getInstance();
-			es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
+			com.soffid.iam.service.ejb.AccountService service = com.soffid.iam.EJBLocator.getAccountService();
 			if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
 			{
 				showPassword.getFellow("qpassword").setValue(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
@@ -539,7 +547,7 @@
 					public void onEvent(Event evt) {
 						if ("onOK".equals(evt.getName()))
 						{
-							es.caib.seycon.ng.servei.ejb.AccountService ejb = es.caib.seycon.ng.EJBLocator.getAccountService();
+							com.soffid.iam.service.ejb.AccountService ejb = com.soffid.iam.EJBLocator.getAccountService();
 							ejb.checkinHPAccount(acc);
 							innerWindow.getFellow("ownerRow").setVisible (false);
 						}
@@ -616,7 +624,7 @@
 											style="white-space:nowrap;"
 											value="${c:l('accounts.dispatcher')}:" />
 										<hbox>
-											<listbox bind="@dispatcher"
+											<listbox bind="@system"
 												id="lbAccountDispatcher" mold="select"
 												dataPath="/model:/dispatcher">
 												<dataitem

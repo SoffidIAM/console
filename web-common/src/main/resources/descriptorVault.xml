@@ -26,13 +26,13 @@
 				method="findAccounts"  if="${!directFilter}" > <!--agent:query, application:update -->
 				<parameter value="${filter}" />
 			</ejb-finder>
-			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
 				method="findAccount" if="${directFilter}"> <!--agent:query, application:update -->
 				<parameter value="${account}" />
 				<parameter value="${system}" />
 			</ejb-finder>
 			<new-instance-script>
-				bean = new es.caib.seycon.ng.comu.Account();
+				bean = new com.soffid.iam.api.Account();
 				bean.setType(es.caib.seycon.ng.comu.AccountType.SHARED);
 				bean.setGrantedUsers ( new LinkedList()) ;
 				bean.setGrantedRoles (new LinkedList());
@@ -48,10 +48,9 @@
 		</finder>
 		<finder name="type" type="type">
 			<script-finder>
-				import es.caib.seycon.ng.comu.*;
 				list = new java.util.LinkedList();
 				list.add (new String(""));
-				for (l: AccountType.literals())
+				for (l: es.caib.seycon.ng.comu.AccountType.literals())
 				{
 					list.add (l);
 				}
@@ -122,7 +121,7 @@
 				<parameter value="${instance}" />
 			</ejb-finder>
 			<new-instance-script>
-				bean = new es.caib.seycon.ng.comu.Account();
+				bean = new com.soffid.iam.api.Account();
 				bean.setType(es.caib.seycon.ng.comu.AccountType.IGNORED);
 				bean.setGrantedUsers ( new LinkedList()) ;
 				bean.setGrantedRoles (new LinkedList());
@@ -161,7 +160,7 @@
 	<datanode name="dispatcher" transient="true"/>
 	
 	<datanode name="account">
-		<ejb-handler jndi="java:comp/env/ejb/AccountEJB">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService">
 			<insert-method method="createAccount" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -189,28 +188,28 @@
 		</finder>
 		<finder name="grantedUsers" type ="grantedUser" refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedUsers}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
+			<new-instance-bean className="com.soffid.iam.api.User"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="grantedGroups" type ="grantedGroup"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedGroups}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
+			<new-instance-bean className="com.soffid.iam.api.Groups"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="grantedRoles" type ="grantedRole"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.grantedRoles}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
+			<new-instance-bean className="com.soffid.iam.api.Role"> 
 			</new-instance-bean>
 		</finder>
 
 		<finder name="ownerUsers" type ="ownerUser"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.ownerUsers}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
+			<new-instance-bean className="com.soffid.iam.api.User"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="ownerGroups" type ="ownerGroup"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.ownerGroups}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
+			<new-instance-bean className="com.soffid.iam.api.Group"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="ownerRoles" type ="ownerRole"  refreshAfterCommit="true">
@@ -221,12 +220,12 @@
 
 		<finder name="managerUsers" type ="managerUser"  refreshAfterCommit="true">
 			<collection-finder collection="${instance.managerUsers}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari"> 
+			<new-instance-bean className="com.soffid.iam.api.User"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="managerGroups" type ="managerGroup" refreshAfterCommit="true">
 			<collection-finder collection="${instance.managerGroups}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Grup"> 
+			<new-instance-bean className="com.soffid.iam.api.Group"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="managerRoles" type ="managerRole" refreshAfterCommit="true">
@@ -236,14 +235,14 @@
 		</finder>
 		
 		<finder name="attribute" type ="attribute" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
 				method="getAccountAttributes">
 				<parameter value="${instance}"/>
 			</ejb-finder>
 		</finder>
 		
 		<finder name="owner" type="void">
-			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
 				method="getHPAccountOwner">
 				<parameter value="${instance}"/>
 			</ejb-finder>
@@ -251,7 +250,7 @@
 
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
-			<attribute-validator expr="${instance.dispatcher}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
+			<attribute-validator expr="${instance.system}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
 			<attribute-validator expr="${instance.passwordPolicy}" notNull="true" friendlyName="accounts.passwordPolicyValidation"/>
 		</validator>
 	</datanode>
@@ -330,10 +329,10 @@
 		<script-handler>
 			<insert-script>
 				instance.accountName = parent.instance.name;
-				instance.systemName = parent.instance.dispatcher;
+				instance.systemName = parent.instance.system;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/AccountEJB">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService">
 			<insert-method method="createAccountAttribute" returnBean="true" > <!-- user:role:create -->
 				<parameter value="${instance}"/>
 			</insert-method>

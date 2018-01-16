@@ -11,7 +11,7 @@ import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.comu.Usuari;
 
-@ValueObject(translatedName="AuthoritativeChange", translatedPackage="com.soffid.iam.sync.intf")
+@ValueObject(translatedName="AuthoritativeChange", translatedPackage="com.soffid.iam.sync.intf", serialVersion="-3968123356323004507L")
 public class AuthoritativeChange {
 	@Nullable
 	AuthoritativeChangeIdentifier id;

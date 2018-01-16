@@ -5,7 +5,8 @@ import java.util.Date;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
-@ValueObject(translatedName="AuthoritativeChangeIdentifier", translatedPackage="com.soffid.iam.sync.intf")
+@ValueObject(translatedName="AuthoritativeChangeIdentifier", translatedPackage="com.soffid.iam.sync.intf",
+		serialVersion="-605755430186793407L")
 public class AuthoritativeChangeIdentifier {
 	@Nullable
 	Object employeeId;

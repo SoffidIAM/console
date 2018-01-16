@@ -3,12 +3,14 @@ package com.soffid.iam.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AuthorizationRole;
@@ -56,6 +60,9 @@ import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.tools.db.persistence.XmlReader;
+import com.soffid.tools.db.schema.Database;
+import com.soffid.tools.db.schema.ForeignKey;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.ServiceLocator;
@@ -261,11 +268,7 @@ public class ApplicationBootServiceImpl extends
 			return null;
 	}
 
-	private void configureDatabase() throws SystemException,
-			NotSupportedException, InternalErrorException, RollbackException,
-			HeuristicMixedException, HeuristicRollbackException,
-			NeedsAccountNameException, AccountAlreadyExistsException,
-			BPMException, IOException, NamingException, SQLException {
+	private void configureDatabase() throws Exception {
 		Security.nestedLogin("master\\Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase();
@@ -278,7 +281,7 @@ public class ApplicationBootServiceImpl extends
 				configSvc.create(cfg);				
 			}
 			int version = Integer.parseInt(cfg.getValue()); 
-			if ( version > 0 && version < 100)
+			if ( version >= 0 && version < 100)
 			{
 				updateFromVersion1 ();
 				cfg.setValue("100"); //$NON-NLS-1$
@@ -330,7 +333,7 @@ public class ApplicationBootServiceImpl extends
 		} 
 	}
 
-	private void updateFromVersion1() throws SQLException 
+	private void updateFromVersion1() throws IOException, Exception 
 	{
 		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
 		final Connection conn = ds.getConnection();
@@ -338,40 +341,36 @@ public class ApplicationBootServiceImpl extends
 		try
 		{
 			Long tenantId = Security.getCurrentTenantId();
-			String[] tables = { "BPM_DOCUMENT", "DOC_TEN_ID", 
-					"SC_ATTTRA", "ATT_TEN_ID",
-					"SC_CUOBTY", "COT_TEN_ID",
-					"SC_RULE", "RUL_TEN_ID",
-					"SC_SCHTAS", "SCT_TEN_ID",
-					"SC_APLICA", "APL_TEN_ID",
-					"SC_AUDITO", "AUD_TEN_ID",
-					"SC_AUTROL", "AUR_TEN_ID",
-					"SC_CONFIG", "CON_TEN_ID",
-					"SC_DISPAT", "DIS_TEN_ID",
-					"SC_DOMCON", "DCN_TEN_ID",
-					"SC_DOMCOR", "DCO_TEN_ID",
-					"SC_DOMUSU", "DOU_TEN_ID",
-					"SC_GRUPS", "GRU_TEN_ID",
-					"SC_IMPRES", "IMP_TEN_ID",
-					"SC_LLICOR", "LCO_TEN_ID",
-					"SC_MAQUIN", "MAQ_TEN_ID",
-					"SC_PUNENT", "PUE_TEN_ID",
-					"SC_REGACC", "RAC_TEN_ID",
-					"SC_SERVEI", "SER_TEN_ID",
-					"SC_SERPLU", "SPL_TEN_ID",
-					"SC_SODRUL", "SOD_TEN_ID",
-					"SC_TASQUE", "TAS_TEN_ID",
-					"SC_TIPDAD", "TDA_TEN_ID",
-					"SC_TIPUSUO", "TUO_TEN_ID",
-					"SC_TIPUSU", "TUS_TEN_ID",
-					"SC_USUARI", "USU_TEN_ID",
-					"SC_XARXES", "XAR_TEN_ID"
-					};
-			for (int i = 0; i < tables.length; i += 2)
-			{
-				executeSentence(conn, "UPDATE "+tables[i]+" SET "+tables[i+1]+"=? WHERE "+tables[i+1]+" IS NULL",
-								new Object[] {tenantId});
-			}
+			
+	    	Database db = new Database();
+	    	XmlReader reader = new XmlReader();
+	    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
+			parseResources(rpr, db, reader, "console-ddl.xml");
+	    	parseResources(rpr, db, reader, "core-ddl.xml");
+	    	parseResources(rpr, db, reader, "plugin-ddl.xml");
+
+	    	
+	    	for (ForeignKey fk: db.foreignKeys)
+	    	{
+	    		if (fk.foreignTable.equals("SC_TENANT"))
+	    		{
+					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" IS NULL",
+							new Object[] {tenantId});
+	    			
+					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" = 0",
+							new Object[] {tenantId});
+	    		}
+	    	}
+	    	try {
+				executeSentence(conn, "UPDATE JBPM_MODULEDEFINITION SET TENANT_=?  WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+				executeSentence(conn, "UPDATE JBPM_MODULEINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+				executeSentence(conn, "UPDATE JBPM_TASKINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
+						new Object[] {tenantId});
+	    	} catch (SQLException e) {
+	    		// Those tables do not exists during test cases
+	    	}
 			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
 					+ "SELECT SRV_ID, ?, SRV_ID "
 					+ "FROM SC_SERVER",
@@ -381,6 +380,15 @@ public class ApplicationBootServiceImpl extends
 		{
 			conn.close();
 		}
+	}
+
+	private void parseResources(ResourcePatternResolver rpr, Database db,
+			XmlReader reader, String path) throws IOException, Exception {
+		Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path);
+    	while (resources.hasMoreElements())
+    	{
+    		reader.parse(db, resources.nextElement().openStream());
+    	}
 	}
 
 	/**

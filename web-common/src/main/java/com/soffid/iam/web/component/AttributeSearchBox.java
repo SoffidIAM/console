@@ -101,6 +101,39 @@ public class AttributeSearchBox extends XulElement {
 
 	public void setSelectedValues(Set<String> selectedValues) {
 		this.selectedValues = selectedValues;
+		if (selectedValues.isEmpty())
+		{
+			queryExpression = null;
+			humanExpression = Labels.getLabel("attributeQuery.all");		
+		}
+		else
+		{
+			StringBuffer sb = new StringBuffer();
+			StringBuffer sb2 = new StringBuffer();
+			for (String value: selectedValues)
+			{
+				if (sb.length() == 0)
+					sb.append("(");
+				else {
+					sb.append(" or ");
+					sb2.append(", ");
+				}
+				sb.append(attributeDef.getName())
+					.append(" eq ")
+					.append('"')
+					.append(escape(value))
+					.append('"');
+				int i = attributeDef.getValues().indexOf(value);
+				if (i >= 0)
+					sb2.append( attributeDef.getLabels().get(i) );
+				else
+					sb2.append( value );
+			}
+			sb.append(")");
+			queryExpression = sb.toString();
+			humanExpression = sb2.toString();
+		}
+		invalidate();
 	}
 
 	public String getQueryExpression() {
@@ -497,37 +530,11 @@ public class AttributeSearchBox extends XulElement {
 				selectedValues.add((String) cb.getAttribute("value"));
 		}
 		
-		if (selectedValues.isEmpty())
-		{
-			queryExpression = null;
-			humanExpression = Labels.getLabel("attributeQuery.all");		
-		}
-		else
-		{
-			StringBuffer sb = new StringBuffer();
-			StringBuffer sb2 = new StringBuffer();
-			for (String value: selectedValues)
-			{
-				if (sb.length() == 0)
-					sb.append("(");
-				else {
-					sb.append(" or ");
-					sb2.append(", ");
-				}
-				sb.append(attributeDef.getName())
-					.append(" eq ")
-					.append('"')
-					.append(escape(value))
-					.append('"');
-				sb2.append(value);
-			}
-			sb.append(")");
-			queryExpression = sb.toString();
-			humanExpression = sb2.toString();
-		}
+		setSelectedValues(selectedValues);
+
 		w.detach();
 		bg.detach();
-		invalidate();
+//		invalidate();
 		notifyParent();
 	}
 

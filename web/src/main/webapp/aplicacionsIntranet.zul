@@ -43,9 +43,9 @@
 			hasQueryALLMenusIntranet = AutoritzacionsUsuari.hasQueryAllMenusIntranet();
 			
 			import es.caib.seycon.ng.comu.*;
-			import es.caib.seycon.ng.utils.AmbitsExecucioPuntEntrada;
+			import com.soffid.iam.utils.AmbitsExecucioPuntEntrada;
 			import es.caib.zkib.datamodel.xml.XmlDataNode;
-			import es.caib.seycon.ng.utils.TipusAutoritzacioPuntEntrada;
+			import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 			import org.zkoss.image.*;
 			import org.zkoss.zul.*;
 		

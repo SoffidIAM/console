@@ -186,7 +186,7 @@ public class EntryPointServiceImpl extends
 		HashSet<EntryPointTreeEntity> monArbre = new HashSet<EntryPointTreeEntity>();
 		monArbre.add(arbre);
 		// Establim l'arbre
-		entity.setChildrenEntryPointTree(monArbre);
+		pareE.setChildrenEntryPointTree(monArbre);
 
 		// Creem les relacions del punt d'entrada
 		// Arbre
@@ -363,7 +363,7 @@ public class EntryPointServiceImpl extends
 		// Analizamos los "enlaces" para saber si sólo tenemos un padre o varios
 		// Si sólo hay uno, se borra el punt d'entrada, si hay varios: se borra
 		// en enlace(link)
-		Collection mosPares = entity.getChildrenEntryPointTree();
+		Collection mosPares = entity.getParentEntryPointTree();
 
 		// Par saber si hem de esborrar el punt d'entrada o només el link
 		// (l'arbre)
@@ -384,7 +384,7 @@ public class EntryPointServiceImpl extends
 		// ARBRE DE PUE: si no estamos enlazados, no permitimos borrarnos si
 		// tenemos hijos
 		if (!enlazado) {
-			Collection mosFills = entity.getParentEntryPointTree();
+			Collection mosFills = entity.getChildrenEntryPointTree();
 			if (mosFills.size() != 0) {
 				throw new RemoveException(
 						String.format(
@@ -424,7 +424,7 @@ public class EntryPointServiceImpl extends
 			// // només
 			// serà
 			// 1
-			entity.setChildrenEntryPointTree(new HashSet<EntryPointTreeEntity>());
+			entity.setParentEntryPointTree(new HashSet<EntryPointTreeEntity>());
 			// Actualitzem l'arbre del pare
 			// getArbrePuntEntradaEntityDao().update(arbrePare);
 
@@ -1296,7 +1296,7 @@ public class EntryPointServiceImpl extends
 		nouPUEClonat.setExecutionMethod(execs);
 
 		// Clonamos los HIJOS si los tiene:
-		Collection _fills = pueClonar.getParentEntryPointTree();
+		Collection _fills = pueClonar.getChildrenEntryPointTree();
 		Collection<EntryPointTreeEntity> fills = new HashSet<EntryPointTreeEntity>();
 		if (_fills != null && _fills.size() != 0) {
 			for (Iterator it = _fills.iterator(); it.hasNext();) {
@@ -1369,7 +1369,7 @@ public class EntryPointServiceImpl extends
 		EntryPointEntity pueDesti = getEntryPointEntityDao().load(
 				idPueDesti);
 		Collection<EntryPointTreeEntity> fillsNouPare = pueDesti
-				.getParentEntryPointTree();
+				.getChildrenEntryPointTree();
 
 		EntryPointTreeEntity nouArbre = getEntryPointTreeEntityDao()
 				.newEntryPointTreeEntity();

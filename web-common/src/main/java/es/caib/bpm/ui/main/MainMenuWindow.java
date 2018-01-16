@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treechildren;
@@ -20,7 +22,8 @@ import es.caib.bpm.ui.tree.ApplicationTreecell;
 import es.caib.bpm.vo.ProcessDefinition;
 
 public class MainMenuWindow extends Window implements AfterCompose {
-
+	private boolean delayProcesses = false;
+	
 	private static final long serialVersionUID = 1L;
 
 	private void createCustomObjects() {
@@ -110,7 +113,27 @@ public class MainMenuWindow extends Window implements AfterCompose {
 
 	@Override
 	public void afterCompose() {
-		createProcesses();
+		if (delayProcesses)
+		{
+			getFellow("availableprocesses").addEventListener("onOpen", new EventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					createProcesses();
+				}
+			} );
+		}
+		else
+		{
+			createProcesses();
+		}
 		createCustomObjects();
+	}
+
+	public boolean isDelayProcesses() {
+		return delayProcesses;
+	}
+
+	public void setDelayProcesses(boolean delayProcesses) {
+		this.delayProcesses = delayProcesses;
 	}
 }

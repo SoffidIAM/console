@@ -8,40 +8,38 @@
 	<zscript id="script">
 <![CDATA[				
     import es.caib.seycon.ng.comu.*;
+    import com.soffid.iam.api.User;
+    import com.soffid.iam.api.Group;
+    import com.soffid.iam.api.Role;
 	Component macro = self;
 	macro.addEventListener("onEnable", new org.zkoss.zk.ui.event.EventListener() {
 		void onEvent (Event evt) {
 			boolean enable = evt.data;
 			btnGrantUser.setVisible(enable);
-			btnGrantRole.setVisible(enable);
-			btnGrantGroup.setVisible(enable);
 			b_esborrar.setVisible(enable);
 			treeGrants.setDataPath(null);
 			treeGrants.setDataPath("/");
 		}
 	});
 	
-	void grant(List identities) {
+	void grantUser(List identities) {
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
 		for (com.soffid.iam.web.component.Identity id: identities)
 		{
 			if (id.getType() == com.soffid.iam.web.component.Identity.Type.USER)
 			{
 				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-						+ "/"+treeGrants.getAttribute("userList"), 
-						Usuari.toUsuari(id.getObject()));
+						+ "/"+treeGrants.getAttribute("userList"), id.getObject());
 			}
 			if (id.getType() == com.soffid.iam.web.component.Identity.Type.GROUP)
 			{
 				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-						+ "/"+treeGrants.getAttribute("groupList"), 
-						Grup.toGrup(id.getObject()));
+						+ "/"+treeGrants.getAttribute("groupList"), id.getObject());
 			}
 			if (id.getType() == com.soffid.iam.web.component.Identity.Type.ROLE)
 			{
 				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-						+ "/"+treeGrants.getAttribute("roleList"), 
-						Rol.toRol(id.getObject()));
+						+ "/"+treeGrants.getAttribute("roleList"), id.getObject());
 			}
 		}
 	}
@@ -61,19 +59,19 @@
 					Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
 
 				}
-
-				]]></zscript>
+	]]></zscript>
 	<toolbar>
 		<toolbarbutton image="~./img/list-add.gif"
 			id="btnGrantUser" label="${c:l('contenidoTarea.btnAgregar')}"
 			visible="${canModifyAccounts}" onClick="addGranted()"
-			onIdentity="grant(event.data)" />
+			onIdentity="grantUser(event.data)" />
 		<deletetreebutton acces="${canModifyAccounts}"
 			id="b_esborrar" potEsborrarBranquesAmbFills="false"
 			tree="treeGrants" />
 	</toolbar>
 	<tree autocommit="false" dataPath="/" id="treeGrants">
 		<custom-attributes userList="${arg.userList}"
+			newApi="${arg.newApi }"
 			groupList="${arg.groupList}"
 			roleList="${arg.roleList}"/>
 		<treecols>
@@ -82,14 +80,14 @@
 		</treecols>
 		<treeitemfinder bind="." open="true" path="/${arg.userList}">
 			<treerow>
-				<treecellimage bind="@codi" image="/img/user.png" />
+				<treecellimage bind="@userName" image="/img/user.png" />
 				<treecell>
 					<label bind="@fullName"  style="margin-right: 1em"/>
 					<imageclic src="/img/link.png">
 						<attribute name="onClick"><![CDATA[
 							String user = es.caib.zkib.datasource.XPathUtils.getValue(
                           						self,
-                          						"@codi");
+                          						"@userName");
                             if (esquema.canClose())
                            		Executions.getCurrent().sendRedirect(
                            			"index.zul?embed&target=/usuaris.zul?user="+user,
@@ -102,14 +100,14 @@
 		</treeitemfinder>
 		<treeitemfinder bind="." open="true" path="/${arg.groupList}">
 			<treerow>
-				<treecellimage bind="@codi" image="/img/group.png" />
+				<treecellimage bind="@name" image="/img/group.png" />
 				<treecell >
-					<label bind="@descripcio" style="margin-right: 1em"/>
+					<label bind="@description" style="margin-right: 1em"/>
 					<imageclic src="/img/link.png">
 						<attribute name="onClick"><![CDATA[
 							String group = es.caib.zkib.datasource.XPathUtils.getValue(
                           						self,
-                          						"@codi");
+                          						"@name");
                             if (esquema.canClose())
                            		Executions.getCurrent().sendRedirect(
                            			"index.zul?embed&target=/grups.zul?group="+group,
@@ -122,8 +120,8 @@
 		</treeitemfinder>
 		<treeitemfinder bind="." open="true" path="/${arg.roleList}">
 			<treerow>
-				<treecellimage bind="@nom" image="/img/key.png" />
-				<treecell bind="@descripcio" />
+				<treecellimage bind="@name" image="/img/key.png" />
+				<treecell bind="@description" />
 			</treerow>
 		</treeitemfinder>
 	</tree>

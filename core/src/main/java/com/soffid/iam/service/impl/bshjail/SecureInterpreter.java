@@ -175,7 +175,7 @@ public class SecureInterpreter {
 		CodeSource codesource = new CodeSource(new URL("http://scripts.customers.soffid.com/"), new Certificate[0]);
 		PermissionCollection permissions = p.getPermissions(codesource);
 
-		log.info("Running shell with permissions: "+permissions.toString());
+//		log.info("Running shell with permissions: "+permissions.toString());
 		
 		ProtectionDomain pd = new ProtectionDomain(codesource, permissions);
 		

@@ -333,8 +333,8 @@
 			</div>
 		</div>
 		
-		<div class="own-ip">
-			<hbox align="end" pack="end">
+		<div class="own-ip" style="display:none">
+			<hbox align="end" pack="end"  style="display:none">
 				<label value="${c:l('selfService.Conneted')} ${p_selfService.ambit}"/>
 			</hbox>
 		</div>

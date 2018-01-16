@@ -13,77 +13,77 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	use="es.caib.seycon.ng.web.ConfiguraSEU">
     <div>
-	<style src="~./styles/estil.css"/>
-	<style src="/css/localSEU.css"/>
-	<style src="/css/devices.css"/>
-	<script src="/js/jquery-1.9.1.min.js" />
-	<script>
-		var dom = {};
-		bj = jQuery.noConflict(true);
-	</script>
-	<style>
-		/*Tabla: Mis Tareas*/
-		.classThree, .classFour, .classFive{display:none;}
-	</style>
-	<script src="/js/own_style.js"></script>
-	<application id="app"
-		allowOpenMultipleTabs="true" 
-		autoReload="false" 
-		favorits="//favorits/favorits" 
-		initialPage="self_service.zul" 
-		logoutPage="/selfservice/prelogout" 
-		mainWindowTitle="Soffid IAM" 
-		menu="//menu/menu" 
-		showFavorites="false" 
-		showProfile="false"
-		width="100%"/>	
-	<include src="menu.zul"/>
+		<style src="~./styles/estil.css"/>
+		<style src="/css/localSEU.css"/>
+		<style src="/css/devices.css"/>
+		<script src="/js/jquery-1.9.1.min.js" />
+		<script>
+			var dom = {};
+			bj = jQuery.noConflict(true);
+		</script>
+		<style>
+			/*Tabla: Mis Tareas*/
+			.classThree, .classFour, .classFive{display:none;}
+		</style>
+		<script src="/js/own_style.js"></script>
+		<application id="app"
+			allowOpenMultipleTabs="true" 
+			autoReload="false" 
+			favorits="//favorits/favorits" 
+			initialPage="self_service.zul" 
+			logoutPage="/selfservice/prelogout" 
+			mainWindowTitle="Soffid IAM" 
+			menu="//menu/menu" 
+			showFavorites="false" 
+			showProfile="false"
+			width="100%"/>	
+		<include src="menu.zul"/>
     </div>
-	    <zscript><![CDATA[
-			void find ( Treechildren treechildren, String target)
+    <zscript><![CDATA[
+		void find ( Treechildren treechildren, String target)
+		{
+			String page;
+			int i = target.indexOf('?');
+			if ( i < 0)
+				page = target;
+			else
+				page = target.substring(0, i);
+			Collection children = treechildren.getItems();
+			for (Iterator it = children.iterator(); it.hasNext();)
 			{
-				String page;
-				int i = target.indexOf('?');
-				if ( i < 0)
-					page = target;
-				else
-					page = target.substring(0, i);
-				Collection children = treechildren.getItems();
-				for (Iterator it = children.iterator(); it.hasNext();)
+				Treeitem item  = it.next();
+				Treerow row = item.getTreerow();
+				Collection grandchildren = row.getChildren();
+				for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
 				{
-					Treeitem item  = it.next();
-					Treerow row = item.getTreerow();
-					Collection grandchildren = row.getChildren();
-					for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
+					Component c = it2.next();
+					if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
 					{
-						Component c = it2.next();
-						if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
+						es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
+						if (page.equals(atc.getPagina()))
 						{
-							es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-							if (page.equals(atc.getPagina()))
-							{
-								app.setInitialPage(target);
-							}
+							app.setInitialPage(target);
 						}
 					}
-					if (item.getTreechildren() != null)
-						find (item.getTreechildren(), target);
-						
-							
 				}
+				if (item.getTreechildren() != null)
+					find (item.getTreechildren(), target);
+					
+						
 			}
-			
-			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
-			if (target != null)
-			{
-				if (target.startsWith("sharedAccounts/sharedAccounts.zul"))
-					target = "vault/vault.zul"+target.substring(33);
-				System.out.println("t="+target);
-				Component menuPage = Executions.createComponents("menu.zul", self, new HashMap());                      
-				Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
-				find (children, target);
-				menuPage.setParent(null);
-			}
-	
-		]]></zscript>
+		}
+		
+		String target = Executions.getCurrent().getNativeRequest().getParameter("target");
+		if (target != null)
+		{
+			if (target.startsWith("sharedAccounts/sharedAccounts.zul"))
+				target = "vault/vault.zul"+target.substring(33);
+			System.out.println("t="+target);
+			Component menuPage = Executions.createComponents("menu.zul", self, new HashMap());                      
+			Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
+			find (children, target);
+			menuPage.setParent(null);
+		}
+
+	]]></zscript>
 </vbox>

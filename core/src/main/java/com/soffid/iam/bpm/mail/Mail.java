@@ -178,7 +178,8 @@ public class Mail implements ActionHandler {
 			if (executionContext.getTaskInstance() != null && 
 					executionContext.getTask() != null &&
 					executionContext.getTaskInstance().getActorId() == null &&
-					executionContext.getTaskInstance().getPooledActors().isEmpty() )
+					(executionContext.getTaskInstance().getPooledActors() == null ||
+						executionContext.getTaskInstance().getPooledActors().isEmpty() ))
 			{
 				recursiveLock.set(this);
 				try {

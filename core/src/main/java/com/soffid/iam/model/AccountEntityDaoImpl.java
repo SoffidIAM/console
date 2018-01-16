@@ -119,7 +119,6 @@ public class AccountEntityDaoImpl extends
 				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
 				{
 					fetchFromCache(target, entry);
-					log.info("Get from cache: "+ (System.currentTimeMillis() - start));
 					return ;
 				}
 			}

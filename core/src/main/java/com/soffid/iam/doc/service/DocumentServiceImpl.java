@@ -1,9 +1,11 @@
 package com.soffid.iam.doc.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 	/** El stream de salida en el archivo */
 	private transient FileOutputStream outputStream= null;
 	/** El stream de lectura en el archivo */
-	private transient FileInputStream inputStream= null;
+	private transient InputStream inputStream= null;
 	/** El nombre de la aplicacion al que pertenece */
 	private String application= null;
 	/** El a�o */
@@ -344,8 +346,10 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 			{
 				//Recuperamos el archivo
 				this.tempFile= getNASManager().retreiveFile(this.innerDocument.getFsPath());
-				
-				this.inputStream= new FileInputStream(this.tempFile);
+				if (tempFile == null)
+					this.inputStream = new ByteArrayInputStream(new byte[0]);
+				else
+					this.inputStream= new FileInputStream(this.tempFile);
 			}
 			else
 			{

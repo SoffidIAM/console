@@ -18,9 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
-import org.mortbay.log.Log;
 
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.ScheduledTask;

@@ -119,6 +119,7 @@ import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.model.UsuariImpressoraEntity;
 import es.caib.seycon.ng.model.UsuariSEUEntity;
 import es.caib.seycon.ng.model.UsuariWFProcessEntity;
+import es.caib.seycon.ng.model.UsuariWFProcessEntityDao;
 import es.caib.seycon.ng.model.criteria.CriteriaSearchConfiguration;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
@@ -2802,9 +2803,16 @@ public class UsuariServiceImpl extends
 
 	@Override
 	protected UsuariWFProcess handleCreate(UsuariWFProcess usuariWFProces) throws Exception {
-		UsuariWFProcessEntity entity = getUsuariWFProcessEntityDao().usuariWFProcessToEntity(usuariWFProces);
-		getUsuariWFProcessEntityDao().create(entity);
-		return getUsuariWFProcessEntityDao().toUsuariWFProcess(entity);		
+		UsuariWFProcessEntityDao dao = getUsuariWFProcessEntityDao();
+		for ( UsuariWFProcessEntity uwp2: dao.findByIdProces(usuariWFProces.getIdProces()))
+		{
+			if (uwp2.getCodiUsuari().equals(usuariWFProces.getCodiUsuari()))
+				return dao.toUsuariWFProcess(uwp2);
+		}
+		
+		UsuariWFProcessEntity entity = dao.usuariWFProcessToEntity(usuariWFProces);
+		dao.create(entity);
+		return dao.toUsuariWFProcess(entity);		
 	}
 
 	@Override

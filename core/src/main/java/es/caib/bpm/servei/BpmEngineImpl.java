@@ -257,7 +257,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 	private void flushContext(JbpmContext ctx) {
 		if (ctx != null) {
 			ctx.setActorId(null);
-			ctx.close();
+			try {
+				ctx.close();
+			} catch (Exception e) {
+				log.info("Error closing BPM context", e);
+			}
 		}
 	}
 
@@ -1032,7 +1036,15 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 				if (instance.isOpen() && !instance.isCancelled()) {
 					try {
-						resultadoFinal.add(VOFactory.newTaskInstance(instance));
+						if (instance.getProcessInstance().hasEnded())
+						{
+							instance.setSignalling(false);
+							instance.cancel();
+						}
+						else
+						{
+							resultadoFinal.add(VOFactory.newTaskInstance(instance));
+						}
 					} catch (RuntimeException e) {
 						log.warn(String.format(Messages.getString("BpmEngineImpl.UnableSerializeTask"), instance.getId()), e); //$NON-NLS-1$
 					}
@@ -1089,8 +1101,16 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 				if (instance.isOpen() && !instance.isCancelled()) {
 					try {
-						resultadoFinal.add(VOFactory
-								.newLightweightTaskInstance(instance));
+						if (instance.getProcessInstance().hasEnded())
+						{
+							instance.setSignalling(false);
+							instance.cancel();
+						}
+						else
+						{
+							resultadoFinal.add(VOFactory
+									.newLightweightTaskInstance(instance));
+						}
 					} catch (RuntimeException e) {
 						log.warn(String.format(Messages.getString("BpmEngineImpl.UnableSerializeTask"), instance.getId()), e); //$NON-NLS-1$
 					}
@@ -1771,7 +1791,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		try {
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
-			Vector resultadoFinal = new Vector();
+			Vector<ProcessDefinition> resultadoFinal = new Vector();
 			for (Iterator it = context.getGraphSession()
 					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
 				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
@@ -1785,6 +1805,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 						resultadoFinal.add(def);
 				}
 			}
+			
+			Collections.sort( resultadoFinal, new Comparator<ProcessDefinition>() {
+				public int compare(ProcessDefinition o1, ProcessDefinition o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
 			return resultadoFinal;
 		} finally {
 			flushContext(context);

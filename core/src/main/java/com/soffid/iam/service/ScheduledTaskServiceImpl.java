@@ -208,14 +208,21 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	 */
 	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException
 	{
-		task.setActive(false);
-		task.setLogReferenceID(task.getLogReferenceID());
-		task.setLastEnd(Calendar.getInstance());
+		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
+		if (entity.getLogReferenceID() != null)
+		{
+			DocumentService ds = getDocumentService();
+			ds.deleteDocument(new DocumentReference(entity.getLogReferenceID()));
+		}
+		entity.setLogReferenceID(task.getLogReferenceID());
+		entity.setActive(false);
+		entity.setLastEnd(new Date());
+		entity.setError(task.isError());
 		try {
-			task.setServerName(Config.getConfig().getHostName());
+			ServerEntity s = getServerEntityDao().findByName(Config.getConfig().getHostName());
+			entity.setServer(s);
 		} catch (IOException e) {
 		}
-		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "F"); //$NON-NLS-1$
 	}

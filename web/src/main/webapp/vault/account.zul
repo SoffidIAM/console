@@ -124,7 +124,7 @@
 				System.out.println ("========================= PATH = "+accountAttributeXPath);
 				Object obj = model.getJXPathContext().getValue(accountAttributeXPath);
 				System.out.println ("========================= OBJ  = "+obj);
-				String value = model.getJXPathContext().getValue(accountAttributeXPath+"/@valorDada");
+				String value = model.getJXPathContext().getValue(accountAttributeXPath+"/@value");
 				System.out.println ("========================= VALUE = "+value);
 				if (value != null)
 				{
@@ -154,13 +154,13 @@
 	void onNewAttributeRow(Row row)
 	{
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(row);
-		String attribute = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@codiDada");
+		String attribute = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@attribute");
 		if (attribute.equals("SSO:Server"))
 		{
 			row.setVisible(false);
 			innerWindow.getFellow("serverRow").setVisible(true);
 			String att = ctx.getXPath(); // Gest /attribute[...] path
-			att = att.substring(att.lastIndexOf("/")+1) + "/@valorDada";
+			att = att.substring(att.lastIndexOf("/")+1) + "/@value";
 			innerWindow.getFellow("serverTextbox").getFellow("dada").setBind(att);
 		}
 		else if (attribute.equals("SSO:URL"))
@@ -168,7 +168,7 @@
 			innerWindow.getFellow("urlRow").setVisible(true);
 			row.setVisible(false);
 			String att = ctx.getXPath(); // Gest /attribute[...] path
-			att = att.substring(att.lastIndexOf("/")+1) + "/@valorDada";
+			att = att.substring(att.lastIndexOf("/")+1) + "/@value";
 			innerWindow.getFellow("urlTextbox").setBind(att);
 		}
 	}
@@ -272,8 +272,8 @@
 			});
 			for ( es.caib.seycon.ng.comu.TipusDada td: metadata)
 			{
-				es.caib.seycon.ng.comu.DadaUsuari du = new es.caib.seycon.ng.comu.DadaUsuari();
-				du.setCodiDada(td.getCodi());
+				com.soffid.iam.api.UserData du = new com.soffid.iam.api.UserData();
+				du.setAttribute(td.getCodi());
 				du.setDataLabel(td.getLabel());
 				du.setSystemName(ssoSystem);
 				du.setVisibility(com.soffid.iam.api.AttributeVisibilityEnum.EDITABLE);
@@ -327,9 +327,9 @@
 				iterator.hasNext();)
 		{
 			es.caib.zkib.jxpath.Pointer p = iterator.next();
-			es.caib.seycon.ng.comu.DadaUsuari du = p.getValue().getInstance();
-			if (du.getCodiDada().startsWith("SSO:") &&
-					Character.isDigit(du.getCodiDada().charAt(4)))
+			com.soffid.iam.api.UserData du = p.getValue().getInstance();
+			if (du.getAttribute().startsWith("SSO:") &&
+					Character.isDigit(du.getAttribute().charAt(4)))
 			{
 				accountAttributeXPath = p.asPath();
 				pageScope.put("accountNameOnAttribute", accountAttributeXPath);
@@ -349,7 +349,7 @@
 		if (accountAttributeXPath == null)
 			return;
 		
-		String value = ctx.getDataSource().getJXPathContext().getValue(accountAttributeXPath+"/@valorDada");
+		String value = ctx.getDataSource().getJXPathContext().getValue(accountAttributeXPath+"/@value");
 		String[] result = splitValues(value);
 		if (result[0].trim().length() == 0)
 			result[0] = "user";
@@ -358,7 +358,7 @@
 				java.net.URLEncoder.encode(result[0], "UTF-8")
 				+ "="
 				+java.net.URLEncoder.encode(result[1], "UTF-8");
-		ctx.getDataSource().getJXPathContext().setValue(accountAttributeXPath+"/@valorDada", str);
+		ctx.getDataSource().getJXPathContext().setValue(accountAttributeXPath+"/@value", str);
 	}
 	
 	void onApply() {
@@ -378,6 +378,7 @@
 		Tree treebox = esquema.getFellow("lista").getFellow("treebox");
 
 		String xPath = null;
+		
 		if (treebox.getSelectedItem() != null)
 			xPath = treebox.getSelectedItem().getValue().getXPath();
 
@@ -804,7 +805,7 @@
 							</columns>
 							<datarow>
 								<input_etiqueta bind="@dataLabel" width_custom="250px"/>
-								<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/>
+								<div use="com.soffid.iam.web.users.additionalData.InputField" v2="true" onChange=""/>
 							</datarow>
 						</grid>
 					</tabpanel>

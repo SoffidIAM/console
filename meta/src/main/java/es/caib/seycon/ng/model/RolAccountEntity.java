@@ -304,7 +304,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.delegateAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) and ra.delegationStatus = 'P' and "
-			   + "user.userName = :user")
+			   + "user.userName = :user and user.tenant.id=:tenantId")
 	@Operation(translated="findRoleAccountToStartDelegation")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToStartDelegation(
 		String user,
@@ -318,7 +318,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.delegateAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null and "
-			   + "user.userName = :user")
+			   + "user.userName = :user and user.tenant.id=:tenantId")
 	@Operation(translated="findRoleAccountToEndDelegation")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEndDelegation(
 		String user,
@@ -332,7 +332,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.ownerAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegationStatus='A' and "
-			   + "user.userName = :user")
+			   + "user.userName = :user and user.tenant.id=:tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findDelegatedRolAccounts(
 		String user) {
 		return null;
@@ -341,7 +341,9 @@ public abstract class RolAccountEntity {
 	@Description("Search delegations to start")
 	@DaoFinder("select ra "
 			   + "from com.soffid.iam.model.RoleAccountEntity as ra\n"
-			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) and ra.delegationStatus = 'P'")
+			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) "
+			   + "      and ra.delegationStatus = 'P' "
+			   + "      and ra.role.system.tenant.id=:tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToStartDelegation(
 		Date now) {
 		return null;
@@ -350,7 +352,8 @@ public abstract class RolAccountEntity {
 	@Description("Search delegations to end")
 	@DaoFinder("select ra "
 			   + "from com.soffid.iam.model.RoleAccountEntity as ra\n"
-			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null")
+			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null and"
+			   + "      ra.role.system.tenant.id=:tenantId")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToEndDelegation(
 		Date now) {
 		return null;

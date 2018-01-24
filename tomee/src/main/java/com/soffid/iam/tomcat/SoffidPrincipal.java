@@ -42,8 +42,4 @@ public class SoffidPrincipal extends GenericPrincipal {
 		this.accountId = accountId;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 }

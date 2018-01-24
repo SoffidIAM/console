@@ -36,6 +36,7 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.service.impl.RuleDryRunMethod;
 import com.soffid.iam.service.impl.RuleEvaluatorGrantRevokeMethod;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.common.DelegationStatus;
@@ -90,15 +91,19 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
 			}
 			List<RoleAccountEntity> roles = new LinkedList<RoleAccountEntity>( raDao.findAllByUserName(user.getUserName()));
-			// Remmove roles delegated by another user
-			for ( Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext ();)
+			if (! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
 			{
-				RoleAccountEntity ra = it.next();
-				if (DelegationStatus.DELEGATION_ACTIVE.equals(ra.getDelegationStatus()))
-					it.remove();
+				// Remmove roles delegated by another user
+				for ( Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext ();)
+				{
+					RoleAccountEntity ra = it.next();
+					if (DelegationStatus.DELEGATION_ACTIVE.equals(ra.getDelegationStatus()))
+						it.remove();
+				}
+				// Add delegated roles
+				
+				roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
 			}
-			// Add delegated roles
-			roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
 			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
 			{

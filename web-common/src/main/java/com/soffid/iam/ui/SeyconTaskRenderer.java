@@ -16,6 +16,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.ui.SeyconTask.Estat;
 
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.ImageClic;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -55,7 +56,7 @@ public class SeyconTaskRenderer implements ListitemRenderer {
 		icCancel.setStyle("width: 16px; float:right");
 		icCancel.setVariable("Title", t.getDescripcioTasca(), true);
 		icCancel.setVariable("id", t.getId(), true);
-		icCancel.addEventListener("onClick", new EventListener() {
+		icCancel.addEventListener("onClick", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", t.getDescripcioTasca()),
 						"Cancel task",

@@ -12,8 +12,8 @@ import javax.naming.NamingException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 
@@ -24,6 +24,7 @@ import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.TaskInstance;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frame;
 
@@ -46,7 +47,7 @@ public class InboxHandler extends Frame {
 	{
 		try {
 			listbox = (Listbox) getFellow("listadoTareas"); //$NON-NLS-1$
-			listbox.addEventListener("onSelect", new EventListener () { //$NON-NLS-1$
+			listbox.addEventListener("onSelect", new SerializableEventListener () { //$NON-NLS-1$
 
 				public void onEvent(Event event) throws Exception {
 			        Listitem item = listbox.getSelectedItem();
@@ -56,7 +57,7 @@ public class InboxHandler extends Frame {
 				}
 				
 			});
-			this.addEventListener("onOpenTask", new EventListener () { //$NON-NLS-1$
+			this.addEventListener("onOpenTask", new SerializableEventListener () { //$NON-NLS-1$
 
 				public void onEvent(Event event) throws Exception {
 			        TaskInstance task = (TaskInstance) event.getData();
@@ -65,7 +66,7 @@ public class InboxHandler extends Frame {
 				}
 				
 			});
-			addEventListener("onReturn", new EventListener () { //$NON-NLS-1$
+			addEventListener("onReturn", new SerializableEventListener () { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					refresh ();
 				}

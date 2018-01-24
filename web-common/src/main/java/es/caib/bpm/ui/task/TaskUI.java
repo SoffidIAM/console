@@ -85,6 +85,7 @@ import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureTimestampException;
 import es.caib.zkib.component.DataGrid;
 import es.caib.zkib.component.DataModel;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.util.SynchronizableBoolean;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frame;
@@ -433,7 +434,7 @@ public class TaskUI extends Frame implements EventListener {
     	if (componente instanceof AbstractTag)
     		return;
     	
-    	componente.addEventListener("onSetReadonly", new EventListener() {
+    	componente.addEventListener("onSetReadonly", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				recursiveDisable (event.getTarget());

@@ -30,6 +30,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Missatgebox;
 import es.caib.zkib.zkiblaf.MissatgeboxDlg;
 
@@ -101,7 +102,7 @@ public class PluginsUI extends Window implements AfterCompose {
     public void delete() throws Exception {
         ServerPlugin sp = getSelectedPlugin();
         if (sp != null) {
-            MissatgeboxDlg mb = Missatgebox.confirmaYES_NO(Messages.getString("PluginsUI.DeletePluginConfirmMessage"), new EventListener() { //$NON-NLS-1$
+            MissatgeboxDlg mb = Missatgebox.confirmaYES_NO(Messages.getString("PluginsUI.DeletePluginConfirmMessage"), new SerializableEventListener() { //$NON-NLS-1$
                 
                 public void onEvent(Event event) throws Exception {
                     if (event.getName() == "onYes") { //$NON-NLS-1$
@@ -210,9 +211,11 @@ public class PluginsUI extends Window implements AfterCompose {
     {
     	Missatgebox.confirmaYES_NO(
 			Messages.getString("PluginsUI.ResetServerQuestion"), //$NON-NLS-1$
-    		new EventListener()
+    		new SerializableEventListener()
     		{
-    			public void onEvent(Event event) throws Exception
+				private static final long serialVersionUID = 1L;
+
+				public void onEvent(Event event) throws Exception
     			{
     				if (event.getName() == "onYes") //$NON-NLS-1$
     				{

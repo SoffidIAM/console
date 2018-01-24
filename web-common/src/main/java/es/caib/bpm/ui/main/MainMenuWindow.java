@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treechildren;
@@ -20,6 +19,7 @@ import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.bpm.ui.tree.ApplicationTreecell;
 import es.caib.bpm.vo.ProcessDefinition;
+import es.caib.zkib.events.SerializableEventListener;
 
 public class MainMenuWindow extends Window implements AfterCompose {
 	private boolean delayProcesses = false;
@@ -115,7 +115,7 @@ public class MainMenuWindow extends Window implements AfterCompose {
 	public void afterCompose() {
 		if (delayProcesses)
 		{
-			getFellow("availableprocesses").addEventListener("onOpen", new EventListener() {
+			getFellow("availableprocesses").addEventListener("onOpen", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					createProcesses();

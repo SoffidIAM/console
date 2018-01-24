@@ -48,6 +48,7 @@ import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -107,21 +108,21 @@ public class SelfServiceHandler extends Frame
 		showPassword = (Window) getFellow("showPassword");
 		fusuaris = (Form) getFellow("fusuaris");
 
-		addEventListener("onClientInfo", new EventListener() {
+		addEventListener("onClientInfo", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				onClientInfo(event);
 			}
 		});
 		
-		addEventListener("onReturn", new EventListener() {
+		addEventListener("onReturn", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				Events.postEvent("onReturn", getFellow("inboxhandler"), null); 
 			}
 		});
 		
-		getFellow("listadoAccounts").addEventListener("onNewRow", new EventListener() {
+		getFellow("listadoAccounts").addEventListener("onNewRow", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				onNewAccount((Listitem) event.getData());
@@ -129,39 +130,39 @@ public class SelfServiceHandler extends Frame
 		});
 		
 		final Textbox appfinder = (Textbox) getFellow("appfinder");
-		appfinder.addEventListener("onChanging", new EventListener() {
+		appfinder.addEventListener("onChanging", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				if (event instanceof InputEvent)
 					search(((InputEvent) event).getValue());
 			}
 		});
 
-		appfinder.addEventListener("onOK", new EventListener() {
+		appfinder.addEventListener("onOK", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				search(appfinder.getValue());
 			}
 		});
 
-		appfinder.addEventListener("onCancel", new EventListener() {
+		appfinder.addEventListener("onCancel", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				appfinder.setValue("");
 				search(null);
 			}
 		});
 
-		getTreebox().addEventListener("onNewRow", new EventListener() {
+		getTreebox().addEventListener("onNewRow", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				carregaIcona((Component) event.getData());
 			}
 		});
 
-		getTreebox().addEventListener("onSelect", new EventListener() {
+		getTreebox().addEventListener("onSelect", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				select();
 			}
 		});
 
-		getFellow("appcancelbutton").addEventListener("onClick", new EventListener() {
+		getFellow("appcancelbutton").addEventListener("onClick", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				appfinder.setValue("");
@@ -209,7 +210,7 @@ public class SelfServiceHandler extends Frame
 					Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util.resource.Labels.getLabel("selfService.Segur"),
 							new Object[] {afectats}), 
 							org.zkoss.util.resource.Labels.getLabel("selfService.Segur2") , 
-							new EventListener(){
+							new SerializableEventListener(){
 								public void onEvent(Event evt) throws InterruptedException{
 									if("onOK".equals(evt.getName())){
 										newPasswordS.setVisible(true);
@@ -439,7 +440,7 @@ public class SelfServiceHandler extends Frame
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(c);
 		final Account acc = (Account) ((DataNode)XPathUtils.getValue(ctx, ".")).getInstance();
 		es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account", 
-				new org.zkoss.zk.ui.event.EventListener() {
+				new SerializableEventListener() {
 					public void onEvent(Event evt) throws CreateException, NamingException, InternalErrorException {
 						if ("onOK".equals(evt.getName())) {
 							AccountService ejb = es.caib.seycon.ng.EJBLocator.getAccountService();

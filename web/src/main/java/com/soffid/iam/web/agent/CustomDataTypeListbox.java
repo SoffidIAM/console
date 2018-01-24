@@ -13,6 +13,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
 
@@ -47,12 +48,7 @@ public class CustomDataTypeListbox extends Listbox implements XPathSubscriber {
 
 	private void enableOnSelectListener() {
 		if (onSelectListener == null) {
-			onSelectListener = new EventListener() {
-
-				public boolean isAsap() {
-					return true;
-				};
-
+			onSelectListener = new SerializableEventListener() {
 				public void onEvent(org.zkoss.zk.ui.event.Event arg0) {// NOTHING
 																		// TO DO
 				};

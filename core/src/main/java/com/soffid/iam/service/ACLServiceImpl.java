@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.RoleGrant;
@@ -37,6 +39,8 @@ public class ACLServiceImpl extends ACLServiceBase {
         permissionCache = Collections.synchronizedMap(new LRUMap(size));
 	}
 	
+	Log log = LogFactory.getLog(getClass());
+	
 	@Override
 	protected AccessControlList handleExpandUser(long userId) throws Exception {
 		UserEntity ue = getUserEntityDao().load(userId);
@@ -46,12 +50,19 @@ public class ACLServiceImpl extends ACLServiceBase {
 		PermissionCache pc = permissionCache.get (userId);
 		if (pc != null)
 		{
+//			log.info("Got entry from cache");
 			if (System.currentTimeMillis() - pc.evaluationDate.getTime() < 30L*1000L) // 30 seconds live for ACL
 			{
-				if ( ue.getLastModificationDate().before(pc.lastModification))
+				if ( ue.getLastModificationDate().equals(pc.lastModification))
 					return pc.acl;
+//				else
+//					log.info("Discarded by user last modification");
 			}
+//			else
+//				log.info("Discarded by more than 30 seconds");
 		}
+//		else
+//			log.info("Entry not found in cache");
 		AccessControlList acl = new AccessControlList();
 		acl.setGroups( new HashSet<Long>());
 		acl.setUsers( new HashSet<Long>());
@@ -75,6 +86,8 @@ public class ACLServiceImpl extends ACLServiceBase {
 		pc.acl = acl;
 		pc.lastModification = ue.getLastModificationDate();
 		pc.evaluationDate = new Date();
+		permissionCache.put(userId, pc);
+		log.info("Entry stored");
 		
 		return acl;
 	}
@@ -178,7 +191,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 		{
 			for (RoleGrant grant: getApplicationService().findEffectiveRoleGrantsByRoleId(roleId))
 			{
-				if (grant.getOwnerSystem().equals(d.getName()))
+				if (grant.getOwnerAccountName() != null && grant.getOwnerSystem().equals(d.getName()))
 					accounts.add(grant.getOwnerAccountName());
 				else if ( grant.getUser() != null)
 				{

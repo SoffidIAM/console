@@ -6,6 +6,7 @@
 
 package com.soffid.iam.service;
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.doc.service.DocumentService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.ConfiguracioEntity;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class,
 	ConfiguracioEntity.class,
+	DocumentService.class,
 	ServerEntity.class})
 public abstract class ScheduledTaskService {
 

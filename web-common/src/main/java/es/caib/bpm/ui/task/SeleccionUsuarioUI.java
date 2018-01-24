@@ -1,5 +1,6 @@
 package es.caib.bpm.ui.task;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -134,7 +135,8 @@ public class SeleccionUsuarioUI extends Window
 		} 
 	}
 	
-	protected class SeleccionUsuarioUIDelegarBtnEventListener implements EventListener{
+	protected class SeleccionUsuarioUIDelegarBtnEventListener implements EventListener, Serializable{
+		private static final long serialVersionUID = 1L;
 		private String codiUsuari;
 
 		public SeleccionUsuarioUIDelegarBtnEventListener(String codiUsuari) {

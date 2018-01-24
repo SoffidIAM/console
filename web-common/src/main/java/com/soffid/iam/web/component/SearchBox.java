@@ -18,7 +18,6 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Listbox;
@@ -34,6 +33,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Esquema;
 import es.caib.zkib.zkiblaf.EsquemaVertical;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -86,13 +86,13 @@ public class SearchBox extends HtmlBasedComponent {
 
 	public SearchBox() {
 		setSclass("search-box");
-		addEventListener(CHANGE_MODE_EVENT, new EventListener() {
+		addEventListener(CHANGE_MODE_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				changeMode();
 			}
 
 		});
-		addEventListener(SEARCH_EVENT, new EventListener() {
+		addEventListener(SEARCH_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				search();
 			}
@@ -234,7 +234,7 @@ public class SearchBox extends HtmlBasedComponent {
 		appendChild(advancedSearch);
 
 		addAttributeButton = new Button(Labels.getLabel("searchBox.addAttribute"));
-		addAttributeButton.addEventListener("onClick", new EventListener() {
+		addAttributeButton.addEventListener("onClick", new SerializableEventListener() {
 			
 			@Override
 			public void onEvent(Event event) throws Exception {
@@ -416,7 +416,7 @@ public class SearchBox extends HtmlBasedComponent {
 						Labels.getLabel(def.getLabelName()));
 				item.setValue(def.getName());
 				item.setAutocheck(true);
-				item.addEventListener("onClick", new EventListener() {
+				item.addEventListener("onClick", new SerializableEventListener() {
 					@Override
 					public void onEvent(Event event) throws Exception {
 						AttributeSearchBox att = addAttribute(def.getName());

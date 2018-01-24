@@ -1,5 +1,6 @@
 package es.caib.bpm.ui.main;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.zkoss.util.resource.Labels;
@@ -15,7 +16,8 @@ import es.caib.bpm.vo.TaskInstance;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class CreateProcessListener implements EventListener {
+public class CreateProcessListener implements EventListener, Serializable {
+	private static final long serialVersionUID = 1L;
 	private ProcessDefinition def;
 	
 	

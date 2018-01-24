@@ -33,6 +33,7 @@ import es.caib.zkib.datasource.ChildDataSourceImpl;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.events.XPathCollectionEvent;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathRerunEvent;
@@ -74,11 +75,7 @@ public class CustomTypeListbox extends Listbox implements XPathSubscriber {
 
 	private void enableOnSelectListener() {
 		if (onSelectListener == null) {
-			onSelectListener = new EventListener() {
-
-				public boolean isAsap() {
-					return true;
-				};
+			onSelectListener = new SerializableEventListener() {
 
 				public void onEvent(org.zkoss.zk.ui.event.Event arg0) {// NOTHING
 																		// TO DO

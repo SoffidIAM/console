@@ -2,6 +2,7 @@ package es.caib.seycon.ng.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.Calendar;
@@ -84,7 +85,7 @@ public class ConfiguraSEU extends Vbox {
 	 * del SEU (resolució, etc..) 
 	 * @author u88683
 	 */
-	class Eventos implements EventListener {
+	class Eventos implements EventListener, Serializable {
 		public void onEvent(org.zkoss.zk.ui.event.Event event)
 				throws Exception {
 			if (event instanceof ClientInfoEvent) {
@@ -217,6 +218,11 @@ public class ConfiguraSEU extends Vbox {
 	                        	break;
 	                        }
 	                        else if (l.getLanguage().equalsIgnoreCase("nl"))
+	                        {
+	                        	idioma = l;
+	                        	break;
+	                        }
+	                        else if (l.getLanguage().equalsIgnoreCase("fr"))
 	                        {
 	                        	idioma = l;
 	                        	break;
@@ -438,7 +444,7 @@ public class ConfiguraSEU extends Vbox {
 		 * Fem que si quan es detecte click s'amague la finestra
 		 * 
 		 */
-		class Eventos implements EventListener {
+		class Eventos implements EventListener, Serializable {
 			public void onEvent(org.zkoss.zk.ui.event.Event event)
 					throws Exception {
 				setVisible(false);

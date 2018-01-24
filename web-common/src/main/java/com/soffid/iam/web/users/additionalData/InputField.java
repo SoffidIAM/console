@@ -59,6 +59,7 @@ public class InputField extends Div implements XPathSubscriber
 	private static final long serialVersionUID = 1L;
 	private String compos;
 	boolean userType;
+	boolean v2 = false;
 	
 	private SingletonBinder binder = new SingletonBinder(this);
 	private SingletonBinder binder3 = new SingletonBinder(this);
@@ -80,18 +81,18 @@ public class InputField extends Div implements XPathSubscriber
 	
 	public void onCreate () throws NamingException, CreateException, InternalErrorException, IOException
 	{
-		binder.setDataPath("@valorDada");
-		binder3.setDataPath("@blobDataValue");
-		binder4.setDataPath("@valorDadaDate");
+		binder.setDataPath(v2 ? "@value" : "@valorDada");
+		binder3.setDataPath(v2 ? "@blobDataValue": "@blobDataValue");
+		binder4.setDataPath(v2 ? "@dateValue" : "@valorDadaDate");
 		createField();
 	}
 	
 	public void onUpdate(XPathEvent arg0) {
 		try {
 			if (!(arg0 instanceof XPathValueEvent)) {
-				binder.setDataPath("@valorDada");
-				binder3.setDataPath("@blobDataValue");
-				binder4.setDataPath("@valorDadaDate");
+				binder.setDataPath(v2 ? "@value" :"@valorDada");
+				binder3.setDataPath(v2 ? "@blobDataValue":"@blobDataValue");
+				binder4.setDataPath(v2 ? "@dateValue" : "@valorDadaDate");
 				compos = new String();
 				createField();
 			}
@@ -312,8 +313,8 @@ public class InputField extends Div implements XPathSubscriber
 		{
 			SelfService ejb = EJBLocator.getSelfService();
 			BindContext bindCtx = XPathUtils.getComponentContext(this);
-			String dataType = (String) XPathUtils.getValue(bindCtx, "@codiDada");
-			String systemName = (String) XPathUtils.getValue(bindCtx, "@systemName");
+			String dataType = (String) XPathUtils.getValue(bindCtx, v2 ? "@attribute" : "@codiDada");
+			String systemName = (String) XPathUtils.getValue(bindCtx, v2 ? "@systemName" : "@systemName");
 			if(dataType != null){
 
 				
@@ -353,11 +354,11 @@ public class InputField extends Div implements XPathSubscriber
 						{
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline'>");
-							sb.append("<label bind=\"@valorDada\"/>");
+							sb.append("<label bind=\"@" + (v2 ? "value": "valorDada") + "\"/>");
 							sb.append("<imageclic src='/img/pencil.png' class='pencil'");
 							sb.append("   onClick='self.visible = self.previousSibling.visible = false;");
 							sb.append("      self.nextSibling.visible = self.nextSibling.nextSibling.visible = true'/>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@valorDada\" onChange='' onOK=''");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange='' onOK=''");
 							sb.append("   readonly='"+readonlyExpr+"' visible='false'/>");
 							sb.append("<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()' class='pencil-ok'/>");
 							sb.append("<label/>"+required);
@@ -366,7 +367,7 @@ public class InputField extends Div implements XPathSubscriber
 						} else {
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@valorDada' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
 							sb.append("<imageclic src='/img/user.png' visible='"+!readonly+"' onClick='self.parent.parent.onSelectUser(event)'");
 							sb.append("   onActualitza='self.parent.parent.onActualitzaUser(event)'");
 							sb.append("   style='margin-left:2px; margin-right:2px; vertical-align:-4px' />");
@@ -382,11 +383,11 @@ public class InputField extends Div implements XPathSubscriber
 						{
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline'>");
-							sb.append("<label bind=\"@valorDada\"/>");
+							sb.append("<label bind=\"@" + (v2 ? "value": "valorDada") + "\"/>");
 							sb.append("<imageclic src='/img/pencil.png' class='pencil'");
 							sb.append("   onClick='self.visible = self.previousSibling.visible = false;");
 							sb.append("      self.nextSibling.visible = self.nextSibling.nextSibling.visible = true'/>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@valorDada\" onChange='' onOK=''");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange='' onOK=''");
 							sb.append("   readonly='"+readonlyExpr+"' visible='false'/>");
 							sb.append("<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()' class='pencil-ok'/>");
 							sb.append("<label/>"+required);
@@ -395,7 +396,7 @@ public class InputField extends Div implements XPathSubscriber
 						} else {
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@valorDada' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
 							sb.append("<imageclic src='/zkau/web/img/grup.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectGroup(event)' onActualitza='self.parent.parent.onActualitzaGroup(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()'/>");
 							sb.append(required+"</div>");
@@ -409,11 +410,11 @@ public class InputField extends Div implements XPathSubscriber
 						{
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline'>");
-							sb.append("<label bind=\"@valorDada\"/>");
+							sb.append("<label bind=\"@" + (v2 ? "value": "valorDada") + "\"/>");
 							sb.append("<imageclic src='/img/pencil.png' class='pencil'");
 							sb.append("   onClick='self.visible = self.previousSibling.visible = false;");
 							sb.append("      self.nextSibling.visible = self.nextSibling.nextSibling.visible = true'/>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@valorDada\" onChange='' onOK=''");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange='' onOK=''");
 							sb.append("   readonly='"+readonlyExpr+"' visible='false'/>");
 							sb.append("<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()' class='pencil-ok'/>");
 							sb.append("<label/>"+required);
@@ -422,7 +423,7 @@ public class InputField extends Div implements XPathSubscriber
 						} else {
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@valorDada' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
 							sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectApplication(event)' onActualitza='self.parent.parent.onActualitzaApplication(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()'/>");
 							sb.append(required+"</div>");
@@ -436,11 +437,11 @@ public class InputField extends Div implements XPathSubscriber
 						{
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline'>");
-							sb.append("<label bind=\"@valorDada\"/>");
+							sb.append("<label bind=\"@" + (v2 ? "value": "valorDada") + "\"/>");
 							sb.append("<imageclic src='/img/pencil.png' class='pencil'");
 							sb.append("   onClick='self.visible = self.previousSibling.visible = false;");
 							sb.append("      self.nextSibling.visible = self.nextSibling.nextSibling.visible = true'/>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@valorDada\" onChange='' onOK=''");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange='' onOK=''");
 							sb.append("   readonly='"+readonlyExpr+"' visible='false'/>");
 							sb.append("<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()' class='pencil-ok'/>");
 							sb.append("<label/>"+required);
@@ -449,7 +450,7 @@ public class InputField extends Div implements XPathSubscriber
 						} else {
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
-							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@valorDada' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
+							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
 							sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectCustomObject(event)' onActualitza='self.parent.parent.onActualitzaCustomObject(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()'/>");
 							sb.append(required+"</div>");
@@ -482,10 +483,10 @@ public class InputField extends Div implements XPathSubscriber
 					}
 					else if(TypeEnumeration.DATE_TYPE.equals(type))
 					{
-						result = "<zk><datebox bind=\"@valorDadaDate\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"' />"+required+"</zk>"; 
+						result = "<zk><datebox bind=\"@" + (v2 ? "dateValue": "valorDadaDate") + "\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"' />"+required+"</zk>"; 
 						if (dualEdit)
 						{
-							result= "<div style='display:inline-block;'><datebox bind=\"@valorDadaDate\" disabled='true' format=\"${c:l('usuaris.zul.dateFormat2')}\" onChange=\"\" />"
+							result= "<div style='display:inline-block;'><datebox bind=\"@" + (v2 ? "dateValue": "valorDadaDate") + "\" disabled='true' format=\"${c:l('usuaris.zul.dateFormat2')}\" onChange=\"\" />"
 									+ "<imageclic src='/img/pencil.png' class='pencil' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
@@ -495,11 +496,11 @@ public class InputField extends Div implements XPathSubscriber
 					}
 					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 					{
-						result = "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' visible='"+(!dualEdit)+"' "
+						result = "<textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange=\"\" width='80%' visible='"+(!dualEdit)+"' "
 									+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\"/>";
 						if (dualEdit)
 						{
-							result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+							result= "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"
 									+ "<imageclic src='/img/pencil.png' class='pencil' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
@@ -530,18 +531,18 @@ public class InputField extends Div implements XPathSubscriber
 					else if (metaData.getValues() == null || metaData.getValues().isEmpty())//String
 					{
 						if (dualEdit)
-							result= result + "<div style='display:inline-block;'><label bind='@valorDada'/>"
+							result= result + "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"
 									+ "<imageclic src='/img/pencil.png' class='pencil' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-									+ "<textbox sclass=\"textbox\" bind=\"@valorDada\" maxlength=\"" + size +"\" width='80%' "
+									+ "<textbox sclass=\"textbox\" bind=\"@" + (v2 ? "value": "valorDada") + "\" maxlength=\"" + size +"\" width='80%' "
 											+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='self.parent.parent.changeData()'/>"
 									+ "<imageclic src='/img/accepta16.png' visible='false' onClick='self.parent.parent.changeData()' class='pencil-ok'/>"+required+"</div>";
 						else
-							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@valorDada\" onChange=\"\" width='80%' "
+							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange=\"\" width='80%' "
 									+ "readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 					} else { // Listbox
-						result = "<listbox mold=\"select\" bind=\"@valorDada\" onChange=\"\" "
+						result = "<listbox mold=\"select\" bind=\"@" + (v2 ? "value": "valorDada") + "\" onChange=\"\" "
 								+ "disabled=\""+readonlyExpr+"\" visible='"+(!dualEdit)+"'>";
 						result = result + "<listitem value=\"\"/>";
 						for (String v: metaData.getValues())
@@ -552,7 +553,7 @@ public class InputField extends Div implements XPathSubscriber
 						result = result + "</listbox>";
 						if (dualEdit)
 						{
-							result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+							result= "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"
 									+ "<imageclic src='/img/pencil.png' class='pencil' "
 										+ "onClick='self.visible = self.previousSibling.visible = false; "
 											+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
@@ -569,15 +570,15 @@ public class InputField extends Div implements XPathSubscriber
 				if (result.equals(""))
 				{
 					if (twoPhaseEdit && ! readonly)
-						result= "<div style='display:inline-block;'><label bind='@valorDada'/>"
+						result= "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"
 								+ "<imageclic src='/img/pencil.png' class='pencil' "
 									+ "onClick='self.visible = self.previousSibling.visible = false; "
 										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-								+ "<textbox sclass=\"textbox\" bind=\"@valorDada\" width='70%' "
+								+ "<textbox sclass=\"textbox\" bind=\"@" + (v2 ? "value": "valorDada") + "\" width='70%' "
 										+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()'/>"
 								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' class='pencil-ok'/>"+required+"</div>";
 					else
-						result= "<zk><textbox sclass=\"textbox\" bind=\"@valorDada\" width='80%' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
+						result= "<zk><textbox sclass=\"textbox\" bind=\"@" + (v2 ? "value": "valorDada") + "\" width='80%' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
 				}
 				if(compos.isEmpty() || !compos.equals(result))
 				{
@@ -780,5 +781,13 @@ public class InputField extends Div implements XPathSubscriber
 		binder.setValue(URLEncoder.encode(values[0], "UTF-8")
 				+ "="
 				+URLEncoder.encode(values[1], "UTF-8"));
+	}
+
+	public boolean isV2() {
+		return v2;
+	}
+
+	public void setV2(boolean v2) {
+		this.v2 = v2;
 	}
 }

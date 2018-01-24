@@ -350,7 +350,9 @@ public class MailServiceImpl extends MailServiceBase {
 	private InternetAddress getUserAddress (String userName) throws UnsupportedEncodingException, InternalErrorException
 	{
 		User user = getUserService().findUserByUserName(userName);
-		if (user.getShortName() != null && user.getMailDomain() != null)
+		if (! user.getActive())
+			return null;
+		else if (user.getShortName() != null && user.getMailDomain() != null)
 		{
 			return new InternetAddress( 
 						user.getShortName()+"@"+user.getMailDomain(),

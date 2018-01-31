@@ -5,10 +5,13 @@
 //
 
 package es.caib.bpm.servei;
+import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.servei.AplicacioService;
+
+import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.UsuariService.class, AplicacioService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
-	es.caib.seycon.ng.servei.SessionCacheService.class})
+	es.caib.seycon.ng.servei.SessionCacheService.class,
+	ProcessHierarchyEntity.class})
 public abstract class BpmEngine {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -80,7 +84,7 @@ public abstract class BpmEngine {
 		es.caib.bpm.vo.ProcessInstance process)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={}, noRollbackFor={java.lang.Exception.class},readOnly=true)
 	public es.caib.bpm.vo.ProcessInstance getProcess(
 		long id)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
@@ -163,7 +167,7 @@ public abstract class BpmEngine {
 		java.lang.String[] actorIds)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class}, readOnly=true)
 	public es.caib.bpm.vo.ProcessInstance getProcessInstance(
 		es.caib.bpm.vo.TaskInstance task)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -329,7 +333,7 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={},noRollbackFor={java.lang.Exception.class}, readOnly=true)
 	public es.caib.bpm.vo.TaskInstance getTask(
 		long id)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
@@ -447,4 +451,18 @@ public abstract class BpmEngine {
 	{
 		return false;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class},readOnly=true)
+	public Collection<Long> findChildProcesses (Long processId)
+	{
+		return null;
+	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class},readOnly=true)
+	public Collection<Long> findParentProceeses (Long processId)
+	{
+		return null;
+	}
+	
+	public void linkProcesses (Long parentProcess, Long childProcess) { }
 }

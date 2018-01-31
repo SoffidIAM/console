@@ -6,15 +6,15 @@
 
 package com.soffid.iam.model;
 
-import com.soffid.iam.api.AttributeVisibilityEnum;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Column;
+import com.soffid.mda.annotation.DaoFinder;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Entity;
+import com.soffid.mda.annotation.Identifier;
+import com.soffid.mda.annotation.Nullable;
 
-import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.model.AplicacioEntity;
-import es.caib.seycon.ng.model.GrupEntity;
-import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 
 @Entity(table = "SC_APPATT")

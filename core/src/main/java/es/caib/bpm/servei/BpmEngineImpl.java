@@ -93,6 +93,8 @@ import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.Sessions;
 
+import com.soffid.iam.model.ProcessHierarchyEntity;
+
 import es.caib.bpm.business.ProcessDefinitionRolesBusiness;
 import es.caib.bpm.business.UserInterfaceBusiness;
 import es.caib.bpm.business.VOFactory;
@@ -846,11 +848,65 @@ public class BpmEngineImpl extends BpmEngineBase {
 					return l1.getDate().compareTo(l2.getDate());
 				}
 			});
+			
+			for (ProcessHierarchyEntity parent: getProcessHierarchyEntityDao().findByChildren(instanceVO.getId()))
+			{
+				long processId = parent.getParentProcess().longValue();
+				addSubprocessLog(context, process, parsedLogs, processId, 0);
+			}
+			for (ProcessHierarchyEntity parent: getProcessHierarchyEntityDao().findByParent(instanceVO.getId()))
+			{
+				long processId = parent.getChildProcess().longValue();
+				addSubprocessLog(context, process, parsedLogs, processId, parsedLogs.size());
+			}
 			ProcessLog[] logs = (ProcessLog[]) parsedLogs
 					.toArray(new ProcessLog[parsedLogs.size()]);
 			return logs;
 		} finally {
 			flushContext(context);
+		}
+	}
+
+	private void addSubprocessLog(JbpmContext context, org.jbpm.graph.exe.ProcessInstance process,
+			LinkedList parsedLogs, long processId, int position) {
+		org.jbpm.graph.exe.ProcessInstance proc = context.loadProcessInstance(processId);
+		if (proc != null)
+		{
+			try {
+				ProcessInstance procvo = VOFactory.newProcessInstance(proc);
+				ProcessLog log = new ProcessLog();
+				log.setDate(procvo.getStart());
+				log.setUser("");
+				log.setProcessId(process.getId());
+				log.setAction(Messages.getString("BpmEngineImpl.StartProcess")+": "+
+						procvo.getId()+" - "+procvo.getDescription());
+				
+				parsedLogs.add(position++, log);
+
+				LinkedList<ProcessLog> parsedLogs2 = new LinkedList<ProcessLog>();
+				parseLog(context, proc, parsedLogs2, proc.getRootToken());
+				Collections.sort(parsedLogs2, new Comparator() {
+					public int compare(Object arg0, Object arg1) {
+						ProcessLog l1 = (ProcessLog) arg0;
+						ProcessLog l2 = (ProcessLog) arg1;
+						return l1.getDate().compareTo(l2.getDate());
+					}
+				});
+				
+				if (parsedLogs2.size() > 0)
+					log.setUser(parsedLogs2.get(0).getUser());
+				
+				if (position > 1)
+				{
+					for ( ProcessLog pl: parsedLogs2)
+					{
+						pl.setAction("> "+pl.getAction());
+						parsedLogs.add(position++, pl);
+					}
+				}
+
+			} catch (Exception e) {
+			}
 		}
 	}
 
@@ -1277,7 +1333,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 		org.jbpm.taskmgmt.exe.TaskInstance ti = context.loadTaskInstance(task
 				.getId());
-		if (business.canAccess(getUserGroups(), ti)) {
+		if (ti.hasEnded())
+		{
+			throw new SecurityException(Messages.getString("BpmEngineImpl.TaskFinishedError")); //$NON-NLS-1$
+
+		}
+		else if (business.canAccess(getUserGroups(), ti)) {
 			startAuthenticationLog(ti.getToken());
 			ti.setActorId(task.getActorId());
 			ti.setBlocking(task.isBlocking());
@@ -2782,6 +2843,34 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (r.equals(role))
 				return true;
 		return false;
+	}
+
+	@Override
+	protected Collection<Long> handleFindChildProcesses(Long processId) throws Exception {
+		LinkedList<Long> result = new LinkedList<Long>();
+		for ( ProcessHierarchyEntity h: getProcessHierarchyEntityDao().findByParent(processId))
+		{
+			result.add(h.getChildProcess());
+		}
+		return result;
+	}
+
+	@Override
+	protected Collection<Long> handleFindParentProceeses(Long processId) throws Exception {
+		LinkedList<Long> result = new LinkedList<Long>();
+		for ( ProcessHierarchyEntity h: getProcessHierarchyEntityDao().findByChildren(processId))
+		{
+			result.add(h.getParentProcess());
+		}
+		return result;
+	}
+
+	@Override
+	protected void handleLinkProcesses(Long parentProcess, Long childProcess) throws Exception {
+		ProcessHierarchyEntity h = getProcessHierarchyEntityDao().newProcessHierarchyEntity();
+		h.setChildProcess(childProcess);
+		h.setParentProcess(parentProcess);
+		getProcessHierarchyEntityDao().create(h);
 	}
 }
 

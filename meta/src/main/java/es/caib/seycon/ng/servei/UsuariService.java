@@ -241,7 +241,7 @@ public abstract class UsuariService {
 	}
 	@Operation ( grantees={roles.Tothom.class},
 			translated="findUserByUserName")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class},readOnly=true,rollbackFor={})
 	public es.caib.seycon.ng.comu.Usuari findUsuariByCodiUsuari(
 		java.lang.String codiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -544,7 +544,7 @@ public abstract class UsuariService {
 	}
 	@Operation ( grantees={roles.user_query.class},
 			translated="getBpmUserProcessList")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(rollbackFor={java.lang.Exception.class}, readOnly=true)
 	public java.util.Collection<es.caib.seycon.ng.comu.ProcesWF> obteLlistaProcessosWFUsuari()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -598,7 +598,7 @@ public abstract class UsuariService {
 	}
 	@Operation ( grantees={roles.user_query.class},
 	translated="findBpmUserProcessInstanceByUserName")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class}, readOnly=true)
 	public java.util.Collection<es.caib.bpm.vo.ProcessInstance> findProcessInstanceWFUsuariByCodiUsuari(
 		java.lang.String codiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {

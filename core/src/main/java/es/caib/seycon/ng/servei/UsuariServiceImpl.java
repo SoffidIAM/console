@@ -35,6 +35,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.mq.il.uil2.msgs.GetIDMsg;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
@@ -145,7 +147,7 @@ public class UsuariServiceImpl extends
 	private static final String CODI_USUARI_IBSALUT = "CODI_USUARI_IBSALUT";// cambio //$NON-NLS-1$
 	private final String DADA_ADDICIONAL_CODI_XESTIB = "CODI_XESTIB"; //$NON-NLS-1$
 	private final String DADA_ADDICIONAL_CODI_XESTIB_GRUPALUMNE = "CODI_XESTIB_GRUPALUMNE"; //$NON-NLS-1$
-
+	Log log = LogFactory.getLog(getClass());
 
 	protected Usuari handleSetServidorsToUsuari(java.lang.String codiUsuari,
 			String servidorPerfil, String servidorCorreu, String servidorHome)
@@ -2784,7 +2786,7 @@ public class UsuariServiceImpl extends
 		try {
 			// Obtenim els processos que l'usuari actual pot iniciar (i són
 			// habilitats)
-			List<es.caib.bpm.vo.ProcessDefinition> processosUsuari = engine.findInitiatorProcessDefinitions();
+			List<es.caib.bpm.vo.ProcessDefinition> processosUsuari = engine.findProcessDefinitions(null, false);
 			if (processosUsuari != null)
 				for (Iterator<es.caib.bpm.vo.ProcessDefinition> it = processosUsuari.iterator(); it.hasNext();) 
 				{
@@ -2861,7 +2863,7 @@ public class UsuariServiceImpl extends
     				}
 				} catch (Exception e)
 				{
-					
+					log.info("Error getting process "+up.getIdProces()+" data", e);
 				}
 			}
 		}

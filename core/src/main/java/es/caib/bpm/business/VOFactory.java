@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.bytes.ByteArray;
@@ -45,13 +47,20 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
 
 public class VOFactory {
+	
+	static Log log = LogFactory.getLog(VOFactory.class);
+	
 	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
 		Comment c = new Comment();
 		String actorId = instance.getActorId();
 		Security.nestedLogin(Security.getCurrentAccount(), new String[] {Security.AUTO_USER_QUERY+Security.AUTO_ALL});
 		try {
-			actorId = actorId+" "+ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(actorId).getFullName();
+			if (actorId == null)
+				actorId = "-";
+			else
+				actorId = actorId+" "+ServiceLocator.instance().getUsuariService().findUsuariByCodiUsuari(actorId).getFullName();
 		} catch (Exception e) {
+			log.info("Error getting user "+actorId, e);
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -153,65 +162,75 @@ public class VOFactory {
 
 	public static es.caib.bpm.vo.ProcessInstance newProcessInstance(
 			org.jbpm.graph.exe.ProcessInstance instance) throws InternalErrorException {
-		es.caib.bpm.vo.ProcessInstance process = new es.caib.bpm.vo.ProcessInstance();
-		process.setEnd(instance.getEnd());
-		process.setId(instance.getId());
-		process.setStart(instance.getStart());
-		process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
-
-		ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
-		try {
-			process.setVariables(instance.getContextInstance().getVariables());
-			if (process.getVariables() == null)
-				process.setVariables(new HashMap<String, Object>());
-		} finally {
-			Thread.currentThread().setContextClassLoader(oldcl);
-		}
-		Vector<Comment> comments = new Vector<Comment>();
-		populateTokenComments(instance.getRootToken(), comments);
-		Collections.sort(comments, new Comparator<Comment>() {
-			public int compare(Comment o1, Comment o2) {
-				return o1.getTime().compareTo(o2.getTime());
-			}
-		});
-		process.setComments(comments);
-		Token t = instance.getRootToken();
-		Node n = t.getNode();
-		if (n instanceof TaskNode)
-		{
-			StringBuffer tasks = new StringBuffer();
-			for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
-				it.hasNext();) {
-				TaskInstance ti = (TaskInstance) it.next();
-				tasks.append(ti.getName());
-				tasks.append(" "); //$NON-NLS-1$
-			}
-			process.setCurrentTask(tasks.toString());
-		}
-		else if (n != null)
-		{
-			process.setCurrentTask(n.getName());
-		}
 		
-		if (process.getVariables().containsKey("$title"))
-			process.setDescription((String) process.getVariables().get("$title"));
-		else
-		{
-			String def = instance.getProcessDefinition().getDescription();
-			if (def != null && !def.trim().isEmpty()) {
-				VariableResolver variableResolver = JbpmExpressionEvaluator
-						.getUsedVariableResolver();
-				process.setDescription( (String) JbpmExpressionEvaluator.evaluate(def,
-						new ExecutionContext( instance.getRootToken()),
-						variableResolver,
-						JbpmExpressionEvaluator.getUsedFunctionMapper()) );
+		try {
+			es.caib.bpm.vo.ProcessInstance process = new es.caib.bpm.vo.ProcessInstance();
+			process.setEnd(instance.getEnd());
+			process.setId(instance.getId());
+			process.setStart(instance.getStart());
+			process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
+	
+			ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
+			try {
+				process.setVariables(instance.getContextInstance().getVariables());
+				if (process.getVariables() == null)
+					process.setVariables(new HashMap<String, Object>());
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldcl);
 			}
+			Vector<Comment> comments = new Vector<Comment>();
+			populateTokenComments(instance.getRootToken(), comments);
+			Collections.sort(comments, new Comparator<Comment>() {
+				public int compare(Comment o1, Comment o2) {
+					return o1.getTime().compareTo(o2.getTime());
+				}
+			});
+			process.setComments(comments);
+			Token t = instance.getRootToken();
+			Node n = t.getNode();
+			if (n instanceof TaskNode)
+			{
+				StringBuffer tasks = new StringBuffer();
+				for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
+					it.hasNext();) {
+					TaskInstance ti = (TaskInstance) it.next();
+					tasks.append(ti.getName());
+					tasks.append(" "); //$NON-NLS-1$
+				}
+				process.setCurrentTask(tasks.toString());
+			}
+			else if (n != null)
+			{
+				process.setCurrentTask(n.getName());
+			}
+			
+			if (process.getVariables().containsKey("$title"))
+				process.setDescription((String) process.getVariables().get("$title"));
 			else
-				process.setDescription(instance.getProcessDefinition().getName());
+			{
+				String def = instance.getProcessDefinition().getDescription();
+				if (def != null && !def.trim().isEmpty()) {
+					VariableResolver variableResolver = JbpmExpressionEvaluator
+							.getUsedVariableResolver();
+					try {
+						process.setDescription( (String) JbpmExpressionEvaluator.evaluate(def,
+								new ExecutionContext( instance.getRootToken()),
+								variableResolver,
+								JbpmExpressionEvaluator.getUsedFunctionMapper()) );
+					} catch (Throwable th) {
+						process.setDescription(instance.getProcessDefinition().getName());
+					}
+				}
+				else
+					process.setDescription(instance.getProcessDefinition().getName());
+			}
+	
+			return process;
+		} catch (Throwable th) {
+			log.info("Error generating ProcessInstance", th);
+			throw new InternalErrorException("Error generating process instance", th);
 		}
-
-		return process;
 	}
 
 	private static void populateTokenComments(Token token, Vector<Comment> comments) {
@@ -404,7 +423,7 @@ public class VOFactory {
 	
 	
 	static WeakHashMap<Long, ClassLoader> classesMap = new WeakHashMap<Long,ClassLoader> ();
-	static private ClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
+	static private ClassLoader getClassLoader(ProcessDefinition def) 
 	{
 		return JbpmConfiguration.getProcessClassLoader(def);
 	}

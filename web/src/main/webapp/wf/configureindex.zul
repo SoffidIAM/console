@@ -142,6 +142,8 @@
 							onClick="ui.configureDocumentManager()"/>
 						<button label="${c:l('configure.cancel')}"
 							onClick="ui.getDocumentManagerSettings()"/>
+						<button label="${c:l('configure.export')}" onClick="ui.exportDocs()"/>
+						<button label="${c:l('conifgure.import')}" onClick="ui.importDocs()"/>
 					</hbox>
 				</row>
 			</rows>

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -15,10 +16,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.openejb.InternalErrorException;
 
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
@@ -420,5 +425,61 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 		
 		getNASManager().deleteFile(result.getFsPath());
 		getDocumentEntityDao().remove(result);
+	}
+
+	@Override
+	protected void handleExportDocuments(OutputStream out) throws Exception {
+		ZipOutputStream zout = new ZipOutputStream(out);
+		zout.putNextEntry(new ZipEntry("soffid-document-dump") );
+		for ( DocumentEntity doc: getDocumentEntityDao().loadAll())
+		{
+			zout.putNextEntry(new ZipEntry(doc.getId().toString()));
+			File f = getNASManager().retreiveFile(doc.getFsPath());
+			if (f != null)
+			{
+				InputStream in = new FileInputStream(f);
+				byte b[] = new byte[8192];
+				int read;
+				while ((read = in.read(b)) > 0)
+				{
+					zout.write(b, 0, read);
+				}
+				in.close();
+				f.delete();
+			}
+		}
+		zout.close();
+	}
+
+	@Override
+	protected void handleImportDocuments(InputStream in) throws Exception {
+		ZipInputStream zin = new ZipInputStream(in);
+		ZipEntry entry = zin.getNextEntry();
+		if (entry == null)
+			throw new InternalErrorException("Cannot open zip file");
+		if (! entry.getName().equals("soffid-document-dump"))
+		{
+			throw new InternalErrorException("Zip file does not contain a document dump");
+		}
+		while ( (entry = zin.getNextEntry()) != null)
+		{
+			File f = getNASManager().getTempFile();
+			FileOutputStream out = new FileOutputStream(f);
+			byte b[] = new byte[8192];
+			int read;
+			while ((read = zin.read(b)) > 0)
+			{
+				out.write(b, 0, read);
+			}
+			out.close();
+			DocumentEntity doc = getDocumentEntityDao().load(Long.parseLong(entry.getName()));
+			if (doc != null)
+			{
+				getNASManager().deleteFile(doc.getFsPath());
+				getNASManager().replaceFile(doc.getFsPath(), f);
+			}
+			f.delete();
+		}
+		zin.close();
 	}
 }

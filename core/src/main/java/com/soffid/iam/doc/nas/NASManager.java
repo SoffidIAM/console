@@ -209,7 +209,11 @@ public class NASManager
 		
 		return path;
 	}
-	
+
+	public void replaceFile(String path, File file) throws NASException
+	{
+		this.comStrategy.uploadFile(file, path);
+	}
 	/**
 	 * Recupera un archivo del NAS a partir del path.
 	 * 

@@ -4,12 +4,12 @@ public class DocumentEntityImpl extends DocumentEntity {
 
 	@Override
 	public String getApplication() {
-		return getFsPath().split("/")[1];
+		return getFsPath().split("/")[2];
 	}
 
 	@Override
 	public int getYear() {
-		String s = getFsPath().split("/")[2];
+		String s = getFsPath().split("/")[3];
 		return Integer.parseInt(s);
 	}
 

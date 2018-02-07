@@ -9,17 +9,6 @@
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
-				if="${query == null &amp;&amp; codi == null}"> <!-- grup: query -->
-				<parameter value="World" />
-				<parameter value="%" />
-				<parameter value="%" />
-				<parameter value="%" />
-				<parameter value="%" />
-				<parameter value="%" />
-				<parameter value="%" />
-				<parameter value="%" />
-			</ejb-finder>
-			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
 				if="${query == null &amp;&amp; codi != null}"> <!-- grup: query -->
 				<parameter value="${codi}" />
 				<parameter value="%" />

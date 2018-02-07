@@ -25,17 +25,19 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.map.LRUMap;
 
 public class AccountEntityDaoImpl extends
 		com.soffid.iam.model.AccountEntityDaoBase {
-	LRUMap cacheMap = new LRUMap(300);
+	Map<Long, AccountCacheEntry> cacheMap = Collections.synchronizedMap( new LRUMap(300) );
 	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(getClass());
 	 
 	private void auditar(String accio, String account, String dispatcher) {
@@ -119,7 +121,6 @@ public class AccountEntityDaoImpl extends
 				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
 				{
 					fetchFromCache(target, entry);
-					log.info("Get from cache: "+ (System.currentTimeMillis() - start));
 					return ;
 				}
 			}

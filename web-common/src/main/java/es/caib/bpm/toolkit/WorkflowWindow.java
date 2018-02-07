@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
@@ -17,6 +16,7 @@ import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
 import es.caib.zkib.component.DataModel;
+import es.caib.zkib.events.SerializableEventListener;
 
 /**
  * Interfaz de usuario generica para elementos de workflow.
@@ -74,41 +74,41 @@ public class WorkflowWindow extends Window {
 		}
 
         engine = (BpmEngine) arguments.get("engine"); //$NON-NLS-1$
-        this.addEventListener(PREPARE_TRANSITION_EVENT, new EventListener() {
+        this.addEventListener(PREPARE_TRANSITION_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
                 prepareTransition((String) event.getData());
             };
         });
 
-        this.addEventListener(COMPLETE_TRANSITION_EVENT, new EventListener() {
+        this.addEventListener(COMPLETE_TRANSITION_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
                 completeTransition((String) event.getData());
             };
         });
 
-        this.addEventListener(SAVE_EVENT, new EventListener() {
+        this.addEventListener(SAVE_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
                 save();
             };
         });
-        this.addEventListener(LOAD_EVENT, new EventListener() {
+        this.addEventListener(LOAD_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
             	load();
            };
         });
         
-        this.addEventListener(DELEGATION_INIT_EVENT, new EventListener() {
+        this.addEventListener(DELEGATION_INIT_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
                 onDelegationInit();
             };
         });
 
-        this.addEventListener(TAB_SELECTED_EVENT, new EventListener() {
+        this.addEventListener(TAB_SELECTED_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
                 onTaskTabSelected((String) event.getData());

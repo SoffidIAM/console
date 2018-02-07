@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.ValueObject;
 public class ProcessInstance {
 	long id = 0;
 	@Nullable
-	es.caib.bpm.classloader.UIClassLoader processClassLoader;
+	transient es.caib.bpm.classloader.UIClassLoader processClassLoader;
 	@Nullable
 	String description;
 	@Nullable

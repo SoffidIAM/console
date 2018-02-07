@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -35,7 +36,9 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 
+import bsh.EvalError;
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Grup;
@@ -316,7 +319,10 @@ public class InputField2 extends Div
 		
 		try
 		{
-			if(dataType != null){
+			if(dataType != null)
+			{
+				calculateVisibility();
+				
 				String result = "";
 				Map <String,Object> map=new HashMap<String, Object>();
 				updateUser = false;
@@ -493,6 +499,31 @@ public class InputField2 extends Div
 			disableRecursive = false;
 		}
 		
+	}
+
+	private void calculateVisibility() throws EvalError, MalformedURLException {
+		if (dataType.getVisibilityExpression() != null && 
+				!dataType.getVisibilityExpression().trim().isEmpty())
+		{
+			BindContext ctx = XPathUtils.getComponentContext(this);
+			String path = ctx.getXPath() + bind;
+			int i = path.lastIndexOf("/attributes");
+			if (i > 0)
+			{
+				path = path.substring(0, i);
+				SecureInterpreter interp = new SecureInterpreter();
+				Object obj = ctx.getDataSource().getJXPathContext().getValue(path);
+				interp.set("object", obj);
+				if ( ! Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+					this.setVisible(false);
+				else
+					this.setVisible(true);
+			}
+		}
+		else
+		{
+			this.setVisible(true);
+		}
 	}
 
 	public boolean isReadonly() {

@@ -27,6 +27,7 @@ import org.zkoss.zul.Textbox;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.vo.BPMUser;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate 
@@ -164,7 +165,7 @@ public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate
 	}
 
 	/**
-	 * Ha de retornar un EventListener diferent cada vegada, que processarà la sel.lecció de l'usuari.
+	 * Ha de retornar un SerializableEventListener diferent cada vegada, que processarà la sel.lecció de l'usuari.
 	 * Principalment ha d'invocar setDelegat(codiUsuari); per a que posteriorment es pugui recuperar el codi de l'usuari sel.leccionat
 	 * @param cols
 	 * @return
@@ -173,7 +174,7 @@ public class SeleccionUsuarioUI2  extends SeleccionUsuarioUITemplate
 		return new SeleccionUsuarioUIDelegarBtnEventListener((String)cols[0]);
 	}
 	
-	public  class SeleccionUsuarioUIDelegarBtnEventListener implements EventListener{
+	public  class SeleccionUsuarioUIDelegarBtnEventListener extends SerializableEventListener {
 		private String codiUsuari;
 
 		public SeleccionUsuarioUIDelegarBtnEventListener(String codiUsuari) {

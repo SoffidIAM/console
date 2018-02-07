@@ -706,3 +706,210 @@ div.identity-tag-role img.imageclic {
 div.identity-tag-role img.imageclic:hover {
 	opacity: 1;
 }
+
+
+
+.search-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: lightblue;
+    height: 100%;
+    z-index: 3;
+    opacity: 0.1;
+}
+
+.search-popup {
+	position: absolute;
+    z-index: 5;
+}
+
+
+.search-popup div.wc-search-popup-none {
+	position: relative; 
+	top: 2em; 
+	background-color:white;
+	border: 1px solid black;
+}
+
+
+.attribute-search-box-remove {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+.search-icon {
+	width:2em;
+	opacity:0.5;
+	position: relative;
+	top: 2px;
+	vertical-align:top;
+}
+
+.attribute-search-box-remove:hover, .search-icon:hover {
+	opacity: 1;
+}
+
+.button-container {
+	margin-top: 7px;
+}
+
+.button-container .buttons {
+	text-align: right;
+}
+
+span.search-box ul li {
+	display: inline-block;
+	margin-bottom: 5px
+}
+
+.searchbox-addcriteria {
+	margin-bottom: 5px
+}
+
+a.remove-filter, a.remove-filter:hover, a.remove-filter:active,a.remove-filter:visited,
+a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited 
+{
+	text-decoration:none
+}
+
+.search-box textarea {
+	width: 80%
+}
+
+
+.capsa_cerca {
+	height: auto !important;
+	padding-bottom: 0px !important
+}
+
+li.attribute-search-box {
+	background-color: white;
+    border: 1px solid #9EC73C;
+    border-image: none;
+    padding: 0px;
+    padding-right: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #7F9FC2;
+}
+
+li.attribute-search-box > button {
+	background-color: transparent;
+    border: none;
+    border-image: none;
+    padding: 4px;
+    margin: 0px;
+    color: #7F9FC2;
+    cursor: pointer;
+}
+
+li.attribute-search-box:hover {
+	background-color: #9EC73C;
+    color: white;
+    cursor: pointer;
+}
+
+
+li.attribute-search-box  > button:hover {
+    color: white;
+}
+
+div.identity-tag-user {
+    background-color: #8080c0;
+    border-radius: 4px;
+    padding: 4px;
+    color: white;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-user span {
+    color: white;
+    margin-right: 2em;
+}
+
+div.identity-tag-user img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-user img.imageclic:hover {
+	opacity: 1;
+}
+
+div.identity-tag-group {
+    background-color: #80c080;
+    border-radius: 4px;
+    padding: 4px;
+    color: white;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-group span {
+    color: white;
+    margin-right: 2em;
+}
+
+div.identity-tag-group img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-group img.imageclic:hover {
+	opacity: 1;
+}
+
+div.identity-selector {
+	cursor:pointer
+}
+
+div.identity-selector:hover {
+	text-decoration: underline
+}
+
+div.identity-tag-role {
+    background-color: #fff080;
+    border-radius: 4px;
+    padding: 4px;
+    color: black;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-role span {
+    color: black;
+    margin-right: 2em;
+}
+
+div.identity-tag-role img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-role img.imageclic:hover {
+	opacity: 1;
+}
+
+input[type="radio"] {
+    vertical-align: -3px;
+}
+
+div.menupopup {
+	border: 1px solid
+}
+
+div.menupopup table {
+	padding: 5px
+}
+
+div.menupopup td {
+	padding-bottom: 5px;
+	padding-left: 7px
+}

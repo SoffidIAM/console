@@ -40,13 +40,8 @@ public class DatabaseStrategy implements CommunicationStrategy {
 				DocumentBlockEntity documentBlock = documentBlockEntityDao.newDocumentBlockEntity();
 				documentBlock.setPath(path);
 				documentBlock.setSequenceNumber(seq++);
-				if (read == b.length)
-					documentBlock.setContent(b);
-				else
-				{
-					byte b2[] = Arrays.copyOf(b, read);
-					documentBlock.setContent(b2);
-				}
+				byte b2[] = Arrays.copyOf(b, read);
+				documentBlock.setContent(b2);
 				documentBlockEntityDao.create(documentBlock);
 			}
 		} catch (IOException e) {
@@ -68,8 +63,8 @@ public class DatabaseStrategy implements CommunicationStrategy {
 						f = File.createTempFile("doc", "tmp");
 						out = new FileOutputStream (f);
 					}
-				}
 					out.write(db.getContent());
+				}
 			}
 			if (out != null)
 				out.close();

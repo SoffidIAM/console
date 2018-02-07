@@ -16,7 +16,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
@@ -31,6 +30,7 @@ import org.zkoss.zul.impl.XulElement;
 import com.soffid.iam.web.SearchAttributeDefinition;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.zkib.events.SerializableEventListener;
 
 public class AttributeSearchBox extends XulElement {
 
@@ -83,7 +83,7 @@ public class AttributeSearchBox extends XulElement {
 		setSclass("attribute-search-box");
 		queryExpression = "";
 		humanExpression = Labels.getLabel("attributeQuery.all");
-		addEventListener(REMOVE_EVENT, new EventListener() {
+		addEventListener(REMOVE_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				onRemove();
 			}
@@ -221,7 +221,7 @@ public class AttributeSearchBox extends XulElement {
 
 		insertBefore(bg, this);
 		bg.setSclass("search-background");
-		bg.addEventListener(CLICK_EVENT, new EventListener() {
+		bg.addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				w.detach();
 				bg.detach();
@@ -278,7 +278,7 @@ public class AttributeSearchBox extends XulElement {
 		enableTextBoxes(rg);
 		((Textbox)w.getFellow(STRING_TEXTBOXES[textOperation])).setText(textValue);
 		
-		rg.addEventListener("onCheck", new EventListener() {
+		rg.addEventListener("onCheck", new SerializableEventListener() {
 			@Override
 			public void onEvent(Event event) throws Exception {
 				Component target = event.getTarget();
@@ -291,14 +291,14 @@ public class AttributeSearchBox extends XulElement {
 		});
 		for (String id: STRING_TEXTBOXES)
 		{
-			w.getFellow(id).addEventListener("onOK", new EventListener() {
+			w.getFellow(id).addEventListener("onOK", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					doTextSearch(w, bg, rg);
 				}
 		
 			});
-			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+			w.getFellow(id).addEventListener("onCancel", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					textOperation = 0;
@@ -313,12 +313,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				doTextSearch(w, bg, rg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				textValue = "";
@@ -372,7 +372,7 @@ public class AttributeSearchBox extends XulElement {
 		enableIntBoxes(rg);
 		((Intbox)w.getFellow(INT_TEXTBOXES[textOperation])).setText(textValue);
 		
-		rg.addEventListener("onCheck", new EventListener() {
+		rg.addEventListener("onCheck", new SerializableEventListener() {
 			@Override
 			public void onEvent(Event event) throws Exception {
 				Component target = event.getTarget();
@@ -385,14 +385,14 @@ public class AttributeSearchBox extends XulElement {
 		});
 		for (String id: INT_TEXTBOXES)
 		{
-			w.getFellow(id).addEventListener("onOK", new EventListener() {
+			w.getFellow(id).addEventListener("onOK", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					doIntSearch(w, bg, rg);
 				}
 		
 			});
-			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+			w.getFellow(id).addEventListener("onCancel", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					textOperation = 0;
@@ -407,12 +407,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				doIntSearch(w, bg, rg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				textValue = "";
@@ -478,14 +478,14 @@ public class AttributeSearchBox extends XulElement {
 		
 		for (String id: DATE_DATEBOXES)
 		{
-			w.getFellow(id).addEventListener("onOK", new EventListener() {
+			w.getFellow(id).addEventListener("onOK", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					doDateSearch(w, bg);
 				}
 		
 			});
-			w.getFellow(id).addEventListener("onCancel", new EventListener() {
+			w.getFellow(id).addEventListener("onCancel", new SerializableEventListener() {
 				@Override
 				public void onEvent(Event event) throws Exception {
 					textOperation = 0;
@@ -501,12 +501,12 @@ public class AttributeSearchBox extends XulElement {
 		
 			});
 		}
-		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				doDateSearch(w, bg);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				textOperation = 0;
 				since = null;
@@ -559,12 +559,12 @@ public class AttributeSearchBox extends XulElement {
 				cb.setChecked(true);
 		}
 		
-		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				doSelectSearch(w, bg, div);
 			}
 		});
-		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new EventListener() {
+		w.getFellow("cancelbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
 				selectedValues.clear();
 				queryExpression = null;

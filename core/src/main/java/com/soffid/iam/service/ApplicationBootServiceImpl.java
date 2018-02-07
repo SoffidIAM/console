@@ -637,17 +637,11 @@ public class ApplicationBootServiceImpl extends
 				null, null);
 
 		if (result.isEmpty()) {
-			String installDir = System.getProperty("catalina.home"); //$NON-NLS-1$ //$NON-NLS-2$
-			File f = new File(installDir).getCanonicalFile();
-			File rootPath = new File(f, "/docs/data"); //$NON-NLS-1$
 			Configuration configuracio = new Configuration();
 			configuracio.setCode("soffid.ui.docPath"); //$NON-NLS-1$
-			configuracio.setValue(rootPath.getAbsolutePath());
+			configuracio.setValue("-");
 			configSvc.create(configuracio);
-
-			rootPath.mkdirs();
 		}
-
 		else {
 			System.setProperty("soffid.ui.docPath", result.iterator().next()
 					.getValue());
@@ -657,17 +651,11 @@ public class ApplicationBootServiceImpl extends
 				null, null, null);
 
 		if (result.isEmpty()) {
-			String installDir = System.getProperty("jboss.home.dir") + "../.."; //$NON-NLS-1$ //$NON-NLS-2$
-			File f = new File(installDir).getCanonicalFile();
-			File rootPath = new File(f, "/docs/tmp"); //$NON-NLS-1$
 			Configuration configuracio = new Configuration();
 			configuracio.setCode("soffid.ui.docTempPath"); //$NON-NLS-1$
-			configuracio.setValue(rootPath.getAbsolutePath());
+			configuracio.setValue(System.getProperty("java.io.tmpdir"));
 			configSvc.create(configuracio);
-
-			rootPath.mkdirs();
 		}
-
 		else {
 			System.setProperty("soffid.ui.docTempPath", result.iterator()
 					.next().getValue());
@@ -819,7 +807,7 @@ public class ApplicationBootServiceImpl extends
 			grup = new Group();
 			grup.setName("enterprise"); //$NON-NLS-1$
 			grup.setParentGroup("world"); //$NON-NLS-1$
-			grup.setDescription("Entrprise"); //$NON-NLS-1$
+			grup.setDescription("Enterprise"); //$NON-NLS-1$
 			grup.setObsolete(new Boolean(false));
 			grupSvc.create(grup);
 		}

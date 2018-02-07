@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>2.0.4-SNAPSHOT</version>
+		<version>2.0.5-SNAPSHOT</version>
 	</parent> 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>web-common</artifactId>
@@ -277,7 +277,7 @@
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>
-			<version>${zkiblaf.version}</version>
+			<version>1.22</version>
 			<classifier>classes</classifier>
 			<type>jar</type>
 		</dependency>

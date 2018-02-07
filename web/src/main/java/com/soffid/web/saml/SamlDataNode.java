@@ -35,7 +35,12 @@ public class SamlDataNode extends SimpleDataNode {
 	private void updateParam(String param, String value) throws InternalErrorException, NamingException, CreateException {
 		ConfigurationService svc = EJBLocator.getConfigurationService();
 		Configuration cfg = svc.findParameterByNameAndNetworkName(param, null);
-		if (cfg == null)
+		if ( value == null || value.trim().isEmpty())
+		{
+			if (cfg != null)
+				svc.delete(cfg);
+		}
+		else if (cfg == null )
 		{
 			cfg = new Configuration();
 			cfg.setCode(param);

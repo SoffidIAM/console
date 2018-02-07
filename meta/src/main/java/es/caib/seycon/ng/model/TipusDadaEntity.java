@@ -98,6 +98,11 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	CustomObjectTypeEntity dataObjectType;
 
+	
+	@Column (name="TDA_VISEXP")
+	@Nullable
+	String visibilityExpression;
+	
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;
 

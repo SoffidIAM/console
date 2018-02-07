@@ -21,7 +21,6 @@ import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Fileupload;
@@ -36,6 +35,7 @@ import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataListbox;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class DespliegueUI extends Frame 
@@ -94,7 +94,7 @@ public class DespliegueUI extends Frame
 				Button boto = new Button();
 				boto.setLabel(Labels.getLabel("deploy.btnDisable")); //$NON-NLS-1$
 				boto.setAttribute("definition", definition); //$NON-NLS-1$
-				boto.addEventListener(Events.ON_CLICK, new EventListener()
+				boto.addEventListener(Events.ON_CLICK, new SerializableEventListener()
 				{
 					public void onEvent(org.zkoss.zk.ui.event.Event event)
 						throws BPMException, CreateException, NamingException,
@@ -115,7 +115,7 @@ public class DespliegueUI extends Frame
 				Button boto = new Button();
 				boto.setLabel(Labels.getLabel("deploy.btnEnable")); //$NON-NLS-1$
 				boto.setAttribute("definition", definition); //$NON-NLS-1$
-				boto.addEventListener(Events.ON_CLICK, new EventListener()
+				boto.addEventListener(Events.ON_CLICK, new SerializableEventListener()
 				{
 					public void onEvent(org.zkoss.zk.ui.event.Event event)
 						throws BPMException, CreateException, NamingException,
@@ -172,7 +172,7 @@ public class DespliegueUI extends Frame
 				Button boto = new Button();
 				boto.setLabel(Labels.getLabel("deploy.btnDisable")); //$NON-NLS-1$
 				boto.setAttribute("definition", definition); //$NON-NLS-1$
-				boto.addEventListener(Events.ON_CLICK, new EventListener()
+				boto.addEventListener(Events.ON_CLICK, new SerializableEventListener()
 				{
 					public void onEvent(org.zkoss.zk.ui.event.Event event)
 						throws BPMException, CreateException, NamingException,

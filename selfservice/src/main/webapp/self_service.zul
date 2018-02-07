@@ -15,7 +15,7 @@
 					import es.caib.seycon.ng.comu.*;
 			 		model.getVariables().declareVariable("query", false);
 			 		boolean canUpdateUserMetadata = true;
-			 		boolean canDelegate = true;
+			 		boolean canDelegate = ! "true".equals(com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.delegation.disable"));
 			 		void delegate (Component comp) {
 			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
 			 			pageScope{"roleToDelegate"} = ra;
@@ -309,7 +309,7 @@
 												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Valor')}" width="15%" />
-												<listheader width="10%"></listheader>
+												<listheader width="10%" visible="${canDelegate }"></listheader>
 											</listhead>
 											<dataitem>
 												<listcell bind="@nomRol"/>
@@ -319,7 +319,7 @@
 												<listcell bind="valorDomini/@nomDomini" />
 												<listcell bind="valorDomini/@descripcio"/>
 												<listcell>
-													<button label="${c:l('seleccionUsuario.btnDelegar') }" onClick='delegate(event.getTarget())'/>
+													<button label="${c:l('seleccionUsuario.btnDelegar') }" onClick='delegate(event.getTarget())' visible='${canDelegate}'/>
 													<button label="${c:l('selfService.cancelDelegation') }" onClick='cancelDelegate(event.getTarget())' visible='false'/>
 												</listcell>
 											</dataitem>
@@ -333,8 +333,8 @@
 			</div>
 		</div>
 		
-		<div class="own-ip">
-			<hbox align="end" pack="end">
+		<div class="own-ip" style="display:none">
+			<hbox align="end" pack="end"  style="display:none">
 				<label value="${c:l('selfService.Conneted')} ${p_selfService.ambit}"/>
 			</hbox>
 		</div>

@@ -16,7 +16,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
@@ -32,6 +31,7 @@ import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataListbox;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frame;
 
@@ -54,14 +54,14 @@ public class ActiveJobHandler extends Frame {
 	{
 		try {
 			listbox = (Listbox) getFellow("listadoJobs"); //$NON-NLS-1$
-			listbox.addEventListener("onSelect", new EventListener () { //$NON-NLS-1$
+			listbox.addEventListener("onSelect", new SerializableEventListener () { //$NON-NLS-1$
 
 				public void onEvent(Event event) throws Exception {
 					onSelectJob();
 				}
 				
 			});
-			addEventListener("onReturn", new EventListener () { //$NON-NLS-1$
+			addEventListener("onReturn", new SerializableEventListener () { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					refresh ();
 				}
@@ -103,7 +103,7 @@ public class ActiveJobHandler extends Frame {
 	    	Button retryButton = (Button) currentJobWindow.getFellow("retrybutton"); //$NON-NLS-1$
 	    	Button closeButton = (Button) currentJobWindow.getFellow("closebutton"); //$NON-NLS-1$
 	    	Button processButton = (Button) currentJobWindow.getFellow("openprocess"); //$NON-NLS-1$
-	    	processButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+	    	processButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					ProcessInstance p = BPMApplication.getEngine().getProcess(currentJob.getProcessId());
 					String url = BPMApplication.getProcessURL(p);
@@ -119,7 +119,7 @@ public class ActiveJobHandler extends Frame {
 	    		statusLabel.setValue(Labels.getLabel("job.status.pause")); //$NON-NLS-1$
 	    		pauseButton.setVisible(false);
 	    		retryButton.setVisible(false);
-	    		resumeButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+	    		resumeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 					public void onEvent(Event event) throws Exception {
 						BPMApplication.getEngine().resumeJob(currentJob);
 						currentJobWindow.setVisible(false);
@@ -136,7 +136,7 @@ public class ActiveJobHandler extends Frame {
 	    		statusLabel.setValue(Labels.getLabel("job.status.error")); //$NON-NLS-1$
 	    		pauseButton.setVisible(false);
 	    		resumeButton.setVisible(false);
-	    		retryButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+	    		retryButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 					public void onEvent(Event event) throws Exception {
 						BPMApplication.getEngine().retryJob(currentJob);
 						currentJobWindow.setVisible(false);
@@ -156,7 +156,7 @@ public class ActiveJobHandler extends Frame {
 	    			statusLabel.setValue(Labels.getLabel("job.status.pending")); //$NON-NLS-1$
 	    		retryButton.setVisible(false);
 	    		resumeButton.setVisible(false);
-	    		pauseButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+	    		pauseButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 					public void onEvent(Event event) throws Exception {
 						BPMApplication.getEngine().pauseJob(currentJob);
 						currentJobWindow.setVisible(false);
@@ -169,7 +169,7 @@ public class ActiveJobHandler extends Frame {
 				});
 	    	}
 	    		
-			closeButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+			closeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					currentJobWindow.setVisible(false);
 					currentJobWindow.setParent(null);

@@ -11,7 +11,7 @@ import com.soffid.mda.annotation.ValueObject;
 public class TaskInstance {
 	long id = 0;
 	@Nullable
-	es.caib.bpm.classloader.UIClassLoader processClassLoader;
+	transient es.caib.bpm.classloader.UIClassLoader processClassLoader;
 	@Nullable
 	protected String processName = null;
 	@Nullable

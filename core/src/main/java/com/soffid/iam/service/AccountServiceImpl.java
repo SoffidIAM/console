@@ -506,7 +506,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName()));
 			anyChange = true;
 		}
-		if (! ae.getDescription().equals( account.getDescription()) ||
+		if ( (ae.getDescription() == null ? account.getDescription() != null: ! ae.getDescription().equals( account.getDescription())) ||
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
 				ae.isDisabled() != account.isDisabled() ||
 				(ae.getLoginUrl() == null ? account.getLoginUrl() != null : ! ae.getLoginUrl().equals(account.getLoginUrl())) ||

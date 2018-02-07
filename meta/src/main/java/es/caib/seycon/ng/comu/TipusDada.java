@@ -75,4 +75,9 @@ public class TipusDada {
 	@Description("Unique value")
 	@Nullable
 	public Boolean unique;
+
+	@Description("Expression to test if attribute should be displayed or not")
+	@Nullable
+	String visibilityExpression;
+	
 }

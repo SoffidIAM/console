@@ -22,6 +22,7 @@ import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.list.DataListItemRenderer;
+import es.caib.zkib.events.SerializableEventListener;
 
 public class HideColumnsComponent extends Toolbarbutton
 {
@@ -70,7 +71,7 @@ public class HideColumnsComponent extends Toolbarbutton
 	{
 		created = true;
 		generateMenu ();
-		addEventListener("onClick", new EventListener() {
+		addEventListener("onClick", new SerializableEventListener() {
 			
 			public void onEvent(Event event) throws Exception {
 				popupMenu.open( HideColumnsComponent.this );
@@ -114,7 +115,7 @@ public class HideColumnsComponent extends Toolbarbutton
 				{
 					final Menuitem mi = new Menuitem(lh.getLabel());
 					mi.setChecked(lh.isVisible());
-					mi.addEventListener("onClick", new EventListener() {
+					mi.addEventListener("onClick", new SerializableEventListener() {
 						
 						public void onEvent(Event event) throws Exception {
 							showOrHide (mi, lh);

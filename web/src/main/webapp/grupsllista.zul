@@ -13,6 +13,7 @@
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			mode = "query";
 			model.getVariables().declareVariable("queryEnabled", false);
+			model.getVariables().declareVariable("disableWorld", true);
 			queryEnabled = false;
 
 			void acceptData() {

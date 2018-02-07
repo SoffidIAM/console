@@ -2040,109 +2040,113 @@ void actualitza (event) {
 										es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.data);
 										if (ctx == null)
 											return;
-										Long rule = XPathUtils.getValue(ctx, "@ruleId");
-										if (rule != null)
-										{
-											Listcell cell = listcells.get(9);
-											if (cell.getChildren().size() > 0 )
+										try {
+											Long rule = XPathUtils.getValue(ctx, "@ruleId");
+											if (rule != null)
 											{
-												cell.getChildren().get(0).visible = false;
-												cell.getChildren().get(1).visible = true;
+												Listcell cell = listcells.get(9);
+												if (cell.getChildren().size() > 0 )
+												{
+													cell.getChildren().get(0).visible = false;
+													cell.getChildren().get(1).visible = true;
+												}
+												cell = event.data.getChildren().get(10);
+												if (cell.getChildren().size() > 0 )
+													cell.getChildren().get(0).visible = false;
 											}
-											cell = event.data.getChildren().get(10);
-											if (cell.getChildren().size() > 0 )
-												cell.getChildren().get(0).visible = false;
-										}
-
-										// Role Delegation
-							 			es.caib.seycon.ng.common.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
-							 			if (ds != null && ds.equals (es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)) {
-											Listcell cell = listcells.get(0);
-							 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
-							 				cell.appendChild(ic);
-							 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
-							 				String since = df.format(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateSince"));
-							 				Date untilDate = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateUntil");
-							 				String until = untilDate == null ? "" :df.format(untilDate);
-							 				String owner = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "ownerAccount");
-							 				
-						 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { owner, since, until }));
-							 			}
-
-										Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
-										if (parentGrant != null)
-										{
-											Listcell cell = listcells.get(9);
-											if (cell.getChildren().size() > 0 )
-												cell.getChildren().get(1).visible = true;
-										}
-										Listcell cellImage = listcells.get(0);
-										if (!cellImage.getChildren().isEmpty())
-										{
-											Image image = cellImage.getChildren().get(0);
-											es.caib.seycon.ng.comu.SoDRisk risk = XPathUtils.getValue (ctx, "@sodRisk");
-											if (risk != null)
+	
+											// Role Delegation
+								 			es.caib.seycon.ng.common.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
+								 			if (ds != null && ds.equals (es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)) {
+												Listcell cell = listcells.get(0);
+								 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
+								 				cell.appendChild(ic);
+								 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
+								 				String since = df.format(es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateSince"));
+								 				Date untilDate = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegateUntil");
+								 				String until = untilDate == null ? "" :df.format(untilDate);
+								 				String owner = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "ownerAccount");
+								 				
+							 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { owner, since, until }));
+								 			}
+	
+											Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
+											if (parentGrant != null)
 											{
-												image.setSrc("/img/risk-" + risk.getValue()+".png");
-												image.setVisible(true);
+												Listcell cell = listcells.get(9);
+												if (cell.getChildren().size() > 0 )
+													cell.getChildren().get(1).visible = true;
 											}
-										}
-										
-										// Disable domain value
-										if ( XPathUtils.getValue (ctx, "valorDomini") == null ||
-											XPathUtils.getValue (ctx, "valorDomini/@valor") == null )
-										{
-											Listcell c = event.data.getChildren().get(2);
-											if (! c.getChildren().isEmpty())
-												c.getChildren().get(1).visible = false;
-										}
-										startbox = null;
-										if (!listcells.get(6).getChildren ().isEmpty ())
-											startbox = listcells.get(6).getChildren().get(0);
-										if (!listcells.get(7).getChildren ().isEmpty ())
-											endbox = listcells.get(7).getChildren().get(0);
-										if (XPathUtils.getValue(ctx,"id") != null)
-										{
-											if (starbox != null)
-												startbox.disabled = true;
-											if (endbox != null)
-												endbox.disabled = true;
-											Date d1 = XPathUtils.getValue(ctx,"@startDate");
-											Date d2 = XPathUtils.getValue(ctx,"@endDate");
-											Date now = new Date();
-											if (d1 != null && now.before(d1) )
+											Listcell cellImage = listcells.get(0);
+											if (!cellImage.getChildren().isEmpty())
 											{
+												Image image = cellImage.getChildren().get(0);
+												es.caib.seycon.ng.comu.SoDRisk risk = XPathUtils.getValue (ctx, "@sodRisk");
+												if (risk != null)
+												{
+													image.setSrc("/img/risk-" + risk.getValue()+".png");
+													image.setVisible(true);
+												}
+											}
+											
+											// Disable domain value
+											if ( XPathUtils.getValue (ctx, "valorDomini") == null ||
+												XPathUtils.getValue (ctx, "valorDomini/@valor") == null )
+											{
+												Listcell c = event.data.getChildren().get(2);
+												if (! c.getChildren().isEmpty())
+													c.getChildren().get(1).visible = false;
+											}
+											startbox = null;
+											if (!listcells.get(6).getChildren ().isEmpty ())
+												startbox = listcells.get(6).getChildren().get(0);
+											if (!listcells.get(7).getChildren ().isEmpty ())
+												endbox = listcells.get(7).getChildren().get(0);
+											if (XPathUtils.getValue(ctx,"id") != null)
+											{
+												if (starbox != null)
+													startbox.disabled = true;
+												if (endbox != null)
+													endbox.disabled = true;
+												Date d1 = XPathUtils.getValue(ctx,"@startDate");
+												Date d2 = XPathUtils.getValue(ctx,"@endDate");
+												Date now = new Date();
+												if (d1 != null && now.before(d1) )
+												{
+													for (c: event.data.getChildren())
+													{
+														c.style = "background-color: #ffffc0;";
+													}
+												}
+												else if (d2 != null && d2.before(now)) 
+												{
+													for (c: event.data.getChildren())
+													{
+														c.style = "text-decoration: line-through;";
+													}
+												} else {
+													event.data.style = event.data.style + "; background-color: blue;";
+												}
+											} else if (showHolderGroup) {
+												// Change holdergroup textbox to a new listbox
+												createHolderGroupListbox(event.data);
+											}
+											// Show sand clock when waiting for approval
+											approvalPending = XPathUtils.getValue(ctx,"@approvalPending");
+											if (approvalPending != null && approvalPending && 
+													!cellImage.getChildren().isEmpty())
+											{
+												Image image = cellImage.getChildren().get(0);
+												image.setVisible(false);
+												Image image2 = cellImage.getChildren().get(1);
+												image2.setVisible(true);
 												for (c: event.data.getChildren())
 												{
 													c.style = "background-color: #ffffc0;";
 												}
 											}
-											else if (d2 != null && d2.before(now)) 
-											{
-												for (c: event.data.getChildren())
-												{
-													c.style = "text-decoration: line-through;";
-												}
-											} else {
-												event.data.style = event.data.style + "; background-color: blue;";
-											}
-										} else if (showHolderGroup) {
-											// Change holdergroup textbox to a new listbox
-											createHolderGroupListbox(event.data);
-										}
-										// Show sand clock when waiting for approval
-										approvalPending = XPathUtils.getValue(ctx,"@approvalPending");
-										if (approvalPending != null && approvalPending && 
-												!cellImage.getChildren().isEmpty())
-										{
-											Image image = cellImage.getChildren().get(0);
-											image.setVisible(false);
-											Image image2 = cellImage.getChildren().get(1);
-											image2.setVisible(true);
-											for (c: event.data.getChildren())
-											{
-												c.style = "background-color: #ffffc0;";
-											}
+										} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {
+											// Ignore event thrown when row does no longer exist
 										}
 									}
 									

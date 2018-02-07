@@ -1780,7 +1780,8 @@ public class ApplicationServiceImpl extends
 	@Override
     protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUser(long userId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
-		if (user.getUserName().equals(Security.getCurrentUser()))
+		if (user.getUserName().equals(Security.getCurrentUser()) && 
+				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
 		{
 			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
 			{
@@ -2068,20 +2069,23 @@ public class ApplicationServiceImpl extends
             getRoleAccountEntityDao().update(toDisable);
             getAccountEntityDao().propagateChanges(toDisable.getAccount());
         }
-		for (RoleAccountEntity toDelegate: getRoleAccountEntityDao().findAllRolAccountToStartDelegation(now))
+		if (! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
 		{
-			toDelegate.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
-			toDelegate.setAccount(toDelegate.getDelegateAccount());
-			getRoleAccountEntityDao().update(toDelegate, "l");
-		}
+			for (RoleAccountEntity toDelegate: getRoleAccountEntityDao().findAllRolAccountToStartDelegation(now))
+			{
+				toDelegate.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
+				toDelegate.setAccount(toDelegate.getDelegateAccount());
+				getRoleAccountEntityDao().update(toDelegate, "l");
+			}
 
-		for (RoleAccountEntity toRevert: getRoleAccountEntityDao().findAllRolAccountToEndDelegation(now))
-		{
-			toRevert.setDelegationStatus(null);
-			toRevert.setAccount(toRevert.getDelegateAccount());
-			toRevert.setDelegateSince(null);
-			toRevert.setDelegateUntil(null);
-			getRoleAccountEntityDao().update(toRevert, "m");
+			for (RoleAccountEntity toRevert: getRoleAccountEntityDao().findAllRolAccountToEndDelegation(now))
+			{
+				toRevert.setDelegationStatus(null);
+				toRevert.setAccount(toRevert.getDelegateAccount());
+				toRevert.setDelegateSince(null);
+				toRevert.setDelegateUntil(null);
+				getRoleAccountEntityDao().update(toRevert, "m");
+			}
 		}
 	}
 

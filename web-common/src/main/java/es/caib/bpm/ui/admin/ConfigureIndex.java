@@ -1,5 +1,9 @@
 package es.caib.bpm.ui.admin;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -8,8 +12,12 @@ import java.util.Map;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.media.AMedia;
+import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
@@ -304,4 +312,38 @@ public class ConfigureIndex extends Frame
 		
 		return (result.isEmpty() ? "" : result.iterator().next().getValor()); //$NON-NLS-1$
 	}
+	
+	public void exportDocs () throws InternalErrorException, NamingException, CreateException, IOException {
+		File f = File.createTempFile("backup", ".zip");
+		FileOutputStream out = new FileOutputStream(f);
+		com.soffid.iam.EJBLocator.getDocumentService().exportDocuments(out);
+		Filedownload.save(new DeleteOnCloseFileInputStream(f), "application/x-zip-file", "documet-backup.zip");
+	}
+
+	public void importDocs () throws InternalErrorException, NamingException, CreateException, IOException, InterruptedException {
+		Media media = Fileupload.get(true);
+		com.soffid.iam.EJBLocator.getDocumentService().importDocuments(media.getStreamData());
+	}
 }
+
+class DeleteOnCloseFileInputStream extends FileInputStream {
+	   private File file;
+	   public DeleteOnCloseFileInputStream(String fileName) throws FileNotFoundException{
+	      this(new File(fileName));
+	   }
+	   public DeleteOnCloseFileInputStream(File file) throws FileNotFoundException{
+	      super(file);
+	      this.file = file;
+	   }
+
+	   public void close() throws IOException {
+	       try {
+	          super.close();
+	       } finally {
+	          if(file != null) {
+	             file.delete();
+	             file = null;
+	         }
+	       }
+	   }
+	}

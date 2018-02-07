@@ -32,7 +32,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zul.Button;
@@ -73,6 +72,7 @@ import es.caib.signatura.api.Signature;
 import es.caib.signatura.api.SignatureTimestampException;
 import es.caib.zkib.component.DataGrid;
 import es.caib.zkib.component.DataModel;
+import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -160,7 +160,7 @@ public class ProcessUI extends Frame {
 			}
 		}
         
-        addEventListener("onReturn", new EventListener() { //$NON-NLS-1$
+        addEventListener("onReturn", new SerializableEventListener() { //$NON-NLS-1$
 			public void onEvent(Event event) throws Exception {
 				ProcessInstance pi = BPMApplication.getEngine().getProcess(processId);
 				openProcessInstance(pi);
@@ -485,7 +485,7 @@ public class ProcessUI extends Frame {
     		statusLabel.setValue(Labels.getLabel("job.status.pause")); //$NON-NLS-1$
     		pauseButton.setVisible(false);
     		retryButton.setVisible(false);
-    		resumeButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+    		resumeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					getEngine().resumeJob(currentJob);
 					currentJobWindow.setVisible(false);
@@ -501,7 +501,7 @@ public class ProcessUI extends Frame {
     		statusLabel.setValue(Labels.getLabel("job.status.error")); //$NON-NLS-1$
     		pauseButton.setVisible(false);
     		resumeButton.setVisible(false);
-    		retryButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+    		retryButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					getEngine().retryJob(currentJob);
 					currentJobWindow.setVisible(false);
@@ -521,7 +521,7 @@ public class ProcessUI extends Frame {
     			statusLabel.setValue(Labels.getLabel("job.status.pending")); //$NON-NLS-1$
     		retryButton.setVisible(false);
     		resumeButton.setVisible(false);
-    		pauseButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+    		pauseButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
 					getEngine().pauseJob(currentJob);
 					currentJobWindow.setVisible(false);
@@ -534,7 +534,7 @@ public class ProcessUI extends Frame {
 			});
     	}
     		
-		closeButton.addEventListener("onClick", new EventListener() { //$NON-NLS-1$
+		closeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 			public void onEvent(Event event) throws Exception {
 				currentJobWindow.setVisible(false);
 				currentJobWindow.setParent(null);

@@ -1,6 +1,8 @@
 package com.soffid.iam.doc.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roles.Tothom;
 import roles.anonymous;
+import roles.parameter_update;
 
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.exception.DocumentBeanException;
@@ -18,6 +21,7 @@ import com.soffid.iam.doc.model.DocSign;
 import com.soffid.iam.doc.model.DocumentEntity;
 import com.soffid.iam.doc.model.FileSystem;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -67,5 +71,13 @@ public class DocumentService
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW, noRollbackFor={InternalErrorException.class})
 	public void deleteDocument(DocumentReference reference) {}
+	
+	@Transactional(propagation=Propagation.NEVER, readOnly=true)
+	@Operation(grantees={ parameter_update.class})
+	public void exportDocuments (OutputStream out) {}
+	
+	@Transactional(propagation=Propagation.NEVER)
+	@Operation(grantees={ parameter_update.class})
+	public void importDocuments(InputStream out) {}
 	
 }

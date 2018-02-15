@@ -46,16 +46,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.FilterClause;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TermRangeFilter;
 import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.search.TopDocs;
@@ -391,7 +394,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		throws Exception
 	{
 		JbpmContext context = getContext();
-		ArrayList resultado = new ArrayList();
+		LinkedList resultado = new LinkedList();
 		
 		try {
 			if ((processID != null) && !processID.equals("")) //$NON-NLS-1$
@@ -463,7 +466,6 @@ public class BpmEngineImpl extends BpmEngineBase {
     				dataFi = sdf.format(dema.getTime());
     			}
     
-    			TopDocs hits;
     			BooleanFilter b = new BooleanFilter();
     			boolean complexQuery = false;
     			if (startDate != null && !"".equals(startDate)) { //$NON-NLS-1$
@@ -479,41 +481,25 @@ public class BpmEngineImpl extends BpmEngineBase {
     				complexQuery = true;
     			}
     
+				DocumentCollector collector = new DocumentCollector();
+				collector.setResult (resultado);
     			if (!finished) {
     				TermsFilter f = new TermsFilter();
     				f.addTerm(new Term("$end", "false")); //$NON-NLS-1$ //$NON-NLS-2$
     				b.add(new FilterClause(f, BooleanClause.Occur.MUST));
     				complexQuery = true;
-    				if (complexQuery)
-    					hits = is.search(q, b, 1000);
-    				else
-    					hits = is.search(q, f, 1000); // Sense filtre de dates
+    				if (complexQuery) {
+						is.search(q, b, collector);
+					} else
+    					is.search(q, f, collector); // Sense filtre de dates
     
     			} else {
     				if (complexQuery)
-    					hits = is.search(q, b, 1000);
+    					is.search(q, b, collector);
     				else
-    					hits = is.search(q, 1000); // Sense cap filtre
+    					is.search(q, collector); // Sense cap filtre
     			}
     
-    			for (int i = 0; i < hits.totalHits; i++) {
-    				int id = hits.scoreDocs[i].doc;
-    				org.apache.lucene.document.Document d = is.getIndexReader()
-    						.document(id);
-    				Field f = d.getField("$id"); //$NON-NLS-1$
-    				if (f != null) {
-    					long processId = Long.parseLong(f.stringValue());
-    					try {
-    						es.caib.bpm.vo.ProcessInstance proc = handleGetProcess(processId);
-    						if (proc != null) {
-    							resultado.add(proc);
-    						}
-    					} catch (Exception e) {
-    						// Ignorar
-    					}
-    				}
-    			}
-    			
     			is.close();
 			}
 			return resultado;
@@ -2684,6 +2670,51 @@ public class BpmEngineImpl extends BpmEngineBase {
         } finally {
             flushContext(context);
         }
+	}
+
+	private final class DocumentCollector extends Collector {
+		private List result;
+		private int docBase;
+		private IndexReader reader;
+		private Scorer scorer;
+
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			this.scorer = scorer;
+		}
+
+		public void setResult(List resultado) {
+			this.result = resultado;
+		}
+
+		@Override
+		public void setNextReader(IndexReader reader, int docBase) throws IOException {
+			this.reader = reader;
+			this.docBase = docBase;
+		}
+
+		@Override
+		public void collect(int id) throws IOException {
+			org.apache.lucene.document.Document d = reader.document(id);
+			Field f = d.getField("$id"); //$NON-NLS-1$
+			if (f != null) {
+				long processId = Long.parseLong(f.stringValue());
+				try {
+					es.caib.bpm.vo.ProcessInstance proc = handleGetProcess(processId);
+					if (proc != null) {
+						result.add(proc);
+					}
+				} catch (Exception e) {
+					// Ignorar
+				}
+			}
+			
+		}
+
+		@Override
+		public boolean acceptsDocsOutOfOrder() {
+			return false;
+		}
 	}
 
 	private interface AltresTasques {

@@ -686,11 +686,21 @@ public class ApplicationBootServiceImpl extends
 			dc = dominiSvc.create(dc);
 		}
 
-		Collection<UserType> tus = dominiSvc.findAllUserType();
 		UserType tipUs;
+		Collection<UserType> tus = dominiSvc.findAllUserType();
 		if (tus.size() > 0) {
 			tipUs = tus.iterator().next();
 		} else {
+			tipUs = new UserType();
+			tipUs.setCode("S"); //$NON-NLS-1$
+			tipUs.setDescription("SSO account"); //$NON-NLS-1$
+			dominiSvc.create(tipUs);
+
+			tipUs = new UserType();
+			tipUs.setCode("E"); //$NON-NLS-1$
+			tipUs.setDescription("External user"); //$NON-NLS-1$
+			dominiSvc.create(tipUs);
+
 			tipUs = new UserType();
 			tipUs.setCode("I"); //$NON-NLS-1$
 			tipUs.setDescription("Internal user"); //$NON-NLS-1$
@@ -700,15 +710,18 @@ public class ApplicationBootServiceImpl extends
 		Collection<PasswordPolicy> pcs = dominiSvc
 				.findAllPasswordPolicyDomain(dc.getCode());
 		if (pcs.size() == 0) {
-			PasswordPolicy pol = new PasswordPolicy();
-			pol.setPasswordDomainCode(dc.getCode());
-			pol.setUsersDomainCode(du.getCode());
-			pol.setDescription("Default password policy"); //$NON-NLS-1$
-			pol.setMaximumPeriod(new Long(365));
-			pol.setMaximumPeriodExpired(new Long(365));
-			pol.setType("M"); //$NON-NLS-1$
-			pol.setUserType(tipUs.getCode());
-			dominiSvc.create(pol);
+			for (UserType tu: dominiSvc.findAllUserType())
+			{
+				PasswordPolicy pol = new PasswordPolicy();
+				pol.setPasswordDomainCode(dc.getCode());
+				pol.setUsersDomainCode(du.getCode());
+				pol.setDescription("Default password policy"); //$NON-NLS-1$
+				pol.setMaximumPeriod(new Long(365));
+				pol.setMaximumPeriodExpired(new Long(365));
+				pol.setType("M"); //$NON-NLS-1$
+				pol.setUserType(tu.getCode());
+				dominiSvc.create(pol);
+			}
 		}
 
 		Application app = appSvc.findApplicationByApplicationName("SOFFID"); //$NON-NLS-1$
@@ -727,7 +740,7 @@ public class ApplicationBootServiceImpl extends
 			dis = new com.soffid.iam.api.System();
 			dis.setRolebased(new Boolean(true));
 			dis.setName("soffid"); //$NON-NLS-1$
-			dis.setDescription("Soffid database");
+			dis.setDescription("Soffid system");
 			dis.setAccessControl(new Boolean(false));
 			dis.setPasswordsDomain(dc.getCode());
 			dis.setUsersDomain(du.getCode());
@@ -735,6 +748,53 @@ public class ApplicationBootServiceImpl extends
 			dis.setClassName("- no class -"); //$NON-NLS-1$
 			dis.setUserTypes("I"); //$NON-NLS-1$
 			dis = dispatcherSvc.create(dis);
+		}
+
+		com.soffid.iam.api.System disSso = dispatcherSvc
+				.findDispatcherByName("SSO"); //$NON-NLS-1$
+		if (disSso == null) {
+			disSso = new com.soffid.iam.api.System();
+			disSso.setRolebased(new Boolean(false));
+			disSso.setManualAccountCreation(true);
+			disSso.setName("SSO"); //$NON-NLS-1$
+			disSso.setDescription("External SSO accounts");
+			disSso.setAccessControl(new Boolean(false));
+			disSso.setPasswordsDomain(dc.getCode());
+			disSso.setUsersDomain(du.getCode());
+			disSso.setPasswordsDomainId(dc.getId());
+			disSso.setClassName("- no class -"); //$NON-NLS-1$
+			disSso.setUserTypes("S"); //$NON-NLS-1$
+			disSso = dispatcherSvc.create(disSso);
+
+			DataType td = new DataType();
+			td.setCode("SSO:Server");
+			td.setLabel("Server");
+			td.setOrder(1L);
+			td.setRequired(false);
+			td.setScope(MetadataScope.ACCOUNT);
+			td.setSystemName(disSso.getName());
+			td.setType(TypeEnumeration.STRING_TYPE);
+			getAdditionalDataService().create(td);
+
+			td = new DataType();
+			td.setCode("SSO:URL");
+			td.setLabel("URL");
+			td.setOrder(2L);
+			td.setRequired(false);
+			td.setScope(MetadataScope.ACCOUNT);
+			td.setSystemName(disSso.getName());
+			td.setType(TypeEnumeration.STRING_TYPE);
+			getAdditionalDataService().create(td);
+
+			td = new DataType();
+			td.setCode("SSO:1");
+			td.setLabel("Form data");
+			td.setOrder(1L);
+			td.setRequired(false);
+			td.setScope(MetadataScope.ACCOUNT);
+			td.setSystemName(disSso.getName());
+			td.setType(TypeEnumeration.SSO_FORM_TYPE);
+			getAdditionalDataService().create(td);
 		}
 
 		Role rol = appSvc
@@ -905,6 +965,20 @@ public class ApplicationBootServiceImpl extends
 					"SSOServer", System.getProperty("hostName") + "." + System.getProperty("domainName")); //$NON-NLS-1$
 			configSvc.create(cfg);
 		}
+
+		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOSystem", null); //$NON-NLS-1$
+		if (cfg == null)
+			configSvc.create( new Configuration("AutoSSOSystem", disSso.getName()) ); //$NON-NLS-1$
+
+		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOPolicy", null); //$NON-NLS-1$
+		if (cfg == null)
+			configSvc.create( new Configuration("AutoSSOPolicy", "S" )); //$NON-NLS-1$
+
+		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOURL", null); //$NON-NLS-1$
+		if (cfg == null)
+			configSvc.create( new Configuration("AutoSSOURL", 
+					"http://"+System.getProperty("hostName") + "." + System.getProperty("domainName")+":8080/" )); //$NON-NLS-1$
+
 
 		Configuration cfg2 = configSvc.findParameterByNameAndNetworkName(
 				"seycon.https.port", null); //$NON-NLS-1$

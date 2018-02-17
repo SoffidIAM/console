@@ -55,8 +55,13 @@ public class Executions extends HttpServlet {
 						} else {
 							response.reset();
 							response.resetBuffer();
+							String fileName = pe.getNom()+"."+exe.getCodiTipusExecucio().toLowerCase();
+							response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName+"\"");
 							response.setContentType(URLDecoder.decode(exe.getTipusMimeExecucio(),"UTF-8")); //$NON-NLS-1$
-							response.getWriter().print(URLDecoder.decode(id,"UTF-8")); //$NON-NLS-1$
+							if ( exe.getCodiTipusExecucio().equals("MZN"))
+								response.getWriter().print(URLDecoder.decode(id,"UTF-8")); //$NON-NLS-1$
+							else
+								response.getWriter().print(exe.getContingut()); //$NON-NLS-1$
 						}
 						return;
 					}

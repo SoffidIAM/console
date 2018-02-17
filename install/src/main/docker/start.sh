@@ -28,11 +28,18 @@ function configure {
 
 	if [[ "$JAVA_OPT" == "" ]]
 	then
-	    echo "-XX:MaxRAMFraction=0.7" >/opt/soffid/iam-console-2/bin/run.vmoptions
+	    echo "-Xmx2048m" >/opt/soffid/iam-console-2/bin/run.vmoptions
 	    echo "-Xms256m" >>/opt/soffid/iam-console-2/bin/run.vmoptions
 	else
 	    echo "$JAVA_OPT" >/opt/soffid/iam-console-2/bin/run.vmoptions
 	fi
+
+
+	if [[ "$SECURE" == "true" ]]
+	then
+	    echo "-Djava.security.manager" >>/opt/soffid/iam-console-2/bin/run.vmoptions
+        echo "-Djava.security.policy=/opt/soffid/iam-console-2/conf/catalina.policy" >>/opt/soffid/iam-console-2/bin/run.vmoptions
+    fi
     
 	(
 		echo 'tomee.serialization.class.blacklist = *'
@@ -56,4 +63,11 @@ then
 fi
 
 
- exec /opt/soffid/iam-console-2/bin/run
+if [[ "$SECURE" == "true" ]]
+then
+    echo "Starting SECURE Soffid IAM Console"
+else
+    echo "Starting Soffid IAM Console"
+fi
+
+exec /opt/soffid/iam-console-2/bin/run 

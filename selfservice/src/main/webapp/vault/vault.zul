@@ -24,6 +24,7 @@
 				if (level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_MANAGER) ||
 						level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER))
 					Events.sendEvent (new Event("onOpenAccount", accountWindow, path));
+				model.getVariables().declareVariable("directFilter", false);
 			}
 			else
 			{
@@ -61,12 +62,10 @@
 			model.getVariables().declareVariable("system", requestedSystem);
 			if (requestedAccount != null && requestedSystem != null)
 			{
-				System.out.println ("ON DEV");
 				model.getVariables().declareVariable("directFilter", true);
 				Events.postEvent(-100, "onPerformQuery", topframe, null);
 			} else {
 				model.getVariables().declareVariable("directFilter", false);
-				System.out.println ("ON TAC");
 			}
 		
 			void select() 
@@ -313,7 +312,6 @@
 	<include src="usuarisllista.zul"/>
 	<include src="grupsllista.zul"/>
 	<include src="rolsllista.zul"/>
-	<include src="finestres/identity.zul" />
 	<style>
 		.lruta {cursor: pointer; display: block;}
 		.lruta:hover {text-decoration:underline;}

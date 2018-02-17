@@ -99,7 +99,7 @@
 							</datarow>
 						</grid>
 					</row>
-					<row>
+					<row visible="false">
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.AdminVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@adminVisibility"
@@ -112,7 +112,7 @@
 							<label value="*" />
 						</div>
 					</row>
-					<row>
+					<row visible="false">
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.OperatorVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@operatorVisibility"
@@ -125,7 +125,7 @@
 							<label value="*" />
 						</div>
 					</row>
-					<row>
+					<row visible="false">
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.UserVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@userVisibility"

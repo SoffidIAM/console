@@ -55,6 +55,7 @@ zk.error = function (msg) {
 								lCA?"Avís: s'ha excedit el temps d'espera màxim":
 									"Warning: exceeded the maximum time"):
 							(leES?"Atención: ha ocurrido un error":leCA?"Atenció: ha ocorregut un error":"Warning: An error occurred");
+    						
 	if (msg!=null && esPopup)
 		msg = lES?"Para poder ver el archivo debe permitir ventanas emergentes para este sitio!":
 			lCA?"Per poder veure l'arxiu ha d'activar les finestres emergents!":
@@ -98,6 +99,7 @@ amaga=function(){try {document.getElementById("timeout.mask"+ zk._errcnt).style.
      ]]></embed>
 	</device-config>
 	<system-config>
+        <!--  ui-factory-class>org.zkoss.zk.ui.http.SerializableUiFactory</ui-factory-class -->
 		<max-upload-size>20480</max-upload-size>
 	</system-config>
 	<zscript-config>

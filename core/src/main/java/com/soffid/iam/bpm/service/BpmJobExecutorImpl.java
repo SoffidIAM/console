@@ -179,6 +179,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		
 		try {
 			i.flush(ctx.getSession(), last, newExecution);
+			last = newExecution;
 		} catch (Exception e) {
 			log.warn(Messages.getString("BpmJobExecutorImpl.IndexingError"), e); //$NON-NLS-1$
 		} finally {

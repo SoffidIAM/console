@@ -177,4 +177,40 @@ public class ListitemCreator {
 		
 	}
 	
+	public Listitem createListitem( ProcessInstance proc)
+	{
+		Listitem item = new Listitem();
+		String style= proc.getEnd() == null ? "" : "font-weight: bold";
+		item.setValue(proc);
+
+		// Id de procés
+		Label l = new Label(Long.toString(proc.getId()));
+		
+		Listcell lc = new Listcell();
+		l.setParent(lc);
+		item.getChildren().add(lc);
+
+		// Nom del procés
+		l = new Label(proc.getDescription());
+		l.setMultiline(true);
+		lc = new Listcell();
+		l.setParent(lc);
+		item.getChildren().add(lc);
+
+
+		String s = formatConHora.format(proc.getStart());
+		if (proc.getEnd() != null)
+			s = s + " - "+formatConHora.format(proc.getEnd());
+		lc = new Listcell(s);
+		lc.setStyle(style);
+		item.getChildren().add(lc);
+		
+		lc = new Listcell(proc.getCurrentTask());
+		lc.setStyle(style);
+		item.getChildren().add(lc);
+
+		return item;
+		
+	}
+	
 }

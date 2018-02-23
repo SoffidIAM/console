@@ -287,7 +287,10 @@ public class AdditionalDataServiceImpl extends
 	public UserData handleUpdate(UserData dadaUsuari) throws InternalErrorException {
 		if (dadaUsuari.getId() != null) {
 			auditChange(dadaUsuari);
-			if (dadaUsuari.getValue() == null || "".equals(dadaUsuari.getValue().trim())) { //$NON-NLS-1$
+			if (dadaUsuari.getDateValue() == null && 
+					dadaUsuari.getBlobDataValue() == null && 
+					( dadaUsuari.getValue() == null || equals(dadaUsuari.getValue().trim().isEmpty())))
+			{ 
 				delete(dadaUsuari); // esborrar dada
 				dadaUsuari.setId(null);
 				return dadaUsuari;

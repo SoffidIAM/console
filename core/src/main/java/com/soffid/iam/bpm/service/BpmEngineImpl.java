@@ -34,6 +34,7 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -45,8 +46,12 @@ import org.apache.lucene.queries.TermsFilter;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TermRangeFilter;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -110,6 +115,7 @@ import com.soffid.iam.bpm.service.impl.UserContextCache;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.service.UserService;
@@ -236,7 +242,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 	private void flushContext(JbpmContext ctx) {
 		if (ctx != null) {
 			ctx.setActorId(null);
-			ctx.close();
+			try {
+				ctx.close();
+			} catch (Exception e) {
+				log.info("Error closing BPM context", e);
+			}
 		}
 	}
 
@@ -367,8 +377,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			String startDate, String endDate, boolean finished)
 			throws Exception {
 		JbpmContext context = getContext();
-		ArrayList resultado = new ArrayList();
-
+		LinkedList resultado = new LinkedList();
+		
 		try {
 			if ((processID != null) && !processID.equals("")) //$NON-NLS-1$
 			{
@@ -455,39 +465,23 @@ public class BpmEngineImpl extends BpmEngineBase {
 					complexQuery = true;
 				}
 
-				if (!finished) {
+				DocumentCollector collector = new DocumentCollector();
+				collector.setResult (resultado);
+    			if (!finished) {
 					TermsFilter f = new TermsFilter( new Term("$end", "false") );
-					b.add(new FilterClause(f, BooleanClause.Occur.MUST));
-					complexQuery = true;
-					if (complexQuery)
-						hits = is.search(q, b, 1000);
-					else
-						hits = is.search(q, f, 1000); // Sense filtre de dates
-
-				} else {
-					if (complexQuery)
-						hits = is.search(q, b, 1000);
-					else
-						hits = is.search(q, 1000); // Sense cap filtre
-				}
-
-				for (int i = 0; i < hits.totalHits; i++) {
-					int id = hits.scoreDocs[i].doc;
-					org.apache.lucene.document.Document d = is.getIndexReader()
-							.document(id);
-					IndexableField f = d.getField("$id"); //$NON-NLS-1$
-					if (f != null) {
-						long processId = Long.parseLong(f.stringValue());
-						try {
-							com.soffid.iam.bpm.api.ProcessInstance proc = handleGetProcess(processId);
-							if (proc != null) {
-								resultado.add(proc);
-							}
-						} catch (Exception e) {
-							// Ignorar
-						}
-					}
-				}
+    				b.add(new FilterClause(f, BooleanClause.Occur.MUST));
+    				complexQuery = true;
+    				if (complexQuery) {
+						is.search(q, b, collector);
+					} else
+    					is.search(q, f, collector); // Sense filtre de dates
+    
+    			} else {
+    				if (complexQuery)
+    					is.search(q, b, collector);
+    				else
+    					is.search(q, collector); // Sense cap filtre
+    			}
 				reader.close();
 			}
 			return resultado;
@@ -829,11 +823,65 @@ public class BpmEngineImpl extends BpmEngineBase {
 					return l1.getDate().compareTo(l2.getDate());
 				}
 			});
+			
+			for (ProcessHierarchyEntity parent: getProcessHierarchyEntityDao().findByChildren(instanceVO.getId()))
+			{
+				long processId = parent.getParentProcess().longValue();
+				addSubprocessLog(context, process, parsedLogs, processId, 0);
+			}
+			for (ProcessHierarchyEntity parent: getProcessHierarchyEntityDao().findByParent(instanceVO.getId()))
+			{
+				long processId = parent.getChildProcess().longValue();
+				addSubprocessLog(context, process, parsedLogs, processId, parsedLogs.size());
+			}
 			ProcessLog[] logs = (ProcessLog[]) parsedLogs
 					.toArray(new ProcessLog[parsedLogs.size()]);
 			return logs;
 		} finally {
 			flushContext(context);
+		}
+	}
+
+	private void addSubprocessLog(JbpmContext context, org.jbpm.graph.exe.ProcessInstance process,
+			LinkedList parsedLogs, long processId, int position) {
+		org.jbpm.graph.exe.ProcessInstance proc = context.loadProcessInstance(processId);
+		if (proc != null)
+		{
+			try {
+				ProcessInstance procvo = VOFactory.newProcessInstance(proc);
+				ProcessLog log = new ProcessLog();
+				log.setDate(procvo.getStart());
+				log.setUser("");
+				log.setProcessId(process.getId());
+				log.setAction(Messages.getString("BpmEngineImpl.StartProcess")+": "+
+						procvo.getId()+" - "+procvo.getDescription());
+				
+				parsedLogs.add(position++, log);
+
+				LinkedList<ProcessLog> parsedLogs2 = new LinkedList<ProcessLog>();
+				parseLog(context, proc, parsedLogs2, proc.getRootToken());
+				Collections.sort(parsedLogs2, new Comparator() {
+					public int compare(Object arg0, Object arg1) {
+						ProcessLog l1 = (ProcessLog) arg0;
+						ProcessLog l2 = (ProcessLog) arg1;
+						return l1.getDate().compareTo(l2.getDate());
+					}
+				});
+				
+				if (parsedLogs2.size() > 0)
+					log.setUser(parsedLogs2.get(0).getUser());
+				
+				if (position > 1)
+				{
+					for ( ProcessLog pl: parsedLogs2)
+					{
+						pl.setAction("> "+pl.getAction());
+						parsedLogs.add(position++, pl);
+					}
+				}
+
+			} catch (Exception e) {
+			}
 		}
 	}
 
@@ -1276,7 +1324,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 		org.jbpm.taskmgmt.exe.TaskInstance ti = context.loadTaskInstance(task
 				.getId());
-		if (business.canAccess(getUserGroups(), ti)) {
+		if (ti.hasEnded())
+		{
+			throw new SecurityException(Messages.getString("BpmEngineImpl.TaskFinishedError")); //$NON-NLS-1$
+
+		}
+		else if (business.canAccess(getUserGroups(), ti)) {
 			startAuthenticationLog(ti.getToken());
 			ti.setActorId(task.getActorId());
 			ti.setBlocking(task.isBlocking());
@@ -1796,7 +1849,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		try {
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
-			Vector resultadoFinal = new Vector();
+			Vector<ProcessDefinition> resultadoFinal = new Vector();
 			for (Iterator it = context.getGraphSession()
 					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
 				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
@@ -1813,6 +1866,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 						resultadoFinal.add(def);
 				}
 			}
+			
+			Collections.sort( resultadoFinal, new Comparator<ProcessDefinition>() {
+				public int compare(ProcessDefinition o1, ProcessDefinition o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
 			return resultadoFinal;
 		} finally {
 			flushContext(context);
@@ -2685,6 +2744,49 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
+	private final class DocumentCollector extends Collector {
+		private List result;
+		private AtomicReaderContext ctx;
+		private Scorer scorer;
+
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			this.scorer = scorer;
+		}
+
+		public void setResult(List resultado) {
+			this.result = resultado;
+		}
+
+		@Override
+		public void setNextReader(AtomicReaderContext ctx) throws IOException {
+			this.ctx = ctx;
+		}
+
+		@Override
+		public void collect(int id) throws IOException {
+			org.apache.lucene.document.Document d = ctx.reader().document(id);
+			IndexableField f = d.getField("$id"); //$NON-NLS-1$
+			if (f != null) {
+				long processId = Long.parseLong(f.stringValue());
+				try {
+					ProcessInstance proc = handleGetProcess(processId);
+					if (proc != null) {
+						result.add(proc);
+					}
+				} catch (Exception e) {
+					// Ignorar
+				}
+			}
+			
+		}
+
+		@Override
+		public boolean acceptsDocsOutOfOrder() {
+			return false;
+		}
+	}
+
 	private interface AltresTasques {
 		List findAltresTasques(JbpmContext context, String usuariId,
 				Collection altresIds);
@@ -2833,6 +2935,34 @@ public class BpmEngineImpl extends BpmEngineBase {
  		for ( String r: getUserGroups())
  			if (r.equals(role))
 				return true;
- 		return false;
- 	}
+		return false;
+	}
+
+	@Override
+	protected Collection<Long> handleFindChildProcesses(Long processId) throws Exception {
+		LinkedList<Long> result = new LinkedList<Long>();
+		for ( ProcessHierarchyEntity h: getProcessHierarchyEntityDao().findByParent(processId))
+		{
+			result.add(h.getChildProcess());
+		}
+		return result;
+	}
+
+	@Override
+	protected Collection<Long> handleFindParentProceeses(Long processId) throws Exception {
+		LinkedList<Long> result = new LinkedList<Long>();
+		for ( ProcessHierarchyEntity h: getProcessHierarchyEntityDao().findByChildren(processId))
+		{
+			result.add(h.getParentProcess());
+		}
+		return result;
+	}
+
+	@Override
+	protected void handleLinkProcesses(Long parentProcess, Long childProcess) throws Exception {
+		ProcessHierarchyEntity h = getProcessHierarchyEntityDao().newProcessHierarchyEntity();
+		h.setChildProcess(childProcess);
+		h.setParentProcess(parentProcess);
+		getProcessHierarchyEntityDao().create(h);
+	}
 }

@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -448,7 +449,9 @@ public class ProcessUI extends Frame {
 		
 	}
 
-    public void onSelectTask ()
+    
+
+	public void onSelectTask ()
     {
     	TaskInstance ti = (TaskInstance) tablaTareas.getSelectedItem().getValue();
     	Application.call(BPMApplication.getTaskURL(ti));

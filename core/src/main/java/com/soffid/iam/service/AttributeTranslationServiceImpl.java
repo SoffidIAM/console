@@ -82,7 +82,10 @@ public class AttributeTranslationServiceImpl extends
 			domains.add(ate.getDomain());
 		}
 		
-		return domains;
+		LinkedList<String> domains2 = new LinkedList<String>(domains);
+		Collections.sort(domains2);
+		
+		return domains2;
 	}
 
 }

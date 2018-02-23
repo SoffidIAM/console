@@ -445,7 +445,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	}
 
 	private void updateRolDependency(RoleDependencyEntity entity, RoleGrant grant) throws InternalErrorException, BPMException {
-		if (grant.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE))
+		if (RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus()))
 			deleteRolDependency(entity);
 		entity.setMandatory(grant.getMandatory());
 	}

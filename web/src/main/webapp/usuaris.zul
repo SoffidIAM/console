@@ -2803,6 +2803,7 @@ void actualitza (event) {
 				]]>
 			</zscript>
 			<vbox width="30em" heights="5em, 3em" align="center">
+				<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
 				<hbox align="center" height="5em" >
 					<hbox width="8em" align="center" pack="end">
 						<label 
@@ -2811,7 +2812,6 @@ void actualitza (event) {
 					</hbox>
 					<space width="2em"></space>
 					<hbox width="18em" align="center" pack="start">
-						<textbox style="display:none"/>
 						<textbox type="password" width="18em" id="password"
 							onOK="onSetPassword();">
 						</textbox>
@@ -2884,24 +2884,28 @@ void actualitza (event) {
 					}
 				]]>
 			</zscript>
-			<vbox width="30em" heights="3em, 2em" style="margin: 4em">
+			<vbox width="30em" heights="2em, 2em" style="margin: 4em">
 				<radiogroup id="generationType" width="24em" orient="vertical">
 					<attribute name="onCheck"><![CDATA[
 					    onChangeSelectedGeneration();
 					]]></attribute>
-					<radio label="${c:l('usuaris.zul.radomPassword')}" id="generationRandom" width="20em" selected="true" value="random" onSelect=""/>
-					<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" value="set" onSelect=""/>
+					<radio label="${c:l('usuaris.zul.radomPassword')}" id="generationRandom" width="20em" 
+						selected="true" value="random" onSelect=""/>
+					<div>
+						<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
+					</div>
+					<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
+						value="set" onSelect="" />
 				</radiogroup>
 				<div style="visibility: hidden" id="passworddiv">
 					<label 
 						value="${c:l('accounts.setPassword.label')}">
 					</label>
-					<textbox style="display:none"/>
 					<textbox style="margin-left: 2em;" disabled="true" type="password" width="18em" id="password"
 						onOK="onSetPassword();">
 					</textbox>
 				</div>
-				<hbox align="center" pack="end" width="26em">
+				<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
 					<button
 						label="${c:l('accounts.setPassword.Cancel')}"
 						onClick="onCancelPassword()" />

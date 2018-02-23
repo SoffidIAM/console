@@ -46,14 +46,7 @@
 
 		innerWindow.setTitle(org.zkoss.util.resource.Labels.getLabel("vault.account.new"));
 
-		String parentPath = path.substring(0, path.lastIndexOf('/'));
-		boolean personal = es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath+"/@personal");
-		
-		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("ownerAcl"), !personal));
-		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("managerAcl"), !personal));
-		Events.sendEvent(new Event("onEnable", innerWindow.getFellow("userAcl"), !personal));
-	
-		innerWindow.getFellow("inheritNewPermissionsCheckbox").setVisible( ! personal );
+		displayAccountAcl();
 		
 		// Add folder users
 		for (String pathToCopy: new String [] {"grantedUsers", "grantedGroups", "grantedRoles",
@@ -78,16 +71,41 @@
 		innerWindow.doHighlighted();
 	}
 	
+	boolean displayAccountAcl ()
+	{
+		es.caib.zkib.component.Form form = innerWindow.getFellow("form");
+		es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(form);
+		String path = bindCtx.getXPath();
+		String parentPath = path.substring(0, path.lastIndexOf('/'));	
+
+		es.caib.seycon.ng.comu.AccountAccessLevelEnum level = es.caib.zkib.datasource.XPathUtils.
+				getValue(bindCtx.getDataSource(), path+"/@accessLevel");
+
+		boolean personal = false;
+		boolean isAdmin = level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER);
+		
+		try {
+			personal = es.caib.zkib.datasource.XPathUtils.getValue(bindCtx.getDataSource() , parentPath+"/@personal");
+		} catch (Exception e)
+		{
+			
+		}
+
+		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("ownerAcl"), !personal && isAdmin));
+		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("managerAcl"), !personal && isAdmin));
+		Events.sendEvent(new Event("onEnable", innerWindow.getFellow("userAcl"), !personal && isAdmin));
+
+		innerWindow.getFellow("inheritNewPermissionsCheckbox").setVisible( ! personal && isAdmin);
+		innerWindow.getFellow("permissionsBox").setVisible(! personal && isAdmin);
+		
+		return isAdmin;
+	}
+	
 	void onOpenAccount (String path) {
 		
 		pageScope.put("accountNameOnAttribute", null);
 		pageScope.put("newAccount", Boolean.FALSE);
 
-		es.caib.seycon.ng.comu.AccountAccessLevelEnum level = es.caib.zkib.datasource.XPathUtils.
-				getValue(model, path+"/@accessLevel");
-
-		boolean isAdmin = level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER);
-		
 		canUpdateUserMetadata = true;
 
 		innerWindow.getFellow("serverRow").setVisible(false);
@@ -98,24 +116,12 @@
 		es.caib.zkib.component.Form form = innerWindow.getFellow("form");
 		form.setDataPath("/model:"+path);
 
-		innerWindow.setTitle(org.zkoss.util.resource.Labels.getLabel("vault.account.new"));
+		innerWindow.setTitle(org.zkoss.util.resource.Labels.getLabel("vault.details"));
 
-		String parentPath = path.substring(0, path.lastIndexOf('/'));
-		boolean personal = false;
-		try {
-			personal = es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath+"/@personal");
-		} catch (Exception e)
-		{
-			
-		}
+		String parentPath = path.substring(0, path.lastIndexOf('/'));	
 		
-		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("ownerAcl"), !personal && isAdmin));
-		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("managerAcl"), !personal && isAdmin));
-		Events.sendEvent(new Event("onEnable", innerWindow.getFellow("userAcl"), !personal && isAdmin));
-	
-		innerWindow.getFellow("inheritNewPermissionsCheckbox").setVisible( ! personal && isAdmin);
+		boolean isAdmin = displayAccountAcl ();
 		
-
 		if (ssoSystem. equals (es.caib.zkib.datasource.XPathUtils.getValue(model, path+"/@system")))
 		{
 			String accountAttributeXPath = findNameAttribute();
@@ -410,7 +416,7 @@
 					es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@name"));
 			es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolderId",
 					es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@id"));
-
+			updateAclView();
 		}
 		selectFolderWnd.setVisible(false);
 	}
@@ -519,6 +525,7 @@
 									if("onOK".equals(evt.getName())){
 										newPasswordS.setVisible(true);
 										newPasswordS.setMode("highlighted");
+										newPasswordS.getFellow("p1").focus();
 									}
 								}
 							});
@@ -527,6 +534,7 @@
 				newPasswordS.setAttribute("acco", account);
 				newPasswordS.setVisible(true);
 				newPasswordS.setMode("highlighted");
+				newPasswordS.getFellow("p1").focus();
 			}else if (account.getType().equals(AccountType.PRIVILEGED)){
 				newPassword.setAttribute("acco", account);
 				java.util.Calendar dia = java.util.Calendar.getInstance();
@@ -535,6 +543,7 @@
 				dia.clear();
 				newPassword.setVisible(true);
 				newPassword.setMode("highlighted");
+				newPassword.getFellow("password").focus();
 			}
 		} catch ( InterruptedException e) {	}
 	}
@@ -704,6 +713,7 @@
 												    			h = h.substring(4);
 													    	serverTextbox.getFellow("dada").setValue( h );
 												    	} catch (Exception e) {
+												    		e.printStackTrace();
 												    		self.setStyle("background-color: pink");
 												    	}
 												    }
@@ -778,7 +788,7 @@
 								</rows>
 							</grid>
 							<separator />
-							<vbox>
+							<vbox id="permissionsBox">
 								<label value="${c:l('accounts.owner')}" />
 								<account_acl id="ownerAcl"
 									userList="ownerUsers" groupList="ownerGroups"
@@ -805,7 +815,7 @@
 							</columns>
 							<datarow>
 								<input_etiqueta bind="@dataLabel" width_custom="250px"/>
-								<div use="com.soffid.iam.web.users.additionalData.InputField"  v2="true" onChange=""/>
+								<div use="com.soffid.iam.web.users.additionalData.InputField" v2="true" onChange=""/>
 							</datarow>
 						</grid>
 					</tabpanel>
@@ -883,6 +893,7 @@
 			]]>
 		</zscript>
 		<div width="100%">
+			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white; background-color: white"/>
 	 		<div class="label" align="center">
 				<label value="${c:l('accounts.setPassword.label')}"/>
 				<space width="1em"/>
@@ -933,8 +944,9 @@
 				]]>
 				</attribute>
 				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}"/>
-				<textbox readonly="true" type="password" style="padding: 0; border: none; outline: none; boxShadow:none; background: transparent"
-					id="fakeqpassword" value="abc12646asd4f645a4f6"/> 
+				<textbox  style="display:none"/>
+				<textbox readonly="true" style="padding: 0; border: none; outline: none; boxShadow:none; background: transparent"
+					id="fakeqpassword" value="****************"/> 
 				<textbox readonly="true" style="display:none; padding: 0; border: none; outline: none; boxShadow:none; background: transparent" 
 					id="qpassword" tooltip="toolPwd"/>
 				<imageclic id="viewImage" src="/img/lupa.gif" action="onMouseOver: doView('${fakeqpassword.uuid}','${qpassword.uuid}');
@@ -965,7 +977,7 @@
 				}
 				
 				void onSetPassword() {
-					es.caib.seycon.ng.servei.ejb.SelfService service = es.caib.seycon.ng.EJBLocator.getSelfService();
+					com.soffid.iam.service.ejb.SelfService service = com.soffid.iam.EJBLocator.getSelfService();
 					Account account = newPasswordS.getAttribute("acco");
 					service.setAccountPassword(account, new Password(p1.getValue()));
 					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
@@ -975,6 +987,7 @@
 			]]>
 		</zscript>
 		<vbox width="100%" align="center">
+			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
 	 		<div align="center" class="label">
 				<label value="${c:l('accounts.setPassword.label')}"/>
 				<space width="1em"/>

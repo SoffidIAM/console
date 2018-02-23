@@ -67,6 +67,8 @@ public class BshJainClassManager extends BshClassManager {
 			
 		String s = name.replace('.', '/') + ".class";
 		URL u = Thread.currentThread().getContextClassLoader().getResource(s);
+		if (u == null)
+			u = getClass().getClassLoader().getResource(s);
 		
 		if (u == null)
 			return false;

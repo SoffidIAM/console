@@ -2,6 +2,7 @@ package com.soffid.iam.bpm.index;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -61,7 +62,9 @@ public class Indexer {
 	}
 
 	public void flush(Session session, long then, long now) throws IOException {
+		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
 		Collection<ProcessInstance> p = getProcesses (session, then, now);
+		
 		
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
@@ -82,6 +85,7 @@ public class Indexer {
 
 			for (ProcessInstance process: p)
 			{
+				log.info("Indexing process "+process.getId());
 				d = generateDocument(process);
 				log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 				// Delete pre-existing document

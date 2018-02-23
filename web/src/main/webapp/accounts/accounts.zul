@@ -1140,8 +1140,11 @@
 					}
 				]]>
 			</zscript>
-			<vbox width="30em" heights="5em, 3em" align="center">
-				<hbox align="center" height="5em" >
+			<vbox width="30em" heights="1em,4em, 3em" align="center">
+				<div>
+					<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
+				</div>
+				<hbox align="center" height="4em" >
 					<hbox width="8em" align="center" pack="end">
 						<label 
 							value="${c:l('accounts.setPassword.label')}">
@@ -1149,7 +1152,6 @@
 					</hbox>
 					<space width="2em"></space>
 					<hbox width="18em" align="center" pack="start">
-						<textbox style="display:none"/>
 						<textbox type="password" width="18em" id="password"
 							onOK="onSetPassword();">
 						</textbox>

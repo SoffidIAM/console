@@ -253,4 +253,13 @@
 		    <version>3.0.0</version>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.zkoss.zk</groupId>
+				<artifactId>zk</artifactId>
+				<version>3.0.8-1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

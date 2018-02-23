@@ -83,6 +83,16 @@
 									<arg value="-f" />
 									<arg value="target/docker/Dockerfile" />
 									<arg value="-t" />
+									<arg value="soffid/iam-console:${pom.version}"/>
+									<arg value="-t" />
+									<arg value="soffid/iam-console:latest" />
+									<arg value="." />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="build" />
+									<arg value="-f" />
+									<arg value="target/docker/Dockerfile" />
+									<arg value="-t" />
 									<arg value="soffid/iam-console:${pom.version}" />
 									<arg value="." />
 								</exec>
@@ -124,6 +134,12 @@
 										target/SEU_installer_64.exe
 									</file>
 									<type>64bits.exe</type>
+								</artifact>
+								<artifact>
+									<file>
+										target/Soffid-iamconsole.tar.gz
+									</file>
+									<type>tar.gz</type>
 								</artifact>
 							</artifacts>
 						</configuration>

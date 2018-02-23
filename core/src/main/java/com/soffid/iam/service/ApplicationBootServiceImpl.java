@@ -636,6 +636,7 @@ public class ApplicationBootServiceImpl extends
 		result = configSvc.findConfigurationByFilter("soffid.ui.docPath", null,
 				null, null);
 
+		
 		if (result.isEmpty()) {
 			Configuration configuracio = new Configuration();
 			configuracio.setCode("soffid.ui.docPath"); //$NON-NLS-1$
@@ -789,7 +790,7 @@ public class ApplicationBootServiceImpl extends
 			td = new DataType();
 			td.setCode("SSO:1");
 			td.setLabel("Form data");
-			td.setOrder(1L);
+			td.setOrder(3L);
 			td.setRequired(false);
 			td.setScope(MetadataScope.ACCOUNT);
 			td.setSystemName(disSso.getName());

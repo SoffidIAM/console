@@ -391,7 +391,11 @@ public class Mail implements ActionHandler {
 			if (actors != null)
 			{
 				Set<String> users = new HashSet<String>();
-				for (String t: evaluate(actors, null, null).split("[, ]+"))
+				String actors2 = evaluate(actors, null, null);
+				if (actors2 == null)
+					return ;
+				
+				for (String t: actors2.split("[, ]+"))
 				{
 					if ( ! t.isEmpty())
 						users.addAll( getNameUsers(t));

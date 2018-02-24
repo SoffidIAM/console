@@ -43,7 +43,7 @@
 					</form>
 				</tabpanel>
 				<tabpanel id="tareas" style="min-height:30em;overflow:auto"> 
-					<listbox id="listadoTareas" mold="paging" onSelect="ui.onSelectTask()" pageSize="5" width="100%">
+					<listbox id="listadoTareas" mold="paging" onSelect="ui.onSelectTask()" pageSize="5" width="100%" style="min-height: 0">
 							<listhead>
 								<listheader label="${c:l('inbox.lbldefinicionTarea')}" sort="auto"/>
 								<listheader label="${c:l('inbox.lblFecha')}" sort="auto"/>
@@ -52,7 +52,7 @@
 								<listheader label="${c:l('inbox.lblIdentificador')}" sort="auto"/>
 							</listhead>
 					</listbox>
-					<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="5" width="100%">
+					<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="5" width="100%"  style="min-height: 0">
 							<listhead>
 								<listheader label="${c:l('job.lblId')}" sort="auto"/>
 								<listheader label="${c:l('job.lbldefinicionTarea')}" sort="auto"/>

@@ -521,33 +521,47 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 tda.setCode(attribute);
 				tda.setScope(MetadataScope.USER);
 				tda.setType(TypeEnumeration.STRING_TYPE);
-                tda = getAdditionalDataService().create(tda);
-            }
-            UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
-            if (dada == null && value != null) {
-                auditAuthoritativeChange(tracker);
-                dada = new UserData();
-                dada.setAttribute(tda.getCode());
-                dada.setUser(user.getUserName());
-                if (value instanceof byte[]) dada.setBlobDataValue((byte[]) value); else if (value instanceof Calendar) dada.setDateValue((Calendar) value); else if (value != null) dada.setValue(value.toString());
-                getAdditionalDataService().create(dada);
-            } else if (value == null && dada != null) {
-                auditAuthoritativeChange(tracker);
-                getAdditionalDataService().delete(dada);
-            } else if (value != null && value instanceof byte[] && !((byte[]) value).equals(dada.getBlobDataValue())) {
-                auditAuthoritativeChange(tracker);
-                dada.setBlobDataValue((byte[]) value);
-                getAdditionalDataService().update(dada);
-            } else if (value != null && value instanceof Calendar && !((Calendar) value).equals(dada.getBlobDataValue())) {
-                auditAuthoritativeChange(tracker);
-                dada.setDateValue((Calendar) value);
-                getAdditionalDataService().update(dada);
-            } else if (value != null && !value.equals(dada.getValue())) {
-                auditAuthoritativeChange(tracker);
-                dada.setValue(value.toString());
-                getAdditionalDataService().update(dada);
-            }
-        }
+				tda = getAdditionalDataService().create(tda);
+			}
+			UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
+			if (dada == null && value != null)
+			{
+				auditAuthoritativeChange(tracker);
+				dada = new UserData();
+				dada.setAttribute(tda.getCode());
+				dada.setUser(user.getUserName());
+				if (value instanceof byte[])
+					dada.setBlobDataValue((byte[]) value);
+				else if (value instanceof Calendar)
+					dada.setDateValue((Calendar) value);
+				else if (value != null)
+					dada.setValue(value.toString());
+				getAdditionalDataService().create(dada);
+			} 
+			else if (value == null && dada!= null)
+			{
+				auditAuthoritativeChange(tracker);
+				getAdditionalDataService().delete(dada);
+			} 
+			else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
+			{
+				auditAuthoritativeChange(tracker);
+				dada.setBlobDataValue((byte[])value);
+				getAdditionalDataService().update(dada);
+			}
+			else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getDateValue())) 
+			{
+				auditAuthoritativeChange(tracker);
+				dada.setDateValue((Calendar)value);
+				getAdditionalDataService().update(dada);
+			}
+			else if (value != null && ! value.equals(dada.getValue())) 
+			{
+				auditAuthoritativeChange(tracker);
+				dada.setValue(value.toString());
+				getAdditionalDataService().update(dada);
+			}
+		}
 	}
 	
 	private AuthoritativeChange getCurrentAttributes (String user) throws InternalErrorException

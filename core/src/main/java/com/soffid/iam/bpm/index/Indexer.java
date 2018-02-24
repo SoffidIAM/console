@@ -38,7 +38,6 @@ import com.soffid.iam.bpm.model.DBProperty;
 
 public class Indexer {
 	private Log log = LogFactory.getLog(Indexer.class);
-	LinkedList documents = new LinkedList ();
 	private static Indexer theIndexer = null;
 	private Indexer () {
 		
@@ -55,17 +54,15 @@ public class Indexer {
 					+ "from org.jbpm.logging.log.ProcessLog as pl "
 					+ "join pl.token as token "
 					+ "join token.processInstance as pi "
-					+ "where pl.date between :then and :now")
+					+ "where pl.date > :then "
+					+ "order by pi.id desc")
 				.setDate("then", new Date(then))
-				.setDate("now", new Date(now))
 				.list();
 	}
 
 	public void flush(Session session, long then, long now) throws IOException {
 		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
 		Collection<ProcessInstance> p = getProcesses (session, then, now);
-		
-		
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, DirectoryFactory.getAnalyzer());
@@ -78,11 +75,6 @@ public class Indexer {
 		}
 		Document d;
 		try { 
-			synchronized (documents) 
-			{
-				documents.clear();
-			}
-
 			for (ProcessInstance process: p)
 			{
 				log.info("Indexing process "+process.getId());
@@ -131,7 +123,6 @@ public class Indexer {
 	}
 
 	public void index(ProcessInstance pi) throws IOException {
-//		enqueue(generateDocument(pi));
 	}
 
 	private StringBuffer addTokenInfo(Document d, ContextInstance ci, Token token, StringBuffer contents) {
@@ -231,9 +222,6 @@ public class Indexer {
 	
 	public void reindexAll ( ) throws IOException {
 		JbpmContext ctx = Configuration.getConfig().createJbpmContext();
-		synchronized (documents) {
-			DirectoryFactory.clearDirectory(ctx.getSession());
-		}
 		try {
 			flush (ctx.getSession(), 0, System.currentTimeMillis());
 		} finally {

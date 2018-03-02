@@ -21,6 +21,8 @@ import org.jbpm.job.Job;
 
 import es.caib.bpm.config.Configuration;
 import es.caib.bpm.index.Indexer;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
+import es.caib.seycon.ng.utils.MailUtils;
 
 public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 	static Integer lock = new Integer(10001);
@@ -104,11 +106,35 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 			StringWriter memoryWriter = new StringWriter();
 			e.printStackTrace(new PrintWriter(memoryWriter));
 			job.setException(memoryWriter.toString());
-			job.setRetries(job.getRetries() - 1);
+			if ( ! "true".equals(System.getProperty("soffid.bpm.error.retry"))) //$NON-NLS-1$ //$NON-NLS-2$
+					job.setRetries(job.getRetries() - 1);
 			Date d = new Date (System.currentTimeMillis()+10 * 60 * 1000); // Esperar deu minuts
 			job.setDueDate(d);
 			job.setLockOwner(null);
 			jbpmContext.getSession().update(job);
+
+			String mailNotification = System.getProperty("soffid.bpm.error.notify"); //$NON-NLS-1$
+			if (mailNotification != null)
+			{
+				StringBuffer body = new StringBuffer();
+				es.caib.bpm.vo.ProcessInstance pi = getBpmEngine().getProcess(job.getId());
+				body.append(String.format(Messages.getString("BpmJobExecutorImpl.3"), //$NON-NLS-1$
+						job.getId(),
+						job.getId(),
+						pi.getDescription()))
+					.append("\n"); //$NON-NLS-1$
+				if ( job.getRetries() >= 0)
+				{
+					body.append(String.format(Messages.getString("BpmJobExecutorImpl.5"), job.getDueDate())) //$NON-NLS-1$
+						.append("\n"); //$NON-NLS-1$
+				}
+				body.append(Messages.getString("BpmJobExecutorImpl.7")) //$NON-NLS-1$
+					.append("\n"); //$NON-NLS-1$
+				body.append( SoffidStackTrace.getStackTrace(e) );
+				getMailService().sendHtmlMailToActors(mailNotification.split("\\s*,\\s*"), //$NON-NLS-1$
+						String.format(Messages.getString("BpmJobExecutorImpl.10"), job.getProcessInstance().getId()), //$NON-NLS-1$
+						body.toString());
+			}
 		} finally {
 			jbpmContext.close();
 		}

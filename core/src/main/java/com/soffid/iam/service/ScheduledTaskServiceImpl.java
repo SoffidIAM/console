@@ -23,6 +23,7 @@ import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.config.Config;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.utils.Security;
 
@@ -201,6 +202,23 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "F"); //$NON-NLS-1$
+		
+		if (task.isError())
+		{
+			String mailNotification = System.getProperty("soffid.scheduler.error.notify"); //$NON-NLS-1$
+			if (mailNotification != null)
+			{
+				StringBuffer body = new StringBuffer();
+				body.append(String.format(Messages.getString("ScheduledTaskServiceImpl.2"), //$NON-NLS-1$
+						task.getName()))
+					.append("\n"); //$NON-NLS-1$
+				body.append( task.getLastLog() );
+				getMailService().sendHtmlMailToActors(mailNotification.split("\\s*,\\s*"), //$NON-NLS-1$
+						String.format(Messages.getString("ScheduledTaskServiceImpl.5"), task.getName()), //$NON-NLS-1$
+						body.toString());
+			}
+
+		}
 	}
 
 	private void reconfigureTasks () throws InternalErrorException

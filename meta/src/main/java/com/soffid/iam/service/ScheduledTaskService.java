@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 	com.soffid.iam.model.ScheduledTaskEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	MailService.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class})
 public abstract class ScheduledTaskService {
 

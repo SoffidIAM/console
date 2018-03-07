@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class Error467Servlet extends HttpServlet {
+public class Error400Servlet extends HttpServlet {
 
     /**
 	 * 
@@ -18,9 +18,9 @@ public class Error467Servlet extends HttpServlet {
             throws ServletException, IOException {
         resp.sendRedirect(req.getContextPath()+"/index.zul"); //$NON-NLS-1$
     }
-
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         resp.sendRedirect(req.getContextPath()+"/index.zul"); //$NON-NLS-1$
     }
+
 }

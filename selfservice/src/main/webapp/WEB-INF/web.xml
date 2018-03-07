@@ -69,6 +69,11 @@
 		<servlet-class>com.soffid.iam.ui.bpm.Error467Servlet</servlet-class>
 	</servlet>
 	<servlet>
+		<description>ErrorHandler</description>
+		<servlet-name>error400</servlet-name>
+		<servlet-class>com.soffid.iam.ui.bpm.Error400Servlet</servlet-class>
+	</servlet>
+	<servlet>
 		<description>DocumentDownload</description>
 		<servlet-name>download-servlet</servlet-name>
 		<servlet-class>com.soffid.iam.ui.bpm.DownloadServlet</servlet-class>
@@ -117,6 +122,11 @@
 	<servlet-mapping>
 		<servlet-name>error467</servlet-name>
 		<url-pattern>/error467</url-pattern>
+		<url-pattern>/j_security_check</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>error400</servlet-name>
+		<url-pattern>/error400</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>download-servlet</servlet-name>
@@ -195,22 +205,6 @@
 	<servlet-mapping>
 		<servlet-name>zkLoader</servlet-name>
 		<url-pattern>*.zhtml</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>zkLoader</servlet-name>
-		<url-pattern>/j_security_lang</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>zkLoader</servlet-name>
-		<url-pattern>/j_security_check</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>zkLoader</servlet-name>
-		<url-pattern>/public/j_security_lang</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>zkLoader</servlet-name>
-		<url-pattern>/public/j_security_check</url-pattern>
 	</servlet-mapping>
 	<servlet>
 		<description>The asynchronous update engine for ZK</description>
@@ -605,6 +599,14 @@
 	
 	<error-page>
 		<error-code>467</error-code>
+		<location>/error467</location>
+	</error-page>
+	<error-page>
+		<error-code>400</error-code>
+		<location>/error400</location>
+	</error-page>
+	<error-page>
+		<error-code>408</error-code>
 		<location>/error467</location>
 	</error-page>
 	<error-page>

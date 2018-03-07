@@ -20,6 +20,8 @@ public class SoffidRealm extends RealmBase {
 	public Principal authenticate(String username, String credentials) {
 		LoginService svc;
 		try {
+			if (credentials == null || credentials.trim().isEmpty())
+				return null;
 			svc = (LoginService) new InitialContext().lookup("openejb:/local/soffid.ejb.com.soffid.iam.tomcat.service.LoginService");
 			return svc.authenticate (username, credentials);
 		} catch (NamingException e) {

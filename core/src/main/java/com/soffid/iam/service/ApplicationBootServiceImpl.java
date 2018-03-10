@@ -990,6 +990,23 @@ public class ApplicationBootServiceImpl extends
 
 		
 		cfg = configSvc.findParameterByNameAndNetworkName(
+				"soffid.task.limit", null); //$NON-NLS-1$
+		if (cfg == null)
+		{
+			cfg = new Configuration("soffid.task.limit", "15"); //$NON-NLS-1$ //$NON-NLS-2$
+			configSvc.create(cfg);
+		}
+		
+		cfg = configSvc.findParameterByNameAndNetworkName(
+				"soffid.task.mode", null); //$NON-NLS-1$
+		if (cfg == null)
+		{
+			cfg = new Configuration("soffid.task.mode", "manual"); //$NON-NLS-1$ //$NON-NLS-2$
+			configSvc.create(cfg);
+		}
+
+
+		cfg = configSvc.findParameterByNameAndNetworkName(
 				"tenantDbLevel", null); //$NON-NLS-1$
 		if (cfg == null)
 		{

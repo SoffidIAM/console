@@ -122,6 +122,7 @@ public class ConfigurationServiceImpl
 			if (Security.isMasterTenant())
 				reconfigureNAS(configuracio);
 			
+			getSyncServerService().updateDispatcherConfiguration();
 		}
 
 		return getConfigEntityDao().toConfiguration(configuracioEntity);
@@ -134,6 +135,7 @@ public class ConfigurationServiceImpl
 		getConfigEntityDao().remove(configuracioEntity);
 		if (toRemove) {
 			ConfigurationCache.remove(codi);
+			getSyncServerService().updateDispatcherConfiguration();
 		}
 	}
 
@@ -150,6 +152,7 @@ public class ConfigurationServiceImpl
 			ConfigurationCache.setProperty(configuracio.getCode(), configuracio.getValue());
 			if (Security.isMasterTenant())
 				reconfigureNAS(configuracio);
+			getSyncServerService().updateDispatcherConfiguration();
 		}
 		return configuracio;
 	}

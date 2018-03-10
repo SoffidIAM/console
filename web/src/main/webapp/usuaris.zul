@@ -48,7 +48,7 @@
 				boolean readOnly = false;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
-				
+			
 				String ghp = System.getProperty("soffid.entitlement.group.holder");
 				if ("always".equals(ghp))
 					showHolderGroup = enforceHolderGroup = true;

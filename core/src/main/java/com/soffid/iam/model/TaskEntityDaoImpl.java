@@ -29,7 +29,11 @@ import org.hibernate.Query;
 public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     @Override
     public void create(TaskEntity tasqueEntity) {
-    	tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) || "manual".equals( status ))
+			return;
+
+		tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
     	if (checkDuplicate(tasqueEntity))
     		return;
 
@@ -250,6 +254,10 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	 */
 	@Override
     protected void handleCreateNoFlush(TaskEntity tasque) throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) || "manual".equals( status ))
+			return;
+		
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
     	if (checkDuplicate(tasque))
     		return;
@@ -258,6 +266,17 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		tooMuchTasks(tasque);
 		this.getHibernateTemplate().save(tasque);
 	}
+
+    protected void handleCreateForce(TaskEntity tasque) throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ))
+			return;
+		tooMuchTasks(tasque);
+		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
+		tasque.setStatus("P");
+		this.getHibernateTemplate().save(tasque);
+	}
+
 
 	@Override
 	protected void handleFinishVirtualSourceTransaction(String virtualTransactionId) throws Exception {

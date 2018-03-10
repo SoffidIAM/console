@@ -15,7 +15,9 @@
 
 	<zscript>
 		<![CDATA[
-			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
+			import es.caib.seycon.ng.utils.*;
+
+			int fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
 			try
 			{
 				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -23,28 +25,27 @@
 			}
 			catch (Exception ex){}
 			
-			queryWindowMin = "50px";
-			queryWindowMax = "110px";
+			String queryWindowMin = "50px";
+			String queryWindowMax = "110px";
 			
-			mode = "query"; 
-			view_altres = false;
+			String mode = "query"; 
+			boolean view_altres = false;
 			
-			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-			canCreateParameter = AutoritzacionsUsuari.hasCreateParameter();
-			canUpdateParameter = AutoritzacionsUsuari.hasUpdateParameter();
-			canDeleteParameter = AutoritzacionsUsuari.hasDeleteParameter();
-			canQueryParameter = AutoritzacionsUsuari.hasQueryParameter();
-			canModifyParameter = canCreateParameter || canUpdateParameter;
+			boolean canCreateParameter = AutoritzacionsUsuari.hasCreateParameter();
+			boolean canUpdateParameter = AutoritzacionsUsuari.hasUpdateParameter();
+			boolean canDeleteParameter = AutoritzacionsUsuari.hasDeleteParameter();
+			boolean canQueryParameter = AutoritzacionsUsuari.hasQueryParameter();
+			boolean canModifyParameter = canCreateParameter || canUpdateParameter;
 			
 			model.getVariables().declareVariable("queryEnabled", canQueryParameter);
 			model.getVariables().declareVariable("codi", "%");
 			
-			queryEnabled = false;
-			retrySearch = false;
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
 			
 			void populateDetails ()
 			{
-				mode = "query";
+				String mode = "query";
 			}
 	
 			// Method to obtain the parameters to search process
@@ -52,13 +53,13 @@
 			{
 				java.util.Map searchValues = new java.util.HashMap();
 				
-				codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
+				Textbox codi = esquema.getFellow("queryWindow").getFellow("queryCodi")
 						.getFellow("textbox");
-				valor = esquema.getFellow("queryWindow").getFellow("queryValor")
+				Textbox valor = esquema.getFellow("queryWindow").getFellow("queryValor")
 						.getFellow("textbox");
-				descripcio = esquema.getFellow("queryWindow")
+				Textbox descripcio = esquema.getFellow("queryWindow")
 						.getFellow("queryDescripcio").getFellow("textbox");
-				xarxa = esquema.getFellow("queryWindow").getFellow("queryXarxa")
+				Textbox xarxa = esquema.getFellow("queryWindow").getFellow("queryXarxa")
 						.getFellow("textbox");
 				
 				// Check enable query
@@ -192,13 +193,57 @@
 			{
 				esquema.showFormulari();
 			}
+			
+			void refreshTaskEngine () {
+				String mode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
+				if (mode == null) mode = "auto";
+				String max = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.limit");
+				for ( item: taskMode.getItems()) 
+					if (item.getValue().equals (mode)) taskMode.setSelectedItem(item);
+				taskLimit.setText(max);
+			}
+
+  			void updateAttribute (String param, String value, String desc)
+   			{
+  				com.soffid.iam.service.ejb.ConfigurationService svc = com.soffid.iam.EJBLocator.getConfigurationService();
+  				com.soffid.iam.api.Configuration cfg = svc.findParameterByNameAndNetworkName(param, null);
+  				if ( value == null || value.trim().isEmpty())
+  				{
+  					if (cfg != null)
+  						svc.delete(cfg);
+  				}
+  				else if (cfg == null )
+  				{
+  					cfg = new com.soffid.iam.api.Configuration();
+  					cfg.setCode(param);
+  					cfg.setValue(value);
+  					cfg.setDescription(desc);
+  					svc.create(cfg);
+  				}
+  				else
+  				{
+  					cfg.setValue(value);
+  					svc.update(cfg);
+  				}
+				com.soffid.iam.utils.ConfigurationCache.setProperty(param, value);
+				tabbox.setSelectedIndex(0);
+				search();
+  				
+   			}
+			void updateTaskEngine () {
+				
+				updateAttribute("soffid.task.mode", taskMode.getSelectedItem().getValue(), "Task operation mode");
+				updateAttribute("soffid.task.limit", taskLimit.getText(), "Maximum number of tasks per transaction");
+			}
+			
 		]]>
 	</zscript>
 	
-	<tabbox>
+	<tabbox onCreate="refreshTaskEngine();" id="tabbox">
 		<tabs>
 			<tab label="${c:l('parametres.zul.Advanced')}"></tab>
 			<tab label="${c:l('parametres.zul.authentication')}"></tab>
+			<tab label="${c:l('parametres.zul.taskEngine')}" onSelect="refreshTaskEngine()"></tab>
 		</tabs>
 		<tabpanels>
 			<tabpanel>
@@ -259,6 +304,7 @@
 	
 		<detalls id="dades">
 			<zscript>
+			<![CDATA[
 				void onChangeDades()
 				{
 					try {
@@ -270,7 +316,7 @@
 						form.getFellow("detall_par").getFellow("dada").setDisabled(true);
 					}
 				}
-			</zscript>
+			]]></zscript>
 			
 			<form id="form" onChangeXPath="onChangeDades()"
 				dataPath="/esquema/lista/listbox:/." width="100%">
@@ -406,7 +452,7 @@
 										</div>
 										<div style="margin-top: 2em">
 											<button label="${c:l('parametres.zul.downloadMetadata') }" onClick="downloadMetadata()"/>
-											<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="samlmodel.commit()"
+											<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="samlmodel.commit();tabbox.setSelectedIndex(0);search();"
 												style="text-align:right"/>
 										</div>
 									</div>
@@ -415,6 +461,35 @@
 						</rows>
 					</grid>
 				</form>				
+			</tabpanel>
+			<tabpanel >
+				<grid sclass="noBorderGrid">
+					<rows>
+						<row>
+							<label value="${c:l('parametres.zul.taskMode')}"/>
+							<listbox mold="select" id="taskMode">
+								<listitem value="readonly" label="${c:l('parametres.zul.mode.readonly') }"></listitem>
+								<listitem value="manual" label="${c:l('parametres.zul.mode.manual') }"></listitem>
+								<listitem value="auto" label="${c:l('parametres.zul.mode.auto') }"></listitem>
+							</listbox>
+						</row>
+						<row>
+							<label value="${c:l('parametres.zul.limit')}"/>
+							<div width="100%">
+								<intbox id="taskLimit"/>
+								<label value="${c:l('parametres.zul.limit2')}"/>
+							</div>
+						</row>
+						<row>
+							<label/>
+							<div style="margin-top: 2em">
+								<button label="${c:l('rolsllista.zul.Cancel·la') }" onClick="refreshTaskEngine()"/>
+								<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="updateTaskEngine()"
+									style="text-align:right"/>
+							</div>
+						</row>
+					</rows>
+				</grid>
 			</tabpanel>
 		</tabpanels>
 	</tabbox>

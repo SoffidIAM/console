@@ -224,6 +224,11 @@ public abstract class TasqueEntity {
 	}
 
 	@DaoOperation
+	public void createForce(es.caib.seycon.ng.model.TasqueEntity tasque)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@DaoOperation
 	public String startVirtualSourceTransaction()
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

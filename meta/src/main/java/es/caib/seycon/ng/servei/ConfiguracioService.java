@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service (translatedName="ConfigurationService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.ConfiguracioEntity.class,
+	SeyconServerService.class,
 	es.caib.seycon.ng.model.BlobConfigurationEntity.class})
 public abstract class ConfiguracioService {
 

@@ -163,25 +163,25 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_USER);
         tasque.setUser(usuari.getUserName());
-        getTaskEntityDao().create(tasque);
+        getTaskEntityDao().createForce(tasque);
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.CREATE_FOLDER);
         tasque.setFolder(usuari.getUserName());
         tasque.setFolderType("U"); //$NON-NLS-1$
-        getTaskEntityDao().create(tasque);
+        getTaskEntityDao().createForce(tasque);
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
         tasque.setGroup(usuari.getPrimaryGroup().getName());
-        getTaskEntityDao().create(tasque);
+        getTaskEntityDao().createForce(tasque);
         if (usuari.getShortName() != null)
         {
             tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_USER_ALIAS);
             tasque.setUser(usuari.getUserName());
-            getTaskEntityDao().create(tasque);
+            getTaskEntityDao().createForce(tasque);
 
         }
     }
@@ -364,17 +364,11 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
     @Override
     public String handleRefreshCanvis(String codiUsuari) throws InternalErrorException {
-        String tasquesPendents = ""; //$NON-NLS-1$
         UserEntity usuari = findByUserName(codiUsuari);
         createTask(usuari);
         createMailTask(usuari);
         // tasquesPendents = refresh(codiUsuari);
-        String[] tasques = getTasks(codiUsuari);
-        if (tasques != null)
-            for (int i = 0; i < tasques.length; i++) {
-                tasquesPendents += tasques[i] + "\n"; // separador //$NON-NLS-1$
-            }
-        return tasquesPendents;
+        return "Synchronization tasks submitted";
     }
 
     /**

@@ -189,6 +189,10 @@
 			// Functionality to refresh syncserver status info
 			void refreshServers()
 			{
+				String taskMode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
+				String taskModeLiteral = taskMode == null ? "" : org.zkoss.util.resource.Labels.getLabel("parametres.zul.mode."+taskMode);
+				taskModeLabel.setValue(taskModeLiteral);
+
 				gridServidors.dataPath = "/model:/server";
 				model.getJXPathContext().getValue("/server").refresh();
 				gridServidors.dataPath = "/model:/server";
@@ -629,12 +633,17 @@
 					else
 						timer.stop();
 			}
+			
+			String taskMode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
+			String taskModeLiteral = taskMode == null ? "" : org.zkoss.util.resource.Labels.getLabel("parametres.zul.mode."+taskMode);
 		]]>
 	</zscript>
 
 	<div sclass="titolpagina" width="100%">
+		<h:span>
 		${c:l('seyconserver.zul.Estatdelsservidorsde')}
-		
+		</h:span>
+		<label id="taskModeLabel" value="${taskModeLiteral }"/>
 		<h:span style="display: inline-block; margin-right: 33px; float: right">
 			<label value="${c:l('seyconserver.zul.AutomaticRefresh')}"
 				style="margin-right:5px; vertical-align: top; font-family: Arial;

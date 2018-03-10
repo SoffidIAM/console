@@ -267,7 +267,7 @@ public class DispatcherServiceImpl extends
 	
 			updateAutomaticTasks(dispatcher, false);
 	
-			updateTipusAndGrups(dispatcher, entity);
+//			updateTipusAndGrups(dispatcher, entity);
 	
 			updateServers();
 	
@@ -633,6 +633,9 @@ public class DispatcherServiceImpl extends
 
 	protected void handlePorpagateUsersDispatcher(String codiAgent)
 			throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) )
+			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
 			throw new SeyconException(
@@ -642,6 +645,8 @@ public class DispatcherServiceImpl extends
 			throw new SeyconException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
+		
+		handleApplyConfiguration(agent);
 		// Obtenim tots els codis d'usuari:
 		Collection<AccountEntity> col = getSystemEntityDao().findByName(
 				codiAgent).getAccounts();
@@ -656,23 +661,30 @@ public class DispatcherServiceImpl extends
 			updateUser.setSystemName(codiAgent);
 			updateUser.setStatus("P");
 			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateUser);
-			getTaskEntityDao().createNoFlush(tasca);
+			getTaskEntityDao().createForce(tasca);
 		}
 
 	}
 
 	protected void handlePropagateDispatcherRoles(String codiAgent)
 			throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) )
+			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
+
+		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
+		handleApplyConfiguration(agent);
 
 		SystemEntity system = getSystemEntityDao().findByName(codiAgent);
 		if (system == null || system.getUrl() == null)
 			throw new SeyconException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
+		
 		// Creem les tasques per a cadascun dels usuaris
 		for (RoleEntity role : system.getRole()) {
 			Task updateRole = new Task();
@@ -683,7 +695,7 @@ public class DispatcherServiceImpl extends
 			updateRole.setSystemName(codiAgent);
 			updateRole.setStatus("P");
 			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
-			getTaskEntityDao().createNoFlush(tasca);
+			getTaskEntityDao().createForce(tasca);
 		}
 
 	}
@@ -1349,6 +1361,9 @@ public class DispatcherServiceImpl extends
 	@Override
 	protected void handlePropagateDispatcherGroups(String codiAgent)
 			throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) )
+			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
 			throw new SeyconException(
@@ -1371,7 +1386,7 @@ public class DispatcherServiceImpl extends
 			updateRole.setDatabase(codiAgent);
 			updateRole.setStatus("P");
 			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
-			getTaskEntityDao().createNoFlush(tasca);
+			getTaskEntityDao().createForce(tasca);
 		}
 
 	}
@@ -1462,6 +1477,16 @@ public class DispatcherServiceImpl extends
 	protected Exception handleTestPropagateObject(String dispatcher,
 			SoffidObjectType type, String object1, String object2)
 			throws Exception {
+		SystemEntity s = getSystemEntityDao().findByName(dispatcher);
+		if (s == null)
+			throw new InternalErrorException (String.format("Unknown system %s", dispatcher));
+		if (s.isReadOnly())
+			throw new InternalErrorException (String.format("System %s is in read only mode", dispatcher));
+			
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) )
+			throw new InternalErrorException ("Task configuration setting is in read only mode");
+
 		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
 		
 		if (svc == null)
@@ -1628,7 +1653,12 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
 		
 		AccountDiffReport report = new AccountDiffReport();
+		report.setSystem(dispatcher);
+		report.setApply(false);
 		report.generateHeader ();
+		report.setAccountEntityDao(getAccountEntityDao());
+		report.setUserEntityDao(getUserEntityDao());
+		report.setAccountService(getAccountService());
 		for (Long l: allUsers)
 		{
 			System.out.println("User "+l);
@@ -1648,24 +1678,42 @@ public class DispatcherServiceImpl extends
 		match = matchGroup(u, groups);
 		match = match && matchUserType(u, userTypes);
 
+		
 		List<AccountEntity> accounts = getAccountEntityDao().findByUserAndSystem(u.getUserName(), dispatcher.getName());
 		if (accounts.isEmpty())
 		{
-			if (! Boolean.TRUE.equals(dispatcher.getRolebased()) && 
-					! Boolean.TRUE.equals(dispatcher.getManualAccountCreation()))
+			match = match && ! Boolean.TRUE.equals(dispatcher.getManualAccountCreation());
+			if (match && Boolean.TRUE.equals(dispatcher.getRolebased()))
+			{
+				match = false;
+				for (RoleGrant grant: getApplicationService().findEffectiveRoleGrantByUser(u.getId()))
+				{
+					if (grant.getSystem().equals(dispatcher.getName()))
+					{
+						match = true;
+						break;
+					}
+				}
+				
+			}
+			if (match)
 			{
 				String accountName = getAccountService().predictAccountName(u.getId(), dispatcher.getName(), ud.getId());
 				if (accountName != null)
-					report.createAccount(u, accountName);
+				{
+					report.createAccount (u, accountName);
+				}
 			}
 		} else {
 			for (AccountEntity acc: accounts)
 			{
 				boolean willBeEnabled = match && 
-						(! Boolean.TRUE.equals( dispatcher.getRolebased() ) || ! acc.getRoles().isEmpty());
+						(! Boolean.TRUE.equals( dispatcher.getRolebased() ) || 
+								! getApplicationService().findEffectiveRoleGrantByAccount(acc.getId()).isEmpty());
+				
 				if (! acc.isDisabled() && ! willBeEnabled)
 				{
-					report.disableAccount (u, acc.getName());
+					report.disableAccount (u, acc);
 				}
 				if (acc.isDisabled() && willBeEnabled)
 				{
@@ -1714,5 +1762,74 @@ public class DispatcherServiceImpl extends
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.ctx = applicationContext;
+	}
+
+	@Override
+	protected void handleApplyConfiguration(com.soffid.iam.api.System dispatcher) throws Exception {
+		handleUpdate(dispatcher);
+		
+		SessionFactory sessionFactory;
+		sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		String t = getTaskEntityDao().startVirtualSourceTransaction();
+		try
+		{
+			HashSet<String> groups = new HashSet<String>();
+			if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
+			{
+				for (String s: dispatcher.getGroups().split("[, ]+"))
+				{
+					groups.add(s);
+				}
+			}
+	
+			HashSet<String> types = new HashSet<String>();
+			if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
+			{
+				for (String s: dispatcher.getUserTypes().split("[, ]+"))
+				{
+					types.add(s);
+				}
+			}
+	
+			List<Long> allUsers = new LinkedList<Long>();
+			for (UserEntity u: getUserEntityDao().loadAll())
+			{
+				allUsers.add(u.getId());
+			}
+			
+			UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
+			if (ud == null)
+				throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
+			
+			AccountDiffReport report = new AccountDiffReport();
+			report.setSystem(dispatcher);
+			report.setApply(true);
+			report.setAccountEntityDao(getAccountEntityDao());
+			report.setUserEntityDao(getUserEntityDao());
+			report.setAccountService(getAccountService());
+			report.generateHeader ();
+			for (Long l: allUsers)
+			{
+				System.out.println("User "+l);
+				UserEntity u = getUserEntityDao().load(l);
+	
+				analyze (u, dispatcher, groups, types, ud,
+						report);
+				session.flush();
+				session.clear();
+			}
+			report.close();
+			report.getFile().delete();
+		} finally {
+			getTaskEntityDao().finishVirtualSourceTransaction(t);
+		}
+	}
+
+	@Override
+	protected void handleRenameAccounts(com.soffid.iam.api.System dispatcher) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

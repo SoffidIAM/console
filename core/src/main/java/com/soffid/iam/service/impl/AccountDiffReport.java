@@ -1,26 +1,29 @@
 package com.soffid.iam.service.impl;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
-import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.System;
+import com.soffid.iam.api.User;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserEntityDao;
+import com.soffid.iam.service.AccountService;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
 public class AccountDiffReport {
 	UserEntityDao userEntityDao;
 	AccountEntityDao accountEntityDao;
+	AccountService accountService;
+	boolean apply = false;
+	System system;
 	
 	private File outFile;
 	private PrintStream out;
@@ -84,17 +87,37 @@ public class AccountDiffReport {
 		return outFile;
 	}
 
-	public void disableAccount(UserEntity u, String accountName) {
+	public void disableAccount(UserEntity u, AccountEntity account) throws InternalErrorException, AccountAlreadyExistsException {
+		if (apply)
+		{
+			Account acc = accountService.findAccountById(account.getId());
+			acc.setStatus(AccountStatus.DISABLED);
+			accountService.updateAccount(acc);
+		}
 		out.print("<tr class='line'><td>");
 		out.print(escape(u.getUserName()));
 		out.print(" ");
 		out.print(escape(u.getFullName()));
 		out.print("</td><td class='revoke'>");
-		out.print(accountName);
+		out.print(account.getName());
 		out.print("</td><td></td></tr>");
 	}
 
-	public void createAccount(UserEntity u, String accountName) {
+	public void createAccount(UserEntity u, String accountName) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+		if (apply)
+		{
+			Account acc = accountService.findAccount(accountName, system.getName());
+			if (acc == null)
+			{
+				User user = userEntityDao.toUser(u);
+				accountService.createAccount(user, system, accountName);
+			}
+			else
+			{
+				acc.setStatus(AccountStatus.ACTIVE);
+				accountService.updateAccount(acc);
+			}
+		}
 		out.print("<tr class='line'><td>");
 		out.print(escape(u.getUserName()));
 		out.print(" ");
@@ -102,6 +125,30 @@ public class AccountDiffReport {
 		out.print("</td><td></td><td class='grant'>");
 		out.print(accountName);
 		out.print("</td></tr>");
+	}
+
+	public boolean isApply() {
+		return apply;
+	}
+
+	public void setApply(boolean apply) {
+		this.apply = apply;
+	}
+
+	public System getSystem() {
+		return system;
+	}
+
+	public void setSystem(System system) {
+		this.system = system;
+	}
+
+	public AccountService getAccountService() {
+		return accountService;
+	}
+
+	public void setAccountService(AccountService accountService) {
+		this.accountService = accountService;
 	}
 
 }

@@ -77,6 +77,20 @@ public abstract class DispatcherService {
 	 return null;
 	}
 
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void applyConfiguration(
+		es.caib.seycon.ng.comu.Dispatcher dispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Operation ( grantees={roles.agent_update.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void renameAccounts(
+		es.caib.seycon.ng.comu.Dispatcher dispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Operation ( grantees={roles.agent_update.class,
 			roles.agent_accessControl_set.class,
 			roles.agent_accessControl_delete.class,

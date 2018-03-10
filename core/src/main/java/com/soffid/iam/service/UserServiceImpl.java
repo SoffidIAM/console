@@ -1934,6 +1934,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	protected String[] handleRefreshChanges(String codiUsuari) throws Exception {
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ))
+			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		String tasques = getUserEntityDao().refreshCanvis(codiUsuari);
 		if (tasques != null) {
 			try {

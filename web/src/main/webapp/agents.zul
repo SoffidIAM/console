@@ -582,6 +582,14 @@
 								}
 							} 
 						
+							String taskMode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
+							if (taskMode == null || "auto".equals(taskMode))
+							{
+								serverStatusRow.setVisible(true);
+								serverStatusMessage.setValue( org.zkoss.util.resource.Labels.getLabel("parametres.zul.mode.auto") );
+							}
+							else
+								serverStatusRow.setVisible(false);
 
 						} catch (Exception e) {
 							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
@@ -1036,6 +1044,10 @@
 					<grid width="99%" sclass="noBorderGrid">
 					<columns visible="false"><column width="14%"/><column/> </columns>
 						<rows>
+							<row id="serverStatusRow">
+								<label style="color:#8A4700" value="${c:l('parametres.zul.taskMode') }:"/>
+								<label style="color:#8A4700" value="" id="serverStatusMessage"/>
+							</row>
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Codi-2')}"/>
 								<hbox width="100%">
@@ -1069,7 +1081,7 @@
 											</attribute>
 										</imageclic>
 										<space width="4px"/>
-										<imageclic id="imgPropagaGroups" if="${canPropagateAgentGroups}" src="/img/group.png" tooltiptext="${c:l('agents.PropagaRols')}"> 
+										<imageclic id="imgPropagaGroups" if="${canPropagateAgentGroups}" src="/img/propagagroup.png" tooltiptext="${c:l('agents.PropagaGroups')}"> 
 											<attribute name="onClick">
 											 	if (canPropagateAgentGroups) {
 													propagaCanvisAgent_Groups();
@@ -2298,6 +2310,14 @@
 		<div style="text-align: right; margin: 2em">
 			<button label="${c:l('error.zul.Tancar')}">
 				<attribute name="onClick">
+					previewWindow.setVisible(false);
+				</attribute>
+			</button>
+			<button label="${c:l('rules.apply')}">
+				<attribute name="onClick">
+					model.commit();
+					es.caib.seycon.ng.comu.Dispatcher d = esquema.getFellow("dades").getFellow("form").getJXPathContext().getValue("/").getInstance();
+					es.caib.seycon.ng.EJBLocator.getDispatcherService().applyConfiguration(d) ;
 					previewWindow.setVisible(false);
 				</attribute>
 			</button>

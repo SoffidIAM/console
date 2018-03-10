@@ -10,6 +10,7 @@
 package com.soffid.iam.reconcile.service;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainValue;
@@ -401,6 +402,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		if (previous == null)
 			throw new InternalErrorException("Cannot update non existing account: "+account.getAccountName());
 		previous.setDescription(account.getDescription());
+		previous.setStatus(account.isActive()? AccountStatus.ACTIVE: AccountStatus.DISABLED);
 		previous.setDisabled(! account.isActive());
 		previous.getAttributes().putAll(account.getAttributes());
 	}

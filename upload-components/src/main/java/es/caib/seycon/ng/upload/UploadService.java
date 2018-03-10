@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Connection;
@@ -220,7 +221,7 @@ public class UploadService {
         String baseFile = baseUrl.getFile();
         baseFile = baseFile.substring(0, baseFile.indexOf("!"));
         URL fileUrl = new URL (baseFile);
-        File jarFile = new File (fileUrl.getFile());
+        File jarFile = new File ( URLDecoder.decode( fileUrl.getFile() ));
         File earDirectory = jarFile.getParentFile();
         File catalinaHome = new File(System.getProperty("catalina.home"));
         
@@ -237,7 +238,12 @@ public class UploadService {
         else if (candidate3.isFile())
         	uploadUrl(artifactId, version, candidate3.toURI().toURL());
         else
-        	log.warn("Unable to loate file "+file);
+        {
+        	log.warn("Unable to locate file "+file);
+        	log.warn("Candidate 1 = "+candidate.getPath());
+        	log.warn("Candidate 2 = "+candidate2.getPath());
+        	log.warn("Candidate 3 = "+candidate3.getPath());
+        }
     }
 
     private void uploadUrl(String artifactId, String version, URL url)

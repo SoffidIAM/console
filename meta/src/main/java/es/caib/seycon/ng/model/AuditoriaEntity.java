@@ -42,7 +42,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String objecte;
 
-	@Column (name="AUD_IDGRU", translated="group")
+	@Column (name="AUD_IDGRU", translated="group", reverseAttribute="audit")
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grup;
 

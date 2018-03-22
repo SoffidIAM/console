@@ -627,7 +627,8 @@ public class Mail implements ActionHandler {
                         debug("Resolving role grantees: " + role.getName() + "@" + role.getSystem());
                         for (RoleGrant grant : aplicacioService.findEffectiveRoleGrantsByRoleId(role.getId())) {
                             if (scope == null || scope.equals(grant.getDomainValue())) {
-                                result.add(grant.getUser());
+                            	if (grant.getUser() != null)
+                            		result.add(grant.getUser());
                             }
                         }
                     }

@@ -10,8 +10,10 @@ import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.EntitlementDelegationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -56,7 +58,8 @@ import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 	ApplicationAttributeEntity.class,
 	TipusDadaEntity.class,
 	RoleAttributeEntity.class,
-	EntitlementDelegationService.class
+	EntitlementDelegationService.class,
+	AsyncRunnerService.class
 	}
 )
 public abstract class AplicacioService {
@@ -554,6 +557,14 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Rol> findRoleByTextAsync(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
@@ -570,9 +581,26 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAsync(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.ValorDomini> findDomainValueByText(
+			Domini domain,
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.ValorDomini> findDomainValueByTextAsync(
 			Domini domain,
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {

@@ -4,7 +4,7 @@
 	<datanode name="aplicacions">
 
 		<finder name="aplicacio" type="aplicacio">
-			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findApplicationByJsonQuery" if = "${query != null}">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findApplicationByJsonQueryAsync" if = "${query != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Aplicacio"></new-instance-bean>

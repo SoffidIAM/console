@@ -5,7 +5,7 @@
 	<datanode name="usuaris"> <!--user:query o mail:query, despres es restringeixen-->
 		<finder name="usuari" type="usuari">
 			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
-				method="findUserByJsonQuery" if = "${query != null}">
+				method="findUserByJsonQueryAsync" if = "${query != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari">

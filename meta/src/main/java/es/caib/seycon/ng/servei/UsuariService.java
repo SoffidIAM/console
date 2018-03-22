@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
@@ -15,6 +17,7 @@ import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.model.AccountEntity;
 
 import java.util.Date;
+import java.util.concurrent.Future;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.ServerEntity.class,
 	AutoritzacioService.class,
 	SessionCacheService.class,
+	AsyncRunnerService.class,
 	AccountEntity.class})
 public abstract class UsuariService {
 
@@ -626,11 +630,27 @@ public abstract class UsuariService {
 
 	@Operation(grantees = { roles.user_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Usuari> findUserByJsonQueryAsync(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByText(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Usuari> findUserByTextAsync(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 
 	@Operation
 	@Transactional(readOnly=true)

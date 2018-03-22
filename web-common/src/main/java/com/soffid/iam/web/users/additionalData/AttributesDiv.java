@@ -1,6 +1,7 @@
 package com.soffid.iam.web.users.additionalData;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -11,6 +12,9 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.WrongValueException;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
@@ -22,11 +26,13 @@ import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.datamodel.DataModelNode;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathRerunEvent;
 import es.caib.zkib.events.XPathSubscriber;
-import es.caib.zkib.events.XPathValueEvent;
 
 public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
@@ -38,6 +44,15 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	String dataPath;
 	boolean readonly;
 	String objectType; 
+	Object ownerObject;
+	String ownerBind;
+	String ownerContext;
+	private static final long serialVersionUID = 1L;
+	
+	private SingletonBinder binder = new SingletonBinder(this);
+
+	private List<TipusDada> dataTypes;
+
 	
 	public boolean isReadonly() {
 		return readonly;
@@ -50,7 +65,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	public String getDataPath() {
 		return dataPath;
 	}
-
+	
 	public void setDataPath(String dataPath) {
 		this.dataPath = dataPath;
 		binder.setDataPath(dataPath);
@@ -88,12 +103,6 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		refresh ();
 	}
 
-	private static final long serialVersionUID = 1L;
-	
-	private SingletonBinder binder = new SingletonBinder(this);
-
-	private List<TipusDada> dataTypes;
-
 	public AttributesDiv(){
 		super();
 	}
@@ -107,7 +116,14 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	{
 		try {
 			if (arg0 instanceof XPathRerunEvent)
+			{
+				if (ownerBind != null) {
+					ownerObject = XPathUtils.getValue(getParent(), ownerBind);
+					if (ownerObject instanceof DataNode)
+						ownerObject = ((DataNode) ownerObject).getInstance();
+				}
 				refresh ();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -134,13 +150,31 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 				input.setDataType( DataType.toDataType(att));
 				input.setSclass(getSclass()+"_input");
 				input.setReadonly(readonly);
+				input.setOwnerObject(ownerObject);
 				d.appendChild(input);
 				try {
 					input.createField();
 				} catch (Exception e) {
 					throw new UiException(e);
 				};
+				input.addEventListener("onChange", new EventListener() {
+					public void onEvent(Event event) throws Exception {
+						adjustVisibility();
+						
+					}
+				});
+				d.setVisible(input.attributeVisible());
 			}
+		}
+	}
+
+	public void adjustVisibility() {
+		for (Div d : (Collection<Div>)getChildren())
+		{
+			InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
+			input.setOwnerObject(ownerObject);
+			input.setOwnerContext(ownerContext);
+			d.setVisible(input.attributeVisible());
 		}
 	}
 
@@ -160,6 +194,47 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	public void setObjectType(String objectType) {
 		this.objectType = objectType;
 		updateMetadata();
+	}
+
+	public Object getOwnerObject() {
+		return ownerObject;
+	}
+
+	public void setOwnerObject(Object ownerObject) {
+		this.ownerObject = ownerObject;
+	}
+
+	public String getOwnerBind() {
+		return ownerBind;
+	}
+
+	public void setOwnerBind(String ownerBind) {
+		this.ownerBind = ownerBind;
+	}
+
+	public String getOwnerContext() {
+		return ownerContext;
+	}
+
+	public void setOwnerContext(String ownerContext) {
+		this.ownerContext = ownerContext;
+	}
+
+	public void validate() {
+		for (Div d : (Collection<Div>)getChildren())
+		{
+			if (d.isVisible())
+			{
+				InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
+				input.setOwnerObject(ownerObject);
+				input.setOwnerContext(ownerContext);
+				if (!input.attributeValidate())
+				{
+					setFocus(true);
+					throw new WrongValueException(this, "Value not accepted");					
+				}
+			}
+		}
 	}
 
 }

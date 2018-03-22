@@ -389,6 +389,29 @@ public class ScriptEnviroment {
 		
 	}
 
+	private void defineApplicationAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	{
+		StringBuffer sb = new StringBuffer();
+		
+		for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypes(MetadataScope.APPLICATION))
+		{
+			if ( sb.length() > 0)
+				sb.append(",");
+			sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+			TypeEnumeration t = td.getType();
+			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
+				sb.append("byte");
+			else if (t == TypeEnumeration.DATE_TYPE)
+				sb.append("java.util.Calendar");
+			else
+				sb.append("java.lang.String");
+			sb.append("\"");
+		}
+		Executions.getCurrent().addAuResponse(null,
+				new AuScript(null, "CodeMirrorJavaTypes[\"applicationAttributes\"]={"+sb.toString()+"};")); 
+		
+	}
+
 	private void defineCustomObjectAttributes(Component c) throws InternalErrorException, NamingException, CreateException
 	{
 		StringBuffer sb = new StringBuffer();
@@ -522,6 +545,51 @@ public class ScriptEnviroment {
 				+ "\"groups\":\"java.util.Map<String,com.soffid.iam.api.Group>\","
 				+ "\"groupsList\":\"java.util.Collection<com.soffid.iam.api.Group>\","
 				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\"}";
+	}
+
+
+	public String getUserAttributeValidationVars (CustomObjectType t) throws InternalErrorException, NamingException, CreateException
+	{
+		String partial = "";
+		if (t.isBuiltin() && t.getScope() == MetadataScope.USER)
+		{
+			defineUserAttributes(null);
+			partial = "\"user\":\"com.soffid.iam.api.User\"," +
+					"\"object\":\"com.soffid.iam.api.User\","+ 
+					"\"attributes\":\"userAttributes\",";
+;
+		} 
+		else if (t.isBuiltin() && t.getScope() == MetadataScope.GROUP)
+		{
+			defineGroupAttributes(null);
+			partial = "\"group\":\"com.soffid.iam.api.Group\","
+					+ "\"object\":\"com.soffid.iam.api.Group\","+ 
+					"\"attributes\":\"groupAttributes\",";
+		}
+		else if (t.isBuiltin() && t.getScope() == MetadataScope.ROLE)
+		{
+			defineRoleAttributes(null);
+			partial = "\"role\":\"com.soffid.iam.api.Role\","
+					+ "\"object\":\"com.soffid.iam.api.Role\","+ 
+					"\"attributes\":\"userAttributes\",";
+		}
+		else if (t.isBuiltin() && t.getScope() == MetadataScope.APPLICATION)
+		{
+			defineApplicationAttributes(null);
+			partial = "\"application\":\"com.soffid.iam.api.Application\","
+					+ "\"object\":\"com.soffid.iam.api.Application\","+ 
+					"\"attributes\":\"applicationAttributes\",";
+		}
+		else
+		{
+			defineCustomObjectAttributes(null);
+			partial = "\"object\":\"com.soffid.iam.api.CustomObject\","+ 
+					"\"attributes\":\"customAttributes"+t.getName()+"\",";
+		}
+		return "{" + partial +
+				"\"value\":\"java.lang.String\","
+			+ "\"requestContext\":\"java.lang.String\","
+			+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\"}";
 	}
 
 }

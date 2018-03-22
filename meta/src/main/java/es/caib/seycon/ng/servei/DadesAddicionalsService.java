@@ -170,5 +170,5 @@ public abstract class DadesAddicionalsService {
 	public CustomObjectType updateCustomObjectType (CustomObjectType obj) { return null;}
 
 	@Operation(grantees={customObjectType_delete.class})
-	public void delete (CustomObjectType obj) { }
+	public void deleteCustomObjectType (CustomObjectType obj) { }
 }

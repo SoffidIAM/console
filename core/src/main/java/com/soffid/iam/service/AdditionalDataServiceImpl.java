@@ -396,7 +396,7 @@ public class AdditionalDataServiceImpl extends
 	}
 
 	@Override
-	protected void handleDelete(CustomObjectType obj) throws Exception {
+	protected void handleDeleteCustomObjectType(CustomObjectType obj) throws Exception {
 		getCustomObjectTypeEntityDao().remove(obj.getId());
 	}
 

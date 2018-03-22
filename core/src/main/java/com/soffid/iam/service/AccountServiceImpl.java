@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
@@ -1885,6 +1886,30 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return result;
 	}
 
+	@Override
+	protected AsyncList<Account> handleFindAccountByTextAsync(final String text) throws Exception {
+		final AsyncList<Account> result = new AsyncList<Account>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (AccountEntity e : getAccountEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								Account v = getAccountEntityDao().toAccount(e);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_ACCOUNT_QUERY, v)) {
+									result.add(v);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+	}
+	
 	@Override
 	protected String handlePredictAccountName(Long userId, String dispatcher, Long domainId) throws Exception {
 		UserDomainEntity du = getUserDomainEntityDao().load(domainId);

@@ -166,6 +166,21 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         }
        	targetVO.setDatabaseReplicaId(null);
        	targetVO.setTenant (sourceEntity.getTenant().getName());
+       	
+       	if ( ! Security.isUserInRole(Security.AUTO_AGENT_UPDATE))
+       	{
+    		targetVO.setParam0(null);
+    		targetVO.setParam1(null);
+    		targetVO.setParam2(null);
+    		targetVO.setParam3(null);
+    		targetVO.setParam4(null);
+    		targetVO.setParam5(null);
+    		targetVO.setParam6(null);
+    		targetVO.setParam7(null);
+    		targetVO.setParam8(null);
+    		targetVO.setParam9(null);
+    		targetVO.setBlobParam(null);
+       	}
     }
 
     /**

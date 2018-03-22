@@ -15,8 +15,6 @@
 		.readonly {background-color: transparent !important}
 	</style>
 
-	<script src='~./js/codemirror/java-classes.js' />
-	<script src='comu/syncserver-classes.js' />
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
@@ -1022,7 +1020,7 @@
 					} else {
 						dada = (String)(event.getData()[0]);
 					}
-					camp = (DataTextbox) form.getFellow(idActualitza).getFellow("dada");
+					camp = (DataTextbox) form.getFellow("grups").getFellow("dada");
 					String oldValue= camp.getValue();
 					if(oldValue == null || oldValue.trim().compareTo("") == 0){
 						oldValue = null;
@@ -1190,7 +1188,6 @@
 									<imageclic id="select_group" src="~./img/grup.gif">
 										<attribute name="onClick">
 											if (canModifyAgent) {
-												String idActualitza ="grups";
 												desktop.getPage("grupsLlista").setAttribute("tipus","");
 												desktop.getPage("grupsLlista").setAttribute("llistaObsolets",false);
 												Events.postEvent("onInicia",desktop.getPage("grupsLlista").getFellow("esquemaLlista"),form);

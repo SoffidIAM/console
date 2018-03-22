@@ -338,8 +338,6 @@ public class InformationSystemEntityDaoImpl
 					.append(i)
 					.append(" or upper(u.description) like :param")
 					.append(i)
-					.append(" or upper(u.system.name) like :param")
-					.append(i)
 					.append(")");
 			}
 			return query(sb.toString(), params);

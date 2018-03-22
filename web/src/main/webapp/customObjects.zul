@@ -166,6 +166,7 @@
 					</div>
 					<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 							dataPath="attributes" scope="custom" objectType='${objectType}'
+							ownerBind="./"
 							sclass="objectatt"/>
 				</div>
 			</form>

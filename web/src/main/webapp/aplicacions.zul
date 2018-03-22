@@ -422,6 +422,7 @@
 							</grid>
 							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
 								dataPath="attributes" scope="application"
+								ownerBind="./"
 								sclass="appatt"/>
 						
 						</tabpanel>

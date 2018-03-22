@@ -10,9 +10,11 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.VaultService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -55,6 +57,7 @@ import roles.account_query;
 	AuditoriaService.class,
 	BpmEngine.class,
 	VaultService.class,
+	AsyncRunnerService.class,
 	VaultFolderEntity.class})
 public abstract class AccountService {
 
@@ -489,9 +492,25 @@ public abstract class AccountService {
 		return null;
 	}
 
+	@Operation(grantees = { account_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Account> findAccountByJsonQueryAsync(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.account_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByText(
+			@Nullable String text)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.account_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Account> findAccountByTextAsync(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

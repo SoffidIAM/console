@@ -102,11 +102,11 @@
 									<listbox id="idioma" mold="select" onSelect=""
 										style="font-size: 12px" width="300px">
 										<listitem label="${c:l('perfil.zul.Predeterminat')}" value=""/>
-										<listitem label="${c:l('perfil.zul.English')}" selected="${idiomaEN}" value="en"/>
-										<listitem label="${c:l('perfil.zul.Espanol')}" selected="${idiomaES}" value="es"/>
-										<listitem label="Française" selected="${idiomaFR}" value="fr"/>
+										<listitem label="English" selected="${idiomaEN}" value="en"/>
+										<listitem label="Español" selected="${idiomaES}" value="es"/>
+										<listitem label="Français" selected="${idiomaFR}" value="fr"/>
 										<listitem label="Nederlandse" selected="${idiomaNL}" value="nl"/>
-										<listitem label="${c:l('perfil.zul.Catala')}" selected="${idiomaCA}" value="ca"/>
+										<listitem label="Català" selected="${idiomaCA}" value="ca"/>
 									</listbox>
 								</row>
 							</rows>

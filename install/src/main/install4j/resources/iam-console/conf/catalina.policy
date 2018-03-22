@@ -124,6 +124,11 @@ grant {
     permission java.util.PropertyPermission "java.vm.vendor", "read";
     permission java.util.PropertyPermission "java.vm.name", "read";
 
+    permission java.util.PropertyPermission "soffid.metrics.service.enable", "read";
+    permission java.util.PropertyPermission "soffid.metrics.service.min", "read";
+    permission java.util.PropertyPermission "soffid.metrics.dao.enable", "read";
+    permission java.util.PropertyPermission "soffid.metrics.dao.min", "read";
+
     // Required for OpenJMX
     permission java.lang.RuntimePermission "getAttribute";
 

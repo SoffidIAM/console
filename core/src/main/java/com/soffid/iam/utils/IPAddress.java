@@ -1,4 +1,6 @@
 package com.soffid.iam.utils;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
 /**
@@ -18,48 +20,22 @@ import java.util.StringTokenizer;
 public class IPAddress 
 {
   /** vector con los cuatro dígitos de la dirección IP (0..3) */
-  public int ip [];
+  public byte[] ip;
   /** true si la IP hace referencia a una subred. false si hace referencia a un host */
   public boolean xarxa ;
   /** vector con los cuatro dígitos de la máscara IP (0..3) */
-  public int mask [];
+  public byte[] mask;
+private String sMask;
 
   /** incrementar la dirección IP ( generar la siguiente ) */
   public void incrementa () 
   {
-    int i = 3;
-    ip [ i ] = ip [ i ] + 1;
-    while ( ip [ i ] == 256 && i >= 0) 
+    int i = ip.length;
+    ip [ i ] = (byte) (ip [ i ] + 1);
+    while ( ip [ i ] == 0 && i >= 0) 
     {
-      ip [ i ] = 0;
       i --;
       ip [ i ] ++;
-    }
-  }
-
-  /** Traduce una cadena a un vector de cuatro dígitos 
-   * @param s cadena con formato aa.bb.cc.dd
-   * @param ip vector con cuatro enteros que albergará la cadena analizada
-   * @throws InvalidIPException cuando la cadena no tiene el formato apropiado
-   */
-  private void tradueix (String s, int ip[])
-    throws InvalidIPException 
-  {
-    if (s == null) throw new InvalidIPException (Messages.getString("IPAddress.NullIP")); //$NON-NLS-1$
-    StringTokenizer tokenizer = new StringTokenizer (s, ".", false); //$NON-NLS-1$
-    int i = 0;
-    while (tokenizer.hasMoreTokens()) 
-    {
-      String token = tokenizer.nextToken();
-      if ( i >= 4 ) throw new InvalidIPException ( Messages.getString("IPAddress.InvalidLenght")); //$NON-NLS-1$
-      try {
-        int x = new Integer (token).intValue ();
-        if ( x > 255 || x < 0 )
-          throw new InvalidIPException (String.format(Messages.getString("IPAddress.IncorrectDigit"), x));   //$NON-NLS-1$
-        ip [ i ++ ] = x;
-      } catch (NumberFormatException e) {
-        throw new InvalidIPException (String.format(Messages.getString("IPAddress.NotANumber"), token)); //$NON-NLS-1$
-      }
     }
   }
 
@@ -67,14 +43,14 @@ public class IPAddress
    * Constructor de una IP de host a partir de la forma textual de la dirección IP
    * @param s cadena con formato aa.bb.cc.dd
    * @throws InvalidIPException cuando la cadena no tiene el formato apropiado
+ * @throws UnknownHostException 
    */
   public IPAddress ( String s ) 
-    throws InvalidIPException 
+    throws InvalidIPException, UnknownHostException 
   {
     xarxa = false;
     mask = null;
-    ip = new int [ 4 ];
-    tradueix (s, ip);
+    ip = InetAddress.getByName(s).getAddress();
   }
 
   /**
@@ -82,20 +58,35 @@ public class IPAddress
    * @param s cadena con formato aa.bb.cc.dd representando la dirección de subred
    * @param sMask cadena con formato aa.bb.cc.dd representando la máscara de subred
    * @throws InvalidIPException cuando la cadena no tiene el formato apropiado
+ * @throws UnknownHostException 
    */
   public IPAddress ( String s, String sMask ) 
-    throws InvalidIPException 
+    throws InvalidIPException, UnknownHostException 
   {
     xarxa = true;
-    mask = new int [ 4 ];
-    ip = new int [ 4 ];
-    tradueix (s, ip);
-    tradueix (sMask, mask);
-    for (int i = 0; i < 4; i++)
-    {
-      if ( ( ip [ i ] & mask [ i ] ) != ip [ i ] )
-        throw new InvalidIPException (String.format(Messages.getString("IPAddress.InvalidMasc"), s)); //$NON-NLS-1$
-    }
+    ip = InetAddress.getByName(s).getAddress();
+	if ( ! sMask.contains("."))
+	{
+		this.sMask = sMask;
+		int bits = Integer.parseInt(sMask);
+		mask = new byte [ip.length];
+		for (int i = mask.length-1; i >= 0; i--)
+		{
+			mask[i] = -1;
+			for (int j = 1; j <=  128; j = j * 2 )
+			{
+				if (bits > 0) {
+					mask [i] = (byte) ( mask [i] & ( ~ j ) );
+					bits --;
+				}
+			}
+		}
+	}
+	else
+	{
+		mask = InetAddress.getByName(sMask).getAddress();
+		this.sMask = InetAddress.getByAddress("", mask).getHostAddress();
+	}
   }
 
   /**
@@ -107,11 +98,15 @@ public class IPAddress
   public boolean conte ( IPAddress hostIp )
   {
     if ( ! xarxa ) return false;
-    for ( int i = 0; i < 4 ; i++) 
-    {
-      if ( (hostIp.ip[i]  & mask [i]) != ip [i] )
-        return false;
-    }
+    
+    if (ip.length != hostIp.ip.length)
+    	return false;
+    
+	for ( int i = 0; i < ip.length; i++)
+	{
+		if ( ( mask[i] &  hostIp.ip[i]) != ip[i])
+			return false;
+	}
     return true;
   }
 
@@ -125,10 +120,12 @@ public class IPAddress
   {
     if ( ! conte (hostIp)) return false;
     
-    for ( int i = 0; i < 4 ; i++) 
+    for ( int i = 0; i < ip.length ; i++) 
     {
-      if ( (255 & hostIp.ip[i]  & ( ~ mask [i]) ) != ( 255 & (~ mask [i]) ))
-        return false;
+    	int m = mask[i];
+    	int ip = hostIp.ip[i];
+    	if ( (m | ip) != 255)
+    		return false;
     }
     return true;
   }
@@ -141,7 +138,7 @@ public class IPAddress
    */
   public boolean esXarxa ( IPAddress hostIp )
   {
-    for ( int i = 0; i < 4 ; i++) 
+    for ( int i = 0; i < ip.length ; i++) 
     {
       if ( hostIp.ip[i] != ip [ i ] )
         return false;
@@ -166,10 +163,29 @@ public class IPAddress
    */
   public String toString ()
   {
-    String s = ""+ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    String s;
+	try {
+		s = InetAddress.getByAddress(ip).getHostAddress();
+	} catch (UnknownHostException e) {
+		throw new RuntimeException(e);
+	}
     if (xarxa) 
-      s = s+"/"+mask[0]+"."+mask[1]+"."+mask[2]+"."+mask[3]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      s = s+"/"+sMask;
     return s;
   }
 
+  public int networkSize () {
+	  int size = 1;
+	  for ( int i = mask.length - 1 ; i >= 0; i-- )
+	  {
+		  for (int j = 1; j < 256; j += j)
+		  {
+			  if ( (mask[i] & j) == 0)
+				  size += size;
+			  else
+				  return size;
+		  }
+	  }
+	  return size;
+  }
 }

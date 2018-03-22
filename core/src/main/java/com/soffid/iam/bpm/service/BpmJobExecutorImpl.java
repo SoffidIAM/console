@@ -91,7 +91,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 			Job job = jobSession.loadJob(id);
 			ProcessInstance pi = job.getProcessInstance();
 			TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
-			String tenant = tm == null? Security.getTenantName(tm.getTenantId()): Security.getMasterTenantName();
+			String tenant = tm != null? Security.getTenantName(tm.getTenantId()): Security.getMasterTenantName();
 			Security.nestedLogin(tenant, "Process "+pi.getId(), Security.ALL_PERMISSIONS);
 			try
 			{

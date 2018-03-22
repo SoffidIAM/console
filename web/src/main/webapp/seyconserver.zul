@@ -388,7 +388,7 @@
 				
 				try
 				{
-					infoServer = getSeyconServerService().getSyncServerInfo(dadaurl);
+					infoServer = com.soffid.iam.EJBLocator.getSyncServerService().getSyncServerInfo(dadaurl);
 				}
 				
 				catch (Throwable th)
@@ -402,16 +402,13 @@
 				
 				urlservidor.setValue(dadaurl); //mostrem url del server
 				
-				if ((infoServer != null) @and (infoServer.size() > 0))
+				if (infoServer != null)
 				{
-					com.soffid.iam.api.SyncServerInfo info = infoServer.get(0);
-					//dadaserverurl = context.getValue(xpath+"/@serverAgentHostsURL");
-					
 					// Posem info del server
-					ss_versio.setValue(info.getVersion());
-					cadMain = info.getExpirationMainCertificate();
-					cadRoot = info.getExpirationRootCertificate();
-					dataAct= info.getCurrentServerDate();
+					ss_versio.setValue(infoServer.getVersion());
+					cadMain = infoServer.getExpirationMainCertificate();
+					cadRoot = infoServer.getExpirationRootCertificate();
+					dataAct= infoServer.getCurrentServerDate();
 					
 					// Per tindre la url del servidor actual
 					urlServerInfo.setValue(dadaurl);
@@ -428,11 +425,11 @@
 					
 					catch (Throwable th) {}
 					
-					ss_jetty.setValue(info.getJetty());
-					ss_sso.setValue(info.getSso());
-					ss_ssodaemon.setValue(info.getSsoDaemon());
-					ss_taskgenerator.setValue(info.getTaskGenerator());
-					ss_database_connections.setValue(info.getDatabaseConnections());
+					ss_jetty.setValue(infoServer.getJetty());
+					ss_sso.setValue(infoServer.getSso());
+					ss_ssodaemon.setValue(infoServer.getSsoDaemon());
+					ss_taskgenerator.setValue(infoServer.getTaskGenerator());
+					ss_database_connections.setValue(infoServer.getDatabaseConnections());
 				}
 				
 				mostraPanel("serverInfo");
@@ -1033,7 +1030,7 @@
 							<input_etiqueta value="${c:l('seyconserver.zul.Datadelservidor')}"/>
 							<label id="ss_data_server"/>
 						</row>
-						<row>
+						<row visible="false">
 							<input_etiqueta value="${c:l('seyconserver.zul.Connexionsdebbdd')}"/>
 							<vbox>
 								<label id="ss_database_connections"/>

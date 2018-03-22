@@ -555,11 +555,25 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 				dada.setBlobDataValue((byte[])value);
 				getDadesAddicionalsService().update(dada);
 			}
-			else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getValorDadaDate())) 
+			else if (value != null && value instanceof Calendar ) 
 			{
-				auditAuthoritativeChange(user.getCodi(), tracker);
-				dada.setValorDadaDate((Calendar)value);
-				getDadesAddicionalsService().update(dada);
+				if (! ((Calendar)value).equals(dada.getValorDadaDate()))
+				{
+					auditAuthoritativeChange(user.getCodi(), tracker);
+					dada.setValorDadaDate((Calendar)value);
+					getDadesAddicionalsService().update(dada);
+				}
+			}
+			else if (value != null && value instanceof Date) 
+			{
+				Calendar vc = Calendar.getInstance();
+				vc.setTime((Date)value);
+				if (! vc.equals(dada.getValorDadaDate()))
+				{
+					auditAuthoritativeChange(user.getCodi(), tracker);
+					dada.setValorDadaDate((Calendar)value);
+					getDadesAddicionalsService().update(dada);
+				}
 			}
 			else if (value != null && ! value.equals(dada.getValorDada())) 
 			{

@@ -36,6 +36,7 @@ import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.ApplicationAdministration;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
@@ -2349,6 +2350,30 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
+	protected AsyncList<Role> handleFindRoleByTextAsync(final String text) throws Exception {
+		final AsyncList<Role> result = new AsyncList<Role>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (RoleEntity e : getRoleEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								Role v = getRoleEntityDao().toRole(e);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_ROLE_QUERY, v)) {
+									result.add(v);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+	}
+
+	@Override
 	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
 
 		// Register virtual attributes for additional data
@@ -2403,6 +2428,30 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
+	protected AsyncList<Application> handleFindApplicationByTextAsync(final String text) throws Exception {
+		final AsyncList<Application> result = new AsyncList<Application>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (InformationSystemEntity e : getInformationSystemEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								Application v = getInformationSystemEntityDao().toApplication(e);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_APPLICATION_QUERY, v)) {
+									result.add(v);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+	}
+
+	@Override
 	protected Collection<DomainValue> handleFindDomainValueByText(Domain domain, String text) throws Exception {
 		LinkedList<DomainValue> result = new LinkedList<DomainValue>();
 		TimeOutUtils tou = new TimeOutUtils();
@@ -2417,6 +2466,23 @@ public class ApplicationServiceImpl extends
 	}
 
 	
+	@Override
+	protected AsyncList<DomainValue> handleFindDomainValueByTextAsync(final Domain domain, final String text) throws Exception {
+		final AsyncList<DomainValue> result = new AsyncList<DomainValue>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						for (DomainValueEntity e : getDomainValueEntityDao().findByText(domain, text)) {
+							if (result.isCancelled())
+								return;
+							DomainValue v = getDomainValueEntityDao().toDomainValue(e);
+							result.add(v);
+						}
+					}
+				}, result);
+		return result;
+	}
+
 	private void findEffectiveRoleGrantsRecursively (RoleEntity r,
 			String domainValue,
 			RoleEntity roleToModify,

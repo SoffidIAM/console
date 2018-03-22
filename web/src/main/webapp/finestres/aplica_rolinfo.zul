@@ -590,6 +590,7 @@
 				</grid>
 				<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
 					dataPath="attributes" scope="role"
+					ownerBind="./"
 					sclass="roleatt"/>
 				<separator spacing="15px"/>
 							<tabbox>
@@ -833,7 +834,7 @@
 															}
 														);
 												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.Afegeixrol"));
-												p.setVariable("invoker", ownedRoles);
+												p.setVariable("invoker", ownerRolesGrid);
 												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
 												]]></attribute>
 										</button>

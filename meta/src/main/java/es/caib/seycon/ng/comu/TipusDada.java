@@ -80,4 +80,7 @@ public class TipusDada {
 	@Nullable
 	String visibilityExpression;
 	
+	@Description("Expression to test if attribute value is valid or not")
+	@Nullable
+	String validationExpression;
 }

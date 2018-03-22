@@ -74,6 +74,7 @@
 				boolean view_altres = false;
 				model.getVariables().declareVariable("queryEnabled", false);
 				model.getVariables().declareVariable("restringeixCerca", true);
+				model.getVariables().declareVariable("async", true);
 			
 				// Autoritzacions d'usuari;
 				import es.caib.seycon.ng.utils.AutoritzacionsUsuari;

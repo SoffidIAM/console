@@ -96,7 +96,7 @@ public class SoffidAuthorization {
 			return valorAtributXML;
 		} 
 		} catch (Throwable th) {
-			log.error (String.format(Messages.getString("AutoritzacioSEU.ObtainAttributeAutoritationsFileError"), nomAtribut,th));   //$NON-NLS-1$
+			// log.error (String.format(Messages.getString("AutoritzacioSEU.ObtainAttributeAutoritationsFileError"), nomAtribut,th));   //$NON-NLS-1$
 		}
 		//System.out.println(nomAtribut+": NUL");
 		return null; //no s'ha trobat

@@ -817,6 +817,16 @@ li.attribute-search-box  > button:hover {
     color: white;
 }
 
+.search-box ul {
+	display:inline;
+}
+
+.search-box img.progress {
+	height: 24px;
+	vertical-align: middle;
+}
+
+
 div.identity-tag-user {
     background-color: #8080c0;
     border-radius: 4px;

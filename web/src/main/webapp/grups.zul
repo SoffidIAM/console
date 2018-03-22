@@ -203,7 +203,7 @@
 				<inserttreebutton id="b_inserir" acces="${canCreateGroup}"
 					onClick="onInserir()" path="/grup" tree="/esquema/lista/treebox"/>
 				<!-- No és permés eliminar grups -->
-				<!-- <deletetreebutton tree="/esquema/lista/treebox" acces="${canModifyGrups}"/> -->
+				<deletetreebutton tree="/esquema/lista/treebox" acces="${canModifyGrups}"/> 
 				<commitbutton id="b_commit" datamodel="/model"/>
 				<toolbarbutton id="b_cancel" image="~./img/document-undo.gif"
 					visible="${false}"
@@ -469,6 +469,7 @@
 							</grid>
 							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 								dataPath="attributes" scope="group"
+								ownerBind="./"
 								sclass="groupatt"/>
 							<separator spacing="10px"/>
 							<vbox width="99%">

@@ -9,7 +9,6 @@
 	<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" > 
 	
 	
-	
 	<window id="identityWindow" closable="true" position="center, center"
 		sizable="false" 
 		style="min-width: 60em; width:60%"
@@ -23,12 +22,108 @@
 		    // currentIdentities: identities pre-loaded
 			start();
 		]]></attribute>
+		<attribute name="onClose"><![CDATA[
+			event.stopPropagation();		                                 
+			cancel();
+		]]></attribute>
+
+		<timer id="timer" repeats="true" delay="1000">
+			<attribute name="onTimer"><![CDATA[
+			System.out.println ("ON TIMER !!!");
+		    boolean any = false;
+		    any = fetchAsyncData(userList, userListPosition, "user") || any;
+		    any = fetchAsyncData(roleList, roleListPosition, "role") || any;
+		    any = fetchAsyncData(groupList, groupListPosition, "group") || any;
+		    any = fetchAsyncData(appList, appListPosition, "app") || any;
+		    any = fetchAsyncData(domainValueList, domainValueListPosition, "domainValue") || any;
+		    
+			if (!any) {
+				timer.stop();
+				searchProgress.setVisible(false);
+			}
+			else
+			{
+				Collections.sort(ids, com.soffid.iam.web.component.Identity.getComparator());
+				result.getChildren().clear();
+				for (com.soffid.iam.web.component.Identity id: ids)
+				{
+					Div d = id.generateSelector(searchCriteria);
+					result.appendChild(d);
+					d.addEventListener("onClick", new org.zkoss.zk.ui.event.EventListener(){
+						public void onEvent(Event e)
+						{
+							selectCandidate(e);
+						}
+					});
+				}
+			}
+			]]></attribute>
+		</timer>
 
 		<zscript><![CDATA[		 
-		// Used for grants		                  
+		// Used for grants
+		com.soffid.iam.api.AsyncList userList = null;
+		int[] userListPosition = new int[1];
+		com.soffid.iam.api.AsyncList accountList = null;
+		int[] accountListPosition = new int[1];
+		com.soffid.iam.api.AsyncList roleList = null;
+		int[] roleListPosition = new int[1];
+		com.soffid.iam.api.AsyncList groupList = null;
+		int[] groupListPosition = new int[1];
+		com.soffid.iam.api.AsyncList appList = null;
+		int[] appListPosition = new int[1];
+		com.soffid.iam.api.AsyncList domainValueList = null;
+		int[] domainValueListPosition = new int[1];
+		List ids = null;
+		String searchCriteria = "";
+		
 		com.soffid.iam.api.Role currentRole = null;
 		String currentRolePrefix = null;
 		boolean grantMode = false;
+		
+		boolean fetchAsyncData ( com.soffid.iam.api.AsyncList list, int[] position, String tag) {
+			boolean any = false;
+			if (list != null)
+			{
+				System.out.println("Fetching from "+tag);
+				System.out.println("done "+list.isDone());
+				System.out.println("cancelled "+list.isCancelled());
+				System.out.println("size "+list.size());
+				System.out.println("pointer "+position[0]);
+				Iterator it = list.iterator();
+				if ( (list.isDone() &&  position[0] == list.size()) || list.isCancelled())
+				{
+					Throwable th = list.getExceptionToThrow();
+					list.clearExceptionToThrow();
+					if (th != null)
+						throw th; 
+					System.out.println("DONE");
+					any = false;
+				} else if (list.size() > position[0]) {
+					System.out.println("New data :"+list.size());
+					int i = 0;
+					while (it.hasNext())
+					{
+					    Object o = it.next();
+						if (i++ >= position[0])
+						{
+							com.soffid.iam.web.component.Identity id = 
+									currentRole == null ? 
+										new com.soffid.iam.web.component.Identity(o):
+										new com.soffid.iam.web.component.Identity(currentRole, o);
+							ids.add(id);				
+							position[0] ++;
+						}
+					}
+					any = true;
+				} else {
+					System.out.println("Waiting");
+					any = true;
+				}
+			}
+			return any;
+
+		}
 		
 		void start () {		                  
 			identityWindow.setTitle( title );
@@ -94,8 +189,8 @@
 					textbox.focus();
 					textbox.setSelectionRange(currentRolePrefix.length(), currentRolePrefix.length());
 					result.getChildren().clear();
-					if (role.getDomain().getExternalCode() != null)
-						search(currentRolePrefix);
+//					if (role.getDomain().getExternalCode() != null)
+					search(currentRolePrefix);
 					return;
 				}
 			}
@@ -107,9 +202,13 @@
 		
 		void search(String t) throws Exception
 		{
-			List ids = new LinkedList();
+			System.out.println ("*** SEARCH "+t);
+			ids = new LinkedList();
+			searchCriteria = t;
 			searchSomething (t, ids);
-
+			
+			searchProgress.setVisible(true);
+			
 			Collections.sort(ids, com.soffid.iam.web.component.Identity.getComparator());
 			result.getChildren().clear();
 			for (com.soffid.iam.web.component.Identity id: ids)
@@ -127,77 +226,65 @@
 		
 		void searchSomething (String t, List ids)
 		{
+			if (userList != null) {
+				System.out.println ("*** SEARCH CANCEL "+t);
+				userList.cancel();
+			}
+			if (accountList != null) accountList.cancel();
+			if (roleList != null) roleList.cancel();
+			if (groupList != null) groupList.cancel();
+			if (domainValueList != null) domainValueList.cancel();
+			if (appList != null) appList.cancel();
+			
 			for (com.soffid.iam.web.component.Identity.Type type: types)
 			{
 				if (type == com.soffid.iam.web.component.Identity.Type.USER)
-				{
 					searchUsers(t, ids);
-				}
+				
 				if (type == com.soffid.iam.web.component.Identity.Type.ACCOUNT)
-				{
 					searchAccounts(t, ids);
-				}
+
 				if (type == com.soffid.iam.web.component.Identity.Type.ROLE)
-				{
 					searchRoles(t, ids);
-				}
+
 				if (type == com.soffid.iam.web.component.Identity.Type.GROUP)
-				{
 					searchGroups(t, ids);
-				}
+				
 				if (type == com.soffid.iam.web.component.Identity.Type.GRANT)
-				{
 					searchGrants(t, ids);
-				}
 			}
 		}
 		
 		void searchUsers (String t, List ids) {
-			Collection users = com.soffid.iam.EJBLocator.getUserService().findUserByText(t);
-			for (com.soffid.iam.api.User user: users) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(user);
-				ids.add(id);				
-			}
+			userListPosition[0] = 0;
+			userList = com.soffid.iam.EJBLocator.getUserService().findUserByTextAsync(t);
+			System.out.println("New user list");
+			timer.start();
 		}
 		                  
 		void searchAccounts (String t, List ids) {
-			Collection accounts = com.soffid.iam.EJBLocator.getAccountService().findAccountByText(t);
-			for (com.soffid.iam.api.Account acc: accounts) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(acc);
-				ids.add(id);
-			}
+			accountListPosition[0] = 0;
+			accountList = com.soffid.iam.EJBLocator.getAccountService().findAccountByTextAsync(t);
+			timer.start();
 		}
 		
 		void searchRoles (String t, List ids) {
-			Collection roles = com.soffid.iam.EJBLocator.getApplicationService().findRoleByText(t);
-			for (com.soffid.iam.api.Role role: roles) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role);
-				ids.add(id);
-			}
+			roleListPosition[0] = 0;
+			roleList = com.soffid.iam.EJBLocator.getApplicationService().findRoleByTextAsync(t);
+			timer.start();
 		}
 
 		void searchGroups (String t, List ids) {
-			Collection groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByText(t);
-			for (com.soffid.iam.api.Group group: groups) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(group);
-				ids.add(id);
-			}
+			groupListPosition[0] = 0;
+			groupList = com.soffid.iam.EJBLocator.getGroupService().findGroupByTextAsync(t);
+			timer.start();
 		}
 
-		void searchGroups (com.soffid.iam.api.Role role, String t, List ids) {
-			Collection groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByText(t);
-			for (com.soffid.iam.api.Group group: groups) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, group);
-				ids.add(id);
-			}
-		}
 
-		void searchApplications (com.soffid.iam.api.Role role, String t, List ids) {
-			Collection apps = com.soffid.iam.EJBLocator.getGroupService().findApplicationsByText(t);
-			for (com.soffid.iam.api.Application app: apps) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, app);
-				ids.add(id);
-			}
+		void searchApplications (String t, List ids) {
+			appListPosition[0] = 0;
+			appList = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByTextAsync(t);
+			timer.start();
 		}
 
 		void searchGrants (String t, List ids) {
@@ -208,21 +295,22 @@
 			{
 
 				String t2 = t.substring(currentRolePrefix.length());
+				searchCriteria = t2;
 				if (currentRole.getDomain().getExternalCode() != null)
 				{
-					searchDomainValues (currentRole, currentRole.getDomain(), t2, ids);
+					searchDomainValues (currentRole.getDomain(), t2, ids);
 				}
 				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.APLICACIONS))
 				{
-					searchApplications (currentRole, t2, ids);
+					searchApplications (t2, ids);
 				}
 				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS))
 				{
-					searchGroups(currentRole, t2, ids);
+					searchGroups(t2, ids);
 				}
 				else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS_USUARI))
 				{
-					searchGroups(currentRole, t2, ids);
+					searchGroups(t2, ids);
 				}
 			} else {
 				if (currentRolePrefix.startsWith(t))
@@ -241,25 +329,25 @@
 			}
 		}
 		                  
-		void searchDomainValues (com.soffid.iam.api.Role role,
-				com.soffid.iam.api.Domain domain, String t, List ids) {
-			Collection values = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByText(domain, t);
-			for (com.soffid.iam.api.DomainValue dv: values) {
-				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(role, dv);
-				ids.add(id);
-			}
+		void searchDomainValues (com.soffid.iam.api.Domain domain, String t, List ids) {
+			domainValueListPosition[0] = 0;
+			domainValueList = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByTextAsync(domain, t);
+			timer.start();
 		}
 
 		]]></zscript>
 
 		<div style="padding: 3em">
 			<div id="selected" style="display: inline"/>
-			<textbox style="display:inline-block; width:100%; min-width: 20em; border: none; border-bottom: solid darkgrey 1px; outline:none" id="textbox"
-				onOK="search(textbox.value)">
-			<attribute name="onChanging"><![CDATA[
-			    search (event.value);                            
-			]]></attribute>
-			</textbox>
+			<div>
+			<image src="~./img/soffid-progress.gif" visible="false" style="height: 2em; position:absolute; left: 6px" id="searchProgress"/>
+				<textbox style="display:inline-block; width:100%; min-width: 20em; border: none; border-bottom: solid darkgrey 1px; outline:none; margin-right: 3em" id="textbox"
+					onOK="search(textbox.value)">
+					<attribute name="onChanging"><![CDATA[
+					    search (event.value);                            
+					]]></attribute>
+				</textbox>
+			</div>
 			<div id="result" style="max-height:12em; overflow-x:hidden; overflow-y:auto"/>
 		</div>
 		
@@ -272,6 +360,10 @@
 
 	</window>
 	
+	<include src="/finestres/aplica_rolsllista.zul"/>
+	<include src="/dominisllista.zul"/>
+	
+	<include src="/finestres/aplica_rol_valorDomini.zul"/>
 </div>
 
 </zk>

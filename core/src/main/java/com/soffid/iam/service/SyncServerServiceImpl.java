@@ -53,9 +53,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.net.ssl.HttpsURLConnection;
@@ -392,7 +394,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     }
 
     private List<String> getServerList() throws InternalErrorException, SQLException, NamingException {
-    	List<String> list = new LinkedList<String>();
+    	Set<String> list = new HashSet<String>();
     	
     	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
     	for (TenantServerEntity s: tenant.getServers())
@@ -400,7 +402,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     		if (s.getTenantServer().getType() == ServerType.MASTERSERVER)
     			list.add(s.getTenantServer().getUrl());
     	}
-		return list;
+		return new java.util.LinkedList<String>(list);
     }
 
     private String getServerPort() throws InternalErrorException, SQLException, NamingException {

@@ -99,9 +99,13 @@ public abstract class TipusDadaEntity {
 	CustomObjectTypeEntity dataObjectType;
 
 	
-	@Column (name="TDA_VISEXP")
+	@Column (name="TDA_VISEXP", length=2048)
 	@Nullable
 	String visibilityExpression;
+	
+	@Column (name="TDA_VALEXP", length=2048)
+	@Nullable
+	String validationExpression;
 	
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;

@@ -24,14 +24,14 @@ public abstract class XarxaEntity {
 	@Column (name="XAR_CODI", length=10, translated="name")
 	public java.lang.String codi;
 
-	@Column (name="XAR_ADRIP", length=25, translated="address")
+	@Column (name="XAR_ADRIP", length=50, translated="address")
 	public java.lang.String adreca;
 
 	@Column (name="XAR_DESCRI", length=50, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="XAR_MASIP", length=25, translated="mask")
+	@Column (name="XAR_MASIP", length=50, translated="mask")
 	@Nullable
 	public java.lang.String mascara;
 

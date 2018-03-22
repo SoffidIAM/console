@@ -111,7 +111,7 @@ public class NASManager
 		IllegalAccessException, ClassNotFoundException, NASException
 	{
 		// Instance of communication strategy
-		String docStrategy = ConfigurationCache.getProperty("soffid.ui.docStrategy");
+		String docStrategy = ConfigurationCache.getMasterProperty("soffid.ui.docStrategy");
 		
 		if (docStrategy.startsWith("es.caib.bpm.nas.comm."))
 			docStrategy = "com.soffid.iam.doc.nas.comm" + docStrategy.substring(docStrategy.lastIndexOf('.'));

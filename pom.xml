@@ -74,11 +74,12 @@
         <plugin>
           <groupId>com.soffid.tools</groupId>
           <artifactId>mda-maven-plugin</artifactId>
-          <version>2.0.32</version>
+          <version>2.0.33-SNAPSHOT</version>
           <configuration>
             <targetServer>tomee</targetServer>
             <translate>true</translate>
             <translateEntities>true</translateEntities>
+            <asyncCollectionClass>com.soffid.iam.api.AsyncList</asyncCollectionClass>
           </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -360,7 +361,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
-        <version>1.32</version>
+        <version>1.33-SNAPSHOT</version>
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

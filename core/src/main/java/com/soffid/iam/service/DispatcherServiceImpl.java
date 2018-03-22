@@ -267,7 +267,7 @@ public class DispatcherServiceImpl extends
 	
 			updateAutomaticTasks(dispatcher, false);
 	
-//			updateTipusAndGrups(dispatcher, entity);
+			updateTipusAndGrups(dispatcher, entity);
 	
 			updateServers();
 	
@@ -1661,7 +1661,6 @@ public class DispatcherServiceImpl extends
 		report.setAccountService(getAccountService());
 		for (Long l: allUsers)
 		{
-			System.out.println("User "+l);
 			UserEntity u = getUserEntityDao().load(l);
 
 			analyze (u, dispatcher, groups, types, ud,
@@ -1812,13 +1811,12 @@ public class DispatcherServiceImpl extends
 			report.generateHeader ();
 			for (Long l: allUsers)
 			{
-				System.out.println("User "+l);
+				session.flush();
+				session.clear();
 				UserEntity u = getUserEntityDao().load(l);
 	
 				analyze (u, dispatcher, groups, types, ud,
 						report);
-				session.flush();
-				session.clear();
 			}
 			report.close();
 			report.getFile().delete();

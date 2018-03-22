@@ -3,6 +3,7 @@ package com.soffid.iam.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -30,15 +31,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.SessionFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.json.JSONException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.BpmProcess;
@@ -100,9 +105,12 @@ import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.BadPasswordException;
@@ -2994,6 +3002,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected Collection<User> handleFindUserByJsonQuery(String query)
 			throws InternalErrorException, Exception {
 
+		LinkedList<User> result = new LinkedList<User>();
+
+		internalSearchUsersByJson(query, result);
+		return result;
+	}
+
+	private void internalSearchUsersByJson(String query, Collection<User> result)
+			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
+			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
 
@@ -3012,11 +3029,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		LinkedList<User> result = new LinkedList<User>();
 		TimeOutUtils tou = new TimeOutUtils();
 		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
 				paramArray)) {
-			tou.checkTimeOut();
+			if (result instanceof AsyncList)
+			{
+				if (((AsyncList) result).isCancelled())
+					return;
+			}
+			else
+			{
+				tou.checkTimeOut();
+			}
 			User u = getUserEntityDao().toUser(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
@@ -3025,6 +3049,27 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 			}
 		}
+	}
+
+	@Override
+	protected AsyncList<User> handleFindUserByJsonQueryAsync(final String query)
+			throws InternalErrorException, Exception {
+		
+		final AsyncList<User> result = new AsyncList<User>();
+		
+		getAsyncRunnerService().run(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					internalSearchUsersByJson(query, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+			
+		}, result);
+
 		return result;
 	}
 
@@ -3048,5 +3093,30 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	@Override
 	protected Collection<String> handleFindUserNames() throws Exception {
 		return getUserEntityDao().findUserNames();
+	}
+
+	@Override
+	protected AsyncList<User> handleFindUserByTextAsync(final String text) throws Exception {
+		final AsyncList<User> result = new AsyncList<User>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (UserEntity ue : getUserEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								User u = getUserEntityDao().toUser(ue);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_USER_QUERY, ue)) {
+									result.add(u);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+		
 	}
 }

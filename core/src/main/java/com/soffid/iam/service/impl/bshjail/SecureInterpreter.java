@@ -171,30 +171,39 @@ public class SecureInterpreter {
 
 	public Object eval (final String expr) throws MalformedURLException, EvalError
 	{
-		Policy p = Policy.getPolicy();
-		CodeSource codesource = new CodeSource(new URL("http://scripts.customers.soffid.com/"), new Certificate[0]);
-		PermissionCollection permissions = p.getPermissions(codesource);
+		Object [] result  = AccessController.doPrivileged(
+				new PrivilegedAction<Object[]>() {
+					public Object[] run() {
+						Policy p = Policy.getPolicy();
+						CodeSource codesource;
+						try {
+							codesource = new CodeSource(new URL("http://scripts.customers.soffid.com/"), new Certificate[0]);
+						} catch (MalformedURLException e1) {
+							return new Object[] {null, e1};
+						}
+						PermissionCollection permissions = p.getPermissions(codesource);
 
-//		log.info("Running shell with permissions: "+permissions.toString());
-		
-		ProtectionDomain pd = new ProtectionDomain(codesource, permissions);
-		
-		
-		AccessControlContext context = new AccessControlContext(new ProtectionDomain[]{pd});
-		
-		
-		Object [] result  = AccessController.doPrivileged(new PrivilegedAction<Object[]>() {
-			@Override
-			public Object[] run() {
-				try {
-					return new Object[] { interp.eval(expr) };
-				} catch (EvalError e) {
-					return new Object[] { null, e};
-				} catch (RuntimeException e) {
-					return new Object[] { null, e};
-				}
-			}
-		}, context);
+//						log.info("Running shell with permissions: "+permissions.toString());
+						
+						ProtectionDomain pd = new ProtectionDomain(codesource, permissions);
+						
+						
+						AccessControlContext context = new AccessControlContext(new ProtectionDomain[]{pd});
+						
+						
+						return AccessController.doPrivileged(new PrivilegedAction<Object[]>() {
+							public Object[] run() {
+								try {
+									return new Object[] { interp.eval(expr) };
+								} catch (EvalError e) {
+									return new Object[] { null, e};
+								} catch (RuntimeException e) {
+									return new Object[] { null, e};
+								}
+							}
+						}, context);
+					}
+				});
 		if (result.length == 0)
 			return null;
 		else if (result.length == 1)

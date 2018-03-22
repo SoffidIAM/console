@@ -72,6 +72,15 @@ public abstract class TaskQueue {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return 0;
 	}
+
+	@Description("Number of errored tasks")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public int countErrorTasks(
+		com.soffid.iam.sync.engine.DispatcherHandler taskDispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return 0;
+	}
+
 	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.SUPPORTS)
 	public void expireTasks()

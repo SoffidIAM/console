@@ -1154,49 +1154,61 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private boolean adrecaCorrecta(String adreca) {
-        if (adreca != null && adreca.trim().compareTo("") != 0) { //$NON-NLS-1$
-            String[] adreces = adreca.split("\\."); //$NON-NLS-1$
-            if (adreces.length == 4) {
-                boolean correcte = true;
-                for (int i = 0; i < 4 && correcte; i++) {
-                    try {
-                        correcte = Integer.parseInt(adreces[i]) <= 255;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                }
-                return correcte;
-            }
-        }
-        return false;
+    	try {
+			InetAddress.getByName(adreca);
+			return true;
+		} catch (java.net.UnknownHostException e1) {
+			return false;
+		}
     }
 
     private boolean maquinaCompatibleAmbXarxa(String adrecaMaquina, String adrecaXarxa,
-            String mascaraXarxa) {
-        if (adrecaXarxa.compareTo("0.0.0.0") == 0 && mascaraXarxa.compareTo("0.0.0.0") == 0) { //$NON-NLS-1$ //$NON-NLS-2$
-            return true;
-        }
+            String mascaraXarxa) throws InternalErrorException {
+        try {
+			if (adrecaXarxa.compareTo("0.0.0.0") == 0 && mascaraXarxa.compareTo("0.0.0.0") == 0) { //$NON-NLS-1$ //$NON-NLS-2$
+			    return true;
+			}
 
-        if (!adrecaCorrecta(mascaraXarxa)) {
-            return false;
-        }
-        String[] mascaresXarxa = mascaraXarxa.split("\\."); //$NON-NLS-1$
-        if (!adrecaCorrecta(adrecaXarxa)) {
-            return false;
-        }
-        String[] adrecaXarxes = adrecaXarxa.split("\\."); //$NON-NLS-1$
-        if (!adrecaCorrecta(adrecaMaquina)) {
-            return false;
-        }
-        String[] adrecaMaquines = adrecaMaquina.split("\\."); //$NON-NLS-1$
-        boolean compatible = true;
-        for (int i = 0; i < 4 && compatible; i++) {
-            int currentMascaraXarxa = Integer.parseInt(mascaresXarxa[i]);
-            int currentAdrecaMaquina = Integer.parseInt(adrecaMaquines[i]);
-            int currentAdrecaXarxa = Integer.parseInt(adrecaXarxes[i]);
-            compatible = (currentMascaraXarxa & currentAdrecaXarxa) == (currentMascaraXarxa & currentAdrecaMaquina);
-        }
-        return compatible;
+			if (!adrecaCorrecta(mascaraXarxa)) {
+			    return false;
+			}
+			String[] mascaresXarxa = mascaraXarxa.split("\\."); //$NON-NLS-1$
+			String[] adrecaXarxes = adrecaXarxa.split("\\."); //$NON-NLS-1$
+			if (!adrecaCorrecta(adrecaMaquina)) {
+			    return false;
+			}
+			byte[] adrHost = InetAddress.getByName(adrecaMaquina).getAddress();
+			byte [] adrNet = InetAddress.getByName(adrecaXarxa).getAddress();
+			byte [] mask;
+			if ( mascaresXarxa.length == 1)
+			{
+				int bits = Integer.parseInt(mascaraXarxa);
+				mask = new byte [adrNet.length];
+				for (int i = 0; i < mask.length; i++)
+				{
+					mask[i] = 0;
+					for (byte j = (byte) 128; j >=  1; j = (byte) (j / 2) )
+					{
+						if (bits > 0) mask [i] = (byte) ( mask [i] | j );
+					}
+				}
+			}
+			else
+				mask = InetAddress.getByName(mascaraXarxa).getAddress();
+			
+			if (adrNet.length != adrHost.length || adrNet.length != mask.length)
+				return false;
+			for (int i = 0; i < adrNet.length; i++)
+			{
+			    if ( ( adrNet[i] & mask[i] ) != ( adrHost[i] & mask[i]) )
+			    	return false;
+			}
+			return true;
+		} catch (NumberFormatException e) {
+			throw new InternalErrorException ("Unable to parse network "+adrecaXarxa+"/"+mascaraXarxa+": expected numeric mask");
+		} catch (java.net.UnknownHostException e) {
+			throw new InternalErrorException ("Unable to parse address "+e.getMessage());
+		}
     }
 
     private boolean maquinesIguals(Host maquinaA, Host maquinaB) {
@@ -1471,56 +1483,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected Boolean handleLaunchVNC(Long sessioId) throws java.io.IOException, TimedOutException,
             InternalErrorException {
-
-        try {
-            SessionEntity sessio = getSessionEntityDao().findById(sessioId);
-
-            if (sessio == null)
-                throw new InternalErrorException(
-                        String.format(
-                                Messages.getString("NetworkServiceImpl.NoSessionIDFound"), //$NON-NLS-1$
-                                sessioId));
-
-            if (sessio.getClientHost() != null)
-                return false;
-
-            // Mirem si és autoritzat (autorització o acls)
-            if (internalGetAccessLevel(sessio.getHost().getName(), sessio.getHost().getNetwork().getName()) < SUPORT)
-                throw new java.lang.SecurityException(Messages.getString("NetworkServiceImpl.NoPermissionMessage")); //$NON-NLS-1$
-
-            InetAddress addr = InetAddress.getLocalHost();
-
-            if (addr == null)
-                throw new InternalErrorException(
-                        Messages.getString("NetworkServiceImpl.NoGetInetAddress")); //$NON-NLS-1$
-
-            TimedProcess t = new TimedProcess(20000);
-            if (addr.getHostName().toLowerCase().startsWith("epreinf14")) //$NON-NLS-1$
-                t.exec(new String[]{"rsh", "spreinfsun2", "rsh", sessio.getHost().getName(), "vnc"}); //$NON-NLS-1$
-            else
-                t.exec(new String[]{"rsh", sessio.getHost().getName(), "vnc"}); //$NON-NLS-1$ //$NON-NLS-2$
-
-            if (t.getOutput().indexOf("concedit") > 0) { //$NON-NLS-1$
-
-                auditaVNC(sessio, "S"); //$NON-NLS-1$
-                /*
-                 * registraAuditoria (sessio.getMaquina().Name,
-                 * usuaris.getIdUsuari(autor), sessio.getUsuari()!=null ?
-                 * sessio.getUsuari().User : "", "S");
-                 */
-                return true;
-            } else
-                auditaVNC(sessio, "N"); //$NON-NLS-1$
-            /*
-             * registraAuditoria( sessio.getMaquina().Name,
-             * usuaris.getIdUsuari(autor), sessio.getUsuari() != null ?
-             * sessio.getUsuari().User : "", "N");
-             */
-            return false;
-
-        } catch (java.net.UnknownHostException e) {
-            throw new InternalErrorException(e.toString());
-        }
+    	return false;
     }
 
     protected Boolean handleHasAnyACLNetworks(String codiUsuari) throws Exception {
@@ -1611,7 +1574,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     @Override
-    protected Host handleRegisterDynamicIP(String nomMaquina, String ip, String serialNumber) throws es.caib.seycon.ng.exception.UnknownHostException, UnknownNetworkException {
+    protected Host handleRegisterDynamicIP(String nomMaquina, String ip, String serialNumber) throws es.caib.seycon.ng.exception.UnknownHostException, UnknownNetworkException, InternalErrorException {
         boolean anyChange = false;
         // First. Test if this IP belongs to anybody else
         HostEntity old = getHostEntityDao().findByIP(ip);
@@ -1745,7 +1708,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return getHostEntityDao().toHost(maquina);
     }
 
-    private NetworkEntity guessNetwork(byte[] b) {
+    private NetworkEntity guessNetwork(byte[] b) throws InternalErrorException {
         NetworkEntityDao dao = getNetworkEntityDao();
         NetworkEntity xarxa = null;
         for (int bc = b.length - 1; xarxa == null && bc >= 0; bc--) {
@@ -1759,7 +1722,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     String addrText = addr2.getHostAddress();
                     xarxa = dao.findByAddress(addrText);
                 } catch (java.net.UnknownHostException e) {
-                    e.printStackTrace();
+                    throw new InternalErrorException("Unable to parse address "+e.getMessage());
                 }
             }
         }

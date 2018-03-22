@@ -30,10 +30,12 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     @Override
     public void create(TaskEntity tasqueEntity) {
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
+
+		tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
+
 		if ("readonly".equals( status ) || "manual".equals( status ))
 			return;
 
-		tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
     	if (checkDuplicate(tasqueEntity))
     		return;
 

@@ -11,7 +11,7 @@ public class TimeOutUtils {
 	public final static String PROPERTY_TIMEOUT = "soffid.ui.timeout"; //$NON-NLS-1$
 	private final static String MESSAGE_RAISETIMEOUT = "TimeOutUtils.checkTimeOut.raiseTimeOut"; //$NON-NLS-1$
 	private final static String MESSAGE_NONPROPERTY = "TimeOutUtils.checkTimeOut.nonPropertyTimeOut"; //$NON-NLS-1$
-	private int GLOBAL_TIMEOUT;
+	private long GLOBAL_TIMEOUT;
 	private Calendar initialTime = null;
 
 	public TimeOutUtils() throws InternalErrorException {
@@ -28,10 +28,14 @@ public class TimeOutUtils {
 	
 	public void checkTimeOut() throws InternalErrorException {
 		if (timedOut())
-			throw new InternalErrorException(String.format(Messages.getString(MESSAGE_RAISETIMEOUT), GLOBAL_TIMEOUT));
+			generateException();
 	}
 
-	private int getGlobalTimeOut() throws InternalErrorException {
+	public static void generateException() throws InternalErrorException {
+		throw new InternalErrorException(String.format(Messages.getString(MESSAGE_RAISETIMEOUT), getGlobalTimeOut()));
+	}
+
+	public static long getGlobalTimeOut() throws InternalErrorException {
 		try {
 			return Integer.parseInt(ConfigurationCache.getMasterProperty(PROPERTY_TIMEOUT));
 		} catch (Exception e) {

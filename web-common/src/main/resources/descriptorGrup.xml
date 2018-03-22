@@ -5,7 +5,7 @@
 	<datanode name="grups">
 
 		<finder name="grup" type="grup">
-			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByJsonQuery" if = "${query != null}">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByJsonQueryAsync" if = "${query != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"

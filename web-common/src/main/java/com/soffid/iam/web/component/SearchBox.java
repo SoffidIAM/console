@@ -20,10 +20,12 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.web.SearchAttributeDefinition;
@@ -53,6 +55,9 @@ public class SearchBox extends HtmlBasedComponent {
 	boolean auto=false;
 	private String lastQuery = "";
 	private boolean initialized = false;
+	private Timer timer;
+	private Image progressImage;
+	private DataModelCollection modelCollection;
 	
 	public String getJsonObject() {
 		return jsonObject;
@@ -119,12 +124,19 @@ public class SearchBox extends HtmlBasedComponent {
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)
 			{
+				modelCollection = (DataModelCollection) v;
 				try {
-					((DataModelCollection) v).refresh();
+					modelCollection.refresh();
 				} catch (Exception e) {
 					throw new UiException(e);
 				}
-				showForm(((DataModelCollection) v).getSize() == 1);
+				showForm(modelCollection.getSize() == 1);
+				if (modelCollection.isInProgress())
+				{
+					timer.setDelay(300);
+					timer.start();
+					progressImage.setVisible(true);
+				}
 					
 			}
 			binder.setDataPath(null);
@@ -219,6 +231,30 @@ public class SearchBox extends HtmlBasedComponent {
 	private void initialize() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
 		
 		getChildren().clear();
+		
+		progressImage = new Image("~./img/soffid-progress.gif");
+		progressImage.setVisible(false);
+		progressImage.setSclass("progress");
+		progressImage.setParent(this);
+		timer = new Timer();
+		timer.setParent(this);
+		timer.setDelay(300);
+		timer.setRepeats(true);
+		timer.setRunning(false);
+		timer.addEventListener("onTimer", new SerializableEventListener() {
+			@Override
+			public void onEvent(Event event) throws Exception {
+				boolean end = !modelCollection.isInProgress();
+				timer.setDelay(1000);
+				modelCollection.updateProgressStatus();
+				if (end)
+				{
+					timer.stop();
+					progressImage.setVisible(false);
+				}
+			}
+		});
+
 		
 		if (jsonObject != null && dictionary == null)
 			dictionary = SearchDictionaryBuilder.build(jsonObject);

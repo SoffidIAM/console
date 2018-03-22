@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.System;
@@ -14,11 +16,13 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserEntityDao;
 import com.soffid.iam.service.AccountService;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
 public class AccountDiffReport {
+	org.apache.commons.logging.Log log =  LogFactory.getLog(getClass());
 	UserEntityDao userEntityDao;
 	AccountEntityDao accountEntityDao;
 	AccountService accountService;
@@ -90,6 +94,7 @@ public class AccountDiffReport {
 	public void disableAccount(UserEntity u, AccountEntity account) throws InternalErrorException, AccountAlreadyExistsException {
 		if (apply)
 		{
+			log.info("Disabling account "+account.getName());
 			Account acc = accountService.findAccountById(account.getId());
 			acc.setStatus(AccountStatus.DISABLED);
 			accountService.updateAccount(acc);
@@ -106,13 +111,16 @@ public class AccountDiffReport {
 	public void createAccount(UserEntity u, String accountName) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
 		if (apply)
 		{
+			log.info("Creating account "+accountName);
 			Account acc = accountService.findAccount(accountName, system.getName());
-			if (acc == null)
+			if (acc == null || acc.getType().equals(AccountType.IGNORED))
 			{
 				User user = userEntityDao.toUser(u);
 				accountService.createAccount(user, system, accountName);
 			}
-			else
+			else if (acc.getType().equals(AccountType.USER) && 
+					acc.getOwnerUsers().size() == 1 &&
+					acc.getOwnerUsers().iterator().next().getId().equals(u.getId()))
 			{
 				acc.setStatus(AccountStatus.ACTIVE);
 				accountService.updateAccount(acc);

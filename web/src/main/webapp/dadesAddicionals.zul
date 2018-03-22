@@ -76,6 +76,8 @@
 		    	objectAttributeWindow.getFellow ("visibility1").setVisible(display);
 		    	objectAttributeWindow.getFellow ("visibility2").setVisible(display);
 		    	objectAttributeWindow.getFellow ("visibility3").setVisible(display);
+		    	objectAttributeWindow.getFellow ("visibility4").setVisible(true);
+		    	objectAttributeWindow.getFellow ("visibility5").setVisible(true);
 		    }
 		    
 			void displayValues ()
@@ -146,6 +148,26 @@
 				);
 			}
 
+			void tryToRemoveObject(Component c)
+			{
+				es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(c);
+				String attName = XPathUtils.getValue(bindCtx, "@name");
+				String message = String.format(org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.zul.RemoveAtt"),
+						new Object[]{attName});
+				Missatgebox.confirmaOK_CANCEL(message,
+					new org.zkoss.zk.ui.event.EventListener()	
+					{
+						public void onEvent(Event evt)
+						{
+							if ("onOK".equals(evt.getName()))
+							{
+								XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.getXPath());
+								model.commit();
+							}
+						}
+					}
+				);
+			}
 			]]>
 	</zscript>
 
@@ -153,7 +175,6 @@
 		<toolbar>
 			<insertbutton acces="${canCreateMetadata}" listbox="/objectList/listbox"
 				onClick='Events.postEvent("onSelect", listbox, null)' />
-			<deletebutton acces="${canDeleteMetadata}" listbox="/objectList/listbox" />
 			<commitbutton datamodel="/model" />
 			<undobutton datamodel="/model" listbox="/objectList/listbox" />
 		</toolbar>
@@ -169,6 +190,7 @@
 					sort="auto" width="20%" />
 				<listheader label="${c:l('com.soffid.iam.api.CustomObjectType.builtin')}"
 					sort="auto" width="60%" />
+				<listheader label="" width="32px" />
 			</listhead>
 			<listfoot>
 				<listfooter span="3">
@@ -182,6 +204,7 @@
 					<checkbox disabled="true" bind="@builtin">
 					</checkbox>
 				</listcell>
+				<listcell value=" "><imageclic src="~./img/list-remove.gif" onClick='tryToRemoveObject(event.target)'/></listcell>
 			</dataitem>
 		</listbox>
 	</window>
@@ -212,7 +235,7 @@
 					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" />
 					<listheader label="${c:l('dadesAddicionals.zul.Label')}" sort="auto" />
 					<listheader label="${c:l('dadesAddicionals.zul.Type')}" sort="auto" />
-					<listheader label="" width="2em" />
+					<listheader label="" width="32px" />
 				</listhead>
 				<dataitem bind=".">
 					<listcell bind="@ordre" />
@@ -230,13 +253,13 @@
 	</window>
 
 	<window id="objectAttributeWindow" sclass="hidden"  onOK="closeAttribute()" onCancel="closeAttribute()" width="95%">
-		<form dataPath="/objectTypeWindow/listbox:/" id="form">
+		<form dataPath="/objectTypeWindow/listbox:/" id="form" width="100%">
 			<div style="margin: 2em">
 			</div>
 
 			<grid width="100%" sclass="noBorderGrid">
 				<columns>
-					<column width="15%"/>
+					<column width="15%" valign="top"/>
 					<column width="85%" />
 				</columns>
 				<rows>
@@ -337,6 +360,7 @@
 							<label value="*" />
 						</div>
 					</row>
+					
 					<row id="visibility2">
 						<input_etiqueta
 							value="${c:l('dadesAddicionals.zul.OperatorVisibility')} :" />
@@ -364,6 +388,52 @@
 							<label value="*" />
 						</div>
 					</row>
+					<row id="visibility4">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.VisibilityExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@visibilityExpression" rows="4"/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    com.soffid.iam.api.CustomObjectType type = XPathUtils.getValue( objectTypeWindow.getFellow("form"), ".").getInstance();
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(type)
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+						</div>
+					</row>
+					<row id="visibility5">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.ValidExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;value: ${c:l('dadesAddicionals.zul.var4')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@validationExpression" rows="4"/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars()
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+							<input_etiqueta value="${c:l('rules.availableVariables') }"/>
+						</div>
+					</row>
 				</rows>
 			</grid>
 			<div align="left">
@@ -371,4 +441,5 @@
 			</div>
 		</form>
 	</window>
+ 	<include src="finestres/editor.zul"/>
  </zk>

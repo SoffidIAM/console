@@ -13,6 +13,7 @@
  */
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -28,6 +29,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
+import org.json.JSONException;
+
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupRoles;
 import com.soffid.iam.api.GroupUser;
@@ -50,9 +54,12 @@ import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -199,21 +206,35 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	protected void handleDelete(Group grup) throws Exception {
-		// Aquesta operació no ha d'estar permitida
-		/*if (esAdministradorUsuaris()) {
-			GrupEntity grupEntity = getGrupEntityDao().findByCodi(
-					grup.getCodi());
-			if (grupEntity == null) {
-				throw new SeyconException("Grup amb codi '" + grup.getCodi()
-						+ "' no trobat.");
-			}
-			getGrupEntityDao().remove(grupEntity);
-		} else {
-			throw new SeyconException(
-					"No té permisos per eliminar el grup amb codi '"
-							+ grup.getCodi() + "'.");
-		}*/
-		throw new SeyconException(Messages.getString("GroupServiceImpl.5")); //$NON-NLS-1$
+		GroupEntity grupEntity = getGroupEntityDao().findByName(grup.getName());
+		if (grupEntity == null) {
+			throw new SeyconException("Group not found: " + grup.getName());
+		}
+		if (grupEntity.getParent() == null)
+		{
+			throw new SeyconException("Cannot remove root (world) group");
+		}
+
+		for (UserEntity u: grupEntity.getPrimaryGroupUsers())
+		{
+			u.setPrimaryGroup(grupEntity.getParent());
+			getUserEntityDao().update(u);
+		}
+			
+		for (RoleAccountEntity ra: grupEntity.getHoldedRoleAssignments())
+		{
+			ra.setHolderGroup(grupEntity.getParent());
+			getRoleAccountEntityDao().update(ra);
+		}
+
+		for (GroupEntity ch: grupEntity.getChildren())
+		{
+			ch.setParent(grupEntity.getParent());
+			getGroupEntityDao().update(ch);
+		}
+		getGroupEntityDao().remove(grupEntity);
+		
+		
 	}
 
 	protected Collection<Group> handleFindGroupsByFilter(String codi, String pare, String unitatOfimatica, String descripcio, String tipus, String obsolet) throws Exception {
@@ -694,10 +715,35 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		return result;
 	}
-
+	
 	@Override
-	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
+	protected AsyncList<Group> handleFindGroupByTextAsync(final String text) throws Exception {
+		final AsyncList<Group> result = new AsyncList<Group>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (GroupEntity e : getGroupEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								Group v = getGroupEntityDao().toGroup(e);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_GROUP_QUERY, v)) {
+									result.add(v);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+	}
 
+
+
+	protected void findByJsonQuery ( AsyncList<Group> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
+	{
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value");
 
@@ -720,10 +766,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		// Execute HQL and generate result
-		LinkedList<Group> result = new LinkedList<Group>();
-		TimeOutUtils tou = new TimeOutUtils();
 		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray)) {
-			tou.checkTimeOut();
+			if (result.isCancelled())
+				return;
 			Group g = getGroupEntityDao().toGroup(ge);
 			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, ge)) {
@@ -731,11 +776,34 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				}
 			}
 		}
-		return result;
+	}
+	@Override
+	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
+		AsyncList<Group> result = new AsyncList<Group>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		return result.get();
 	}
 
 	@Override
 	protected Collection<String> handleFindGroupNames() throws Exception {
 		return getGroupEntityDao().findGroupNames();
+	}
+
+	@Override
+	protected AsyncList<Group> handleFindGroupByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<Group> result = new AsyncList<Group>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
 	}
 }

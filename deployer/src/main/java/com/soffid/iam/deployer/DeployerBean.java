@@ -28,8 +28,6 @@ import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -680,6 +678,7 @@ public class DeployerBean implements DeployerService {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
 			public Void run() {
 				try {
+					log.info("Redeploying SOFFID CONSOLE");
 					pauseConnector();
 					Thread.sleep(2000);
 					undeploy();
@@ -820,8 +819,8 @@ public class DeployerBean implements DeployerService {
 				long last = calculateLastModified();
 		
 				if (last > lastModified) {
-					redeploy();
 					lastModified = last;
+					redeploy();
 				}
 			}
 		} catch (Exception e) {

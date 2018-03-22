@@ -56,7 +56,7 @@
 										com.soffid.iam.web.component.Identity.Type.ROLE
 								}
 							);
-					p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.addGroup"));
+					p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("accounts.addIdentity"));
 					p.setVariable("invoker", btnGrantUser);
 					Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
 

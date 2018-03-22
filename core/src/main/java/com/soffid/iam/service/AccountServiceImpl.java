@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,12 +19,14 @@ import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
+import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
@@ -67,9 +70,12 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import bsh.EvalError;
 import es.caib.bpm.vo.PredefinedProcessType;
@@ -1837,7 +1843,32 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	@Override
 	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws InternalErrorException, Exception {
-
+		AsyncList<Account> result = new AsyncList<Account>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		return result.get();
+	}
+	
+	@Override
+	protected AsyncList<Account> handleFindAccountByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<Account> result = new AsyncList<Account>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+	
+	protected void findByJsonQuery ( AsyncList<Account> result, String query) 
+			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
+	{
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
 
@@ -1855,11 +1886,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		Collection<Account> result = new LinkedList<Account>();
-		TimeOutUtils tou = new TimeOutUtils();
 		for (AccountEntity ue : getAccountEntityDao().query(hql.toString(),
 				paramArray)) {
-			tou.checkTimeOut();
+			if (result.isCancelled())
+				return;
 			Account u = getAccountEntityDao().toAccount(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
@@ -1868,7 +1898,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				}
 			}
 		}
-		return result;
 	}
 
 	@Override
@@ -1885,6 +1914,30 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return result;
 	}
 
+	@Override
+	protected AsyncList<Account> handleFindAccountByTextAsync(final String text) throws Exception {
+		final AsyncList<Account> result = new AsyncList<Account>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						try {
+							for (AccountEntity e : getAccountEntityDao().findByText(text)) {
+								if (result.isCancelled())
+									return;
+								Account v = getAccountEntityDao().toAccount(e);
+								if (getAuthorizationService().hasPermission(
+										Security.AUTO_ACCOUNT_QUERY, v)) {
+									result.add(v);
+								}
+							}
+						} catch (InternalErrorException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}, result);
+		return result;
+	}
+	
 	@Override
 	protected String handlePredictAccountName(Long userId, String dispatcher, Long domainId) throws Exception {
 		UserDomainEntity du = getUserDomainEntityDao().load(domainId);

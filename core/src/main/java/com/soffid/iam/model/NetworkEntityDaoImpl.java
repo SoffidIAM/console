@@ -30,6 +30,9 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,6 +46,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @see es.caib.seycon.ng.model.XarxaEntity
@@ -118,29 +124,6 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
 
     public void toXarxaCustom(com.soffid.iam.model.NetworkEntity sourceEntity, com.soffid.iam.api.Network targetVO) {
         targetVO.setLanAccess(new Boolean(sourceEntity.getNormalized().compareTo("S") == 0)); //$NON-NLS-1$
-        String adrecaXarxa = targetVO.getIp();
-        StringTokenizer tokenizer = new StringTokenizer(adrecaXarxa, ".", false); //$NON-NLS-1$
-        List partsAdrecaXarxaList = new LinkedList();
-        while (tokenizer.hasMoreTokens()) {
-            partsAdrecaXarxaList.add((String) tokenizer.nextToken());
-        }
-        String partsAdrecaXarxa[] = (String[]) partsAdrecaXarxaList.toArray(new String[0]);
-
-        String adrecaBenFormada = ""; //$NON-NLS-1$
-        for (int i = 0; i < partsAdrecaXarxa.length; i++) {
-            adrecaBenFormada = adrecaBenFormada + partsAdrecaXarxa[i];
-            if (i < 3) {
-                adrecaBenFormada = adrecaBenFormada + "."; //$NON-NLS-1$
-            }
-        }
-        // posar zeros
-        for (int i = partsAdrecaXarxa.length; i < 4; i++) {
-            adrecaBenFormada = adrecaBenFormada + "0"; //$NON-NLS-1$
-            if (i < 3) {
-                adrecaBenFormada = adrecaBenFormada + "."; //$NON-NLS-1$
-            }
-        }
-        targetVO.setIp(adrecaBenFormada);
         targetVO.setDhcpSupport(sourceEntity.isDchpSupport());
     }
 
@@ -178,35 +161,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         return entity;
     }
 
-    private boolean maquinaCompatibleAmbXarxa(String adrecaMaquina, String adrecaXarxa,
-            String mascaraXarxa) {
-        if (adrecaXarxa.compareTo("0.0.0.0") == 0 && mascaraXarxa.compareTo("0.0.0.0") == 0) { //$NON-NLS-1$ //$NON-NLS-2$
-            return true;
-        }
-
-        if (!adrecaCorrecta(mascaraXarxa)) {
-            return false;
-        }
-        String[] mascaresXarxa = mascaraXarxa.split("\\."); //$NON-NLS-1$
-        if (!adrecaCorrecta(adrecaXarxa)) {
-            return false;
-        }
-        String[] adrecaXarxes = adrecaXarxa.split("\\."); //$NON-NLS-1$
-        if (!adrecaCorrecta(adrecaMaquina)) {
-            return false;
-        }
-        String[] adrecaMaquines = adrecaMaquina.split("\\."); //$NON-NLS-1$
-        boolean compatible = true;
-        for (int i = 0; i < 4 && compatible; i++) {
-            int currentMascaraXarxa = Integer.parseInt(mascaresXarxa[i]);
-            int currentAdrecaMaquina = Integer.parseInt(adrecaMaquines[i]);
-            int currentAdrecaXarxa = Integer.parseInt(adrecaXarxes[i]);
-            compatible = (currentMascaraXarxa & currentAdrecaXarxa) == (currentMascaraXarxa & currentAdrecaMaquina);
-        }
-        return compatible;
-    }
-
-    private void xarxaToEntityCustom(com.soffid.iam.api.Network sourceVO, com.soffid.iam.model.NetworkEntity targetEntity) {
+    private void xarxaToEntityCustom(com.soffid.iam.api.Network sourceVO, com.soffid.iam.model.NetworkEntity targetEntity) throws InvalidIPException {
 
         if (sourceVO.getLanAccess() != null) {
             targetEntity.setNormalized(sourceVO.getLanAccess().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -233,19 +188,13 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
     }
 
     private boolean adrecaCorrecta(String adreca) {
-        String[] adreces = adreca.split("\\."); //$NON-NLS-1$
-        if (adreces.length == 4) {
-            boolean correcte = true;
-            for (int i = 0; adreces.length < 4 && correcte; i++) {
-                try {
-                    correcte = Integer.parseInt(adreces[i]) <= 255;
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-            return correcte;
-        }
-        return false;
+    	try {
+			InetAddress a = InetAddress.getByName(adreca);
+			InetAddress a2 = InetAddress.getByAddress(null, a.getAddress());
+			return true;
+		} catch (UnknownHostException e) {
+			return false;
+		}
     }
 
     private String toBinaryAddress(String[] adreca) {
@@ -264,29 +213,57 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         return adrecaBinari;
     }
 
-    private boolean adrecaCompatibleAmbXarxa(String adrecaXarxa, String mascaraXarxa) {
-        if (!adrecaCorrecta(mascaraXarxa)) {
-            return false;
-        }
-        String[] mascaresXarxa = mascaraXarxa.split("\\."); //$NON-NLS-1$
-        if (!adrecaCorrecta(adrecaXarxa)) {
-            return false;
-        }
-        String[] adrecaXarxes = adrecaXarxa.split("\\."); //$NON-NLS-1$
-        try {
-            String mascaraBinari = toBinaryAddress(mascaresXarxa);
-            String adrecaBinari = toBinaryAddress(adrecaXarxes);
-            boolean compatible = true;
-            for (int i = 0; i < mascaraBinari.length() && compatible; i++) {
-                if (mascaraBinari.charAt(i) == '0') {
-                    compatible = adrecaBinari.charAt(i) == '0';
-                }
-            }
-            return compatible;
-        } catch (Exception e) {
-            return false;
-        }
+    Log log = LogFactory.getLog(getClass());
+    
+    private boolean adrecaCompatibleAmbXarxa(String adrecaXarxa, String mascaraXarxa) throws InvalidIPException {
+		try {
+			IPAddress ip = new IPAddress(adrecaXarxa, mascaraXarxa);
+			byte [] adrNet = ip.ip;
+			byte [] mask = ip.mask;
+
+			if (mask.length != adrNet.length)
+				return false;
+			
+			for ( int i = 0; i < adrNet.length; i++)
+			{
+				if ( ( ( ~ mask[i] ) &  adrNet[i]) != 0)
+				{
+					log.info("Error in byte "+i+" Value = "+adrNet[i]+" Mask = "+mask[i]);
+					return false;
+				}
+			}
+			return true;
+		} catch (NumberFormatException e) {
+			log.info ("Error parsing "+adrecaXarxa+"/"+mascaraXarxa, e);
+			return false;
+		} catch (UnknownHostException e) {
+			log.info ("Error parsing "+adrecaXarxa+"/"+mascaraXarxa, e);
+			return false;
+		}
     }
+
+	private byte[] getMaskBytes(String mascaraXarxa, byte[] adrNet) throws UnknownHostException {
+		byte[] mask;
+		if ( ! mascaraXarxa.contains("."))
+		{
+			int bits = Integer.parseInt(mascaraXarxa);
+			mask = new byte [adrNet.length];
+			for (int i = 0; i < mask.length; i++)
+			{
+				mask[i] = 0;
+				for (byte j = (byte) 128; j >=  1; j = (byte) (j / 2) )
+				{
+					if (bits > 0) {
+						mask [i] = (byte) ( mask [i] | j );
+						bits --;
+					}
+				}
+			}
+		}
+		else
+			mask = InetAddress.getByName(mascaraXarxa).getAddress();
+		return mask;
+	}
 
     /**
      * @see es.caib.seycon.ng.model.XarxaEntityDao#xarxaToEntity(es.caib.seycon.ng.comu.Xarxa,
@@ -294,13 +271,17 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      */
     public void networkToEntity(com.soffid.iam.api.Network sourceVO, com.soffid.iam.model.NetworkEntity targetEntity, boolean copyIfNull) {
         super.networkToEntity(sourceVO, targetEntity, copyIfNull);
-        xarxaToEntityCustom(sourceVO, targetEntity);
+        try {
+			xarxaToEntityCustom(sourceVO, targetEntity);
+		} catch (InvalidIPException e) {
+			throw new RuntimeException(e);
+		}
     }
 
     public String getFirstFreeIP(String ipXarxa, String mascara) {
         try {
             // Prepara el cursor
-            IPAddress ip = new IPAddress(ipXarxa, mascara);
+        	IPAddress ip = new IPAddress(ipXarxa, mascara);
             IPAddress ip2 = new IPAddress(ipXarxa);
             ip2.incrementa();
             // Prueba cada una de las redes
@@ -326,13 +307,14 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      *            true si debe calcular las IPs libres, false si debe calcular
      *            las ocupadas
      * @return n�mero de IPs libres u ocupades
+     * @throws UnknownHostException 
      * @throws InternalErrorException
      *             error de configuraci�n del servidor o en los datos de la
      *             subred.
      * @throws UnknownNetworkException
      *             subred desconocida
      */
-    private Long getIPsBuidesOcupades(String ipXarxa, String netmask, boolean buides) {
+    private Long getIPsBuidesOcupades(String ipXarxa, String netmask, boolean buides) throws UnknownHostException {
         PreparedStatement stmt = null;
         ResultSet rset = null;
         Connection conn = null;
@@ -341,8 +323,10 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         // Prepara las IPs de la red y del host
         try 
         {
-	        IPAddress ip = new IPAddress(ipXarxa, netmask);
 	        IPAddress ip2 = new IPAddress(ipXarxa);
+	        IPAddress ip = new IPAddress(ipXarxa, netmask);
+	        if (ip.networkSize() > 4096)
+	        	return 0L;
 	        ip2.incrementa();
 	        // Prueba cada una de las redes
 	        while (ip.esHostValid(ip2)) {
@@ -377,7 +361,11 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      *             subred desconocida
      */
     public Long getVoidIPs(String ipXarxa, String netmask) {
-        return getIPsBuidesOcupades(ipXarxa, netmask, true);
+        try {
+			return getIPsBuidesOcupades(ipXarxa, netmask, true);
+		} catch (UnknownHostException e) {
+			return 0L;
+		}
     }
 
     /**
@@ -394,7 +382,11 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
      */
     public Long getUsedIPs(String ipXarxa, String netmask) {
 
-        return getIPsBuidesOcupades(ipXarxa, netmask, false);
+        try {
+			return getIPsBuidesOcupades(ipXarxa, netmask, false);
+		} catch (UnknownHostException e) {
+			return 0L;
+		}
     }
 
     public void create(Collection entities) {

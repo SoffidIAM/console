@@ -114,8 +114,6 @@ public class GroupEntityDaoImpl extends
 	public void remove(com.soffid.iam.model.GroupEntity grup) throws RuntimeException { //En principi NO ES FA MAI
 		try {
 			String codiGrup = grup.getName();
-			super.remove(grup);
-			getSession(false).flush();
 			
 			// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus padres)
 			HashSet rolsAPropagar =new HashSet();
@@ -124,22 +122,35 @@ public class GroupEntityDaoImpl extends
 			// Propagamos los roles: (creamos las tareas)
 			propagarRolsAtorgatsGrups(rolsAPropagar);						
 
-                        TaskEntity tasque;
-                        tasque = getTaskEntityDao().newTaskEntity();
-                        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getName());
-                        getTaskEntityDao().create(tasque);
-                        if (grup.getHomeServer() != null) {
-                            tasque = getTaskEntityDao().newTaskEntity();
-                            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                            tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getName());
-                            tasque.setFolderType("G"); //$NON-NLS-1$
-                            getTaskEntityDao().create(tasque);
-                        }
+            TaskEntity tasque;
+            tasque = getTaskEntityDao().newTaskEntity();
+            tasque.setDate(new Timestamp(System.currentTimeMillis()));
+            tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+            tasque.setGroup(grup.getName());
+            getTaskEntityDao().create(tasque);
+            if (grup.getHomeServer() != null) {
+                tasque = getTaskEntityDao().newTaskEntity();
+                tasque.setDate(new Timestamp(System.currentTimeMillis()));
+                tasque.setTransaction(TaskHandler.CREATE_FOLDER);
+                tasque.setFolder(grup.getName());
+                tasque.setFolderType("G"); //$NON-NLS-1$
+                getTaskEntityDao().create(tasque);
+            }
 			auditarGrup("D", codiGrup); //$NON-NLS-1$
-			getSession().flush();
+
+			getUserGroupEntityDao().remove( grup.getSecondaryGroupUsers());
+			getRoleGroupEntityDao().remove(grup.getGrantedRoles());
+			getGroupAttributeEntityDao().remove(grup.getAttributes());
+			getMailListGroupMemberEntityDao().remove(grup.getMailLists());
+			getMailListRoleMemberEntityDao().remove(grup.getRoleScopeMailLists());
+			getRoleAccountEntityDao().remove(grup.getUsersRoles());
+			for (AuditEntity aud: grup.getAudit())
+			{
+				aud.setGroup(null);
+			}
+			super.remove(grup);
+			getSession(false).flush();
+			
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 

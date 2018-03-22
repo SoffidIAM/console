@@ -469,6 +469,7 @@
 							</grid>
 							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 								dataPath="attributes" scope="group"
+								ownerBind="./"
 								sclass="groupatt"/>
 							<separator spacing="10px"/>
 							<vbox width="99%">

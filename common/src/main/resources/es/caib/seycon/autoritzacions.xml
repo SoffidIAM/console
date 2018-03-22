@@ -129,7 +129,7 @@
 
 	<autoritzacio>
 		<codi>user:refresh</codi>
-		<descripcio>Propagate users and see users tasks</descripcio>
+		<descripcio>Propagate users and view users tasks</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
 		<ambit>Users</ambit>
@@ -140,7 +140,7 @@
 
 	<autoritzacio>
 		<codi>user:role:query</codi>
-		<descripcio>See the users roles</descripcio>
+		<descripcio>Query the users roles</descripcio>
 		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>
 		<scope>children</scope>
 		<ambit>Users</ambit>
@@ -148,7 +148,7 @@
 
 	<autoritzacio>
 		<codi>user:session:query</codi>
-		<descripcio>See the users opened sessions</descripcio>
+		<descripcio>Query the users opened sessions</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
 		<ambit>Users</ambit>
@@ -260,7 +260,7 @@
 
 	<autoritzacio>
 		<codi>user:accessRegister:query</codi>
-		<descripcio>See users access logs (User management window)
+		<descripcio>Query users access logs (User management window)
 		</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
@@ -269,7 +269,7 @@
 
 	<autoritzacio>
 		<codi>user:mazinger:query</codi>
-		<descripcio>See Mazinger applications</descripcio>
+		<descripcio>View ESSO applications</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
 		<ambit>Users</ambit>
@@ -292,6 +292,14 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>group:delete</codi>
+		<descripcio>Remove groups</descripcio>
+		<ambit>Groups</ambit>
+		<hereta/>
+	</autoritzacio>
+
+
+	<autoritzacio>
 		<codi>group:update</codi>
 		<descripcio>Update groups</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
@@ -310,7 +318,7 @@
 
 	<autoritzacio>
 		<codi>group:query</codi>
-		<descripcio>See groups (Group management window)</descripcio>
+		<descripcio>Query groups (Group management window)</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>both</scope>
 		<ambit>Groups</ambit>
@@ -323,7 +331,7 @@
 
 	<autoritzacio>
 		<codi>group:role:query</codi>
-		<descripcio>See assigned roles to groups</descripcio>
+		<descripcio>Query assigned roles to groups</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>both</scope>
 		<ambit>Groups</ambit>
@@ -334,7 +342,7 @@
 
 	<autoritzacio>
 		<codi>group:user:query</codi>
-		<descripcio>See in the group management window the groups to which
+		<descripcio>View in the group management window the groups to which
 			users belong</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
@@ -397,7 +405,7 @@
 
 	<autoritzacio>
 		<codi>organizationalUnit:query</codi>
-		<descripcio>See the organizational unit types</descripcio>
+		<descripcio>Query the organizational unit types</descripcio>
 		<ambit>Organizational unit</ambit>
 	</autoritzacio>
 
@@ -435,7 +443,7 @@
 
 	<autoritzacio>
 		<codi>host:all:query</codi>
-		<descripcio>See all hosts</descripcio>
+		<descripcio>Query all hosts</descripcio>
 		<ambit>Hosts</ambit>
 		<hereta>
 			network:all:query
@@ -451,8 +459,8 @@
 
 	<autoritzacio>
 		<codi>host:admin:query</codi>
-		<descripcio>See and revoke authorizations access to authorized
-			machines as local administrator. To see the machine administrator.
+		<descripcio>View and revoke authorizations access to authorized
+			machines as local administrator. To view the machine administrator.
 		</descripcio>
 		<ambit>Hosts</ambit>
 		<hereta>
@@ -542,7 +550,7 @@
 
 	<autoritzacio>
 		<codi>network:all:query</codi>
-		<descripcio>See all networks</descripcio>
+		<descripcio>Query all networks</descripcio>
 		<ambit>Networks</ambit>
 	</autoritzacio>
 
@@ -579,13 +587,13 @@
 
 	<autoritzacio>
 		<codi>printer:query</codi>
-		<descripcio>See all printers</descripcio>
+		<descripcio>Query all printers</descripcio>
 		<ambit>Printers</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>printer:acl:query</codi>
-		<descripcio>See all printers (with ACL server >= query)</descripcio>
+		<descripcio>Query all printers (with ACL server >= query)</descripcio>
 		<ambit>Printers</ambit>
 	</autoritzacio>
 
@@ -669,7 +677,7 @@
 
 	<autoritzacio>
 		<codi>application:query</codi>
-		<descripcio>See applications and their roles</descripcio>
+		<descripcio>Query applications and their roles</descripcio>
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Applications</ambit>
 		<hereta>
@@ -680,7 +688,7 @@
 
 	<autoritzacio>
 		<codi>accessRegister:query</codi>
-		<descripcio>See all access logs</descripcio>
+		<descripcio>Query all access logs</descripcio>
 		<ambit>Access logs</ambit>
 	</autoritzacio>
 
@@ -714,7 +722,7 @@
 
 	<autoritzacio>
 		<codi>metadata:query</codi>
-		<descripcio>See the additional data types</descripcio>
+		<descripcio>Query the additional data types</descripcio>
 		<ambit>Additional data</ambit>
 	</autoritzacio>
 
@@ -748,7 +756,7 @@
 
 	<autoritzacio>
 		<codi>service:query</codi>
-		<descripcio>See services</descripcio>
+		<descripcio>Query services</descripcio>
 		<ambit>Services</ambit>
 	</autoritzacio>
 
@@ -782,7 +790,7 @@
 
 	<autoritzacio>
 		<codi>mail:query</codi>
-		<descripcio>See domains and e-mail lists</descripcio>
+		<descripcio>Query domains and e-mail lists</descripcio>
 		<ambit>E-mail</ambit>
 	</autoritzacio>
 
@@ -815,7 +823,7 @@
 
 	<autoritzacio>
 		<codi>parameter:query</codi>
-		<descripcio>See configuration parameters</descripcio>
+		<descripcio>Query configuration parameters</descripcio>
 		<ambit>Parameters</ambit>
 	</autoritzacio>
 
@@ -861,7 +869,7 @@
 
 	<autoritzacio>
 		<codi>agent:query</codi>
-		<descripcio>See the agents configuration</descripcio>
+		<descripcio>Query the agents configuration</descripcio>
 		<ambit>Agents</ambit>
 		<hereta>
 			agent:query
@@ -929,7 +937,7 @@
 
 	<autoritzacio>
 		<codi>agent:accessControl:query</codi>
-		<descripcio>See agents access control rules</descripcio>
+		<descripcio>Query agents access control rules</descripcio>
 		<ambit>Agents</ambit>
 		<hereta>
 			agent:query
@@ -978,19 +986,19 @@
 
 	<autoritzacio>
 		<codi>audit:query</codi>
-		<descripcio>See audit logs</descripcio>
+		<descripcio>Query audit logs</descripcio>
 		<ambit>Audit</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>audit:custom:query</codi>
-		<descripcio>See the audit logs in users management window</descripcio>
+		<descripcio>Query the audit logs in users management window</descripcio>
 		<ambit>Audit</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>intranetMenus:admin</codi>
-		<descripcio>See and manage all intranet menus</descripcio>
+		<descripcio>Query and manage all intranet menus</descripcio>
 		<ambit>Intranet menus</ambit>
 		<hereta>
 			intranetMenus:all:query,
@@ -1002,19 +1010,19 @@
 
 	<autoritzacio>
 		<codi>intranetMenus:all:query</codi>
-		<descripcio>See all intranet access menus</descripcio>
+		<descripcio>Query all intranet access menus</descripcio>
 		<ambit>Intranet menus</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>monitor:server:list</codi>
-		<descripcio>See the seycon servers status</descripcio>
+		<descripcio>Query the seycon servers status</descripcio>
 		<ambit>Monitoring</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>monitor:agent:list</codi>
-		<descripcio>See the seycon server agents status</descripcio>
+		<descripcio>Query the seycon server agents status</descripcio>
 		<ambit>Monitoring</ambit>
 	</autoritzacio>
 
@@ -1026,7 +1034,7 @@
 
 	<autoritzacio>
 		<codi>base:log:query</codi>
-		<descripcio>See the seycon servers logs</descripcio>
+		<descripcio>Query the seycon servers logs</descripcio>
 		<ambit>Monitoring</ambit>
 	</autoritzacio>
 
@@ -1114,7 +1122,7 @@
 
 	<autoritzacio>
 		<codi>usersDomain:query</codi>
-		<descripcio>See user domains</descripcio>
+		<descripcio>Query user domains</descripcio>
 		<ambit>User domains</ambit>
 	</autoritzacio>
 

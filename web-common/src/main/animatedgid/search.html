@@ -1,0 +1,80 @@
+<html>
+	<header>
+		<script type="text/javascript" src="LZWEncoder.js"></script>
+		<script type="text/javascript" src="NeuQuant.js"></script>
+		<script type="text/javascript" src="GIFEncoder.js"></script>
+		<script type="text/javascript" src="w3color.js"></script>
+	</header>
+<body>
+<canvas width="230px" height="230px" id="mycanvas">
+</canvas>
+<script>
+	var c=document.getElementById("mycanvas");
+	var ctx=c.getContext("2d");
+	var steps = 36;
+	var encoding = false;
+	var encoder = new GIFEncoder();
+	encoder.setRepeat(0);
+	encoder.setDelay(25); 
+	var color = {
+//		0: "#a6ff00",
+		0: "#9ec73c",
+		1: "#22B9D8",
+//		1: "#4dffe6",
+//		2: "#cfcfcf"};
+		2: "#628fb3"};
+	function image (pos, color)
+	{
+		if (pos  > steps - 2)
+			return;
+		ctx.beginPath();
+		ctx.fillStyle = color;
+		ctx.strokeStyle = color;
+		ctx.arc(115+ 1.5 * (pos ** 1.2) * Math.sin(pos/8*Math.PI),
+				100+ 1.5 * (pos ** 1.2) * Math.cos(pos/8*Math.PI), 
+				pos,0,2*Math.PI);
+		if (pos  > steps - 5)
+		{
+			c = new w3color (color);
+			c.lighter((5-steps+pos) * 10);
+			ctx.fillStyle = c.toHexString();
+			ctx.strokeStyle = c.toHexString();
+		}
+		ctx.stroke();
+	
+		ctx.fill();
+	}
+	function draw() {
+		ctx.fillStyle="#ffffff";
+		ctx.fillRect(0,0,400,400);file:///tmp/x.html
+		var c=0;
+		for (var j = 0; j < steps; j+=2)
+			image ((i/10+j) % steps, color[(c++)%3]);
+		if (encoding)
+		{
+			encoder.setTransparent ( 0xffffff );
+			encoder.addFrame(ctx);
+		}
+			
+		i++;
+		document.getElementById("t").value = i;
+	}
+	i = 0;
+	function startEncoding() {
+		encoder.start();
+		encoder.setSize (230, 230);
+		encoding = true;
+	}
+	function endEncoding() {
+		encoder.finish();
+		encoder.download("download.gif");	
+	}
+</script>
+<input type="button" id="n" onClick="timer = setInterval ( draw, 25);" value="start"/>
+<input type="button" id="n" onClick="clearInterval(timer);" value="stop"/>
+<input type="button" id="n" onClick="startEncoding()" value="Start encoding"/>
+<input type="button" id="n" onClick="draw()" value="next"/>
+<input type="button" id="n" onClick="endEncoding()" value="End encoding"/>
+<input id="t"/>
+</body>
+</html>

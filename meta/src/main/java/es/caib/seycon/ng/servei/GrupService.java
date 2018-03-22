@@ -5,7 +5,9 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -33,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 	AutoritzacioService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
 	es.caib.seycon.ng.servei.AplicacioService.class,
-	
+	AsyncRunnerService.class,
 	GroupAttributeEntity.class,
 	TipusDadaEntity.class
 })
@@ -97,7 +99,7 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation(translated="delete")
+	@Operation(translated="delete", grantees=roles.group_delete.class)
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.Grup grup)
@@ -296,7 +298,21 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupByTextAsync(
+			@Nullable String text) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupByJsonQueryAsync(@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

@@ -342,6 +342,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 
 				if (!taskInstance.hasEnded()) {
+					taskInstance.setSignalling(false);
 					taskInstance.cancel();
 				}
 			}
@@ -1093,7 +1094,15 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 				if (instance.isOpen() && !instance.isCancelled())
 					try {
-						resultadoFinal.add(VOFactory.newTaskInstance(instance));
+						if (instance.getProcessInstance().hasEnded())
+						{
+							instance.setSignalling(false);
+							instance.cancel();
+						}
+						else
+						{
+							resultadoFinal.add(VOFactory.newTaskInstance(instance));
+						}
 					} catch (RuntimeException e) {
 						log.warn(
 								String.format(
@@ -1140,6 +1149,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 						if (instance.getProcessInstance().hasEnded())
 						{
 							instance.setSignalling(false);
+							instance.setEnd(new Date());
 							instance.cancel();
 						}
 						else
@@ -1163,8 +1173,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 				if (instance.isOpen() && !instance.isCancelled())
 					try {
-						resultadoFinal.add(VOFactory
-								.newLightweightTaskInstance(instance));
+						if (instance.getProcessInstance().hasEnded())
+						{
+							instance.setSignalling(false);
+							instance.setEnd(new Date());
+							instance.cancel();
+						}
+						else
+						{
+							resultadoFinal.add(VOFactory
+									.newLightweightTaskInstance(instance));
+						}
 					} catch (RuntimeException e) {
 						log.warn(
 								String.format(

@@ -5,6 +5,7 @@
 //
 
 package es.caib.bpm.servei;
+import com.soffid.iam.service.MailService;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Propagation;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( grantees={roles.anonymous.class},
 		translatedName="BpmJobExecutor", translatedPackage="com.soffid.iam.bpm.service")
 @Depends ({es.caib.bpm.servei.BpmConfigService.class,
+	MailService.class,
 	es.caib.bpm.servei.BpmEngine.class})
 public abstract class BpmJobExecutor {
 

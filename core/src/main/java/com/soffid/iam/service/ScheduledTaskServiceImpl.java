@@ -225,6 +225,23 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		}
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "F"); //$NON-NLS-1$
+		
+		if (task.isError())
+		{
+			String mailNotification = System.getProperty("soffid.scheduler.error.notify"); //$NON-NLS-1$
+			if (mailNotification != null)
+			{
+				StringBuffer body = new StringBuffer();
+				body.append(String.format(Messages.getString("ScheduledTaskServiceImpl.2"), //$NON-NLS-1$
+						task.getName()))
+					.append("\n"); //$NON-NLS-1$
+				body.append( task.getLastLog() );
+				getMailService().sendHtmlMailToActors(mailNotification.split("\\s*,\\s*"), //$NON-NLS-1$
+						String.format(Messages.getString("ScheduledTaskServiceImpl.5"), task.getName()), //$NON-NLS-1$
+						body.toString());
+			}
+
+		}
 	}
 
 	private void reconfigureTasks () throws InternalErrorException

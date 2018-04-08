@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class,
+	MailService.class,
 	ConfiguracioEntity.class,
 	DocumentService.class,
 	ServerEntity.class})

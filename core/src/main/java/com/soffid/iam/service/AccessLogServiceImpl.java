@@ -392,7 +392,13 @@ public class AccessLogServiceImpl extends
         if (registre.getClientName() != null && registre.getClientName().length() > 0) {
             HostEntity maquina = maquinaDao.findByName(registre.getClientName());
             if (maquina == null)
-                maquina = maquinaDao.findByIP(registre.getClientName());
+            {
+            	for (HostEntity m: maquinaDao.findByIP(registre.getClientName()))
+            	{
+            		maquina = m;
+            	}
+            }
+
             if (maquina == null) {
                 if (registre.getInformation() == null)
                     registre.setInformation(Messages.getString("AccessEntryServiceImpl.57") + registre.getClientName()); //$NON-NLS-1$

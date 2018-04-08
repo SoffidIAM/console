@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -155,7 +157,7 @@ public abstract class MaquinaEntity {
 	}
 	@Operation(translated="findByIP")
 	@DaoFinder
-	public es.caib.seycon.ng.model.MaquinaEntity findByAdreca(
+	public Collection<es.caib.seycon.ng.model.MaquinaEntity> findByAdreca(
 		@Nullable java.lang.String hostIP) {
 	 return null;
 	}
@@ -166,7 +168,7 @@ public abstract class MaquinaEntity {
 	}
 }
 
-@Index (name="MAQ_UK_IP",	unique=true,
+@Index (name="MAQ_UK_IP",	unique=false,
 entity=es.caib.seycon.ng.model.MaquinaEntity.class,
 columns={"MAQ_TEN_ID", "MAQ_ADRIP"})
 abstract class MaquinaIndex {

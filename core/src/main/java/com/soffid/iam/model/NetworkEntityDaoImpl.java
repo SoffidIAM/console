@@ -287,8 +287,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             // Prueba cada una de las redes
             boolean finalitza = false;
             while (ip.esHostValid(ip2)) {
-            	HostEntity maquina = getHostEntityDao().findByIP(ip2.toString());
-                if (maquina == null)
+            	if ( getHostEntityDao().findByIP(ip2.toString()).isEmpty())
                     return ip2.toString();
                 ip2.incrementa();
             }

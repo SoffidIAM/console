@@ -10,6 +10,7 @@
 package com.soffid.iam.service;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +26,9 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
+import com.soffid.iam.doc.api.DocumentInputStream;
 import com.soffid.iam.doc.api.DocumentReference;
+import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.DocumentService;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.ScheduledTaskEntity;
@@ -206,7 +209,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	/* (non-Javadoc)
 	 * @see com.soffid.iam.service.ScheduledTaskService#registerEndTask(com.soffid.iam.api.ScheduledTask)
 	 */
-	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException
+	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException, DocumentBeanException
 	{
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
 		if (entity.getLogReferenceID() != null)
@@ -235,8 +238,36 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 				body.append(String.format(Messages.getString("ScheduledTaskServiceImpl.2"), //$NON-NLS-1$
 						task.getName()))
 					.append("\n"); //$NON-NLS-1$
-				body.append( task.getLastLog() );
-				getMailService().sendHtmlMailToActors(mailNotification.split("\\s*,\\s*"), //$NON-NLS-1$
+				
+				if (task.getLogReferenceID() != null)
+				{
+					StringBuffer tail = new StringBuffer();
+					DocumentService ds = getDocumentService();
+					try {
+						boolean truncated = false;
+						ds.openDocument( new DocumentReference (task.getLogReferenceID()));
+						DocumentInputStream in  = new DocumentInputStream( ds );
+						InputStreamReader reader = new InputStreamReader(in);
+						for (int ch = 0; ( ch = reader.read()) != -1; )
+						{
+							if (tail.length() > 32000)
+							{
+								truncated = true;
+								tail.delete(0, 4000);
+							}
+							tail.append((char) ch);
+						}
+						if (truncated)
+						{
+							body.append("... TRUNCATED TEXT ... ");
+						}
+						body.append(tail);
+					} catch ( Exception e ) {
+						log.warn("Error getting task log", e);
+					}
+				
+				}
+				getMailService().sendTextMailToActors(mailNotification.split("\\s*,\\s*"), //$NON-NLS-1$
 						String.format(Messages.getString("ScheduledTaskServiceImpl.5"), task.getName()), //$NON-NLS-1$
 						body.toString());
 			}

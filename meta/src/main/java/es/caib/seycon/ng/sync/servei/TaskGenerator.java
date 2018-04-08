@@ -94,6 +94,12 @@ public abstract class TaskGenerator {
 	}
 
 	@Transactional(readOnly=true)
+	public String startVirtualSourceTransaction(boolean readonly)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Transactional(readOnly=true)
 	public void finishVirtualSourceTransaction(String virtualTransactionId)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}

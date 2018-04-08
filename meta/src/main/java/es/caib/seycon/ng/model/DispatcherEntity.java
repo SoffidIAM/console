@@ -107,6 +107,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public Boolean fullReconciliation;
 
+	@Description("Forrward changes to each agent after load")
+	@Column (name="DIS_GENTAS", length=1)
+	@Nullable
+	public Boolean generateTasksOnLoad;
+
 	@Column (name="DIS_TEN_ID")
 	public TenantEntity tenant;
 	

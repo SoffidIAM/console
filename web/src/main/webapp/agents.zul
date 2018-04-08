@@ -1868,6 +1868,10 @@
 							<checkbox bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile') }" onCheck=""/>
 							<input_etiqueta value="${c:l('agents.zul.fullReconcile2')}" style="display:block; width: 100%"/>
 						</div>
+						<div style="margin-bottom: 32px">
+							<checkbox bind="@generateTasksOnLoad" disabled="${!canModifyAgent}" label="${c:l('agents.zul.generateTasksOnLoad') }" onCheck=""/>
+							<input_etiqueta value="${c:l('agents.zul.generateTasksOnLoad2')}" style="display:block; width: 100%"/>
+						</div>
 					
 						<grid dataPath="/esquema/lista/listbox:/reconcileTrigger" width="100%" fixedLayout="false">
 							<columns>

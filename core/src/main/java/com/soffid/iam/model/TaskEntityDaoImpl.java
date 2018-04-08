@@ -225,6 +225,9 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     private boolean tooMuchTasks (TaskEntity entity)
     {
     	TransactionStatus c = currentTransactionStatus();
+    	if (c.readonly)
+    		return true;
+    	
     	if (c.exceeded)
     	{
     		entity.setStatus("X");
@@ -293,20 +296,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 	@Override
 	protected String handleStartVirtualSourceTransaction() throws Exception {
-		TransactionStatus c = currentTransactionStatus();
-		if (c.virtualId == null)
-		{
-			synchronized (transactionSeed)
-			{
-				c.virtualId = transactionSeed + "#" + virtualCounter;
-				virtualCounter ++;
-			}
-			c.transactionHash = null;
-			c.count = 0;
-			return c.virtualId;
-		} else {
-			return c.virtualId+"#nested";
-		}
+		return handleStartVirtualSourceTransaction(false);
 	}
 
 	@Override
@@ -327,6 +317,25 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		q.setLong("tenantId", Security.getCurrentTenantId());
 		q.executeUpdate();
 	}
+
+	@Override
+	protected String handleStartVirtualSourceTransaction(boolean readonly) throws Exception {
+		TransactionStatus c = currentTransactionStatus();
+		if (c.virtualId == null)
+		{
+			synchronized (transactionSeed)
+			{
+				c.virtualId = transactionSeed + "#" + virtualCounter;
+				virtualCounter ++;
+			}
+			c.transactionHash = null;
+			c.count = 0;
+			c.readonly = readonly;
+			return c.virtualId;
+		} else {
+			return c.virtualId+"#nested";
+		}
+	}
 }
 
 class TransactionStatus {
@@ -334,4 +343,5 @@ class TransactionStatus {
 	String transactionHash;
 	int count;
 	boolean exceeded;
+	boolean readonly;
 }

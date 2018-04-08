@@ -95,6 +95,10 @@ public class Dispatcher {
 	@Attribute(defaultValue = "false")
 	public boolean fullReconciliation;
 
+	@Description("Forrward changes to each agent after load")
+	@Attribute(defaultValue="true")
+	public boolean generateTasksOnLoad;
+
 	@Nullable
 	public java.lang.Long databaseReplicaId;
 

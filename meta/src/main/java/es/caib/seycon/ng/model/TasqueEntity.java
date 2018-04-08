@@ -235,6 +235,12 @@ public abstract class TasqueEntity {
 	}
 
 	@DaoOperation
+	public String startVirtualSourceTransaction(boolean readonly)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@DaoOperation
 	public void finishVirtualSourceTransaction(String virtualTransactionId)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}

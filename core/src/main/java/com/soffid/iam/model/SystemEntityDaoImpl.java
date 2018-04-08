@@ -166,6 +166,10 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         }
        	targetVO.setDatabaseReplicaId(null);
        	targetVO.setTenant (sourceEntity.getTenant().getName());
+       	if (sourceEntity.getGenerateTasksOnLoad() == null)
+       		targetVO.setGenerateTasksOnLoad(true);
+       	else
+       		targetVO.setGenerateTasksOnLoad(sourceEntity.getGenerateTasksOnLoad().booleanValue());
        	
        	if ( ! Security.isUserInRole(Security.AUTO_AGENT_UPDATE))
        	{

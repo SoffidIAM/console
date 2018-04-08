@@ -1624,6 +1624,24 @@ catch (Exception e)
                 </serializedBean>
                 <condition />
               </action>
+              <action name="" id="1380" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.WaitForHttpPortAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.WaitForHttpPortAction">
+                      <void property="host">
+                        <string>${installer:dbHost}</string>
+                      </void>
+                      <void property="port">
+                        <int>8080</int>
+                      </void>
+                      <void property="timeout">
+                        <int>120</int>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
             </actions>
             <formComponents />
           </screen>
@@ -1637,7 +1655,20 @@ catch (Exception e)
             <validation />
             <preActivation />
             <postActivation />
-            <actions />
+            <actions>
+              <action name="" id="1382" customizedId="" beanClass="com.install4j.runtime.beans.actions.finish.ShowURLAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.finish.ShowURLAction">
+                      <void property="urlSpec">
+                        <string>http://${installer:dbHost}:8080/</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>!context.isUnattended()</condition>
+              </action>
+            </actions>
             <formComponents />
           </screen>
         </screens>

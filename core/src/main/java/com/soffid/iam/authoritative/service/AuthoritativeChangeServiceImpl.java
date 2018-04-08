@@ -543,17 +543,34 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 				auditAuthoritativeChange(tracker);
 				getAdditionalDataService().delete(dada);
 			} 
-			else if (value != null && value instanceof byte[] && ! ((byte[])value).equals(dada.getBlobDataValue())) 
+			else if (value != null && value instanceof byte[] ) 
 			{
-				auditAuthoritativeChange(tracker);
-				dada.setBlobDataValue((byte[])value);
-				getAdditionalDataService().update(dada);
+				if ( ! ((byte[])value).equals(dada.getBlobDataValue()))
+				{
+					auditAuthoritativeChange(tracker);
+					dada.setBlobDataValue((byte[])value);
+					getAdditionalDataService().update(dada);
+				}
 			}
-			else if (value != null && value instanceof Calendar  && ! ((Calendar)value).equals(dada.getDateValue())) 
+			else if (value != null && value instanceof Calendar) 
 			{
-				auditAuthoritativeChange(tracker);
-				dada.setDateValue((Calendar)value);
-				getAdditionalDataService().update(dada);
+				if ( ! ((Calendar)value).equals(dada.getDateValue()))
+				{
+					auditAuthoritativeChange(tracker);
+					dada.setDateValue((Calendar)value);
+					getAdditionalDataService().update(dada);
+				}
+			}
+			else if (value != null && value instanceof Date) 
+			{
+				Calendar c = Calendar.getInstance();
+				c.setTime((Date) value);
+				if ( ! c.equals(dada.getDateValue()))
+				{
+					auditAuthoritativeChange(tracker);
+					dada.setDateValue(c);
+					getAdditionalDataService().update(dada);
+				}
 			}
 			else if (value != null && ! value.equals(dada.getValue())) 
 			{

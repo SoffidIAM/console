@@ -25,6 +25,7 @@ import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.Indexer;
 import com.soffid.iam.bpm.model.TenantModule;
 
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.utils.Security;
 
 public class BpmJobExecutorImpl extends BpmJobExecutorBase {
@@ -131,7 +132,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 			if (mailNotification != null)
 			{
 				StringBuffer body = new StringBuffer();
-				es.caib.bpm.vo.ProcessInstance pi = getBpmEngine().getProcess(job.getId());
+				com.soffid.iam.bpm.api.ProcessInstance pi = getBpmEngine().getProcess(job.getId());
 				body.append(String.format(Messages.getString("BpmJobExecutorImpl.3"), //$NON-NLS-1$
 						job.getId(),
 						job.getId(),

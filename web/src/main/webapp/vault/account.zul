@@ -91,6 +91,12 @@
 			
 		}
 
+		displayAccountAcl(isAdmin, personal);
+	}
+	
+	boolean displayAccountAcl (boolean isAdmin, boolean personal)
+	{
+		
 		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("ownerAcl"), !personal && isAdmin));
 		Events.sendEvent(new Event("onEnable",  innerWindow.getFellow("managerAcl"), !personal && isAdmin));
 		Events.sendEvent(new Event("onEnable", innerWindow.getFellow("userAcl"), !personal && isAdmin));
@@ -416,7 +422,23 @@
 					es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@name"));
 			es.caib.zkib.datasource.XPathUtils.setValue(ctx2, "@vaultFolderId",
 					es.caib.zkib.datasource.XPathUtils.getValue(ctx1, "@id"));
-			updateAclView();
+			
+			es.caib.seycon.ng.comu.AccountAccessLevelEnum level = es.caib.zkib.datasource.XPathUtils.
+					getValue(ctx2.getDataSource(), ctx2.getXPath()+"/@accessLevel");
+			boolean isAdmin = level.equals(es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER);
+
+			boolean personal = false;
+			
+			try {
+				String path = ctx1.getXPath();
+				personal = es.caib.zkib.datasource.XPathUtils.getValue(ctx1.getDataSource() , path+"/@personal");
+			} catch (Exception e)
+			{
+				
+			}
+
+
+			displayAccountAcl(isAdmin, personal);
 		}
 		selectFolderWnd.setVisible(false);
 	}
@@ -846,7 +868,7 @@
 				</treerow>
 			</treeitemfinder>
 		</tree>
-		<div style="float:right; margin-top: 2em;">
+		<div style="text-align:right; margin-top: 2em;">
 			<button label="${c:l('accounts.setPassword.Cancel')}"
 				onClick="selectFolderWnd.setVisible(false);" />
 			<button id="selectButton"

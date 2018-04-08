@@ -835,12 +835,11 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Host handleFindHostByIp(String ip) throws Exception {
-        HostEntity host = getHostEntityDao().findByIP(ip);
-        if (host == null)
-            return null;
-        else {
+    	for (HostEntity host: getHostEntityDao().findByIP(ip))
+    	{
             return getHostEntityDao().toHost(host);
-        }
+    	}
+        return null;
     }
 
 
@@ -1577,62 +1576,31 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected Host handleRegisterDynamicIP(String nomMaquina, String ip, String serialNumber) throws es.caib.seycon.ng.exception.UnknownHostException, UnknownNetworkException, InternalErrorException {
         boolean anyChange = false;
         // First. Test if this IP belongs to anybody else
-        HostEntity old = getHostEntityDao().findByIP(ip);
-        HostEntity maquina = null;
-        if (old != null) {
-            if (serialNumber.equals(old.getSerialNumber())) {
-                maquina = old;
-                // Coincide serial number 
-                if (!nomMaquina.equals(maquina.getName())) {
-                    // Host name changed
-                    // Check if already exists such a name
-                    old = getHostEntityDao().findByName(nomMaquina);
-                    if (old != null) {
-                        old.setDeleted(true);
-                        getHostEntityDao().update(old);
-                    }
-                    maquina.setName(nomMaquina);
-                    anyChange = true;
-                }
-            } else {
-                if (old.getDeleted().booleanValue() || old.getDynamicIP().booleanValue()) {
-                    old.setHostIP(null);
-                    old.setNetwork(null);
-                    getHostEntityDao().update(old);
-                } else {
-                    log.warn(String
-                            .format(Messages.getString("NetworkServiceImpl.HostsCollisionMessage"), //$NON-NLS-1$
-                                    nomMaquina, nomMaquina, ip, serialNumber));
-                    throw new UnknownHostException(String.format(Messages.getString("NetworkServiceImpl.IPAssignedMessage"), ip, old.getName()));
-                }
-            }
-        }
         // Second. Test if this name belongs to anybody else
-        if (maquina == null) {
-            // Found a host with no serial number => Bind it
-            old = getHostEntityDao().findByName(nomMaquina);
-            if (old == null) {
-                // Nothing to do
-            } else if (old.getSerialNumber() == null && old.getDynamicIP().booleanValue()) {
-                // Replace unused host
-                maquina = old;
-                maquina.setSerialNumber(serialNumber);
-                maquina.setHostIP(ip);
-                maquina.setLastSeen(new Date());
-                getHostEntityDao().update(maquina);
-            } else if (serialNumber.equals(old.getSerialNumber())) {
-                // Found host entry
-                maquina = old;
-            } else if (old.getDynamicIP().booleanValue()) {
-                // Autodelete
-                old.setDeleted(true);
-                getHostEntityDao().update(old);
-            } else {
-                log.warn(String.format(
-                        Messages.getString("NetworkServiceImpl.HostsCollisionMessage"), //$NON-NLS-1$
-                        nomMaquina, nomMaquina, ip, serialNumber));
-                throw new UnknownHostException(nomMaquina);
-            }
+        // Found a host with no serial number => Bind it
+        HostEntity maquina = null;
+        HostEntity old = getHostEntityDao().findByName(nomMaquina);
+        if (old == null) {
+            // Nothing to do
+        } else if (old.getSerialNumber() == null && old.getDynamicIP().booleanValue()) {
+            // Replace unused host
+            maquina = old;
+            maquina.setSerialNumber(serialNumber);
+            maquina.setHostIP(ip);
+            maquina.setLastSeen(new Date());
+            getHostEntityDao().update(maquina);
+        } else if (serialNumber.equals(old.getSerialNumber())) {
+            // Found host entry
+            maquina = old;
+        } else if (old.getDynamicIP().booleanValue()) {
+            // Autodelete
+            old.setDeleted(true);
+            getHostEntityDao().update(old);
+        } else {
+            log.warn(String.format(
+                    Messages.getString("NetworkServiceImpl.HostsCollisionMessage"), //$NON-NLS-1$
+                    nomMaquina, nomMaquina, ip, serialNumber));
+            throw new UnknownHostException(nomMaquina);
         }
         // Third. Test if this serial is already used (with another name)
         if (maquina == null) {

@@ -575,6 +575,14 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQueryAsync(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByText(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {

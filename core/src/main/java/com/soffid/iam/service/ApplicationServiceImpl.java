@@ -14,6 +14,7 @@
 package com.soffid.iam.service;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import java.util.Vector;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
+import org.json.JSONException;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -81,9 +83,11 @@ import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.common.DelegationStatus;
@@ -2375,6 +2379,32 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
+		AsyncList<Application> result = new AsyncList<Application>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findApplicationByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		return result.get();
+	}
+
+	@Override
+	protected AsyncList<Application> handleFindApplicationByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<Application> result = new AsyncList<Application>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findApplicationByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	protected void findApplicationByJsonQuery ( AsyncList<Application> result, String query) 
+			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
+	{
 
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value");
@@ -2398,8 +2428,9 @@ public class ApplicationServiceImpl extends
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		// Execute HQL and generate result
-		LinkedList<Application> result = new LinkedList<Application>();
 		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray)) {
+			if (result.isCancelled())
+				return;
 			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(ApplicationVO)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, applicationEntity)) {
@@ -2407,7 +2438,6 @@ public class ApplicationServiceImpl extends
 				}
 			}
 		}
-		return result;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.event.EventListener;
@@ -29,6 +30,7 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.config.Config;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.web.Languages;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Usuari;
@@ -201,32 +203,14 @@ public class ConfiguraSEU extends Vbox {
 	                Enumeration e = req.getLocales();
 	                while (e.hasMoreElements())
 	                {
-	                        Locale l = (Locale) e.nextElement();
-	                        if (l.getLanguage().equalsIgnoreCase("ca"))
-	                        {
-	                        	idioma = l;
-	                        	break;
-	                        }
-	                        else if (l.getLanguage().equalsIgnoreCase("es"))
-	                        {
-	                        	idioma = l;
-	                        	break;
-	                        }
-	                        else if (l.getLanguage().equalsIgnoreCase("en"))
-	                        {
-	                        	idioma = l;
-	                        	break;
-	                        }
-	                        else if (l.getLanguage().equalsIgnoreCase("nl"))
-	                        {
-	                        	idioma = l;
-	                        	break;
-	                        }
-	                        else if (l.getLanguage().equalsIgnoreCase("fr"))
-	                        {
-	                        	idioma = l;
-	                        	break;
-	                        }
+                        Locale l = (Locale) e.nextElement();
+					    for (int i = 0; i < com.soffid.iam.web.Languages.langs.length; i++)
+					    {
+					    	if (l.getLanguage().equals( Languages.langs[i] ))
+					    		idioma = l;
+                        }
+					    if ( idioma != null)
+					    	break;
 	                }
 	                if (idioma == null)
 	                {
@@ -244,8 +228,8 @@ public class ConfiguraSEU extends Vbox {
 		}
 		
 		// Con esto, el zk establece el idioma:
-		sessio.setAttribute("px_preferred_locale", idioma); //$NON-NLS-1$
-//		org.zkoss.util.Locales.setThreadLocal(idioma);
+		sessio.setAttribute(Attributes.PREFERRED_LOCALE, idioma); //$NON-NLS-1$
+		org.zkoss.util.Locales.setThreadLocal(idioma);
 		return idioma;
 	}
 	

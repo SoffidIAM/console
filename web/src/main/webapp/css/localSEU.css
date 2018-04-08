@@ -30,8 +30,9 @@ div.head-cell-inner, div.cell-inner,
 div.head-cell-inner {text-align:left;}
 .dateboxinp  {
 	font-size: 11px;
-	padding: 2px;
-	width: 305px;
+	padding-left: 2px;
+	padding-right: 24px;
+	width: 120px;
 }
 .dateboxread input {border: 0px !important; font-size:11px; width: 14em !important;}
 .dateboxreadnoborder input {border: 0px !important; font-size:11px; width: 12em !important;}

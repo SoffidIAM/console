@@ -109,6 +109,10 @@ public class WorkflowInterceptor implements Filter {
 				if (forcedLocale != null)
 				{
 					sesion.setAttribute(Attributes.PREFERRED_LOCALE, new Locale(forcedLocale));
+					org.zkoss.util.Locales.setThreadLocal(new Locale(forcedLocale));
+				} else {
+					Locale locale = (Locale) sesion.getAttribute(Attributes.PREFERRED_LOCALE);
+					org.zkoss.util.Locales.setThreadLocal( locale );
 				}
 
 				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
@@ -140,6 +144,7 @@ public class WorkflowInterceptor implements Filter {
 						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
 			} finally {
 				try {
+					org.zkoss.util.Locales.setThreadLocal(null);
 					sessionCacheService.clearSession();
 				} catch (InternalErrorException e) {
 					e.printStackTrace();

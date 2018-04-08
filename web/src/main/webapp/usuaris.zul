@@ -34,6 +34,12 @@
 			td.dataTreeCelldestacada div { border: 1px solid red; }
 			td.dataTreeCelldestacada div
 			.dateboxreadnoborderinp.text-disd { color: red !important; }
+
+			.useratt {display: table; padding: 0px; width: 100%}
+			.useratt_row {display: table-row}
+			.useratt_row span {padding-left:5px}
+			.useratt_label {display: table-cell; width: 202px}
+			.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		</style>
 
 		<zscript src="comu/netejaCriteris.zul"/>
@@ -1241,56 +1247,11 @@
 
 								<hbox width="100%"
 									widths="40%,1px,40%,1px,*">
-								<vbox width="99%">
-									<grid dataPath="/esquema/lista/listbox:/dada"
-										if="${canUpdateUserMetadata}" width="98%">
-										<attribute name="onNewRow">
-										<![CDATA[
-										       
-										    try 
-										    {
-											    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
-											    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
-											    	event.data.setVisible(false);
-										    }
-										    catch (Exception e)
-										    {
-										    	// Received event on detached element
-										    }
-										]]>
-										</attribute>
-										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}" width="250px"></column>
-											<column></column>
-										</columns>
-										<datarow>
-											<input_etiqueta bind="@dataLabel" width_custom="250px"
-												value="${c:l('usuaris.zul.@codiDada')}"/>
-												<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/>
-										</datarow>
-									</grid>
-									<grid
-										dataPath="/esquema/lista/listbox:/dada"
-										if="${!canUpdateUserMetadata}" width="98%">
-										<attribute name="onNewRow">
-										<![CDATA[
-										    com.soffid.iam.api.AttributeVisibilityEnum v = XPathUtils.getValue(event.data, "@visibility");
-										    if (v == com.soffid.iam.api.AttributeVisibilityEnum.HIDDEN)
-										    	event.data.setVisible(false);
-										]]>
-										</attribute>
-										<columns>
-											<column label="${c:l('usuaris.zul.Dadesaddicionals')}"  width="250px"></column>
-											<column></column>
-										</columns>
-										<datarow>
-											<input_etiqueta
-												bind="@dataLabel" value="${c:l('usuaris.zul.@codiDada')}"
-												width_custom="250px" />
-												<div use="com.soffid.iam.web.users.additionalData.InputField"/>
-										</datarow>
-									</grid>
-								</vbox>
+									<div use="com.soffid.iam.web.users.additionalData.UserAttributesDiv" 
+										dataPath="/esquema/lista/listbox:/dada" readonly="${!canUpdateUserMetadata }"
+										ownerBind="./"
+										sclass="useratt"
+										style="border: 1px solid #7F9DB9; padding:5px; padding-right: 16px"/>
 									<separator width="1px" />
 									<vbox width="99%">
 										<grid

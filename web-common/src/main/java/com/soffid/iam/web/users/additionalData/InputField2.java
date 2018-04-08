@@ -39,6 +39,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.SimpleConstraint;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
+import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.CustomObject;
@@ -156,7 +157,7 @@ public class InputField2 extends Div
 		String[] data = (String[]) event.getData();
 		String userName = data[0];
 		setValue(userName);
-		updateUser();
+		onChange(event);
 	}
 
 	public void onChange(Event event) {
@@ -170,6 +171,11 @@ public class InputField2 extends Div
 				((AttributesDiv) c).adjustVisibility();
 				break;
 			}
+			else if (c instanceof UserAttributesDiv)
+			{
+				((UserAttributesDiv) c).adjustVisibility();
+				break;
+			}
 			else
 				c = c.getParent();
 		} while (c != null);
@@ -179,19 +185,19 @@ public class InputField2 extends Div
 		String[] data = (String[]) event.getData();
 		String group = data[0];
 		setValue(group);
-		updateGroup();
+		onChange(event);
 	}
 
 	public void onActualitzaApplication(Event event) {
 		String data = (String) event.getData();
 		setValue(data);
-		updateApplication();
+		onChange(event);
 	}
 
 	public void onActualitzaCustomObject(Event event) {
 		String data = (String) event.getData();
 		setValue(data);
-		updateCustomObject();
+		onChange(event);
 	}
 
 	private void setValue(Object userName) {
@@ -253,7 +259,7 @@ public class InputField2 extends Div
 			if (u == null)
 			{
 				l.setValue("?");
-				throw new WrongValueException(this, "Unknown user");
+				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
 			}
 			else
 				l.setValue(u.getFullName());
@@ -283,7 +289,7 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (g == null) {
 				l.setValue("?");
-				throw new WrongValueException(this, "Unknown group");
+				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
 			}
 			l.setValue(g.getDescripcio());
 		}
@@ -301,7 +307,7 @@ public class InputField2 extends Div
 		else
 			l = (Label) c.getChildren().get(4);
 
-		if (application == null)
+		if (application == null || application.isEmpty())
 			l.setValue("");
 		else {
 			Aplicacio a = null;
@@ -310,14 +316,13 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (a == null) {
 				l.setValue("?");
-				throw new WrongValueException(this, "Unknown application");
+				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
 			}
 			l.setValue(a.getNom());
 		}
 	}
 
 	public void updateCustomObject() {
-
 		String customObject = (String) getValue();
 		Component c = (Component) ((Component) getChildren().get(0));
 		Label l;
@@ -327,7 +332,7 @@ public class InputField2 extends Div
 		else
 			l = (Label) c.getChildren().get(4);
 
-		if (customObject == null)
+		if (customObject == null || customObject.isEmpty())
 			l.setValue("");
 		else {
 			CustomObject co = null;
@@ -336,7 +341,7 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (co == null) {
 				l.setValue("?");
-				throw new WrongValueException(this, "Unknown "+customObject);
+				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
 			}
 			l.setValue(co.getDescription());
 		}
@@ -762,7 +767,7 @@ public class InputField2 extends Div
 		Object value = XPathUtils.getValue(ctx, bind);
 
 		if (dataType.isRequired() && ( value == null ||  "".equals(value)))
-			throw new WrongValueException(this, SimpleConstraint.NO_EMPTY);
+			throw new WrongValueException(this, MZul.EMPTY_NOT_ALLOWED);
 			
 		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			updateApplication();
@@ -828,7 +833,10 @@ public class InputField2 extends Div
 	private SecureInterpreter createInterpreter() throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = XPathUtils.getValue(ctx, bind);
-		Map attributes = (Map) XPathUtils.getValue(ctx, "/.");
+		Component grandpa = getParent().getParent();
+		Map attributes = grandpa instanceof UserAttributesDiv ? 
+			((UserAttributesDiv) grandpa).getAttributesMap():
+			(Map) XPathUtils.getValue(ctx, "/.");
 		SecureInterpreter i = new SecureInterpreter();
 
 		i.set("value", value);

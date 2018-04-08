@@ -89,8 +89,10 @@
 						    	Listitem li = new Listitem( com.soffid.iam.web.Languages.descriptions[i], 
 					    				com.soffid.iam.web.Languages.langs[i]);
 						    	self.appendChild(li);
-						    	if ( li.getValue().equals(idioma))
+						    	if ( li.getValue().equals(idiomaSEU))
+						    	{
 						    		self.setSelectedItem(li);
+						    	}
 						    }
 						]]></attribute>
 						<listitem label="${c:l('perfil.zul.Predeterminat')}" value=""/>

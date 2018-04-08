@@ -26,11 +26,6 @@
 			darrerLoginSEU = session.getAttribute("es.caib.seycon.ng.web.lastLoginSEU");
 			darreraIPLoginSEU = session.getAttribute("es.caib.seycon.ng.web.lastIP");
 			idiomaSEU = session.getAttribute("es.caib.seycon.ng.web.idioma");
-			idiomaCA = idiomaSEU != null && "ca".equals(idiomaSEU);
-			idiomaES = idiomaSEU != null && "es".equals(idiomaSEU);
-			idiomaEN = idiomaSEU != null && "en".equals(idiomaSEU);
-			idiomaNL = idiomaSEU != null && "nl".equals(idiomaSEU);
-			idiomaFR = idiomaSEU != null && "fr".equals(idiomaSEU);
 		
 			try {
 				if (darrerLoginSEU != null) {
@@ -101,12 +96,17 @@
 									<input_etiqueta value="${c:l('perfil.zul.IdiomadelSEU')}" />
 									<listbox id="idioma" mold="select" onSelect=""
 										style="font-size: 12px" width="300px">
+										<attribute name="onCreate"><![CDATA[
+										    for (int i = 0; i < com.soffid.iam.web.Languages.langs.length; i++)
+										    {
+										    	Listitem li = new Listitem( com.soffid.iam.web.Languages.descriptions[i], 
+									    				com.soffid.iam.web.Languages.langs[i]);
+										    	self.appendChild(li);
+										    	if ( li.getValue().equals(idioma))
+										    		self.setSelectedItem(li);
+										    }
+										]]></attribute>
 										<listitem label="${c:l('perfil.zul.Predeterminat')}" value=""/>
-										<listitem label="English" selected="${idiomaEN}" value="en"/>
-										<listitem label="Español" selected="${idiomaES}" value="es"/>
-										<listitem label="Français" selected="${idiomaFR}" value="fr"/>
-										<listitem label="Nederlandse" selected="${idiomaNL}" value="nl"/>
-										<listitem label="Català" selected="${idiomaCA}" value="ca"/>
 									</listbox>
 								</row>
 							</rows>

@@ -71,3 +71,8 @@ public abstract class DadaUsuariEntity {
 	}
 
 }
+
+@Index(columns={"DUS_IDUSU","DUS_TDAID"}, name="SC_DADUSU_USU_UK", unique=true, entity=DadaUsuariEntity.class)
+class DadaUsuariIndex {
+	
+}

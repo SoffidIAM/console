@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.soffid.iam.console</groupId>
 		<artifactId>root</artifactId>
-		<version>1.8.11</version>
+		<version>1.8.12-SNAPSHOT</version>
 	</parent>
 	<artifactId>iam-webservice</artifactId>
 	<packaging>war</packaging>

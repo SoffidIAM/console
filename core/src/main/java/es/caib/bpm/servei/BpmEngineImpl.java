@@ -776,6 +776,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 						return VOFactory.newProcessInstance(process);
 					}
 				}
+				// Check for parent processes
+				
+				for ( ProcessHierarchyEntity pp: getProcessHierarchyEntityDao().findByChildren(process.getId()) )
+				{
+					if ( handleGetProcess(pp.getParentProcess()) != null)
+						return VOFactory.newProcessInstance(process);
+				}
+				
 				return null;
 //				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
 			} else {

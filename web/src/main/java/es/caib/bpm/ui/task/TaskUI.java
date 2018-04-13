@@ -54,6 +54,7 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Radio;
+import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Textbox;
@@ -362,7 +363,14 @@ public class TaskUI extends Frame implements EventListener {
             comments.setDataPath("BPMdata:/processInstance/comments"); //$NON-NLS-1$
             newComment.setValue(""); //$NON-NLS-1$
             newcommentBox.setVisible(canManage);
-
+        	Tab tb = (Tab) tabbox.getTabs().getChildren().get(3);
+            if ( getCurrentProcess().getComments().isEmpty() )
+            {
+            	tb.setSclass("tab");
+            } else {
+            	tb.setSclass("redtab tab");
+            }
+            
             if (componenteGenerado != null
                     && componenteGenerado instanceof WorkflowWindow) {
                 WorkflowWindow window = (WorkflowWindow) componenteGenerado;
@@ -819,6 +827,13 @@ public class TaskUI extends Frame implements EventListener {
             if(dataSubida!= null)
             {
                     String tag = ((HttpSession)sesion.getNativeSession()).getId();
+                    List tags = business.getTags();
+                    int counter = 0;
+                    while ( tags.contains(tag) )
+                    {
+                    	counter++;
+                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
+                    }
                     business.uploadFile(dataSubida, tag);
                     refreshListadoArchivos();
             }

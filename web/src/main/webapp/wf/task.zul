@@ -35,7 +35,7 @@
 			</tabs>
 			<tabpanels>
 				<tabpanel id="tarea" style="overflow:auto;min-height:30em;">
-					<form dataPath="BPMdata:/taskInstance/variables" width="100%">
+					<form dataPath="BPMdata:/taskInstance[1]/variables" width="100%">
 						<vbox id="datosElementoWorkflow" width="100%">
 					
 						</vbox>

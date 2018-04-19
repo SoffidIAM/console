@@ -8,6 +8,16 @@
 	
     <zscript><![CDATA[
 		String task = Executions.getCurrent().getNativeRequest().getParameter("id");
+		try {
+			es.caib.bpm.servei.BpmEngine engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
+			es.caib.bpm.vo.TaskInstance ti = engine.getTask(Long.parseLong(task));
+			if (ti != null && ti.getStart() == null)
+			{
+				engine.startTask(ti);
+			}
+		} catch (Exception e) {
+			
+		}
 		]]></zscript>
 		
 	<application id="app" allowOpenMultipleTabs="false" autoReload="false" favorits="//favorits/favorits" 

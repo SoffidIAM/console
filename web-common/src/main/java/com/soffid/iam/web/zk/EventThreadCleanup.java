@@ -10,6 +10,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
@@ -23,6 +24,7 @@ public class EventThreadCleanup extends TomeeThreadCleanup {
 		super.cleanup(comp, evt, errs);
 		if (Security.getPrincipal() != null)
 			Security.nestedLogoff();
+		MessageFactory.setThreadLocale(null);
 	}
 
 	public EventThreadCleanup() throws NamingException, CreateException {

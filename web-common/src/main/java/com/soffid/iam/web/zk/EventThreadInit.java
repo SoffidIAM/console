@@ -1,5 +1,7 @@
 package com.soffid.iam.web.zk;
 
+import java.util.Locale;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -8,6 +10,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
@@ -18,7 +21,7 @@ public class EventThreadInit extends TomeeThreadInit {
 	String cacheSession;
 	private SessionCacheService ejb;
 	private GenericPrincipal currentIdentity;
-	
+	Locale locale;
 	
 	public EventThreadInit() throws NamingException, CreateException {
 		super();
@@ -36,6 +39,7 @@ public class EventThreadInit extends TomeeThreadInit {
 		{
 			Security.nestedLogin(currentIdentity);
 		}
+		MessageFactory.setThreadLocale(locale);
 		return true;
 	}
 
@@ -44,6 +48,7 @@ public class EventThreadInit extends TomeeThreadInit {
 		super.prepare(comp, event);
 		cacheSession = ejb.getCurrentSessionId();
 		currentIdentity = Security.getPrincipal();
+		locale = MessageFactory.getLocale();
 	}
 
 }

@@ -26,38 +26,6 @@ public class MessageFactory
 	public static Locale getLocale () {
 		Locale l = currentLocale.get();
 	
-		if (l == null)
-		{
-			if (localesClass == null)
-			{
-				try
-				{
-					localesClass = Thread.currentThread().getContextClassLoader().loadClass("org.zkoss.util.Locales"); //$NON-NLS-1$
-					if (localesClass != null)
-						getCurrentMethod = localesClass.getMethod("getCurrent"); //$NON-NLS-1$
-				}
-				catch (ClassNotFoundException e)
-				{
-				}
-				catch (SecurityException e)
-				{
-				}
-				catch (NoSuchMethodException e)
-				{
-				}
-			}
-			if (localesClass != null)
-			{
-				try
-				{
-					l = (Locale) getCurrentMethod.invoke(null);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
 		if ( l == null)
 			return Locale.getDefault();
 		else

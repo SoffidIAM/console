@@ -31,6 +31,7 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SecurityFunctionMapper;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.web.ConfiguraSEU;
 import es.caib.zkib.datamodel.xml.FunctionMapperChain;
 
 /**
@@ -108,11 +109,23 @@ public class WorkflowInterceptor implements Filter {
 				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
 				if (forcedLocale != null)
 				{
-					sesion.setAttribute(Attributes.PREFERRED_LOCALE, new Locale(forcedLocale));
-					org.zkoss.util.Locales.setThreadLocal(new Locale(forcedLocale));
+					Locale locale = new Locale(forcedLocale);
+					sesion.setAttribute(Attributes.PREFERRED_LOCALE, locale);
+					org.zkoss.util.Locales.setThreadLocal(locale);
+					MessageFactory.setThreadLocale(locale);
 				} else {
-					Locale locale = (Locale) sesion.getAttribute(Attributes.PREFERRED_LOCALE);
-					org.zkoss.util.Locales.setThreadLocal( locale );
+					String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
+					if (lang == null)
+					{
+						ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
+						lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);
+					}
+					if (lang != null)
+					{
+						Locale locale = new Locale (lang);
+						org.zkoss.util.Locales.setThreadLocal( locale );
+						MessageFactory.setThreadLocale(locale);
+					}
 				}
 
 				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
@@ -144,6 +157,7 @@ public class WorkflowInterceptor implements Filter {
 						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
 			} finally {
 				try {
+					MessageFactory.setThreadLocale(null);
 					org.zkoss.util.Locales.setThreadLocal(null);
 					sessionCacheService.clearSession();
 				} catch (InternalErrorException e) {

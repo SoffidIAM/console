@@ -14,11 +14,14 @@ import java.util.Properties;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Session;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -51,8 +54,6 @@ public class ConfiguraSEU extends Vbox {
 
 	private static String versio = getVersioSEU();
 	
-	private boolean mostraSplash = false;
-	
 	// Preferències/dades de configuració
 	public static final String SEU_LANG = "lang"; //$NON-NLS-1$
 	public static final String SEU_LAST_IP = "lastIP"; //$NON-NLS-1$
@@ -64,9 +65,9 @@ public class ConfiguraSEU extends Vbox {
 	private static final String SESSIO_LAST_IP_SEU = "es.caib.seycon.ng.web.lastIP"; //$NON-NLS-1$
 	// Atenció: el valor de la variable de sessió SESSIO_CURRENT_IP_SEU s'empra des dels workflows:
 	private static final String SESSIO_CURRENT_IP_SEU = "es.caib.seycon.ng.web.currentIP"; //$NON-NLS-1$
-	private static final String SESSIO_IDIOMA = "es.caib.seycon.ng.web.idioma"; //$NON-NLS-1$
+	public static final String SESSIO_IDIOMA = "es.caib.seycon.ng.web.idioma"; //$NON-NLS-1$
 	
-	Log log = LogFactory.getLog(ConfiguraSEU.class);
+	static Log log = LogFactory.getLog(ConfiguraSEU.class);
 	
 	
 	public ConfiguraSEU() throws RemoteException, NamingException, CreateException, Exception {
@@ -79,7 +80,6 @@ public class ConfiguraSEU extends Vbox {
 		try {Executions.getCurrent().getDesktop().getWebApp().setAppName("Soffid IAM");} catch (Throwable th) {} //$NON-NLS-1$
 		
 		// Obtenim informació de l'usuariSEU
-		configuraUsuariSEU();
 	}
 	
 	/**
@@ -137,11 +137,6 @@ public class ConfiguraSEU extends Vbox {
 	 */
 	public void onCreate() throws Exception, RemoteException, NamingException,
 			CreateException {
-		if (mostraSplash && false) {
-			Splash splash = new Splash();
-			appendChild(splash);
-			splash.mostraFinestra();
-		}
 	}
 	
 	
@@ -168,16 +163,20 @@ public class ConfiguraSEU extends Vbox {
 
 	}
 	
+	public static Locale configuraLocale (String language) {
+		HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
+				.getCurrent().getNativeRequest();
+		return configuraLocale(language, req);
+	}
 	/**
 	 * Si l'usuari té un idioma definit a la seva configuració
 	 * fem un override de la configuració del navegador i de 
 	 * la pàgina de login
 	 * @param language
 	 */
-	public static Locale configuraLocale (String language) {
+	public static Locale configuraLocale (String language, HttpServletRequest req) {
 		
 		java.util.Locale idioma = null; 
-		org.zkoss.zk.ui.Session sessio = org.zkoss.zk.ui.Sessions.getCurrent();
 		
 		// Intentem crear un locale del idioma
 		try {
@@ -195,8 +194,6 @@ public class ConfiguraSEU extends Vbox {
 				idioma = new Locale(ConfigurationCache.getProperty("soffid.language"));
 			else
 			{
-				HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui.Executions
-						.getCurrent().getNativeRequest();
 	            if (idioma == null)
 	            {
 	    			// Medium priority, web browser preferences ( if any )
@@ -228,19 +225,26 @@ public class ConfiguraSEU extends Vbox {
 		}
 		
 		// Con esto, el zk establece el idioma:
-		sessio.setAttribute(Attributes.PREFERRED_LOCALE, idioma); //$NON-NLS-1$
+		if (req != null)
+			req.getSession().setAttribute(Attributes.PREFERRED_LOCALE, idioma); //$NON-NLS-1$
+		else
+		{
+			Session sessio = Sessions.getCurrent();
+			if (sessio != null)
+				sessio.setAttribute(Attributes.PREFERRED_LOCALE, idioma); //$NON-NLS-1$
+		}
 		org.zkoss.util.Locales.setThreadLocal(idioma);
 		return idioma;
 	}
 	
-	private UsuariService usuari_service = null;
+	private static UsuariService usuari_service = null;
 	
-	private UsuariService getUsuariService() throws NamingException, CreateException, RemoteException {
+	private static UsuariService getUsuariService() throws NamingException, CreateException, RemoteException {
 		if (usuari_service == null) usuari_service = EJBLocator.getUsuariService();
 		return usuari_service;
 	}
 	
-	private UsuariSEU obteUsuariSEU(String codiUsuari) {
+	private static UsuariSEU obteUsuariSEU(String codiUsuari) {
 		try {
 			return getUsuariService().findUsuariSEUByCodiUsuari(codiUsuari);
 		} catch (Throwable th) {
@@ -249,7 +253,7 @@ public class ConfiguraSEU extends Vbox {
 		}
 	}
 	
-	private Usuari findCurrentUsuari() {
+	private static Usuari findCurrentUsuari() {
 		try {
 			return getUsuariService().getCurrentUsuari();
 		} catch (Throwable th) {
@@ -268,11 +272,11 @@ public class ConfiguraSEU extends Vbox {
 	 * @throws NamingException
 	 * @throws CreateException
 	 */
-	private void configuraUsuariSEU() throws Exception,
+	public static void configuraUsuariSEU(HttpServletRequest req) throws Exception,
 			RemoteException, NamingException, CreateException  {
 		
 		// Comprovem que no s'hagin obtinunnamed1()gut les dades en aquesta sessió
-		org.zkoss.zk.ui.Session sessio = org.zkoss.zk.ui.Sessions.getCurrent();
+		HttpSession sessio = req.getSession();
 		String versioSEU = null;
 		try {
 			versioSEU = (String) sessio
@@ -283,8 +287,7 @@ public class ConfiguraSEU extends Vbox {
 		Usuari user = findCurrentUsuari();
 		if (user == null)
 		{
-			Locale l = configuraLocale(null);
-			sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());			
+			Locale l = configuraLocale(null, req);
 			return;
 		}
 		
@@ -303,8 +306,6 @@ public class ConfiguraSEU extends Vbox {
 				if (usuDarreraVersio == null
 						|| (usuDarreraVersio != null && !usuDarreraVersio
 								.equals(versio))) {
-					mostraSplash = true;					
-										
 					// Actualitzem la versió del SEU a l'usuari
 					usuariSEU.setVersio(versio);
 				}
@@ -326,7 +327,7 @@ public class ConfiguraSEU extends Vbox {
 				// Establim les seves preferències d'idioma
 				// per defecte en català.. a no se que l'usuari
 				// ho especifique
-				Locale l  = configuraLocale((String) usuariSEU.getPreferenciesSEU().get(SEU_LANG));
+				Locale l  = configuraLocale((String) usuariSEU.getPreferenciesSEU().get(SEU_LANG), req);
 				sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
 				
 				// Actualitzem el seu darrer login
@@ -353,13 +354,7 @@ public class ConfiguraSEU extends Vbox {
 				// Guardem els favorits encara que siga buit
 				usuariSEU.setPreferenciesSEU(prefs);
 				
-				// Establim les seves preferències d'idioma
-				// per defecte per defecte, l'idioma del navegador
-				// a no se que l'usuari ho especifique al seu perfil
-				HttpServletRequest req = (HttpServletRequest) org.zkoss.zk.ui
-								.Executions.getCurrent().getNativeRequest();
-				
-				Locale lang = configuraLocale(null);
+				Locale lang = configuraLocale(null, req);
 				sessio.setAttribute(SESSIO_IDIOMA, lang.getLanguage());
 				usuariSEU.getPreferenciesSEU().put(SEU_LANG, lang.getLanguage());
 				
@@ -372,7 +367,6 @@ public class ConfiguraSEU extends Vbox {
 
 				getUsuariService().create(usuariSEU); // el creem
 				//Mostrem la fiestra de novetats
-				mostraSplash = true;
 			}
 		}
 	}

@@ -821,6 +821,13 @@ public class TaskUI extends Frame implements EventListener {
             if(dataSubida!= null)
             {
                     String tag = ((HttpSession)sesion.getNativeSession()).getId();
+                    List tags = business.getTags();
+                    int counter = 0;
+                    while ( tags.contains(tag) )
+                    {
+                    	counter++;
+                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
+                    }
                     business.uploadFile(dataSubida, tag);
                     refreshListadoArchivos();
             }

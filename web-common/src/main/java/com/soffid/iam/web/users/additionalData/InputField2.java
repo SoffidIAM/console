@@ -861,8 +861,8 @@ public class InputField2 extends Div
 			if (ownerObject instanceof Aplicacio)
 				i.set("application", Application.toApplication((Aplicacio) ownerObject));
 			i.set("object", ownerObject);
-			i.set("context", ownerContext);
 		}
+		i.set("context", ownerContext);
 		return i;
 	}
 

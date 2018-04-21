@@ -86,7 +86,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 	public synchronized Object[] toArray() {
 		Object[] ar = new Object [size];
 		int i = 0;
-		for (Entry<?> e = source.first; e != null; e = e.next)
+		for (Entry<?> e = first; e != null; e = e.next)
 		{
 			ar [i++] = e.element;
 		}
@@ -99,7 +99,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
             a = (T[])java.lang.reflect.Array.newInstance(
                     a.getClass().getComponentType(), size);
 		int i = 0;
-		for (Entry<?> e = source.first; e != null; e = e.next)
+		for (Entry<?> e = first; e != null; e = e.next)
 		{
 			a [i++] = (T) e.element;
 		}

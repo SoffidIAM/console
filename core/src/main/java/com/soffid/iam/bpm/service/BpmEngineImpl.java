@@ -108,6 +108,7 @@ import com.soffid.iam.bpm.index.Indexer;
 import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
+import com.soffid.iam.bpm.model.TenantModule;
 import com.soffid.iam.bpm.model.TenantModuleDefinition;
 import com.soffid.iam.bpm.model.UserInterface;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
@@ -577,11 +578,16 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.next();
 
 				try {
-					if (business.isUserAuthorized(OBSERVER_ROLE,
-							getUserGroups(), p.getProcessDefinition())
-							|| business.isUserAuthorized(SUPERVISOR_ROLE,
-									getUserGroups(), p.getProcessDefinition()))
-						resultado.add(VOFactory.newProcessInstance(p));
+					TenantModule tm = (TenantModule) p.getInstance(TenantModule.class);
+					if (tm == null && Security.getCurrentTenantName().equals(Security.getMasterTenantName()) ||
+							tm != null && tm.getTenantId() != null && Security.getCurrentTenantId() == tm.getTenantId().longValue())
+					{
+						if (business.isUserAuthorized(OBSERVER_ROLE,
+								getUserGroups(), p.getProcessDefinition())
+								|| business.isUserAuthorized(SUPERVISOR_ROLE,
+										getUserGroups(), p.getProcessDefinition()))
+							resultado.add(VOFactory.newProcessInstance(p));
+					}
 				} catch (JbpmException e) {
 					log.warn(e);
 				}
@@ -748,28 +754,41 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (process == null)
 				return null;
 
-			org.jbpm.graph.def.ProcessDefinition definition = process
-					.getProcessDefinition();
+			TenantModule tm = (TenantModule) process.getInstance(TenantModule.class);
+			if (tm == null && Security.getCurrentTenantName().equals(Security.getMasterTenantName()) ||
+					tm != null && tm.getTenantId() != null && Security.getCurrentTenantId() == tm.getTenantId().longValue())
+			{
 
-			if (!isInternalService()
-					&& !business.isUserAuthorized(OBSERVER_ROLE,
-							getUserGroups(), definition)
-					&& !business.isUserAuthorized(SUPERVISOR_ROLE,
-							getUserGroups(), definition)) {
-				Collection list = process.getTaskMgmtInstance()
-						.getTaskInstances();
-				for (Iterator it = list.iterator(); it.hasNext();) {
-					org.jbpm.taskmgmt.exe.TaskInstance ti = (org.jbpm.taskmgmt.exe.TaskInstance) it
-							.next();
-					if (business.canAccess(getUserGroups(), ti)) {
-						return VOFactory.newProcessInstance(process);
+				org.jbpm.graph.def.ProcessDefinition definition = process
+						.getProcessDefinition();
+	
+				if (!isInternalService()
+						&& !business.isUserAuthorized(OBSERVER_ROLE,
+								getUserGroups(), definition)
+						&& !business.isUserAuthorized(SUPERVISOR_ROLE,
+								getUserGroups(), definition)) {
+					Collection list = process.getTaskMgmtInstance()
+							.getTaskInstances();
+					for (Iterator it = list.iterator(); it.hasNext();) {
+						org.jbpm.taskmgmt.exe.TaskInstance ti = (org.jbpm.taskmgmt.exe.TaskInstance) it
+								.next();
+						if (business.canAccess(getUserGroups(), ti)) {
+							return VOFactory.newProcessInstance(process);
+						}
 					}
+					for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(id))
+					{
+						if (handleGetProcess(parentProcess.getParentProcess()) != null)
+							return VOFactory.newProcessInstance(process);
+					}
+					return null;
+					//				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
+				} else {
+					return VOFactory.newProcessInstance(process);
 				}
-				return null;
-				//				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
-			} else {
-				return VOFactory.newProcessInstance(process);
 			}
+			else
+				return null;
 		} catch (RuntimeException ex) {
 			throw ex;
 		} finally {

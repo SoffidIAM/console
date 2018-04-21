@@ -109,7 +109,7 @@ public class VOFactory {
 		if (instance.getAvailableTransitions() == null)
 			vo.setTransitions(new String[0]);
 		else {
-			List transitionList = instance.getToken().getNode().getLeavingTransitions();
+			List transitionList = instance.getTask().getTaskNode().getLeavingTransitions();
 			String transitions[] = new String[transitionList.size()];
 			int i = 0;
 			for (Iterator it = transitionList.iterator(); it.hasNext();) {

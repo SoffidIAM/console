@@ -35,6 +35,9 @@ import org.jbpm.graph.exe.Token;
 
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.model.DBProperty;
+import com.soffid.iam.bpm.model.TenantModule;
+
+import es.caib.seycon.ng.utils.Security;
 
 public class Indexer {
 	private Log log = LogFactory.getLog(Indexer.class);
@@ -56,7 +59,7 @@ public class Indexer {
 					+ "join token.processInstance as pi "
 					+ "where pl.date > :then "
 					+ "order by pi.id desc")
-				.setDate("then", new Date(then))
+				.setTimestamp ("then", new Date(then))
 				.list();
 	}
 
@@ -112,6 +115,16 @@ public class Indexer {
 				Field.Store.NO, Field.Index.ANALYZED));
 		d.add(new Field ("$end",  //$NON-NLS-1$
 				pi.getEnd() == null ? "false": "true", //$NON-NLS-1$ //$NON-NLS-2$
+				Field.Store.NO, Field.Index.ANALYZED));
+		
+		TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
+		if (tm != null && tm.getTenantId() != null)
+			d.add(new Field ("$tenant",  //$NON-NLS-1$
+				tm.getTenantId().toString(), //$NON-NLS-1$ //$NON-NLS-2$
+				Field.Store.NO, Field.Index.ANALYZED));
+		else
+			d.add(new Field ("$tenant",  //$NON-NLS-1$
+				Long.toString( Security.getCurrentTenantId()), //$NON-NLS-1$ //$NON-NLS-2$
 				Field.Store.NO, Field.Index.ANALYZED));
 		// Afegim data d'inici i de fi
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd"); //Formato 20100924 //$NON-NLS-1$

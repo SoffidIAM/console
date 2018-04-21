@@ -20,22 +20,24 @@
 		<attribute name="onCreate"><![CDATA[
 			if (pageScope{"requestedAccount"} != null)
 			{
-				esquema.getFellow("queryWindow").getFellow("queryName")
-						.getFellow("textbox").setValue(pageScope{"requestedAccount"});
-				Combobox dispatcher = esquema.getFellow("queryWindow")
-						.getFellow("queryDispatcher");
-				for (Comboitem li: dispatcher.getItems())
+				model.getJXPathContext().getVariables().declareVariable("synchro", "true");
+				qw = esquema.getFellow("queryWindow");
+				searchBox = qw.getFellow("searchBox");
+				searchBox.addAttribute("system").setSearchFilter(pageScope{"requestedSystem"});
+				searchBox.addAttribute("name").setSearchFilter(pageScope{"requestedAccount"});
+				searchBox.addAttribute("type").setSearchFilter(null);
+				searchBox.search();
+				if (esquema.getFellow("lista").getFellow("listbox").getItems().size() == 1)
 				{
-					if (li.getValue() != null && li.getValue().equals(pageScope{"requestedSystem"}))
-					{
-						dispatcher.setSelectedItem(li);
-					}
+					showDetall();
+					esquema.removeCriteria();
+					esquema.removeList();
+					esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
 				}
-				esquema.getFellow("queryWindow")
-						.getFellow("queryIgnore").setSelectedIndex(0);
-				search();
-				esquema.removeCriteria();
-				esquema.removeList();
+				else
+				{
+					model.getJXPathContext().getVariables().declareVariable("synchro", null);
+				}
 
 			}
 		]]>
@@ -73,7 +75,6 @@
 			    String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
 				pageScope{"requestedSystem"} = requestedSystem;
 
-				boolean queryEnabled = true;
 				fileres = es.caib.seycon.ng.web.Custom.FILERES;
 				fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
 				try
@@ -98,173 +99,8 @@
 				canDeleteUserRole = AutoritzacionsUsuari.hasDeleteUserRole();
 				import es.caib.seycon.ng.comu.*;
 				
-				queryEnabled = false;
 				retrySearch = false;
 				
-				// Method to obtain the parameters to search process
-				java.util.Map getSearchParameters()
-				{
-					java.util.Map searchValues = new java.util.HashMap();
-					
-					name = esquema.getFellow("queryWindow").getFellow("queryName")
-							.getFellow("textbox");
-					description = esquema.getFellow("queryWindow")
-							.getFellow("queryDescription").getFellow("textbox");
-					dispatcher = esquema.getFellow("queryWindow")
-							.getFellow("queryDispatcher").getSelectedItem();
-					accountType = esquema.getFellow("queryWindow").getFellow("queryAccountType")
-							.getSelectedItem();
-					ignoreType = esquema.getFellow("queryWindow")
-							.getFellow("queryIgnore").getSelectedItem();
-					grantedUsers = esquema.getFellow("queryWindow")
-							.getFellow("queryGrantedUsers").getFellow("textbox");
-					grantedGroups = esquema.getFellow("queryWindow")
-							.getFellow("queryGrantedGroups").getFellow("textbox");
-					grantedRoles = esquema.getFellow("queryWindow")
-							.getFellow("queryGrantedRoles").getFellow("textbox");
-					
-					// Check enable query
-					if (((name == null) || (name.value == null) ||
-							(name.value.trim().length() == 0)) &&
-							(description.value.trim().length() == 0) &&
-							(dispatcher == null) && (accountType == null) &&
-							(grantedUsers.value.trim().length() == 0) &&
-							(grantedGroups.value.trim().length() == 0) &&
-							(grantedRoles.value.trim().length() == 0))
-					{
-						queryEnabled = false;
-					}
-					
-					else
-					{
-						queryEnabled = true;
-					}
-					
-					return searchValues;
-				}
-				
-				void search()
-				{
-					model.getJXPathContext().getVariables().declareVariable("queryEnabled", true);
-					java.util.Map lista = new java.util.HashMap();
-					AccountCriteria criteria = model.getJXPathContext().getValue("/query[1]").instance;
-					
-					if (esquema.isCommitPending())
-					{
-						Missatgebox.avis(org.zkoss.util.resource.Labels
-								.getLabel("usuaris.Confirmar"),
-								org.zkoss.util.resource.Labels
-										.getLabel("usuaris.CanvisPendents"));
-						return;
-					}
-					
-					getSearchParameters();
-					
-					if (!retrySearch)
-					{
-						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getDescription()));
-						criteria.setDispatcher(criteria.getDispatcher());
-						criteria.setExcludeType(criteria.getExcludeType());
-						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getGrantedGroups()));
-						criteria.setGrantedRoles(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getGrantedRoles()));
-						criteria.setGrantedUsers(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getGrantedUsers()));
-						criteria.setName(es.caib.seycon.ng.web.utils.Autowildcards
-								.replaceAsteriskChar(criteria.getName()));
-						criteria.setType(criteria.getType());
-					}
-					
-					else
-					{
-						criteria.setDescription(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getDescription()));
-						criteria.setDispatcher(criteria.getDispatcher());
-						criteria.setExcludeType(criteria.getExcludeType());
-						criteria.setGrantedGroups(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getGrantedGroups()));
-						criteria.setGrantedRoles(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getGrantedRoles()));
-						criteria.setGrantedUsers(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getGrantedUsers()));
-						criteria.setName(es.caib.seycon.ng.web.utils.Autowildcards
-								.addPercentChar(criteria.getName()));
-						criteria.setType(criteria.getType());
-					}
-					
-					listbox = esquema.getFellow("lista").getFellow("listbox");
-					if (queryEnabled)
-					{
-						model.getJXPathContext().getValue("/account").refresh();
-						// listbox.dataPath = "/model:/account";
-					}
-					if (listbox.getModel().getSize() == 1)
-					{
-						listbox.renderAll();
-						Listitem elem = listbox.getItemAtIndex(0);
-						if (elem != null)
-							listbox.setSelectedItem(elem);
-					
-						select();
-					}
-					
-					else
-					{
-						if ((listbox.getModel().getSize() == 0) && !retrySearch)
-						{
-							retrySearch = true;
-							search();
-						}
-						
-						else
-						{
-							esquema.tancaDetalls(); //amaguem dades..
-							retrySearch = false;
-						}
-					}
-					
-					checkTruncatedList(listbox);
-				}
-				
-				void showAltres()
-				{
-					if (view_altres == false)
-					{
-						esquema.getFellow("queryWindow").setHeight(queryWindowMax);
-						esquema.getFellow("queryWindow").getFellow("queryWindowAltres")
-								.setVisible(true);
-						esquema.getFellow("queryWindow").getFellow("img_altres")
-								.setSrc("~./img/fletxa-baix.gif");
-						view_altres = true;
-					}
-					else
-					{
-						esquema.getFellow("queryWindow").setHeight(queryWindowMin);
-						esquema.getFellow("queryWindow").getFellow("queryWindowAltres")
-								.setVisible(false);
-						esquema.getFellow("queryWindow").getFellow("img_altres")
-								.setSrc("~./img/fletxa.gif");
-						view_altres = false;
-					}
-				}
-				
-				void blockSearchCriteria()
-				{
-					if (view_search_criteria == false)
-					{
-						esquema.getFellow("queryWindow").setHeight(queryWindowMin);
-						esquema.getFellow("queryWindow")
-								.getFellow("label_show_search")
-								.setLabel(
-										org.zkoss.util.resource.Labels
-												.getLabel("usuaris.zul.HideSearch"));
-						esquema.getFellow("queryWindow").getFellow("img_test")
-								.setSrc("~./img/fletxa-baix.gif");
-						view_search_criteria = true;
-					}
-				}
 				void select () {
 							if (esquema.getFellow("lista").getFellow("listbox").selectedItem != null @and
 								esquema.getFellow("lista").getFellow("listbox").selectedItem.value != null) {
@@ -446,9 +282,6 @@
 				}
 			]]>
 		</zscript>
-<!-- 
-		<textbox xmlns:w="http://www.zkoss.org/2005/zk/client" value="abc123" action="onMouseOver: alert('hola');"/>
- -->
  		<esquemavertical datamodel="/model" focusCriteri="queryName"
 			id="esquema" onHideFormulari="showLista()" hideSearchToolbar="true">
 

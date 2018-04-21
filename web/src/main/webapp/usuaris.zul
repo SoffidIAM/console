@@ -14,14 +14,22 @@
 		<![CDATA[
 				if (pageScope{"requestedUser"} != null)
 				{
+					model.getJXPathContext().getVariables().declareVariable("synchro", "true");
 					qw = esquema.getFellow("queryWindow");
 					searchBox = qw.getFellow("searchBox");
 					searchBox.addAttribute("userName").setSearchFilter(requestedUser);
 					searchBox.search();
-					esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
-					showDetall();
-					esquema.removeCriteria();
-					esquema.removeList();
+					if (esquema.getFellow("lista").getFellow("listbox").getItems().size() == 1)
+					{
+						showDetall();
+						esquema.removeCriteria();
+						esquema.removeList();
+						esquema.getFellow("lista").getFellow("listbox").setSelectedIndex(0);
+					}
+					else
+					{
+						model.getJXPathContext().getVariables().declareVariable("synchro", null);
+					}
 				}
 		]]>
 		</attribute>
@@ -55,7 +63,7 @@
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
 			
-				String ghp = System.getProperty("soffid.entitlement.group.holder");
+				String ghp = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.entitlement.group.holder");
 				if ("always".equals(ghp))
 					showHolderGroup = enforceHolderGroup = true;
 				else if ("optional".equals(ghp))

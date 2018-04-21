@@ -20,7 +20,7 @@ public abstract class AccountMetadataEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column(name = "AME_NAME", length = 25)
+	@Column(name = "AME_NAME", length = 50)
 	public java.lang.String name;
 
 	@Column(name = "AME_DIS_ID", reverseAttribute = "metaData", cascadeDelete = true)

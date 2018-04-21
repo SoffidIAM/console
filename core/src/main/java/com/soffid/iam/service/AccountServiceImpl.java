@@ -1848,6 +1848,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		findByJsonQuery(result, query);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
+		result.done();
 		return result.get();
 	}
 	

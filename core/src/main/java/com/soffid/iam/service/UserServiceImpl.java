@@ -3005,6 +3005,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		LinkedList<User> result = new LinkedList<User>();
 
 		internalSearchUsersByJson(query, result);
+		
 		return result;
 	}
 

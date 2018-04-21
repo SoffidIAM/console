@@ -2384,6 +2384,7 @@ public class ApplicationServiceImpl extends
 		findApplicationByJsonQuery(result, query);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
+		result.done();
 		return result.get();
 	}
 

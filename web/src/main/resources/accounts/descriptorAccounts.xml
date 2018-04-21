@@ -57,10 +57,13 @@
 				return bean;
 			</new-instance-script>
 			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService"
-					method="findAccountByJsonQueryAsync" if="${query != null}">
+					method="findAccountByJsonQueryAsync" if="${query != null  &amp;&amp; synchro == null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Account"></new-instance-bean>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService"
+					method="findAccountByJsonQuery" if="${query != null  &amp;&amp; synchro != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
 		</finder>
 		<finder name="tipusUsuari" type="tipusUsuari">
 			<script-finder>

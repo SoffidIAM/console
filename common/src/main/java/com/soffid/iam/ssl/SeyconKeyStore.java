@@ -54,7 +54,7 @@ public class SeyconKeyStore {
             {
                 String sslKey = ""; //$NON-NLS-1$
                 Random r = new Random ();
-                for ( int i = 0; i < 16; i ++)
+                for ( int i = 0; i < 32; i ++)
                 {
                         int c = r.nextInt(94);
                         sslKey = sslKey + (char) ('!'+c);

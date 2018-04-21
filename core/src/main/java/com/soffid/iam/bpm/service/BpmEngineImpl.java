@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -150,7 +151,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	private String getUserName() {
 		if (Security.getPrincipal() == null)
-			return "nobody";
+			return "nobody"; //$NON-NLS-1$
 
 		String p = null;
 		p = Security.getCurrentUser();
@@ -246,7 +247,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			try {
 				ctx.close();
 			} catch (Exception e) {
-				log.info("Error closing BPM context", e);
+				log.info("Error closing BPM context", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -271,7 +272,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 							.get(0);
 					if (getUserName().equals(log.getActorId())) {
 						resultadoFinal.add(VOFactory
-								.newProcessInstance(instance));
+								.newProcessInstance(context, getProcessHierarchyEntityDao(), instance));
 					}
 				}
 			}
@@ -350,7 +351,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			
 			endAuthenticationLog(instance.getRootToken());
 			context.save(instance);
-			return VOFactory.newProcessInstance(instance);
+			return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),instance);
 		} finally {
 			flushContext(context);
 		}
@@ -586,7 +587,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 								getUserGroups(), p.getProcessDefinition())
 								|| business.isUserAuthorized(SUPERVISOR_ROLE,
 										getUserGroups(), p.getProcessDefinition()))
-							resultado.add(VOFactory.newProcessInstance(p));
+							resultado.add(VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),p));
 					}
 				} catch (JbpmException e) {
 					log.warn(e);
@@ -623,7 +624,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 								.next();
 						try {
 							resultadoFinal.add(VOFactory
-									.newProcessInstance(instance));
+									.newProcessInstance(context, getProcessHierarchyEntityDao(),instance));
 						} catch (JbpmException e) {
 							log.warn(e);
 						}
@@ -773,18 +774,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 						org.jbpm.taskmgmt.exe.TaskInstance ti = (org.jbpm.taskmgmt.exe.TaskInstance) it
 								.next();
 						if (business.canAccess(getUserGroups(), ti)) {
-							return VOFactory.newProcessInstance(process);
+							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 						}
 					}
 					for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(id))
 					{
 						if (handleGetProcess(parentProcess.getParentProcess()) != null)
-							return VOFactory.newProcessInstance(process);
+							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 					}
 					return null;
 					//				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
 				} else {
-					return VOFactory.newProcessInstance(process);
+					return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 				}
 			}
 			else
@@ -868,13 +869,13 @@ public class BpmEngineImpl extends BpmEngineBase {
 		if (proc != null)
 		{
 			try {
-				ProcessInstance procvo = VOFactory.newProcessInstance(proc);
+				ProcessInstance procvo = VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),proc);
 				ProcessLog log = new ProcessLog();
 				log.setDate(procvo.getStart());
-				log.setUser("");
+				log.setUser(""); //$NON-NLS-1$
 				log.setProcessId(process.getId());
-				log.setAction(Messages.getString("BpmEngineImpl.StartProcess")+": "+
-						procvo.getId()+" - "+procvo.getDescription());
+				log.setAction(Messages.getString("BpmEngineImpl.StartProcess")+": "+ //$NON-NLS-1$ //$NON-NLS-2$
+						procvo.getId()+" - "+procvo.getDescription()); //$NON-NLS-1$
 				
 				parsedLogs.add(position++, log);
 
@@ -895,7 +896,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				{
 					for ( ProcessLog pl: parsedLogs2)
 					{
-						pl.setAction("> "+pl.getAction());
+						pl.setAction("> "+pl.getAction()); //$NON-NLS-1$
 						parsedLogs.add(position++, pl);
 					}
 				}
@@ -1522,7 +1523,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		try {
 			org.jbpm.taskmgmt.exe.TaskInstance instance = context
 					.loadTaskInstance(task.getId());
-			return VOFactory.newProcessInstance(instance.getToken()
+			return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),instance.getToken()
 					.getProcessInstance());
 		} finally {
 			flushContext(context);
@@ -2034,7 +2035,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				endAuthenticationLog(pi.getRootToken());
 				context.save(pi);
 			}
-			return VOFactory.newProcessInstance(pi);
+			return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),pi);
 		} catch (Exception e) {
 			context.setRollbackOnly();
 			if (e instanceof BPMException)
@@ -2359,13 +2360,27 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 			definition = org.jbpm.graph.def.ProcessDefinition
 					.parseParZipInputStream(new ZipInputStream(streamLectura));
-
-			streamLectura.close();
 			
+			streamLectura.close();
+
 			TenantModuleDefinition tmd = new TenantModuleDefinition();
 			tmd.setTenantId(Security.getCurrentTenantId());
 			definition.addDefinition( tmd );
 
+			Set<String> taskNames = new HashSet<String>();
+			for (Node node: definition.getNodes())
+			{
+				if (node instanceof TaskNode)
+				{
+					for ( Task task: (Collection<Task>)((TaskNode) node).getTasks())
+					{
+						if (taskNames.contains(task.getName()))
+							throw new InternalErrorException (String.format(Messages.getString("BpmEngineImpl.duplicatedTask"),task.getName())); //$NON-NLS-1$
+						taskNames.add(task.getName());
+					}
+				}
+			}
+			
 			context.deployProcessDefinition(definition);
 
 			context.getGraphSession().saveProcessDefinition(definition);

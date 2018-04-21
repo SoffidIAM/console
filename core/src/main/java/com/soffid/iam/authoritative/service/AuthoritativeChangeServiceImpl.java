@@ -563,6 +563,17 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			}
 			else if (value != null && value instanceof Date) 
 			{
+				Calendar vc = Calendar.getInstance();
+				vc.setTime((Date)value);
+				if (! vc.equals(dada.getDateValue()))
+				{
+					auditAuthoritativeChange(tracker);
+					dada.setDateValue((Calendar)value);
+					getAdditionalDataService().update(dada);
+				}
+			}
+			else if (value != null && value instanceof Date) 
+			{
 				Calendar c = Calendar.getInstance();
 				c.setTime((Date) value);
 				if ( ! c.equals(dada.getDateValue()))

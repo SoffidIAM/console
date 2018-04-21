@@ -2,6 +2,7 @@ package com.soffid.iam.bpm.business;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.jbpm.graph.def.Node;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.def.Transition;
 import org.jbpm.graph.exe.ExecutionContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.graph.exe.Token;
 import org.jbpm.graph.node.TaskNode;
 import org.jbpm.job.Job;
@@ -39,6 +41,8 @@ import com.soffid.iam.bpm.api.Comment;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
+import com.soffid.iam.model.ProcessHierarchyEntity;
+import com.soffid.iam.model.ProcessHierarchyEntityDao;
 
 import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.exception.BPMException;
@@ -156,6 +160,8 @@ public class VOFactory {
 	}
 
 	public static com.soffid.iam.bpm.api.ProcessInstance newProcessInstance(
+			JbpmContext context,
+			ProcessHierarchyEntityDao hDao,
 			org.jbpm.graph.exe.ProcessInstance instance) throws InternalErrorException {
 		try {
 			com.soffid.iam.bpm.api.ProcessInstance process = new com.soffid.iam.bpm.api.ProcessInstance();
@@ -174,7 +180,7 @@ public class VOFactory {
 				Thread.currentThread().setContextClassLoader(oldcl);
 			}
 			Vector<Comment> comments = new Vector<Comment>();
-			populateTokenComments(instance.getRootToken(), comments);
+			populateTokenComments(context, hDao, instance, comments);
 			Collections.sort(comments, new Comparator<Comment>() {
 				public int compare(Comment o1, Comment o2) {
 					return o1.getTime().compareTo(o2.getTime());
@@ -225,6 +231,20 @@ public class VOFactory {
 			log.info("Error generating ProcessInstance", th);
 			throw new InternalErrorException("Error generating process instance", th);
 		}
+	}
+
+	private static void populateTokenComments(JbpmContext context, ProcessHierarchyEntityDao hDao,
+			ProcessInstance instance, Vector<Comment> comments) {
+		for (ProcessHierarchyEntity parent: hDao.findByChildren(instance.getId()))
+		{
+			ProcessInstance parentProc = context.getProcessInstance(parent.getParentProcess().longValue());
+			if (parent != null)
+			{
+				populateTokenComments(context, hDao, parentProc, comments);
+			}
+		}
+
+		populateTokenComments(instance.getRootToken(), comments);
 	}
 
 	private static void populateTokenComments(Token token, Vector<Comment> comments) {

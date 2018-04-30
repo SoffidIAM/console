@@ -75,6 +75,7 @@ public abstract class Rol {
 	public Date approvalEnd;
 
 	@Description ("Role custom attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
 	@Nullable
 	public Map<String,Object> attributes; 
 }

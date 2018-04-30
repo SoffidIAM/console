@@ -643,7 +643,7 @@ public class TaskUI extends Frame implements EventListener {
                     {
                     	for (TaskInstance ti: tasks)
                     	{
-                    		if (ti.getActorId().equals (Security.getCurrentUser()))
+                    		if (ti.getActorId() != null && ti.getActorId().equals (Security.getCurrentUser()))
                     		{
                                 ti = engine.startTask(ti);
                                 Application.jumpTo(BPMApplication.getTaskURL(ti));

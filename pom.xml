@@ -10,7 +10,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>1.8.14-SNAPSHOT</version>
+  <version>1.8.14</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -24,7 +24,7 @@
   <url>http://www.soffid.com/doc/console</url>
   <scm>
         <connection>scm:git:ssh://git@stash.dev.lab:7999/iam2/console.git</connection>
-    <tag>HEAD</tag>
+    <tag>console-1.8.14</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>

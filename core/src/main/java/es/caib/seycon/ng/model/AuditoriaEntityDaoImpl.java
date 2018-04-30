@@ -110,7 +110,10 @@ public class AuditoriaEntityDaoImpl extends
                 d.get(Calendar.SECOND),
                 d.get(Calendar.MILLISECOND));
         p.print(" "); // SP
-        p.print(Config.getConfig().getHostName()); // HOSTNAME
+        String hn = Config.getConfig().getHostName();
+        if (hn == null || hn.trim().isEmpty())
+        	hn = InetAddress.getLocalHost().getHostName();
+        p.print(hn); // HOSTNAME
         p.print(" "); // SP
         p.print("SOFFID"); // APPNAME
         p.print(" "); // SP

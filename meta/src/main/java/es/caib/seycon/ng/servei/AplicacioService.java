@@ -145,6 +145,22 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Description("Finds the management roles for any information system")
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findApplicationManagers(
+			java.lang.String informationSystem, String roleName)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Description("Finds the managers with a set management role for an application")
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findApplicationManagementRoles()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 
 	
 	@Operation(grantees = { roles.application_query.class }, translated = "findRolesByUserName")

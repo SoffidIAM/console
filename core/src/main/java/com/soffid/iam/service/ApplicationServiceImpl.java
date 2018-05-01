@@ -2762,8 +2762,33 @@ public class ApplicationServiceImpl extends
 		return getRoleEntityDao().findRoleNames(systemName);
 	}
 
+	@Override
+	protected Collection<Role> handleFindApplicationManagementRoles() throws Exception {
+		Collection<RoleEntity> roles = getRoleEntityDao().findApplicationManagementRoles();
+		return getRoleEntityDao().toRoleList(roles);
+	}
 
-
+	@Override
+	protected Collection<RoleAccount> handleFindApplicationManagers(String informationSystem, String roleName)
+			throws Exception {
+		Collection<RoleAccount> ra = new LinkedList<RoleAccount>();
+		for (RoleEntity role: getRoleEntityDao().findApplicationManagementRoles())
+		{
+			if (role.getName().equals(roleName))
+			{
+				Collection<RoleAccountEntity> grants = getRoleAccountEntityDao().findByRoleAndDomainValue(
+						role.getName(),
+						role.getSystem().getName(),
+						DomainType.APLICACIONS,
+						null,
+						informationSystem,
+						null
+						);
+				ra.addAll(getRoleAccountEntityDao().toRoleAccountList(grants));
+			}
+		}
+		return ra;
+	}
 }
 
 class RolAccountDetail

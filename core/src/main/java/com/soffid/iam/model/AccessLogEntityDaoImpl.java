@@ -289,7 +289,7 @@ public class AccessLogEntityDaoImpl extends
                             : "") //$NON-NLS-1$
                     + (!senseUsuari ? "left join registreAcces.user user " //$NON-NLS-1$
                             : "") //$NON-NLS-1$
-                    + ("where registreAccess.tenant.id = :tenantId ") //$NON-NLS-1$
+                    + ("where registreAcces.tenant.id = :tenantId ") //$NON-NLS-1$
                     + (!senseClient ? "and (client.name like :nomClient) " : "") //$NON-NLS-1$ //$NON-NLS-2$
                     + (!senseServidor ? "and (server.name like :nomServidor) " //$NON-NLS-1$
                             : "") //$NON-NLS-1$

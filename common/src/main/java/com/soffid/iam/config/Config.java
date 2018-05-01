@@ -95,6 +95,7 @@ public class Config {
 		File config = getConfigFile();
         if (config.canRead()) {
             prop.load(new FileInputStream(config));
+            inMemory = false;
         }
 	}
 

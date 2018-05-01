@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.model;
 
 import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -234,6 +237,7 @@ public abstract class RolEntity {
 		return null;
 	}
 
+
 	@Operation(translated = "findByNameAndSystem")
 	@DaoFinder("select rolEntity \n"
 			+ "from com.soffid.iam.model.RoleEntity rolEntity \n"
@@ -303,6 +307,17 @@ public abstract class RolEntity {
 	public java.util.List<String> findRoleNames(String system) {
 		return null;
 	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@DaoFinder("select u "
+			+ "from com.soffid.iam.model.RoleEntity as u "
+			+ "where u.domainType = 'APLICACIONS'")
+	public java.util.Collection<RolEntity> findApplicationManagementRoles()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
 }
 
 

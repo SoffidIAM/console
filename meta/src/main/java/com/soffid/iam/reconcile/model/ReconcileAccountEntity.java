@@ -7,8 +7,11 @@
 package com.soffid.iam.reconcile.model;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.AccountEntity;
+
 @Entity (table="SC_RECACO" )
-@Depends ({com.soffid.iam.reconcile.common.ReconcileAccount.class})
+@Depends ({com.soffid.iam.reconcile.common.ReconcileAccount.class,
+	AccountEntity.class})
 public abstract class ReconcileAccountEntity {
 
 	@Column (name="RAC_ID")

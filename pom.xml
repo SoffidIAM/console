@@ -414,7 +414,7 @@
     <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.23-SNAPSHOT</zkiblaf.version>
+    <zkiblaf.version>1.23</zkiblaf.version>
     <zkdb.version>1.33</zkdb.version>
   </properties>
   <pluginRepositories>

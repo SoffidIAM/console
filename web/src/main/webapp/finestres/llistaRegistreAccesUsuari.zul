@@ -139,7 +139,7 @@
 			event.stopPropagation ();
 		</attribute>	
 		
-		<criteris height="20px" id="queryWindow" onOK="search(true)" width="99.7%">				
+		<criteris id="queryWindow" onOK="search(true)" width="99.7%">				
 			<hbox>
 				<input_criteri etiqueta="${c:l('llistaRegistreAccesUsuari.zul.NumRegistres')}" id="queryNumRegistres"/>
 				<input_criteri etiqueta="${c:l('llistaRegistreAccesUsuari.zul.DataInici')}" id="queryData" visible="false"/>

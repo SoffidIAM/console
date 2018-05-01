@@ -154,7 +154,7 @@
 
 		<detalls id="dades" width="100%" style="border:none;">
 			<form dataPath="/esquema/lista/listbox:/" id="form" width="99%" onOK="">
-				<div style="border: 3px solid #637792; padding:13px">
+				<div style="padding:13px">
 					<div class="objectatt_row">
 						<label value="${c:l('com.soffid.iam.api.CustomObject.name')}" sclass="objectatt_label"/>
 						<textbox bind="@name" width="250px" id="objectTypeName" onChange=""/>

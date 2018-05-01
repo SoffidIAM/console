@@ -1,47 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?page id="grupsLlista" title="Llista de grups"?>
+<?page id="aplicacionsLlista" title="Llista d'aplicacions"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk>
-	<datamodel id="model" rootNode="grups" src="descriptorGrup.xml" />
-
+	<datamodel id="model" rootNode="aplicacions" src="descriptorAplicacio.xml"/>
+	
 	<zscript src="comu/checkTruncatedResults.zul" />
 
 	<zscript>
 		<![CDATA[
 			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-			mode = "query";
+			mode = "query"; 
 			model.getVariables().declareVariable("queryEnabled", false);
-			model.getVariables().declareVariable("disableWorld", true);
 			queryEnabled = false;
 
-			void acceptData() {
+			void acceptaDada() {
 				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
 				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
 				index = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getSelectedIndex();
-				ctx = ds.getJXPathContext();
-				pointer = ctx.createPath(xpath + "[" + (index + 1) + "]");
+				ctx = ds.getJXPathContext(); 
+				pointer = ctx.createPath (xpath+"["+(index + 1)+"]");
 				ctx2 = ctx.getRelativeContext(pointer);
-				codiGrup = (String) ctx2.getPointer("@codi").getValue();
-				descGrup = (String) ctx2.getPointer("@descripcio").getValue();
-				idGrup = (String) ctx2.getPointer("@id").getValue().toString();
-				pointer.invalidate();
-				String[] dades = { codiGrup, descGrup, idGrup };
+				codi = (String)ctx2.getPointer("@codi").getValue();
+				pointer.invalidate ();						
 				Component formComponent = (Component) pageScope.get("contextComponent");
-				Events.postEvent("onActualitza", formComponent, dades);
+				Events.postEvent ("onActualitza", formComponent, codi);							
 				cleanWindow();
 			}
+
 			void cleanWindow() {
 				model.getVariables().declareVariable("queryEnabled", false);
-//				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/grup[false]";
-				esquemaLlista.visible = false;
+//				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/aplicacio[false]";
+				esquemaLlista.visible=false;
 //				esquemaLlista.getFellow("finishButton").disabled = true;
 			}
 		]]>
 	</zscript>
 
-	<window id="esquemaLlista" closable="true" position="center, center" sizable="true" title="${c:l('grupsllista.Titol')}"
+	<window id="esquemaLlista" closable="true" position="center, center" sizable="true" title="${c:l('aplicacionsllista.Titol')}"
 			visible="false" width="900px">
 
 		<attribute name="onInicia">
@@ -64,40 +61,30 @@
 		<esquemavertical id="esquema" hideSearchToolbar="true" style="margin:10px">
 
 			<criteris id="queryWindow">
-				<attribute name="onCreate"><![CDATA[
-				]]></attribute>
-				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.Group"
-						defaultAttributes="name, description, type"
-						dataPath="/model:/grup" variableName="query">
+				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.Application"
+					defaultAttributes="name, description, roles.name"
+					dataPath="/model:/aplicacio" variableName="query">
 				</searchbox>
 			</criteris>
 
 			<navegador id="lista">
-				<listbox id="listbox" autocommit="false" dataPath="/model:/grup" fixedLayout="true" rows="${fileres}">
+				<listbox autocommit="false" dataPath="/model:/aplicacio" fixedLayout="true" id="listbox" rows="${fileres}">
 					<attribute name="onSelect">
 						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
 					</attribute>
 					<listhead>
-						<listheader label="${c:l('grupsllista.zul.Codi-2')}"
-							width="30%" />
-						<listheader
-							label="${c:l('grupsllista.zul.Descripcia-2')}" width="70%" />
+						<listheader label="${c:l('aplicacionsllista.zul.Codi-2')}" width="200px"/>
+						<listheader label="${c:l('aplicacionsllista.zul.Descripcia')}" width="400px"/>
 					</listhead>
-					<listfoot>
-						<listfooter span="3">
-							<label id="listboxFoot"
-								style="margin-left: 10px;" />
-						</listfooter>
-					</listfoot>
 					<dataitem bind=".">
 						<listcell bind="@codi">
 							<attribute name="onDoubleClick">
-								acceptData();
+								acceptaDada();
 							</attribute>
 						</listcell>
-						<listcell bind="@descripcio">
+						<listcell bind="@nom">
 							<attribute name="onDoubleClick">
-								acceptData();
+								acceptaDada();
 							</attribute>
 						</listcell>
 					</dataitem>
@@ -105,14 +92,14 @@
 			</navegador>
 		</esquemavertical>
 		<hbox style="margin-left:auto; margin-right:auto">
-			<button disabled="true" id="finishButton" label="${c:l('grupsllista.zul.Accepta')}">
+			<button disabled="true" id="finishButton" label="${c:l('aplicacionsllista.zul.Accepta')}">
 				<attribute name="onClick">
-					if (!self.disabled)
-						acceptData();
+					if (! self.disabled)
+						acceptaDada();
 				</attribute>
 			</button>
-			<button label="${c:l('grupsllista.zul.Cancel·la')}" onClick="cleanWindow()" />
+			<button label="${c:l('aplicacionsllista.zul.Cancel·la')}" onClick="cleanWindow()"/>			
 		</hbox>
-		<separator spacing="10px" />
+		<separator spacing="10px"/>
 	</window>
 </zk>

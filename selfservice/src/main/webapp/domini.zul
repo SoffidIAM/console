@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="domini" title="Nou domini d'aplicació"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+
+	<zscript>
+	<![CDATA[
+		void cleanWindow()
+		{
+			esquemaDomini.getFellow("dades").getFellow("form").getFellow("detall_nom").setValue("");
+			esquemaDomini.getFellow("dades").getFellow("form").getFellow("detall_descripcio").setValue("");
+			esquemaDomini.visible=false;						
+		}
+		
+		void acceptaDada()
+		{
+			String nom = esquemaDomini.getFellow("dades").getFellow("form").getFellow("detall_nom").getValue();
+			String des = esquemaDomini.getFellow("dades").getFellow("form").getFellow("detall_descripcio").getValue();
+			String[] dades = {nom, des};
+			if(nom != null && !nom.trim().isEmpty()){
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, dades);							
+				cleanWindow();
+			}
+			else
+			{
+				Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("domain.NameNotNull"),
+						org.zkoss.util.resource.Labels.getLabel("domain.ErrorNameValidation"));
+			}
+		}
+		]]>
+	</zscript>
+
+	<window closable="true" id="esquemaDomini" position="center, center" title="${c:l('domini.Titol')}" visible="false" width="80%">
+		<attribute name="onInicia">
+     		pageScope.put("contextComponent", event.data);
+			if(self.mode.compareToIgnoreCase("highlighted") != 0){
+				self.setMode("highlighted");
+			}else{
+				self.visible = true;
+			}
+		</attribute>
+		<attribute name="onClose">
+			cleanWindow();
+			event.stopPropagation ();
+		</attribute>
+	
+		<detalls id="dades" width="790px">
+			<form id="form">
+				<grid fixedLayout="true" height="52px" width="785px">
+					<rows>
+						<row>
+							<input_etiqueta value="${c:l('domini.zul.Nom')}"/>
+							<textbox id="detall_nom" maxlength="30" onChange="self.value=self.value.toUpperCase()" sclass="textbox" width="400px"/>
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('domini.zul.Descripcia')}"/>
+							<textbox id="detall_descripcio" sclass="textbox" width="700px"/>
+						</row>
+					</rows>
+				</grid>
+			</form>
+		</detalls>
+		
+		<separator spacing="5px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button id="finishButton" label="${c:l('domini.zul.Accepta')}">
+				<attribute name="onClick">
+				if (!esquemaDomini.getFellow("dades").getFellow("detall_nom").value.equals("")) {
+					acceptaDada();
+				}
+				</attribute>
+			</button>
+			<button label="${c:l('domini.zul.Cancel·la')}" onClick="cleanWindow()"/>								
+		</hbox>
+			
+	</window>
+	
+</zk>

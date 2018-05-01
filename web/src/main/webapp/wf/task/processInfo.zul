@@ -12,13 +12,13 @@
 		<rows>
 			<row>
 				<label sclass="label" value="${c:l('process.lblFechaInicio')}"/>
-				<datebox disabled="true" id="txtFechaInicio"/>
+				<datebox disabled="true" id="txtFechaInicio"  buttonVisible="false"/>
 				<label sclass="label" value="${c:l('process.lblFechaCreacion')}"/>
-				<datebox disabled="true" id="txtFechaCreacion"/>
+				<datebox disabled="true" id="txtFechaCreacion"  buttonVisible="false"/>
 			</row>
 			<row>
 				<label sclass="label" value="${c:l('process.lblFechaFinalizacion')}"/>
-				<datebox disabled="true" id="txtFechaFinalizacion"/>
+				<datebox disabled="true" id="txtFechaFinalizacion"  buttonVisible="false"/>
 				<label sclass="label" value="${c:l('process.lblEstado')}"/>
 				<label id="txtEstado"/>
 			</row>

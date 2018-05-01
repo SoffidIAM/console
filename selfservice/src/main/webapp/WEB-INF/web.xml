@@ -580,6 +580,18 @@
 	</ejb-local-ref>
 
 	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/AdditionalDataServiceEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.AdditionalDataService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/v2/CustomObjectEJB</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.CustomObjectService</local>
+	</ejb-local-ref>
+
+	<ejb-local-ref>
 		<ejb-ref-name>ejb/v2/DispatcherEJB</ejb-ref-name>
 		<ejb-ref-type>Session</ejb-ref-type>
 		<local>com.soffid.iam.service.ejb.DispatcherService</local>

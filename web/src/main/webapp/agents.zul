@@ -1529,19 +1529,6 @@
 											bind="." 
 											mold="select" 
 											width="15%"/>
-										<label value="Condition: " width="10%"></label>
-										<input_dada bind="@condition" width_custom ="45%"></input_dada>
-										<imageclic src="/img/pencil.png" width="1em" >
-											<attribute name="onClick"><![CDATA[
-											    Events.sendEvent(new Event ("onEdit", 
-											    		desktop.getPage("editor").getFellow("top"),
-											    		new Object[] {
-															    event.getTarget().getPreviousSibling().getFellow("dada"),
-															    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars2(self)
-														}
-											    ));
-											]]></attribute>
-										</imageclic>
 									</div>
 	
 										

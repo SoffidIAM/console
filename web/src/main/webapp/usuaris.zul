@@ -45,8 +45,7 @@
 
 			.useratt {display: table; padding: 0px; width: 100%}
 			.useratt_row {display: table-row}
-			.useratt_row span {padding-left:5px}
-			.useratt_label {display: table-cell; width: 202px}
+			.useratt_label {display: table-cell; width: 120px}
 			.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		</style>
 
@@ -709,12 +708,16 @@
 									<vbox width="100%">
 										<hbox width="100%" widths="50%,1px,*">
 											<grid width="99%">
+												<columns>
+													<column width="120px"></column>
+													<column/>
+												</columns>
 												<rows>
 													<row>
 														<input_etiqueta
 															value="${c:l('usuaris.zul.Codi-2')}" />
 
-														<hbox width="100%">
+														<hbox width="100%" widths=", 16px, 15px">
 															<textbox id="codi" bind="@codi" maxlength="150"
 																sclass="textbox" constraint="no empty" width="100%">
 																<attribute name="onChange">
@@ -844,7 +847,7 @@
 																bind="@codiGrupPrimari" mascara="no empty"
 																lectura="${!canModifyUser}" width_custom="200px" 
 																tooltip="tooltipGrup" style="display: inline-block; "/>
-															<label value="*" style="display: inline-block; padding-left: 4px; padding-right: 4px;"/>
+															<label value="*" style="display: inline-block;"/>
 															<imageclic src="~./img/grup.gif" style="display: inline-block; ">
 																<attribute name="onClick">
 																	if (canModifyUser)
@@ -989,7 +992,7 @@
 														<div>
 															<checkbox id="actiu" bind="@actiu"
 																disabled="${!canModifyUser}" onCheck='setDisabledColor()' />
-															<label value="${c:l('accounts.Disabled')}" style="background-color: red; color:white;" visible="false" id="disabledRow"/>
+															<label value="${c:l('accounts.Disabled')}" style="background-color: red; color:white; padding: 2px 6px 0px 6px;" visible="false" id="disabledRow"/>
 														</div>
 													</row>
 													<row>
@@ -1004,7 +1007,7 @@
 										<separator height="1px" />
 										<grid width="100%">
 											<columns>
-												<column width="12em"/>
+												<column width="120px"/>
 												<column width="*"/>
 											</columns>
 												<rows>
@@ -1258,8 +1261,9 @@
 									<div use="com.soffid.iam.web.users.additionalData.UserAttributesDiv" 
 										dataPath="/esquema/lista/listbox:/dada" readonly="${!canUpdateUserMetadata }"
 										ownerBind="./"
+										ownerContext="console"
 										sclass="useratt"
-										style="border: 1px solid #7F9DB9; padding:5px; padding-right: 16px"/>
+										style="padding:5px; padding-right: 16px"/>
 									<separator width="1px" />
 									<vbox width="99%">
 										<grid
@@ -1303,8 +1307,46 @@
 												<column
 													label="${c:l('usuaris.zul.Grup')}" width="*" />
 												<column
-													label="${c:l('usuaris.zul.')}"
-													visible="${canDeleteUserGroup}" width="30px" />
+													visible="${canDeleteUserGroup}" width="30px" >
+													<zscript>
+													<![CDATA[
+							  				void addGroup() {
+												Page p = desktop.getPage("identity");
+												p.setVariable("types",
+															new com.soffid.iam.web.component.Identity.Type[] {
+																	com.soffid.iam.web.component.Identity.Type.GROUP
+															}
+														);
+												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.addGroup"));
+												p.setVariable("invoker", addNewGroupButton);
+												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+											}
+
+											void selectedGroup(List identities) {
+												for (com.soffid.iam.web.component.Identity id: identities)
+												{
+													es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(addNewGroupButton);
+													group = id.getObject();
+													String path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath());
+													es.caib.zkib.jxpath.JXPathContext xpathContext = 
+															ctx.getDataSource().getJXPathContext();
+													xpathContext.setValue(path+"/@codiGrup", group.getName());
+
+													campCodiUsuari = (DataTextbox) form.getFellow("codi");
+													codiUsuari = campCodiUsuari.getValue();
+													xpathContext.setValue(path+"/@codiUsuari", codiUsuari);
+													xpathContext.setValue(path+"/@descripcioGrup", group.getDescription());
+													xpathContext.setValue(path+"/@nomComplet", nomUsuari());
+												}
+											}
+													]]></zscript>
+													<imageclic align="right" src="~./img/list-add.gif"
+														visible="${canCreateUserGroup}"
+														id="addNewGroupButton"
+														onClick="addGroup()" onIdentity="selectedGroup(event.data)">
+													
+													</imageclic>
+												</column>
 											</columns>
 											<datarow>
 												<div>
@@ -1345,45 +1387,6 @@
 												</imageclic>
 											</datarow>
 										</grid>
-
-										<button
-											image="~./img/list-add.gif"
-											label="${c:l('usuaris.zul.Afegeixnou')}"
-											visible="${canCreateUserGroup}"
-											id="addNewGroupButton"
-											onClick="addGroup()" onIdentity="selectedGroup(event.data)">
-											<zscript><![CDATA[
-							  				void addGroup() {
-												Page p = desktop.getPage("identity");
-												p.setVariable("types",
-															new com.soffid.iam.web.component.Identity.Type[] {
-																	com.soffid.iam.web.component.Identity.Type.GROUP
-															}
-														);
-												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.addGroup"));
-												p.setVariable("invoker", addNewGroupButton);
-												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
-											}
-
-											void selectedGroup(List identities) {
-												for (com.soffid.iam.web.component.Identity id: identities)
-												{
-													es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(addNewGroupButton);
-													group = id.getObject();
-													String path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/grup");
-													es.caib.zkib.jxpath.JXPathContext xpathContext = 
-															ctx.getDataSource().getJXPathContext();
-													xpathContext.setValue(path+"/@codiGrup", group.getName());
-
-													campCodiUsuari = (DataTextbox) form.getFellow("codi");
-													codiUsuari = campCodiUsuari.getValue();
-													xpathContext.setValue(path+"/@codiUsuari", codiUsuari);
-													xpathContext.setValue(path+"/@descripcioGrup", group.getDescription());
-													xpathContext.setValue(path+"/@nomComplet", nomUsuari());
-												}
-											}
-											]]></zscript>
-										</button>
 										<popup id="grupsTooltip"
 											width="200px">
 											<attribute name="onOpen">
@@ -1413,72 +1416,44 @@
 
 								<separator spacing="10px" />
 
-								<hbox width="99%" widths="50%,50%">
-									<grid sclass="grid sensescroll">
-										<rows>
-											<row>
-												<input_etiqueta
-													value="${c:l('usuaris.zul.Creatper')}" />
-												<hbox>
-													<input_dada
-														bind="@usuariCreacio" id="usuariCreacio" lectura="true" />
-													<datebox
-														bind="@dataCreacioUsuari" disabled="true"
-														format="${c:l('usuaris.zul.dateFormat')}" id="dataCreacio" sclass="dateboxread" />
-												</hbox>
-											</row>
-											<row>
-												<input_etiqueta
-													value="${c:l('usuaris.zul.Modificatper')}" />
-												<hbox>
-													<input_dada
-														bind="@usuariDarreraModificacio"
-														id="usuariDarreraModificacio" lectura="true" />
-													<datebox
-														bind="@dataDarreraModificacioUsuari" disabled="true"
-														format="${c:l('usuaris.zul.dateFormat')}" id="dataDarreraModificacio"
-														sclass="dateboxread"/>
-												</hbox>
-											</row>
-										</rows>
-									</grid>
-									<grid sclass="grid sensescroll">
-										<rows>
-											<row>
-												<hbox width="100%"
-													widths="50%,50%">
-													<vbox
-														width="100%">
-														<hbox
-															width="100%" widths="50%,50%">
-															<input_etiqueta
-																value="${c:l('usuaris.zul.DarreraccasalSEU')}" />
-															<datebox
-																bind="@usuariSEU/dataDarrerLogin" buttonVisible="false"
-																disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
-																sclass="dateboxread" width="120px" />
-														</hbox>
-														<hbox
-															width="100%" widths="50%,50%">
-															<input_etiqueta
-																value="${c:l('usuaris.zul.IPdeconnexia')}" />
-															<input_dada
-																bind="@usuariSEU/lastIP" lectura="true"
-																width_custom="120px" />
-														</hbox>
-													</vbox>
-													<hbox width="50%"
-														widths="50%,50%">
-														<input_etiqueta
-															value="${c:l('usuaris.zul.Versia')}" />
-														<input_dada
-															bind="@usuariSEU/@versio" lectura="true" />
-													</hbox>
-												</hbox>
-											</row>
-										</rows>
-									</grid>
-								</hbox>
+								<vbox>
+									<div>
+										<input_etiqueta
+											value="${c:l('usuaris.zul.Creatper')}" />
+										<label
+											bind="@usuariCreacio" id="usuariCreacio"  />
+										<datebox
+											style="margin-left: 10px"
+											bind="@dataCreacioUsuari" disabled="true"  buttonVisible="false"
+											format="${c:l('usuaris.zul.dateFormat')}" id="dataCreacio" sclass="dateboxread" />
+									</div>
+									<div>
+										<input_etiqueta
+											value="${c:l('usuaris.zul.Modificatper')}" />
+										<label
+											bind="@usuariDarreraModificacio"
+											id="usuariDarreraModificacio" />
+										<datebox
+											style="margin: 10px"
+											bind="@dataDarreraModificacioUsuari" disabled="true"  buttonVisible="false"
+											format="${c:l('usuaris.zul.dateFormat')}" id="dataDarreraModificacio"
+											sclass="dateboxread"/>
+									</div>
+									<div>
+										<input_etiqueta
+											value="${c:l('usuaris.zul.DarreraccasalSEU')}" />
+										<datebox 
+											style="margin: 10px"
+											bind="@usuariSEU/dataDarrerLogin" buttonVisible="false"
+											disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+											sclass="dateboxread" width="120px" />
+										<input_etiqueta
+											value="${c:l('usuaris.zul.IPdeconnexia')}" />
+										<input_dada
+											bind="@usuariSEU/lastIP" lectura="true"
+											width_custom="120px" />
+									</div>
+								</vbox>
 							</tabpanel>
 							<tabpanel id="accounts" onCreatedAccout="accountCreated()">
 								<zscript>
@@ -2095,7 +2070,7 @@ void actualitza (event) {
 														c.style = "text-decoration: line-through;";
 													}
 												} else {
-													event.data.style = event.data.style + "; background-color: blue;";
+													event.data.style = event.data.style + "; background-color: transparent;";
 												}
 											} else if (showHolderGroup) {
 												// Change holdergroup textbox to a new listbox
@@ -2587,7 +2562,7 @@ void actualitza (event) {
 											<label bind="@nomMaquinaServidora" />
 											<label bind="@nomMaquinaClient" />
 											<label bind="@port" />
-											<datebox bind="@dataInici" buttonVisible="false"
+											<datebox bind="@dataInici" buttonVisible="false" 
 												disabled="true" format="dd/MM/yyyy kk:mm"
 												sclass="dateboxreadnoborder" width="99%" />
 											<imageclic sclass="imageclic centre" src="~./img/vnc.gif">
@@ -2611,7 +2586,7 @@ void actualitza (event) {
 								<vbox width="100%">
 									<listbox
 										dataPath="/esquema/lista/listbox:/processosUsuari"
-										fixedLayout="true" height="300px" id="gridProcessos"
+										fixedLayout="true" id="gridProcessos"
 										width="99%">
 										<listhead>
 											<listheader

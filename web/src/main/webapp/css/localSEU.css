@@ -455,8 +455,6 @@ body
     text-indent: 20px;
 }
 
-.text, .textbox { box-sizing: content-box; padding: 2px;}
-
 
 .noBorderGrid tr.z-row td.z-row-inner, tr.z-row .z-cell, div.z-grid { border: none;  }
 .noBorderGrid div.grid-body tbody tr td.gc {border: none;}
@@ -817,3 +815,143 @@ div.displayedFromLeft {
 .toolbarOnlyDetails a img {
 	vertical-align:-3px
 }
+
+
+/** new style **/
+.capsa_cerca {
+	border:none;
+}
+
+.capsa_navegador {
+	border:none;
+}
+
+div.listbox {
+	border: none;
+}
+
+div.listbox-foot, div.grid-foot, div.tree-foot{
+	border-top: none;
+}
+
+
+div.listbox, div.tree, div.grid {
+	background: transparent; border: 0px solid #7F9DB9; overflow: hidden;
+}
+
+div.tree-head th, div.listbox-head th, div.grid-head th
+	 {
+	overflow: hidden; border: 1px solid;
+	border-color: #DAE7F6 #9EB6CE #9EB6CE #DAE7F6;
+	white-space: nowrap; padding: 2px;
+	font-size: small; font-weight: normal;
+	vertical-align: top;
+}
+div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
+	 {
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(/zkau/web/zul/img/sort/v_hint.gif);
+	background-position: 99% center;
+	background-repeat: no-repeat;
+}
+div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner
+	 {
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(/zkau/web/zul/img/sort/v_asc.gif);
+	background-position: 99% center;
+	background-repeat: no-repeat;
+}
+div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner
+	 {
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(/zkau/web/zul/img/sort/v_dsc.gif);
+	background-position: 99% center;
+	background-repeat: no-repeat;
+}
+div.tree-body, div.listbox-body, div.grid-body {
+	background: white; border: 0; overflow: auto; width: 100%;
+}
+div.listbox-pgi, div.grid-pgi, div.tree-pgi {
+	border-top: 0px solid #AAB; overflow: hidden;
+}
+div.listbox-pgi-t, div.grid-pgi-t, div.tree-pgi-t {
+	border-bottom: 0px solid #AAB; overflow: hidden;
+}
+tr.grid td.gc { 
+	font-size: 11px; color: black; background: white; 
+	border: none; 
+	padding: 2px;
+}
+
+
+.text, .textbox { 
+	box-sizing: content-box; padding: 2px;
+}
+
+input.textbox, input.dateboxinp, input.text {
+	box-sizing: border-box;
+	padding: 2px;
+	border: none;
+	background: transparent;
+	border-bottom: 1px solid #AAB;
+}
+
+textarea.text {
+	box-sizing: border-box;
+	padding: 2px;
+	border: solid 1px #637792;
+	background: transparent;
+	border-bottom: 1px solid #AAB;
+	border-radius: 2px;
+	min-height: 20px;
+}
+
+input.readonly, input.text-disd {
+	box-sizing: border-box;
+	background: transparent;
+	border: none;
+}
+
+
+/* Hacemos que el listbox parezca a los estilos del grid */
+.likeagrid table td {
+	background-color: transparent;
+	padding:4px 5px;
+	border: none;
+	cursor: default;
+}
+
+.likeagrid table td div table td {
+	border: none;
+}
+
+.likeagrid {
+	border:none;
+}
+
+
+table.listbox-btable tr.seld td, 
+table.listbox-btable tr.seld,
+div.tree-body  table tr.seld {
+	background-color: powderblue;
+}	
+tr.overd {
+	background-color: aliceblue;
+}	
+div.record-form > div > img.imageclic {
+	float: none;
+	margin-left: 10px;
+}
+
+.capsa_detalls {
+	border: none;
+	overflow: auto;
+	padding: 0px;
+	margin-bottom: 7px;
+}
+
+.wf_listbox {
+    border: none;
+}
+
+

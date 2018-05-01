@@ -5,7 +5,8 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
+		title="${c:l('seu.dominiUsuaris')}" width="99%">
 
 	<script src='~./js/codemirror/java-classes.js'/>
 	
@@ -1000,4 +1001,4 @@
 			</tabpanel>
 		</tabpanels>
 	</tabbox>
-</zk>
+</frame>

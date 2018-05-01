@@ -18,8 +18,9 @@
 		div.nosel table.listbox-btable tr.seld td div span {font-weight:normal;}
 		.st0 {margin:0 0 5px 0;cursor:pointer !important;}
 		div.doscolors tr td { vertical-align:top;}
-		div.doscolors tr.odd td {background-color: #FFFFFF;}
+		div.doscolors tr.odd td {background-color: lightblue;}
 		div.doscolors tr.seld td {background-color: #DBDBDB;}
+		div.doscolors tr.odd.overd td  {background-color: aliceblue;}
 		.st { color: blue !important; }
 		.st:hover {text-decoration:underline;color:blue !important;}		
 		.agentcss:hover {text-decoration:underline; color:blue !important; cursor: pointer;}

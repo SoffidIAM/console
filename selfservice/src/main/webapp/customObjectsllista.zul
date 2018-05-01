@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="customObjectsLlista" title="List of custom objects"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<zk>
+	<datamodel id="model" rootNode="objects" src="descriptorCustomObject.xml" />
+	
+	<zscript src="comu/checkTruncatedResults.zul" />
+	
+	<zscript>
+		<![CDATA[
+			
+			
+			void acceptaDada() {
+				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
+				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
+				index = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getSelectedIndex();
+				ctx = ds.getJXPathContext(); 
+				pointer = ctx.createPath(xpath+"["+(index + 1)+"]");
+				ctx2 = ctx.getRelativeContext(pointer);
+				codi = (String) ctx2.getPointer("@name").getValue();
+				pointer.invalidate();						
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Events.postEvent ("onActualitza", formComponent, codi);							
+				cleanWindow();
+			}
+
+			void cleanWindow() {
+				model.getVariables().declareVariable("queryEnabled", false);
+				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/customObject[false]";
+				esquemaLlista.visible=false;
+				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+	 	]]>
+	</zscript>
+	
+	<window id="esquemaLlista" closable="true" position="center, center" sizable="true" title="${c:l('main.lblCustomObjectTypes')}"
+		visible="false" width="900px">
+
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				
+				String objectType = page.getAttribute("type");
+				model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
+				
+				esquema.getFellow("queryWindow").getFellow("searchBox").
+					setJsonObject("com.soffid.iam.api.CustomObject#"+objectType);
+				
+				model.getVariables().declareVariable("query", null);
+				model.refresh();
+
+				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setMode("highlighted");
+				}else{
+					self.visible = true;
+				}
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation();
+			]]>
+		</attribute>
+		
+		<esquemavertical id="esquema" hideSearchToolbar="true" style="margin:10px">
+		
+			<criteris id="queryWindow">
+				<searchbox auto="true" id="searchBox" jsonObject="com.soffid.iam.api.CustomObject" 
+					defaultAttributes="name, description"
+					dataPath="/model:/object" variableName="query">
+				</searchbox>
+			</criteris>
+			
+			<navegador id="lista">
+				<toolbar>
+					<insertbutton id="b_inserir" acces="${canCreate}"
+						onClick='Events.postEvent("onSelect", listbox, null)' 
+						listbox="/esquema/lista/listbox"/>
+					<deletebutton listbox="/esquema/lista/listbox" acces="${canDelete}"/> 
+					<commitbutton id="b_commit" datamodel="/model"/>
+					<toolbarbutton id="b_cancel" image="~./img/document-undo.gif"
+						visible="${false}"
+						label="${c:l('grups.zul.CancelChanges')}" />
+				</toolbar>
+				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="${fileres}" autocommit="false">
+					<attribute name="onSelect">
+						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
+					</attribute>
+					<listhead>
+						<listheader label="${c:l('com.soffid.iam.api.CustomObject.name')}"
+							sort="auto" width="20%" />
+						<listheader
+							label="${c:l('com.soffid.iam.api.CustomObject.description')}"
+							sort="auto" width="20%" />
+					</listhead>
+					<listfoot>
+						<listfooter span="3">
+							<label id="listboxFoot" style="margin-left: 10px;" />
+						</listfooter>
+					</listfoot>
+					<dataitem bind=".">
+						<listcell bind="@name">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+						<listcell bind="@description">
+							<attribute name="onDoubleClick">
+								acceptaDada();
+							</attribute>
+						</listcell>
+					</dataitem>
+				</listbox>
+			</navegador>
+		
+		</esquemavertical>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('aplicacionsllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (! self.disabled)
+						acceptaDada();
+				</attribute>
+			</button>
+			<button label="${c:l('aplicacionsllista.zul.Cancel·la')}" onClick="cleanWindow()"/>			
+		</hbox>
+		<separator spacing="10px"/>
+	</window>	         
+</zk>

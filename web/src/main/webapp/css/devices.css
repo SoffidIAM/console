@@ -78,11 +78,17 @@ td[class^='tab-3d-']{background-image:none;}
 .tab, .tab a, .tabsel, .tabsel a{font-size:13px; font-weight:bold;}
 .tab a{color:#7F9FC2}
 .tabsel a{color: #9EC73C;}
-.tabsel, .tab{border:1px solid #7F9FC2; }
+.tabsel, .tab{border-bottom:none }
 
 /* Esquinas superiores de la tabla de las pesta�as*/
-td.tab-3d-first1, td.tab-3d-first2, td.tab-3d-last1, td.tab-3d-last2 {border-bottom: 1px solid #7F9FC2;}
-td.tab-thicktabbox-first1, td.tab-thicktabbox-first2, td.tab-thicktabbox-last1 {border-bottom: 3px solid #637792;}
+td.tab-3d-first1, td.tab-3d-first2, td.tab-3d-last1, td.tab-3d-last2 {border-bottom: none;}
+td.tab-thicktabbox-first1, td.tab-thicktabbox-first2, td.tab-thicktabbox-last1 {
+	border-bottom: none;
+	}
+td.tab-thicktabbox-last1, 
+td.tab-3d-last1 {
+	border-bottom: 1px solid #637792;
+}
 td.tab-3d-first2, td.tab-3d-last2, td.tab-thicktabbox-first2, td.tab-thicktabbox-last2{width:auto;}
 
 /*** THICK TABBOX ************/
@@ -93,12 +99,12 @@ td.tab-thicktabbox-first2 {
 	width: 3px; height: 3px;
 }
 td.tab-thicktabbox-last1 {
-	border-left: 2px solid #637792;
+	border-left: none;
 	width: 3px; height: 33px;
 }
 td.tab-thicktabbox-last2 {
 	width: 1px; height: 3px;
-	border-bottom: 3px solid #637792;
+	border-bottom: none;
 }
 
 td.tab-thicktabbox-tl-sel, td.tabaccd-thicktabbox-tl-sel {
@@ -138,19 +144,27 @@ td.tab-thicktabbox-mr-uns, td.tabaccd-thicktabbox-mr-uns, td.groupbox-thicktabbo
 }
 
 div.thicktabbox div.tabpanels div.tabpanel {
-	border-left: 3px solid #637792 !important;
-	border-bottom: 3px solid #637792 !important;
-	border-right: 3px solid #637792 !important;
+	border: none !important;
 }
-div.thicktabbox div table tbody tr td.tabsel, div.thicktabbox div table tbody tr td.tab{
-	border-left:1px solid #637792; 
-	border-right:1px solid #637792; 
-	border-top: 3px solid #637792;
-	border-bottom: none;
+div table tbody tr td.tabsel
+{
+	border-left: none !important;
+	border-top: none !important;
+	border-right: none !important;
+	border-bottom: 2px solid #9EC73C; 
+	
+} 
+
+div table tbody tr td.tab{
+	border-left: none !important;
+	border-top: none !important;
+	border-right: none !important;
+	border-bottom:1px solid #637792; 
+	
 } 
 
 div.thicktabbox > div > table > tbody > tr > td:first-child {
-	border-right: 2px solid #637792;
+	border-right: none;
 } 
 
 
@@ -160,7 +174,7 @@ td.tab-thicktabbox-bl-sel {
 }
 td.tab-thicktabbox-bl-uns {
 	width: 5px; height: 3px;
-	border-bottom: 2px solid #637792;
+	border-bottom: none;
 }
 td.tab-thicktabbox-bm-sel {
 	height: 3px;
@@ -168,7 +182,7 @@ td.tab-thicktabbox-bm-sel {
 }
 td.tab-thicktabbox-bm-uns {
 	height: 3px;
-	border-bottom: 2px solid #637792;
+	border-bottom: none;
 }
 td.tab-thicktabbox-br-sel {
 	width: 5px; height: 3px;
@@ -176,7 +190,7 @@ td.tab-thicktabbox-br-sel {
 }
 td.tab-thicktabbox-br-uns {
 	width: 5px; height: 3px;
-	border-bottom: 2px solid #637792;
+	border-bottom: none;
 }
 
 tr.tab-thicktabbox-m, tr.tab-vthicktabbox-m, tr.tabaccd-thicktabbox-m, tr.groupbox-thicktabbox-m {
@@ -189,7 +203,11 @@ td.tabaccd-thicktabbox-b, td.groupbox-thicktabbox-b {
 /****** End thicktabbox ***********/
 
 /* Tabla */
-div.tabpanel {border-left:1px solid #7F9FC2  !important;border-right:1px solid #7F9FC2  !important;border-bottom:1px solid #7F9FC2 !important; }
+div.tabpanel {
+	border-left:none;
+	border-right: none;
+	border-bottom: none; 
+}
 
 /* Sidebar: Aplicaciones*/
 .aplications img{margin-top:-2px;}
@@ -244,6 +262,10 @@ div.tabpanel {border-left:1px solid #7F9FC2  !important;border-right:1px solid #
 	font-family: Arial, sans-serif;	font-size: 11px; font-weight: bold; color: #FFF;
 	border: 0px; text-decoration: none; background: #637792;
 	white-space:nowrap; 
+}
+
+.toolbar a:hover {
+	background: #7387a2;
 }
 
 

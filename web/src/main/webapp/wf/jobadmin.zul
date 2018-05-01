@@ -162,7 +162,7 @@ void startNow(Image img)
 				</listbox>
 				<div style="display: inline; width: 100%; height: 100%; ">
 					<div style="vertical-align: middle;  height: 100%; width: 32px; display: inline-block; ">
-						<image visible="false" style="vertical-align: middle" onClick="showMessage(self)"/>
+						<image visible="false" style="vertical-align: middle; cursor: pointer;" onClick="showMessage(self)"/>
 					</div>
 					<div style="vertical-align: middle; width: 8em; height: 100%; display:inline-block; ">
 						<label style="vertical-align: top; line-height: 20px;"/>

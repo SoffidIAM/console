@@ -356,7 +356,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkiblaf</artifactId>
-        <version>1.23-SNAPSHOT</version>
+        <version>1.23</version>
       </dependency>
       <dependency>
         <groupId>com.soffid.zkib</groupId>

@@ -18,6 +18,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TaskEntityDao;
 import com.soffid.iam.model.UserEntityDao;
@@ -49,9 +50,11 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.sync.servei.TaskQueue;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.BeansException;
@@ -397,14 +400,76 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		}
 	}
 
-	private void updateAccount(ReconcileAccount account) throws InternalErrorException {
+	private void updateAccount(ReconcileAccount account) throws InternalErrorException, AccountAlreadyExistsException {
 		Account previous = getAccountService().findAccount(account.getAccountName(), account.getDispatcher());
 		if (previous == null)
 			throw new InternalErrorException("Cannot update non existing account: "+account.getAccountName());
 		previous.setDescription(account.getDescription());
 		previous.setStatus(account.isActive()? AccountStatus.ACTIVE: AccountStatus.DISABLED);
 		previous.setDisabled(! account.isActive());
+		getAccountService().updateAccount(previous);
+		updateAccountAttributes(account, previous);
 		previous.getAttributes().putAll(account.getAttributes());
+	}
+
+	private void updateAccountAttributes(ReconcileAccount account, Account previous) throws InternalErrorException {
+		List<UserData> att2 = previous == null ? new LinkedList<UserData>():
+				getAccountService().getAccountAttributes(previous);
+		for (String att: account.getAttributes().keySet())
+		{
+			Object v = account.getAttributes().get(att);
+			boolean found = false;
+			for (UserData ud: att2)
+			{
+				if (ud.getAttribute().equals(att))
+				{
+					found = true;
+					if (v == null)
+					{
+						getAccountService().removeAccountAttribute(ud);
+					}
+					else
+					{
+						if (v instanceof Date)
+						{
+							ud.setDateValue(Calendar.getInstance());
+							ud.getDateValue().setTime((Date)v);
+						}
+						else if (v instanceof Calendar)
+						{
+							ud.setDateValue((Calendar)v);
+						}
+						else
+						{
+							ud.setValue(v.toString());
+						}
+						getAccountService().updateAccountAttribute(ud);
+					}
+				}
+			}
+			if (! found && v != null)
+			{
+				UserData ud = new UserData();
+				ud.setAccountName(account.getAccountName());
+				ud.setSystemName(account.getDispatcher());
+				ud.setAttribute(att);
+				if (v instanceof Date)
+				{
+					ud.setDateValue(Calendar.getInstance());
+					ud.getDateValue().setTime((Date)v);
+				}
+				else if (v instanceof Calendar)
+				{
+					ud.setDateValue((Calendar)v);
+				}
+				else
+				{
+					ud.setValue(v.toString());
+				}
+				getAccountService().createAccountAttribute(ud);
+				
+			}
+		}
 	}
 
 	/**
@@ -440,11 +505,13 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 		if (account.getAccountType().equals(AccountType.USER))
 		{
 			createNewUserAccount(account);
+			updateAccountAttributes(account, null);
 		}
 
 		else
 		{
 			accountServ.createAccount(newAccount);
+			updateAccountAttributes(account, null);
 		}
 	}
 
@@ -495,6 +562,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 			UserAccount acc = accountServ.createAccount(user, disp, account.getAccountName());
 			acc.setAttributes(account.getAttributes());
 			accountServ.updateAccount(acc);
+			updateAccountAttributes(account, null);
 		}
 
 		catch (AccountAlreadyExistsException ex)

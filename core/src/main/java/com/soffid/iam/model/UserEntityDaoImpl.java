@@ -976,7 +976,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
         LinkedList<UserEntity> usuarisRol = new LinkedList<UserEntity>();
 
-        for (RoleAccountEntity rolAccount : getRoleAccountEntityDao().findByRoleAndDomainValue(nomRolAtorgat, baseDeDadesRolAtorgat, codiAplicacioRolAtorgat, tipusDomini, codiGrupDominiRolAtorgat, codiAplicacioDominiRolAtorgat, new Long(idValorDominiAplicacioDominiRolAtorgat))) {
+        for (RoleAccountEntity rolAccount : getRoleAccountEntityDao().findByRoleAndDomainValue(nomRolAtorgat, baseDeDadesRolAtorgat, tipusDomini, codiGrupDominiRolAtorgat, codiAplicacioDominiRolAtorgat, new Long(idValorDominiAplicacioDominiRolAtorgat))) {
             com.soffid.iam.model.AccountEntity acc = rolAccount.getAccount();
             if (acc.getType().equals(AccountType.USER) && acc.getUsers().size() == 1) {
                 usuarisRol.add(acc.getUsers().iterator().next().getUser());

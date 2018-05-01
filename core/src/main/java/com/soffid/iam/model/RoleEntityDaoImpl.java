@@ -1112,7 +1112,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	                                        rolContenidor.getName(),
 	                                        rolContenidor.getSystem()
 	                                                .getName(),
-	                                        rolContenidor.getInformationSystem().getName(),
 	                                        rolContenidor.getDomainType(),
 	                                        associacio.getGranteeGroupDomain() != null ? associacio
 	                                                .getGranteeGroupDomain().getName()

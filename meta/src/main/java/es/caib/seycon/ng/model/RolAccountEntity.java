@@ -165,8 +165,7 @@ public abstract class RolAccountEntity {
 			+ "left join ra.group as gr "
 			+ "left join ra.informationSystem informationSystem \n"
 			+ "left join ra.domainValue domainValue \n"
-			+ "where (role.name = :roleName and role.system.name = :systemName and \n"
-			+ "           role.informationSystem.name = :roleInformationSystem) and "
+			+ "where (role.name = :roleName and role.system.name = :systemName) and \n"
 			+ "ra.domainType=:domainType and \n"
 			+ "( gr is null or :groupScope = gr.name) and \n"
 			+ "( informationSystem is null or :informationSystemScope = informationSystem.name) and \n"
@@ -175,7 +174,6 @@ public abstract class RolAccountEntity {
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByRolAndValorDomini(
 			java.lang.String roleName, 
 			java.lang.String systemName,
-			java.lang.String roleInformationSystem, 
 			java.lang.String domainType,
 			java.lang.String groupScope,
 			java.lang.String informationSystemScope,

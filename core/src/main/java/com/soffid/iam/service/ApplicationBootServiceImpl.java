@@ -272,9 +272,15 @@ public class ApplicationBootServiceImpl extends
 		Security.nestedLogin("master\\Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase();
-			
-			Configuration cfg = configSvc.findParameterByNameAndNetworkName(
-					"versionLevel", null); //$NON-NLS-1$
+
+			Configuration cfg = null;
+			for (Configuration cfg2: configSvc.findConfigurationByFilter("masterVersionLevel", null, null, null))
+			{
+				if (cfg == null)
+					cfg = cfg2;
+				else 
+					configSvc.delete(cfg2);
+			}
 			if (cfg == null)
 			{
 				cfg = new Configuration("masterVersionLevel", "0"); //$NON-NLS-1$ //$NON-NLS-2$

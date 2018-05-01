@@ -7,8 +7,11 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.AuditoriaEntity;
+
 @ValueObject ( translatedName="Audit",
 	 translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass=AuditoriaEntity.class)
 public class Auditoria {
 
 	@Attribute(translated = "additionalInfo" )
@@ -25,6 +28,7 @@ public class Auditoria {
 	@Description("Person who has made the action")
 	@Nullable
 	@Attribute(translated = "author" )
+	@JsonAttribute(hibernateAttribute="accountAssoc.name")
 	public java.lang.String autor;
 
 	@Nullable
@@ -87,11 +91,13 @@ public class Auditoria {
 	public java.lang.String parametreConfiguracio;
 
 	@Nullable
+	@JsonAttribute(hibernateJoin="accountAssoc.users as users", hibernateAttribute="user.primaryGroup.name")
 	@Attribute(translated = "primaryGroupAuthor" )
 	public java.lang.String autorGrupPrimari;
 
 	@Nullable
 	@Attribute(translated = "authorFullName" )
+	@JsonAttribute(hibernateAttribute="accountAssoc.description")
 	public java.lang.String autorNomComplet;
 
 	@Nullable

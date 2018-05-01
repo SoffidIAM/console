@@ -6,12 +6,15 @@
 
 package es.caib.seycon.ng.servei;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
 @Service(translatedName = "AuditService", translatedPackage = "com.soffid.iam.service")
-@Depends({ es.caib.seycon.ng.model.AuditoriaEntity.class })
+@Depends({ es.caib.seycon.ng.model.AuditoriaEntity.class,
+	AsyncRunnerService.class})
 public abstract class AuditoriaService {
 
 	@Operation(grantees = { roles.audit_query.class }, translated = "findAuditById")
@@ -74,6 +77,22 @@ public abstract class AuditoriaService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.Auditoria create(
 			es.caib.seycon.ng.comu.Auditoria auditoria)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.audit_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Auditoria> findAuditByJsonQuery(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.audit_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Auditoria> findAuditByJsonQueryAsync(
+			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

@@ -15,23 +15,41 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.User;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.UserDataEntity;
+import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Vector;
+
+import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.AuditoriaService
@@ -250,4 +268,81 @@ public class AuditServiceImpl extends
 		getAuditEntityDao().create(entity);
 		return getAuditEntityDao().toAudit(entity);
 	}
+
+	@Override
+	protected Collection<Audit> handleFindAuditByJsonQuery(String query)
+			throws InternalErrorException, Exception {
+
+		auditaQuery(query);
+
+		LinkedList<Audit> result = new LinkedList<Audit>();
+
+		internalSearchAuditsByJson(query, result);
+		
+		return result;
+	}
+
+	private void internalSearchAuditsByJson(String query, Collection<Audit> result)
+			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
+			EvalException, InternalErrorException {
+
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(Audit.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.tenant.id = :tenantId";
+
+		qs = qs + " order by o.calendar";
+		
+		hql.setWhereString(new StringBuffer(qs));
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size()+1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		TimeOutUtils tou = new TimeOutUtils();
+		for (AuditEntity ue : getAuditEntityDao().query(hql.toString(),
+				paramArray)) {
+			if (result instanceof AsyncList)
+			{
+				if (((AsyncList) result).isCancelled())
+					return;
+			}
+			else
+			{
+				tou.checkTimeOut();
+			}
+			Audit u = getAuditEntityDao().toAudit(ue);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
+				result.add(u);
+			}
+		}
+	}
+
+	@Override
+	protected AsyncList<Audit> handleFindAuditByJsonQueryAsync(final String query)
+			throws InternalErrorException, Exception {
+		
+		final AsyncList<Audit> result = new AsyncList<Audit>();
+		
+		auditaQuery(query);
+		getAsyncRunnerService().run(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					internalSearchAuditsByJson(query, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+			
+		}, result);
+
+		return result;
+	}
+
 }

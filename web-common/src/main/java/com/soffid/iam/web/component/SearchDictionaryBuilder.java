@@ -5,8 +5,10 @@ import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,8 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.web.SearchAttributeDefinition;
@@ -306,6 +310,65 @@ public class SearchDictionaryBuilder {
 			}
 		} catch (Exception e) {
 			// Cannot retrieve accounts list
+		}
+		return sd2;
+	}
+
+	private static SearchDictionary addAuditAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
+		SearchDictionary sd2 = new SearchDictionary(sd1);
+		LinkedList<SearchAttributeDefinition> attributes = new LinkedList<SearchAttributeDefinition>(sd1.getAttributes());
+		sd2.setAttributes( attributes);
+
+		for ( Iterator<SearchAttributeDefinition> it = attributes.iterator(); it.hasNext();)
+		{
+			SearchAttributeDefinition sad = it.next();
+			if (sad.getName().equals("mailDomainBelogns") ||
+					sad.getName().equals("file") ||
+					sad.getName().equals("fileName") )
+				it.remove();
+			else if (sad.getName().equals("customObjectType"))
+			{
+				List<String> types = new LinkedList<String>();
+				List<String> labels = new LinkedList<String>();
+				List<CustomObjectType> objectTypes = new LinkedList<CustomObjectType>( 
+						ServiceLocator.instance().getAdditionalDataService().findCustomObjectTypeByJsonQuery("") );
+				Collections.sort(objectTypes, new Comparator<CustomObjectType>() {
+					@Override
+					public int compare(CustomObjectType o1, CustomObjectType o2) {
+						return o1.getDescription().compareTo(o2.getDescription());
+					}
+				});
+				for (CustomObjectType ot: objectTypes)
+				{
+					types.add(ot.getName());
+					labels.add(ot.getDescription());
+				}
+				sad.setValues(types);
+				sad.setLabels(labels);
+			}
+			else if (sad.getName().equals("database"))
+			{
+				List<String> types = new LinkedList<String>();
+				List<String> labels = new LinkedList<String>();
+				List<com.soffid.iam.api.System> systems = new LinkedList<com.soffid.iam.api.System>( 
+						ServiceLocator.instance().getDispatcherService().findDispatchersByFilter(null, null, null, null, null, null));
+				if (systems.size() <= 15)
+				{
+					Collections.sort(systems, new Comparator<com.soffid.iam.api.System>() {
+						@Override
+						public int compare(com.soffid.iam.api.System o1, com.soffid.iam.api.System o2) {
+							return o1.getDescription().compareTo(o2.getDescription());
+						}
+					});
+					for (com.soffid.iam.api.System ot: systems)
+					{
+						types.add(ot.getName());
+						labels.add(ot.getDescription());
+					}
+					sad.setValues(types);
+					sad.setLabels(labels);
+				}
+			}
 		}
 		return sd2;
 	}

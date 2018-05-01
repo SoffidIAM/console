@@ -1,5 +1,6 @@
 package com.soffid.iam.web.component;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -431,6 +432,17 @@ public class AttributeSearchBox extends XulElement {
 		since = db1.getValue();
 		Datebox db2 = (Datebox)w.getFellow("db2");
 		until = db2.getValue();
+		setDateSearchInterval(since, until);
+		w.detach();
+		bg.detach();
+		notifyParent();
+	}
+
+	public void setDateSearchInterval(Date since, Date until) {
+		this.since = since;
+		this.until = until;
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT); 
+		
 		if (since == null && until == null)
 		{
 			queryExpression = null;
@@ -442,7 +454,7 @@ public class AttributeSearchBox extends XulElement {
 					ISODateTimeFormat.dateTime().print(until.getTime())+
 					"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Until")+" \""+
-					db2.getText()+"\"";
+					df.format(until)+"\"";
 		}
 		else if (until == null)
 		{
@@ -450,7 +462,7 @@ public class AttributeSearchBox extends XulElement {
 					ISODateTimeFormat.dateTime().print(since.getTime())+
 					"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Since")+" \""+
-					db1.getText()+"\"";
+					df.format(since)+"\"";
 		}
 		else
 		{
@@ -462,12 +474,9 @@ public class AttributeSearchBox extends XulElement {
 					attributeDef.getName()+" le \""+
 					ISODateTimeFormat.dateTime().print(until.getTime())+
 					"\"";
-			humanExpression = String.format(s,"\""+db1.getText()+"\"", "\""+db2.getText()+"\"");
+			humanExpression = String.format(s,"\""+df.format(since)+"\"", "\""+df.format(until)+"\"");
 		}
-		w.detach();
-		bg.detach();
 		invalidate();
-		notifyParent();
 	}
 
 	private void createDateSearch(final Window w, final Div bg) {

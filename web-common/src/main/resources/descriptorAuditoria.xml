@@ -4,15 +4,12 @@
 	<datanode name="auditories">
 		<finder name="auditoria" type="auditoria">
 			<ejb-finder jndi="java:comp/env/ejb/AuditoriaEJB"
-				method="findAuditoriesByCriteri" if="${queryEnabled}"> <!-- audit:query -->
-				<parameter value="${data}"/>
-				<parameter value="${dataFi}"/>
-				<parameter value="${autor}"/>
-				<parameter value="${objecte}"/>
-				<parameter value="${usuari}"/>
-				<parameter value="${objecteAuditat}"/>
-				<parameter value="${valorOA}"/>
-				<parameter value="${accio}"/>
+				method="findAuditByJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:comp/env/ejb/AuditoriaEJB"
+				method="findAuditByJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
+				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Auditoria">
 			</new-instance-bean>

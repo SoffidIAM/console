@@ -217,7 +217,14 @@ public class AuditEntityDaoImpl extends
 					} 
 					catch (MissingResourceException e3) 
 					{
-						msg = MessageFactory.getString(BUNDLE_NAME2 + "_" + targetVO.getObject(), targetVO.getAction()); //$NON-NLS-1$
+						try {
+							msg = MessageFactory.getString(BUNDLE_NAME2 + "_" + targetVO.getObject(), targetVO.getAction()); //$NON-NLS-1$
+						}
+						catch (MissingResourceException e4) 
+						{
+							log.info("Error. Cannot find audit descriptio for "+key.toString());
+							msg = "";
+						}
 					}
 				}
 			}

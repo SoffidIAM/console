@@ -163,6 +163,23 @@ public abstract class AplicacioService {
 	}
 
 	
+	@Description("Finds the management roles for any group")
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findGroupManagers(
+			java.lang.String group, String roleName)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Description("Finds the managers with a set management role for a group")
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findGroupManagementRoles()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.application_query.class }, translated = "findRolesByUserName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRolsByCodiUsuari(

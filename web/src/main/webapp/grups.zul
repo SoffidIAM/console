@@ -27,6 +27,8 @@
 
 	<zscript>
 		<![CDATA[
+		    import es.caib.zkib.datasource.XPathUtils;
+		    
 			String requestedGroup = Executions.getCurrent().getNativeRequest().getParameter("group");
 			pageScope{"requestedGroup"} = requestedGroup;
 			import es.caib.zkib.zkiblaf.Missatgebox;
@@ -47,10 +49,12 @@
 			boolean canCreateGroup = AutoritzacionsUsuari.hasCreateGroup();
 			boolean canUpdateGroup = AutoritzacionsUsuari.hasUpdateGroup();
 			boolean canQueryGroup = AutoritzacionsUsuari.hasQueryGroup();
+			boolean canQueryRoles = AutoritzacionsUsuari.canQueryAllUserRole();
 			boolean canQueryGroupRoles =  AutoritzacionsUsuari.hasQueryGroupRoles();
 			boolean canQueryGroupUsers =  AutoritzacionsUsuari.hasQueryGroupUsers();
 			boolean canCreateGroupPrinter = AutoritzacionsUsuari.hasCreateGroupPrinter();
 			boolean canDeleteGroupPrinter = AutoritzacionsUsuari.hasDeleteGroupPrinter();
+			boolean canModifyAplicacio = AutoritzacionsUsuari.hasUpdateAplicacio();
 			
 			model.getVariables().declareVariable("queryEnabled", canQueryGroup);
 			
@@ -356,7 +360,7 @@
 						<tab label="${c:l('grups.zul.Grup')}"/>
 						<tab label="${c:l('grups.zul.Impressores')}"/>
 						<tab if="${canQueryGroupRoles}" label="${c:l('grups.zul.RolsAtorgats')}"/>
-						<tab if="${canQueryGroupUsers}" label="${c:l('grups.zul.Usuarisambrolsdelgru')}"/>
+						<tab if="${canQueryRoles}"  label="${c:l('aplicacions.zul.Responsables')}"/>
 					</tabs>
 
 					<tabpanels>
@@ -647,30 +651,74 @@
 							</vbox>
 						</tabpanel>
 						
-						<tabpanel id="t_usuarisRolGrup" if="${canQueryGroupRoles}"> <!-- atenció: son usuaris amb rol del grup group:role:query -->
-							<vbox width="99%">
-								<label value="${c:l('grups.zul.Usuarisambroldedomin')}"/>
-								<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuarisRolGrup" fixedLayout="true" height="96%" id="usuarisRolGrup" rows="15" sclass="likeagrid">
-									<listhead>
-										<listheader label="${c:l('grups.zul.Codi-2')}" sort="auto" width="12%"/>
-										<listheader label="${c:l('grups.zul.Nomcomplert')}" sort="auto" width="31%"/>
-										<listheader label="${c:l('grups.zul.Rol')}" sort="auto" width="19%"/>
-										<listheader label="${c:l('grups.zul.Bbdd')}" sort="auto" width="19%"/>
-										<listheader label="${c:l('grups.zul.Domini')}" sort="auto" width="19%"/>
-									</listhead>
-									<dataitem bind=".">
-										<listcell bind="@codiUsuari"/>
-										<listcell bind="@nomComplertUsuari"/>
-										<listcell bind="@nomRol"/>
-										<listcell bind="@baseDeDades"/>
-										<listcell bind="valorDomini/@nomDomini"/>
-									</dataitem>
-								</listbox>
-								<hbox style="float:right">
-									<listexportbutton acces="${canQueryGroupRoles}"
-										listbox="usuarisRolGrup"/>
-								</hbox>
-							</vbox>
+						<tabpanel if="${canQueryRoles }">
+							<grid dataPath="managementRole">
+								<datarow>
+									<div>
+										<label bind="@nom"/> - <label bind="@descripcio"/>
+										<div style="width:100%; padding-left:80px">
+											<grid dataPath="manager"  width="100%" >
+												<columns>
+													<column label="${c:l('aplicacions.zul.Responsable')}" width="100px"/>
+													<column label="${c:l('aplicacions.zul.Nom-2')}"/>
+													<column align="center" width="30px">
+														<imageclic src="~./img/list-add.gif" visible="${canModifyAplicacio }" >
+															<attribute name="onClick"><![CDATA[
+																Page p = desktop.getPage("identity");
+																p.setVariable("types",
+																			new com.soffid.iam.web.component.Identity.Type[] {
+																					com.soffid.iam.web.component.Identity.Type.USER
+																			}
+																		);
+																p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("accounts.addUser"));
+																p.setVariable("invoker", self);
+																Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+															]]>
+															</attribute>
+															<attribute name="onIdentity"><![CDATA[
+																for (com.soffid.iam.web.component.Identity id: event.data)
+																{
+																	es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
+																	es.caib.zkib.binder.BindContext parentCtx = XPathUtils.getComponentContext(self.parent.parent.parent.parent);
+																	user = id.getObject();
+																	String path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath());
+																	es.caib.zkib.jxpath.JXPathContext xpathContext = 
+																			ctx.getDataSource().getJXPathContext();
+																	xpathContext.setValue(path+"/@baseDeDades", XPathUtils.getValue(parentCtx, "baseDeDades"));
+																	xpathContext.setValue(path+"/@certificationDate", new Date());
+																	xpathContext.setValue(path+"/@codiAplicacio", XPathUtils.getValue(parentCtx, "codiAplicacio"));
+																	xpathContext.setValue(path+"/@codiUsuari", user.getUserName());
+																	xpathContext.setValue(path+"/@descripcioRol", XPathUtils.getValue(parentCtx, "descripcio"));
+																	xpathContext.setValue(path+"/@enabled", true);
+																	xpathContext.setValue(path+"/@nomComplertUsuari", user.getFullName());
+																	xpathContext.setValue(path+"/@nomRol", XPathUtils.getValue(parentCtx, "nom"));
+																	xpathContext.setValue(path+"/@startDate", new Date());
+																	xpathContext.setValue(path+"/@valorDomini", new es.caib.seycon.ng.comu.ValorDomini());
+																	xpathContext.setValue(path+"/@valorDomini/@valor", XPathUtils.getValue( form, "codi"));
+																	xpathContext.setValue(path+"/@valorDomini/@nomDomini", es.caib.seycon.ng.comu.TipusDomini.GRUPS);
+																}
+															]]>
+															</attribute>
+														</imageclic>
+													</column>
+												</columns>
+												<datarow>
+													<label bind="@codiUsuari"/>
+													<label bind="@nomComplertUsuari"/>
+													<imageclic align="center" src="~./img/list-remove.gif" visible="${canModifyAplicacio }">
+														<attribute name="onClick">
+															if (canModifyAplicacio) {
+																es.caib.zkib.binder.BindContext b = XPathUtils.getComponentContext(self);
+																XPathUtils.removePath( b.getDataSource(), b.getXPath() );
+															}
+														</attribute>
+													</imageclic>
+												</datarow>
+											</grid>
+										</div>
+									</div>
+								</datarow>
+							</grid>
 						</tabpanel>
 					</tabpanels>
 				</tabbox>
@@ -706,5 +754,6 @@
 	<include src="usuarisllista.zul"/>
 	<include src="aplicacionsllista.zul" />
 	<include src="customObjectsllista.zul" />
+	<include src="finestres/identity.zul" />
 	
 </frame>

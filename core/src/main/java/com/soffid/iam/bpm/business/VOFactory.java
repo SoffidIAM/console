@@ -244,7 +244,12 @@ public class VOFactory {
 			}
 		}
 
-		populateTokenComments(instance.getRootToken(), comments);
+		Token t = instance.getRootToken();
+		do
+		{
+			populateTokenComments(t, comments);
+			t = t.getProcessInstance().getSuperProcessToken();
+		} while (t != null);
 	}
 
 	private static void populateTokenComments(Token token, Vector<Comment> comments) {

@@ -433,53 +433,11 @@
 										<label bind="@nom"/> - <label bind="@descripcio"/>
 										<div style="width:100%; padding-left:80px">
 											<grid dataPath="manager"  width="100%" >
-												<attribute name="onActualitza">
-															dada = (String)(event.getData()[0]);
-															modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridResponsable.getModel();
-															ds = gridResponsable.getDataSource(); 
-															ctx =  ds.getJXPathContext();
-															xpath = gridResponsable.getXPath() + "[@nomRol = 'SC_RESPONSABLE']";
-															boolean jaExisteix = true;
-															try {
-																valor = ctx.getValue(xpath);
-															} catch(Exception e) {
-																jaExisteix = false;
-															}
-															bbdd = getBaseDeDades("APP_OWNER","SOFFID");
-															if (!bbdd.equals("")) {
-																if (jaExisteix) {
-																	pointer = ctx.getPointer(xpath);	
-																} else {
-																	position = modelProxy.newInstance();
-																	ds = gridResponsable.getDataSource(); 
-																	ctx =  ds.getJXPathContext(); 
-																	xpath = gridResponsable.getXPath() + modelProxy.getBind(position); 
-																	pointer =ctx.createPath (xpath);
-																}
-																ctx2 = ctx.getRelativeContext(pointer);
-																ctx2.setValue("@codiUsuari", dada);
-																ctx2.setValue("@nomRol","SC_RESPONSABLE");
-																
-																dsAplicacio = form.getDataSource(); 
-																ctxAplicacio =  dsAplicacio.getJXPathContext(); 
-																codiAplica = ctxAplicacio.getValue("@codi");
-																ctx2.setValue("@codiAplicacio", codiAplica);
-																ctx2.setValue("@codiAplicacioRol", "SEYCON");
-																ctx2.setValue("@codiBaseDeDadesRol", bbdd);
-																
-																ctx2.setValue("@nomComplertUsuari", event.getData()[1]);
-																
-																pointer.invalidate ();
-															} else {
-																Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("aplicacions.ResponsableIncorrecta"), new Object [] {dada}),
-																				org.zkoss.util.resource.Labels.getLabel("aplicacions.ErrorResponsable"));
-															}
-												</attribute>
 												<columns>
 													<column label="${c:l('aplicacions.zul.Responsable')}" width="100px"/>
 													<column label="${c:l('aplicacions.zul.Nom-2')}"/>
 													<column align="center" width="30px">
-														<imageclic align="right" src="~./img/list-add.gif">
+														<imageclic src="~./img/list-add.gif">
 															<attribute name="onClick"><![CDATA[
 																Page p = desktop.getPage("identity");
 																p.setVariable("types",

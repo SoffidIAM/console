@@ -83,6 +83,13 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.Usuari">
 			</new-instance-bean>
 		</finder>
+
+		<finder name="managementRole" type="managementRole" refreshAfterCommit="true">  <!-- application:query -->
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findGroupManagementRoles">
+			</ejb-finder>
+		</finder>
+
 		<finder name="usuarisRolGrup" type="usuarisRolGrup">
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB"
 				method="findRolsUsuarisTipusDominiGrupsAndGrupsUsuari" if="canQueryGroupRoles"> <!-- group:role:query -->
@@ -130,4 +137,32 @@
 	<datanode name="usuarisRolGrup" />
 
 	<datanode name="tipusUnitatOrganitzativa" />
+
+	<datanode name="managementRole">
+		<finder name="manager" type="manager">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
+				method="findGroupManagers">
+				<parameter value="${parent.instance.codi}" />
+				<parameter value="${instance.nom}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="manager">
+		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+
 </zkib-model>

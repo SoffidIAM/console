@@ -1,6 +1,5 @@
 package com.soffid.iam.service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,7 +18,6 @@ import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
-import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -38,7 +36,6 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
-import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
@@ -70,12 +67,9 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
-import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
-import com.soffid.scimquery.parser.ParseException;
-import com.soffid.scimquery.parser.TokenMgrError;
 
 import bsh.EvalError;
 import es.caib.bpm.vo.PredefinedProcessType;
@@ -1868,7 +1862,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 	
 	protected void findByJsonQuery ( AsyncList<Account> result, String query) 
-			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
+			throws Exception
 	{
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");

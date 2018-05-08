@@ -294,7 +294,7 @@ public class AuditServiceImpl extends
 		else
 			qs = "("+qs+") and o.tenant.id = :tenantId";
 
-		qs = qs + " order by o.calendar";
+		qs = qs + " order by o.date";
 		
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();

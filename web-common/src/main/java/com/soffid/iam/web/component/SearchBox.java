@@ -137,6 +137,10 @@ public class SearchBox extends HtmlBasedComponent {
 					timer.start();
 					progressImage.setVisible(true);
 				}
+				else
+				{
+					modelCollection.updateProgressStatus();
+				}
 					
 			}
 			binder.setDataPath(null);
@@ -246,11 +250,14 @@ public class SearchBox extends HtmlBasedComponent {
 			public void onEvent(Event event) throws Exception {
 				boolean end = !modelCollection.isInProgress();
 				timer.setDelay(1000);
-				modelCollection.updateProgressStatus();
-				if (end)
-				{
-					timer.stop();
-					progressImage.setVisible(false);
+				try {
+					modelCollection.updateProgressStatus();
+				} finally {
+					if (end)
+					{
+						timer.stop();
+						progressImage.setVisible(false);
+					}
 				}
 			}
 		});

@@ -142,6 +142,7 @@ public class Auditoria {
 	public java.lang.String scheduledTask;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute="date")
 	public java.util.Calendar calendar;
 
 	@Nullable

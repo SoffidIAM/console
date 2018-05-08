@@ -34,6 +34,9 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 			}
 			this.source = source;
 			source.parent = this;
+			this.cancelled = source.cancelled;
+			this.done = source.done;
+			this.exceptionToThrow = source.exceptionToThrow;
 		}
 	}
 	
@@ -54,7 +57,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 				notifyAll();
 			}
 			if (parent != null)
-				parent.done();
+				parent.cancel();
 			if (source != null)
 				source.cancel();
 		}
@@ -254,9 +257,19 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 	}
 
 	public synchronized void cancel(Throwable th) {
-		exceptionToThrow = th;
-		cancelled = true;
-		notifyAll();
+		if (! cancelled)
+		{
+			exceptionToThrow = th;
+			cancelled = true;
+			cancelled = true;
+			synchronized (this) {
+				notifyAll();
+			}
+			if (parent != null)
+				parent.cancel(th);
+			if (source != null)
+				source.cancel(th);
+		}
 	}
 
 	public Throwable getExceptionToThrow() {

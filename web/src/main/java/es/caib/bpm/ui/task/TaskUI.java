@@ -618,18 +618,20 @@ public class TaskUI extends Frame implements EventListener {
 
                     ProcessInstance process = getCurrentProcess();
                     engine.update(task);
-                    if (newComment.getValue() != null
-                            && newComment.getValue().length() > 0) {
-                        task = engine.addComment(task, newComment.getValue());
-                        workflowWindow.setTask(task);
-                    }
 
                     Events.sendEvent(new Event(
                             WorkflowWindow.PREPARE_TRANSITION_EVENT,
                             workflowWindow, transicion));
 
-                    task = engine.executeTask(task, transicion);
-                    workflowWindow.setTask(task);
+
+                    if (newComment.getValue() != null
+                            && newComment.getValue().length() > 0) {
+                        engine.addComment(task, newComment.getValue());
+                        // workflowWindow.setTask(task);
+                    }
+
+                    engine.executeTask(task, transicion);
+                    // workflowWindow.setTask(task);
 
                     Events.sendEvent(new Event(
                             WorkflowWindow.COMPLETE_TRANSITION_EVENT,

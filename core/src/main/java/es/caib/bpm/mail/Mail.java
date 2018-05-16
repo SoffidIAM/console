@@ -165,6 +165,11 @@ public class Mail implements ActionHandler {
 
     		sendPredefinedMail("Mail.4");
 		} 
+		else if ("delegate".equals(getTemplate()) )
+		{
+			template = Event.EVENTTYPE_TASK_ASSIGN;
+    		sendPredefinedMail("Mail.4");
+		} 
 		else if ("task-reminder".equals(getTemplate()) ) //$NON-NLS-1$
 		{
     		sendPredefinedMail("Mail.8");

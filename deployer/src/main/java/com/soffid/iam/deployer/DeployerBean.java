@@ -713,6 +713,7 @@ public class DeployerBean implements DeployerService {
 			if (isFailSafe()) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
+				deleteCacheProperties ();
 				recursivelyDelete(tmpDir());
 				getTimestampFile().delete();
 				uncompressEar();
@@ -723,6 +724,7 @@ public class DeployerBean implements DeployerService {
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
+				updateCacheProperties (qh);
 				try {
 					List<Object[]> result = null;
 					try {
@@ -791,6 +793,23 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
+
+	private void updateCacheProperties(QueryHelper qh) throws SQLException {
+		deleteCacheProperties();
+		for ( Object[] data: qh.select(
+				  "SELECT CON_CODI, CON_VALOR "
+				+ "FROM   SC_TENANT, SC_CONFIG "
+				+ "WHERE  CON_TEN_ID=TEN_ID AND CON_IDXAR IS NULL AND TEN_NAME='master' "
+				+ "AND    CON_CODI LIKE 'soffid.cache.%'", new Object [0]))
+		{
+			System.setProperty  ((String) data[0], (String) data[1]);
+		}
+	}
+
+	private void deleteCacheProperties() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private void doDeploy() throws Exception {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {

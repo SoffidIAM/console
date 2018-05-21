@@ -109,6 +109,7 @@ import com.soffid.iam.bpm.business.VOFactory;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.DirectoryFactory;
 import com.soffid.iam.bpm.index.Indexer;
+import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
@@ -2643,7 +2644,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 				org.jbpm.graph.exe.ProcessInstance pi = j.getProcessInstance();
 				if (business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
 						pi))
-					v.add(VOFactory.newJob(j));
+				{
+					TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
+					if (tm == null && Security.getCurrentTenantName().equals(Security.getMasterTenantName()) ||
+							tm != null && tm.getTenantId() != null && Security.getCurrentTenantId() == tm.getTenantId().longValue())
+						v.add(VOFactory.newJob(j));
+				}
 			}
 
 			return v;

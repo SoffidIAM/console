@@ -1186,7 +1186,7 @@ public class InternalPasswordServiceImpl extends
         	    if (ls != null)
         	    	return ls.validatePassword(account.getName(), account.getSystem().getName(), password.getPassword());
         	}
-            catch (NoSuchBeanDefinitionException e) 
+            catch (Exception e) 
             {
             
             }

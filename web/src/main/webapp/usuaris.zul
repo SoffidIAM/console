@@ -1037,7 +1037,8 @@
 									</vbox>
 									<vbox align="center" width="100%"
 										style="border:1px solid #7F9196;padding:2px;background-color:#EEEEEE">
-										<imageclic id="imgPwd" src="~./img/pwd.gif" tooltip="pwd">
+										<imageclic id="imgPwd" src="~./img/pwd.gif" 
+											title="${c:l('usuaris.zul.Canviacontrasenya')}">
 											<attribute name="onClick">
 												<![CDATA[
 													llista = (DataListbox) esquema.getFellow("lista").getFellow("listbox");
@@ -1098,7 +1099,7 @@
 											</attribute>
 										</imageclic>
 										<imageclic id="imgPropaga" src="~./img/propaga.gif"
-											tooltip="propaga">
+											title="${c:l('usuaris.zul.Propagaelscanvis')}">
 											<attribute name="onClick">
 												if (!form.getFellow("codi").value.equals("")) {
 													Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels
@@ -1120,7 +1121,8 @@
 											</attribute>
 										</imageclic>
 										<imageclic id="imgTasquesPendents"
-											src="~./img/exclamacio.gif" tooltip="tasquesPendents"
+											src="~./img/exclamacio.gif" 
+											title="${c:l('usuaris.zul.Llistalestasquespend')}"
 											visible="false">
 											<attribute name="onClick">
 												if (!form.getFellow("codi").value.equals("")) {
@@ -1132,18 +1134,9 @@
 												}
 											</attribute>
 										</imageclic>
-										<!--  <imageclic id="imgConsultaQuota" src="~./img/quota.gif" tooltip="consultaQuota" visible="false"> 
-											<attribute name="onClick">
-											if (!form.getFellow("codi").value.equals("")) {
-											consultaQuota(form.getFellow("codi").value);
-											} else {
-											Missatgebox.info("Ha de seleccionar un usuari.","Consulta quota");
-											}
-											</attribute>
-											</imageclic>-->
 										<imageclic
 											id="imgRegistresAcces" src="~./img/aplicacio.gif"
-											tooltip="registresAcces">
+											title="${c:l('usuaris.zul.Registresdaccas')}">
 											<attribute name="onClick">
 												if (!form.getFellow("codi").value.equals("")) {
 													desktop.getPage("registresAccesUsuari").setAttribute("usuari",
@@ -1158,7 +1151,7 @@
 											</attribute>
 										</imageclic>
 										<imageclic id="imgMazinger" src="img/mazinger.gif"
-											tooltip="mazinger">
+											title="${c:l('usuaris.zul.ConfiguraciadeMazing')}">
 											<attribute name="onClick">
 												if (!form.getFellow("codi").value.equals("")) {
 													desktop.getPage("mazingerconfig").setAttribute("usuari",
@@ -1173,7 +1166,7 @@
 											</attribute>
 										</imageclic>
 										<imageclic id="imgAuditausu" src="img/auditoria.png"
-											tooltip="auditausu" visible="${canQueryCustomAudit}">
+											title="${c:l('usuaris.zul.Auditoriadusuari')}" visible="${canQueryCustomAudit}">
 											<attribute name="onClick">
 												<![CDATA[
 													if (!form.getFellow("codi").value.equals("")) {
@@ -1205,7 +1198,7 @@
 											</attribute>
 										</imageclic>
 										<imageclic id="imgWF"
-											src="img/nouwf.png" tooltip="nouwf">
+											src="img/nouwf.png" title="${c:l('usuaris.zul.Crearprocasdelusuar')}">
 											<attribute name="onClick">
 	if (!form.getFellow("codi").value.equals("")) {
 		desktop.getPage("usuNouProces").setAttribute("codiUsuari",
@@ -1220,37 +1213,6 @@
 	}
 </attribute>
 										</imageclic>
-										<popup id="pwd">
-											<label
-												value="${c:l('usuaris.zul.Canviacontrasenya')}" />
-										</popup>
-										<popup id="propaga">
-											<label
-												value="${c:l('usuaris.zul.Propagaelscanvis')}" />
-										</popup>
-										<popup id="tasquesPendents">
-											<label
-												value="${c:l('usuaris.zul.Llistalestasquespend')}" />
-										</popup>
-										<!--  	<popup id="consultaQuota">
-											<label value="${c:l('usuaris.zul.Consultaquota')}"/>
-											</popup>	-->
-										<popup id="registresAcces">
-											<label
-												value="${c:l('usuaris.zul.Registresdaccas')}" />
-										</popup>
-										<popup id="mazinger">
-											<label
-												value="${c:l('usuaris.zul.ConfiguraciadeMazing')}" />
-										</popup>
-										<popup id="auditausu">
-											<label
-												value="${c:l('usuaris.zul.Auditoriadusuari')}" />
-										</popup>
-										<popup id="nouwf">
-											<label
-												value="${c:l('usuaris.zul.Crearprocasdelusuar')}" />
-										</popup>
 									</vbox>
 								</hbox>
 

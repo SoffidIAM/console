@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.hibernate.mapping.RootClass;
 import org.hibernate.mapping.Table;
 import org.mortbay.log.Log;
 import org.springframework.beans.BeansException;
@@ -53,7 +54,7 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 		
 		config.setProperty("hibernate.FlushMode", "commit"); //$NON-NLS-1$ //$NON-NLS-2$
 		String enableCache = System.getProperty("soffid.cache.enable");
-		if ( enableCache != null && ! "false".equals(enableCache))
+		if ( JCSCacheProvider.isEnabled() )
 		{
 			config.setProperty("hibernate.cache.provider_class", "com.soffid.iam.spring.JCSCacheProvider"); //$NON-NLS-1$ //$NON-NLS-2$
 			config.setProperty("hibernate.cache.use_second_level_cache", "true");
@@ -112,12 +113,16 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 			{
 				
 				PersistentClass pc = (PersistentClass) it.next();
-				config.setCacheConcurrencyStrategy( pc.getClassName(), "read-write");
-				for ( Iterator it2 = pc.getPropertyIterator(); it2.hasNext();)
+				PersistentClass rc = config.getClassMapping(pc.getClassName());
+				if (rc instanceof RootClass)
 				{
-					Property p = (Property) it2.next();
-					if (! p.getValue().isSimpleValue())
-						config.setCollectionCacheConcurrencyStrategy(pc.getClassName()+"."+p.getName(), "read-write");
+					config.setCacheConcurrencyStrategy( pc.getClassName(), "read-write");
+					for ( Iterator it2 = pc.getPropertyIterator(); it2.hasNext();)
+					{
+						Property p = (Property) it2.next();
+						if (! p.getValue().isSimpleValue())
+							config.setCollectionCacheConcurrencyStrategy(pc.getClassName()+"."+p.getName(), "read-write");
+					}
 				}
 			}		
 		}

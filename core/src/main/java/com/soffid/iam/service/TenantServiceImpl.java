@@ -17,7 +17,7 @@ import com.soffid.iam.utils.Security;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantServiceImpl extends TenantServiceBase {
-	private final String MASTER_NAME = "master";
+	public final static String MASTER_NAME = "master";
 	
 	@Override
 	protected Tenant handleGetMasterTenant() throws Exception {

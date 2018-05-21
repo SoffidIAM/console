@@ -92,6 +92,7 @@ public class ApplicationBootServiceImpl extends
 	private ApplicationService appSvc;
 	private ConfigurationService configSvc;
 	private BpmConfigService bpmConfigSvc;
+	private TenantService tenantService;
 
 	private Log log = LogFactory
 			.getLog(com.soffid.iam.service.ApplicationBootService.class);
@@ -153,6 +154,7 @@ public class ApplicationBootServiceImpl extends
 		tdSvc = getAdditionalDataService();
 		peSvc = getEntryPointService();
 		accountSvc = getAccountService();
+		tenantService = getTenantService();
 	}
 	/**
 	 * 
@@ -379,7 +381,8 @@ public class ApplicationBootServiceImpl extends
 	    	}
 			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
 					+ "SELECT SRV_ID, ?, SRV_ID "
-					+ "FROM SC_SERVER",
+					+ "FROM SC_SERVER "
+					+ "WHERE SRV_ID NOT IN (SELECT TNS_SRV_ID FROM SC_TENSER)",
 					new Object[] {tenantId});
 		}
 		finally
@@ -674,6 +677,8 @@ public class ApplicationBootServiceImpl extends
 			SQLException, NamingException {
 		Configuration cfg = null;
 
+		tenantService.getMasterTenant();
+		
 		createScheduledTasks();
 
 		UserDomain du = dominiSvc.findUserDomainByName("DEFAULT"); //$NON-NLS-1$

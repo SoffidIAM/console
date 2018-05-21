@@ -331,10 +331,6 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 
 	@Override
 	protected void handleStartNow(ScheduledTask task) throws Exception {
-		if (task.getServerName().equals("*"))
-		{
-			
-		}
         RemoteServiceLocator rsl = createRemoteServiceLocator(task.getServerName());
         if (rsl == null)
         	throw new InternalErrorException("Not allowed to execute task on "+task.getServerName());
@@ -345,11 +341,10 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
     private RemoteServiceLocator createRemoteServiceLocator(String serverName) throws IOException, InternalErrorException {
         for (ServerEntity server:  getServerEntityDao().findByTenant(Security.getCurrentTenantName()))
         {
-        	if (server.getType() == ServerType.MASTERSERVER && 
-        			("*".equals(serverName) || server.getName().equals(serverName)))
+        	if ( (server.getType() == ServerType.MASTERSERVER && "*".equals(serverName) )
+        			|| server.getName().equals(serverName))
         	{
-                RemoteServiceLocator rsl = new RemoteServiceLocator(serverName);
-                URLManager um = new URLManager(serverName);
+                RemoteServiceLocator rsl = new RemoteServiceLocator( server.getUrl() );
             	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
                 rsl.setAuthToken(server.getAuth());
                 return rsl;

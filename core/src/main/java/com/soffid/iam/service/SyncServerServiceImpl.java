@@ -138,6 +138,14 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
     }
 
+    private RemoteServiceLocator createServerRemoteServiceLocator(String server) throws IOException, InternalErrorException {
+    	ServerEntity s = getServerEntityDao().findByName(server);
+    	if (s == null)
+    		throw new IOException ("Unknown server "+server);
+    	else
+    		return createRemoteServiceLocator(s.getUrl());
+    }
+    
     private RemoteServiceLocator createRemoteServiceLocator(String string) throws IOException, InternalErrorException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(string);
         URLManager um = new URLManager(string);
@@ -551,8 +559,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         roundrobin ++;
         for (int i = 0; i < serv.size(); i++) {
         	String serverName = serv.get( (i + roundrobin) % serv.size());
-            RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
             try {
+                RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
                 SyncStatusService service = rsl.getSyncStatusService();
                 if (service != null)
                 	service.reconfigureDispatchers();;
@@ -571,7 +579,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		{
 			throw new InternalErrorException(String.format("Task %d is not scheduled yet", taskId));
 		} else {
-	        RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server);
 	        
 	        SyncStatusService status = rsl.getSyncStatusService();
 
@@ -591,7 +599,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		{
 			getTaskEntityDao().remove(task);
 		} else {
-	        RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server);
 	        
 	        SyncStatusService status = rsl.getSyncStatusService();
 

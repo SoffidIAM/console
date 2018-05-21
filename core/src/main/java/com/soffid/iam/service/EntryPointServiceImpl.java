@@ -2194,7 +2194,7 @@ public class EntryPointServiceImpl extends
 
 		// GRUP: només els de permís d'aministrador (!!)
 		List<EntryPointGroupEntity> autoGrup = getEntryPointGroupEntityDao()
-				.query("from com.soffid.iam.model.EntryPointGroupEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
+				.query("from com.soffid.iam.model.EntryPointGroupEntity where auhtorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
 		List<AccessTreeAuthorization> autoGrupVO = getEntryPointGroupEntityDao()
 				.toAccessTreeAuthorizationList(autoGrup);
 		for (Iterator<AccessTreeAuthorization> it = autoGrupVO.iterator(); it

@@ -65,4 +65,7 @@ public abstract class UsuariGrupEntity {
 
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
+
+	public void customCache() {
+	}
 }

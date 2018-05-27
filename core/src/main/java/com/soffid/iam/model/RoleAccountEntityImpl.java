@@ -2,7 +2,10 @@ package com.soffid.iam.model;
 
 import java.util.Collection;
 
+import org.hibernate.proxy.HibernateProxy;
+
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -41,7 +44,11 @@ public class RoleAccountEntityImpl extends RoleAccountEntity implements Security
 
 		return false;
 	}
-	
-	
+
+	@Override
+	public void customCache() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

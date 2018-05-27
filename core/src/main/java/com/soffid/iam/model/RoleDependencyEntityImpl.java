@@ -11,11 +11,14 @@ package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
 
+import org.hibernate.proxy.HibernateProxy;
+
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.spring.JCSCacheProvider;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 
@@ -151,4 +154,9 @@ public class RoleDependencyEntityImpl
 		else
 			return getContained().isAllowed(permission);
 	}
+
+	@Override
+	public void customCache() {
+	}
+
 }

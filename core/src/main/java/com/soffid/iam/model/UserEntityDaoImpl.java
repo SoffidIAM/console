@@ -207,7 +207,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     }
 
     public void remove(com.soffid.iam.model.UserEntity usuari) throws RuntimeException {
-        try {// ¿Esto se utiliza?.. en teoría NO
+        try {
             createMailTask(usuari);
 
             String codiUsuari = usuari.getUserName();

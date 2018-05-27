@@ -11,7 +11,7 @@ import org.hibernate.cache.CacheException;
 import org.hibernate.cache.Timestamper;
 
 public class JCSCache implements Cache {
-	Log log = LogFactory.getLog(getClass());
+	// Log log = LogFactory.getLog(getClass());
 	
 	private CacheAccess<Object, Object> jcs;
 
@@ -29,23 +29,23 @@ public class JCSCache implements Cache {
 
 	@Override
 	public Object get(Object key) throws CacheException {
-		Object o = jcs.get(key);
+		Object o = jcs.get(key.toString());
 		return o;
 	}
 
 	@Override
 	public void put(Object key, Object value) throws CacheException {
-		jcs.put(key, value);
+		jcs.put(key.toString(), value);
 	}
 
 	@Override
 	public void update(Object key, Object value) throws CacheException {
-		jcs.put(key, value);
+		jcs.put(key.toString(), value);
 	}
 
 	@Override
 	public void remove(Object key) throws CacheException {
-		jcs.remove(key);
+		jcs.remove(key.toString());
 	}
 
 	@Override

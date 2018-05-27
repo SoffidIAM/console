@@ -5,8 +5,11 @@
 
 package com.soffid.iam.model;
 
+import org.hibernate.proxy.HibernateProxy;
+
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -29,6 +32,11 @@ public class UserGroupEntityImpl extends UserGroupEntity
 			return getGroup().isAllowed(permission);
 		
 		return false;
+	}
+
+	
+	@Override
+	public void customCache() {
 	}
 
 }

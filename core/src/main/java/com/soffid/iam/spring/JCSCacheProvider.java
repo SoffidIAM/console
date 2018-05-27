@@ -20,6 +20,8 @@ import com.soffid.iam.utils.Security;
 
 public class JCSCacheProvider implements CacheProvider 
 {	
+	public static final String PREFIX = "hibernate";
+	
 	private static Boolean enabled = null;
 	public static boolean isEnabled () {
 		if (enabled == null)

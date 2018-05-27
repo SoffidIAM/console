@@ -362,4 +362,7 @@ public abstract class RolAccountEntity {
 	
 	@DaoOperation
 	void update(RolAccountEntity entity, String auditOperation) {}
+
+	public void customCache() {
+	}
 }

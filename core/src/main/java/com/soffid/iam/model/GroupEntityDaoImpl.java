@@ -150,7 +150,6 @@ public class GroupEntityDaoImpl extends
 			}
 			super.remove(grup);
 			getSession(false).flush();
-			
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 

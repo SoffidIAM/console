@@ -7,6 +7,9 @@ import java.util.Map;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.event.PreDeleteEventListener;
+import org.hibernate.event.PreInsertEventListener;
+import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.RootClass;
@@ -58,7 +61,7 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 		{
 			config.setProperty("hibernate.cache.provider_class", "com.soffid.iam.spring.JCSCacheProvider"); //$NON-NLS-1$ //$NON-NLS-2$
 			config.setProperty("hibernate.cache.use_second_level_cache", "true");
-			config.setProperty("hibernate.cache.region_prefix", "hibernate");
+			config.setProperty("hibernate.cache.region_prefix", JCSCacheProvider.PREFIX);
 		}
 
 		for (Object name: beans.keySet())
@@ -78,34 +81,25 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 		if ( "true".equals(enableCache))
 		{
 			config.setCacheConcurrencyStrategy(UserEntityImpl.class.getName(), "read-write");
-			config.setCollectionCacheConcurrencyStrategy(UserEntityImpl.class.getName()+".accounts", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(UserEntityImpl.class.getName()+".secondaryGroups", "read-write");
 
 			config.setCacheConcurrencyStrategy(UserGroupEntityImpl.class.getName(), "read-write");
 
 			config.setCacheConcurrencyStrategy(GroupEntityImpl.class.getName(), "read-write");
-			config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".children", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".primaryGroupUsers", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".secondaryGroupUsers", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".grantedRoles", "read-write");
 
 			config.setCacheConcurrencyStrategy(RoleGroupEntityImpl.class.getName(), "read-write");
 
 			config.setCacheConcurrencyStrategy(UserAccountEntityImpl.class.getName(), "read-write");
 
 			config.setCacheConcurrencyStrategy(AccountEntityImpl.class.getName(), "read-write");
-			config.setCollectionCacheConcurrencyStrategy(AccountEntityImpl.class.getName()+".roles", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(AccountEntityImpl.class.getName()+".users", "read-write");
+
 
 			config.setCacheConcurrencyStrategy(RoleAccountEntityImpl.class.getName(), "read-write");
 
 			config.setCacheConcurrencyStrategy(RoleEntityImpl.class.getName(), "read-write");
-			config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containerGroups", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containerRoles", "read-write");
-			config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containedRoles", "read-write");
 			
 			config.setCacheConcurrencyStrategy(RoleAccountEntityImpl.class.getName(), "read-write");
 
+			configureCollectionsCache(config);
 		}
 		else if ( "full".equals(enableCache))
 		{
@@ -117,15 +111,37 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 				if (rc instanceof RootClass)
 				{
 					config.setCacheConcurrencyStrategy( pc.getClassName(), "read-write");
-					for ( Iterator it2 = pc.getPropertyIterator(); it2.hasNext();)
-					{
-						Property p = (Property) it2.next();
-						if (! p.getValue().isSimpleValue())
-							config.setCollectionCacheConcurrencyStrategy(pc.getClassName()+"."+p.getName(), "read-write");
-					}
 				}
 			}		
+			configureCollectionsCache(config);
 		}
 	}
+
+	private void configureCollectionsCache(Configuration config) {
+		config.setCollectionCacheConcurrencyStrategy(UserEntityImpl.class.getName()+".accounts", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(UserEntityImpl.class.getName()+".secondaryGroups", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".children", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".primaryGroupUsers", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".secondaryGroupUsers", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(GroupEntityImpl.class.getName()+".grantedRoles", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(AccountEntityImpl.class.getName()+".roles", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(AccountEntityImpl.class.getName()+".users", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containerGroups", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containerRoles", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containedRoles", "read-write");
+		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".accounts", "read-write");
+		
+		config.getEventListeners().setPreInsertEventListeners(new PreInsertEventListener[] {
+				new CollectionCacheEventListener ()
+		});
+
+		config.getEventListeners().setPreUpdateEventListeners(new PreUpdateEventListener[] {
+				new CollectionCacheEventListener ()
+		});
+
+		config.getEventListeners().setPreDeleteEventListeners(new PreDeleteEventListener[] {
+				new CollectionCacheEventListener ()
+		});
+}
 
 }

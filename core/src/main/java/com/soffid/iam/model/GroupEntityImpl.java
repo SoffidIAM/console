@@ -8,9 +8,12 @@ package com.soffid.iam.model;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.hibernate.proxy.HibernateProxy;
+
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.Security;
 
@@ -87,4 +90,9 @@ public class GroupEntityImpl extends com.soffid.iam.model.GroupEntity
 			throw new SecurityException ("Unable to check permissions", e);
 		}
 	}
+
+	@Override
+	public void customCache() {
+	}
+
 }

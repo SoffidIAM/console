@@ -605,7 +605,7 @@
 								<tabpanels>
 									<tabpanel>
 										<listbox fixedLayout="true"
-											dataPath="/ownedRoles" style="margin-bottom:13px" rows="6"
+											dataPath="/ownedRoles" style="margin-bottom:13px"
 											width="100%" id="ownedRoles"
 											onIdentity='addRole(event.data, true)'
 											onNewRow="newGrantRow(event.data)">
@@ -673,7 +673,7 @@
 												</listheader>
 												<listheader
 													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
-													width="2em" sort="auto">
+													width="64px" sort="auto">
 												</listheader>
 												<listheader id="ownedRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
@@ -724,7 +724,7 @@
 									<tabpanel>
 										<listbox id="ownerRolesGrid"
 											dataPath="/ownerRoles" fixedLayout="true"
-											style="margin-bottom: 2em" rows="6" width="100%"
+											style="margin-bottom: 2em" width="100%"
 											onIdentity='addRole(event.data, false)'
 											onNewRow="newGrantRow(event.data)">
 											<zscript>
@@ -791,7 +791,7 @@
 												</listheader>
 												<listheader
 													label="${c:l('aplica_rolsllista.zul.Mandatory')}"
-													width="2em" sort="auto">
+													width="64px" sort="auto">
 												</listheader>
 												<listheader id="ownerRolesRemoveColumn"
 													label="${c:l('aplica_rolinfo.zul.')}" width="30px" />
@@ -840,7 +840,7 @@
 										</button>
 									</tabpanel>
 									<tabpanel>
-										<listbox fixedLayout="true" rows="6"
+										<listbox fixedLayout="true" 
 											id="ownerGroupsGrid" dataPath="/granteeGroups"
 											style="margin-bottom: 2em"
 											onIdentity='addGroup(event.data)'

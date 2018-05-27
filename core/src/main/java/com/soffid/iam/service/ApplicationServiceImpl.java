@@ -1942,11 +1942,13 @@ public class ApplicationServiceImpl extends
 
 	private void populateParentGrantsForGroup(HashSet<RolAccountDetail> radSet, GroupEntity grup, Object originalGrant) {
 		for (UserEntity u : grup.getPrimaryGroupUsers()) {
-            populateParentGrantsForUser(radSet, u, originalGrant, grup);
+			if (u.getActive().equals("S"))
+				populateParentGrantsForUser(radSet, u, originalGrant, grup);
         }
 		
 		for (UserGroupEntity sg : grup.getSecondaryGroupUsers()) {
-            populateParentGrantsForUser(radSet, sg.getUser(), originalGrant, grup);
+			if (sg.getUser().getActive().equals("S"))
+				populateParentGrantsForUser(radSet, sg.getUser(), originalGrant, grup);
         }
 
 		for (GroupEntity fill : grup.getChildren()) {
@@ -1957,44 +1959,47 @@ public class ApplicationServiceImpl extends
 	private void populateParentGrantsForUser(HashSet<RolAccountDetail> radSet, 
 			UserEntity u, Object originalGrant, 
 			GroupEntity granteeGroup) {
-		SystemEntity de;
-		if (originalGrant instanceof RoleDependencyEntity)
-			de = ((RoleDependencyEntity) originalGrant).getContained().getSystem();
-		else
-			de = ((RoleGroupEntity) originalGrant).getGrantedRole().getSystem();
+		if (u.getActive().equals("S"))
+		{
+			SystemEntity de;
+			if (originalGrant instanceof RoleDependencyEntity)
+				de = ((RoleDependencyEntity) originalGrant).getContained().getSystem();
+			else
+				de = ((RoleGroupEntity) originalGrant).getGrantedRole().getSystem();
+				
 			
-		
-		List<AccountEntity> accounts = getAccountsForDispatcher(u, null, de);
-		for (AccountEntity acc : accounts) {
-            if (acc != null) {
-                addAccountGrant(acc, radSet, originalGrant, granteeGroup);
-            }
-            else
-            {
-				AccountEntity dummyAccount;
-				try {
-					String accName = getAccountService().guessAccountName(u.getUserName(), de.getName());
-					if (accName != null)
-					{
-						dummyAccount = getAccountEntityDao().newAccountEntity();
-						dummyAccount.setName(accName);
-						dummyAccount.setDescription(u.getUserName());
-						dummyAccount.setDisabled(false);
-						dummyAccount.setSystem(de);
-						dummyAccount.setType(AccountType.USER);
-						UserAccountEntity uac = getUserAccountEntityDao().newUserAccountEntity();
-						uac.setUser(u);
-						uac.setAccount(dummyAccount);
-						dummyAccount.getUsers().add(uac);
-					    addAccountGrant(dummyAccount, radSet, originalGrant, granteeGroup);
+			List<AccountEntity> accounts = getAccountsForDispatcher(u, null, de);
+			for (AccountEntity acc : accounts) {
+	            if (acc != null) {
+	                addAccountGrant(acc, radSet, originalGrant, granteeGroup);
+	            }
+	            else
+	            {
+					AccountEntity dummyAccount;
+					try {
+						String accName = getAccountService().guessAccountName(u.getUserName(), de.getName());
+						if (accName != null)
+						{
+							dummyAccount = getAccountEntityDao().newAccountEntity();
+							dummyAccount.setName(accName);
+							dummyAccount.setDescription(u.getUserName());
+							dummyAccount.setDisabled(false);
+							dummyAccount.setSystem(de);
+							dummyAccount.setType(AccountType.USER);
+							UserAccountEntity uac = getUserAccountEntityDao().newUserAccountEntity();
+							uac.setUser(u);
+							uac.setAccount(dummyAccount);
+							dummyAccount.getUsers().add(uac);
+						    addAccountGrant(dummyAccount, radSet, originalGrant, granteeGroup);
+						}
+					} catch (InternalErrorException e) {
+						// Ignore
 					}
-				} catch (InternalErrorException e) {
-					// Ignore
 				}
-			}
-        }
+	        }
+		}
 	}
-
+	
 	private void addAccountGrant(AccountEntity account, HashSet<RolAccountDetail> radSet, Object originalGrant,
 			GroupEntity granteeGroup) {
 		RolAccountDetail rad;

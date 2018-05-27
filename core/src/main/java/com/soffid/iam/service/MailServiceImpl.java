@@ -159,19 +159,22 @@ public class MailServiceImpl extends MailServiceBase {
 		try
 		{
 			Address[] address = getAddress(actors);
-			msg.setFrom(new InternetAddress(getFrom()));
-			msg.setRecipients(Message.RecipientType.TO, address);
-			// -- Set the subject and body text --
-			msg.setSubject(subject, "UTF-8");
-
-			// enviem en mime - utf-8, que és com ho tenim al repositori
-			msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
-			// -- Set some other header information --
-			msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
-			msg.setSentDate(new Date());
-
-			// -- Send the message --
-			Transport.send(msg);
+			if (address.length > 0)
+			{
+				msg.setFrom(new InternetAddress(getFrom()));
+				msg.setRecipients(Message.RecipientType.TO, address);
+				// -- Set the subject and body text --
+				msg.setSubject(subject, "UTF-8");
+	
+				// enviem en mime - utf-8, que és com ho tenim al repositori
+				msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
+				// -- Set some other header information --
+				msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
+				msg.setSentDate(new Date());
+	
+				// -- Send the message --
+				Transport.send(msg);
+			}
 		}
 		catch (AddressException e)
 		{
@@ -198,19 +201,22 @@ public class MailServiceImpl extends MailServiceBase {
 		try
 		{
 			Address[] address = getAddress(actors);
-			msg.setFrom(new InternetAddress(getFrom()));
-			msg.setRecipients(Message.RecipientType.TO, address);
-			// -- Set the subject and body text --
-			msg.setSubject(subject, "UTF-8");
-
-			// enviem en mime - utf-8, que és com ho tenim al repositori
-			msg.setContent(body, "text/plain; charset=utf-8"); //$NON-NLS-1$
-			// -- Set some other header information --
-			msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
-			msg.setSentDate(new Date());
-
-			// -- Send the message --
-			Transport.send(msg);
+			if (address.length > 0)
+			{
+				msg.setFrom(new InternetAddress(getFrom()));
+				msg.setRecipients(Message.RecipientType.TO, address);
+				// -- Set the subject and body text --
+				msg.setSubject(subject, "UTF-8");
+	
+				// enviem en mime - utf-8, que és com ho tenim al repositori
+				msg.setContent(body, "text/plain; charset=utf-8"); //$NON-NLS-1$
+				// -- Set some other header information --
+				msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
+				msg.setSentDate(new Date());
+	
+				// -- Send the message --
+				Transport.send(msg);
+			}
 		}
 		catch (AddressException e)
 		{

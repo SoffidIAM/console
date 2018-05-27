@@ -126,4 +126,7 @@ public abstract class RolAssociacioRolEntity {
 	public boolean isAllowed(String permission) {
 		return false;
 	}
+
+	public void customCache() {
+	}
 }

@@ -408,7 +408,8 @@ public abstract class AbstractTest extends AbstractHibernateTest
 		super.setUp();
 	
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
-
+		
+		ServiceLocator.instance().getTenantService().getMasterTenant();
 		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			setupdb();

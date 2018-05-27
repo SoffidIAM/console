@@ -96,7 +96,7 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="rolsheredats" type="rol"> <!-- user:role:query -->
+		<finder name="rolsheredats" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
 				method="findInformacioTextualJerarquiaRolsUsuariByCodiUsuari"
 				if="${canQueryUserRole}">

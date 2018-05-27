@@ -13,26 +13,24 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
-
-import com.soffid.iam.api.Configuration;
-import com.soffid.iam.config.Config;
-import com.soffid.iam.doc.exception.NASException;
-import com.soffid.iam.doc.nas.NASManager;
-import com.soffid.iam.model.BlobConfigurationEntity;
-import com.soffid.iam.model.BlobConfigurationEntityDao;
-import com.soffid.iam.model.ConfigEntity;
-import com.soffid.iam.model.Parameter;
-import com.soffid.iam.utils.ConfigurationCache;
-import com.soffid.iam.utils.Security;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.resource.spi.SecurityException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.soffid.iam.api.Configuration;
+import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.doc.nas.NASManager;
+import com.soffid.iam.model.BlobConfigurationEntity;
+import com.soffid.iam.model.BlobConfigurationEntityDao;
+import com.soffid.iam.model.ConfigEntity;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
 /**
  * @see es.caib.seycon.ng.servei.ConfiguracioService
@@ -224,6 +222,9 @@ public class ConfigurationServiceImpl
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void handleUpdateBlob(String name, byte[] data) throws Exception {
+		if (! Security.isMasterTenant())
+			throw new SecurityException("Blob configuration can only be updated from master tenant");
+			
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);
 		if (result.isEmpty()) {
@@ -243,6 +244,9 @@ public class ConfigurationServiceImpl
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void handleDeleteBlob(String name) throws Exception {
+		if (! Security.isMasterTenant())
+			throw new SecurityException("Blob configuration can only be updated from master tenant");
+
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);
 		for (Iterator it = result.iterator(); it.hasNext(); )
@@ -257,6 +261,9 @@ public class ConfigurationServiceImpl
 	protected void handleUpdateBlob(String name, byte[] data, String version)
 			throws Exception
 	{
+		if (! Security.isMasterTenant())
+			throw new SecurityException("Blob configuration can only be updated from master tenant");
+
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);
 		if (result.isEmpty()) {

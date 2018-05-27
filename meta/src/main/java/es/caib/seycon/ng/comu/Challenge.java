@@ -37,6 +37,8 @@ public class Challenge {
 	@Nullable
     int centinelPort;
 	@Nullable
+    String otpHandler;
+	@Nullable
     String cardNumber;
 	@Nullable
     String cell;

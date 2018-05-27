@@ -16,6 +16,8 @@
 	<zscript>
 		<![CDATA[
 			import es.caib.seycon.ng.utils.*;
+			
+			boolean masterTenant = Security.isMasterTenant();
 
 			int fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
 			try
@@ -197,10 +199,35 @@
 			void refreshTaskEngine () {
 				String mode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
 				if (mode == null) mode = "auto";
-				String max = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.limit");
 				for ( item: taskMode.getItems()) 
 					if (item.getValue().equals (mode)) taskMode.setSelectedItem(item);
+				String max = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.limit");
 				taskLimit.setText(max);
+			}
+
+			void refreshCacheEngine () {
+				String mode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.cache.enable");
+				if (mode == null) mode = "false";
+				for ( item: cacheMode.getItems()) 
+					if (item.getValue().equals (mode)) cacheMode.setSelectedItem(item);
+
+				byte[] c = com.soffid.iam.EJBLocator.getConfigurationService().getBlob("soffid.cache.config");
+				cacheProperties.setValue(c == null? "" : new String (c, "UTF-8"));
+			}
+
+			void updateCacheEngine () {
+				String mode = cacheMode.getSelectedItem().getValue();
+				
+				updateAttribute("soffid.cache.enable", mode, "Hibernate cache mode");
+
+				String p = cacheProperties.getValue();
+				
+				if (p.trim().isEmpty())
+					com.soffid.iam.EJBLocator.getConfigurationService().deleteBlob("soffid.cache.config");
+				else
+					com.soffid.iam.EJBLocator.getConfigurationService().updateBlob("soffid.cache.config", p.getBytes("UTF-8")); 
+
+				es.caib.zkib.zkiblaf.Missatgebox.avis( org.zkoss.util.resource.Labels.getLabel("parametres.zul.restartNeeded") );
 			}
 
   			void updateAttribute (String param, String value, String desc)
@@ -244,6 +271,7 @@
 			<tab label="${c:l('parametres.zul.Advanced')}"></tab>
 			<tab label="${c:l('parametres.zul.authentication')}"></tab>
 			<tab label="${c:l('parametres.zul.taskEngine')}" onSelect="refreshTaskEngine()"></tab>
+			<tab label="${c:l('parametres.zul.cache')}" onSelect="refreshCacheEngine()" if="${masterTenant }"></tab>
 		</tabs>
 		<tabpanels>
 			<tabpanel>
@@ -485,6 +513,32 @@
 							<div style="margin-top: 2em">
 								<button label="${c:l('rolsllista.zul.Cancel·la') }" onClick="refreshTaskEngine()"/>
 								<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="updateTaskEngine()"
+									style="text-align:right"/>
+							</div>
+						</row>
+					</rows>
+				</grid>
+			</tabpanel>
+			<tabpanel  if="${masterTenant }">
+				<grid sclass="noBorderGrid">
+					<rows>
+						<row>
+							<label value="${c:l('parametres.zul.cacheMode')}"/>
+							<listbox mold="select" id="cacheMode">
+								<listitem value="false" label="${c:l('parametres.zul.cacheMode.disable') }"></listitem>
+								<listitem value="true" label="${c:l('parametres.zul.cacheMode.enable') }"></listitem>
+								<listitem value="full" label="${c:l('parametres.zul.cacheMode.complete') }"></listitem>
+							</listbox>
+						</row>
+						<row>
+							<label value="${c:l('parametres.zul.cache.properties')}"/>
+							<textbox rows="20" id="cacheProperties" width="100%"></textbox>
+						</row>
+						<row>
+							<label></label>
+							<div style="margin-top: 2em">
+								<button label="${c:l('rolsllista.zul.Cancel·la') }" onClick="refreshCacheEngine()"/>
+								<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="updateCacheEngine()"
 									style="text-align:right"/>
 							</div>
 						</row>

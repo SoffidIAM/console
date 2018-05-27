@@ -26,6 +26,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
+import com.soffid.iam.service.TenantServiceImpl;
 import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.ConfigurationCache;
 
@@ -690,22 +691,8 @@ public class Security {
 				getCurrentTenantName ().equals (getMasterTenantName());
 	}
 	
-	static String masterTenantName = null;
-	
 	public static String getMasterTenantName () {
-		if (masterTenantName == null)
-		{
-			try {
-				TenantService tenantService = getTenantService();
-				if (tenantService == null)
-					masterTenantName = "master";
-				else
-					masterTenantName = tenantService.getMasterTenant().getName();
-			} catch (InternalErrorException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return masterTenantName;
+		return TenantServiceImpl.MASTER_NAME;
 	}
 
 }

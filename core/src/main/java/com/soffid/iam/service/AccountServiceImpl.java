@@ -146,14 +146,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (acc != null)
 		{
 			if (acc.getType().equals (AccountType.IGNORED) && /* Unmanaged account with no owner */ 
-				acc.getAcl().isEmpty() &&
+				(acc.getAcl() == null || acc.getAcl().isEmpty()) &&
 				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE) ||
 				
 				acc.getAcl().size() == 1  &&  /* Account already belongs to the user and only to the user*/
 				acc.getAcl().iterator().next().getUser() == ue &&
 				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER  ||
 				
-				acc.getStatus().equals (AccountStatus.REMOVED) )
+				AccountStatus.REMOVED.equals ( acc.getStatus()) )
 
 			{
 				acc.setType(AccountType.USER);

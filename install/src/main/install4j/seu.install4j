@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
   <directoryPresets config="../../../target/lib" />
-  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="1.9" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -55,7 +55,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; &quot;-Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../endorsed&quot;&quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot; -Djava.awt.headless=true" arguments="start" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; &quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot; -Djava.awt.headless=true" arguments="start" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
         <classPath>
           <archive location="bin/bootstrap.jar" failOnError="false" />
           <archive location="bin/tomcat-juli.jar" failOnError="false" />
@@ -95,7 +95,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; &quot;-Djava.endorsed.dirs=${launcher:sys.launcherDirectory}/../endorsed&quot;&quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot; -Djava.awt.headless=true" arguments="start" allowVMPassthroughParameters="false" preferredVM="server" bundleRuntime="true">
+      <java mainClass="org.apache.catalina.startup.Bootstrap" vmParameters="&quot;-Djava.util.logging.config.file=${launcher:sys.launcherDirectory}/../conf/logging.properties&quot; &quot;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager&quot; &quot;-javaagent:${launcher:sys.launcherDirectory}/../lib/openejb-javaagent.jar&quot; &quot;-Dcatalina.base=${launcher:sys.launcherDirectory}/..&quot; &quot;-Dcatalina.home=${launcher:sys.launcherDirectory}/..&quot; &quot;-Djava.io.tmpdir=${launcher:sys.launcherDirectory}/../temp&quot; -Djava.awt.headless=true" arguments="start" allowVMPassthroughParameters="false" preferredVM="server" bundleRuntime="true">
         <classPath>
           <archive location="bin/bootstrap.jar" failOnError="false" />
           <archive location="bin/tomcat-juli.jar" failOnError="false" />
@@ -1128,7 +1128,7 @@ return;</preActivation>
               <formComponent name="" id="787" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent" id="CheckboxComponent0">
                       <void property="checkboxText">
                         <string>Configure database connection</string>
                       </void>
@@ -1226,7 +1226,7 @@ return true;</validation>
               <formComponent name="" id="1084" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent" id="CheckboxComponent0">
                       <void property="coupledComponentIds">
                         <void method="add">
                           <string>155</string>

@@ -59,4 +59,7 @@ public abstract class UserAccountEntity {
 			es.caib.seycon.ng.model.UserAccountEntity account)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	public void customCache() {
+	}
 }

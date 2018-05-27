@@ -124,8 +124,18 @@ public class NASServlet extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		super.doDelete(req, resp);
+		String base = System.getProperty("soffid.ui.docPath");
+		if (base == null)
+		{
+			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");
+		}
+		File f = new File (base, req.getPathInfo());
+		if (  ! f.getCanonicalPath().startsWith(base))
+		{
+			throw new ServletException("Bad path "+req.getPathInfo());
+		}
+		else
+			f.delete();
 	}
 
 }

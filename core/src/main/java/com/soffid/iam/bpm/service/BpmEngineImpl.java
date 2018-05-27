@@ -72,8 +72,10 @@ import org.jbpm.JbpmContext;
 import org.jbpm.JbpmException;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.file.def.FileDefinition;
+import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.Comment;
+import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.graph.log.ActionLog;
 import org.jbpm.graph.log.ProcessInstanceCreateLog;
 import org.jbpm.graph.log.ProcessInstanceEndLog;
@@ -87,6 +89,7 @@ import org.jbpm.logging.log.MessageLog;
 import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
+import org.jbpm.taskmgmt.log.TaskAssignLog;
 import org.xml.sax.SAXException;
 
 import com.soffid.iam.api.Group;
@@ -106,6 +109,7 @@ import com.soffid.iam.bpm.business.VOFactory;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.index.DirectoryFactory;
 import com.soffid.iam.bpm.index.Indexer;
+import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
@@ -954,6 +958,16 @@ public class BpmEngineImpl extends BpmEngineBase {
 		if (pl instanceof ProcessInstanceCreateLog) {
 			logLine.setAction(Messages.getString("BpmEngineImpl.StartProcess")); //$NON-NLS-1$
 			parsedLogs.add(logLine);
+		} else 	if (pl instanceof TaskAssignLog) {
+			TaskAssignLog tal = (TaskAssignLog) pl;
+			if (tal.getTaskOldActorId() != null && 
+					tal.getTaskNewActorId() != null &&
+					!tal.getTaskNewActorId().equals(tal.getTaskOldActorId()))
+			{
+				logLine.setAction(String.format(Messages.getString("BpmEngineImpl.AssignedTo"), //$NON-NLS-1$
+						tal.getTaskNewActorId())); 
+				parsedLogs.add(logLine);
+			}
 		} else if (pl instanceof TransitionLog) {
 			TransitionLog tl = (TransitionLog) pl;
 			logLine.setAction((tl.getTransition().getName() != null
@@ -1474,6 +1488,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.getTaskInstance(task.getId());
 			startAuthenticationLog(instance.getToken());
 			instance.setActorId(username);
+			
+			// Send email
+			Mail mailAction = new Mail();
+			mailAction.setTemplate("delegate");
+			ExecutionContext ctx = new ExecutionContext(instance.getToken());
+			ctx.setTaskInstance(instance);
+			mailAction.execute(ctx);
+			
 			endAuthenticationLog(instance.getToken());
 			context.save(instance);
 			return VOFactory.newTaskInstance(instance);
@@ -2622,7 +2644,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 				org.jbpm.graph.exe.ProcessInstance pi = j.getProcessInstance();
 				if (business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
 						pi))
-					v.add(VOFactory.newJob(j));
+				{
+					TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
+					if (tm == null && Security.getCurrentTenantName().equals(Security.getMasterTenantName()) ||
+							tm != null && tm.getTenantId() != null && Security.getCurrentTenantId() == tm.getTenantId().longValue())
+						v.add(VOFactory.newJob(j));
+				}
 			}
 
 			return v;

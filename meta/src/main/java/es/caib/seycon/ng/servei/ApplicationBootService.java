@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.*;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.bpm.servei.BpmEngine.class,
 	es.caib.seycon.ng.servei.SoDRuleService.class,
+	TenantService.class,
 	com.soffid.iam.service.ScheduledTaskService.class})
 public abstract class ApplicationBootService {
 

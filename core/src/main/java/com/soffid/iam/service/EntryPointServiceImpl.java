@@ -36,6 +36,7 @@ import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -68,7 +69,11 @@ import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
 
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.jcs.access.behavior.ICacheAccess;
 import org.dom4j.Document;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -77,21 +82,11 @@ import org.xml.sax.SAXException;
  * @see es.caib.seycon.ng.servei.PuntEntradaService
  */
 public class EntryPointServiceImpl extends
-		com.soffid.iam.service.EntryPointServiceBase {
+		com.soffid.iam.service.EntryPointServiceBase  {
 
 	private static final String ROOT_TAG = "Root"; //$NON-NLS-1$
-	Map<String, PermissionsCache> permisosCache;
 
 	public EntryPointServiceImpl() {
-    	int size = 500;
-    	try {
-	    	String cacheSize = ConfigurationCache.getProperty("soffid.cache.identity.size");
-	    	if (cacheSize != null )
-	    		size = Integer.parseInt(cacheSize);
-    	} catch (Throwable t) {
-    		
-    	}
-        permisosCache = Collections.synchronizedMap(new LRUMap(size));
 	}
 
 	private static final Long ROOT_ID = new Long(0);
@@ -775,13 +770,13 @@ public class EntryPointServiceImpl extends
         if (user == null)
         	return new PermissionsCache();
         
-		PermissionsCache entry = permisosCache.get(user);
+		PermissionsCache entry = getCache().get(user);
 		if (entry != null && !entry.isValid())
-			permisosCache.remove(user);
+			getCache().remove(user);
         if (entry != null && entry.isValid())
         	return entry;
         
-        permisosCache.remove(user);
+        getCache().remove(user);
 			 
 		return calculateAuthorizations(user);
 	}
@@ -825,7 +820,7 @@ public class EntryPointServiceImpl extends
             	entry.getAccountsPUE().add(acc.getId());
             }
  			// Guardem les dades de l'usuari actual
-			permisosCache.put(user, entry);
+			getCache().put(user, entry);
 			return entry;
 		} else {
 			return new PermissionsCache();
@@ -2194,7 +2189,7 @@ public class EntryPointServiceImpl extends
 
 		// GRUP: només els de permís d'aministrador (!!)
 		List<EntryPointGroupEntity> autoGrup = getEntryPointGroupEntityDao()
-				.query("from com.soffid.iam.model.EntryPointGroupEntity where authorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
+				.query("from com.soffid.iam.model.EntryPointGroupEntity where auhtorizationLevel=\'A\'", new Parameter[0]); //$NON-NLS-1$
 		List<AccessTreeAuthorization> autoGrupVO = getEntryPointGroupEntityDao()
 				.toAccessTreeAuthorizationList(autoGrup);
 		for (Iterator<AccessTreeAuthorization> it = autoGrupVO.iterator(); it
@@ -2301,6 +2296,16 @@ public class EntryPointServiceImpl extends
 			}
 		}
 	}
+
+	
+	private ICacheAccess<String, PermissionsCache> cache;
+	private ICacheAccess<String, PermissionsCache> getCache()
+	{ 
+		if (cache == null)
+			cache = JCSCacheProvider.buildCache(PermissionsCache.class.getName());
+		return cache;
+	}
+
 }
 
 class PermissionsCache {

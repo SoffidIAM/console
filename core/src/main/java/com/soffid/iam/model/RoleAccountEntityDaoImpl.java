@@ -407,6 +407,7 @@ public class RoleAccountEntityDaoImpl extends
 			super.remove(rolsUsuaris);
 
 			auditarRolAccount("D", rolsUsuaris); //$NON-NLS-1$
+			
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages

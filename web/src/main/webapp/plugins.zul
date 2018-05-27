@@ -24,7 +24,7 @@
 	</zscript>
 	
 	<window id="esquema" use="es.caib.seycon.ng.web.PluginsUI" width="${amplaria}">
-		<navegador id="lista" width="100%">
+		<navegador id="lista" width="100%" height="">
 			<toolbar>
 				<toolbarbutton id="enableButton" if="${canUpdatePlugins}"
 					image="img/enable.png" label="${c:l('plugins.zul.Enable')}"
@@ -44,8 +44,8 @@
 			</toolbar>
 			
 			<tree autocommit="false" dataPath="/model:/" fixedLayout="true"
-				height="96%" id="listbox" onSelect="esquema.select()"
-				onNewRow="esquema.onRenderServerPlugin(event.data)" rows="${fileres}">
+				id="listbox" onSelect="esquema.select()"
+				onNewRow="esquema.onRenderServerPlugin(event.data)">
 				<treecols>
 					<treecol label="${c:l('plugins.zul.Plugin')}" width="100%"/>
 				</treecols>

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -713,6 +714,7 @@ public class DeployerBean implements DeployerService {
 			if (isFailSafe()) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
+				deleteCacheProperties ();
 				recursivelyDelete(tmpDir());
 				getTimestampFile().delete();
 				uncompressEar();
@@ -723,6 +725,7 @@ public class DeployerBean implements DeployerService {
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
+				updateCacheProperties (qh);
 				try {
 					List<Object[]> result = null;
 					try {
@@ -791,6 +794,31 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
+
+	private void updateCacheProperties(QueryHelper qh) throws SQLException, UnsupportedEncodingException {
+		deleteCacheProperties();
+		for ( Object[] data: qh.select(
+				  "SELECT CON_CODI, CON_VALOR "
+				+ "FROM   SC_TENANT, SC_CONFIG "
+				+ "WHERE  CON_TEN_ID=TEN_ID AND CON_IDXAR IS NULL AND TEN_NAME='master' "
+				+ "AND    CON_CODI = 'soffid.cache.enable'", new Object [0]))
+		{
+			System.setProperty  ((String) data[0], (String) data[1]);
+		}
+		
+		for ( Object[] data: qh.select(
+				  "SELECT BCO_NAME, BCO_VALUE "
+				+ "FROM   SC_BLOCON "
+				+ "WHERE  BCO_NAME = 'soffid.cache.config'", new Object [0]))
+		{
+			System.setProperty  ((String) data[0], new String((byte[]) data[1], "UTF-8"));
+		}
+
+	}
+
+	private void deleteCacheProperties() {
+		System.setProperty("soffid.cache.enable", "false");
+	}
 
 	private void doDeploy() throws Exception {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {

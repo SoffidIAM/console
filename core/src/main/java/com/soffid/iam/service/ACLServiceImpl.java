@@ -1,42 +1,25 @@
 package com.soffid.iam.service;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.jcs.access.behavior.ICacheAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.GroupEntity;
-import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
-import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.spring.JCSCacheProvider;
 
-import es.caib.seycon.ng.comu.Dispatcher;
-import es.caib.seycon.ng.comu.RolGrant;
-
-public class ACLServiceImpl extends ACLServiceBase {
+public class ACLServiceImpl extends ACLServiceBase  {
 	
-	private Map<Long,PermissionCache> permissionCache;
-
 	public ACLServiceImpl ()
 	{
-    	int size = 50;
-    	try {
-	    	String cacheSize = ConfigurationCache.getProperty("soffid.cache.identity.size");
-	    	if (cacheSize != null )
-	    		size = Integer.parseInt(cacheSize);
-    	} catch (Throwable t) {
-    		
-    	}
-        permissionCache = Collections.synchronizedMap(new LRUMap(size));
 	}
 	
 	Log log = LogFactory.getLog(getClass());
@@ -47,22 +30,11 @@ public class ACLServiceImpl extends ACLServiceBase {
 		if (ue == null)
 			return new AccessControlList();
 		
-		PermissionCache pc = permissionCache.get (userId);
+		PermissionCache pc = getCache().get(userId);
 		if (pc != null)
 		{
-//			log.info("Got entry from cache");
-			if (System.currentTimeMillis() - pc.evaluationDate.getTime() < 30L*1000L) // 30 seconds live for ACL
-			{
-				if ( ue.getLastModificationDate().equals(pc.lastModification))
-					return pc.acl;
-//				else
-//					log.info("Discarded by user last modification");
-			}
-//			else
-//				log.info("Discarded by more than 30 seconds");
+			return pc.acl;
 		}
-//		else
-//			log.info("Entry not found in cache");
 		AccessControlList acl = new AccessControlList();
 		acl.setGroups( new HashSet<Long>());
 		acl.setUsers( new HashSet<Long>());
@@ -86,7 +58,7 @@ public class ACLServiceImpl extends ACLServiceBase {
 		pc.acl = acl;
 		pc.lastModification = ue.getLastModificationDate();
 		pc.evaluationDate = new Date();
-		permissionCache.put(userId, pc);
+		getCache().put(userId, pc);
 		log.info("Entry stored");
 		
 		return acl;
@@ -237,6 +209,15 @@ public class ACLServiceImpl extends ACLServiceBase {
 		
 		for (GroupEntity child: ge.getChildren())
 			addGroupMembers(child, d, accounts);
+	}
+
+	
+	private ICacheAccess<Long, PermissionCache> cache;
+	private ICacheAccess<Long, PermissionCache> getCache()
+	{ 
+		if (cache == null)
+			cache = JCSCacheProvider.buildCache(PermissionCache.class.getName());
+		return cache;
 	}
 
 }

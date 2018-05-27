@@ -86,21 +86,21 @@ public abstract class ConfiguracioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation(translated="updateBlob")
+	@Operation(grantees={roles.parameter_update.class},translated="updateBlob")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void updateBlob(
 		java.lang.String name, 
 		byte[] data)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	@Operation(translated="getBlob")
+	@Operation(grantees={roles.parameter_update.class},translated="getBlob")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public byte[] getBlob(
 		java.lang.String name)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation(translated="deleteBlob")
+	@Operation(grantees={roles.parameter_update.class},translated="deleteBlob")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void deleteBlob(
 		java.lang.String name)

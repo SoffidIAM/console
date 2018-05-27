@@ -14,6 +14,7 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
 
@@ -31,13 +32,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.jcs.access.CacheAccess;
+import org.apache.commons.jcs.access.behavior.ICacheAccess;
 
 public class AccountEntityDaoImpl extends
 		com.soffid.iam.model.AccountEntityDaoBase {
-	Map<Long, AccountCacheEntry> cacheMap = Collections.synchronizedMap( new LRUMap(300) );
 	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(getClass());
 	 
 	private void auditar(String accio, String account, String dispatcher) {
@@ -62,14 +62,14 @@ public class AccountEntityDaoImpl extends
 	public void create(com.soffid.iam.model.AccountEntity entity) {
 		super.create(entity);
 		auditar("C", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
-		cacheMap.remove(entity.getId());
+		getCache().remove(entity.getId());
 	}
 
 	@Override
 	public void update(com.soffid.iam.model.AccountEntity entity) {
 		try {
 			handleUpdate(entity, "U");
-			cacheMap.remove(entity.getId());
+			getCache().remove(entity.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -77,7 +77,7 @@ public class AccountEntityDaoImpl extends
 
 	@Override
 	public void remove(com.soffid.iam.model.AccountEntity entity) {
-		cacheMap.remove(entity.getId());
+		getCache().remove(entity.getId());
 		getAccountAccessEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.AccountAccessEntity>(entity
 						.getAcl()));
@@ -114,15 +114,11 @@ public class AccountEntityDaoImpl extends
 	public void toAccount(com.soffid.iam.model.AccountEntity source,
 			Account target) {
 		try {
-			long start = System.currentTimeMillis();
-			if ( ! Security.isSyncServer())
- 			{
-				AccountCacheEntry entry = (AccountCacheEntry) cacheMap.get(source.getId());
-				if ( entry != null && System.currentTimeMillis() - entry.timeStamp < 5000 )
-				{
-					fetchFromCache(target, entry);
-					return ;
-				}
+			AccountCacheEntry entry = (AccountCacheEntry) getCache().get(source.getId());
+			if ( entry != null)
+			{
+				fetchFromCache(target, entry);
+				return ;
 			}
 			super.toAccount(source, target);
 			// Incompatible types source.dispatcher and target.dispatcher
@@ -253,11 +249,7 @@ public class AccountEntityDaoImpl extends
 				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE);
 			}
 
-			start = System.currentTimeMillis();
-			if ( ! Security.isSyncServer())
-			{
-				storeCacheEntry(source, target);
-			}
+			storeCacheEntry(source, target);
 	
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
@@ -292,7 +284,7 @@ public class AccountEntityDaoImpl extends
 		else
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
 
-		cacheMap.put(source.getId(), entry);
+		getCache().put(source.getId(), entry);
 	}
 
 	private void fetchFromCache(Account target, AccountCacheEntry entry)
@@ -468,11 +460,18 @@ public class AccountEntityDaoImpl extends
 	protected void handleUpdate(AccountEntity entity, String auditType)
 			throws Exception {
 		super.update(entity);
-		cacheMap.remove(entity.getId());
+		getCache().remove(entity.getId());
 		if (auditType != null)
 			auditar(auditType, entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
 
+	private ICacheAccess<Long, AccountCacheEntry> cache;
+	private ICacheAccess<Long, AccountCacheEntry> getCache()
+	{ 
+		if (cache == null)
+			cache = JCSCacheProvider.buildCache(AccountCacheEntry.class.getName());
+		return cache;
+	}
 
 	@Override
 	public Collection<AccountEntity> findByText(CriteriaSearchConfiguration criteria, String text) {

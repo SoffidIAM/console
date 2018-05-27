@@ -246,6 +246,9 @@ public abstract class GrupEntity {
 			+ "from com.soffid.iam.model.GroupEntity as g "
 			+ "where g.obsolete = 'N'")
 	public Collection<String>findGroupNames () { return null; }
+
+	public void customCache() {
+	}
 }
 
 

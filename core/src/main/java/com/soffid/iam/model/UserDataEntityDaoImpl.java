@@ -51,7 +51,9 @@ public class UserDataEntityDaoImpl
 		try {
 			
 	    	if (dadaUsuari.getDataType().getUnique() != null &&
-	    			dadaUsuari.getDataType().getUnique().booleanValue() )
+	    			dadaUsuari.getDataType().getUnique().booleanValue() &&
+	    			dadaUsuari.getValue() != null &&
+	    			! dadaUsuari.getValue().trim().isEmpty())
 	    	{
 				for (UserDataEntity du: findByTypeAndValue(dadaUsuari.getDataType().getName(), 
 						dadaUsuari.getValue()))

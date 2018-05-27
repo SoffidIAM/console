@@ -103,7 +103,7 @@ public class PropertiesStore {
             		p.getProperty("dbPasswordCipher").equals("PlainText")) &&
             		p.getProperty("dbPassword") != null)
             {
-            	p.setProperty("dbPasswordCipher", "com.soffid.iam.tomee.SoffidPasswordCipher");
+            	p.setProperty("dbPasswordCipher", "com.soffid.iam.tomcat.SoffidPasswordCipher");
             	String pass = p.getProperty("dbPassword");
             	p.setProperty("dbPassword", PasswordCipher.encrypt(pass));
             }

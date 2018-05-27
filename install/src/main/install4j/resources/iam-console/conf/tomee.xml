@@ -25,7 +25,7 @@
     minIdle = 0
     numTestsPerEvictionRun = 3
     password = ${dbPassword}
-    passwordCipher = PlainText
+    passwordCipher = ${dbPasswordCipher}
     poolPreparedStatements = false
     serviceId = 
     testOnBorrow = true

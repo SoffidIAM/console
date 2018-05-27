@@ -74,3 +74,4 @@ openejb.deploymentId.format = {appId}-{ejbClass}
 
 dbMaxConnections=200
 soffid.server.port=8080
+dbPasswordCipher=PlainText

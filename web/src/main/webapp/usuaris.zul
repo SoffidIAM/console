@@ -1539,7 +1539,7 @@
 								<vbox width="100%">
 									<tree id="treebox" autocommit="false"
 										dataPath="/esquema/lista/listbox:/" fixedLayout="true"
-										onSelect="" rows="${fileres}" width="100%"
+										onSelect="" width="100%"
 										onNewRow="onDisplayAccount(event.data)">
 										<attribute name="onRecarrega">
 											treebox = esquema.getFellow("dades").getFellow("treebox");

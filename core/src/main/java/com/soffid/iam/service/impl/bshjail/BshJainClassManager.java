@@ -86,9 +86,9 @@ public class BshJainClassManager extends BshClassManager {
 			}
 		}
 		
-		int slash = file.lastIndexOf(File.separatorChar);
+		int slash = file.lastIndexOf("/");
 		if (slash > 0)
-		file = file.substring(slash + 1);
+			file = file.substring(slash + 1);
 		if (file.matches("iam-common-.*\\.jar") ||
 				file.matches ("plugin.*\\.jar"))
 			return true;

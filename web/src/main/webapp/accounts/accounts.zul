@@ -460,14 +460,14 @@
 											<row>
 												<input_etiqueta
 													value="${c:l('accounts.lastUpdated')}:" />
-												<datebox readonly="true" disabled="true"
+												<datebox readonly="true" disabled="true" buttonVisible="false"
 													bind="@lastUpdated" width="10em" 
 													format="${c:l('usuaris.zul.dateFormat')}" />
 											</row>
 											<row>
 												<input_etiqueta
 													value="${c:l('accounts.lastLogin')}:" />
-												<datebox readonly="true" disabled="true"
+												<datebox readonly="true" disabled="true" buttonVisible="false"
 													bind="@lastLogin" width="10em" 
 													format="${c:l('usuaris.zul.dateFormat')}" />
 											</row>
@@ -475,7 +475,7 @@
 												<input_etiqueta
 													value="${c:l('accounts.lastPasswordSet')}:" />
 												<hbox>
-													<datebox readonly="true" disabled="true"
+													<datebox readonly="true" disabled="true" buttonVisible="false"
 														bind="@lastPasswordSet" width="10em" 
 														format="${c:l('usuaris.zul.dateFormat')}" />
 													<button label="${c:l('accounts.setPassword')}"
@@ -485,7 +485,7 @@
 											<row>
 												<input_etiqueta
 													value="${c:l('accounts.passwordExpiration')}:" />
-												<datebox readonly="true" disabled="true"
+												<datebox readonly="true" disabled="true" buttonVisible="false"
 													bind="@passwordExpiration" width="10em" 
 													format="${c:l('usuaris.zul.dateFormat')}" />
 											</row>
@@ -530,7 +530,7 @@
 							<tabpanel id="rols">
 								<vbox width="100%">
 									<listbox id="gridRols" dataPath="/esquema/lista/listbox:/rol"
-										fixedLayout="true" height="400px" sclass="likeagrid">
+										fixedLayout="true" sclass="likeagrid">
 										<attribute name="onNewRow"><![CDATA[
 											ctx = XPathUtils.getComponentContext(event.data);
 											if (ctx == null)
@@ -571,7 +571,7 @@
 														c.style = "text-decoration: line-through;";
 													}
 												} else {
-													event.data.style = event.data.style + "; background-color: blue;";
+													event.data.style = event.data.style + "; background-color: transparent;";
 												}
 											}
 											// Show sand clock when waiting for approval
@@ -584,6 +584,20 @@
 												for (c: event.data.getChildren())
 												{
 													c.style = "background-color: #ffffc0;";
+												}
+											}
+											// Show sand clock when waiting for approval
+											removalPending = XPathUtils.getValue(ctx,"@removalPending");
+											if (removalPending != null && removalPending && 
+													!cellImage.getChildren().isEmpty())
+											{
+												Image image = cellImage.getChildren().get(0);
+												image.setVisible(false);
+												Image image2 = cellImage.getChildren().get(1);
+												image2.setVisible(true);
+												for (c: event.data.getChildren())
+												{
+													c.style = "background-color: #ffffc0;text-decoration: line-through;";
 												}
 											}
 										]]></attribute>
@@ -712,10 +726,10 @@
 											<listcell bind="@baseDeDades" />
 											<listcell bind="@codiAplicacio" />
 											<listcell >
-												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@startDate"></datebox>
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" buttonVisible="false" bind="@startDate"></datebox>
 											</listcell>
 											<listcell >
-												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"></datebox>
+												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" buttonVisible="false" bind="@endDate"></datebox>
 											</listcell>
 											<listcell>
 												<imageclic align="right" src="~./img/list-remove.gif">

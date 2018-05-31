@@ -83,6 +83,10 @@ public abstract class RolAccountEntity {
 	@Column(name = "RLU_APRPEN", defaultValue = "false")
 	public boolean approvalPending;
 
+	@Column(name = "RLU_REMPEN", defaultValue = "false")
+	@Nullable
+	public Boolean removalPending;
+
 	@Description("This foreign key binds this the role assignment to the group membership that grants this role to the account. Not applicable for shared accounts")
 	@Column(name = "RLU_GROUP")
 	@Nullable

@@ -1,34 +1,28 @@
 package com.soffid.iam.spring;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.PreDeleteEventListener;
-import org.hibernate.event.PreInsertEventListener;
-import org.hibernate.event.PreUpdateEventListener;
+import org.hibernate.event.PostDeleteEventListener;
+import org.hibernate.event.PostInsertEventListener;
+import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
 import org.hibernate.mapping.RootClass;
-import org.hibernate.mapping.Table;
 import org.mortbay.log.Log;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
-import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityImpl;
 import com.soffid.iam.model.GroupEntityImpl;
 import com.soffid.iam.model.RoleAccountEntityImpl;
 import com.soffid.iam.model.RoleEntityImpl;
-import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.RoleGroupEntityImpl;
 import com.soffid.iam.model.UserAccountEntityImpl;
-import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserEntityImpl;
 import com.soffid.iam.model.UserGroupEntityImpl;
 
@@ -131,15 +125,15 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".containedRoles", "read-write");
 		config.setCollectionCacheConcurrencyStrategy(RoleEntityImpl.class.getName()+".accounts", "read-write");
 		
-		config.getEventListeners().setPreInsertEventListeners(new PreInsertEventListener[] {
+		config.getEventListeners().setPostInsertEventListeners(new PostInsertEventListener[] {
 				new CollectionCacheEventListener ()
 		});
 
-		config.getEventListeners().setPreUpdateEventListeners(new PreUpdateEventListener[] {
+		config.getEventListeners().setPostUpdateEventListeners(new PostUpdateEventListener[] {
 				new CollectionCacheEventListener ()
 		});
 
-		config.getEventListeners().setPreDeleteEventListeners(new PreDeleteEventListener[] {
+		config.getEventListeners().setPostDeleteEventListeners(new PostDeleteEventListener[] {
 				new CollectionCacheEventListener ()
 		});
 }

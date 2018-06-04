@@ -19,7 +19,7 @@ public class JCSCache implements Cache {
 
 	public JCSCache(String regionName) {
 		this.regionName = regionName;
-		jcs = JCS.getInstance(regionName);
+		jcs = JCS.getInstance("hibernate");
 	}
 
 	@Override

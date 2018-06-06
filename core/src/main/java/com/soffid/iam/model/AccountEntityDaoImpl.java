@@ -14,6 +14,7 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.spring.DummyCache;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
@@ -22,6 +23,7 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -469,7 +471,9 @@ public class AccountEntityDaoImpl extends
 	private ICacheAccess<Long, AccountCacheEntry> getCache()
 	{ 
 		if (cache == null)
+		{
 			cache = JCSCacheProvider.buildCache(AccountCacheEntry.class.getName());
+		}
 		return cache;
 	}
 
@@ -499,7 +503,12 @@ public class AccountEntityDaoImpl extends
 }
 
 
-class AccountCacheEntry {
+class AccountCacheEntry implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	long timeStamp;
 	Account account;
 	HashSet<String> ownerAcl;

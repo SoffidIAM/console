@@ -40,7 +40,7 @@ void onNewRow(Row r)
 	{
 		l.setValue("Not executed");
 		l.setStyle("color: gray;");
-		play.setVisible(task.isEnabled());
+		play.setVisible(true);
 	}
 	else if (task.isActive())
 	{
@@ -60,7 +60,7 @@ void onNewRow(Row r)
 		l.setValue(s);
 		i.setSrc ("/img/semafor-vermell.png");
 		i.setVisible(true);
-		play.setVisible(task.isEnabled());
+		play.setVisible(true);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void onNewRow(Row r)
 		l.setValue(s);
 		i.setSrc ("/img/semafor-verd.png");
 		i.setVisible(true);
-		play.setVisible(task.isEnabled());
+		play.setVisible(true);
 	}
 }
 

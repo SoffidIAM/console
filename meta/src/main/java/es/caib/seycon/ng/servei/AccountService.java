@@ -246,7 +246,7 @@ public abstract class AccountService {
 	@Description("Generates the account name for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="guessAccountName")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public java.lang.String gessAccountName(
 		java.lang.String userName, 
 		java.lang.String dispatcherName)
@@ -257,7 +257,7 @@ public abstract class AccountService {
 	@Description("Checks if an account should be created for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="needsAccount")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public boolean needsAccount(
 		java.lang.String userName, 
 		java.lang.String dispatcherName)

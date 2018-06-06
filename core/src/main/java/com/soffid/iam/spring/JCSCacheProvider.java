@@ -1,6 +1,7 @@
 package com.soffid.iam.spring;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
@@ -41,7 +42,10 @@ public class JCSCacheProvider implements CacheProvider
 		Properties p = new Properties ();
 		try {
 			String propTxt = System.getProperty("soffid.cache.config");
-			if (propTxt == null)
+			String propTxtFile = System.getProperty("soffid.cache.configFile");
+			if (propTxtFile != null)
+				p.load( new FileInputStream(propTxtFile));
+			else if (propTxt == null)
 				p.load( getClass().getResourceAsStream("jcs.properties"));
 			else
 				p.load( new StringReader(propTxt));

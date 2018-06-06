@@ -2052,6 +2052,20 @@ void actualitza (event) {
 													c.style = "background-color: #ffffc0;";
 												}
 											}
+											// Show sand clock when waiting for approval
+											removalPending = XPathUtils.getValue(ctx,"@removalPending");
+											if (removalPending != null && removalPending && 
+													!cellImage.getChildren().isEmpty())
+											{
+												Image image = cellImage.getChildren().get(0);
+												image.setVisible(false);
+												Image image2 = cellImage.getChildren().get(1);
+												image2.setVisible(true);
+												for (c: event.data.getChildren())
+												{
+													c.style = "background-color: #ffffc0;text-decoration: line-through;";
+												}
+											}
 										} catch (es.caib.zkib.jxpath.JXPathNotFoundException e) {
 											// Ignore event thrown when row does no longer exist
 										}

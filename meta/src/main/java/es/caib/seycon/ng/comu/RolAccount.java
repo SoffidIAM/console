@@ -101,6 +101,9 @@ public class RolAccount {
 	@Attribute(defaultValue="true")
 	public boolean approvalPending;
 	
+	@Attribute(defaultValue = "false")
+	@Nullable
+	public Boolean removalPending;
 	
 	@Description("This attribute holds the group name that is bound to this the role assignment. Not applicable for shared accounts")
 	@Nullable

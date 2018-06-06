@@ -860,7 +860,7 @@ public class ApplicationServiceImpl extends
 		   				return getRoleAccountEntityDao().toRoleAccount(rg);
 		   			else
 		   			{
-		   				deleteRoleAccountEntity(rolsUsuarisEntity, null);
+		   				deleteRoleAccountEntity(rolsUsuarisEntity, null, true);
 		   				rolsUsuarisEntity.getAccount().getRoles().remove(rolsUsuarisEntity);
 		   			}
 		   		}
@@ -873,7 +873,7 @@ public class ApplicationServiceImpl extends
 		    	inital = getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity);
 			
 		    if (nwap)
-		    	launchWorkflowApprovalProcess(rolsUsuarisEntity);
+		    	launchWorkflowApprovalProcess(rolsUsuarisEntity, "grant");
 		    else
 		    {
 		       	if ( ! nwap )
@@ -938,7 +938,7 @@ public class ApplicationServiceImpl extends
      * @param RoleAccountEntity
      * @throws InternalErrorException 
 	 */
-	private void launchWorkflowApprovalProcess(RoleAccountEntity RoleAccountEntity) throws InternalErrorException {
+	private void launchWorkflowApprovalProcess(RoleAccountEntity RoleAccountEntity, String action) throws InternalErrorException {
 		RoleEntity role = RoleAccountEntity.getRole();
 		if (role != null)
 		{
@@ -959,6 +959,7 @@ public class ApplicationServiceImpl extends
 					pi.getContextInstance().createVariable("request", ra);
 					pi.getContextInstance().createVariable("requesterAccount", Security.getCurrentAccount());
 					pi.getContextInstance().createVariable("requesterUser", Security.getCurrentUser());
+					pi.getContextInstance().createVariable("action", action);
 					pi.signal();
 					ctx.save(pi);
 					
@@ -1058,14 +1059,14 @@ public class ApplicationServiceImpl extends
                 user = ua.getUser();
             }
             
-            deleteRoleAccountEntity(rolsUsuarisEntity, user);
+            deleteRoleAccountEntity(rolsUsuarisEntity, user, false);
             return;
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Messages.getString("ApplicationServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
     }
 
-	private void deleteRoleAccountEntity(RoleAccountEntity rolsUsuarisEntity, UserEntity user) throws InternalErrorException {
+	private void deleteRoleAccountEntity(RoleAccountEntity rolsUsuarisEntity, UserEntity user, boolean force) throws InternalErrorException {
 		if (rolsUsuarisEntity.isApprovalPending() && rolsUsuarisEntity.getApprovalProcess() != null)
 		{
 			JbpmContext ctx = getBpmEngine().getContext();
@@ -1088,17 +1089,60 @@ public class ApplicationServiceImpl extends
 				ctx.close();
 			}
 		}
-		List<RoleAccountEntity> list = new LinkedList<RoleAccountEntity>();
-		list.add(rolsUsuarisEntity);
-		if (rolsUsuarisEntity.getParent() != null)
-		{
-			rolsUsuarisEntity.getChildren().remove(rolsUsuarisEntity);
-		}
-		getRoleAccountEntityDao().remove(rolsUsuarisEntity);
 		
-		if (user != null)
-			getRuleEvaluatorService().applyRules(user);
-		getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+		if (!force && rolsUsuarisEntity.getRemovalPending() != null && rolsUsuarisEntity.getRemovalPending().booleanValue())
+		{
+			JbpmContext ctx = getBpmEngine().getContext();
+			try 
+			{
+				ProcessInstance pi = ctx.getProcessInstance(rolsUsuarisEntity.getApprovalProcess());
+				if (pi != null && !pi.hasEnded())
+				{
+					if (force)
+					{
+						pi.getRootToken().addComment("Requested role has been revoked");
+						pi.getRootToken().end();
+						pi.end();
+						for (TaskInstance ti: pi.getTaskMgmtInstance().getUnfinishedTasks(pi.getRootToken()))
+						{
+							if (!ti.hasEnded())
+								ti.cancel();
+						}            			
+						ctx.save(pi);	
+					}
+					else
+					{
+						// Remove is in process
+						return;
+					}
+				}
+			} finally {
+				ctx.close();
+			}
+		}
+
+		// Launch workflow approval process
+	    boolean nwap = !force && needsWorkflowApprovalProcess(rolsUsuarisEntity);
+	    
+	    if (nwap && ! rolsUsuarisEntity.isApprovalPending() )
+	    {
+		   	rolsUsuarisEntity.setRemovalPending(Boolean.TRUE);
+		   	launchWorkflowApprovalProcess(rolsUsuarisEntity, "revoke");
+	    }
+	    else
+	    {
+			List<RoleAccountEntity> list = new LinkedList<RoleAccountEntity>();
+			list.add(rolsUsuarisEntity);
+			if (rolsUsuarisEntity.getParent() != null)
+			{
+				rolsUsuarisEntity.getChildren().remove(rolsUsuarisEntity);
+			}
+			getRoleAccountEntityDao().remove(rolsUsuarisEntity);
+			
+			if (user != null)
+				getRuleEvaluatorService().applyRules(user);
+			getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
+	    }
 	}
 
 	@Override
@@ -2120,7 +2164,7 @@ public class ApplicationServiceImpl extends
             AccountEntity acc = uae.getAccount();
             for (RoleAccountEntity rae : new LinkedList<RoleAccountEntity>(acc.getRoles())) {
                 if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals(groupId)) {
-                    deleteRoleAccountEntity(rae, user);
+                    deleteRoleAccountEntity(rae, user, false);
                 }
             }
         }
@@ -2821,6 +2865,59 @@ public class ApplicationServiceImpl extends
 			}
 		}
 		return ra;
+	}
+
+	@Override
+	public void handleApproveDelete(RoleAccount rolsUsuaris) throws InternalErrorException, InternalErrorException {
+		RoleAccountEntity ra = getRoleAccountEntityDao().load(rolsUsuaris.getId());
+		if (ra.getRemovalPending() != null && ra.getRemovalPending().booleanValue())
+		{
+			UserEntity u = null;
+			for ( UserAccountEntity users: ra.getAccount().getUsers())
+				u = users.getUser();
+			
+			deleteRoleAccountEntity(ra, u, true);
+		}
+	}
+
+	@Override
+	public void handleDenyDelete(RoleAccount rolsUsuaris) throws InternalErrorException, InternalErrorException {
+		RoleAccountEntity ra = getRoleAccountEntityDao().load(rolsUsuaris.getId());
+		if (ra != null && ra.getRemovalPending() != null && ra.getRemovalPending().booleanValue())
+		{
+			ra.setRemovalPending(false);
+			getRoleAccountEntityDao().update(ra);
+		}
+	}
+
+	@Override
+	protected void handleDeleteByRuleEvaluation(RoleAccount rolsUsuaris) throws Exception {
+        String codiAplicacio = rolsUsuaris.getInformationSystemName();
+        // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
+        // {
+        RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().load(rolsUsuaris.getId());
+    	if (rolsUsuarisEntity == null)
+    		return;
+    	
+        if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_DELETE, rolsUsuarisEntity)) {
+
+        	if (rolsUsuarisEntity.getRule() == null)
+        	{
+        		if (Security.isSyncServer()) // SYNC SERVER
+            		return;
+        		throw new InternalErrorException(Messages.getString("AplicacioServiceImpl.CannotRevokeManually")); //$NON-NLS-1$
+        	}
+
+        	UserEntity user = null;
+            for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
+                user = ua.getUser();
+            }
+            
+            deleteRoleAccountEntity(rolsUsuarisEntity, user, false);
+            return;
+        } 
+        throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Messages.getString("ApplicationServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
 	}
 }
 

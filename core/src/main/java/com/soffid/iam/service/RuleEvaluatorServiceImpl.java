@@ -356,24 +356,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		@Override
 		public void revoke(UserEntity user, RoleAccountEntity role) throws InternalErrorException {
             RoleAccount r = getRoleAccountEntityDao().toRoleAccount(role);
-            getApplicationService().update(r);
-            Task updateRole = new Task();
-            updateRole.setTransaction("UpdateRole");
-            updateRole.setTaskDate(Calendar.getInstance());
-            updateRole.setStatus("P");
-            updateRole.setRole(r.getRoleName());
-            updateRole.setDatabase(r.getSystem());
-            TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
-            getTaskEntityDao().create(tasca);
-            Task updateUser = new Task();
-            updateUser.setTransaction(TaskHandler.UPDATE_USER);
-            updateUser.setTaskDate(Calendar.getInstance());
-            updateUser.setStatus("P");
-            updateUser.setUser(user.getUserName());
-            TaskEntity tasca2 = getTaskEntityDao().taskToEntity(updateUser);
-            getTaskEntityDao().create(tasca2);
-
-            getRoleAccountEntityDao().remove(role);
+            getApplicationService().deleteByRuleEvaluation(r);
 		}
 		
 		@Override
@@ -387,7 +370,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				ra.setAccountId(account.getId());
 				ra.setAccountName(account.getName());
 				Security.nestedLogin(Security.getCurrentAccount (), new String[] {
-					Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL
+					Security.AUTO_USER_ROLE_DELETE+Security.AUTO_ALL
 				});
 				try {
 					getApplicationService().create(ra);

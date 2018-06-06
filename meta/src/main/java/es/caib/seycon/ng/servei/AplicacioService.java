@@ -315,8 +315,24 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
+	@Operation()
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void deleteByRuleEvaluation(es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void denyApproval(es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void approveDelete(es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void denyDelete(es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 

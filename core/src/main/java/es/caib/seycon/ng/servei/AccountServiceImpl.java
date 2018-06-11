@@ -1,7 +1,5 @@
 package es.caib.seycon.ng.servei;
 
-import java.security.Principal;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -14,16 +12,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
-
-import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
-import org.jboss.invocation.pooled.server.ServerThread;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
-import org.mortbay.log.Log;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -34,22 +26,17 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.model.AccountAttributeEntity;
-import com.soffid.iam.model.AccountAttributeEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
-import com.soffid.iam.reconcile.common.ReconcileAccount;
 
 import bsh.EvalError;
 import bsh.Interpreter;
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.bpm.vo.ProcessDefinition;
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
-import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Grup;
@@ -57,24 +44,17 @@ import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PolicyCheckResult;
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.ServerType;
-import es.caib.seycon.ng.comu.SeyconServerInfo;
-import es.caib.seycon.ng.comu.SoDRule;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.comu.TipusUsuari;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariGrup;
-import es.caib.seycon.ng.comu.UsuariWFProcess;
-import es.caib.seycon.ng.comu.sso.NameParser;
-import es.caib.seycon.ng.config.Config;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.NotAllowedException;
-import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.ng.model.AccountAccessEntity;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AccountEntityDao;
@@ -97,10 +77,8 @@ import es.caib.seycon.ng.model.UserAccountEntityDao;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariGrupEntity;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.remote.URLManager;
 import es.caib.seycon.ng.servei.account.AccountNameGenerator;
 import es.caib.seycon.ng.sync.engine.TaskHandler;
-import es.caib.seycon.ng.sync.servei.SecretStoreService;
 import es.caib.seycon.ng.sync.servei.SyncStatusService;
 import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 import es.caib.seycon.ng.utils.Security;
@@ -811,7 +789,8 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		AccountEntity oldAccount = dao.findByNameAndDispatcher(account.getName(), accountEntity.getDispatcher().getCodi());
 		if (oldAccount == null)
 		{
-			createAccountTask(accountEntity);
+			if (accountEntity.getOldName() == null)
+				accountEntity.setOldName(accountEntity.getName());
 			accountEntity.setName(account.getName());
 			dao.update(accountEntity);
 			createAccountTask(accountEntity);
@@ -1077,6 +1056,7 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		
 		if (ae != null)
 		{
+			ae.setOldName(null);
 			ae.setLastUpdated(new Date());
 			getAccountEntityDao().update(ae, "A");
 		}
@@ -1195,9 +1175,16 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 	protected void handleSetAccountPassword (Account account, Password password)
 					throws Exception
 	{
+		setAccountPassword(account, password, false);
+	}
+
+	private Password setAccountPassword(Account account, Password password, boolean temporary)
+			throws InternalErrorException, BadPasswordException, Exception {
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		String principal = Security.getPrincipal().getName();
 		InternalPasswordService ips = getInternalPasswordService ();
+		
+		Password result = null;
 		
 		if (ae.getType().equals(AccountType.PRIVILEGED))
 		{
@@ -1263,13 +1250,22 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		
 		/// Now, do the job
-        PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
-        if (! check.isValid()) {
-            throw new BadPasswordException(check.getReason());
-        }
-		ips.storeAndForwardAccountPassword(ae, password, false, null);
+		if (password == null)
+		{
+			result = ips.generateNewAccountPassword(ae, temporary);
+		}
+		else
+		{
+	        PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
+	        if (! check.isValid()) {
+	            throw new BadPasswordException(check.getReason());
+	        }
+			ips.storeAndForwardAccountPassword(ae, password, temporary, null);
+		}
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
+		
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -1986,6 +1982,16 @@ public class AccountServiceImpl extends AccountServiceBase implements Applicatio
 		}
 		else
 			return getAccountEntityDao().toAccount(acc);
+	}
+
+	public void handleSetAccountTemporaryPassword(Account account, Password password)
+			throws Exception {
+		setAccountPassword(account, password, true);
+	}
+
+	public Password handleGenerateAccountTemporaryPassword(Account account)
+			throws  Exception {
+		return setAccountPassword(account, null, false);
 	}
 
 }

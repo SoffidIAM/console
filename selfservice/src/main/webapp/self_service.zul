@@ -502,5 +502,6 @@
 					onClick="cancelDelegate()" />
 			</div>
 		</window>
+		<include src="finestres/editorHTML.zul" />
 	</frame>
 </zk>

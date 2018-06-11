@@ -225,9 +225,15 @@ public class XarxaServiceImpl extends es.caib.seycon.ng.servei.XarxaServiceBase 
                                                          * int[]{ADMINISTRACIO})
                                                          */) {
         	XarxaEntity xarxaEntity = getXarxaEntityDao().xarxaToEntity(xarxa);
-        	if(!xarxaEntity.getMaquines().isEmpty() || xarxaEntity.getAutoritzacions().isEmpty())
-        		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
-        						new Object[]{xarxaEntity.getCodi()}));
+        	getXarxaACEntityDao().remove( xarxaEntity.getAutoritzacions());
+        	for ( MaquinaEntity maq: xarxaEntity.getMaquines())
+        	{
+        		if (maq.getDeleted() != null && maq.getDeleted().booleanValue())
+        			getMaquinaEntityDao().remove(maq);
+        		else
+            		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
+    						new Object[]{xarxaEntity.getCodi()}));
+        	}
             getXarxaEntityDao().remove(xarxaEntity);
         } else {
             throw new SeyconException(Messages.getString("XarxaServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$

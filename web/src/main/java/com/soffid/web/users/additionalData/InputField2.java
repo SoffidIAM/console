@@ -324,6 +324,35 @@ public class InputField2 extends Div
 								
 						}
 					}	
+					else if ( TypeEnumeration.HTML.equals(type))
+					{
+						Object v = getValue();
+						result = "<div>"
+								+ "<html style='display: inline-block; border: solid 1px black'>"
+								+ "<attribute name=\"onChange\"><![CDATA[\n" +
+									"self.parent.parent.changeHtml (event.data);"+
+								  "]]></attribute>" 
+								+ "<![CDATA["
+								+ (v == null ? "": 
+									v instanceof String ? v:
+									new String((byte[]) v, "UTF-8"))
+								+ "]]></html>" ;
+						if (!readonly)
+						{
+								result = result + 
+									"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" + 
+										"<attribute name=\"onClick\"><![CDATA[\n" + 
+											"Events.sendEvent(new Event (\"onEdit\", \n" + 
+												"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" + 
+												"new Object[] {\n" + 
+													"event.getTarget().getPreviousSibling(),"+ 
+												"}" + 
+											"));" + 
+										"]]></attribute>" + 
+									"</imageclic>";
+						}
+						result = result +  "</div>";
+					}
 					else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
 					{
 						Object v = XPathUtils.getValue(this, getBind());
@@ -468,6 +497,16 @@ public class InputField2 extends Div
         img.setContent(byteArrayToImage(data));
         img.setParent(span);       
         img.setStyle("max-width: 100px; max-height: 100px; ");
+        if (twoPhaseEdit)
+        {
+        	commit();
+        }
+    }
+	
+
+	public void changeHtml(String text) throws Exception {
+        byte data[] = text.getBytes("UTF-8");
+        setValue(data);
         if (twoPhaseEdit)
         {
         	commit();

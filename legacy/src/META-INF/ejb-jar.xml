@@ -37,7 +37,7 @@
 			<env-entry>
 				<env-entry-name>lockPeriod</env-entry-name>
 				<env-entry-type>java.lang.String</env-entry-type>
-				<env-entry-value><![CDATA[30]]></env-entry-value>
+				<env-entry-value><![CDATA[10]]></env-entry-value>
 			</env-entry>
 			<env-entry>
 				<env-entry-name>defaultCertDomain</env-entry-name>

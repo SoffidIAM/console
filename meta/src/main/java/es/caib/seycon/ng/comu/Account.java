@@ -19,6 +19,10 @@ public abstract class Account {
 	@Description("Account name")
 	public java.lang.String name;
 
+	@Description("Old account name")
+	@Nullable
+	public java.lang.String oldName;
+
 	@Description("Account description")
 	@Nullable
 	public java.lang.String description;

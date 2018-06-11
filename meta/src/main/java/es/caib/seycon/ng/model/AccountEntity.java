@@ -45,6 +45,10 @@ public abstract class AccountEntity {
 	@Nullable
 	public java.lang.String name;
 
+	@Column (name="ACC_OLDNAM", length=128)
+	@Nullable
+	public java.lang.String oldName;
+
 	@Column (name="ACC_DIS_ID")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 

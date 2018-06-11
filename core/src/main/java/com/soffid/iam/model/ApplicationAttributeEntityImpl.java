@@ -26,6 +26,7 @@ public class ApplicationAttributeEntityImpl extends com.soffid.iam.model.Applica
 			setBlobDataValue(null);
 		} 
 		else if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+				getMetadata().getType().equals( TypeEnumeration.HTML) ||
 				getMetadata().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			setBlobDataValue( (byte[]) value);
@@ -44,6 +45,7 @@ public class ApplicationAttributeEntityImpl extends com.soffid.iam.model.Applica
 	@Override
 	public Object getObjectValue() {
 		if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+				getMetadata().getType().equals( TypeEnumeration.HTML) ||
 				getMetadata().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			return getBlobDataValue();

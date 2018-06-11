@@ -143,14 +143,14 @@ public class DomainServiceImpl extends
 	 */
 	protected java.util.Collection<DomainValue> handleFindDomainValuesByFilter(com.soffid.iam.api.Domain domini, String codi, String descripcio, String codiUsuari) throws java.lang.Exception {
 		if (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) {
-			String query = "select group " //$NON-NLS-1$
-					+ "from com.soffid.iam.model.GroupEntity group " //$NON-NLS-1$
-					+ "join group.secondaryGroupUsers as sg " //$NON-NLS-1$
+			String query = "select grp " //$NON-NLS-1$
+					+ "from com.soffid.iam.model.GroupEntity grp " //$NON-NLS-1$
+					+ "join grp.secondaryGroupUsers as sg " //$NON-NLS-1$
 					+ "join sg.user as user " //$NON-NLS-1$
 					+ "where " //$NON-NLS-1$
 					+ "user.userName = :codiUsuari and " //$NON-NLS-1$
-					+ "(:codi is null or group.name like :codi) and " //$NON-NLS-1$
-					+ "(:descripcio is null or group.description like :descripcio)"; //$NON-NLS-1$
+					+ "(:codi is null or grp.name like :codi) and " //$NON-NLS-1$
+					+ "(:descripcio is null or grp.description like :descripcio)"; //$NON-NLS-1$
 			Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			Parameter codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			Parameter codiUsuariParameter = new Parameter("codiUsuari", //$NON-NLS-1$
@@ -162,13 +162,13 @@ public class DomainServiceImpl extends
 				valorsDomini = new Vector<GroupEntity>();
 			}
 
-			String queryGrupPrimari = "select group " //$NON-NLS-1$
-					+ "from com.soffid.iam.model.GroupEntity group " //$NON-NLS-1$
-					+ "join group.primaryGroupUsers as user " //$NON-NLS-1$
+			String queryGrupPrimari = "select grp " //$NON-NLS-1$
+					+ "from com.soffid.iam.model.GroupEntity grp " //$NON-NLS-1$
+					+ "join grp.primaryGroupUsers as user " //$NON-NLS-1$
 					+ "where " //$NON-NLS-1$
 					+ "user.userName = :codiUsuari and " //$NON-NLS-1$
-					+ "(:codi is null or group.name like :codi) and " //$NON-NLS-1$
-					+ "(:descripcio is null or group.description like :descripcio)"; //$NON-NLS-1$
+					+ "(:codi is null or grp.name like :codi) and " //$NON-NLS-1$
+					+ "(:descripcio is null or grp.description like :descripcio)"; //$NON-NLS-1$
 			codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 			codiDescripcio = new Parameter("descripcio", descripcio); //$NON-NLS-1$
 			codiUsuariParameter = new Parameter("codiUsuari", codiUsuari); //$NON-NLS-1$

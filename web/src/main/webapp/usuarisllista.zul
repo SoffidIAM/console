@@ -25,6 +25,8 @@
 				mode = "query";
 			}
 			
+			
+			
 			// Method to obtain the parameters to search process
 			java.util.Map getSearchParameters()
 			{

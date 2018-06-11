@@ -960,6 +960,7 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 	<include src="/agentsllista.zul"/>
 	<include src="/grups_posseidors.zul"/>
 	<include src="/finestres/aplica_rolsllista.zul"/>
+	<include src="/finestres/editorHTML.zul"/>
 	<include src="/dominisllista.zul"/>
 	
 	<include src="/finestres/aplica_rol_valorDomini.zul"/>

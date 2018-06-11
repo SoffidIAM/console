@@ -23,7 +23,7 @@
 	</script>
 	<style>
 		/*Tabla: Mis Tareas*/
-		.classThree, .classFour, .classFive{display:none;}
+		.tasks .classThree, .tasks .classFour, .tasks .classFive{display:none;}
 	</style>
 	<script src="/js/own_style.js"></script>
 	<application id="app"

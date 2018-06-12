@@ -15,4 +15,5 @@ public class TypeEnumeration {
 	public String applicationType = "A";
 	public String customObjectType = "C";
 	public String ssoFormType = "F";
+	public java.lang.String html="H";
 }

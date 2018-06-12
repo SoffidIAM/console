@@ -53,6 +53,10 @@ public abstract class AccountEntity {
 	@Column(name = "ACC_DIS_ID", translated = "system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
+	@Column (name="ACC_OLDNAM", length=128)
+	@Nullable
+	public java.lang.String oldName;
+
 	@ForeignKey(foreignColumn = "AAC_ACC_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountAccessEntity> acl;
 

@@ -384,7 +384,23 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
+	@Description("Sets the account temporary password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void setAccountTemporaryPassword(
+		es.caib.seycon.ng.comu.Account account, 
+		es.caib.seycon.ng.comu.Password password)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 	
+	@Description("Generates a temporary password for the account")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Password generateAccountTemporaryPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
 	///
 	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},

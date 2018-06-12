@@ -134,6 +134,7 @@ public class UploadService {
 			uploadComponentCurrent("org.apache.commons", "commons-jcs-core", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("jasperreports","jasperreports", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("spring", "1.2.7", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("cxf-rt-rs-client", "3.1.10", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("hibernate", "3.2.6.ga", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("commons-collections", "3.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("commons-beanutils", "1.7.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

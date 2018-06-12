@@ -243,6 +243,16 @@ public abstract class AccountService {
 	}
 	
 	/////////////
+	@Description("Generates the account name for a user domain")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
+	public java.lang.String guessAccountNameForDomain(
+		java.lang.String userName, 
+		java.lang.String domainName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	/////////////
 	@Description("Generates the account name for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="guessAccountName")
@@ -253,7 +263,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	
+
 	@Description("Checks if an account should be created for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="needsAccount")

@@ -434,12 +434,23 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		
-		if (! ae.isDisabled() && account.isDisabled())
+		if (account.getStatus() == null)
+			account.setStatus( account.isDisabled() ? AccountStatus.DISABLED: AccountStatus.ACTIVE);
+		
+		if (AccountStatus.REMOVED.equals(ae.getStatus()) && !account.getStatus().equals(AccountStatus.REMOVED))
+		{
+			audit("C", ae);
+		}
+		else if ( ! AccountStatus.REMOVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.REMOVED))
+		{
+			audit("R", ae);
+		}
+		else if (! ae.isDisabled() && account.isDisabled())
 		{
 			anyChange = true;
 			audit("e", ae);
 		}
-		if (ae.isDisabled() && !account.isDisabled())
+		else if (ae.isDisabled() && !account.isDisabled())
 		{
 			audit("E", ae);
 			anyChange = true;
@@ -771,8 +782,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			if (! (obj instanceof AccountNameGenerator))
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
 			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
-			return generator.getAccountName(ue, de);
+			SystemEntity de = dispatcherName == null ? null: getSystemEntityDao().findByName(dispatcherName);
+			return generator.getAccountName(ue, de, du);
 		}
 		else
 			return null;
@@ -797,7 +808,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			String expression) throws EvalError, MalformedURLException {
 		User userVO = getUserEntityDao().toUser(ue);
 		SecureInterpreter interpreter = new SecureInterpreter();
-		SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
+		SystemEntity de = dispatcherName == null ? null : getSystemEntityDao().findByName(dispatcherName);
 		
 		HashMap<String, String> attributes;
 		HashMap<String, Group> groups;
@@ -821,7 +832,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		interpreter.set("dominiEntity", du); //$NON-NLS-1$
 		interpreter.set("userDomain", getUserDomainEntityDao().toUserDomain(du)); //$NON-NLS-1$
 		interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
-		interpreter.set("system", getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
+		interpreter.set("system", de == null ? null : getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
 		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
 				
 		return interpreter.eval(expression);
@@ -1987,5 +1998,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	@Override
 	protected Collection<String> handleFindAccountNames(String system) throws Exception {
 		return getAccountEntityDao().findAcountNames(system);
+	}
+
+	@Override
+	protected String handleGuessAccountNameForDomain(String userName, String domainName) throws Exception {
+		UserDomainEntity du = getUserDomainEntityDao().findByName(domainName);
+		// Search if already has a user name for this user domain
+		
+		UserEntity ue = getUserEntityDao().findByUserName(userName);
+		return guessAccountName(null, du, ue);
 	}
 }

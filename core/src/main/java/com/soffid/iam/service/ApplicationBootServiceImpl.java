@@ -1043,6 +1043,8 @@ public class ApplicationBootServiceImpl extends
 		}
 		if (ConfigurationCache.getProperty("soffid.ui.wildcards") == null) //$NON-NLS-1$
 			ConfigurationCache.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.setProperty("org.apache.cxf.useSpringClassHelpers", "0");
 	}
 
 	/**

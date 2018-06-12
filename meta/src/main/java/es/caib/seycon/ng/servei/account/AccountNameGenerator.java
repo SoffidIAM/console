@@ -7,6 +7,8 @@
 package es.caib.seycon.ng.servei.account;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.DominiUsuariEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( internal=true, translatedName="AccountNameGenerator",
@@ -16,7 +18,8 @@ public abstract class AccountNameGenerator {
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getAccountName(
 		es.caib.seycon.ng.model.UsuariEntity user, 
-		es.caib.seycon.ng.model.DispatcherEntity dispatcher)
+		es.caib.seycon.ng.model.DispatcherEntity dispatcher,
+		DominiUsuariEntity userDomain)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

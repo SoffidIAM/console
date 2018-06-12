@@ -9,6 +9,14 @@ public class SAMLConfig {
 	public int cache;
 	public boolean alwaysTrust;
 	public String hostName;
+	protected boolean enableLinotp;
+	protected String linotpUser;
+	protected String linotpPassword;
+	protected String linotpServer;
+	protected String linotpUserDomain;
+	protected String requireToken;
+	protected String optionalToken;
+	protected Long tokenTimeout;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -63,5 +71,69 @@ public class SAMLConfig {
 	
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
+	}
+	
+	public boolean isEnableLinotp() {
+		return enableLinotp;
+	}
+	
+	public void setEnableLinotp(boolean enableLinotp) {
+		this.enableLinotp = enableLinotp;
+	}
+	
+	public String getLinotpUser() {
+		return linotpUser;
+	}
+	
+	public void setLinotpUser(String linotpUser) {
+		this.linotpUser = linotpUser;
+	}
+	
+	public String getLinotpPassword() {
+		return linotpPassword;
+	}
+	
+	public void setLinotpPassword(String linotpPassword) {
+		this.linotpPassword = linotpPassword;
+	}
+	
+	public String getLinotpServer() {
+		return linotpServer;
+	}
+	
+	public void setLinotpServer(String linotpServer) {
+		this.linotpServer = linotpServer;
+	}
+	
+	public String getLinotpUserDomain() {
+		return linotpUserDomain;
+	}
+	
+	public void setLinotpUserDomain(String linotpUserDomain) {
+		this.linotpUserDomain = linotpUserDomain;
+	}
+	
+	public String getRequireToken() {
+		return requireToken;
+	}
+	
+	public void setRequireToken(String requireToken) {
+		this.requireToken = requireToken;
+	}
+	
+	public String getOptionalToken() {
+		return optionalToken;
+	}
+	
+	public void setOptionalToken(String optionalToken) {
+		this.optionalToken = optionalToken;
+	}
+	
+	public Long getTokenTimeout() {
+		return tokenTimeout;
+	}
+	
+	public void setTokenTimeout(Long tokenTimeout) {
+		this.tokenTimeout = tokenTimeout;
 	}
 }

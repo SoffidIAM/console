@@ -16,6 +16,7 @@ import org.apache.commons.beanutils.LazyDynaMap;
 import org.zkoss.zk.ui.Executions;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -56,6 +57,18 @@ public class SamlDataModel extends SimpleDataNode {
 					c.cache = Integer.parseInt(s);
 				} catch (Exception e) {
 				}
+				
+				c.enableLinotp = "true".equals(ConfigurationCache.getProperty("soffid.linotp.enable"));
+				c.linotpUser = ConfigurationCache.getProperty("soffid.linotp.user");
+				c.linotpPassword = ConfigurationCache.getProperty("soffid.linotp.password");
+				c.linotpServer = ConfigurationCache.getProperty("soffid.linotp.server");
+				c.linotpUserDomain = ConfigurationCache.getProperty("soffid.linotp.userDomain");
+				
+				c.requireToken = ConfigurationCache.getProperty("soffid.otp.required");
+				c.optionalToken = ConfigurationCache.getProperty("soffid.otp.optional");
+				String tokenTimeoutString = ConfigurationCache.getProperty("soffid.otp.timeout");
+				c.tokenTimeout = tokenTimeoutString == null || tokenTimeoutString.isEmpty() ? null: Long.valueOf( tokenTimeoutString );
+
 				return Collections.singleton(c);
 			}
 		}, SamlDataNode.class);
@@ -88,5 +101,21 @@ public class SamlDataModel extends SimpleDataNode {
 				return l;
 			}
 		}, SimpleDataNode.class);
-	}
+
+		addFinder("userDomain", new Finder() {
+			
+			public Object newInstance() throws Exception {
+				return null;
+			}
+			
+			public Collection find() throws Exception {
+				LinkedList<UserDomain> list = new LinkedList<UserDomain>();
+				UserDomain empty = new UserDomain();
+				empty.setDescription("- select -");
+				list.add(empty);
+				list.addAll(  EJBLocator.getUserDomainService().findAllUserDomain() );
+				return list;
+			}
+		}, SimpleDataNode.class);
+}
 }

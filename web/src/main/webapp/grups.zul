@@ -477,9 +477,11 @@
 								sclass="groupatt"/>
 							<separator spacing="10px"/>
 							<vbox width="99%">
-							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" height="96%" id="gridUsuaris" if="${canQueryGroupUsers}" rows="15" sclass="likeagrid">
+							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" 
+								id="gridUsuaris" if="${canQueryGroupUsers}" mold="paging" pageSize="20" sclass="likeagrid">
 								<listhead>
-									<listheader label="${c:l('grups.zul.Codi-2')}" sort="auto" width="200px"/>
+									<listheader label="${c:l('grups.zul.Codi-2')}" sort="auto" width="200px">
+									</listheader>
 									<listheader label="${c:l('grups.zul.Nom')}" sort="auto"/>
 									<listheader label="${c:l('grups.zul.Tipus')}" sort="auto" width="120px"/>
 								</listhead>
@@ -503,6 +505,8 @@
 									<listcell bind="@info"/>
 								</dataitem>
 							</listbox>
+
+							<progress bind="/esquema/lista/treebox:/usuari"  if="${canQueryGroupUsers}" ></progress>
 							<hbox style="float:right">
 							<listexportbutton acces="${canQueryGroup}" if="${canQueryGroupUsers}" listbox="gridUsuaris"/>
 							</hbox>

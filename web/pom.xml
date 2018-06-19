@@ -240,6 +240,43 @@
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zhtml</artifactId>
 			<version>3.0.8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.zkoss.common</groupId>
+					<artifactId>zcommon</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.zkoss.common</groupId>
+					<artifactId>zweb</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.zkoss.zk</groupId>
+					<artifactId>zk</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.zkforge</groupId>
+			<artifactId>fckez</artifactId>
+			<version>2.6.1_1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.zkoss.common</groupId>
+					<artifactId>zcommon</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.zkoss.common</groupId>
+					<artifactId>zweb</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.zkoss.zk</groupId>
+					<artifactId>zk</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.zkoss.zk</groupId>
+					<artifactId>zul</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>

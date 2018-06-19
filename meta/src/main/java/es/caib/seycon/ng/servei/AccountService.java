@@ -243,6 +243,16 @@ public abstract class AccountService {
 	}
 	
 	/////////////
+	@Description("Generates the account name for a user domain")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
+	public java.lang.String guessAccountNameForDomain(
+		java.lang.String userName, 
+		java.lang.String domainName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	/////////////
 	@Description("Generates the account name for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="guessAccountName")
@@ -253,7 +263,7 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	
+
 	@Description("Checks if an account should be created for a user and system")
 	@Operation ( grantees={roles.agent_update.class},
 			translated="needsAccount")
@@ -374,7 +384,23 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
+	@Description("Sets the account temporary password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void setAccountTemporaryPassword(
+		es.caib.seycon.ng.comu.Account account, 
+		es.caib.seycon.ng.comu.Password password)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 	
+	@Description("Generates a temporary password for the account")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Password generateAccountTemporaryPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
 	///
 	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},

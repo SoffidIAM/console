@@ -528,7 +528,35 @@ public class InputField extends Div implements XPathSubscriber
 								
 						}
 					}	
-					else if (metaData.getValues() == null || metaData.getValues().isEmpty())//String
+					else if ( TypeEnumeration.HTML.equals(type))
+					{
+						byte [] v = getBlobDataValue();
+						result = "<div>"
+								+ "<html style='display: inline-block; border: solid 1px black'>"
+								+ "<attribute name=\"onChange\"><![CDATA[\n" 
+								+ "self.parent.parent.changeHtml (event.data);"
+								+ "]]></attribute>" 
+							  	+ "<![CDATA["
+								+ (v == null ? "": 
+									new String((byte[]) v, "UTF-8"))
+								+ "]]></html>" ;
+						if (!readonly)
+						{
+								result = result + 
+									"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" + 
+										"<attribute name=\"onClick\"><![CDATA[\n" + 
+											"Events.sendEvent(new Event (\"onEdit\", \n" + 
+												"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" + 
+												"new Object[] {\n" + 
+													"event.getTarget().getPreviousSibling()"+ 
+												"}" + 
+											"));" + 
+										"]]></attribute>" + 
+									"</imageclic>";
+						}
+						result = result +  "</div>";
+					}
+					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
 					{
 						if (dualEdit)
 							result= result + "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"
@@ -665,6 +693,16 @@ public class InputField extends Div implements XPathSubscriber
         }
     }
 	
+	
+	public void changeHtml(String text) throws Exception {
+        byte data[] = text.getBytes("UTF-8");
+        setBlobDataValue(data);
+        if (twoPhaseEdit)
+        {
+        	binder.getDataSource().commit();
+        }
+    }
+
 
 	public static AImage byteArrayToImage(byte[] bytes) throws IOException{
 		

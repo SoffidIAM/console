@@ -44,5 +44,13 @@
 			<mold-uri>~./zul/html/searchbox.dsp</mold-uri>
 		</mold>
 	</component>	
+	
+	<component>
+		<extends>frame</extends>
+		<component-name>frame</component-name>
+		<component-class>com.soffid.iam.web.component.Frame</component-class>
+	</component>
+
+	
 </language-addon>
 

@@ -2692,6 +2692,7 @@ void actualitza (event) {
 		<include src="finestres/user_renameAccount.zul" />
 		<include src="finestres/user_createAccount.zul" />
 		<include src="finestres/identity.zul" />
+		<include src="finestres/editorHTML.zul" />
 
 		<window closable="true" id="newPassword" position="center, center"
 			sizable="true" title="${c:l('accounts.setPassword.title')}"

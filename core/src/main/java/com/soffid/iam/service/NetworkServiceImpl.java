@@ -208,7 +208,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     /**
      * @see es.caib.seycon.ng.servei.XarxaService#delete(es.caib.seycon.ng.comu.Xarxa)
      */
-    protected void handleDelete(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
+    protected void handleDelete(Network xarxa) throws java.lang.Exception {
         if (AutoritzacionsUsuari.canDeleteAllNetworks() /*
                                                          * ||
                                                          * hasNetworkAuthorizations
@@ -220,8 +220,15 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                                                          * int[]{ADMINISTRACIO})
                                                          */) {
         	NetworkEntity xarxaEntity = getNetworkEntityDao().networkToEntity(xarxa);
-        	if(!xarxaEntity.getHosts().isEmpty() || xarxaEntity.getAuthorizations().isEmpty())
-        		throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IntegrityViolationHosts"), new Object[]{xarxaEntity.getName()}));
+        	getNetworkAuthorizationEntityDao().remove( xarxaEntity.getAuthorizations());
+        	for ( HostEntity maq: xarxaEntity.getHosts())
+        	{
+        		if (maq.getDeleted() != null && maq.getDeleted().booleanValue())
+        			getHostEntityDao().remove(maq);
+        		else
+            		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
+    						new Object[]{xarxaEntity.getName()}));
+        	}
             getNetworkEntityDao().remove(xarxaEntity);
         } else {
             throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$

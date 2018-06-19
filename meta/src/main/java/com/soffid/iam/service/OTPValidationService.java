@@ -1,16 +1,20 @@
 package com.soffid.iam.service;
 
 import com.soffid.iam.service.impl.OTPHandler;
+import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Challenge;
+import roles.Tothom;
 
-@Service(internal=true, serverPath="/seycon/otpValidationService")
+@Service(serverPath="/seycon/otpValidationService")
 public class OTPValidationService {
 	public void registerOTPHandler (OTPHandler handler) { }
 
+	@Operation(grantees= {Tothom.class})
 	public Challenge selectToken (Challenge challenge) {return null;}
 	
+	@Operation(grantees= {Tothom.class})
 	public boolean validatePin (Challenge challenge, String pin) {return false;}
 }
 

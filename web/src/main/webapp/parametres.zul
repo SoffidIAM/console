@@ -5,6 +5,8 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="comu/input_password.zul"?>
+
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<datamodel id="model" rootNode="parametres" src="descriptorParametre.xml"/>
@@ -478,13 +480,77 @@
 												</dataitem>
 											</listbox>
 										</div>
-										<div style="margin-top: 2em">
-											<button label="${c:l('parametres.zul.downloadMetadata') }" onClick="downloadMetadata()"/>
-											<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="samlmodel.commit();tabbox.setSelectedIndex(0);search();"
-												style="text-align:right"/>
+									</div>
+								</div>
+							</row>
+							<row>
+								<label value="${c:l('parametres.zul.linotpIntegration')}"/>
+								<label/>
+							</row>
+							<row>
+								<label/>
+								<div  width="100%">
+									<div>
+										<checkbox bind="enableLinotp" label="${c:l('deploy.lblEnable') }" 
+											style="display:block"/> 
+										<div>
+											<label value="${c:l('parametres.zul.linotpServer')}: "/>
+											<textbox bind="linotpServer" width="30em"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.linotpUser')}: "/>
+											<textbox bind="linotpUser" width="30em"
+												onOK=""/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.linotpPassord')}: "/>
+											<input_password width_custom="30em" bind="linotpPassword"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.linotpUserDomain')}: "/>
+											<listbox mold="select" bind="linotpUserDomain"
+												dataPath="/samlmodel:/userDomain">
+												<dataitem bind="/code">
+													<listcell bind="/description"/>
+												</dataitem>
+											</listbox>
 										</div>
 									</div>
 								</div>
+							</row>
+							<row>
+								<label value="${c:l('parametres.zul.otpUsage')}"/>
+								<label/>
+							</row>
+							<row>
+								<label/>
+								<div  width="100%">
+									<div>
+										<div>
+											<label value="${c:l('parametres.zul.otpOptional')}: "/>
+											<textbox bind="optionalToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.otpRequired')}: "/>
+											<textbox bind="requireToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+										</div>
+										<div>
+											<label value="${c:l('parametres.zul.otpTimeout')}: "/>
+											<intbox bind="tokenTimeout" width="30" maxlength="500"/>
+											<label value="${c:l('parametres.zul.otpTimeout2')}: "/>
+											
+										</div>
+									</div>
+								</div>
+							</row>
+							<row>
+								<label/>
+								<div style="margin-top: 2em">
+									<button label="${c:l('parametres.zul.downloadMetadata') }" onClick="downloadMetadata()"/>
+									<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="samlmodel.commit();tabbox.setSelectedIndex(0);search();"
+										style="text-align:right"/>
+								</div>
+						
 							</row>
 						</rows>
 					</grid>

@@ -23,7 +23,7 @@
 		</script>
 		<style>
 			/*Tabla: Mis Tareas*/
-			.classThree, .classFour, .classFive{display:none;}
+			.tasks .classThree, .tasks .classFour, .tasks .classFive{display:none;}
 		</style>
 		<script src="/js/own_style.js"></script>
 		<application id="app"
@@ -38,6 +38,7 @@
 			showProfile="false"
 			width="100%"/>	
 		<include src="menu.zul"/>
+
     </div>
     <zscript><![CDATA[
 		void find ( Treechildren treechildren, String target)

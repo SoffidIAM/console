@@ -52,7 +52,7 @@ import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class SelfServiceHandler extends Frame 
+public class SelfServiceHandler extends com.soffid.iam.web.component.Frame 
 {
 	private String ambit;
 

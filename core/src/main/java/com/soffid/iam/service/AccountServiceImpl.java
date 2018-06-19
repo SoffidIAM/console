@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -434,12 +435,23 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		
-		if (! ae.isDisabled() && account.isDisabled())
+		if (account.getStatus() == null)
+			account.setStatus( account.isDisabled() ? AccountStatus.DISABLED: AccountStatus.ACTIVE);
+		
+		if (AccountStatus.REMOVED.equals(ae.getStatus()) && !account.getStatus().equals(AccountStatus.REMOVED))
+		{
+			audit("C", ae);
+		}
+		else if ( ! AccountStatus.REMOVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.REMOVED))
+		{
+			audit("R", ae);
+		}
+		else if (! ae.isDisabled() && account.isDisabled())
 		{
 			anyChange = true;
 			audit("e", ae);
 		}
-		if (ae.isDisabled() && !account.isDisabled())
+		else if (ae.isDisabled() && !account.isDisabled())
 		{
 			audit("E", ae);
 			anyChange = true;
@@ -711,7 +723,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountEntity oldAccount = dao.findByNameAndSystem(account.getName(), accountEntity.getSystem().getName());
 		if (oldAccount == null)
 		{
-			createAccountTask(accountEntity);
+			if (accountEntity.getOldName() == null)
+				accountEntity.setOldName(accountEntity.getName());
 			accountEntity.setName(account.getName());
 			dao.update(accountEntity);
 			createAccountTask(accountEntity);
@@ -771,8 +784,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			if (! (obj instanceof AccountNameGenerator))
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.BeanNotImplementNameGenerator"), du.getBeanGenerator())); //$NON-NLS-1$
 			AccountNameGenerator generator = (AccountNameGenerator) obj;
-			SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
-			return generator.getAccountName(ue, de);
+			SystemEntity de = dispatcherName == null ? null: getSystemEntityDao().findByName(dispatcherName);
+			return generator.getAccountName(ue, de, du);
 		}
 		else
 			return null;
@@ -797,7 +810,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			String expression) throws EvalError, MalformedURLException {
 		User userVO = getUserEntityDao().toUser(ue);
 		SecureInterpreter interpreter = new SecureInterpreter();
-		SystemEntity de = getSystemEntityDao().findByName(dispatcherName);
+		SystemEntity de = dispatcherName == null ? null : getSystemEntityDao().findByName(dispatcherName);
 		
 		HashMap<String, String> attributes;
 		HashMap<String, Group> groups;
@@ -821,7 +834,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		interpreter.set("dominiEntity", du); //$NON-NLS-1$
 		interpreter.set("userDomain", getUserDomainEntityDao().toUserDomain(du)); //$NON-NLS-1$
 		interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
-		interpreter.set("system", getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
+		interpreter.set("system", de == null ? null : getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
 		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
 				
 		return interpreter.eval(expression);
@@ -985,6 +998,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		if (ae != null)
 		{
+			ae.setOldName(null);
 			ae.setLastUpdated(new Date());
 			getAccountEntityDao().update(ae, "A");
 		}
@@ -1096,9 +1110,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected void handleSetAccountPassword (Account account, Password password)
 					throws Exception
 	{
+		setAccountPassword(account, password, false);
+	}
+
+	private Password setAccountPassword(Account account, Password password, boolean temporary)
+			throws InternalErrorException, BadPasswordException, Exception {
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
+		
+		Password result = null;
 		
 		if (ae.getType().equals(AccountType.PRIVILEGED))
 		{
@@ -1159,13 +1180,22 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 		
 		/// Now, do the job
-        PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
-        if (! check.isValid()) {
-            throw new BadPasswordException(check.getReason());
-        }
-		ips.storeAndForwardAccountPassword(ae, password, false, null);
+		if (password == null)
+		{
+			result = ips.generateNewAccountPassword(ae, temporary);
+		}
+		else
+		{
+	        PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
+	        if (! check.isValid()) {
+	            throw new BadPasswordException(check.getReason());
+	        }
+			ips.storeAndForwardAccountPassword(ae, password, temporary, null);
+		}
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
+		
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -1988,4 +2018,24 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected Collection<String> handleFindAccountNames(String system) throws Exception {
 		return getAccountEntityDao().findAcountNames(system);
 	}
+
+	@Override
+	protected String handleGuessAccountNameForDomain(String userName, String domainName) throws Exception {
+		UserDomainEntity du = getUserDomainEntityDao().findByName(domainName);
+		// Search if already has a user name for this user domain
+		
+		UserEntity ue = getUserEntityDao().findByUserName(userName);
+		return guessAccountName(null, du, ue);
+	}
+
+	public void handleSetAccountTemporaryPassword(Account account, Password password)
+			throws Exception {
+		setAccountPassword(account, password, true);
+	}
+
+	public Password handleGenerateAccountTemporaryPassword(Account account)
+			throws  Exception {
+		return setAccountPassword(account, null, false);
+	}
+
 }

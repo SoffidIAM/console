@@ -29,7 +29,6 @@
 
 		<timer id="timer" repeats="true" delay="1000">
 			<attribute name="onTimer"><![CDATA[
-			System.out.println ("ON TIMER !!!");
 		    boolean any = false;
 		    any = fetchAsyncData(userList, userListPosition, "user") || any;
 		    any = fetchAsyncData(roleList, roleListPosition, "role") || any;
@@ -85,11 +84,6 @@
 			boolean any = false;
 			if (list != null)
 			{
-				System.out.println("Fetching from "+tag);
-				System.out.println("done "+list.isDone());
-				System.out.println("cancelled "+list.isCancelled());
-				System.out.println("size "+list.size());
-				System.out.println("pointer "+position[0]);
 				Iterator it = list.iterator();
 				if ( (list.isDone() &&  position[0] == list.size()) || list.isCancelled())
 				{
@@ -97,10 +91,8 @@
 					list.clearExceptionToThrow();
 					if (th != null)
 						throw th; 
-					System.out.println("DONE");
 					any = false;
 				} else if (list.size() > position[0]) {
-					System.out.println("New data :"+list.size());
 					int i = 0;
 					while (it.hasNext())
 					{
@@ -117,7 +109,6 @@
 					}
 					any = true;
 				} else {
-					System.out.println("Waiting");
 					any = true;
 				}
 			}
@@ -202,7 +193,6 @@
 		
 		void search(String t) throws Exception
 		{
-			System.out.println ("*** SEARCH "+t);
 			ids = new LinkedList();
 			searchCriteria = t;
 			searchSomething (t, ids);
@@ -227,7 +217,6 @@
 		void searchSomething (String t, List ids)
 		{
 			if (userList != null) {
-				System.out.println ("*** SEARCH CANCEL "+t);
 				userList.cancel();
 			}
 			if (accountList != null) accountList.cancel();
@@ -258,7 +247,6 @@
 		void searchUsers (String t, List ids) {
 			userListPosition[0] = 0;
 			userList = com.soffid.iam.EJBLocator.getUserService().findUserByTextAsync(t);
-			System.out.println("New user list");
 			timer.start();
 		}
 		                  

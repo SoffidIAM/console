@@ -509,16 +509,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			ae.setType(account.getType());
 		}
 
-		if (! ae.isDisabled() && account.isDisabled())
-			audit("e", ae);
-		if (ae.isDisabled() && !account.isDisabled())
-			audit("E", ae);
-
 		if (! account.getName().equals(ae.getName()))
 		{
 			if (getAccountEntityDao().findByNameAndSystem(account.getName(), ae.getSystem().getName()) != null)
 				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName()));
 			anyChange = true;
+			account.setOldName(ae.getName());
 		}
 		if ( (ae.getDescription() == null ? account.getDescription() != null: ! ae.getDescription().equals( account.getDescription())) ||
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
@@ -527,13 +523,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				! ae.getPasswordPolicy().getName().equals(account.getPasswordPolicy()))
 			anyChange = true;
 		
+
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
 		if (account.getType().equals(AccountType.USER))
 			removeAcl (ae);
-		else
+		else if (updateAcl(ae, account))
 		{
-			anyChange = anyChange || updateAcl(ae, account);
+			anyChange = true;
 		}
 			
 		

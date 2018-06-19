@@ -69,6 +69,7 @@ import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -78,12 +79,14 @@ import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleDependencyEntityDao;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.RoleGroupEntityDao;
+import com.soffid.iam.model.SecretEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SessionEntity;
@@ -1183,10 +1186,29 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					Messages.getString("UserServiceImpl.NoAuthorizedToDelete")); //$NON-NLS-1$
 		}
 		if (usuariEntity != null) {
-			// els usuaris mai s'eliminen, es fa un downgrade
 			disableUser(usuari.getUserName());
 			removeOldAlias(usuari);
 			getUserDataEntityDao().remove(usuariEntity.getUserData());
+			usuariEntity.getUserData().clear();
+			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
+			{
+				AccountEntity acc = ua.getAccount();
+				getAccountEntityDao().remove(acc);
+			}
+			usuariEntity.getAccounts().clear();
+			for (PasswordEntity pass : usuariEntity.getPasswords())
+			{
+				getPasswordEntityDao().remove(pass);
+			}
+			usuariEntity.getPasswords().clear();
+			
+			for (SecretEntity secret: usuariEntity.getSecrets())
+			{
+				getSecretEntityDao().remove(secret);
+			}
+			usuariEntity.getSecrets().clear();
+			for (AccessLogEntity al: getAccessLogEntityDao().findLastAccessLogByUserName(usuariEntity.getUserName(),null))
+				getAccessLogEntityDao().remove(al);
 			getUserEntityDao().remove(usuariEntity);
 		}
 	}

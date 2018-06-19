@@ -76,7 +76,7 @@
 			</new-instance-bean>
 		</finder>
 		<finder name="usuari" type="usuari">
-			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findUsuarisPertanyenAlGrupByCodiGrup"
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findUsuarisPertanyenAlGrupByCodiGrupAsync"
 				if="canQueryGroupUsers">  <!-- group:user:query -->
 				<parameter value="${instance.codi}" />
 			</ejb-finder>

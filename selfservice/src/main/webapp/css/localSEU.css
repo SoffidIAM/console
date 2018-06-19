@@ -821,7 +821,7 @@ li.attribute-search-box  > button:hover {
 	display:inline;
 }
 
-.search-box img.progress {
+img.progress {
 	height: 24px;
 	vertical-align: middle;
 }

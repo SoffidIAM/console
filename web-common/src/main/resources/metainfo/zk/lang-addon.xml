@@ -26,6 +26,12 @@
 		</mold>
 	</component>	
 
+	<component>
+		<component-name>progress</component-name>
+		<component-class>com.soffid.iam.web.component.ProgressImage</component-class>
+		<extends>div</extends>
+	</component>	
+
 	<javascript-module name="attributesearchbox.attributesearchbox" version="1.0"/>
 	<component>
 		<component-name>attributesearchbox</component-name>

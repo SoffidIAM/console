@@ -121,6 +121,7 @@
 									.setVisible(false);
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(false);
+							form.getFellow("edit_codi_button").setVisible(false);
 							form.getFellow("txtAccountDescription").getFellow("dada")
 									.setReadonly(false);
 							form.getFellow("lbAccountType").setDisabled(false);
@@ -139,6 +140,7 @@
 									.setVisible(true);
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(true);
+							form.getFellow("edit_codi_button").setVisible(true);
 							form.getFellow("txtAccountDescription").getFellow("dada")
 									.setReadonly(true);
 							form.getFellow("lbAccountType").setDisabled(false);
@@ -157,6 +159,7 @@
 									.setVisible(true);
 							form.getFellow("txtAccountName").getFellow("dada")
 									.setReadonly(true);
+							form.getFellow("edit_codi_button").setVisible(true);
 							form.getFellow("txtAccountDescription").getFellow("dada")
 									.setReadonly(false);
 							form.getFellow("lbAccountType").setDisabled(false);
@@ -180,6 +183,7 @@
 						}
 						form.getFellow("txtAccountName").getFellow("dada")
 								.setReadonly(true);
+						form.getFellow("edit_codi_button").setVisible(true);
 						form.getFellow("txtAccountDescription").getFellow("dada")
 								.setReadonly(true);
 						form.getFellow("lbAccountType").setDisabled(true);
@@ -403,6 +407,8 @@
 													<input_dada id="txtAccountName" bind="@name"
 														lectura="${!canModifyAccounts}" maxlength="10"
 														multiline_custom="false" width_custom="100%" />
+													<imageclic src='/img/pencil.png' onClick='self.previousSibling.getFellow("dada").readonly = false; self.visible = false; '
+														id ="edit_codi_button" visible="${canModifyAccounts}"/>
 													<label value="*" />
 													<image src="~./img/exclamacio.gif"
 														id="updateIndicator" visible="false" width="16px"

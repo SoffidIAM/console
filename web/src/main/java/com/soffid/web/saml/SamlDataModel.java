@@ -58,7 +58,7 @@ public class SamlDataModel extends SimpleDataNode {
 				} catch (Exception e) {
 				}
 				
-				c.enableLinotp = "true".equals(ConfigurationCache.getProperty("soffid.linotp.enable"));
+				c.enableLinotp = "true".equals(ConfigurationCache.getProperty("soffid.linotp.enabled"));
 				c.linotpUser = ConfigurationCache.getProperty("soffid.linotp.user");
 				c.linotpPassword = ConfigurationCache.getProperty("soffid.linotp.password");
 				c.linotpServer = ConfigurationCache.getProperty("soffid.linotp.server");

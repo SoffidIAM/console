@@ -552,35 +552,42 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	protected Collection<GroupUser> handleFindUsersBelongtoGroupByGroupName(String codiGrup) throws Exception {
+		AsyncList<GroupUser> result = new AsyncList<GroupUser>();
 
-		// Obtenim els usuaris que tenen aquest grup com a grup primari
-		// o com a grup secundari i filtrem per autoritzacions
-		Collection<GroupUser> totsUsuarisGrup = new LinkedList();
 
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findGroupUsers(codiGrup, result);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		return result.get();
+	}
+
+	private void findGroupUsers(String codiGrup, AsyncList<GroupUser> result) throws InternalErrorException {
 		// Mirem les autoritzacions a nivell de grup per group:user:query
 		Collection usuari = getUserEntityDao().findByPrimaryGroup(codiGrup);
 		for (Iterator it = usuari.iterator(); it.hasNext(); ) {
+			if (result.isCancelled())
+				return;
             UserEntity user = (UserEntity) it.next();
             if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, user)) {
                 String nomComplet = user.getFullName();
                 GroupUser usugru = new GroupUser(user.getUserName(), user.getPrimaryGroup().getName(), nomComplet);
                 usugru.setInfo(Messages.getString("GroupServiceImpl.PrimaryGroupText"));
-                totsUsuarisGrup.add(usugru);
+                result.add(usugru);
             }
         }
 
 		Collection<UserGroupEntity> usuaris = getUserGroupEntityDao().findByGroupName(codiGrup);
 		// Los añadimos al listado anterior
 		for (UserGroupEntity uge : usuaris) {
+			if (result.isCancelled())
+				return;
             if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, uge)) {
                 GroupUser ug = getUserGroupEntityDao().toGroupUser(uge);
                 ug.setInfo(Messages.getString("GroupServiceImpl.SecondaryGroupText"));
-                totsUsuarisGrup.add(ug);
+                result.add(ug);
             }
         }
-
-		// sinó tornem la llista buida
-		return totsUsuarisGrup;
 	}
 
 	protected Group handleFindGroupById(Long grupId) throws Exception {
@@ -799,6 +806,21 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			public void run() {
 				try {
 					findByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	@Override
+	protected AsyncList<GroupUser> handleFindUsersBelongtoGroupByGroupNameAsync(final String codiGrup) throws Exception {
+		final AsyncList<GroupUser> result = new AsyncList<GroupUser>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findGroupUsers(codiGrup, result);
 				} catch (Exception e) {
 					result.cancel(e);
 				}

@@ -361,7 +361,12 @@ public class DispatcherServiceImpl extends
 		if (tipusUsuariToGenerateAccounts != null
 				&& !tipusUsuariToGenerateAccounts.isEmpty())
 			if (dispatcher.getUrl() != null)
-				handlePorpagateUsersDispatcher(dispatcher.getName());
+			{
+				
+				String status = ConfigurationCache.getProperty("soffid.task.mode");
+				if (! "readonly".equals( status ) && ! "manual".equals( status ))
+					handlePorpagateUsersDispatcher(dispatcher.getName());
+			}
 	}
 
 	private void generateUpdateUser(String usuari, String dispatcher)

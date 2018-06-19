@@ -93,6 +93,7 @@
 				import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
 				import es.caib.zkib.datasource.XPathUtils;
 				canCreateUser = !readOnly && AutoritzacionsUsuari.hasCreateUser();
+				canDeleteUser = !readOnly && com.soffid.iam.utils.Security.isUserInRole("user:delete");
 				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
 				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
 				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
@@ -546,6 +547,24 @@
 					disabledRow.setVisible (! actiu.isChecked());   					
 				}
 				
+				void confirmDelete ()
+				{
+					es.caib.zkib.component.DataListbox lb = (es.caib.zkib.component.DataListbox) 
+							esquema.getFellow("lista").getFellow("listbox");
+					es.caib.zkib.binder.BindContext ctx =
+							XPathUtils.getComponentContext(esquema.getFellow("dades").getFellow("form"));
+					String name = XPathUtils.getValue(ctx, "codi");
+					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(
+							org.zkoss.util.resource.Labels.getLabel("usuaris.zul.deleteConfirm", new String [] { name }),
+							new org.zkoss.zk.ui.event.EventListener() {
+								public void onEvent(Event evt) {
+									if ("onOK".equals(evt.getName())) {
+										lb.delete();
+									}
+								}
+							}
+							);
+				}
 			]]>
 		</zscript>
 
@@ -567,6 +586,9 @@
 					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="user"/>
 					<insertbutton acces="${canCreateUser}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
+					<deletebutton acces="${canDeleteUser}"
+						listbox="/esquema/lista/listbox"
+						onClick="confirmDelete(); event.stopPropagation();"/>
 					<commitbutton datamodel="/model" onClick="doCommit(event)"/>
 					<undobutton datamodel="/model" listbox="/esquema/lista/listbox" />
 					<listexporttoolbarbutton acces="${canQueryUser}"

@@ -556,7 +556,7 @@ public class InputField extends Div implements XPathSubscriber
 						}
 						result = result +  "</div>";
 					}
-					else if (typeData.getValues() == null || typeData.getValues().isEmpty())//String
+					else if (metaData.getValues() == null || metaData.getValues().isEmpty())//String
 					{
 						if (dualEdit)
 							result= result + "<div style='display:inline-block;'><label bind='@" + (v2 ? "value": "valorDada") + "'/>"

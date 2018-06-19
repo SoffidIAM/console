@@ -244,6 +244,16 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.group_user_query.class},
+			translated="findUsersBelongtoGroupByGroupNameAsync")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public AsyncList<es.caib.seycon.ng.comu.UsuariGrup> findUsuarisPertanyenAlGrupByCodiGrupAsync(
+		java.lang.String codiGrup)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation (translated="getRolesFromGroup")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolsGrup> getRolsFromGrup(

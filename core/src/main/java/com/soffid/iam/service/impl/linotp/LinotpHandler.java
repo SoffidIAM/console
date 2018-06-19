@@ -1,9 +1,6 @@
 package com.soffid.iam.service.impl.linotp;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 import javax.json.Json;
@@ -11,15 +8,11 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
-import org.apache.openejb.InternalErrorException;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Challenge;
@@ -28,6 +21,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.service.impl.OTPHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
 
 public class LinotpHandler implements OTPHandler {
@@ -38,7 +32,7 @@ public class LinotpHandler implements OTPHandler {
 		return "true".equals(enabled);
 	}
 	
-	private String getUrl (String url)
+	private String getUrl (String url) throws InternalErrorException
 	{
 		String base = ConfigurationCache.getProperty("soffid.linotp.server");
 		if (base == null)
@@ -149,7 +143,7 @@ public class LinotpHandler implements OTPHandler {
 	}
 
 	@Override
-	public boolean validatePin(Challenge challenge, String pin) {
+	public boolean validatePin(Challenge challenge, String pin) throws IllegalArgumentException, InternalErrorException {
 		if (isEnabled())
 		{
 			String linOtpUser = getLinotpUserName(challenge.getUser());

@@ -59,7 +59,7 @@ public class ACLServiceImpl extends ACLServiceBase  {
 		pc.lastModification = ue.getLastModificationDate();
 		pc.evaluationDate = new Date();
 		getCache().put(userId, pc);
-		log.info("Entry stored");
+//		log.info("Entry stored");
 		
 		return acl;
 	}

@@ -39,7 +39,7 @@ public class SamlDataNode extends SimpleDataNode {
 			if (c.linotpServer == null || c.linotpServer.trim().isEmpty())
 				throw new InternalErrorException ("Missing LinOTP server");
 		}
-		updateParam("soffid.linotp.enable", c.enableLinotp? "true": "false");
+		updateParam("soffid.linotp.enabled", c.enableLinotp? "true": "false");
 		updateParam("soffid.linotp.user", c.linotpUser);
 		updateParam("soffid.linotp.password", c.linotpPassword);
 		updateParam("soffid.linotp.server", c.linotpServer);

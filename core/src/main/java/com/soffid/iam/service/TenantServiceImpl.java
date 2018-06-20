@@ -22,15 +22,6 @@ public class TenantServiceImpl extends TenantServiceBase {
 	@Override
 	protected Tenant handleGetMasterTenant() throws Exception {
 		Tenant t = handleGetTenant(MASTER_NAME);
-		if ( t == null )
-		{
-			TenantEntity te = getTenantEntityDao().newTenantEntity();
-			te.setDescription("Master tenant");
-			te.setName(MASTER_NAME);
-			te.setDescription("Autocreated master tenant");
-			getTenantEntityDao().create(te);
-			t = getTenantEntityDao().toTenant(te);
-		}
 		return t;
 	}
 
@@ -38,7 +29,18 @@ public class TenantServiceImpl extends TenantServiceBase {
 	protected Tenant handleGetTenant(String name) throws Exception {
 		TenantEntity t = getTenantEntityDao().findByName(name);
 		if (t == null)
-			return null;
+		{
+			if ( name.equals(MASTER_NAME))
+			{
+				t = getTenantEntityDao().newTenantEntity();
+				t.setDescription("Master tenant");
+				t.setName(MASTER_NAME);
+				t.setDescription("Autocreated master tenant");
+				getTenantEntityDao().create(t);
+			}
+			else
+				return null;
+		}
 		return getTenantEntityDao().toTenant(t);
 	}
 

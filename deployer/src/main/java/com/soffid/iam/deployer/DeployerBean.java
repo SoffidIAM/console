@@ -798,30 +798,34 @@ public class DeployerBean implements DeployerService {
 
 	private void updateCacheProperties(QueryHelper qh) throws SQLException, IOException {
 		deleteCacheProperties();
-		for ( Object[] data: qh.select(
-				  "SELECT CON_CODI, CON_VALOR "
-				+ "FROM   SC_TENANT, SC_CONFIG "
-				+ "WHERE  CON_TEN_ID=TEN_ID AND CON_IDXAR IS NULL AND TEN_NAME='master' "
-				+ "AND    CON_CODI = 'soffid.cache.enable'", new Object [0]))
-		{
-			System.setProperty  ((String) data[0], (String) data[1]);
-		}
-		
-		File f = new File ( new File (getJbossHomeDir(), "conf"), "jcs.properties");
-		if (f.canRead())
-		{
-			System.setProperty("soffid.cache.configFile", f.getAbsolutePath());
-		}
-		else
-		{
-			System.getProperties().remove("soffid.cache.configFile");
+		try {
 			for ( Object[] data: qh.select(
-					  "SELECT BCO_NAME, BCO_VALUE "
-					+ "FROM   SC_BLOCON "
-					+ "WHERE  BCO_NAME = 'soffid.cache.config'", new Object [0]))
+					  "SELECT CON_CODI, CON_VALOR "
+					+ "FROM   SC_TENANT, SC_CONFIG "
+					+ "WHERE  CON_TEN_ID=TEN_ID AND CON_IDXAR IS NULL AND TEN_NAME='master' "
+					+ "AND    CON_CODI = 'soffid.cache.enable'", new Object [0]))
 			{
-				System.setProperty  ((String) data[0], new String((byte[]) data[1], "UTF-8"));
+				System.setProperty  ((String) data[0], (String) data[1]);
 			}
+			
+			File f = new File ( new File (getJbossHomeDir(), "conf"), "jcs.properties");
+			if (f.canRead())
+			{
+				System.setProperty("soffid.cache.configFile", f.getAbsolutePath());
+			}
+			else
+			{
+				System.getProperties().remove("soffid.cache.configFile");
+				for ( Object[] data: qh.select(
+						  "SELECT BCO_NAME, BCO_VALUE "
+						+ "FROM   SC_BLOCON "
+						+ "WHERE  BCO_NAME = 'soffid.cache.config'", new Object [0]))
+				{
+					System.setProperty  ((String) data[0], new String((byte[]) data[1], "UTF-8"));
+				}
+			}
+		} catch (Exception e) {
+			log.info("Error getting cache configuration", e);
 		}
 
 	}

@@ -43,7 +43,8 @@ public class ScriptEnviroment {
 	 */
 	public String getLoadTriggerVars (Component c) throws InternalErrorException, NamingException, CreateException
 	{
-		SoffidObjectType type = (SoffidObjectType) XPathUtils.getValue(c, "@objectType");
+		Object o = XPathUtils.getValue(c, "@objectType");
+		SoffidObjectType type = SoffidObjectType.fromString( o.toString() );
 
 		defineAccountAttributes(c);
 		defineUserAttributes(c);

@@ -8,6 +8,8 @@ package es.caib.seycon.ng.servei;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.VaultFolderAccessEntity;
+import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.*;
 
@@ -69,7 +71,9 @@ import org.springframework.transaction.annotation.Transactional;
 	AccountPasswordEntity.class,
 	AccountAttributeEntity.class,
 	RegistreAccesEntity.class,
-	AccountEntity.class})
+	AccountEntity.class, 
+	VaultFolderEntity.class,
+	VaultFolderAccessEntity.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")

@@ -590,7 +590,7 @@
 				</grid>
 				<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 
 					dataPath="attributes" scope="role"
-					ownerBind="./"
+					ownerBind="."
 					sclass="roleatt"/>
 				<separator spacing="15px"/>
 							<tabbox>

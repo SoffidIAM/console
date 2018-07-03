@@ -100,6 +100,8 @@ import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.model.UserProcessEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.model.VaultFolderAccessEntity;
+import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.CertificateParser;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -1190,6 +1192,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			removeOldAlias(usuari);
 			getUserDataEntityDao().remove(usuariEntity.getUserData());
 			usuariEntity.getUserData().clear();
+			for (VaultFolderAccessEntity ua: new LinkedList<VaultFolderAccessEntity> ( usuariEntity.getVaultFolders()))
+			{
+				getVaultFolderAccessEntityDao().remove(ua);
+			}
+			for (UserPreferencesEntity ua: new LinkedList<UserPreferencesEntity> ( usuariEntity.getSEUInformation()))
+			{
+				getUserPreferencesEntityDao().remove(ua);
+			}
 			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
 			{
 				AccountEntity acc = ua.getAccount();

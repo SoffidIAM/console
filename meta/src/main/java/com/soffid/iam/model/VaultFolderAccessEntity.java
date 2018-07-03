@@ -29,7 +29,7 @@ public abstract class VaultFolderAccessEntity {
 	public es.caib.seycon.ng.model.GrupEntity group;
 
 	@Description ("Grantee user")
-	@Column (name="VFA_USU_ID")
+	@Column (name="VFA_USU_ID", reverseAttribute="vaultFolders")
 	@Nullable
 	public es.caib.seycon.ng.model.UsuariEntity user;
 

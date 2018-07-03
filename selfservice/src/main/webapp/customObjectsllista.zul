@@ -48,6 +48,8 @@
 				esquema.getFellow("queryWindow").getFellow("searchBox").
 					setJsonObject("com.soffid.iam.api.CustomObject#"+objectType);
 				
+				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/object";
+
 				model.getVariables().declareVariable("query", null);
 				model.refresh();
 

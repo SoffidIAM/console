@@ -58,7 +58,7 @@
 		if (obj instanceof java.util.Map)
 		{
 			String r = "";
-			for ( Object k : obj.keyset) {
+			for ( Object k : obj.keySet()) {
 				if (r.isEmpty()) r = "{";
 				else r = r + ", ";
 				r = r + stringify(k, indent+" ") + ": "+stringify (obj.get(k), indent+"  ");
@@ -147,7 +147,7 @@
 						<row>
 							<input_etiqueta
 								value="${c:l('user_renameaccount.Nom')}"/>
-							<textbox id="detall_nom" maxlength="50"
+							<textbox id="detall_nom" maxlength="150"
 								sclass="textbox" width="99%">
 							</textbox>
 

@@ -68,8 +68,8 @@
   <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" 
   	use="es.caib.bpm.ui.main.MainMenuWindow" 
   	delayProcesses="true"
-  	position="fixed"
   	visible="false" width="30em"
+  	style="position: fixed; left: 5px; top: 29px; z-index: 14"
   	onCall="es.caib.zkib.zkiblaf.Application.setPage(event.data);">
     <tree fixedLayout="true" vflex="false" id="menutree">
     	<treechildren>
@@ -331,5 +331,6 @@
     <label id="X"/>
     <label id="Z"/>
     
+  	<div style="position:fixed; left:0; top:0; width:100%; height:100%; opacity:0.5; background-color: white; z-index: -1" onClick="menu.setVisible(false)"/>
   </window>
 </zk>

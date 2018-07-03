@@ -29,7 +29,7 @@
 		<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
 			initialPage="wf/inbox.zul"
 			style="overflow: visible" embed="${embed}" 
-			menu="//menu/menu" embeddedMenu="false"
+			menu="//menu/menu" embeddedMenu="true"
 			logoutPage="/prelogout" mainWindowTitle="Soffid IAM" showFavorites="false" width="100%">
 			<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
 				<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>

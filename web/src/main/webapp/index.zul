@@ -17,6 +17,7 @@
 	</attribute>
 	
     <div>
+    	<include src="wf/menu.zul"/>
 		<zscript>
 			<![CDATA[
 				boolean embed = Executions.getCurrent().getNativeRequest().getParameter("embed") != null;
@@ -28,13 +29,13 @@
 		<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
 			initialPage="wf/inbox.zul"
 			style="overflow: visible" embed="${embed}" 
-			logoutPage="/prelogout" mainWindowTitle="Soffid IAM" menu="//menu/menu" showFavorites="false" width="100%">
+			menu="//menu/menu" embeddedMenu="false"
+			logoutPage="/prelogout" mainWindowTitle="Soffid IAM" showFavorites="false" width="100%">
 			<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
 				<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
 			</div>
 		</application>
-		<image src="img/waitpacman.gif" style="display:none;visibility:hidden;"/>		
-		<include src="wf/menu.zul"/>
+		<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
 		<zscript>
 			<![CDATA[
 				Executions.getCurrent().getDesktop().getSession().setAttribute("paginaActual", null);

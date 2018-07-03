@@ -361,7 +361,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
-        <version>1.34</version>
+        <version>1.35-SNAPSHOT</version>
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -414,7 +414,7 @@
     <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.23</zkiblaf.version>
+    <zkiblaf.version>1.24-SNAPSHOT</zkiblaf.version>
     <zkdb.version>1.34</zkdb.version>
   </properties>
   <pluginRepositories>

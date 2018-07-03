@@ -276,8 +276,8 @@ public class AttributeSearchBox extends XulElement {
 				w, new HashMap<String, String>());
 		final Radiogroup rg = ((Radiogroup) w.getFellow("rg"));
 		rg.setSelectedIndex(textOperation);
-		enableTextBoxes(rg);
 		((Textbox)w.getFellow(STRING_TEXTBOXES[textOperation])).setText(textValue);
+		enableTextBoxes(rg);
 		
 		rg.addEventListener("onCheck", new SerializableEventListener() {
 			@Override

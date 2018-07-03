@@ -69,7 +69,7 @@ public class DocumentService
 	@Transactional(readOnly=true)
 	public void endDownloadTransfer() throws DocumentBeanException {};
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW, noRollbackFor={InternalErrorException.class})
+	@Transactional(propagation=Propagation.REQUIRES_NEW, noRollbackFor={InternalErrorException.class, DocumentBeanException.class})
 	public void deleteDocument(DocumentReference reference) {}
 	
 	@Transactional(propagation=Propagation.NEVER, readOnly=true)

@@ -569,7 +569,7 @@ public class InputField2 extends Div
 				SecureInterpreter interp = new SecureInterpreter();
 				Object obj = ctx.getDataSource().getJXPathContext().getValue(path);
 				interp.set("object", obj);
-				if ( ! Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+				if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
 					this.setVisible(false);
 				else
 					this.setVisible(true);

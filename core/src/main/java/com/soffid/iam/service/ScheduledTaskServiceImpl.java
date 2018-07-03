@@ -212,10 +212,14 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	public void handleRegisterEndTask (ScheduledTask task) throws InternalErrorException, DocumentBeanException
 	{
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
-		if (entity.getLogReferenceID() != null)
+		if (entity.getLogReferenceID() != null && entity.getLogReferenceID().contains(":"))
 		{
 			DocumentService ds = getDocumentService();
-			ds.deleteDocument(new DocumentReference(entity.getLogReferenceID()));
+			try {
+				ds.deleteDocument(new DocumentReference(entity.getLogReferenceID()));
+			} catch (Throwable th ) {
+				// Ignore deletion problem
+			}
 		}
 		entity.setLogReferenceID(task.getLogReferenceID());
 		entity.setActive(false);

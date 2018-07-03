@@ -250,36 +250,63 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + account.getSystem()));
 		}
-		if (account.getType().equals(AccountType.IGNORED) || account.getType().equals(AccountType.PRIVILEGED) ||
-				account.getType().equals(AccountType.SHARED))
+		acc = getAccountEntityDao().newAccountEntity();
+		acc.setAcl(new HashSet<AccountAccessEntity>());
+		acc.setDescription(account.getDescription());
+		acc.setSystem(getSystemEntityDao().findByName(account.getSystem()));
+		acc.setName(account.getName());
+		acc.setType(account.getType());
+		acc.setInheritNewPermissions(account.isInheritNewPermissions());
+		UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
+		if (tu == null)
+			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
+		acc.setPasswordPolicy( tu );
+		getAccountEntityDao().create(acc);
+		if (acc.getType() == AccountType.USER)
 		{
-			acc = getAccountEntityDao().newAccountEntity();
-			acc.setAcl(new HashSet<AccountAccessEntity>());
-			acc.setDescription(account.getDescription());
-			acc.setSystem(getSystemEntityDao().findByName(account.getSystem()));
-			acc.setName(account.getName());
-			acc.setType(account.getType());
-			acc.setInheritNewPermissions(account.isInheritNewPermissions());
-			UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
-			if (tu == null)
-				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$
-			acc.setPasswordPolicy( tu );
-			getAccountEntityDao().create(acc);
-			updateAcl (acc, account);
+			if (account.getOwnerUsers() == null || account.getOwnerUsers().size() != 1 ||
+				(account.getOwnerRoles() != null && !account.getOwnerRoles().isEmpty()) ||
+				(account.getOwnerGroups() != null && !account.getOwnerGroups().isEmpty()) ||
+				(account.getManagerUsers() != null && !account.getManagerUsers().isEmpty()) ||
+				(account.getManagerRoles() != null && !account.getManagerRoles().isEmpty()) ||
+				(account.getManagerGroups() != null && !account.getManagerGroups().isEmpty()) ||
+				(account.getGrantedUsers() != null && !account.getGrantedUsers().isEmpty()) ||
+				(account.getGrantedRoles() != null && !account.getGrantedRoles().isEmpty()) ||
+				(account.getGrantedGroups() != null && !account.getGrantedGroups().isEmpty()))
+				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
+					
+			User owner = account.getOwnerUsers().iterator().next();
 			
-			account.setId(acc.getId());
-			account = getVaultService().addToFolder(account);
+			UserEntity ue = getUserEntityDao().load(owner.getId());
+			UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
+			uae.setAccount(acc);
+			uae.setUser(ue);
+			getUserAccountEntityDao().create(uae);
 			
-			if (! acc.isDisabled())
-				audit("E", acc);
-
-			createAccountTask(acc);
-			return account;
+			account.setDescription(owner.getFullName());
+			
+			com.soffid.iam.api.System dispatcher = getDispatcherService().findDispatcherByName(account.getSystem());
+			account.setDisabled(!getDispatcherService().isUserAllowed(dispatcher, owner.getUserName()));
+			
+			createUserTask(ue);
+				
+			account = getAccountEntityDao().toAccount(acc);
 		}
 		else
 		{
-			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidAccountType"), account.getType().toString())); //$NON-NLS-1$
+			updateAcl (acc, account);
+		
+			account.setId(acc.getId());
+			account = getVaultService().addToFolder(account);
 		}
+		
+		account.setId(acc.getId());
+
+		if (! acc.isDisabled())
+			audit("E", acc);
+
+		createAccountTask(acc);
+		return account;
 	}
 
 	private Collection<Group> getAclGrupCollectionForLevel(Account account, AccountAccessLevelEnum level) {

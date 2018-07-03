@@ -255,7 +255,22 @@ tr.seld td.UNKNOWN {
 	border-bottom:0.3em solid #70a3cc;
 	padding: 2px 3px;
 	height: 30px;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: +1;
 	/*width: 100%;*/
+}
+
+.menuprincipal {
+	position: fixed;
+	left: 0;
+	top: 30px;
+}
+
+.workarea {
+	margin-top: 35px;
 }
 
 .col_cen {

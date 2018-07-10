@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -280,21 +281,10 @@ public class ApplicationBootServiceImpl extends
 			{
 				if (cfg == null)
 				{
-					log.info("Soffid 2.0 database level: "+cfg2.getValue());
 					cfg = cfg2;
 				}
 				else 
 					configSvc.delete(cfg2);
-			}
-
-			Configuration cfgLevel = null;
-			for (Configuration cfg2: configSvc.findConfigurationByFilter("versionLevel", null, null, null))
-			{
-				if (cfgLevel == null)
-				{
-					log.info("Soffid 1.0 database level: "+cfg2.getValue());
-					cfgLevel = cfg2;
-				}
 			}
 
 			if (cfg == null)
@@ -303,9 +293,9 @@ public class ApplicationBootServiceImpl extends
 				configSvc.create(cfg);				
 			}
 			int version = Integer.parseInt(cfg.getValue()); 
-			if ( version >= 0 && version < 100 && cfgLevel != null)
+			log.info("Soffid 2.0 database level: "+version);
+			if ( version >= 0 && version < 100)
 			{
-				log.info("Upgrading from version 1 to version 2");
 				updateFromVersion1 ();
 				cfg.setValue("100"); //$NON-NLS-1$
 				configSvc.update(cfg);
@@ -368,45 +358,54 @@ public class ApplicationBootServiceImpl extends
 		
 		try
 		{
-			Long tenantId = tenantService.getMasterTenant().getId();
-			
-	    	Database db = new Database();
-	    	XmlReader reader = new XmlReader();
-	    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
-			parseResources(rpr, db, reader, "console-ddl.xml");
-	    	parseResources(rpr, db, reader, "core-ddl.xml");
-	    	parseResources(rpr, db, reader, "plugin-ddl.xml");
-
-	    	
-	    	for (ForeignKey fk: db.foreignKeys)
-	    	{
-	    		if (fk.foreignTable.equals("SC_TENANT"))
-	    		{
-	    			log.info("Assigning tenant on table "+fk.tableName);
-					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" IS NULL",
+			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery("SELECT CON_VALOR FROM SC_CONFIG WHERE CON_CODI='versionLevel'");
+			if (rset.next())
+			{
+				log.info("Upgrading from version 1 to version 2");
+	
+				Long tenantId = tenantService.getMasterTenant().getId();
+				
+		    	Database db = new Database();
+		    	XmlReader reader = new XmlReader();
+		    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
+				parseResources(rpr, db, reader, "console-ddl.xml");
+		    	parseResources(rpr, db, reader, "core-ddl.xml");
+		    	parseResources(rpr, db, reader, "plugin-ddl.xml");
+	
+		    	
+		    	for (ForeignKey fk: db.foreignKeys)
+		    	{
+		    		if (fk.foreignTable.equals("SC_TENANT"))
+		    		{
+		    			log.info("Assigning tenant on table "+fk.tableName);
+						executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" IS NULL",
+								new Object[] {tenantId});
+		    			
+						executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" = 0",
+								new Object[] {tenantId});
+		    		}
+		    	}
+		    	try {
+	    			log.info("Assigning tenant on BPM tables");
+					executeSentence(conn, "UPDATE JBPM_MODULEDEFINITION SET TENANT_=?  WHERE TENANT_ IS NULL",
 							new Object[] {tenantId});
-	    			
-					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" = 0",
+					executeSentence(conn, "UPDATE JBPM_MODULEINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
 							new Object[] {tenantId});
-	    		}
-	    	}
-	    	try {
-    			log.info("Assigning tenant on BPM tables");
-				executeSentence(conn, "UPDATE JBPM_MODULEDEFINITION SET TENANT_=?  WHERE TENANT_ IS NULL",
+					executeSentence(conn, "UPDATE JBPM_TASKINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
+							new Object[] {tenantId});
+		    	} catch (SQLException e) {
+		    		// Those tables do not exists during test cases
+		    	}
+				log.info("Assigning sync server to master tenant");
+				executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
+						+ "SELECT SRV_ID, ?, SRV_ID "
+						+ "FROM SC_SERVER "
+						+ "WHERE SRV_ID NOT IN (SELECT TNS_SRV_ID FROM SC_TENSER)",
 						new Object[] {tenantId});
-				executeSentence(conn, "UPDATE JBPM_MODULEINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
-						new Object[] {tenantId});
-				executeSentence(conn, "UPDATE JBPM_TASKINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
-						new Object[] {tenantId});
-	    	} catch (SQLException e) {
-	    		// Those tables do not exists during test cases
-	    	}
-			log.info("Assigning sync server to master tenant");
-			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
-					+ "SELECT SRV_ID, ?, SRV_ID "
-					+ "FROM SC_SERVER "
-					+ "WHERE SRV_ID NOT IN (SELECT TNS_SRV_ID FROM SC_TENSER)",
-					new Object[] {tenantId});
+			}
+			rset.close();
+			stmt.close();
 		}
 		finally
 		{

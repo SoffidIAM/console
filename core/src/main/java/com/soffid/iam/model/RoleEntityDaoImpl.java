@@ -1476,7 +1476,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             return entity;
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), message));  //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
         }
 	}
 

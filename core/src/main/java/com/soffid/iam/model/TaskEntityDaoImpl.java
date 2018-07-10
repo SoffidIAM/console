@@ -41,6 +41,10 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 		tasqueEntity.setStatus("P"); //$NON-NLS-1$
 
+    	TransactionStatus c = currentTransactionStatus();
+    	if (c.readonly)
+    		return;
+    	
 		tooMuchTasks(tasqueEntity);
         if (tasqueEntity.getPriority() == null)
         {
@@ -262,12 +266,16 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
 		if ("readonly".equals( status ) || "manual".equals( status ))
 			return;
+    	TransactionStatus c = currentTransactionStatus();
+    	if (c.readonly)
+    		return;
 		
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
     	if (checkDuplicate(tasque))
     		return;
 		tasque.setStatus("P");
 
+    	
 		tooMuchTasks(tasque);
 		this.getHibernateTemplate().save(tasque);
 	}
@@ -276,6 +284,11 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
 		if ("readonly".equals( status ))
 			return;
+
+		TransactionStatus c = currentTransactionStatus();
+    	if (c.readonly)
+    		return;
+    	
 		tooMuchTasks(tasque);
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
 		tasque.setStatus("P");

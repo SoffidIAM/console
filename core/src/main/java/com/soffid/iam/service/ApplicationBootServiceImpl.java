@@ -273,33 +273,53 @@ public class ApplicationBootServiceImpl extends
 	private void configureDatabase() throws Exception {
 		Security.nestedLogin("master\\Anonymous", Security.ALL_PERMISSIONS);
 		try {
-			configureTenantDatabase();
 
+			log.info("Checking data status");
 			Configuration cfg = null;
 			for (Configuration cfg2: configSvc.findConfigurationByFilter("masterVersionLevel", null, null, null))
 			{
 				if (cfg == null)
+				{
+					log.info("Soffid 2.0 database level: "+cfg2.getValue());
 					cfg = cfg2;
+				}
 				else 
 					configSvc.delete(cfg2);
 			}
+
+			Configuration cfgLevel = null;
+			for (Configuration cfg2: configSvc.findConfigurationByFilter("versionLevel", null, null, null))
+			{
+				if (cfgLevel == null)
+				{
+					log.info("Soffid 1.0 database level: "+cfg2.getValue());
+					cfgLevel = cfg2;
+				}
+			}
+
 			if (cfg == null)
 			{
 				cfg = new Configuration("masterVersionLevel", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 				configSvc.create(cfg);				
 			}
 			int version = Integer.parseInt(cfg.getValue()); 
-			if ( version >= 0 && version < 100)
+			if ( version >= 0 && version < 100 && cfgLevel != null)
 			{
+				log.info("Upgrading from version 1 to version 2");
 				updateFromVersion1 ();
 				cfg.setValue("100"); //$NON-NLS-1$
 				configSvc.update(cfg);
 			}
+
+			// Create initial tenant data
+			configureTenantDatabase();
+
 			if (version < 101) { //$NON-NLS-1$
 				cfg.setValue("101"); //$NON-NLS-1$
 				updateMandatoryRolGrant();
 				configSvc.update(cfg);
 			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -348,7 +368,7 @@ public class ApplicationBootServiceImpl extends
 		
 		try
 		{
-			Long tenantId = Security.getCurrentTenantId();
+			Long tenantId = tenantService.getMasterTenant().getId();
 			
 	    	Database db = new Database();
 	    	XmlReader reader = new XmlReader();
@@ -362,6 +382,7 @@ public class ApplicationBootServiceImpl extends
 	    	{
 	    		if (fk.foreignTable.equals("SC_TENANT"))
 	    		{
+	    			log.info("Assigning tenant on table "+fk.tableName);
 					executeSentence(conn, "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=? WHERE "+fk.columns.get(0)+" IS NULL",
 							new Object[] {tenantId});
 	    			
@@ -370,6 +391,7 @@ public class ApplicationBootServiceImpl extends
 	    		}
 	    	}
 	    	try {
+    			log.info("Assigning tenant on BPM tables");
 				executeSentence(conn, "UPDATE JBPM_MODULEDEFINITION SET TENANT_=?  WHERE TENANT_ IS NULL",
 						new Object[] {tenantId});
 				executeSentence(conn, "UPDATE JBPM_MODULEINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
@@ -379,6 +401,7 @@ public class ApplicationBootServiceImpl extends
 	    	} catch (SQLException e) {
 	    		// Those tables do not exists during test cases
 	    	}
+			log.info("Assigning sync server to master tenant");
 			executeSentence(conn, "INSERT INTO SC_TENSER(TNS_ID,TNS_TEN_ID,TNS_SRV_ID) "
 					+ "SELECT SRV_ID, ?, SRV_ID "
 					+ "FROM SC_SERVER "

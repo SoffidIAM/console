@@ -39,16 +39,27 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @see es.caib.seycon.ng.sync.servei.SessioService
  */
 public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBase {
     private String hostName;
-
+    Log log = LogFactory.getLog(getClass());
+    
     public SessionServiceImpl() throws FileNotFoundException, IOException {
         hostName = Config.getConfig().getHostName();
         if (hostName == null)
-            hostName = InetAddress.getLocalHost().getHostName();
+        {
+        	try {
+        		hostName = InetAddress.getLocalHost().getHostName();
+        	} catch (Exception e) {
+        		log.warn ("Error resolving local host name", e);
+        		hostName = "127.0.0.1";
+        	}
+        }
     }
 
     private HostEntity findMaquina(String nomOrIp) {

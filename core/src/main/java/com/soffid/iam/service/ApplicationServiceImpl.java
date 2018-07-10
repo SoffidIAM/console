@@ -2483,7 +2483,7 @@ public class ApplicationServiceImpl extends
 				return;
 			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(ApplicationVO)) {
-				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, applicationEntity)) {
+				if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_QUERY, applicationEntity)) {
 					result.add(ApplicationVO);
 				}
 			}

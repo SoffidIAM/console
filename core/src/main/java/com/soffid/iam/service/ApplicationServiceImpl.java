@@ -2390,9 +2390,9 @@ public class ApplicationServiceImpl extends
 		LinkedList<Role> result = new LinkedList<Role>();
 		TimeOutUtils tou = new TimeOutUtils();
 		for (RoleEntity ue : getRoleEntityDao().findByText(text)) {
-			Role u = getRoleEntityDao().toRole(ue);
 			if (getAuthorizationService().hasPermission(
 					Security.AUTO_ROLE_QUERY, ue)) {
+				Role u = getRoleEntityDao().toRole(ue);
 				result.add(u);
 			}
 			if (tou.timedOut())
@@ -2412,9 +2412,9 @@ public class ApplicationServiceImpl extends
 							for (RoleEntity e : getRoleEntityDao().findByText(text)) {
 								if (result.isCancelled())
 									return;
-								Role v = getRoleEntityDao().toRole(e);
 								if (getAuthorizationService().hasPermission(
-										Security.AUTO_ROLE_QUERY, v)) {
+										Security.AUTO_ROLE_QUERY, e)) {
+									Role v = getRoleEntityDao().toRole(e);
 									result.add(v);
 								}
 							}

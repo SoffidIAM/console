@@ -6,6 +6,7 @@ import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Listheader;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.MetadataScope;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.TipusDada;
@@ -27,7 +28,10 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 				{
 					if ( TypeEnumeration.STRING_TYPE.equals(tda.getType()) || 
 							TypeEnumeration.EMAIL_TYPE.equals(tda.getType()) ||
-							TypeEnumeration.USER_TYPE.equals(tda.getType()))
+							TypeEnumeration.USER_TYPE.equals(tda.getType()) ||
+							TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(tda.getType()) ||
+							TypeEnumeration.APPLICATION_TYPE.equals(tda.getType()) ||
+							TypeEnumeration.GROUP_TYPE.equals(tda.getType()) )
 					{
 						Listheader h = new Listheader(tda.getLabel());
 						h.setWidth("12%");

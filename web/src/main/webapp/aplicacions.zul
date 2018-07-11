@@ -220,6 +220,8 @@
 
 		<navegador id="lista" width="${amplaria}">
 			<toolbar>
+				<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" 
+					preferenceName="app"/>
 				<insertbutton acces="${canCreateAplicacio}"
 					listbox="/esquema/lista/listbox" onClick="showDetall()"/>
 				<deletebutton acces="${canDeleteAplicacio}"
@@ -231,7 +233,8 @@
 			</toolbar>
 			<listbox id="listbox" autocommit="false" dataPath="/model:/aplicacio"
 				fixedLayout="true" height="96%" onClick="showDetall()"
-				onSelect="select();" rows="${fileres}">
+				onSelect="select();" rows="${fileres}"
+				use="com.soffid.iam.web.ApplicationListBox">
 				<listhead>
 					<listheader label="${c:l('aplicacions.zul.Codi-2')}" sort="auto"
 						width="36%"/>
@@ -767,7 +770,8 @@
 							</toolbar>
 							<listbox fixedLayout="true" id="gridRols" mold="paging" pageSize="15" width="100%"
 								sclass="likeagrid" onUpdateRol="onUpdateRol(event.data)"
-								dataPath="/esquema/lista/listbox:/rol">
+								dataPath="/esquema/lista/listbox:/rol"
+								use="com.soffid.iam.web.RolesListBox">
 								<listhead>
 									<listheader label="${c:l('aplicacions.zul.NomRol-2')}" sort="auto" width="22%">
 										<textboxfilter bind="@nom" />

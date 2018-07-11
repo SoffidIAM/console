@@ -39,8 +39,8 @@ public class RoleAccountEntityImpl extends RoleAccountEntity implements Security
 		if (Security.isUserInRole(permission + Security.AUTO_ALL))
 			return true;
 				
-		if (getInformationSystem() != null)
-			return Security.isUserInRole(permission+"/"+getInformationSystem().getName());
+		if (getRole() != null && getRole().getInformationSystem() != null)
+			return Security.isUserInRole(permission+"/"+getRole().getInformationSystem().getName());
 
 		return false;
 	}

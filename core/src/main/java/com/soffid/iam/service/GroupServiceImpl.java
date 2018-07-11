@@ -791,6 +791,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		findByJsonQuery(result, query);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
+		result.done();
 		return result.get();
 	}
 

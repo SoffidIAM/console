@@ -871,6 +871,7 @@ public class ApplicationBootServiceImpl extends
 			m.setOffice(new Boolean(false));
 			m.setPrintersServer(new Boolean(false));
 			m.setOs("ALT"); //$NON-NLS-1$
+			m.setSerialNumber("loopback"+System.currentTimeMillis());
 			xarxaSvc.create(m);
 		}
 
@@ -884,6 +885,7 @@ public class ApplicationBootServiceImpl extends
 			m.setOffice(new Boolean(false));
 			m.setPrintersServer(new Boolean(false));
 			m.setOs("ALT"); //$NON-NLS-1$
+			m.setSerialNumber("null"+System.currentTimeMillis());
 			xarxaSvc.create(m);
 		}
 

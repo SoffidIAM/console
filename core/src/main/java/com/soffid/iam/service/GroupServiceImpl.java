@@ -713,9 +713,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected Collection<Group> handleFindGroupByText(String text) throws Exception {
 		LinkedList<Group> result = new LinkedList<Group>();
 		for (GroupEntity ue : getGroupEntityDao().findByText(text)) {
-			Group u = getGroupEntityDao().toGroup(ue);
 			if (getAuthorizationService().hasPermission(
 					Security.AUTO_GROUP_QUERY, ue)) {
+				Group u = getGroupEntityDao().toGroup(ue);
 				result.add(u);
 			}
 		}
@@ -733,9 +733,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 							for (GroupEntity e : getGroupEntityDao().findByText(text)) {
 								if (result.isCancelled())
 									return;
-								Group v = getGroupEntityDao().toGroup(e);
 								if (getAuthorizationService().hasPermission(
-										Security.AUTO_GROUP_QUERY, v)) {
+										Security.AUTO_GROUP_QUERY, e)) {
+									Group v = getGroupEntityDao().toGroup(e);
 									result.add(v);
 								}
 							}

@@ -45,15 +45,12 @@ public abstract class AbstractAttachmentManager {
  
         int leidos = 0;
 
-        log.debug(Messages.getString("AbstractAttachmentManager.OpenArchiveTransfer")); //$NON-NLS-1$
         document.openUploadTransfer();
 
-        log.debug(Messages.getString("AbstractAttachmentManager.SendPackages")); //$NON-NLS-1$
         while ((leidos = stream.read(buffer)) != -1) {
             document.nextUploadPackage(buffer, leidos);
         }
 
-        log.debug(Messages.getString("AbstractAttachmentManager.CloseArchiveTransfer")); //$NON-NLS-1$
         document.endUploadTransfer();
 
         attach(tag, document);
@@ -63,12 +60,10 @@ public abstract class AbstractAttachmentManager {
     }
 
     public void attach(String tag, DocumentService document) throws RemoteException, InternalErrorException {
-        log.debug(Messages.getString("AbstractAttachmentManager.CloseSystemReference")); //$NON-NLS-1$
         putVariable(PREFIX + tag, document.getReference().toString());
     }
 
     public void attach(String tag, DocumentReference documentReference) throws RemoteException, InternalErrorException {
-        log.debug(Messages.getString("AbstractAttachmentManager.CloseSystemReference")); //$NON-NLS-1$
         putVariable(PREFIX + tag, documentReference.toString());
     }
 
@@ -77,10 +72,8 @@ public abstract class AbstractAttachmentManager {
             NamingException, CreateException, DocumentBeanException,
             InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
         
-    	log.debug(Messages.getString("AbstractAttachmentManager.Connect")); //$NON-NLS-1$
         DocumentService document = EJBLocator.getDocumentService();
         
-        log.debug(Messages.getString("AbstractAttachmentManager.MakeDocument")); //$NON-NLS-1$
         document.createDocument(contentType, originalName, "BPM-WEB"); //$NON-NLS-1$
         return document;
     }

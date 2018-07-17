@@ -903,8 +903,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			query += "left join usuari.dadaUsuari as dadaUsuari " //$NON-NLS-1$
 					+ "left join dadaUsuari.tipusDada as tipusDada "; //$NON-NLS-1$
 		}
-		query += "where " //$NON-NLS-1$
-		// + (restringeixCerca.booleanValue() ? "(rownum < 202) and " : "")
+		query += "where usuari.tenant.id=:tenantId and " //$NON-NLS-1$
 				+ "(:codi is null or usuari.userName like :codi) and (:nom is null or upper(usuari.userName) like upper(:nom)) and " //$NON-NLS-1$
 				+ "(:primerLlinatge is null or upper(usuari.lastName) like upper(:primerLlinatge)) and " //$NON-NLS-1$
 				+ "(:nomCurt is null or usuari.shortName like :nomCurt) and " //$NON-NLS-1$
@@ -929,6 +928,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					+ "where grupUsuari.group name like :grupSecundari ) "; //$NON-NLS-1$
 		}
 
+		Parameter tenantParameter = new Parameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
 		Parameter codiParameter = new Parameter("codi", codi); //$NON-NLS-1$
 		Parameter nomParameter = new Parameter("nom", nom); //$NON-NLS-1$
 		Parameter primerLlinatgeParameter = new Parameter("primerLlinatge", //$NON-NLS-1$
@@ -974,7 +974,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		Vector<Parameter> finalParameters = new Vector<Parameter>();
 		if (dni != null) {
 			if (grupSecundari != null) {
-				for (Parameter parameter : new Parameter[] { codiParameter,
+				for (Parameter parameter : new Parameter[] { 
+						tenantParameter, codiParameter,
 						nomParameter, primerLlinatgeParameter,
 						nomCurtParameter, usuariCreacioParameter,
 						actiuParameter, segonLlinatgeParameter,
@@ -987,7 +988,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 
 			} else {
-				for (Parameter parameter : new Parameter[] { codiParameter,
+				for (Parameter parameter : new Parameter[] { 
+						tenantParameter,  codiParameter,
 						nomParameter, primerLlinatgeParameter,
 						nomCurtParameter, usuariCreacioParameter,
 						actiuParameter, segonLlinatgeParameter,
@@ -1001,7 +1003,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			}
 		} else {
 			if (grupSecundari != null) {
-				for (Parameter parameter : new Parameter[] { codiParameter,
+				for (Parameter parameter : new Parameter[] { 
+						tenantParameter,  codiParameter,
 						nomParameter, primerLlinatgeParameter,
 						nomCurtParameter, usuariCreacioParameter,
 						actiuParameter, segonLlinatgeParameter,
@@ -1013,7 +1016,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					finalParameters.add(parameter);
 				}
 			} else {
-				for (Parameter parameter : new Parameter[] { codiParameter,
+				for (Parameter parameter : new Parameter[] { 
+						tenantParameter,  codiParameter,
 						nomParameter, primerLlinatgeParameter,
 						nomCurtParameter, usuariCreacioParameter,
 						actiuParameter, segonLlinatgeParameter,

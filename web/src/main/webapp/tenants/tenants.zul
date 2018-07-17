@@ -204,6 +204,12 @@
 							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
 									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
 									"tenant:update");
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"tenant:remove");
+							es.caib.zkib.datasource.XPathUtils.setValue(ds, 
+									es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions")+"/newValue", 
+									"tenant:switch");
 						}
 					} catch (Exception e) {
 						form.getFellow("form_name").getFellow("dada").setDisabled(true);
@@ -220,10 +226,25 @@
 					String name = es.caib.zkib.datasource.XPathUtils.getValue(form, "name");
 					if (name != null)
 					{
+						LinkedList effectiveRoles = new LinkedList();
+						es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(form);
+						for ( String role: Security.getAuthorizations())
+						{
+							boolean forbidden = false;
+							for ( String tp: ctx.getDataSource().getJXPathContext().iterate("/permissions/newValue"))
+							{
+								System.out.println ("Checking role "+role+" against "+tp);
+								if (role.startsWith(tp))
+									forbidden = true;
+							}
+							if (!forbidden)
+								effectiveRoles.add(role);
+						}
+
 						com.soffid.iam.tomcat.SoffidPrincipal p = new com.soffid.iam.tomcat.SoffidPrincipal (
 								name+"\\"+Security.getCurrentAccount(),
 								"*",
-								Security.getAuthorizations());
+								effectiveRoles);
 						p.setFullName( Security.getPrincipal().getFullName());
 						session.setAttribute(es.caib.bpm.filters.WorkflowInterceptor.SOFFID_NESTED_PRINCIPAL,
 								p);

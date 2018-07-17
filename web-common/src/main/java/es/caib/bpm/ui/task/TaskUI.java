@@ -539,7 +539,8 @@ public class TaskUI extends Frame implements EventListener {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
     	UIClassLoader cl = task.getProcessClassLoader();
-        Thread.currentThread().setContextClassLoader( cl.clone(heavenLoader));
+    	cl.setParentClassLoader(heavenLoader);
+        Thread.currentThread().setContextClassLoader( cl);
 
         return heavenLoader;
     }

@@ -55,6 +55,7 @@ import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
 
 import es.caib.bpm.attachment.ProcessAttachmentManager;
+import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.datamodel.BPMDataNode;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
@@ -638,7 +639,9 @@ public class ProcessUI extends Frame {
             CreateException, NamingException, InternalErrorException {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(proc.getProcessClassLoader().clone(heavenLoader));
+    	UIClassLoader cl = proc.getProcessClassLoader();
+    	cl.setParentClassLoader(heavenLoader);
+        Thread.currentThread().setContextClassLoader(cl);
 
         return heavenLoader;
     }

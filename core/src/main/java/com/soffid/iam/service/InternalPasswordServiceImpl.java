@@ -432,7 +432,8 @@ public class InternalPasswordServiceImpl extends
 //        c.add(Calendar.DAY_OF_MONTH, -1);
 
         Collection expired = getPasswordEntityDao()
-        		.query("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity "
+        		.query("select contrasneya "
+        				+ "from com.soffid.iam.model.PasswordEntity as contrasenya "
         				+ "where contrasenya.domain = :domini and "
         				+ "contrasenya.user.userType = :tipusUsuari and "
         				+ "contrasenya.user.active=\'S\' and "
@@ -823,7 +824,8 @@ public class InternalPasswordServiceImpl extends
                     c.set(Calendar.MILLISECOND, 0);
                     c.add(Calendar.DAY_OF_YEAR, -pc.getGracePeriodTime().intValue());
                     Collection<PasswordEntity> expired = getPasswordEntityDao()
-                    		.query("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity "
+                    		.query("select contrasenya "
+                    				+ "from com.soffid.iam.model.PasswordEntity as contrasenya "
                     				+ "where contrasenya.domain = :domini and "
                     				+ "contrasenya.user.userType.name = :tipusUsuari and "
                     				+ "contrasenya.expirationDate <= :caducitat and "

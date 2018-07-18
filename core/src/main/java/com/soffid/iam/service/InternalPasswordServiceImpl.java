@@ -456,6 +456,7 @@ public class InternalPasswordServiceImpl extends
         		+ "  account.system.url is not null and "
         		+ "  account.passwordPolicy = :tipusUsuari and "
         		+ "  account.disabled = false and "
+				+ "  account.type != 'I' and "
         		+ "  pass.expirationDate <= :caducitat and "
         		+ "  pass.active in (\'S\', \'N\') and "
         		+ "  pass.order = 0", 
@@ -481,7 +482,8 @@ public class InternalPasswordServiceImpl extends
         
         Collection expired = getPasswordEntityDao()
         		.query(
-        				"from com.soffid.iam.model.PasswordEntity as contrasenyaEntity "
+        				"select contrasenya "
+        				+ "from com.soffid.iam.model.PasswordEntity as contrasenya "
         				+ "where contrasenya.domain = :domini and "
         				+ "contrasenya.user.userType = :tipusUsuari and "
         				+ "contrasenya.expirationDate <= :caducitat and "
@@ -507,6 +509,7 @@ public class InternalPasswordServiceImpl extends
         				+ "  account.system.url is not null and "
                 		+ "  account.passwordPolicy = :tipusUsuari and "
         				+ "  account.disabled = false and "
+        				+ "  account.type != 'I' and "
         				+ "  pass.expirationDate <= :caducitat and "
         				+ "  pass.active in (\'S\', \'N\') and "
         				+ "  pass.order = 0", 

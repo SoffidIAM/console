@@ -373,6 +373,7 @@ tr.grid {
 	border-bottom: 0.3em solid #70a3cc;
 	padding: 2px 3px;
 	height: 30px;
+	overflow: hidden;
 	/*width: 100%;*/
 }
 

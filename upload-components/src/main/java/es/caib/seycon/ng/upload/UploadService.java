@@ -88,7 +88,6 @@ public class UploadService {
             	}
             }
             
-			context.getTimerService().createTimer(500, "Upload");
             
             Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
             		getBeansOfType(ApplicationBootService.class);
@@ -101,6 +100,7 @@ public class UploadService {
             }
             
             log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
+			context.getTimerService().createTimer(10, "Upload");
         } catch (Throwable e) {
             log.warn(Messages.getString("UploadService.UploadFileError"), e); //$NON-NLS-1$
         }
@@ -129,6 +129,9 @@ public class UploadService {
 			uploadComponentCurrent("com.soffid.iam.console", "iam-common", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("com.soffid.iam.console", "iam-core", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("com.soffid.iam.console", "dbtools", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentCurrent("com.soffid.iam.console", "iam-tomee", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentCurrent("com.soffid.iam.console", "scim-query", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 			uploadComponentCurrent("org.jbpm.jbpm3", "jbpm-jpdl", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("es.caib.signatura.valcert", "valcert-client-axis", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentCurrent("org.apache.commons", "commons-jcs-core", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -145,7 +148,15 @@ public class UploadService {
 			uploadComponentVersion("asm-attrs", "1.5.3", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("antlr", "2.7.6", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cron4j", "2.2.5", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			
+
+			uploadComponentVersion("json", "20080701", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+			uploadComponentVersion("lucene-core", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-queries", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-analyzers-common", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-queryparser", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-sandbox", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 			uploadComponentVersion("opensaml-core", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("opensaml-xmlsec-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("opensaml-security-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -230,18 +241,22 @@ public class UploadService {
         File candidate = new File (earDirectory, file);
         File candidate2 = new File (earDirectory, "lib"+File.separator+file);
         File candidate3 = new File (catalinaHome, "lib"+File.separator+file);
+        File candidate4 = new File (catalinaHome, "lib"+File.separator+artifactId+"."+packaging);
         if (candidate.isFile())
         	uploadUrl(artifactId, version, candidate.toURI().toURL());
         else if (candidate2.isFile())
         	uploadUrl(artifactId, version, candidate2.toURI().toURL());
         else if (candidate3.isFile())
         	uploadUrl(artifactId, version, candidate3.toURI().toURL());
+        else if (candidate4.isFile())
+        	uploadUrl(artifactId, version, candidate4.toURI().toURL());
         else
         {
         	log.warn("Unable to locate file "+file);
         	log.warn("Candidate 1 = "+candidate.getPath());
         	log.warn("Candidate 2 = "+candidate2.getPath());
         	log.warn("Candidate 3 = "+candidate3.getPath());
+        	log.warn("Candidate 4 = "+candidate4.getPath());
         }
     }
 

@@ -17,6 +17,12 @@
 	</component>
 
 	<component>
+		<extends>treeitem</extends>
+		<component-name>menutreeitem</component-name>
+		<component-class>es.caib.bpm.ui.tree.MenuTreeitem</component-class>
+	</component>
+
+	<component>
 		<component-name>listbox</component-name>
 		<extends>listbox</extends>
 		<component-class>es.caib.zkib.component.DataListbox</component-class>

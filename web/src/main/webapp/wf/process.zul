@@ -42,24 +42,17 @@
 						</vbox>
 					</form>
 				</tabpanel>
-				<tabpanel id="tareas" style="min-height:30em;overflow:auto"> 
-					<listbox id="listadoTareas" mold="paging" onSelect="ui.onSelectTask()" pageSize="5" width="100%" style="min-height: 0">
-							<listhead>
-								<listheader label="${c:l('inbox.lbldefinicionTarea')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblFecha')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblFechaPrevistaFin')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblActoresAsignados')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblIdentificador')}" sort="auto"/>
-							</listhead>
-					</listbox>
-					<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="5" width="100%"  style="min-height: 0">
-							<listhead>
-								<listheader label="${c:l('job.lblId')}" sort="auto"/>
-								<listheader label="${c:l('job.lbldefinicionTarea')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblFecha')}" sort="auto"/>
-								<listheader label="${c:l('process.lblEstado')}" sort="auto"/>
-							</listhead>
-					</listbox>
+				<tabpanel id="tareas" style="overflow:auto"> 
+					<tree id="listadoTareas" mold="paging" width="100%" style="min-height: 0">
+							<treecols>
+								<treecol label="${c:l('process.lblIdentificador')}" />
+								<treecol label="${c:l('llistesCorreu.zul.Descripcia-2')}" />
+								<treecol label="${c:l('inbox.lblFecha')}" />
+								<treecol label="${c:l('process.lblEstado')}" />
+								<treecol label="${c:l('inbox.lblActoresAsignados')}" />
+							</treecols>
+							<treechildren></treechildren>
+					</tree>
 				</tabpanel>
 				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
 				<!-- 

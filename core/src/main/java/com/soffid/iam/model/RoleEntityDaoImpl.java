@@ -363,8 +363,19 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	private void createRoleDependency(RoleGrant grant) throws InternalErrorException, BPMException {
 		StringBuffer path = new StringBuffer();
 
-		RoleEntity ownerRole = load (grant.getOwnerRole()); 
-        RoleEntity ownedRole = load (grant.getRoleId()); 
+		RoleEntity ownerRole = grant.getOwnerRole() != null? 
+				load (grant.getOwnerRole()) :
+					findByNameAndSystem(grant.getOwnerRoleName(), grant.getOwnerSystem());
+		if (ownerRole == null)
+			throw new InternalErrorException("Invalid owner role");
+		grant.setOwnerRole( ownerRole.getId());
+		
+        RoleEntity ownedRole = grant.getRoleId() != null ?
+        		load (grant.getRoleId()) :
+        			findByNameAndSystem(grant.getRoleName(), grant.getSystem());
+		if (ownedRole == null)
+			throw new InternalErrorException("Invalid owned role");
+        grant.setRoleId(ownedRole.getId());
         
         if (checkNoCycles( grant, path)) {
         	RoleDependencyEntity entity = getRoleDependencyEntityDao().newRoleDependencyEntity();
@@ -1476,7 +1487,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             return entity;
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), message));  //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
         }
 	}
 

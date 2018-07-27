@@ -326,7 +326,10 @@ abstract class UsuariIndex {
 }
 
 
-@Index (name="USU_UK_NOMCUR_IDDCO",	unique=true,
+/*
+ * Cannot set unique = true, because Oracle will fail when two users have no short name
+ */
+@Index (name="USU_UK_NOMCUR_IDDCO",	unique=false,
 entity=es.caib.seycon.ng.model.UsuariEntity.class,
 columns={"USU_TEN_ID", "USU_NOMCUR", "USU_IDDCO"})
 abstract class UsuariNomCurtIndex {

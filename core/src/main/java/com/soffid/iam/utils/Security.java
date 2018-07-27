@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.TenantServiceImpl;
 import com.soffid.iam.tomcat.SoffidPrincipal;
-import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 

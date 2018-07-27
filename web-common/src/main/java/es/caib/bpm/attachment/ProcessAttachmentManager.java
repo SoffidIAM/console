@@ -26,6 +26,7 @@ import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.EJBContainer;
 import es.caib.bpm.vo.ProcessInstance;
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class ProcessAttachmentManager extends AbstractAttachmentManager {
@@ -41,8 +42,7 @@ public class ProcessAttachmentManager extends AbstractAttachmentManager {
 
     public ProcessAttachmentManager(long processId) throws CreateException, NamingException, BPMException, InternalErrorException {
         super();
-        HttpSession sesion = (HttpSession) Sessions.getCurrent().getNativeSession();
-        BpmEngine engine = EJBContainer.getEJBContainer(sesion).getEngine();
+        BpmEngine engine = EJBLocator.getBpmEngine();
         
         this.process=engine.getProcess(processId);
             
@@ -88,8 +88,7 @@ public class ProcessAttachmentManager extends AbstractAttachmentManager {
 
         HttpSession sesion = (HttpSession) Sessions.getCurrent()
                 .getNativeSession();
-        BpmEngine engine = EJBContainer.getEJBContainer(sesion)
-                .getEngine();
+        BpmEngine engine = EJBLocator.getBpmEngine();
         engine.update(process);
     }
 
@@ -105,8 +104,7 @@ public class ProcessAttachmentManager extends AbstractAttachmentManager {
 
         HttpSession sesion = (HttpSession) Sessions.getCurrent()
                 .getNativeSession();
-        BpmEngine engine = EJBContainer.getEJBContainer(sesion)
-                .getEngine();
+        BpmEngine engine = EJBLocator.getBpmEngine();
         engine.update(process);
     }
 

@@ -75,7 +75,7 @@
     	<treechildren>
     		<treeitem>
     			<treerow>
-    				<apptreecell langlabel="main.lblTabInbox"/>
+    				<treecell label="${c:l('main.lblTabInbox')}" onClick="self.parent.parent.setOpen ( ! self.parent.parent.isOpen() )"/>
     			</treerow>
 		    	<treechildren>
 		    		<treeitem>
@@ -107,7 +107,7 @@
 		    		</treeitem>
 		    	</treechildren>
     		</treeitem>
-    		<treeitem id="administracio">
+    		<treeitem id="administracio" open="false">
     			<treerow>
     				<treecell label="${c:l('main.lblAdmin')}" onClick="administracio.setOpen ( ! administracio.isOpen() )"/>
     			</treerow>
@@ -210,7 +210,7 @@
 	    			</treeitem>
 		     		<treeitem id="customObjectTypes" open="false" if="${canViewCustomObjects }">
 		    			<treerow>
-		    				<treecell label="${c:l('main.lblCustomObjectTypes')}" />
+		    				<treecell label="${c:l('main.lblCustomObjectTypes')}"  onClick="self.parent.parent.setOpen ( ! self.parent.parent.isOpen() )"/>
 		    			</treerow>
 			    		 <treechildren>
 			    		 </treechildren>

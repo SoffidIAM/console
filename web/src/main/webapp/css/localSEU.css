@@ -260,6 +260,7 @@ tr.seld td.UNKNOWN {
 	right: 0;
 	top: 0;
 	z-index: +1;
+	overflow: hidden;
 	/*width: 100%;*/
 }
 

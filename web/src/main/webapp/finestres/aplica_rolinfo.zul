@@ -449,7 +449,7 @@
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
 							<hbox>
-								<textbox id="detall_nom" maxlength="50" sclass="textbox"
+								<textbox id="detall_nom" maxlength="64" sclass="textbox"
 									bind="@nom" constraint="no empty">
 									<attribute name="onChange">
 										<![CDATA[

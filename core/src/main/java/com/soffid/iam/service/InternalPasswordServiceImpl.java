@@ -293,7 +293,7 @@ public class InternalPasswordServiceImpl extends
 
         handleStorePassword(user, dce, password, mustChange);
 
-        createTask(TaskHandler.UPDATE_USER_PASSWORD, dce.getName(), user.getUserName(), password, mustChange);
+        createTask(TaskHandler.UPDATE_USER_PASSWORD, dce.getName(), user.getUserName(), password, mustChange, true);
     }
 
     private void doStorePassword(UserEntity usuari, PasswordDomainEntity dce, PasswordPolicyEntity pcd, com.soffid.iam.api.Password password, String estat, boolean mustChange) throws InternalErrorException {
@@ -533,7 +533,7 @@ public class InternalPasswordServiceImpl extends
     }
 
     private TaskHandler createTask(String transa, String dominiContrasenyes,
-            String user, Password password, boolean mustChange) throws InternalErrorException {
+            String user, Password password, boolean mustChange, boolean force) throws InternalErrorException {
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(transa);
@@ -543,6 +543,8 @@ public class InternalPasswordServiceImpl extends
         tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         tasque.setStatus("P"); //$NON-NLS-1$
         try {
+        	if (force)
+                getTaskEntityDao().createForce(tasque);
        		return getTaskQueue().addTask(tasque);
         } 
         catch (NoSuchBeanDefinitionException e) 
@@ -552,6 +554,10 @@ public class InternalPasswordServiceImpl extends
         }
     }
 
+    private TaskHandler createTask(String transa, String dominiContrasenyes,
+            String user, Password password, boolean mustChange) throws InternalErrorException {
+    	return createTask(transa, dominiContrasenyes, user, password, mustChange, false);
+    }
 
     @SuppressWarnings ("unchecked")
 	private Map<String, Exception> executeOB(String transa, String dominiContrasenyes,
@@ -883,9 +889,10 @@ public class InternalPasswordServiceImpl extends
 
     /**
      * Generates a new password
+     * @param b 
      */
 
-    protected Password randomPassword(UserEntity user, com.soffid.iam.model.PasswordDomainEntity passDomain, boolean mustChange, boolean fake) throws Exception {
+    protected Password randomPassword(UserEntity user, com.soffid.iam.model.PasswordDomainEntity passDomain, boolean mustChange, boolean fake, boolean forcePropagation) throws Exception {
         Password password = null;
         boolean found = false;
 
@@ -894,7 +901,7 @@ public class InternalPasswordServiceImpl extends
             password = generateRandomPassword(user, passDomain, pcd, true, false);
             if (!fake) {
                 doStorePassword(user, passDomain, pcd, password, mustChange ? "E": "N", mustChange); //$NON-NLS-1$ //$NON-NLS-2$
-                createTask(TaskHandler.UPDATE_USER_PASSWORD, passDomain.getName(), user.getUserName(), password, mustChange);
+                createTask(TaskHandler.UPDATE_USER_PASSWORD, passDomain.getName(), user.getUserName(), password, mustChange, forcePropagation);
             }
             return password;
         } else
@@ -907,7 +914,7 @@ public class InternalPasswordServiceImpl extends
     @SuppressWarnings(value = "unchecked")
     @Override
     protected Password handleGenerateNewPassword(UserEntity user, com.soffid.iam.model.PasswordDomainEntity passDomain, boolean mustChange) throws Exception {
-        return randomPassword(user, passDomain, mustChange, false);
+        return randomPassword(user, passDomain, mustChange, false, true);
 
     }
 
@@ -939,7 +946,7 @@ public class InternalPasswordServiceImpl extends
             }
             return pass;
         } else
-            return randomPassword(user, passDomain, true, true);
+            return randomPassword(user, passDomain, true, true, false);
     }
 
     @Override

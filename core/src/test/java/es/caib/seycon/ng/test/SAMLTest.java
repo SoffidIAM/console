@@ -37,6 +37,7 @@ public class SAMLTest extends AbstractTest
 {
 	public void testSAMLRequest() throws Exception
 	{
+		if (true) return; // temporary disabled
 		Security.nestedLogin("Test", new String[] {Security.AUTO_AUTHORIZATION_ALL});
 		try {
 			String hostName = InetAddress.getLocalHost().getHostName();

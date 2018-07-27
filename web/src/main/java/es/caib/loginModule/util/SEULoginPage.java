@@ -1,9 +1,6 @@
 package es.caib.loginModule.util;
 
-import java.security.Principal;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.Locale;
+import java.security.Principal; import java.util.Calendar; import java.util.Enumeration; import java.util.Locale;
 
 import javax.management.remote.JMXPrincipal;
 import javax.servlet.http.HttpServletRequest;
@@ -37,28 +34,7 @@ public class SEULoginPage implements LoginPage {
 	}
 
 	private boolean esCertificateLoginActivat() {
-
-		// Mirem si tenim valor al cache de activació i és actualitzat 
-		if ( darreraActualitzacioValor !=null && darreraActualitzacioValor.getTimeInMillis() > (Calendar.getInstance().getTimeInMillis() - tempsValidesaValor))
-			return cachedValorCertificateLogin;
-		PrincipalStore.set(principal);
-		es.caib.seycon.ng.servei.ConfiguracioService service = locator.getConfiguracioService();
-		Configuracio config = null;
-		
-		try {
-			config = service.findParametreByCodiAndCodiXarxa(
-				"CertificateLogin", null); //$NON-NLS-1$
-		} catch (InternalErrorException e) {
-			e.printStackTrace();
-		}
-		
-		// Guardem el valor en cache i la data d'actualització
-		if (config != null && "true".equals(config.getValor())) //$NON-NLS-1$
-			cachedValorCertificateLogin = true;
-		else
-			cachedValorCertificateLogin = false;
-		darreraActualitzacioValor = Calendar.getInstance();
-		return cachedValorCertificateLogin;
+		return false;
 	}
 
 	public int getLoginMethod() {

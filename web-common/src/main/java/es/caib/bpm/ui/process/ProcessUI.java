@@ -10,9 +10,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zul.Button;
@@ -46,6 +49,10 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tree;
+import org.zkoss.zul.Treecell;
+import org.zkoss.zul.Treechildren;
+import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.Treerow;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
@@ -89,8 +96,7 @@ public class ProcessUI extends Frame {
     Datebox fechaCreacionTarea;
     Datebox fechaFinalizacionProceso;
     Listbox tablaArchivos;
-	private Listbox tablaJobs;
-	private Listbox tablaTareas;
+	private Tree tablaTareas;
 	private Label estado;
 	private Label descripcion;
 	private Label idproceso;
@@ -140,8 +146,7 @@ public class ProcessUI extends Frame {
         asignadoA = (Label) getFellow("txtAsignadoA"); //$NON-NLS-1$
         estado = (Label) getFellow("txtEstado"); //$NON-NLS-1$
         tablaArchivos = getAttachmentsListbox();
-        tablaTareas = (Listbox) getFellow("listadoTareas"); //$NON-NLS-1$
-        tablaJobs = (Listbox) getFellow("listadoJobs"); //$NON-NLS-1$
+        tablaTareas = (Tree) getFellow("listadoTareas"); //$NON-NLS-1$
         ventanaDinamica = getFellow("datosElementoWorkflow"); //$NON-NLS-1$
         model = (DataModel) getFellow("BPMdata"); //$NON-NLS-1$
         comments = (DataGrid) getFellow("comments"); //$NON-NLS-1$
@@ -155,7 +160,7 @@ public class ProcessUI extends Frame {
         if (processId > 0) {
 			ProcessInstance pi = BPMApplication.getEngine().getProcess(processId);
 			try {
-				openProcessInstance(pi);
+				openProcessInstance(pi, true);
 			} catch (Exception e)
 			{
 				log.warn("Error opening process", e);
@@ -165,7 +170,7 @@ public class ProcessUI extends Frame {
         addEventListener("onReturn", new SerializableEventListener() { //$NON-NLS-1$
 			public void onEvent(Event event) throws Exception {
 				ProcessInstance pi = BPMApplication.getEngine().getProcess(processId);
-				openProcessInstance(pi);
+				openProcessInstance(pi, false);
 			}
 		});
 	}
@@ -217,14 +222,14 @@ public class ProcessUI extends Frame {
     private static final long serialVersionUID = 1L;
 
     public void refresh() throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {
-    	openProcessInstance(getCurrentProcess());
+    	openProcessInstance(getCurrentProcess(), false);
 		if (currentJobWindow != null)
 			currentJobWindow.setParent(null);
 		currentJobWindow = null;
 		currentJob = null;
     }
     
-    public void openProcessInstance(ProcessInstance proc) throws IOException,
+    public void openProcessInstance(ProcessInstance proc, boolean firstTime) throws IOException,
             DocumentException, ClassNotFoundException, SQLException,
             NamingException, CreateException, BPMException, InternalErrorException {
         ProcessDefinition definicion;
@@ -365,9 +370,9 @@ public class ProcessUI extends Frame {
 
                 cargarTablaArchivos(proc, tablaArchivos);
                 cargarTablaTareas (proc, tablaTareas);
-                cargarTablaJobs (proc, tablaJobs);
                 
-                tabbox.setSelectedIndex(0);
+                if (firstTime)
+                	tabbox.setSelectedIndex(0);
             } else {
                 throw new UiException(
                         Messages.getString("ProcessUI.GeneratedObjectErrorType")); //$NON-NLS-1$
@@ -452,134 +457,247 @@ public class ProcessUI extends Frame {
 
     
 
-	public void onSelectTask ()
-    {
-    	TaskInstance ti = (TaskInstance) tablaTareas.getSelectedItem().getValue();
-    	Application.call(BPMApplication.getTaskURL(ti));
-    }
+	EventListener onSelectTask = new EventListener() {
+		@Override
+		public void onEvent(Event event) throws Exception {
+	    	TaskInstance ti = (TaskInstance) tablaTareas.getSelectedItem().getValue();
+	    	Application.call(BPMApplication.getTaskURL(ti));
+		}
+	};
     
-    public void onSelectJob ()
-    {
-    	currentJob = (Job) tablaJobs.getSelectedItem().getValue();
-    	Component[] components = Executions.getCurrent().createComponents("/wf/job.zul", new HashMap()); //$NON-NLS-1$
-    	if (components.length != 1)
-    	{
-    		throw new UiException (Messages.getString("ProcessUI.OnlyOneComponentExpected")); //$NON-NLS-1$
-    	}
-    	if (currentJobWindow != null)
-    		currentJobWindow.setParent(null);
-    	currentJobWindow = (Window)components[0];
-    	currentJobWindow.setParent(this);
-    	SimpleDateFormat formatConHora = new SimpleDateFormat("dd/MM/yyyy hh:mm"); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.id")).setValue(Long.toString(currentJob.getId())); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.process")).setValue(Long.toString(currentJob.getProcessId())); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.name")).setValue(currentJob.getName()); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.dueDate")).setValue(formatConHora.format(currentJob.getDueDate())); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.failures")).setValue(Integer.toString(currentJob.getFailures())); //$NON-NLS-1$
-    	((Label)currentJobWindow.getFellow("job.error")).setValue(currentJob.getErrorMessage()); //$NON-NLS-1$
-    	Label statusLabel =((Label)currentJobWindow.getFellow("job.status")); //$NON-NLS-1$
-    	Button pauseButton = (Button) currentJobWindow.getFellow("pausebutton"); //$NON-NLS-1$
-    	Button resumeButton = (Button) currentJobWindow.getFellow("resumebutton"); //$NON-NLS-1$
-    	Button retryButton = (Button) currentJobWindow.getFellow("retrybutton"); //$NON-NLS-1$
-    	Button closeButton = (Button) currentJobWindow.getFellow("closebutton"); //$NON-NLS-1$
-    	Button processButton = (Button) currentJobWindow.getFellow("openprocess"); //$NON-NLS-1$
-    	processButton.setVisible(false);
-    	if (currentJob.isPaused())
-    	{
-    		statusLabel.setValue(Labels.getLabel("job.status.pause")); //$NON-NLS-1$
-    		pauseButton.setVisible(false);
-    		retryButton.setVisible(false);
-    		resumeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
+	EventListener onSelectJob = new EventListener() {
+		@Override
+		public void onEvent(Event event) throws Exception {
+	    	currentJob = (Job) tablaTareas.getSelectedItem().getValue();
+	    	Component[] components = Executions.getCurrent().createComponents("/wf/job.zul", new HashMap()); //$NON-NLS-1$
+	    	if (components.length != 1)
+	    	{
+	    		throw new UiException (Messages.getString("ProcessUI.OnlyOneComponentExpected")); //$NON-NLS-1$
+	    	}
+	    	if (currentJobWindow != null)
+	    		currentJobWindow.setParent(null);
+	    	currentJobWindow = (Window)components[0];
+	    	currentJobWindow.setParent(  ProcessUI.this );
+	    	SimpleDateFormat formatConHora = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.id")).setValue(Long.toString(currentJob.getId())); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.process")).setValue(Long.toString(currentJob.getProcessId())); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.name")).setValue(currentJob.getName()); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.dueDate")).setValue(formatConHora.format(currentJob.getDueDate())); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.failures")).setValue(Integer.toString(currentJob.getFailures())); //$NON-NLS-1$
+	    	((Label)currentJobWindow.getFellow("job.error")).setValue(currentJob.getErrorMessage()); //$NON-NLS-1$
+	    	Label statusLabel =((Label)currentJobWindow.getFellow("job.status")); //$NON-NLS-1$
+	    	Button pauseButton = (Button) currentJobWindow.getFellow("pausebutton"); //$NON-NLS-1$
+	    	Button resumeButton = (Button) currentJobWindow.getFellow("resumebutton"); //$NON-NLS-1$
+	    	Button retryButton = (Button) currentJobWindow.getFellow("retrybutton"); //$NON-NLS-1$
+	    	Button closeButton = (Button) currentJobWindow.getFellow("closebutton"); //$NON-NLS-1$
+	    	Button processButton = (Button) currentJobWindow.getFellow("openprocess"); //$NON-NLS-1$
+	    	processButton.setVisible(false);
+	    	if (currentJob.isPaused())
+	    	{
+	    		statusLabel.setValue(Labels.getLabel("job.status.pause")); //$NON-NLS-1$
+	    		pauseButton.setVisible(false);
+	    		retryButton.setVisible(false);
+	    		resumeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
+					public void onEvent(Event event) throws Exception {
+						getEngine().resumeJob(currentJob);
+						currentJobWindow.setVisible(false);
+						currentJobWindow.setParent(null);
+						currentJobWindow = null;
+						currentJob = null;
+						refresh ();
+					}
+				});
+	    	}
+	    	else if (currentJob.isError())
+	    	{
+	    		statusLabel.setValue(Labels.getLabel("job.status.error")); //$NON-NLS-1$
+	    		pauseButton.setVisible(false);
+	    		resumeButton.setVisible(false);
+	    		retryButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
+					public void onEvent(Event event) throws Exception {
+						getEngine().retryJob(currentJob);
+						currentJobWindow.setVisible(false);
+						currentJobWindow.setParent(null);
+						currentJobWindow = null;
+						currentJob = null;
+						refresh ();
+					}
+						
+				});
+	    	}
+	    	else 
+	    	{
+	    		if (currentJob.getFailures() > 0 && currentJob.getErrorMessage() != null)
+	    			statusLabel.setValue(Labels.getLabel("job.status.warning")); //$NON-NLS-1$
+	    		else
+	    			statusLabel.setValue(Labels.getLabel("job.status.pending")); //$NON-NLS-1$
+	    		retryButton.setVisible(false);
+	    		resumeButton.setVisible(false);
+	    		pauseButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
+					public void onEvent(Event event) throws Exception {
+						getEngine().pauseJob(currentJob);
+						currentJobWindow.setVisible(false);
+						currentJobWindow.setParent(null);
+						currentJobWindow = null;
+						currentJob = null;
+						refresh ();
+					}
+						
+				});
+	    	}
+	    		
+			closeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
 				public void onEvent(Event event) throws Exception {
-					getEngine().resumeJob(currentJob);
 					currentJobWindow.setVisible(false);
 					currentJobWindow.setParent(null);
 					currentJobWindow = null;
 					currentJob = null;
-					refresh ();
 				}
 			});
-    	}
-    	else if (currentJob.isError())
-    	{
-    		statusLabel.setValue(Labels.getLabel("job.status.error")); //$NON-NLS-1$
-    		pauseButton.setVisible(false);
-    		resumeButton.setVisible(false);
-    		retryButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
-				public void onEvent(Event event) throws Exception {
-					getEngine().retryJob(currentJob);
-					currentJobWindow.setVisible(false);
-					currentJobWindow.setParent(null);
-					currentJobWindow = null;
-					currentJob = null;
-					refresh ();
-				}
-					
-			});
-    	}
-    	else 
-    	{
-    		if (currentJob.getFailures() > 0 && currentJob.getErrorMessage() != null)
-    			statusLabel.setValue(Labels.getLabel("job.status.warning")); //$NON-NLS-1$
-    		else
-    			statusLabel.setValue(Labels.getLabel("job.status.pending")); //$NON-NLS-1$
-    		retryButton.setVisible(false);
-    		resumeButton.setVisible(false);
-    		pauseButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
-				public void onEvent(Event event) throws Exception {
-					getEngine().pauseJob(currentJob);
-					currentJobWindow.setVisible(false);
-					currentJobWindow.setParent(null);
-					currentJobWindow = null;
-					currentJob = null;
-					refresh ();
-				}
-					
-			});
-    	}
-    		
-		closeButton.addEventListener("onClick", new SerializableEventListener() { //$NON-NLS-1$
-			public void onEvent(Event event) throws Exception {
-				currentJobWindow.setVisible(false);
-				currentJobWindow.setParent(null);
-				currentJobWindow = null;
-				currentJob = null;
-			}
-		});
-
-		currentJobWindow.doOverlapped();
-    	
-		tablaJobs.setSelectedItem(null);
-    }
+	
+			currentJobWindow.doOverlapped();
+	    	
+	    }
+	};
     
-	private void cargarTablaTareas(ProcessInstance proc, Listbox tablaTareas) throws CreateException, NamingException, BPMException, InternalErrorException {
+	private void cargarTablaTareas(ProcessInstance proc, Tree tablaTareas) throws CreateException, NamingException, BPMException, InternalErrorException {
 		BpmEngine engine = getEngine();
-		List tasks = engine.getActiveTasks(proc);
-		if (tasks == null || tasks.isEmpty())
-			tablaTareas.setVisible(false);
-		else
+		
+		Set <Long> roots = new HashSet<Long>();
+		Set <Long> children = new HashSet<Long>();
+		Set <Long> current = new HashSet<Long>();
+		current.add(proc.getId());
+		roots.add(proc.getId());
+	
+		do
 		{
-			// Visible
-			tablaTareas.setVisible(true);
-			// Limpiar
-			while (tablaTareas.getItemCount() > 0)
-				tablaTareas.getItemAtIndex(0).setParent(null);
-			// Crear filas
-			ListitemCreator creator = new ListitemCreator(engine);
-			for (Iterator it = tasks.iterator(); it.hasNext(); )
-			{
-				TaskInstance task = (TaskInstance) it.next();
-
-				
-				Listitem item = creator.createListitem(task);
-					tablaTareas.getItems().add(item);
+			Set<Long> c = current;
+			current = new HashSet<Long>();
+			for ( Long id: c) {
+				for (Long parent: engine.findParentProceeses(id))
+				{
+					if ( ! children.contains(parent) && !roots.contains(parent) && ! current.contains(parent))
+					{
+						roots.add(parent);
+						roots.remove(id);
+						children.add (id);
+						current.add(parent);
+					}
+				}
 			}
+			
+		} while ( ! current.isEmpty());
+
+		tablaTareas.getTreechildren().getChildren().clear();
+		
+		loadProcesses ( engine, roots, new HashSet<Long> (), tablaTareas.getTreechildren());
+		
+	}
+
+
+    private void loadProcesses(BpmEngine engine, Set<Long> roots, HashSet<Long> processed, Treechildren treechildren) throws InternalErrorException, BPMException {
+    	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
+    	for ( Long id: roots )
+    	{
+    		if ( ! processed.contains(id))
+    		{
+    			ProcessInstance proc = engine.getProcess(id);
+    			if (proc != null)
+    			{
+	    			processed.add(id);
+	    			Treeitem item = new Treeitem(); item.setParent(treechildren);
+	    			item.setOpen(true);
+	    			Treerow row = new Treerow(); row.setParent(item);
+	    			row.appendChild(  new Treecell( Labels.getLabel("process.lblProceso")+" "+id.toString()));
+	    			row.appendChild( new Treecell(proc.getDescription()));
+	    			row.appendChild( new Treecell ( df.format( proc.getStart() ) ));
+	    			row.appendChild(new Treecell ( proc.getCurrentTask() ));
+	    			row.appendChild(new Treecell());
+	    			Treechildren tch = new Treechildren(); tch.setParent(item);
+	    			loadProcessTasks ( engine, proc, tch );
+	    			loadProcessJobs ( engine, proc, tch );
+	    			
+	    			HashSet<Long> childProcs = new HashSet<Long>(engine.findChildProcesses(proc.getId()));
+	    			loadProcesses(engine, childProcs, processed, tch);
+    			}
+    		}
+    	}
+	}
+
+	private void loadProcessTasks(BpmEngine engine, ProcessInstance proc, Treechildren treechildren) throws InternalErrorException, BPMException {
+    	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
+		List<TaskInstance> tasks = engine.getActiveTasks(proc);
+		for (Iterator<TaskInstance> it = tasks.iterator(); it.hasNext(); )
+		{
+			TaskInstance task = (TaskInstance) it.next();
+
+			
+			Treeitem item = new Treeitem();
+			item.setValue(task);
+			item.setParent(treechildren);
+			Treerow row = new Treerow(); row.setParent(item);
+			row.appendChild(  new Treecell( Labels.getLabel("process.lblTarea")+" "+ task.getId()));
+			row.appendChild( new Treecell(task.getName()));
+			row.appendChild( new Treecell ( df.format( task.getCreate() ) ));
+			
+			row.appendChild(new Treecell ( task.getStart() == null ? 
+					Labels.getLabel("job.status.started") :  
+						Labels.getLabel("job.status.pending") ));
+
+			if (task.getActorId() != null) {
+				row.appendChild( new Treecell(task.getActorId()));
+			} else {
+				String actors = null;
+				for (Iterator it2 = task.getPooledActors().iterator(); it2.hasNext();) {
+					String actor = (String) it2.next();
+					if (actors == null)
+						actors = actor;
+					else
+						actors = actors + "; " + actor; //$NON-NLS-1$
+				}
+				if (actors == null)
+					actors = "-"; //$NON-NLS-1$
+				row.appendChild( new Treecell(actors));
+			}
+			row.addEventListener("onClick", onSelectTask);
 			
 		}
 	}
 
+	private void loadProcessJobs(BpmEngine engine, ProcessInstance proc, Treechildren treechildren) throws InternalErrorException, BPMException {
+    	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
+		List<Job> tasks = engine.getActiveJobs(proc);
+		for (Iterator<Job> it = tasks.iterator(); it.hasNext(); )
+		{
+			Job job = it.next();
 
-    private void disableInputbox(Component componente) {
+			
+			Treeitem item = new Treeitem();
+			item.setValue(job);
+			item.setParent(treechildren);
+			Treerow row = new Treerow(); row.setParent(item);
+			row.appendChild( new Treecell( Labels.getLabel("job.lbldefinicionTarea=")+" "+ job.getId()));
+			row.appendChild( new Treecell(job.getName()));
+			row.appendChild( new Treecell ( df.format( job.getDueDate() ) ));
+			
+			if (job.isPaused())
+			{
+				row.appendChild( new Treecell ( "job.status.pause" ));
+			} else if (job.isError())
+			{
+				row.appendChild( new Treecell ( "job.status.error" ));
+			} else if (job.getFailures() > 0 && job.getErrorMessage() != null) {
+				row.appendChild( new Treecell ( "job.status.warning" ));
+			} else {
+				row.appendChild( new Treecell ( "job.status.pending" ));
+			}
+
+			row.appendChild( new Treecell());
+			row.addEventListener("onClick", onSelectJob);
+		}
+	}
+
+	private void disableInputbox(Component componente) {
         if (componente instanceof InputElement)
             ((InputElement) componente).setReadonly(true);
         else if (componente instanceof Listbox)

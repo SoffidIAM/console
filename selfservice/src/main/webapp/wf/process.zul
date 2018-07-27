@@ -4,6 +4,11 @@
 <?component name="attachments" macroURI="process/attachments.zul" inline="true"?>
 <?component name="comments" macroURI="process/comments.zul" inline="true"?>
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="ui" use="es.caib.bpm.ui.process.ProcessUI" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+		<style>
+			/*Tabla: Mis Tareas*/
+			.classThree, .classFour, .classFive{display:block;}
+
+		</style>
 		<datamodel class="es.caib.bpm.datamodel.BPMDataNode" id="BPMdata"/>
 		<hbox width="100%">
 			<grid width="100%">
@@ -30,31 +35,24 @@
 			</tabs>
 			<tabpanels width="100%">
 				<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
-					<form dataPath="BPMdata:/processInstance/variables">
+					<form dataPath="BPMdata:/processInstance/variables" width="100%">
 						 
-						<vbox id="datosElementoWorkflow">
+						<vbox id="datosElementoWorkflow" width="100%">
 					
 						</vbox>
 					</form>
 				</tabpanel>
-				<tabpanel id="tareas" style="min-height:30em;overflow:auto"> 
-					<listbox id="listadoTareas" mold="paging" onSelect="ui.onSelectTask()" pageSize="5" width="100%">
-							<listhead>
-								<listheader label="${c:l('inbox.lbldefinicionTarea')}" sort="auto" width="40%"/>
-								<listheader label="${c:l('inbox.lblFecha')}" sort="auto"  width="15%"/>
-								<listheader label="${c:l('inbox.lblFechaPrevistaFin')}" sort="auto"  width="15%"/>
-								<listheader label="${c:l('inbox.lblActoresAsignados')}" sort="auto"  width="15%"/>
-								<listheader label="${c:l('inbox.lblIdentificador')}" sort="auto" width="15%"/>
-							</listhead>
-					</listbox>
-					<listbox id="listadoJobs" mold="paging" onSelect="ui.onSelectJob()" pageSize="5" width="100%">
-							<listhead>
-								<listheader label="${c:l('job.lblId')}" sort="auto"/>
-								<listheader label="${c:l('job.lbldefinicionTarea')}" sort="auto"/>
-								<listheader label="${c:l('inbox.lblFecha')}" sort="auto"/>
-								<listheader label="${c:l('process.lblEstado')}" sort="auto"/>
-							</listhead>
-					</listbox>
+				<tabpanel id="tareas" style="overflow:auto"> 
+					<tree id="listadoTareas" mold="paging" width="100%" style="min-height: 0">
+							<treecols>
+								<treecol label="${c:l('process.lblIdentificador')}" />
+								<treecol label="${c:l('llistesCorreu.zul.Descripcia-2')}" />
+								<treecol label="${c:l('inbox.lblFecha')}" />
+								<treecol label="${c:l('process.lblEstado')}" />
+								<treecol label="${c:l('inbox.lblActoresAsignados')}" />
+							</treecols>
+							<treechildren></treechildren>
+					</tree>
 				</tabpanel>
 				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
 				<!-- 

@@ -344,6 +344,7 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public org.jbpm.JbpmConfiguration getJBpmConfiguration()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

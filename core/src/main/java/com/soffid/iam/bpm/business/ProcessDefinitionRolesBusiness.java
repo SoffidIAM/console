@@ -32,18 +32,18 @@ public class ProcessDefinitionRolesBusiness {
 		
 		Swimlane swim = null;
 		
+		if ( checkOldAuthorization(appRole, userRoles, definition))
+			return true;
+
 		if (definition != null && definition.getTaskMgmtDefinition() != null)
 			swim = definition.getTaskMgmtDefinition().getSwimlane(appRole);
 		
-		if (swim == null)
-			return checkOldAuthorization(appRole, userRoles, definition);
-		else {
+		if (swim != null)
+		{
 			String members = swim.getActorIdExpression();
 			if (members == null)
 				members = swim.getPooledActorsExpression();
-			if (members == null)
-				return checkOldAuthorization(appRole, userRoles, definition);
-			else
+			if (members != null)
 			{
 				String parsedMembers[] = getDefinitionActors(members);
 				for (int i = 0; i < parsedMembers.length; i++) {
@@ -51,9 +51,10 @@ public class ProcessDefinitionRolesBusiness {
 						if (userRoles[j].equals(parsedMembers[i]))
 							return true;
 				}
-				return false;
 			}
 		}
+		
+		return false;
 	}
 
 	private String[] getDefinitionActors(String pooledActorsExpression) {
@@ -99,10 +100,11 @@ public class ProcessDefinitionRolesBusiness {
 		ExecutionContext ctx = new ExecutionContext(pi.getRootToken());
 		ExecutionContext.pushCurrentContext(ctx);
 		try {
+			if ( checkOldAuthorization(appRole, userRoles, pi.getProcessDefinition()))
+				return true;
 			Swimlane swim = pi.getProcessDefinition().getTaskMgmtDefinition().getSwimlane(appRole);
-			if (swim == null)
-				return checkOldAuthorization(appRole, userRoles, pi.getProcessDefinition());
-			else {
+			if (swim != null)
+			{
 				SwimlaneInstance swimInstance = pi.getTaskMgmtInstance().
 					getInitializedSwimlaneInstance(ctx, swim);
 				if (swimInstance.getActorId() != null) {
@@ -119,8 +121,8 @@ public class ProcessDefinitionRolesBusiness {
 								return true;
 					}
 				}
-				return false;
 			}
+			return false;
 		} finally {
 			ExecutionContext.popCurrentContext(ctx);
 		}

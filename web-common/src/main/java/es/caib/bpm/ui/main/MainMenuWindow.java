@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
+import org.zkoss.zul.Tree;
 import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treechildren;
 import org.zkoss.zul.Treeitem;
@@ -127,6 +129,27 @@ public class MainMenuWindow extends Window implements AfterCompose {
 			createProcesses();
 		}
 		createCustomObjects();
+		registerListener ( );
+	}
+
+	private void registerListener() {
+		Tree tree = (Tree) getFellowIfAny("menutree");
+		if (tree != null)
+		{
+			for (Treeitem item: (Collection<Treeitem>) tree.getItems())
+			{
+				registerListener (item);
+			}
+		}
+	}
+
+	private void registerListener(Treeitem item) {
+		if (item.getTreechildren() != null )
+		{
+			item.addEventListener("onOpen", onOpenEventListener);
+			for (Treeitem child: (Collection<Treeitem>) item.getTreechildren().getChildren())
+				registerListener(child);
+		}
 	}
 
 	public boolean isDelayProcesses() {
@@ -136,4 +159,41 @@ public class MainMenuWindow extends Window implements AfterCompose {
 	public void setDelayProcesses(boolean delayProcesses) {
 		this.delayProcesses = delayProcesses;
 	}
+
+	private void closeSiblings(Treeitem menuTreeitem) {
+		Treechildren treechildren = (Treechildren) menuTreeitem.getParent();
+		for ( Treeitem sibling: (Collection<Treeitem>) treechildren.getChildren())
+		{
+			if (sibling != menuTreeitem)
+			{
+				closeChildren (sibling);
+			}
+		}
+		
+		Component parent = treechildren.getParent();
+		if (parent instanceof Treeitem)
+			closeSiblings((Treeitem) parent);
+		
+	}
+
+	private void closeChildren(Treeitem parent) {
+		if (parent.getTreechildren() != null && parent.isOpen())
+		{
+			parent.setOpen(false);
+			for ( Treeitem child: (Collection<Treeitem>) parent.getTreechildren().getChildren())
+			{
+				closeChildren(child);
+			}
+		}
+	}
+
+	private org.zkoss.zk.ui.event.EventListener onOpenEventListener = new org.zkoss.zk.ui.event.EventListener() {
+		@Override
+		public void onEvent(Event event) throws Exception {
+			
+			Treeitem treeitem = (Treeitem) event.getTarget();
+			if (treeitem.isOpen())
+				closeSiblings (treeitem);
+		}
+	};
 }

@@ -105,7 +105,7 @@ public class DeployerBean implements DeployerService {
 			public Void run() {
 				try {
 					deploy(true);
-					context.getTimerService().createTimer(5000, 5000, "Scan Timer");
+					context.getTimerService().createTimer(10, 5000, "Scan Timer");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -838,7 +838,11 @@ public class DeployerBean implements DeployerService {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
 			public Void run() {
 				try {
+					log.info("Deploying by first time");
+					pauseConnector();
+					undeploy();
 					deploy(true);
+					resumeConnector();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

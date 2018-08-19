@@ -676,20 +676,20 @@ public class ProcessUI extends Frame {
 			item.setValue(job);
 			item.setParent(treechildren);
 			Treerow row = new Treerow(); row.setParent(item);
-			row.appendChild( new Treecell( Labels.getLabel("job.lbldefinicionTarea=")+" "+ job.getId()));
+			row.appendChild( new Treecell( Labels.getLabel("job.lbldefinicionTarea")+" "+ job.getId()));
 			row.appendChild( new Treecell(job.getName()));
 			row.appendChild( new Treecell ( df.format( job.getDueDate() ) ));
 			
 			if (job.isPaused())
 			{
-				row.appendChild( new Treecell ( "job.status.pause" ));
+				row.appendChild( new Treecell ( Labels.getLabel ("job.status.pause" )));
 			} else if (job.isError())
 			{
-				row.appendChild( new Treecell ( "job.status.error" ));
+				row.appendChild( new Treecell ( Labels.getLabel("job.status.error" )));
 			} else if (job.getFailures() > 0 && job.getErrorMessage() != null) {
-				row.appendChild( new Treecell ( "job.status.warning" ));
+				row.appendChild( new Treecell ( Labels.getLabel("job.status.warning" )));
 			} else {
-				row.appendChild( new Treecell ( "job.status.pending" ));
+				row.appendChild( new Treecell ( Labels.getLabel("job.status.pending" )));
 			}
 
 			row.appendChild( new Treecell());
@@ -757,9 +757,7 @@ public class ProcessUI extends Frame {
             CreateException, NamingException, InternalErrorException {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
-    	UIClassLoader cl = proc.getProcessClassLoader();
-    	cl.setParentClassLoader(heavenLoader);
-        Thread.currentThread().setContextClassLoader(cl);
+        Thread.currentThread().setContextClassLoader(proc.getProcessClassLoader().clone(heavenLoader));
 
         return heavenLoader;
     }

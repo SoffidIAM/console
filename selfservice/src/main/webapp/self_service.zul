@@ -175,6 +175,19 @@
 							</listbox>
 						</vbox>
 					</div>
+					<div class="tasks">
+						<vbox use="es.caib.bpm.ui.inbox.MyProcessHandler" id="processhandler" sclass="">
+							<label value="${c:l('selfService.MyProcess')}" sclass="titolSelf"/>
+							<listbox fixedLayout="true" id="listadoProcesos" mold="paging" pageSize="15" sclass="senseBorder">
+								<listhead>
+									<listheader label="${c:l('process.lblIdentificador')}" sort="auto" width="20%"/>
+									<listheader label="${c:l('inbox.lblProceso')}" sort="auto" width="40%"/>
+									<listheader label="${c:l('inbox.lblFecha')}" sort="auto" width="20%"/>
+									<listheader label="${c:l('process.lblEstado')}" sort="auto" width="20%"/>
+								</listhead>
+							</listbox>
+						</vbox>
+					</div>
 					<div class="accounts">
 						<label value="${c:l('selfService.Accounts')}" sclass="titolSelf"/>
 						<listbox id="listadoAccounts" autocommit="false"

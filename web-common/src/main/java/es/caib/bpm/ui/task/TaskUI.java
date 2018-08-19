@@ -348,6 +348,7 @@ public class TaskUI extends Frame implements EventListener {
 	                if (!canManage || task.isCancelled() || task.getEnd()!=null)
 	                    disableInputbox(componenteGenerado);
                 } catch (Exception e) {
+	            	log.warn("Error generating task page", e);
 	        		Label l = new Label (e.toString());
 	        		l.setStyle("color: red");
 	        		l.setMultiline(true);
@@ -539,8 +540,8 @@ public class TaskUI extends Frame implements EventListener {
 
     	ClassLoader heavenLoader = Thread.currentThread().getContextClassLoader();
     	UIClassLoader cl = task.getProcessClassLoader();
-    	cl.setParentClassLoader(heavenLoader);
-        Thread.currentThread().setContextClassLoader( cl);
+
+        Thread.currentThread().setContextClassLoader(cl.clone(heavenLoader));
 
         return heavenLoader;
     }

@@ -194,11 +194,15 @@
 			<artifactId>zkiblaf</artifactId>
 			<version>${zkiblaf.version}</version>
 			<classifier>classes</classifier>
-			<scope>provided</scope>
 		</dependency>		
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkdb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.zk</groupId>
+			<artifactId>zhtml</artifactId>
+			<version>3.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>es.caib.jboss</groupId>
@@ -237,14 +241,10 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.zkoss.zk</groupId>
-			<artifactId>zhtml</artifactId>
-			<version>3.0.8</version>
-		</dependency>
-		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>web-common</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.portlet/portlet-api -->
 		<dependency>
@@ -253,13 +253,4 @@
 		    <version>3.0.0</version>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.zkoss.zk</groupId>
-				<artifactId>zk</artifactId>
-				<version>3.0.8-2</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

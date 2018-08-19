@@ -369,9 +369,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
 				ra.setAccountId(account.getId());
 				ra.setAccountName(account.getName());
-				Security.nestedLogin(Security.getCurrentAccount (), new String[] {
-					Security.AUTO_USER_ROLE_DELETE+Security.AUTO_ALL
-				});
+				Security.nestedLogin(Security.getCurrentAccount (), Security.ALL_PERMISSIONS);
 				try {
 					getApplicationService().create(ra);
 				} finally {

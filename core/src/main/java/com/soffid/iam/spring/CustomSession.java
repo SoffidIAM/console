@@ -6,8 +6,12 @@ package com.soffid.iam.spring;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -20,6 +24,10 @@ import org.hibernate.Query;
 import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.classic.Session;
+import org.hibernate.event.FlushEvent;
+import org.hibernate.event.FlushEventListener;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.stat.SessionStatistics;
@@ -38,22 +46,30 @@ public class CustomSession implements Session
 	}
 	public Object saveOrUpdateCopy (Object object) throws HibernateException
 	{
-		return proxy.saveOrUpdateCopy(object);
+		Object o = proxy.saveOrUpdateCopy(object);
+		registerDirtyEntity(o);
+		return o;
 	}
 	public Object saveOrUpdateCopy (Object object, Serializable id)
 					throws HibernateException
 	{
-		return proxy.saveOrUpdateCopy(object, id);
+		Object o = proxy.saveOrUpdateCopy(object, id);
+		registerDirtyEntity(o);
+		return o;
 	}
 	public Object saveOrUpdateCopy (String entityName, Object object)
 					throws HibernateException
 	{
-		return proxy.saveOrUpdateCopy(entityName, object);
+		Object o = proxy.saveOrUpdateCopy(entityName, object);;
+		registerDirtyEntity(o);
+		return o; 
 	}
 	public Object saveOrUpdateCopy (String entityName, Object object, Serializable id)
 					throws HibernateException
 	{
-		return proxy.saveOrUpdateCopy(entityName, object, id);
+		Object o = proxy.saveOrUpdateCopy(entityName, object, id);
+		registerDirtyEntity(object);
+		return o;
 	}
 	public List find (String query) throws HibernateException
 	{
@@ -122,20 +138,24 @@ public class CustomSession implements Session
 	public void save (Object object, Serializable id) throws HibernateException
 	{
 		proxy.save(object, id);
+		registerDirtyEntity(object);
 	}
 	public void save (String entityName, Object object, Serializable id)
 					throws HibernateException
 	{
 		proxy.save(entityName, object, id);
+		registerDirtyEntity(object);
 	}
 	public void update (Object object, Serializable id) throws HibernateException
 	{
 		proxy.update(object, id);
+		registerDirtyEntity(object);
 	}
 	public void update (String entityName, Object object, Serializable id)
 					throws HibernateException
 	{
 		proxy.update(entityName, object, id);
+		registerDirtyEntity(object);
 	}
 	public EntityMode getEntityMode ()
 	{
@@ -175,6 +195,7 @@ public class CustomSession implements Session
 	}
 	public Connection close () throws HibernateException
 	{
+		entities.remove(proxy);
 		return proxy.close();
 	}
 	public void cancelQuery () throws HibernateException
@@ -239,53 +260,69 @@ public class CustomSession implements Session
 	}
 	public Serializable save (Object object) throws HibernateException
 	{
-		return proxy.save(object);
+		Serializable o = proxy.save(object);
+		registerDirtyEntity(object);
+		return o;
 	}
 	public Serializable save (String entityName, Object object)
 					throws HibernateException
 	{
-		return proxy.save(entityName, object);
+		Serializable o = proxy.save(entityName, object);
+		getDirtyEntities().add(o);
+		return o;
 	}
 	public void saveOrUpdate (Object object) throws HibernateException
 	{
+		registerDirtyEntity(object);
 		proxy.saveOrUpdate(object);
 	}
 	public void saveOrUpdate (String entityName, Object object)
 					throws HibernateException
 	{
 		proxy.saveOrUpdate(entityName, object);
+		registerDirtyEntity(object);
 	}
 	public void update (Object object) throws HibernateException
 	{
 		proxy.update(object);
+		registerDirtyEntity(object);
 	}
 	public void update (String entityName, Object object) throws HibernateException
 	{
 		proxy.update(entityName, object);
+		registerDirtyEntity(object);
 	}
 	public Object merge (Object object) throws HibernateException
 	{
-		return proxy.merge(object);
+		Object o = proxy.merge(object);
+		registerDirtyEntity(o);
+		return o;
 	}
 	public Object merge (String entityName, Object object) throws HibernateException
 	{
-		return proxy.merge(entityName, object);
+		Object o = proxy.merge(entityName, object);
+		registerDirtyEntity(o);
+		return o;
 	}
 	public void persist (Object object) throws HibernateException
 	{
 		proxy.persist(object);
+		registerDirtyEntity(object);
 	}
 	public void persist (String entityName, Object object) throws HibernateException
 	{
 		proxy.persist(entityName, object);
+		registerDirtyEntity(object);
 	}
 	public void delete (Object object) throws HibernateException
 	{
 		proxy.delete(object);
+		registerDirtyEntity(object);
 	}
 	public void delete (String entityName, Object object) throws HibernateException
 	{
 		proxy.delete(entityName, object);
+		registerDirtyEntity(object);
 	}
 	public void lock (Object object, LockMode lockMode) throws HibernateException
 	{
@@ -414,5 +451,42 @@ public class CustomSession implements Session
 		proxy.reconnect(connection);
 	}
 	
+
+	// Entity flush improvement
+	static WeakHashMap<Session, Collection<Object>> entities = new WeakHashMap<Session, Collection<Object>>();
+	Collection<Object> dirtyEntities = null;
 	
+	public Collection<Object> getDirtyEntities ()
+	{
+		if (dirtyEntities == null)
+		{
+			synchronized (entities)
+			{
+				dirtyEntities = entities.get(proxy);
+				if (dirtyEntities == null)
+				{
+					dirtyEntities = new HashSet<Object>();
+					 entities.put(proxy, dirtyEntities);
+				}
+			}
+		}
+		return dirtyEntities;
+	}
+
+	public static Collection<Object> getDirtyEntities (org.hibernate.Session session)
+	{
+		synchronized (entities)
+		{
+			return entities.get(session);
+		}
+	}
+
+	private void registerDirtyEntity(Object object) {
+		if (object instanceof HibernateProxy)
+		{
+			HibernateProxy p = (HibernateProxy) object;
+			object = p.getHibernateLazyInitializer().getImplementation();
+		}
+		getDirtyEntities().add(object);
+	}
 }

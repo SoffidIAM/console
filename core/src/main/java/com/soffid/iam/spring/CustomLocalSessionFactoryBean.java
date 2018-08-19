@@ -6,6 +6,8 @@ import java.util.Map;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.event.FlushEvent;
+import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
@@ -72,6 +74,14 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 			}
 		}
 
+		
+		// Replace default flush listener
+		if (! "false".equals(System.getProperty("hibernate-boost")))
+		{
+			config.getEventListeners().setFlushEventListeners(new FlushEventListener[] {
+				new CustomFlushEventListener()
+			});
+		}
 		if ( "true".equals(enableCache))
 		{
 			config.setCacheConcurrencyStrategy(UserEntityImpl.class.getName(), "read-write");

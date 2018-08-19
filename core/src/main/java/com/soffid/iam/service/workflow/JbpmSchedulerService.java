@@ -14,13 +14,12 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.bpm.index.IndexerThread;
 import com.soffid.iam.bpm.job.JobExecutor;
-import com.soffid.iam.deployer.DeployerService;
 
 @Singleton(name = "JbpmSchedulerService")
 @Startup
 @javax.ejb.TransactionManagement(value = javax.ejb.TransactionManagementType.CONTAINER)
 @javax.ejb.TransactionAttribute(value = javax.ejb.TransactionAttributeType.SUPPORTS)
-public class JbpmSchedulerService {
+public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	Log log = LogFactory.getLog(JbpmSchedulerService.class);
 
 	@Resource
@@ -34,8 +33,7 @@ public class JbpmSchedulerService {
 
 	private IndexerThread indexerThread;
 
-	@PostConstruct
-	public void init() throws Exception {
+	public void start() {
 		try {
 			log.info("Starting");
 
@@ -60,6 +58,11 @@ public class JbpmSchedulerService {
 
 	@PreDestroy
 	public void stopService() throws Exception {
+		stop ();
+	}
+	
+	public void stop() throws InterruptedException 
+	{
 		if (indexerThread != null)
 			indexerThread.setFinish(true);
 		if (scheduler != null) {

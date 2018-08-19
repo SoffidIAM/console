@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tomee>
-  <!-- see http://tomee.apache.org/containers-and-resources.html -->
+	<!-- see http://tomee.apache.org/containers-and-resources.html -->
 
-  <!-- activate next line to be able to deploy applications in apps -->
-  <!-- <Deployments dir="apps" /> -->
-  <Deployments dir="apps" autoDeploy="true"/> 
-  <Resource id="jdbc/soffid" type="DataSource">
-    accessToUnderlyingConnectionAllowed = false
-    alternateUsernameAllowed = false
-    connectionProperties = 
-    defaultAutoCommit = true
-    defaultReadOnly = 
-    definition = 
-    ignoreDefaultValues = false
-    initialSize = 0
-    jdbcDriver = com.mysql.jdbc.Driver
-    jdbcUrl = ${dbDriverUrl}
-    jtaManaged = true
-    maxActive = 50
-    maxIdle = 20
-    maxOpenPreparedStatements = 0
-    maxWaitTime = -1 millisecond
-    minEvictableIdleTime = 30 minutes
-    minIdle = 0
-    numTestsPerEvictionRun = 3
-    password = ${dbPassword}
-    passwordCipher = ${dbPasswordCipher}
-    poolPreparedStatements = false
-    serviceId = 
-    testOnBorrow = true
-    testOnReturn = false
-    testWhileIdle = false
-    timeBetweenEvictionRuns = -1 millisecond
-    userName = ${dbUser}
-    validationQuery = ${dbValidationQuery}
-   </Resource>
+	<Deployments dir="apps" autoDeploy="true" />
+
+	<TransactionManager id="myTransactionManager"
+		type="TransactionManager">
+		defaultTransactionTimeout = 60 minutes
+		flushSleepTime = 50 Milliseconds
+	</TransactionManager>
+
+	<Resource id="jdbc/soffid" type="DataSource">
+		accessToUnderlyingConnectionAllowed = false
+		alternateUsernameAllowed = false
+		connectionProperties =
+		defaultAutoCommit = true
+		defaultReadOnly =
+		definition =
+		ignoreDefaultValues = false
+		initialSize = 0
+		jdbcDriver = com.mysql.jdbc.Driver
+		jdbcUrl = ${dbDriverUrl}
+		jtaManaged = true
+		maxActive = 50
+		maxIdle = 20
+		maxOpenPreparedStatements = 0
+		maxWaitTime = -1 millisecond
+		minEvictableIdleTime = 30 minutes
+		minIdle = 0
+		numTestsPerEvictionRun = 3
+		password = ${dbPassword}
+		passwordCipher = ${dbPasswordCipher}
+		poolPreparedStatements = false
+		serviceId =
+		testOnBorrow = true
+		testOnReturn = false
+		testWhileIdle = false
+		timeBetweenEvictionRuns = -1 millisecond
+		userName = ${dbUser}
+		validationQuery = ${dbValidationQuery}
+	</Resource>
 	<Container id="myStatelessContainer" type="STATELESS">
-	    accessTimeout = 30 seconds
-	    callbackThreads = 5
-	    closeTimeout = 5 minutes
-	    garbageCollection = false
-	    idleTimeout = 0 minutes
-	    maxAge = 0 hours
-	    maxAgeOffset = -1
-	    maxSize = 250
-	    minSize = 20
-	    replaceAged = true
-	    replaceFlushed = false
-	    strictPooling = true
-	    sweepInterval = 5 minutes
+		accessTimeout = 30 seconds
+		callbackThreads = 5
+		closeTimeout = 5 minutes
+		garbageCollection = false
+		idleTimeout = 0 minutes
+		maxAge = 0 hours
+		maxAgeOffset = -1
+		maxSize = 250
+		minSize = 20
+		replaceAged = true
+		replaceFlushed = false
+		strictPooling = true
+		sweepInterval = 5 minutes
 	</Container>
 </tomee>

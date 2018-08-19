@@ -264,20 +264,37 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 			Session session = context.getSession();
 			Query query = session.createQuery("select pi " //$NON-NLS-1$
-					+ "from org.jbpm.graph.exe.ProcessInstance as pi " //$NON-NLS-1$
-					+ "where pi.end is null " + "order by pi.start desc"); //$NON-NLS-1$ //$NON-NLS-2$
+					+ "from org.jbpm.graph.exe.ProcessInstance as pi "
+					+ "join pi.instances as instance " //$NON-NLS-1$
+					+ "where (pi.end is null or pi.end > :oneWeekAgo) and instance.initiator = :initiator " 
+					+ "order by pi.start desc"); //$NON-NLS-1$ //$NON-NLS-2$
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DAY_OF_MONTH, -7);
+			query.setParameter("oneWeekAgo", c.getTime());
+			query.setParameter("initiator", Security.getCurrentUser());
 			for (Iterator it = query.iterate(); it.hasNext();) {
 				org.jbpm.graph.exe.ProcessInstance instance = (org.jbpm.graph.exe.ProcessInstance) it
 						.next();
-				List logs = instance.getLoggingInstance().getLogs(
-						ProcessInstanceCreateLog.class);
-				if (logs.size() > 0) {
-					ProcessInstanceCreateLog log = (ProcessInstanceCreateLog) logs
-							.get(0);
-					if (getUserName().equals(log.getActorId())) {
-						resultadoFinal.add(VOFactory
-								.newProcessInstance(context, getProcessHierarchyEntityDao(), instance));
+				if ( getProcessHierarchyEntityDao().findByChildren(instance.getId()).isEmpty())
+				{
+					// Does not have parent process
+					ProcessInstance proc = VOFactory
+							.newProcessInstance(context, getProcessHierarchyEntityDao(), instance);
+					resultadoFinal.add(proc);
+					if (  instance.hasEnded())
+					{
+						// Check if every children has ended
+						for( ProcessHierarchyEntity id: getProcessHierarchyEntityDao().findByParent(instance.getId()))
+						{
+							org.jbpm.graph.exe.ProcessInstance child = context.getProcessInstance(id.getChildProcess());
+							if (! child.hasEnded())
+							{
+								proc.setCurrentTask("...");
+								break;
+							}
+						}
 					}
+					
 				}
 			}
 			return resultadoFinal;
@@ -2394,7 +2411,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 			{
 				if (node instanceof TaskNode)
 				{
-					for ( Task task: (Collection<Task>)((TaskNode) node).getTasks())
+					
+					Collection<Task> tasks = (Collection<Task>)((TaskNode) node).getTasks();
+					if (tasks == null)
+						throw new InternalErrorException("Task node "+node.getName()+" does not contain any task");
+					for ( Task task: tasks)
 					{
 						if (taskNames.contains(task.getName()))
 							throw new InternalErrorException (String.format(Messages.getString("BpmEngineImpl.duplicatedTask"),task.getName())); //$NON-NLS-1$

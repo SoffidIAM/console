@@ -3,6 +3,8 @@ package com.soffid.iam.bpm.model;
 import org.jbpm.module.def.ModuleDefinition;
 import org.jbpm.module.exe.ModuleInstance;
 
+import com.soffid.iam.utils.Security;
+
 public class TenantModuleDefinition extends ModuleDefinition {
 
 	/**
@@ -24,6 +26,7 @@ public class TenantModuleDefinition extends ModuleDefinition {
 	public ModuleInstance createInstance() {
 		TenantModule ti = new TenantModule ();
 		ti.setTenantId(getTenantId());
+		ti.setInitiator(Security.getCurrentUser());
 		return ti;
 	}
 

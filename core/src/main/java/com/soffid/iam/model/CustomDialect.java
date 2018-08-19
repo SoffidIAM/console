@@ -30,7 +30,12 @@ public class CustomDialect extends Dialect {
     Dialect proxyDialect;
     
     public static Class dialectClass = null; 
+    
+    boolean oracle = false;
+    boolean mysql = false;
+    boolean sqlServer = false;
 
+    
     public CustomDialect() {
         super();
         if (dialectClass != null)
@@ -62,10 +67,13 @@ public class CustomDialect extends Dialect {
 	        }
 	        if ("mysql".equals(type))  //$NON-NLS-1$
 	        {
+	        	mysql = true;
 	            proxyDialect = new MySQL5InnoDBDialect();
 	        } else if ("oracle".equals (type)) { //$NON-NLS-1$
+	        	oracle = true;
 	            proxyDialect = new Oracle10gDialect();
 	        } else if ("sqlserver".equals(type)) { //$NON-NLS-1$
+	        	sqlServer = true;
 	        	proxyDialect = new SQLServerDialect();
 	        } else {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -505,6 +513,18 @@ public class CustomDialect extends Dialect {
     public boolean supportsBindAsCallableArgument() {
         return proxyDialect.supportsBindAsCallableArgument();
     }
+
+	public boolean isOracle() {
+		return oracle;
+	}
+
+	public boolean isMysql() {
+		return mysql;
+	}
+
+	public boolean isSqlServer() {
+		return sqlServer;
+	}
     
     
 }

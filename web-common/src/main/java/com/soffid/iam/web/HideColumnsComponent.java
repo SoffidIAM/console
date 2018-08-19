@@ -137,13 +137,18 @@ public class HideColumnsComponent extends Toolbarbutton
 			if (lb.getItemRenderer() != null &&
 					lb.getItemRenderer() instanceof DataListItemRenderer)
 			{
+				int row = 0;
 				for (Listitem i: (List<Listitem>)lb.getItems())
 				{
-					try {
-						lb.getItemRenderer().render(i, null);
-					} catch (Exception e) {
+					if (! i.getChildren().isEmpty())
+					{
+						try {
+							lb.getItemRenderer().render(i, null);
+						} catch (Exception e) {
+						}
 					}
 				}
+				lb.invalidate();
 			}
 		}
 	}

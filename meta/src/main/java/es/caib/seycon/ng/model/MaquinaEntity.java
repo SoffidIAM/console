@@ -177,7 +177,8 @@ columns={"MAQ_TEN_ID", "MAQ_ADRIP"})
 abstract class MaquinaIndex {
 }
 
-@Index (name="MAQ_UK_SERIAL",	unique=true,
+// Do not set to unique to prevent Oracle failure when serial is null
+@Index (name="MAQ_UK_SERIAL",	unique=false,
 entity=es.caib.seycon.ng.model.MaquinaEntity.class,
 columns={"MAQ_TEN_ID", "MAQ_SERIAL"})
 abstract class MaquinaSerialIndex {

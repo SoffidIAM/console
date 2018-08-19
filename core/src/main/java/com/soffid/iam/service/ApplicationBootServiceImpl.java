@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,7 @@ public class ApplicationBootServiceImpl extends
 	private ConfigurationService configSvc;
 	private BpmConfigService bpmConfigSvc;
 	private TenantService tenantService;
+	Boolean started = Boolean.FALSE;
 
 	private Log log = LogFactory
 			.getLog(com.soffid.iam.service.ApplicationBootService.class);
@@ -107,10 +109,13 @@ public class ApplicationBootServiceImpl extends
 		configureSystemProperties();
 		ConfigurationCache.setProperty(
 				"soffid.ui.maxrows", Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
+		started = Boolean.TRUE;
 	}
 
 	@Override
 	protected void handleConsoleBoot() throws Exception {
+		log.info("Running console boot");
+		
 		ServiceLocator.instance();
 		
 		loadServiceHandlers();
@@ -137,6 +142,8 @@ public class ApplicationBootServiceImpl extends
 		createScheduledTasks();
 
 		loadWorkflows();
+		
+		started = Boolean.TRUE;
 	}
 
 	
@@ -394,6 +401,19 @@ public class ApplicationBootServiceImpl extends
 							new Object[] {tenantId});
 					executeSentence(conn, "UPDATE JBPM_TASKINSTANCE SET TENANT_=? WHERE TENANT_ IS NULL",
 							new Object[] {tenantId});
+
+					executeSentence(conn, "INSERT INTO JBPM_MODULEDEFINITION (ID_, CLASS_, NAME_, PROCESSDEFINITION_, TENANT_) "
+							+ "SELECT ID_, 'E', 'com.soffid.iam.bpm.model.TenantModuleDefinition', ID_, ? "
+							+ "FROM JBPM_PROCESSDEFINITION "
+							+ "WHERE ID_ NOT IN (SELECT PROCESSDEFINITION_ FROM JBPM_MODULEDEFINITION WHERE CLASS_='E')",
+							new Object[] {tenantId});
+
+					executeSentence(conn, "INSERT INTO JBPM_MODULEINSTANCE (ID_, CLASS_, NAME_, PROCESSINSTANCE_, TENANT_, VERSION_) "
+							+ "SELECT ID_, 'E', 'com.soffid.iam.bpm.model.TenantModule', ID_, ?, 1 "
+							+ "FROM JBPM_PROCESSINSTANCE "
+							+ "WHERE ID_ NOT IN (SELECT PROCESSINSTANCE_ FROM JBPM_MODULEINSTANCE WHERE CLASS_='E')",
+							new Object[] {tenantId});
+
 		    	} catch (SQLException e) {
 		    		// Those tables do not exists during test cases
 		    	}
@@ -721,20 +741,28 @@ public class ApplicationBootServiceImpl extends
 		}
 
 		UserType tipUs;
-		Collection<UserType> tus = dominiSvc.findAllUserType();
-		if (tus.size() > 0) {
-			tipUs = tus.iterator().next();
-		} else {
+		HashSet<String> tus2 = new HashSet<String>();
+		for (UserType tus: dominiSvc.findAllUserType())
+		{
+			tus2.add (tus.getCode());
+		}
+		if (!tus2.contains("S"))
+		{
 			tipUs = new UserType();
 			tipUs.setCode("S"); //$NON-NLS-1$
 			tipUs.setDescription("SSO account"); //$NON-NLS-1$
 			dominiSvc.create(tipUs);
 
+		}
+		if (!tus2.contains("I"))
+		{	
 			tipUs = new UserType();
 			tipUs.setCode("E"); //$NON-NLS-1$
 			tipUs.setDescription("External user"); //$NON-NLS-1$
 			dominiSvc.create(tipUs);
-
+		}
+		if (!tus2.contains("E"))
+		{
 			tipUs = new UserType();
 			tipUs.setCode("I"); //$NON-NLS-1$
 			tipUs.setDescription("Internal user"); //$NON-NLS-1$
@@ -1122,6 +1150,7 @@ public class ApplicationBootServiceImpl extends
 			Security.nestedLogoff();
 		}
 	}
+
 }
 
 interface RowProcessor {

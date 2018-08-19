@@ -280,5 +280,4 @@ public class BpmConfigServiceImpl extends BpmConfigServiceBase {
 	protected void handleTenantBoot(Tenant tenant) throws Exception {
 	}
 
-
 }

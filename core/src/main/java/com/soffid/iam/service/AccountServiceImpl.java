@@ -43,6 +43,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
@@ -1922,6 +1923,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

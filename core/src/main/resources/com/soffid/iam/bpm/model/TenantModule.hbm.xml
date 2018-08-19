@@ -10,6 +10,7 @@
             extends="org.jbpm.module.exe.ModuleInstance" 
             discriminator-value="E">
     <property name="tenantId" column="TENANT_" />            
+    <property name="initiator" column="INITIATOR_" />            
   </subclass>
 
 </hibernate-mapping>

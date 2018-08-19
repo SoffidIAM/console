@@ -677,6 +677,7 @@
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='VERSION_' type='BIGINT'/>
 		<column name='TENANT_' type='BIGINT'/>
+		<column name='INITIATOR_' type='VARCHAR' length='128'/>
 	</table>
 
 	<foreignKey name='FK_MODINST_PRCINST' table='JBPM_MODULEINSTANCE' foreignTable='JBPM_PROCESSINSTANCE'>

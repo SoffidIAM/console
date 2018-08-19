@@ -18,7 +18,9 @@ import com.soffid.scimquery.conf.Configuration;
 
 public abstract class AbstractExpression implements Serializable {
 	private static final String ROOT_OBJECT_NAME = "o";
-
+	private static final String ROOT_OBJECT_NAME2 = "p";
+	private boolean oracleWorkaround = false;
+	
 	/**
 	 * Generates HQL Sentence
 	 * @param query
@@ -136,8 +138,8 @@ public abstract class AbstractExpression implements Serializable {
 	{
 		EvaluationContext ctx = new EvaluationContext();
 		ctx.currentBean = query.getClassConfig();
-		ctx.objectName = ROOT_OBJECT_NAME;
-		ctx.hibernatePath.append(ROOT_OBJECT_NAME);
+		ctx.objectName = query.getRootObject();
+		ctx.hibernatePath.append( query.getRootObject() );
 		ctx.beanPath.append(".");
 		ctx.beanPath.append(attributeReference);
 		generateHQLStringReference(query, attributeReference, ctx);
@@ -217,7 +219,7 @@ public abstract class AbstractExpression implements Serializable {
 					if (obj == null)
 					{
 						int number = query.getNextObject();
-						obj = "o"+number;
+						obj = ROOT_OBJECT_NAME +number;
 						query.getObjects().put(obj, ctx.hibernatePath.toString());
 						query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
 					}
@@ -292,7 +294,7 @@ public abstract class AbstractExpression implements Serializable {
 				if (obj == null)
 				{
 					int number = query.getNextObject();
-					obj = "o"+number;
+					obj = ROOT_OBJECT_NAME2+number;
 					query.getObjects().put(obj, ctx.hibernatePath.toString());
 					query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
 				}
@@ -367,14 +369,47 @@ public abstract class AbstractExpression implements Serializable {
 		String hibernateClass = cc.getHibernateClass();
 		
 		HQLQuery query = new HQLQuery(cc);
-		query.getQueryString().append("select distinct ")
+	
+		if (oracleWorkaround)
+			query.setRootObject(ROOT_OBJECT_NAME2);
+		else
+			query.setRootObject(ROOT_OBJECT_NAME);
+		
+		query.getQueryString().append("select ")
 			.append(ROOT_OBJECT_NAME)
 			.append(" from ")
 			.append(hibernateClass)
 			.append(" as ")
 			.append(ROOT_OBJECT_NAME);
 		generateHSQLString(query);
+		
+		if (query.getWhereString().length() > 0 && oracleWorkaround)
+		{
+			StringBuffer where2 = new StringBuffer();
+			where2.append ( ROOT_OBJECT_NAME)
+				.append(".id in (select ")
+				.append(ROOT_OBJECT_NAME2)
+				.append(".id from ")
+				.append(hibernateClass)
+				.append(" as ")
+				.append(ROOT_OBJECT_NAME2)
+				.append(query.getJoinString() )
+				.append(" where ");
+			query.getWhereString().insert(0, where2);
+			query.getWhereString().append(")");
+			
+			query.getJoinString().setLength(0);
+			
+		}
 		return query;
+	}
+
+	public boolean isOracleWorkaround() {
+		return oracleWorkaround;
+	}
+
+	public void setOracleWorkaround(boolean oracleWorkaround) {
+		this.oracleWorkaround = oracleWorkaround;
 	}
 
 }

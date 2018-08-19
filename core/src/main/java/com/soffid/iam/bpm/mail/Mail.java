@@ -264,7 +264,7 @@ public class Mail implements ActionHandler {
 	private InputStream getMailContent ()
 	{
 		Locale locale = MessageFactory.getLocale();
-		
+
 		InputStream in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-custom.html"); //$NON-NLS-1$
@@ -272,6 +272,14 @@ public class Mail implements ActionHandler {
 			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"-custom.html"); //$NON-NLS-1$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"-template.html"); //$NON-NLS-1$
 		return in;
 	}
 

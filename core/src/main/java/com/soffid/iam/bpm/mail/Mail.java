@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.mail.MessagingException;
@@ -177,9 +178,7 @@ public class Mail implements ActionHandler {
 		{
 			if (executionContext.getTaskInstance() != null && 
 					executionContext.getTask() != null &&
-					executionContext.getTaskInstance().getActorId() == null &&
-					(executionContext.getTaskInstance().getPooledActors() == null ||
-						executionContext.getTaskInstance().getPooledActors().isEmpty() ))
+					executionContext.getTaskInstance().getActorId() == null)
 			{
 				recursiveLock.set(this);
 				try {
@@ -269,17 +268,13 @@ public class Mail implements ActionHandler {
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-custom.html"); //$NON-NLS-1$
 		if (in == null)
-			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (in == null)
-			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
-		if (in == null)
 			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"-custom.html"); //$NON-NLS-1$
 		if (in == null)
-			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
-			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"-template.html"); //$NON-NLS-1$
+			in = getClass().getResourceAsStream(template+"-template.html"); //$NON-NLS-1$
 		return in;
 	}
 
@@ -336,9 +331,14 @@ public class Mail implements ActionHandler {
 		VariableResolver variableResolver = JbpmExpressionEvaluator
 				.getUsedVariableResolver();
 		if (variableResolver != null) {
+			Properties prop = new Properties();
+			String externalURL = ConfigurationCache.getProperty("soffid.externalURL");
+			if (externalURL == null)
+				externalURL = ConfigurationCache.getProperty("AutoSSOURL");
+			prop.put("AutoSSOURL", externalURL);
 			variableResolver = new MailVariableResolver(
 					from, to,
-					System.getProperties(),
+					prop,
 					variableResolver);
 		}
 		return (String) JbpmExpressionEvaluator.evaluate(expression,

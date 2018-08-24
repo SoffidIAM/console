@@ -13,6 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
@@ -39,7 +41,8 @@ import org.hibernate.type.Type;
  */
 public class CustomSession implements Session
 {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	private Session proxy;
 	public CustomSession (Session proxy) {
 		this.proxy = proxy;
@@ -167,7 +170,9 @@ public class CustomSession implements Session
 	}
 	public void flush () throws HibernateException
 	{
+//		long t = System.currentTimeMillis();
 		proxy.flush();
+//		log.info("Flush time: "+(System.currentTimeMillis()-t));
 	}
 	public void setFlushMode (FlushMode flushMode)
 	{

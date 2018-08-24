@@ -309,7 +309,7 @@ public class ApplicationBootServiceImpl extends
 			}
 
 			// Create initial tenant data
-			configureTenantDatabase();
+			configureTenantDatabase("master");
 
 			if (version < 101) { //$NON-NLS-1$
 				cfg.setValue("101"); //$NON-NLS-1$
@@ -341,7 +341,7 @@ public class ApplicationBootServiceImpl extends
 	}
 
 
-	private void configureTenantDatabase() throws SystemException,
+	private void configureTenantDatabase(String tenantName) throws SystemException,
 			NotSupportedException, InternalErrorException, RollbackException,
 			HeuristicMixedException, HeuristicRollbackException,
 			NeedsAccountNameException, AccountAlreadyExistsException,
@@ -353,6 +353,20 @@ public class ApplicationBootServiceImpl extends
 		if (firstSetup) {
 			createInitialData();
 			configureDocumentManager();
+			
+			String externalURL = ConfigurationCache.getMasterProperty("AutoSSOURL");
+			if (externalURL != null)
+			{
+				try {
+					URL u = new URL(externalURL);
+					URL u2 = new URL (u.getProtocol(), tenantName+"."+u.getHost(), u.getPort(), u.getFile());
+					cfg  = new Configuration ("AutoSSOURL", u2.toExternalForm());
+					configSvc.create(cfg);
+				} catch (Exception e) {
+					log.warn("Error parsing url "+externalURL, e);
+				}
+			}
+			
 			cfg = new Configuration("tenantVersionLevel", "101"); //$NON-NLS-1$ //$NON-NLS-2$
 			configSvc.create(cfg);
 		} 
@@ -1145,7 +1159,7 @@ public class ApplicationBootServiceImpl extends
 		
 		Security.nestedLogin(tenant.getName(),  "Anonymous", Security.ALL_PERMISSIONS);
 		try {
-			configureTenantDatabase();
+			configureTenantDatabase(tenant.getName());
 		} finally {
 			Security.nestedLogoff();
 		}

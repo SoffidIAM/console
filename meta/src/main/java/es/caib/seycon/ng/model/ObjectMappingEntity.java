@@ -43,8 +43,8 @@ public abstract class ObjectMappingEntity {
 	@Column (name="OBM_DIS_ID", translated="system")
 	public es.caib.seycon.ng.model.DispatcherEntity dispatcher;
 
-	@Column (name="OBM_AUTHOR")
-	public boolean authoritative;
+//	@Column (name="OBM_AUTHOR")
+//	public boolean authoritative;
 
 	@ForeignKey (foreignColumn="ATM_OBM_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AttributeMappingEntity> attributeMappings;

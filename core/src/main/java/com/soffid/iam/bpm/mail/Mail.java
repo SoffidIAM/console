@@ -250,8 +250,8 @@ public class Mail implements ActionHandler {
 					}
 					send(from, 
 							Collections.singleton(recipient), 
-							evaluate(subject, recipient.getPersonal(), fromDescription), 
-							evaluate (text, recipient.getPersonal(), fromDescription));
+							evaluate(subject, fromDescription, recipient.getPersonal()), 
+							evaluate (text, fromDescription, recipient.getPersonal()));
 				}
 			}
 		} finally {
@@ -341,9 +341,11 @@ public class Mail implements ActionHandler {
 					prop,
 					variableResolver);
 		}
-		return (String) JbpmExpressionEvaluator.evaluate(expression,
+		String s = (String) JbpmExpressionEvaluator.evaluate(expression,
 				executionContext, variableResolver,
 				JbpmExpressionEvaluator.getUsedFunctionMapper());
+		log.info("Result: "+s);
+		return s;
 	}
 
 	private void sendCustomMail() throws IOException,
@@ -397,8 +399,8 @@ public class Mail implements ActionHandler {
 					}
 					send(from, 
 							Collections.singleton(user), 
-							evaluate(subject, user.getPersonal(), fromDescription), 
-							evaluate (text, user.getPersonal(), fromDescription));
+							evaluate(subject, fromDescription, user.getPersonal()), 
+							evaluate (text, fromDescription, user.getPersonal()));
 				}
 			}
 			if (actors != null)

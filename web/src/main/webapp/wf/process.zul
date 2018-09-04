@@ -43,7 +43,7 @@
 					</form>
 				</tabpanel>
 				<tabpanel id="tareas" style="overflow:auto"> 
-					<tree id="listadoTareas" mold="paging" width="100%" style="min-height: 0">
+					<tree id="listadoTareas" width="100%" style="min-height: 0">
 							<treecols>
 								<treecol label="${c:l('process.lblIdentificador')}" />
 								<treecol label="${c:l('llistesCorreu.zul.Descripcia-2')}" />

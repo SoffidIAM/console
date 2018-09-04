@@ -9,7 +9,7 @@
 	<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" > 
 	
 	
-	<window id="identityWindow" closable="true" position="center, center"
+	<window id="identityWindow" closable="false" position="center, center"
 		sizable="false" 
 		style="min-width: 60em; width:60%"
 		title="${c:l('identity.title')}" 

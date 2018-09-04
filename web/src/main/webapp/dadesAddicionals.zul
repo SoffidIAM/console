@@ -421,11 +421,12 @@
 								<textbox width="90%" visible="true" bind="@validationExpression" rows="4"/>
 								<imageclic src="/img/pencil.png" width="1em" >
 									<attribute name="onClick"><![CDATA[
+									    com.soffid.iam.api.CustomObjectType type = XPathUtils.getValue( objectTypeWindow.getFellow("form"), ".").getInstance();
 									    Events.sendEvent(new Event ("onEdit", 
 									    		desktop.getPage("editor").getFellow("top"),
 									    		new Object[] {
 													    event.getTarget().getPreviousSibling(),
-													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars()
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(type)
 												}
 									    ));
 									]]></attribute>

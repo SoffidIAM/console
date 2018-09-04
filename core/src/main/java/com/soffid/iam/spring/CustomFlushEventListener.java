@@ -1,9 +1,11 @@
 package com.soffid.iam.spring;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,9 +18,11 @@ import org.hibernate.engine.ActionQueue;
 import org.hibernate.engine.Cascade;
 import org.hibernate.engine.CascadingAction;
 import org.hibernate.engine.CollectionEntry;
+import org.hibernate.engine.CollectionKey;
 import org.hibernate.engine.Collections;
 import org.hibernate.engine.EntityEntry;
 import org.hibernate.engine.PersistenceContext;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.Status;
 import org.hibernate.event.EventSource;
 import org.hibernate.event.FlushEntityEvent;
@@ -47,7 +51,7 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 	 * @param event The flush event.
 	 * @throws HibernateException Error flushing caches to execution queues.
 	 */
-	protected void flushEverythingToExecutions(FlushEvent event) throws HibernateException {
+	protected List<Map.Entry> newFlushEverythingToExecutions(FlushEvent event) throws HibernateException {
 
 		log.trace("flushing session");
 		
@@ -60,7 +64,7 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 		// we could move this inside if we wanted to
 		// tolerate collection initializations during
 		// collection dirty checking:
-		prepareCollectionFlushes(session);
+		List<Map.Entry>collections = prepareCollectionFlushes(session);
 		// now, any collections that are initialized
 		// inside this block do not get updated - they
 		// are ignored until the next flush
@@ -68,7 +72,7 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 		persistenceContext.setFlushing(true);
 		try {
 			flushEntities(event);
-			flushCollections(session);
+			flushCollections(session, collections);
 		}
 		finally {
 			persistenceContext.setFlushing(false);
@@ -93,6 +97,8 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 					session.getEntityMode() 
 				);
 		}
+		
+		return collections;
 	}
 
 	/**
@@ -147,22 +153,26 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 	 * Initialize the flags of the CollectionEntry, including the
 	 * dirty check.
 	 */
-	private void prepareCollectionFlushes(EventSource session) throws HibernateException {
+	private List<Map.Entry> prepareCollectionFlushes(EventSource session) throws HibernateException {
 		Collection<Object> entities = CustomSession.getDirtyEntities( session );
-
+		List<Map.Entry>collections = new LinkedList<Map.Entry>();
 		// Initialize dirty flags for arrays + collections with composite elements
 		// and reset reached, doupdate, etc.
 		
 		log.debug("dirty checking collections");
 
-		final List list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
-		final int size = list.size();
-		for ( int i = 0; i < size; i++ ) {
-			Map.Entry e = ( Map.Entry ) list.get( i );
+		final List<Map.Entry> list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
+//		final int size = list.size();
+		for ( Map.Entry e: list ) {
 			CollectionEntry collectionEntry = (CollectionEntry) e.getValue();
 			PersistentCollection key = (PersistentCollection) e.getKey();
-			collectionEntry.preFlush( key );
+			if (key.getOwner() == null || (entities != null && entities.contains( key.getOwner()) ))
+			{
+				collectionEntry.preFlush( key );
+				collections.add(e);
+			}
 		}
+		return collections;
 	}
 
 	/**
@@ -215,35 +225,25 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 	/**
 	 * process any unreferenced collections and then inspect all known collections,
 	 * scheduling creates/removes/updates
+	 * @param collections 
 	 */
-	private void flushCollections(EventSource session) throws HibernateException {
+	private void flushCollections(EventSource session, List<Entry> collections) throws HibernateException {
 		Collection<Object> entities = CustomSession.getDirtyEntities( session );
 
 		log.trace("Processing unreferenced collections");
 
-		List list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
-		int size = list.size();
-		for ( int i = 0; i < size; i++ ) {
-			Map.Entry me = ( Map.Entry ) list.get( i );
+//		final List<Map.Entry> list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
+//		final int size = list.size();
+		for ( Map.Entry me: collections ) {
 			CollectionEntry ce = (CollectionEntry) me.getValue();
 			if ( !ce.isReached() && !ce.isIgnore() ) {
 				PersistentCollection coll = (PersistentCollection) me.getKey();
-				if (entities != null && entities.contains(coll.getOwner()))
-				{
-					EntityEntry entry = session.getPersistenceContext().getEntry(coll.getOwner());
-					if (entry != null)
-						Collections.processUnreachableCollection( coll, session );
-					else
-					{
-						throw new HibernateException ("Dirty collection owner "+coll.getOwner().toString()+" not found in session");
-					}
-				}
+				EntityEntry entry = session.getPersistenceContext().getEntry(coll.getOwner());
+				if (entry != null)
+					Collections.processUnreachableCollection( coll, session );
 				else
 				{
-					ce.setDoupdate(false);
-					ce.setDorecreate(false);
-					ce.setDoremove(false);
-					ce.setReached(true);
+					throw new HibernateException ("Dirty collection owner "+coll.getOwner().toString()+" not found in session");
 				}
 			}
 		}
@@ -252,56 +252,47 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 
 		log.trace( "Scheduling collection removes/(re)creates/updates" );
 
-		list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
-		size = list.size();
+//		list = IdentityMap.entries( session.getPersistenceContext().getCollectionEntries() );
 		ActionQueue actionQueue = session.getActionQueue();
-		for ( int i = 0; i < size; i++ ) {
-			Map.Entry me = (Map.Entry) list.get(i);
+//		final int size = list.size();
+		for ( Map.Entry me: collections ) {
 			PersistentCollection coll = (PersistentCollection) me.getKey();
 			CollectionEntry ce = (CollectionEntry) me.getValue();
 			
-			if (  coll.getOwner() == null || (entities != null && entities.contains(  coll.getOwner() )))
-//			if ( ! ce.isProcessed() )
-			{
-				
-	
-				if ( ce.isDorecreate() ) {
-					session.getInterceptor().onCollectionRecreate( coll, ce.getCurrentKey() );
-					actionQueue.addAction(
-							new CollectionRecreateAction( 
-									coll, 
-									ce.getCurrentPersister(), 
-									ce.getCurrentKey(), 
-									session 
-								)
-						);
-				}
-				if ( ce.isDoremove() ) {
-					session.getInterceptor().onCollectionRemove( coll, ce.getLoadedKey() );
-					actionQueue.addAction(
-							new CollectionRemoveAction( 
-									coll,
-									ce.getLoadedPersister(), 
-									ce.getLoadedKey(), 
-									ce.isSnapshotEmpty(coll), 
-									session 
-								)
-						);
-				}
-				if ( ce.isDoupdate() ) {
-					session.getInterceptor().onCollectionUpdate( coll, ce.getLoadedKey() );
-					actionQueue.addAction(
-							new CollectionUpdateAction( 
-									coll, 
-									ce.getLoadedPersister(), 
-									ce.getLoadedKey(), 
-									ce.isSnapshotEmpty(coll), 
-									session 
-								)
-						);
-				}
-			} else {
-				ce.setProcessed(true);
+			if ( ce.isDorecreate() ) {
+				session.getInterceptor().onCollectionRecreate( coll, ce.getCurrentKey() );
+				actionQueue.addAction(
+						new CollectionRecreateAction( 
+								coll, 
+								ce.getCurrentPersister(), 
+								ce.getCurrentKey(), 
+								session 
+							)
+					);
+			}
+			if ( ce.isDoremove() ) {
+				session.getInterceptor().onCollectionRemove( coll, ce.getLoadedKey() );
+				actionQueue.addAction(
+						new CollectionRemoveAction( 
+								coll,
+								ce.getLoadedPersister(), 
+								ce.getLoadedKey(), 
+								ce.isSnapshotEmpty(coll), 
+								session 
+							)
+					);
+			}
+			if ( ce.isDoupdate() ) {
+				session.getInterceptor().onCollectionUpdate( coll, ce.getLoadedKey() );
+				actionQueue.addAction(
+						new CollectionUpdateAction( 
+								coll, 
+								ce.getLoadedPersister(), 
+								ce.getLoadedKey(), 
+								ce.isSnapshotEmpty(coll), 
+								session 
+							)
+					);
 			}
 		}
 
@@ -318,9 +309,9 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 		final EventSource source = event.getSession();
 		if ( source.getPersistenceContext().hasNonReadOnlyEntities() ) {
 			
-			flushEverythingToExecutions(event);
+			List<Map.Entry>collections = newFlushEverythingToExecutions(event);
 			performExecutions(source);
-			postFlush(source);
+			postFlush(source, collections);
 		
 			if ( source.getFactory().getStatistics().isStatisticsEnabled() ) {
 				source.getFactory().getStatisticsImplementor().flush();
@@ -328,6 +319,50 @@ public class CustomFlushEventListener extends DefaultFlushEventListener {
 			Collection<Object> l = CustomSession.getDirtyEntities(event.getSession());
 			if (l != null) l.clear();
 		}
+	}
+
+	/**
+	 * 1. Recreate the collection key -> collection map
+	 * 2. rebuild the collection entries
+	 * 3. call Interceptor.postFlush()
+	 * @param collections 
+	 */
+	protected void postFlush(EventSource session, List<Entry> collections) throws HibernateException {
+
+		log.trace( "post flush" );
+
+		final PersistenceContext persistenceContext = session.getPersistenceContext();
+//		persistenceContext.getCollectionsByKey().clear();
+		persistenceContext.getBatchFetchQueue()
+				.clearSubselects(); //the database has changed now, so the subselect results need to be invalidated
+
+		Collection<Object> entities = CustomSession.getDirtyEntities( session );
+		Iterator iter = collections.iterator();
+		while ( iter.hasNext() ) {
+			Map.Entry me = (Map.Entry) iter.next();
+			CollectionEntry collectionEntry = (CollectionEntry) me.getValue();
+			PersistentCollection persistentCollection = (PersistentCollection) me.getKey();
+			collectionEntry.postFlush(persistentCollection);
+			if ( collectionEntry.getLoadedPersister() == null ) {
+				//if the collection is dereferenced, remove from the session cache
+				//iter.remove(); //does not work, since the entrySet is not backed by the set
+				persistenceContext.getCollectionEntries()
+						.remove(persistentCollection);
+			}
+			else {
+				//otherwise recreate the mapping between the collection and its key
+				CollectionKey collectionKey = new CollectionKey( 
+						collectionEntry.getLoadedPersister(), 
+						collectionEntry.getLoadedKey(), 
+						session.getEntityMode() 
+					);
+				persistenceContext.getCollectionsByKey()
+						.put(collectionKey, persistentCollection);
+			}
+		}
+		
+		session.getInterceptor().postFlush( new LazyIterator( persistenceContext.getEntitiesByKey() ) );
+
 	}
 
 }

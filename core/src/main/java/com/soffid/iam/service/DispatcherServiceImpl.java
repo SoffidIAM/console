@@ -264,13 +264,15 @@ public class DispatcherServiceImpl extends
 			// Obtenim el nou entity
 			SystemEntity entity = getSystemEntityDao().systemToEntity(dispatcher);
 			entity.setTimeStamp(new Date());
-	
+			
 			updateAutomaticTasks(dispatcher, false);
 	
 			updateTipusAndGrups(dispatcher, entity);
 	
 			updateServers();
 	
+			getSystemEntityDao().update(entity);
+			
 			return getSystemEntityDao().toSystem(entity);
 		} finally {
 			getTaskEntityDao().finishVirtualSourceTransaction(t);

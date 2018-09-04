@@ -275,7 +275,9 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 		{
 			this.inputStream.close();
 			getNASManager().cleanTemporaryResources();
-			
+
+			if (this.tempFile != null)
+				this.tempFile.delete();
 			this.inputStream= null;
 			this.tempFile= null;
 		}

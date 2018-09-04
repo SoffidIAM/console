@@ -1788,6 +1788,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 				try {
 					if (ba != null)
 						return new String(ba, "UTF-8"); //$NON-NLS-1$
+					else
+						log.warn("Cannot get resource "+url);
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -1809,6 +1811,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					}
 				}
 			}
+			log.warn("Cannot get resource "+name);
 			return null;
 		} finally {
 			flushContext(context);
@@ -1860,6 +1863,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 					return ui.getFileName();
 			} catch (PatternSyntaxException e) {
 				// Ignore
+			}
+		}
+		log.warn("Cannot get UI definition for "+taskName);
+		for (Iterator it = resultado.iterator(); it.hasNext();) {
+			UserInterface ui = (UserInterface) it.next();
+			try {
+				if (ui.getTarea().equals(taskName)
+						|| Pattern.matches(ui.getTarea(), taskName))
+					return ui.getFileName();
+				log.warn("Miss pattern "+ui.getTarea());
+			} catch (PatternSyntaxException e) {
+				log.warn("Wrong pattern "+ui.getTarea());
 			}
 		}
 		return null;
@@ -2989,8 +3004,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 			flushContext(context);
 		}
 
-		deployProcessParDefinition(f);
-		f.delete();
+		try {
+			deployProcessParDefinition(f);
+		} finally {
+			f.delete();
+		}
 	}
 
 	/**

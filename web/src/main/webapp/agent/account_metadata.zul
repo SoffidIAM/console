@@ -76,9 +76,9 @@
 									<imageclic align="center" src="~./img/list-add.gif">
 										<attribute name="onClick"><![CDATA[
 				if (canModifyMetadata) {
-					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(form);
-					es.caib.seycon.ng.comu.TipusDada tda = XPathUtils.getValue(ctx, ".").getInstance();
-					XPathUtils.createPath(ctx.getDataSource(), "/values", "");
+					es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
+//					es.caib.seycon.ng.comu.TipusDada tda = XPathUtils.getValue(ctx, ".").getInstance();
+					XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath(), "");
 				}
 				]]>
 														</attribute>

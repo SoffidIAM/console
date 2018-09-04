@@ -60,7 +60,7 @@ public class DatabaseStrategy implements CommunicationStrategy {
 				{
 					if (f == null)
 					{
-						f = File.createTempFile("doc", "tmp");
+						f = File.createTempFile("doc", ".tmp");
 						out = new FileOutputStream (f);
 					}
 					out.write(db.getContent());

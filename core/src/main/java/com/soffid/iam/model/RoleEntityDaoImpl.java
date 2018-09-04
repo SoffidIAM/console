@@ -459,6 +459,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		if (RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus()))
 			deleteRolDependency(entity);
 		entity.setMandatory(grant.getMandatory());
+		getRoleDependencyEntityDao().update(entity);
 	}
 
 	public void remove(com.soffid.iam.model.RoleEntity Role)

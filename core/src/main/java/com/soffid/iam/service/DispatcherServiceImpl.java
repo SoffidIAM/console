@@ -262,18 +262,18 @@ public class DispatcherServiceImpl extends
 					entityOld.getSystemGroup());
 	
 			// Obtenim el nou entity
-			SystemEntity entity = getSystemEntityDao().systemToEntity(dispatcher);
-			entity.setTimeStamp(new Date());
+			getSystemEntityDao().systemToEntity(dispatcher, entityOld, true);
+			entityOld.setTimeStamp(new Date());
 			
 			updateAutomaticTasks(dispatcher, false);
 	
-			updateTipusAndGrups(dispatcher, entity);
+			updateTipusAndGrups(dispatcher, entityOld);
 	
 			updateServers();
 	
-			getSystemEntityDao().update(entity);
+			getSystemEntityDao().update(entityOld);
 			
-			return getSystemEntityDao().toSystem(entity);
+			return getSystemEntityDao().toSystem(entityOld);
 		} finally {
 			getTaskEntityDao().finishVirtualSourceTransaction(t);
 		}
@@ -360,15 +360,15 @@ public class DispatcherServiceImpl extends
 			}
 			log.info("Updated " + l + " users");
 		}
-		if (tipusUsuariToGenerateAccounts != null
-				&& !tipusUsuariToGenerateAccounts.isEmpty())
-			if (dispatcher.getUrl() != null)
-			{
-				
-				String status = ConfigurationCache.getProperty("soffid.task.mode");
-				if (! "readonly".equals( status ) && ! "manual".equals( status ))
-					handlePorpagateUsersDispatcher(dispatcher.getName());
-			}
+//		if (tipusUsuariToGenerateAccounts != null
+//				&& !tipusUsuariToGenerateAccounts.isEmpty())
+//			if (dispatcher.getUrl() != null)
+//			{
+//				
+//				String status = ConfigurationCache.getProperty("soffid.task.mode");
+//				if (! "readonly".equals( status ) && ! "manual".equals( status ))
+//					handlePorpagateUsersDispatcher(dispatcher.getName());
+//			}
 	}
 
 	private void generateUpdateUser(String usuari, String dispatcher)

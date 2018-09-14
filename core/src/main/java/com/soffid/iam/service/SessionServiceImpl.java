@@ -153,8 +153,6 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         }
         sessio.setWebHandler(url);
         
-        getSessionEntityDao().create(sessio);
-        
         ServiceEntityDao seDao = getServiceEntityDao(); 
         ServiceEntity se = seDao.findByName("sso"); //$NON-NLS-1$
         if (se == null) {
@@ -183,6 +181,8 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         
 
         sessio.setLoginLogInfo(ra);
+        getSessionEntityDao().create(sessio);
+        
         Session svo = getSessionEntityDao().toSession(sessio);
         svo.setKey(sessio.getKey());
         svo.setTemporaryKey(sessio.getNewKey());
@@ -248,9 +248,12 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     @Override
     protected void handleDestroySession(Session sessio) throws Exception {
         SessionEntity se = getSessionEntityDao().load(sessio.getId());
-        
-        se.getLoginLogInfo().setEndDate(new Date());
-        getAccessLogEntityDao().update(se.getLoginLogInfo());
+
+        if (se.getLoginLogInfo() != null)
+        {
+        	se.getLoginLogInfo().setEndDate(new Date());
+        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+        }
         getSessionEntityDao().remove(se);
     }
 

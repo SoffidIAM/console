@@ -290,7 +290,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 						
 				}
 				if ( ! found )
-					createRoleDependency(grant);
+					createRoleDependency(grant, true);
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
@@ -351,7 +351,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 						
 				}
 				if ( ! found )
-					createRoleDependency(grant);
+					createRoleDependency(grant, false);
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
@@ -360,7 +360,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 	}
 	 
-	private void createRoleDependency(RoleGrant grant) throws InternalErrorException, BPMException {
+	private void createRoleDependency(RoleGrant grant, boolean checkGranteeCycles) throws InternalErrorException, BPMException {
 		StringBuffer path = new StringBuffer();
 
 		RoleEntity ownerRole = grant.getOwnerRole() != null? 
@@ -377,7 +377,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			throw new InternalErrorException("Invalid owned role");
         grant.setRoleId(ownedRole.getId());
         
-        if (checkNoCycles( grant, path)) {
+        if (checkNoCycles( grant, path, checkGranteeCycles)) {
         	RoleDependencyEntity entity = getRoleDependencyEntityDao().newRoleDependencyEntity();
         	
         	getRoleDependencyEntityDao().roleGrantToEntity(grant, entity, true);
@@ -1306,10 +1306,18 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	}
 
     private boolean checkNoCycles(
-            RoleGrant grant, StringBuffer cami) {
+            RoleGrant grant, StringBuffer cami, boolean checkGranteeCycles) {
         RoleEntity contingut = load ( grant.getRoleId());
         RoleEntity pare = load (grant.getOwnerRole());
 
+        if (grant.getRoleId().equals(grant.getOwnerRole()))
+        {
+        	cami.append(contingut.getName())
+        		.append(" <=> ")
+        		.append(contingut.getName()); //$NON-NLS-1$
+       		return false;
+        }
+        	
         // Método: Para todo T,D / T & D son RoleEntity
         // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
         // (versión breve)
@@ -1317,27 +1325,32 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         //
         // Obtenemos dónde está contenido el padre (el contenedor del Role)
         // return true;
-        cami.append(contingut.getName() + " => "); //$NON-NLS-1$
-        return checkNoCycles(contingut, pare, cami);
+        if (checkGranteeCycles)
+        	cami.append(contingut.getName() + " <= "); //$NON-NLS-1$
+        else
+        	cami.append(contingut.getName() + " => "); 
+        return checkNoCycles(contingut, pare, cami, checkGranteeCycles);
     }
 
     private boolean checkNoCycles(RoleEntity fill,
-            RoleEntity pare, StringBuffer cami) {
-        Collection pareEsContingut = pare.getContainerRoles();
+            RoleEntity pare, StringBuffer cami, boolean checkGranteeCycles) {
+        Collection pareEsContingut = checkGranteeCycles ? pare.getContainerRoles() : fill.getContainedRoles();
         boolean senseCicles = true;
-        cami.append(pare.getName() + " => "); //$NON-NLS-1$
-        for (Iterator it = pareEsContingut.iterator(); senseCicles
-                && it.hasNext();) {
+        cami.append(pare.getName());
+        if (checkGranteeCycles) cami.append(" <= "); //$NON-NLS-1$
+        else cami.append(" => "); //$NON-NLS-1$
+        int len = cami.length();
+        for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext();) {
+        	cami.setLength(len);
             RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
-            RoleEntity parePare = relacio.getContainer();
+            RoleEntity parePare = checkGranteeCycles ? relacio.getContainer(): relacio.getContained();
             if (parePare.equals(fill)) {
-                senseCicles = false;
                 cami.append(parePare.getName());
-                return false; // S'ha trobat un cicle
+                senseCicles = false;
             } else {
                 // Verificamos la descendencia del contenedor (padre)
                 senseCicles = checkNoCycles(fill, parePare,
-                        cami);
+                        cami, checkGranteeCycles);
             }
         }
         return senseCicles;

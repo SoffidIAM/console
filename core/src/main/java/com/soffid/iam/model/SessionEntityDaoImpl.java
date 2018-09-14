@@ -31,26 +31,6 @@ import java.util.Iterator;
 public class SessionEntityDaoImpl extends
 		com.soffid.iam.model.SessionEntityDaoBase {
 
-	public void create(com.soffid.iam.model.SessionEntity sessio) throws RuntimeException {
-		try {
-			super.create(sessio);
-			getSession(false).flush();
-		} catch (Throwable e) {
-			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("SessionEntityDaoImpl.0"), sessio.getHost().getName(), sessio.getClientHost().getName(), message));
-		}
-	}
-
-	public void remove(com.soffid.iam.model.SessionEntity sessio) throws RuntimeException {
-		try {
-			super.remove(sessio);
-			getSession(false).flush();
-		} catch (Throwable e) {
-			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("SessionEntityDaoImpl.1"), sessio.getHost().getName(), sessio.getClientHost().getName(), message));
-		}
-	}
-
 	public void toSession(com.soffid.iam.model.SessionEntity sourceEntity, com.soffid.iam.api.Session targetVO) {
 		super.toSession(sourceEntity, targetVO);
 		toSessioCustom(sourceEntity, targetVO);
@@ -82,7 +62,8 @@ public class SessionEntityDaoImpl extends
 		}
 		targetVO.setUserName(sourceEntity.getUser().getUserName());
 		targetVO.setUserFullName(sourceEntity.getUser().getFullName());
-		targetVO.setAccessLogId(sourceEntity.getLoginLogInfo().getId());
+		if (sourceEntity.getLoginLogInfo() != null)
+			targetVO.setAccessLogId(sourceEntity.getLoginLogInfo().getId());
 	}
 
 	/**

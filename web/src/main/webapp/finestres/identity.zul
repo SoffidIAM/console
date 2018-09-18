@@ -9,7 +9,7 @@
 	<div xmlns:h="http://www.w3.org/1999/xhtml" width="100%" > 
 	
 	
-	<window id="identityWindow" closable="false" position="center, center"
+	<window id="identityWindow" closable="true" position="center, center"
 		sizable="false" 
 		style="min-width: 60em; width:60%"
 		title="${c:l('identity.title')}" 
@@ -80,6 +80,9 @@
 		String currentRolePrefix = null;
 		boolean grantMode = false;
 		
+		page.setVariable("singleIdentity", false);
+		page.setVariable("wildcardDomain", false);
+		
 		boolean fetchAsyncData ( com.soffid.iam.api.AsyncList list, int[] position, String tag) {
 			boolean any = false;
 			if (list != null)
@@ -116,8 +119,9 @@
 
 		}
 		
-		void start () {		                  
-			identityWindow.setTitle( title );
+		void start () {
+			if (title != null && title != void)
+				identityWindow.setTitle( title );
 			identityWindow.doHighlighted();
 			selected.getChildren().clear();
 			if ( currentIdentities != null && currentIdentities != void)
@@ -189,6 +193,10 @@
 			selected.appendChild(id.generateTag(true) );
 			textbox.focus();
 			textbox.setSelectionRange(0, textbox.getText().length());
+			if (singleIdentity)
+			{
+				accept();
+			}
 		}
 		
 		void search(String t) throws Exception
@@ -284,6 +292,12 @@
 
 				String t2 = t.substring(currentRolePrefix.length());
 				searchCriteria = t2;
+				if (wildcardDomain && t2.isEmpty() && ! currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.SENSE_DOMINI))
+				{
+					com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(currentRole, 
+							new com.soffid.iam.api.DomainValue());
+					ids.add(id);				
+				}
 				if (currentRole.getDomain().getExternalCode() != null)
 				{
 					searchDomainValues (currentRole.getDomain(), t2, ids);
@@ -319,6 +333,7 @@
 		                  
 		void searchDomainValues (com.soffid.iam.api.Domain domain, String t, List ids) {
 			domainValueListPosition[0] = 0;
+			domainValueList = new LinkedList();
 			domainValueList = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByTextAsync(domain, t);
 			timer.start();
 		}

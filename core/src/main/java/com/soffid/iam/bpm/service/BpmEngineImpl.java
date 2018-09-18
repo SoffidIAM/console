@@ -120,6 +120,7 @@ import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 import com.soffid.iam.bpm.service.impl.UserContextCache;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.iam.model.SystemEntity;
@@ -2929,7 +2930,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 			p.add(new Parameter("givenName", givenName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			clauses.add("upper(concat(usuari.lastName,' ',usuari.middleName)) like :surName"); //$NON-NLS-1$
+			if ( new CustomDialect().isOracle() )
+				clauses.add("upper ( usuari.lastName ) like :surName"); //$NON-NLS-1$
+			else
+				clauses.add("upper(concat(usuari.lastName,' ',usuari.middleName)) like :surName"); //$NON-NLS-1$
 			p.add(new Parameter("surName", surName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (group != null) {

@@ -38,7 +38,7 @@ public class LocalFileSystemStrategy implements CommunicationStrategy
 
 		archivo = new File(this.rootPath, path);
 
-		return archivo;
+		return new DoNotDeleteFile(archivo);
 	}
 
 	/**

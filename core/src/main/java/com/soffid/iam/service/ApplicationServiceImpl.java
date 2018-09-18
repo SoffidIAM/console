@@ -2245,6 +2245,7 @@ public class ApplicationServiceImpl extends
 		{
 			Object v = app.getAttributes().get(att.getMetadata().getName());
 			att.setObjectValue(v);
+			getApplicationAttributeEntityDao().update(att);
 			keys.remove(att.getMetadata().getName());
 		}
 		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
@@ -2300,6 +2301,7 @@ public class ApplicationServiceImpl extends
 		{
 			Object v = app.getAttributes().get(att.getMetadata().getName());
 			att.setObjectValue(v);
+			getRoleAttributeEntityDao().update(att);
 			keys.remove(att.getMetadata().getName());
 		}
 		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);

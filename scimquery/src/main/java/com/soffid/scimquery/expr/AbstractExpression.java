@@ -375,8 +375,10 @@ public abstract class AbstractExpression implements Serializable {
 		else
 			query.setRootObject(ROOT_OBJECT_NAME);
 		
-		query.getQueryString().append("select ")
-			.append(ROOT_OBJECT_NAME)
+		query.getQueryString().append("select ");
+		if ( !oracleWorkaround)
+			query.getQueryString().append("distinct ");
+		query.getQueryString().append(ROOT_OBJECT_NAME)
 			.append(" from ")
 			.append(hibernateClass)
 			.append(" as ")

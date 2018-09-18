@@ -62,3 +62,9 @@ public abstract class ContrasenyaEntity {
 	 return null;
 	}
 }
+
+@Index(name="SC_CONTRA_ORDRE_UK", unique=true, columns= {"CTR_IDUSU", "CTR_ORDRE"}, entity=ContrasenyaEntity.class)
+class ContrasenyaEntityOrderUK
+{
+	
+}

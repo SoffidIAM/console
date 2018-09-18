@@ -39,31 +39,40 @@ public class JCSCacheProvider implements CacheProvider
 	private CacheAccess<Object, Object> cache;
 
 	public JCSCacheProvider() throws FileNotFoundException, IOException {
-		Properties p = new Properties ();
-		try {
-			String propTxt = System.getProperty("soffid.cache.config");
-			String propTxtFile = System.getProperty("soffid.cache.configFile");
-			if (propTxtFile != null)
-				p.load( new FileInputStream(propTxtFile));
-			else if (propTxt == null)
-				p.load( getClass().getResourceAsStream("jcs.properties"));
-			else
-				p.load( new StringReader(propTxt));
-		} catch (IOException e) {
-			throw new HibernateException(e);
-		}
-		
-		String cacheDir = null;
-		if ( Security.isSyncServer())
-			cacheDir =  Config.getConfig().getHomeDir()+"/tmp/cache";
-		else
-			cacheDir = System.getProperty("catalina.home")+"/work/cache";
-		new File(cacheDir).mkdirs();
-		
-		p.put("cs.auxiliary.DC.attributes.DiskPath", cacheDir);		
-		JCS.setConfigProperties(p);
+		init();
 		
 		cache = JCS.getInstance("default");
+	}
+
+	private static boolean initialised = false;
+	
+	private static void init() throws IOException, FileNotFoundException {
+		if (!initialised)
+		{
+			Properties p = new Properties ();
+			try {
+				String propTxt = System.getProperty("soffid.cache.config");
+				String propTxtFile = System.getProperty("soffid.cache.configFile");
+				if (propTxtFile != null)
+					p.load( new FileInputStream(propTxtFile));
+				else if (propTxt == null || propTxt.isEmpty())
+					p.load( JCSCacheProvider.class.getResourceAsStream("jcs.properties"));
+				else
+					p.load( new StringReader(propTxt));
+			} catch (IOException e) {
+				throw new HibernateException(e);
+			}
+			
+			String cacheDir = null;
+			if ( Security.isSyncServer())
+				cacheDir =  Config.getConfig().getHomeDir()+"/tmp/cache";
+			else
+				cacheDir = System.getProperty("catalina.home")+"/work/cache";
+			new File(cacheDir).mkdirs();
+			
+			p.put("cs.auxiliary.DC.attributes.DiskPath", cacheDir);		
+			JCS.setConfigProperties(p);
+		}
 	}
 
 	@Override
@@ -89,11 +98,16 @@ public class JCSCacheProvider implements CacheProvider
 		return true;
 	}
 	
-	public static <K,V> ICacheAccess<K, V> buildCache (String regionName)
+	public static <K,V> ICacheAccess<K, V> buildCache (String regionName) 
 	{
-		if (isEnabled())
+		try {
+			init();
+		} catch (IOException e) {
+			throw new RuntimeException("Error initializing java cache", e);
+		}
+		if (isEnabled() || ! Security.isSyncServer())
 			return JCS.getInstance(regionName);
 		else
-			return new DummyCache<K,V>();
+			return new DummyCache<K, V>();
 	}
 }

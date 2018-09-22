@@ -313,6 +313,7 @@ public class SAMLServiceInternal {
 			requestEntity.setUser(user);
 			requestEntity.setFinished(true);
 			requestEntity.setKey(sb.toString());
+			requestDao.update(requestEntity);
 			return new String[]{requestEntity.getExternalId(), sb.toString()};
 		}
 		log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");

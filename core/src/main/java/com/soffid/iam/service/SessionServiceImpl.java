@@ -168,7 +168,7 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         ra.setSystem(hostName);
         ra.setStartDate(new Date());
         ra.setEndDate(null);
-        ra.setSessionId(sessio.getId().toString());
+        ra.setSessionId("-");
         ra.setProtocol(se);
         ra.setServer(me);
         ra.setAccessType("L"); //$NON-NLS-1$
@@ -182,6 +182,9 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
 
         sessio.setLoginLogInfo(ra);
         getSessionEntityDao().create(sessio);
+        
+        ra.setSessionId(sessio.getId().toString());
+        getAccessLogEntityDao().update(ra);
         
         Session svo = getSessionEntityDao().toSession(sessio);
         svo.setKey(sessio.getKey());

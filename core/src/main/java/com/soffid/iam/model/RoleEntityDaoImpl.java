@@ -330,9 +330,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 	}
 	 
-	private void updateGrantedRoles(Role role, RoleEntity entity) throws InternalErrorException, BPMException {
+	private boolean updateGrantedRoles(Role role, RoleEntity entity) throws InternalErrorException, BPMException {
 		// Compraramos con los existentes anteriormente : i esborrem els que
 		// ja no existeixen
+		boolean anyChange = false;
+		
 		LinkedList<RoleDependencyEntity> currentGrants = new LinkedList<RoleDependencyEntity>(entity.getContainedRoles());
 		if (role.getOwnedRoles() != null) {
 			for (RoleGrant grant: role.getOwnedRoles())
@@ -345,19 +347,25 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 					{
 						found = true;
 						it.remove();
-						updateRolDependency(grantEntity, grant);
+						if (updateRolDependency(grantEntity, grant))
+							anyChange = true;
 						break;
 					}
 						
 				}
 				if ( ! found )
+				{
 					createRoleDependency(grant, false);
+					anyChange = true;
+				}
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
 		{
 			deleteRolDependency(grantEntity);
+			anyChange = true;
 		}
+		return anyChange;
 	}
 	 
 	private void createRoleDependency(RoleGrant grant, boolean checkGranteeCycles) throws InternalErrorException, BPMException {
@@ -455,11 +463,19 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         }
 	}
 
-	private void updateRolDependency(RoleDependencyEntity entity, RoleGrant grant) throws InternalErrorException, BPMException {
+	private boolean updateRolDependency(RoleDependencyEntity entity, RoleGrant grant) throws InternalErrorException, BPMException {
+		boolean anyChange = false;
 		if (RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus()))
+		{
+			anyChange = true;
 			deleteRolDependency(entity);
+		}
+		if ( entity.getMandatory() == null ||
+				!entity.getMandatory().equals(grant.getMandatory()))
+			anyChange = true;
 		entity.setMandatory(grant.getMandatory());
 		getRoleDependencyEntityDao().update(entity);
+		return anyChange;
 	}
 
 	public void remove(com.soffid.iam.model.RoleEntity Role)
@@ -1456,8 +1472,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             
             updateGranteeRoles(role, entity);
 
+            boolean forcePropagation = false;
             if (updateOwnedRoles)
-            	updateGrantedRoles(role, entity);
+            	forcePropagation = updateGrantedRoles(role, entity);
 
             updateGranteeGroups(role, entity);
 
@@ -1475,6 +1492,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
                     accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
 
+            if (forcePropagation)
+            {
+            	usuarisPropagarAfter.addAll(usuarisPropagar);
+            	accountsPropagarAfter.addAll(accountsPropagar);
+                usuarisPropagar.clear();
+                accountsPropagar.clear();
+            }
+            	
             generatePropagationTasks(usuarisPropagar, accountsPropagar,
 					rolsPropagar, grupsPropagar, usuarisPropagarAfter,
 					accountsPropagarAfter, rolsPropagarAfter,

@@ -37,6 +37,7 @@
       <fileEntry mountPoint="1072" file="../../../target/lib/mariadb-java-client.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/ojdbc7.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/sqljdbc4.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1072" file="../../../target/lib/postgresql.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1073" file="../../../target/lib/deployer.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="1069" file="./resources/iam-console" overwriteMode="1" shared="false" fileMode="644" uninstallMode="2" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="iam-console" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude />
@@ -132,6 +133,7 @@
       <archive location="../../../target/lib/ojdbc7.jar" />
       <archive location="../../../target/lib/mariadb-java-client.jar" />
       <archive location="../../../target/lib/sqljdbc4.jar" />
+      <archive location="../../../target/lib/postgresql.jar" />
     </customCode>
     <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
       <commentFiles />
@@ -916,7 +918,7 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.services.StopServiceAction">
                       <void property="launcherId">
-                        <string>467</string>
+                        <string>1301</string>
                       </void>
                     </object>
                   </java>
@@ -1018,7 +1020,10 @@ return true;</string>
                 </object>
               </java>
             </serializedBean>
-            <condition />
+            <condition>if (null != context.getVariable("dbStatus"))
+   return false;
+else
+   return true;</condition>
             <validation>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
 p.save ();
 
@@ -1115,6 +1120,12 @@ else
           if (current.intValue() == 2) { // SQLSERVIER
             context.setVariable("dbPort", new Long(1433));
           }
+          if (current.intValue() == 3) { // Oracle Service
+            context.setVariable("dbPort", new Long(1521));
+          }
+          if (current.intValue() == 4) { // SQLSERVIER
+            context.setVariable("dbPort", new Long(5432));
+          }
     }
 es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
 p.save ();
@@ -1157,15 +1168,21 @@ return;</preActivation>
                         <string>Database driver</string>
                       </void>
                       <void property="listEntries">
-                        <array class="java.lang.String" length="3">
+                        <array class="java.lang.String" length="5">
                           <void index="0">
                             <string>Mysql</string>
                           </void>
                           <void index="1">
-                            <string>Oracle</string>
+                            <string>Oracle(SID)</string>
                           </void>
                           <void index="2">
                             <string>SqlServer</string>
+                          </void>
+                          <void index="3">
+                            <string>Oracle(ServiceName)</string>
+                          </void>
+                          <void index="4">
+                            <string>PostgreSQL</string>
                           </void>
                         </array>
                       </void>
@@ -1334,7 +1351,7 @@ return true;</validation>
                         <string>soffid</string>
                       </void>
                       <void property="labelText">
-                        <string>Database sid</string>
+                        <string>Database name or SID</string>
                       </void>
                       <void property="variableName">
                         <string>dbSid</string>
@@ -1458,7 +1475,8 @@ If it already exists, the password will be changed.</string>
                     </object>
                   </java>
                 </serializedBean>
-                <initScript>if (((Integer)context.getVariable("dbDriver")).intValue() == 0) { 
+                <initScript>if (((Integer)context.getVariable("dbDriver")).intValue() == 0 ||
+    ((Integer)context.getVariable("dbDriver")).intValue() == 3 ) { 
    component.setVisible(false);
 } else {
    component.setVisible(true);
@@ -1598,8 +1616,7 @@ If it already exists, the password will be changed.</string>
                       <void property="script">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>System.out.println ("Creating database owner");
-es.caib.seycon.ng.install.DatabaseCreator c = new es.caib.seycon.ng.install.DatabaseCreator(context);
+                            <string>es.caib.seycon.ng.install.DatabaseCreator c = new es.caib.seycon.ng.install.DatabaseCreator(context);
 
 try
 {

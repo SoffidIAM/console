@@ -224,7 +224,9 @@ public class DeployerBean implements DeployerService {
 	private void extractPlugins(QueryHelper qh) throws Exception {
 		qh.select("SELECT SPM_ID, SPL_NAME, SPM_TYPE, SPM_CLASS, SPM_DATA " + //$NON-NLS-1$
 				"FROM SC_SERPLU P, SC_SEPLMO M " + //$NON-NLS-1$
-				"WHERE P.SPL_ENABLE=1 AND P.SPL_ID=M.SPM_SPL_ID",
+				"WHERE P.SPL_ENABLE" +
+					(qh.conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ? "": "=1")+
+					" AND P.SPL_ID=M.SPM_SPL_ID",
 				new Object[0], //$NON-NLS-1$
 				new QueryAction() {
 					public void perform(ResultSet rset) throws SQLException,

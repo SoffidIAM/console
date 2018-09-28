@@ -28,8 +28,10 @@ import com.install4j.api.screens.Screen;
 
 public class DatabaseCreator {
     private static final int MYSQL_DRIVER = 0;
-    private static final int ORACLE_DRIVER = 1;
+    private static final int ORACLE_DRIVER_SID = 1;
     private static final int SQLSERVER_DRIVER=2;
+    private static final int ORACLE_DRIVER_SVC = 3;
+    private static final int POSTGRESQL_DRIVER=4;
     Context ctx;
     private String user;
     private String password;
@@ -66,7 +68,7 @@ public class DatabaseCreator {
         port = (Long) ctx.getVariable("dbPort"); //$NON-NLS-1$
         sid = (String) ctx.getVariable("dbSid"); //$NON-NLS-1$
         schema = (String) ctx.getVariable("dbUser"); //$NON-NLS-1$
-        schemaPassword = (String) ctx.getVariable("dPassword"); //$NON-NLS-1$
+        schemaPassword = (String) ctx.getVariable("dbPassword"); //$NON-NLS-1$
         createUser = (Boolean) ctx.getVariable("dbCreateUser"); //$NON-NLS-1$
 
         tableTablespace = (String) ctx.getVariable("dbTableTablespace"); //$NON-NLS-1$
@@ -74,9 +76,14 @@ public class DatabaseCreator {
         tableTablespaceSize = (Long) ctx.getVariable("dbTableTablespaceSize"); //$NON-NLS-1$
         indexTablespaceSize = (Long) ctx.getVariable("dbIndexTablespaceSize"); //$NON-NLS-1$
         driver = ((Integer) ctx.getVariable("dbDriver")).intValue(); //$NON-NLS-1$
-        if (driver == ORACLE_DRIVER) {
+        if (driver == ORACLE_DRIVER_SID) {
             driverString = "oracle"; //$NON-NLS-1$
             driverUrl = "jdbc:oracle:thin:@"+host+":"+port+":"+sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            driverClass= "oracle.jdbc.driver.OracleDriver"; //$NON-NLS-1$
+            sanitySelect = "select 1 from dual"; //$NON-NLS-1$
+        } else if (driver == ORACLE_DRIVER_SVC) {
+            driverString = "oracle"; //$NON-NLS-1$
+            driverUrl = "jdbc:oracle:thin:@//"+host+":"+port+"/"+sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             driverClass= "oracle.jdbc.driver.OracleDriver"; //$NON-NLS-1$
             sanitySelect = "select 1 from dual"; //$NON-NLS-1$
         } else if(driver == SQLSERVER_DRIVER){
@@ -85,9 +92,16 @@ public class DatabaseCreator {
             driverClass= "com.microsoft.sqlserver.jdbc.SQLServerDriver"; //$NON-NLS-1$
             sanitySelect = "select 1 from sysobjects"; //$NON-NLS-1$
             //connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MSSQLValidConnectionChecker"; //$NON-NLS-1$
+        } else if(driver == POSTGRESQL_DRIVER){
+        	driverString = "postgresql"; //$NON-NLS-1$
+        	driverUrl = "jdbc:postgresql://"+host+":"+port+"/" + sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            driverClass= "org.postgresql.Driver"; //$NON-NLS-1$
+            sanitySelect = "select 1"; //$NON-NLS-1$
+            //connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MSSQLValidConnectionChecker"; //$NON-NLS-1$
         } else {
             driverString = "mysql"; //$NON-NLS-1$
-            driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            		"?useUnicode=yes&characterEncoding=UTF-8"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             driverClass= "org.mariadb.jdbc.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
         }
@@ -111,13 +125,25 @@ public class DatabaseCreator {
         DriverManager.registerDriver((java.sql.Driver) c.newInstance());
 
         String url;
-        if (driver == (ORACLE_DRIVER)){
+        if (driver == (ORACLE_DRIVER_SID)){
             url = "jdbc:oracle:thin:@" + host + ":" + port + ":" + sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             Properties props = new Properties(); 
       	  	props.put("user", user); 
       	  	props.put("password", password);
       	  	props.put("internal_logon", "sysdba");
       	  	return DriverManager.getConnection (url, props);
+        }
+        else if (driver == (ORACLE_DRIVER_SID)){
+            url = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            Properties props = new Properties(); 
+      	  	props.put("user", user); 
+      	  	props.put("password", password);
+      	  	props.put("internal_logon", "sysdba");
+      	  	return DriverManager.getConnection (url, props);
+        }
+        else if (driver == (POSTGRESQL_DRIVER)){
+            url = "jdbc:postgresql://" + host + ":" + port + "/" + sid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        	return DriverManager.getConnection(url, user, password);
         }
         else if (driver == (SQLSERVER_DRIVER)){
         	url = "jdbc:sqlserver://" + host + ":" + port;
@@ -139,7 +165,7 @@ public class DatabaseCreator {
 
     public void test() throws Exception {
         Connection c = getMasterConnection();
-        PreparedStatement s = c.prepareStatement(driver == ORACLE_DRIVER ? "SELECT 1 FROM DUAL" //$NON-NLS-1$
+        PreparedStatement s = c.prepareStatement(driver == ORACLE_DRIVER_SID || driver == ORACLE_DRIVER_SVC ? "SELECT 1 FROM DUAL" //$NON-NLS-1$
                 : "SELECT 1"); //$NON-NLS-1$
         ResultSet rset = s.executeQuery();
         rset.close();
@@ -158,7 +184,7 @@ public class DatabaseCreator {
 
         pi.setStatusMessage("Creating user ....");  //$NON-NLS-1$
         pi.setPercentCompleted(1);
-        if (ORACLE_DRIVER == (driver)) {
+        if (ORACLE_DRIVER_SID == (driver) || ORACLE_DRIVER_SVC == driver) {
             PreparedStatement pstmt = c
                     .prepareStatement("SELECT 1 FROM SYS.ALL_USERS WHERE USERNAME=?"); //$NON-NLS-1$
             pstmt.setString(1, schema.toUpperCase());
@@ -185,6 +211,21 @@ public class DatabaseCreator {
 
             createTablespace(c, indexTablespace, indexTablespaceSize);
             executeSentence("ALTER USER " + schema + " QUOTA UNLIMITED ON " + indexTablespace); //$NON-NLS-1$ //$NON-NLS-2$
+        } else if (POSTGRESQL_DRIVER == (driver)) {
+            PreparedStatement pstmt = c
+                    .prepareStatement("select * from pg_catalog.pg_user where usename=?"); //$NON-NLS-1$
+            pstmt.setString(1, schema.toLowerCase());
+            ResultSet rset = pstmt.executeQuery();
+            if (rset.next()) {
+                executeSentence("ALTER USER " + schema + " WITH PASSWORD '" + schemaPassword //$NON-NLS-1$ //$NON-NLS-2$
+                        + "'"); //$NON-NLS-1$
+            } else {
+                executeSentence("CREATE USER " + schema + " WITH PASSWORD '" + schemaPassword //$NON-NLS-1$ //$NON-NLS-2$
+                        + "'"); //$NON-NLS-1$
+            }
+            rset.close();
+            pstmt.close();
+            executeSentence("GRANT ALL PRIVILEGES ON DATABASE "+sid+" TO " + schema); //$NON-NLS-1$
         } else if (MYSQL_DRIVER == (driver)){
             PreparedStatement pstmt = c.prepareStatement("SHOW DATABASES"); //$NON-NLS-1$
             ResultSet rset = pstmt.executeQuery();
@@ -379,172 +420,6 @@ public class DatabaseCreator {
         return true;
     }
 
-    private void processChar(char ch) throws SQLException {
-        if (ch == ';' && !plsql) {
-            joinLine(buffer, line);
-            executeCurrentStatement();
-        } else if (ch == '\n' || ch == '\r') {
-            if (buffer.length() == 0) {
-                String l = line.toString();
-                if (l.indexOf("PACKAGE") >= 0 || l.indexOf("TRIGGER") >= 0 //$NON-NLS-1$ //$NON-NLS-2$
-                        || l.indexOf("DECLARE") >= 0 || l.indexOf("BEGIN") >= 0 //$NON-NLS-1$ //$NON-NLS-2$
-                        || l.indexOf("FUNCTION") >= 0 || l.indexOf("PROCEDURE") >= 0) //$NON-NLS-1$ //$NON-NLS-2$
-                    plsql = true;
-                joinLine(buffer, line);
-            } else if (plsql && line.toString().trim().equals("/")) { //$NON-NLS-1$
-                executeCurrentStatement();
-            } else {
-                joinLine(buffer, line);
-            }
-        } else {
-            line.append(ch);
-        }
-    }
-
-    private void executeCurrentStatement() throws SQLException {
-        String s;
-        if (buffer.length() > 40)
-            s = buffer.substring(0, 40) + " ..."; //$NON-NLS-1$
-        else
-            s = buffer.toString();
-        ProgressInterface pi = ctx.getProgressInterface();
-        pi.setStatusMessage(s.replace('\n', ' '));
-        String sql = buffer.toString().trim();
-        if (ORACLE_DRIVER == (driver)) {
-            if (sql.startsWith("ORACLE ")) //$NON-NLS-1$
-                sql = sql.substring(7);
-            else if (sql.startsWith("MYSQL ")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            else if (sql.startsWith("SQLSERVER "))
-            	sql= "";
-
-            sql = sql.replaceAll("AUTO_INCREMENT", ""); //$NON-NLS-1$ //$NON-NLS-2$
-
-            if (sql.startsWith("CREATE TABLE")) //$NON-NLS-1$
-                sql = sql + " TABLESPACE " + tableTablespace; //$NON-NLS-1$
-            else if (sql.startsWith("CREATE INDEX") || sql.startsWith("CREATE UNIQUE INDEX")) //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql + " TABLESPACE " + indexTablespace; //$NON-NLS-1$
-            else if (sql.startsWith("ALTER TABLE") //$NON-NLS-1$
-                    && (sql.contains("PRIMARY KEY") || sql.contains("UNIQUE"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                int i = sql.indexOf(" ENABLE"); //$NON-NLS-1$
-                if (i < 0)
-                    sql = sql + " USING INDEX TABLESPACE " + indexTablespace; //$NON-NLS-1$
-                else
-                    sql = sql.substring(0, i) + " USING INDEX TABLESPACE " + indexTablespace //$NON-NLS-1$
-                            + sql.substring(i);
-            }
-            if (sql.startsWith("CREATE TABLE") || sql.startsWith("ALTER TABLE")) { //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("INTEGER", "NUMBER(10)"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("BIGINT", "NUMBER(20)"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("MEDIUMBLOB", "BLOB"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("SMALLINT", "NUMBER(3)"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-        if (MYSQL_DRIVER == (driver)) {
-            if (sql.startsWith("MYSQL ")) //$NON-NLS-1$
-                sql = sql.substring(6);
-            else if (sql.startsWith("ORACLE ")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            else if (sql.startsWith("SQLSERVER "))
-            	sql = "";
-            if (sql.startsWith("CREATE SEQUENCE")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            if (sql.startsWith("COMMENT ON")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            if (sql.startsWith("CREATE TABLE") || sql.startsWith("ALTER TABLE")) { //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("VARCHAR2\\(([0-9]+) CHAR\\)", "VARCHAR ($1)"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("CHAR\\(([0-9]+) CHAR\\)", "CHAR ($1)"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll(" DATE", " DATETIME"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("SYSDATE", "CURRENT_TIMESTAMP"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("TIMESTAMP *\\([0-9+]\\)", "DATETIME"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("FLOAT *\\([0-9]+\\)", "DOUBLE"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("NUMBER *\\([0-7](,0)?\\)", "INTEGER"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("NUMBER *\\([0-9]*(,0)?\\)", "BIGINT"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("CLOB", "TEXT"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("RAW *\\([0-9]+\\)", "BLOB"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll(" ENABLE", " "); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            if (sql.startsWith ("CREATE TABLE")) { //$NON-NLS-1$
-                sql = sql + " ENGINE = InnoDB"; //$NON-NLS-1$
-            }
-            sql = sql.replace('"', ' ');
-        }
-        if (SQLSERVER_DRIVER == (driver)) {	//SINTAXI CORRECTE???
-            if (sql.startsWith("SQLSERVER ")) //$NON-NLS-1$
-                sql = sql.substring(10);
-            else if (sql.startsWith("ORACLE ")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            else if (sql.startsWith("MYSQL "))
-            	sql= "";
-            if (sql.startsWith("CREATE SEQUENCE")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            if (sql.startsWith("COMMENT ON")) //$NON-NLS-1$
-                sql = ""; //$NON-NLS-1$
-            if (sql.startsWith("CREATE TABLE") || sql.startsWith("ALTER TABLE")) { //$NON-NLS-1$ //$NON-NLS-2$
-            	sql = sql.replaceAll("VARCHAR2\\(([0-9]+) CHAR\\)", "VARCHAR ($1)");
-            	sql = sql.replaceAll("AUTO_INCREMENT", "IDENTITY(1,1)");
-                sql = sql.replaceAll("CHAR\\(([0-9]+) CHAR\\)", "CHAR ($1)");
-                sql = sql.replaceAll("NUMBER *\\([0-7](,0)?\\)", "INT"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("NUMBER *\\([0-9]*(,0)?\\)", "BIGINT"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql= sql.replaceAll("MEDIUMBLOB", "VARBINARY(max)");	// max
-                sql= sql.replaceAll("BLOB", "VARBINARY(max)");	// max
-                sql= sql.replaceAll("CLOB", "NVARCHAR(max)");	// max
-                sql = sql.replaceAll("RAW *\\([0-9]+\\)", "NVARCHAR(max)");	// max
-                sql = sql.replaceAll("TIMESTAMP *\\([0-9+]\\)", "DATETIME"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll("FLOAT *\\([0-9]+\\)", "REAL"); //$NON-NLS-1$ //$NON-NLS-2$
-                sql = sql.replaceAll(" ENABLE", " ");	//No necessita res
-            }
-            if(sql.startsWith("ALTER TABLE")){
-            	int i = sql.indexOf("ADD CONSTRAINT");
-            	int j = sql.indexOf("UNIQUE");
-            	if(i>0 && j>0)
-            		sql = "";
-            }
-            if(sql.startsWith("CREATE UNIQUE INDEX")){
-            	sql = sql + " WHERE ";
-            	int i = sql.indexOf("(");
-            	int j = sql.indexOf(")");
-            	String sqlaux = sql.substring(i+1, j);
-            	String aux1 = "";
-            	int k = sqlaux.indexOf(",");
-            	while (k>0){
-            		aux1 = sqlaux.substring(0,k);
-            		sqlaux = sqlaux.substring(k+1);
-            		sql = sql + aux1 + " IS NOT NULL ";
-            		int l = sqlaux.length();
-            		if (l>0)
-            			sql = sql + " AND ";
-            		k = sqlaux.indexOf(",");
-            	}
-        		sql = sql + sqlaux + " IS NOT NULL ";
-            }
-            sql = sql.replace('"', ' ');
-        }
-        if (!sql.isEmpty()) {
-            executeSentence(sql);
-        }
-        if (SQLSERVER_DRIVER == driver) 
-        {
-        	if (sql.startsWith("CREATE") || sql.startsWith("ALTER"))
-        	{
-        		currentConnection.commit();
-        	}
-        } 
-        buffer.setLength(0);
-        line.setLength(0);
-        plsql = false;
-    }
-
-    private void joinLine(StringBuffer buffer, StringBuffer line) {
-        String linestr = line.toString().trim();
-        if (!linestr.startsWith("--")) { //$NON-NLS-1$
-            if (buffer.length() > 0)
-                buffer.append('\n');
-            buffer.append(linestr);
-        }
-        line.setLength(0);
-    }
-
     private void executeSentence(String b) throws SQLException {
         try {
             String originalSQL = b;
@@ -568,7 +443,8 @@ public class DatabaseCreator {
             }
             stmt.execute(b);
         } catch (SQLException e) {
-            if (driver == ORACLE_DRIVER && (e.getErrorCode() == 955 || // Name
+            if ((driver == ORACLE_DRIVER_SID  || ORACLE_DRIVER_SVC == driver) 
+            		&& (e.getErrorCode() == 955 || // Name
                                                                        // is
                                                                        // already
                                                                        // used

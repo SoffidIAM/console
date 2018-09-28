@@ -329,8 +329,12 @@ public class ApplicationBootServiceImpl extends
 		
 		try
 		{
-			executeSentence(conn, "UPDATE SC_ROLROL SET RRL_MANDAT=1 WHERE RRL_MANDAT IS NULL",
+			if (conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL"))
+				executeSentence(conn, "UPDATE SC_ROLROL SET RRL_MANDAT=true WHERE RRL_MANDAT IS NULL",
 							new Object[0]);
+			else
+				executeSentence(conn, "UPDATE SC_ROLROL SET RRL_MANDAT=1 WHERE RRL_MANDAT IS NULL",
+					new Object[0]);
 			executeSentence(conn, "UPDATE SC_TIPDAD SET TDA_SCOPE='user' WHERE TDA_SCOPE IS NULL",
 					new Object[0]);
 		}

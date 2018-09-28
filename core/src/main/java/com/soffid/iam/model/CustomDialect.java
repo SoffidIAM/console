@@ -16,6 +16,7 @@ import org.hibernate.dialect.DialectFactory;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.lock.LockingStrategy;
 import org.hibernate.exception.SQLExceptionConverter;
@@ -75,6 +76,9 @@ public class CustomDialect extends Dialect {
 	        } else if ("sqlserver".equals(type)) { //$NON-NLS-1$
 	        	sqlServer = true;
 	        	proxyDialect = new SQLServerDialect();
+	        } else if ("postgresql".equals (type)) { //$NON-NLS-1$
+	        	oracle = false;
+	            proxyDialect = new PostgreSQLDialect();
 	        } else {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 	        }

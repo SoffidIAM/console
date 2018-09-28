@@ -47,6 +47,7 @@ import com.soffid.tools.db.updater.DBUpdater;
 import com.soffid.tools.db.updater.MsSqlServerUpdater;
 import com.soffid.tools.db.updater.MySqlUpdater;
 import com.soffid.tools.db.updater.OracleUpdater;
+import com.soffid.tools.db.updater.PostgresqlUpdater;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -381,15 +382,29 @@ public class UploadService {
     	parseResources(rpr, db, reader, "plugin-ddl.xml");
         DataSource ds = (DataSource) new InitialContext().lookup("openejb:/Resource/jdbc/soffid");
         Connection conn = ds.getConnection();
-        String type = System.getProperty("dbDriverString"); //$NON-NLS-1$
+        String type = conn.getMetaData().getDatabaseProductName(); //$NON-NLS-1$
+        String type2 = System.getProperty("dbDriverString"); //$NON-NLS-1$
         DBUpdater updater ;
-        if ("mysql".equals(type))  //$NON-NLS-1$
+        if ("mysql".equalsIgnoreCase(type) || 
+        		"mariadb".equalsIgnoreCase(type) )  //$NON-NLS-1$
         {
         	updater = new MySqlUpdater();
-        } else if ("oracle".equals (type)) { //$NON-NLS-1$
+        } else if ("oracle".equalsIgnoreCase(type)) { //$NON-NLS-1$
         	updater = new OracleUpdater();
-        } else if ("sqlserver".equals(type)) {
+        } else if ("sqlserver".equalsIgnoreCase(type)) {
         	updater = new MsSqlServerUpdater();
+        } else if ("postgresql".equalsIgnoreCase(type)) { //$NON-NLS-1$
+            updater = new PostgresqlUpdater();
+        } else if ("mysql".equalsIgnoreCase(type2) || 
+        		"mariadb".equalsIgnoreCase(type2) )  //$NON-NLS-1$
+        {
+        	updater = new MySqlUpdater();
+        } else if ("oracle".equalsIgnoreCase(type2)) { //$NON-NLS-1$
+        	updater = new OracleUpdater();
+        } else if ("sqlserver".equalsIgnoreCase(type2)) {
+        	updater = new MsSqlServerUpdater();
+        } else if ("postgresql".equalsIgnoreCase(type2)) { //$NON-NLS-1$
+            updater = new PostgresqlUpdater();
         } else {
             throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
         }

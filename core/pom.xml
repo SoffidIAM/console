@@ -683,8 +683,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>dbtools</artifactId>
-			<version>1.16</version>
-			<scope>provided</scope>
+			<version>1.17-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.commons</groupId>

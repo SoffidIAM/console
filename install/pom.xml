@@ -222,6 +222,12 @@
 			<artifactId>sqljdbc4</artifactId>
 			<version>3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.5.jre7</version>
+			<scope>test</scope>
+		</dependency>
 	    <dependency>
            	<groupId>${project.groupId}</groupId>
            	<artifactId>deployer</artifactId>

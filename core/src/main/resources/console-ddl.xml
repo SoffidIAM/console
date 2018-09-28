@@ -91,7 +91,7 @@
 		<column name='PDR_PROCESS_DEFINITION_ID' type='BIGINT'/>
 		<column name='PDR_APP_ROLE' type='VARCHAR' length='250'/>
 		<column name='PDR_USER_ROLE' type='VARCHAR' length='250'/>
-		<column name='PDR_IS_USER' type='SMALLINT'/>
+		<column name='PDR_IS_USER' type='BIT'/>
 		<column name='PDR_ID' type='BIGINT'  notNull='true' primaryKey='true'/>
 	</table>
 
@@ -108,7 +108,7 @@
 		<column name='PRO_INSTANCE_ID' type='BIGINT' notNull='true'/>
 		<column name='PRO_DOC_ID' type='BIGINT' notNull='true'/>
 		<column name='PRO_DOC_HASH' type='VARCHAR' length='250' notNull='true'/>
-		<column name='PRO_DELETED' type='SMALLINT' notNull='true'/>
+		<column name='PRO_DELETED' type='BIT' notNull='true'/>
 	</table>
 
 
@@ -220,9 +220,9 @@
 		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='CLASS' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
-		<column name='ISPROPAGATIONALLOWED_' type='SMALLINT'/>
+		<column name='ISPROPAGATIONALLOWED_' type='BIT'/>
 		<column name='ACTIONEXPRESSION_' type='VARCHAR' length='255'/>
-		<column name='ISASYNC_' type='SMALLINT'/>
+		<column name='ISASYNC_' type='BIT'/>
 		<column name='REFERENCEDACTION_' type='BIGINT'/>
 		<column name='ACTIONDELEGATION_' type='BIGINT'/>
 		<column name='EVENT_' type='BIGINT'/>
@@ -456,8 +456,8 @@
 		<column name='PROCESSINSTANCE_' type='BIGINT'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='TASKINSTANCE_' type='BIGINT'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
-		<column name='ISEXCLUSIVE_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
+		<column name='ISEXCLUSIVE_' type='BIT'/>
 		<column name='LOCKOWNER_' type='VARCHAR' length='255'/>
 		<column name='LOCKTIME_' type='TIMESTAMP'/>
 		<column name='EXCEPTION_' type='LONGVARCHAR' length='65535'/>
@@ -615,7 +615,7 @@
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='DESTINATION_' type='VARCHAR' length='255'/>
 		<column name='EXCEPTION_' type='CLOB' length='4000'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='TEXT_' type='VARCHAR' length='255'/>
 		<column name='ACTION_' type='BIGINT'/>
@@ -698,18 +698,18 @@
 		<column name='CLASS_' type='CHAR' length='1' notNull='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
-		<column name='ISASYNC_' type='SMALLINT'/>
+		<column name='ISASYNC_' type='BIT'/>
 		<column name='ACTION_' type='BIGINT'/>
 		<column name='SUPERSTATE_' type='BIGINT'/>
 		<column name='SUBPROCESSDEFINITION_' type='BIGINT'/>
 		<column name='DECISIONEXPRESSION_' type='VARCHAR' length='255'/>
 		<column name='DECISIONDELEGATION' type='BIGINT'/>
 		<column name='SIGNAL_' type='BIGINT'/>
-		<column name='CREATETASKS_' type='SMALLINT'/>
-		<column name='ENDTASKS_' type='SMALLINT'/>
+		<column name='CREATETASKS_' type='BIT'/>
+		<column name='ENDTASKS_' type='BIT'/>
 		<column name='NODECOLLECTIONINDEX_' type='BIGINT'/>
 		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
-		<column name='ISASYNCEXCL_' type='SMALLINT'/>
+		<column name='ISASYNCEXCL_' type='BIT'/>
 		<column name='SUBPROCNAME_' type='VARCHAR' length='255'/>
 		<column name='SCRIPT_' type='BIGINT'/>
 		<column name='PARENTLOCKMODE_' type='VARCHAR' length='255'/>
@@ -762,7 +762,7 @@
 		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='VERSION_' type='BIGINT'/>
-		<column name='ISTERMINATIONIMPLICIT_' type='SMALLINT'/>
+		<column name='ISTERMINATIONIMPLICIT_' type='BOOLEAN'/>
 		<column name='STARTSTATE_' type='BIGINT'/>
 		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
 		<column name='CLASS_' type='CHAR' length='1'/>
@@ -781,7 +781,7 @@
 		<column name='VERSION_' type='BIGINT' notNull='true'/>
 		<column name='START_' type='TIMESTAMP'/>
 		<column name='END_' type='TIMESTAMP'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
 		<column name='ROOTTOKEN_' type='BIGINT'/>
 		<column name='SUPERPROCESSTOKEN_' type='BIGINT'/>
@@ -879,8 +879,8 @@
 		<column name='NAME_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>
 		<column name='DESCRIPTION_' type='VARCHAR' length='4000'/>
-		<column name='ISBLOCKING_' type='SMALLINT'/>
-		<column name='ISSIGNALLING_' type='SMALLINT'/>
+		<column name='ISBLOCKING_' type='BIT'/>
+		<column name='ISSIGNALLING_' type='BIT'/>
 		<column name='DUEDATE_' type='VARCHAR' length='255'/>
 		<column name='ACTORIDEXPRESSION_' type='VARCHAR' length='255'/>
 		<column name='POOLEDACTORSEXPRESSION_' type='VARCHAR' length='255'/>
@@ -973,11 +973,11 @@
 		<column name='END_' type='TIMESTAMP'/>
 		<column name='DUEDATE_' type='TIMESTAMP'/>
 		<column name='PRIORITY_' type='BIGINT'/>
-		<column name='ISCANCELLED_' type='SMALLINT'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
-		<column name='ISOPEN_' type='SMALLINT'/>
-		<column name='ISSIGNALLING_' type='SMALLINT'/>
-		<column name='ISBLOCKING_' type='SMALLINT'/>
+		<column name='ISCANCELLED_' type='BIT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
+		<column name='ISOPEN_' type='BIT'/>
+		<column name='ISSIGNALLING_' type='BIT'/>
+		<column name='ISBLOCKING_' type='BIT'/>
 		<column name='TASK_' type='BIGINT'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='SWIMLANINSTANCE_' type='BIGINT'/>
@@ -1021,7 +1021,7 @@
 		<column name='REPEAT_' type='VARCHAR' length='255'/>
 		<column name='TRANSITIONNAME_' type='VARCHAR' length='255'/>
 		<column name='EXCEPTION_' type='VARCHAR' length='4000'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
 		<column name='ACTION_' type='BIGINT'/>
 		<column name='TOKEN_' type='BIGINT'/>
 		<column name='PROCESSINSTANCE_' type='BIGINT'/>
@@ -1061,9 +1061,9 @@
 		<column name='END_' type='TIMESTAMP'/>
 		<column name='NODEENTER_' type='TIMESTAMP'/>
 		<column name='NEXTLOGINDEX_' type='BIGINT'/>
-		<column name='ISABLETOREACTIVATEPARENT_' type='SMALLINT'/>
-		<column name='ISTERMINATIONIMPLICIT_' type='SMALLINT'/>
-		<column name='ISSUSPENDED_' type='SMALLINT'/>
+		<column name='ISABLETOREACTIVATEPARENT_' type='BIT'/>
+		<column name='ISTERMINATIONIMPLICIT_' type='BIT'/>
+		<column name='ISSUSPENDED_' type='BIT'/>
 		<column name='NODE_' type='BIGINT'/>
 		<column name='PROCESSINSTANCE_' type='BIGINT'/>
 		<column name='PARENT_' type='BIGINT'/>

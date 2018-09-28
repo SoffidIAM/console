@@ -22,6 +22,7 @@ public class EventThreadInit extends TomeeThreadInit {
 	private SessionCacheService ejb;
 	private GenericPrincipal currentIdentity;
 	Locale locale;
+	private String clientIp;
 	
 	public EventThreadInit() throws NamingException, CreateException {
 		super();
@@ -37,6 +38,7 @@ public class EventThreadInit extends TomeeThreadInit {
 			ejb.setSession(cacheSession);
 		if (currentIdentity != null)
 		{
+			Security.setClientIp(clientIp);
 			Security.nestedLogin(currentIdentity);
 		}
 		MessageFactory.setThreadLocale(locale);
@@ -49,6 +51,7 @@ public class EventThreadInit extends TomeeThreadInit {
 		cacheSession = ejb.getCurrentSessionId();
 		currentIdentity = Security.getPrincipal();
 		locale = MessageFactory.getLocale();
+		clientIp = Security.getClientIp();
 	}
 
 }

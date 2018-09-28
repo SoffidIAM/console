@@ -153,6 +153,10 @@ public abstract class AuditoriaEntity {
 	@Column (name="AUD_TEN_ID")
 	public TenantEntity tenant;
 
+	@Column (name="AUD_SRCIP")
+	@Nullable
+	public String sourceIp;
+
 	@DaoFinder
 	public es.caib.seycon.ng.model.AuditoriaEntity findById(
 		java.lang.Long id) {

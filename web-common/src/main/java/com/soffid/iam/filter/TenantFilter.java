@@ -17,6 +17,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.utils.Security;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantFilter implements Filter {
@@ -34,40 +36,46 @@ public class TenantFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest httpReq = (HttpServletRequest) request;
-		HttpServletResponse httpResp = (HttpServletResponse) response;
-		String tenantHost;
 		try {
-			tenantHost = new TenantExtractor().getTenant(httpReq);
-		} catch (InternalErrorException e) {
-			throw new ServletException(e);
-		}
-
-		HttpSession s = httpReq.getSession(true);
-		
-		Principal principal = httpReq.getUserPrincipal();
-		if (principal != null && ! principal.getName().startsWith(tenantHost+"\\"))
-		{
-			log.info("Received request on server "+httpReq.getServerName()+"(tenant "+tenantHost+") for user "+principal.getName());
-			s.invalidate();
-			httpResp.sendRedirect(httpReq.getContextPath());
-		} else {
-			String previousTenant = (String) s.getAttribute("tenant");
-			if (previousTenant == null)
-			{
-				s.setAttribute("tenant", tenantHost);
-				chain.doFilter(request, response);
+			HttpServletRequest httpReq = (HttpServletRequest) request;
+			HttpServletResponse httpResp = (HttpServletResponse) response;
+			
+			String tenantHost;
+			try {
+				tenantHost = new TenantExtractor().getTenant(httpReq);
+			} catch (InternalErrorException e) {
+				throw new ServletException(e);
 			}
-			else if (! previousTenant.equals(tenantHost))
+	
+			Security.setClientRequest(httpReq);
+
+			HttpSession s = httpReq.getSession(true);
+			Principal principal = httpReq.getUserPrincipal();
+			if (principal != null && ! principal.getName().startsWith(tenantHost+"\\"))
 			{
-				log.info("Received request on server "+httpReq.getServerName()+"(tenant "+tenantHost+") with session for tenant "+previousTenant);
+				log.info("Received request on server "+httpReq.getServerName()+"(tenant "+tenantHost+") for user "+principal.getName());
 				s.invalidate();
 				httpResp.sendRedirect(httpReq.getContextPath());
+			} else {
+				String previousTenant = (String) s.getAttribute("tenant");
+				if (previousTenant == null)
+				{
+					s.setAttribute("tenant", tenantHost);
+					chain.doFilter(request, response);
+				}
+				else if (! previousTenant.equals(tenantHost))
+				{
+					log.info("Received request on server "+httpReq.getServerName()+"(tenant "+tenantHost+") with session for tenant "+previousTenant);
+					s.invalidate();
+					httpResp.sendRedirect(httpReq.getContextPath());
+				}
+				else
+				{
+					chain.doFilter(request, response);
+				}
 			}
-			else
-			{
-				chain.doFilter(request, response);
-			}
+		} finally {
+			Security.setClientIp(null);
 		}
 	}
 

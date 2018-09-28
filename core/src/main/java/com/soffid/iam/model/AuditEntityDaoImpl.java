@@ -27,6 +27,7 @@ import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
+import es.caib.seycon.ng.utils.Security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,6 +76,16 @@ public class AuditEntityDaoImpl extends
 					auditoria.setUser(ue.getUserName());
 			}
 			auditoria.setDate(new Date());
+			auditoria.setSourceIp(Security.getClientIp());
+			if (auditoria.getSourceIp() == null)
+			{
+				try 
+				{
+					auditoria.setSourceIp( InetAddress.getLocalHost().getHostName());
+				} catch (Exception e) {
+					
+				}
+			}
 			super.create(auditoria);
 			getSession(false).flush();
 			

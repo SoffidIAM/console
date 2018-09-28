@@ -779,6 +779,7 @@ public class ApplicationServiceImpl extends
            	Account account = null;
         	Security.nestedLogin(Security.getCurrentAccount(), new String[] { 
         		Security.AUTO_USER_QUERY+Security.AUTO_ALL,
+        		Security.AUTO_ACCOUNT_UPDATE,
         		Security.AUTO_ACCOUNT_QUERY, 
         		Security.AUTO_ACCOUNT_CREATE,
         		Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL, 

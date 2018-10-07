@@ -9,6 +9,8 @@ import com.soffid.iam.model.TenantEntity;
 import java.util.Map;
 
 import com.soffid.iam.api.ReconcileTrigger;
+import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.service.ScheduledTaskService;
 import com.soffid.iam.service.TenantService;
@@ -50,7 +52,8 @@ import roles.agent_update;
 	es.caib.seycon.ng.model.ObjectMappingEntity.class,
 	AccountEntity.class,
 	DominiUsuariEntity.class,
-	
+	AccountMetadataEntity.class,
+	AccountAttributeEntity.class,
 	ScheduledTaskService.class,
 	ObjectMappingTriggerEntity.class,
 	es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,

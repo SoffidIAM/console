@@ -65,9 +65,6 @@
 	//showFavorites = es.caib.zkib.zkiblaf.Application.isFavoritesVisible();
 	]]>
   </zscript>
-  <style>
-  	.tree-hidden { background-color: red;}
-  </style>
   <window border="none" id="menu" sclass="menuprincipal" title="${c:l('menu.title')}" 
   	use="es.caib.bpm.ui.main.MainMenuWindow" 
   	delayProcesses="true"

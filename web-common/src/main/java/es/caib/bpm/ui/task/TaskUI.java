@@ -185,7 +185,7 @@ public class TaskUI extends Frame implements EventListener {
         btnCerrar = (Button) botonera.getFellow("btnCerrar"); //$NON-NLS-1$
         ventanaDinamica = getFellow("datosElementoWorkflow"); //$NON-NLS-1$
 
-		if (taskId > 0) {
+		if (taskId != 0) {
 			TaskInstance ti = BPMApplication.getEngine().getTask(taskId);
 			if (ti == null)
 				Application.goBack();

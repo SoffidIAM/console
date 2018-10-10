@@ -157,7 +157,7 @@ public class ProcessUI extends Frame {
         btnCancel = (Button) getFellow("btnCancel"); //$NON-NLS-1$
         btnUpgrade = (Button) getFellow("btnUpgrade"); //$NON-NLS-1$
 
-        if (processId > 0) {
+        if (processId != 0) {
 			ProcessInstance pi = BPMApplication.getEngine().getProcess(processId);
 			try {
 				openProcessInstance(pi, true);

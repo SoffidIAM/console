@@ -69,6 +69,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 
 public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
@@ -1348,16 +1350,20 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         return checkNoCycles(contingut, pare, cami, checkGranteeCycles);
     }
 
+    Log log = LogFactory.getLog(getClass());
+    
     private boolean checkNoCycles(RoleEntity fill,
             RoleEntity pare, StringBuffer cami, boolean checkGranteeCycles) {
-        Collection pareEsContingut = checkGranteeCycles ? pare.getContainerRoles() : fill.getContainedRoles();
+        Collection pareEsContingut = checkGranteeCycles ? pare.getContainerRoles() : pare.getContainedRoles();
         boolean senseCicles = true;
         cami.append(pare.getName());
         if (checkGranteeCycles) cami.append(" <= "); //$NON-NLS-1$
         else cami.append(" => "); //$NON-NLS-1$
         int len = cami.length();
+        log.info("Checking cycle "+cami.toString());
         for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext();) {
         	cami.setLength(len);
+        	
             RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
             RoleEntity parePare = checkGranteeCycles ? relacio.getContainer(): relacio.getContained();
             if (parePare.equals(fill)) {
@@ -1526,6 +1532,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             return entity;
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
+            LogFactory.getLog(getClass()).warn("Error updating role: ", e);
 			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
         }
 	}

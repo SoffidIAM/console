@@ -198,7 +198,8 @@
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Group"
 				defaultAttributes="name, description, type" dataPath="/model:/grup"
-				variableName="query">
+				preference="group"
+				variableName="query" variableNameText="queryText">
 			</searchbox>
 		</criteris>
 

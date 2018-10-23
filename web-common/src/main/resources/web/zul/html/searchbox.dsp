@@ -12,9 +12,11 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 <c:set var="self" value="${requestScope.arg.self}"/>
 <span id="${self.uuid}"${self.outerAttrs}${self.innerAttrs} z.type="attributesearchbox.attributesearchbox.Searchbox">
 <div style="float:right; padding-top:4px; padding-right:8px;">
-	<a href="#" id="${self.uuid}!mode" class="change-mode-label">${self.changeModeLabel}</a>
+	<a href="#" id="${self.uuid}!modeText" class='${self.textStyle}'>${c:l('searchBox.textMode')}</a>
+	<a href="#" id="${self.uuid}!modeBasic" class='${self.basicStyle}'>${c:l('searchBox.basicMode')}</a>
+	<a href="#" id="${self.uuid}!modeAdvanced" class='${self.advancedStyle}'>${c:l('searchBox.advancedMode')}</a>
 </div>
-<c:if test="${!self.advancedMode}">
+<c:if test="${self.basicMode}">
 	<ul>
 		<c:forEach var="child" items="${self.attributeSearchBoxesAndPopups}">
 			<li>
@@ -27,6 +29,12 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
 </c:if>
 <c:if test="${self.advancedMode}">
 	${z:redraw(self.advancedSearch, null)}
+	<a href="#" class="search-link" id="${self.uuid}!search">
+		<img class="search-icon" src="${self.searchIconUrl}"/>
+	</a>
+</c:if>
+<c:if test="${self.textMode}">
+	${z:redraw(self.textSearchBox, null)}
 	<a href="#" class="search-link" id="${self.uuid}!search">
 		<img class="search-icon" src="${self.searchIconUrl}"/>
 	</a>

@@ -178,7 +178,9 @@ public class Mail implements ActionHandler {
 		{
 			if (executionContext.getTaskInstance() != null && 
 					executionContext.getTask() != null &&
-					executionContext.getTaskInstance().getActorId() == null)
+					executionContext.getTaskInstance().getActorId() == null &&
+					(executionContext.getTaskInstance().getPooledActors() == null ||
+						executionContext.getTaskInstance().getPooledActors().isEmpty() ))
 			{
 				recursiveLock.set(this);
 				try {
@@ -670,7 +672,7 @@ public class Mail implements ActionHandler {
 		else
 		{
 			UserData dada = ServiceLocator.instance().getUserService().findDataByUserAndCode(usuari.getUserName(), "EMAIL"); //$NON-NLS-1$
-			if (dada != null && dada.getValue() != null)
+			if (dada != null && dada.getValue() != null && ! dada.getValue().trim().isEmpty())
 			{
 				return new InternetAddress(dada.getValue(),
 						usuari.getFullName());

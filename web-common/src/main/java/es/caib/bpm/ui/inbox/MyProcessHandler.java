@@ -90,7 +90,7 @@ public class MyProcessHandler extends Frame {
 			if (procs != null) {
 				Collections.sort(procs, new Comparator<ProcessInstance>() {
 					public int compare(ProcessInstance t0, ProcessInstance t1) {
-						return t0.getStart().compareTo(t1.getStart());
+						return - t0.getStart().compareTo(t1.getStart());
 					}
 				});
 

@@ -267,12 +267,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 			Query query = session.createQuery("select pi " //$NON-NLS-1$
 					+ "from org.jbpm.graph.exe.ProcessInstance as pi "
 					+ "join pi.instances as instance " //$NON-NLS-1$
-					+ "where (pi.end is null or pi.end > :oneWeekAgo) and instance.initiator = :initiator " 
+					+ "where (pi.end is null or pi.end > :oneWeekAgo) and instance.initiator = :initiator and "
+					+ "instance.tenantId = :tenantId " 
 					+ "order by pi.start desc"); //$NON-NLS-1$ //$NON-NLS-2$
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.DAY_OF_MONTH, -7);
 			query.setParameter("oneWeekAgo", c.getTime());
 			query.setParameter("initiator", Security.getCurrentUser());
+			query.setParameter("tenantId", Security.getCurrentTenantId());
 			for (Iterator it = query.iterate(); it.hasNext();) {
 				org.jbpm.graph.exe.ProcessInstance instance = (org.jbpm.graph.exe.ProcessInstance) it
 						.next();
@@ -799,14 +801,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 						}
 					}
+					log.info("Cannot query process "+id+". Looking for parent processes");
 					for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(id))
 					{
+						log.info("Cannot query process "+id+". Looking for parent process "+parentProcess.getParentProcess());
 						if (handleGetProcess(parentProcess.getParentProcess()) != null)
 							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 					}
+					log.info("Definitevely not allowed to query process "+id+".");
 					return null;
 					//				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
 				} else {
+					log.info("Allowed to query process "+id+".");
 					return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 				}
 			}
@@ -2644,6 +2650,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 									|| business
 											.canAccess(getUserGroups(), task)) {
 								v.add(VOFactory.newTaskInstance(task));
+							} else {
+								log.info("Cannot query process "+process.getId()+". Looking for parent processes");
+								
+								for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(process.getId()))
+								{
+									log.info("Cannot query process "+process.getId()+". Looking for parent process "+parentProcess.getParentProcess());
+									if (handleGetProcess(parentProcess.getParentProcess()) != null)
+									{
+										v.add( VOFactory.newTaskInstance(task) );
+										break;
+									}
+								}
 							}
 						} catch (RuntimeException e) {
 							log.warn(

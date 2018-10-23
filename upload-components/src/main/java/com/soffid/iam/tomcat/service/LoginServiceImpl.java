@@ -67,6 +67,11 @@ public class LoginServiceImpl implements LoginService {
 				samlAuthorized = true;
 				username = samlPrincipal;
 			}
+			if (credentials.length() > 2000)
+			{
+				log.info(username + " login rejected. Password too long (more than 2000 characters)");
+				return null;
+			}
 			int i = username.indexOf('\\');
 			if (i < 0) {
 				tenant = locator.getTenantService().getMasterTenant();

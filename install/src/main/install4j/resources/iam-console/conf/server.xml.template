@@ -63,8 +63,13 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
+    
+    <!-- ***************************************
+         Mind to change secure to true
+         -->
     <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
+               secure="false" 
                redirectPort="8443" xpoweredBy="false" server="Apache TomEE" />
     <!-- A "Connector" using the shared thread pool-->
     <!--

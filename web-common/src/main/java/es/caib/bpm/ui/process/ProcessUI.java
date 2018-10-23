@@ -253,34 +253,11 @@ public class ProcessUI extends Frame {
         Application.setTitle (subject == null? definicion.getName()+" "+proc.getId(): subject); //$NON-NLS-1$
 
 
-        imagen = engine.getProcessDefinitionImage(definicion);
-
-        BufferedImage imagenBuffered = ImageIO.read(new ByteArrayInputStream(
-                imagen));
-        imagenBuffered.getGraphics().setColor(Color.RED);
-
-        int[] coordinates = engine.getCoordinates(proc);
-
-        Graphics2D graph = (Graphics2D) imagenBuffered.getGraphics();
-        graph.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                1.0F));
-        graph.setPaint(new Color(255, 140, 140));
-        graph.setStroke(new BasicStroke(2.5f));
-
-        // log.debug("Dibujamos en: X: " + coordinates[0] + " Y: " +
-        // coordinates[1] + " Ancho: " + coordinates[2] + " Alto: " +
-        // coordinates[3]);
-        graph.draw(new Rectangle2D.Double((double) coordinates[0],
-                (double) coordinates[1], (double) coordinates[2],
-                (double) coordinates[3]));
-
-        streamSalidaImagen = new ByteArrayOutputStream();
-        ImageIO.write(imagenBuffered, "jpeg", streamSalidaImagen); //$NON-NLS-1$
-
-        imagenProceso = new AImage("image/jpeg", streamSalidaImagen //$NON-NLS-1$
-                .toByteArray());
-
-        visorProceso.setContent((org.zkoss.image.Image) imagenProceso);
+        try {
+        	generateImage(engine, proc, definicion);
+        } catch (Exception e) {
+        	log.warn("Error generating workflow image", e);
+        }
 
 
         proceso.setValue(definicion.getName() + " (Ver. " + definicion.getTag() //$NON-NLS-1$
@@ -385,6 +362,41 @@ public class ProcessUI extends Frame {
 
         }
     }
+
+	private void generateImage(BpmEngine engine, ProcessInstance proc, ProcessDefinition definicion)
+			throws InternalErrorException, IOException {
+		byte[] imagen;
+		org.zkoss.image.Image imagenProceso;
+		ByteArrayOutputStream streamSalidaImagen;
+		imagen = engine.getProcessDefinitionImage(definicion);
+
+        BufferedImage imagenBuffered = ImageIO.read(new ByteArrayInputStream(
+                imagen));
+        imagenBuffered.getGraphics().setColor(Color.RED);
+
+        int[] coordinates = engine.getCoordinates(proc);
+
+        Graphics2D graph = (Graphics2D) imagenBuffered.getGraphics();
+        graph.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                1.0F));
+        graph.setPaint(new Color(255, 140, 140));
+        graph.setStroke(new BasicStroke(2.5f));
+
+        // log.debug("Dibujamos en: X: " + coordinates[0] + " Y: " +
+        // coordinates[1] + " Ancho: " + coordinates[2] + " Alto: " +
+        // coordinates[3]);
+        graph.draw(new Rectangle2D.Double((double) coordinates[0],
+                (double) coordinates[1], (double) coordinates[2],
+                (double) coordinates[3]));
+
+        streamSalidaImagen = new ByteArrayOutputStream();
+        ImageIO.write(imagenBuffered, "jpeg", streamSalidaImagen); //$NON-NLS-1$
+
+        imagenProceso = new AImage("image/jpeg", streamSalidaImagen //$NON-NLS-1$
+                .toByteArray());
+
+        visorProceso.setContent((org.zkoss.image.Image) imagenProceso);
+	}
 
 	private void describeTokens(ProcessInstance proc, BpmEngine engine)
 			throws BPMException, InternalErrorException {
@@ -590,12 +602,12 @@ public class ProcessUI extends Frame {
 
 		tablaTareas.getTreechildren().getChildren().clear();
 		
-		loadProcesses ( engine, roots, new HashSet<Long> (), tablaTareas.getTreechildren());
+		loadProcesses ( engine, roots, new HashSet<Long> (), tablaTareas.getTreechildren(), true);
 		
 	}
 
 
-    private void loadProcesses(BpmEngine engine, Set<Long> roots, HashSet<Long> processed, Treechildren treechildren) throws InternalErrorException, BPMException {
+    private void loadProcesses(BpmEngine engine, Set<Long> roots, HashSet<Long> processed, Treechildren treechildren, boolean expandir) throws InternalErrorException, BPMException {
     	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
     	for ( Long id: roots )
     	{
@@ -606,7 +618,7 @@ public class ProcessUI extends Frame {
     			{
 	    			processed.add(id);
 	    			Treeitem item = new Treeitem(); item.setParent(treechildren);
-	    			item.setOpen(true);
+	    			item.setOpen(expandir);
 	    			Treerow row = new Treerow(); row.setParent(item);
 	    			row.appendChild(  new Treecell( Labels.getLabel("process.lblProceso")+" "+id.toString()));
 	    			row.appendChild( new Treecell(proc.getDescription()));
@@ -618,7 +630,7 @@ public class ProcessUI extends Frame {
 	    			loadProcessJobs ( engine, proc, tch );
 	    			
 	    			HashSet<Long> childProcs = new HashSet<Long>(engine.findChildProcesses(proc.getId()));
-	    			loadProcesses(engine, childProcs, processed, tch);
+	    			loadProcesses(engine, childProcs, processed, tch, false);
     			}
     		}
     	}
@@ -667,33 +679,36 @@ public class ProcessUI extends Frame {
 	private void loadProcessJobs(BpmEngine engine, ProcessInstance proc, Treechildren treechildren) throws InternalErrorException, BPMException {
     	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
 		List<Job> tasks = engine.getActiveJobs(proc);
-		for (Iterator<Job> it = tasks.iterator(); it.hasNext(); )
+		if (tasks != null)
 		{
-			Job job = it.next();
-
-			
-			Treeitem item = new Treeitem();
-			item.setValue(job);
-			item.setParent(treechildren);
-			Treerow row = new Treerow(); row.setParent(item);
-			row.appendChild( new Treecell( Labels.getLabel("job.lbldefinicionTarea")+" "+ job.getId()));
-			row.appendChild( new Treecell(job.getName()));
-			row.appendChild( new Treecell ( df.format( job.getDueDate() ) ));
-			
-			if (job.isPaused())
+			for (Iterator<Job> it = tasks.iterator(); it.hasNext(); )
 			{
-				row.appendChild( new Treecell ( Labels.getLabel ("job.status.pause" )));
-			} else if (job.isError())
-			{
-				row.appendChild( new Treecell ( Labels.getLabel("job.status.error" )));
-			} else if (job.getFailures() > 0 && job.getErrorMessage() != null) {
-				row.appendChild( new Treecell ( Labels.getLabel("job.status.warning" )));
-			} else {
-				row.appendChild( new Treecell ( Labels.getLabel("job.status.pending" )));
+				Job job = it.next();
+	
+				
+				Treeitem item = new Treeitem();
+				item.setValue(job);
+				item.setParent(treechildren);
+				Treerow row = new Treerow(); row.setParent(item);
+				row.appendChild( new Treecell( Labels.getLabel("job.lbldefinicionTarea")+" "+ job.getId()));
+				row.appendChild( new Treecell(job.getName()));
+				row.appendChild( new Treecell ( df.format( job.getDueDate() ) ));
+				
+				if (job.isPaused())
+				{
+					row.appendChild( new Treecell ( Labels.getLabel ("job.status.pause" )));
+				} else if (job.isError())
+				{
+					row.appendChild( new Treecell ( Labels.getLabel("job.status.error" )));
+				} else if (job.getFailures() > 0 && job.getErrorMessage() != null) {
+					row.appendChild( new Treecell ( Labels.getLabel("job.status.warning" )));
+				} else {
+					row.appendChild( new Treecell ( Labels.getLabel("job.status.pending" )));
+				}
+	
+				row.appendChild( new Treecell());
+				row.addEventListener("onClick", onSelectJob);
 			}
-
-			row.appendChild( new Treecell());
-			row.addEventListener("onClick", onSelectJob);
 		}
 	}
 

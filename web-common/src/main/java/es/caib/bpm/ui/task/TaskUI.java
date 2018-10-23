@@ -262,34 +262,11 @@ public class TaskUI extends Frame implements EventListener {
         definicion = engine.getProcessDefinition(instanciaProceso);
         setCurrentDefinition(definicion);
 
-        imagen = engine.getProcessDefinitionImage(definicion);
-
-        BufferedImage imagenBuffered = ImageIO.read(new ByteArrayInputStream(
-                imagen));
-        imagenBuffered.getGraphics().setColor(Color.RED);
-
-        int[] coordinates = engine.getCoordinates(task);
-
-        Graphics2D graph = (Graphics2D) imagenBuffered.getGraphics();
-        graph.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                1.0F));
-        graph.setPaint(new Color(255, 140, 140));
-        graph.setStroke(new BasicStroke(2.5f));
-
-        // log.debug("Dibujamos en: X: " + coordinates[0] + " Y: " +
-        // coordinates[1] + " Ancho: " + coordinates[2] + " Alto: " +
-        // coordinates[3]);
-        graph.draw(new Rectangle2D.Double((double) coordinates[0],
-                (double) coordinates[1], (double) coordinates[2],
-                (double) coordinates[3]));
-
-        streamSalidaImagen = new ByteArrayOutputStream();
-        ImageIO.write(imagenBuffered, "jpeg", streamSalidaImagen); //$NON-NLS-1$
-
-        imagenProceso = new AImage("image/jpeg", streamSalidaImagen //$NON-NLS-1$
-                .toByteArray());
-
-        visorImagenes.setContent((org.zkoss.image.Image) imagenProceso);
+        try {
+	        generateImage(engine, definicion, task);
+        } catch (Exception e) {
+        	log.warn("Error rendering workflow image", e);
+        }
 
         // Establecemos los datos de proceso
 
@@ -438,6 +415,41 @@ public class TaskUI extends Frame implements EventListener {
         }
     }
 
+	private void generateImage(BpmEngine engine, ProcessDefinition definicion, TaskInstance task)
+			throws InternalErrorException, IOException {
+		byte[] imagen;
+		org.zkoss.image.Image imagenProceso;
+		ByteArrayOutputStream streamSalidaImagen;
+		imagen = engine.getProcessDefinitionImage(definicion);
+
+		BufferedImage imagenBuffered = ImageIO.read(new ByteArrayInputStream(
+		        imagen));
+		imagenBuffered.getGraphics().setColor(Color.RED);
+
+		int[] coordinates = engine.getCoordinates(task);
+
+		Graphics2D graph = (Graphics2D) imagenBuffered.getGraphics();
+		graph.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+		        1.0F));
+		graph.setPaint(new Color(255, 140, 140));
+		graph.setStroke(new BasicStroke(2.5f));
+
+		// log.debug("Dibujamos en: X: " + coordinates[0] + " Y: " +
+		// coordinates[1] + " Ancho: " + coordinates[2] + " Alto: " +
+		// coordinates[3]);
+		graph.draw(new Rectangle2D.Double((double) coordinates[0],
+		        (double) coordinates[1], (double) coordinates[2],
+		        (double) coordinates[3]));
+
+		streamSalidaImagen = new ByteArrayOutputStream();
+		ImageIO.write(imagenBuffered, "jpeg", streamSalidaImagen); //$NON-NLS-1$
+
+		imagenProceso = new AImage("image/jpeg", streamSalidaImagen //$NON-NLS-1$
+		        .toByteArray());
+
+		visorImagenes.setContent((org.zkoss.image.Image) imagenProceso);
+	}
+
 
     private void disableInputbox(final Component componente) {
     	if (componente instanceof AbstractTag)
@@ -520,17 +532,21 @@ public class TaskUI extends Frame implements EventListener {
 
         for (Iterator it = business.getTags().iterator(); it.hasNext();) {
             String tag = (String) it.next();
-            DocumentService document = business.getDocument(tag);
-
-            item = new Listitem();
-            item.appendChild(new Listcell(document.getExternalName()));
-            item.appendChild(new Listcell(document.getMimeType()));
-            item.setValue(tag);
-
-            item.appendChild(new Listcell(Messages.getString("TaskUI.PublicInfo"))); //$NON-NLS-1$
-            item.appendChild(new Listcell("")); //$NON-NLS-1$
-
-            tablaArchivos.getItems().add(item);
+            try {
+	            DocumentService document = business.getDocument(tag);
+	
+	            item = new Listitem();
+	            item.appendChild(new Listcell(document.getExternalName()));
+	            item.appendChild(new Listcell(document.getMimeType()));
+	            item.setValue(tag);
+	
+	            item.appendChild(new Listcell(Messages.getString("TaskUI.PublicInfo"))); //$NON-NLS-1$
+	            item.appendChild(new Listcell("")); //$NON-NLS-1$
+	
+	            tablaArchivos.getItems().add(item);
+            } catch (Exception e) {
+            	
+            }
         }
     }
 

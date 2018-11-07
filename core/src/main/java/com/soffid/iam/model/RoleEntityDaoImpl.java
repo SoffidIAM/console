@@ -292,7 +292,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 						
 				}
 				if ( ! found )
+				{
+					grant.setRoleId(entity.getId());
 					createRoleDependency(grant, true);
+				}
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
@@ -357,6 +360,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				}
 				if ( ! found )
 				{
+					grant.setOwnerRole(entity.getId());
 					createRoleDependency(grant, false);
 					anyChange = true;
 				}

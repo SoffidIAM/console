@@ -23,6 +23,7 @@ import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAccountEntityDao;
 import com.soffid.iam.model.RoleEntity;
@@ -54,6 +55,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
@@ -67,7 +70,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
  */
 public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implements ApplicationContextAware
 {
-
+	Log log = LogFactory.getLog(getClass());
 	private ApplicationContext ctx;
 	private SessionFactory sessionFactory;
 
@@ -266,7 +269,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
 
 		List<Long> allUsers = new LinkedList<Long>();
-		for (UserEntity u: getUserEntityDao().loadAll())
+		for (UserEntity u: getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId", 
+				new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())} ))
 		{
 			allUsers.add(u.getId());
 		}
@@ -280,7 +284,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				session.load(rule, rule.getId());
 				i = 0;
 			}
-			System.out.println("User "+l);
+			log.info("User "+l);
 			UserEntity u = getUserEntityDao().load(l);
 			apply (rule, u);
 		}
@@ -392,7 +396,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
 
 		List<Long> allUsers = new LinkedList<Long>();
-		for (UserEntity u: getUserEntityDao().loadAll())
+		for (UserEntity u: getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId", 
+				new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())} ))
 		{
 			allUsers.add(u.getId());
 		}
@@ -406,7 +411,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 //				session.clear();
 				i = 0;
 			}
-			System.out.println("User "+l);
+			log.info("User "+l);
 			UserEntity u = getUserEntityDao().load(l);
 			
 			doApply(rule, u, new InterpreterEnvironment(u), report);

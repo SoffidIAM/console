@@ -123,13 +123,13 @@ public class DispatcherServiceImpl extends
 			}
 	
 			// Check user domain
-			if (dispatcher.getUsersDomain().isEmpty()) {
+			if (dispatcher.getUsersDomain() == null || dispatcher.getUsersDomain().isEmpty()) {
 				throw new IllegalArgumentException(
 						Messages.getString("DispatcherServiceImpl.UserDomainRequired")); //$NON-NLS-1$
 			}
 	
 			// Check password domain
-			if (dispatcher.getPasswordsDomain().isEmpty()) {
+			if (dispatcher.getPasswordsDomain() == null || dispatcher.getPasswordsDomain().isEmpty()) {
 				throw new IllegalArgumentException(
 						Messages.getString("DispatcherServiceImpl.PasswordDomainRequired")); //$NON-NLS-1$
 			}

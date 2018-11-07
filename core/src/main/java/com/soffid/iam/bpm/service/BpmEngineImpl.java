@@ -132,6 +132,7 @@ import es.caib.bpm.exception.BPMErrorCodes;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.exception.InvalidConfigurationException;
 import es.caib.bpm.exception.InvalidParameterException;
+import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
@@ -864,7 +865,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			org.jbpm.graph.exe.ProcessInstance process = context
 					.loadProcessInstance(instanceVO.getId());
 			LinkedList parsedLogs = new LinkedList();
-			parseLog(context, process, parsedLogs, process.getRootToken());
+			parseLog(context, process, parsedLogs, process.getRootToken(), false);
 			Collections.sort(parsedLogs, new Comparator() {
 				public int compare(Object arg0, Object arg1) {
 					ProcessLog l1 = (ProcessLog) arg0;
@@ -891,6 +892,38 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
+	@Override
+	protected ProcessLog[] handleGetTaskLog(TaskInstance instanceVO)
+			throws Exception {
+		JbpmContext context = getContext();
+		try {
+			
+			org.jbpm.taskmgmt.exe.TaskInstance task = context.getTaskInstance(instanceVO.getId());
+			LinkedList parsedLogs = new LinkedList();
+
+			for (ProcessHierarchyEntity parent: getProcessHierarchyEntityDao().findByChildren(task.getProcessInstance().getId()))
+			{
+				long processId = parent.getParentProcess().longValue();
+				addSubprocessLog(context, task.getProcessInstance(), parsedLogs, processId, 0);
+			}
+
+			parseLog(context, task.getProcessInstance(), parsedLogs, task.getToken(), true );
+			Collections.sort(parsedLogs, new Comparator() {
+				public int compare(Object arg0, Object arg1) {
+					ProcessLog l1 = (ProcessLog) arg0;
+					ProcessLog l2 = (ProcessLog) arg1;
+					return l1.getDate().compareTo(l2.getDate());
+				}
+			});
+			
+			ProcessLog[] logs = (ProcessLog[]) parsedLogs
+					.toArray(new ProcessLog[parsedLogs.size()]);
+			return logs;
+		} finally {
+			flushContext(context);
+		}
+	}
+
 	private void addSubprocessLog(JbpmContext context, org.jbpm.graph.exe.ProcessInstance process,
 			LinkedList parsedLogs, long processId, int position) {
 		org.jbpm.graph.exe.ProcessInstance proc = context.loadProcessInstance(processId);
@@ -908,7 +941,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				parsedLogs.add(position++, log);
 
 				LinkedList<ProcessLog> parsedLogs2 = new LinkedList<ProcessLog>();
-				parseLog(context, proc, parsedLogs2, proc.getRootToken());
+				parseLog(context, proc, parsedLogs2, proc.getRootToken(), false);
 				Collections.sort(parsedLogs2, new Comparator() {
 					public int compare(Object arg0, Object arg1) {
 						ProcessLog l1 = (ProcessLog) arg0;
@@ -936,9 +969,13 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	private void parseLog(JbpmContext context,
 			org.jbpm.graph.exe.ProcessInstance process, LinkedList parsedLogs,
-			org.jbpm.graph.exe.Token t) {
+			org.jbpm.graph.exe.Token t,
+			boolean parentOnly) {
 		Criteria criteria = null;
 
+		
+		if (t.hasParent() && parentOnly && t.getParent() != null)
+			parseLog(context, process, parsedLogs, t.getParent(), parentOnly);
 		criteria = context.getSession().createCriteria(
 				org.jbpm.logging.log.ProcessLog.class);
 
@@ -950,10 +987,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.next();
 			parseLog(process, parsedLogs, pl);
 		}
-		for (Iterator it2 = t.getChildren().values().iterator(); it2.hasNext();) {
-			org.jbpm.graph.exe.Token childToken = (org.jbpm.graph.exe.Token) it2
-					.next();
-			parseLog(context, process, parsedLogs, childToken);
+		
+		if (! parentOnly)
+		{
+			for (Iterator it2 = t.getChildren().values().iterator(); it2.hasNext();) {
+				org.jbpm.graph.exe.Token childToken = (org.jbpm.graph.exe.Token) it2
+						.next();
+				parseLog(context, process, parsedLogs, childToken, parentOnly);
+			}
 		}
 
 	}
@@ -1375,10 +1416,19 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected TaskInstance handleExecuteTask(TaskInstance task,
 			String transitionName) throws Exception {
 		JbpmContext context = getContext();
-		;
+		org.jbpm.graph.exe.ProcessInstance process = context.getProcessInstance(task.getProcessId());
+		if (process == null)
+			throw new InternalErrorException("Unable to find process "+task.getProcessId());
+		
+		org.jbpm.taskmgmt.exe.TaskInstance instance = context.getTaskInstance(task.getId());
+		if (instance == null)
+			throw new InternalErrorException("Unable to find process "+task.getId());
+		if (instance.hasEnded() || instance.isCancelled())
+			throw new UserWorkflowException( String.format("Task %d is already finished", instance.getId()));
+		
+
 		try {
-			org.jbpm.taskmgmt.exe.TaskInstance instance = doUpdate(context,
-					task);
+			instance = doUpdate(context, task);
 			startAuthenticationLog(instance.getToken());
 			instance.end(transitionName);
 			endAuthenticationLog(instance.getToken());

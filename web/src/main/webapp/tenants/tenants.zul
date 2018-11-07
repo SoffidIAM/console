@@ -233,7 +233,6 @@
 							boolean forbidden = false;
 							for ( String tp: ctx.getDataSource().getJXPathContext().iterate("/permissions/newValue"))
 							{
-								System.out.println ("Checking role "+role+" against "+tp);
 								if (role.startsWith(tp))
 									forbidden = true;
 							}

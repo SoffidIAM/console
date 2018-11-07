@@ -2,9 +2,11 @@ package com.soffid.iam.service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.TenantCriteria;
@@ -87,6 +89,7 @@ public class TenantServiceImpl extends TenantServiceBase {
 		{
 			throw new SecurityException("Not allowed to update tenants from "+Security.getCurrentTenantName()+" tenant");
 		}
+		disabledPermissions.remove(tenant.getId());
 		TenantEntity entity = getTenantEntityDao().tenantToEntity(tenant);
 		getTenantEntityDao().update(entity);
 		return getTenantEntityDao().toTenant(entity);
@@ -102,6 +105,7 @@ public class TenantServiceImpl extends TenantServiceBase {
 		tep.setAppliesTo(te);
 		tep.setPermission(permission);
 		getTenantDisabledPermissionEntityDao().create(tep);
+		disabledPermissions.remove(tenant.getId());
 	}
 
 	@Override
@@ -117,21 +121,31 @@ public class TenantServiceImpl extends TenantServiceBase {
 				break;
 			}
 		}
+		disabledPermissions.remove(tenant.getId());
 	}
 
+	
+	Map<Long, List<String>> disabledPermissions = new HashMap<Long, List<String>>();
 	@Override
 	protected List<String> handleGetDisabledPermissions(Tenant tenant)
 			throws Exception {
-		List<String> result = new LinkedList<String>();
+		List<String> result = disabledPermissions.get(tenant.getId());
 		
-		TenantEntity te = getTenantEntityDao().load(tenant.getId());
-		for (TenantDisabledPermissionEntity tep: te.getDisabledPermissions())
+		if (result == null)
 		{
-			result.add(tep.getPermission());
-		}
+			result = new LinkedList<String>();
 		
-		if ( ! result.isEmpty())
-			result.add(Security.AUTO_AUTHORIZATION_ALL);
+			TenantEntity te = getTenantEntityDao().load(tenant.getId());
+			for (TenantDisabledPermissionEntity tep: te.getDisabledPermissions())
+			{
+				result.add(tep.getPermission());
+			}
+			
+			if ( ! result.isEmpty())
+				result.add(Security.AUTO_AUTHORIZATION_ALL);
+			
+			disabledPermissions.put(tenant.getId(), result);
+		}
 		
 		return result;
 	}

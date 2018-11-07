@@ -415,9 +415,13 @@ public class Security {
     		{
 		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
     		} else {
-				Tenant t = getTenantService().getTenant(tenant);
-				if ( t == null)
+				Long tenantId = getTenantId(tenant);
+				if ( tenantId == null)
 					throw new RuntimeException("Invalid tenant: "+tenant);
+				Tenant t = new Tenant();
+				t.setId(tenantId);
+				t.setName(tenant);
+				t.setDescription(tenant);
 				if (roles == Security.ALL_PERMISSIONS)
 				{
 					if (auths == null)

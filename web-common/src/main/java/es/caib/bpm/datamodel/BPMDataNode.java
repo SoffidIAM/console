@@ -31,7 +31,7 @@ public class BPMDataNode extends DummyDataNode {
 									return false;
 								}
                         },
-                        DummyDataNode.class);
+                        TaskDataNode.class);
         // Process
         addFinder("processInstance", //$NON-NLS-1$
                 new Finder () {

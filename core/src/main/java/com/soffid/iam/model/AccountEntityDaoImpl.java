@@ -309,6 +309,7 @@ public class AccountEntityDaoImpl extends
 		target.setName(entry.account.getName());
 		target.setOwnerGroups(entry.account.getOwnerGroups());
 		target.setOwnerRoles(entry.account.getOwnerRoles());
+		target.setOwnerUsers(entry.account.getOwnerUsers());
 		target.setPasswordExpiration(entry.account.getPasswordExpiration());
 		target.setPasswordPolicy(entry.account.getPasswordPolicy());
 		target.setType(entry.account.getType());

@@ -108,6 +108,12 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.bpm.vo.ProcessLog[] getTaskLog(
+		es.caib.bpm.vo.TaskInstance process)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void upgradeProcess(
 		es.caib.bpm.vo.ProcessInstance instanceVO)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {

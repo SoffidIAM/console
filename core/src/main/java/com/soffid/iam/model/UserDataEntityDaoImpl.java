@@ -58,7 +58,7 @@ public class UserDataEntityDaoImpl
 				for (UserDataEntity du: findByTypeAndValue(dadaUsuari.getDataType().getName(), 
 						dadaUsuari.getValue()))
 				{
-					throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.6"),  //$NON-NLS-1$
+					throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.6"),  //$NON-NLS-1$
 							du.getValue(), du.getUser().getUserName())); 
 				}
 	    	}
@@ -85,7 +85,7 @@ public class UserDataEntityDaoImpl
 						dadaUsuariEntity.getValue()))
 				{
 					if (!dadaUsuariEntity.getId().equals(du.getId()))
-						throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.7"),  //$NON-NLS-1$
+						throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.7"),  //$NON-NLS-1$
 							du.getValue(), du.getUser().getUserName())); 
 				}
 	    	}

@@ -333,7 +333,6 @@
 		                  
 		void searchDomainValues (com.soffid.iam.api.Domain domain, String t, List ids) {
 			domainValueListPosition[0] = 0;
-			domainValueList = new LinkedList();
 			domainValueList = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByTextAsync(domain, t);
 			timer.start();
 		}

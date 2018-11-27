@@ -27,7 +27,7 @@
 			cancel();
 		]]></attribute>
 
-		<timer id="timer" repeats="true" delay="1000">
+		<timer id="timer" repeats="true" delay="1000" running="false">
 			<attribute name="onTimer"><![CDATA[
 		    boolean any = false;
 		    any = fetchAsyncData(userList, userListPosition, "user") || any;

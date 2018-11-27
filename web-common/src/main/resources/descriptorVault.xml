@@ -4,7 +4,7 @@
 	<datanode name="root">
 		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				 method="findFolders" if="${!directFilter}">
+				 method="findFolders" if="${enabled &amp;&amp; !directFilter}">
 				<parameter value="${filter}" />
 			</ejb-finder>
 			<new-instance-script>
@@ -23,11 +23,11 @@
 		</finder>
 		<finder name="account" type="account">
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				method="findAccounts"  if="${!directFilter}" > <!--agent:query, application:update -->
+				method="findAccounts"  if="${enabled &amp;&amp; !directFilter}" > <!--agent:query, application:update -->
 				<parameter value="${filter}" />
 			</ejb-finder>
 			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
-				method="findAccount" if="${directFilter}"> <!--agent:query, application:update -->
+				method="findAccount" if="${enabled &amp;&amp; directFilter}"> <!--agent:query, application:update -->
 				<parameter value="${account}" />
 				<parameter value="${system}" />
 			</ejb-finder>
@@ -80,6 +80,12 @@
 			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
 			</ejb-finder>
 		</finder>		
+		<finder name="folder2" type="folder2"> <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				 method="findFolders">
+				<parameter value="${null}" />
+			</ejb-finder>
+		</finder>
 	</datanode>
  
 	<datanode name="folder">
@@ -139,6 +145,15 @@
 			<attribute-validator expr="${instance.name}" notNull="true" maxLength="256" friendlyName="vault.folder.name"/>
 			<attribute-validator expr="${instance.description}" notNull="true" maxLength="1024" friendlyName="vault.folder.description"/>
 		</validator>
+	</datanode>
+
+	<datanode name="folder2">
+		<finder name="folder2" type="folder2">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+				method="getChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder>
 	</datanode>
 
 	<datanode name="type" transient="true">

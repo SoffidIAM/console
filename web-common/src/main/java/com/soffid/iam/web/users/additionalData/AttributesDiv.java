@@ -43,6 +43,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	 */
 	
 	MetadataScope scope;
+	String system;
 	String dataPath;
 	boolean readonly;
 	String objectType; 
@@ -100,7 +101,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 			}
 			else if (scope == MetadataScope.ACCOUNT)
 			{
-				String system = null;
+				String system = this.system;
 				if (ownerObject != null && ownerObject instanceof Account)
 				{
 					system = ((Account)ownerObject).getSystem();
@@ -272,6 +273,14 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 				}
 			}
 		}
+	}
+
+	public String getSystem() {
+		return system;
+	}
+
+	public void setSystem(String accountSystem) {
+		this.system = accountSystem;
 	}
 
 }

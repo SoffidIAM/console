@@ -26,15 +26,6 @@ function configure {
 	    exit 1
 	fi
 
-	if [[ "$JAVA_OPT" == "" ]]
-	then
-	    echo "-Xmx2048m" >/opt/soffid/iam-console-2/bin/run.vmoptions
-	    echo "-Xms256m" >>/opt/soffid/iam-console-2/bin/run.vmoptions
-	else
-	    echo "$JAVA_OPT" >/opt/soffid/iam-console-2/bin/run.vmoptions
-	fi
-
-
 	if [[ "$SECURE" == "true" ]]
 	then
 	    echo "-Djava.security.manager" >>/opt/soffid/iam-console-2/bin/run.vmoptions
@@ -63,6 +54,13 @@ then
    configure || exit 1
 fi
 
+if [[ "$JAVA_OPT" == "" ]]
+then
+    INSTALL4J_ADD_VM_PARAMS="-Xmx2048m -Xms256m"
+else
+    INSTALL4J_ADD_VM_PARAMS="$JAVA_OPT"
+fi
+export INSTALL4J_ADD_VM_PARAMS
 
 if [[ "$SECURE" == "true" ]]
 then

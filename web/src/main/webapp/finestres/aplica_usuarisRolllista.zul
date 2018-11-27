@@ -66,6 +66,7 @@
 									model.commit();
 								}
 								model.getVariables().declareVariable("queryEnabled", false);
+								model.refresh();
 								esquemaLlista.visible=false;
 								view_altres = false;
 							}

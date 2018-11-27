@@ -21,83 +21,53 @@
 		}
 	});
 	
-				void addGrantedUser() {
-					Events.postEvent("onInicia", desktop.getPage("usuarisLlista")
-							.getFellow("esquemaLlista"), self);
+	void grant(List identities) {
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
+		for (com.soffid.iam.web.component.Identity id: identities)
+		{
+			if (id.getType() == com.soffid.iam.web.component.Identity.Type.USER)
+			{
+				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+						+ "/"+treeGrants.getAttribute("userList"), 
+						Usuari.toUsuari(id.getObject()));
+			}
+			if (id.getType() == com.soffid.iam.web.component.Identity.Type.GROUP)
+			{
+				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+						+ "/"+treeGrants.getAttribute("groupList"), 
+						Grup.toGrup(id.getObject()));
+			}
+			if (id.getType() == com.soffid.iam.web.component.Identity.Type.ROLE)
+			{
+				XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
+						+ "/"+treeGrants.getAttribute("roleList"), 
+						Rol.toRol(id.getObject()));
+			}
+		}
+	}
+
+				void addGranted ()
+				{
+					Page p = desktop.getPage("identity");
+					p.setVariable("types",
+								new com.soffid.iam.web.component.Identity.Type[] {
+										com.soffid.iam.web.component.Identity.Type.GROUP,
+										com.soffid.iam.web.component.Identity.Type.USER,
+										com.soffid.iam.web.component.Identity.Type.ROLE
+								}
+							);
+					p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("accounts.addIdentity"));
+					p.setVariable("invoker", btnGrantUser);
+					Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
+
 				}
-				void grantUser(Object[] dades) {
-					String codiUsuari = (String) dades[0];
-					String nomComplert = (String) dades[1];
-					String idUsuari = (String) dades[2];
-					// Creem l'autorització
-					Usuari u = new Usuari();
-					u.setId(Long.decode(idUsuari));
-					u.setCodi(codiUsuari);
-					u.setFullName(nomComplert);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("userList"), u);
-				}
-				void addGrantedRole() {
-					desktop.getPage("rolsLlista").setAttribute("tipus", "cap");
-					desktop.getPage("rolsLlista").setAttribute("mostraGestionableWF",
-							"true");//perquè mostre rols gestionableWF	
-					desktop.getPage("rolsLlista").setAttribute("usuari", ""); //??	
-					Events.postEvent("onInicia",
-							desktop.getPage("rolsLlista").getFellow("esquemaLlista"), self);
-				}
-				void grantRole(Object[] dades) {
-					//Obtenim les dades del rol
-					//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
-					String nomRol = (String) dades[0];
-					String codiAplicacio = (String) dades[1];
-					String descripcio = (String) dades[2];
-					String bbdd = (String) dades[5];
-					String idrol = (String) dades[6];
-					// Creem l'autorització
-					Rol r = new Rol();
-					r.setId(Long.decode(idrol));
-					r.setNom(nomRol);
-					r.setDescripcio(descripcio);
-					r.setBaseDeDades(bbdd);
-					r.setCodiAplicacio(codiAplicacio);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("roleList"), r);
-				}
-				void addGrantedGroup() {
-					desktop.getPage("grupsLlista").setAttribute("tipus", "");
-					desktop.getPage("grupsLlista").setAttribute("llistaObsolets", false);
-					Events.postEvent("onInicia",
-							desktop.getPage("grupsLlista").getFellow("esquemaLlista"), self);
-				}
-				void grantGroup(Object[] dades) {
-					String codiGrup = (String) dades[0];
-					String descGrup = (String) dades[1];
-					String idGrup = (String) dades[2];
-					// Creem l'autorització
-					Grup g = new Grup();
-					g.setCodi(codiGrup);
-					g.setId(Long.decode(idGrup));
-					g.setDescripcio(descGrup);
-					ctx = XPathUtils.getComponentContext(self);
-					path = XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()
-							+ "/"+treeGrants.getAttribute("groupList"), g);
-				}
-	]]></zscript>
+
+				]]></zscript>
 	<toolbar>
 		<toolbarbutton image="~./img/list-add.gif"
-			id="btnGrantUser" label="${c:l('accounts.addUser')}"
-			visible="${canModifyAccounts}" onClick="addGrantedUser()"
-			onActualitza="grantUser(event.data)" />
-		<toolbarbutton image="~./img/list-add.gif"
-			id="btnGrantGroup" label="${c:l('accounts.addGroup')}"
-			visible="${canModifyAccounts}" onClick="addGrantedGroup()"
-			onActualitza="grantGroup(event.data)" />
-		<toolbarbutton image="~./img/list-add.gif"
-			id="btnGrantRole" label="${c:l('accounts.addRole')}"
-			visible="${canModifyAccounts}" onClick="addGrantedRole()"
-			onActualitza="grantRole(event.data)" />
+			id="btnGrantUser" label="${c:l('contenidoTarea.btnAgregar')}"
+			visible="${canModifyAccounts}" onClick="addGranted()"
+			onIdentity="grant(event.data)" />
 		<deletetreebutton acces="${canModifyAccounts}"
 			id="b_esborrar" potEsborrarBranquesAmbFills="false"
 			tree="treeGrants" />

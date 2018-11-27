@@ -11,6 +11,8 @@
     import com.soffid.iam.api.User;
     import com.soffid.iam.api.Group;
     import com.soffid.iam.api.Role;
+    import es.caib.zkib.datasource.XPathUtils;
+    
 	Component macro = self;
 	macro.addEventListener("onEnable", new org.zkoss.zk.ui.event.EventListener() {
 		void onEvent (Event evt) {

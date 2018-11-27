@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
@@ -502,93 +503,26 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private void applyAttributesChange(User user, ProcessTracker tracker) throws InternalErrorException {
 		AuthoritativeChange change = tracker.change;
 		
+		Map<String, Object> attributes = getUserService().findUserAttributes(user.getUserName());
+		
+		
 		for (String attribute : change.getAttributes().keySet()) {
-            Object value = change.getAttributes().get(attribute);
-            if (value != null && value instanceof Date) {
-                Calendar c = Calendar.getInstance();
-                c.setTime((Date) value);
-                value = c;
-            }
             DataType tda = getAdditionalDataService().findDataTypeByName(attribute);
+            auditAuthoritativeChange(tracker);
             if (tda == null) {
                 long i = 100;
                 tda = new DataType();
                 for (DataType tda2 : getAdditionalDataService().getDataTypes()) {
                     if (tda2.getOrder().longValue() >= i) i = tda2.getOrder().longValue() + 1;
                 }
-                auditAuthoritativeChange(tracker);
                 tda.setOrder(i);
                 tda.setCode(attribute);
 				tda.setScope(MetadataScope.USER);
 				tda.setType(TypeEnumeration.STRING_TYPE);
 				tda = getAdditionalDataService().create(tda);
 			}
-			UserData dada = getUserService().findDataByUserAndCode(user.getUserName(), attribute);
-			if (dada == null && value != null)
-			{
-				auditAuthoritativeChange(tracker);
-				dada = new UserData();
-				dada.setAttribute(tda.getCode());
-				dada.setUser(user.getUserName());
-				if (value instanceof byte[])
-					dada.setBlobDataValue((byte[]) value);
-				else if (value instanceof Calendar)
-					dada.setDateValue((Calendar) value);
-				else if (value != null)
-					dada.setValue(value.toString());
-				getAdditionalDataService().create(dada);
-			} 
-			else if (value == null && dada!= null)
-			{
-				auditAuthoritativeChange(tracker);
-				getAdditionalDataService().delete(dada);
-			} 
-			else if (value != null && value instanceof byte[] ) 
-			{
-				if ( ! ((byte[])value).equals(dada.getBlobDataValue()))
-				{
-					auditAuthoritativeChange(tracker);
-					dada.setBlobDataValue((byte[])value);
-					getAdditionalDataService().update(dada);
-				}
-			}
-			else if (value != null && value instanceof Calendar) 
-			{
-				if ( ! ((Calendar)value).equals(dada.getDateValue()))
-				{
-					auditAuthoritativeChange(tracker);
-					dada.setDateValue((Calendar)value);
-					getAdditionalDataService().update(dada);
-				}
-			}
-			else if (value != null && value instanceof Date) 
-			{
-				Calendar vc = Calendar.getInstance();
-				vc.setTime((Date)value);
-				if (! vc.equals(dada.getDateValue()))
-				{
-					auditAuthoritativeChange(tracker);
-					dada.setDateValue((Calendar)value);
-					getAdditionalDataService().update(dada);
-				}
-			}
-			else if (value != null && value instanceof Date) 
-			{
-				Calendar c = Calendar.getInstance();
-				c.setTime((Date) value);
-				if ( ! c.equals(dada.getDateValue()))
-				{
-					auditAuthoritativeChange(tracker);
-					dada.setDateValue(c);
-					getAdditionalDataService().update(dada);
-				}
-			}
-			else if (value != null && ! value.equals(dada.getValue())) 
-			{
-				auditAuthoritativeChange(tracker);
-				dada.setValue(value.toString());
-				getAdditionalDataService().update(dada);
-			}
+            Object value = change.getAttributes().get(attribute);
+            attributes.put(attribute, value);
 		}
 	}
 	
@@ -608,10 +542,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 current.getGroups().add(grup.getName());
             }
     		
-    		current.setAttributes(new HashMap<String, Object>());
-    		for (UserData dus : getUserService().findUserDataByUserName(user)) {
-                current.getAttributes().put(dus.getAttribute(), dus.getBlobDataValue() != null ? dus.getBlobDataValue() : dus.getDateValue() != null ? dus.getDateValue() : dus.getValue());
-            }
+    		current.setAttributes( getUserService().findUserAttributes(user));
     		return current;
 		}
 	}

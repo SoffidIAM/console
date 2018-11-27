@@ -244,7 +244,7 @@ public class AdditionalDataServiceImpl extends
 
 	public UserData handleCreate(UserData dadaUsuari) throws InternalErrorException {
 		
-		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType(dadaUsuari.getUser(), dadaUsuari.getAttribute());
+		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().load ( dadaUsuari.getId());
 		
 		if (dadaUsuariEntity == null)
 			dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);

@@ -182,6 +182,12 @@ public abstract class AccountEntity {
 		
 	}
 
+	@DaoOperation
+	public void removeFromCache (AccountEntity entity) 
+	{
+		
+	}
+
 	@DaoFinder("from com.soffid.iam.model.AccountEntity where :text is null")
 	public Collection<AccountEntity>findByText (String text) { return null; }
 	

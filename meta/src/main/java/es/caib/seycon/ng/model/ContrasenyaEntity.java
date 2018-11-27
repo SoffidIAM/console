@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_CONTRA", translatedName="PasswordEntity", translatedPackage="com.soffid.iam.model" )
@@ -56,14 +58,14 @@ public abstract class ContrasenyaEntity {
 	@DaoFinder("from  com.soffid.iam.model.PasswordEntity as contrasenyaEntity \n"
 			+ "where contrasenyaEntity.user = :user and contrasenyaEntity.domain = :domain\n"
 			+ "and contrasenyaEntity.order = 0\n")
-	public es.caib.seycon.ng.model.ContrasenyaEntity findLastByUsuariDomini(
+	public Collection<es.caib.seycon.ng.model.ContrasenyaEntity> findLastByUsuariDomini(
 		es.caib.seycon.ng.model.UsuariEntity user, 
 		es.caib.seycon.ng.model.DominiContrasenyaEntity domain) {
 	 return null;
 	}
 }
 
-@Index(name="SC_CONTRA_ORDRE_UK", unique=true, columns= {"CTR_IDUSU", "CTR_ORDRE"}, entity=ContrasenyaEntity.class)
+@Index(name="SC_CONTRA_ORDRE_UK", unique=true, columns= {"CTR_IDUSU", "CTR_DCN_ID", "CTR_ORDRE"}, entity=ContrasenyaEntity.class)
 class ContrasenyaEntityOrderUK
 {
 	

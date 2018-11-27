@@ -44,6 +44,10 @@ public abstract class AccountMetadataEntity {
 	@Nullable
 	public Boolean required;
 
+	@Column(name = "AME_MULTIV")
+	@Nullable
+	public Boolean multiValued;
+
 	@Description("blank separated list of url-encoded values")
 	@Column(name = "AME_VALUE", length = 64000)
 	@Nullable

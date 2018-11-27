@@ -22,6 +22,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.api.UserData;
 import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.service.BpmEngine;
@@ -67,6 +68,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -589,6 +591,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			tasque.setTransaction(TaskHandler.UPDATE_ROLE);
 			tasque.setRole(Role.getName());
 			tasque.setDb(Role.getSystem().getName());
+			tasque.setSystemName(Role.getSystem().getName());
 			getTaskEntityDao().createNoFlush(tasque);
 			auditarRol("D", nomRol, codiAplicacio, codiBaseDeDades); //$NON-NLS-1$
 		} catch (Throwable e) {
@@ -718,11 +721,25 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		targetVO.setIndirectAssignment((rolsPosseidorsRol.size() != 0 || grupsPosseidors
 				.size() != 0) ? "*" : ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-        targetVO.setAttributes(new HashMap<String, Object>());
-		for ( RoleAttributeEntity att: sourceEntity.getAttributes())
-		{
-			targetVO.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
+		targetVO.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = targetVO.getAttributes();
+		for (RoleAttributeEntity att : sourceEntity.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
 		}
+
 	}
 
 	/**
@@ -1238,6 +1255,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				updateRole.setStatus("P");
 				updateRole.setRole(role.getName());
 				updateRole.setDatabase(role.getSystem().getName());
+				updateRole.setSystemName(role.getSystem().getName());
 				TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
 				getTaskEntityDao().createNoFlush(tasca);
 			}
@@ -1440,6 +1458,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
             tasque.setRole(entity.getName());
             tasque.setSystemName(entity.getSystem().getName());
+            tasque.setDb(entity.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
 
             getSession(false).flush();
@@ -1520,6 +1539,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
             tasque.setRole(entity.getName());
             tasque.setSystemName(entity.getSystem().getName());
+            tasque.setDb(entity.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
             if (! sameName)
             {
@@ -1528,6 +1548,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
                 tasque.setTransaction(TaskHandler.UPDATE_ROLE);
                 tasque.setRole(oldName);
                 tasque.setSystemName(oldSystem);
+                tasque.setDb(oldSystem);
                 getTaskEntityDao().createNoFlush(tasque);
             }
             getSession(false).flush();
@@ -1585,6 +1606,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
         tasque.setRole(entity.getName());
         tasque.setSystemName(entity.getSystem().getName());
+        tasque.setDb(entity.getSystem().getName());
         getTaskEntityDao().createNoFlush(tasque);
 
         entity.setApprovalEnd(new java.util.Date());
@@ -1635,6 +1657,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         tasque.setTransaction(TaskHandler.UPDATE_ROLE);
         tasque.setRole(entity.getName());
         tasque.setSystemName(entity.getSystem().getName());
+        tasque.setDb(entity.getSystem().getName());
         getTaskEntityDao().createNoFlush(tasque);
 
         entity.setApprovalEnd(new java.util.Date());

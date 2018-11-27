@@ -36,6 +36,12 @@ public abstract class AccountAttributeEntity {
 	@Column(name = "AAT_BLOB", length = 400000)
 	@Nullable
 	public byte[] blobDataValue;
+	
+	public Object getObjectValue () { return null;}
+	
+	public void setObjectValue (Object value) {}
+
+
 
 	@DaoFinder("select att from com.soffid.iam.model.AccountAttributeEntity as att "
 			+ "where att.account.name = :account and "

@@ -74,6 +74,7 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserAccountEntityImpl;
+import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
@@ -747,8 +748,9 @@ public class ApplicationServiceImpl extends
         if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
         {
         	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(rolsUsuaris.getAccountName(), rolsUsuaris.getSystem());
-        	if (acc != null)
+        	if (acc != null) {
         		rolsUsuaris.setAccountId(acc.getId());
+        	}
         }
         	
         List<RoleAccount> grantsToCreate = new LinkedList<RoleAccount>();
@@ -809,6 +811,7 @@ public class ApplicationServiceImpl extends
            		Security.nestedLogoff();
            	}
         	ra.setAccountId(account.getId());
+        	ra.setAccountName(account.getName());
         }
         	
         // Check group holder
@@ -2238,116 +2241,193 @@ public class ApplicationServiceImpl extends
 
 	private void updateApplicationAttributes (Application app, InformationSystemEntity entity) throws InternalErrorException
 	{
-		if (app.getAttributes() == null)
-			app.setAttributes(new HashMap<String, Object>());
-		
-		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
-		for ( ApplicationAttributeEntity att: entity.getAttributes())
+		if (entity != null)
 		{
-			Object v = app.getAttributes().get(att.getMetadata().getName());
-			att.setObjectValue(v);
-			getApplicationAttributeEntityDao().update(att);
-			keys.remove(att.getMetadata().getName());
-		}
-		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
-		for (String key: keys)
-		{
-			Object v = app.getAttributes().get(key);
-			if ( v != null)
+			Map<String, Object> attributes = app.getAttributes();
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<ApplicationAttributeEntity> entities = new LinkedList<ApplicationAttributeEntity> (entity.getAttributes());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
 			{
-				boolean found = false;
-				ApplicationAttributeEntity aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity ();
-				for ( MetaDataEntity d: md)
+				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.APPLICATION, key))
 				{
-					if (d.getName().equals(key))
+					Object v = attributes.get(key);
+					if (v == null)
 					{
-						aae.setMetadata(d);
-						found = true;
-						break;
+						// Do nothing
+					}
+					else if (v instanceof List)
+					{
+						List l = (List) v;
+						for (Object o: (List) v)
+						{
+							if (o != null)
+							{
+								updateApplicationAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateApplicationAttribute(entity, entities, key, metadata, v);
 					}
 				}
-				if (!found)
-					throw new InternalErrorException(String.format("Unknown attribute %s", key));
-				aae.setObjectValue(v);
-				aae.setInformationSystem(entity);
-				getApplicationAttributeEntityDao().create(aae);
 			}
-		}
-		
-		for ( MetaDataEntity m: md)
-		{
-			Object o = app.getAttributes().get(m.getName());
-			if ( o == null || "".equals(o))
+			
+			getApplicationAttributeEntityDao().remove(entities);
+			entity.getAttributes().removeAll(entities);
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
+			
+			for ( MetaDataEntity m: md)
 			{
-				if (m.getRequired() != null && m.getRequired().booleanValue())
-					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
-			} else {
-				if (m.getUnique() != null && m.getUnique().booleanValue())
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
 				{
-					if (getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), o.toString()).size() > 1)
-						throw new InternalErrorException(String.format("Already exists a role with %s %s",
-								m.getLabel(), o.toString()));
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<ApplicationAttributeEntity> p = getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a user with %s %s",
+										m.getLabel(), v));
+						}
+					}
 				}
 			}
 		}
 	}
 
-	private void updateRoleAttributes (Role app, RoleEntity entity) throws InternalErrorException
-	{
-		if (app.getAttributes() == null)
-			app.setAttributes(new HashMap<String, Object>());
-		
-		HashSet<String> keys = new HashSet<String>(app.getAttributes().keySet());
-		for ( RoleAttributeEntity att: entity.getAttributes())
+	private void updateApplicationAttribute(InformationSystemEntity entity, LinkedList<ApplicationAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) {
+		ApplicationAttributeEntity aae = findApplicationAttributeEntity(attributes, key, value);
+		if (aae == null)
 		{
-			Object v = app.getAttributes().get(att.getMetadata().getName());
-			att.setObjectValue(v);
-			getRoleAttributeEntityDao().update(att);
-			keys.remove(att.getMetadata().getName());
+			aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity();
+			aae.setInformationSystem(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getApplicationAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
 		}
-		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
-		for (String key: keys)
+		else
+			attributes.remove(aae);
+	}
+
+	private ApplicationAttributeEntity findApplicationAttributeEntity(LinkedList<ApplicationAttributeEntity> entities, String key,
+			Object o) {
+		for (ApplicationAttributeEntity aae: entities)
 		{
-			Object v = app.getAttributes().get(key);
-			if ( v != null)
+			if (aae.getMetadata().getName().equals(key))
 			{
-				boolean found = false;
-				RoleAttributeEntity aae = getRoleAttributeEntityDao().newRoleAttributeEntity ();
-				for ( MetaDataEntity d: md)
-				{
-					if (d.getName().equals(key))
-					{
-						aae.setMetadata(d);
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-					throw new InternalErrorException(String.format("Unknown attribute %s", key));
-				aae.setObjectValue(v);
-				aae.setRole(entity);
-				getRoleAttributeEntityDao().create(aae);
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
 			}
 		}
-		
-		for ( MetaDataEntity m: md)
+		return null;
+	}
+
+
+	private void updateRoleAttributes (Role app, RoleEntity entity) throws InternalErrorException
+	{
+		if (entity != null)
 		{
-			Object o = app.getAttributes().get(m.getName());
-			if ( o == null || "".equals(o))
+			Map<String, Object> attributes = app.getAttributes();
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<RoleAttributeEntity> entities = new LinkedList<RoleAttributeEntity> (entity.getAttributes());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
 			{
-				if (m.getRequired() != null && m.getRequired().booleanValue())
-					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
-			} else {
-				if (m.getUnique() != null && m.getUnique().booleanValue())
+				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.ROLE, key))
 				{
-					List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getName(), o.toString());
-					if (p.size() > 1)
-						throw new InternalErrorException(String.format("Already exists a role with %s %s",
-								m.getLabel(), o.toString()));
+					Object v = attributes.get(key);
+					if (v == null)
+					{
+						// Do nothing
+					}
+					else if (v instanceof List)
+					{
+						List l = (List) v;
+						for (Object o: (List) v)
+						{
+							if (o != null)
+							{
+								updateRoleAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateRoleAttribute(entity, entities, key, metadata, v);
+					}
+				}
+			}
+			
+			getRoleAttributeEntityDao().remove(entities);
+			entity.getAttributes().removeAll(entities);
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().loadAll();
+			
+			for ( MetaDataEntity m: md)
+			{
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
+				{
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a role with %s %s",
+										m.getLabel(), v));
+						}
+					}
 				}
 			}
 		}
 	}
+
+	private void updateRoleAttribute(RoleEntity entity, LinkedList<RoleAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) {
+		RoleAttributeEntity aae = findRoleAttributeEntity(attributes, key, value);
+		if (aae == null)
+		{
+			aae = getRoleAttributeEntityDao().newRoleAttributeEntity();
+			aae.setRole(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getRoleAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private RoleAttributeEntity findRoleAttributeEntity(LinkedList<RoleAttributeEntity> entities, String key,
+			Object o) {
+		for (RoleAttributeEntity aae: entities)
+		{
+			if (aae.getMetadata().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
+	}
+
 
 	@Override
 	protected Collection<Role> handleFindRoleByJsonQuery(String query)

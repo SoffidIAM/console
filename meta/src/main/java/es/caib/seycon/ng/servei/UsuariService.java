@@ -207,6 +207,21 @@ public abstract class UsuariService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.user_query.class }, translated = "findUserAttributes")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Map<String, Object> findUserAttributes(
+			@Nullable java.lang.String codiUsuari)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_metadata_update.class }, translated = "updateUserAttributes")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void updateUserAttributes(
+			java.lang.String codiUsuari, java.util.Map<String, Object> attributes)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Operation(translated = "getDataType")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> getTipusDades()

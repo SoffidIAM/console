@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,33 +20,33 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 
 import es.caib.seycon.ng.EJBLocator;
+import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.xml.XmlDataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathRerunEvent;
 import es.caib.zkib.events.XPathSubscriber;
 
-public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
+public class AccountAttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	/**
 	 * 
 	 */
 	
-	MetadataScope scope;
 	String dataPath;
 	boolean readonly;
-	String objectType; 
 	Object ownerObject;
 	String ownerBind;
 	String ownerContext;
@@ -73,49 +74,9 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		binder.setDataPath(dataPath);
 	}
 
-	public String getScope() {
-		return scope.toString();
-	}
-
-	public void setScope(String scope) {
-		this.scope = MetadataScope.fromString(scope);
-		updateMetadata();
-	}
-
-	public void updateMetadata() {
+	private void updateMetadata() {
 		try {
-			if (scope == null)
-				return;
-			else if (scope == MetadataScope.CUSTOM)
-			{
-				if (objectType == null || objectType.trim().isEmpty())
-					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
-			}
-			else if (scope == MetadataScope.CUSTOM)
-			{
-				if (objectType == null || objectType.trim().isEmpty())
-					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
-			}
-			else if (scope == MetadataScope.ACCOUNT)
-			{
-				String system = null;
-				if (ownerObject != null && ownerObject instanceof Account)
-				{
-					system = ((Account)ownerObject).getSystem();
-				}
-				if (ownerObject != null && ownerObject instanceof es.caib.seycon.ng.comu.Account)
-				{
-					system = ((es.caib.seycon.ng.comu.Account)ownerObject).getDispatcher();
-				}
-						
-				if (system == null || system.trim().isEmpty())
-					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findSystemDataTypes(system));
-			}
-			else
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(this.scope));
+			dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(MetadataScope.USER));
 			Collections.sort(dataTypes, new Comparator<TipusDada>() {
 				public int compare(TipusDada o1, TipusDada o2) {
 					return o1.getOrdre().compareTo(o2.getOrdre());
@@ -127,7 +88,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		refresh ();
 	}
 
-	public AttributesDiv(){
+	public AccountAttributesDiv(){
 		super();
 	}
 	
@@ -135,7 +96,8 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	{
 		updateMetadata();
 	}
-	
+
+
 	public void onUpdate(XPathEvent arg0) 
 	{
 		try {
@@ -146,62 +108,71 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					if (ownerObject instanceof DataNode)
 						ownerObject = ((DataNode) ownerObject).getInstance();
 				}
-				if (scope == MetadataScope.ACCOUNT)
-					updateMetadata();
-				else
-					refresh ();
+				refresh ();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	boolean recursive = false;
 	private void refresh() {
-		while (getFirstChild() != null)
-			removeChild(getFirstChild());
-		Map<String, Object> attributes = (Map<String, Object>) binder.getValue();
-		if (attributes == null)
-		{
-			attributes = new HashMap<String, Object>();
-			try {
-				binder.setValue(attributes);
-			} catch (Exception e) {
-				return;
-			}
-		}
-		if (attributes != null)
-		{
-			for (TipusDada att: dataTypes)
+		if (recursive)
+			return;
+		recursive = true ;
+		try {
+			while (getFirstChild() != null)
+				removeChild(getFirstChild());
+			List<XmlDataNode> attributes = (List<XmlDataNode>) binder.getValue();
+			if (attributes != null)
 			{
-				Div d = new Div();
-				appendChild(d);
-				d.setSclass(getSclass()+"_row");
-				Label l = new Label (att.getLabel());
-				l.setSclass(getSclass()+"_label");
-				d.appendChild(l);
-				InputField2 input = new InputField2();
-				if (! attributes.containsKey(att.getCodi()))
-					attributes.put(att.getCodi(), null);
-				input.setBind("[@name='"+att.getCodi()+"']");
-				input.setDataType( DataType.toDataType(att));
-				input.setSclass(getSclass()+"_input");
-				input.setReadonly(readonly);
-				input.setOwnerObject(ownerObject);
-				input.setOwnerContext(ownerContext);
-				d.appendChild(input);
-				try {
-					input.createField();
-				} catch (Exception e) {
-					throw new UiException(e);
-				};
-				input.addEventListener("onChange", new EventListener() {
-					public void onEvent(Event event) throws Exception {
-						adjustVisibility();
-						
+				for (TipusDada att: dataTypes)
+				{
+					// Find Datatype
+					int position = 0;
+					boolean found = false;
+					DadaUsuari attValue = null;
+					for ( Iterator<XmlDataNode> it = attributes.iterator(); it.hasNext();)
+					{
+						position ++;
+						attValue = (DadaUsuari) it.next().getInstance();
+						if (attValue.getCodiDada().equals(att.getCodi()))
+						{
+							Div d = new Div();
+							appendChild(d);
+							d.setSclass(getSclass()+"_row");
+							Label l = new Label (att.getLabel());
+							l.setSclass(getSclass()+"_label");
+							d.appendChild(l);
+							InputField2 input = new InputField2();
+							if (att.getType() == TypeEnumeration.DATE_TYPE)
+								input.setBind("["+position+"]/valorDadaDate");
+							else
+								input.setBind("["+position+"]/valorDada");
+							input.setDataType( DataType.toDataType(att));
+							input.setSclass(getSclass()+"_input");
+							input.setReadonly(readonly);
+							input.setOwnerObject(ownerObject);
+							d.appendChild(input);
+							try {
+								input.createField();
+							} catch (Exception e) {
+								throw new UiException(e);
+							};
+							input.addEventListener("onChange", new EventListener() {
+								public void onEvent(Event event) throws Exception {
+									adjustVisibility();
+									
+								}
+							});
+							d.setVisible(input.attributeVisible());
+							break;
+						}
 					}
-				});
-				d.setVisible(input.attributeVisible());
+				}
 			}
+		} finally {
+			recursive = false;
 		}
 	}
 
@@ -222,15 +193,6 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	public String getXPath() {
 		return binder.getXPath();
-	}
-
-	public String getObjectType() {
-		return objectType;
-	}
-
-	public void setObjectType(String objectType) {
-		this.objectType = objectType;
-		updateMetadata();
 	}
 
 	public Object getOwnerObject() {
@@ -274,4 +236,21 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		}
 	}
 
+	public Map<String,Object> getAttributesMap ()
+	{
+		Map<String, Object> m = new HashMap<String, Object>();
+		List<XmlDataNode> attributes = (List<XmlDataNode>) binder.getValue();
+		if (attributes != null)
+		{
+			for ( Iterator<XmlDataNode> it = attributes.iterator(); it.hasNext();)
+			{
+				DadaUsuari attValue = (DadaUsuari) it.next().getInstance();
+				if (attValue.getValorDadaDate() == null)
+					m.put(attValue.getCodiDada(), attValue.getValorDada());
+				else
+					m.put(attValue.getCodiDada(), attValue.getValorDada());
+			}
+		}
+		return m ;
+	}
 }

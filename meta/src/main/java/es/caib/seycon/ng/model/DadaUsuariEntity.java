@@ -5,7 +5,14 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+
 import com.soffid.iam.api.AttributeVisibilityEnum;
+
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.servei.AutoritzacioService;
 import com.soffid.mda.annotation.*;
 
@@ -40,23 +47,12 @@ public abstract class DadaUsuariEntity {
 			+ "left join dadaUsuari.user as user "
 			+ "left join dadaUsuari.dataType as type "
 			+ "where user.userName = :userName and type.name=:dataType and user.tenant.id = :tenantId")
-	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiTipusDada(
+	public Collection<es.caib.seycon.ng.model.DadaUsuariEntity> findDadaByCodiTipusDada(
 		java.lang.String userName, 
 		java.lang.String dataType) {
 	 return null;
 	}
 	
-	@Operation(translated="findByDataType2")
-	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
-			+ "left join dadaUsuari.user as user "
-			+ "left join dadaUsuari.dataType as type "
-			+ "where user.userName = :userName and type.name=:dataType and user.tenant.id = :tenantId")
-	public es.caib.seycon.ng.model.DadaUsuariEntity findDadaByCodiUsuariAndCodiTipusDada(
-		java.lang.String userName, 
-		java.lang.String dataType) {
-	 return null;
-	}
-
 	@DaoFinder("select dadaUsuari from com.soffid.iam.model.UserDataEntity as dadaUsuari "
 			+ "left join dadaUsuari.dataType as type "
 			+ "where dadaUsuari.value = :value and type.name=:dataType and "
@@ -77,9 +73,12 @@ public abstract class DadaUsuariEntity {
 		return false;
 	}
 
+	public void setObjectValue(Object value) {}
+	public Object getObjectValue() {return null;}
+
 }
 
-@Index(columns={"DUS_IDUSU","DUS_TDAID"}, name="SC_DADUSU_USU_UK", unique=true, entity=DadaUsuariEntity.class)
+@Index(columns={"DUS_IDUSU","DUS_TDAID"}, name="SC_DADUSU_USU_UK", entity=DadaUsuariEntity.class)
 class DadaUsuariIndex {
 	
 }

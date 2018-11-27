@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <zk>
+	<style>
+		.accatt {display: table; padding: 0px; width: 100%}
+		.accatt_row {display: table-row}
+		.accatt_row span {}
+		.accatt_label {display: table-cell; width: 202px}
+		.accatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+	</style>
 	<zscript><![CDATA[
 		import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
 		boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+		void doQuery ()
+		{
+			es.caib.seycon.ng.servei.ejb.DispatcherService svc = es.caib.seycon.ng.EJBLocator.getDispatcherService();
+			
+			String name = es.caib.zkib.datasource.XPathUtils.getValue(button, "/@name");
+			String system = es.caib.zkib.datasource.XPathUtils.getValue(button, "/@dispatcher");
+
+			Map map = svc.getNativeObject(
+					system,
+					es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT,
+					name, system);
+			Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+			for (String key: map.keySet())
+			{
+				map.put(key, stringify(map.get(key), ""));
+			}
+			Events.postEvent("onStart", c, new Object[]{
+					name,
+					map
+			});
+		}
 	]]>
 	</zscript>
-	<grid dataPath="attribute" sclass="noBorderGrid"
-		if="${canUpdateUserMetadata}" fixedLayout="true">
-		<columns>
-			<column width="260px"/>
-			<column />
-		</columns>
-		<datarow>
-			<input_etiqueta bind="@dataLabel" width_custom="250px"/>
-			<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/>
-		</datarow>
-	</grid>
+	<div dataPath="attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+		ownerBind="." id="attributes"
+		if="${canUpdateUserMetadata}" scope="account" sclass="accatt" >
+	</div>
+	
+	<hbox style="margin-left:auto; margin-right:auto">
+		<button label="${c:l('vault.details')}" id="button"
+			onClick="doQuery()" />
+	</hbox>
+	
+ 	<include src="finestres/agent_objectAttributes.zul"/>
 </zk>

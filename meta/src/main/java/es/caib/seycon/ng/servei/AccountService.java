@@ -156,6 +156,23 @@ public abstract class AccountService {
 	/**
 	 * 
 	 * @param account
+	 * @return
+	 * @throws es.caib.seycon.ng.exception.InternalErrorException
+	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
+	 */
+	@Description ("Creates a shared account, including its attributes")
+	@Operation ( grantees={roles.agent_update.class,roles.account_create.class},
+			translated="createAccount2")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Account createAccount2(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
+	 return null;
+	}
+	
+	/**
+	 * 
+	 * @param account
 	 * @throws es.caib.seycon.ng.exception.InternalErrorException
 	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
 	 */
@@ -164,6 +181,22 @@ public abstract class AccountService {
 			translated="updateAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public Account updateAccount(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param account
+	 * @throws es.caib.seycon.ng.exception.InternalErrorException
+	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
+	 */
+	@Description("Updates a shared account, including its attributes")
+	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
+			translated="updateAccount2")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Account updateAccount2(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.AccountAlreadyExistsException {
 		return null;

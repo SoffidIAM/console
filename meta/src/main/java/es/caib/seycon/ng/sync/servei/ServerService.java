@@ -14,6 +14,7 @@ import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.servei.PasswordService;
+import es.caib.seycon.ng.servei.UsuariService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.DispatcherService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,
+	UsuariService.class,
 	PasswordService.class,
 	CustomObjectService.class,
 	AttributeTranslationService.class})
@@ -282,6 +284,12 @@ public abstract class ServerService {
 	}
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
 	public java.util.Collection<es.caib.seycon.ng.comu.DadaUsuari> getUserData(
+		long userId)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
+	 return null;
+	}
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
+	public java.util.Map<String,Object> getUserAttributes(
 		long userId)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
 	 return null;

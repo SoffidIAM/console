@@ -17,6 +17,7 @@
 					model.getJXPathContext().getVariables().declareVariable("synchro", "true");
 					qw = esquema.getFellow("queryWindow");
 					searchBox = qw.getFellow("searchBox");
+					searchBox.setBasicMode();
 					searchBox.addAttribute("userName").setSearchFilter(requestedUser);
 					searchBox.search();
 					if (esquema.getFellow("lista").getFellow("listbox").getItems().size() == 1)
@@ -1243,8 +1244,8 @@
 
 								<hbox width="100%"
 									widths="40%,1px,40%,1px,*">
-									<div use="com.soffid.iam.web.users.additionalData.UserAttributesDiv" 
-										dataPath="/esquema/lista/listbox:/dada" readonly="${!canUpdateUserMetadata }"
+									<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" scope="user" 
+										dataPath="/esquema/lista/listbox:/attributes[1]" readonly="${!canUpdateUserMetadata }"
 										ownerBind="./"
 										ownerContext="console"
 										sclass="useratt"

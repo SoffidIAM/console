@@ -63,6 +63,11 @@
 							onClick="" onCheck="" />
 					</row>
 					<row >
+						<input_etiqueta value="${c:l('dadesAddicionals.zul.Multivalued')}" />
+						<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
+							onClick="" onCheck="" />
+					</row>
+					<row >
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}" />
 						<textbox bind="@size" id="detail_size" maxlength="50" sclass="textbox"
 							readonly="${!canModifyMetadata}" width="8em" onChange="" />

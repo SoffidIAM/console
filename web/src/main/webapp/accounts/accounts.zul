@@ -255,6 +255,11 @@
 							}
 							);
 				}
+				
+				void onChangeDispatcher()
+				{
+					Path.getComponent("/esquema/dades/attributesEmbed/attributes").updateMetadata();
+				}
 				void selectParent() {
 					es.caib.zkib.component.DataTree tree = selectFolderWnd
 							.getFellow("folderTree");
@@ -381,14 +386,14 @@
 				</listbox>
 			</navegador>
 
-			<detalls id="dades" width="${amplaria}" style="border: none">
+			<detalls id="dades" width="100%" style="border: none">
 				<toolbar height="22px" if="${requestedAccount != null}">
 					<commitbutton datamodel="/model" />
 				</toolbar>
-				<form dataPath="/esquema/lista/listbox:/" id="form"
+				<form dataPath="/esquema/lista/listbox:/" id="form"  width="100%"
 					onChangeXPath="updateFormFields()">
 					<timer delay="10000" repeats="true" onTimer="checkIsUpdatePending();"/>
-					<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+					<tabbox id="panels" class="thicktabbox"  width="100%">
 						<tabs>
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />
@@ -396,7 +401,7 @@
 							<tab label="${c:l('accounts.attribute') }"/>
 						</tabs>
 
-						<tabpanels>
+						<tabpanels >
 							<tabpanel id="basica">
 								<hbox width="100%" widths="50%,1px,45%,*">
 									<grid>
@@ -421,6 +426,7 @@
 													value="${c:l('accounts.dispatcher')}:" />
 												<hbox>
 													<listbox bind="@dispatcher" id="lbAccountDispatcher"
+														onSelect="onChangeDispatcher()"
 														mold="select" dataPath="/model:/dispatcher">
 														<dataitem bind="@codi">
 															<listcell bind="@codi" />
@@ -955,8 +961,8 @@
 									</hbox>
 								</vbox>
 							</tabpanel>
-							<tabpanel id="attributes">
-								<embed src="/accounts/attributes.zul"/>
+							<tabpanel id="attributes" width="100%">
+								<embed src="/accounts/attributes.zul" width="100%" id="attributesEmbed"/>
 							</tabpanel>
 						</tabpanels>
 					</tabbox>

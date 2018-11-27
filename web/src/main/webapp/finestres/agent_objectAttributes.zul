@@ -65,7 +65,8 @@
 					</rows>
 				</grid>
 				<grid 
-					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  fixedLayout="false">
+					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  fixedLayout="false"
+					style="max-heigth: 800px; overflow-y: auto">
 					<columns>
 						<column width="200px"/>
 						<column />

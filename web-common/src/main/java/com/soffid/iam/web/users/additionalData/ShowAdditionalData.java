@@ -87,12 +87,7 @@ public class ShowAdditionalData {
 	
 	public void checkRequiredAttributes (DataNode userNode) throws InternalErrorException, CreateException, NamingException
 	{
-		DataModelCollection lm = userNode.getListModel("dada");
-		for (int i = 0; i < lm.getSize(); i++)
-		{
-			DataNode dadaNode = (DataNode) lm.getDataModel(i);
-			checkRequiredAttribute(dadaNode);
-		}
+		System.out.println();
 	}
 
 	public void checkRequiredAttribute (DataNode dadaNode) throws InternalErrorException, CreateException, NamingException

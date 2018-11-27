@@ -158,7 +158,7 @@ public class DispatcherServiceImpl extends
 	
 			updateAutomaticTasks(dispatcher, false);
 	
-			handleSetDefaultMappingsByDispatcher(dispatcher.getId());
+//			handleSetDefaultMappingsByDispatcher(dispatcher.getId());
 	
 			updateTipusAndGrups(dispatcher, dispatcherEntity);
 	

@@ -6,6 +6,9 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.DataType;
+
+import es.caib.seycon.ng.comu.TypeEnumeration;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -47,6 +50,8 @@ public class AccountMetadataEntityDaoImpl extends AccountMetadataEntityDaoBase
 			}
 			target.setValues(values);
 		}
+		if (source.getDataObjectType() != null)
+			target.setDataObjectType(source.getDataObjectType().getName());
 	}
 
 	@Override
@@ -76,6 +81,13 @@ public class AccountMetadataEntityDaoImpl extends AccountMetadataEntityDaoBase
 				}
 			}
 			target.setValues(b.toString());
+		}
+		if (source.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+		{
+			CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(source.getDataObjectType());
+			if (cot == null)
+				throw new RuntimeException("Invalid custom object type "+source.getCustomObjectType());
+			target.setDataObjectType(cot);
 		}
 	}
 }

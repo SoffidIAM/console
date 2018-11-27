@@ -78,6 +78,10 @@ public abstract class AccountMetadataEntity {
 	@Nullable
 	public Boolean unique;
 
+	@Description("Object type instances acting as value of the attribute, for custom object type attributes")
+	@Column (name="TDA_COT_ID", reverseAttribute="refererncedBy", composition=true)
+	@Nullable
+	CustomObjectTypeEntity dataObjectType;
 	/********************** DAOS ************************/
 	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name\n"
 			+ "and system.tenant.id=:tenantId")

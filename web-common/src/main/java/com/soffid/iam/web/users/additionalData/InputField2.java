@@ -411,7 +411,8 @@ public class InputField2 extends Div
 						{
 							createFieldElement(new Integer(i), l.get(i));
 						}
-						createFieldElement(new Integer(i), null);
+						if (!readonly)
+							createFieldElement(new Integer(i), null);
 					}
 				}
 				else

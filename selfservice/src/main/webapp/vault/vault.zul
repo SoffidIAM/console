@@ -309,6 +309,7 @@
 	
 	<folderWindow id="folderWindow"></folderWindow>
 	<accountWindow id="accountWindow"/>
+	<include src="customObjectsllista.zul" />
 	<include src="usuarisllista.zul"/>
 	<include src="grupsllista.zul"/>
 	<include src="rolsllista.zul"/>

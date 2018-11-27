@@ -1011,9 +1011,11 @@
 					</hbox>
 					<space width="2em"></space>
 					<hbox width="18em" align="center" pack="start">
-						<textbox type="password" width="18em" id="password"
-							onOK="onSetPassword();">
-						</textbox>
+						<h:form style="display:inline">
+							<textbox type="password" width="18em" id="password"
+								onOK="onSetPassword();">
+							</textbox>
+						</h:form>
 					</hbox>
 				</hbox>
 				<hbox align="center" pack="end" width="30em">
@@ -1054,9 +1056,10 @@
 		</window>
 		
 	</frame>
+	<include src="customObjectsllista.zul" />
+	<include src="usuarisllista.zul" />
+	<include src="grupsllista.zul" />
 	<include src="rolsllista.zul" />
 	<include src="finestres/canviPassword.zul" />
 	<include src="finestres/identity.zul" />
-	<include src="usuarisllista.zul" />
-	<include src="grupsllista.zul" />
 </zk>

@@ -35,6 +35,6 @@ public class CustomObjectTypeEntity {
 	public CustomObjectTypeEntity findByName (String name) {return null;}
 }
 
-@Index(columns="COT_NAME", unique=true, name="SC_CUOBTY_UK", entity=CustomObjectTypeEntity.class)
+@Index(columns={"COT_TEN_ID","COT_NAME"}, unique=true, name="SC_CUOBTY_UK", entity=CustomObjectTypeEntity.class)
 class CustomObjectTypeEntityKey {
 }

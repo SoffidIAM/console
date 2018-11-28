@@ -202,13 +202,6 @@
 	</datanode>
 	
 	<datanode name="account">
-		<finder name="attribute" type ="attribute" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
-				method="getAccountAttributes">
-				<parameter value="${instance}"/>
-			</ejb-finder>
-		</finder>
-
 		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService">
 			<insert-method method="createAccount2" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>

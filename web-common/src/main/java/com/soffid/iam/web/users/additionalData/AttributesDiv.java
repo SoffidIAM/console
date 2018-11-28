@@ -53,6 +53,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	private static final long serialVersionUID = 1L;
 	
 	private SingletonBinder binder = new SingletonBinder(this);
+	private SingletonBinder ownerBinder = new SingletonBinder(this);
 
 	private List<TipusDada> dataTypes;
 
@@ -85,6 +86,15 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	public void updateMetadata() {
 		try {
+			if (ownerBind != null) {
+				try {
+					ownerObject = ownerBinder.getValue();
+					if (ownerObject instanceof DataNode)
+						ownerObject = ((DataNode) ownerObject).getInstance();
+				} catch (Exception e) {
+					
+				}
+			}
 			if (scope == null)
 				return;
 			else if (scope == MetadataScope.CUSTOM)
@@ -142,15 +152,17 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		try {
 			if (arg0 instanceof XPathRerunEvent)
 			{
-				if (ownerBind != null) {
-					ownerObject = XPathUtils.getValue(getParent(), ownerBind);
-					if (ownerObject instanceof DataNode)
-						ownerObject = ((DataNode) ownerObject).getInstance();
-				}
 				if (scope == MetadataScope.ACCOUNT)
 					updateMetadata();
 				else
+				{
+					if (ownerBind != null) {
+						ownerObject = ownerBinder.getValue();
+						if (ownerObject instanceof DataNode)
+							ownerObject = ((DataNode) ownerObject).getInstance();
+					}
 					refresh ();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -248,6 +260,9 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	public void setOwnerBind(String ownerBind) {
 		this.ownerBind = ownerBind;
+		try {
+			ownerBinder.setDataPath(ownerBind);
+		} catch (Exception e) {}
 	}
 
 	public String getOwnerContext() {

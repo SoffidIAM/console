@@ -13,13 +13,18 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Tree;
+import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.Treerow;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
@@ -31,6 +36,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.Embed;
+import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
@@ -64,6 +70,7 @@ public class VaultFrame extends Frame {
 		getModel().getVariables().declareVariable("account", requestedAccount);
 		getModel().getVariables().declareVariable("system", requestedSystem);
 		getModel().getVariables().declareVariable("enabled", true);
+		getFellow("esquema").getFellow("lista").getFellow("b_inserir").addEventListener("onClick", addRootFolder);
 		if (requestedAccount != null && requestedSystem != null)
 		{
 			getModel().getVariables().declareVariable("directFilter", true);
@@ -97,6 +104,7 @@ public class VaultFrame extends Frame {
 		
 	}
 
+	
 	EventListener onPerformQuery = new EventListener() {
 		public void onEvent(Event event) throws Exception
 		{
@@ -134,11 +142,13 @@ public class VaultFrame extends Frame {
 		this.currentContext = currentContext;
 	}
 	
-	void addRootFolder () throws Exception
-	{
-		String path = XPathUtils.createPath(getModel(), "/folder");
-		Events.sendEvent (new Event("onNewFolder", getFolderWindow(), path));
-	}
+	public EventListener addRootFolder = new EventListener() {
+		@Override
+		public void onEvent(Event event) throws Exception {
+			String path = XPathUtils.createPath(getModel(), "/folder");
+			Events.sendEvent (new Event("onNewFolder", getFolderWindow(), path));
+		}
+	};
 	
 	
 	private Component getFolderWindow() {
@@ -218,8 +228,7 @@ public class VaultFrame extends Frame {
 		es.caib.zkib.binder.BindContext ctx = currentContext;
 		String accountName = (String) XPathUtils.getValue(ctx, "@name");
 		Missatgebox.confirmaOK_CANCEL(
-				org.zkoss.util.resource.Labels
-						.getLabel("vault.folder.remove", new Object[] { accountName }), 
+				String.format(org.zkoss.util.resource.Labels.getLabel("vault.folder.remove"), accountName), 
 				org.zkoss.util.resource.Labels.getLabel("vault.confirm"), 
 				new EventListener() {
 			public void onEvent(Event evt) throws CommitException {
@@ -246,6 +255,7 @@ public class VaultFrame extends Frame {
 	
 	void setPassword (Component button) throws InternalErrorException, NamingException, CreateException, CommitException
 	{
+		selectItem(button);
 		getModel().commit ();
 		try{
 			final Window newPasswordS = (Window) getAccountWindow().getFellow("newPasswordS");
@@ -278,8 +288,9 @@ public class VaultFrame extends Frame {
 			}else if (account.getType().equals(es.caib.seycon.ng.comu.AccountType.PRIVILEGED)){
 				newPassword.setAttribute("acco", account);
 				ctx = XPathUtils.getComponentContext(button);
-				String parent = ctx.getXPath();
-				parent = parent.substring(0, parent.lastIndexOf('['));
+				String path = ctx.getXPath();
+				newPassword.setAttribute("path", path);
+				String parent = path.substring(0, path.lastIndexOf('['));
 				newPassword.setAttribute("parentPath", parent);
 				java.util.Calendar dia = java.util.Calendar.getInstance();
 				dia.add(java.util.Calendar.DAY_OF_MONTH, 1);
@@ -490,4 +501,55 @@ public class VaultFrame extends Frame {
 	}
 	
 
+	public void checkIsUpdatePending ()
+	{
+		Treeitem item = getTreebox().getSelectedItem();
+		if (item != null)
+		{
+		    es.caib.zkib.datamodel.DataNode dn = (DataNode) XPathUtils.getValue(item, ".");
+		    if (dn == null)
+		    	return;
+		    final Account account = (Account) dn.getInstance();
+	    	Treerow row = item.getTreerow();
+			Treecell cell = (Treecell) row.getFirstChild();
+			Component link = (Component) cell.getChildren().get(3);
+			if (link.getAttribute("warning") == null )
+			{
+				final Image image = new Image("~./img/exclamacio.gif");
+				image.setStyle("margin-left: 24px");
+				image.setAttribute("warning", "true");
+				cell.insertBefore(image, link);
+				final Timer timer = (Timer) getPage().getFellow("timer");
+				timer.addEventListener("onTimer", new EventListener() {
+					@Override
+					public void onEvent(Event event) throws Exception {
+						if ( ! ServiceLocator.instance().getAccountService().isUpdatePending(account))
+						{
+							image.detach();
+							timer.removeEventListener("onTimer", this);
+						}
+					}
+				});
+			}
+    		Div owner = (Div) item.getTreerow().getFirstChild().getChildren().get(4);
+	    	if (! account.getType().equals( AccountType.PRIVILEGED))
+	    	{
+	    		owner.setVisible(false);
+	    	} else {
+	    		String ownerUser = null;
+	    		
+	    		try { 
+	    			dn.getListModel("owner").refresh();
+	    			ownerUser = (String) XPathUtils.getValue(item, "/owner/@userName");	
+	    		} catch (Exception e) {}
+	    		if ( ownerUser == null || ownerUser.isEmpty())
+		    		owner.setVisible(false);
+	    		else
+	    		{
+		    		owner.setVisible(true);
+	    			((Component)owner.getChildren().get(2)).addEventListener("onClick", checkinHPAccount );
+	    		}
+	    	}
+		}
+	}
 }

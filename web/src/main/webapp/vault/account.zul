@@ -24,7 +24,6 @@
 		position="center,center" width="80%" use="com.soffid.iam.web.vault.AccountWindow">
 		<form id="form" dataPath="/model:/void" orient="vertical"
 			width="100%" style="padding: 10px">
-			<timer delay="10000" repeats="true" id="timer"/>
 			<tabbox id="panels" width="${amplaria2}"
 				class="thicktabbox">
 				<tabs>
@@ -317,11 +316,13 @@
 							innerWindow.getFellow("ownerRow").setVisible (true);
 						} catch (Exception e) {}
 						try {
-							String parentPath = newPassword.getAttribute("parentPath");
-							es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath).refresh();
+							String path = newPassword.getAttribute("path");
+							es.caib.zkib.datasource.XPathUtils.getValue(model, path).refresh();
 						} catch (Exception e) {
 								e.printStackTrace();
 						}
+						innerWindow.checkIsUpdatePending();
+						topframe.checkIsUpdatePending();
 					}
 					else
 					{
@@ -426,6 +427,7 @@
 					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
 					onCancelPassword();
 					innerWindow.checkIsUpdatePending();
+					topframe.checkIsUpdatePending();
 				}
 			]]>
 		</zscript>

@@ -11,6 +11,12 @@
 	<language-name>xul/html</language-name>
 	
 	<component>
+		<extends>window</extends>
+		<component-name>task</component-name>
+		<component-class>es.caib.bpm.toolkit.WorkflowWindow</component-class>
+	</component>
+
+	<component>
 		<extends>treecell</extends>
 		<component-name>apptreecell</component-name>
 		<component-class>es.caib.bpm.ui.tree.ApplicationTreecell</component-class>

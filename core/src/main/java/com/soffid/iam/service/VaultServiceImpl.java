@@ -120,10 +120,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		if (!entity.getChildren().isEmpty())
 			throw new SeyconException("Cannot remove folder with accounts inside");
 		
-		for ( VaultFolderAccessEntity ace: entity.getAcl())
-		{
-			checkRemoveParentAce (entity, ace);
-		}
+		getVaultFolderAccessEntityDao().remove(entity.getAcl());
 		getVaultFolderEntityDao().remove(entity);
 	}
 

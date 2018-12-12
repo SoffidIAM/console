@@ -78,7 +78,7 @@ public class AccountWindow extends Window implements AfterCompose {
 				onOpenAccount((String) evt.getData());
 			}
 		});
-		getFellow("timer").addEventListener("onTimer", new org.zkoss.zk.ui.event.EventListener() {
+		getPage().getFellow("timer").addEventListener("onTimer", new org.zkoss.zk.ui.event.EventListener() {
 			public void onEvent(Event evt) throws UnsupportedEncodingException {
 				checkIsUpdatePending();
 			}
@@ -126,7 +126,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@type",
 				es.caib.seycon.ng.comu.AccountType.SHARED);
 
-		displayFormatSSO(true);
+		displayFormatStandard(true);
 		doHighlighted();
 	}
 
@@ -252,8 +252,8 @@ public class AccountWindow extends Window implements AfterCompose {
 	void displayFormatStandard(boolean isAdmin) {
 		getFellow("txtAccountName").setVisible(true);
 		getFellow("dispatcherRow").setVisible(true);
-		getFellow("typeRow").setVisible(false);
-		getFellow("dispatcherRow").setVisible(false);
+		getFellow("typeRow").setVisible(true);
+		getFellow("dispatcherRow").setVisible(true);
 		getFellow("enabledRow").setVisible(true);
 		getFellow("passwordPolicyRow").setVisible(true);
 
@@ -577,6 +577,7 @@ public class AccountWindow extends Window implements AfterCompose {
 			Account account = (Account) ((DataNode) XPathUtils.getValue(ctx, ".")).getInstance();
 			if (account.getType().equals(AccountType.USER)) {
 				newPasswordS.setAttribute("acco", account);
+				newPasswordS.setAttribute("path", accountPath);
 				SelfService service = EJBLocator.getSelfService();
 				String afectats = service.queryOtherAffectedAccounts(account);
 				if (afectats != null) {

@@ -1394,12 +1394,16 @@ public class InternalPasswordServiceImpl extends
 			{
 				SystemEntity dispatcher = dao.findByName(defaultName); //$NON-NLS-1$
 				if (dispatcher != null)
+				{
+					defaultDispatchers.put(Security.getCurrentTenantName(), defaultName);
 					return defaultName;
+				}
 			}
 			
 			for (SystemEntity dispatcher : dao.loadAll()) {
                 if (dispatcher.isMainSystem()) {
                     defaultDispatcher = dispatcher.getName();
+					defaultDispatchers.put(Security.getCurrentTenantName(), defaultDispatcher);
                     return defaultDispatcher;
                 }
             }

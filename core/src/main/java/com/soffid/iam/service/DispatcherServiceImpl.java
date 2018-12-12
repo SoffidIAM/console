@@ -775,53 +775,7 @@ public class DispatcherServiceImpl extends
 	@Override
 	protected boolean handleIsUserAllowed(com.soffid.iam.api.System dispatcher,
 			String user) throws Exception {
-		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
-		if (de == null)
-			return false;
-		UserEntity ue = getUserEntityDao().findByUserName(user);
-		if (ue.getActive().equals("N"))
-			return false;
-
-		if (de.getManualAccountCreation() != null
-				&& de.getManualAccountCreation())
-			return true;
-
-		// Test user types
-		boolean found = false;
-		for (Iterator<UserTypeSystemEntity> it = de.getUserType().iterator(); !found
-				&& it.hasNext();) {
-			UserTypeSystemEntity tu = it.next();
-			if (tu.getUserType().getId().equals(ue.getUserType().getId()))
-				found = true;
-		}
-		if (!found)
-			return false;
-
-		// Test dispatcher groups
-		if (!de.getSystemGroup().isEmpty()) {
-			found = false;
-			for (Iterator<SystemGroupEntity> it = de.getSystemGroup()
-					.iterator(); it.hasNext() && !found;) {
-				SystemGroupEntity gde = it.next();
-				if (userBelongsToGroup(ue, gde.getGroup()))
-					found = true;
-			}
-			if (!found)
-				return false;
-		}
-
-		// Test role-based condition
-		if (de.getRoleBased().equals("S")) { //$NON-NLS-1$
-			Collection<RoleGrant> grants = getApplicationService()
-					.findEffectiveRoleGrantByUser(ue.getId());
-			for (RoleGrant grant : grants) {
-				if (grant.getSystem().equals(de.getName()))
-					return true;
-			}
-			return false;
-		}
-		return true;
-
+		return handleIsUserAllowed(dispatcher, user, null);
 	}
 
 	private boolean userBelongsToGroup(UserEntity userEntity, GroupEntity grup) {
@@ -1839,7 +1793,58 @@ public class DispatcherServiceImpl extends
 
 	@Override
 	protected void handleRenameAccounts(com.soffid.iam.api.System dispatcher) throws Exception {
-		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected boolean handleIsUserAllowed(com.soffid.iam.api.System dispatcher, String user,
+			Collection<RoleGrant> grants) throws Exception {
+		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
+		if (de == null)
+			return false;
+		UserEntity ue = getUserEntityDao().findByUserName(user);
+		if (ue.getActive().equals("N"))
+			return false;
+
+		if (de.getManualAccountCreation() != null
+				&& de.getManualAccountCreation())
+			return true;
+
+		// Test user types
+		boolean found = false;
+		for (Iterator<UserTypeSystemEntity> it = de.getUserType().iterator(); !found
+				&& it.hasNext();) {
+			UserTypeSystemEntity tu = it.next();
+			if (tu.getUserType().getId().equals(ue.getUserType().getId()))
+				found = true;
+		}
+		if (!found)
+			return false;
+
+		// Test dispatcher groups
+		if (!de.getSystemGroup().isEmpty()) {
+			found = false;
+			for (Iterator<SystemGroupEntity> it = de.getSystemGroup()
+					.iterator(); it.hasNext() && !found;) {
+				SystemGroupEntity gde = it.next();
+				if (userBelongsToGroup(ue, gde.getGroup()))
+					found = true;
+			}
+			if (!found)
+				return false;
+		}
+
+		// Test role-based condition
+		if (de.getRoleBased().equals("S")) { //$NON-NLS-1$
+			if (grants == null)
+				grants = getApplicationService()
+					.findEffectiveRoleGrantByUser(ue.getId());
+			for (RoleGrant grant : grants) {
+				if (grant.getSystem().equals(de.getName()))
+					return true;
+			}
+			return false;
+		}
+		return true;
 	}
 }

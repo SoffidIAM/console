@@ -835,7 +835,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, dis.getName());
                 String description = ue.getUserName() + " - " + ue.getFullName();
                 if (description.length() > 50) description = description.substring(0, 47) + "...";
-                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user)) {
+                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user, perms)) {
                     if (accs.isEmpty()) {
                         try {
                             generateAccount(null, ue, disEntity, false);

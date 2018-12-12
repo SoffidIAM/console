@@ -20,11 +20,16 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.User;
+import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
@@ -186,36 +191,77 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		{
 			for (TipusDada att: dataTypes)
 			{
-				Div d = new Div();
-				appendChild(d);
-				d.setSclass(getSclass()+"_row");
-				Label l = new Label (att.getLabel());
-				l.setSclass(getSclass()+"_label");
-				d.appendChild(l);
-				InputField2 input = new InputField2();
-				if (! attributes.containsKey(att.getCodi()))
-					attributes.put(att.getCodi(), null);
-				input.setBind("[@name='"+att.getCodi()+"']");
-				input.setDataType( DataType.toDataType(att));
-				input.setSclass(getSclass()+"_input");
-				input.setReadonly(readonly);
-				input.setOwnerObject(ownerObject);
-				input.setOwnerContext(ownerContext);
-				d.appendChild(input);
-				try {
-					input.createField();
-				} catch (Exception e) {
-					throw new UiException(e);
-				};
-				input.addEventListener("onChange", new EventListener() {
-					public void onEvent(Event event) throws Exception {
-						adjustVisibility();
-						
-					}
-				});
-				d.setVisible(input.attributeVisible());
+				AttributeVisibilityEnum v = getVisibility (att);
+				if (v != AttributeVisibilityEnum.HIDDEN)
+				{
+					Div d = new Div();
+					appendChild(d);
+					d.setSclass(getSclass()+"_row");
+					Label l = new Label (att.getLabel());
+					l.setSclass(getSclass()+"_label");
+					d.appendChild(l);
+					InputField2 input = new InputField2();
+					if (! attributes.containsKey(att.getCodi()))
+						attributes.put(att.getCodi(), null);
+					input.setBind("[@name='"+att.getCodi()+"']");
+					input.setDataType( DataType.toDataType(att));
+					input.setSclass(getSclass()+"_input");
+					input.setReadonly(readonly || v == AttributeVisibilityEnum.READONLY);
+					input.setOwnerObject(ownerObject);
+					input.setOwnerContext(ownerContext);
+					d.appendChild(input);
+					try {
+						input.createField();
+					} catch (Exception e) {
+						throw new UiException(e);
+					};
+					input.addEventListener("onChange", new EventListener() {
+						public void onEvent(Event event) throws Exception {
+							adjustVisibility();
+							
+						}
+					});
+					d.setVisible(input.attributeVisible());
+				}
 			}
 		}
+	}
+
+	private AttributeVisibilityEnum getVisibility(TipusDada tda) {
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+
+		String user = null;
+		Object obj = getOwnerObject();
+		if (obj == null)
+			obj = ownerBinder.getValue();
+		if (obj != null && obj instanceof User)
+			user = ((User)obj).getUserName();
+		else if (obj != null && obj instanceof Usuari)
+			user = ((Usuari)obj).getCodi();
+		
+		if (user != null)
+		{
+			String currentUser = Security.getCurrentUser();
+			if (currentUser != null && currentUser.equals(user))
+					return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN
+							: tda.getUserVisibility();
+		}
+
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE : tda.getAdminVisibility();
+		else if (Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE))
+			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE : tda.getOperatorVisibility();
+		else 
+		{
+			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY
+					: tda.getOperatorVisibility();
+			if (AttributeVisibilityEnum.EDITABLE.equals(v))
+				v = AttributeVisibilityEnum.READONLY;
+			return v;
+		} 
 	}
 
 	public void adjustVisibility() {

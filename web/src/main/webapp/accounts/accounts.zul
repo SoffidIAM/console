@@ -1062,4 +1062,5 @@
 	<include src="rolsllista.zul" />
 	<include src="finestres/canviPassword.zul" />
 	<include src="finestres/identity.zul" />
+	<include src="finestres/editorHTML.zul" />
 </zk>

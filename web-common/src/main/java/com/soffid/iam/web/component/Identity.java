@@ -19,6 +19,7 @@ import com.soffid.iam.api.User;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DomainValue;
 
 import es.caib.zkib.events.SerializableEventListener;
@@ -26,7 +27,7 @@ import es.caib.zkib.zkiblaf.ImageClic;
 
 public class Identity implements Comparable<Identity>{
 	public enum Type {
-		USER, ACCOUNT, ROLE, GROUP, GRANT
+		USER, ACCOUNT, ROLE, GROUP, GRANT, CUSTOM_OBJECT, APPLICATION
 	} ;
 	
 	Type type;
@@ -134,6 +135,18 @@ public class Identity implements Comparable<Identity>{
 		object = r;
 	}
 
+	public Identity(CustomObject o) {
+		type = Type.CUSTOM_OBJECT;
+		label = o.getName()+" - "+o.getDescription();
+		object = o;
+	}
+
+	public Identity(Application o) {
+		type = Type.APPLICATION;
+		label = o.getName()+" - "+o.getDescription();
+		object = o;
+	}
+
 	public Type getType() {
 		return type;
 	}
@@ -167,6 +180,7 @@ public class Identity implements Comparable<Identity>{
 			type == Type.GROUP ? "/img/group.png" :
 			type == Type.ROLE ? "/img/key.png":
 			type == Type.GRANT ? "/img/key.png":
+			type == Type.APPLICATION ? "/img/key.png":
 				"/img/account.png");
 		d.appendChild(img);
 		String l = selectorLabel == null ? label: selectorLabel;

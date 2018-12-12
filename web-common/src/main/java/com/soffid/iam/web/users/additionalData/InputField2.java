@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,7 +21,6 @@ import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
-import javax.xml.xpath.XPathException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.zkoss.image.AImage;
@@ -33,7 +33,9 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
@@ -43,17 +45,20 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
+import com.soffid.iam.web.component.Identity;
 
 import bsh.EvalError;
 import bsh.TargetError;
@@ -68,7 +73,6 @@ import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
-import es.caib.zkib.component.DataTextbox;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.JXPathException;
@@ -76,6 +80,16 @@ import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField2 extends Div 
 {
+	private final class TimerEventListener implements EventListener {
+		public void onEvent(Event event) throws Exception {
+			try {
+				updateSearchStatus();
+			} catch (Throwable e) {
+				throw new UiException(""+e);
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 	private String compos;
 	DataType dataType;
@@ -148,7 +162,8 @@ public class InputField2 extends Div
 	public void onSelectCustomObject(Event event) {
 		Page p = getDesktop().getPage("customObjectsLlista");
 		p.setAttribute("type", dataType.getDataObjectType());
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		Boolean multiValued = dataType.isMultiValued();
+		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
 	}
 
 	/** 
@@ -164,14 +179,167 @@ public class InputField2 extends Div
 		((HtmlBasedComponent)div.getChildren().get(3)).setVisible(false);
 	}
 
-	public void onActualitzaUser(Event event) throws UnsupportedEncodingException, IOException {
+	public void onActualitzaUser(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String[] data = (String[]) event.getData();
 		String userName = data[0];
 		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(userName);
 		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onChange(Event event) throws UnsupportedEncodingException, IOException {
+	org.zkoss.zhtml.Div searchBox = null;
+	AsyncList<?> currentSearch = null;
+	private Div searchContent;
+	int searchPosition = 0;
+	List<Identity> searchResults = null;
+	private String searchCriteria;
+	private InputElement currentSearchTextbox;
+	public void onChanging(InputEvent event) throws Throwable {
+		currentSearchTextbox = (InputElement) event.getTarget();
+		searchCriteria = (String) event.getValue();
+		cancelSearch();
+		if (searchBox != null)
+			searchBox.detach();
+		searchResults = new LinkedList<Identity>();
+		searchPosition = 0;
+		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+		{
+			currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.USER_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getUserService().findUserByTextAsync(searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getGroupService().findGroupByTextAsync(searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByTextAsync(searchCriteria);
+		}
+		searchBox = new org.zkoss.zhtml.Div();
+		searchBox.setDynamicProperty("tabindex", "-1");
+		searchBox.setSclass("attributeSearchPopup");
+		currentSearchTextbox.getParent().insertBefore(searchBox, currentSearchTextbox);
+		Timer t = new org.zkoss.zul.Timer();
+		t.setDelay(1000);
+		t.setRepeats(true);
+		t.addEventListener("onTimer", new TimerEventListener());
+		searchBox.appendChild(t);
+		searchContent = new Div();
+		searchBox.appendChild (searchContent);
+		Image searchProgress = new Image();
+		searchProgress.setSrc("~./img/soffid-progress.gif");
+		searchProgress .setStyle("height: 2em");
+		searchBox.appendChild(searchProgress);
+		
+		updateSearchStatus ();
+		
+	}
+
+	private void updateSearchStatus() throws Throwable {
+		if (currentSearch == null)
+			return;
+		Iterator it = currentSearch.iterator();
+		if ( (currentSearch.isDone() &&  searchPosition == currentSearch.size()) || currentSearch.isCancelled())
+		{
+			((Component)searchBox.getChildren().get(2)).setVisible(false); // Hide ensaimada
+			((Timer)searchBox.getChildren().get(0)).stop(); // Stop timer
+			Throwable th = currentSearch.getExceptionToThrow();
+			currentSearch.clearExceptionToThrow();
+			if (th != null)
+			{
+				cancelSearch();
+				throw th; 
+			}
+		} else if (currentSearch.size() > searchPosition) {
+			int i = 0;
+			boolean any = false;
+			while (it.hasNext())
+			{
+			    Object o = it.next();
+				if (i++ >= searchPosition)
+				{
+					any = true;
+					Div d = new Div();
+					Identity identity = null;
+					if (o instanceof CustomObject)
+						identity = new Identity( (CustomObject ) o);
+					if (o instanceof Group)
+						identity = new Identity( (Group ) o);
+					if (o instanceof User)
+						identity = new Identity( (User ) o);
+					if (o instanceof Application)
+						identity = new Identity( (Application ) o);
+					if (identity != null)
+					{
+						searchResults.add(identity);
+						searchPosition ++;
+					}
+				}
+			}
+			if (any)
+			{			
+				Collections.sort(searchResults, com.soffid.iam.web.component.Identity.getComparator());
+				searchContent.getChildren().clear();
+				for (com.soffid.iam.web.component.Identity id: searchResults)
+				{
+					Object o = id.getObject();
+					String value = o instanceof CustomObject ? ((CustomObject) o).getName() :
+						o instanceof User ? ((User) o).getUserName() :
+						o instanceof Group ? ((Group) o).getName() :
+						o instanceof Application ? ((Application) o).getName() :
+						o instanceof Role ? ((Role) o).getName() :
+						null;
+					if (value != null)
+					{
+						value = org.apache.commons.lang3.StringEscapeUtils.escapeJava(value);
+						Div d = id.generateSelector(searchCriteria);
+						d.setAction("onMouseDown: document.getElementById('"+currentSearchTextbox.getUuid()+"').value='" + value + "'");
+						searchContent.appendChild(d);
+					}
+				}
+			}
+		} 
+	}
+
+	protected void selectCandidate(Event e) throws UnsupportedEncodingException, IOException, CommitException {
+		System.out.println("***** "+e);
+		Div d = (Div) e.getTarget();
+		Identity identity = (Identity) d.getAttribute("identity");
+		Object o = identity.getObject();
+		String value = null;
+		if ( o instanceof CustomObject)
+			value = ((CustomObject) o).getName();
+		if (value != null)
+		{
+			cancelSearch();
+			currentSearchTextbox.setRawValue( value );
+			applyChange(currentSearchTextbox, value);
+		}
+	}
+
+	public void onBlur (Event event)
+	{
+		System.out.println("***** "+event);
+		cancelSearch();
+	}
+	
+	public void cancelSearch() {
+		if (currentSearch != null)
+		{
+			currentSearch.cancel();
+			currentSearch = null;
+		}
+		if (searchBox != null)
+		{
+			searchBox.setVisible(false);
+		}
+	}
+
+	public void onChange(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		System.out.println("***** "+event);
+//		cancelSearch();
 		Component tb = event.getTarget();
 		
 		Object value = null;
@@ -184,6 +352,10 @@ public class InputField2 extends Div
 				value = lb.getSelectedItem().getValue();
 		}
 		
+		applyChange(tb, value);
+	}
+
+	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
 		Integer order = (Integer) tb.getAttribute("position");
 		
 		if (order == null)
@@ -220,25 +392,50 @@ public class InputField2 extends Div
 			else
 				c = c.getParent();
 		} while (c != null);
+		
 	}
 
-	public void onActualitzaGroup(Event event) throws UnsupportedEncodingException, IOException {
+	public void changeHtml(Event ev) throws Exception {
+		String text = (String) ev.getData();
+        byte data[] = text.getBytes("UTF-8");
+        applyChange(ev.getTarget(), data);
+        if (twoPhaseEdit)
+        	binder.getDataSource().commit();
+    }
+
+	public void onActualitzaGroup(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String[] data = (String[]) event.getData();
 		String group = data[0];
 		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(group);
 		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onActualitzaApplication(Event event) throws UnsupportedEncodingException, IOException {
+	public void onActualitzaApplication(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String data = (String) event.getData();
 		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data);
 		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onActualitzaCustomObject(Event event) throws UnsupportedEncodingException, IOException {
-		String data = (String) event.getData();
-		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data);
-		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+	public void onActualitzaCustomObject(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling();
+		if ( dataType.isMultiValued() )
+		{
+			List<String> data = (List<String>) event.getData();
+			for (String s: data)
+			{
+				textbox.setRawValue(s);
+				onChange( new Event (event.getName(), textbox ) );
+				List l = (List) binder.getValue();
+				int currentSize = l.size();
+				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
+			}
+		}
+		else
+		{
+			String data = (String) event.getData();
+			textbox.setRawValue(data);
+			onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		}
 	}
 
 	private void commit() throws CommitException {
@@ -272,8 +469,8 @@ public class InputField2 extends Div
 	
 	public boolean updateUser(String id)
 	{
-		String user = ( (InputElement) getFellow(id)).getText();
-		Component c = (Component) ((Component) getChildren().get(0));
+		InputElement inputElement = (InputElement) getFellow(id);
+		String user = inputElement.getText();
 		
 		Label l = (Label) getFellowIfAny(id+"b");
 		
@@ -292,7 +489,7 @@ public class InputField2 extends Div
 			if (u == null)
 			{
 				if (l != null) l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			else
 			{
@@ -305,8 +502,8 @@ public class InputField2 extends Div
 
 	public boolean updateGroup(String id) {
 
-		String group = ( (InputElement) getFellow(id)).getText();
-		Component c = (Component) ((Component) getChildren().get(0));
+		InputElement inputElement = (InputElement) getFellow(id);
+		String group = inputElement.getText();
 
 		Label l = (Label) getFellowIfAny(id+"b");
 
@@ -322,7 +519,7 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (g == null) {
 				if (l != null) l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			if (l != null )
 				l.setValue(g.getDescripcio());
@@ -332,8 +529,8 @@ public class InputField2 extends Div
 
 	public void updateApplication(String id) {
 
-		String application = ( (InputElement) getFellow(id)).getText();
-		Component c = (Component) ((Component) getChildren().get(0));
+		InputElement inputElement = (InputElement) getFellow(id);
+		String application = inputElement.getText();
 
 		Label l = (Label) getFellowIfAny(id+"b");
 
@@ -347,15 +544,15 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (a == null) {
 				if (l != null) l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			if (l != null) l.setValue(a.getNom());
 		}
 	}
 
 	public void updateCustomObject(String id) {
-		String customObject = ( (InputElement) getFellow(id)).getText();
-		Component c = (Component) ((Component) getChildren().get(0));
+		InputElement inputElement = (InputElement) getFellow(id);
+		String customObject = inputElement.getText();
 
 		Label l = (Label) getFellowIfAny(id+"b");
 
@@ -370,9 +567,10 @@ public class InputField2 extends Div
 			} catch (Exception e) {}
 			if (co == null) {
 				if (l != null) l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
-			if (l != null) l.setValue(co.getDescription());
+			else
+				if (l != null) l.setValue(co.getDescription());
 		}
 	}
 
@@ -401,7 +599,7 @@ public class InputField2 extends Div
 					if (value == null)
 					{
 						value = new LinkedList();
-						binder.setValue(value);
+//						binder.setValue(value);
 					}
 					if (value instanceof List)
 					{
@@ -456,8 +654,10 @@ public class InputField2 extends Div
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
 									+ "id=\""+id+"\" "
-											+ "onChange=\"self.parent.parent.onChange(event)\" readonly=\""
-							+readonlyExpr+ "\"/>" +
+									+ "onChange='self.parent.parent.onChange(event)' "  
+									+ "onBlur='self.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
 							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
 									+ "onClick='self.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
@@ -469,7 +669,10 @@ public class InputField2 extends Div
 				updateGroup = true;
 				StringBuffer sb = new StringBuffer();
 				sb.append("<div style='display:block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
+						+ "onChange='self.parent.parent.onChange(event)' "  
+						+ "onBlur='self.parent.parent.onBlur(event)' "
+						+ "onChanging='self.parent.parent.onChanging(event)' "
 						+ "id=\""+id+"\" "
 						+ "readonly='"+readonlyExpr+"'/>");
 				sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
@@ -501,8 +704,10 @@ public class InputField2 extends Div
 			{
 				updateCustomObject = true;
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display:block' visible='true'>");
+				sb.append("<div style='display:block' visible='true' >");
 				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+						+ "onBlur='self.parent.parent.onBlur(event)' "
+						+ "onChanging='self.parent.parent.onChanging(event)'  "
 						+ "id=\""+id+"\" "
 						+ "readonly='"+readonlyExpr+"'/>");
 				sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
@@ -550,7 +755,7 @@ public class InputField2 extends Div
 				result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
 						+ "id=\""+id+"\" "
 							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
-									+ "onChange='self.parent.onChange(event)'/>";
+									+ "onChange='self.parent.parent.onChange(event)'/>";
 				result = "<div>"+result+required+"</div>";
 			}	
 			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
@@ -565,6 +770,33 @@ public class InputField2 extends Div
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
 				result = "<div>"+result+required+"</div>"; 
 			}	
+			else if ( TypeEnumeration.HTML.equals(type))
+			{
+				String v = value == null ? "": value instanceof byte[] ? new String((byte[])value, "UTF-8") : value.toString(); 
+				result = "<div>"
+						+ "<html style='display: inline-block; border: solid 1px black' id='"+id+"'>"
+						+ "<attribute name=\"onChange\"><![CDATA[\n" 
+						+ "self.parent.parent.changeHtml (event);"
+						+ "]]></attribute>" 
+					  	+ "<![CDATA["
+						+ (v)
+						+ "]]></html>" ;
+				if (!readonly)
+				{
+						result = result + 
+							"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" + 
+								"<attribute name=\"onClick\"><![CDATA[\n" + 
+									"Events.sendEvent(new Event (\"onEdit\", \n" + 
+										"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" + 
+										"new Object[] {\n" + 
+											"event.getTarget().getPreviousSibling()"+ 
+										"}" + 
+									"));" + 
+								"]]></attribute>" + 
+							"</imageclic>";
+				}
+				result = result +  "</div>";
+			}
 			else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
 			{
 					result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
@@ -882,6 +1114,13 @@ public class InputField2 extends Div
 		if (position != null && value instanceof List)
 			value = ((List)value).get(position.intValue());
 
+		Component input = getFellow(getIdForPosition(position));
+		if (input instanceof InputElement)
+		{
+			InputElement inputElement = (InputElement) input;
+			inputElement.clearErrorMessage();
+		}
+		
 		if (dataType.isRequired() && ( value == null ||  "".equals(value)))
 			throw new WrongValueException(this, MZul.EMPTY_NOT_ALLOWED);
 			
@@ -1013,7 +1252,7 @@ public class InputField2 extends Div
 			Object value = binder.getValue();
 			if (dataType.isMultiValued())
 			{
-				if (value instanceof List)
+				if (value != null && value instanceof List)
 				{
 					List l = (List) value;
 					int i;

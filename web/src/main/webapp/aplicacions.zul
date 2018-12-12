@@ -1200,4 +1200,5 @@ void removeSodRule (Component button)
 	<include src="finestres/aplica_usuarisRolllista.zul"/>
 	<include src="finestres/aplica_permisosRol.zul"/>
 	<include src="finestres/identity.zul" />
+	<include src="finestres/editorHTML.zul" />
 </frame>

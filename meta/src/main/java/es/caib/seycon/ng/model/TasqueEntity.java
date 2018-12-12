@@ -254,6 +254,11 @@ public abstract class TasqueEntity {
 	public void cancelUnscheduled()
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@DaoOperation
+	public void cancelUnscheduledCopies(TasqueEntity entity)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 }
 
 

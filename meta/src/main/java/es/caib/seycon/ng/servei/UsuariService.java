@@ -11,6 +11,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
@@ -72,6 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
 	AccountAttributeEntity.class,
 	RegistreAccesEntity.class,
 	AccountEntity.class, 
+	AttributeValidationService.class,
 	VaultFolderEntity.class,
 	VaultFolderAccessEntity.class})
 public abstract class UsuariService {

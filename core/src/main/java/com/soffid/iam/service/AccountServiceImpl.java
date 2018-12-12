@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.logging.exe.LoggingInstance;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -39,6 +40,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -410,10 +412,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void updateAccountAttribute(AccountEntity entity, LinkedList<AccountAttributeEntity> attributes, String key,
-			AccountMetadataEntity metadata, Object value) {
+			AccountMetadataEntity metadata, Object value) throws InternalErrorException {
 		AccountAttributeEntity aae = findAccountAttributeEntity ( attributes, key, value);
 		if (aae == null)
 		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = getAccountAttributeEntityDao().newAccountAttributeEntity();
 			aae.setAccount(entity);
 			aae.setMetadata(metadata);
@@ -806,6 +809,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		UserEntity ue = getUserEntityDao().findByUserName(user);
 		if (ue == null)
 			return;
+		
+		Collection<RoleGrant> perms = getApplicationService().findEffectiveRoleGrantByUser(ue.getId());
 		
 		SystemEntityDao disDao = getSystemEntityDao();
 		for (SystemEntity disEntity : disDao.loadAll()) {
@@ -1389,7 +1394,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (callerUe == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
 
-		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
+		if (! force )
+		{
+			if ( ! ae.getUsers().isEmpty())
+			{
+				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
+				if (! currentUser.getId().equals(callerUe.getId()))
+					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
+			}
+		}
+		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_HP_PASSWORD))
 		{
 			// Check if policy allows user change
 			UserDomainService dominiUsuariService = getUserDomainService();
@@ -1449,15 +1463,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 		}
 		
-		if (! force )
-		{
-			if ( ! ae.getUsers().isEmpty())
-			{
-				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
-				if (! currentUser.getId().equals(callerUe.getId()))
-					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
-			}
-		}
 		/// Now, do the job
         PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
         if (! check.isValid()) {
@@ -1491,8 +1496,17 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return false;
 		JbpmContext ctx = getBpmEngine().getContext();
 		try {
-			ProcessDefinition pd = (ProcessDefinition) def.get(0);
+			com.soffid.iam.bpm.api.ProcessDefinition pd = (com.soffid.iam.bpm.api.ProcessDefinition) def.get(0);
 			org.jbpm.graph.exe.ProcessInstance pi = ctx.newProcessInstance(pd.getName());
+			LoggingInstance li = (LoggingInstance) pi.getInstance(LoggingInstance.class);
+			if (li == null) {
+				li = new LoggingInstance();
+				pi.addInstance(li);
+			}
+			AuthenticationLog log = new AuthenticationLog();
+			log.setToken(pi.getRootToken());
+			log.setActorId(Security.getCurrentUser());
+			li.startCompositeLog(log);
 			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
 			pi.getContextInstance().createVariable("account", acc.getId());
 			pi.getContextInstance().createVariable("accountSystem", acc.getSystem());
@@ -1501,11 +1515,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			pi.getContextInstance().createVariable("until", until);
 			pi.signal();
 			ctx.save(pi);
+			if (li != null) {
+				li.endCompositeLog();
+			}
 			return true;
 		} finally {
 			ctx.close();
 		}
-		 	}
+	}
 
 	private UserEntity getUserForAccount(AccountEntity acc) {
 		UserEntity ue = null;

@@ -121,9 +121,7 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 				return null;
 			else
 				try {
-					Calendar c = Calendar.getInstance();
-					c.setTime(DATE_FORMAT.parse(getValue()));
-					return c;
+					return DATE_FORMAT.parse(getValue());
 				} catch (ParseException e) {
 					return null;
 				}

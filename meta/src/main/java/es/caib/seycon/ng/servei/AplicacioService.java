@@ -15,6 +15,7 @@ import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.EntitlementDelegationService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -59,6 +60,7 @@ import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 	TipusDadaEntity.class,
 	RoleAttributeEntity.class,
 	EntitlementDelegationService.class,
+	AttributeValidationService.class,
 	AsyncRunnerService.class
 	}
 )

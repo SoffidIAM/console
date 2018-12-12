@@ -3,22 +3,31 @@ package com.soffid.iam.service;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -50,6 +59,31 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 
 	@Override
 	protected Collection<CustomObject> handleFindCustomObjectByJsonQuery(String objectType, String query) throws Exception {
+		AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findCustomObjectByJsonQuery(result, objectType, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+	
+	@Override
+	protected AsyncList<CustomObject> handleFindCustomObjectByJsonQueryAsync(final String objectType, final String query) throws Exception {
+		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findCustomObjectByJsonQuery(result, objectType, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	protected void findCustomObjectByJsonQuery(AsyncList<CustomObject> result, String objectType, String query) throws Exception {
 
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value");
@@ -70,16 +104,16 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		paramArray[i++] = new Parameter("objectType", objectType);
-		Collection<CustomObject> result = new LinkedList<CustomObject>();
 		for (CustomObjectEntity ue : getCustomObjectEntityDao().query(hql.toString(),
 				paramArray)) 
 		{
+			if (result.isCancelled())
+				return;
 			CustomObject u = getCustomObjectEntityDao().toCustomObject(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				result.add(u);
 			}
 		}
-		return result;
 	}
 
 	@Override
@@ -88,6 +122,22 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		return getCustomObjectEntityDao().toCustomObjectList(list);
 	}
 
+	@Override
+	protected AsyncList<CustomObject> handleFindCustomObjectByTextAsync(final String objectType, final String query) throws Exception {
+		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		getAsyncRunnerService().run(
+				new Runnable() {
+					public void run () {
+						for (CustomObjectEntity e : getCustomObjectEntityDao().findByText(objectType, query)) {
+							if (result.isCancelled())
+								return;
+							CustomObject v = getCustomObjectEntityDao().toCustomObject(e);
+							result.add(v);
+						}
+					}
+				}, result);
+		return result;
+	}
 	@Override
 	protected CustomObject handleUpdateCustomObject(CustomObject obj) throws Exception {
 		CustomObjectEntity entity = getCustomObjectEntityDao().load(obj.getId());
@@ -111,57 +161,99 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		if (obj.getAttributes() == null)
 			obj.setAttributes(new HashMap<String, Object>());
 		
-		HashSet<String> keys = new HashSet<String>(obj.getAttributes().keySet());
-		for ( CustomObjectAttributeEntity att: entity.getAttributes())
+		if (entity != null)
 		{
-			Object v = obj.getAttributes().get(att.getMetadata().getName());
-			att.setObjectValue(v);
-			keys.remove(att.getMetadata().getName());
-		}
-		List<MetaDataEntity> md = getMetaDataEntityDao().findByObjectTypeAndName(obj.getType(), null);
-		for (String key: keys)
-		{
-			Object v = obj.getAttributes().get(key);
-			if ( v != null)
+			Map<String, Object> attributes = obj.getAttributes();
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<CustomObjectAttributeEntity> entities = new LinkedList<CustomObjectAttributeEntity> (entity.getAttributes());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
 			{
-				boolean found = false;
-				CustomObjectAttributeEntity aae = getCustomObjectAttributeEntityDao().newCustomObjectAttributeEntity();
-				for ( MetaDataEntity d: md)
+				for (MetaDataEntity metadata: entity.getType().getAttributes())
 				{
-					if (d.getName().equals(key))
+					Object v = attributes.get(key);
+					if (v == null)
 					{
-						aae.setMetadata(d);
-						found = true;
-						break;
+						// Do nothing
+					}
+					else if (v instanceof List)
+					{
+						List l = (List) v;
+						for (Object o: (List) v)
+						{
+							if (o != null)
+							{
+								updateAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateAttribute(entity, entities, key, metadata, v);
 					}
 				}
-				if (!found)
-					throw new InternalErrorException(String.format("Unknown attribute %s", key));
-				aae.setObjectValue(v);
-				aae.setCustomObject(entity);
-				getCustomObjectAttributeEntityDao().create(aae);
 			}
-		}
-		
-		for ( MetaDataEntity m: md)
-		{
-			Object o = obj.getAttributes().get(m.getName());
-			if ( o == null || "".equals(o))
+			
+			entity.getAttributes().removeAll(entities);
+			getCustomObjectAttributeEntityDao().remove(entities);
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
+			
+			for ( MetaDataEntity m: md)
 			{
-				if (m.getRequired() != null && m.getRequired().booleanValue())
-					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
-			} else {
-				if (m.getUnique() != null && m.getUnique().booleanValue())
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
 				{
-					List<CustomObjectAttributeEntity> p = getCustomObjectAttributeEntityDao().findByTypeNameAndValue(obj.getType(), m.getName(), o.toString());
-					if (p.size() > 1)
-						throw new InternalErrorException(String.format("Already exists a role with %s %s",
-								m.getLabel(), o.toString()));
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<CustomObjectAttributeEntity> p = getCustomObjectAttributeEntityDao().findByTypeNameAndValue(entity.getType().getName(), m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a role with %s %s",
+										m.getLabel(), v));
+						}
+					}
 				}
 			}
 		}
 	}
-	
+
+	private void updateAttribute(CustomObjectEntity entity, LinkedList<CustomObjectAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		CustomObjectAttributeEntity aae = findAttributeEntity(attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			aae = getCustomObjectAttributeEntityDao().newCustomObjectAttributeEntity();
+			aae.setCustomObject(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getCustomObjectAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private CustomObjectAttributeEntity findAttributeEntity(LinkedList<CustomObjectAttributeEntity> entities, String key,
+			Object o) {
+		for (CustomObjectAttributeEntity aae: entities)
+		{
+			if (aae.getMetadata().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
+	}
+
 	void generateTask(CustomObjectEntity entity)
 	{
 		TaskEntity task = getTaskEntityDao().newTaskEntity();

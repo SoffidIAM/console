@@ -16,6 +16,7 @@ import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.VaultService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -58,6 +59,7 @@ import roles.account_query;
 	BpmEngine.class,
 	VaultService.class,
 	AsyncRunnerService.class,
+	AttributeValidationService.class,
 	VaultFolderEntity.class})
 public abstract class AccountService {
 

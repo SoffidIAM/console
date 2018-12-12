@@ -723,10 +723,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	private void updateGroupAttribute(GroupEntity entity, LinkedList<GroupAttributeEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) {
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
 		GroupAttributeEntity aae = findGroupAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = getGroupAttributeEntityDao().newGroupAttributeEntity();
 			aae.setGroup(entity);
 			aae.setMetadata(metadata);

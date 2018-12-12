@@ -2276,8 +2276,8 @@ public class ApplicationServiceImpl extends
 				}
 			}
 			
-			getApplicationAttributeEntityDao().remove(entities);
 			entity.getAttributes().removeAll(entities);
+			getApplicationAttributeEntityDao().remove(entities);
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
 			
 			for ( MetaDataEntity m: md)
@@ -2305,10 +2305,11 @@ public class ApplicationServiceImpl extends
 	}
 
 	private void updateApplicationAttribute(InformationSystemEntity entity, LinkedList<ApplicationAttributeEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) {
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
 		ApplicationAttributeEntity aae = findApplicationAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity();
 			aae.setInformationSystem(entity);
 			aae.setMetadata(metadata);
@@ -2371,9 +2372,9 @@ public class ApplicationServiceImpl extends
 				}
 			}
 			
-			getRoleAttributeEntityDao().remove(entities);
 			entity.getAttributes().removeAll(entities);
-			Collection<MetaDataEntity> md = getMetaDataEntityDao().loadAll();
+			getRoleAttributeEntityDao().remove(entities);
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 			
 			for ( MetaDataEntity m: md)
 			{
@@ -2400,10 +2401,11 @@ public class ApplicationServiceImpl extends
 	}
 
 	private void updateRoleAttribute(RoleEntity entity, LinkedList<RoleAttributeEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) {
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
 		RoleAttributeEntity aae = findRoleAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = getRoleAttributeEntityDao().newRoleAttributeEntity();
 			aae.setRole(entity);
 			aae.setMetadata(metadata);

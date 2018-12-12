@@ -3171,8 +3171,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		UserEntity source = getUserEntityDao().findByUserName(codiUsuari);
 		if (source != null)
 		{
-			for (UserDataEntity att : source.getUserData()) {
-				UserData vd = getUserDataEntityDao().toUserData(att);
+			Collection<UserDataEntity> userData = source.getUserData();
+			fetchUserAttributes(attributes, userData, true);
+		}
+		return attributes;
+	}
+
+	private void fetchUserAttributes(Map<String, Object> attributes, Collection<UserDataEntity> userData, boolean applyRestrictions) {
+		for (UserDataEntity att : userData) {
+			UserData vd = getUserDataEntityDao().toUserData(att);
+			if (! applyRestrictions || att.getAttributeVisibility() != AttributeVisibilityEnum.HIDDEN)
+			{
 				if (att.getDataType().getMultiValued() != null && att.getDataType().getMultiValued().booleanValue())
 				{
 					LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
@@ -3182,7 +3191,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 						attributes.put(vd.getAttribute(), r);
 					}
 					if (vd.getDateValue() != null)
-						r.add(vd.getDateValue());
+						r.add(vd.getDateValue().getTime());
 					else if (vd.getValue() != null)
 						r.add(vd.getValue());
 					else if (vd.getBlobDataValue() != null)
@@ -3192,7 +3201,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				{
 					if (vd.getDateValue() != null)
 						attributes
-								.put(vd.getAttribute(), vd.getDateValue());
+								.put(vd.getAttribute(), vd.getDateValue().getTime());
 					else if (vd.getValue() != null)
 						attributes.put(vd.getAttribute(), vd.getValue());
 					else if (vd.getBlobDataValue() != null)
@@ -3200,7 +3209,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 			}
 		}
-		return attributes;
 	}
 
 	@Override
@@ -3237,11 +3245,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					updateUserAttribute(entity, entities, key, metadata, v);
 				}
 			}
+
+			for (UserDataEntity attribute: entities)
+			{
+				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
+				{
+					getUserDataEntityDao().remove(attribute);
+					entity.getUserData().remove(attribute);
+				}
+			}
+
+			fetchUserAttributes(attributes, entities, false);
 			
-			getUserDataEntityDao().remove(entities);
-			entity.getUserData().removeAll(entities);
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.USER);
-			
 			for ( MetaDataEntity m: md)
 			{
 				Object o = attributes.get(m.getName());
@@ -3267,16 +3283,20 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	private void updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) {
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
 		UserDataEntity aae = findUserDataEntity(attributes, key, value);
 		if (aae == null)
 		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = getUserDataEntityDao().newUserDataEntity();
 			aae.setUser(entity);
 			aae.setDataType(metadata);
 			aae.setObjectValue(value);
-			getUserDataEntityDao().create(aae);
-			entity.getUserData().add(aae);
+			if (aae.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
+			{
+				getUserDataEntityDao().create(aae);
+				entity.getUserData().add(aae);
+			}
 		}
 		else
 			attributes.remove(aae);

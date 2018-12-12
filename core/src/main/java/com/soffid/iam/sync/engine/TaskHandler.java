@@ -363,7 +363,7 @@ public class TaskHandler
 		else if (RECONCILE_USER.equals(transactionCode))
 			hash = "RC_U " + task.getUser() + "/" + task.getHost(); //$NON-NLS-1$ //$NON-NLS-2$
 		else if (RECONCILE_ROLE.equals(transactionCode))
-			hash = "RC_R " + task.getRole() + "/" + task.getHost(); //$NON-NLS-1$ //$NON-NLS-2$
+			hash = "RC_R " + task.getRole() + "/" + task.getDatabase(); //$NON-NLS-1$ //$NON-NLS-2$
 		else if (RECONCILE_USERS.equals(transactionCode))
 			hash = "RC_U " + task.getHost(); //$NON-NLS-1$
 		else if (END_RECONCILE.equals(transactionCode))

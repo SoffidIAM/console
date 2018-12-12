@@ -26,7 +26,8 @@ public abstract class SessioService {
 		java.lang.String nomMaquina, 
 		@Nullable java.lang.String nomAquinaClient, 
 		int port, 
-		@Nullable java.lang.String key)
+		@Nullable java.lang.String key,
+		@Nullable String authenticationMethod)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -36,7 +37,8 @@ public abstract class SessioService {
 		java.lang.String codiUsuari, 
 		java.lang.String nomMaquina, 
 		java.lang.String nomMaquinaClient, 
-		java.lang.String url)
+		java.lang.String url,
+		@Nullable String authenticationMethod)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
 	 return null;
 	}

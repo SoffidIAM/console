@@ -93,11 +93,12 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
      * @see es.caib.seycon.ng.sync.servei.SessioService#registraSessioWeb(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String)
      */
-    protected com.soffid.iam.api.Session handleRegisterWebSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, java.lang.String url) throws java.lang.Exception {
-        return doCreateSession(codiUsuari, nomMaquina, nomMaquinaClient, TipusSessio.WSSO, url, null, null);
+    protected com.soffid.iam.api.Session handleRegisterWebSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, java.lang.String url, String authenticationMethod) throws java.lang.Exception {
+        return doCreateSession(codiUsuari, nomMaquina, nomMaquinaClient, TipusSessio.WSSO, url, null, null, authenticationMethod);
     }
 
-    private com.soffid.iam.api.Session doCreateSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, TipusSessio tipus, java.lang.String url, java.lang.Long port, String key) throws UnknownHostException, UnknownUserException {
+    private com.soffid.iam.api.Session doCreateSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, TipusSessio tipus, 
+    		java.lang.String url, java.lang.Long port, String key, String authenticationMethod) throws UnknownHostException, UnknownUserException {
         HostEntity me = findMaquina(nomMaquina);
         HostEntity meClient = null;
         
@@ -116,6 +117,7 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         sessio.setKey(key.toString());
         sessio.setType(tipus);
         sessio.setPort(port);
+        sessio.setAuthenticationMethod(authenticationMethod);
         if (me == null)
         {
         	sessio.setHostName(nomMaquina);
@@ -261,8 +263,8 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     }
 
     @Override
-    protected Session handleRegisterSession(String codiUsuari, String nomMaquina, String nomMaquinaClient, int port, String key) throws Exception {
-        return doCreateSession(codiUsuari, nomMaquina, nomMaquinaClient, TipusSessio.ESSO, null, new Long(port), key);
+    protected Session handleRegisterSession(String codiUsuari, String nomMaquina, String nomMaquinaClient, int port, String key, String authenticationMethod) throws Exception {
+        return doCreateSession(codiUsuari, nomMaquina, nomMaquinaClient, TipusSessio.ESSO, null, new Long(port), key, authenticationMethod);
     }
 
     @Override

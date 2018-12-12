@@ -357,29 +357,32 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
 					+ "where transaction=:transaction and user=:user and "
 					+ "tenant.id=:tenantId and hash is null");
-			q.setParameter("transaction", entity.getTransaction());
-			q.setParameter("user", entity.getUser());
-			q.setParameter("tenantId", entity.getTenant().getId());
+			q.setString("transaction", entity.getTransaction());
+			q.setString("user", entity.getUser());
+			q.setLong("tenantId", entity.getTenant().getId());
+			q.executeUpdate();
 		}
 		if (entity.getTransaction().equals("UpdateAccount"))
 		{
 			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
 					+ "where transaction=:transaction and user=:user and systemName=:systemName and "
 					+ "tenant.id=:tenantId and systemName=:systemName and hash is null");
-			q.setParameter("transaction", entity.getTransaction());
-			q.setParameter("user", entity.getUser());
-			q.setParameter("systemName", entity.getSystemName());
-			q.setParameter("tenantId", entity.getTenant().getId());
+			q.setString("transaction", entity.getTransaction());
+			q.setString("user", entity.getUser());
+			q.setString("systemName", entity.getSystemName());
+			q.setLong("tenantId", entity.getTenant().getId());
+			q.executeUpdate();
 		}
 		if (entity.getTransaction().equals("UpdateRole") && entity.getDb() == null)
 		{
 			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
 					+ "where transaction=:transaction and role=:role and db=:db and "
 					+ "tenant.id=:tenantId and hash is null");
-			q.setParameter("transaction", entity.getTransaction());
-			q.setParameter("role", entity.getRole());
-			q.setParameter("db", entity.getDb());
-			q.setParameter("tenantId", entity.getTenant().getId());
+			q.setString("transaction", entity.getTransaction());
+			q.setString("role", entity.getRole());
+			q.setString("db", entity.getDb());
+			q.setLong("tenantId", entity.getTenant().getId());
+			q.executeUpdate();
 		}
 	}
 }

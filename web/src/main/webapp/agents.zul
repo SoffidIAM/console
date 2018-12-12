@@ -1100,8 +1100,9 @@
 							
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Tipus-2')}"/>
-								<hbox width="90%" widths="45%,*">
+								<hbox width="90%" widths="45%,*" style="padding-top: 6px; padding-bottom: 6px">
 									<combobox bind="@nomCla" dataPath="/model:/plugin"  id="cbClassDescription"
+										style="border: 1px solid #AAB; margin-top: 5px; margin-bottom: 5px; padding: 4px"
 										onChange="onChangeClass();" readonly="true" width="96%">
 										<datacomboitem bind="@className" labelBind="@description"/>
 									</combobox>

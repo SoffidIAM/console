@@ -1046,3 +1046,58 @@ a.change-mode-label-selected {
 	font-weight: bold;
 	text-decoration: none;
 }
+
+span.rbtnbk {
+	background-image: none;
+	border: none;
+}
+
+select.listbox {
+    border: 1px solid #AAB;
+    padding: 2px 18px 2px 2px;
+    color: black;
+    background-color: white;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-width:80px;
+    padding-right: 16px;
+
+  /* styling */
+  background-color: white;
+  border-radius: 2px;
+  display: inline-block;
+  font: inherit;
+/*  line-height: 1.1em; 
+  padding: 2em 3.5em 0.5em 1em; */
+
+  /* reset */
+
+  margin: 0;      
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: transparent url(/zkau/web/zul/img/combobtn.gif);
+  background-position:
+    calc(100% - 4px) calc(50%) ;
+  background-repeat: no-repeat;
+}
+
+select.classic:focus {
+}
+
+
+
+div.attributeSearchPopup {
+    border: solid 2px #AAB;
+    z-index: 10;
+    float: left;
+    margin-top: 20px;
+    position: absolute;
+    min-width: 150px;
+    min-height: 80px;
+    background: white;
+    padding: 8px;
+}

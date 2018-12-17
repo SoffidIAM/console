@@ -75,7 +75,7 @@ public abstract class DominiUsuariService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	@Operation ( grantees={roles.usersDomain_query.class},
+	@Operation ( grantees={roles.usersDomain_query.class, roles.sso_manage.class},
 			translated="findAllUserType")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusUsuari> findAllTipusUsuari()

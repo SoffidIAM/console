@@ -118,7 +118,8 @@ public abstract class DispatcherService {
 	}
 
 	@Operation ( grantees={roles.agent_query.class,
-			roles.application_update.class},
+			roles.application_update.class,
+			roles.sso_manage.class},
 			translated="findDispatchersByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Dispatcher> findDispatchersByFiltre(

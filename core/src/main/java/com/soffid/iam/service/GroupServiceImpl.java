@@ -694,8 +694,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				}
 			}
 			
-			getGroupAttributeEntityDao().remove(entities);
 			entity.getAttributes().removeAll(entities);
+			getGroupEntityDao().update(entity);
+
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
 			
 			for ( MetaDataEntity m: md)

@@ -2277,7 +2277,8 @@ public class ApplicationServiceImpl extends
 			}
 			
 			entity.getAttributes().removeAll(entities);
-			getApplicationAttributeEntityDao().remove(entities);
+			getInformationSystemEntityDao().update(entity);
+
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
 			
 			for ( MetaDataEntity m: md)
@@ -2373,7 +2374,7 @@ public class ApplicationServiceImpl extends
 			}
 			
 			entity.getAttributes().removeAll(entities);
-			getRoleAttributeEntityDao().remove(entities);
+			getRoleEntityDao().update(entity);
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 			
 			for ( MetaDataEntity m: md)

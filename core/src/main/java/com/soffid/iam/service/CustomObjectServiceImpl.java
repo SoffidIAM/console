@@ -197,7 +197,8 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			}
 			
 			entity.getAttributes().removeAll(entities);
-			getCustomObjectAttributeEntityDao().remove(entities);
+			getCustomObjectEntityDao().update(entity);
+			
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 			
 			for ( MetaDataEntity m: md)

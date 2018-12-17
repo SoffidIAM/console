@@ -384,8 +384,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 		}
 		
-		getAccountAttributeEntityDao().remove(entities);
 		entity.getAttributes().removeAll(entities);
+		getAccountEntityDao().update(entity);
+
 		Collection<AccountMetadataEntity> md = entity.getSystem().getMetaData();
 		
 		for ( AccountMetadataEntity m: md)

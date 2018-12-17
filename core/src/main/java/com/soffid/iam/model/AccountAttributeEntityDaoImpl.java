@@ -84,17 +84,6 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
 
     @Override
 	public void create(AccountAttributeEntity entity) {
-    	if (entity.getMetadata().getUnique() != null &&
-    			entity.getMetadata().getUnique().booleanValue() )
-    	{
-			for (AccountAttributeEntity du: findByNameAndValue(entity.getMetadata().getSystem().getName(), 
-					entity.getMetadata().getName(), entity.getValue()))
-			{
-				throw new SeyconException(String.format(com.soffid.iam.model.Messages.getString("AccountAttributeEntityDaoImpl.2"), 
-						du.getValue(), du.getAccount().getName())); //$NON-NLS-1$
-			}
-    	}
-		
 		super.create(entity);
 		if (Hibernate.isInitialized(entity.getAccount().getAttributes()))
 			entity.getAccount().getAttributes().add(entity);
@@ -156,17 +145,6 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
 
 	@Override
 	public void update(AccountAttributeEntity entity) {
-    	if (entity.getMetadata().getUnique() != null &&
-    			entity.getMetadata().getUnique().booleanValue() )
-    	{
-			for (AccountAttributeEntity du: findByNameAndValue(entity.getMetadata().getSystem().getName(), 
-					entity.getMetadata().getName(), entity.getValue()) )
-			{
-				if (!du.getId().equals(entity.getId()))
-					throw new SeyconException(String.format(com.soffid.iam.model.Messages.getString("AccountAttributeEntityDaoImpl.2"), 
-							du.getValue(), du.getAccount().getName())); //$NON-NLS-1$
-			}
-    	}
 		super.update(entity);
 	}
 }

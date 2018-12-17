@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.json.JSONException;
 
+import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupRoles;
@@ -39,15 +40,18 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -653,61 +657,102 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 	}
 
-	private void updateGroupAttributes (Group group, GroupEntity entity) throws InternalErrorException
+	private void updateGroupAttributes (Group app, GroupEntity entity) throws InternalErrorException
 	{
-		if (group.getAttributes() == null)
-			group.setAttributes(new HashMap<String, Object>());
-		
-		HashSet<String> keys = new HashSet<String>(group.getAttributes().keySet());
-		for ( GroupAttributeEntity att: entity.getAttributes())
+		if (entity != null)
 		{
-			Object v = group.getAttributes().get(att.getMetadata().getName());
-			att.setObjectValue(v);
-			getGroupAttributeEntityDao().update(att);
-			keys.remove(att.getMetadata().getName());
-		}
-		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
-		for (String key: keys)
-		{
-			Object v = group.getAttributes().get(key);
-			if ( v != null)
+			Map<String, Object> attributes = app.getAttributes();
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<GroupAttributeEntity> entities = new LinkedList<GroupAttributeEntity> (entity.getAttributes());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
 			{
-				boolean found = false;
-				GroupAttributeEntity aae = getGroupAttributeEntityDao().newGroupAttributeEntity ();
-				for ( MetaDataEntity d: md)
+				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.GROUP, key))
 				{
-					if (d.getName().equals(key))
+					Object v = attributes.get(key);
+					if (v == null)
 					{
-						aae.setMetadata(d);
-						found = true;
-						break;
+						// Do nothing
+					}
+					else if (v instanceof List)
+					{
+						List l = (List) v;
+						for (Object o: (List) v)
+						{
+							if (o != null)
+							{
+								updateGroupAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateGroupAttribute(entity, entities, key, metadata, v);
 					}
 				}
-				if (!found)
-					throw new InternalErrorException(String.format("Unknown attribute %s", key));
-				aae.setObjectValue(v);
-				aae.setGroup(entity);
-				getGroupAttributeEntityDao().create(aae);
 			}
-		}
-		
-		for ( MetaDataEntity m: md)
-		{
-			Object o = group.getAttributes().get(m.getName());
-			if ( o == null || "".equals(o))
+			
+			entity.getAttributes().removeAll(entities);
+			getGroupEntityDao().update(entity);
+
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
+			
+			for ( MetaDataEntity m: md)
 			{
-				if (m.getRequired() != null && m.getRequired().booleanValue())
-					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
-			} else {
-				if (m.getUnique() != null && m.getUnique().booleanValue())
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
 				{
-					if (getGroupAttributeEntityDao().findByNameAndValue(m.getName(), o.toString()).size() > 1)
-						throw new InternalErrorException(String.format("Already exists a role with %s %s",
-								m.getLabel(), o.toString()));
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<GroupAttributeEntity> p = getGroupAttributeEntityDao().findByNameAndValue(m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a user with %s %s",
+										m.getLabel(), v));
+						}
+					}
 				}
 			}
 		}
 	}
+
+	private void updateGroupAttribute(GroupEntity entity, LinkedList<GroupAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		GroupAttributeEntity aae = findGroupAttributeEntity(attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			aae = getGroupAttributeEntityDao().newGroupAttributeEntity();
+			aae.setGroup(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getGroupAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private GroupAttributeEntity findGroupAttributeEntity(LinkedList<GroupAttributeEntity> entities, String key,
+			Object o) {
+		for (GroupAttributeEntity aae: entities)
+		{
+			if (aae.getMetadata().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
+	}
+
 
 
 	@Override

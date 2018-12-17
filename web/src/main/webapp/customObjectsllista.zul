@@ -10,19 +10,27 @@
 	
 	<zscript>
 		<![CDATA[
-			
-			
 			void acceptaDada() {
+				Listbox listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+				if (listbox.getSelectedItems().isEmpty())
+					return;
 				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
 				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
-				index = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getSelectedIndex();
-				ctx = ds.getJXPathContext(); 
-				pointer = ctx.createPath(xpath+"["+(index + 1)+"]");
-				ctx2 = ctx.getRelativeContext(pointer);
-				codi = (String) ctx2.getPointer("@name").getValue();
-				pointer.invalidate();						
+				ctx = ds.getJXPathContext();
 				Component formComponent = (Component) pageScope.get("contextComponent");
-				Events.postEvent ("onActualitza", formComponent, codi);							
+				Boolean multi = (Boolean) pageScope.get("contextMultiple");
+				if ( multi )
+				{
+					List result = new LinkedList();
+					for (item: listbox.getSelectedItems())
+					{
+						result.add ( item.getValue().getInstance().getName()); 
+					}
+					Events.postEvent ("onActualitza", formComponent, result);						
+				} else { 
+					String codi = (String) listbox.getSelectedItem().getValue().getInstance().getName();
+					Events.postEvent ("onActualitza", formComponent, codi);						
+				} 
 				cleanWindow();
 			}
 
@@ -30,7 +38,6 @@
 				model.getVariables().declareVariable("queryEnabled", false);
 				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/customObject[false]";
 				esquemaLlista.visible=false;
-				esquemaLlista.getFellow("finishButton").disabled = true;
 			}
 	 	]]>
 	</zscript>
@@ -40,7 +47,23 @@
 
 		<attribute name="onInicia">
 			<![CDATA[
-				pageScope.put("contextComponent", event.data);
+			    Listbox listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+			    Component c;
+			    boolean multi = false;
+			    
+			    if (event.data != null && event.data.getClass().isArray()) {
+			    	c = event.data[0];
+			    	multi = event.data[1];
+			    }
+			    else
+			    {
+			    	c = event.data;
+			    	multi = false;
+			    }
+		    	listbox.setMultiple(multi);
+		    	listbox.setCheckmark(multi);
+				pageScope.put("contextComponent", c);
+				pageScope.put("contextMultiple", multi);
 				
 				String objectType = page.getAttribute("type");
 				model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
@@ -48,11 +71,11 @@
 				esquema.getFellow("queryWindow").getFellow("searchBox").
 					setJsonObject("com.soffid.iam.api.CustomObject#"+objectType);
 				
-				esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").dataPath = "/model:/object";
-
-				model.getVariables().declareVariable("query", null);
+				listbox.dataPath = "/model:/object";
+				listbox.setSelectedItem(null);
+				model.getVariables().declareVariable("query", "");
 				model.refresh();
-	
+
 				if(self.mode.compareToIgnoreCase("highlighted") != 0){
 					self.setMode("highlighted");
 				}else{
@@ -120,7 +143,7 @@
 		
 		</esquemavertical>
 		<hbox style="margin-left:auto; margin-right:auto">
-			<button disabled="true" id="finishButton" label="${c:l('aplicacionsllista.zul.Accepta')}">
+			<button  id="finishButton" label="${c:l('aplicacionsllista.zul.Accepta')}">
 				<attribute name="onClick">
 					if (! self.disabled)
 						acceptaDada();

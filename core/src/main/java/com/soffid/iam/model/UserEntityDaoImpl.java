@@ -265,19 +265,17 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         targetVO.setMailAlias(aliesDeCorreu);
 
         // OBTENIM EL NIF
-        UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(targetVO.getUserName(), "NIF"); //$NON-NLS-1$
-        if (dadaUsuariEntity != null) {
+        targetVO.setNationalID(""); //$NON-NLS-1$
+		for (UserDataEntity dadaUsuariEntity: getUserDataEntityDao().findByDataType(targetVO.getUserName(), "NIF")) //$NON-NLS-1$
+        {
             targetVO.setNationalID(dadaUsuariEntity.getValue());
-        } else {
-            targetVO.setNationalID(""); //$NON-NLS-1$
         }
 
         // TELÈFON
-        dadaUsuariEntity = getUserDataEntityDao().findByDataType2(targetVO.getUserName(), "PHONE"); //$NON-NLS-1$
-        if (dadaUsuariEntity != null) {
+        targetVO.setPhoneNumber(""); //$NON-NLS-1$
+		for (UserDataEntity dadaUsuariEntity: getUserDataEntityDao().findByDataType(targetVO.getUserName(), "PHONE")) //$NON-NLS-1$
+        {
             targetVO.setPhoneNumber(dadaUsuariEntity.getValue());
-        } else {
-            targetVO.setPhoneNumber(""); //$NON-NLS-1$
         }
 
         // DATA DE CREACIÓ
@@ -581,7 +579,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                  * Solo se le inserta directamente el telefono si el usuario ya
                  * existe dado que el codigo de usuario aun es temporal
                  */
-                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(sourceVO.getUserName(), TELEFON);
+            	Collection<UserDataEntity> l = getUserDataEntityDao().findByDataType(sourceVO.getUserName(), TELEFON);
+                UserDataEntity dadaUsuariEntity = l.isEmpty() ? null: l.iterator().next(); 
                 if (dadaUsuariEntity == null) {
                     /*
                      * El usuario no tiene telefono, se crea uno nuevo
@@ -600,10 +599,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     getUserDataEntityDao().update(dadaUsuariEntity);
                 }
             } else {
-                UserDataEntity dadaUsuari = getUserDataEntityDao().findByDataType2(sourceVO.getUserName(), TELEFON);
-                if (dadaUsuari != null) {
-                    getUserDataEntityDao().remove(dadaUsuari);
-                }
+            	getUserDataEntityDao().remove( getUserDataEntityDao().findByDataType(sourceVO.getUserName(), TELEFON) );
             }
 
             String nif = sourceVO.getNationalID();
@@ -612,7 +608,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                  * El nif no es nulo, hay que actualizarlo o añadirlo si no
                  * tenía
                  */
-                UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType2(sourceVO.getUserName(), NIF);
+            	Collection<UserDataEntity> l = getUserDataEntityDao().findByDataType(sourceVO.getUserName(), NIF);
+                UserDataEntity dadaUsuariEntity = l.isEmpty() ? null: l.iterator().next(); 
                 if (dadaUsuariEntity != null) {
                     /* Actualizar el nif */
                     dadaUsuariEntity.setValue(nif);
@@ -628,10 +625,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     getUserDataEntityDao().create(dadaUsuariEntity);
                 }
             } else {
-                UserDataEntity dadaUsuari = getUserDataEntityDao().findByDataType2(sourceVO.getUserName(), NIF);
-                if (dadaUsuari != null) {
-                    getUserDataEntityDao().remove(dadaUsuari);
-                }
+            	getUserDataEntityDao().remove( getUserDataEntityDao().findByDataType(sourceVO.getUserName(), NIF) );
             }
         }
 
@@ -907,28 +901,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
     public UserEntity anonimousUserToEntity(AnonimousUser usuariAnonim) {
         return null;
-    }
-
-    public void toAnonimousUser(UserEntity source, AnonimousUser target) {
-        String correu = null;
-        // busquem l'email a les dades addicionals
-        UserDataEntity dada = getUserDataEntityDao().findByDataType2(source.getUserName(), SeyconLogon_EMAIL_ADD_CODE);
-        if (dada != null)
-        {
-            correu = dada.getValue();
-        }
-        if (correu == null) {
-            target = null;
-            return;
-        }
-
-        // omplim els altres camps
-        target.setUserCode(source.getUserName());
-        target.setLastName(source.getLastName());
-        target.setLasName2(source.getMiddleName());
-        target.setName(source.getFirstName());
-        target.setEmail(correu);
-
     }
 
     public List<UserEntity> findUsersGroupAndSubgroupsByGroupCode(String codiGrup) {// Correcto??

@@ -5,10 +5,12 @@ import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
@@ -25,13 +27,19 @@ import roles.customObject_update;
 
 @Service
 @Depends({CustomObjectEntity.class, CustomObjectTypeEntity.class, TipusDadaEntity.class, CustomObjectAttributeEntity.class,
-	TasqueEntity.class, AuditoriaEntity.class})
+	AttributeValidationService.class, TasqueEntity.class, AuditoriaEntity.class, AsyncRunnerService.class})
 public class CustomObjectService {
 	@Operation(grantees={customObject_query.class})
 	public Collection<CustomObject> findCustomObjectByJsonQuery (String objectType, @Nullable String query) { return null;}
 	
 	@Operation(grantees={customObject_query.class})
 	public Collection<CustomObject> findCustomObjectByText (String objectType, @Nullable String query) { return null;}
+
+	@Operation(grantees={customObject_query.class})
+	public AsyncList<CustomObject> findCustomObjectByJsonQueryAsync (String objectType, @Nullable String query) { return null;}
+	
+	@Operation(grantees={customObject_query.class})
+	public AsyncList<CustomObject> findCustomObjectByTextAsync (String objectType, @Nullable String query) { return null;}
 
 	@Operation(grantees={customObject_query.class})
 	public CustomObject findCustomObjectByTypeAndName (String objectType, String name) { return null;}

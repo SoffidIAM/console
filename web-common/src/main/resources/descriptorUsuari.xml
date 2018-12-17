@@ -132,13 +132,11 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.UsuariImpressora"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="dada" type="dada" executeOnNewObjects="true">  <!-- user:query -->
-			<script-finder>
-				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
-				return obj.getDadaUsuari(instance.codi); 
-			</script-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.DadaUsuari"> 
-			</new-instance-bean>
+		<finder name="attributes" type="attributes" executeOnNewObjects="true">  <!-- user:query -->
+			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
+				method="findUserAttributes" if="${canQueryUser}">
+				<parameter value="${instance.codi}"/>
+			</ejb-finder>
 		</finder>
 		<!-- 
 		<finder name="accounts" type="account">
@@ -190,41 +188,33 @@
 
 	<datanode name="tipusDada" transient="true" />
 		
-	<datanode name="dada">
-		<script-handler>
-			<update-script>
-				if (instance.getCodiUsuari() == null)
-					instance.setCodiUsuari (parent.instance.getCodi());
-				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
-				obj.checkRequiredAttribute(self); 
-			</update-script>
-		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
-			<insert-method method="create"  returnBean="true" > <!-- user:metadata:update -->
+	<datanode name="attributes">
+		<ejb-handler jndi="java:comp/env/ejb/UsuariEJB">
+			<insert-method method="updateUserAttributes"  > <!-- user:metadata:update -->
+				<parameter value="${parent.codi}" />
 				<parameter value="${instance}" />
 			</insert-method>
-			<!--delete-method method="delete">  // NOTA: és un update 
-				<parameter value="${instance}" />
-			</delete-method-->
-			<update-method method="update"  returnBean="true"> <!-- user:metadata:update -->
+			<update-method method="updateUserAttributes"> <!-- user:metadata:update -->
+				<parameter value="${parent.codi}" />
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
 	</datanode>
 	
 	<datanode name="account">
-		<finder name="attribute" type ="attribute" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/AccountEJB"
-				method="getAccountAttributes">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService">
+			<insert-method method="createAccount2" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
-			</ejb-finder>
-		</finder>
-
+			</insert-method>
+			<delete-method method="removeAccount">    
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updateAccount2" returnBean="true"> <!-- user:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		
 		<script-handler>
-			<update-script>
-				as = es.caib.seycon.ng.EJBLocator.getAccountService();
-				as.renameAccount(instance);
-			</update-script>
 			<insert-script>
 				usuari = parent.parent.parent.instance;
 				ds = es.caib.seycon.ng.EJBLocator.getDispatcherService();
@@ -234,32 +224,9 @@
 				instance.id = account.id;
 				instance.type = account.type;
 				instance.name = account.name;
-			</insert-script>
-			<delete-script>
-				as = es.caib.seycon.ng.EJBLocator.getAccountService();
-				as.removeAccount(instance);
-			</delete-script>
-		</script-handler>
-	</datanode>
-
-	<datanode name="attribute">
-		<script-handler>
-			<insert-script>
-				instance.accountName = parent.instance.name;
-				instance.systemName = parent.instance.dispatcher;
+				as.updateAccount2(instance);
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/AccountEJB">
-			<insert-method method="createAccountAttribute" returnBean="true" > <!-- user:role:create -->
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="deleteAccountAttribute" >  <!-- user:role:delete -->
-				<parameter value="${instance}" />
-			</delete-method>
-			<update-method method="updateAccountAttribute">  
-				<parameter value="${instance}" />
-			</update-method>
-		</ejb-handler>
 	</datanode>
 
 	<datanode name="sessio" />

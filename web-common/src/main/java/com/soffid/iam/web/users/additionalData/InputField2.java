@@ -9,17 +9,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.logging.LogFactory;
-import org.apache.xpath.operations.Bool;
-import org.jfree.util.Log;
 import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
@@ -30,24 +33,32 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.SimpleConstraint;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
+import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
+import com.soffid.iam.web.component.Identity;
 
 import bsh.EvalError;
 import bsh.TargetError;
@@ -61,17 +72,30 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
+import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathException;
 import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField2 extends Div 
 {
+	private final class TimerEventListener implements EventListener {
+		public void onEvent(Event event) throws Exception {
+			try {
+				updateSearchStatus();
+			} catch (Throwable e) {
+				throw new UiException(""+e);
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 	private String compos;
 	DataType dataType;
 	private String bind;
 	private Object ownerObject;
+	SingletonBinder binder = new SingletonBinder(this);
 	
 	public DataType getDataType() {
 		return dataType;
@@ -87,6 +111,7 @@ public class InputField2 extends Div
 
 	public void setBind(String bind) {
 		this.bind = bind;
+		binder.setDataPath(bind);
 	}
 
 	private boolean twoPhaseEdit;
@@ -137,7 +162,8 @@ public class InputField2 extends Div
 	public void onSelectCustomObject(Event event) {
 		Page p = getDesktop().getPage("customObjectsLlista");
 		p.setAttribute("type", dataType.getDataObjectType());
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		Boolean multiValued = dataType.isMultiValued();
+		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
 	}
 
 	/** 
@@ -153,15 +179,202 @@ public class InputField2 extends Div
 		((HtmlBasedComponent)div.getChildren().get(3)).setVisible(false);
 	}
 
-	public void onActualitzaUser(Event event) {
+	public void onActualitzaUser(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String[] data = (String[]) event.getData();
 		String userName = data[0];
-		setValue(userName);
-		onChange(event);
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(userName);
+		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onChange(Event event) {
-		attributeValidate();
+	org.zkoss.zhtml.Div searchBox = null;
+	AsyncList<?> currentSearch = null;
+	private Div searchContent;
+	int searchPosition = 0;
+	List<Identity> searchResults = null;
+	private String searchCriteria;
+	private InputElement currentSearchTextbox;
+	public void onChanging(InputEvent event) throws Throwable {
+		currentSearchTextbox = (InputElement) event.getTarget();
+		searchCriteria = (String) event.getValue();
+		cancelSearch();
+		if (searchBox != null)
+			searchBox.detach();
+		searchResults = new LinkedList<Identity>();
+		searchPosition = 0;
+		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+		{
+			currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.USER_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getUserService().findUserByTextAsync(searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getGroupService().findGroupByTextAsync(searchCriteria);
+		}
+		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
+		{
+			currentSearch = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByTextAsync(searchCriteria);
+		}
+		searchBox = new org.zkoss.zhtml.Div();
+		searchBox.setDynamicProperty("tabindex", "-1");
+		searchBox.setSclass("attributeSearchPopup");
+		currentSearchTextbox.getParent().insertBefore(searchBox, currentSearchTextbox);
+		Timer t = new org.zkoss.zul.Timer();
+		t.setDelay(1000);
+		t.setRepeats(true);
+		t.addEventListener("onTimer", new TimerEventListener());
+		searchBox.appendChild(t);
+		searchContent = new Div();
+		searchBox.appendChild (searchContent);
+		Image searchProgress = new Image();
+		searchProgress.setSrc("~./img/soffid-progress.gif");
+		searchProgress .setStyle("height: 2em");
+		searchBox.appendChild(searchProgress);
+		
+		updateSearchStatus ();
+		
+	}
+
+	private void updateSearchStatus() throws Throwable {
+		if (currentSearch == null)
+			return;
+		Iterator it = currentSearch.iterator();
+		if ( (currentSearch.isDone() &&  searchPosition == currentSearch.size()) || currentSearch.isCancelled())
+		{
+			((Component)searchBox.getChildren().get(2)).setVisible(false); // Hide ensaimada
+			((Timer)searchBox.getChildren().get(0)).stop(); // Stop timer
+			Throwable th = currentSearch.getExceptionToThrow();
+			currentSearch.clearExceptionToThrow();
+			if (th != null)
+			{
+				cancelSearch();
+				throw th; 
+			}
+		} else if (currentSearch.size() > searchPosition) {
+			int i = 0;
+			boolean any = false;
+			while (it.hasNext())
+			{
+			    Object o = it.next();
+				if (i++ >= searchPosition)
+				{
+					any = true;
+					Div d = new Div();
+					Identity identity = null;
+					if (o instanceof CustomObject)
+						identity = new Identity( (CustomObject ) o);
+					if (o instanceof Group)
+						identity = new Identity( (Group ) o);
+					if (o instanceof User)
+						identity = new Identity( (User ) o);
+					if (o instanceof Application)
+						identity = new Identity( (Application ) o);
+					if (identity != null)
+					{
+						searchResults.add(identity);
+						searchPosition ++;
+					}
+				}
+			}
+			if (any)
+			{			
+				Collections.sort(searchResults, com.soffid.iam.web.component.Identity.getComparator());
+				searchContent.getChildren().clear();
+				for (com.soffid.iam.web.component.Identity id: searchResults)
+				{
+					Object o = id.getObject();
+					String value = o instanceof CustomObject ? ((CustomObject) o).getName() :
+						o instanceof User ? ((User) o).getUserName() :
+						o instanceof Group ? ((Group) o).getName() :
+						o instanceof Application ? ((Application) o).getName() :
+						o instanceof Role ? ((Role) o).getName() :
+						null;
+					if (value != null)
+					{
+						value = org.apache.commons.lang3.StringEscapeUtils.escapeJava(value);
+						Div d = id.generateSelector(searchCriteria);
+						d.setAction("onMouseDown: document.getElementById('"+currentSearchTextbox.getUuid()+"').value='" + value + "'");
+						searchContent.appendChild(d);
+					}
+				}
+			}
+		} 
+	}
+
+	protected void selectCandidate(Event e) throws UnsupportedEncodingException, IOException, CommitException {
+		System.out.println("***** "+e);
+		Div d = (Div) e.getTarget();
+		Identity identity = (Identity) d.getAttribute("identity");
+		Object o = identity.getObject();
+		String value = null;
+		if ( o instanceof CustomObject)
+			value = ((CustomObject) o).getName();
+		if (value != null)
+		{
+			cancelSearch();
+			currentSearchTextbox.setRawValue( value );
+			applyChange(currentSearchTextbox, value);
+		}
+	}
+
+	public void onBlur (Event event)
+	{
+		System.out.println("***** "+event);
+		cancelSearch();
+	}
+	
+	public void cancelSearch() {
+		if (currentSearch != null)
+		{
+			currentSearch.cancel();
+			currentSearch = null;
+		}
+		if (searchBox != null)
+		{
+			searchBox.setVisible(false);
+		}
+	}
+
+	public void onChange(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		System.out.println("***** "+event);
+//		cancelSearch();
+		Component tb = event.getTarget();
+		
+		Object value = null;
+		if (tb instanceof InputElement)
+			value = ((InputElement) tb).getRawValue();
+		else if (tb instanceof Listbox)
+		{
+			Listbox lb = (Listbox) tb;
+			if (lb.getSelectedItem() != null)
+				value = lb.getSelectedItem().getValue();
+		}
+		
+		applyChange(tb, value);
+	}
+
+	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
+		Integer order = (Integer) tb.getAttribute("position");
+		
+		if (order == null)
+			binder.setValue(value);
+		else {
+			List l = (List) binder.getValue();
+			if (l == null) l = new LinkedList();
+			if (order.intValue() == l.size() )
+			{
+				l.add(value);
+				createFieldElement(new Integer (l.size()), null);
+			}
+			else
+				l.set(order.intValue(), value);
+			binder.setValue(new LinkedList());
+			binder.setValue(l);
+		}
+				
+		attributeValidate( order );
 
 		Component c = this;
 		do
@@ -179,32 +392,52 @@ public class InputField2 extends Div
 			else
 				c = c.getParent();
 		} while (c != null);
+		
 	}
 
-	public void onActualitzaGroup(Event event) {
+	public void changeHtml(Event ev) throws Exception {
+		String text = (String) ev.getData();
+        byte data[] = text.getBytes("UTF-8");
+        applyChange(ev.getTarget(), data);
+        if (twoPhaseEdit)
+        	binder.getDataSource().commit();
+    }
+
+	public void onActualitzaGroup(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String[] data = (String[]) event.getData();
 		String group = data[0];
-		setValue(group);
-		onChange(event);
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(group);
+		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onActualitzaApplication(Event event) {
+	public void onActualitzaApplication(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String data = (String) event.getData();
-		setValue(data);
-		onChange(event);
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data);
+		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
-	public void onActualitzaCustomObject(Event event) {
-		String data = (String) event.getData();
-		setValue(data);
-		onChange(event);
+	public void onActualitzaCustomObject(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling();
+		if ( dataType.isMultiValued() )
+		{
+			List<String> data = (List<String>) event.getData();
+			for (String s: data)
+			{
+				textbox.setRawValue(s);
+				onChange( new Event (event.getName(), textbox ) );
+				List l = (List) binder.getValue();
+				int currentSize = l.size();
+				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
+			}
+		}
+		else
+		{
+			String data = (String) event.getData();
+			textbox.setRawValue(data);
+			onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		}
 	}
 
-	private void setValue(Object userName) {
-		BindContext ctx = XPathUtils.getComponentContext(this);
-		XPathUtils.setValue(ctx, bind, userName);
-	}
-	
 	private void commit() throws CommitException {
 		XPathUtils.getComponentContext(this).getDataSource().commit();
 	}
@@ -234,21 +467,18 @@ public class InputField2 extends Div
 		return XPathUtils.getValue( XPathUtils.getComponentContext(this), bind );
 	}
 	
-	public boolean updateUser()
+	public boolean updateUser(String id)
 	{
-		String user = (String) getValue();
-		Component c = (Component) ((Component) getChildren().get(0));
+		InputElement inputElement = (InputElement) getFellow(id);
+		String user = inputElement.getText();
 		
-		Label l;
+		Label l = (Label) getFellowIfAny(id+"b");
 		
-		if (c.getChildren().get(2) instanceof Label)
-			l = (Label) c.getChildren().get(2);
-		else
-			l = (Label) c.getChildren().get(4);
-
 		Usuari u = null;
 		if (user == null || user.isEmpty())
-			l.setValue("");
+		{
+			if (l != null) l.setValue("");
+		}
 		else
 		{
 			try {
@@ -258,92 +488,89 @@ public class InputField2 extends Div
 			}
 			if (u == null)
 			{
-				l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			else
-				l.setValue(u.getFullName());
+			{
+				if (l != null) l.setValue(u.getFullName());
+			}
 		}
 		
 		return true;
 	}
 
-	public boolean updateGroup() {
+	public boolean updateGroup(String id) {
 
-		String group = (String) getValue();
-		Component c = (Component) ((Component) getChildren().get(0));
-		Label l;
+		InputElement inputElement = (InputElement) getFellow(id);
+		String group = inputElement.getText();
 
-		if (c.getChildren().get(2) instanceof Label)
-			l = (Label) c.getChildren().get(2);
-		else
-			l = (Label) c.getChildren().get(4);
+		Label l = (Label) getFellowIfAny(id+"b");
 
 		
 		if (group == null || group.isEmpty())
-			l.setValue("");
+		{
+			if (l != null) l.setValue("");
+		}
 		else {
 			Grup g = null;
 			try {
 				g = EJBLocator.getGrupService().findGrupByCodiGrup(group);
 			} catch (Exception e) {}
 			if (g == null) {
-				l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
-			l.setValue(g.getDescripcio());
+			if (l != null )
+				l.setValue(g.getDescripcio());
 		}
 		return true;
 	}
 
-	public void updateApplication() {
+	public void updateApplication(String id) {
 
-		String application = (String) getValue();
-		Component c = (Component) ((Component) getChildren().get(0));
-		Label l;
+		InputElement inputElement = (InputElement) getFellow(id);
+		String application = inputElement.getText();
 
-		if (c.getChildren().get(2) instanceof Label)
-			l = (Label) c.getChildren().get(2);
-		else
-			l = (Label) c.getChildren().get(4);
+		Label l = (Label) getFellowIfAny(id+"b");
 
-		if (application == null || application.isEmpty())
-			l.setValue("");
-		else {
+		if (application == null || application.isEmpty()) {
+			if (l != null)
+				l.setValue("");
+		} else {
 			Aplicacio a = null;
 			try {
 				a = EJBLocator.getAplicacioService().findAplicacioByCodiAplicacio(application);
 			} catch (Exception e) {}
 			if (a == null) {
-				l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
-			l.setValue(a.getNom());
+			if (l != null) l.setValue(a.getNom());
 		}
 	}
 
-	public void updateCustomObject() {
-		String customObject = (String) getValue();
-		Component c = (Component) ((Component) getChildren().get(0));
-		Label l;
+	public void updateCustomObject(String id) {
+		InputElement inputElement = (InputElement) getFellow(id);
+		String customObject = inputElement.getText();
 
-		if (c.getChildren().get(2) instanceof Label)
-			l = (Label) c.getChildren().get(2);
-		else
-			l = (Label) c.getChildren().get(4);
+		Label l = (Label) getFellowIfAny(id+"b");
 
 		if (customObject == null || customObject.isEmpty())
-			l.setValue("");
+		{
+			if (l != null) l.setValue("");
+		}
 		else {
 			CustomObject co = null;
 			try {
 				co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName(dataType.getDataObjectType(), customObject);
 			} catch (Exception e) {}
 			if (co == null) {
-				l.setValue("?");
-				throw new WrongValueException(this, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
-			l.setValue(co.getDescription());
+			else
+				if (l != null) l.setValue(co.getDescription());
 		}
 	}
 
@@ -359,193 +586,35 @@ public class InputField2 extends Div
 		
 		try
 		{
+			while (!getChildren().isEmpty())
+			{
+				((Component)getChildren().get(0)).setParent(null);
+			}
 			if(dataType != null)
 			{
+				Object value = binder.getValue();
 				calculateVisibility();
-				
-				String result = "";
-				Map <String,Object> map=new HashMap<String, Object>();
-				updateUser = false;
-				updateGroup = false;
-				updateApplication = false;
-				updateCustomObject = false;
-				String readonlyExpr = readonly ? "true" : "false";
-				TypeEnumeration type = dataType.getType();
-				String stringType = new String();
-				if(type!=null)
-					stringType = type.toString();
-				int size = 0;
-				if(dataType.getSize() != null)
-					size = dataType.getSize();
-				String required = "";
-				if (dataType.isRequired())
-					required = "*";
-					
-				if(stringType != null && !stringType.trim().isEmpty()){
-					if(TypeEnumeration.USER_TYPE.equals(type))
-					{
-						updateUser = true;
-							result = "<div style='display:inline' visible='true'>"
-									+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-											+ "bind=\""+getBind()+"\" "
-													+ "onChange=\"self.parent.parent.onChange(event)\" readonly=\""
-									+readonlyExpr+"\"/>" +
-									"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
-											+ "onClick='self.parent.parent.onSelectUser(event)' "
-											+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-									+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()'/>"
-									+ required+"</div>";
-					}
-					else if(TypeEnumeration.GROUP_TYPE.equals(type))
-					{
-						updateGroup = true;
-						StringBuffer sb = new StringBuffer();
-						sb.append("<div style='display:inline' visible='true'>");
-						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.onChange(event)' onOK='' readonly='"+readonlyExpr+"'/>");
-						sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
-								+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
-								+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-								+ " visible=\""+(!readonly)+"\" />");
-						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()'/>");
-						sb.append(required+"</div>");
-						result = sb.toString();
-					}
-					else if(TypeEnumeration.APPLICATION_TYPE.equals(type))
-					{
-						updateApplication = true;
-						StringBuffer sb = new StringBuffer();
-						sb.append("<div style='display:inline' visible='true'>");
-						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.onChange(event)' onOK='' readonly='"+readonlyExpr+"'/>");
-						sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
-								+ "onClick='self.parent.parent.onSelectApplication(event)' "
-								+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
-								+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-								+ " visible=\""+(!readonly)+"\"/>");
-						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()'/>");
-						sb.append(required+"</div>");
-						result = sb.toString();
-					}
-					else if(TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(type))
-					{
-						updateCustomObject = true;
-						StringBuffer sb = new StringBuffer();
-						sb.append("<div style='display:inline' visible='true'>");
-						sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind=\""+getBind()+"\" onChange='self.parent.parent.onChange(event)' onOK='' readonly='"+readonlyExpr+"'/>");
-						sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-								+ " visible=\""+(!readonly)+"\" "
-								+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
-								+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
-								+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-						sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()'/>");
-						sb.append(required+"</div>");
-						result = sb.toString();
-					}
-					else if(TypeEnumeration.BINARY_TYPE.equals(type))
-					{
-						boolean visible = fileAlreadySaved();
-						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
-									"onClick=\"self.parent.parent.uploadBinary();\" "
-									+ "disabled=\""+readonlyExpr+"\">" +
-									"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" "
-											+ "onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
-									"</button>"+required+"</h:span>";
-					}
-					else if(TypeEnumeration.PHOTO_TYPE.equals(type))
-					{
-						if(getValue() != null){
-							map.put("image", byteArrayToImage((byte[])getValue()));
-							result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" "
-								    + " onClick=\"self.parent.parent.upload(self.parent);\" "
-								    + "disabled=\""+readonlyExpr+"\"/>"
-									+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+"</h:span>";
-						}else{
-							result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
-								    " onClick=\"self.parent.parent.upload(self.parent);\" "
-								    + "disabled=\""+readonlyExpr+"\">" +
-									"</button>"+required+"</h:span>";
-						}
-					}
-					else if(TypeEnumeration.DATE_TYPE.equals(type))
-					{
-						result = "<zk><datebox bind=\""+getBind()+"\" format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
-								+ "onChange='self.parent.onChange(event)'/>"+required+"</zk>"; 
-					}
-					else if(TypeEnumeration.EMAIL_TYPE.equals(type))
-					{
-						result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\" bind=\""+getBind()+"\" width='100%' visible='true' "
-									+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
-											+ "onChange='self.parent.onChange(event)'/>";
-						if (required.length() > 0)
-						{
-							result = "<zk>"+result+required+"</zk>";
-						}
-					}	
-					else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
-					{
-						String []split = getFormValues ();
-						result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.updateSsoForm(event)\" width='40%'  "
-									+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
-									+ "<label value=' = '/>"
-									+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.updateSsoForm(event)\" width='40%'  "
-									+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>"
-									+ "</zk>";
-						if (required.length() > 0)
-						{
-							result = "<zk>"+result+required+"</zk>"; 
-								
-						}
-					}	
-					else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
-					{
-							result = "<zk><textbox sclass=\"textbox\" maxlength=\"" + size +"\" bind=\""+getBind()+"\" width='98%' "
-									+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.onChange(event)'/>"+required+"</zk>";
-					} else { // Listbox
-						result = "<listbox mold=\"select\" bind=\""+getBind()+"\" onChange=\"\" "
-								+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.onChange(event)'>";
-						result = result + "<listitem value=\"\"/>";
-						for (String v: dataType.getValues())
-						{
-							String s = v.replaceAll("\"", "&quot;");
-							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
-						}
-						result = result + "</listbox>";
-						if (required.length() > 0)
-						{
-							result = "<zk>"+result+required+"</zk>"; 
-								
-						}
-					}
-				}
-				if (result.equals(""))
+				if (dataType.isMultiValued())
 				{
-					if (twoPhaseEdit && ! readonly)
-						result= "<div style='display:inline-block;'><label bind='"+getBind()+"'/>"
-								+ "<imageclic src='/img/pencil.png' "
-									+ "onClick='self.visible = self.previousSibling.visible = false; "
-										+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-								+ "<textbox sclass=\"textbox\" bind=\""+getBind()+"\" width='90%' "
-										+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
-												+ "onChange='parent.parent.onChange(event)'/>"
-								+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
-								+ "onChange='self.parent.onChange(event)'/>"+required+"</div>";
-					else
-						result= "<zk><textbox sclass=\"textbox\" bind=\""+getBind()+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</zk>";
-				}
-				if(compos.isEmpty() || !compos.equals(result))
-				{
-					while (!getChildren().isEmpty())
+					if (value == null)
 					{
-						((Component)getChildren().get(0)).setParent(null);
+						value = new LinkedList();
+//						binder.setValue(value);
 					}
-					compos=result;
-					Executions.createComponentsDirectly(result, "zul", this, map);
-					if (updateUser) updateUser();
-					if (updateGroup) updateGroup();
-					if (updateApplication) updateApplication();
-					if (updateCustomObject) updateCustomObject();
+					if (value instanceof List)
+					{
+						List l = (List) value;
+						int i;
+						for ( i = 0; i < l.size(); i++)
+						{
+							createFieldElement(new Integer(i), l.get(i));
+						}
+						if (!readonly)
+							createFieldElement(new Integer(i), null);
+					}
 				}
-				//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
-				//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre
+				else
+					createFieldElement(null, value);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -554,6 +623,263 @@ public class InputField2 extends Div
 			disableRecursive = false;
 		}
 		
+	}
+
+	private void createFieldElement(Integer position, Object value) throws IOException, UnsupportedEncodingException {
+		String result = "";
+		Map <String,Object> map=new HashMap<String, Object>();
+		updateUser = false;
+		updateGroup = false;
+		updateApplication = false;
+		updateCustomObject = false;
+		String readonlyExpr = readonly ? "true" : "false";
+		TypeEnumeration type = dataType.getType();
+		String stringType = new String();
+		if(type!=null)
+			stringType = type.toString();
+		int size = 0;
+		if(dataType.getSize() != null)
+			size = dataType.getSize();
+		String required = "";
+		if (dataType.isRequired())
+			required = "*";
+			
+		String id = getIdForPosition(position);
+		String id2 = id + "b";
+		String id3 = id + "c";
+		if(stringType != null && !stringType.trim().isEmpty()){
+			if(TypeEnumeration.USER_TYPE.equals(type))
+			{
+				updateUser = true;
+					result = "<div style='display:block' visible='true'>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.onChange(event)' "  
+									+ "onBlur='self.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+									+ "onClick='self.parent.parent.onSelectUser(event)' "
+									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()' id=\""+id2+"\" />"
+							+ required+"</div>";
+			}
+			else if(TypeEnumeration.GROUP_TYPE.equals(type))
+			{
+				updateGroup = true;
+				StringBuffer sb = new StringBuffer();
+				sb.append("<div style='display:block' visible='true'>");
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
+						+ "onChange='self.parent.parent.onChange(event)' "  
+						+ "onBlur='self.parent.parent.onBlur(event)' "
+						+ "onChanging='self.parent.parent.onChanging(event)' "
+						+ "id=\""+id+"\" "
+						+ "readonly='"+readonlyExpr+"'/>");
+				sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
+						+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
+						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+						+ " visible=\""+(!readonly)+"\" />");
+				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()' id=\""+id2+"\"/>");
+				sb.append(required+"</div>");
+				result = sb.toString();
+			}
+			else if(TypeEnumeration.APPLICATION_TYPE.equals(type))
+			{
+				updateApplication = true;
+				StringBuffer sb = new StringBuffer();
+				sb.append("<div style='display: block' visible='true'>");
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+						+ "id=\""+id+"\" "
+						+ "readonly='"+readonlyExpr+"'/>");
+				sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
+						+ "onClick='self.parent.parent.onSelectApplication(event)' "
+						+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
+						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+						+ " visible=\""+(!readonly)+"\"/>");
+				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()' id=\""+id2+"\"/>");
+				sb.append(required+"</div>");
+				result = sb.toString();
+			}
+			else if(TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(type))
+			{
+				updateCustomObject = true;
+				StringBuffer sb = new StringBuffer();
+				sb.append("<div style='display:block' visible='true' >");
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+						+ "onBlur='self.parent.parent.onBlur(event)' "
+						+ "onChanging='self.parent.parent.onChanging(event)'  "
+						+ "id=\""+id+"\" "
+						+ "readonly='"+readonlyExpr+"'/>");
+				sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
+						+ " visible=\""+(!readonly)+"\" "
+						+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
+						+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
+						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
+				sb.append(required+"</div>");
+				result = sb.toString();
+			}
+			else if(TypeEnumeration.BINARY_TYPE.equals(type))
+			{
+				boolean visible = fileAlreadySaved();
+				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
+							"onClick=\"self.parent.parent.uploadBinary();\" "
+							+ "disabled=\""+readonlyExpr+"\">" +
+							"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" "
+									+ "onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
+							"</button>"+required+"</h:span>";
+			}
+			else if(TypeEnumeration.PHOTO_TYPE.equals(type))
+			{
+				if(getValue() != null){
+					map.put("image", byteArrayToImage((byte[])getValue()));
+					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" "
+						    + " onClick=\"self.parent.parent.upload(self.parent);\" "
+						    + "disabled=\""+readonlyExpr+"\"/>"
+							+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+"</h:span>";
+				}else{
+					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
+						    " onClick=\"self.parent.parent.upload(self.parent);\" "
+						    + "disabled=\""+readonlyExpr+"\">" +
+							"</button>"+required+"</h:span>";
+				}
+			}
+			else if(TypeEnumeration.DATE_TYPE.equals(type))
+			{
+				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
+						+ "id=\""+id+"\" "
+						+ "onChange='self.parent.parent.onChange(event)'/>"+required+"</div>"; 
+			}
+			else if(TypeEnumeration.EMAIL_TYPE.equals(type))
+			{
+				result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
+						+ "id=\""+id+"\" "
+							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
+									+ "onChange='self.parent.parent.onChange(event)'/>";
+				result = "<div>"+result+required+"</div>";
+			}	
+			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
+			{
+				String []split = getFormValues ();
+				result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+							+ "id=\""+id+"\" "
+							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
+							+ "<label value=' = '/>"
+							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+							+ "id=\""+id2+"\" "
+							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
+				result = "<div>"+result+required+"</div>"; 
+			}	
+			else if ( TypeEnumeration.HTML.equals(type))
+			{
+				String v = value == null ? "": value instanceof byte[] ? new String((byte[])value, "UTF-8") : value.toString(); 
+				result = "<div>"
+						+ "<html style='display: inline-block; border: solid 1px black' id='"+id+"'>"
+						+ "<attribute name=\"onChange\"><![CDATA[\n" 
+						+ "self.parent.parent.changeHtml (event);"
+						+ "]]></attribute>" 
+					  	+ "<![CDATA["
+						+ (v)
+						+ "]]></html>" ;
+				if (!readonly)
+				{
+						result = result + 
+							"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" + 
+								"<attribute name=\"onClick\"><![CDATA[\n" + 
+									"Events.sendEvent(new Event (\"onEdit\", \n" + 
+										"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" + 
+										"new Object[] {\n" + 
+											"event.getTarget().getPreviousSibling()"+ 
+										"}" + 
+									"));" + 
+								"]]></attribute>" + 
+							"</imageclic>";
+				}
+				result = result +  "</div>";
+			}
+			else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
+			{
+					result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
+							+ "id=\""+id+"\" "
+							+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChange(event)' onOK=''/>"+required+"</div>";
+			} else { // Listbox
+				result = "<listbox mold=\"select\" onChange=\"\" "
+						+ "id=\""+id+"\" "
+						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChange(event)'>";
+				result = result + "<listitem value=\"\"/>";
+				for (String v: dataType.getValues())
+				{
+					String s = v.replaceAll("\"", "&quot;");
+					result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+				}
+				result = result + "</listbox>";
+				result = "<div>"+result+required+"</div>"; 
+			}
+		}
+		if (result.equals(""))
+		{
+			if (twoPhaseEdit && ! readonly)
+				result= "<div><label id='"+id3+"'/>"
+						+ "<imageclic src='/img/pencil.png' "
+							+ "onClick='self.visible = self.previousSibling.visible = false; "
+								+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
+						+ "<textbox sclass=\"textbox\" width='90%' "
+								+ "id=\""+id+"\" "
+								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
+										+ "onChange='parent.parent.onChange(event)'/>"
+						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
+						+ "onChange='self.parent.parent.onChange(event)'/>"+required+"</div>";
+			else
+				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
+		}
+		if(compos.isEmpty() || !compos.equals(result))
+		{
+			compos=result;
+			Executions.createComponentsDirectly(result, "zul", this, map);
+			Component c = getFellowIfAny(id);
+			if (c != null)
+			{
+				c.setAttribute("position", position);
+				if (value != null && ! TypeEnumeration.SSO_FORM_TYPE.equals(type))
+				{
+					if (c instanceof Datebox) {
+						if (value instanceof Date)
+							((Datebox) c).setValue ((Date) value);
+						else if (value instanceof Calendar)
+							((Datebox) c).setValue ( ((Calendar) value ).getTime() );
+						else
+							((Datebox) c).setRawValue(value);
+					}
+					else if (c instanceof Listbox) {
+						Listbox lb = (Listbox) c;
+						for (Listitem item: (Collection<Listitem>)lb.getItems()){
+							if (value.equals(item.getValue()))
+								lb.setSelectedItem(item);
+						}
+					}
+					else if (c instanceof InputElement) ((InputElement) c).setRawValue(value);
+				}
+			}
+			Component c2 = getFellowIfAny(id2);
+			if (c2 != null)
+				c2.setAttribute("position", position);
+			Component c3 = getFellowIfAny(id3);
+			if (c3 != null && c3 instanceof Label && value != null)
+				((Label) c3).setValue(value.toString());
+			if (updateUser) updateUser(id);
+			if (updateGroup) updateGroup(id);
+			if (updateApplication) updateApplication(id);
+			if (updateCustomObject) updateCustomObject(id);
+		}
+		//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
+		//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre
+	}
+
+	private String getIdForPosition(Integer position) {
+		String id = "s_"+hashCode();
+		if ( position != null)
+			id = id + "_p_" + position;
+		return id;
 	}
 
 	private void calculateVisibility() throws EvalError, MalformedURLException {
@@ -630,7 +956,9 @@ public class InputField2 extends Div
             os.close();
             data = os.toByteArray();
         }
-        setValue(data);
+        
+        binder.setValue(data);
+        
         for (Iterator<?> it = span.getChildren().iterator(); it.hasNext();)
         {
         	Component c = (Component) it.next();
@@ -691,7 +1019,7 @@ public class InputField2 extends Div
 	            data = os.toByteArray();
 	        }
         }
-        setValue(data);
+        binder.setValue(data);
         if (twoPhaseEdit)
         	commit();
     }
@@ -719,6 +1047,7 @@ public class InputField2 extends Div
 	
 	public void setPage(Page page) {
 		super.setPage(page);
+		binder.setPage(page);
 	}
 
 	public Object clone() {
@@ -728,11 +1057,13 @@ public class InputField2 extends Div
 		clone.compos = this.compos;
 		clone.twoPhaseEdit = this.twoPhaseEdit;
 		clone.updateUser = this.updateUser;
+		clone.binder = new SingletonBinder (clone);
+		clone.binder.setDataPath(binder.getDataPath());
 		return clone;
 	}
 		
 	
-	public void updateSsoForm (Event event) throws UnsupportedEncodingException
+	public void updateSsoForm (Event event) throws IOException
 	{
 		String values[] = new String[] { "", ""};
 		int i = 0;
@@ -743,10 +1074,27 @@ public class InputField2 extends Div
 				values[i++] = ((Textbox)obj).getText();
 			}
 		}
-		setValue(URLEncoder.encode(values[0], "UTF-8")
+		binder.setValue(URLEncoder.encode(values[0], "UTF-8")
 				+ "="
 				+URLEncoder.encode(values[1], "UTF-8"));
-		onChange(event);
+		attributeValidate( null );
+
+		Component c = this;
+		do
+		{
+			if (c instanceof AttributesDiv)
+			{
+				((AttributesDiv) c).adjustVisibility();
+				break;
+			}
+			else if (c instanceof UserAttributesDiv)
+			{
+				((UserAttributesDiv) c).adjustVisibility();
+				break;
+			}
+			else
+				c = c.getParent();
+		} while (c != null);
 	}
 
 	public Object getOwnerObject() {
@@ -757,24 +1105,33 @@ public class InputField2 extends Div
 		this.ownerObject = ownerObject;
 	}
 	
-	public boolean attributeValidate()
+	public boolean attributeValidate(Integer position)
 	{
 		Clients.closeErrorBox(this);
 		
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = XPathUtils.getValue(ctx, bind);
+		if (position != null && value instanceof List)
+			value = ((List)value).get(position.intValue());
 
+		Component input = getFellow(getIdForPosition(position));
+		if (input instanceof InputElement)
+		{
+			InputElement inputElement = (InputElement) input;
+			inputElement.clearErrorMessage();
+		}
+		
 		if (dataType.isRequired() && ( value == null ||  "".equals(value)))
 			throw new WrongValueException(this, MZul.EMPTY_NOT_ALLOWED);
 			
 		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
-			updateApplication();
+			updateApplication( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.USER_TYPE)
-			updateUser();
+			updateUser( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
-			updateGroup();
+			updateGroup( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
-			updateCustomObject();
+			updateCustomObject( getIdForPosition(position) );
 		
 		if (dataType.getValidationExpression() == null ||
 				dataType.getValidationExpression().isEmpty())
@@ -825,12 +1182,15 @@ public class InputField2 extends Div
 			throw new UiException(e.toString(), e);
 		} catch (MalformedURLException e) {
 			throw new UiException (e.toString());
+		} catch (JXPathException e) {
+			return false;
 		}
 	}
 
 	private SecureInterpreter createInterpreter() throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
-		Object value = XPathUtils.getValue(ctx, bind);
+		Object value = null;
+		value = XPathUtils.getValue(ctx, bind);
 		Component grandpa = getParent().getParent();
 		Map attributes = grandpa instanceof UserAttributesDiv ? 
 			((UserAttributesDiv) grandpa).getAttributesMap():
@@ -879,4 +1239,33 @@ public class InputField2 extends Div
 	public void setOwnerContext(String ownerContext) {
 		this.ownerContext = ownerContext;
 	}
+
+
+	public void setParent(Component parent) {
+		super.setParent(parent);
+		binder.setParent(parent);
+	}
+
+	public boolean attributeValidateAll() {
+		if(dataType != null)
+		{
+			Object value = binder.getValue();
+			if (dataType.isMultiValued())
+			{
+				if (value != null && value instanceof List)
+				{
+					List l = (List) value;
+					int i;
+					for ( i = 0; i < l.size(); i++)
+					{
+						attributeValidate(new Integer(i));
+					}
+				}
+			}
+			else
+				attributeValidate(null);
+		}
+		return true;
+	}
+
 }

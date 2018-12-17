@@ -227,7 +227,7 @@ public class UserAttributesDiv extends Div implements XPathSubscriber, BindConte
 				InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
 				input.setOwnerObject(ownerObject);
 				input.setOwnerContext(ownerContext);
-				if (!input.attributeValidate())
+				if (!input.attributeValidateAll())
 				{
 					setFocus(true);
 					throw new WrongValueException(this, "Value not accepted");					

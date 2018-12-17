@@ -45,8 +45,10 @@
 					</row>
 					<row>
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Type')}" />
-						<listbox width="99%" visible="true" bind="@type" mold="select"
-							disabled="${!canModifyMetadata}" style="font-size: 10px" dataPath="/model:/dataType">
+						<listbox width="99%" visible="true" bind="." mold="select"
+							use="com.soffid.iam.web.agent.CustomDataTypeListbox"
+							disabled="${!canModifyMetadata}" style="font-size: 10px"
+							onChange='checkListboxCustomObjectTypes(this)'>
 							<dataitem bind="@value">
 								<listcell bind="@literal" />
 							</dataitem>
@@ -60,6 +62,11 @@
 					<row >
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Unique')}" />
 						<checkbox bind="@unique" disabled="${!canModifyMetadata}"
+							onClick="" onCheck="" />
+					</row>
+					<row >
+						<input_etiqueta value="${c:l('dadesAddicionals.zul.Multivalued')}" />
+						<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
 							onClick="" onCheck="" />
 					</row>
 					<row >

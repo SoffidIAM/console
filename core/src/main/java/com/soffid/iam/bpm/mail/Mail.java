@@ -227,7 +227,6 @@ public class Mail implements ActionHandler {
 					MessageFactory.setThreadLocale(new Locale (usuari.getConsoleProperties().getLanguage()));
 				
 				String subject = Messages.getString(header); //$NON-NLS-1$
-				
 				InputStream in = getMailContent();
 				InputStreamReader reader = new InputStreamReader(in);
 				StringBuffer buffer = new StringBuffer ();
@@ -320,6 +319,8 @@ public class Mail implements ActionHandler {
 			while (subject != null && 
 					(subject.startsWith(" ") || subject.startsWith("\t")))
 					subject = subject.substring(1);
+			subject = subject.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
+			fromAddress = fromAddress.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
 			MailUtils.sendHtmlMail(null, targetAddresses, fromAddress, subject, text);
 		}
 	}

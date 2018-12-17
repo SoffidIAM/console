@@ -40,20 +40,16 @@ public class CustomObjectEntityDaoImpl extends CustomObjectEntityDaoBase {
 		
 		StringBuffer sb = new StringBuffer("select u "
 				+ "from com.soffid.iam.model.CustomObjectEntity as u "
-				+ "where u.type.name=:objectType, u.type.tenant.id = :tenantId");
+				+ "where u.type.name=:objectType and u.type.tenant.id = :tenantId");
 		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
 		params[1] = new Parameter("objectType", objectType);
 		for (int i = 0; i < split.length; i++)
 		{
 			sb.append(" and ");
 			params[i+2] = new Parameter("param"+i, "%"+split[i].toUpperCase()+"%");
-			sb.append("(upper(u.userName) like :param")
+			sb.append("(upper(u.name) like :param")
 				.append(i)
-				.append(" or upper(u.firstName) like :param")
-				.append(i)
-				.append(" or upper(u.lastName) like :param")
-				.append(i)
-				.append(" or upper(u.middleName) like :param")
+				.append(" or upper(u.description) like :param")
 				.append(i)
 				.append(")");
 		}

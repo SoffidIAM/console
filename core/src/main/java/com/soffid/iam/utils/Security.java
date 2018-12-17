@@ -280,6 +280,7 @@ public class Security {
     public static final String AUTO_ACCOUNT_DELETE = "account:delete"; //$NON-NLS-1$
     public static final String AUTO_ACCOUNT_QUERY = "account:query"; //$NON-NLS-1$
     public static final String AUTO_ACCOUNT_PASSWORD = "account:password"; //$NON-NLS-1$
+    public static final String AUTO_ACCOUNT_HP_PASSWORD = "account:hp-password"; //$NON-NLS-1$
     
     public static final String AUTO_ACCOUNT_ATTRIBUTE_UPDATE = "account:attribute:update"; //$NON-NLS-1$
     public static final String AUTO_ACCOUNT_ATTRIBUTE_QUERY = "account:attribute:query";

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.jcs.access.CacheAccess;
 import org.apache.commons.jcs.access.behavior.ICacheAccess;
@@ -201,28 +202,36 @@ public class AccountEntityDaoImpl extends
 				}
 			}
 			target.setAttributes(new HashMap<String, Object>());
+			Map<String, Object> attributes = target.getAttributes();
 			for (AccountAttributeEntity att : source.getAttributes()) {
 				UserData vd = getAccountAttributeEntityDao().toUserData(att);
-				if (vd.getDateValue() != null)
-					target.getAttributes()
-							.put(vd.getAttribute(), vd.getDateValue());
-				else if (vd.getValue() != null)
-					target.getAttributes().put(vd.getAttribute(), vd.getValue());
+				if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+				{
+					LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
+					if (r == null)
+					{
+						r = new LinkedList<Object>();
+						attributes.put(vd.getAttribute(), r);
+					}
+					if (vd.getDateValue() != null)
+						r.add(vd.getDateValue());
+					else if (vd.getValue() != null)
+						r.add(vd.getValue());
+					else if (vd.getBlobDataValue() != null)
+						r.add(vd.getBlobDataValue());
+				}
+				else
+				{
+					if (vd.getDateValue() != null)
+						attributes
+								.put(vd.getAttribute(), vd.getDateValue());
+					else if (vd.getValue() != null)
+						attributes.put(vd.getAttribute(), vd.getValue());
+					else if (vd.getBlobDataValue() != null)
+						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+				}
 			}
 	
-			HashMap<String, Object> atts = new HashMap<String, Object>();
-			target.setAttributes(atts);
-			// Now assign attributes
-			for (AccountAttributeEntity att : source.getAttributes()) {
-				UserData vd = getAccountAttributeEntityDao().toUserData(att);
-				if (vd.getBlobDataValue() != null)
-					atts.put(vd.getAttribute(), vd.getBlobDataValue());
-				else if (vd.getDateValue() != null)
-					atts.put(vd.getAttribute(), vd.getDateValue());
-				else if (vd.getValue() != null)
-					atts.put(vd.getAttribute(), vd.getValue());
-			}
-			
 			// Assign vault folder
 			if (source.getFolder() == null)
 			{
@@ -291,7 +300,7 @@ public class AccountEntityDaoImpl extends
 
 	private void fetchFromCache(Account target, AccountCacheEntry entry)
 			throws InternalErrorException {
-		target.setAttributes(entry.account.getAttributes());
+		target.setAttributes( new HashMap<String, Object>( entry.account.getAttributes()) );
 		target.setDescription(entry.account.getDescription());
 		target.setDisabled(entry.account.isDisabled());
 		target.setSystem(entry.account.getSystem());
@@ -501,6 +510,12 @@ public class AccountEntityDaoImpl extends
 		}
 		return query(sb.toString(), params);
 	}
+	
+	public void handleRemoveFromCache (AccountEntity entity) 
+	{
+		getCache().remove(entity.getId());
+	}
+
 }
 
 

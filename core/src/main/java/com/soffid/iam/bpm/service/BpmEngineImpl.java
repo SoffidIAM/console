@@ -3074,11 +3074,6 @@ public class BpmEngineImpl extends BpmEngineBase {
 			}
 		} finally {
 			flushContext(context);
-		}
-
-		try {
-			deployProcessParDefinition(f);
-		} finally {
 			f.delete();
 		}
 	}

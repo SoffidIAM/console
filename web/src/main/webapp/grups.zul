@@ -761,5 +761,6 @@
 	<include src="aplicacionsllista.zul" />
 	<include src="customObjectsllista.zul" />
 	<include src="finestres/identity.zul" />
+	<include src="finestres/editorHTML.zul" />
 	
 </frame>

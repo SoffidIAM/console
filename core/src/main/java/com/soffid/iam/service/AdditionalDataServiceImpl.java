@@ -65,7 +65,15 @@ public class AdditionalDataServiceImpl extends
 			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER))
 				it.remove();
 		}
-		return getMetaDataEntityDao().toDataTypeList(col);
+		LinkedList <DataType> list = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(col));
+		Collections.sort(list, new Comparator<DataType>() {
+			@Override
+			public int compare(DataType o1, DataType o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}
+			
+		});
+		return list;
 	}
 
 	/**
@@ -161,7 +169,7 @@ public class AdditionalDataServiceImpl extends
 	 */
 	private void validateUniqueOrderForAccountMetadata(DataType dataTypeVO) {
 		List<AccountMetadataEntity> dataTypeEntityList = getAccountMetadataEntityDao().findBySystem(dataTypeVO.getSystemName());
-		if (dataTypeVO.getOrder() == 0) {
+		if (dataTypeVO.getOrder() == null || dataTypeVO.getOrder().equals( 0 ) ) {
 			long next = 10;
 			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
 				if (dataTypeEntity.getOrder().longValue() >= next) next = dataTypeEntity.getOrder().longValue() + 1;
@@ -244,7 +252,7 @@ public class AdditionalDataServiceImpl extends
 
 	public UserData handleCreate(UserData dadaUsuari) throws InternalErrorException {
 		
-		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().findByDataType(dadaUsuari.getUser(), dadaUsuari.getAttribute());
+		UserDataEntity dadaUsuariEntity = dadaUsuari.getId() == null ? null: getUserDataEntityDao().load ( dadaUsuari.getId());
 		
 		if (dadaUsuariEntity == null)
 			dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);
@@ -348,7 +356,15 @@ public class AdditionalDataServiceImpl extends
 		SystemEntity de = getSystemEntityDao().findByName(system);
 		if (de == null)
 			return null;
-		return getAccountMetadataEntityDao().toDataTypeList(de.getMetaData());
+		LinkedList <DataType>col = new LinkedList<DataType>( getAccountMetadataEntityDao().toDataTypeList(de.getMetaData()));
+		Collections.sort(col, new Comparator<DataType>() {
+			@Override
+			public int compare(DataType o1, DataType o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}
+			
+		});
+		return col;
 	}
 
 	@Override
@@ -358,8 +374,16 @@ public class AdditionalDataServiceImpl extends
 			return handleGetDataTypes();
 		
 		
-		List<MetaDataEntity> col = this.getMetaDataEntityDao().findByScope(scope);
-		return getMetaDataEntityDao().toDataTypeList(col);
+		List<MetaDataEntity> entities = this.getMetaDataEntityDao().findByScope(scope);
+		LinkedList <DataType> col = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(entities));
+		Collections.sort(col, new Comparator<DataType>() {
+			@Override
+			public int compare(DataType o1, DataType o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}
+			
+		});
+		return col;
 	}
 
 	@Override

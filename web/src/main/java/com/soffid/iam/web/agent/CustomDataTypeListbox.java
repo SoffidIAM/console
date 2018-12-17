@@ -18,6 +18,7 @@ import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
 
 public class CustomDataTypeListbox extends Listbox implements XPathSubscriber {
+	boolean accountMetadata = false;
 
 	private static final long serialVersionUID = 7972552691186027886L;
 	SingletonBinder valueBinder = new SingletonBinder(this);
@@ -83,6 +84,8 @@ public class CustomDataTypeListbox extends Listbox implements XPathSubscriber {
 				}
 				DataSource ds = valueBinder.getDataSource();
 				String path = valueBinder.getXPath();
+				if (!path.endsWith("/"))
+					path = path + "/";
 				ds.getJXPathContext().setValue(path+"@type", 
 						type);
 				ds.getJXPathContext().setValue(path+"@dataObjectType", 

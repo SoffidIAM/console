@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.logging.exe.LoggingInstance;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,6 +30,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PolicyCheckResult;
@@ -38,6 +40,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -45,8 +48,10 @@ import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -127,6 +132,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de, boolean force) throws Exception {
+		UserAccountEntity uae ;
 		boolean nullName = false;
 		if (name == null)
 		{
@@ -174,6 +180,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		}
 	    		
 	    		getAccountEntityDao().update(acc);
+	    		uae = bindAccountToUser(ue, acc);
 			}
 			else
 				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getName()));
@@ -194,18 +201,21 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		acc.setStatus(AccountStatus.REMOVED);
     		}
     		getAccountEntityDao().create(acc);
+    		uae = bindAccountToUser(ue, acc);
+			audit("C", acc);
 		}
 
+
+		return uae;
+	}
+
+	private UserAccountEntity bindAccountToUser(UserEntity ue, AccountEntity acc) {
 		UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
 		uae.setAccount(acc);
 		uae.setUser(ue);
 		getUserAccountEntityDao().create(uae);
 		acc.getUsers().add(uae);
 		ue.getAccounts().add(uae);
-
-		if (! acc.isDisabled())
-			audit("E", acc);
-
 		createAccountTask(uae.getAccount());
 		return uae;
 	}
@@ -308,6 +318,136 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		createAccountTask(acc);
 		return account;
+	}
+
+	@Override
+    protected Account handleCreateAccount2(com.soffid.iam.api.Account account) throws Exception {
+		Map<String, Object> attributes ;
+		if (account.getAttributes () == null)
+		    attributes = new HashMap<String, Object>(  );
+		else
+		    attributes = new HashMap<String, Object>( account.getAttributes() );
+		Account acc = handleCreateAccount(account);
+		if (attributes != null && ! attributes.isEmpty())
+		{
+			acc.setAttributes(attributes);
+			AccountEntity entity = getAccountEntityDao().load(acc.getId());
+			updateAccountAttributes( account, entity );
+			getAccountEntityDao().removeFromCache(entity);
+		}
+		return acc;
+	}
+	
+	@Override
+    protected Account handleUpdateAccount2(com.soffid.iam.api.Account account) throws Exception {
+		Map<String, Object> attributes = new HashMap<String, Object>( account.getAttributes() );
+		Account acc = handleUpdateAccount(account);
+		if (attributes != null && ! attributes.isEmpty())
+		{
+			acc.setAttributes(attributes);
+			AccountEntity entity = getAccountEntityDao().load(acc.getId());
+			updateAccountAttributes( account, entity );
+			getAccountEntityDao().removeFromCache(entity);
+		}
+		return acc;
+	}
+
+	private void updateAccountAttributes (Account app, AccountEntity entity) throws InternalErrorException
+	{
+		if (app.getAttributes() == null)
+			app.setAttributes(new HashMap<String, Object>());
+		
+		LinkedList<AccountAttributeEntity> entities = new LinkedList<AccountAttributeEntity> (entity.getAttributes());
+		HashSet<String> keys = new HashSet<String>();
+		for (String key: app.getAttributes().keySet() )
+		{
+			AccountMetadataEntity metadata = findMetadata (entity, key);
+			Object v = app.getAttributes().get(key);
+			if (v == null)
+			{
+				// Do nothing
+			}
+			else if (v instanceof List)
+			{
+				List l = (List) v;
+				for (Object o: (List) v)
+				{
+					if (o != null)
+					{
+						updateAccountAttribute(entity, entities, key, metadata, o);
+					}
+				}
+			}
+			else
+			{
+				updateAccountAttribute(entity, entities, key, metadata, v);
+			}
+		}
+		
+		entity.getAttributes().removeAll(entities);
+		getAccountEntityDao().update(entity);
+
+		Collection<AccountMetadataEntity> md = entity.getSystem().getMetaData();
+		
+		for ( AccountMetadataEntity m: md)
+		{
+			Object o = app.getAttributes().get(m.getName());
+			if ( o == null || "".equals(o))
+			{
+				if (m.getRequired() != null && m.getRequired().booleanValue())
+					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+			} else {
+				if (m.getUnique() != null && m.getUnique().booleanValue())
+				{
+					List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+					for (String v: l)
+					{
+						List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);
+						if (p.size() > 1)
+							throw new InternalErrorException(String.format("Already exists an account with %s %s",
+									m.getLabel(), v));
+					}
+				}
+			}
+		}
+	}
+
+	private void updateAccountAttribute(AccountEntity entity, LinkedList<AccountAttributeEntity> attributes, String key,
+			AccountMetadataEntity metadata, Object value) throws InternalErrorException {
+		AccountAttributeEntity aae = findAccountAttributeEntity ( attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			aae = getAccountAttributeEntityDao().newAccountAttributeEntity();
+			aae.setAccount(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getAccountAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+		}
+		else
+			attributes.remove(aae);
+	}
+
+
+	private AccountAttributeEntity findAccountAttributeEntity(LinkedList<AccountAttributeEntity> entities, String key,
+			Object o) {
+		for (AccountAttributeEntity aae: entities)
+		{
+			if (aae.getMetadata().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
+	}
+
+	private AccountMetadataEntity findMetadata(AccountEntity entity, String key) throws InternalErrorException {
+		for (AccountMetadataEntity m: entity.getSystem().getMetaData())
+			if (m.getName().equals(key))
+				return m;
+		throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key));
 	}
 
 	private Collection<Group> getAclGrupCollectionForLevel(Account account, AccountAccessLevelEnum level) {
@@ -601,6 +741,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
 			tasque.setUser(ae.getName());
 			tasque.setSystemName(ae.getSystem().getName());
+			tasque.setDb(ae.getSystem().getName());
 			getTaskEntityDao().create(tasque);
 		}
 	}
@@ -611,7 +752,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
 			tasque.setTransaction(TaskHandler.NOTIFY_PASSWORD_CHANGE);
 			tasque.setSystemName(ae.getSystem().getName());
-			
+			tasque.setDb(ae.getSystem().getName());
 			// Check notify to group
 			if (ge != null)
 				tasque.setGroup(ge.getId().toString());
@@ -670,6 +811,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (ue == null)
 			return;
 		
+		Collection<RoleGrant> perms = getApplicationService().findEffectiveRoleGrantByUser(ue.getId());
+		
 		SystemEntityDao disDao = getSystemEntityDao();
 		for (SystemEntity disEntity : disDao.loadAll()) {
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
@@ -679,11 +822,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
+                        audit("E", acc);
                     }
                     if (!acc.isDisabled() && !"S".equals(ue.getActive())) {
                         acc.setDisabled(true);
 						acc.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(acc);
+                        audit("e", acc);
                     }
                 }
             } else if (disEntity.isMainSystem() || disEntity.getUrl() != null) {
@@ -691,7 +836,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, dis.getName());
                 String description = ue.getUserName() + " - " + ue.getFullName();
                 if (description.length() > 50) description = description.substring(0, 47) + "...";
-                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user)) {
+                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user, perms)) {
                     if (accs.isEmpty()) {
                         try {
                             generateAccount(null, ue, disEntity, false);
@@ -705,6 +850,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                                 acc.setDescription(description);
     							acc.setStatus(AccountStatus.ACTIVE);
                                 getAccountEntityDao().update(acc);
+                                audit("E", acc);
                             }
                         }
                     }
@@ -715,6 +861,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     						acc.setStatus(AccountStatus.DISABLED);
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
+                            audit("e", acc);
                         }
                     }
                 }
@@ -1248,7 +1395,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (callerUe == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.UserNotFoundForAccount"), principal, dispatcher)); //$NON-NLS-1$
 
-		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
+		if (! force )
+		{
+			if ( ! ae.getUsers().isEmpty())
+			{
+				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
+				if (! currentUser.getId().equals(callerUe.getId()))
+					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
+			}
+		}
+		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_HP_PASSWORD))
 		{
 			// Check if policy allows user change
 			UserDomainService dominiUsuariService = getUserDomainService();
@@ -1308,15 +1464,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 		}
 		
-		if (! force )
-		{
-			if ( ! ae.getUsers().isEmpty())
-			{
-				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
-				if (! currentUser.getId().equals(callerUe.getId()))
-					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
-			}
-		}
 		/// Now, do the job
         PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
         if (! check.isValid()) {
@@ -1350,8 +1497,17 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return false;
 		JbpmContext ctx = getBpmEngine().getContext();
 		try {
-			ProcessDefinition pd = (ProcessDefinition) def.get(0);
+			com.soffid.iam.bpm.api.ProcessDefinition pd = (com.soffid.iam.bpm.api.ProcessDefinition) def.get(0);
 			org.jbpm.graph.exe.ProcessInstance pi = ctx.newProcessInstance(pd.getName());
+			LoggingInstance li = (LoggingInstance) pi.getInstance(LoggingInstance.class);
+			if (li == null) {
+				li = new LoggingInstance();
+				pi.addInstance(li);
+			}
+			AuthenticationLog log = new AuthenticationLog();
+			log.setToken(pi.getRootToken());
+			log.setActorId(Security.getCurrentUser());
+			li.startCompositeLog(log);
 			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
 			pi.getContextInstance().createVariable("account", acc.getId());
 			pi.getContextInstance().createVariable("accountSystem", acc.getSystem());
@@ -1360,11 +1516,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			pi.getContextInstance().createVariable("until", until);
 			pi.signal();
 			ctx.save(pi);
+			if (li != null) {
+				li.endCompositeLog();
+			}
 			return true;
 		} finally {
 			ctx.close();
 		}
-		 	}
+	}
 
 	private UserEntity getUserForAccount(AccountEntity acc) {
 		UserEntity ue = null;
@@ -1778,7 +1937,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         found = true;
                         AttributeVisibilityEnum vis = data.getAttributeVisibility();
                         if (vis.equals(AttributeVisibilityEnum.EDITABLE) || vis.equals(AttributeVisibilityEnum.READONLY)) result.add(getAccountAttributeEntityDao().toUserData(data));
-                        break;
+//                        break;
                     }
                 }
                 if (!found) {

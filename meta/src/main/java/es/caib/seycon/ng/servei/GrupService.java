@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AplicacioService.class,
 	AsyncRunnerService.class,
 	GroupAttributeEntity.class,
+	AttributeValidationService.class,
 	TipusDadaEntity.class
 })
 public abstract class GrupService {

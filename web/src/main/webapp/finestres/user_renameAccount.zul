@@ -4,6 +4,13 @@
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
+	<style>
+		.accatt {display: table; padding: 0px; width: 100%}
+		.accatt_row {display: table-row}
+		.accatt_row span {}
+		.accatt_label {display: table-cell; width: 202px}
+		.accatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+	</style>
 	<zscript>
 <![CDATA[
 	import es.caib.zkib.zkiblaf.Missatgebox;
@@ -16,6 +23,7 @@
 		dades.getFellow("detall_nom").setBind ("/changeName/nullbean:/@name");
 
 		dades.getFellow("attributeGrid").setDataPath( "/changeName/nullbean:/attribute");
+		dades.getFellow("attributeGrid").setOwnerBind( "/changeName/nullbean:/attribute");
 	}
 	void onWindowClose(Event event) {
 		cleanWindow();
@@ -130,7 +138,9 @@
 
 	dades.getFellow("detall_nom").setBind (dsPath+":"+rootPath+ "/@name");
 
-	dades.getFellow("attributeGrid").setDataPath( dsPath+":"+rootPath+ "/attribute");
+	dades.getFellow("attributeGrid").setDataPath( dsPath+":"+rootPath+ "/attributes");
+	dades.getFellow("attributeGrid").setOwnerBind( dsPath+":"+rootPath);
+	dades.getFellow("attributeGrid").updateMetadata();
 	]]>
 		</attribute>
 
@@ -154,18 +164,10 @@
 						</row>
 					</rows>
 				</grid>
-				<grid dataPath="/changeName/nullbean:/attribute"  
-					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"
-					if="${canUpdateUserMetadata}" fixedLayout="true">
-					<columns>
-						<column width="260px"/>
-						<column />
-					</columns>
-					<datarow>
-						<input_etiqueta bind="@dataLabel" width_custom="250px"/>
-						<div use="com.soffid.iam.web.users.additionalData.InputField" onChange=""/>
-					</datarow>
-				</grid>
+				<div dataPath="/changeName/nullbean:/attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+					ownerBind="/changeName/nullbean:/attributes" id="attributeGrid"
+					if="${canUpdateUserMetadata}" scope="account" sclass="accatt" >
+				</div>
 			</div>
 			<separator spacing="5px" />
 			<hbox style="margin-left:auto; margin-right:auto">

@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -70,7 +71,9 @@ import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
+import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
@@ -1591,10 +1594,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			auditChange("E", previousUser.getUserName(), null);
 		}
 
-		// Verifiquem si hem de fer la comprovació de la identitat:
-		// s'ha modifcat el nif de l'usuari??
-		UserDataEntity nifAnterior = getUserDataEntityDao().findByDataType(
-				usuari.getUserName(), "NIF"); //$NON-NLS-1$
 		// Updates user name (if needed)
 		if (!usuariAbans.getUserName().equals(usuari.getUserName())) {
 			for (UserProcessEntity upe : getUserProcessEntityDao()
@@ -1750,9 +1749,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	protected UserData handleFindDataByUserAndCode(String codiUsuari,
 			String codiTipusDada) throws Exception {
-		UserDataEntity dadaUsuariEntity = getUserDataEntityDao()
-				.findByDataType(codiUsuari, codiTipusDada);
-		if (dadaUsuariEntity != null) {
+		for (UserDataEntity dadaUsuariEntity: getUserDataEntityDao()
+				.findByDataType(codiUsuari, codiTipusDada))
+		{
 			UserData dadaUsuari = getUserDataEntityDao().toUserData(
 					dadaUsuariEntity);
 			return dadaUsuari;
@@ -1777,7 +1776,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				return getSessionEntityDao().toSessionList(sessions);
 			}
 		}
-		// TODO: Aquí no donem error de que no disposa permisos ... (!!)
 		return Collections.emptyList();
 	}
 
@@ -3161,4 +3159,161 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return result;
 		
 	}
+
+	@Override
+	protected Map<String, Object> handleFindUserAttributes(String codiUsuari) throws Exception {
+		
+		HashMap<String, Object> attributes = new HashMap<String, Object>();
+
+		if (codiUsuari == null || codiUsuari.trim().isEmpty())
+			return attributes;
+		
+		UserEntity source = getUserEntityDao().findByUserName(codiUsuari);
+		if (source != null)
+		{
+			Collection<UserDataEntity> userData = source.getUserData();
+			fetchUserAttributes(attributes, userData, true);
+		}
+		return attributes;
+	}
+
+	private void fetchUserAttributes(Map<String, Object> attributes, Collection<UserDataEntity> userData, boolean applyRestrictions) {
+		for (UserDataEntity att : userData) {
+			UserData vd = getUserDataEntityDao().toUserData(att);
+			if (! applyRestrictions || att.getAttributeVisibility() != AttributeVisibilityEnum.HIDDEN)
+			{
+				if (att.getDataType().getMultiValued() != null && att.getDataType().getMultiValued().booleanValue())
+				{
+					LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
+					if (r == null)
+					{
+						r = new LinkedList<Object>();
+						attributes.put(vd.getAttribute(), r);
+					}
+					if (vd.getDateValue() != null)
+						r.add(vd.getDateValue().getTime());
+					else if (vd.getValue() != null)
+						r.add(vd.getValue());
+					else if (vd.getBlobDataValue() != null)
+						r.add(vd.getBlobDataValue());
+				}
+				else
+				{
+					if (vd.getDateValue() != null)
+						attributes
+								.put(vd.getAttribute(), vd.getDateValue().getTime());
+					else if (vd.getValue() != null)
+						attributes.put(vd.getAttribute(), vd.getValue());
+					else if (vd.getBlobDataValue() != null)
+						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
+		UserEntity entity = getUserEntityDao().findByUserName(codiUsuari);
+		if (entity != null)
+		{
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<UserDataEntity> entities = new LinkedList<UserDataEntity> (entity.getUserData());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
+			{
+				MetaDataEntity metadata = getMetaDataEntityDao().findDataTypeByName(key);
+				Object v = attributes.get(key);
+				if (v == null)
+				{
+					// Do nothing
+				}
+				else if (v instanceof List)
+				{
+					List l = (List) v;
+					for (Object o: (List) v)
+					{
+						if (o != null)
+						{
+							updateUserAttribute(entity, entities, key, metadata, o);
+						}
+					}
+				}
+				else
+				{
+					updateUserAttribute(entity, entities, key, metadata, v);
+				}
+			}
+
+			for (UserDataEntity attribute: entities)
+			{
+				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
+				{
+					getUserDataEntityDao().remove(attribute);
+					entity.getUserData().remove(attribute);
+				}
+			}
+
+			fetchUserAttributes(attributes, entities, false);
+			
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+			for ( MetaDataEntity m: md)
+			{
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
+				{
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<UserDataEntity> p = getUserDataEntityDao().findByTypeAndValue(m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a user with %s %s",
+										m.getLabel(), v));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		UserDataEntity aae = findUserDataEntity(attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			aae = getUserDataEntityDao().newUserDataEntity();
+			aae.setUser(entity);
+			aae.setDataType(metadata);
+			aae.setObjectValue(value);
+			if (aae.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
+			{
+				getUserDataEntityDao().create(aae);
+				entity.getUserData().add(aae);
+			}
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private UserDataEntity findUserDataEntity(LinkedList<UserDataEntity> entities, String key,
+			Object o) {
+		for (UserDataEntity aae: entities)
+		{
+			if (aae.getDataType().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
+	}
+
+
 }

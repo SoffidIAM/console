@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?component name="account_acl" macro-uri="/accounts/accountAcl2.zul"?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+
+<zk xmlns:h="http://www.w3.org/1999/xhtml" >
+	<script>
+	function doCopy (uuid) {
+		document.getElementById(uuid).style.display="inline"; 
+		document.getElementById(uuid).focus(); 
+		document.getElementById(uuid).select();
+		document.execCommand('copy');
+		document.getElementById(uuid).setSelectionRange (0,0); 
+		document.getElementById(uuid).style.display="none"; 
+	}
+	function doView (uuid1, uuid2) {
+		document.getElementById(uuid2).style.display="inline"; 
+		document.getElementById(uuid1).style.display="none"; 
+	}
+	</script>
+	<window id="innerWindow" visible="false" sizable="true"
+		position="center,center" width="80%" use="com.soffid.iam.web.vault.AccountWindow">
+		<form id="form" dataPath="/model:/void" orient="vertical"
+			width="100%" style="padding: 10px">
+			<timer delay="10000" repeats="true" id="timer"/>
+			<tabbox id="panels" width="${amplaria2}"
+				class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('accounts.attribute') }" />
+				</tabs>
+
+				<tabpanels>
+					<tabpanel id="basica">
+						<hbox width="100%" widths="50%,1px,45%,*">
+							<grid>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('vault.account.folder')}:" />
+										<div>
+											<label bind="@vaultFolder" />
+											<imageclic src="/img/root.gif" id="changeFolderButton" width="16px" height="16px" onClick="innerWindow.selectParent()">
+											</imageclic>
+										</div>
+									</row>
+									<row id="nameRow">
+										<input_etiqueta
+											value="${c:l('accounts.name')}:" />
+										<div>
+											<image
+												 style="float:right"
+												src="~./img/exclamacio.gif" id="updateIndicator"
+												visible="false" width="16px" height="16px">
+											</image>
+											<label value="*" style="float:right"/>
+											<div style="padding: 0 5px 0 0; overflow: hidden">
+												<input_dada
+													id="txtAccountName" bind="@name"
+													maxlength="128"
+													multiline_custom="false" width_custom="95%" />
+												<textbox sclass="textbox"
+													id="txtAccountName2" 
+													onChange="innerWindow.onChangeAccountName(self)"
+													maxlength="128"
+													multiline="false" width="90%" />
+											</div>
+										</div>
+									</row>
+									<row id="dispatcherRow">
+										<input_etiqueta
+											style="white-space:nowrap;"
+											value="${c:l('accounts.dispatcher')}:" />
+										<hbox>
+											<listbox bind="@system"
+												id="lbAccountDispatcher" mold="select"
+												dataPath="/model:/dispatcher">
+												<dataitem
+													bind="@codi">
+													<listcell
+														bind="@codi" />
+												</dataitem>
+											</listbox>
+
+											<label value="*" />
+										</hbox>
+									</row>
+									<row id="typeRow">
+										<input_etiqueta
+											style="white-space:nowrap;" value="${c:l('accounts.type')}:" />
+										<listbox bind="@type"
+											id="lbAccountType" mold="select" dataPath="/model:/type">
+											<dataitem bind="@value">
+												<listcell
+													bind="@literal" />
+											</dataitem>
+										</listbox>
+									</row>
+									<row id="passwordPolicyRow">
+										<input_etiqueta
+											style="white-space:nowrap;"
+											value="${c:l('accounts.policy')}:" />
+
+										<hbox>
+											<listbox
+												bind="@passwordPolicy" id="lbPolicy" mold="select"
+												dataPath="/model:/tipusUsuari">
+												<dataitem
+													bind="@codi">
+													<listcell
+														bind="@descripcio" />
+												</dataitem>
+											</listbox>
+
+											<label value="*" />
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.description')}:" />
+										<input_dada
+											id="txtAccountDescription" bind="@description"
+											maxlength="255"
+											multiline_custom="false" width_custom="97%" />
+									</row>
+									<row id="urlRow">
+										<input_etiqueta
+											value="${c:l('vault.account.url')}:" />
+										<textbox
+											id="urlTextbox"
+											sclass="textbox" 
+											maxlength="255"
+											multiline="false" width="100%" >
+											<attribute name="onChanging"><![CDATA[
+										    		self.setStyle("");
+											]]></attribute>
+											<attribute name="onChange">
+												<![CDATA[
+												    String value = self.getValue();
+												    if (value == null || value.trim().length () == 0)
+												    {
+												    	serverTextbox.getFellow("dada").setValue("");
+												    }
+												    else
+												    {
+												    	try {
+													    	java.net.URL url = new java.net.URL(value);
+												    		self.setStyle("");
+												    		String h = url.getHost();
+												    		if (h.startsWith("www."))
+												    			h = h.substring(4);
+													    	serverTextbox.getFellow("dada").setValue( h );
+												    	} catch (Exception e) {
+												    		e.printStackTrace();
+												    		self.setStyle("background-color: pink");
+												    	}
+												    }
+												]]>
+											</attribute>
+										</textbox>
+									</row>
+									<row id="serverRow">
+										<input_etiqueta
+											value="${c:l('vault.account.server')}:" />
+										<input_dada
+											id="serverTextbox" 
+											maxlength="128"
+											multiline_custom="false" width_custom="100%" />
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.lastUpdated')}:" />
+										<datebox readonly="true"
+											disabled="true" bind="@lastUpdated" width="10em"
+											format="${c:l('usuaris.zul.dateFormat')}" />
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.lastPasswordSet')}:" />
+										<hbox>
+											<datebox readonly="true"
+												disabled="true" bind="@lastPasswordSet" width="10em"
+												format="${c:l('usuaris.zul.dateFormat')}" />
+											<imageclic src="/img/lupa.gif" id ="queryImg">
+												<attribute name="onClick">
+													innerWindow.queryPassword(self);
+												</attribute>
+											</imageclic>
+											<imageclic src="~./img/pwd.gif" id="passwordImg" title="${c:l('accounts.setPassword')}">
+												<attribute name="onClick">
+													innerWindow.setPassword(self);
+												</attribute>
+											</imageclic>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta
+											value="${c:l('accounts.passwordExpiration')}:" />
+										<datebox readonly="true"
+											disabled="true" bind="@passwordExpiration" width="10em"
+											format="${c:l('usuaris.zul.dateFormat')}" />
+									</row>
+									<row id="enabledRow">
+										<input_etiqueta
+											value="${c:l('accounts.status')}:" />
+										<listbox bind="@disabled"
+											id="lbAccountDisabled" mold="select">
+											<listitem
+												value="${false}">
+												<listcell
+													label="${c:l('accounts.Enabled')}" />
+											</listitem>
+											<listitem value="${true}">
+												<listcell
+													label="${c:l('accounts.Disabled')}" />
+											</listitem>
+										</listbox>
+									</row>
+									<row id="ownerRow">
+										<label value="Owner:" />
+										<div>
+											<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@userName"></label>
+											<image src="/img/cancel.png" width="12px" height="12px" onClick="innerWindow.checkinAccount(self)"/>
+										</div>
+									</row>
+								</rows>
+							</grid>
+							<separator />
+							<vbox id="permissionsBox">
+								<label value="${c:l('accounts.owner')}" />
+								<account_acl id="ownerAcl"
+									userList="ownerUsers" groupList="ownerGroups"
+									roleList="ownerRoles" />
+								<label
+									value="${c:l('accounts.manager')}" />
+								<account_acl id="managerAcl"
+									userList="managerUsers" groupList="managerGroups"
+									roleList="managerRoles" />
+								<label value="${c:l('accounts.userAccess')}" />
+								<account_acl id="userAcl"
+									userList="grantedUsers" groupList="grantedGroups"
+									roleList="grantedRoles" />
+								<checkbox id="inheritNewPermissionsCheckbox" bind="@inheritNewPermissions" label="${c:l('vault.account.inheritPermissions')}"></checkbox>
+							</vbox>
+						</hbox>
+					</tabpanel>
+
+					<tabpanel id="attributes">
+						<div dataPath="attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+							ownerBind="." id="attributesDiv"
+							scope="account" sclass="accatt" >
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+
+			<div style="float:right; margin-top: 2em;">
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="innerWindow.onCancel()" />
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="innerWindow.onApply()" />
+			</div>
+		</form>
+	</window>
+	<window id="selectFolderWnd" visible="false" sizable="true"
+		position="center,center" width="50%"
+		title="${c:l('vault.folder.SelectParentFolder')}">
+		<tree autocommit="false" dataPath="/model:/" fixedLayout="false"
+			width="100%" rows="10" id="folderTree">
+			<treeitemfinder bind="." open="false" path="/folder2">
+				<treerow
+					onDoubleClick="if (folderTree.getSelectedCount() > 0) selectedParentFolder();">
+					<treecell>
+						<image src="/img/root.gif" height="1em" />
+						<label bind="@name"
+							style="display: inline-block; padding-bottom: 5px; padding-top: 5px;" />
+					</treecell>
+				</treerow>
+			</treeitemfinder>
+		</tree>
+		<div style="text-align:right; margin-top: 2em;">
+			<button label="${c:l('accounts.setPassword.Cancel')}"
+				onClick="selectFolderWnd.setVisible(false);" />
+			<button id="selectButton"
+				label="${c:l('accounts.setPassword.OK')}"
+				onClick="innerWindow.selectedParentFolder()" />
+		</div>
+	</window>
+	
+	<window id="newPassword" closable="true" sclass="new-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.NewPassword')}" visible="false" width="31em"
+			onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+			<![CDATA[
+				void onCancelPassword() {
+					password.setValue("");
+					newPassword.setVisible(false);
+				}
+
+				void onSetPassword() {
+					com.soffid.iam.service.ejb.SelfService service = com.soffid.iam.EJBLocator.getSelfService();
+					com.soffid.iam.api.Account account = newPassword.getAttribute("acco");
+					timepwd.getValue();
+					boolean done = service.setHPAccountPassword(account,
+							new com.soffid.iam.api.Password(password.getValue()), timepwd.getValue(),
+								checkpwd.isChecked());
+					if (done)
+					{
+						es.caib.zkib.zkiblaf.Missatgebox
+							.confirmaOK(org.zkoss.util.resource.Labels
+							.getLabel("accounts.setPassword.msg"));
+						es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(innerWindow.getFellow("form") );
+						try {
+							es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/owner").refresh();
+							innerWindow.getFellow("ownerRow").setVisible (true);
+						} catch (Exception e) {}
+						try {
+							String parentPath = newPassword.getAttribute("parentPath");
+							es.caib.zkib.datasource.XPathUtils.getValue(model, parentPath).refresh();
+						} catch (Exception e) {
+								e.printStackTrace();
+						}
+					}
+					else
+					{
+						es.caib.zkib.zkiblaf.Missatgebox
+						.confirmaOK(org.zkoss.util.resource.Labels
+						.getLabel("accounts.setPassword.delayed.msg"));
+					}
+					onCancelPassword();
+				}
+			]]>
+		</zscript>
+		<div width="100%">
+			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white; background-color: white"/>
+	 		<div class="label" align="center">
+				<label value="${c:l('accounts.setPassword.label')}"/>
+				<space width="1em"/>
+				<h:form style="display:inline">
+					<textbox id="password" type="password" width="18em" onOK="onSetPassword();"/>
+				</h:form>
+			</div>
+			<div class="label" align="center">
+				<label id="lblpwd" value="${c:l('selfService.Valid')}"/>
+				<space width="1em"/>
+				<datebox id="timepwd" width="18em"
+					format="${c:l('selfService.Format')}" constraint="no past,no empty"/>
+			</div>
+			<div class="label" align="center">
+				<label id="lblcheckpwd" value="${c:l('selfService.Force')}"/>
+				<checkbox id="checkpwd"/> 
+			</div>
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="onSetPassword()" />
+				<space width="1em" />
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="onCancelPassword()" />
+			</div>
+		</div>
+	</window>
+	<window id="showPassword" closable="true" sclass="show-pass"
+		position="center, center" sizable="true"
+		title="${c:l('selfService.QueryPasswords')}" visible="false" width="31em"
+		onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+			<![CDATA[
+				void onCancelPassword() {
+					qpassword.setValue("");
+					showPassword.setVisible(false);
+				}
+			]]>
+		</zscript>
+		<popup id="toolPwd">
+			<vbox>
+				<label id="popupPwd" multiline="true"/>
+			</vbox>
+		</popup>
+		<vbox width="100%" align="center">
+			<space width="2em"/>
+			<hbox align="center">
+				<attribute name="onCreate"><![CDATA[
+				// Change button order
+				self.insertBefore(viewImage, fakeqpassword);
+				]]>
+				</attribute>
+				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}"/>
+				<textbox  style="display:none"/>
+				<textbox readonly="true" style="padding: 0; border: none; outline: none; boxShadow:none; background: transparent"
+					id="fakeqpassword" value="****************"/> 
+				<textbox readonly="true" style="display:none; padding: 0; border: none; outline: none; boxShadow:none; background: transparent" 
+					id="qpassword" tooltip="toolPwd"/>
+				<imageclic id="viewImage" src="/img/lupa.gif" action="onMouseOver: doView('${fakeqpassword.uuid}','${qpassword.uuid}');
+					onMouseLeave: doView('${qpassword.uuid}','${fakeqpassword.uuid}')"
+					title="${c:l('vault.account.view') }"
+					tooltip="toolPwd"
+				/>
+				<imageclic src="/img/edit-copy.png" action="onClick: doCopy('${qpassword.uuid}')"
+					title="${c:l('vault.account.copy')}"/>
+		</hbox>
+			<space width="2em"/>
+			<hbox>
+				<button label="${c:l('selfService.Close')}"
+					onClick="onCancelPassword()" />
+			</hbox>
+			<space width="1em"/>
+		</vbox>
+	</window>
+	<window id="newPasswordS" closable="true" sclass="new-pass"
+		position="center, center" sizable="true"
+		title="${c:l('selfService.NewPassword')}" visible="false" width="34em"
+		onClose="onCancelPassword(); event.stopPropagation();">
+		<zscript>
+			<![CDATA[
+				void onCancelPassword() {
+					p1.setValue("");
+					newPasswordS.setVisible(false);
+				}
+				
+				void onSetPassword() {
+					com.soffid.iam.service.ejb.SelfService service = com.soffid.iam.EJBLocator.getSelfService();
+					com.soffid.iam.api.Account account = newPasswordS.getAttribute("acco");
+					service.setAccountPassword(account, new com.soffid.iam.api.Password(p1.getValue()));
+					es.caib.zkib.zkiblaf.Missatgebox.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
+					onCancelPassword();
+					innerWindow.checkIsUpdatePending();
+				}
+			]]>
+		</zscript>
+		<vbox width="100%" align="center">
+			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
+	 		<div align="center" class="label">
+				<label value="${c:l('accounts.setPassword.label')}"/>
+				<space width="1em"/>
+				<h:form style="display:inline">
+					<textbox type="password" width="18em" id="p1" onOK="onSetPassword();"/>
+				</h:form>
+			</div>
+			
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="onSetPassword()" />
+				<space width="1em"/>
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="onCancelPassword()" />
+			</div>
+		</vbox>
+	</window>
+	
+</zk>

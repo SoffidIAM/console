@@ -820,7 +820,7 @@ public class AutoritzacionsUsuari
 
 	public static boolean hasViewPluginsSEU ()
 	{
-		return Security.isUserInRole(Security.AUTO_SEU_VIEW_PARAMETRES);
+		return Security.isUserInRole(Security.AUTO_SEU_VIEW_PLUGINS);
 	}
 
 	public static boolean hasViewRegistreAccesSEU ()

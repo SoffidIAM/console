@@ -47,6 +47,8 @@ public class TipusDada {
 	
 	public boolean required;
 	
+	public boolean multiValued;
+	
 	@Nullable
 	public String label;
 	

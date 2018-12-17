@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @see es.caib.seycon.ng.model.GrupEntity
@@ -265,10 +266,24 @@ public class GroupEntityDaoImpl extends
 			grup.setQuota("0"); //$NON-NLS-1$
 		}
 		grup.setAttributes(new HashMap<String, Object>());
-		for ( GroupAttributeEntity att: entity.getAttributes())
-		{
-			grup.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
+		Map<String, Object> attributes = grup.getAttributes();
+		for (GroupAttributeEntity att : grupEntity.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
 		}
+
 	}
 
 	/**

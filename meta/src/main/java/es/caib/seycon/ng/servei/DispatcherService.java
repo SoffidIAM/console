@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.servei;
 import com.soffid.iam.model.TenantEntity;
+
+import java.util.Collection;
 import java.util.Map;
 
 import com.soffid.iam.api.ReconcileTrigger;
@@ -19,6 +21,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ObjectMappingTrigger;
+import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AccountEntity;
@@ -115,7 +118,8 @@ public abstract class DispatcherService {
 	}
 
 	@Operation ( grantees={roles.agent_query.class,
-			roles.application_update.class},
+			roles.application_update.class,
+			roles.sso_manage.class},
 			translated="findDispatchersByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Dispatcher> findDispatchersByFiltre(
@@ -269,6 +273,7 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation(translated="isUserAllowed")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public boolean isUserAllowed(
@@ -277,6 +282,18 @@ public abstract class DispatcherService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
+	
+	@Operation(translated="isUserAllowed")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public boolean isUserAllowed(
+		es.caib.seycon.ng.comu.Dispatcher dispatcher, 
+		java.lang.String user,
+		Collection<RolGrant> permissions)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return false;
+	}
+	
+	
 	@Operation ( grantees={roles.user_role_create.class,
 			roles.agent_query.class},
 			translated="findAllActiveDispatchers")

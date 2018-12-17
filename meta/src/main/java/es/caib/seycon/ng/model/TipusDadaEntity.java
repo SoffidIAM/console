@@ -56,6 +56,10 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public Boolean required;
 	
+	@Column(name = "TDA_MULTIV")
+	@Nullable
+	public Boolean multiValued;
+
 	@Description ("blank separated list of url-encoded values")
 	@Column (name="TDA_VALUE", length=64000)
 	@Nullable

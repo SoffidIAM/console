@@ -52,5 +52,9 @@ public class Sessio {
 
 	@Nullable
 	public java.lang.String url;
+	
+	@Nullable
+	public String authenticationMethod;
+	
 
 }

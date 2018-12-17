@@ -11,6 +11,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
@@ -72,6 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
 	AccountAttributeEntity.class,
 	RegistreAccesEntity.class,
 	AccountEntity.class, 
+	AttributeValidationService.class,
 	VaultFolderEntity.class,
 	VaultFolderAccessEntity.class})
 public abstract class UsuariService {
@@ -205,6 +207,21 @@ public abstract class UsuariService {
 			java.lang.String codiUsuari)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
+	}
+
+	@Operation(grantees = { roles.user_query.class }, translated = "findUserAttributes")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Map<String, Object> findUserAttributes(
+			@Nullable java.lang.String codiUsuari)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_metadata_update.class }, translated = "updateUserAttributes")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void updateUserAttributes(
+			java.lang.String codiUsuari, java.util.Map<String, Object> attributes)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Operation(translated = "getDataType")

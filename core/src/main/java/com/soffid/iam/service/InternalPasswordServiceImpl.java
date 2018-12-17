@@ -393,8 +393,8 @@ public class InternalPasswordServiceImpl extends
             throw new InternalErrorException(String.format("Policy not found for password domain %s", dce.getName())); //$NON-NLS-1$
 
         String digest = getDigest(password);
-        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, dce);
-        if (contra != null && contra.getPassword().equals(digest) && contra.getActive().equals("N")) { //$NON-NLS-1$
+        for (PasswordEntity contra: getPasswordEntityDao().findLastByUserDomain(user, dce))
+        {
             contra.setActive("S"); //$NON-NLS-1$
             getPasswordEntityDao().update(contra);
         }
@@ -733,18 +733,20 @@ public class InternalPasswordServiceImpl extends
 
         if (user.getActive().equals("N")) //$NON-NLS-1$
         	return PasswordValidation.PASSWORD_WRONG;
-        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, passwordDomain);
-        if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") || contra.getActive().equals("E"))) { //$NON-NLS-1$
-            if (digest.equals(contra.getPassword())) {
-                if (new Date().before(contra.getExpirationDate())) {
-                	updateAccountLastLogin(user, passwordDomain);
-                	return PasswordValidation.PASSWORD_GOOD;
-                } else if (checkExpired) {
-                    return PasswordValidation.PASSWORD_GOOD_EXPIRED;
-                } else {
-                    return PasswordValidation.PASSWORD_WRONG;
-                }
-            }
+        for (PasswordEntity contra: getPasswordEntityDao().findLastByUserDomain(user, passwordDomain))
+        {
+	        if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") || contra.getActive().equals("E"))) { //$NON-NLS-1$
+	            if (digest.equals(contra.getPassword())) {
+	                if (new Date().before(contra.getExpirationDate())) {
+	                	updateAccountLastLogin(user, passwordDomain);
+	                	return PasswordValidation.PASSWORD_GOOD;
+	                } else if (checkExpired) {
+	                    return PasswordValidation.PASSWORD_GOOD_EXPIRED;
+	                } else {
+	                    return PasswordValidation.PASSWORD_WRONG;
+	                }
+	            }
+	        }
         }
 
         boolean taskQueue = false;
@@ -920,11 +922,9 @@ public class InternalPasswordServiceImpl extends
 
     @Override
     protected PasswordStatus handleGetPasswordsStatus(UserEntity user, PasswordDomainEntity domini) throws Exception {
-		PasswordEntity last = getPasswordEntityDao().findLastByUserDomain(user, domini);
-		if (last == null)
-			return null;
-		else
+    	for ( PasswordEntity last : getPasswordEntityDao().findLastByUserDomain(user, domini))
 			return getPasswordEntityDao().toPasswordStatus(last);
+		return null;
     }
 
     @Override
@@ -952,11 +952,9 @@ public class InternalPasswordServiceImpl extends
     @Override
     protected boolean handleIsPasswordExpired(UserEntity user, PasswordDomainEntity passwordDomain) throws Exception {
 
-        PasswordEntity contra = getPasswordEntityDao().findLastByUserDomain(user, passwordDomain);
-
-        if (contra.getExpirationDate().before(new Date())) {
-            return true;
-        }
+    	for (PasswordEntity contra: getPasswordEntityDao().findLastByUserDomain(user, passwordDomain))
+    		if (contra.getExpirationDate().before(new Date())) 
+    			return true;
 
         return false;
     }
@@ -1214,11 +1212,14 @@ public class InternalPasswordServiceImpl extends
 	private UserEntity getUsuari(AccountEntity account) throws InternalErrorException {
 		for (UserAccountEntity uae: account.getUsers())
 			return uae.getUser();
-		throw new InternalErrorException(String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), account.getName(), account.getSystem().getName())); //$NON-NLS-1$
+		throw new InternalErrorException(
+			String.format(Messages.getString("InternalPasswordServiceImpl.NoUserForAccount"), 
+				account.getName(), account.getSystem().getName())); //$NON-NLS-1$
 	}
 
 	private TaskHandler createAccountTask(String transa, String account,
-            String dispatcher, Password password, boolean mustChange, Date untilDate) throws InternalErrorException {
+            String dispatcher, Password password, boolean mustChange, Date untilDate) throws InternalErrorException 
+    {
         TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(transa);
@@ -1393,12 +1394,16 @@ public class InternalPasswordServiceImpl extends
 			{
 				SystemEntity dispatcher = dao.findByName(defaultName); //$NON-NLS-1$
 				if (dispatcher != null)
+				{
+					defaultDispatchers.put(Security.getCurrentTenantName(), defaultName);
 					return defaultName;
+				}
 			}
 			
 			for (SystemEntity dispatcher : dao.loadAll()) {
                 if (dispatcher.isMainSystem()) {
                     defaultDispatcher = dispatcher.getName();
+					defaultDispatchers.put(Security.getCurrentTenantName(), defaultDispatcher);
                     return defaultDispatcher;
                 }
             }

@@ -13,4 +13,5 @@ EXPOSE 8080
 
 VOLUME  /opt/soffid/iam-console-2/logs
 VOLUME  /opt/soffid/iam-console-2/docs
+VOLUME  /opt/soffid/iam-console-2/conf
 ENTRYPOINT /opt/soffid/iam-console-2/start.sh

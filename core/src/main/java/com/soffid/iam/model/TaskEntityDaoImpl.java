@@ -349,6 +349,42 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 			return c.virtualId+"#nested";
 		}
 	}
+
+	@Override
+	protected void handleCancelUnscheduledCopies(TaskEntity entity) throws Exception {
+		if (entity.getTransaction().equals("UpdateUser") && entity.getSystemName() == null)
+		{
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and user=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getUser());
+			q.setLong(2, entity.getTenant().getId());
+			q.executeUpdate();
+		}
+		if (entity.getTransaction().equals("UpdateAccount"))
+		{
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and user=? and systemName=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getUser());
+			q.setString(2, entity.getSystemName());
+			q.setLong(3, entity.getTenant().getId());
+			q.executeUpdate();
+		}
+		if (entity.getTransaction().equals("UpdateRole") && entity.getDb() == null)
+		{
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and role=? and db=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getRole());
+			q.setString(2, entity.getDb());
+			q.setLong(3, entity.getTenant().getId());
+			q.executeUpdate();
+		}
+	}
 }
 
 class TransactionStatus {

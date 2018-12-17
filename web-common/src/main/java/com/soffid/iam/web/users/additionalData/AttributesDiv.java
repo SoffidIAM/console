@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,17 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.User;
+import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
@@ -41,6 +48,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	 */
 	
 	MetadataScope scope;
+	String system;
 	String dataPath;
 	boolean readonly;
 	String objectType; 
@@ -50,6 +58,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	private static final long serialVersionUID = 1L;
 	
 	private SingletonBinder binder = new SingletonBinder(this);
+	private SingletonBinder ownerBinder = new SingletonBinder(this);
 
 	private List<TipusDada> dataTypes;
 
@@ -80,8 +89,17 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		updateMetadata();
 	}
 
-	private void updateMetadata() {
+	public void updateMetadata() {
 		try {
+			if (ownerBind != null) {
+				try {
+					ownerObject = ownerBinder.getValue();
+					if (ownerObject instanceof DataNode)
+						ownerObject = ((DataNode) ownerObject).getInstance();
+				} catch (Exception e) {
+					
+				}
+			}
 			if (scope == null)
 				return;
 			else if (scope == MetadataScope.CUSTOM)
@@ -89,6 +107,28 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 				if (objectType == null || objectType.trim().isEmpty())
 					return;
 				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
+			}
+			else if (scope == MetadataScope.CUSTOM)
+			{
+				if (objectType == null || objectType.trim().isEmpty())
+					return;
+				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
+			}
+			else if (scope == MetadataScope.ACCOUNT)
+			{
+				String system = this.system;
+				if (ownerObject != null && ownerObject instanceof Account)
+				{
+					system = ((Account)ownerObject).getSystem();
+				}
+				if (ownerObject != null && ownerObject instanceof es.caib.seycon.ng.comu.Account)
+				{
+					system = ((es.caib.seycon.ng.comu.Account)ownerObject).getDispatcher();
+				}
+						
+				if (system == null || system.trim().isEmpty())
+					return;
+				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findSystemDataTypes(system));
 			}
 			else
 				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(this.scope));
@@ -117,12 +157,17 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		try {
 			if (arg0 instanceof XPathRerunEvent)
 			{
-				if (ownerBind != null) {
-					ownerObject = XPathUtils.getValue(getParent(), ownerBind);
-					if (ownerObject instanceof DataNode)
-						ownerObject = ((DataNode) ownerObject).getInstance();
+				if (scope == MetadataScope.ACCOUNT)
+					updateMetadata();
+				else
+				{
+					if (ownerBind != null) {
+						ownerObject = ownerBinder.getValue();
+						if (ownerObject instanceof DataNode)
+							ownerObject = ((DataNode) ownerObject).getInstance();
+					}
+					refresh ();
 				}
-				refresh ();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,40 +178,90 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		while (getFirstChild() != null)
 			removeChild(getFirstChild());
 		Map<String, Object> attributes = (Map<String, Object>) binder.getValue();
+		if (attributes == null)
+		{
+			attributes = new HashMap<String, Object>();
+			try {
+				binder.setValue(attributes);
+			} catch (Exception e) {
+				return;
+			}
+		}
 		if (attributes != null)
 		{
 			for (TipusDada att: dataTypes)
 			{
-				Div d = new Div();
-				appendChild(d);
-				d.setSclass(getSclass()+"_row");
-				Label l = new Label (att.getLabel());
-				l.setSclass(getSclass()+"_label");
-				d.appendChild(l);
-				InputField2 input = new InputField2();
-				if (! attributes.containsKey(att.getCodi()))
-					attributes.put(att.getCodi(), null);
-				input.setBind("[@name='"+att.getCodi()+"']");
-				input.setDataType( DataType.toDataType(att));
-				input.setSclass(getSclass()+"_input");
-				input.setReadonly(readonly);
-				input.setOwnerObject(ownerObject);
-				input.setOwnerContext(ownerContext);
-				d.appendChild(input);
-				try {
-					input.createField();
-				} catch (Exception e) {
-					throw new UiException(e);
-				};
-				input.addEventListener("onChange", new EventListener() {
-					public void onEvent(Event event) throws Exception {
-						adjustVisibility();
-						
-					}
-				});
-				d.setVisible(input.attributeVisible());
+				AttributeVisibilityEnum v = getVisibility (att);
+				if (v != AttributeVisibilityEnum.HIDDEN)
+				{
+					Div d = new Div();
+					appendChild(d);
+					d.setSclass(getSclass()+"_row");
+					Label l = new Label (att.getLabel());
+					l.setSclass(getSclass()+"_label");
+					d.appendChild(l);
+					InputField2 input = new InputField2();
+					if (! attributes.containsKey(att.getCodi()))
+						attributes.put(att.getCodi(), null);
+					input.setBind("[@name='"+att.getCodi()+"']");
+					input.setDataType( DataType.toDataType(att));
+					input.setSclass(getSclass()+"_input");
+					input.setReadonly(readonly || v == AttributeVisibilityEnum.READONLY);
+					input.setOwnerObject(ownerObject);
+					input.setOwnerContext(ownerContext);
+					d.appendChild(input);
+					try {
+						input.createField();
+					} catch (Exception e) {
+						throw new UiException(e);
+					};
+					input.addEventListener("onChange", new EventListener() {
+						public void onEvent(Event event) throws Exception {
+							adjustVisibility();
+							
+						}
+					});
+					d.setVisible(input.attributeVisible());
+				}
 			}
 		}
+	}
+
+	private AttributeVisibilityEnum getVisibility(TipusDada tda) {
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+
+		String user = null;
+		Object obj = getOwnerObject();
+		if (obj == null)
+			obj = ownerBinder.getValue();
+		if (obj != null && obj instanceof User)
+			user = ((User)obj).getUserName();
+		else if (obj != null && obj instanceof Usuari)
+			user = ((Usuari)obj).getCodi();
+		
+		if (user != null)
+		{
+			String currentUser = Security.getCurrentUser();
+			if (currentUser != null && currentUser.equals(user))
+					return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN
+							: tda.getUserVisibility();
+		}
+
+		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
+			return AttributeVisibilityEnum.EDITABLE;
+		else if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+			return tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE : tda.getAdminVisibility();
+		else if (Security.isUserInRole(Security.AUTO_USER_METADATA_UPDATE))
+			return tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE : tda.getOperatorVisibility();
+		else 
+		{
+			AttributeVisibilityEnum v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY
+					: tda.getOperatorVisibility();
+			if (AttributeVisibilityEnum.EDITABLE.equals(v))
+				v = AttributeVisibilityEnum.READONLY;
+			return v;
+		} 
 	}
 
 	public void adjustVisibility() {
@@ -211,6 +306,9 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 
 	public void setOwnerBind(String ownerBind) {
 		this.ownerBind = ownerBind;
+		try {
+			ownerBinder.setDataPath(ownerBind);
+		} catch (Exception e) {}
 	}
 
 	public String getOwnerContext() {
@@ -229,13 +327,21 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 				InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
 				input.setOwnerObject(ownerObject);
 				input.setOwnerContext(ownerContext);
-				if (!input.attributeValidate())
+				if (!input.attributeValidateAll())
 				{
 					setFocus(true);
 					throw new WrongValueException(this, "Value not accepted");					
 				}
 			}
 		}
+	}
+
+	public String getSystem() {
+		return system;
+	}
+
+	public void setSystem(String accountSystem) {
+		this.system = accountSystem;
 	}
 
 }

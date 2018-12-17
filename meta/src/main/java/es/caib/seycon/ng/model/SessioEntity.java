@@ -80,6 +80,10 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.lang.String hostAddress;
 
+	@Column (name="SES_AUTHMT", length=4)
+	@Nullable
+	public String authenticationMethod;
+
 	@Operation(translated="findSessionByUserName")
 	@DaoFinder("select session\n"
 			+ "from com.soffid.iam.model.SessionEntity session "

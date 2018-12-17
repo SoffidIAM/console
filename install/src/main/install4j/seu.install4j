@@ -1170,7 +1170,7 @@ return;</preActivation>
                       <void property="listEntries">
                         <array class="java.lang.String" length="5">
                           <void index="0">
-                            <string>Mysql</string>
+                            <string>Mysql or MariaDB</string>
                           </void>
                           <void index="1">
                             <string>Oracle(SID)</string>

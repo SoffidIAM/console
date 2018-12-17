@@ -17,6 +17,7 @@
 					model.getJXPathContext().getVariables().declareVariable("synchro", "true");
 					qw = esquema.getFellow("queryWindow");
 					searchBox = qw.getFellow("searchBox");
+					searchBox.setBasicMode();
 					searchBox.addAttribute("userName").setSearchFilter(requestedUser);
 					searchBox.search();
 					if (esquema.getFellow("lista").getFellow("listbox").getItems().size() == 1)
@@ -643,7 +644,6 @@
 						<listcell bind="@primerLlinatge" />
 						<listcell bind="@segonLlinatge" />
 						<listcell bind="@codiGrupPrimari" />
-						<listcell bind="@NIF" />
 						<listcell bind="@nomCurt" />
 						<listcell bind="@dominiCorreu" />
 						<listcell bind="@tipusUsuari" />
@@ -651,7 +651,6 @@
 						<listcell bind="@servidorPerfil" />
 						<listcell bind="@servidorCorreu" />
 						<listcell bind="@aliesCorreu" />
-						<listcell bind="@telefon" />
 					</dataitem>
 				</listbox>
 			</navegador>
@@ -819,7 +818,7 @@
 															</imageclic>
 														</hbox>
 													</row>
-													<row>
+													<row visible="false">
 														<input_etiqueta
 															value="${c:l('usuaris.zul.NIF-2')}" />
 														<hbox width="97%" widths="*,5px,17px">
@@ -1047,7 +1046,7 @@
 															</attribute>
 														</textbox>
 													</row>
-													<row>
+													<row visible="false">
 														<input_etiqueta
 															value="${c:l('usuaris.zul.Telafon')}" 
 															width_custom="1em" />
@@ -1242,9 +1241,9 @@
 								<separator spacing="10px" />
 
 								<hbox width="100%"
-									widths="40%,1px,40%,1px,*">
-									<div use="com.soffid.iam.web.users.additionalData.UserAttributesDiv" 
-										dataPath="/esquema/lista/listbox:/dada" readonly="${!canUpdateUserMetadata }"
+									widths="50%,1px,*">
+									<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" scope="user" 
+										dataPath="/esquema/lista/listbox:/attributes[1]" readonly="${!canUpdateUserMetadata }"
 										ownerBind="./"
 										ownerContext="console"
 										sclass="useratt"
@@ -1253,7 +1252,7 @@
 									<vbox width="99%">
 										<grid
 											dataPath="/esquema/lista/listbox:/grup" fixedLayout="true"
-											height="130px" id="gridGrups" width="99%">
+											id="gridGrups" width="99%">
 											<attribute name="onActualitza">
 	dada = (String) (event.getData()[0]);
 	modelProxy = (es.caib.zkib.binder.list.FullModelProxy) gridGrups.getModel();
@@ -1388,9 +1387,7 @@
 											<label
 												id="grupsTooltipLabel" value="" />
 										</popup>
-									</vbox>
-									<separator width="1px" />
-									<vbox width="99%">
+										<separator width="10px" />
 										<input_etiqueta
 											value="${c:l('usuaris.zul.Observacions')}" />
 										<input_dada bind="@comentari"
@@ -2757,9 +2754,11 @@ void actualitza (event) {
 					</hbox>
 					<space width="2em"></space>
 					<hbox width="18em" align="center" pack="start">
-						<textbox type="password" width="18em" id="password"
-							onOK="onSetPassword();">
-						</textbox>
+						<h:form style="display:inline">
+								<textbox type="password" width="18em" id="password"
+									onOK="onSetPassword();">
+								</textbox>
+						</h:form>
 					</hbox>
 				</hbox>
 				<hbox align="center" pack="end" width="30em">

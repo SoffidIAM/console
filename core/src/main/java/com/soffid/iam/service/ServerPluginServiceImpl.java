@@ -15,6 +15,8 @@ package com.soffid.iam.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -373,7 +375,15 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
                 v.addAll(sp.getAgents());
             }
         }
-        return getAgentDescriptorEntityDao().toAgentDescriptorList(v);
+        List<AgentDescriptor> l = getAgentDescriptorEntityDao().toAgentDescriptorList(v);
+        Collections.sort(l, new Comparator<AgentDescriptor>() {
+
+			@Override
+			public int compare(AgentDescriptor o1, AgentDescriptor o2) {
+				return o1.getDescription().compareTo(o2.getDescription());
+			}
+		});
+        return l;
     }
 
     /**

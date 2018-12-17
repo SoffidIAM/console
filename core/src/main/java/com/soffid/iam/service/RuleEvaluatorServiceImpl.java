@@ -320,6 +320,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		
 	}
 	
+	static ThreadLocal<Interpreter> interpreters = new ThreadLocal<Interpreter>();
 	class InterpreterEnvironment {
 		
 		private User userVO;
@@ -343,7 +344,12 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		
 		public Interpreter getInterpeter() throws EvalError
 		{
-			Interpreter interpreter = new Interpreter();
+			Interpreter interpreter = interpreters.get();
+			if ( interpreter == null)
+			{
+				interpreter = new Interpreter();
+				interpreters.set(interpreter);
+			}
 			interpreter.set("user", userVO); //$NON-NLS-1$
 			interpreter.set("attributes", attributes); //$NON-NLS-1$
 			interpreter.set("groups", groups); //$NON-NLS-1$

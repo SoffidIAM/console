@@ -354,34 +354,34 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	protected void handleCancelUnscheduledCopies(TaskEntity entity) throws Exception {
 		if (entity.getTransaction().equals("UpdateUser") && entity.getSystemName() == null)
 		{
-			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
-					+ "where transaction=:transaction and user=:user and "
-					+ "tenant.id=:tenantId and hash is null");
-			q.setString("transaction", entity.getTransaction());
-			q.setString("user", entity.getUser());
-			q.setLong("tenantId", entity.getTenant().getId());
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and user=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getUser());
+			q.setLong(2, entity.getTenant().getId());
 			q.executeUpdate();
 		}
 		if (entity.getTransaction().equals("UpdateAccount"))
 		{
-			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
-					+ "where transaction=:transaction and user=:user and systemName=:systemName and "
-					+ "tenant.id=:tenantId and systemName=:systemName and hash is null");
-			q.setString("transaction", entity.getTransaction());
-			q.setString("user", entity.getUser());
-			q.setString("systemName", entity.getSystemName());
-			q.setLong("tenantId", entity.getTenant().getId());
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and user=? and systemName=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getUser());
+			q.setString(2, entity.getSystemName());
+			q.setLong(3, entity.getTenant().getId());
 			q.executeUpdate();
 		}
 		if (entity.getTransaction().equals("UpdateRole") && entity.getDb() == null)
 		{
-			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityDaoImpl "
-					+ "where transaction=:transaction and role=:role and db=:db and "
-					+ "tenant.id=:tenantId and hash is null");
-			q.setString("transaction", entity.getTransaction());
-			q.setString("role", entity.getRole());
-			q.setString("db", entity.getDb());
-			q.setLong("tenantId", entity.getTenant().getId());
+			Query q = getSession().createQuery("delete from com.soffid.iam.model.TaskEntityImpl "
+					+ "where transaction=? and role=? and db=? and "
+					+ "tenant.id=? and hash is null");
+			q.setString(0, entity.getTransaction());
+			q.setString(1, entity.getRole());
+			q.setString(2, entity.getDb());
+			q.setLong(3, entity.getTenant().getId());
 			q.executeUpdate();
 		}
 	}

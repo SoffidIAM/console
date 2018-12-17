@@ -7,8 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
+import javax.json.JsonArray;
 import javax.naming.NamingException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
@@ -26,11 +30,18 @@ import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timer;
+import org.zkoss.zul.Tree;
+import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.ConsoleProperties;
+import com.soffid.iam.api.User;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 
+import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -47,9 +58,10 @@ public class SearchBox extends HtmlBasedComponent {
 	String jsonObject;
 	private Button addAttributeButton;
 	private Textbox advancedSearch;
+	private Textbox textSearchBox;
 	private Menupopup menu;
-	boolean advancedMode = false;
 	String variableName;
+	String variableNameText;
 	String dataPath;
 	private String defaultAttributes;
 	boolean auto=false;
@@ -58,6 +70,12 @@ public class SearchBox extends HtmlBasedComponent {
 	private Timer timer;
 	private Image progressImage;
 	private DataModelCollection modelCollection;
+	private boolean textSearch = false;
+	private String preference = null;
+	static int TEXT = 0;
+	static int BASIC = 1;
+	static int ADVANCED = 2;
+	int mode = BASIC;
 	
 	public String getJsonObject() {
 		return jsonObject;
@@ -70,7 +88,6 @@ public class SearchBox extends HtmlBasedComponent {
 			dictionary = null;
 			initialize();
 		}
-		
 	}
 
 	public String getDataPath() {
@@ -93,7 +110,15 @@ public class SearchBox extends HtmlBasedComponent {
 		setSclass("search-box");
 		addEventListener(CHANGE_MODE_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
-				changeMode();
+				String i = (String)event.getData();
+				if (i == null || i.equals("1"))
+					setBasicMode();
+				else if (i.equals("2"))
+					setAdvancedMode();
+				else if (i.equals("0"))
+					setTextMode();
+				else 
+					setBasicMode();
 			}
 
 		});
@@ -120,7 +145,12 @@ public class SearchBox extends HtmlBasedComponent {
 			
 			lastQuery  = getQueryString();
 
-			ds.getJXPathContext().getVariables().declareVariable(variableName, lastQuery);
+			if (variableName != null)
+				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? null: lastQuery);
+			
+			if (variableNameText != null)
+				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: null);
+
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)
 			{
@@ -144,6 +174,10 @@ public class SearchBox extends HtmlBasedComponent {
 					
 			}
 			binder.setDataPath(null);
+			try {
+				savePreferences();
+			} catch (Exception e) {
+			}
 		}
 	}
 
@@ -190,46 +224,138 @@ public class SearchBox extends HtmlBasedComponent {
 							lb.setSelectedIndex(0);
 						}
 					}
+					if (c instanceof Tree)
+					{
+						Tree tree = (Tree) c;
+						if (tree.getItemCount() > 0 && tree.getSelectedItem() == null)
+						{
+							tree.setSelectedItem((Treeitem) tree.getItems().iterator().next());
+						}
+					}
 				}
 			}
 		}
 	}
 
-	private void changeMode() {
-		advancedMode = ! advancedMode;
-		if (advancedMode)
+	private void setTextMode() {
+		mode = TEXT;
+		setChildrenVisibility();
+		invalidate();
+		textSearchBox.setFocus(true);
+	}
+
+	private void setAdvancedMode() {
+		mode = ADVANCED;
+		StringBuffer sb = new StringBuffer();
+		for (AttributeSearchBox asb: getAttributeSearchBoxes())
 		{
-			StringBuffer sb = new StringBuffer();
-			for (AttributeSearchBox asb: getAttributeSearchBoxes())
+			String f = asb.getQueryExpression();
+			if (f != null && !f.isEmpty())
 			{
-				String f = asb.getQueryExpression();
-				if (f != null && !f.isEmpty())
-				{
-					if (sb.length() > 0)
-						sb.append(" AND ");
-					sb.append(f);
-				}
+				if (sb.length() > 0)
+					sb.append(" AND ");
+				sb.append(f);
 			}
-			advancedSearch.setValue(sb.toString());
 		}
+		advancedSearch.setValue(sb.toString());
+		setChildrenVisibility();
+		invalidate();
+		advancedSearch.setFocus(true);
+	}
+
+
+	private void setBasicMode() {
+		mode = BASIC;
 		setChildrenVisibility();
 		invalidate();
 	}
+
 
 	private void setChildrenVisibility ()
 	{
 		for (Component c: getAttributeSearchBoxes())
 		{
-			c.setVisible(!advancedMode);
+			c.setVisible(mode == BASIC);
 		}
-		addAttributeButton.setVisible(!advancedMode);
-		advancedSearch.setVisible(advancedMode);
+		addAttributeButton.setVisible(mode == BASIC);
+		advancedSearch.setVisible(mode == ADVANCED);
+		textSearchBox.setVisible(mode == TEXT);
 	}
 	
 	public void onCreate () throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
 		initialize();
 		initialized  = true;
+		try {
+			loadPreferences ();
+		} catch (JSONException e) {
+		}
+	}
+
+	private void loadPreferences() throws JSONException, InternalErrorException, NamingException, CreateException {
+		if (preference != null)
+		{
+			User u = EJBLocator.getUserService().getCurrentUser();
+			if (u != null)
+			{
+				ConsoleProperties us = u.getConsoleProperties();
+				if (us != null)
+				{
+					String p = (String) us.getPreferences().get("sb-"+preference);
+					if (p != null)
+					{
+						JSONObject j = new JSONObject(p);
+						int option = j.getInt("type");
+						if (option == TEXT)
+							setTextMode();
+						else if (option == ADVANCED)
+							setAdvancedMode();
+						else
+							setBasicMode();
+						JSONArray l = j.optJSONArray("criteria");
+						if (l != null)
+						{
+							for (Object child: new LinkedList(getChildren()))
+							{
+								if (child instanceof AttributeSearchBox)
+									((AttributeSearchBox) child).detach();
+							}
+							for ( int i = 0; i < l.length(); i++)
+							{
+								String s = l.getString(i);
+								addAttribute(s);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void savePreferences() throws JSONException, InternalErrorException, NamingException, CreateException {
+		if (preference != null)
+		{
+			User u = EJBLocator.getUserService().getCurrentUser();
+			if (u != null)
+			{
+				ConsoleProperties us = u.getConsoleProperties();
+				if (us != null)
+				{
+					JSONObject j = new JSONObject();
+					j.put("type", mode);
+					LinkedList l = new LinkedList<String>();
+					for (Object child: getChildren())
+					{
+						if (child instanceof AttributeSearchBox)
+							l.add( ((AttributeSearchBox) child).getAttributeDef().getName() );
+					}
+					j.put("criteria", l);
+					String p = j.toString();
+					us.getPreferences().put("sb-"+preference, p);
+					EJBLocator.getUserService().update(us);
+				}
+			}
+		}
 	}
 
 	private void initialize() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
@@ -276,6 +402,17 @@ public class SearchBox extends HtmlBasedComponent {
 		advancedSearch.setRows(2);
 		appendChild(advancedSearch);
 
+		textSearchBox = new Textbox();
+		appendChild(textSearchBox);
+		textSearchBox.setClass("textsearch textbox");
+		textSearchBox.addEventListener("onOK", new SerializableEventListener() {
+			@Override
+			public void onEvent(Event event) throws Exception {
+				search();
+			}
+		});
+		
+
 		addAttributeButton = new Button(Labels.getLabel("searchBox.addAttribute"));
 		addAttributeButton.addEventListener("onClick", new SerializableEventListener() {
 			
@@ -305,21 +442,17 @@ public class SearchBox extends HtmlBasedComponent {
 	}
 	
 	public boolean isAdvancedMode() {
-		return advancedMode;
+		return mode == ADVANCED;
 	}
 
-	public void setAdvancedMode(boolean advancedMode) {
-		this.advancedMode = advancedMode;
+	public boolean isBasicMode() {
+		return mode == BASIC;
 	}
 
-	public String getChangeModeLabel ()
-	{
-		if (advancedMode)
-			return Labels.getLabel("searchBox.basicMode");
-		else
-			return Labels.getLabel("searchBox.advancedMode");
+	public boolean isTextMode() {
+		return mode == TEXT;
 	}
-	
+
 	public void setDefaultAttributes (String s)
 	{
 		this.defaultAttributes = s;
@@ -409,7 +542,9 @@ public class SearchBox extends HtmlBasedComponent {
 
 	public String getQueryString ()
 	{
-		if (advancedMode)
+		if (mode == TEXT)
+			return textSearchBox.getText();
+		else if (mode == ADVANCED)
 			return advancedSearch.getText();
 		else
 		{
@@ -529,6 +664,7 @@ public class SearchBox extends HtmlBasedComponent {
 		{
 			if (c != addAttributeButton && 
 					c != advancedSearch &&
+					c != textSearchBox &&
 					!(c instanceof AttributeSearchBox) &&
 					!(c instanceof Window))
 				l.add(c);
@@ -541,14 +677,14 @@ public class SearchBox extends HtmlBasedComponent {
 		return advancedSearch;
 	}
 
-	public void setAdvancedSearch(Textbox advancedSearch) {
-		this.advancedSearch = advancedSearch;
+	public Textbox getTextSearchBox() {
+		return textSearchBox;
 	}
 
 	private static Command _onChangeMode  = new ComponentCommand (CHANGE_MODE_EVENT, 0) {
 		protected void process(AuRequest request) {
 			try {
-				Events.postEvent(new Event (CHANGE_MODE_EVENT, request.getComponent(),"")); //$NON-NLS-1$
+				Events.postEvent(new Event (CHANGE_MODE_EVENT, request.getComponent(), request.getData()[0])); //$NON-NLS-1$
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
@@ -604,5 +740,55 @@ public class SearchBox extends HtmlBasedComponent {
 
 	public void setAuto(boolean auto) {
 		this.auto = auto;
+	}
+
+	public boolean isTextSearch() {
+		return textSearch;
+	}
+
+	public void setTextSearch(boolean textSearch) {
+		this.textSearch = textSearch;
+	}
+
+	public String getPreference() {
+		return preference;
+	}
+
+	public void setPreference(String preference) {
+		this.preference = preference;
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
+	public String getVariableNameText() {
+		return variableNameText;
+	}
+
+	public void setVariableNameText(String variableNameText) {
+		this.variableNameText = variableNameText;
+		textSearch = variableNameText != null;
+	}
+	
+	public String getTextStyle () {
+		if (variableNameText == null)
+			return "change-mode-label-hidden";
+		else if (mode == TEXT)
+			return "change-mode-label-selected";
+		else
+			return "change-mode-label";
+	}
+	public String getBasicStyle () {
+		if (mode == BASIC)
+			return "change-mode-label-selected";
+		else
+			return "change-mode-label";
+	}
+	public String getAdvancedStyle () {
+		if (mode == ADVANCED)
+			return "change-mode-label-selected";
+		else
+			return "change-mode-label";
 	}
 }

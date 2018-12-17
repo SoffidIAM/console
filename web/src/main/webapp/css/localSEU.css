@@ -277,11 +277,13 @@ tr.seld td.UNKNOWN {
 .col_cen {
 	text-align:center;
 	vertical-align:middle;
-	margin: 5px auto;
+	margin-left: 140px;
+	margin-right: 5px;
 	white-space: nowrap;
 	max-width: 50%;
 	overflow: hidden;
 	height: auto !important;
+	
 }
 
 .col_izq {
@@ -594,9 +596,13 @@ a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited
 }
 
 .search-box textarea {
-	width: 80%
+	width: 70%
 }
 
+.search-box input.textsearch {
+	padding-top: 9px;
+	width: 70%
+}
 
 .capsa_cerca {
 	height: auto !important;
@@ -970,4 +976,73 @@ div.record-form > div > img.imageclic {
     border: none;
 }
 
+@keyframes hopin {
+    from {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		margin: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+    to {
+    	transform: scaleY(1.0);
+    }
+}
+	    
+@keyframes hopoff {
+    from {
+    	transform: scaleY(1.0);
+    	opacity: 1;
+		height: auto;
+		padding: 5px 0px 5px 10px;
+    }
+    to {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+}
 
+.tree-body tr.tree-hidden > td > div {
+	height: 0;
+	margin: 0;
+	padding: 0px 0px 0px 10px;
+	opacity: 0;
+	transform: scaleY(0.0);
+	animation-name: hopoff;
+	animation-duration: 0.3s;
+}
+
+.tree-body tr.tree-displayed > td > div {
+	animation-name: hopin;
+	animation-duration: 0.3s;
+}
+
+.rolldown > td > div {
+  	overflow-y: hidden;
+	max-height: 500px; /* approximate max height */
+	animation-name: rolldown;
+	animation-duration: 1s;
+}
+
+.roundedWindow {
+	border-radius: 7px;
+	border: solid #22B9D8 7px;
+	background-color: white;
+	animation-name: appear;
+	animation-duration: 0.7s;
+}
+
+a.change-mode-label {
+	
+}
+
+a.change-mode-label-hidden {
+	display:none;
+}
+
+a.change-mode-label-selected {
+	font-weight: bold;
+	text-decoration: none;
+}

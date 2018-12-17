@@ -10,7 +10,16 @@
 	<zscript><![CDATA[
 		String task = Executions.getCurrent().getNativeRequest().getParameter("id");
 		org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("task.zul");
-		log.info("XX");
+		try {
+			es.caib.bpm.servei.BpmEngine engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
+			es.caib.bpm.vo.TaskInstance ti = engine.getTask(Long.parseLong(task));
+			if (ti != null && ti.getStart() == null)
+			{
+				engine.startTask(ti);
+			}
+		} catch (Exception e) {
+			
+		}
 		]]></zscript>
 
 	<application id="app" allowOpenMultipleTabs="false"

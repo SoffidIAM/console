@@ -21,6 +21,7 @@ import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -64,11 +65,15 @@ public class PasswordServiceImpl
     /**
      * @see es.caib.seycon.ng.servei.PasswordService#checkPassword(java.lang.String, java.lang.String, Password, boolean, boolean)
      */
-    protected boolean handleCheckPassword(java.lang.String user, java.lang.String passwordDomain, 
+    protected boolean handleCheckPassword(java.lang.String user, java.lang.String system, 
             Password password, boolean checkTrusted, boolean checkExpired)
         throws java.lang.Exception
     {
-       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, passwordDomain);
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, system);
+       	if (acc == null)
+       	{
+   			throw new InternalErrorException("Account not found "+user+" at "+system);
+       	}	
 
        	return getInternalPasswordService().checkAccountPassword(acc, password, checkTrusted, checkExpired) != PasswordValidation.PASSWORD_WRONG;
     }

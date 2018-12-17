@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.apache.catalina.realm.GenericPrincipal;
@@ -414,9 +415,13 @@ public class Security {
     		{
 		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
     		} else {
-				Tenant t = getTenantService().getTenant(tenant);
-				if ( t == null)
+				Long tenantId = getTenantId(tenant);
+				if ( tenantId == null)
 					throw new RuntimeException("Invalid tenant: "+tenant);
+				Tenant t = new Tenant();
+				t.setId(tenantId);
+				t.setName(tenant);
+				t.setDescription(tenant);
 				if (roles == Security.ALL_PERMISSIONS)
 				{
 					if (auths == null)
@@ -490,6 +495,10 @@ public class Security {
 
     public static void nestedLogin( String roles[])  {
         nestedLogin (getPrincipal().getName(), roles);
+    }
+
+    public static void clearNestedLogins() {
+        getIdentities().clear();
     }
 
     public static void nestedLogoff() {
@@ -692,7 +701,55 @@ public class Security {
 	public static String getMasterTenantName () {
 		return TenantServiceImpl.MASTER_NAME;
 	}
+	
+	static ThreadLocal<String> clientIp = new ThreadLocal<String>();
+	public static void setClientIp (String ip)
+	{
+		clientIp.set(ip);
+	}
 
+	public static String getClientIp ()
+	{
+		return clientIp.get();
+	}
+	
+	public static void setClientRequest (HttpServletRequest req)
+	{
+		String ip = req.getRemoteAddr();
+		String trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
+		String forwardedFor = req.getHeader("x-forwarded-for");
+		if (trustedProxies != null)
+		{
+			String[] tp = trustedProxies.split("[, ]+");
+			if ( isTrusted (ip, tp) )
+			{
+				if (forwardedFor == null || forwardedFor.trim().isEmpty())
+				{
+					try {
+						ip = InetAddress.getLocalHost().getHostAddress();
+					} catch (UnknownHostException e) {
+						ip = "127.0.0.1" ;
+					}
+				} else {
+					String[] ff = forwardedFor.split("[ ,]+");
+					for (int i = ff.length - 1; i >= 0; i--)
+					{
+						ip = ff[i];
+						if ( ! isTrusted(ip, tp))
+							break;
+					}
+				}
+			}
+		}
+		setClientIp(ip);
+	}
+
+	private static boolean isTrusted(String ip, String[] tp) {
+		for (String t: tp)
+			if (ip.equalsIgnoreCase(t))
+				return true;
+		return false;
+	}
 }
 
 class Identity {

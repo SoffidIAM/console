@@ -463,7 +463,7 @@
 							</hbox>
 						</row>
 						<row>
-							<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
+							<input_etiqueta value="${c:l('aplica_rolsllista.zul.Aplicacia')}"/>
 							<hbox>
 								<textbox bind="@codiAplicacio" maxlength="20"
 									sclass="textbox"
@@ -715,6 +715,7 @@
 																	com.soffid.iam.web.component.Identity.Type.GRANT
 															}
 														);
+												p.setVariable("wildcardDomain", true);
 												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.Afegeixrol"));
 												p.setVariable("invoker", ownedRoles);
 												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
@@ -833,6 +834,7 @@
 																	com.soffid.iam.web.component.Identity.Type.GRANT
 															}
 														);
+												p.setVariable("wildcardDomain", true);
 												p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("usuaris.zul.Afegeixrol"));
 												p.setVariable("invoker", ownerRolesGrid);
 												Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));

@@ -86,7 +86,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         }
         
         try {
-            Config.configureClient(sb.toString(), getServerPort());
+        	if ( ! Security.isSyncServer())
+        		Config.configureClient(sb.toString(), getServerPort());
         } catch (Throwable th) {
             // JUST IN CASE OF ACCIDENT (!!)
             if (serverList != null) {

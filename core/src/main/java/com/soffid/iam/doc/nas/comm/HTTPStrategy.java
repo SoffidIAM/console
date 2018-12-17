@@ -102,9 +102,13 @@ public class HTTPStrategy implements CommunicationStrategy
 		this.tempPath= properties.getProperty("soffid.ui.docTempPath");
 		
 		properties.put(JWOptions.QUIET_P, JWOptions.TRUE_P);
-		this.user = ConfigurationCache.getMasterProperty("soffid.ui.docUsername").trim(); //$NON-NLS-1$
-		this.password = ConfigurationCache.getMasterProperty("soffid.ui.docUserPassword").trim(); //$NON-NLS-1$
-		if (user != null && password != null)
+		this.user = ConfigurationCache.getMasterProperty("soffid.ui.docUsername"); //$NON-NLS-1$
+		if (this.user != null)
+			this.user= user.trim();
+		this.password = ConfigurationCache.getMasterProperty("soffid.ui.docUserPassword"); //$NON-NLS-1$
+		if (password != null)
+			password = password.trim();
+		if (user != null && ! user.isEmpty() && password != null && ! password.isEmpty())
 		{
 			properties.put (JWOptions.USER_P, user);
 			try {

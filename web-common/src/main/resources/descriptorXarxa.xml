@@ -53,6 +53,7 @@
 			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="networks.CodeValidation"/>
 			<attribute-validator expr="${instance.adreca}" notNull="true" friendlyName="networks.AddressValidation"/>
 			<attribute-validator expr="${instance.mascara}" notNull="true" friendlyName="networks.MaskValidation"/>
+			<attribute-validator expr="${instance.descripcio}" notNull="true" friendlyName="networks.DescriptionValidation"/>
 		</validator>
 	</datanode>
 

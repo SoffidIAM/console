@@ -43,6 +43,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
@@ -1714,7 +1715,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{
 			User caller = AutoritzacionsUsuari.getCurrentUsuari();
-			if (caller.getId() != usuari.getId())
+			if (caller != null && caller.getId() != usuari.getId())
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
 		Collection<RoleGrant> grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
@@ -1922,6 +1923,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

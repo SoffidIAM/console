@@ -11,7 +11,11 @@ public class QueryBuilder {
         org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()
                 .createQuery(queryString);
         for (int i = 0; parameters != null && i < parameters.length; i++) {
-            queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
+        	if (parameters[i].getValue() == null)
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
+            		org.hibernate.Hibernate.STRING);
+        	else
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }
         java.util.List results = queryObject.list();
         return results;
@@ -23,7 +27,11 @@ public class QueryBuilder {
         org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()
                 .createQuery(queryString);
         for (int i = 0; parameters != null && i < parameters.length; i++) {
-            queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
+        	if (parameters[i].getValue() == null)
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
+            		org.hibernate.Hibernate.STRING);
+        	else
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }
         queryObject.setMaxResults(maxResults);
         java.util.List results = queryObject.list();

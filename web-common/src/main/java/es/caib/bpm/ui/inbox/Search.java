@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,6 +103,12 @@ public class Search extends Frame
 				txtProcessID.getValue(), dataIni, dataFi,
 				chkFinalizada.isChecked());
 
+			Collections.sort(resultado, new Comparator<ProcessInstance>() {
+				@Override
+				public int compare(ProcessInstance o1, ProcessInstance o2) {
+					return - o1.getStart().compareTo(o2.getStart());
+				}
+			});
 			log.debug(String.format(Messages.getString("Search.NumInstancesFoundInfo"), resultado.size()));   //$NON-NLS-1$
 
 			resultadoBusqueda= (Listbox)this.getFellow("resultadoBusqueda"); //$NON-NLS-1$

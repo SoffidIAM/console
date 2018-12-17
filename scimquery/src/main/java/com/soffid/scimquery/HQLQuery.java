@@ -88,9 +88,10 @@ public class HQLQuery {
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append (getQueryString())
-			.append(getJoinString())
-			.append("\nwhere ")
-			.append(getWhereString());
+			.append(getJoinString());
+		if (getWhereString().length() > 0)
+			sb.append("\nwhere ")
+			  .append(getWhereString());
 		return sb.toString();
 	}
 
@@ -112,5 +113,14 @@ public class HQLQuery {
 
 	public void setNonHQLAttributeUsed(boolean nonHQLAttributeUsed) {
 		this.nonHQLAttributeUsed = nonHQLAttributeUsed;
+	}
+
+	String rootObject = null;
+	public String getRootObject() {
+		return rootObject;
+	}
+
+	public void setRootObject(String rootObject) {
+		this.rootObject = rootObject;
 	}
 }

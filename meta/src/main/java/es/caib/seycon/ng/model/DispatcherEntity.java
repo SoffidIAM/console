@@ -236,9 +236,12 @@ public abstract class DispatcherEntity {
 
 	@DaoFinder("select dis "
 			+ "from com.soffid.iam.model.SystemEntity as dis "
-			+ "join dis.tenant as tenant "
-			+ "join tenant.servers as server "
-			+ "where server.tenantServer.name = :server")
+			+ "where dis.id in ("
+				+ "select distinct dis2.id "
+				+ "from com.soffid.iam.model.SystemEntity as dis2 "
+				+ "join dis2.tenant as tenant "
+				+ "join tenant.servers as server "
+				+ "where server.tenantServer.name = :server)")
 	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findServerTenants(String server) {
 		return null;
 	}

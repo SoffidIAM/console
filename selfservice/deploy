@@ -1,6 +1,6 @@
 #!/bin/bash
-cp -r /home/gbuades/soffid-2.0/console/selfservice/src/main/webapp/* /home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/work/soffid/iam-ear.ear/selfservice-*
-cp -r /home/gbuades/soffid-2.0/console/selfservice/src/main/resources/* /home/gbuades/soffid-2.0/test/apache-tomee-plus-7.0.3/work/soffid/iam-ear.ear/selfservice-*
+cp -r /home/gbuades/soffid-2.0/console/selfservice/src/main/webapp/* /home/gbuades/soffid-2.0/test/iam-console-2/work/soffid/iam-ear.ear/selfservice-*
+cp -r /home/gbuades/soffid-2.0/console/selfservice/src/main/resources/* /home/gbuades/soffid-2.0/test/iam-console-2/work/soffid/iam-ear.ear/selfservice-*
 
 
 

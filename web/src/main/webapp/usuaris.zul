@@ -577,7 +577,8 @@
 				<searchbox auto="true" id="searchBox"
 					jsonObject="com.soffid.iam.api.User" 
 					defaultAttributes="userName, firstName, lastName, primaryGroup"
-					dataPath="/model:/usuari" variableName="query"></searchbox>
+					preference="users"
+					dataPath="/model:/usuari" variableName="query" variableNameText="textQuery"></searchbox>
 
 			</criteris>
 

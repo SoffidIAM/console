@@ -52,7 +52,7 @@
 							.Labels.getLabel("auditoria.Titol"));
 				}
 				catch (Exception ex){}
-				int fileres = 25;
+				int fileres = 50;
 	
 				import es.caib.zkib.zkiblaf.Missatgebox;
 				
@@ -130,12 +130,13 @@
 				</toolbar>
 				
 				<listbox id="listbox" autocommit="false" dataPath="/model:/auditoria"
-					mold="paging" pageSize="${fileres}" rows="${fileres}">
+					mold="paging" pageSize="${fileres}">
 					<listhead>
 						<listheader id="ldata" label="${c:l('auditoria.zul.Data/Hora')}"
 							sort="auto" width="12em"/>
 						<listheader id="lautor" label="${c:l('auditoria.zul.Autor-2')}"
 							sort="auto" width="10em"/>
+						<listheader visible="false" id="lip" label="${c:l('com.soffid.iam.api.Audit.sourceIp')}" width="50px"/>
 						<listheader visible="false" id="lobjecte" label="${c:l('auditoria.zul.Objecte-2')}" width="50px"/>
 						<listheader visible="false" id="lusuari" label="${c:l('auditoria.zul.Usuari')}" width="80px"/>
 						<listheader visible="false" id="laplicacio" label="${c:l('auditoria.zul.Aplicacia')}" width="80px"/>
@@ -190,6 +191,7 @@
 								</attribute>
 							</imageclic>
 						</listcell>
+						<listcell bind="@sourceIp"/>
 						<listcell bind="@objecte"/>
 						<listcell>
 							<label bind="@usuari" tooltip="tooltipInfoUsuari" style="margin-right: 1em"/>

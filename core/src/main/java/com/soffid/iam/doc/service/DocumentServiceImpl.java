@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -275,7 +275,9 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 		{
 			this.inputStream.close();
 			getNASManager().cleanTemporaryResources();
-			
+
+			if (this.tempFile != null)
+				this.tempFile.delete();
 			this.inputStream= null;
 			this.tempFile= null;
 		}
@@ -308,7 +310,14 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 			
 			signList= new ArrayList(document.getSigns());
 			
-			Collections.sort(signList, new BeanComparator("timestamp"));
+			Collections.sort(signList, new Comparator<DocSign>() {
+
+				@Override
+				public int compare(DocSign o1, DocSign o2) {
+					return o1.getTimestamp().compareTo(o2.getTimestamp());
+				}
+				
+			});
 			Collections.reverse(signList);
 			
 			for(Iterator it= signList.iterator(); it.hasNext();)

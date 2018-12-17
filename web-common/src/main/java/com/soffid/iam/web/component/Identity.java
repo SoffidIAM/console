@@ -64,6 +64,9 @@ public class Identity implements Comparable<Identity>{
 		if (domainValue == null)
 		{
 			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription();
+		} else if (domainValue.getValue() == null ) {
+			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
+				+ " / " + Labels.getLabel("attributeQuery.all");
 		} else {
 			label = role.getName()+" @ "+role.getSystem()+" - "+role.getDescription()
 				+ " / " + domainValue.getValue()+" - "+domainValue.getDescription();

@@ -1,6 +1,8 @@
 package es.caib.seycon.ng.upload;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -36,6 +38,7 @@ import com.soffid.iam.model.identity.IdentityGeneratorBean;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.ApplicationShutdownService;
 import com.soffid.iam.service.ConfigurationService;
+import com.soffid.iam.service.workflow.JbpmSchedulerServiceInterface;
 import com.soffid.tools.db.persistence.XmlReader;
 import com.soffid.tools.db.schema.Column;
 import com.soffid.tools.db.schema.Database;
@@ -44,6 +47,7 @@ import com.soffid.tools.db.updater.DBUpdater;
 import com.soffid.tools.db.updater.MsSqlServerUpdater;
 import com.soffid.tools.db.updater.MySqlUpdater;
 import com.soffid.tools.db.updater.OracleUpdater;
+import com.soffid.tools.db.updater.PostgresqlUpdater;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -55,8 +59,8 @@ public class UploadService {
     Log log = LogFactory.getLog(UploadService.class);
 
     
-    @EJB(beanName="SoffidDeployerBean")
-    DeployerService soffidDeployer;
+    @EJB(beanName="JbpmSchedulerService")
+    JbpmSchedulerServiceInterface jbpmScheduler;
     
 	@Resource
 	private SessionContext context;
@@ -80,29 +84,35 @@ public class UploadService {
             try {
             	com.soffid.iam.ServiceLocator.instance().getUserService();
             } catch (Exception e)  {
-            	if (! soffidDeployer.isFailSafe())
-            	{
-            		soffidDeployer.setFailSafe(true);
-   					context.getTimerService().createTimer(5000, "Redeploy");
-            		return ;
-            	}
+            	log.warn("Error initializing spring context", e);
+				context.getTimerService().createTimer(5000, "Redeploy");
             }
             
             
             Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
             		getBeansOfType(ApplicationBootService.class);
 
+            String bootServiceName = ApplicationBootService.SERVICE_NAME;
+           	log.info ("Executing startup bean: " + bootServiceName);
+            ApplicationBootService bootService = ServiceLocator.instance().getApplicationBootService();
+            bootService.consoleBoot();
             for ( Object service: beans.keySet())
             {
-            	log.info ("Executing startup bean: " + service);
-            	
-            	((ApplicationBootService) beans.get(service)).consoleBoot();
+            	if ( ! service.equals(bootServiceName))
+            	{
+	            	log.info ("Executing startup bean: " + service);
+	            	
+	            	((ApplicationBootService) beans.get(service)).consoleBoot();
+            	}
             }
             
             log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
 			context.getTimerService().createTimer(10, "Upload");
+			context.getTimerService().createTimer(10, "BPM");
         } catch (Throwable e) {
             log.warn(Messages.getString("UploadService.UploadFileError"), e); //$NON-NLS-1$
+			context.getTimerService().createTimer(5000, "Redeploy");
+       		return ;
         }
     }
 	
@@ -111,17 +121,31 @@ public class UploadService {
 	{
 		if (timer.getInfo().equals("Redeploy"))
 		{
-			log.info("Redeploying in fail-safe mode");
-			try {
-				soffidDeployer.redeploy();
-			} catch (Exception e) {
-				log.warn ("Error deploying in fail-safe mode", e);
+			File f = new File(
+					new File(getCatalinaHomeDir(), "soffid"), "fail-safe"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			if (! f.exists())
+			{
+				log.info("Redeploying in fail-safe mode");
+				try {
+					new FileOutputStream(f).close();
+				} catch (IOException e) {
+					log.warn("Unable to create file "+f.getPath());
+				}
 			}
 		}
 		if (timer.getInfo().equals("Upload"))
 		{
 			uploadComponents();
 		}
+		if (timer.getInfo().equals("BPM"))
+		{
+			jbpmScheduler.start();
+		}
+	}
+
+	private File getCatalinaHomeDir() {
+		return new File(System.getProperty("catalina.home")); //$NON-NLS-1$
 	}
 
 	private void uploadComponents() {
@@ -358,15 +382,29 @@ public class UploadService {
     	parseResources(rpr, db, reader, "plugin-ddl.xml");
         DataSource ds = (DataSource) new InitialContext().lookup("openejb:/Resource/jdbc/soffid");
         Connection conn = ds.getConnection();
-        String type = System.getProperty("dbDriverString"); //$NON-NLS-1$
+        String type = conn.getMetaData().getDatabaseProductName(); //$NON-NLS-1$
+        String type2 = System.getProperty("dbDriverString"); //$NON-NLS-1$
         DBUpdater updater ;
-        if ("mysql".equals(type))  //$NON-NLS-1$
+        if ("mysql".equalsIgnoreCase(type) || 
+        		"mariadb".equalsIgnoreCase(type) )  //$NON-NLS-1$
         {
         	updater = new MySqlUpdater();
-        } else if ("oracle".equals (type)) { //$NON-NLS-1$
+        } else if ("oracle".equalsIgnoreCase(type)) { //$NON-NLS-1$
         	updater = new OracleUpdater();
-        } else if ("sqlserver".equals(type)) {
+        } else if ("sqlserver".equalsIgnoreCase(type)) {
         	updater = new MsSqlServerUpdater();
+        } else if ("postgresql".equalsIgnoreCase(type)) { //$NON-NLS-1$
+            updater = new PostgresqlUpdater();
+        } else if ("mysql".equalsIgnoreCase(type2) || 
+        		"mariadb".equalsIgnoreCase(type2) )  //$NON-NLS-1$
+        {
+        	updater = new MySqlUpdater();
+        } else if ("oracle".equalsIgnoreCase(type2)) { //$NON-NLS-1$
+        	updater = new OracleUpdater();
+        } else if ("sqlserver".equalsIgnoreCase(type2)) {
+        	updater = new MsSqlServerUpdater();
+        } else if ("postgresql".equalsIgnoreCase(type2)) { //$NON-NLS-1$
+            updater = new PostgresqlUpdater();
         } else {
             throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
         }

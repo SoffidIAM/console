@@ -437,7 +437,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		GroupService service = getGroupService();
 		service.propagateRolsChangesToDispatcher(usuari.getPrimaryGroup());
 
-		if ( usuari.getActive().booleanValue())
+		if ( usuari.getActive() != null && usuari.getActive().booleanValue())
 		{
 			auditChange("E", usuari.getUserName(), null);
 		}
@@ -1223,6 +1223,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			usuariEntity.getSecrets().clear();
 			for (AccessLogEntity al: getAccessLogEntityDao().findLastAccessLogByUserName(usuariEntity.getUserName(),null))
 				getAccessLogEntityDao().remove(al);
+
+			getSessionEntityDao().remove(usuariEntity.getSessions());
+
 			getUserEntityDao().remove(usuariEntity);
 		}
 	}

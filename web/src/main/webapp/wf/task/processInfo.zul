@@ -33,7 +33,7 @@
 			</row>	
 		</rows>
 	</grid>
-	<grid dataPath="BPMdata:/processInstance/log" fixedLayout="true" id="logs" width="100%">
+	<grid dataPath="BPMdata:/taskInstance/log" fixedLayout="true" id="logs" width="100%">
 		<columns>
 			<column label="${c:l('task.data')}" width="15%"/>
 			<column label="${c:l('task.autor')}" width="20%"/>

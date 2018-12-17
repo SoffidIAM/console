@@ -69,6 +69,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 
 public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
@@ -290,7 +292,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 						
 				}
 				if ( ! found )
-					createRoleDependency(grant);
+				{
+					grant.setRoleId(entity.getId());
+					createRoleDependency(grant, true);
+				}
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
@@ -330,9 +335,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 	}
 	 
-	private void updateGrantedRoles(Role role, RoleEntity entity) throws InternalErrorException, BPMException {
+	private boolean updateGrantedRoles(Role role, RoleEntity entity) throws InternalErrorException, BPMException {
 		// Compraramos con los existentes anteriormente : i esborrem els que
 		// ja no existeixen
+		boolean anyChange = false;
+		
 		LinkedList<RoleDependencyEntity> currentGrants = new LinkedList<RoleDependencyEntity>(entity.getContainedRoles());
 		if (role.getOwnedRoles() != null) {
 			for (RoleGrant grant: role.getOwnedRoles())
@@ -345,22 +352,29 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 					{
 						found = true;
 						it.remove();
-						updateRolDependency(grantEntity, grant);
+						if (updateRolDependency(grantEntity, grant))
+							anyChange = true;
 						break;
 					}
 						
 				}
 				if ( ! found )
-					createRoleDependency(grant);
+				{
+					grant.setOwnerRole(entity.getId());
+					createRoleDependency(grant, false);
+					anyChange = true;
+				}
 			}
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
 		{
 			deleteRolDependency(grantEntity);
+			anyChange = true;
 		}
+		return anyChange;
 	}
 	 
-	private void createRoleDependency(RoleGrant grant) throws InternalErrorException, BPMException {
+	private void createRoleDependency(RoleGrant grant, boolean checkGranteeCycles) throws InternalErrorException, BPMException {
 		StringBuffer path = new StringBuffer();
 
 		RoleEntity ownerRole = grant.getOwnerRole() != null? 
@@ -377,7 +391,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			throw new InternalErrorException("Invalid owned role");
         grant.setRoleId(ownedRole.getId());
         
-        if (checkNoCycles( grant, path)) {
+        if (checkNoCycles( grant, path, checkGranteeCycles)) {
         	RoleDependencyEntity entity = getRoleDependencyEntityDao().newRoleDependencyEntity();
         	
         	getRoleDependencyEntityDao().roleGrantToEntity(grant, entity, true);
@@ -455,10 +469,19 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         }
 	}
 
-	private void updateRolDependency(RoleDependencyEntity entity, RoleGrant grant) throws InternalErrorException, BPMException {
+	private boolean updateRolDependency(RoleDependencyEntity entity, RoleGrant grant) throws InternalErrorException, BPMException {
+		boolean anyChange = false;
 		if (RoleDependencyStatus.STATUS_TOREMOVE.equals(grant.getStatus()))
+		{
+			anyChange = true;
 			deleteRolDependency(entity);
+		}
+		if ( entity.getMandatory() == null ||
+				!entity.getMandatory().equals(grant.getMandatory()))
+			anyChange = true;
 		entity.setMandatory(grant.getMandatory());
+		getRoleDependencyEntityDao().update(entity);
+		return anyChange;
 	}
 
 	public void remove(com.soffid.iam.model.RoleEntity Role)
@@ -1305,10 +1328,18 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	}
 
     private boolean checkNoCycles(
-            RoleGrant grant, StringBuffer cami) {
+            RoleGrant grant, StringBuffer cami, boolean checkGranteeCycles) {
         RoleEntity contingut = load ( grant.getRoleId());
         RoleEntity pare = load (grant.getOwnerRole());
 
+        if (grant.getRoleId().equals(grant.getOwnerRole()))
+        {
+        	cami.append(contingut.getName())
+        		.append(" <=> ")
+        		.append(contingut.getName()); //$NON-NLS-1$
+       		return false;
+        }
+        	
         // Método: Para todo T,D / T & D son RoleEntity
         // no existe C(D,D1): D está contenido en D1 (contenedor) tal que
         // (versión breve)
@@ -1316,27 +1347,36 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         //
         // Obtenemos dónde está contenido el padre (el contenedor del Role)
         // return true;
-        cami.append(contingut.getName() + " => "); //$NON-NLS-1$
-        return checkNoCycles(contingut, pare, cami);
+        if (checkGranteeCycles)
+        	cami.append(contingut.getName() + " <= "); //$NON-NLS-1$
+        else
+        	cami.append(contingut.getName() + " => "); 
+        return checkNoCycles(contingut, pare, cami, checkGranteeCycles);
     }
 
+    Log log = LogFactory.getLog(getClass());
+    
     private boolean checkNoCycles(RoleEntity fill,
-            RoleEntity pare, StringBuffer cami) {
-        Collection pareEsContingut = pare.getContainerRoles();
+            RoleEntity pare, StringBuffer cami, boolean checkGranteeCycles) {
+        Collection pareEsContingut = checkGranteeCycles ? pare.getContainerRoles() : pare.getContainedRoles();
         boolean senseCicles = true;
-        cami.append(pare.getName() + " => "); //$NON-NLS-1$
-        for (Iterator it = pareEsContingut.iterator(); senseCicles
-                && it.hasNext();) {
+        cami.append(pare.getName());
+        if (checkGranteeCycles) cami.append(" <= "); //$NON-NLS-1$
+        else cami.append(" => "); //$NON-NLS-1$
+        int len = cami.length();
+        log.info("Checking cycle "+cami.toString());
+        for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext();) {
+        	cami.setLength(len);
+        	
             RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
-            RoleEntity parePare = relacio.getContainer();
+            RoleEntity parePare = checkGranteeCycles ? relacio.getContainer(): relacio.getContained();
             if (parePare.equals(fill)) {
-                senseCicles = false;
                 cami.append(parePare.getName());
-                return false; // S'ha trobat un cicle
+                senseCicles = false;
             } else {
                 // Verificamos la descendencia del contenedor (padre)
                 senseCicles = checkNoCycles(fill, parePare,
-                        cami);
+                        cami, checkGranteeCycles);
             }
         }
         return senseCicles;
@@ -1442,8 +1482,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             
             updateGranteeRoles(role, entity);
 
+            boolean forcePropagation = false;
             if (updateOwnedRoles)
-            	updateGrantedRoles(role, entity);
+            	forcePropagation = updateGrantedRoles(role, entity);
 
             updateGranteeGroups(role, entity);
 
@@ -1461,6 +1502,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             getHerenciaRol_Usuaris_Rols_Grups(entity, usuarisPropagarAfter,
                     accountsPropagarAfter, rolsPropagarAfter, grupsPropagarAfter, false);
 
+            if (forcePropagation)
+            {
+            	usuarisPropagarAfter.addAll(usuarisPropagar);
+            	accountsPropagarAfter.addAll(accountsPropagar);
+                usuarisPropagar.clear();
+                accountsPropagar.clear();
+            }
+            	
             generatePropagationTasks(usuarisPropagar, accountsPropagar,
 					rolsPropagar, grupsPropagar, usuarisPropagarAfter,
 					accountsPropagarAfter, rolsPropagarAfter,
@@ -1487,6 +1536,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             return entity;
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
+            LogFactory.getLog(getClass()).warn("Error updating role: ", e);
 			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
         }
 	}

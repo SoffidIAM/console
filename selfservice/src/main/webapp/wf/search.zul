@@ -75,7 +75,7 @@
 		</hbox>
 		<label value=""/>
 		<label sclass="label" style="margin:10px;" value="${c:l('observacion.lblResultadoBusqueda')}"/>
-		<listbox fixedLayout="true" id="resultadoBusqueda" mold="paging" onSelect="observacion.seleccionarProceso(self)" pageSize="25">
+		<listbox fixedLayout="true" id="resultadoBusqueda" mold="paging" onSelect="observacion.seleccionarProceso(self)" pageSize="50">
 				<listhead>
 					<listheader label="${c:l('observacion.lblIdProceso')}" sort="auto" width="10%"/>
 					<listheader label="${c:l('observacion.lblProceso')}" sort="auto" width="25%"/>

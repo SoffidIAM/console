@@ -198,7 +198,8 @@
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Group"
 				defaultAttributes="name, description, type" dataPath="/model:/grup"
-				variableName="query">
+				preference="group"
+				variableName="query" variableNameText="queryText">
 			</searchbox>
 		</criteris>
 
@@ -214,7 +215,8 @@
 					label="${c:l('grups.zul.CancelChanges')}"
 					onClick="onRefrescaArbreIntern(false);" />
 			</toolbar>
-			<tree id="treebox" dataPath="/model:/" fixedLayout="true" pageSize="19"
+			<tree id="treebox" dataPath="/model:/" fixedLayout="true" pageSize="19" 
+				 style="min-height: 100px"
 				 onSelect="select()" rows="${fileres}" autocommit="false">
 				<treecols>
 					<treecol label="${c:l('grups.zul.Descripcia-2')}" width="70%"/>

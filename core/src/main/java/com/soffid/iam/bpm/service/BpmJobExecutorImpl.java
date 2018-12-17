@@ -9,14 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.ejb.EJBException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
-import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
-import org.jbpm.JbpmException;
 import org.jbpm.db.JobSession;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.job.Job;

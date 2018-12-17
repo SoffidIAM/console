@@ -210,9 +210,6 @@ public class ConfigureIndex extends Frame
 		String userPassword) throws NamingException, CreateException,
 		InternalErrorException
 	{
-		// Document manager strategy
-		saveParameter("soffid.ui.docStrategy", docStrategy); //$NON-NLS-1$
-		
 		// Document manager path
 		saveParameter("soffid.ui.docPath", docPath); //$NON-NLS-1$
 		
@@ -235,6 +232,9 @@ public class ConfigureIndex extends Frame
 			clearNotUserProperty("soffid.ui.docUsername"); //$NON-NLS-1$
 			clearNotUserProperty("soffid.ui.docUserPassword"); //$NON-NLS-1$
 		}
+		// Document manager strategy
+		saveParameter("soffid.ui.docStrategy", docStrategy); //$NON-NLS-1$
+		
 	}
 
 	/**

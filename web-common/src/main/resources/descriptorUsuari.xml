@@ -9,6 +9,10 @@
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
+				method="findUserByTextAsync" if = "${textQuery != null &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
 				method="findUserByJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>

@@ -779,6 +779,7 @@ public class ApplicationServiceImpl extends
            	Account account = null;
         	Security.nestedLogin(Security.getCurrentAccount(), new String[] { 
         		Security.AUTO_USER_QUERY+Security.AUTO_ALL,
+        		Security.AUTO_ACCOUNT_UPDATE,
         		Security.AUTO_ACCOUNT_QUERY, 
         		Security.AUTO_ACCOUNT_CREATE,
         		Security.AUTO_ACCOUNT_QUERY+Security.AUTO_ALL, 
@@ -2245,6 +2246,7 @@ public class ApplicationServiceImpl extends
 		{
 			Object v = app.getAttributes().get(att.getMetadata().getName());
 			att.setObjectValue(v);
+			getApplicationAttributeEntityDao().update(att);
 			keys.remove(att.getMetadata().getName());
 		}
 		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
@@ -2300,6 +2302,7 @@ public class ApplicationServiceImpl extends
 		{
 			Object v = app.getAttributes().get(att.getMetadata().getName());
 			att.setObjectValue(v);
+			getRoleAttributeEntityDao().update(att);
 			keys.remove(att.getMetadata().getName());
 		}
 		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);

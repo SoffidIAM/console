@@ -82,6 +82,14 @@ void showMessage (Image img)
 {
 	es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(img);
 	String ref = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@logReferenceID");
+	Long id = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@id");
+	for ( com.soffid.iam.api.ScheduledTask t: com.soffid.iam.EJBLocator.getScheduledTaskService().listTasks())
+	{
+		if (t.getId().equals ( id ))
+		{
+			ref = t.getLogReferenceID();
+		}
+	}
 	if (ref == null)
 		return;
 	String name = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "@name");

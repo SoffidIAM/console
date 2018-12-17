@@ -1,5 +1,6 @@
 package com.soffid.iam.tomcat.service;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,8 +12,13 @@ import java.util.Set;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 
+import org.apache.catalina.Realm;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.openejb.loader.SystemInstance;
+import org.apache.openejb.spi.Assembler;
+import org.apache.openejb.spi.SecurityService;
+import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
@@ -27,6 +33,7 @@ import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.tomcat.LoginService;
 import com.soffid.iam.tomcat.SoffidPrincipal;
+import com.soffid.iam.tomcat.SoffidRealm;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -60,6 +67,11 @@ public class LoginServiceImpl implements LoginService {
 				samlAuthorized = true;
 				username = samlPrincipal;
 			}
+			if (credentials.length() > 2000)
+			{
+				log.info(username + " login rejected. Password too long (more than 2000 characters)");
+				return null;
+			}
 			int i = username.indexOf('\\');
 			if (i < 0) {
 				tenant = locator.getTenantService().getMasterTenant();
@@ -78,82 +90,124 @@ public class LoginServiceImpl implements LoginService {
 				log.info(username + " login rejected. Tenant is disabled");
 				return null;
 			}
-
-			Security.nestedLogin(tenant.getName(), "$$INTERNAL$$", new String[] {
-					Security.AUTO_USER_QUERY + Security.AUTO_ALL,
-					Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL });
+			
+			
+			Object state = enterWebapp();
 			try {
-				// Valida usuario/dni contra BBDD
-				TenantService ts = ServiceLocator.instance().getTenantService();
-				UserService us = ServiceLocator.instance().getUserService();
-				AccountService as = ServiceLocator.instance().getAccountService();
-				PasswordService ps = ServiceLocator.instance().getPasswordService();
-
-				String dispatcher = ps.getDefaultDispatcher();
-				Account acc = null;
+				Security.nestedLogin(tenant.getName(), "$$INTERNAL$$", new String[] {
+						Security.AUTO_USER_QUERY + Security.AUTO_ALL,
+						Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL });
 				try {
-					acc = as.findAccount(account, dispatcher);
-				} catch (IllegalArgumentException e) {
-					log.info("Login rejected: username and/or credentials are empty");
-					return null;
+					// Valida usuario/dni contra BBDD
+					TenantService ts = ServiceLocator.instance().getTenantService();
+					UserService us = ServiceLocator.instance().getUserService();
+					AccountService as = ServiceLocator.instance().getAccountService();
+					PasswordService ps = ServiceLocator.instance().getPasswordService();
+	
+					String dispatcher = ps.getDefaultDispatcher();
+					Account acc = null;
+					try {
+						acc = as.findAccount(account, dispatcher);
+					} catch (IllegalArgumentException e) {
+						log.info("Login rejected: username and/or credentials are empty");
+						return null;
+					}
+					if (acc == null) {
+						log.info(username + " login rejected. Unknown account");
+						return null;
+					}
+					if (acc.isDisabled()) {
+						log.info(username + " login rejected. Disabled account");
+						return null;
+					}
+	
+					SoffidPrincipal principal;
+					String passwordDomain = ps.getDefaultDispatcher();
+					if (samlAuthorized ||
+							ps.checkPassword(account, passwordDomain, new Password(
+							credentials), true, false)) {
+						List<String> roles = getRoles(acc);
+						roles.add("PASSWORD:VALID");
+						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
+								credentials,
+								roles);
+					} else if (ps.checkPassword(account, passwordDomain, new Password(
+							credentials), false, true)) {
+						List<String> roles = getRoles(acc);
+						roles.add("PASSWORD:EXPIRED");
+						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
+								credentials,
+								roles);
+					} else {
+						log.info(username + " login rejected. Invalid password");
+						return null;
+					}
+			
+					if ( ! tenants.contains(tenant.getName()))
+					{
+			            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
+			            		getBeansOfType(ApplicationBootService.class);
+	
+			            for ( Object service: beans.keySet())
+			            {
+			            	log.info ("Executing startup bean: " + service);
+			            	
+			            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
+			            }
+			            tenants.add(tenant.getName());
+					}
+					
+					principal.setAccountId(acc.getId());
+					principal.setFullName(acc.getDescription());
+					principal.setTenant(tenant.getName());
+					return principal;
+				} finally {
+					Security.nestedLogoff();
 				}
-				if (acc == null) {
-					log.info(username + " login rejected. Unknown account");
-					return null;
-				}
-				if (acc.isDisabled()) {
-					log.info(username + " login rejected. Disabled account");
-					return null;
-				}
-
-				SoffidPrincipal principal;
-				String passwordDomain = ps.getDefaultDispatcher();
-				if (samlAuthorized ||
-						ps.checkPassword(account, passwordDomain, new Password(
-						credentials), true, false)) {
-					List<String> roles = getRoles(acc);
-					roles.add("PASSWORD:VALID");
-					principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
-							credentials,
-							roles);
-				} else if (ps.checkPassword(account, passwordDomain, new Password(
-						credentials), false, true)) {
-					List<String> roles = getRoles(acc);
-					roles.add("PASSWORD:EXPIRED");
-					principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
-							credentials,
-							roles);
-				} else {
-					log.info(username + " login rejected. Invalid password");
-					return null;
-				}
-		
-				if ( ! tenants.contains(tenant.getName()))
-				{
-		            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
-		            		getBeansOfType(ApplicationBootService.class);
-
-		            for ( Object service: beans.keySet())
-		            {
-		            	log.info ("Executing startup bean: " + service);
-		            	
-		            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
-		            }
-		            tenants.add(tenant.getName());
-				}
-				
-				principal.setAccountId(acc.getId());
-				principal.setFullName(acc.getDescription());
-				principal.setTenant(tenant.getName());
-				return principal;
 			} finally {
-				Security.nestedLogoff();
+				exitWebapp(state);
 			}
 		} catch (InternalErrorException e) {
 			throw new SecurityException ("Error during login process", e);
 		}
 	}
 
+	
+    Realm dummyRealm = new SoffidRealm();
+    Principal dummyPrincipal = new SoffidPrincipal("master\\$$ANONYMUOS", null, new LinkedList<String>());
+
+    private Object enterWebapp ()
+	{
+    	SystemInstance si = SystemInstance.get();
+    	if (si == null)
+    		return null;
+    	Assembler a = si.getComponent(Assembler.class);
+    	if (a == null)
+    		return null;
+        final TomcatSecurityService ss = (TomcatSecurityService) a.getSecurityService();
+        if (ss == null)
+        	return null;
+        
+        return ss.enterWebApp(dummyRealm, dummyPrincipal, null);
+	}
+	
+    private void exitWebapp (Object state)
+	{
+    	if (state == null)
+    		return;
+    	SystemInstance si = SystemInstance.get();
+    	if (si == null)
+    		return ;
+    	Assembler a = si.getComponent(Assembler.class);
+    	if (a == null)
+    		return;
+        final TomcatSecurityService ss = (TomcatSecurityService) a.getSecurityService();
+        if (ss == null)
+        	return;
+        
+        ss.exitWebApp(state);
+	}
+	
 	private List<String> getRoles(Account acc) throws InternalErrorException {
 		AuthorizationService us = ServiceLocator.instance()
 				.getAuthorizationService();

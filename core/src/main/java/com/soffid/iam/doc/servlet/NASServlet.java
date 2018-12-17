@@ -14,12 +14,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.util.Base64;
 
 public class NASServlet extends HttpServlet {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	boolean validateRequest (HttpServletRequest req, HttpServletResponse resp) throws ServletException
 	{
 		String auth = req.getHeader("Authorization");
@@ -92,6 +96,10 @@ public class NASServlet extends HttpServlet {
 				out.close ();
 			}
 		}
+		else
+		{
+			log.warn("Unauthorized to get document "+req.getRequestURI()+" from "+req.getRemoteAddr());
+		}
 	}
 
 	@Override
@@ -103,8 +111,10 @@ public class NASServlet extends HttpServlet {
 			f.getParentFile().mkdirs();
 			if (f.canRead())
 			{
+				log.info("Rejecting request "+req.getRequestURI()+" to store already existing file "+f.getPath());
 				resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			} else {
+				log.info("Storing request "+req.getRequestURI()+" into "+f.getPath());
 				InputStream in = req.getInputStream();
 				resp.setContentType("binary/octet-stream");
 				resp.setContentLength((int) f.length());
@@ -119,23 +129,34 @@ public class NASServlet extends HttpServlet {
 				out.close ();
 			}
 		}
+		else
+		{
+			log.warn("Unauthorized to store document "+req.getRequestURI()+" from "+req.getRemoteAddr());
+		}
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String base = System.getProperty("soffid.ui.docPath");
-		if (base == null)
+		if (validateRequest(req, resp))
 		{
-			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");
-		}
-		File f = new File (base, req.getPathInfo());
-		if (  ! f.getCanonicalPath().startsWith(base))
-		{
-			throw new ServletException("Bad path "+req.getPathInfo());
+			String base = ConfigurationCache.getProperty("soffid.ui.docPath");
+			if (base == null)
+			{
+				throw new ServletException("Missing configuration parameter soffid.ui.docPath ");
+			}
+			File f = new File (base, req.getPathInfo());
+			if (  ! f.getCanonicalPath().startsWith(base))
+			{
+				throw new ServletException("Bad path "+req.getPathInfo());
+			}
+			else
+				f.delete();
 		}
 		else
-			f.delete();
+		{
+			log.warn("Unauthorized to remove document "+req.getRequestURI()+" from "+req.getRemoteAddr());
+		}
 	}
 
 }

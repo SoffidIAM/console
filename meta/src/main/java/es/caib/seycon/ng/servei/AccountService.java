@@ -213,7 +213,7 @@ public abstract class AccountService {
 	 * @throws es.caib.seycon.ng.exception.InternalErrorException
 	 */
 	@Description("Removes a shared account")
-	@Operation ( grantees={roles.agent_update.class,roles.actor_delete.class},
+	@Operation ( grantees={roles.agent_update.class,roles.account_delete.class},
 			translated="removeAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void removeAccount(

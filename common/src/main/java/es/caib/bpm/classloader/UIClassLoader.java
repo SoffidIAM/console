@@ -25,10 +25,9 @@ import com.soffid.iam.api.ParentData;
 public class UIClassLoader extends ClassLoader 
 {
 	
-	private ClassLoader parentClassLoader = null;
-	public void setParentClassLoader (ClassLoader parentClassLoader)
+	public UIClassLoader clone (ClassLoader parentClassLoader)
 	{
-		this.parentClassLoader  = parentClassLoader;
+		return new UIClassLoader(processId, mapaClases, parentClassLoader);
 	}
 	
 	private ProtectionDomain protectionDomain;
@@ -66,12 +65,6 @@ public class UIClassLoader extends ClassLoader
 		{
 			return new ByteArrayInputStream ((byte[]) mapaClases.get(name));
 		}
-		if (parentClassLoader != null)
-		{
-			InputStream in = parentClassLoader.getResourceAsStream(name);
-			if (in != null)
-				return in;
-		}
 		return super.getResourceAsStream(name);
 	}
 
@@ -87,14 +80,6 @@ public class UIClassLoader extends ClassLoader
 			byte[] bytesClase = (byte[])mapaClases.get(newName);
 			return this.defineClass(name, bytesClase, 0, bytesClase.length, protectionDomain);
 			
-		}
-		if (parentClassLoader != null)
-		{
-			try {
-				return parentClassLoader.loadClass(name);
-			} catch (ClassNotFoundException e) {
-				// Use default class loader
-			}
 		}
 		return getParent().loadClass(name);
 	}

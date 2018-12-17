@@ -217,7 +217,7 @@ public class SearchDictionaryBuilder {
 		addJoin(sd, "acl.role.name", "acl.role.name", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "acl.group.name", "acl.group.name", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "acl.user.userName", "acl.user.userName", TypeEnumeration.STRING_TYPE);
-		addJoin(sd, "roles.name", "roles.name", TypeEnumeration.STRING_TYPE);
+		addJoin(sd, "roles.role.name", "roles.role.name", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "users.user.userName", "users.user.userName", TypeEnumeration.STRING_TYPE);
 		addAccountType(sd);
 	}

@@ -566,9 +566,7 @@ public class InputField2 extends Div
 			if (i > 0)
 			{
 				path = path.substring(0, i);
-				SecureInterpreter interp = new SecureInterpreter();
-				Object obj = ctx.getDataSource().getJXPathContext().getValue(path);
-				interp.set("object", obj);
+				SecureInterpreter interp = createInterpreter();
 				if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
 					this.setVisible(false);
 				else
@@ -844,23 +842,35 @@ public class InputField2 extends Div
 		i.set("serviceLocator", new com.soffid.iam.EJBLocator());
 		if (ownerObject != null)
 		{
+			i.set("object", ownerObject);
 			if (ownerObject instanceof User)
 				i.set("user", ownerObject);
 			if (ownerObject instanceof Usuari)
+			{
 				i.set("user", User.toUser((Usuari) ownerObject));
+				i.set("object", User.toUser((Usuari) ownerObject));
+			}
 			if (ownerObject instanceof Group)
 				i.set("group", ownerObject);
 			if (ownerObject instanceof Grup)
+			{
 				i.set("group", Group.toGroup((Grup) ownerObject) );
+				i.set("object", Group.toGroup((Grup) ownerObject) );
+			}
 			if (ownerObject instanceof Role)
 				i.set("role", ownerObject);
 			if (ownerObject instanceof Rol)
+			{
 				i.set("role", Role.toRole((Rol) ownerObject));
+				i.set("object", Role.toRole((Rol) ownerObject));
+			}
 			if (ownerObject instanceof Application)
 				i.set("application", ownerObject);
 			if (ownerObject instanceof Aplicacio)
+			{
 				i.set("application", Application.toApplication((Aplicacio) ownerObject));
-			i.set("object", ownerObject);
+				i.set("object", Application.toApplication((Aplicacio) ownerObject));
+			}
 		}
 		i.set("context", ownerContext);
 		return i;

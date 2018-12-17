@@ -16,6 +16,7 @@ import org.hibernate.dialect.DialectFactory;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.lock.LockingStrategy;
 import org.hibernate.exception.SQLExceptionConverter;
@@ -30,7 +31,12 @@ public class CustomDialect extends Dialect {
     Dialect proxyDialect;
     
     public static Class dialectClass = null; 
+    
+    boolean oracle = false;
+    boolean mysql = false;
+    boolean sqlServer = false;
 
+    
     public CustomDialect() {
         super();
         if (dialectClass != null)
@@ -62,11 +68,17 @@ public class CustomDialect extends Dialect {
 	        }
 	        if ("mysql".equals(type))  //$NON-NLS-1$
 	        {
+	        	mysql = true;
 	            proxyDialect = new MySQL5InnoDBDialect();
 	        } else if ("oracle".equals (type)) { //$NON-NLS-1$
+	        	oracle = true;
 	            proxyDialect = new Oracle10gDialect();
 	        } else if ("sqlserver".equals(type)) { //$NON-NLS-1$
+	        	sqlServer = true;
 	        	proxyDialect = new SQLServerDialect();
+	        } else if ("postgresql".equals (type)) { //$NON-NLS-1$
+	        	oracle = false;
+	            proxyDialect = new PostgreSQLDialect();
 	        } else {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
@@ -505,6 +517,18 @@ public class CustomDialect extends Dialect {
     public boolean supportsBindAsCallableArgument() {
         return proxyDialect.supportsBindAsCallableArgument();
     }
+
+	public boolean isOracle() {
+		return oracle;
+	}
+
+	public boolean isMysql() {
+		return mysql;
+	}
+
+	public boolean isSqlServer() {
+		return sqlServer;
+	}
     
     
 }

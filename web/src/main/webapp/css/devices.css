@@ -10,6 +10,7 @@ img, video, canvas { max-width: 100%;}
 
 #logo{ margin: 7px 10px 0px 5px; vertical-align: -45%; background: transparent; height: 25px; }
 .col_cen {margin-top: 7px;}
+.col_der {margin-top: 0px;}
 
 .startmenu:hover {background:  #70a3cc !important;}
 
@@ -19,7 +20,7 @@ img, video, canvas { max-width: 100%;}
 
 /****** MENU PRINCIPAL/PERFIL Y VENTANAS ******/
 .shadow-window{ box-shadow: 0px 1px 7px #888888; }
-.col_izq{width:auto; margin-right: 1em; }
+.col_izq{width:auto; margin-right: 1em; position: absolute;}
 .menu-display .tree{border:0px;}
 .menu-display div.tree-body td{padding:0;}
 .tree-body td .cell-inner{padding:5px 0px 5px 10px;}	

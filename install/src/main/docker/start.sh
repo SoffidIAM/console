@@ -45,6 +45,7 @@ function configure {
 		echo 'tomee.serialization.class.blacklist = *'
 		echo "dbUser=$MARIADB_USER"
 		echo "dbPassword=$MARIADB_PASS"
+		echo "dbPasswordCipher=PlainText"
 		echo "dbValidationQuery=select 1"
 		echo "dbDriverString=mysql"
 		echo "dbDriverUrl=jdbc\:mysql\://$MARIADB_HOST\:$MARIADB_PORT/$MARIADB_DB"

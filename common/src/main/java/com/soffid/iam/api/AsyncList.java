@@ -231,10 +231,10 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 			{
 				if (!done && !cancelled)
 					this.wait();
-				if (done)
-					return new LinkedList<E>(this);
-				else if (exceptionToThrow != null)
+				if (exceptionToThrow != null)
 					throw new ExecutionException(exceptionToThrow);
+				else if (done)
+					return new LinkedList<E>(this);
 				else
 					throw new CancellationException();
 			}

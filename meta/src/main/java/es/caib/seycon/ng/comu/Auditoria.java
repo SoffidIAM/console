@@ -150,4 +150,8 @@ public class Auditoria {
 	
 	@Nullable
 	public java.lang.String customObjectType;
+
+	@Nullable
+	public String sourceIp;
+
 }

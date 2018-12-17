@@ -14,10 +14,22 @@ zkAttributesearchbox.cleanup=function(_2){
 
 zkSearchbox={};
 zkSearchbox.init=function(ed) {
-	zk.listen(document.getElementById(ed.id+"!mode"), 
+	zk.listen(document.getElementById(ed.id+"!modeText"), 
 			"click", 
 			function () {
-		var req = {uuid: ed.id, cmd: "onChangeMode", data : []};
+		var req = {uuid: ed.id, cmd: "onChangeMode", data : [0]};
+		zkau.send (req, 5);
+	});
+	zk.listen(document.getElementById(ed.id+"!modeBasic"), 
+			"click", 
+			function () {
+		var req = {uuid: ed.id, cmd: "onChangeMode", data : [1]};
+		zkau.send (req, 5);
+	});
+	zk.listen(document.getElementById(ed.id+"!modeAdvanced"), 
+			"click", 
+			function () {
+		var req = {uuid: ed.id, cmd: "onChangeMode", data : [2]};
 		zkau.send (req, 5);
 	});
 	zk.listen(document.getElementById(ed.id+"!search"), 

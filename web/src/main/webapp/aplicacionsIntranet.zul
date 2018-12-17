@@ -1874,17 +1874,6 @@
 								</button>
 							</vbox>
 						</tabpanel>
-						<zscript>
-							void editorJS(contingut, quina_execucio) {
-								if (Executions.getCurrent().isSafari()) {
-									Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.Navegador")); 
-									return;
-								}
-								desktop.getPage("editorJS").setAttribute("contingutJS",contingut);
-								desktop.getPage("editorJS").setAttribute("procedenciaFrom",quina_execucio);
-								Events.postEvent ("onInicia",desktop.getPage("editorJS").getFellow("esquemaJS"),t_execucions);
-							}			
-						</zscript>
 						<tabpanel id="t_execucions">
 							<attribute name="onActualitza">
 								dadesjs = event.getData();
@@ -2061,7 +2050,6 @@
 	<include src="grupsllista.zul"/>
 	<include src="rolsllista.zul"/>
 	<include src="finestres/editorXML.zul"/>
-	<include src="finestres/editorJS.zul"/>
 	<include src="finestres/aplicaIntranet_autoritzacio.zul"/>
 	<include src="accounts/accountsList.zul"/>
 </frame>

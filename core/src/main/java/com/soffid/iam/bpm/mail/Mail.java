@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.mail.MessagingException;
@@ -251,8 +252,8 @@ public class Mail implements ActionHandler {
 					}
 					send(from, 
 							Collections.singleton(recipient), 
-							evaluate(subject, recipient.getPersonal(), fromDescription), 
-							evaluate (text, recipient.getPersonal(), fromDescription));
+							evaluate(subject, fromDescription, recipient.getPersonal()), 
+							evaluate (text, fromDescription, recipient.getPersonal()));
 				}
 			}
 		} finally {
@@ -264,10 +265,14 @@ public class Mail implements ActionHandler {
 	private InputStream getMailContent ()
 	{
 		Locale locale = MessageFactory.getLocale();
-		
+
 		InputStream in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"-custom.html"); //$NON-NLS-1$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"_"+locale.getLanguage()+"-custom.html"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (in == null)
+			in = getClass().getResourceAsStream("/es/caib/bpm/mail/"+template+"-custom.html"); //$NON-NLS-1$
 		if (in == null)
 			in = getClass().getResourceAsStream(template+"_"+locale.getLanguage()+"-template.html"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (in == null)
@@ -328,14 +333,21 @@ public class Mail implements ActionHandler {
 		VariableResolver variableResolver = JbpmExpressionEvaluator
 				.getUsedVariableResolver();
 		if (variableResolver != null) {
+			Properties prop = new Properties();
+			String externalURL = ConfigurationCache.getProperty("soffid.externalURL");
+			if (externalURL == null)
+				externalURL = ConfigurationCache.getProperty("AutoSSOURL");
+			prop.put("AutoSSOURL", externalURL);
 			variableResolver = new MailVariableResolver(
 					from, to,
-					System.getProperties(),
+					prop,
 					variableResolver);
 		}
-		return (String) JbpmExpressionEvaluator.evaluate(expression,
+		String s = (String) JbpmExpressionEvaluator.evaluate(expression,
 				executionContext, variableResolver,
 				JbpmExpressionEvaluator.getUsedFunctionMapper());
+		log.info("Result: "+s);
+		return s;
 	}
 
 	private void sendCustomMail() throws IOException,
@@ -389,8 +401,8 @@ public class Mail implements ActionHandler {
 					}
 					send(from, 
 							Collections.singleton(user), 
-							evaluate(subject, user.getPersonal(), fromDescription), 
-							evaluate (text, user.getPersonal(), fromDescription));
+							evaluate(subject, fromDescription, user.getPersonal()), 
+							evaluate (text, fromDescription, user.getPersonal()));
 				}
 			}
 			if (actors != null)
@@ -660,7 +672,7 @@ public class Mail implements ActionHandler {
 		else
 		{
 			UserData dada = ServiceLocator.instance().getUserService().findDataByUserAndCode(usuari.getUserName(), "EMAIL"); //$NON-NLS-1$
-			if (dada != null && dada.getValue() != null)
+			if (dada != null && dada.getValue() != null && ! dada.getValue().trim().isEmpty())
 			{
 				return new InternetAddress(dada.getValue(),
 						usuari.getFullName());

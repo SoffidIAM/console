@@ -663,6 +663,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		{
 			Object v = group.getAttributes().get(att.getMetadata().getName());
 			att.setObjectValue(v);
+			getGroupAttributeEntityDao().update(att);
 			keys.remove(att.getMetadata().getName());
 		}
 		List<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);

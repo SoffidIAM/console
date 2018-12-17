@@ -85,6 +85,7 @@ public class WorkflowInterceptor implements Filter {
 		}
 		if (request instanceof HttpServletRequest) 
 		{
+			
 			HttpSession sesion = ((HttpServletRequest) request).getSession();
 			try {
 				Principal principal = ((HttpServletRequest) request)
@@ -101,8 +102,11 @@ public class WorkflowInterceptor implements Filter {
 					}
 				}
 
-				((HttpServletResponse) response).addHeader("X-UA-Compatible",
-						"IE=11;IE=8");
+				HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+				httpServletResponse.addHeader("X-UA-Compatible", "IE=11;IE=8");
+				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
+				
+				
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				

@@ -58,6 +58,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.ProcessDefinitionProperty;
 import com.soffid.iam.bpm.model.ProcessDefinitionUserRole;
 import com.soffid.iam.bpm.model.UserInterface;
@@ -107,7 +108,7 @@ public class UserInterfaceBusiness {
 						Action action = (Action) it.next();
 						if (action.getName().equals(task.getName())
 										&& action.getActionDelegation() != null
-										&& "es.caib.bpm.mail.Mail".equals(action //$NON-NLS-1$
+										&& Mail.class.getName().equals(action //$NON-NLS-1$
 														.getActionDelegation()
 														.getClassName()))
 						{

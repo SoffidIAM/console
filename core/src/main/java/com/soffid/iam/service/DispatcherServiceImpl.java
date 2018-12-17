@@ -53,6 +53,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserTypeDispatcher;
 import com.soffid.iam.model.AccessControlEntity;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AgentDescriptorEntity;
 import com.soffid.iam.model.AttributeMappingEntity;
 import com.soffid.iam.model.DefaultAttributeMappingEntity;
@@ -122,13 +123,13 @@ public class DispatcherServiceImpl extends
 			}
 	
 			// Check user domain
-			if (dispatcher.getUsersDomain().isEmpty()) {
+			if (dispatcher.getUsersDomain() == null || dispatcher.getUsersDomain().isEmpty()) {
 				throw new IllegalArgumentException(
 						Messages.getString("DispatcherServiceImpl.UserDomainRequired")); //$NON-NLS-1$
 			}
 	
 			// Check password domain
-			if (dispatcher.getPasswordsDomain().isEmpty()) {
+			if (dispatcher.getPasswordsDomain() == null || dispatcher.getPasswordsDomain().isEmpty()) {
 				throw new IllegalArgumentException(
 						Messages.getString("DispatcherServiceImpl.PasswordDomainRequired")); //$NON-NLS-1$
 			}
@@ -262,16 +263,18 @@ public class DispatcherServiceImpl extends
 					entityOld.getSystemGroup());
 	
 			// Obtenim el nou entity
-			SystemEntity entity = getSystemEntityDao().systemToEntity(dispatcher);
-			entity.setTimeStamp(new Date());
-	
+			getSystemEntityDao().systemToEntity(dispatcher, entityOld, true);
+			entityOld.setTimeStamp(new Date());
+			
 			updateAutomaticTasks(dispatcher, false);
 	
-			updateTipusAndGrups(dispatcher, entity);
+			updateTipusAndGrups(dispatcher, entityOld);
 	
 			updateServers();
 	
-			return getSystemEntityDao().toSystem(entity);
+			getSystemEntityDao().update(entityOld);
+			
+			return getSystemEntityDao().toSystem(entityOld);
 		} finally {
 			getTaskEntityDao().finishVirtualSourceTransaction(t);
 		}
@@ -358,15 +361,15 @@ public class DispatcherServiceImpl extends
 			}
 			log.info("Updated " + l + " users");
 		}
-		if (tipusUsuariToGenerateAccounts != null
-				&& !tipusUsuariToGenerateAccounts.isEmpty())
-			if (dispatcher.getUrl() != null)
-			{
-				
-				String status = ConfigurationCache.getProperty("soffid.task.mode");
-				if (! "readonly".equals( status ) && ! "manual".equals( status ))
-					handlePorpagateUsersDispatcher(dispatcher.getName());
-			}
+//		if (tipusUsuariToGenerateAccounts != null
+//				&& !tipusUsuariToGenerateAccounts.isEmpty())
+//			if (dispatcher.getUrl() != null)
+//			{
+//				
+//				String status = ConfigurationCache.getProperty("soffid.task.mode");
+//				if (! "readonly".equals( status ) && ! "manual".equals( status ))
+//					handlePorpagateUsersDispatcher(dispatcher.getName());
+//			}
 	}
 
 	private void generateUpdateUser(String usuari, String dispatcher)
@@ -486,6 +489,10 @@ public class DispatcherServiceImpl extends
 		getAccessControlEntityDao()
 				.remove(dispatcherEntity.getAccessControls());
 
+		for (AccountMetadataEntity att: dispatcherEntity.getMetaData())
+		{
+			att.getData();
+		}
 		for (ObjectMappingEntity om : dispatcherEntity.getObjectMappings()) {
 			for (AttributeMappingEntity am : om.getAttributeMappings()) {
 				getAttributeMappingEntityDao().remove(am);

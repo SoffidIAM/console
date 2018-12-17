@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>2.3.3-SNAPSHOT</version>
+		<version>2.4.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>upload-components</artifactId>
 	<name>SEU component uploader</name>
@@ -129,9 +129,15 @@
 		    <version>2.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.openejb</groupId>
+			<groupId>org.apache.tomee</groupId>
 			<artifactId>openejb-jee</artifactId>
-			<version>4.7.4</version>
+			<version>7.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>tomee-catalina</artifactId>
+			<version>7.0.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -147,7 +153,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>dbtools</artifactId>
-			<version>1.16</version>
+			<version>1.17</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>

@@ -6,7 +6,7 @@
 <?component name="input_dada" macro-uri="comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <frame id="f_plugins" xmlns:h="http://www.w3.org/1999/xhtml" saveContent="true"
-	title="${c:l('plugins.Titol')}" width="99%">
+	title="${c:l('seu.plugins')}" width="99%">
 
 	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>
 	

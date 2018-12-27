@@ -447,7 +447,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
         if (transactionCode.equals(TaskHandler.UPDATE_ROLE)  
         		|| transactionCode.equals(TaskHandler.RECONCILE_ROLE)) //$NON-NLS-1$
-            result = result + " " + tasca.getRole(); //$NON-NLS-1$
+            result = result + " " + tasca.getRole() + tasca.getDb(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.CREATE_FOLDER)) //$NON-NLS-1$
             result = result + " " + tasca.getFolder(); //$NON-NLS-1$

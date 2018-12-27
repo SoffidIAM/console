@@ -202,19 +202,15 @@
 	</datanode>
 	
 	<datanode name="account">
-		<ejb-handler jndi="openejb:/local/soffid.ejb.es.caib.seycon.ng.servei.AccountService">
-			<insert-method method="createAccount2" returnBean="true" >  <!-- user:create -->
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="removeAccount">    
-				<parameter value="${instance}" />
-			</delete-method>
-			<update-method method="updateAccount2" returnBean="true"> <!-- user:update -->
-				<parameter value="${instance}" />
-			</update-method>
-		</ejb-handler>
-		
 		<script-handler>
+			<update-script>
+				as = es.caib.seycon.ng.EJBLocator.getAccountService();
+				as.updateAccount2(instance);
+			</update-script>
+			<delete-script>
+				as = es.caib.seycon.ng.EJBLocator.getAccountService();
+				as.removeAccount(instance);
+			</delete-script>
 			<insert-script>
 				usuari = parent.parent.parent.instance;
 				ds = es.caib.seycon.ng.EJBLocator.getDispatcherService();

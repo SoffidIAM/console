@@ -166,12 +166,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         getTaskEntityDao().createForce(tasque);
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-        tasque.setFolder(usuari.getUserName());
-        tasque.setFolderType("U"); //$NON-NLS-1$
-        getTaskEntityDao().createForce(tasque);
-        tasque = getTaskEntityDao().newTaskEntity();
-        tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
         tasque.setGroup(usuari.getPrimaryGroup().getName());
         getTaskEntityDao().createForce(tasque);
@@ -430,7 +424,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             Iterator<RoleAccountEntity> iterator = rolsUsuaris.iterator();
             while (iterator.hasNext()) {
                 RoleAccountEntity rolUsuari = iterator.next();
-                if (rolUsuari.getDomainType().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+                if (TipusDomini.GRUPS_USUARI.equals(rolUsuari.getDomainType())) {
                     String codiGrupValorDomini = rolUsuari.getGroup().getName();
                     // Mirem que no el tinga com a grup secundari
                     if (codiGrupValorDomini.compareTo(codiGrupPrimari) == 0

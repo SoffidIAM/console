@@ -2485,6 +2485,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	@Override
 	protected BpmUserProcess handleCreate(BpmUserProcess usuariWFProces)
 			throws Exception {
+		for (UserProcessEntity existing: getUserProcessEntityDao().findByUserName(usuariWFProces.getUserCode()))
+		{
+			if (existing.getProcessId().equals(usuariWFProces.getProcessId()))
+				return getUserProcessEntityDao().toBpmUserProcess(existing);
+		}
 		UserProcessEntity entity = getUserProcessEntityDao()
 				.bpmUserProcessToEntity(usuariWFProces);
 		getUserProcessEntityDao().create(entity);

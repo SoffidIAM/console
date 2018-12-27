@@ -340,7 +340,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	
 	@Override
     protected Account handleUpdateAccount2(com.soffid.iam.api.Account account) throws Exception {
-		Map<String, Object> attributes = new HashMap<String, Object>( account.getAttributes() );
+		Map<String, Object> attributes = account.getAttributes() == null ?
+				null :
+				new HashMap<String, Object>( account.getAttributes() );
 		Account acc = handleUpdateAccount(account);
 		if (attributes != null && ! attributes.isEmpty())
 		{

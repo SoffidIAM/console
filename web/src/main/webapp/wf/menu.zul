@@ -10,6 +10,7 @@
 
 	// Control d'accés del SEU
 	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
+	boolean canViewJob = Security.isUserInRole("schedule:query") || Security.isUserInRole("schedule:admin");
 	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
 	boolean canViewGrups =  AutoritzacionsUsuari.hasViewGrupsSEU();		
 	boolean canViewDadesAddicionals = AutoritzacionsUsuari.hasViewDadesAddicionalsSEU();		
@@ -88,7 +89,7 @@
 		    				<apptreecell langlabel="inbox.lblFiltroTareas2" pagina="wf/runningtasks.zul"/>
 		    			</treerow>
 		    		</treeitem>
-		    		<treeitem if="${admin}" open="false"> 
+		    		<treeitem if="${canViewJob}" open="false"> 
 		    			<treerow>
 		    				<apptreecell langlabel="main.lblAdminJobs" pagina="wf/jobadmin.zul"/>
 		    			</treerow>

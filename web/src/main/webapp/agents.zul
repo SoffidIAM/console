@@ -910,7 +910,9 @@
 							}
 							return r + "]";
 						}
-						return obj.toString();
+						String s = obj.toString();
+						if (s.length() > 150) s = s.substring(0, 145)+" ...";
+						return s;
 					}
 
 					void doLoadTest (Event event)
@@ -929,10 +931,11 @@
 						String o2 = g.getFellow("testRowTextbox2").getValue();
 						if (o2 == null || o2.trim().length() == 0)
 							o2 = "-";
-						Map map = svc.getSoffidObject(
+						com.soffid.iam.sync.engine.intf.GetObjectResults result = svc.getSoffidObject(
 								XPathUtils.getValue(g, "../../@codi"),
 								XPathUtils.getValue(g, "../@soffidObject"),
 								o1, o2);
+						map = result.getObject();
 						if (map == null)
 						{
 							es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
@@ -945,7 +948,7 @@
 						}
 						Events.postEvent("onStart", c, new Object[]{
 								o1,
-								map
+								result
 						});
 					}
 
@@ -959,10 +962,11 @@
 						String o2 = g.getFellow("testRowTextbox2").getValue();
 						if (o2 == null || o2.trim().length() == 0)
 							o2 = "-";
-						Map map = svc.getNativeObject(
+						com.soffid.iam.sync.engine.intf.GetObjectResults result = svc.getNativeObject(
 								XPathUtils.getValue(g, "../../@codi"),
 								XPathUtils.getValue(g, "../@soffidObject"),
 								o1, o2);
+						map = result.getObject();
 						if (map == null)
 						{
 							es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
@@ -975,7 +979,7 @@
 						}
 						Events.postEvent("onStart", c, new Object[]{
 								o1,
-								map
+								result
 						});
 					}
 
@@ -995,18 +999,13 @@
 						String o2 = g.getFellow("testRowTextbox2").getValue();
 						if (o2 == null || o2.trim().length() == 0)
 							o2 = "-";
-						Exception e = svc.testPropagateObject(
+						com.soffid.iam.sync.engine.intf.DebugTaskResults r = svc.testPropagateObject(
 								XPathUtils.getValue(g, "../@codi"),
 								XPathUtils.getValue(g, "@soffidObject"),
 								o1, o2);
-						if ( e != null)
-						{
-							throw e;
-						}
-						else
-						{
-							es.caib.zkib.zkiblaf.Missatgebox.confirmaOK("Success !!");
-						}
+						testWindow.getFellow("status").setValue(r.getStatus());
+						testWindow.getFellow("log").setValue(r.getLog());
+						testWindow.doHighlighted();
 					}
 						
 				]]>
@@ -2313,6 +2312,24 @@
 		</div>
 		
 	</window>
+
+	<window visible="false" width="80%" title="Test log" id="testWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div>
+			<label value="${c:l('job.status') }: "/>
+			<label id="status"/>
+		</div>
+		<textbox id="log" multiline="true" rows="20" width="100%" readonly="true"/>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					testWindow.setVisible(false);
+				</attribute>
+			</button>
+		</div>
+	</window>
+	
 	<include src="grupsllista.zul"/>
 	<include src="controlAcces.zul"/>
  	<include src="finestres/editor.zul"/>

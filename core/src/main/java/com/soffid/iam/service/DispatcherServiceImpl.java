@@ -82,7 +82,9 @@ import com.soffid.iam.model.UserTypeSystemEntity;
 import com.soffid.iam.service.RuleEvaluatorServiceImpl.InterpreterEnvironment;
 import com.soffid.iam.service.impl.AccountDiffReport;
 import com.soffid.iam.service.impl.RuleDryRunMethod;
+import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.sync.intf.ExtensibleObject;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
@@ -98,7 +100,7 @@ import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 
 /**
- * @see es.caib.seycon.ng.servei.DispatcherService
+ * @see es.caib.seycon.ng.servei.DispatcherServiceh
  */
 public class DispatcherServiceImpl extends
 		com.soffid.iam.service.DispatcherServiceBase 
@@ -1440,7 +1442,7 @@ public class DispatcherServiceImpl extends
 	}
 
 	@Override
-	protected Exception handleTestPropagateObject(String dispatcher,
+	protected DebugTaskResults handleTestPropagateObject(String dispatcher,
 			SoffidObjectType type, String object1, String object2)
 			throws Exception {
 		SystemEntity s = getSystemEntityDao().findByName(dispatcher);
@@ -1538,32 +1540,35 @@ public class DispatcherServiceImpl extends
 	}
 
 	@Override
-	protected Map<String, Object> handleGetNativeObject(String dispatcher, SoffidObjectType type, String object1,
+	protected GetObjectResults handleGetNativeObject(String dispatcher, SoffidObjectType type, String object1,
 			String object2) throws Exception {
 		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
 		
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
-		Map<String, Object> o = svc.getNativeObject(dispatcher, type, object1, object2);
+		GetObjectResults o = svc.getNativeObject(dispatcher, type, object1, object2);
 		Map<String,Object> r = new HashMap<String, Object>();
 
-		fill ("", "", r, o);
+		fill ("", "", r, o.getObject());
 		
-		return r;
+		o.setObject(r);
+		return o;
 	}
 
 	@Override
-	protected Map<String, Object> handleGetSoffidObject(String dispatcher, SoffidObjectType type, String object1,
+	protected GetObjectResults handleGetSoffidObject(String dispatcher, SoffidObjectType type, String object1,
 			String object2) throws Exception {
 		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
 		
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
-		Map<String, Object> o = svc.getSoffidObject(dispatcher, type, object1, object2);
+		GetObjectResults o = svc.getSoffidObject(dispatcher, type, object1, object2);
 		Map<String,Object> r = new HashMap<String, Object>();
-		fill ("", "", r, o);
+		fill ("", "", r, o.getObject());
 		
-		return r;
+		o.setObject(r);
+		
+		return o;
 	}
 
 	private void fill(String prefix, String suffix, Map<String, Object> r, Map<String, Object> o) {

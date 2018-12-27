@@ -95,10 +95,16 @@
 		String name = ds.getJXPathContext().getValue(path+"/@name");
 		String system = ds.getJXPathContext().getValue(path+"/@dispatcher");
 
-		Map map = svc.getNativeObject(
+		com.soffid.iam.sync.engine.intf.GetObjectResults result = svc.getNativeObject(
 				system,
 				es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT,
 				name, system);
+		Map map = result.getObject();
+		if (map == null)
+		{
+			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
+			return;
+		}
 		Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
 		for (String key: map.keySet())
 		{
@@ -106,7 +112,7 @@
 		}
 		Events.postEvent("onStart", c, new Object[]{
 				name,
-				map
+				result
 		});
 	}
 

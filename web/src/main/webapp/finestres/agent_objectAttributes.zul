@@ -25,24 +25,30 @@
 	void onStart(Event event) 
 	{
 		String objectName = event.getData()[0];
-		Map attributes = event.getData()[1];
+		com.soffid.iam.sync.engine.intf.GetObjectResults o = event.getData()[1];
 		objectAttributesWindow.doHighlighted();
 		
 		objectAttributesWindow.getFellow("detall_nom").setValue(objectName);
 		Grid grid = objectAttributesWindow.getFellow("attributeGrid");
 		grid.getRows().getChildren().clear();
 		boolean blue=true;
-		for (String key: attributes.keySet())
+		Map attributes = o.getObject();
+		List keys = new LinkedList(attributes.keySet());
+		Collections.sort(keys);
+		for (String key: keys)
 		{
 			Row row = new Row();
 			if (blue) row.setStyle("background-color: #d0d0ff;");
 			blue = ! blue;
 			row.appendChild(new Label(key));
-			Label l = new Label(attributes.get(key));
+			String v = attributes.get(key);
+			Label l = new Label(v);
 			l.setMultiline(true);
 			row.appendChild(l);
 			grid.getRows().appendChild(row);			
 		}
+		log.setValue( o.getLog() );
+		status.setValue(o.getStatus());
 		
 	}
 ]]>
@@ -64,15 +70,23 @@
 						</row>
 					</rows>
 				</grid>
-				<grid 
-					id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  fixedLayout="false"
-					style="max-heigth: 800px; overflow-y: auto">
-					<columns>
-						<column width="200px"/>
-						<column />
-					</columns>
-					<rows/>
-				</grid>
+				
+				<div style="max-height: 600px; overflow-y: auto">
+					<grid id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  fixedLayout="false">
+						<columns>
+							<column width="200px"/>
+							<column />
+						</columns>
+						<rows/>
+					</grid>
+				</div>
+
+				<div style="margin-top:16px; margin-bottom: 8px;">
+					<label value="${c:l('job.status') }: "/>
+					<label id="status"/>
+				</div>
+				
+				<textbox id="log" multiline="true" rows="3" readonly="true" width="100%"/>
 			</div>
 			<separator spacing="5px" />
 			<hbox style="margin-left:auto; margin-right:auto">

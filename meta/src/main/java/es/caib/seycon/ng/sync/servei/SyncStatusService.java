@@ -8,6 +8,8 @@ package es.caib.seycon.ng.sync.servei;
 import java.util.Map;
 
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.sync.engine.intf.DebugTaskResults;
+import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.SoffidObjectType;
@@ -101,7 +103,7 @@ public abstract class SyncStatusService {
 
 	// Testar un mapper
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public Exception testPropagateObject(String dispatcher, 
+	public DebugTaskResults testPropagateObject(String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
 	{
 		return null;
@@ -122,11 +124,11 @@ public abstract class SyncStatusService {
 		
 	}
 	
-	public Map<String,Object> getNativeObject (String dispatcher, 
+	public GetObjectResults getNativeObject (String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2)
 	{ return null; }
 
-	public Map<String,Object> getSoffidObject (String dispatcher, 
+	public GetObjectResults getSoffidObject (String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2)
 	{ return null; }
 }

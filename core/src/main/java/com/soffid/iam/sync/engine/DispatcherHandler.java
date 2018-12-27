@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.SoffidObjectType;
+import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.sync.intf.KerberosAgent;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -54,14 +55,16 @@ public abstract class DispatcherHandler {
     
     public abstract void processOBTask (TaskHandler task) throws InternalErrorException;
 
+    public abstract com.soffid.iam.sync.engine.intf.DebugTaskResults debugTask (TaskHandler task) throws InternalErrorException;
+
 	public abstract void doReconcile (ScheduledTask task, PrintWriter out);
 
 	public abstract void doAuthoritativeImport (ScheduledTask task, PrintWriter out);
 
-	public abstract Map<String, Object>  getSoffidObject(String systemName, SoffidObjectType type, String object1,
+	public abstract GetObjectResults  getSoffidObject(String systemName, SoffidObjectType type, String object1,
 			String object2) throws Exception;
 
-	public abstract Map<String, Object>  getNativeObject(String systemName, SoffidObjectType type, String object1,
+	public abstract GetObjectResults  getNativeObject(String systemName, SoffidObjectType type, String object1,
 			String object2) throws Exception;
 
 	/**

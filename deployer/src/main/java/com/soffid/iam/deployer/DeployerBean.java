@@ -93,6 +93,7 @@ public class DeployerBean implements DeployerService {
 	
 	@Resource
 	private SessionContext context;
+	private boolean exploded = false;
 
 	public DeployerBean() {
 		super();
@@ -100,7 +101,11 @@ public class DeployerBean implements DeployerService {
 
 	@PostConstruct
 	public void init() throws Exception {
-		log.info("Started deployer bean");
+		exploded  = "true".equals( System.getProperty("soffid.deploy.exploded"));
+		if (exploded)
+			log.info("Started deployer bean using exploded mode");
+		else
+			log.info("Started deployer bean");
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
 			public Void run() {
 				try {
@@ -182,16 +187,21 @@ public class DeployerBean implements DeployerService {
 			webUri.setTextContent(removeExtension(path));
 		}
 
+//		NodeList ejbmodules = (NodeList) xpath.evaluate("module/ejb", node, XPathConstants.NODESET);
+//		for (int i = 0; i < ejbmodules.getLength(); i++) {
+//			Node ejbmodule = ejbmodules.item(i);
+//			String path = ejbmodule.getTextContent();
+//			ejbmodule.setTextContent(removeExtension(path));
+//		}
+
 		for (String modulePath : coreModules) {
 			File moduleFile = new File(modulePath);
-			if (isEjbModule(moduleFile)) {
-				Element me = doc.createElement("module"); //$NON-NLS-1$
-				Element ejb = doc.createElement("ejb"); //$NON-NLS-1$
-				ejb.appendChild(doc.createTextNode(moduleFile.getName()));
-				me.appendChild(ejb);
-				node.appendChild(me);
-				log.info("Registering ejb module " + moduleFile.getName());
-			}
+			Element me = doc.createElement("module"); //$NON-NLS-1$
+			Element ejb = doc.createElement("ejb"); //$NON-NLS-1$
+			ejb.appendChild(doc.createTextNode(moduleFile.getName()));
+			me.appendChild(ejb);
+			node.appendChild(me);
+			log.info("Registering ejb module " + moduleFile.getName());
 		}
 
 		TransformerFactory transformerFactory = TransformerFactory
@@ -427,27 +437,53 @@ public class DeployerBean implements DeployerService {
 
 	protected void extractCoreAddon(String name, InputStream binaryStream)
 			throws Exception {
-		File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
-		log.info("Generating addon file " + coreFile);
-		FileOutputStream out = new FileOutputStream(coreFile);
-		byte b[] = new byte[4096];
-		int read;
-		while ((read = binaryStream.read(b)) > 0) {
-			out.write(b, 0, read);
-		}
-		out.close();
-		if (isEjbModule(coreFile)) {
-			coreModules.add(coreFile.getPath());
-		} else {
+		if (exploded && false)
+		{
 			File commonFile = new File(deployDir(), "lib/plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
-			InputStream in = new FileInputStream(coreFile);
-			out = new FileOutputStream(commonFile);
+			commonFile.getParentFile().mkdirs();
+			InputStream in = binaryStream;
+			FileOutputStream out = new FileOutputStream(commonFile);
+			int read;
+			byte b[] = new byte[4096];
 			while ((read = in.read(b)) > 0) {
 				out.write(b, 0, read);
 			}
 			in.close();
 			out.close();
-			coreFile.delete();
+			if ( isEjbModule(commonFile))
+			{
+				File coreFile = new File(deployDir(), "plugin-" + name ); //$NON-NLS-1$ //$NON-NLS-2$
+				log.info("Generating addon file " + coreFile);
+				coreFile.mkdirs();
+				uncompress(new FileInputStream(commonFile), coreFile);
+				coreModules.add(coreFile.getPath());
+				commonFile.delete();
+			}
+		}
+		else
+		{
+			File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.info("Generating addon file " + coreFile);
+			FileOutputStream out = new FileOutputStream(coreFile);
+			byte b[] = new byte[4096];
+			int read;
+			while ((read = binaryStream.read(b)) > 0) {
+				out.write(b, 0, read);
+			}
+			out.close();
+			if (isEjbModule(coreFile)) {
+				coreModules.add(coreFile.getPath());
+			} else {
+				File commonFile = new File(deployDir(), "lib/plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
+				InputStream in = new FileInputStream(coreFile);
+				out = new FileOutputStream(commonFile);
+				while ((read = in.read(b)) > 0) {
+					out.write(b, 0, read);
+				}
+				in.close();
+				out.close();
+				coreFile.delete();
+			}
 		}
 	}
 
@@ -527,14 +563,38 @@ public class DeployerBean implements DeployerService {
 					extractWar(zin, f);
 				else {
 					f.getParentFile().mkdirs();
-					extractFile(zin, f);
+					if (false && exploded && ! entry.getName().startsWith("lib") && entry.getName().endsWith(".jar"))
+					{
+						log.info("Exploding "+entry.getName());
+						f = new File ( removeExtension( f.getPath() ) );
+						uncompress (zin, f);
+					}
+					else
+					{
+						log.info("Extracting "+entry.getName());
+						extractFile(zin, f);
+					}
 				}
 			}
 		}
 	}
 
+	private void uncompress(InputStream binaryStream, File dir) throws FileNotFoundException, IOException {
+		ZipInputStream zin2 = new ZipInputStream(binaryStream);
+		ZipEntry entry;
+		while ((entry = zin2.getNextEntry()) != null) {
+			File f = new File(dir, entry.getName());
+			if (entry.isDirectory()) {
+				f.mkdirs();
+			} else {
+				f.getParentFile().mkdirs();
+				extractFile(zin2, f);
+			}
+		}
+	}
+
 	private String removeExtension (String warFile) {
-		if (warFile.toUpperCase().endsWith(".WAR"))
+		if (warFile.toUpperCase().endsWith(".WAR") || warFile.toUpperCase().endsWith(".JAR"))
 		{
 			int i = warFile.lastIndexOf('.');
 			if ( i >= 0)
@@ -578,10 +638,23 @@ public class DeployerBean implements DeployerService {
 			if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
-				f.getParentFile().mkdirs();
-				extractFile(zin, f);
+				if ( exploded && canBeExploded(entry.getName()))
+				{
+					uncompress(zin, new File (warFile, "WEB-INF/classes"));
+				}
+				else
+				{
+					f.getParentFile().mkdirs();
+					extractFile(zin, f);
+				}
 			}
 		}
+	}
+
+	private boolean canBeExploded(String name) {
+		return name.startsWith("WEB-INF/lib") && 
+				name.toLowerCase().endsWith(".jar") && 
+				(name.contains("iam-common") || name.contains("web-common") || name.contains("plugin"));
 	}
 
 	private File tmpDir() {

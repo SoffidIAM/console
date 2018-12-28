@@ -4,10 +4,6 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<style src="~./styles/estil.css"/>
-	<style src="/css/localSEU.css"/>
-	<style src="/css/devices.css"/>
-	
 	<datamodel id="model" rootNode="permisosUsuaris" src="finestres/descriptorPermisosRols.xml"/>
 	
 	<zscript>

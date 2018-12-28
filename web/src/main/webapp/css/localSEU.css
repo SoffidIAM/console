@@ -274,7 +274,12 @@ tr.seld td.UNKNOWN {
 	margin-top: 35px;
 }
 
+.col_der {
+	padding-top: 5px;
+}
+
 .col_cen {
+	padding-top: 5px;
 	text-align:center;
 	vertical-align:middle;
 	margin-left: 140px;

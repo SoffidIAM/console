@@ -17,8 +17,6 @@
 	</style>
 	<frame id="p_rules" saveContent="true"
 		title="${c:l('rules.lblTitle')}" width="99%" >
-		<style src="~./styles/estil.css" />
-		<style src="/css/localSEU.css" />
 		<style>
 			span.etiqueta {white-space:nowrap !important;}
 			.dataListcelldestacada div { background-color: #FF0000; }

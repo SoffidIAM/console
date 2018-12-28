@@ -2,8 +2,6 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="SOFFID IAM" ?>
 <vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" use="es.caib.seycon.ng.web.ConfiguraSEU" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-	<style src="~./styles/estil.css"/>
-	<style src="/css/localSEU.css"/>
 	<application autoReload="true" initialPage="../wf/inbox.zul" logoutPage="/logout/?logoutTo=public" mainWindowTitle="Soffid IAM" menu="//menu/menu" width="100%"/>
 	<image src="../img/waitpacman.gif" style="display:none;visibility:hidden;"/>
 	<include src="../wf/task/sign.zul"/>

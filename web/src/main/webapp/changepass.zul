@@ -5,10 +5,6 @@
 
 <!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul -->
 
-	<style src="~./styles/estil.css" />
-	<style src="/css/localSEU.css" />
-	<style src="/css/devices.css"/>
-
 	<zscript>
 		<![CDATA[
 			String usuari = com.soffid.iam.utils.Security.getCurrentAccount();

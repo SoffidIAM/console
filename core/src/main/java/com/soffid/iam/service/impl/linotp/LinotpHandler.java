@@ -13,6 +13,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Challenge;
@@ -116,16 +119,15 @@ public class LinotpHandler implements OTPHandler {
 			System.out.println(response.getHeaderString("Content-Type"));
 			System.out.println(response.getStatus());
 			System.out.println(response.getStatusInfo().getReasonPhrase());
-			JsonObject result = Json.createReader((InputStream) response.getEntity(  ))
-				.readObject();
-			JsonObject r;
-			if ( (r = result.getJsonObject("result")) != null)
+			JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
+			JSONObject r;
+			if ( (r = result.optJSONObject("result")) != null)
 			{
 				if (r.getBoolean("status")) {
-					JsonArray data = r.getJsonObject("value").getJsonArray("data");
-					for (int i = 0; i< data.size(); i++)
+					JSONArray data = r.getJSONObject("value").getJSONArray("data");
+					for (int i = 0; i< data.length(); i++)
 					{
-						JsonObject token = data.getJsonObject(i);
+						JSONObject token = data.optJSONObject(i);
 						if (token != null && token.getBoolean("LinOtp.Isactive"))
 						{
 							challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));

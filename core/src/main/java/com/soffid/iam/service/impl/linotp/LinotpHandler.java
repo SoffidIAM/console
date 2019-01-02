@@ -3,9 +3,6 @@ package com.soffid.iam.service.impl.linotp;
 import java.io.InputStream;
 import java.util.Random;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -14,6 +11,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -164,12 +162,16 @@ public class LinotpHandler implements OTPHandler {
 			System.out.println(response.getHeaderString("Content-Type"));
 			System.out.println(response.getStatus());
 			System.out.println(response.getStatusInfo().getReasonPhrase());
-			JsonObject result = Json.createReader((InputStream) response.getEntity(  ))
-				.readObject();
-			JsonObject r;
-			if ( (r = result.getJsonObject("result")) != null)
+			JSONObject result;
+			try {
+				result = new JSONObject( response.readEntity(String.class));
+			} catch (JSONException e) {
+				throw new InternalErrorException("Error decoding LinOTP response", e);
+			}
+			JSONObject r;
+			if ( (r = result.optJSONObject("result")) != null)
 			{
-				if (r.getBoolean("status") && r.getBoolean("value")) {
+				if (r.optBoolean("status") && r.optBoolean("value")) {
 					return true;
 				}
 			}

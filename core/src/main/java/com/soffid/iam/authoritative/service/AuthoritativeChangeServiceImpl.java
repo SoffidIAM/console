@@ -252,9 +252,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detecteAttributeChange (AuthoritativeChange change) throws InternalErrorException
 	{
+		log.info("Testing attributes change");
 		if (change.getAttributes() != null)
 		{
 			for (String attribute : change.getAttributes().keySet()) {
+				log.info("Testing attributes change for  " + attribute );
                 Object value = change.getAttributes().get(attribute);
                 if (value != null && value instanceof Date) {
                     Calendar c = Calendar.getInstance();
@@ -262,7 +264,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                     value = c;
                 }
                 UserData dada = getUserService().findDataByUserAndCode(change.getUser().getUserName(), attribute);
-                if (dada == null && value != null) return true; else if (value == null && dada != null) return true; else if (value != null && value instanceof byte[]) {
+                if (dada == null && value != null) return true; 
+                else if (value == null && dada != null) return true; 
+                else if (value != null && value instanceof byte[]) {
                     if (((byte[]) value).equals(dada.getBlobDataValue())) return true;
                 } else if (value != null && value instanceof Calendar) {
                     if (!((Calendar) value).equals(dada.getDateValue())) return true;
@@ -340,24 +344,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private void applyChange (AuthoritativeChange change) throws SecurityException, InternalErrorException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
 	{
-		Security.nestedLogin(change.getSourceSystem(), 
-			new String [] { 
-				Security.AUTO_USER_CREATE+Security.AUTO_ALL,
-				Security.AUTO_USER_QUERY+Security.AUTO_ALL,
-				Security.AUTO_USER_UPDATE+Security.AUTO_ALL,
-				Security.AUTO_GROUP_CREATE+Security.AUTO_ALL,
-				Security.AUTO_GROUP_QUERY+Security.AUTO_ALL,
-				Security.AUTO_GROUP_UPDATE+Security.AUTO_ALL,
-				Security.AUTO_USER_GROUP_CREATE+Security.AUTO_ALL,
-				Security.AUTO_USER_GROUP_DELETE+Security.AUTO_ALL,
-				Security.AUTO_USER_ROLE_CREATE+Security.AUTO_ALL,
-				Security.AUTO_USER_ROLE_DELETE+Security.AUTO_ALL,
-				Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
-				Security.AUTO_METADATA_CREATE+Security.AUTO_ALL,
-				Security.AUTO_METADATA_QUERY+Security.AUTO_ALL,
-				Security.AUTO_METADATA_UPDATE+Security.AUTO_ALL,
-				Security.AUTO_USER_METADATA_UPDATE+Security.AUTO_ALL
-			});
+		Security.nestedLogin(change.getSourceSystem(), Security.ALL_PERMISSIONS);
 		try {
 			ProcessTracker tracker = new ProcessTracker();
 			tracker.change = change;
@@ -501,6 +488,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @throws InternalErrorException 
 	 */
 	private void applyAttributesChange(User user, ProcessTracker tracker) throws InternalErrorException {
+		log.info("Applying attributes change");
 		AuthoritativeChange change = tracker.change;
 		
 		Map<String, Object> attributes = getUserService().findUserAttributes(user.getUserName());
@@ -524,6 +512,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
             Object value = change.getAttributes().get(attribute);
             attributes.put(attribute, value);
 		}
+		getUserService().updateUserAttributes(user.getUserName(), attributes);
 	}
 	
 	private AuthoritativeChange getCurrentAttributes (String user) throws InternalErrorException

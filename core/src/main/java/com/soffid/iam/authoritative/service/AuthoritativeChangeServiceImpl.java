@@ -252,11 +252,9 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 */
 	private boolean detecteAttributeChange (AuthoritativeChange change) throws InternalErrorException
 	{
-		log.info("Testing attributes change");
 		if (change.getAttributes() != null)
 		{
 			for (String attribute : change.getAttributes().keySet()) {
-				log.info("Testing attributes change for  " + attribute );
                 Object value = change.getAttributes().get(attribute);
                 if (value != null && value instanceof Date) {
                     Calendar c = Calendar.getInstance();
@@ -488,7 +486,6 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @throws InternalErrorException 
 	 */
 	private void applyAttributesChange(User user, ProcessTracker tracker) throws InternalErrorException {
-		log.info("Applying attributes change");
 		AuthoritativeChange change = tracker.change;
 		
 		Map<String, Object> attributes = getUserService().findUserAttributes(user.getUserName());

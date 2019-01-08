@@ -20,6 +20,7 @@ package org.zkoss.zk.ui.impl;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -513,9 +514,10 @@ import org.zkoss.zk.ui.util.DeferredValue;
 				//after called, _moved is cleared (add to _attached if necessary)
 
 			//1b. remove reduntant
-			removeRedundant(_invalidated);
-			removeRedundant(_attached);
-			removeCrossRedundant();
+			removeRedundant();
+//			removeRedundant(_invalidated);
+//			removeRedundant(_attached);
+//			removeCrossRedundant();
 
 			//1c. process Cropper
 			croppingInfos = doCrop();
@@ -780,7 +782,85 @@ import org.zkoss.zk.ui.util.DeferredValue;
 			}
 		}
 	}
-	
+
+	/** Removes redundant components in _invalidated, _smartUpdated and _attached.
+	 */
+	private void removeRedundant() {
+		int initsz = (_invalidated.size() + _attached.size()) / 2 + 30;
+		final Set<Component> ins = new HashSet<Component>(initsz), //one of ancestor in _invalidated or _attached
+				outs = new HashSet<Component>(initsz); //none of ancestor in _invalidated nor _attached
+		final List<Component> ancs = new ArrayList<Component>(50);
+		//process _invalidated
+		for (Iterator<Component> it = _invalidated.iterator(); it.hasNext();) {
+			Component p = it.next();
+			if (_attached.contains(p)) { //attached has higher priority
+				it.remove();
+				continue;
+			}
+			boolean removed = false;
+			while ((p = p.getParent()) != null) { //don't check p in _invalidated
+				if (outs.contains(p)) //checked
+					break;
+				if (ins.contains(p) || _invalidated.contains(p) || _attached.contains(p)) {
+					it.remove();
+					removed = true;
+					break;
+				}
+				ancs.add(p);
+			}
+			if (removed)
+				ins.addAll(ancs);
+			else
+				outs.addAll(ancs);
+			ancs.clear();
+		}
+
+		//process _attached
+		for (Iterator<Component> it = _attached.iterator(); it.hasNext();) {
+			Component p = it.next();
+			boolean removed = false;
+			while ((p = p.getParent()) != null) { //don't check p in _attached
+				if (outs.contains(p)) //checked
+					break;
+				if (ins.contains(p) || _invalidated.contains(p) || _attached.contains(p)) {
+					it.remove();
+					removed = true;
+					break;
+				}
+				ancs.add(p);
+			}
+			if (removed)
+				ins.addAll(ancs);
+			else
+				outs.addAll(ancs);
+			ancs.clear();
+		}
+
+		//process _smartUpdated
+		for (Iterator<Component> it = _smartUpdated.keySet().iterator(); it.hasNext();) {
+			Component p = it.next();
+			boolean removed = false, first = true;
+			for (; p != null; p = p.getParent()) { //check p in _smartUpdated
+				if (outs.contains(p)) //checked
+					break;
+				if (ins.contains(p) || _invalidated.contains(p) || _attached.contains(p)) {
+					it.remove();
+					removed = true;
+					break;
+				}
+				if (first)
+					first = false; //No need to add 1st p
+				else
+					ancs.add(p);
+			}
+			if (removed)
+				ins.addAll(ancs);
+			else
+				outs.addAll(ancs);
+			ancs.clear();
+		}
+	}
+
 	/** Removes redundant components (i.e., an descendant of another).
 	 */
 	private static void removeRedundant(Set comps) {

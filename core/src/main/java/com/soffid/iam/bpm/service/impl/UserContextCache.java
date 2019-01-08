@@ -12,7 +12,6 @@ public class UserContextCache {
 	}
 
 	Date date;
-	String roles [];
 	String messages [];
 	File tempFile;
 	public File getTempFile() {
@@ -48,11 +47,4 @@ public class UserContextCache {
 	public void setExpirationDate(Date date) {
 		this.date = date;
 	}
-	public String[] getRoles() {
-		return roles;
-	}
-	public void setRoles(String[] roles) {
-		this.roles = roles;
-	}
-
 }

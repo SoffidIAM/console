@@ -17,7 +17,7 @@ public class EventThreadCleanup extends TomeeThreadCleanup {
 	@Override
 	public void cleanup(Component comp, Event evt, List errs) throws Exception {
 		super.cleanup(comp, evt, errs);
-		if (Security.getPrincipal() != null)
+		if (Security.getSoffidPrincipal() != null)
 			Security.nestedLogoff();
 		MessageFactory.setThreadLocale(null);
 		Security.setClientIp(null);

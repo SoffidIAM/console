@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AutoritzacioPUEUsuariEntity.class,
 	es.caib.seycon.ng.model.IconaEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
+	DispatcherService.class,
+	AplicacioService.class,
 	GrupEntity.class, RolEntity.class,
 	AccountService.class,
 	EntryPointAccountEntity.class,

@@ -608,6 +608,15 @@ public abstract class UsuariService {
 		return null;
 	}
 
+	@Operation(translated = "getUserGroupsHierarchy")
+	@Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRED, isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED, rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
+	public java.util.Collection<es.caib.seycon.ng.comu.Grup> getUserGroupsHierarchy(
+			long userId, String holderGroup)
+			throws es.caib.seycon.ng.exception.InternalErrorException,
+			es.caib.seycon.ng.exception.UnknownUserException {
+		return null;
+	}
+
 	@Operation(translated = "getUserRoles")
 	@Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRED, isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED, rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> getUserRoles(

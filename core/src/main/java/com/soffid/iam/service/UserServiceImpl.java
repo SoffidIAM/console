@@ -2631,51 +2631,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (entity == null)
 			throw new UnknownUserException(Long.toString(userId));
 
-		// Recuperar rols explicits de l'usuari
-		List<RoleAccountEntity> originalGrants = getRoleAccountEntityDao()
-				.findByUserName(entity.getUserName());
-		List<RoleGrant> rols = getRoleAccountEntityDao().toRoleGrantList(
-				originalGrants);
-
-		// Recuprear rols implicits dels rols
-		if (!explicit) {
-			for (RoleAccountEntity rau : originalGrants) {
-				populateRolRoles(rau.getRole(), rols);
-			}
-			populateGroupRoles(entity.getPrimaryGroup(), rols);
-			for (Iterator<UserGroupEntity> it = entity.getSecondaryGroups()
-					.iterator(); it.hasNext();) {
-				UserGroupEntity ug = it.next();
-				populateGroupRoles(ug.getGroup(), rols);
-			}
-		}
-
-		return rols;
-
-	}
-
-	private void populateGroupRoles(GroupEntity grup, List<RoleGrant> rols) {
-		RoleGroupEntityDao dao = getRoleGroupEntityDao();
-		for (Iterator<RoleGroupEntity> it = grup.getGrantedRoles()
-				.iterator(); it.hasNext();) {
-			RoleGroupEntity rg = it.next();
-			rols.add(dao.toRoleGrant(rg));
-			populateRolRoles(rg.getGrantedRole(), rols);
+		if (!explicit)
+			return getApplicationService().findEffectiveRoleGrantByUser(userId);
+		else
+		{
+			// Recuperar rols explicits de l'usuari
+			List<RoleAccountEntity> originalGrants = getRoleAccountEntityDao()
+					.findByUserName(entity.getUserName());
+			List<RoleGrant> rols = getRoleAccountEntityDao().toRoleGrantList(
+					originalGrants);
+			return rols;
 		}
 	}
 
-	private void populateRolRoles(RoleEntity rol, List<RoleGrant> rols) {
-		RoleDependencyEntityDao dao = getRoleDependencyEntityDao();
-		for (Iterator<RoleDependencyEntity> it = rol.getContainedRoles()
-				.iterator(); it.hasNext();) {
-			RoleDependencyEntity rarEntity = it.next();
-			RoleGrant rg = dao.toRoleGrant(rarEntity);
-			rols.add(rg);
-			populateRolRoles(rarEntity.getContained(), rols);
-		}
-	}
-
-	@Override
 	protected Collection<RoleGrant> handleGetUserRoles(long userId)
 			throws Exception {
 		return getUserRoles(userId, false);
@@ -3320,5 +3288,46 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return null;
 	}
 
+	@Override
+	public Collection<Group> handleGetUserGroupsHierarchy(long userId, String holderGroup)
+			throws InternalErrorException, InternalErrorException, UnknownUserException {
+		UserEntityDao dao = getUserEntityDao();
+		UserEntity entity = dao.load(userId);
+		if (entity == null)
+			throw new UnknownUserException(Long.toString(userId));
+		GroupEntityDao grupDao = getGroupEntityDao();
+		LinkedList<GroupEntity> grups = new LinkedList<GroupEntity>();
+		HashMap<String, Group> result = new HashMap<String, Group>();
+
+		grups.add(entity.getPrimaryGroup());
+		for (Iterator<UserGroupEntity> it = entity.getSecondaryGroups()
+				.iterator(); it.hasNext();) {
+			UserGroupEntity uge = it.next();
+			GroupEntity g = uge.getGroup();
+			if ( g.getName().equals(holderGroup) || ! isHolderGroup(g))
+				grups.add(g);
+		}
+
+		while (!grups.isEmpty()) {
+			GroupEntity head = grups.getFirst();
+			if (result.get(head.getName()) == null) {
+				result.put(head.getName(), grupDao.toGroup(head));
+				if (head.getParent() != null)
+					grups.add(head.getParent());
+			}
+			grups.removeFirst();
+		}
+		LinkedList<Group> grupsList = new LinkedList<Group>();
+		grupsList.addAll(result.values());
+		return grupsList;
+	}
+	
+	boolean isHolderGroup (GroupEntity group)
+	{
+		if (group.getUnitType() != null && group.getUnitType().isRoleHolder())
+			return true;
+		else
+			return false;
+	}
 
 }

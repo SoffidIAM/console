@@ -23,11 +23,11 @@ import org.apache.commons.collections.map.LRUMap;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.TenantServiceImpl;
-import com.soffid.iam.tomcat.SoffidPrincipal;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -316,21 +316,48 @@ public class Security {
         return s;
     }
 
-    private static String[] getPrincipalRoles (GenericPrincipal p)
+    public static String[] getPrincipalRoles (GenericPrincipal p)
     {
     	try {
     		return p.getRoles();
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			return new String[0];
+		}
+    }
+    
+    public static String[] getPrincipalSoffidRoles (GenericPrincipal p)
+    {
+    	try {
+    		return ((SoffidPrincipal) p).getSoffidRoles();
+		} catch (Throwable e) {
+			return new String[0];
+		}
+    }
+    
+    public static String[] getPrincipalGroups (GenericPrincipal p)
+    {
+    	try {
+    		return ((SoffidPrincipal) p).getGroups();
+		} catch (Throwable e) {
 			return new String[0];
 		}
     }
     
 
+    public static String[] getPrincipalGroupsAndRoles (GenericPrincipal p)
+    {
+    	try {
+    		return ((SoffidPrincipal) p).getGroupsAndRoles();
+		} catch (Throwable e) {
+			return new String[0];
+		}
+    }
+    
     public static boolean isUserInRole(String role) {
         if (onSyncServer)
             return true;
 
-        GenericPrincipal principal = getPrincipal ();
+        GenericPrincipal principal = getSoffidPrincipal ();
 
         if (principal == null)
         	return false;
@@ -361,15 +388,18 @@ public class Security {
     }
 
     public static List<String> getAuthorizations() {
-    	GenericPrincipal principal = getPrincipal();
+    	GenericPrincipal principal = getSoffidPrincipal();
     	if (principal == null)
     		return Collections.emptyList();
     	else
     		return Arrays.asList(principal.getRoles());
     }
 
-
     public static GenericPrincipal getPrincipal() {
+    	return getSoffidPrincipal();
+    }
+
+    public static SoffidPrincipal getSoffidPrincipal() {
         if (!getIdentities().isEmpty()) {
             return getIdentities().peek();
         } else if (onSyncServer) {
@@ -384,11 +414,10 @@ public class Security {
                 }
             }
             return new SoffidPrincipal(Security.getMasterTenantName()+"\\"+host, 
-            		host, 
-            		Collections.singletonList(AUTO_AUTHORIZATION_ALL) );
+            		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null );
         } else {
         	try {
-        		return TomeePrincipalRetriever.getPrincipal ();
+        		return (SoffidPrincipal) TomeePrincipalRetriever.getPrincipal ();
         	} catch (Throwable th) {
         		return null;
         	}
@@ -414,8 +443,11 @@ public class Security {
     	try {
     		if (getTenantService() == null) // For proxy servers
     		{
-		        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
+		        p = new SoffidPrincipal(tenant+"\\"+user, Arrays.asList(roles), null, null);
     		} else {
+    			
+    			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
+    			
 				Long tenantId = getTenantId(tenant);
 				if ( tenantId == null)
 					throw new RuntimeException("Invalid tenant: "+tenant);
@@ -438,7 +470,7 @@ public class Security {
 							auths2.add(a.getCodi()+Security.AUTO_ALL);
 						}
 					}
-			        p = new SoffidPrincipal(tenant+"\\"+user, "*", auths2);
+			        p = new SoffidPrincipal(tenant+"\\"+user, auths2, currentPrincipal);
 				}
 				else
 				{
@@ -450,7 +482,7 @@ public class Security {
 								throw new RuntimeException("Cannot elevate permission "+role);
 						}
 					}
-			        p = new SoffidPrincipal(tenant+"\\"+user, "*", Arrays.asList(roles));
+			        p = new SoffidPrincipal(tenant+"\\"+user, Arrays.asList(roles), currentPrincipal);
 				}
     		}
 		} catch (InternalErrorException e) {
@@ -495,7 +527,7 @@ public class Security {
 
 
     public static void nestedLogin( String roles[])  {
-        nestedLogin (getPrincipal().getName(), roles);
+        nestedLogin (getSoffidPrincipal().getName(), roles);
     }
 
     public static void clearNestedLogins() {
@@ -521,7 +553,7 @@ public class Security {
 
     public static String getCurrentAccount ()
     {
-    	Principal p = getPrincipal();
+    	Principal p = getSoffidPrincipal();
     	if (p == null)
     		return null;
     	else
@@ -550,7 +582,7 @@ public class Security {
     
     public static String getCurrentTenantName () throws InternalErrorException
     {
-    	GenericPrincipal p = getPrincipal();
+    	GenericPrincipal p = getSoffidPrincipal();
     	if (p != null)
     	{
     		int i = p.getName().indexOf('\\');
@@ -578,7 +610,7 @@ public class Security {
     		return null;
     	else
     	{
-    		p = getPrincipal();
+    		p = getSoffidPrincipal();
     	}
     	
 		if (p == null)

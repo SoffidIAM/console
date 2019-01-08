@@ -1,20 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
-		<script>
-		updateUsername = function  ()
+	<script><![CDATA[
+	    var useHolderGroup = true;
+		function updateUsername ()
+		{
+			document.getElementById("j_username").value = '';
+			var tenant = document.getElementById("j_tenant").value;
+			var account = document.getElementById("j_account").value;
+			zkau.send ({uuid:'hgh',cmd:'onSelectUser', data:[tenant, account]}); 
+		}
+		
+		function updateAccountName()
 		{
 			var tenant = document.getElementById("j_tenant").value;
 			var account = document.getElementById("j_account").value;
+			if (useHolderGroup) {
+				option = document.getElementById('j_group').value;
+				if (option.length == 0)
+				{
+					document.getElementById("j_username").value = '';
+					document.getElementById('loginButton').style.display="none";
+					return;
+				}
+				account = option+"\\"+account;
+				document.getElementById('loginButton').style.display="";
+			}
 			if (tenant == null || tenant.length == 0)
 			{
 				document.getElementById("j_username").value = account;
 			} else {
 				document.getElementById("j_username").value = tenant + "\\" + account;
 			}
-			
 		}
-		</script>
+		
+		function displayHolderGroup(groups) {
+			document.getElementById('holderGroupDiv').style.display="";
+			var selector = document.getElementById('j_group');
+			while (selector.firstElementChild != null)
+				selector.firstElementChild.remove();
+			var option = document.createElement("OPTION");
+			option.setAttribute("value", '');
+			option.appendChild (document.createTextNode("- Select one -"));
+			selector.appendChild(option);
+			for (i = 0; i < groups.length; i++)
+			{
+				option = document.createElement("OPTION");
+				option.setAttribute("value", groups[i].name);
+				option.appendChild (document.createTextNode(groups[i].description+" - "+groups[i].name));
+				selector.appendChild(option);
+			}
+			selector.size = groups.length + 1;
+			document.getElementById('loginButton').style.display="none";
+			selector.focus();
+			useHolderGroup = true;
+			updateAccountName();
+		}
+
+		function hideHolderGroup() {
+			useHolderGroup = false;
+			document.getElementById('holderGroupDiv').style.display="none";
+			document.getElementById('loginButton').style.display="";
+			updateAccountName();
+		}
+	]]></script>
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
 	<style src="/css/devices.css"/>
@@ -79,14 +128,21 @@
 				<p>
 				
 					<div class="inputlogin">${c:l('login.lblUser')} :
-					<input name="j_account" id="j_account" type="text" autocomplete="off" autofocus onChange="updateUsername ()" /></div>
+					<input name="j_account" id="j_account" type="text" autocomplete="off" autofocus onChange="updateUsername ()" style="width: 200px"/></div>
 				</p>
+				<p />
+					<div id="holderGroupDiv" style="display:none" class="inputlogin">${c:l('accounts.group')} :
+						<select name="j_group" style="width: 200px; overflow: hidden; vertical-align: top"  id="j_group" onchange="updateAccountName()">
+							<option value="">- Select one -</option>
+						</select>
+					</div>
+				<p/>
 				<p>
 					<div class="inputlogin">${c:l('login.lblPassword')} :
-					<input name="j_password" id="j_password" type="password" autocomplete="off" value="${password }"/></div>
+					<input name="j_password" id="j_password" type="password" autocomplete="off" value="${password }" style="width: 200px"/></div>
 				</p>
 				<p style="color:red;">${error}</p>
-				<input name="formUCboton" type="submit" value="${c:l('configure.Login')}">
+				<input name="formUCboton" id="loginButton" type="submit" value="${c:l('configure.Login')}">
 ]]></html>
 <html if="${saml }"><![CDATA[
    				<input type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${rootPath }/saml'"/>
@@ -105,4 +161,5 @@
 			// -->
 			</script>
    		]]></html>
+   		<div use="com.soffid.iam.web.groupHolder.HolderGroupHandler" id="hgh"/>
 </zk>

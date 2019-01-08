@@ -23,9 +23,9 @@ import org.zkoss.web.Attributes;
 import org.zkoss.zk.scripting.Interpreters;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
-import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SecurityFunctionMapper;

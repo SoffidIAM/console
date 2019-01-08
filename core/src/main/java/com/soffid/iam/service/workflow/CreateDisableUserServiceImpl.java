@@ -280,7 +280,7 @@ public class CreateDisableUserServiceImpl extends com.soffid.iam.service.workflo
 		if (obsolet != null && (obsolet.trim().compareTo("") == 0 || obsolet.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
 			obsolet = null;
 		}
-		Principal principal = Security.getPrincipal();
+		Principal principal = Security.getSoffidPrincipal();
 		if (principal == null) {
 			return new Vector();
 		}

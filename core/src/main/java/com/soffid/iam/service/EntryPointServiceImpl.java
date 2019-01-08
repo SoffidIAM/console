@@ -20,7 +20,11 @@ import com.soffid.iam.api.AccessTreeExecutionType;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EntryPointAccountEntity;
 import com.soffid.iam.model.EntryPointEntity;
@@ -42,8 +46,10 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -700,7 +706,7 @@ public class EntryPointServiceImpl extends
             		return true;
             
             for (Long l: cache.users)
-            	if (permisos.getUserId().equals(l))
+            	if (permisos.getUserId() != null && permisos.getUserId().equals(l))
             		return true;
             
             for (Long l: cache.groups)
@@ -766,64 +772,100 @@ public class EntryPointServiceImpl extends
     	        		        		   
 	private PermissionsCache getCurrentAuthorizations()
 			throws InternalErrorException {
-		String user = Security.getCurrentUser();
-        if (user == null)
+		SoffidPrincipal p = Security.getSoffidPrincipal();
+        if (p == null)
         	return new PermissionsCache();
         
-		PermissionsCache entry = getCache().get(user);
-		if (entry != null && !entry.isValid())
-			getCache().remove(user);
-        if (entry != null && entry.isValid())
+		PermissionsCache entry = getCache().get(p);
+        if (entry != null)
         	return entry;
         
-        getCache().remove(user);
+        getCache().remove(p);
 			 
-		return calculateAuthorizations(user);
+		return calculateAuthorizations(p);
 	}
 
-	private PermissionsCache calculateAuthorizations(String user)
+	private PermissionsCache calculateAuthorizations(SoffidPrincipal p)
 			throws InternalErrorException {
+		
+		String accountName = p.getName();
+		if (accountName.contains("\\"))
+			accountName = accountName.substring(accountName.indexOf('\\')+1);
+		
+		com.soffid.iam.api.System soffid = getDispatcherService().findSoffidDispatcher();
+		
+		
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, soffid.getName());
+		if (acc == null)
+			return new PermissionsCache();
+		
+		if (acc.getType() == AccountType.USER && acc.getUsers().size() == 1)
+		{
+			String holderGroup = p.getHolderGroup();
+			GroupEntity holderGroupObj = holderGroup == null ? null : getGroupEntityDao().findByName(holderGroup);
+			
+			UserEntity usuari = acc.getUsers().iterator().next().getUser();
 
-		UserEntity usuari = getUserEntityDao().findByUserName(user);
-		if (usuari != null) {
 			PermissionsCache entry = new PermissionsCache();
 
 			entry.setUserId(usuari.getId());
-			 
-			// Grups de l'usuari
-			GroupEntity gprimari = usuari.getPrimaryGroup();
-			Collection<UserGroupEntity> grups = usuari.getSecondaryGroups();
-			if (gprimari != null) {
-				entry.getGrupsUsuariPUE().add(gprimari.getId());// ,gprimari);
-			}
-			if (grups != null) {
-				for (Iterator<UserGroupEntity> it = grups.iterator(); it
-						.hasNext();) {
-					UserGroupEntity uge = it.next();
-					GroupEntity g = uge.getGroup();
-					entry.getGrupsUsuariPUE().add(g.getId());
+			
+			try {
+				Collection<Group> groups;
+				if (holderGroupObj != null)
+					groups = getUserService().getUserGroupsHierarchy(usuari.getId(), holderGroup);
+				else
+					groups = getUserService().getUserGroupsHierarchy(usuari.getId());
+				
+				if (groups != null) {
+					for (Group group: groups) {
+						entry.getGrupsUsuariPUE().add(group.getId());
+					}
 				}
+			} catch (UnknownUserException e) {
 			}
 
-			// Rols de l'usuari: jerarquia
-			Collection<Role> rolsJerarquia = getUserService()
-					.findUserRolesHierachyByUserName(user);
-			if (rolsJerarquia != null) {
-				for (Iterator<Role> it = rolsJerarquia.iterator(); it.hasNext();) {
-					Role rol = it.next();
-					entry.getRolsUsuariPUE().add(rol.getId());
+			Collection<RoleGrant> grants;
+			if (holderGroupObj != null)
+				grants = getApplicationService().findEffectiveRoleGrantByUserAndHolderGroup(usuari.getId(), holderGroupObj.getId());
+			else
+				grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
+
+			if (grants != null)
+			{
+				for (RoleGrant grant: grants)
+				{
+					entry.getRolsUsuariPUE().add(grant.getRoleId());					
 				}
 			}
             // Get active accounts
-            for ( Account acc: getAccountService().getUserGrantedAccounts(getUserEntityDao().toUser(usuari)))
+            for ( Account account: getAccountService().getUserGrantedAccounts(getUserEntityDao().toUser(usuari)))
             {
-            	entry.getAccountsPUE().add(acc.getId());
+            	entry.getAccountsPUE().add(account.getId());
             }
  			// Guardem les dades de l'usuari actual
-			getCache().put(user, entry);
+			getCache().put(p, entry);
 			return entry;
 		} else {
-			return new PermissionsCache();
+			PermissionsCache entry = new PermissionsCache();
+
+			entry.setUserId(null);
+
+			Collection<RoleGrant> grants;
+			grants = getApplicationService().findEffectiveRoleGrantByAccount(acc.getId());
+
+			if (grants != null)
+			{
+				for (RoleGrant grant: grants)
+				{
+					entry.getRolsUsuariPUE().add(grant.getRoleId());					
+				}
+			}
+            // Get active accounts
+           	entry.getAccountsPUE().add(acc.getId());
+ 			// Guardem les dades de l'usuari actual
+			getCache().put(p, entry);
+			return entry;
 		}
 	}
 
@@ -2298,8 +2340,8 @@ public class EntryPointServiceImpl extends
 	}
 
 	
-	private ICacheAccess<String, PermissionsCache> cache;
-	private ICacheAccess<String, PermissionsCache> getCache()
+	private ICacheAccess<Principal, PermissionsCache> cache;
+	private ICacheAccess<Principal, PermissionsCache> getCache()
 	{ 
 		if (cache == null)
 			cache = JCSCacheProvider.buildCache(PermissionsCache.class.getName());
@@ -2312,7 +2354,6 @@ class PermissionsCache {
 	private Set<Long> grupsUsuariPUE;
 	private Set<Long> rolsUsuariPUE;
 	private Set<Long> accountsPUE;
-	long expirationDate;
 	private Long userId;
 
 	public Long getUserId() {
@@ -2320,7 +2361,6 @@ class PermissionsCache {
 	}
 
 	public PermissionsCache() {
-		expirationDate = (System.currentTimeMillis() + 600000); 
 		grupsUsuariPUE = new HashSet<Long>();
 		rolsUsuariPUE = new HashSet<Long>();
 		accountsPUE = new HashSet<Long>();
@@ -2336,10 +2376,6 @@ class PermissionsCache {
 
 	public void setAccountsPUE(Set<Long> accountsPUE) {
 		this.accountsPUE = accountsPUE;
-	}
-
-	public boolean isValid() {
-		return expirationDate > System.currentTimeMillis();
 	}
 
 	public Set<Long> getGrupsUsuariPUE() {

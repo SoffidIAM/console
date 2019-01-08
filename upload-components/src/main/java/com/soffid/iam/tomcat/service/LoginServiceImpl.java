@@ -2,6 +2,7 @@ package com.soffid.iam.tomcat.service;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -22,8 +23,12 @@ import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
+import com.soffid.iam.api.User;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
@@ -32,11 +37,12 @@ import com.soffid.iam.service.SamlService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.tomcat.LoginService;
-import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.tomcat.SoffidRealm;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 
 @Stateless(name = "LoginService")
 @Local({ LoginService.class })
@@ -56,6 +62,7 @@ public class LoginServiceImpl implements LoginService {
 				return null;
 			
 			String account;
+			String holderGroup = null;
 			Tenant tenant;
 			log.info(username + " logging in");
 			ServiceLocator locator = ServiceLocator.instance();
@@ -112,6 +119,21 @@ public class LoginServiceImpl implements LoginService {
 						log.info("Login rejected: username and/or credentials are empty");
 						return null;
 					}
+					if (acc == null) 
+					{
+						int idx = account.indexOf("\\");
+						if (idx > 0)
+						{
+							holderGroup = account.substring(0, idx);
+							account = account.substring(idx+1);
+							try {
+								acc = as.findAccount(account, dispatcher);
+							} catch (IllegalArgumentException e) {
+								log.info("Login rejected: username and/or credentials are empty");
+								return null;
+							}
+						}
+					}
 					if (acc == null) {
 						log.info(username + " login rejected. Unknown account");
 						return null;
@@ -123,21 +145,21 @@ public class LoginServiceImpl implements LoginService {
 	
 					SoffidPrincipal principal;
 					String passwordDomain = ps.getDefaultDispatcher();
+					List<String> groups = getUserGroups (acc, holderGroup);
+					List<String> soffidRoles = getUserRoles(acc, holderGroup);
+					List<String> roles = getRoles(acc, holderGroup);
 					if (samlAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
-						List<String> roles = getRoles(acc);
 						roles.add("PASSWORD:VALID");
 						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
-								credentials,
-								roles);
+								roles, groups, soffidRoles);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
-						List<String> roles = getRoles(acc);
 						roles.add("PASSWORD:EXPIRED");
 						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
-								credentials,
-								roles);
+								roles,
+								groups, soffidRoles);
 					} else {
 						log.info(username + " login rejected. Invalid password");
 						return null;
@@ -159,7 +181,7 @@ public class LoginServiceImpl implements LoginService {
 					
 					principal.setAccountId(acc.getId());
 					principal.setFullName(acc.getDescription());
-					principal.setTenant(tenant.getName());
+					principal.setHolderGroup(holderGroup);
 					return principal;
 				} finally {
 					Security.nestedLogoff();
@@ -167,14 +189,69 @@ public class LoginServiceImpl implements LoginService {
 			} finally {
 				exitWebapp(state);
 			}
+		} catch (UnknownUserException e) {
+			throw new SecurityException ("Error during login process", e);
 		} catch (InternalErrorException e) {
 			throw new SecurityException ("Error during login process", e);
 		}
 	}
 
 	
+    private List<String> getUserGroups(Account acc, String holderGroup) throws InternalErrorException, UnknownUserException {
+    	List<String> result = new LinkedList<String>();
+    	if (acc.getType().equals(AccountType.USER))
+    	{
+    		User u = acc.getOwnerUsers().iterator().next();
+    		Collection<Group> groups;
+			if (holderGroup == null)
+    			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId());
+    		else
+    			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId() );
+			for ( Group g: groups)
+				result.add(g.getName());
+    	}
+    	return result;
+	}
+
+
+    private List<String> getUserRoles(Account acc, String holderGroup) throws InternalErrorException {
+    	List<String> result = new LinkedList<String>();
+    	Collection<RoleGrant> groups;
+    	if (acc.getType().equals(AccountType.USER) && acc.getOwnerUsers().size() == 1)
+    	{
+    		User u = acc.getOwnerUsers().iterator().next();
+    		result.add(u.getUserName());
+			if (holderGroup == null)
+    			groups = ServiceLocator.instance().getApplicationService().findEffectiveRoleGrantByUser(u.getId());
+    		else {
+    			Group group = ServiceLocator.instance().getGroupService().findGroupByGroupName(holderGroup);
+    			if (group == null)
+        			groups = ServiceLocator.instance().getApplicationService().findEffectiveRoleGrantByUser(u.getId());
+    			else
+    				groups = ServiceLocator.instance().getApplicationService().findEffectiveRoleGrantByUserAndHolderGroup(u.getId(), group.getId());
+    		}
+    	} else {
+			groups = ServiceLocator.instance().getApplicationService().findEffectiveRoleGrantByAccount(acc.getId());
+    	}
+    	
+    	com.soffid.iam.api.System soffidSystem = ServiceLocator.instance().getDispatcherService().findSoffidDispatcher();
+    	for ( RoleGrant grant: groups)
+    	{
+    		if (grant.getSystem().equals(soffidSystem.getName()))
+    			result.add(grant.getRoleName());
+    		result.add(grant.getRoleName()+"@"+grant.getSystem());
+    		if (grant.isHasDomain())
+    		{
+    			if (grant.getSystem().equals(soffidSystem.getName()))
+    				result.add(grant.getRoleName()+"/"+grant.getDomainValue());
+    			result.add(grant.getRoleName()+"/"+grant.getDomainValue()+"@"+grant.getSystem());
+    		}
+    	}
+    	return result;
+	}
+
     Realm dummyRealm = new SoffidRealm();
-    Principal dummyPrincipal = new SoffidPrincipal("master\\$$ANONYMUOS", null, new LinkedList<String>());
+    Principal dummyPrincipal = new SoffidPrincipal("master\\$$ANONYMUOS", new LinkedList<String>(), null, null);
 
     private Object enterWebapp ()
 	{
@@ -208,12 +285,18 @@ public class LoginServiceImpl implements LoginService {
         ss.exitWebApp(state);
 	}
 	
-	private List<String> getRoles(Account acc) throws InternalErrorException {
+	private List<String> getRoles(Account acc, String holderGroup) throws InternalErrorException {
 		AuthorizationService us = ServiceLocator.instance()
 				.getAuthorizationService();
 
-		String[] rolesArray = us.getUserAuthorizationsString(acc.getName(),
-				new HashMap<String, String>());
-		return new LinkedList<String>(Arrays.asList(rolesArray));
+		if (holderGroup == null)
+		{
+			String[] rolesArray = us.getUserAuthorizationsString(acc.getName(),
+					new HashMap<String, String>());
+			return new LinkedList<String>(Arrays.asList(rolesArray));
+		} else {
+			String[] rolesArray = us.getUserGroupAuthorizationString(acc.getName(), holderGroup);
+			return new LinkedList<String>(Arrays.asList(rolesArray));
+		}
 	}
 }

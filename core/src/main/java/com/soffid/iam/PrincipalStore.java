@@ -21,7 +21,7 @@ public class PrincipalStore
      */
     public static java.security.Principal get()
     {
-    	return Security.getPrincipal();
+    	return Security.getSoffidPrincipal();
     }
 
     /**

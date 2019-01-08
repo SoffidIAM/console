@@ -276,7 +276,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			seccioPressupostaria = null;
 		}
 
-		Principal principal = Security.getPrincipal();
+		Principal principal = Security.getSoffidPrincipal();
 		if (principal == null) {
 			return new Vector();
 		}

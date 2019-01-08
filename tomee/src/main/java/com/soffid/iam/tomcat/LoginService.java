@@ -1,7 +1,9 @@
 package com.soffid.iam.tomcat;
 
+import java.security.Principal;
+
 public interface LoginService {
 
-	public SoffidPrincipal authenticate(String username, String credentials) ;
+	public Principal authenticate(String username, String credentials) ;
 
 }

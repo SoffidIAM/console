@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipInputStream;
 
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -120,6 +121,7 @@ import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 import com.soffid.iam.bpm.service.impl.UserContextCache;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ProcessHierarchyEntity;
@@ -156,7 +158,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 	LRUMap map = new LRUMap();
 
 	private String getUserName() {
-		if (Security.getPrincipal() == null)
+		if (Security.getSoffidPrincipal() == null)
 			return "nobody"; //$NON-NLS-1$
 
 		String p = null;
@@ -167,62 +169,32 @@ public class BpmEngineImpl extends BpmEngineBase {
 			return p;
 	}
 
+	private String getHolderGroup() {
+		if (Security.getSoffidPrincipal() == null)
+			return "nobody"; //$NON-NLS-1$
+
+		GenericPrincipal p = Security.getSoffidPrincipal();
+		if (p != null && p instanceof SoffidPrincipal)
+			return ((SoffidPrincipal)p).getHolderGroup();
+		else
+			return null;
+	}
+
 	private UserContextCache getUserContextCache()
 			throws InternalErrorException, UnknownUserException, BPMException {
 		String sessionId;
 		String user = getUserName();
-
+		String holderGroup = getHolderGroup();
+		
 		UserContextCache cached;
 		if (user == null) {
 			cached = new UserContextCache();
-			cached.setRoles(new String[] { "anonymous" }); //$NON-NLS-1$
 			return cached;
 		}
 		
-		cached = (UserContextCache) getSessionCacheService().getObject(
-				CACHE_TAG);
+		cached = (UserContextCache) getSessionCacheService().getObject( CACHE_TAG );
 		if (cached == null) {
 			cached = new UserContextCache();
-			UserService usuariService = getUserService();
-			User userData = usuariService.getCurrentUser();
-
-			LinkedList<String> userGroups = new LinkedList<String>();
-			if (userData != null) {
-				SystemEntity defaultDispatcher = getSystemEntityDao()
-						.findSoffidSystem();
-				userGroups.add(user);
-				Collection<Group> grups = usuariService
-						.getUserGroupsHierarchy(userData.getId());
-				for (Group grup : grups) {
-					userGroups.add(grup.getName());
-				}
-
-				Collection<RoleGrant> roles = getApplicationService()
-						.findEffectiveRoleGrantByUser(userData.getId());
-				for (RoleGrant role : roles) {
-					String name = role.getRoleName();
-					if (role.getSystem().equals(defaultDispatcher.getName()))
-						userGroups.add(name);
-					name = name + "@" + role.getSystem();
-					userGroups.add(name);
-					if (role.getDomainValue() != null) {
-						name = role.getRoleName();
-						name = name + "/" + role.getDomainValue();
-						if (role.getSystem()
-								.equals(defaultDispatcher.getName()))
-							userGroups.add(name);
-						name = name + "@" + role.getSystem();
-						userGroups.add(name);
-					}
-				}
-
-				for (String auth : Security.getAuthorizations()) {
-					userGroups.add("auth:" + auth); //$NON-NLS-1$
-				}
-			}
-
-			userGroups.add("tothom"); //$NON-NLS-1$
-			cached.setRoles(userGroups.toArray(new String[userGroups.size()]));
 			getSessionCacheService().putObject(CACHE_TAG, cached);
 		}
 		return cached;
@@ -243,8 +215,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 	 */
 	private String[] getUserGroups() throws BPMException,
 			InternalErrorException, UnknownUserException {
-		UserContextCache userCtx = getUserContextCache();
-		return userCtx.getRoles();
+		GenericPrincipal principal = Security.getSoffidPrincipal();
+		return Security.getPrincipalGroupsAndRoles(principal);
 	}
 
 	private void flushContext(JbpmContext ctx) {
@@ -2556,7 +2528,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	@Override
 	protected JbpmContext handleGetContext() throws Exception {
-		Principal p = Security.getPrincipal();
+		Principal p = Security.getSoffidPrincipal();
 		String user = null;
 		if (p != null)
 			user = Security.getCurrentUser();

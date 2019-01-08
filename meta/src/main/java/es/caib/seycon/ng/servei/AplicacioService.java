@@ -553,6 +553,14 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class }, translated = "findEffectiveRoleGrantByUserAndHolderGroup")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findEffectiveRolGrantByUserAndHolderGroup(
+			long userId, long groupId)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.application_query.class }, translated = "findEffectiveRoleGrantByAccount")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findEffectiveRolGrantByAccount(

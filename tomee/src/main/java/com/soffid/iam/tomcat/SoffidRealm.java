@@ -6,6 +6,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +33,7 @@ public class SoffidRealm extends RealmBase {
 
 	@Override
 	public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
-		if (principal != null && principal instanceof SoffidPrincipal)
+		if (principal != null && principal instanceof GenericPrincipal)
 		{
 	        if (wrapper != null) {
 	            String realRole = wrapper.findSecurityReference(role);
@@ -40,7 +41,7 @@ public class SoffidRealm extends RealmBase {
 	                role = realRole;
 	        }
 
-	        return ((SoffidPrincipal)principal).hasRole(role);
+	        return ((GenericPrincipal)principal).hasRole(role);
 		}
 		else
 			return super.hasRole(wrapper, principal, role);

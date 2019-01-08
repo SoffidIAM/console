@@ -84,6 +84,15 @@ public abstract class AutoritzacioService {
 	 return null;
 	}
 
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.lang.String[] getUserGroupAuthorizationString(
+		java.lang.String user, String holderGroup)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+
 	@Description("Gets the autohrization given some login process properties")
 	@Operation
 	@Transactional(rollbackFor={java.lang.Exception.class})

@@ -10,9 +10,9 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
-import com.soffid.iam.tomcat.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
 
 import es.caib.zkib.zkiblaf.tomee.TomeeThreadInit;
@@ -49,7 +49,7 @@ public class EventThreadInit extends TomeeThreadInit {
 	public void prepare(Component comp, Event event) throws Exception {
 		super.prepare(comp, event);
 		cacheSession = ejb.getCurrentSessionId();
-		currentIdentity = Security.getPrincipal();
+		currentIdentity = Security.getSoffidPrincipal();
 		locale = MessageFactory.getLocale();
 		clientIp = Security.getClientIp();
 	}

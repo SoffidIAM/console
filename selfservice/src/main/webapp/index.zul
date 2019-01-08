@@ -12,6 +12,8 @@
 	width="100%" 
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	use="es.caib.seycon.ng.web.ConfiguraSEU">
+    <zscript><![CDATA[
+	]]></zscript>
     <div>
 		<style src="~./styles/estil.css"/>
 		<style src="/css/localSEU.css"/>

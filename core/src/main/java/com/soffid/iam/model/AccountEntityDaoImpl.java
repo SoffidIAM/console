@@ -257,7 +257,7 @@ public class AccountEntityDaoImpl extends
 			}
 			else
 			{
-				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE);
+				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE && target.getStatus() != AccountStatus.FORCED_ACTIVE);
 			}
 
 			storeCacheEntry(source, target);
@@ -397,7 +397,7 @@ public class AccountEntityDaoImpl extends
 		}
 		else
 		{
-			target.setDisabled( target.getStatus() != AccountStatus.ACTIVE);
+			target.setDisabled( target.getStatus() != AccountStatus.ACTIVE && target.getStatus() != AccountStatus.FORCED_ACTIVE);
 		}
 		SystemEntity dispatcher = getSystemEntityDao().findByName(
 				source.getSystem());

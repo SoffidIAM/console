@@ -607,14 +607,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		if (account.getStatus() == null)
 			account.setStatus( account.isDisabled() ? AccountStatus.DISABLED: AccountStatus.ACTIVE);
-		
+		else
+			account.setDisabled( account.getStatus() != AccountStatus.ACTIVE && account.getStatus() != AccountStatus.FORCED_ACTIVE);
 		if (AccountStatus.REMOVED.equals(ae.getStatus()) && !account.getStatus().equals(AccountStatus.REMOVED))
 		{
 			audit("C", ae);
 		}
 		else if ( ! AccountStatus.REMOVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.REMOVED))
 		{
-			audit("R", ae);
+			audit("D", ae);
 		}
 		else if (! ae.isDisabled() && account.isDisabled())
 		{
@@ -820,13 +821,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
                 List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getName());
                 for (AccountEntity acc : accs) {
-                    if (acc.isDisabled() && "S".equals(ue.getActive())) {
+                    if (acc.getStatus() == AccountStatus.DISABLED && "S".equals(ue.getActive())) {
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
                         audit("E", acc);
                     }
-                    if (!acc.isDisabled() && !"S".equals(ue.getActive())) {
+                    if ( (acc.getStatus() == AccountStatus.ACTIVE ||
+                    		acc.getStatus() == AccountStatus.FORCED_ACTIVE ) && !"S".equals(ue.getActive())) {
                         acc.setDisabled(true);
 						acc.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(acc);
@@ -847,23 +849,35 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         }
                     } else {
                         for (AccountEntity acc : accs) {
-                            if (acc.isDisabled() || !description.equals(acc.getDescription())) {
+                            if ( acc.getStatus() != AccountStatus.FORCED_ACTIVE &&
+                            		acc.getStatus() != AccountStatus.FORCED_DISABLED &&
+                            		acc.getStatus() != AccountStatus.ACTIVE ) {
                                 acc.setDisabled(false);
                                 acc.setDescription(description);
     							acc.setStatus(AccountStatus.ACTIVE);
                                 getAccountEntityDao().update(acc);
                                 audit("E", acc);
                             }
+                            if (!description.equals(acc.getDescription())) {
+                                acc.setDescription(description);
+                                getAccountEntityDao().update(acc);
+                            }
                         }
                     }
                 } else if (!accs.isEmpty()) {
                     for (AccountEntity acc : accs) {
-                        if (!acc.isDisabled() || !description.equals(acc.getDescription())) {
+                    	if (! "S".equals(ue.getActive()) && acc.getStatus() == AccountStatus.FORCED_ACTIVE ||
+                    			acc.getStatus() == AccountStatus.ACTIVE)
+                    	{
                             acc.setDisabled(true);
     						acc.setStatus(AccountStatus.DISABLED);
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
                             audit("e", acc);
+                   		}
+                        if (! description.equals(acc.getDescription())) {
+                            acc.setDescription(description);
+                            getAccountEntityDao().update(acc);
                         }
                     }
                 }

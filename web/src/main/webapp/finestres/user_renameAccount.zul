@@ -143,10 +143,18 @@
 	String rootPath = page.getAttribute("dataPath") ;
 
 	dades.getFellow("detall_nom").setBind (dsPath+":"+rootPath+ "/@name");
+	dades.getFellow("lbAccountDisabled").setBind (dsPath+":"+rootPath+ "/@status");
 
 	dades.getFellow("attributeGrid").setDataPath( dsPath+":"+rootPath+ "/attributes");
 	dades.getFellow("attributeGrid").setOwnerBind( dsPath+":"+rootPath);
 	dades.getFellow("attributeGrid").updateMetadata();
+	
+	statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
+	statusForceEnabled = com.soffid.iam.api.AccountStatus.FORCED_ACTIVE;
+	statusForceDisabled = com.soffid.iam.api.AccountStatus.FORCED_DISABLED;
+	statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
+	statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
+
 	]]>
 		</attribute>
 
@@ -167,6 +175,27 @@
 								sclass="textbox" width="99%">
 							</textbox>
 
+						</row>
+						<row>
+							<input_etiqueta value="${c:l('accounts.status')}:" />
+							<listbox id="lbAccountDisabled"
+								mold="select">
+								<listitem value="${statusEnabled}">
+									<listcell label="${c:l('accounts.Enabled')}" />
+								</listitem>
+								<listitem value="${statusForceEnabled}">
+									<listcell label="${c:l('accounts.ForceEnabled')}" />
+								</listitem>
+								<listitem value="${statusDisabled}">
+									<listcell label="${c:l('accounts.Disabled')}" />
+								</listitem>
+								<listitem value="${statusForceDisabled}">
+									<listcell label="${c:l('accounts.ForceDisabled')}" />
+								</listitem>
+								<listitem value="${statusRemoved}">
+									<listcell label="${c:l('accounts.Removed')}" />
+								</listitem>
+							</listbox>
 						</row>
 					</rows>
 				</grid>

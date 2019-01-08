@@ -1273,7 +1273,7 @@ public class ApplicationServiceImpl extends
 
 		UserEntity user = getUserEntityDao().load(usuari.getId());
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateRoles(radSet, ALL, user);
+		populateRoles(radSet, ALL, user, null);
 		LinkedList<ContainerRole> rgl = new LinkedList<ContainerRole>();
 		for (RolAccountDetail rad : radSet) {
             RoleGrant rg = null;
@@ -1634,7 +1634,7 @@ public class ApplicationServiceImpl extends
         }
     }
     
-    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user) {
+    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup) {
     	if (type == NONE)
     		return;
     	
@@ -1642,15 +1642,17 @@ public class ApplicationServiceImpl extends
     	{
     		if (uac.getAccount().getType().equals (AccountType.USER))
     		{
-    			populateAccountRoles (rad, type, uac.getAccount(), user);
+    			populateAccountRoles (rad, type, uac.getAccount(), user, holderGroup);
     		}
     	}
     	
     	if (type == INDIRECT || type == ALL)
     	{
-    		populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user);
+    		if (holderGroup == null || holderGroup  == user.getPrimaryGroup())
+    			populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user);
     		for (UserGroupEntity ug : user.getSecondaryGroups()) {
-                populateGroupRoles(rad, ALL, ug.getGroup(), user);
+        		if (holderGroup == null || holderGroup  == ug.getGroup())
+        			populateGroupRoles(rad, ALL, ug.getGroup(), user);
             }
     	}
     	
@@ -1786,13 +1788,16 @@ public class ApplicationServiceImpl extends
 				(e.getEndDate() == null  || today.equals(e.getEndDate()) || today.before(e.getEndDate()));
 	}
 	
-	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user) {
+	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user, GroupEntity holderGroup) {
 		for (RoleAccountEntity ra : account.getRoles()) {
-            RolAccountDetail n = new RolAccountDetail(ra, account);
-            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
-                if (type == DIRECT || type == ALL) rad.add(n);
-                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
-            }
+			if (holderGroup == null || ra.getHolderGroup() == holderGroup)
+			{
+	            RolAccountDetail n = new RolAccountDetail(ra, account);
+	            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
+	                if (type == DIRECT || type == ALL) rad.add(n);
+	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
+	            }
+			}
         }
 	}
 
@@ -1800,7 +1805,7 @@ public class ApplicationServiceImpl extends
     protected Collection<RoleGrant> handleFindRoleGrantByAccount(Long accountId) throws Exception {
 		AccountEntity account = getAccountEntityDao().load(accountId);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateAccountRoles(radSet, DIRECT, account, null);
+		populateAccountRoles(radSet, DIRECT, account, null, null);
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             if (rad.granted.getSystem().getId().equals(account.getSystem().getId())) {
@@ -1820,7 +1825,7 @@ public class ApplicationServiceImpl extends
 			return rg;
 		
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateAccountRoles(radSet, DIRECT, account, null);
+		populateAccountRoles(radSet, DIRECT, account, null, null);
 		for (RolAccountDetail rad : radSet) {
             if (rad.granted.getSystem().getId().equals(account.getSystem().getId())) {
                 if (rad.rolAccount != null) rg.add(getRoleAccountEntityDao().toRoleAccount(rad.rolAccount));
@@ -1843,7 +1848,43 @@ public class ApplicationServiceImpl extends
 			getEntitlementDelegationService().revertExpiredDelegations();
 		}
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateRoles(radSet, ALL, user);
+		populateRoles(radSet, ALL, user, null);
+		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
+		for (RolAccountDetail rad : radSet) {
+            RoleGrant rg = null;
+            if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
+            if (rad.rolRol != null) {
+                rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
+                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
+            }
+            if (rad.rolGrup != null) rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+            if (rg != null) {
+                if (rad.account != null) rg.setOwnerAccountName(rad.account.getName());
+                rgl.add(rg);
+            }
+        }
+		return rgl;
+	}
+
+	@Override
+    protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUserAndHolderGroup(long userId, long groupId) throws Exception {
+		UserEntity user = getUserEntityDao().load(userId);
+		if (user.getUserName().equals(Security.getCurrentUser()) && 
+				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
+		{
+			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
+			{
+				getEntitlementDelegationService().acceptDelegation(ra);
+			}
+			getEntitlementDelegationService().revertExpiredDelegations();
+		}
+		GroupEntity group = getGroupEntityDao().load(groupId);
+		if (group == null)
+		{
+			throw new InternalErrorException("Uknown group "+groupId);
+		}
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		populateRoles(radSet, ALL, user, group);
 		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             RoleGrant rg = null;
@@ -1869,12 +1910,12 @@ public class ApplicationServiceImpl extends
 		{
 			for (UserAccountEntity user: account.getUsers())
 			{
-				populateAccountRoles(radSet, ALL, account, user.getUser());
-				populateRoles(radSet, INDIRECT, user.getUser());
+				populateAccountRoles(radSet, ALL, account, user.getUser(), null);
+				populateRoles(radSet, INDIRECT, user.getUser(), null);
 			}
 		}
 		else
-			populateAccountRoles(radSet, ALL, account, null);
+			populateAccountRoles(radSet, ALL, account, null, null);
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             if (rad.account != null && rad.account.getId().longValue() == accountId) {

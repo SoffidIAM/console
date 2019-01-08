@@ -216,7 +216,7 @@ public class AuthorizationServiceImpl extends
 
     Log log = LogFactory.getLog(getClass());
     
-    private List<AuthorizationRole> getAutoritzacionsUsuari(Collection autoritzacionsRolVO, String codiUsuari) throws InternalErrorException {
+    private List<AuthorizationRole> getAutoritzacionsUsuari(Collection autoritzacionsRolVO, String codiUsuari, String holderGroup) throws InternalErrorException {
 
         List<AuthorizationRole> autoritzacionsUsuari = new LinkedList<AuthorizationRole>();
 
@@ -233,11 +233,18 @@ public class AuthorizationServiceImpl extends
         if (account == null)
         	return new Vector<AuthorizationRole>();
         
-        Collection<RoleGrant> grants;
+        Collection<RoleGrant> grants = new LinkedList<RoleGrant>();
         if (account instanceof UserAccount)
         {
         	User usuari = getUserService().findUserByUserName(((UserAccount) account).getUser());
-        	grants = appSvc.findEffectiveRoleGrantByUser(usuari.getId());
+        	if ( holderGroup != null)
+        	{
+        		GroupEntity group = getGroupEntityDao().findByName(holderGroup);
+        		if (group != null)
+        			grants = appSvc.findEffectiveRoleGrantByUserAndHolderGroup(usuari.getId(), group.getId());
+        	}
+        	else
+        		grants = appSvc.findEffectiveRoleGrantByUser(usuari.getId());
         }
         else
         	grants = appSvc.findEffectiveRoleGrantByAccount(account.getId());
@@ -428,7 +435,7 @@ public class AuthorizationServiceImpl extends
 
         // Pasem a VO
 
-        List<AuthorizationRole> auts = getAutoritzacionsUsuari(getAuthorizationEntityDao().toAuthorizationRoleList(autoritzacionsRol), codiUsuari);
+        List<AuthorizationRole> auts = getAutoritzacionsUsuari(getAuthorizationEntityDao().toAuthorizationRoleList(autoritzacionsRol), codiUsuari, null);
         autoritzacions = new AutoritzacioCache (auts);
         getSessionCacheService().putObject(AUTORITZACIO_CACHE, autoritzacions);
         return auts;
@@ -849,7 +856,28 @@ public class AuthorizationServiceImpl extends
 		
 		return false;
 	}
-	
+
+
+	protected Collection handleGetUserGroupAuthorizations(String user, String holderGroup) throws Exception {
+        // Obtenim totes les autoritzacions (Entities)
+        // amb els diferents rols que inclou
+        List<AuthorizationEntity> autoritzacionsRol = getAuthorizationEntityDao().loadAll();
+
+        // Si no es troba cap autorització: sortim
+        if (autoritzacionsRol == null || autoritzacionsRol.size() == 0)
+            return new ArrayList();
+
+        // Pasem a VO
+
+        List<AuthorizationRole> auts = getAutoritzacionsUsuari(getAuthorizationEntityDao().toAuthorizationRoleList(autoritzacionsRol), user, holderGroup);
+        return auts;
+	}
+
+	protected String[] handleGetUserGroupAuthorizationString(String user, String holderGroup) throws Exception {
+        Collection c = handleGetUserGroupAuthorizations(user, holderGroup);
+        return autoritzacionsToString(c);
+	}
+
 }
 
 class AutoritzacioCache {

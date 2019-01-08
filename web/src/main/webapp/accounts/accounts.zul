@@ -62,6 +62,8 @@
 				import es.caib.seycon.ng.comu.*;
 				
 				statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
+				statusForceEnabled = com.soffid.iam.api.AccountStatus.FORCED_ACTIVE;
+				statusForceDisabled = com.soffid.iam.api.AccountStatus.FORCED_DISABLED;
 				statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
 				statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
 
@@ -371,8 +373,14 @@
 													<listitem value="${statusEnabled}">
 														<listcell label="${c:l('accounts.Enabled')}" />
 													</listitem>
+													<listitem value="${statusForceEnabled}">
+														<listcell label="${c:l('accounts.ForceEnabled')}" />
+													</listitem>
 													<listitem value="${statusDisabled}">
 														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+													<listitem value="${statusForceDisabled}">
+														<listcell label="${c:l('accounts.ForceDisabled')}" />
 													</listitem>
 													<listitem value="${statusRemoved}">
 														<listcell label="${c:l('accounts.Removed')}" />
@@ -505,8 +513,14 @@
 													<listitem value="${statusEnabled}">
 														<listcell label="${c:l('accounts.Enabled')}" />
 													</listitem>
+													<listitem value="${statusForceEnabled}">
+														<listcell label="${c:l('accounts.ForceEnabled')}" />
+													</listitem>
 													<listitem value="${statusDisabled}">
 														<listcell label="${c:l('accounts.Disabled')}" />
+													</listitem>
+													<listitem value="${statusForceDisabled}">
+														<listcell label="${c:l('accounts.ForceDisabled')}" />
 													</listitem>
 													<listitem value="${statusRemoved}">
 														<listcell label="${c:l('accounts.Removed')}" />

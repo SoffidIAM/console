@@ -1210,7 +1210,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
 			{
 				AccountEntity acc = ua.getAccount();
-				getAccountEntityDao().remove(acc);
+		        getAccountEntityDao().remove(acc);
+		        acc.setType(AccountType.SHARED);
+		        getAccountEntityDao().propagateChanges(acc);
 			}
 			usuariEntity.getAccounts().clear();
 			for (PasswordEntity pass : usuariEntity.getPasswords())

@@ -16,11 +16,18 @@
 	import es.caib.zkib.zkiblaf.Missatgebox;
 	import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
 	boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
+	com.soffid.iam.api.AccountStatus statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
+	com.soffid.iam.api.AccountStatus statusForceEnabled = com.soffid.iam.api.AccountStatus.FORCED_ACTIVE;
+	com.soffid.iam.api.AccountStatus statusForceDisabled = com.soffid.iam.api.AccountStatus.FORCED_DISABLED;
+	com.soffid.iam.api.AccountStatus statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
+	com.soffid.iam.api.AccountStatus statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
+
 	
 	void cleanWindow() {
 		changeName.visible = false;
 		
 		dades.getFellow("detall_nom").setBind ("/changeName/nullbean:/@name");
+		dades.getFellow("lbAccountDisabled").setBind ("/changeName/nullbean:/@name");
 
 		dades.getFellow("attributeGrid").setDataPath( "/changeName/nullbean:/attribute");
 		dades.getFellow("attributeGrid").setOwnerBind( "/changeName/nullbean:/attribute");
@@ -144,17 +151,11 @@
 
 	dades.getFellow("detall_nom").setBind (dsPath+":"+rootPath+ "/@name");
 	dades.getFellow("lbAccountDisabled").setBind (dsPath+":"+rootPath+ "/@status");
-
+	dades.getFellow("lbAccountDisabled").onUpdate ( new es.caib.zkib.events.XPathValueEvent(ds, rootPath+ "/@status"));
 	dades.getFellow("attributeGrid").setDataPath( dsPath+":"+rootPath+ "/attributes");
 	dades.getFellow("attributeGrid").setOwnerBind( dsPath+":"+rootPath);
 	dades.getFellow("attributeGrid").updateMetadata();
 	
-	statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
-	statusForceEnabled = com.soffid.iam.api.AccountStatus.FORCED_ACTIVE;
-	statusForceDisabled = com.soffid.iam.api.AccountStatus.FORCED_DISABLED;
-	statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
-	statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
-
 	]]>
 		</attribute>
 
@@ -199,7 +200,8 @@
 						</row>
 					</rows>
 				</grid>
-				<div dataPath="/changeName/nullbean:/attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+				<div style="padding: 5px" 
+				    dataPath="/changeName/nullbean:/attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 					ownerBind="/changeName/nullbean:/attributes" id="attributeGrid"
 					if="${canUpdateUserMetadata}" scope="account" sclass="accatt" >
 				</div>

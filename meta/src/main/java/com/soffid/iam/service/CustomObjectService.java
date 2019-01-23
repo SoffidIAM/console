@@ -25,7 +25,7 @@ import roles.customObject_delete;
 import roles.customObject_query;
 import roles.customObject_update;
 
-@Service
+@Service (serverPath="/seycon/customObjectService", serverRole="agent")
 @Depends({CustomObjectEntity.class, CustomObjectTypeEntity.class, TipusDadaEntity.class, CustomObjectAttributeEntity.class,
 	AttributeValidationService.class, TasqueEntity.class, AuditoriaEntity.class, AsyncRunnerService.class})
 public class CustomObjectService {

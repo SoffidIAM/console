@@ -14,7 +14,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
-@Service 
+@Service (serverPath="/seycon/atributeTranslationService", serverRole="agent")
 @Depends({AttributeTranslationEntity.class})
 public class AttributeTranslationService {
 	@Operation(grantees={AttributeTranslationCreate.class}) 

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="MailList",
@@ -61,4 +63,9 @@ public class LlistaCorreu {
 	@Attribute(translated = "listsBelong" )
 	public java.lang.String llistaLlistesOnPertany;
 
+	@Description ("Mail list custom attributes")
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

@@ -6,13 +6,16 @@
 
 package es.caib.seycon.ng.servei;
 import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 	MailListGroupMemberEntity.class,
 	AplicacioEntity.class,
 	ValorDominiAplicacioEntity.class,
+	TipusDadaEntity.class, 
+	AttributeValidationService.class,
+	MailListAttributeEntity.class,
 	RolEntity.class,
 	GrupEntity.class})
 public abstract class LlistesDeCorreuService {

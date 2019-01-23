@@ -43,9 +43,11 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -207,6 +209,25 @@ public class EmailListEntityDaoImpl extends
 		} else {
 			targetVO.setListsBelong(llistesPertany.substring(0, llistesPertany.length() - 2));
 		}
+		targetVO.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = targetVO.getAttributes();
+		for (MailListAttributeEntity att : sourceEntity.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
+		}
+
 
 	}
 

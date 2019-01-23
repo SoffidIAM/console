@@ -21,14 +21,19 @@ import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MailListRelated;
 import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailListContainerEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.ExternEmailEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
@@ -37,6 +42,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownApplicationException;
 import es.caib.seycon.ng.exception.UnknownMailListException;
@@ -44,10 +50,14 @@ import es.caib.seycon.ng.exception.UnknownRoleException;
 
 import java.rmi.activation.UnknownGroupException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -131,6 +141,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		getEmailListEntityDao().create(llistaCorreuEntity);
 		llistaCorreu.setId(llistaCorreuEntity.getId());
+		updateMailListAttributes(llistaCorreu, llistaCorreuEntity);
 		return getEmailListEntityDao().toMailList(llistaCorreuEntity);
 	}
 
@@ -138,6 +149,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		if(!llistaCorreuEntity.getExternals().isEmpty() || !llistaCorreuEntity.getUserMailLists().isEmpty() || !llistaCorreuEntity.getMailListContent().isEmpty())
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.IntegrityException"), llistaCorreu.getName()));
+		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
 
@@ -160,6 +172,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			getEmailListEntityDao().update(llistaCorreuEntity);
 		else
 			getEmailListEntityDao().create(llistaCorreuEntity);
+		updateMailListAttributes(llistaCorreu, llistaCorreuEntity);
 		return getEmailListEntityDao().toMailList(llistaCorreuEntity);
 	}
 
@@ -613,6 +626,102 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
                 }
             }
         }
+	}
+
+	private void updateMailListAttributes (MailList app, EmailListEntity entity) throws InternalErrorException
+	{
+		if (entity != null)
+		{
+			Map<String, Object> attributes = app.getAttributes();
+			if (attributes == null)
+				attributes = (new HashMap<String, Object>());
+			
+			LinkedList<MailListAttributeEntity> entities = new LinkedList<MailListAttributeEntity> (entity.getAttributes());
+			HashSet<String> keys = new HashSet<String>();
+			for (String key: attributes.keySet() )
+			{
+				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.MAIL_LIST, key))
+				{
+					Object v = attributes.get(key);
+					if (v == null)
+					{
+						// Do nothing
+					}
+					else if (v instanceof List)
+					{
+						List l = (List) v;
+						for (Object o: (List) v)
+						{
+							if (o != null)
+							{
+								updateMailListAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateMailListAttribute(entity, entities, key, metadata, v);
+					}
+				}
+			}
+			
+			entity.getAttributes().removeAll(entities);
+			getEmailListEntityDao().update(entity);
+
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.MAIL_LIST);
+			
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
+			{
+				Object o = attributes.get(m.getName());
+				if ( o == null || "".equals(o))
+				{
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						for (String v: l)
+						{
+							List<MailListAttributeEntity> p = getMailListAttributeEntityDao().findByNameAndValue(m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists a user with %s %s",
+										m.getLabel(), v));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void updateMailListAttribute(EmailListEntity entity, LinkedList<MailListAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		MailListAttributeEntity aae = findMailListAttributeEntity(attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			aae = getMailListAttributeEntityDao().newMailListAttributeEntity();
+			aae.setMailList(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getMailListAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private MailListAttributeEntity findMailListAttributeEntity(LinkedList<MailListAttributeEntity> entities, String key,
+			Object o) {
+		for (MailListAttributeEntity aae: entities)
+		{
+			if (aae.getMetadata().getName().equals(key))
+			{
+				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+					return aae;
+			}
+		}
+		return null;
 	}
 
 }

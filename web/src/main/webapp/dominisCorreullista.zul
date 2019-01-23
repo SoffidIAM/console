@@ -90,7 +90,7 @@
 				if(queryEnabled)
 				{
 					model.getJXPathContext().getValue("/dominiCorreu").refresh();
-					listbox.dataPath = "/model:/dominiCorreu"; 
+					listbox.dataPath = "../../model:/dominiCorreu"; 
 				}
 				
 				if ((listbox.getModel().getSize() == 0) && !retrySearch)
@@ -131,7 +131,7 @@
 				queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
 				queryWindow.getFellow("queryObsolet").getFellow("textbox").value = "";
 				model.getVariables().declareVariable("queryEnabled", false);
-				lista.getFellow("listbox").dataPath = "/model:/dominiCorreu[false]";
+				lista.getFellow("listbox").dataPath = "../../model:/dominiCorreu[false]";
 				esquemaLlista.visible=false;			
 				view_altres = false;							
 				esquemaLlista.getFellow("finishButton").disabled = true;				
@@ -158,9 +158,8 @@
 		<attribute name="onInicia">
 			pageScope.put("contextComponent", event.data);
 			
-			llistaObsolets = desktop.getPage("dominisCorreuLlista").getAttribute("llistaObsolets");  
+			llistaObsolets = page.getAttribute("llistaObsolets");  
 			if (!llistaObsolets) {
-				<!-- desktop.getPage("dominisCorreuLlista").setTitle("Llista de dominis de correu actius"); -->
 				esquemaLlista.setTitle(org.zkoss.util.resource.Labels.getLabel("dominisCorreullista.LlistaActius"));
 				model.getVariables().declareVariable("obsolet",false);
 				esquemaLlista.getFellow("queryWindow").getFellow("queryObsolet").getFellow("textbox").setValue("N");

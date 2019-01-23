@@ -26,7 +26,7 @@
 				<label sclass="label" value="${c:l('process.lblAsignadoA')}"/>
 				<label id="txtAsignadoA"/>
 				<label sclass="label" value=""/>
-				<button label="${c:l('process.verDiagrama')}" onClick="visorProcesoWnd.doPopup()"/>
+				<button label="${c:l('process.verDiagrama')}" onClick="visorProcesoWnd.doPopup()" id="viewProcessDiagramButton"/>
 			</row>
 			<row spans="4">
 				<label id="txtDescripcion" multiline="true"/>

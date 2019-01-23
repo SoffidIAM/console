@@ -264,7 +264,7 @@ public class SearchBox extends HtmlBasedComponent {
 	}
 
 
-	private void setBasicMode() {
+	public void setBasicMode() {
 		mode = BASIC;
 		setChildrenVisibility();
 		invalidate();

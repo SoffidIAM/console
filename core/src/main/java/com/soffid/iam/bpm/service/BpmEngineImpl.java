@@ -774,18 +774,13 @@ public class BpmEngineImpl extends BpmEngineBase {
 							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 						}
 					}
-					log.info("Cannot query process "+id+". Looking for parent processes");
 					for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(id))
 					{
-						log.info("Cannot query process "+id+". Looking for parent process "+parentProcess.getParentProcess());
 						if (handleGetProcess(parentProcess.getParentProcess()) != null)
 							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 					}
-					log.info("Definitevely not allowed to query process "+id+".");
 					return null;
-					//				throw new SecurityException(Messages.getString("BpmEngineImpl.AccesNotAuthorizedMessage")); //$NON-NLS-1$
 				} else {
-					log.info("Allowed to query process "+id+".");
 					return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 				}
 			}
@@ -1895,17 +1890,6 @@ public class BpmEngineImpl extends BpmEngineBase {
 			}
 		}
 		log.warn("Cannot get UI definition for "+taskName);
-		for (Iterator it = resultado.iterator(); it.hasNext();) {
-			UserInterface ui = (UserInterface) it.next();
-			try {
-				if (ui.getTarea().equals(taskName)
-						|| Pattern.matches(ui.getTarea(), taskName))
-					return ui.getFileName();
-				log.warn("Miss pattern "+ui.getTarea());
-			} catch (PatternSyntaxException e) {
-				log.warn("Wrong pattern "+ui.getTarea());
-			}
-		}
 		return null;
 	}
 

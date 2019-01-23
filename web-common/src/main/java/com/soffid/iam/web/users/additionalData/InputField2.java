@@ -23,6 +23,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.logging.LogFactory;
 import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
@@ -41,6 +42,7 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Image;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
@@ -55,8 +57,12 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserType;
+import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.web.component.Identity;
 
@@ -80,6 +86,8 @@ import es.caib.zkib.zkiblaf.Frame;
 
 public class InputField2 extends Div 
 {
+	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
+	
 	private final class TimerEventListener implements EventListener {
 		public void onEvent(Event event) throws Exception {
 			try {
@@ -144,7 +152,9 @@ public class InputField2 extends Div
 	
 	public void onSelectUser (Event event) {
 		Page p = getDesktop().getPage("usuarisLlista");
+		Boolean multiValued = dataType.isMultiValued();
 		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued });
 	}
 
 	public void onSelectGroup(Event event) {
@@ -152,6 +162,7 @@ public class InputField2 extends Div
 		p.setAttribute("tipus", "");
 		p.setAttribute("llistaObsolets", false);
 		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued() });
 	}
 
 	public void onSelectApplication(Event event) {
@@ -164,6 +175,42 @@ public class InputField2 extends Div
 		p.setAttribute("type", dataType.getDataObjectType());
 		Boolean multiValued = dataType.isMultiValued();
 		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
+	}
+
+	public void onSelectHost(Event event) {
+		Page p = getDesktop().getPageIfAny("maquinesLlista");
+		if ( p == null)
+		{
+			Component hostsWindow = getPage().getFellowIfAny("hostsWindow");
+			if (hostsWindow == null)
+			{
+				hostsWindow = new Window();
+				hostsWindow.setId("hostsWindow");
+				hostsWindow.setPage(getPage());
+				Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap());
+			}
+			Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget());
+		}
+		else
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+	}
+
+	public void onSelectMailDomain(Event event) {
+		Page p = getDesktop().getPageIfAny("dominisCorreuLlista");
+		if ( p == null)
+		{
+			Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow");
+			if (mailDomainWindow == null)
+			{
+				mailDomainWindow = new Window();
+				mailDomainWindow.setId("mailDomainWindow");
+				mailDomainWindow.setPage(getPage());
+				Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap());
+			}
+			Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget());
+		}
+		else
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 	}
 
 	/** 
@@ -180,10 +227,26 @@ public class InputField2 extends Div
 	}
 
 	public void onActualitzaUser(Event event) throws UnsupportedEncodingException, IOException, CommitException {
-		String[] data = (String[]) event.getData();
-		String userName = data[0];
-		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(userName);
-		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		if (dataType.isMultiValued())
+		{
+			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling();
+			List<String> data = (List<String>) event.getData();
+			for (String s: data)
+			{
+				textbox.setRawValue(s);
+				onChildChange( new Event (event.getName(), textbox ) );
+				List l = (List) binder.getValue();
+				int currentSize = l.size();
+				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
+			}			
+		}
+		else
+		{
+			String[] data = (String[]) event.getData();
+			String userName = data[0];
+			((InputElement) event.getTarget().getPreviousSibling()).setRawValue(userName);
+			onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		}
 	}
 
 	org.zkoss.zhtml.Div searchBox = null;
@@ -193,6 +256,7 @@ public class InputField2 extends Div
 	List<Identity> searchResults = null;
 	private String searchCriteria;
 	private InputElement currentSearchTextbox;
+	private SearchFilter filter;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
 		searchCriteria = (String) event.getValue();
@@ -262,20 +326,23 @@ public class InputField2 extends Div
 				{
 					any = true;
 					Div d = new Div();
-					Identity identity = null;
-					if (o instanceof CustomObject)
-						identity = new Identity( (CustomObject ) o);
-					if (o instanceof Group)
-						identity = new Identity( (Group ) o);
-					if (o instanceof User)
-						identity = new Identity( (User ) o);
-					if (o instanceof Application)
-						identity = new Identity( (Application ) o);
-					if (identity != null)
+					if (filter == null || filter.isAllowedValue(o))
 					{
-						searchResults.add(identity);
-						searchPosition ++;
+						Identity identity = null;
+						if (o instanceof CustomObject)
+							identity = new Identity( (CustomObject ) o);
+						if (o instanceof Group)
+							identity = new Identity( (Group ) o);
+						if (o instanceof User)
+							identity = new Identity( (User ) o);
+						if (o instanceof Application)
+							identity = new Identity( (Application ) o);
+						if (identity != null)
+						{
+							searchResults.add(identity);
+						}
 					}
+					searchPosition ++;
 				}
 			}
 			if (any)
@@ -304,7 +371,6 @@ public class InputField2 extends Div
 	}
 
 	protected void selectCandidate(Event e) throws UnsupportedEncodingException, IOException, CommitException {
-		System.out.println("***** "+e);
 		Div d = (Div) e.getTarget();
 		Identity identity = (Identity) d.getAttribute("identity");
 		Object o = identity.getObject();
@@ -316,12 +382,12 @@ public class InputField2 extends Div
 			cancelSearch();
 			currentSearchTextbox.setRawValue( value );
 			applyChange(currentSearchTextbox, value);
+			Events.postEvent("onChange", this, null);
 		}
 	}
 
 	public void onBlur (Event event)
 	{
-		System.out.println("***** "+event);
 		cancelSearch();
 	}
 	
@@ -337,8 +403,7 @@ public class InputField2 extends Div
 		}
 	}
 
-	public void onChange(Event event) throws UnsupportedEncodingException, IOException, CommitException {
-		System.out.println("***** "+event);
+	public void onChildChange(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 //		cancelSearch();
 		Component tb = event.getTarget();
 		
@@ -351,7 +416,7 @@ public class InputField2 extends Div
 			if (lb.getSelectedItem() != null)
 				value = lb.getSelectedItem().getValue();
 		}
-		
+		Events.postEvent("onChange", this, null);
 		applyChange(tb, value);
 	}
 
@@ -404,16 +469,45 @@ public class InputField2 extends Div
     }
 
 	public void onActualitzaGroup(Event event) throws UnsupportedEncodingException, IOException, CommitException {
-		String[] data = (String[]) event.getData();
-		String group = data[0];
-		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(group);
-		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		if (dataType.isMultiValued())
+		{
+			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling();
+			List<String> data = (List<String>) event.getData();
+			for (String s: data)
+			{
+				textbox.setRawValue(s);
+				onChildChange( new Event (event.getName(), textbox ) );
+				List l = (List) binder.getValue();
+				int currentSize = l.size();
+				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
+			}			
+		}
+		else
+		{
+			String[] data = (String[]) event.getData();
+			String groupName = data[0];
+			((InputElement) event.getTarget().getPreviousSibling()).setRawValue(groupName);
+			onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		}
 	}
 
 	public void onActualitzaApplication(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		String data = (String) event.getData();
 		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data);
-		onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+		onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+	}
+
+
+	public void onActualitzaHost(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		Object[] data = (Object[]) event.getData();
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data[0]);
+		onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+	}
+
+	public void onActualitzaMailDomain(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		String data = (String) event.getData();
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data);
+		onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
 	public void onActualitzaCustomObject(Event event) throws UnsupportedEncodingException, IOException, CommitException {
@@ -424,7 +518,7 @@ public class InputField2 extends Div
 			for (String s: data)
 			{
 				textbox.setRawValue(s);
-				onChange( new Event (event.getName(), textbox ) );
+				onChildChange( new Event (event.getName(), textbox ) );
 				List l = (List) binder.getValue();
 				int currentSize = l.size();
 				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
@@ -434,7 +528,7 @@ public class InputField2 extends Div
 		{
 			String data = (String) event.getData();
 			textbox.setRawValue(data);
-			onChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+			onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 		}
 	}
 
@@ -474,7 +568,7 @@ public class InputField2 extends Div
 		
 		Label l = (Label) getFellowIfAny(id+"b");
 		
-		Usuari u = null;
+		User u = null;
 		if (user == null || user.isEmpty())
 		{
 			if (l != null) l.setValue("");
@@ -482,11 +576,11 @@ public class InputField2 extends Div
 		else
 		{
 			try {
-				UsuariService ejb = EJBLocator.getUsuariService();
-				u = ejb.findUsuariByCodiUsuari(user);
+				UserService ejb = com.soffid.iam.EJBLocator.getUserService();
+				u = ejb.findUserByUserName(user);
 			} catch (Exception e) {
 			}
-			if (u == null)
+			if (u == null || ( filter != null && ! filter.isAllowedValue(u)))
 			{
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -513,16 +607,16 @@ public class InputField2 extends Div
 			if (l != null) l.setValue("");
 		}
 		else {
-			Grup g = null;
+			Group g = null;
 			try {
-				g = EJBLocator.getGrupService().findGrupByCodiGrup(group);
+				g = com.soffid.iam.EJBLocator.getGroupService().findGroupByGroupName(group);
 			} catch (Exception e) {}
-			if (g == null) {
+			if (g == null || ( filter != null && ! filter.isAllowedValue(g))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			if (l != null )
-				l.setValue(g.getDescripcio());
+				l.setValue(g.getDescription());
 		}
 		return true;
 	}
@@ -542,11 +636,57 @@ public class InputField2 extends Div
 			try {
 				a = EJBLocator.getAplicacioService().findAplicacioByCodiAplicacio(application);
 			} catch (Exception e) {}
-			if (a == null) {
+			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
 			if (l != null) l.setValue(a.getNom());
+		}
+	}
+
+	public void updateHost(String id) {
+
+		InputElement inputElement = (InputElement) getFellow(id);
+		String host = inputElement.getText();
+
+		Label l = (Label) getFellowIfAny(id+"b");
+
+		if (host == null || host.isEmpty()) {
+			if (l != null)
+				l.setValue("");
+		} else {
+			Host a = null;
+			try {
+				a = com.soffid.iam.EJBLocator.getNetworkService().findHostByName(host);
+			} catch (Exception e) {}
+			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+			}
+			if (l != null) l.setValue(a.getDescription());
+		}
+	}
+
+	public void updateMailDomain(String id) {
+
+		InputElement inputElement = (InputElement) getFellow(id);
+		String mailDomain = inputElement.getText();
+
+		Label l = (Label) getFellowIfAny(id+"b");
+
+		if (mailDomain == null || mailDomain.isEmpty()) {
+			if (l != null)
+				l.setValue("");
+		} else {
+			MailDomain a = null;
+			try {
+				a = com.soffid.iam.EJBLocator.getMailListsService().findMailDomainByName(mailDomain);
+			} catch (Exception e) {}
+			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+			}
+			if (l != null) l.setValue(a.getDescription());
 		}
 	}
 
@@ -565,7 +705,7 @@ public class InputField2 extends Div
 			try {
 				co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName(dataType.getDataObjectType(), customObject);
 			} catch (Exception e) {}
-			if (co == null) {
+			if (co == null || ( filter != null && ! filter.isAllowedValue(co))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
@@ -654,7 +794,7 @@ public class InputField2 extends Div
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
 									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.onChange(event)' "  
+									+ "onChange='self.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.onChanging(event)' "
 									+ "readonly=\"" +readonlyExpr+ "\"/>" +
@@ -670,7 +810,7 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				sb.append("<div style='display:block' visible='true'>");
 				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
-						+ "onChange='self.parent.parent.onChange(event)' "  
+						+ "onChange='self.parent.parent.onChildChange(event)' "  
 						+ "onBlur='self.parent.parent.onBlur(event)' "
 						+ "onChanging='self.parent.parent.onChanging(event)' "
 						+ "id=\""+id+"\" "
@@ -688,7 +828,7 @@ public class InputField2 extends Div
 				updateApplication = true;
 				StringBuffer sb = new StringBuffer();
 				sb.append("<div style='display: block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
 						+ "id=\""+id+"\" "
 						+ "readonly='"+readonlyExpr+"'/>");
 				sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
@@ -700,12 +840,44 @@ public class InputField2 extends Div
 				sb.append(required+"</div>");
 				result = sb.toString();
 			}
+			else if(TypeEnumeration.HOST_TYPE.equals(type))
+			{
+				StringBuffer sb = new StringBuffer();
+				sb.append("<div style='display: block' visible='true'>");
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+						+ "id=\""+id+"\" "
+						+ "readonly='"+readonlyExpr+"'/>");
+				sb.append("<imageclic src='/zkau/web/img/host.png' "
+						+ "onClick='self.parent.parent.onSelectHost(event)' "
+						+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
+						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+						+ " visible=\""+(!readonly)+"\"/>");
+				sb.append("<label id=\""+id2+"\"/>");
+				sb.append(required+"</div>");
+				result = sb.toString();
+			}
+			else if(TypeEnumeration.MAIL_DOMAIN_TYPE.equals(type))
+			{
+				StringBuffer sb = new StringBuffer();
+				sb.append("<div style='display: block' visible='true'>");
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+						+ "id=\""+id+"\" "
+						+ "readonly='"+readonlyExpr+"'/>");
+				sb.append("<imageclic src='/zkau/web/img/mail.png' "
+						+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
+						+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
+						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+						+ " visible=\""+(!readonly)+"\"/>");
+				sb.append("<label id=\""+id2+"\" visible='false'/>");
+				sb.append(required+"</div>");
+				result = sb.toString();
+			}
 			else if(TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(type))
 			{
 				updateCustomObject = true;
 				StringBuffer sb = new StringBuffer();
 				sb.append("<div style='display:block' visible='true' >");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChange(event)' onOK='' "
+				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
 						+ "onBlur='self.parent.parent.onBlur(event)' "
 						+ "onChanging='self.parent.parent.onChanging(event)'  "
 						+ "id=\""+id+"\" "
@@ -748,14 +920,14 @@ public class InputField2 extends Div
 			{
 				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
 						+ "id=\""+id+"\" "
-						+ "onChange='self.parent.parent.onChange(event)'/>"+required+"</div>"; 
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+"</div>"; 
 			}
 			else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 			{
 				result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
 						+ "id=\""+id+"\" "
 							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
-									+ "onChange='self.parent.parent.onChange(event)'/>";
+									+ "onChange='self.parent.parent.onChildChange(event)'/>";
 				result = "<div>"+result+required+"</div>";
 			}	
 			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
@@ -797,23 +969,49 @@ public class InputField2 extends Div
 				}
 				result = result +  "</div>";
 			}
-			else if (dataType.getValues() == null || dataType.getValues().isEmpty())//String
+			else if ( TypeEnumeration.BOOLEAN_TYPE.equals(type))
 			{
-					result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
-							+ "id=\""+id+"\" "
-							+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChange(event)' onOK=''/>"+required+"</div>";
-			} else { // Listbox
+					result = "<div><checkbox  id=\""+id+"\" "
+							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+"</div>";
+			}
+			else if (dataType.getValues() != null && ! dataType.getValues().isEmpty())//String
+			{
 				result = "<listbox mold=\"select\" onChange=\"\" "
 						+ "id=\""+id+"\" "
-						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChange(event)'>";
+						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
 				result = result + "<listitem value=\"\"/>";
 				for (String v: dataType.getValues())
 				{
-					String s = v.replaceAll("\"", "&quot;");
-					result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+					String s = escapeString(v);
+					int separator = s.indexOf(':');
+					if (separator > 0)
+						result = result + "<listitem value=\""+s.substring(0, separator).trim()+"\" label=\""+s.substring(separator+1).trim()+"\"/>";
+					else
+						result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
 				}
 				result = result + "</listbox>";
 				result = "<div>"+result+required+"</div>"; 
+			}
+			else if (TypeEnumeration.USER_TYPE_TYPE.equals(type))
+			{
+				result = "<listbox mold=\"select\" onChange=\"\" "
+						+ "id=\""+id+"\" "
+						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
+				result = result + "<listitem value=\"\"/>";
+				try {
+					for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
+					{
+						result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+					}
+				} catch (Exception e) {
+					log.info("Error getting user types", e);
+				}
+				result = result + "</listbox>";
+				result = "<div>"+result+required+"</div>"; 
+			} else { // Listbox
+				result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
+						+ "id=\""+id+"\" "
+						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+"</div>";
 			}
 		}
 		if (result.equals(""))
@@ -826,9 +1024,9 @@ public class InputField2 extends Div
 						+ "<textbox sclass=\"textbox\" width='90%' "
 								+ "id=\""+id+"\" "
 								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
-										+ "onChange='parent.parent.onChange(event)'/>"
+										+ "onChange='parent.parent.onChildChange(event)'/>"
 						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
-						+ "onChange='self.parent.parent.onChange(event)'/>"+required+"</div>";
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+"</div>";
 			else
 				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
 		}
@@ -873,6 +1071,10 @@ public class InputField2 extends Div
 		}
 		//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
 		//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre
+	}
+
+	private String escapeString(String v) {
+		return v.replaceAll("\"", "&quot;");
 	}
 
 	private String getIdForPosition(Integer position) {
@@ -1122,7 +1324,7 @@ public class InputField2 extends Div
 		}
 		
 		if (dataType.isRequired() && ( value == null ||  "".equals(value)))
-			throw new WrongValueException(this, MZul.EMPTY_NOT_ALLOWED);
+			throw new WrongValueException(input, MZul.VALUE_NOT_MATCHED);
 			
 		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			updateApplication( getIdForPosition(position) );
@@ -1132,6 +1334,10 @@ public class InputField2 extends Div
 			updateGroup( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
 			updateCustomObject( getIdForPosition(position) );
+		if (dataType.getType() == TypeEnumeration.HOST_TYPE)
+			updateHost( getIdForPosition(position) );
+		if (dataType.getType() == TypeEnumeration.MAIL_DOMAIN_TYPE)
+			updateMailDomain( getIdForPosition(position) );
 		
 		if (dataType.getValidationExpression() == null ||
 				dataType.getValidationExpression().isEmpty())
@@ -1144,13 +1350,13 @@ public class InputField2 extends Div
 			if (o != null && o instanceof Boolean)
 			{
 				if  (!((Boolean) o).booleanValue())
-					throw new WrongValueException(this, "Invalid value");
+					throw new WrongValueException(input, MZul.VALUE_NOT_MATCHED);
 			}
 			else
 				throw new UiException(String.format("Validation expression for attribute %s has not returned a boolean value", dataType.getCode()));
 		} catch ( TargetError e) {
 			if (e.getTarget() instanceof UiException)
-				throw new WrongValueException(this, e.getMessage());
+				throw new UiException(e);
 			else
 				throw new RuntimeException(e.getTarget());
 		} catch ( EvalError e) {
@@ -1177,7 +1383,7 @@ public class InputField2 extends Div
 			else
 				throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode()));
 		} catch ( TargetError e) {
-			throw new WrongValueException(e.getMessage(), e);
+			throw new UiException(e.getTarget());
 		} catch ( EvalError e) {
 			throw new UiException(e.toString(), e);
 		} catch (MalformedURLException e) {
@@ -1266,6 +1472,10 @@ public class InputField2 extends Div
 				attributeValidate(null);
 		}
 		return true;
+	}
+
+	public void setSearchFilter(SearchFilter filter) {
+		this.filter = filter;
 	}
 
 }

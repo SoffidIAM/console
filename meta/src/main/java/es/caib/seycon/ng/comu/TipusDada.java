@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.comu;
 import java.util.List;
 
+import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.Attribute;
@@ -85,4 +86,18 @@ public class TipusDada {
 	@Description("Expression to test if attribute value is valid or not")
 	@Nullable
 	String validationExpression;
+		
+	@Description("Expression to test if the reference object can be selected ")
+	@Nullable
+	String filterExpression;
+
+	@Description("Built-in attribute")
+	@Nullable
+	@Attribute (defaultValue="false")
+	Boolean builtin;
+	
+	@Description ("Uppercase / lowercase usage")
+	@Nullable
+	@Attribute (defaultValue="com.soffid.iam.api.LetterCaseEnum.MIXEDCASE")
+	LetterCaseEnum letterCase;
 }

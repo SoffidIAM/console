@@ -6,9 +6,11 @@
 
 package es.caib.seycon.ng.model;
 import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Depends;
@@ -70,6 +72,11 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public String label;
 	
+	@Description("NLS Label to display")
+	@Column (name="TDA_NLSLAB", length=128)
+	@Nullable
+	public String nlsLabel;
+
 	@Description("Administrator visibility")
 	@Column (name="TDA_ADMVIS", length=1)
 	@Nullable
@@ -113,6 +120,21 @@ public abstract class TipusDadaEntity {
 	
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;
+
+	@Description("Expression to test if the reference object can be selected ")
+	@Nullable
+	@Column(name="TDA_FILEXP")
+	String filterExpression;
+
+	@Description("Built-in attribute")
+	@Nullable
+	@Column(name="TDA_BUILTI", defaultValue="false")
+	Boolean builtin;
+	
+	@Description ("Uppercase / lowercase usage")
+	@Nullable
+	@Column(name="TDA_LETCAS", defaultValue="com.soffid.iam.api.LetterCaseEnum.MIXEDCASE")
+	LetterCaseEnum letterCase;
 
 	/********************** DAOS ************************/
 	@Operation(translated="findDataTypeByName")

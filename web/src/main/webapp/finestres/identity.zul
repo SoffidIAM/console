@@ -138,6 +138,7 @@
 			}
 			textbox.setValue("");
 			result.getChildren().clear();
+			currentRole = null;
 		}
 		
 		void cancel()

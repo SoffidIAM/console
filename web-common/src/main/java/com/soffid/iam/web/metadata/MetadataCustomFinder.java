@@ -25,12 +25,12 @@ public class MetadataCustomFinder implements FinderHandler {
 		{
 			MetadataScope scope = MetadataScope.fromString(co.getName());
 			l = new Vector<TipusDada>(
-					EJBLocator.getDadesAddicionalsService().findDataTypes(scope));
+					EJBLocator.getDadesAddicionalsService().findDataTypes2(scope));
 		}
 		else
 		{
 			l = new Vector<TipusDada>(
-					EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(co.getName(), null));
+					EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName2(co.getName(), null));
 		}
 		Collections.sort(l, new Comparator<TipusDada>() {
 			public int compare(TipusDada o1, TipusDada o2) {

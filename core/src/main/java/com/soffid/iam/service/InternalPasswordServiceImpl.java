@@ -1189,7 +1189,8 @@ public class InternalPasswordServiceImpl extends
 
     private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password) throws InternalErrorException, IOException {
     	
-    	if ("S".equals(account.getSystem().getTrusted()))
+    	if ("S".equals(account.getSystem().getTrusted()) &&
+    			account.getSystem().getUrl() != null)
     	{
         	try {
         		ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService().getServerService(ConsoleLogonService.REMOTE_PATH);

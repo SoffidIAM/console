@@ -312,6 +312,7 @@ public abstract class RolEntity {
 	@DaoFinder("select u "
 			+ "from com.soffid.iam.model.RoleEntity as u "
 			+ "where u.domainType = 'APLICACIONS' and "
+			+ " u.id in (select e.role.id from com.soffid.iam.model.AuthorizationEntity e) and "
 			+ " u.system.tenant.id=:tenantId")
 	public java.util.Collection<RolEntity> findApplicationManagementRoles()
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -319,9 +320,10 @@ public abstract class RolEntity {
 	}
 
 	@Operation(grantees = { roles.application_query.class })
-	@DaoFinder("select u "
+	@DaoFinder("select distinct u "
 			+ "from com.soffid.iam.model.RoleEntity as u "
 			+ "where (u.domainType = 'GRUPS' or u.domainType='GRUPS_USUARI') and "
+			+ " u.id in (select e.role.id from com.soffid.iam.model.AuthorizationEntity e) and "
 			+ " u.system.tenant.id=:tenantId")
 	public java.util.Collection<RolEntity> findGroupManagementRoles()
 			throws es.caib.seycon.ng.exception.InternalErrorException {

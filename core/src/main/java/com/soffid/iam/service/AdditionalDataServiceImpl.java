@@ -62,7 +62,8 @@ public class AdditionalDataServiceImpl extends
 		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
 		{
 			MetaDataEntity td = it.next();
-			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER))
+			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER) ||
+					Boolean.TRUE.equals( td.getBuiltin() ) )
 				it.remove();
 		}
 		LinkedList <DataType> list = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(col));
@@ -357,6 +358,12 @@ public class AdditionalDataServiceImpl extends
 		if (de == null)
 			return null;
 		LinkedList <DataType>col = new LinkedList<DataType>( getAccountMetadataEntityDao().toDataTypeList(de.getMetaData()));
+		for ( Iterator<DataType> iterator = col.iterator(); iterator.hasNext(); )
+		{
+			DataType md = iterator.next();
+			if ( Boolean.TRUE.equals(md.getBuiltin()))
+				iterator.remove();
+		}
 		Collections.sort(col, new Comparator<DataType>() {
 			@Override
 			public int compare(DataType o1, DataType o2) {
@@ -375,6 +382,12 @@ public class AdditionalDataServiceImpl extends
 		
 		
 		List<MetaDataEntity> entities = this.getMetaDataEntityDao().findByScope(scope);
+		for ( Iterator<MetaDataEntity> iterator = entities.iterator(); iterator.hasNext(); )
+		{
+			MetaDataEntity md = iterator.next();
+			if ( Boolean.TRUE.equals(md.getBuiltin()))
+				iterator.remove();
+		}
 		LinkedList <DataType> col = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(entities));
 		Collections.sort(col, new Comparator<DataType>() {
 			@Override
@@ -458,8 +471,15 @@ public class AdditionalDataServiceImpl extends
 	@Override
 	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName(String objectType, String code)
 			throws Exception {
-		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, code);
-		return getMetaDataEntityDao().toDataTypeList(r);
+		List<MetaDataEntity> col = getMetaDataEntityDao().findByObjectTypeAndName(objectType, code);
+		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
+		{
+			MetaDataEntity td = it.next();
+			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER) ||
+					Boolean.TRUE.equals( td.getBuiltin() ) )
+				it.remove();
+		}
+		return getMetaDataEntityDao().toDataTypeList(col);
 	}
 
 	@Override
@@ -477,5 +497,42 @@ public class AdditionalDataServiceImpl extends
 			return null;
 		else
 			return getCustomObjectTypeEntityDao().toCustomObjectType(o);
+	}
+
+	@Override
+	protected Collection<DataType> handleFindDataTypes2(MetadataScope scope) throws Exception {
+		List<MetaDataEntity> entities = this.getMetaDataEntityDao().findByScope(scope);
+		LinkedList <DataType> col = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(entities));
+		Collections.sort(col, new Comparator<DataType>() {
+			@Override
+			public int compare(DataType o1, DataType o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}
+			
+		});
+		return col;
+	}
+
+	@Override
+	protected List<DataType> handleFindSystemDataTypes2(String system) throws Exception {
+		SystemEntity de = getSystemEntityDao().findByName(system);
+		if (de == null)
+			return null;
+		LinkedList <DataType>col = new LinkedList<DataType>( getAccountMetadataEntityDao().toDataTypeList(de.getMetaData()));
+		Collections.sort(col, new Comparator<DataType>() {
+			@Override
+			public int compare(DataType o1, DataType o2) {
+				return o1.getOrder().compareTo(o2.getOrder());
+			}
+			
+		});
+		return col;
+	}
+
+	@Override
+	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName2(String objectType, String attribute)
+			throws Exception {
+		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, attribute);
+		return getMetaDataEntityDao().toDataTypeList(r);
 	}
 }

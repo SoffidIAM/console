@@ -10,6 +10,8 @@ import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.TipusDadaEntity;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="ApplicationBootService",
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.bpm.servei.BpmEngine.class,
 	es.caib.seycon.ng.servei.SoDRuleService.class,
 	TenantService.class,
+	TipusDadaEntity.class,
 	com.soffid.iam.service.ScheduledTaskService.class})
 public abstract class ApplicationBootService {
 

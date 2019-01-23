@@ -201,7 +201,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 			
-			for ( MetaDataEntity m: md)
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
 				if ( o == null || "".equals(o))

@@ -557,12 +557,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected Collection<GroupUser> handleFindUsersBelongtoGroupByGroupName(String codiGrup) throws Exception {
 		AsyncList<GroupUser> result = new AsyncList<GroupUser>();
-
-
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
 		findGroupUsers(codiGrup, result);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
+		result.done();
 		return result.get();
 	}
 
@@ -699,7 +698,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
 			
-			for ( MetaDataEntity m: md)
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
 				if ( o == null || "".equals(o))

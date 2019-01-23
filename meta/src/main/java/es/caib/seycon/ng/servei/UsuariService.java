@@ -75,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 	AccountEntity.class, 
 	AttributeValidationService.class,
 	VaultFolderEntity.class,
+	AuditoriaService.class,
 	VaultFolderAccessEntity.class})
 public abstract class UsuariService {
 

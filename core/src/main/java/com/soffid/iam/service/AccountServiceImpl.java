@@ -363,29 +363,31 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		HashSet<String> keys = new HashSet<String>();
 		for (String key: app.getAttributes().keySet() )
 		{
-			AccountMetadataEntity metadata = findMetadata (entity, key);
 			Object v = app.getAttributes().get(key);
 			if (v == null)
 			{
 				// Do nothing
 			}
-			else if (v instanceof List)
-			{
-				List l = (List) v;
-				for (Object o: (List) v)
-				{
-					if (o != null)
-					{
-						updateAccountAttribute(entity, entities, key, metadata, o);
-					}
-				}
-			}
 			else
 			{
-				updateAccountAttribute(entity, entities, key, metadata, v);
+				AccountMetadataEntity metadata = findMetadata (entity, key);
+				if (v instanceof List)
+				{
+					List l = (List) v;
+					for (Object o: (List) v)
+					{
+						if (o != null)
+						{
+							updateAccountAttribute(entity, entities, key, metadata, o);
+						}
+					}
+				}
+				else
+				{
+					updateAccountAttribute(entity, entities, key, metadata, v);
+				}
 			}
 		}
-		
 		entity.getAttributes().removeAll(entities);
 		getAccountEntityDao().update(entity);
 

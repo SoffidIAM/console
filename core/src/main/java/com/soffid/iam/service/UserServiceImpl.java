@@ -3199,6 +3199,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			for (String key: attributes.keySet() )
 			{
 				MetaDataEntity metadata = getMetaDataEntityDao().findDataTypeByName(key);
+				if (metadata == null)
+					throw new InternalErrorException("Attribute definition not found for attribute "+key);
 				Object v = attributes.get(key);
 				if (v == null)
 				{
@@ -3233,13 +3235,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			fetchUserAttributes(attributes, entities, false);
 			
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.USER);
-			for ( MetaDataEntity m: md)
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
 				if ( o == null || "".equals(o))
 				{
 					if (m.getRequired() != null && m.getRequired().booleanValue())
-						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getName()));
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{

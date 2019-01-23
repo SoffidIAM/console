@@ -33,7 +33,7 @@ public class Usuari {
 	public java.util.Calendar dataCreacioUsuari;
 
 	@Nullable
-	@Attribute(translated = "createdByUser" )
+	@Attribute(translated = "createdByUser", synonyms = {"createdBy"} )
 	public java.lang.String usuariCreacio;
 
 	@Nullable
@@ -42,7 +42,7 @@ public class Usuari {
 	public java.lang.Boolean actiu;
 
 	@Nullable
-	@Attribute(translated = "middleName" )
+	@Attribute(translated = "middleName", synonyms = {"lastName2"} )
 	public java.lang.String segonLlinatge;
 
 	@Nullable
@@ -78,11 +78,11 @@ public class Usuari {
 	public java.lang.String codiGrupPrimari;
 
 	@Nullable
-	@Attribute(translated = "modifiedDate" )
+	@Attribute(translated = "modifiedDate", synonyms= {"modifiedOn"} )
 	public java.util.Calendar dataDarreraModificacioUsuari;
 
 	@Nullable
-	@Attribute(translated = "modifiedByUser" )
+	@Attribute(translated = "modifiedByUser", synonyms= {"modifiedBy"} )
 	public java.lang.String usuariDarreraModificacio;
 
 	@Nullable

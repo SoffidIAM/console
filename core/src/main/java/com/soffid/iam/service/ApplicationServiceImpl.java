@@ -2322,7 +2322,7 @@ public class ApplicationServiceImpl extends
 
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
 			
-			for ( MetaDataEntity m: md)
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
 				if ( o == null || "".equals(o))
@@ -2418,7 +2418,7 @@ public class ApplicationServiceImpl extends
 			getRoleEntityDao().update(entity);
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
 			
-			for ( MetaDataEntity m: md)
+			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
 				if ( o == null || "".equals(o))

@@ -53,8 +53,19 @@ public abstract class DadesAddicionalsService {
 	}
 
 
+
 	@Operation(grantees={Tothom.class})
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the bultin and not builtin attributes")
+	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findDataTypes2( MetadataScope scope)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
+	@Operation(grantees={Tothom.class})
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the not builtin attributes")
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findDataTypes( MetadataScope scope)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
@@ -99,8 +110,19 @@ public abstract class DadesAddicionalsService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.metadata_query.class, Tothom.class }, translated = "findDataTypesByObjectTypeAndName2")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the bultin and not builtin attributes")
+	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findDataTypesByObjectTypeAndName2(
+			String objectType,
+			@Nullable java.lang.String codi)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.metadata_query.class, Tothom.class }, translated = "findDataTypesByObjectTypeAndName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the not builtin attributes")
 	public java.util.Collection<es.caib.seycon.ng.comu.TipusDada> findDataTypesByObjectTypeAndName(
 			String objectType,
 			@Nullable java.lang.String codi)
@@ -152,6 +174,15 @@ public abstract class DadesAddicionalsService {
 
 	@Operation(grantees = { roles.metadata_query.class})
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the bultin and not builtin attributes")
+	public List<TipusDada> findSystemDataTypes2(String system)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.metadata_query.class})
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description("Retrieves the not builtin attributes")
 	public List<TipusDada> findSystemDataTypes(String system)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

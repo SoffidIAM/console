@@ -59,12 +59,16 @@ import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
+import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.service.impl.DatabaseParser;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.tools.db.persistence.XmlReader;
+import com.soffid.tools.db.schema.Column;
 import com.soffid.tools.db.schema.Database;
 import com.soffid.tools.db.schema.ForeignKey;
+import com.soffid.tools.db.schema.Table;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.ServiceLocator;
@@ -345,11 +349,7 @@ public class ApplicationBootServiceImpl extends
 	}
 
 
-	private void configureTenantDatabase(String tenantName) throws SystemException,
-			NotSupportedException, InternalErrorException, RollbackException,
-			HeuristicMixedException, HeuristicRollbackException,
-			NeedsAccountNameException, AccountAlreadyExistsException,
-			BPMException, IOException, NamingException, SQLException {
+	private void configureTenantDatabase(String tenantName) throws Exception {
 
 		Configuration cfg = configSvc.findParameterByNameAndNetworkName(
 				"tenantVersionLevel", null); //$NON-NLS-1$
@@ -374,6 +374,13 @@ public class ApplicationBootServiceImpl extends
 			cfg = new Configuration("tenantVersionLevel", "101"); //$NON-NLS-1$ //$NON-NLS-2$
 			configSvc.create(cfg);
 		} 
+		if (cfg.getValue().equals("101"))
+		{
+			createStandardAttributes();
+			cfg.setValue("102");
+			configSvc.update(cfg);
+		}
+
 	}
 
 	private void updateFromVersion1() throws IOException, Exception 
@@ -732,9 +739,7 @@ public class ApplicationBootServiceImpl extends
 		}
 	}
 
-	protected void createInitialData() throws InternalErrorException,
-			NeedsAccountNameException, AccountAlreadyExistsException,
-			SQLException, NamingException {
+	protected void createInitialData() throws Exception {
 		Configuration cfg = null;
 
 		tenantService.getMasterTenant();
@@ -1099,7 +1104,110 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("1");
 			configSvc.update(cfg);
 		}
+	}
 
+	private void createStandardAttributes() throws Exception {
+		createStandardUserAttributes();
+		createStandardAccountAttributes();
+		createStandardRoleAttributes();
+		createStandardApplicationAttributes();
+	}
+
+	private void createStandardApplicationAttributes() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void createStandardRoleAttributes() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void createStandardAccountAttributes() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void createStandardUserAttributes() throws Exception {
+		int i = 0;
+		createStandardField (i++, MetadataScope.USER, User.class, "userName", "SC_USUARI", "USU_CODI", TypeEnumeration.STRING_TYPE, null, true);
+		createStandardField (i++, MetadataScope.USER, User.class, "active", "SC_USUARI", "USU_ACTIU", TypeEnumeration.BOOLEAN_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "comments", "SC_USUARI", "USU_COMENT", TypeEnumeration.STRING_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "createdBy", "SC_USUARI", "USU_USUCRE", TypeEnumeration.USER_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "createdOn", "SC_USUARI", "USU_DATCRE", TypeEnumeration.DATE_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "firstName", "SC_USUARI", "USU_NOM", TypeEnumeration.STRING_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "lastName", "SC_USUARI", "USU_PRILLI", TypeEnumeration.STRING_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "middleName", "SC_USUARI", "USU_SEGLLI", TypeEnumeration.STRING_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "homeServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
+		createStandardField2 (i++, MetadataScope.USER, User.class, "mailAlias", TypeEnumeration.STRING_TYPE, null, false, 256, true);
+		createStandardField (i++, MetadataScope.USER, User.class, "mailDomain", "SC_DOMCOR", "DCO_CODI", TypeEnumeration.MAIL_DOMAIN_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "mailServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "modifiedBy", "SC_USUARI", "USU_USUMOD", TypeEnumeration.USER_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "modifiedOn", "SC_USUARI", "USU_DATMOD", TypeEnumeration.DATE_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "primaryGroup", "SC_GRUPS", "GRU_CODI", TypeEnumeration.GROUP_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "profileServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "shortName", "SC_USUARI", "USU_NOMCUR", TypeEnumeration.STRING_TYPE, null, false);
+		createStandardField (i++, MetadataScope.USER, User.class, "userType", "SC_TIPUSU", "TUS_CODI", TypeEnumeration.USER_TYPE_TYPE, null, false);
+	}
+
+	static Database database = null;
+	
+	private void createStandardField(int order, MetadataScope scope, Class<User> class1, String att, String table,
+			String column, TypeEnumeration type, String filterExpression, boolean unique) throws Exception {
+		Column c = searchColumn (table, column);
+		if (c == null)
+			throw new InternalErrorException ("Unable to find column "+table+"."+column);
+		createStandardField2(order, scope, class1, att, type, filterExpression, unique,
+				c.length == null || c.length.isEmpty()? 100: Integer.parseInt(c.length), 
+				c.notNull);
+	}
+	
+	private void createStandardField2(int order, MetadataScope scope, Class<User> class1, String att, TypeEnumeration type,
+			String filterExpression, boolean unique, int size, boolean nullable) throws Exception {
+		MetaDataEntity dataType = getMetaDataEntityDao().newMetaDataEntity();
+		for ( MetaDataEntity dt: getMetaDataEntityDao().findDataTypesByScopeAndName(scope, att))
+		{
+			if (Boolean.TRUE == dt.getBuiltin() && att.equals(dt.getName()))
+			{
+				dataType = dt;
+				break;
+			}
+		}
+		
+		dataType.setName( att );
+		dataType.setType( type);
+		dataType.setBuiltin(true);
+		dataType.setFilterExpression(filterExpression);
+		dataType.setNlsLabel(class1.toString()+"."+att);
+		if (dataType.getOrder() == null)
+			dataType.setOrder( new Long (order) );
+		dataType.setName(att);
+		dataType.setUnique(unique);
+		dataType.setScope(scope);
+		dataType.setRequired( ! nullable );
+		if (dataType.getSize() == null || dataType.getSize().intValue() > size)
+			dataType.setSize( size );
+		if (dataType.getId() == null)
+			getMetaDataEntityDao().create(dataType);
+		else
+			getMetaDataEntityDao().update(dataType);
+	}
+
+	private Column searchColumn(String tableName, String columnName) throws Exception {
+		if (database == null)
+			database = new DatabaseParser().parse();
+		for (Table table: database.tables)
+		{
+			if (table.name.equals(tableName))
+			{
+				for (Column column: table.columns)
+				{
+					if (column.name.equals(columnName))
+						return column;
+				}
+			}
+		}
+		return null;
 	}
 
 	protected void configureSystemProperties() throws InternalErrorException {

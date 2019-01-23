@@ -924,3 +924,146 @@ div.menupopup td {
 	padding-bottom: 5px;
 	padding-left: 7px
 }
+
+@keyframes hopin {
+    from {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		margin: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+    to {
+    	transform: scaleY(1.0);
+    }
+}
+	    
+@keyframes hopoff {
+    from {
+    	transform: scaleY(1.0);
+    	opacity: 1;
+		height: auto;
+		padding: 5px 0px 5px 10px;
+    }
+    to {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+}
+
+.tree-body tr.tree-hidden > td > div {
+	height: 0;
+	margin: 0;
+	padding: 0px 0px 0px 10px;
+	opacity: 0;
+	transform: scaleY(0.0);
+	animation-name: hopoff;
+	animation-duration: 0.3s;
+}
+
+.tree-body tr.tree-displayed > td > div {
+	animation-name: hopin;
+	animation-duration: 0.3s;
+}
+
+.rolldown > td > div {
+  	overflow-y: hidden;
+	max-height: 500px; /* approximate max height */
+	animation-name: rolldown;
+	animation-duration: 1s;
+}
+
+.roundedWindow {
+	border-radius: 7px;
+	border: solid #22B9D8 7px;
+	background-color: white;
+	animation-name: appear;
+	animation-duration: 0.7s;
+}
+
+a.change-mode-label {
+	
+}
+
+a.change-mode-label-hidden {
+	display:none;
+}
+
+a.change-mode-label-selected {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+span.rbtnbk {
+	background-image: none;
+	border: none;
+}
+
+
+select.listbox {
+    border: 1px solid #AAB;
+    padding: 2px 18px 2px 2px;
+    color: black;
+    background-color: white;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-width:80px;
+    padding-right: 16px;
+
+  /* styling */
+  background-color: white;
+  border-radius: 2px;
+  display: inline-block;
+  font: inherit;
+/*  line-height: 1.1em; 
+  padding: 2em 3.5em 0.5em 1em; */
+
+  /* reset */
+
+  margin: 0;      
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: transparent url(/zkau/web/zul/img/combobtn.gif);
+  background-position:
+    calc(100% - 4px) calc(50%) ;
+  background-repeat: no-repeat;
+}
+
+select.listbox:disabled {
+    background: white;
+    border:none;
+}
+
+select.classic:focus {
+}
+
+
+
+div.attributeSearchPopup {
+    border: solid 2px #AAB;
+    z-index: 10;
+    float: left;
+    margin-top: 20px;
+    position: absolute;
+    min-width: 150px;
+    min-height: 80px;
+    background: white;
+    padding: 8px;
+}
+
+div.inputField_input {
+	display: inline-block;
+	width: 150px;
+	vertical-align: top;
+}
+			
+div.inputField_label {
+	display: inline-block;
+	vertical-align: top;
+}

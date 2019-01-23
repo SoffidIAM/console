@@ -26,14 +26,14 @@
 				<label sclass="label" value="${c:l('process.lblAsignadoA')}"/>
 				<label id="txtAsignadoA"/>
 				<label sclass="label" value=""/>
-				<button label="${c:l('process.verDiagrama')}" onClick="visorProcesoWnd.doPopup()"/>
+				<button label="${c:l('process.verDiagrama')}" onClick="visorProcesoWnd.doPopup()" id="viewProcessDiagramButton"/>
 			</row>
 			<row spans="4">
 				<label id="txtDescripcion" multiline="true"/>
 			</row>	
 		</rows>
 	</grid>
-	<grid dataPath="BPMdata:/processInstance/log" fixedLayout="true" id="logs" width="100%">
+	<grid dataPath="BPMdata:/taskInstance/log" fixedLayout="true" id="logs" width="100%">
 		<columns>
 			<column label="${c:l('task.data')}" width="15%"/>
 			<column label="${c:l('task.autor')}" width="20%"/>

@@ -265,7 +265,8 @@ public class TaskUI extends Frame implements EventListener {
         try {
 	        generateImage(engine, definicion, task);
         } catch (Exception e) {
-        	log.warn("Error rendering workflow image", e);
+        	getFellow("viewProcessDiagramButton").setVisible(false);
+        	// log.warn("Error rendering workflow image", e);
         }
 
         // Establecemos los datos de proceso
@@ -364,7 +365,8 @@ public class TaskUI extends Frame implements EventListener {
                 try {
                 	Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
                 } catch (Exception e) {
-	            	window.detach();;                	
+                	log.warn("Error loading task", e);
+	            	window.detach();
 
 	            	Label l = new Label (e.toString());
 	        		l.setStyle("color: red");

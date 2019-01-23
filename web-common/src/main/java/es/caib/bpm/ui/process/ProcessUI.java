@@ -256,7 +256,8 @@ public class ProcessUI extends Frame {
         try {
         	generateImage(engine, proc, definicion);
         } catch (Exception e) {
-        	log.warn("Error generating workflow image", e);
+        	getFellow("viewProcessDiagramButton").setVisible(false);
+//        	log.warn("Error generating workflow image", e);
         }
 
 

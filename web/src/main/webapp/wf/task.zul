@@ -69,5 +69,10 @@
 				<hbox id="botonera"/>
 			</hbox>
 		</hbox>
+		<include src="usuarisllista.zul" />
+		<include src="grupsllista.zul" />
+		<include src="aplicacionsllista.zul" />
+		<include src="customObjectsllista.zul" />
+		<include src="rolsllista.zul" />
 	</frame>
 </zk>

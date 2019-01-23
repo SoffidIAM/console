@@ -240,11 +240,10 @@
 								effectiveRoles.add(role);
 						}
 
-						com.soffid.iam.tomcat.SoffidPrincipal p = new com.soffid.iam.tomcat.SoffidPrincipal (
+						com.soffid.iam.common.security.SoffidPrincipal p = new com.soffid.iam.common.security.SoffidPrincipal (
 								name+"\\"+Security.getCurrentAccount(),
-								"*",
-								effectiveRoles);
-						p.setFullName( Security.getPrincipal().getFullName());
+								effectiveRoles,
+								Security.getSoffidPrincipal());
 						session.setAttribute(es.caib.bpm.filters.WorkflowInterceptor.SOFFID_NESTED_PRINCIPAL,
 								p);
 						Executions.sendRedirect("/index.zul");

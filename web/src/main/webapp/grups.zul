@@ -15,7 +15,7 @@
 	<style>
 		.groupatt {display: table; padding: 0px; width: 100%}
 		.groupatt_row {display: table-row}
-		.groupatt_row span {padding-left:5px}
+		.groupatt_row > span {padding-left:5px}
 		.groupatt_label {display: table-cell; width: 202px}
 		.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		.ourcheck input {vertical-align:-7px}

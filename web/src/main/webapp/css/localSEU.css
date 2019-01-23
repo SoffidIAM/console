@@ -1090,6 +1090,11 @@ select.listbox {
   background-repeat: no-repeat;
 }
 
+select.listbox:disabled {
+    background: white;
+    border:none;
+}
+
 select.classic:focus {
 }
 
@@ -1106,3 +1111,20 @@ div.attributeSearchPopup {
     background: white;
     padding: 8px;
 }
+
+div.inputField {
+	display: table-row
+}
+span.inputField_label {
+	display: table-cell;
+	width: 120px;
+	vertical-align: top;
+}
+			
+div.inputField_input {
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+			

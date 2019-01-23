@@ -18,12 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.realm.GenericPrincipal;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
 import org.zkoss.zk.scripting.Interpreters;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -107,7 +107,7 @@ public class WorkflowInterceptor implements Filter {
 				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
 				
 				
-				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
+				GenericPrincipal nestedPrincipal = (GenericPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				
 				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
@@ -153,6 +153,7 @@ public class WorkflowInterceptor implements Filter {
 				}
 				else
 				{
+					Security.clearNestedLogins();
 					filter.doFilter(request, response);
 				}
 

@@ -142,7 +142,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		User u = getCurrentUser();
 		Security.nestedLogin(u.getUserName(), new String[]{Security.AUTO_USER_ROLE_QUERY + Security.AUTO_ALL});
 		try {
-			LinkedList<RoleAccount> ra = new LinkedList<RoleAccount> (getApplicationService().findUserRolesByUserName(u.getUserName()));
+			LinkedList<RoleAccount> ra = new LinkedList<RoleAccount> (getApplicationService().findUserRolesByUserNameNoSoD(u.getUserName()));
 			ra.addAll( getEntitlementDelegationService().findActiveDelegations() );
 			return ra;
 		} finally {

@@ -1246,23 +1246,27 @@ public class ApplicationServiceImpl extends
     }
 
     protected Collection<RoleAccount> handleFindUserRolesByUserName(String codiUsuari) throws Exception {// desde usuaris.zul para ver qué roles puede
-                              // mostrar
-        List<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByUserName(codiUsuari);
-
-        if (rolusus != null) {
-            // Filtrem per autoritzacions
-            List<RoleAccount> ra = new LinkedList<RoleAccount>();
-            for (RoleAccountEntity rae : rolusus) {
-                if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) ;
-                ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
-            }
-    		getSoDRuleService().qualifyRolAccountList(ra);
-    		return ra;
-       }
-        return new Vector();
+    	return internalFindUserRolesByUserName (codiUsuari, true);
     }
 
-    protected Collection<ContainerRole> handleFindTextualInformationAndUserRolesHierachyByUserName(String codiUsuari) throws Exception {
+    private Collection<RoleAccount> internalFindUserRolesByUserName(String codiUsuari, boolean sod) throws InternalErrorException {
+    	List<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByUserName(codiUsuari);
+    	
+    	if (rolusus != null) {
+    		// Filtrem per autoritzacions
+    		List<RoleAccount> ra = new LinkedList<RoleAccount>();
+    		for (RoleAccountEntity rae : rolusus) {
+    			if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) ;
+    			ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
+    		}
+    		if (sod)
+    			getSoDRuleService().qualifyRolAccountList(ra);
+    		return ra;
+    	}
+    	return new Vector();
+	}
+
+	protected Collection<ContainerRole> handleFindTextualInformationAndUserRolesHierachyByUserName(String codiUsuari) throws Exception {
         return handleFindTextualInformationAndUserRolesHierachyByUserName(codiUsuari, "N"); //$NON-NLS-1$
     }
 
@@ -3004,6 +3008,11 @@ public class ApplicationServiceImpl extends
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				Messages.getString("ApplicationServiceImpl.UnableDeleteRol"), codiAplicacio)); //$NON-NLS-1$
+	}
+
+	@Override
+	protected Collection<RoleAccount> handleFindUserRolesByUserNameNoSoD(String codiUsuari) throws Exception {
+    	return internalFindUserRolesByUserName (codiUsuari, false);
 	}
 }
 

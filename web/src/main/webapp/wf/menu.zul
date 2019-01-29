@@ -12,6 +12,7 @@
 	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
 	boolean canViewJob = Security.isUserInRole("schedule:query") || Security.isUserInRole("schedule:admin");
 	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
+	boolean canViewDirectory = Security.isUserInRole("selfservice:directory");
 	boolean canViewGrups =  AutoritzacionsUsuari.hasViewGrupsSEU();		
 	boolean canViewDadesAddicionals = AutoritzacionsUsuari.hasViewDadesAddicionalsSEU();		
 	boolean canViewTipusUOrganitzativa = AutoritzacionsUsuari.hasViewTipusUOSEU();

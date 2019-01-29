@@ -6,7 +6,8 @@
 <window border="none" style="border:0px;" id="menu" sclass="menuprincipal menu-display shadow-window" title="${c:l('menu.title')}" use="es.caib.bpm.ui.main.MainMenuWindow" visible="false" width="30em">
 	<zscript>
 	<![CDATA[
-	canManageSharedAccounts = es.caib.seycon.ng.utils.Security.isUserInRole("sso:manageAccounts");
+	canManageSharedAccounts = com.soffid.iam.utils.Security.isUserInRole("sso:manageAccounts");
+	boolean canViewDirectory = com.soffid.iam.utils.Security.isUserInRole("selfservice:directory");
 	]]>
 	</zscript>
 	<tree fixedLayout="true" vflex="false" id="menutree">
@@ -20,6 +21,11 @@
 			<treeitem>
 		    	<treerow>
 		    		<apptreecell langlabel="selfService.SharedAccounts" if="${canManageSharedAccounts}" pagina="vault/vault.zul"/> 
+		    	</treerow>
+		    </treeitem>
+			<treeitem>
+		    	<treerow>
+		    		<apptreecell langlabel="selfService.Directory" if="${canViewDirectory}" pagina="directory/directory.zul"/> 
 		    	</treerow>
 		    </treeitem>
     		<treeitem>

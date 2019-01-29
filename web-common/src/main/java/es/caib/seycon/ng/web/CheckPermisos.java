@@ -5,6 +5,7 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.util.Initiator;
 
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.Security;
 
 /**
  * Classe per fer la comprovació de permisos als ZULS, rep com a paràmetre un
@@ -47,6 +48,10 @@ public class CheckPermisos implements Initiator {
 			}
 		} else if ("aplicacions".equals(pagina)) { //$NON-NLS-1$
 			if (!AutoritzacionsUsuari.hasViewAplicacionsSEU()) {
+				redirect = true;
+			}
+		} else if ("directory".equals(pagina)) { //$NON-NLS-1$
+			if (!Security.isUserInRole("selfservice:directory")) {
 				redirect = true;
 			}
 		} else if ("auditoria".equals(pagina)) { //$NON-NLS-1$

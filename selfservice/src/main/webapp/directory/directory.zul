@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="grups" title="Group management"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="directory" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml">
+	<datamodel id="model" rootNode="grups" src="descriptorGrup.xml" />
+	
+	<style>
+		.groupatt {display: table; padding: 0px; width: 100%}
+		.groupatt_row {display: table-row}
+		.groupatt_row > span {padding-left:5px}
+		.groupatt_label {display: table-cell; width: 202px;
+		    color: #7F9FC2;
+		    font-weight: bold;
+		    font-size: 14px;
+    	}
+		.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		.ourcheck input {vertical-align:-7px}
+	</style>
+
+	<zscript>
+		<![CDATA[
+		    import es.caib.zkib.datasource.XPathUtils;
+		    
+			String requestedGroup = Executions.getCurrent().getNativeRequest().getParameter("group");
+			pageScope{"requestedGroup"} = requestedGroup;
+			import es.caib.zkib.zkiblaf.Missatgebox;
+			try
+			{
+				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
+					.Labels.getLabel("selfService.Directory"));
+			}
+			catch (Exception ex){}
+			
+			fileres = es.caib.seycon.ng.web.Custom.FILERES_GRUPS;
+				
+			String mode = "query";
+			boolean view_altres = false;
+			
+			// Autoritzacions
+			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+			boolean canCreateGroup = false;
+			boolean canUpdateGroup = false;
+			boolean canQueryGroup = false;
+			boolean canQueryRoles = false;
+			boolean canQueryGroupRoles =  AutoritzacionsUsuari.hasQueryGroupRoles();
+			boolean canQueryGroupUsers =  AutoritzacionsUsuari.hasQueryGroupUsers();
+			boolean canCreateGroupPrinter = false;
+			boolean canDeleteGroupPrinter = false;
+			boolean canModifyAplicacio = false;
+			
+			model.getVariables().declareVariable("queryEnabled", canQueryGroup);
+			
+			//Mixtes
+			canModifyGrups = canCreateGroup || canUpdateGroup;
+			
+			model.getVariables().declareVariable("canCreateGroup", canCreateGroup);
+			model.getVariables().declareVariable("canUpdateGroup", canUpdateGroup);
+			model.getVariables().declareVariable("canQueryGroup", canQueryGroup);
+			model.getVariables().declareVariable("canQueryGroupRoles", canQueryGroupRoles);
+			model.getVariables().declareVariable("canQueryGroupUsers", canQueryGroupUsers);
+			
+			
+			retrySearch = false;
+			boolean queryEnabled = false;
+			boolean retrySearch = false;
+			String initialGrup = "World";
+			if (requestedGroup != null)
+			{
+				initialGrup = requestedGroup;
+				
+			}
+			model.getVariables().declareVariable("codi", initialGrup);
+			
+			void populateDetails ()
+			{
+				mode="query";
+			}
+			
+			void select () 
+			{
+				if (esquema.getFellow("lista").getFellow("treebox").selectedItem != null && 
+					esquema.getFellow("lista").getFellow("treebox").selectedItem.value != null) {
+					populateDetails (); 
+					showDetall ();
+				} 
+			}
+			
+			void showLista ()  
+			{
+				esquema.getFellow("lista").getFellow("treebox").clearSelection();
+				esquema.getFellow("lista").getFellow("treebox").setRows(18);
+			}
+			
+			void showDetall () 
+			{
+				esquema.getFellow("lista").getFellow("treebox").setRows(5);
+				esquema.showFormulari();
+			}
+			
+		]]>
+	</zscript>
+
+	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi" hideSearchToolbar="true" onHideFormulari="showLista()">
+
+		<attribute name="onCreate">
+		<![CDATA[
+			if (pageScope{"requestedGroup"} != null)
+				Events.postEvent("onAutoQuery", esquema, null);
+		]]></attribute>
+
+		<attribute name="onAutoQuery">
+		<![CDATA[
+			esquema.getFellow("queryWindow").parent.parent.setVisible(false);
+			Tree treebox = esquema.getFellow("lista").getFellow("treebox");
+			Collection items = treebox.getTreechildren ().getItems();
+			if (items.size() == 1)
+			{
+				Treeitem ti = items.iterator().next();
+				treebox.setSelectedItem(ti);
+				select ();
+				esquema.removeList();
+			}
+			esquema.removeCriteria();
+		]]></attribute>
+
+		<criteris id="queryWindow" style="margin-bottom:1em;" width="100%" height="">
+			<attribute name="onCreate"><![CDATA[
+//				searchBox.addAttribute("name").setSearchFilter("World");
+			]]></attribute>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Group"
+				defaultAttributes="name, description, type" dataPath="/model:/grup"
+				preference="group"
+				variableName="query" variableNameText="queryText">
+			</searchbox>
+		</criteris>
+
+		<navegador id="lista" width="${amplaria}">
+			<tree id="treebox" dataPath="/model:/" fixedLayout="true" pageSize="19" 
+				 style="min-height: 100px"
+				 onSelect="select()" rows="${fileres}" autocommit="false">
+				<treecols>
+					<treecol label="${c:l('grups.zul.Descripcia-2')}" width="70%"/>
+					<treecol label="${c:l('grups.zul.Grup')}" width="15%"/>
+					<treecol label="${c:l('grups.zul.Tipus')}" width="15%"/>
+				</treecols>
+				<treefoot>
+					<treefooter span="3">
+						<label id="treeboxFoot" style="margin-left: 10px;" />
+					</treefooter>
+				</treefoot>
+				<treeitemfinder bind="." open="false" path="/grup">
+					<treerow>
+						<treecelldestacat bind="@descripcio" destacatBoolea="@obsolet"/>
+						<treecell bind="@codi"/>
+						<treecell bind="@tipus"/>
+					</treerow>
+				</treeitemfinder>
+			</tree>
+		</navegador>
+	
+		<detalls id="dades" width="${amplaria}" style="border:none">
+
+			<zscript>
+				<![CDATA[
+					void onChangeDades()
+					{
+						try {
+							llistaDePares();
+						} catch (Exception e) {
+						}
+					}
+					
+					void seleccionaGrup(xpath,codiGrupFill) 
+					{
+						children = esquema.getFellow("lista").getFellow("treebox").getTreechildren().getChildren();
+						
+						Iterator itr = children.iterator();
+						while(itr.hasNext()) {
+							item = itr.next();
+							//System.out.println("child = "+item.getLabel());
+							esquema.getFellow("lista").getFellow("treebox").setSelectedItem(item);
+						}
+						
+					}
+					 
+					void llistaDePares ()
+					{
+						ds = esquema.getFellow("dades").getFellow("form").getDataSource();
+						ctx =  ds.getJXPathContext();
+						String codiGrup = ctx.getValue("@codi");
+						es.caib.seycon.ng.servei.ejb.GrupService grupService = es.caib.seycon.ng.EJBLocator.getGrupService();
+						java.util.Collection pares = grupService.getLlistaDePares(codiGrup);
+				
+						//<!--  Esborrar la llista de pares del grup anterior -->
+						java.util.List aEsborrar = form.getFellow("hbox_llistapares").getChildren();
+						Iterator itrAnterior = aEsborrar.iterator();
+						while(itrAnterior.hasNext()) {
+							itrAnterior.next();
+							itrAnterior.remove();
+						}
+						
+					//<!-- Omplir la llista de pares del grup actual -->
+					int i = 0;
+					Iterator itr = pares.iterator();
+		    		while(itr.hasNext()) {
+		    			if (i==0) {fletxa = "";} else {fletxa = " > ";}	//&gt;
+			    		org.zkoss.zul.Label pareLabel = new org.zkoss.zul.Label (fletxa + itr.next().getDescripcio());
+			    		pareLabel.setStyle("font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: black; cursor: pointer;");
+			   			form.getFellow("hbox_llistapares").appendChild(pareLabel);
+			   			i++;
+		   			 }
+				}
+				
+				void llevaEspais(Textbox tb) {
+					if (tb.getValue().indexOf(" ") != -1) {
+						tb.setValue(tb.getValue().replaceAll(" ",""));
+					}
+				}
+				
+				void verificaSecPres(Textbox t_secPres) {
+					// Li llevem els espais extra
+					if (t_secPres!=null && t_secPres.value !=null && !"".equals(t_secPres.value)) {
+						String valorsp = t_secPres.value;
+						t_secPres.value = valorsp.replaceAll(" ",""); //eliminamos espacios
+					}
+				}
+				]]>
+			</zscript>
+			
+			<form dataPath="/esquema/lista/treebox:/" id="form" onChangeXPath="onChangeDades()" width="99%">
+				<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+					<tabs>
+						<tab label="${c:l('grups.zul.Grup')}"/>
+						<tab label="${c:l('aplicacions.zul.Responsables')}"/>
+					</tabs>
+
+					<tabpanels>
+						<tabpanel id="basica">
+							<hbox id="hbox_llistapares"/>
+							
+							<separator spacing="5px"/>
+							
+							<grid width="99%"  sclass="noBorderGrid">
+								<columns>
+									<column width="200px"/>
+									<column />
+								</columns>
+								<rows>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
+										
+										<hbox>
+											<textbox bind="@codi" id="detall_codi" maxlength="20"
+												disabled="true" sclass="textbox"
+												constraint="no empty"/>
+										</hbox>
+											
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Descripcia-2')}"/>
+										
+										<hbox width="52%">
+											<input_dada bind="@descripcio" id="detall_des"
+												lectura="${!canModifyGrups}" maxim="100"
+												width_custom="99%" mascara="no empty"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Quota')}"/>
+										<input_dada bind="@quota" id="detall_quota" lectura="${!canModifyGrups}" width_custom="50%"/>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Tipus-2')}"/>
+										<hbox>
+											<input_dada bind="@tipus" id="detall_tipus" lectura="${!canModifyGrups}"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Unitatofimatica-2')}"/>
+										<input_dada bind="@unitatOfimatica" id="detall_unitatOfimatica" lectura="${!canModifyGrups}" maxim="2"/>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Servidorofimatic-2')}"/>
+										<hbox>
+											<input_dada bind="@nomServidorOfimatic" id="detall_servidorOfimatic" lectura="${!canModifyGrups}"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Gruppare')}"/>
+										<hbox>
+											<input_dada id="detall_codiPare" bind="@codiPare"
+												lectura="${!canModifyGrups}"/>
+										</hbox>
+									</row>
+									<row>
+										<input_etiqueta value="${c:l('grups.zul.Obsolet-2')}"/>
+										<checkbox bind="@obsolet" disabled="${!canModifyGrups}" id="obsolet" class="ourcheck" onCheck=""/>
+									</row>
+								</rows>
+							</grid>
+							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+								dataPath="attributes" scope="group"
+								ownerBind="./"
+								readonly="true"
+								sclass="groupatt"/>
+							<separator spacing="10px"/>
+							<vbox width="99%">
+							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" 
+								id="gridUsuaris" if="${canQueryGroupUsers}" mold="paging" pageSize="20" sclass="likeagrid">
+								<listhead>
+									<listheader label="${c:l('grups.zul.Codi-2')}" sort="auto" width="200px">
+									</listheader>
+									<listheader label="${c:l('grups.zul.Nom')}" sort="auto"/>
+									<listheader label="${c:l('grups.zul.Tipus')}" sort="auto" width="120px"/>
+								</listhead>
+								<dataitem bind=".">
+									<listcell bind="@codiUsuari" />
+									<listcell>
+										<label bind="@nomComplet" style="margin-right: 1em"/>
+										<imageclic src="/img/link.png">
+											<attribute name="onClick"><![CDATA[
+												Window w = desktop.getPage("users").getFellow("userWindow");
+												Events.postEvent("onOpen", w, event.getTarget().getParent().getPreviousSibling().getLabel());
+											]]>
+											</attribute>
+										</imageclic>
+									</listcell>
+									<listcell bind="@info"/>
+								</dataitem>
+							</listbox>
+
+							<progress bind="/esquema/lista/treebox:/usuari"  if="${canQueryGroupUsers}" ></progress>
+							<hbox style="float:right">
+							<listexportbutton acces="${canQueryGroup}" if="${canQueryGroupUsers}" listbox="gridUsuaris"/>
+							</hbox>
+							</vbox>
+						</tabpanel>
+						
+						<tabpanel if="${canQueryRoles }">
+							<grid dataPath="managementRole">
+								<datarow>
+									<div>
+										<label bind="@nom"/> - <label bind="@descripcio"/>
+										<div style="width:100%; padding-left:80px">
+											<grid dataPath="manager"  width="100%" >
+												<columns>
+													<column label="${c:l('aplicacions.zul.Responsable')}" width="100px"/>
+													<column label="${c:l('aplicacions.zul.Nom-2')}"/>
+												</columns>
+												<datarow>
+													<label bind="@codiUsuari"/>
+													<label bind="@nomComplertUsuari"/>
+												</datarow>
+											</grid>
+										</div>
+									</div>
+								</datarow>
+							</grid>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+				<popup id="tooltipCodiGrup" width="200px">
+					<attribute name="onOpen">
+						if (event.getReference() instanceof DataListcell) {
+							listCell = event.getReference(); 
+							dlistbox = listCell.getListbox(); 
+							modelo = dlistbox.getModel(); 
+							listItem = listCell.getParent(); 
+							posicio = listItem.getIndex(); 
+							elemPos = modelo.getElementAt(posicio); 
+							xpath = elemPos.getDataContext().getXPath(); 
+							dataSource = dlistbox.getDataSource(); 
+							context = dataSource.getJXPathContext();  
+							dada = context.getValue(xpath+"/@codiGrup");
+							rolsNomTooltipLabel.value = "codi grup='"+dada+"'";
+						}
+					</attribute>
+					<label id="rolsNomTooltipLabel" value=""/>
+				</popup>
+			</form>
+			<toolbar if="${requestedGroup != null}" class="toolbarOnlyDetails">
+				<commitbutton id="b_commit" datamodel="/model" />
+			</toolbar>
+		</detalls>
+	</esquemavertical>
+	
+	<include src="/directory/user.zul"/>
+	
+</frame>

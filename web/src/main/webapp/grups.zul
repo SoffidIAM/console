@@ -69,7 +69,7 @@
 			retrySearch = false;
 			boolean queryEnabled = false;
 			boolean retrySearch = false;
-			String initialGrup="World";
+			String initialGrup = "World";
 			if (requestedGroup != null)
 			{
 				initialGrup = requestedGroup;
@@ -189,7 +189,7 @@
 
 		<criteris id="queryWindow" style="margin-bottom:1em;" width="100%" height="">
 			<attribute name="onCreate"><![CDATA[
-				searchBox.addAttribute("name").setSearchFilter("World");
+//				searchBox.addAttribute("name").setSearchFilter("World");
 			]]></attribute>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Group"

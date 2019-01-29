@@ -1355,6 +1355,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>selfservice:directory</codi>
+		<descripcio>Browse corporate directory</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>sso:createSharedFolders</codi>
 		<descripcio>Create root shared folders</descripcio>
 		<ambit>SelfService</ambit>

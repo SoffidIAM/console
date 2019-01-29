@@ -7,6 +7,6 @@
 package roles;
 import com.soffid.mda.annotation.*;
 
-@Role (name="monitor:server:list\n" )
+@Role (name="monitor:server:list" )
 public abstract class monitor_server_list {
 }

@@ -25,12 +25,12 @@ import com.soffid.mda.annotation.Service;
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.ValorDomini;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
 import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
-@Service(translatedName = "ApplicationService", translatedPackage = "com.soffid.iam.service")
+@Service(translatedName = "ApplicationService", translatedPackage = "com.soffid.iam.service",
+		serverPath="/seycon/ApplicationService", serverRole="agent")
 @Depends({
 		// / Entities
 		es.caib.seycon.ng.model.NotificacioEntity.class,

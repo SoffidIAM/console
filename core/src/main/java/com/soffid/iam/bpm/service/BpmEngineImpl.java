@@ -173,9 +173,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 		if (Security.getSoffidPrincipal() == null)
 			return "nobody"; //$NON-NLS-1$
 
-		GenericPrincipal p = Security.getSoffidPrincipal();
+		SoffidPrincipal p = Security.getSoffidPrincipal();
 		if (p != null && p instanceof SoffidPrincipal)
-			return ((SoffidPrincipal)p).getHolderGroup();
+			return p.getHolderGroup();
 		else
 			return null;
 	}
@@ -215,8 +215,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 	 */
 	private String[] getUserGroups() throws BPMException,
 			InternalErrorException, UnknownUserException {
-		GenericPrincipal principal = Security.getSoffidPrincipal();
-		return Security.getPrincipalGroupsAndRoles(principal);
+		SoffidPrincipal principal = Security.getSoffidPrincipal();
+		return principal.getGroupsAndRoles();
 	}
 
 	private void flushContext(JbpmContext ctx) {

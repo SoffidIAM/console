@@ -29,6 +29,7 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
@@ -152,12 +153,12 @@ public class LoginServiceImpl implements LoginService {
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
 						roles.add("PASSWORD:VALID");
-						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
+						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
 								roles, groups, soffidRoles);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");
-						principal = new SoffidPrincipal(tenant.getName()+ "\\" + account, 
+						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
 								roles,
 								groups, soffidRoles);
 					} else {
@@ -251,7 +252,7 @@ public class LoginServiceImpl implements LoginService {
 	}
 
     Realm dummyRealm = new SoffidRealm();
-    Principal dummyPrincipal = new SoffidPrincipal("master\\$$ANONYMUOS", new LinkedList<String>(), null, null);
+    Principal dummyPrincipal = new SoffidPrincipalImpl("master\\$$ANONYMUOS", new LinkedList<String>(), null, null);
 
     private Object enterWebapp ()
 	{

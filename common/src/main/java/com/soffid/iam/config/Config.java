@@ -134,7 +134,16 @@ public class Config {
         }
      }
 
+    private File homeDir = null;
     public File getHomeDir() throws IOException {
+    	if (homeDir == null)
+    	{
+    		homeDir = computeHomeDir();
+    	}
+    	return homeDir;
+    }
+
+    private File computeHomeDir() throws IOException {
         String exe = System.getProperty("exe4j.moduleName"); //$NON-NLS-1$
         if (exe != null) {
             return new File(exe).getParentFile().getParentFile();
@@ -164,9 +173,8 @@ public class Config {
         }
 
         return new File("."); //$NON-NLS-1$
-    }
-
-    public File getLogFile() throws IOException {
+	}
+	public File getLogFile() throws IOException {
         File dir = getLogDir();
         return new File(dir, "syncserver.log"); //$NON-NLS-1$
     }

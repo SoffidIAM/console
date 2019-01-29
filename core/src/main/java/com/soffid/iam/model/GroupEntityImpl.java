@@ -58,37 +58,7 @@ public class GroupEntityImpl extends com.soffid.iam.model.GroupEntity
 		if (Security.isUserInRole(permission+"/"+getName()))
 			return true;
 		
-		try 
-		{
-			AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
-			for (Iterator it = autService.getAuthorizationInfo(permission).iterator(); it.hasNext(); )
-			{
-				SoffidAuthorization as = (SoffidAuthorization) it.next();
-				if ("parents".equals(as.getScope()) || "both".equals(as.getScope()))
-				{
-					for (GroupEntity child: getChildren())
-					{
-						if (checkDeep(permission, child))
-							return true;
-					}
-				}
-				
-				if ("children".equals(as.getScope()) || "both".equals(as.getScope()))
-				{
-					GroupEntity parent = getParent();
-					while (parent != null)
-					{
-						if (Security.isUserInRole(permission+"/"+parent.getName()))
-							return true;
-						parent = parent.getParent();
-					}
-				}
-
-			}
-			return false;
-		} catch (InternalErrorException e) {
-			throw new SecurityException ("Unable to check permissions", e);
-		}
+		return false;
 	}
 
 	@Override

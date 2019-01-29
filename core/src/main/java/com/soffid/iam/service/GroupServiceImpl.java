@@ -823,7 +823,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				return;
 			Group g = getGroupEntityDao().toGroup(ge);
 			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
-				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, ge)) {
+				if (getAuthorizationService().hasPermission(Security.AUTO_GROUP_QUERY, ge)) {
 					result.add(g);
 				}
 			}

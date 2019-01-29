@@ -49,6 +49,10 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	private DataType dataTypeObj;
 
+	private InputField2 input;
+
+	private Object ownerObject;
+
 	public void updateMetadata() {
 		dataTypeObj = new DataType();
 		dataTypeObj.setDataObjectType(dataObjectType);
@@ -108,13 +112,14 @@ public class CustomField extends Div implements XPathSubscriber {
 			Label l = new Label(label);
 			l.setSclass( getSclass()+"_label" );
 			appendChild(l);
-			InputField2 input = new InputField2();
+			input = new InputField2();
 			input.setDataType(dataTypeObj);
 			input.setSclass(getSclass()+"_input");
 			input.setReadonly(readonly);
 			appendChild(input);
 			input.setBind(binder.getDataPath());
 			input.setSearchFilter(searchFilter);
+			input.setOwnerObject(ownerObject);
 			try {
 				input.createField();
 			} catch (Exception e) {
@@ -187,7 +192,11 @@ public class CustomField extends Div implements XPathSubscriber {
 	}
 
 	public void setReadonly(boolean readonly) {
-		this.readonly = readonly;
+		if (readonly != this.readonly)
+		{
+			this.readonly = readonly;
+			refresh();
+		}
 	}
 
 	public String getValidationScript() {
@@ -210,6 +219,11 @@ public class CustomField extends Div implements XPathSubscriber {
 	{
 		binder.setDataPath(bind);
 		refresh();
+	}
+
+	public String getBind ()
+	{
+		return binder.getDataPath();
 	}
 
 	public void setPage(Page page) {
@@ -272,5 +286,26 @@ public class CustomField extends Div implements XPathSubscriber {
 		}
 		return null;
 		
+	}
+
+	public Object getValue() {
+		return binder.getValue();
+	}
+	
+	public boolean validate () {
+		return input.attributeValidateAll();
+	}
+
+	public Object getOwnerObject() {
+		return ownerObject;
+	}
+
+	public void setOwnerObject(Object ownerObject) {
+		this.ownerObject = ownerObject;
+	}
+	
+	public void adjustVisibility ()
+	{
+		setVisible ( input.attributeVisible() );
 	}
 }

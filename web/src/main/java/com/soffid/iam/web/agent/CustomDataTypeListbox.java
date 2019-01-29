@@ -146,9 +146,10 @@ public class CustomDataTypeListbox extends Listbox implements XPathSubscriber {
 		String currentCustomType = null;
 
 		try {
-			DataNode dn = (DataNode) valueBinder.getValue();
-			if (dn == null)
+			Object value = valueBinder.getValue();
+			if (value == null)
 				return;
+			DataNode dn = (DataNode) value;
 			currentType = (TypeEnumeration) dn.get("type");
 			currentCustomType = (String) dn.get("dataObjectType");
 		} catch (Exception e) {

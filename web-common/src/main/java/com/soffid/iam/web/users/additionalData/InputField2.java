@@ -60,8 +60,10 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.web.component.Identity;
@@ -919,6 +921,7 @@ public class InputField2 extends Div
 			else if(TypeEnumeration.DATE_TYPE.equals(type))
 			{
 				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
+						+ (readonly ? "buttonVisible=\"false\" ": "")
 						+ "id=\""+id+"\" "
 						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+"</div>"; 
 			}
@@ -1436,6 +1439,14 @@ public class InputField2 extends Div
 			{
 				i.set("application", Application.toApplication((Aplicacio) ownerObject));
 				i.set("object", Application.toApplication((Aplicacio) ownerObject));
+			}
+			if (ownerObject instanceof Task)
+			{
+				i.set("task",  ownerObject);
+			}
+			if (ownerObject instanceof ProcessInstance)
+			{
+				i.set("process", ownerObject);
 			}
 		}
 		i.set("context", ownerContext);

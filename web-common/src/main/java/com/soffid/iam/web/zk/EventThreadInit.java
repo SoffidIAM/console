@@ -20,7 +20,7 @@ import es.caib.zkib.zkiblaf.tomee.TomeeThreadInit;
 public class EventThreadInit extends TomeeThreadInit {
 	String cacheSession;
 	private SessionCacheService ejb;
-	private GenericPrincipal currentIdentity;
+	private SoffidPrincipal currentIdentity;
 	Locale locale;
 	private String clientIp;
 	
@@ -36,6 +36,7 @@ public class EventThreadInit extends TomeeThreadInit {
 			ejb.clearSession();
 		else
 			ejb.setSession(cacheSession);
+		Security.clearNestedLogins();
 		if (currentIdentity != null)
 		{
 			Security.setClientIp(clientIp);

@@ -26,6 +26,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.TenantServiceImpl;
 
@@ -316,15 +317,6 @@ public class Security {
         return s;
     }
 
-    public static String[] getPrincipalRoles (GenericPrincipal p)
-    {
-    	try {
-    		return p.getRoles();
-		} catch (Throwable e) {
-			return new String[0];
-		}
-    }
-    
     public static String[] getPrincipalSoffidRoles (GenericPrincipal p)
     {
     	try {
@@ -357,7 +349,7 @@ public class Security {
         if (onSyncServer)
             return true;
 
-        GenericPrincipal principal = getSoffidPrincipal ();
+        SoffidPrincipal principal = getSoffidPrincipal ();
 
         if (principal == null)
         	return false;
@@ -371,7 +363,7 @@ public class Security {
     	int i = role.indexOf('/');
         if (i <= 0)
         {
-        	for ( String s: getPrincipalRoles(principal))
+        	for ( String s: principal.getRoles())
         	{
         		if (s.startsWith(role+"/"))
         			return true;
@@ -388,14 +380,14 @@ public class Security {
     }
 
     public static List<String> getAuthorizations() {
-    	GenericPrincipal principal = getSoffidPrincipal();
+    	SoffidPrincipal principal = getSoffidPrincipal();
     	if (principal == null)
     		return Collections.emptyList();
     	else
     		return Arrays.asList(principal.getRoles());
     }
 
-    public static GenericPrincipal getPrincipal() {
+    public static Principal getPrincipal() {
     	return getSoffidPrincipal();
     }
 
@@ -413,7 +405,7 @@ public class Security {
                     host = "root"; //$NON-NLS-1$
                 }
             }
-            return new SoffidPrincipal(Security.getMasterTenantName()+"\\"+host, 
+            return new SoffidPrincipalImpl(Security.getMasterTenantName()+"\\"+host, 
             		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null );
         } else {
         	try {
@@ -443,7 +435,7 @@ public class Security {
     	try {
     		if (getTenantService() == null) // For proxy servers
     		{
-		        p = new SoffidPrincipal(tenant+"\\"+user, Arrays.asList(roles), null, null);
+		        p = new SoffidPrincipalImpl(tenant+"\\"+user, Arrays.asList(roles), null, null);
     		} else {
     			
     			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
@@ -470,7 +462,7 @@ public class Security {
 							auths2.add(a.getCodi()+Security.AUTO_ALL);
 						}
 					}
-			        p = new SoffidPrincipal(tenant+"\\"+user, auths2, currentPrincipal);
+			        p = new SoffidPrincipalImpl(tenant+"\\"+user, auths2, currentPrincipal);
 				}
 				else
 				{
@@ -482,7 +474,7 @@ public class Security {
 								throw new RuntimeException("Cannot elevate permission "+role);
 						}
 					}
-			        p = new SoffidPrincipal(tenant+"\\"+user, Arrays.asList(roles), currentPrincipal);
+			        p = new SoffidPrincipalImpl(tenant+"\\"+user, Arrays.asList(roles), currentPrincipal);
 				}
     		}
 		} catch (InternalErrorException e) {
@@ -512,17 +504,12 @@ public class Security {
         internalNestedLogin(tenant, user, roles);
     }
 
-    public static void nestedLogin(GenericPrincipal principal)  {
-        if (principal instanceof SoffidPrincipal)
-        {
-            int i = principal.getName().indexOf('\\');
-            if ( i >= 0)
-            	assertCanSetTenant(principal.getName().substring(0, i));
-        	assertCanSetIdentity();
-        	getIdentities().push((SoffidPrincipal) principal);
-        }
-        else
-        	nestedLogin(principal.getName(), principal.getRoles());
+    public static void nestedLogin(SoffidPrincipal principal)  {
+        int i = principal.getName().indexOf('\\');
+        if ( i >= 0)
+        	assertCanSetTenant(principal.getName().substring(0, i));
+    	assertCanSetIdentity();
+    	getIdentities().push((SoffidPrincipal) principal);
     }
 
 
@@ -582,7 +569,7 @@ public class Security {
     
     public static String getCurrentTenantName () throws InternalErrorException
     {
-    	GenericPrincipal p = getSoffidPrincipal();
+    	SoffidPrincipal p = getSoffidPrincipal();
     	if (p != null)
     	{
     		int i = p.getName().indexOf('\\');
@@ -601,7 +588,7 @@ public class Security {
     
     public static String getCurrentUser () 
     {
-    	GenericPrincipal p;
+    	SoffidPrincipal p;
     	if (! getIdentities().isEmpty())
     	{
     		p = getIdentities().peek();

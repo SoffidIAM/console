@@ -29,7 +29,7 @@ public class Usuari {
 	public java.lang.String nomCurt;
 
 	@Nullable
-	@Attribute(translated = "createdDate" )
+	@Attribute(translated = "createdDate", synonyms = {"createdOn"} )
 	public java.util.Calendar dataCreacioUsuari;
 
 	@Nullable

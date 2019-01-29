@@ -755,6 +755,10 @@
 		<foreignColumn name='ID_'/>
 	</foreignKey>
 
+	<index name='IDX_POOLEDACTOR_ACTORID' table='JBPM_POOLEDACTOR' unique='false'>
+		<column name='ACTORID_'/>
+	</index>
+
 	
 	<!-- TABLE JBPM_PROCESSDEFINITION  -->
 

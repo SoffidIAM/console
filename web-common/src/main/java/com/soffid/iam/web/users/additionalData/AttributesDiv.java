@@ -27,7 +27,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.EJBLocator;
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -90,6 +90,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	}
 
 	public void updateMetadata() {
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
 		try {
 			if (ownerBind != null) {
 				try {
@@ -106,13 +107,13 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 			{
 				if (objectType == null || objectType.trim().isEmpty())
 					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
+				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
 			}
 			else if (scope == MetadataScope.CUSTOM)
 			{
 				if (objectType == null || objectType.trim().isEmpty())
 					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
+				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findDataTypesByObjectTypeAndName(objectType, null));
 			}
 			else if (scope == MetadataScope.ACCOUNT)
 			{
@@ -128,10 +129,10 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 						
 				if (system == null || system.trim().isEmpty())
 					return;
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findSystemDataTypes(system));
+				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findSystemDataTypes(system));
 			}
 			else
-				dataTypes = new LinkedList<TipusDada>(EJBLocator.getDadesAddicionalsService().findDataTypes(this.scope));
+				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findDataTypes(this.scope));
 			Collections.sort(dataTypes, new Comparator<TipusDada>() {
 				public int compare(TipusDada o1, TipusDada o2) {
 					return o1.getOrdre().compareTo(o2.getOrdre());
@@ -139,6 +140,8 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 			});
 		} catch (Exception e) {
 			throw new UiException(e);
+		} finally {
+			Security.nestedLogoff();
 		}
 		refresh ();
 	}

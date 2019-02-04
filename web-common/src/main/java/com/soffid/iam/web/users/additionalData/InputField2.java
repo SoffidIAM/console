@@ -52,6 +52,7 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.mesg.MZul;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
@@ -66,6 +67,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.Identity;
 
 import bsh.EvalError;
@@ -267,21 +269,27 @@ public class InputField2 extends Div
 			searchBox.detach();
 		searchResults = new LinkedList<Identity>();
 		searchPosition = 0;
-		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		try
 		{
-			currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
-		}
-		if (dataType.getType() == TypeEnumeration.USER_TYPE)
-		{
-			currentSearch = com.soffid.iam.EJBLocator.getUserService().findUserByTextAsync(searchCriteria);
-		}
-		if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
-		{
-			currentSearch = com.soffid.iam.EJBLocator.getGroupService().findGroupByTextAsync(searchCriteria);
-		}
-		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
-		{
-			currentSearch = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByTextAsync(searchCriteria);
+			if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
+			{
+				currentSearch = ServiceLocator.instance().getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
+			}
+			if (dataType.getType() == TypeEnumeration.USER_TYPE)
+			{
+				currentSearch = ServiceLocator.instance().getUserService().findUserByTextAsync(searchCriteria);
+			}
+			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
+			{
+				currentSearch = ServiceLocator.instance().getGroupService().findGroupByTextAsync(searchCriteria);
+			}
+			if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
+			{
+				currentSearch = ServiceLocator.instance().getApplicationService().findApplicationByTextAsync(searchCriteria);
+			}
+		} finally {
+			Security.nestedLogoff();
 		}
 		searchBox = new org.zkoss.zhtml.Div();
 		searchBox.setDynamicProperty("tabindex", "-1");
@@ -759,8 +767,7 @@ public class InputField2 extends Div
 					createFieldElement(null, value);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
-			// Ignore
+			log.warn(e);
 		} finally {
 			disableRecursive = false;
 		}
@@ -865,7 +872,7 @@ public class InputField2 extends Div
 				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
 						+ "id=\""+id+"\" "
 						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='/zkau/web/img/mail.png' "
+				sb.append("<imageclic src='~./img/mail.png' "
 						+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
 						+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
 						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "

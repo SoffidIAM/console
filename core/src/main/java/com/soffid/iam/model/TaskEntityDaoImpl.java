@@ -21,12 +21,15 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 
 /**
  * @see es.caib.seycon.ng.model.TasqueEntity
  */
 public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
+	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
+	
     @Override
     public void create(TaskEntity tasqueEntity) {
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
@@ -82,7 +85,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	if (tasqueEntity.getTransaction().equals( TaskHandler.UPDATE_USER))
     	{
     		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
-    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.user=? and t.tenant.id=?" );
+    				+ "where t.server is null and t.transaction=? and t.systemName is null and t.user=? and t.tenant.id=?" );
     		q.setString(0, tasqueEntity.getTransaction());
     		q.setString(1, tasqueEntity.getUser());
     		q.setLong(2, tasqueEntity.getTenant().getId());
@@ -263,6 +266,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	 */
 	@Override
     protected void handleCreateNoFlush(TaskEntity tasque) throws Exception {
+    	log.info("Creatinc task "+tasque.getTransaction());
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
 		if ("readonly".equals( status ) || "manual".equals( status ))
 			return;
@@ -291,6 +295,8 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	
 		tooMuchTasks(tasque);
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
+    	if (checkDuplicate(tasque))
+    		return;
 		tasque.setStatus("P");
 		this.getHibernateTemplate().save(tasque);
 	}

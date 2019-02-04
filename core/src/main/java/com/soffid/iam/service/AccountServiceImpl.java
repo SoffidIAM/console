@@ -128,15 +128,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		UserEntity ue = getUser(usuari.getUserName());
 		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
 		UserAccountEntity uae = generateAccount(name, ue, de, true);
+		createAccountTask(uae.getAccount());
 		return getUserAccountEntityDao().toUserAccount(uae);
 	}
 
 	private UserAccountEntity generateAccount(String name, UserEntity ue, SystemEntity de, boolean force) throws Exception {
 		UserAccountEntity uae ;
-		boolean nullName = false;
 		if (name == null)
 		{
-			nullName = true;
 			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getName());
 			if (! existing.isEmpty())
 				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
@@ -216,7 +215,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		getUserAccountEntityDao().create(uae);
 		acc.getUsers().add(uae);
 		ue.getAccounts().add(uae);
-		createAccountTask(uae.getAccount());
 		return uae;
 	}
 

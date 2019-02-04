@@ -29,7 +29,6 @@ import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;

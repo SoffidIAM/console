@@ -67,7 +67,7 @@
 			retrySearch = false;
 			boolean queryEnabled = false;
 			boolean retrySearch = false;
-			String initialGrup = "World";
+			String initialGrup = "world";
 			if (requestedGroup != null)
 			{
 				initialGrup = requestedGroup;

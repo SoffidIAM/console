@@ -1130,7 +1130,7 @@
 											</dataitem>
 										</listbox>
 										<label value=" ${c:l('agents.zul.sharedThread')}:" />
-										<checkbox bind="@sharedDispatcher" />
+										<checkbox bind="@sharedDispatcher" onCheck=""/>
 									</div>
 									<listbox
 										disabled="${!canModifyAgent}"

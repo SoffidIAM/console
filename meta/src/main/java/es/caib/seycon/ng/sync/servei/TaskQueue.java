@@ -8,6 +8,7 @@ package es.caib.seycon.ng.sync.servei;
 
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.engine.intf.DebugTaskResults;
+import com.soffid.iam.sync.service.SyncServerStatsService;
 import com.soffid.mda.annotation.*;
 
 import java.util.Map;
@@ -22,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 		es.caib.seycon.ng.sync.servei.SecretStoreService.class, es.caib.seycon.ng.model.AccountEntity.class,
 		es.caib.seycon.ng.servei.AccountService.class, es.caib.seycon.ng.sync.servei.ServerService.class,
 		es.caib.seycon.ng.sync.servei.ChangePasswordNotificationQueue.class,
-		es.caib.seycon.ng.sync.servei.TaskQueue.class })
+		es.caib.seycon.ng.sync.servei.TaskQueue.class ,
+		SyncServerStatsService.class})
 @Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
 public abstract class TaskQueue {
 
@@ -89,18 +91,6 @@ public abstract class TaskQueue {
 			boolean bOK, @Nullable java.lang.String sReason, @Nullable java.lang.Throwable t)
 			throws es.caib.seycon.ng.exception.InternalErrorException,
 			es.caib.seycon.ng.exception.InternalErrorException {
-	}
-
-	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public boolean isEmpty() throws es.caib.seycon.ng.exception.InternalErrorException {
-		return false;
-	}
-
-	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Iterator<TaskHandler> getIterator() throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
 	}
 
 	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")

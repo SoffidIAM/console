@@ -280,8 +280,8 @@ public class DispatcherServiceImpl extends
 		} finally {
 			getTaskEntityDao().finishVirtualSourceTransaction(t);
 		}
-	}
 
+	}
 	private void updateTipusAndGrups(com.soffid.iam.api.System dispatcher,
 			SystemEntity entity) throws InternalErrorException, Exception {
 		updateTipus(dispatcher, entity);
@@ -293,7 +293,6 @@ public class DispatcherServiceImpl extends
 		UserTypeEntityDao tipusDao = getUserTypeEntityDao();
 		com.soffid.iam.service.AccountService accService = getAccountService();
 		String[] tipus = dispatcher.getUserTypes().split("[, ]+"); //$NON-NLS-1$
-		Collection<UserTypeEntity> tipusUsuariToGenerateAccounts = new LinkedList<UserTypeEntity>();
 		for (int i = 0; i < tipus.length; i++) {
 			String t = tipus[i].trim();
 			boolean found = false;
@@ -314,7 +313,6 @@ public class DispatcherServiceImpl extends
 				td.setUserType(tu);
 				getUserTypeSystemEntityDao().create(td);
 				entity.getUserType().add(td);
-				tipusUsuariToGenerateAccounts.add(tu);
 			}
 		}
 		for (Iterator<UserTypeSystemEntity> it = entity.getUserType()
@@ -328,63 +326,10 @@ public class DispatcherServiceImpl extends
 				}
 			}
 			if (!found) {
-				tipusUsuariToGenerateAccounts.add(td.getUserType());
 				getUserTypeSystemEntityDao().remove(td);
 				it.remove();
-				UserService usuService = getUserService();
-				Collection<User> usuaris = usuService.findUserByCriteria("",
-						"", "", "", "", "", "", "", "", "", td.getUserType()
-								.getName(), "", "", "", "", "", "", "", false);
-				accService = getAccountService();
-				long l = usuaris.size();
-				int i = 0;
-				for (User usuari : usuaris) {
-					i++;
-					if (i % 100 == 1)
-						log.info("Updating user " + i + " of " + l);
-					generateUpdateUser(usuari.getUserName(), entity.getName());
-				}
-				log.info("Updated " + l + " users");
 			}
 		}
-		for (UserTypeEntity tu : tipusUsuariToGenerateAccounts) {
-			UserService usuService = getUserService();
-			Collection<User> usuaris = usuService.findUserByCriteria("", "",
-					"", "", "", "", "", "", "", "", tu.getName(), "", "", "",
-					"", "", "", "", false);
-			accService = getAccountService();
-			long l = usuaris.size();
-			int i = 0;
-			for (User usuari : usuaris) {
-				i++;
-				if (i % 100 == 1)
-					log.info("Updating user " + i + " of " + l);
-				generateUpdateUser(usuari.getUserName(), entity.getName());
-			}
-			log.info("Updated " + l + " users");
-		}
-//		if (tipusUsuariToGenerateAccounts != null
-//				&& !tipusUsuariToGenerateAccounts.isEmpty())
-//			if (dispatcher.getUrl() != null)
-//			{
-//				
-//				String status = ConfigurationCache.getProperty("soffid.task.mode");
-//				if (! "readonly".equals( status ) && ! "manual".equals( status ))
-//					handlePorpagateUsersDispatcher(dispatcher.getName());
-//			}
-	}
-
-	private void generateUpdateUser(String usuari, String dispatcher)
-			throws InternalErrorException {
-		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-		tasque.setTransaction(TaskHandler.UPDATE_USER);// Actualització de l'usuari a //$NON-NLS-1$
-		// l'agent
-		tasque.setDate(new Timestamp(System.currentTimeMillis()));
-		tasque.setUser(usuari);
-		tasque.setSystemName(dispatcher); // Només es genera la tasca al
-											// dispatcher actual
-		tasque.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-		getTaskEntityDao().createNoFlush(tasque);
 	}
 
 	private void updateGrups(com.soffid.iam.api.System dispatcher,
@@ -443,38 +388,8 @@ public class DispatcherServiceImpl extends
 				groupsToGenerateAccounts.add(gd.getGroup());
 				getSystemGroupEntityDao().remove(gd);
 				it.remove();
-				List<UserEntity> usuaris = getUserEntityDao()
-						.findUsersGroupAndSubgroupsByGroupCode(
-								gd.getGroup().getName());
-				accService = getAccountService();
-				long l = usuaris.size();
-				int i = 0;
-				for (UserEntity usuari : usuaris) {
-					i++;
-					if (i % 100 == 1)
-						log.info("Updating user " + i + " of " + l);
-					generateUpdateUser(usuari.getUserName(), entity.getName());
-				}
-				log.info("Updated " + l + " users");
 			}
 		}
-		for (GroupEntity gr : groupsToGenerateAccounts) {
-			List<UserEntity> usuaris = getUserEntityDao()
-					.findUsersGroupAndSubgroupsByGroupCode(gr.getName());
-			long l = usuaris.size();
-			int i = 0;
-			for (UserEntity usuari : usuaris) {
-				i++;
-				if (i % 100 == 1)
-					log.info("Updating user " + i + " of " + l);
-				generateUpdateUser(usuari.getUserName(), entity.getName());
-			}
-			log.info("Updated " + l + " users");
-		}
-		if (groupsToGenerateAccounts != null
-				&& !groupsToGenerateAccounts.isEmpty())
-			if (dispatcher.getUrl() != null)
-				handlePorpagateUsersDispatcher(dispatcher.getName());
 	}
 
 	/**

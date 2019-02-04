@@ -345,8 +345,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		UserGroupEntity usuariGrup = getUserGroupEntityDao().findByUserAndGroup(codiUsuari, codiGrup);
 		long userId = usuariGrup.getUser().getId();
 		long groupId = usuariGrup.getGroup().getId();
+
+		usuariGrup.getUser().getSecondaryGroups().remove(usuariGrup);
+		usuariGrup.getGroup().getSecondaryGroupUsers().remove(usuariGrup);
 		getUserGroupEntityDao().remove(usuariGrup);
-		/*IAM-318*/
+
+
 		handlePropagateRolsChangesToDispatcher(codiGrup);
 		getApplicationService().revokeRolesHoldedOnGroup(userId, groupId);
 
@@ -410,7 +414,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			getUserGroupEntityDao().create(usuariGrupEntity);
 			usuariGrup.setId(usuariGrupEntity.getId());
 			usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
-			/*IAM-318*/
+			
+			usuari.getSecondaryGroups().add(usuariGrupEntity);
+			usuariGrupEntity.getGroup().getSecondaryGroupUsers().add(usuariGrupEntity);
+			
 			handlePropagateRolsChangesToDispatcher(usuariGrup.getGroup());
 			getRuleEvaluatorService().applyRules(usuari);
 
@@ -454,9 +461,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			getUserEntityDao().update(usuari);
 			long groupId = usuariGrupEntity.getGroup().getId();
 
-			getUserGroupEntityDao().remove(usuariGrupEntity);
 			
 			usuari.getSecondaryGroups().remove(usuariGrupEntity);
+			usuariGrupEntity.getGroup().getSecondaryGroupUsers().remove(usuariGrupEntity);
+			getUserGroupEntityDao().remove(usuariGrupEntity);
 
 			getApplicationService().revokeRolesHoldedOnGroup(usuari.getId(), groupId);
 

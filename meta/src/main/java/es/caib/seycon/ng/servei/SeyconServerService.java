@@ -15,6 +15,7 @@ import es.caib.seycon.ng.comu.Tasca;
 import es.caib.seycon.ng.model.ConfiguracioEntity;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,4 +126,8 @@ public abstract class SeyconServerService {
 	public void cancelUnscheduledTasks() {
 
 	}
+	
+	@Operation(grantees = { roles.monitor_server_list.class })
+	public Map<String,int[]> getStats ( String server, String metric, int seconds, int step ) { return null;}
+
 }

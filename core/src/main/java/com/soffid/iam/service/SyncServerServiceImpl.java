@@ -34,6 +34,7 @@ import com.soffid.iam.remote.URLManager;
 import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.service.SyncServerStatsService;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.ui.SeyconTask;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -57,6 +58,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NamingException;
@@ -669,6 +671,21 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 			t.setStatus("P");
 			getTaskEntityDao().update(t);
 		}
+	}
+
+	@Override
+	protected Map<String, int[]> handleGetStats(String server, String metric, int seconds, int step) throws Exception {
+        try {
+            RemoteServiceLocator rsl = createRemoteServiceLocator(server);
+            
+            SyncServerStatsService stats = rsl.getSyncServerStatsService();
+
+            return stats.getStats(metric, seconds, step);
+        } catch (Throwable th) {
+        	LogFactory.getLog(getClass()).info("Unable to connecto to "+server, th);
+            throw new SeyconException(String.format(
+                    Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
+        }
 	}
 
 }

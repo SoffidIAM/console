@@ -490,6 +490,27 @@
 			}
 			
 			// Functionality to obtain the server log
+			void getStats(self)
+			{
+			// LOG
+				if (canQueryServerLog)
+				{
+					try
+					{
+						
+						// Get URL server  
+						dada = getURLServer(self);
+						statsWindow.open(dada);
+					}
+					
+					catch (Throwable th)
+					{
+						Missatgebox.error (org.zkoss.util.resource.Labels
+								.getLabel("seyconServer.ErrorLog"));
+					}
+				}
+			}
+			
 			void getServerLog(self)
 			{
 			// LOG
@@ -497,6 +518,7 @@
 				{
 					try
 					{
+						
 						// Get URL server  
 						dada = getURLServer(self);
 						
@@ -515,7 +537,6 @@
 					}
 				}
 			}
-			
 			// Functionality to show agent tasks
 			void viewAgentTasks(self)
 			{
@@ -637,12 +658,12 @@
 		]]>
 	</zscript>
 
-	<div sclass="titolpagina" width="100%">
+	<div sclass="titolpagina" style="width: 800px;">
 		<h:span>
 		${c:l('seyconserver.zul.Estatdelsservidorsde')}
 		</h:span>
 		<label id="taskModeLabel" value="${taskModeLiteral }"/>
-		<h:span style="display: inline-block; margin-right: 33px; float: right">
+		<h:span style="display: inline-block; float: right">
 			<label value="${c:l('seyconserver.zul.AutomaticRefresh')}"
 				style="margin-right:5px; vertical-align: top; font-family: Arial;
 					font-size: 12px; font-weight: bold; color: #0E5462;"/>
@@ -657,117 +678,121 @@
 	<timer id="timer" delay="${refreshPageTime}" repeats="true" 
 		onTimer="refreshPage()" />
 	
-	<hbox width="900px%" widths="800px,50px">
-		<vbox width="100%">
-		<listbox dataPath="/model:/server" fixedLayout="false" id="gridServidors" width="100%"
-			noSizable="true" sclass="likeagrid headcentrat nosel"
-			onCreate="checkRefreshPage()">
-			<listhead><!--  NOTA: si es canvia, canviar també el dee de tasques pendents -->
-				<listheader label="${c:l('seyconserver.zul.URL')}" width="20em"/>
-				<listheader label="${c:l('seyconserver.zul.Status')}" width="50px"/>
-				<listheader label="${c:l('seyconserver.zul.Agents')}" width="26%"/>
-				<listheader label="${c:l('seyconserver.zul.Tasques')}" width="22%"/>
-				<listheader label="${c:l('seyconserver.zul.Estat')}" width="80px"/>
-			</listhead>
-			<dataitem bind=".">
-				<listcell bind="@url"/>
-				<listcell>
-					<div align="center">
-						<imagebinding align="middle" bind="@estat" srcBinding="${iconasSemafor}" enableTooltip="false"/>
-					</div>
-				</listcell>
-				<listcell>
-					<hbox width="100%" widths="*,85px">
-						<label bind="@numAgents"
-							tooltiptext="${c:l('seyconserver.zul.TotalAgentsConnectats')}"/>
-						<button if="${canQueryAgentList}"
-							label="${c:l('seyconserver.zul.VeureAgents')}" width="100%">
-							<attribute name="onClick">
-								viewAgents(self);
-							</attribute>
-						</button>
-					</hbox>
-				</listcell>
-				<listcell>
-					<hbox width="99%" widths="*,85px">
-						<label bind="@numTasquesPendents"
-							tooltiptext="${c:l('seyconserver.zul.TotalTasquesPendents')}"/>
-						<button if="${canQueryAgentList}"
-							label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
-							<attribute name="onClick">
-								viewTasks(self, false);
-							</attribute>
-						</button>
-					</hbox>
-				</listcell>
-				<listcell>
-					<div align="center">
-						<imageclic align="middle" src="img/info.png"
-							style="margin-right:10px;" tooltiptext="${c:l('seyconserver.Informacio')}">
-							<attribute name="onClick">
-								viewServerAdditionalInfo(self);
-							</attribute>
-						</imageclic>
-						<imageclic align="middle" if="${canRestartAgent}"
-							src="img/refresca.png" style="margin-right:10px;"
-							tooltiptext="${c:l('seyconserver.Reiniciar')}">
-							<attribute name="onClick">
-								restartServer(self);
-							</attribute>
-						</imageclic>
-						<imageclic align="middle" if="${canQueryServerLog}" src="img/log.png"
-							tooltiptext="${c:l('seyconserver.Log')}">
-							<attribute name="onClick">
-								getServerLog(self);
-							</attribute>
-						</imageclic>
-					</div>
-				</listcell>
-			</dataitem>
-		</listbox>
-		<iframe height="0" id="logwindow" visible="false" width="0"/>
-		<listbox id="gridTasquesPendents" dataPath="/model:/tasquespendents"
-			fixedLayout="false" sclass="likeagrid headcentrat nosel" width="100%">
-			<listhead>
-				<listheader label="${c:l('seyconserver.zul.URL')}" width="20em"/>
-				<listheader label="${c:l('seyconserver.zul.Estat')}" width="50px"/>
-				<listheader label="${c:l('seyconserver.zul.Agents')}" width="26%"/>
-				<listheader label="${c:l('seyconserver.zul.Tasques')}" width="22%"/>
-				<listheader label="${c:l('seyconserver.zul.')}" width="80px"/>
-			</listhead>
-			<dataitem bind=".">
-				<listcell bind="@url"/>
-				<listcell>
-					<div align="center">
-						<imagebinding align="middle" bind="@estat"
-							srcBinding="${iconasSemafor}" enableTooltip="false"/>
-					</div>
-				</listcell>
-				<listcell>
-					<label bind="@numAgents"/>
-				</listcell>
-				<listcell>
-					<hbox width="100%" widths="*, 85px">
-						<label bind="@numTasquesPendents"/>
-						<button if="${canQueryAgentList}"
-							label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
-							<attribute name="onClick">
-								viewUnscheduledTasks();
-							</attribute>
-						</button>
-					</hbox>
-				</listcell>
-				<listcell/>
-			</dataitem>
-		</listbox>
-		</vbox>
-		
-		<vbox>
+		<div style="width: 800px; text-align: right">
 			<image onClick="refrescaServidors()" sclass="reloadtasks"
 				src="/images/reload-petit.png"
 				tooltiptext="${c:l('seyconserver.Refresca')}"/>
+		</div>
+		<vbox width="800px">
+			<listbox dataPath="/model:/server" fixedLayout="true" id="gridServidors"
+				noSizable="true" sclass="likeagrid headcentrat nosel"
+				onCreate="checkRefreshPage()">
+				<listhead><!--  NOTA: si es canvia, canviar també el dee de tasques pendents -->
+					<listheader label="${c:l('seyconserver.zul.URL')}" width="300px"/>
+					<listheader label="${c:l('seyconserver.zul.Status')}" width="50px"/>
+					<listheader label="${c:l('seyconserver.zul.Agents')}" width="150px"/>
+					<listheader label="${c:l('seyconserver.zul.Tasques')}" width="150px"/>
+					<listheader label="${c:l('seyconserver.zul.Actions')}" width="120px"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@url"/>
+					<listcell>
+						<div align="center">
+							<imagebinding align="middle" bind="@estat" srcBinding="${iconasSemafor}" enableTooltip="false"/>
+						</div>
+					</listcell>
+					<listcell>
+						<hbox width="100%" widths="*,85px">
+							<label bind="@numAgents"
+								tooltiptext="${c:l('seyconserver.zul.TotalAgentsConnectats')}"/>
+							<button if="${canQueryAgentList}"
+								label="${c:l('seyconserver.zul.VeureAgents')}" width="100%">
+								<attribute name="onClick">
+									viewAgents(self);
+								</attribute>
+							</button>
+						</hbox>
+					</listcell>
+					<listcell>
+						<hbox width="99%" widths="*,85px">
+							<label bind="@numTasquesPendents"
+								tooltiptext="${c:l('seyconserver.zul.TotalTasquesPendents')}"/>
+							<button if="${canQueryAgentList}"
+								label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
+								<attribute name="onClick">
+									viewTasks(self, false);
+								</attribute>
+							</button>
+						</hbox>
+					</listcell>
+					<listcell>
+						<div align="center">
+							<imageclic align="middle" src="img/info.png"
+								style="margin-right:10px;" title="${c:l('seyconserver.Informacio')}">
+								<attribute name="onClick"  width="16px">
+									viewServerAdditionalInfo(self);
+								</attribute>
+							</imageclic>
+							<imageclic align="middle" if="${canRestartAgent}"
+								src="img/refresca.png" style="margin-right:10px;"
+								title="${c:l('seyconserver.Reiniciar')}"  width="16px">
+								<attribute name="onClick">
+									restartServer(self);
+								</attribute>
+							</imageclic>
+							<imageclic align="middle" if="${canQueryServerLog}" src="img/log.png"
+								 style="margin-right:10px;" title="${c:l('seyconserver.Log')}"  width="16px">
+								<attribute name="onClick">
+									getServerLog(self);
+								</attribute>
+							</imageclic>
+							<imageclic align="middle" if="${canQueryServerLog}" src="img/chart.png"
+								title="${c:l('seyconserver.zul.stats')}" width="16px">
+								<attribute name="onClick">
+									getStats(self);
+								</attribute>
+							</imageclic>
+						</div>
+					</listcell>
+				</dataitem>
+			</listbox>
+			<iframe height="0" id="logwindow" visible="false" width="0"/>
+			<listbox id="gridTasquesPendents" dataPath="/model:/tasquespendents"
+				fixedLayout="false" sclass="likeagrid headcentrat nosel">
+				<listhead>
+					<listheader label="${c:l('seyconserver.zul.URL')}" width="300px"/>
+					<listheader label="${c:l('seyconserver.zul.Status')}" width="50px"/>
+					<listheader label="${c:l('seyconserver.zul.Agents')}" width="150px"/>
+					<listheader label="${c:l('seyconserver.zul.Tasques')}" width="150px"/>
+					<listheader label="${c:l('seyconserver.zul.')}" width="120px"/>
+				</listhead>
+				<dataitem bind=".">
+					<listcell bind="@url"/>
+					<listcell>
+						<div align="center">
+							<imagebinding align="middle" bind="@estat"
+								srcBinding="${iconasSemafor}" enableTooltip="false"/>
+						</div>
+					</listcell>
+					<listcell>
+						<label bind="@numAgents"/>
+					</listcell>
+					<listcell>
+						<hbox width="100%" widths="*, 85px">
+							<label bind="@numTasquesPendents"/>
+							<button if="${canQueryAgentList}"
+								label="${c:l('seyconserver.zul.VeureTasques')}" width="100%">
+								<attribute name="onClick">
+									viewUnscheduledTasks();
+								</attribute>
+							</button>
+						</hbox>
+					</listcell>
+					<listcell/>
+				</dataitem>
+			</listbox>
 		</vbox>
-	</hbox>
+		
 
 	<separator height="20px"/>
 	
@@ -1147,5 +1172,16 @@
 
 	</tabpanels>
 	</tabbox>
+	<window width="800px" use="com.soffid.iam.web.StatsWindow" id="statsWindow"  visible="false">
+		<div style="padding: 20px">
+			<label value="${c:l('seyconserver.zul.submetric') }" ></label>
+			<listbox id="submetric" mold="select" onSelect="statsWindow.generateGraph()"/>
+			<button label="${c:l('debug.zul.Refrescar') }" onClick="statsWindow.refresh();"/>
+			<image id="graph" width="800px" height="400px"/>
+			<div style="width:100%; text-align: right">
+				<button label="${c:l('error.zul.Tancar') }" onClick="statsWindow.setVisible(false)"/>
+			</div>
+		</div>
+	</window>
 </frame>
 </zk>

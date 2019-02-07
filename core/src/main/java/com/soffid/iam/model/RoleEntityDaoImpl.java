@@ -1366,34 +1366,39 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         // Obtenemos dónde está contenido el padre (el contenedor del Role)
         // return true;
         if (checkGranteeCycles)
+        {
         	cami.append(contingut.getName() + " <= "); //$NON-NLS-1$
+        	return checkNoCycles(contingut, pare, cami, checkGranteeCycles);
+        }
         else
-        	cami.append(contingut.getName() + " => "); 
-        return checkNoCycles(contingut, pare, cami, checkGranteeCycles);
+        {
+        	cami.append(contingut.getName() + " => ");
+        	return checkNoCycles(pare, contingut, cami, checkGranteeCycles);
+        }
     }
 
     Log log = LogFactory.getLog(getClass());
     
-    private boolean checkNoCycles(RoleEntity fill,
-            RoleEntity pare, StringBuffer cami, boolean checkGranteeCycles) {
-        Collection pareEsContingut = checkGranteeCycles ? pare.getContainerRoles() : pare.getContainedRoles();
+    private boolean checkNoCycles(RoleEntity sourceRole,
+            RoleEntity currentRole, StringBuffer cami, boolean checkGranteeCycles) {
+        Collection<RoleDependencyEntity> nextGrants = checkGranteeCycles ? currentRole.getContainerRoles() : currentRole.getContainedRoles();
         boolean senseCicles = true;
-        cami.append(pare.getName());
+        cami.append(currentRole.getName());
         if (checkGranteeCycles) cami.append(" <= "); //$NON-NLS-1$
         else cami.append(" => "); //$NON-NLS-1$
         int len = cami.length();
         log.info("Checking cycle "+cami.toString());
-        for (Iterator it = pareEsContingut.iterator(); senseCicles && it.hasNext();) {
+        for (Iterator<RoleDependencyEntity> it = nextGrants.iterator(); senseCicles && it.hasNext();) {
         	cami.setLength(len);
         	
-            RoleDependencyEntity relacio = (RoleDependencyEntity) it.next();
-            RoleEntity parePare = checkGranteeCycles ? relacio.getContainer(): relacio.getContained();
-            if (parePare.equals(fill)) {
-                cami.append(parePare.getName());
+            RoleDependencyEntity relacio = it.next();
+            RoleEntity nextRole = checkGranteeCycles ? relacio.getContainer(): relacio.getContained();
+            if (nextRole.equals(sourceRole)) {
+                cami.append(nextRole.getName());
                 senseCicles = false;
             } else {
                 // Verificamos la descendencia del contenedor (padre)
-                senseCicles = checkNoCycles(fill, parePare,
+                senseCicles = checkNoCycles(sourceRole, nextRole,
                         cami, checkGranteeCycles);
             }
         }

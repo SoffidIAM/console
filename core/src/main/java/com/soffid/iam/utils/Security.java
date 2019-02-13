@@ -406,6 +406,7 @@ public class Security {
                 }
             }
             return new SoffidPrincipalImpl(Security.getMasterTenantName()+"\\"+host, 
+            		null, null, null,
             		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null );
         } else {
         	try {
@@ -435,7 +436,7 @@ public class Security {
     	try {
     		if (getTenantService() == null) // For proxy servers
     		{
-		        p = new SoffidPrincipalImpl(tenant+"\\"+user, Arrays.asList(roles), null, null);
+		        p = new SoffidPrincipalImpl(tenant+"\\"+user, null, null, null, Arrays.asList(roles), null, null);
     		} else {
     			
     			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
@@ -602,39 +603,7 @@ public class Security {
     	
 		if (p == null)
 			return null;
-		if (principalToUserMap == null)
-		{
-	    	int size = 500;
-	    	try {
-		    	String cacheSize = ConfigurationCache.getMasterProperty("soffid.cache.identity.size");
-		    	if (cacheSize != null )
-		    		size = Integer.parseInt(cacheSize);
-	    	} catch (Throwable t) {
-	    		
-	    	}
-	    	principalToUserMap = Collections.synchronizedMap(new LRUMap(size));			
-		}
-        try
-        {
-    		String user = principalToUserMap.get(p.getName());
-    		if (user == null)
-    		{
-	            if (userService == null)
-	            {
-            		userService = ServiceLocator.instance().getUserService();
-	            }
-				User usuari = userService.getCurrentUser();
-				if (usuari == null)
-					return null;
-				user = usuari.getUserName();
-				principalToUserMap.put(p.getName(), user);
-    		}
-    		return user;
-		}
-		catch (InternalErrorException e)
-		{
-			return null;
-		}
+		return p.getUserName();
     }
     
     static HashMap<String, Long> tenants = new HashMap<String,Long>();

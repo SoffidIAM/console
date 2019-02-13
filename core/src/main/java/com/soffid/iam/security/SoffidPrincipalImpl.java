@@ -15,8 +15,12 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String[] groups;
 	private String[] soffidRoles;
 	private String[] groupsAndRoles;
+	private String userName;
 	
-	public SoffidPrincipalImpl(String name, 
+	public SoffidPrincipalImpl(String name,
+			String userName,
+			String fullName,
+			String holderGroup,
 			List<String> permissions,
 			List<String> groups,
 			List<String> soffidRoles) {
@@ -24,6 +28,9 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		init (name, 
 				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
 				soffidRoles == null ? new String[0]: soffidRoles.toArray(new String[soffidRoles.size()]) );
+		this.holderGroup = holderGroup;
+		this.fullName = fullName;
+		this.userName = userName;
 	}
 
 	public SoffidPrincipalImpl(String name,  
@@ -35,6 +42,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		else
 		{
 			init(name, parent.getGroups(), parent.getSoffidRoles());
+			userName = parent.getUserName();
 			fullName = parent.getFullName();
 			holderGroup = parent.getHolderGroup();
 		}
@@ -63,16 +71,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			groupsAndRoles[idx++] = soffidRoles[j];
 		for (int j = 0; j < groups.length; j++)
 			groupsAndRoles[idx++] = groups[j];
-		
 	}
 
 
 	public String getFullName() {
 		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
 	}
 
 	public String getTenant() {
@@ -82,14 +85,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	public long getAccountId() {
 		return accountId;
 	}
-
-	public void setAccountId(long accountId) {
-	}
-
-
-	public void setTenant(String tenant) {
-	}
-
 
 	public String getHolderGroup() {
 		return holderGroup;
@@ -105,16 +100,12 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		return soffidRoles;
 	}
 
-	public void setHolderGroup(String holderGroup) {
-		this.holderGroup = holderGroup;
-	}
-
 	public String[] getGroupsAndRoles() {
 		return groupsAndRoles;
 	}
 
 	@Override
-	public void setAccountId(Long id) {
-		accountId = id;
+	public String getUserName() {
+		return userName;
 	}
 }

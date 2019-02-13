@@ -2,7 +2,9 @@ package com.soffid.scimquery;
 
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.soffid.scimquery.conf.ClassConfig;
 
@@ -57,6 +59,11 @@ public class HQLQuery {
 
 	public Map<String, String> getObjects() {
 		return objects;
+	}
+
+	Map<String,String> joins = new HashMap<String,String>();
+	public Map<String, String> getJoins() {
+		return joins;
 	}
 
 	public StringBuffer getQueryString() {

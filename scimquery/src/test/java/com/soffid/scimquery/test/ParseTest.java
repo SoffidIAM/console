@@ -122,8 +122,12 @@ public class ParseTest extends TestCase {
 		Configuration.registerClass(config);
 
 		expressionTester("attributes.employee eq \"value\"", Account.class);
-
+		
 		expressionTester("attributes.employee eq \"value\" and not (attributes.hire eq \"now\")", Account.class);
+
+		expressionTester("attributes.employee eq \"value\" and (attributes.hire eq \"now\" or attributes.hire eq \"then\" or attributes.hire eq \"never\")", Account.class);
+
+		expressionTester("attributes.employee eq \"value\" and (attributes.hire eq \"now\" and attributes.leav eq \"never\")", Account.class);
 
 		expressionTester(
 				"userColumn.nameColumn gt \"a\" and name eq \"abc\" and attributes.employee eq \"value\" and not (attributes.hire eq \"now\")",
@@ -139,4 +143,33 @@ public class ParseTest extends TestCase {
 	TokenMgrError, JSONException {
 		expressionTester("", Account.class);
 	}
+
+	public void testAttribute2() throws ParseException, EvalException, UnsupportedEncodingException,
+			ClassNotFoundException, TokenMgrError, JSONException {
+		ClassConfig config = new ClassConfig();
+		config.setClazz(AttributeValueEntity.class.getCanonicalName());
+		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
+		AttributeConfig attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("numericValue");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		attributeConfig.setAttributeName("employee");
+		config.getAttributes().put("employee", attributeConfig);
+
+		attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("value");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		config.setDefaultVirtualAttribute(attributeConfig);
+
+		Configuration.registerClass(config);
+
+		expressionTester2(
+				"attributes.employee eq \"value\" and attributes.leav eq \"never\" and "
+				+ "(attributes.hire eq \"now\" or attributes.hire eq \"then\" or attributes.hire eq \"never\")",
+				Account.class ,
+				false);
+
+	}
+
 }

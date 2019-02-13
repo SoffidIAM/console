@@ -196,17 +196,28 @@ public abstract class AbstractExpression implements Serializable {
 				AttributeConfig attConfig = entityConfig.getAttribute(part);
 				if (attConfig.isVirtualAttribute())
 				{
-					String obj = (ctx.objectName);
+					String path = ctx.partialPath+"."+part;
+					String obj = query.getObjects().get(path);
+					if (obj == null)
+					{
+						int number = query.getNextObject();
+						obj = ROOT_OBJECT_NAME +number;
+						query.getObjects().put(path, obj);
+						query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
+					}
+					ctx.partialPath = null;
 					int i = query.getNextParameter();
 					String param  = "p"+i;
 					ctx.objectCondition = obj+"."+attConfig.getVirtualAttributeName()+"=:"+param+" and ";
 					ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 					query.getParameters().put(param, part);
 				} else {
+					flushParts(query, ctx);
 					ctx.objectName = ctx.objectName+"."+part;					
 					ctx.hibernateClass = attConfig.getScimType().getCanonicalName();
 				}
 			} else {
+				flushParts(query, ctx);
 				Field f = Class.forName(entityClass).getDeclaredField(part);
 				if ( isPrimitive (f))
 				{
@@ -220,8 +231,9 @@ public abstract class AbstractExpression implements Serializable {
 					{
 						int number = query.getNextObject();
 						obj = ROOT_OBJECT_NAME +number;
-						query.getObjects().put(obj, ctx.hibernatePath.toString());
-						query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
+						ctx.partialPath = ctx.hibernatePath.toString();
+						ctx.partialObjectToUse = obj;
+						ctx.partialJoinToAdd = "\nleft join "+ctx.objectName+"."+part+" as "+obj;
 					}
 					ctx.objectName = obj;
 				}
@@ -261,6 +273,16 @@ public abstract class AbstractExpression implements Serializable {
 		}
 	}
 
+	private void flushParts(HQLQuery query, EvaluationContext ctx) {
+		if (ctx.partialPath != null)
+		{
+			String obj = ctx.partialObjectToUse;
+			query.getObjects().put(ctx.partialPath, obj);
+			query.getJoinString().append(ctx.partialJoinToAdd);
+			ctx.partialPath = null;
+		}
+	}
+
 	/**
 	 * Generates the reference to a column based on a scim object
 	 * 
@@ -272,6 +294,7 @@ public abstract class AbstractExpression implements Serializable {
 	private void generateBeanPart(HQLQuery query, EvaluationContext ctx,
 			String part) throws EvalException, UnsupportedEncodingException,
 			ClassNotFoundException, JSONException {
+		flushParts(query, ctx);
 		AttributeConfig attribute = ctx.currentBean.getAttribute(part);
 		if (attribute == null)
 		{
@@ -295,7 +318,7 @@ public abstract class AbstractExpression implements Serializable {
 				{
 					int number = query.getNextObject();
 					obj = ROOT_OBJECT_NAME2+number;
-					query.getObjects().put(obj, ctx.hibernatePath.toString());
+					query.getObjects().put(ctx.hibernatePath.toString(), obj);
 					query.getJoinString().append("\nleft join "+ctx.objectName+"."+part+" as "+obj);
 				}
 				ctx.objectName = obj+"."+attribute.getAttributeName()+"=? and "+obj+"."+attribute.getVirtualAttributeValue();
@@ -310,6 +333,7 @@ public abstract class AbstractExpression implements Serializable {
 			}
 			else
 			{
+				flushParts(query, ctx);
 				ctx.hibernateClass = ctx.currentBean.getHibernateClass();
 				ctx.currentBean = null;
 				generateHQLStringReference(query, hibernateColumn, ctx);
@@ -426,4 +450,7 @@ class EvaluationContext {
 	String objectName;
 	StringBuffer hibernatePath = new StringBuffer();
 	StringBuffer beanPath = new StringBuffer();
+	String partialPath;
+	String partialJoinToAdd;
+	String partialObjectToUse;
 }

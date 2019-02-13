@@ -108,7 +108,7 @@ public class WorkflowInterceptor implements Filter {
 				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
 				
 				
-				GenericPrincipal nestedPrincipal = (GenericPrincipal) sesion
+				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				
 				String forcedLocale = ConfigurationCache.getProperty("soffid.language");

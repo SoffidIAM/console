@@ -52,6 +52,7 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.mesg.MZul;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
@@ -72,7 +73,6 @@ import com.soffid.iam.web.component.Identity;
 
 import bsh.EvalError;
 import bsh.TargetError;
-import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
@@ -269,27 +269,29 @@ public class InputField2 extends Div
 			searchBox.detach();
 		searchResults = new LinkedList<Identity>();
 		searchPosition = 0;
-		Security.nestedLogin(Security.ALL_PERMISSIONS);
+//		Security.nestedLogin(Security.ALL_PERMISSIONS);
 		try
 		{
 			if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
 			{
-				currentSearch = ServiceLocator.instance().getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
+				currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
 			}
 			if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			{
-				currentSearch = ServiceLocator.instance().getUserService().findUserByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getUserService().findUserByTextAsync(searchCriteria);
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
 			{
-				currentSearch = ServiceLocator.instance().getGroupService().findGroupByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getGroupService().findGroupByTextAsync(searchCriteria);
 			}
 			if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			{
-				currentSearch = ServiceLocator.instance().getApplicationService().findApplicationByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getApplicationService().findApplicationByTextAsync(searchCriteria);
 			}
+		} catch (Exception e) {
+			log.warn("Error querying objects", e);
 		} finally {
-			Security.nestedLogoff();
+//			Security.nestedLogoff();
 		}
 		searchBox = new org.zkoss.zhtml.Div();
 		searchBox.setDynamicProperty("tabindex", "-1");
@@ -432,7 +434,8 @@ public class InputField2 extends Div
 
 	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
 		Integer order = (Integer) tb.getAttribute("position");
-		
+		boolean refresh = false;
+		boolean novallidate = false;
 		if (order == null)
 			binder.setValue(value);
 		else {
@@ -445,12 +448,41 @@ public class InputField2 extends Div
 			}
 			else
 				l.set(order.intValue(), value);
-			binder.setValue(new LinkedList());
-			binder.setValue(l);
+			LinkedList l2 = new LinkedList();
+			int pos = 0;
+			for (Object vv: l)
+			{
+				if (vv != null && ! vv.toString().trim().isEmpty())
+					l2.add(vv);
+				else {
+					if (pos < order)
+						order --;
+					else if (pos == order)
+						novallidate = true;
+					refresh = true;
+				}
+			}
+			binder.setValue(l2);
 		}
 				
-		attributeValidate( order );
+		if (refresh)
+		{
+			try {
+				createField();
+				String id = getIdForPosition(order);
+				InputElement component = (InputElement) getFellowIfAny(id);
+				if (component != null)
+					component.focus();
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
+			
+		}
 
+		if ( ! novallidate)
+			attributeValidate( order );
+		
+		
 		Component c = this;
 		do
 		{
@@ -642,15 +674,15 @@ public class InputField2 extends Div
 			if (l != null)
 				l.setValue("");
 		} else {
-			Aplicacio a = null;
+			Application a = null;
 			try {
-				a = EJBLocator.getAplicacioService().findAplicacioByCodiAplicacio(application);
+				a = EJBLocator.getApplicationService().findApplicationByApplicationName(application);
 			} catch (Exception e) {}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
 			}
-			if (l != null) l.setValue(a.getNom());
+			if (l != null) l.setValue(a.getName());
 		}
 	}
 

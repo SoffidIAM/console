@@ -5,10 +5,12 @@
 //
 
 package es.caib.seycon.ng.servei;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.*;
 
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 	AttributeValidationService.class,
 	MailListAttributeEntity.class,
 	RolEntity.class,
+	AsyncRunnerService.class,
 	GrupEntity.class})
 public abstract class LlistesDeCorreuService {
 
@@ -346,4 +349,20 @@ public abstract class LlistesDeCorreuService {
 		es.caib.seycon.ng.comu.RelacioLlistaCorreu relacioLlistaCorreu)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreu> findMailListByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.LlistaCorreu> findMailListByJsonQueryAsync(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 }

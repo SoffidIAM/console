@@ -9,6 +9,10 @@ import java.util.Map;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.LlistaCorreuEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
+
+@JsonObject (hibernateClass=LlistaCorreuEntity.class)
 @ValueObject ( translatedName="MailList",
 	 translatedPackage="com.soffid.iam.api")
 public class LlistaCorreu {

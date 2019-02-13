@@ -102,10 +102,9 @@ public class EmailListEntityDaoImpl extends
 		try {
 			String nomLlistaDeCorreu = llistaCorreu.getName();
 			String domini = llistaCorreu.getDomain() == null ? null : llistaCorreu.getDomain().getName();
-			super.remove(llistaCorreu);
-			getSession(false).flush();
 			auditarLlistaDeCorreu("D", nomLlistaDeCorreu, domini); //$NON-NLS-1$
 			generateUpdateTasks(llistaCorreu);
+			super.remove(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.8"), llistaCorreu.getName(), message));

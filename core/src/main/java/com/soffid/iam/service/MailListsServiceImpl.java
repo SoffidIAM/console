@@ -15,6 +15,7 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.ExternalName;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MailDomain;
@@ -34,12 +35,20 @@ import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -48,6 +57,7 @@ import es.caib.seycon.ng.exception.UnknownApplicationException;
 import es.caib.seycon.ng.exception.UnknownMailListException;
 import es.caib.seycon.ng.exception.UnknownRoleException;
 
+import java.io.UnsupportedEncodingException;
 import java.rmi.activation.UnknownGroupException;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +69,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.LlistesDeCorreuService
@@ -149,7 +161,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		if(!llistaCorreuEntity.getExternals().isEmpty() || !llistaCorreuEntity.getUserMailLists().isEmpty() || !llistaCorreuEntity.getMailListContent().isEmpty())
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.IntegrityException"), llistaCorreu.getName()));
-		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
+//		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
 
@@ -178,9 +190,6 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 	protected UserMailList handleCreate(UserMailList llistaCorreuUsuari) throws Exception {
 		UserEmailEntity llistaCorreuUsuariEntity = getUserEmailEntityDao().userMailListToEntity(llistaCorreuUsuari);
-		if (llistaCorreuUsuariEntity.getUser().getUserName().compareTo(Security.getCurrentUser()) == 0) {
-			throw new SeyconException(Messages.getString("MailListsServiceImpl.1")); //$NON-NLS-1$
-		}
 
 		getUserEmailEntityDao().create(llistaCorreuUsuariEntity);
 
@@ -647,10 +656,10 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 					{
 						// Do nothing
 					}
-					else if (v instanceof List)
+					else if (v instanceof Collection)
 					{
-						List l = (List) v;
-						for (Object o: (List) v)
+						Collection l = (Collection) v;
+						for (Object o: (Collection) v)
 						{
 							if (o != null)
 							{
@@ -680,7 +689,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 						for (String v: l)
 						{
 							List<MailListAttributeEntity> p = getMailListAttributeEntityDao().findByNameAndValue(m.getName(), v);
@@ -724,4 +733,65 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		return null;
 	}
 
+
+
+	protected void findByJsonQuery ( AsyncList<MailList> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
+	{
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value");
+
+		// Prepare query HQL
+		AbstractExpression expression = ExpressionParser.parse(query);
+		HQLQuery hql = expression.generateHSQLString(MailList.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "(" + qs + ") and o.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
+
+		// Include HQL parameters
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size() + 1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+
+		// Execute HQL and generate result
+		for (EmailListEntity ge : getEmailListEntityDao().query(hql.toString(), paramArray)) {
+			if (result.isCancelled())
+				return;
+			MailList g = getEmailListEntityDao().toMailList(ge);
+			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
+				result.add(g);
+			}
+		}
+	}
+	@Override
+	protected Collection<MailList> handleFindMailListByJsonQuery(String query) throws InternalErrorException, Exception {
+		AsyncList<MailList> result = new AsyncList<MailList>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
+
+	@Override
+	protected AsyncList<MailList> handleFindMailListByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<MailList> result = new AsyncList<MailList>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
 }

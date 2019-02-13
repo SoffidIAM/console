@@ -110,7 +110,7 @@
 						visible="${false}"
 						label="${c:l('grups.zul.CancelChanges')}" />
 				</toolbar>
-				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="${fileres}" autocommit="false">
+				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="30" autocommit="false">
 					<attribute name="onSelect">
 						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
 					</attribute>

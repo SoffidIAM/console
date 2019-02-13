@@ -305,29 +305,12 @@
 		    	</treechildren>
     		</treeitem>
     		
-    		<!-- <treeitem id="ajuda" open="false">
-    			<treerow>
-    				<treecell label="${c:l('seu.ajuda')}" onClick="ajuda.setOpen ( ! ajuda.isOpen() )"/>
-    			</treerow>
-    			<treechildren>
-    				<treeitem id="aboutseu" open="false"> 
-    					<treerow>
-    						<apptreecell langlabel="seu.aboutseu" pagina="/aboutseu/seu.zul"/>
-    					</treerow>
-    				</treeitem>
-    			</treechildren>
-    		</treeitem>-->
     		<treeitem id="elmeuperfil" open="false">
     			<treerow>
     				<apptreecell langlabel="seu.elmeuperfil" pagina="perfil/perfil.zul"/>
     			</treerow>
     		</treeitem>
     		
-    		<!--treeitem open="false" id="favorits" if="${showFavorites}">	Ja estava comentada
-    			<treerow >
-    				<treecell label="Afegir a favorits" sclass="menufavorits" onClick = '' image="~./img/star_borde2.png"/>
-    			</treerow>
-    		</treeitem-->
     	</treechildren>
     </tree>
     <label id="X"/>

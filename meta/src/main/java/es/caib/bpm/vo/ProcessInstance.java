@@ -24,5 +24,8 @@ public class ProcessInstance {
 	protected String currentTask = null;
 	@Nullable
 	protected List<Comment> comments = null;
+	
+	long processDefinition;
 
+	boolean dummyProcess;
 }

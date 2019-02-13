@@ -16,6 +16,11 @@ public class TaskInstance {
 	protected String processName = null;
 	@Nullable
 	protected long processId = -1L;
+	
+	long processDefinition;
+
+	boolean dummyTask;
+
 	@Nullable
 	protected String name = null;
 	@Nullable

@@ -156,7 +156,10 @@ public class VOFactory {
         if(param!=null)
         	timeThresold=param.getValue();
 
-		return vo;
+        vo.setProcessDefinition(instance.getProcessInstance().getProcessDefinition().getId());
+        vo.setDummyTask(false);
+
+        return vo;
 	}
 
 	public static com.soffid.iam.bpm.api.ProcessInstance newProcessInstance(
@@ -226,7 +229,10 @@ public class VOFactory {
 					process.setDescription(instance.getProcessDefinition().getName());
 			}
 	
-			return process;
+	        process.setProcessDefinition(instance.getProcessDefinition().getId());
+	        process.setDummyProcess(false);
+
+	        return process;
 		} catch (Throwable th) {
 			log.info("Error generating ProcessInstance", th);
 			throw new InternalErrorException("Error generating process instance", th);
@@ -439,7 +445,7 @@ public class VOFactory {
 	
 	
 	static WeakHashMap<Long, ClassLoader> classesMap = new WeakHashMap<Long,ClassLoader> ();
-	static private UIClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
+	static public UIClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
 	{
 		return (UIClassLoader) JbpmConfiguration.getProcessClassLoader(def);
 	}

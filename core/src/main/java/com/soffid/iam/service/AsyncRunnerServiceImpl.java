@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.common.TransactionalTask;
 import com.soffid.iam.utils.Security;
 
 public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
@@ -39,6 +40,11 @@ public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
 			log.info("Exception during async run process "+runnable.toString(), th );
 			result.cancel(th);
 		}
+	}
+
+	@Override
+	protected Object handleRunTransaction(TransactionalTask runnable) throws Exception {
+		return runnable.run();
 	}
 
 }

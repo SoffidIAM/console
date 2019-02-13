@@ -13,6 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,6 +76,8 @@ import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.file.def.FileDefinition;
 import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.Node;
+import org.jbpm.graph.def.Node.NodeType;
+import org.jbpm.graph.def.Transition;
 import org.jbpm.graph.exe.Comment;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.graph.log.ActionLog;
@@ -130,6 +133,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.utils.Security;
 
+import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.exception.BPMErrorCodes;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.exception.InvalidConfigurationException;
@@ -139,6 +143,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
 public class BpmEngineImpl extends BpmEngineBase {
+	private static final String UI_START_ZUL = "ui/start.zul";
 	/**
 	 * 
 	 */
@@ -284,10 +289,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			ProcessInstance process) throws Exception {
 		JbpmContext context = getContext();
 		try {
-			org.jbpm.graph.exe.ProcessInstance instance = context
-					.loadProcessInstance(process.getId());
-			org.jbpm.graph.def.ProcessDefinition definition = instance
-					.getProcessDefinition();
+			org.jbpm.graph.def.ProcessDefinition definition =
+					context.getGraphSession().getProcessDefinition(process.getProcessDefinition());
 			return VOFactory.newProcessDefinition(definition, context);
 		} finally {
 			flushContext(context);
@@ -864,7 +867,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 			throws Exception {
 		JbpmContext context = getContext();
 		try {
-			
+			if (instanceVO.isDummyTask())
+				return new ProcessLog[0];
+
 			org.jbpm.taskmgmt.exe.TaskInstance task = context.getTaskInstance(instanceVO.getId());
 			LinkedList parsedLogs = new LinkedList();
 
@@ -1331,6 +1336,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected TaskInstance handleStartTask(TaskInstance task) throws Exception {
 		JbpmContext context = getContext();
 		try {
+			if (task.isDummyTask())
+				return task;
+			
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
 
@@ -1360,17 +1368,31 @@ public class BpmEngineImpl extends BpmEngineBase {
 		JbpmContext jbpmContext = null;
 		Session session = null;
 
+		jbpmContext = getContext();
 		try {
-			jbpmContext = getContext();
+			storeDummyTask(task);
 
 			session = jbpmContext.getSession();
 
-			org.jbpm.taskmgmt.exe.TaskInstance ti = jbpmContext
-					.getTaskInstanceForUpdate(task.getId());
-			Comment c = new Comment(getUserName(), comment);
-			ti.addComment(c);
-			jbpmContext.save(ti);
-			return VOFactory.newTaskInstance(ti);
+			
+			if ( task.getId() == 0)
+			{
+				org.jbpm.graph.exe.ProcessInstance proc = jbpmContext.getProcessInstance(task.getProcessId());
+				org.jbpm.graph.exe.Token token = proc.getRootToken();
+				Comment c = new Comment(getUserName(), comment);
+				token.addComment(c);
+				jbpmContext.save(proc);
+				return task;
+			}
+			else
+			{
+				org.jbpm.taskmgmt.exe.TaskInstance ti = jbpmContext
+						.getTaskInstanceForUpdate(task.getId());
+				Comment c = new Comment(getUserName(), comment);
+				ti.addComment(c);
+				jbpmContext.save(ti);
+				return VOFactory.newTaskInstance(ti);
+			}
 		} catch (RuntimeException ex) {
 			throw ex;
 		} finally {
@@ -1383,31 +1405,73 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected TaskInstance handleExecuteTask(TaskInstance task,
 			String transitionName) throws Exception {
 		JbpmContext context = getContext();
+		
+		storeDummyTask(task);
+
 		org.jbpm.graph.exe.ProcessInstance process = context.getProcessInstance(task.getProcessId());
 		if (process == null)
 			throw new InternalErrorException("Unable to find process "+task.getProcessId());
 		
-		org.jbpm.taskmgmt.exe.TaskInstance instance = context.getTaskInstance(task.getId());
-		if (instance == null)
-			throw new InternalErrorException("Unable to find process "+task.getId());
-		if (instance.hasEnded() || instance.isCancelled())
-			throw new UserWorkflowException( String.format("Task %d is already finished", instance.getId()));
-		
-
-		try {
-			instance = doUpdate(context, task);
-			startAuthenticationLog(instance.getToken());
-			instance.end(transitionName);
-			endAuthenticationLog(instance.getToken());
-			context.save(instance);
-			return VOFactory.newTaskInstance(instance);
-		} catch (Exception e) {
-			context.setRollbackOnly();
-			throw new BPMException(
-					Messages.getString("BpmEngineImpl.TransitionError"), e, -1); //$NON-NLS-1$
-		} finally {
-			flushContext(context);
+		if (task.getId() == 0L)
+		{
+			org.jbpm.graph.exe.Token token = process.getRootToken();
+			if (! token.getNode().getNodeType().equals( NodeType.StartState))
+				throw new UserWorkflowException( String.format("Task is already finished"));
+			try {
+				ExecutionContext ctx = new ExecutionContext(token);
+				startAuthenticationLog(token);
+				HashMap map = new HashMap();
+				map.putAll(task.getVariables());
+				// Borrar y modificar variables
+				for (Iterator it = process.getContextInstance().getVariables(token).keySet().iterator(); it
+						.hasNext();) {
+					String key = (String) it.next();
+					Object value = map.get(key);
+					process.getContextInstance().setVariable(key, value, token);
+					map.remove(key);
+				}
+				// Agregar variables
+				for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+					String key = (String) it.next();
+					Object value = map.get(key);
+					process.getContextInstance().setVariable(key, value, token);
+				}
+				token.signal(transitionName);
+				endAuthenticationLog(token);
+				context.save(process);
+				task.setEnd(new Date());
+				return task;
+			} catch (Exception e) {
+				context.setRollbackOnly();
+				throw new BPMException(
+						Messages.getString("BpmEngineImpl.TransitionError"), e, -1); //$NON-NLS-1$
+			} finally {
+				flushContext(context);
+			}
 		}
+		else
+		{
+			org.jbpm.taskmgmt.exe.TaskInstance instance = context.getTaskInstance(task.getId());
+			if (instance == null)
+				throw new InternalErrorException("Unable to find process "+task.getId());
+			if (instance.hasEnded() || instance.isCancelled())
+				throw new UserWorkflowException( String.format("Task %d is already finished", instance.getId()));
+			try {
+				instance = doUpdate(context, task);
+				startAuthenticationLog(instance.getToken());
+				instance.end(transitionName);
+				endAuthenticationLog(instance.getToken());
+				context.save(instance);
+				return VOFactory.newTaskInstance(instance);
+			} catch (Exception e) {
+				context.setRollbackOnly();
+				throw new BPMException(
+						Messages.getString("BpmEngineImpl.TransitionError"), e, -1); //$NON-NLS-1$
+			} finally {
+				flushContext(context);
+			}
+		}
+
 	}
 
 	private org.jbpm.taskmgmt.exe.TaskInstance doUpdate(JbpmContext context,
@@ -1499,6 +1563,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			throws Exception {
 		JbpmContext context = getContext();
 		try {
+			if ( task.isDummyTask())
+				throw new InternalErrorException("Cannot reserve initial task");
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
 
@@ -1523,8 +1589,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected TaskInstance handleDelegateTaskToUser(TaskInstance task,
 			String username) throws Exception {
 		JbpmContext context = getContext();
-		;
 		try {
+			if ( task.isDummyTask())
+				throw new InternalErrorException("Cannot reserve initial task");
 			org.jbpm.taskmgmt.exe.TaskInstance instance = context
 					.getTaskInstance(task.getId());
 			startAuthenticationLog(instance.getToken());
@@ -1546,10 +1613,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	@Override
-	protected void handleUpdate(TaskInstance task) throws Exception {
-		JbpmContext context = getContext();
+	protected TaskInstance handleUpdate(TaskInstance task) throws Exception {
+ 		JbpmContext context = getContext();
 		try {
-			doUpdate(context, task);
+			if (task.isDummyTask())
+				storeDummyTask(task);
+			else
+				doUpdate(context, task);
+			return task;
 
 		} finally {
 			flushContext(context);
@@ -1564,15 +1635,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 		business.setContext(context);
 
 		try {
-			org.jbpm.taskmgmt.exe.TaskInstance ti = context
-					.loadTaskInstance(task.getId());
-			if (business.canAccess(getUserGroups(), ti)) {
-				startAuthenticationLog(ti.getToken());
-				SwimlaneInstance swimlaneInstance = ti.getTaskMgmtInstance()
-						.getSwimlaneInstance(swimlane);
-				swimlaneInstance.setPooledActors(actorIds);
-				endAuthenticationLog(ti.getToken());
-				context.save(ti);
+			if ( !task.isDummyTask())
+			{
+				org.jbpm.taskmgmt.exe.TaskInstance ti = context
+						.loadTaskInstance(task.getId());
+				if (business.canAccess(getUserGroups(), ti)) {
+					startAuthenticationLog(ti.getToken());
+					SwimlaneInstance swimlaneInstance = ti.getTaskMgmtInstance()
+							.getSwimlaneInstance(swimlane);
+					swimlaneInstance.setPooledActors(actorIds);
+					endAuthenticationLog(ti.getToken());
+					context.save(ti);
+				}
 			}
 		} finally {
 			flushContext(context);
@@ -1584,10 +1658,32 @@ public class BpmEngineImpl extends BpmEngineBase {
 			throws Exception {
 		JbpmContext context = getContext();
 		try {
-			org.jbpm.taskmgmt.exe.TaskInstance instance = context
-					.loadTaskInstance(task.getId());
-			return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),instance.getToken()
-					.getProcessInstance());
+			if (task.isDummyTask())
+			{
+				org.jbpm.graph.def.ProcessDefinition def = context.getGraphSession().getProcessDefinition(task.getProcessDefinition());
+				ProcessInstance proc = new ProcessInstance();
+				proc.setComments(new LinkedList<com.soffid.iam.bpm.api.Comment>());
+				proc.setDescription(def.getName());
+				proc.setDummyProcess(true);
+				proc.setId(0);
+				proc.setProcessClassLoader(VOFactory.getClassLoader(def));
+				proc.setStart(new Date());
+				proc.setVariables(new HashMap<String, Object>());
+				proc.setProcessDefinition(task.getProcessDefinition());
+				return proc;
+			}
+			else if (task.getId() == 0L)
+			{
+				org.jbpm.graph.exe.ProcessInstance proc = context.getProcessInstance(task.getProcessId());
+				return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),proc);
+			}
+			else
+			{
+				org.jbpm.taskmgmt.exe.TaskInstance instance = context
+						.loadTaskInstance(task.getId());
+				return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),instance.getToken()
+						.getProcessInstance());
+			}
 		} finally {
 			flushContext(context);
 		}
@@ -1597,13 +1693,18 @@ public class BpmEngineImpl extends BpmEngineBase {
 	protected TaskInstance handleCancel(TaskInstance task) throws Exception {
 		JbpmContext context = getContext();
 		try {
-			org.jbpm.taskmgmt.exe.TaskInstance instance = context
-					.getTaskInstance(task.getId());
-			startAuthenticationLog(instance.getToken());
-			instance.cancel();
-			endAuthenticationLog(instance.getToken());
-			context.save(instance);
-			return VOFactory.newTaskInstance(instance);
+			if (!task.isDummyTask())
+			{
+				org.jbpm.taskmgmt.exe.TaskInstance instance = context
+						.getTaskInstance(task.getId());
+				startAuthenticationLog(instance.getToken());
+				instance.cancel();
+				endAuthenticationLog(instance.getToken());
+				context.save(instance);
+				return VOFactory.newTaskInstance(instance);
+			}
+			else
+				return task;
 		} finally {
 			flushContext(context);
 		}
@@ -1799,44 +1900,64 @@ public class BpmEngineImpl extends BpmEngineBase {
 		JbpmContext context = getContext();
 
 		try {
-			org.jbpm.taskmgmt.exe.TaskInstance instance = context
-					.getTaskInstance(task.getId());
-			org.jbpm.graph.def.ProcessDefinition pd = instance
-					.getContextInstance().getProcessInstance()
-					.getProcessDefinition();
-			FileDefinition fd = pd.getFileDefinition();
-
-			String url = getUIfor(context, pd, instance.getTask().getName());
-			if (url != null) {
-				byte ba[] = (byte[]) fd.getBytes(url);
-				try {
-					if (ba != null)
-						return new String(ba, "UTF-8"); //$NON-NLS-1$
-					else
-						log.warn("Cannot get resource "+url);
-				} catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(e);
-				}
-			}
-
-			String name = "ui/" + task.getName().replaceAll(" ", "[ _\\\\-.]?").replaceAll("\\{", ".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-					+ "\\..+"; //$NON-NLS-1$
-			Pattern p = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
-			Map map = fd.getBytesMap();
-			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-				String key = (String) it.next();
-				if (p.matcher(key).matches()) {
-					byte ba[] = (byte[]) map.get(key);
+			if (task.isDummyTask())
+			{
+				org.jbpm.graph.def.ProcessDefinition pd = context.getGraphSession().getProcessDefinition(task.getProcessDefinition());
+				FileDefinition fd = pd.getFileDefinition();
+				if (fd.hasFile(UI_START_ZUL))
+				{
+					byte ba[] = (byte[]) fd.getBytes(UI_START_ZUL);
 					try {
-						if (ba != null)
-							return new String(ba, "UTF-8"); //$NON-NLS-1$
+						return new String(ba, "UTF-8"); //$NON-NLS-1$
 					} catch (UnsupportedEncodingException e) {
 						throw new RuntimeException(e);
 					}
 				}
+				else
+					throw new InternalErrorException("Cannot get resource "+UI_START_ZUL);
 			}
-			log.warn("Cannot get resource "+name);
-			return null;
+			else
+			{
+				
+				org.jbpm.taskmgmt.exe.TaskInstance instance = context
+						.getTaskInstance(task.getId());
+				org.jbpm.graph.def.ProcessDefinition pd = instance
+						.getContextInstance().getProcessInstance()
+						.getProcessDefinition();
+				FileDefinition fd = pd.getFileDefinition();
+				
+				String url = getUIfor(context, pd, instance.getTask().getName());
+				if (url != null && fd.hasFile(url)) {
+					try {
+						byte ba[] = (byte[]) fd.getBytes(url);
+						if (ba != null)
+							return new String(ba, "UTF-8"); //$NON-NLS-1$
+						else
+							log.warn("Cannot get resource "+url);
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				
+				String name = "ui/" + task.getName().replaceAll(" ", "[ _\\\\-.]?").replaceAll("\\{", ".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+						+ "\\..+"; //$NON-NLS-1$
+				Pattern p = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+				Map map = fd.getBytesMap();
+				for (Iterator it = map.keySet().iterator(); it.hasNext();) {
+					String key = (String) it.next();
+					if (p.matcher(key).matches()) {
+						byte ba[] = (byte[]) map.get(key);
+						try {
+							if (ba != null)
+								return new String(ba, "UTF-8"); //$NON-NLS-1$
+						} catch (UnsupportedEncodingException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}
+				log.warn("Cannot get resource "+name);
+				return null;
+			}
 		} finally {
 			flushContext(context);
 		}
@@ -1847,9 +1968,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 		JbpmContext context = getContext();
 
 		try {
-			org.jbpm.graph.exe.ProcessInstance pi = context
-					.getProcessInstance(process.getId());
-			org.jbpm.graph.def.ProcessDefinition pd = pi.getProcessDefinition();
+			org.jbpm.graph.def.ProcessDefinition pd = context.getGraphSession().getProcessDefinition(process.getProcessDefinition());
 			FileDefinition fd = pd.getFileDefinition();
 
 			try {
@@ -2080,29 +2199,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			org.jbpm.graph.def.ProcessDefinition definition = context
 					.getGraphSession().findLatestProcessDefinition(
 							def.getName());
-			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
-			business.setContext(context);
-			if (!isInternalService()
-					&& !business.isUserAuthorized(INITIATOR_ROLE,
-							getUserGroups(), definition))
-				throw new SecurityException(
-						Messages.getString("BpmEngineImpl.NotAuthorizedToMakeProcess")); //$NON-NLS-1$
-
-			ProcessDefinitionProperty prop = getProcessDefinitionDisabledProperty(
-					context, definition);
-			if (prop != null && "true".equals(prop.getValue())) //$NON-NLS-1$
-				throw new BPMException(
-						Messages.getString("BpmEngineImpl.ProcessDisabled"), 2); //$NON-NLS-1$
-
-			org.jbpm.graph.exe.ProcessInstance pi = new org.jbpm.graph.exe.ProcessInstance(
-					definition);
-			if (start) {
-				startAuthenticationLog(pi.getRootToken());
-				pi.signal();
-				endAuthenticationLog(pi.getRootToken());
-				context.save(pi);
-			}
-			return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),pi);
+			return newProcessInstance(context, definition, start);
 		} catch (Exception e) {
 			context.setRollbackOnly();
 			if (e instanceof BPMException)
@@ -2113,6 +2210,33 @@ public class BpmEngineImpl extends BpmEngineBase {
 		} finally {
 			flushContext(context);
 		}
+	}
+
+	private ProcessInstance newProcessInstance(JbpmContext context, org.jbpm.graph.def.ProcessDefinition definition,
+			boolean start) throws BPMException, InternalErrorException, UnknownUserException {
+		ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+		business.setContext(context);
+		if (!isInternalService()
+				&& !business.isUserAuthorized(INITIATOR_ROLE,
+						getUserGroups(), definition))
+			throw new SecurityException(
+					Messages.getString("BpmEngineImpl.NotAuthorizedToMakeProcess")); //$NON-NLS-1$
+
+		ProcessDefinitionProperty prop = getProcessDefinitionDisabledProperty(
+				context, definition);
+		if (prop != null && "true".equals(prop.getValue())) //$NON-NLS-1$
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.ProcessDisabled"), 2); //$NON-NLS-1$
+
+		org.jbpm.graph.exe.ProcessInstance pi = new org.jbpm.graph.exe.ProcessInstance(
+				definition);
+		if (start) {
+			startAuthenticationLog(pi.getRootToken());
+			pi.signal();
+			endAuthenticationLog(pi.getRootToken());
+			context.save(pi);
+		}
+		return VOFactory.newProcessInstance(context, getProcessHierarchyEntityDao(),pi);
 	}
 
 	private ProcessDefinitionProperty getProcessDefinitionDisabledProperty(
@@ -3106,5 +3230,84 @@ public class BpmEngineImpl extends BpmEngineBase {
 		h.setChildProcess(childProcess);
 		h.setParentProcess(parentProcess);
 		getProcessHierarchyEntityDao().create(h);
+	}
+
+	@Override
+	protected TaskInstance handleCreateDummyTask(long processDefinitionId) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.def.ProcessDefinition definition = context.getGraphSession().getProcessDefinition(processDefinitionId);
+			if (definition == null)
+				return null;
+			
+			definition = context.getGraphSession().findLatestProcessDefinition(definition.getName());
+
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+			if (!isInternalService()
+					&& !business.isUserAuthorized(INITIATOR_ROLE,
+							getUserGroups(), definition))
+				throw new SecurityException(
+						Messages.getString("BpmEngineImpl.NotAuthorizedToMakeProcess")); //$NON-NLS-1$
+			
+			if (definition.getFileDefinition().hasFile(UI_START_ZUL))
+			{
+				TaskInstance task = new TaskInstance();
+				task.setActorId(Security.getCurrentUser());
+				task.setBlocking(false);
+				task.setCancelled(false);
+				task.setCreate(new Date());
+				task.setDescription(definition.getDescription());
+				task.setDummyTask(true);
+				task.setId(0);
+				task.setName(definition.getName());
+				task.setOpen(true);
+				task.setPooledActors(new HashSet<String>());
+				task.setPriority(0);
+				task.setProcessClassLoader( VOFactory.getClassLoader(definition));
+				task.setProcessDefinition(definition.getId());
+				task.setProcessId(0);
+				task.setProcessName(definition.getName());
+				task.setSignalling(true);
+				task.setStart(new Date());
+				task.setVariables(new HashMap());
+				List<Transition> transitions = definition.getStartState().getLeavingTransitions();
+				String[] transitionNames = new String[transitions.size()];
+				for (int i = 0; i < transitions.size(); i++)
+					transitionNames[i] = transitions.get(i).getName();
+				Arrays.sort(transitionNames);
+				task.setTransitions(transitionNames);
+				return task;
+			}
+			else
+				return null;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	private void storeDummyTask (TaskInstance task) throws InternalErrorException, BPMException, UnknownUserException
+	{
+		JbpmContext context = getContext();
+		try {
+			if (task.isDummyTask())
+			{
+				org.jbpm.graph.def.ProcessDefinition definition = context.getGraphSession().getProcessDefinition(task.getProcessDefinition());
+				ProcessInstance pi = newProcessInstance(context, definition, false);
+				org.jbpm.graph.exe.ProcessInstance proc = context.getGraphSession().getProcessInstance(pi.getId());
+				startAuthenticationLog(proc.getRootToken());
+				ExecutionContext ctx = new ExecutionContext(proc.getRootToken());
+				for ( Object s: task.getVariables().keySet())
+				{
+					ctx.setVariable(s.toString(), task.getVariables().get(s));
+				}
+				endAuthenticationLog(proc.getRootToken());
+				context.save(proc);
+				task.setDummyTask(false);
+				task.setProcessId(proc.getId());
+			}
+		} finally {
+			flushContext(context);
+		}
 	}
 }

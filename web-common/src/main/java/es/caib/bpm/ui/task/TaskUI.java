@@ -27,7 +27,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.DocumentException;
 import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
@@ -62,6 +61,8 @@ import org.zkoss.zul.Tree;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.impl.InputElement;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.common.TransactionalTask;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
@@ -94,7 +95,7 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class TaskUI extends Frame implements EventListener {
 	
-	private long taskId = 0;
+	private Long taskId = null;
     Label proceso = null;
     Label tarea = null;
     Label asignadoA = null;
@@ -126,6 +127,7 @@ public class TaskUI extends Frame implements EventListener {
     Button btnDelegar = null;
 	private Button btnCerrar;
 	private Button btnSalvar;
+	private Long definitionId;
 
     
 	public boolean canClose() {
@@ -148,6 +150,11 @@ public class TaskUI extends Frame implements EventListener {
 		if (id != null) {
 			taskId  = Long.parseLong(id);
 		}
+		String def = req.getParameter("def"); //$NON-NLS-1$
+		if (def != null) {
+			definitionId  = Long.parseLong(def);
+		}
+		
 	}
 
 	public void onCreate ()  throws Exception {
@@ -185,12 +192,16 @@ public class TaskUI extends Frame implements EventListener {
         btnCerrar = (Button) botonera.getFellow("btnCerrar"); //$NON-NLS-1$
         ventanaDinamica = getFellow("datosElementoWorkflow"); //$NON-NLS-1$
 
-		if (taskId != 0) {
+		if (taskId != null) {
 			TaskInstance ti = BPMApplication.getEngine().getTask(taskId);
 			if (ti == null)
 				Application.goBack();
 			else
 				openTaskInstance(ti);
+		} else if (definitionId != null)
+		{
+			TaskInstance ti = BPMApplication.getEngine().createDummyTask(definitionId);
+			openTaskInstance(ti);
 		}
 		
 	}
@@ -238,7 +249,7 @@ public class TaskUI extends Frame implements EventListener {
     private static final long serialVersionUID = 1L;
 
     public void openTaskInstance(TaskInstance task) throws IOException,
-            DocumentException, ClassNotFoundException, SQLException,
+            Exception, ClassNotFoundException, SQLException,
             NamingException, CreateException, InternalErrorException, BPMException {
         ProcessDefinition definicion;
         BpmEngine engine = getEngine();
@@ -272,8 +283,8 @@ public class TaskUI extends Frame implements EventListener {
         // Establecemos los datos de proceso
 
         proceso.setValue(String.format(Messages.getString("TaskUI.DataProcessInfo"), definicion.getName(), definicion.getTag())); //$NON-NLS-1$
-        idproceso.setValue(Long.toString(instanciaProceso.getId()));
-        idtarea.setValue(Long.toString(task.getId()));
+        idproceso.setValue( instanciaProceso.getId() == 0L ? "" : Long.toString(instanciaProceso.getId()));
+        idtarea.setValue( task.getId() == 0L ? "" :Long.toString(task.getId()));
         descripcion.setValue(task.getDescription());
         fechaFinalizacionProceso.setValue(instanciaProceso.getEnd());
         tarea.setValue(task.getName());
@@ -581,11 +592,13 @@ public class TaskUI extends Frame implements EventListener {
 
         btnDelegar.setVisible(
         		(task.getStart() == null || user.equals(task.getActorId())) 
-        		&& !task.isCancelled() && task.getEnd()==null		);
+        		&& !task.isCancelled() && task.getEnd()==null		&&
+        		!task.isDummyTask());
 
         boolean iniciado = user.equals(task.getActorId())
                 && task.getStart() != null;
-        btnSalvar.setVisible(iniciado && !task.isCancelled() && task.getEnd()==null);
+        btnSalvar.setVisible(iniciado && !task.isCancelled() && task.getEnd()==null && ! task.isDummyTask());
+        btnCerrar.setVisible(! task.isDummyTask());
         
         //només mostrar botons de transició si la tasca està activa
         if(!task.isCancelled() && task.getEnd()==null){
@@ -623,44 +636,53 @@ public class TaskUI extends Frame implements EventListener {
         }
     }
 
-    public void ejecutarTarea(String transicion) throws InterruptedException,
+    public void ejecutarTarea(final String transicion) throws InterruptedException,
             IOException, CreateException, NamingException {
-        TaskInstance task = null;
-        BpmEngine engine = getEngine();
+        final TaskInstance task = currentTask;
+        final BpmEngine engine = getEngine();
 
         try {
-        	WorkflowWindow workflowWindow = getWorkflowWindow ();
+        	final WorkflowWindow workflowWindow = getWorkflowWindow ();
             if (workflowWindow != null) {
-
-                task = workflowWindow.getTask();
-
                 try {
                     Events.sendEvent(new Event(WorkflowWindow.SAVE_EVENT,
                             workflowWindow));
 
-                    ProcessInstance process = getCurrentProcess();
-                    engine.update(task);
+                    
+                    Events.sendEvent(new Event(
+                    		WorkflowWindow.PREPARE_TRANSITION_EVENT,
+                    		workflowWindow, transicion));
+
+                    EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
+						@Override
+						public Object run() throws Exception
+						{
+							ProcessInstance process = getCurrentProcess();
+							TaskInstance task2 = engine.update(task);
+							if (process.isDummyProcess())
+								process = engine.getProcessInstance(task2);
+							
+							
+							if (newComment.getValue() != null
+									&& newComment.getValue().length() > 0) {
+								engine.addComment(task2, newComment.getValue());
+								// workflowWindow.setTask(task);
+							}
+							
+							engine.executeTask(task2, transicion);
+							// workflowWindow.setTask(task);
+							
+							currentProcess = process;
+							return null;
+						}
+					});
 
                     Events.sendEvent(new Event(
-                            WorkflowWindow.PREPARE_TRANSITION_EVENT,
-                            workflowWindow, transicion));
-
-
-                    if (newComment.getValue() != null
-                            && newComment.getValue().length() > 0) {
-                        engine.addComment(task, newComment.getValue());
-                        // workflowWindow.setTask(task);
-                    }
-
-                    engine.executeTask(task, transicion);
-                    // workflowWindow.setTask(task);
-
-                    Events.sendEvent(new Event(
-                            WorkflowWindow.COMPLETE_TRANSITION_EVENT,
-                            workflowWindow, transicion));
-
+                    		WorkflowWindow.COMPLETE_TRANSITION_EVENT,
+                    		workflowWindow, transicion));
+                    
                     // Locate next task from same process
-                    List<TaskInstance> tasks = engine.getPendingTasks(process);
+                    List<TaskInstance> tasks = engine.getPendingTasks(currentProcess);
 
                     getDataModel().commit();
                     if (tasks != null)
@@ -767,7 +789,7 @@ public class TaskUI extends Frame implements EventListener {
     }
 
     public void cerrarTarea() throws InterruptedException, IOException,
-            CreateException, NamingException, BPMException, ClassNotFoundException, SQLException, DocumentException {
+            CreateException, NamingException, BPMException, ClassNotFoundException, SQLException, Exception {
        	Application.goBack();
     }
 

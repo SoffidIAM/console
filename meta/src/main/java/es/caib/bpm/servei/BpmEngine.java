@@ -41,6 +41,12 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.bpm.vo.TaskInstance createDummyTask (
+		long processDefinitionId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.ProcessInstance cancel(
 		es.caib.bpm.vo.ProcessInstance process)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -167,9 +173,10 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public void update(
+	public TaskInstance update(
 		es.caib.bpm.vo.TaskInstance task)
-		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException { 
+		return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void updateSwimlane(

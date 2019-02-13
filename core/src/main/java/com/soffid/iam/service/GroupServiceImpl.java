@@ -683,10 +683,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 					{
 						// Do nothing
 					}
-					else if (v instanceof List)
+					else if (v instanceof Collection)
 					{
-						List l = (List) v;
-						for (Object o: (List) v)
+						Collection l = (Collection) v;
+						for (Object o: (Collection) v)
 						{
 							if (o != null)
 							{
@@ -716,7 +716,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 						for (String v: l)
 						{
 							List<GroupAttributeEntity> p = getGroupAttributeEntityDao().findByNameAndValue(m.getName(), v);
@@ -848,10 +848,6 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		return result.get();
 	}
 
-	@Override
-	protected Collection<String> handleFindGroupNames() throws Exception {
-		return getGroupEntityDao().findGroupNames();
-	}
 
 	@Override
 	protected AsyncList<Group> handleFindGroupByJsonQueryAsync(final String query) throws Exception {
@@ -866,6 +862,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			}
 		}, result);
 		return result;
+	}
+
+	@Override
+	protected Collection<String> handleFindGroupNames() throws Exception {
+		return getGroupEntityDao().findGroupNames();
 	}
 
 	@Override

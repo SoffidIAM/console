@@ -2303,10 +2303,10 @@ public class ApplicationServiceImpl extends
 					{
 						// Do nothing
 					}
-					else if (v instanceof List)
+					else if (v instanceof Collection)
 					{
-						List l = (List) v;
-						for (Object o: (List) v)
+						Collection l = (Collection) v;
+						for (Object o: (Collection) v)
 						{
 							if (o != null)
 							{
@@ -2336,7 +2336,7 @@ public class ApplicationServiceImpl extends
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 						for (String v: l)
 						{
 							List<ApplicationAttributeEntity> p = getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), v);
@@ -2400,10 +2400,10 @@ public class ApplicationServiceImpl extends
 					{
 						// Do nothing
 					}
-					else if (v instanceof List)
+					else if (v instanceof Collection)
 					{
-						List l = (List) v;
-						for (Object o: (List) v)
+						Collection l = (Collection) v;
+						for (Object o: (Collection) v)
 						{
 							if (o != null)
 							{
@@ -2432,7 +2432,7 @@ public class ApplicationServiceImpl extends
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 						for (String v: l)
 						{
 							List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getName(), v);

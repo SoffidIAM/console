@@ -369,10 +369,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			else
 			{
 				AccountMetadataEntity metadata = findMetadata (entity, key);
-				if (v instanceof List)
+				if (v instanceof Collection)
 				{
-					List l = (List) v;
-					for (Object o: (List) v)
+					Collection l = (Collection) v;
+					for (Object o: (Collection) v)
 					{
 						if (o != null)
 						{
@@ -401,7 +401,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			} else {
 				if (m.getUnique() != null && m.getUnique().booleanValue())
 				{
-					List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+					Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 					for (String v: l)
 					{
 						List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);

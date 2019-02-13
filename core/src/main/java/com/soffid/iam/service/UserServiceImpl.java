@@ -3206,10 +3206,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				{
 					// Do nothing
 				}
-				else if (v instanceof List)
+				else if (v instanceof Collection)
 				{
-					List l = (List) v;
-					for (Object o: (List) v)
+					Collection l = (Collection) v;
+					for (Object o: (Collection) v)
 					{
 						if (o != null)
 						{
@@ -3245,7 +3245,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
 						for (String v: l)
 						{
 							List<UserDataEntity> p = getUserDataEntityDao().findByTypeAndValue(m.getName(), v);

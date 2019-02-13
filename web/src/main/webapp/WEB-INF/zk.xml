@@ -100,7 +100,7 @@ zk.error = function (msg) {
      ]]></embed>
 	</device-config>
 	<system-config>
-		<max-upload-size>20480</max-upload-size>
+		<max-upload-size>40480</max-upload-size>
 	</system-config>
 	<zscript-config>
 		<language-name>Java</language-name>

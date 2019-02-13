@@ -7,6 +7,7 @@ import java.util.List;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.Treecell;
@@ -81,14 +82,44 @@ public class MainMenuWindow extends Window implements AfterCompose {
 
 			for (Iterator it = l.iterator(); it.hasNext();) {
 				ProcessDefinition def = (ProcessDefinition) it.next();
-				Treecell treecell = new Treecell();
-				Treeitem treeitem = new Treeitem();
-				Treerow treerow = new Treerow();
-				treecell.setLabel(def.getName());
-				treecell.addEventListener("onClick", new CreateProcessListener(def)); // $NON-NLS-1$
-				treecell.setParent(treerow);
-				treerow.setParent(treeitem);
-				treeitem.setParent(children);
+				String[] split = def.getName().split("/");
+				Treechildren currentChildren = children;
+				for (int i = 0; i < split.length && currentChildren != null; i++)
+				{
+					Treecell treecell = null;
+					Treeitem treeitem = null;
+					Treerow treerow = null;
+					for ( Treeitem sibling: (Collection<Treeitem>)currentChildren.getChildren())
+					{
+						if (split[i].equals(sibling.getAttribute("path")))
+						{
+							treeitem = sibling;
+							treecell = (Treecell) treeitem.getFirstChild().getFirstChild();
+							currentChildren = treeitem.getTreechildren();
+							break;
+						}
+					}
+					if (treeitem == null)
+					{
+						treecell = new Treecell();
+						treeitem = new Treeitem();
+						treerow = new Treerow();
+						treecell.setLabel(split[i]);
+						treecell.setParent(treerow);
+						treerow.setParent(treeitem);
+						treeitem.setParent(currentChildren);
+						treeitem.setAttribute("path", split[i]);
+						if (i == split.length -1)
+						{
+							treecell.addEventListener("onClick", new CreateProcessListener(def)); // $NON-NLS-1$
+						} else {
+							currentChildren = new Treechildren();
+							currentChildren.setParent(treeitem);
+							treeitem.setOpen(false);
+							treecell.addEventListener("onClick", treeEventListener); // $NON-NLS-1$
+						}
+					}
+				}
 			}
 
 			// Check no available process
@@ -105,6 +136,15 @@ public class MainMenuWindow extends Window implements AfterCompose {
 		}
 	}
 
+	EventListener treeEventListener = new EventListener() {
+		
+		@Override
+		public void onEvent(Event event) throws Exception {
+			Treecell item = (Treecell) event.getTarget();
+			item.getTreeitem().setOpen( ! item.getTreeitem().isOpen());
+		}
+	};
+	
 	public boolean setVisible(boolean visible) {
 		if (visible) {
 			afterCompose();

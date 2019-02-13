@@ -149,22 +149,29 @@ public class LoginServiceImpl implements LoginService {
 					List<String> groups = getUserGroups (acc, holderGroup);
 					List<String> soffidRoles = getUserRoles(acc, holderGroup);
 					List<String> roles = getRoles(acc, holderGroup);
+					
+					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getUserName() : null;
+					String fullName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getFullName() : acc.getDescription();
+					
 					if (samlAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
 						roles.add("PASSWORD:VALID");
-						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
+						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
+								userName, fullName, holderGroup,
 								roles, groups, soffidRoles);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
+								userName, fullName, holderGroup,
 								roles,
 								groups, soffidRoles);
 					} else {
 						log.info(username + " login rejected. Invalid password");
 						return null;
 					}
+					
 			
 					if ( ! tenants.contains(tenant.getName()))
 					{
@@ -180,9 +187,6 @@ public class LoginServiceImpl implements LoginService {
 			            tenants.add(tenant.getName());
 					}
 					
-					principal.setAccountId(acc.getId());
-					principal.setFullName(acc.getDescription());
-					principal.setHolderGroup(holderGroup);
 					return principal;
 				} finally {
 					Security.nestedLogoff();
@@ -252,7 +256,7 @@ public class LoginServiceImpl implements LoginService {
 	}
 
     Realm dummyRealm = new SoffidRealm();
-    Principal dummyPrincipal = new SoffidPrincipalImpl("master\\$$ANONYMUOS", new LinkedList<String>(), null, null);
+    Principal dummyPrincipal = new SoffidPrincipalImpl("master\\$$ANONYMUOS", null, "Anonymous", null, new LinkedList<String>(), null, null);
 
     private Object enterWebapp ()
 	{

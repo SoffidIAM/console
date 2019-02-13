@@ -638,7 +638,7 @@
 	ctx = XPathUtils.getComponentContext(self);
 	proc = XPathUtils.getValue(ctx, "/@approvalProcess");
 	if (idProces != null) {
-		es.caib.zkib.zkiblaf.Application.call("wf/process.zul?id=" + proc);
+		es.caib.zkib.zkiblaf.Application.call("/wf/process.zul?id=" + proc);
 	}
 ]]></attribute>
 												</imageclic>
@@ -764,12 +764,11 @@
 	listItem = listCell.getParent();
 	posicio = listItem.getIndex();
 	elemPos = modelo.getElementAt(posicio);
-	xpath = elemPos.getDataContext().getXPath();
-	ds = dlistbox.getDataSource();
-	ctx = ds.getJXPathContext();
-	idProces = ctx.getValue(xpath + "/@id");
+	es.caib.zkib.binder.BindContext bindContext = XPathUtils.getComponentContext(self);
+	idProces = XPathUtils.getValue(bindContext, "@id");
 	if (idProces != null) {
-		es.caib.zkib.zkiblaf.Application.call("wf/process.zul?id=" + idProces);
+		userWindow.setVisible(false);
+		es.caib.zkib.zkiblaf.Application.call("/wf/process.zul?id=" + idProces);
 	}
 </attribute>
 												</imageclic>

@@ -16,21 +16,29 @@
 			boolean queryEnabled = false;
 
 			void acceptData() {
-				ds = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getDataSource();
-				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
-				index = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getSelectedIndex();
-				ctx = ds.getJXPathContext();
-				pointer = ctx.createPath(xpath+"["+(index + 1)+"]");
-				ctx2 = ctx.getRelativeContext(pointer);
-				String codi = (String)ctx2.getPointer("@codi").getValue();
-				String nom = (String)ctx2.getPointer("@nom").getValue();
-				String id = (String)ctx2.getPointer("@id").getValue().toString();
-				String primerLlinatge = (String)ctx2.getPointer("@primerLlinatge").getValue();
-				String segonLlinatge = (String)ctx2.getPointer("@segonLlinatge").getValue();
-				pointer.invalidate();
-				String[] dades = {codi, nom + " " + primerLlinatge + ((segonLlinatge != null) ? " " + segonLlinatge : ""), id};
 				Component formComponent = (Component) pageScope.get("contextComponent");
-				Events.postEvent("onActualitza", formComponent, dades);
+				Listbox listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+				if (pageScope.get("multi"))
+				{
+					List result = new LinkedList();
+					for (Listitem item: listbox.getSelectedItems())
+					{
+						result.add ( item.getValue().getInstance().getCodi()); 
+					}
+					Events.postEvent ("onActualitza", formComponent, result);						
+					
+				}
+				else
+				{
+					es.caib.seycon.ng.comu.Usuari user = listbox.getSelectedItem().getValue().getInstance();
+					String codi = user.getCodi();
+					String nom = user.getNom();
+					Long id = user.getId();
+					String primerLlinatge = user.getPrimerLlinatge();
+					String segonLlinatge = user.getSegonLlinatge();
+					String[] dades = {codi, nom + " " + primerLlinatge + ((segonLlinatge != null) ? " " + segonLlinatge : ""), id.toString()};
+					Events.postEvent("onActualitza", formComponent, dades);
+				}
 				cleanWindow();
 			}
 
@@ -39,6 +47,18 @@
 				model.refresh();
 				esquemaLlista.visible=false;
 				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void applyFilter (Event event)
+			{
+				com.soffid.iam.web.users.additionalData.SearchFilter filter = pageScope.get("filter");
+				if (filter != null)
+				{
+					Listitem item = event.getData();
+					es.caib.seycon.ng.comu.Usuari value = item.getValue().getInstance();
+					if ( ! filter.isAllowedValue( com.soffid.iam.api.User.toUser(value) ))
+						item.detach();
+				}
 			}
 		]]>
 	</zscript>
@@ -49,10 +69,25 @@
 		<attribute name="onInicia">
 			<![CDATA[
 				pageScope.put("contextComponent", event.data);
+				pageScope.put("filter", null);
+				pageScope.put("multi", false);
 				if(self.mode.compareToIgnoreCase("highlighted") != 0){
 					self.setMode("highlighted");
 				}else{
 					self.visible = true;
+				}
+				esquema.getFellow("lista").getFellow("listbox").setMultiple(false);
+				esquema.getFellow("lista").getFellow("listbox").setCheckmark(false);
+			]]>
+		</attribute>
+		<attribute name="onConfigure">
+			<![CDATA[
+				pageScope.put("filter", event.data[0]);
+				pageScope.put("multi", event.data[1]);
+				if (event.data[1])
+				{
+					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
+					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
 				}
 			]]>
 		</attribute>
@@ -74,7 +109,7 @@
 
 			<navegador id="lista">
 				<listbox id="listbox" autocommit="false" dataPath="/model:/usuari"
-					fixedLayout="true" rows="${fileres}">
+					fixedLayout="true" rows="${fileres}" onNewRow="applyFilter(event)">
 					<attribute name="onSelect">
 						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
 					</attribute>

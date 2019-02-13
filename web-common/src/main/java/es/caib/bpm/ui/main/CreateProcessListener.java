@@ -29,22 +29,29 @@ public class CreateProcessListener implements EventListener, Serializable {
 
 	public void onEvent(Event event) throws Exception {
 		BpmEngine engine = BPMApplication.getEngine();
-		ProcessInstance instance= engine.newProcess(def);
-		
-        List tasks = engine.getPendingTasks(instance);
-
-		Treeitem item = (Treeitem) event.getTarget().getFellow("availableprocesses"); //$NON-NLS-1$
-		//item.setOpen(false);
 		
 		event.getTarget().getFellow("menu").setVisible(false); //$NON-NLS-1$
-        
-        if (tasks != null && tasks.size() > 0) {
-            TaskInstance task = (TaskInstance) tasks.get(0);
-            task = engine.startTask(task);
-            Application.call(BPMApplication.getTaskURL(task));
-        } else {
-        	Missatgebox.info(Labels.getLabel("nuevoProceso.msgCreacionProceso") + " " + instance.getId()); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+		
+		TaskInstance taskInstance = engine.createDummyTask(def.getId());
+		if (taskInstance != null)
+		{
+			Application.call(BPMApplication.getTaskURL(taskInstance));
+		}
+		else
+		{
+			ProcessInstance instance= engine.newProcess(def);
+			
+			List tasks = engine.getPendingTasks(instance);
+			
+			if (tasks != null && tasks.size() > 0) {
+				TaskInstance task = (TaskInstance) tasks.get(0);
+				task = engine.startTask(task);
+				Application.call(BPMApplication.getTaskURL(task));
+			} else {
+				Missatgebox.info(Labels.getLabel("nuevoProceso.msgCreacionProceso") + " " + instance.getId()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+		}
 	}
 
 }

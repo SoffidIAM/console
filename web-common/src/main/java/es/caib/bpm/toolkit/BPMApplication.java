@@ -24,7 +24,10 @@ public class BPMApplication {
     
     public static String getTaskURL (TaskInstance task) 
     {
-    	return "/wf/task.zul?id="+task.getId(); //$NON-NLS-1$
+    	if (task.isDummyTask())
+        	return "/wf/task.zul?def="+task.getProcessDefinition(); //$NON-NLS-1$
+    	else
+    		return "/wf/task.zul?id="+task.getId(); //$NON-NLS-1$
     }
     
     public static String getMassiveTaskURL (TaskInstance task, String transition) 

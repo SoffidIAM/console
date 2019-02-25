@@ -43,6 +43,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     		return;
 
 		tasqueEntity.setStatus("P"); //$NON-NLS-1$
+		tasqueEntity.setDate(new Timestamp(System.currentTimeMillis()));
 
     	TransactionStatus c = currentTransactionStatus();
     	if (c.readonly)
@@ -219,7 +220,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	if (current.virtualId == null)
     	{
     		String hash = transactionSeed + getSession().getTransaction().hashCode();
-    		if (! hash.equals(current.transactionHash)) 
+    		if (! hash.equals(current.transactionHash)) // New standard transition 
     		{
     			current.transactionHash = hash;
     			current.count = 0;
@@ -304,13 +305,9 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 	@Override
 	protected void handleFinishVirtualSourceTransaction(String virtualTransactionId) throws Exception {
-		TransactionStatus c = currentTransactionStatus();
-		if (c.virtualId != null && c.virtualId.equals(virtualTransactionId))
-		{
-			c.transactionHash = null;
-			c.virtualId = null;
-			c.count = 0;
-		}
+		TransactionStatus current = currentTransactionStatus();
+		TransactionStatus c = current.previous;
+		transactionStatus.set(c);
 	}
 
 	@Override
@@ -339,21 +336,20 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 	@Override
 	protected String handleStartVirtualSourceTransaction(boolean readonly) throws Exception {
-		TransactionStatus c = currentTransactionStatus();
-		if (c.virtualId == null)
+		TransactionStatus current = currentTransactionStatus();
+		TransactionStatus c = new TransactionStatus();
+		c.previous = current;
+		synchronized (transactionSeed)
 		{
-			synchronized (transactionSeed)
-			{
-				c.virtualId = transactionSeed + "#" + virtualCounter;
-				virtualCounter ++;
-			}
-			c.transactionHash = null;
-			c.count = 0;
-			c.readonly = readonly;
-			return c.virtualId;
-		} else {
-			return c.virtualId+"#nested";
+			c.virtualId = transactionSeed + "#" + virtualCounter;
+			virtualCounter ++;
 		}
+		c.transactionHash = null;
+		c.count = 0;
+		if (readonly )
+			c.readonly = true;
+		transactionStatus.set(c);
+		return c.virtualId;
 	}
 
 	@Override
@@ -399,4 +395,5 @@ class TransactionStatus {
 	int count;
 	boolean exceeded;
 	boolean readonly;
+	TransactionStatus previous;
 }

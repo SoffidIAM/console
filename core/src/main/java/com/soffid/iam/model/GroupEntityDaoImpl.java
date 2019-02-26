@@ -148,6 +148,7 @@ public class GroupEntityDaoImpl extends
 			for (AuditEntity aud: grup.getAudit())
 			{
 				aud.setGroup(null);
+				getAuditEntityDao().update(aud);
 			}
 			super.remove(grup);
 			getSession(false).flush();

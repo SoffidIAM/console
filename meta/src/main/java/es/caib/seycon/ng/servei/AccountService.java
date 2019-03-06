@@ -5,7 +5,6 @@
 //
 
 package es.caib.seycon.ng.servei;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;

@@ -156,6 +156,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(acc.getAcl() == null || acc.getAcl().isEmpty()) &&
 				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE) ||
 				
+				(acc.getType().equals (AccountType.IGNORED) || acc.getType().equals (AccountType.SHARED) ) &&
 				acc.getAcl().size() == 1  &&  /* Account already belongs to the user and only to the user*/
 				acc.getAcl().iterator().next().getUser() == ue &&
 				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER  ||
@@ -733,6 +734,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     protected void handleRemoveAccount(com.soffid.iam.api.Account account) throws Exception {
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		createAccountTask(ae);
+		for (UserAccountEntity userAccount: ae.getUsers())
+		{
+			getUserAccountEntityDao().remove(userAccount);
+		}
+		ae.getUsers().clear();
 		getAccountEntityDao().remove(ae);
 	}
 

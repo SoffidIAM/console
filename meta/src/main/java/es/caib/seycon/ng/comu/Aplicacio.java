@@ -70,6 +70,10 @@ public class Aplicacio {
 	@Nullable
 	public String roleDefinitionProcess;
 	
+	@Description ("Only one single role can be assigned to each user")
+	@Nullable
+	public boolean singleRole;
+	
 	@Description ("Application custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
 	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")

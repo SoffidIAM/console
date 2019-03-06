@@ -420,6 +420,10 @@
 											</attribute>
 										</textbox>
 									</row>
+									<row>
+										<input_etiqueta value="${c:l('com.soffid.iam.api.Application.singleRole')} :"/>
+										<checkbox bind="singleRole" onCheck=""/>
+									</row>
 								</rows>
 							</grid>
 							<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" 

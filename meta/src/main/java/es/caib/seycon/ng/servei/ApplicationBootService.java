@@ -5,14 +5,15 @@
 //
 
 package es.caib.seycon.ng.servei;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.api.Tenant;
-import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.TenantService;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.model.TipusDadaEntity;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="ApplicationBootService",
 	translatedPackage="com.soffid.iam.service")

@@ -321,6 +321,12 @@ public class ApplicationBootServiceImpl extends
 				configSvc.update(cfg);
 			}
 
+			if (version < 102) { //$NON-NLS-1$
+				cfg.setValue("102"); //$NON-NLS-1$
+				updateBlobTenant();
+				configSvc.update(cfg);
+			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -450,6 +456,25 @@ public class ApplicationBootServiceImpl extends
 						new Object[] {tenantId});
 			}
 			rset.close();
+			stmt.close();
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updateBlobTenant() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			Long tenantId = tenantService.getMasterTenant().getId();
+			PreparedStatement stmt = conn.prepareStatement("UPDATE SC_BLOCON SET BCO_TEN_ID=? WHERE BCO_TEN_ID IS NULL");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
 			stmt.close();
 		}
 		finally

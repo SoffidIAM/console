@@ -210,6 +210,16 @@ public class ConfigurationServiceImpl
 	protected byte[] handleGetBlob(String name) throws Exception {
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);
+		if (result.isEmpty())
+		{
+			Security.nestedLogin("master", "none", Security.ALL_PERMISSIONS);
+			try
+			{
+				result = dao.findByNameAndTenant(name, Security.getCurrentTenantId());
+			} finally {
+				Security.nestedLogoff();
+			}
+		}
 		if (result.isEmpty()) {
 			return null;
 		} else {
@@ -222,8 +232,8 @@ public class ConfigurationServiceImpl
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void handleUpdateBlob(String name, byte[] data) throws Exception {
-		if (! Security.isMasterTenant())
-			throw new SecurityException("Blob configuration can only be updated from master tenant");
+//		if (! Security.isMasterTenant())
+//			throw new SecurityException("Blob configuration can only be updated from master tenant");
 			
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);

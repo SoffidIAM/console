@@ -5,9 +5,7 @@
 //
 
 package es.caib.seycon.ng.servei;
-import com.soffid.mda.annotation.*;
-
-import org.springframework.transaction.annotation.Transactional;
+import com.soffid.mda.annotation.Service;
 
 @Service (translatedName="ApplicationShutdownService",
 	translatedPackage="com.soffid.iam.service")

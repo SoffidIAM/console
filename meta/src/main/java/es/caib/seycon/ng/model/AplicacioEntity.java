@@ -75,6 +75,11 @@ public abstract class AplicacioEntity {
 	@Nullable
 	public String roleDefinitionProcess;
 
+
+	@Column (name="APL_SGNROL")
+	@Nullable
+	public Boolean singleRole;
+	
 	/************************** DAOS *********************************************************/
 	
 	@ForeignKey (foreignColumn="SOD_APL_ID")

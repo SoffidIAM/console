@@ -52,6 +52,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.model.AccountEntity;
@@ -72,9 +73,8 @@ import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserAccountEntity;
-import com.soffid.iam.model.UserAccountEntityImpl;
-import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
@@ -94,7 +94,6 @@ import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.SoDRisk;
-import com.soffid.iam.api.SoDRule;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -729,11 +728,40 @@ public class ApplicationServiceImpl extends
 
     protected Role handleUpdate(Role rol) throws Exception {
         RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
+        String oldName = rolEntity.getName();
         if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
             rolEntity = getRoleEntityDao().update(rol, false); // actualizamos cambios del rol
 
             updateRoleAttributes(rol, rolEntity);
+            
+            if (!oldName.equals(rol.getName()))
+            {
+        		TaskEntity t = getTaskEntityDao().newTaskEntity();
+       			t.setTransaction("UpdateRole");
+       			t.setRole(oldName);
+        		t.setSystemName(rol.getSystem());
+        		t.setDb(rol.getSystem());
+        		getTaskEntityDao().create(t);
+            	// Propagate users
+            	for ( RoleGrant user: handleFindEffectiveRoleGrantsByRoleId(rolEntity.getId()))
+            	{
+            		t = getTaskEntityDao().newTaskEntity();
+            		if (user.getUser() != null)
+            		{
+            			t.setTransaction("UpdateUser");
+            			t.setUser(user.getUser());
+            		}
+            		else
+            		{
+            			t.setTransaction("UpdateAccount");
+            			t.setUser(user.getOwnerAccountName());
+            		}
+            		t.setSystemName(rol.getSystem());
+            		t.setDb(rol.getSystem());
+            		getTaskEntityDao().create(t);
+            	}
+            }
             
             return getRoleEntityDao().toRole(rolEntity);
         }
@@ -860,13 +888,19 @@ public class ApplicationServiceImpl extends
 		   			else if (rg.getDomainValue() != null && 
 		   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
 		   				continue ;
-		   			else if (rg.isEnabled())
+		   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date())))
 		   				return getRoleAccountEntityDao().toRoleAccount(rg);
 		   			else
 		   			{
-		   				deleteRoleAccountEntity(rolsUsuarisEntity, null, true);
-		   				rolsUsuarisEntity.getAccount().getRoles().remove(rolsUsuarisEntity);
+		   				deleteRoleAccountEntity(rg, null, true);
+		   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
 		   			}
+		   		}
+		   		else if (rolsUsuarisEntity.getRole().getInformationSystem() == rg.getRole().getInformationSystem() &&
+		   			Boolean.TRUE.equals(rolsUsuarisEntity.getRole().getInformationSystem().getSingleRole()))
+		   		{
+	   				deleteRoleAccountEntity(rg, null, true);
+	   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
 		   		}
 		   	}
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);

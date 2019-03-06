@@ -6,11 +6,14 @@
 
 package es.caib.seycon.ng.servei;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.service.AsyncRunnerService;
-import com.soffid.mda.annotation.*;
-
-import org.springframework.transaction.annotation.Transactional;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 @Service(translatedName = "AuditService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.AuditoriaEntity.class,

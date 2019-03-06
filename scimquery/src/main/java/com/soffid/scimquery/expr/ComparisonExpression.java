@@ -381,21 +381,27 @@ public class ComparisonExpression extends AbstractExpression {
 					query.getWhereString().append("upper(");
 					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(") like ");
-					addParameter (query, value.toString().toUpperCase()+"%", String.class);
+					addParameter (query, escapeSql(value.toString().toUpperCase())+"%", String.class);
+					query.getWhereString().append(" escape ");
+					addParameter (query, "\\", String.class);
 				}
 				else if ("ew".equalsIgnoreCase(operator))
 				{
 					query.getWhereString().append("upper(");
 					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(") like ");
-					addParameter (query, "%"+value.toString().toUpperCase(), String.class);
+					addParameter (query, "%"+escapeSql(value.toString().toUpperCase()), String.class);
+					query.getWhereString().append(" escape ");
+					addParameter (query, "\\", String.class);
 				}
 				else if ("co".equalsIgnoreCase(operator))
 				{
 					query.getWhereString().append("upper(");
 					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(") like ");
-					addParameter (query, "%"+value.toString().toUpperCase()+"%", String.class);
+					addParameter (query, "%"+escapeSql(value.toString().toUpperCase())+"%", String.class);
+					query.getWhereString().append(" escape ");
+					addParameter (query, "\\", String.class);
 				}
 				else if ("pr".equalsIgnoreCase(operator))
 				{
@@ -408,6 +414,10 @@ public class ComparisonExpression extends AbstractExpression {
 		} catch (Exception e) {
 			throw new EvalException("Error evaluating attribute "+attribute, e);
 		}
+	}
+
+	private String escapeSql(String upperCase) {
+		return upperCase.replaceAll("\\\\", "\\\\\\\\").replaceAll("_", "\\\\_").replaceAll("%", "\\\\%");
 	}
 
 	private void addParameter(HQLQuery query, Object value2, Class<?> hibernateClass) {

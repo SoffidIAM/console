@@ -7,15 +7,18 @@
 package es.caib.seycon.ng.servei;
 import java.util.Map;
 
-import com.soffid.iam.service.TenantService;
-import com.soffid.mda.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.seycon.ng.model.RolAssociacioRolEntity;
+import com.soffid.iam.service.TenantService;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
+
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariImpressoraEntity;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service (translatedName="AuthorizationService",
 	translatedPackage="com.soffid.iam.service")

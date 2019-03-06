@@ -1021,13 +1021,14 @@ public class InputField2 extends Div
 				result = "<listbox mold=\"select\" onChange=\"\" "
 						+ "id=\""+id+"\" "
 						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
-				result = result + "<listitem value=\"\"/>";
+				if (! dataType.isRequired())
+					result = result + "<listitem value=\"\"/>";
 				for (String v: dataType.getValues())
 				{
 					String s = escapeString(v);
 					int separator = s.indexOf(':');
 					if (separator > 0)
-						result = result + "<listitem value=\""+s.substring(0, separator).trim()+"\" label=\""+s.substring(separator+1).trim()+"\"/>";
+						result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
 					else
 						result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
 				}
@@ -1116,7 +1117,10 @@ public class InputField2 extends Div
 	}
 
 	private String escapeString(String v) {
-		return v.replaceAll("\"", "&quot;");
+		return v.replaceAll("&", "&amp;")
+				.replaceAll("\"", "&quot;")
+				.replaceAll("<", "&gt;")
+				.replaceAll(">", "&gt;");
 	}
 
 	private String getIdForPosition(Integer position) {

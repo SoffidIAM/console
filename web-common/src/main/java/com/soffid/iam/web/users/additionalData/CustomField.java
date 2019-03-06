@@ -113,10 +113,10 @@ public class CustomField extends Div implements XPathSubscriber {
 			l.setSclass( getSclass()+"_label" );
 			appendChild(l);
 			input = new InputField2();
+			appendChild(input);
 			input.setDataType(dataTypeObj);
 			input.setSclass(getSclass()+"_input");
 			input.setReadonly(readonly);
-			appendChild(input);
 			input.setBind(binder.getDataPath());
 			input.setSearchFilter(searchFilter);
 			input.setOwnerObject(ownerObject);

@@ -132,7 +132,7 @@
 			<new-instance-bean className="es.caib.seycon.ng.comu.UsuariImpressora"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="attributes" type="attributes" executeOnNewObjects="true">  <!-- user:query -->
+		<finder name="attributes" type="attributes" executeOnNewObjects="true" refreshAfterCommit="true" >  <!-- user:query -->
 			<ejb-finder jndi="java:comp/env/ejb/UsuariEJB"
 				method="findUserAttributes" if="${canQueryUser}">
 				<parameter value="${instance.codi}"/>

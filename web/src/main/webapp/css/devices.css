@@ -2,10 +2,10 @@
 ================================================== */
 img, video, canvas { max-width: 100%;}
 /****** TOP LINE ******/
-.topline{height:35px !important; background-color: #22B9D8 !important; border-bottom: 0.1em solid #7f9fc2 !important; padding: 0 !important; margin: 0 !important; box-shadow: 0px 1px 7px #888888;}
+.topline{height:35px !important; background-color: {SKY} !important; border-bottom: 0.1em solid {SKYDARK} !important; padding: 0 !important; margin: 0 !important; box-shadow: 0px 1px 7px #888888;}
 .startmenu {
 	height: 35px;
-	border: 0px !important; float: left; border: 0; border-radius: 0; background-color: #22B9D8 !important; padding: 0px !important; margin: 0 !important;
+	border: 0px !important; float: left; border: 0; border-radius: 0; background-color: {SKY} !important; padding: 0px !important; margin: 0 !important;
 	}
 
 #logo{ margin: 7px 10px 0px 5px; vertical-align: -45%; background: transparent; height: 25px; }
@@ -28,15 +28,15 @@ span.tree-root-close, span.tree-tee-close, span.tree-last-close,
 span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 0px 10px 0px 0px; background-repeat: no-repeat; width: 16px; min-height: 16px;}
 span.tree-root-close, span.tree-tee-close, span.tree-last-close{ background-image: url(/icons/collapse.png); background-size: 16px 16px; }
 span.tree-root-open, span.tree-tee-open, span.tree-last-open{ background-image: url(/icons/expand.png); background-size: 16px 16px;}	
-span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ background-color:white !important; font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px; color:#22B9D8; font-weight: normal;line-height: 40px; border-top: 1px solid #eee; cursor:pointer; }
+span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ background-color:white !important; font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px; color:{SKY}; font-weight: normal;line-height: 40px; border-top: 1px solid #eee; cursor:pointer; }
 .mwt-menuprincipal, .rwt-menuprincipal{ box-shadow:none; }
 .menuperfil{ padding-right:10px; z-index: 1;}
-.menuperfil:hover, .menu-display div.cell-inner:hover{background-color: #22B9D8 !important; color:white;}
+.menuperfil:hover, .menu-display div.cell-inner:hover{background-color: {SKY} !important; color:white;}
 .menu-display .tree-root-open, .menu-display .tree-root-close{ float: right; margin:11px 20px;}
 
 /**** VENTANAS ****/
-.show-pass, .new-pass{ background-color:white; border:1px solid #22B9D8; padding-bottom:15px; }
-.show-pass .title td, .new-pass .title td{ padding-left: 3px; background-color:#22B9D8; line-height: 30px; }
+.show-pass, .new-pass{ background-color:white; border:1px solid {SKY}; padding-bottom:15px; }
+.show-pass .title td, .new-pass .title td{ padding-left: 3px; background-color:{SKY}; line-height: 30px; }
 .show-pass span, .new-pass span{color: #000;}
 .show-pass input, .new-pass input{padding: 4px 4px 5px 4px;}
 .new-pass div{margin-top:10px;}
@@ -47,7 +47,7 @@ span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ back
 .menuperfil{display:none; top: 35px !important; right: 0px !important; position: absolute; }
 
 /****** TITULOS *******/
-.titolSelf{ font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:25px; color:#7F9FC2; }
+.titolSelf{ font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:25px; color:{BLUEDARK}; }
 
 .fons{ background-color:transparent; }
 .content{ display: table;width: 100%; max-width: 100%;margin: 0 auto; }
@@ -77,8 +77,8 @@ td[class^='tab-3d-']{background-image:none;}
 .tab-3d-mm', .tab-thicktabbox-mm' a {white-space:pre;}
 
 .tab, .tab a, .tabsel, .tabsel a{font-size:13px; font-weight:bold;}
-.tab a{color:#7F9FC2}
-.tabsel a{color: #9EC73C;}
+.tab a{color:{SKY}}
+.tabsel a{color: {GREEN};}
 .tabsel, .tab{border-bottom:none }
 
 /* Esquinas superiores de la tabla de las pesta�as*/
@@ -88,7 +88,7 @@ td.tab-thicktabbox-first1, td.tab-thicktabbox-first2, td.tab-thicktabbox-last1 {
 	}
 td.tab-thicktabbox-last1, 
 td.tab-3d-last1 {
-	border-bottom: 1px solid #637792;
+	border-bottom: 1px solid {BLUEDARK};
 }
 td.tab-3d-first2, td.tab-3d-last2, td.tab-thicktabbox-first2, td.tab-thicktabbox-last2{width:auto;}
 
@@ -152,7 +152,7 @@ div table tbody tr td.tabsel
 	border-left: none !important;
 	border-top: none !important;
 	border-right: none !important;
-	border-bottom: 2px solid #9EC73C; 
+	border-bottom: 2px solid {GREEN}; 
 	
 } 
 
@@ -160,7 +160,7 @@ div table tbody tr td.tab{
 	border-left: none !important;
 	border-top: none !important;
 	border-right: none !important;
-	border-bottom:1px solid #637792; 
+	border-bottom:1px solid {BLUEDARK}; 
 	
 } 
 
@@ -214,7 +214,7 @@ div.tabpanel {
 .aplications img{margin-top:-2px;}
 
 /*zona IP*/
-.own-ip {position: fixed; left: 0; bottom: 0; background-color: #9EC73C; width: 100%; padding: 10px;opacity: 0.8;}
+.own-ip {position: fixed; left: 0; bottom: 0; background-color: {GREEN}; width: 100%; padding: 10px;opacity: 0.8;}
 .own-ip span {color: white;font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px;}
 /* #Media Queries
 ================================================== */
@@ -222,7 +222,7 @@ div.tabpanel {
 @media only screen and (max-width: 876px) {
 	.content{display: block; overflow: hidden; width: auto; margin-top: 10px;}
 	.sidebar, .wrap{float:none; display: block; width: auto; padding:0px 0px 15px 0px; margin: 15px 0px 0px 0px;}	
-	.aplications .tree-body{border:1px solid #7F9FC2; width:100%;}
+	.aplications .tree-body{border:1px solid {BLUEDARK}; width:100%;}
 	.aplications .tree-body span{font-size:20px;}
 	span.tree-root-close, span.tree-tee-close, span.tree-last-close,
 	span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 2px 10px 0px 0px;}
@@ -256,17 +256,17 @@ div.tabpanel {
 
 /* Barra de botons */
 .toolbar {
-	padding: 2px; border: 1px; border-top:0.1px solid white; background: #637792; 
+	padding: 2px; border: 1px; border-top:0.1px solid white; background: ; 
 }
 
 .toolbar a, .toolbar a:visited, .toolbar a:hover {
-	font-family: Arial, sans-serif;	font-size: 11px; font-weight: bold; color: #FFF;
-	border: 0px; text-decoration: none; background: #637792;
+	font-family: Arial, sans-serif;	font-size: 11px; font-weight: bold; color: {BLUETEXT};
+	border: 0px; text-decoration: none; background: ;
 	white-space:nowrap; 
 }
 
 .toolbar a:hover {
-	background: #7387a2;
+	background: {BLUELIGHT};
 }
 
 

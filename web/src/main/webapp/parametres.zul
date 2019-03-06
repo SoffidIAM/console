@@ -271,6 +271,7 @@
 	<tabbox onCreate="refreshTaskEngine();" id="tabbox">
 		<tabs>
 			<tab label="${c:l('parametres.zul.Advanced')}"></tab>
+			<tab label="${c:l('parametres.zul.UserInterface')} " ></tab>
 			<tab label="${c:l('parametres.zul.authentication')}"></tab>
 			<tab label="${c:l('parametres.zul.taskEngine')}" onSelect="refreshTaskEngine()"></tab>
 			<tab label="${c:l('parametres.zul.cache')}" onSelect="refreshCacheEngine()" if="${masterTenant }"></tab>
@@ -409,6 +410,76 @@
 			</form>
 		</detalls>
 	</esquema>
+			</tabpanel>
+			<tabpanel>
+				<zscript>
+					colorManager = new com.soffid.iam.web.config.ColorManager();
+					colorManager.setColors(tabbox);
+				</zscript>
+				<script>
+					function onChangeColor(item, value) {
+							var element = document.getElementById(item);
+							if (element.value != value)
+							{
+								element.value = value;
+								zkTxbox.onupdate(element);
+							}
+					};
+					function onChangeTBColor(item, value) {
+							var element = document.getElementById(item);
+							if (element.value != value)
+							{
+								element.value = value;
+							}
+					};
+				</script>
+				<div>
+					<div width="300px" style="display: inline-block">
+						<label value="Header:" style="display: inline-block; width: 100px"></label>
+						<textbox value="${color3 }" id="color3tb" action="onInput:onChangeTBColor('color3Selector',this.value)"/> 
+						<h:input type='color' id="color3Selector" value="${color3 }" onChange="onChangeColor('${color3tb.uuid }', this.value)"></h:input >
+					</div>
+					<div width="300px" style="display: inline-block">
+						<label value="Header text:"  style="display: inline-block; width: 100px"></label>
+						<textbox value="${color3text }" id="color3Texttb" action="onInput:onChangeTBColor('color3TextSelector',this.value)"/> 
+						<h:input type='color' id="color3TextSelector" value="${color3text }" onChange="onChangeColor('${color3Texttb.uuid }', this.value)"></h:input >
+					</div>
+				</div>
+				<div>
+					<div width="300px" style="display: inline-block">
+						<label value="Toolbar:" style="display: inline-block; width: 100px"></label>
+						<textbox value="${color2 }" id="color2tb" action="onInput:onChangeTBColor('color2Selector',this.value)" onChange=""/> 
+						<h:input type='color' id="color2Selector" value="${color2 }" onChange="onChangeColor('${color2tb.uuid }', this.value)"></h:input >
+					</div>
+					<div width="300px" style="display: inline-block">
+						<label value="Toolbar text:" style="display: inline-block; width: 100px"></label>
+						<textbox value="${color2text }" id="color2Texttb" action="onInput:onChangeTBColor('color2TextSelector',this.value)"  onChange=""/> 
+						<h:input type='color' id="color2TextSelector" value="${color2text }" onChange="onChangeColor('${color2Texttb.uuid }', this.value)"></h:input >
+					</div>
+				</div>
+				<div>
+					<div width="300px" style="display: inline-block">
+						<label value="Highlight:" style="display: inline-block; width: 100px"></label>
+						<textbox value="${color1 }" id="color1tb" action="onInput:onChangeTBColor('color1Selector',this.value)"/> 
+						<h:input type='color' id="color1Selector" value="${color1 }" onChange="onChangeColor('${color1tb.uuid }', this.value)"></h:input >
+					</div>
+					<div width="300px" style="display: inline-block">
+						<label value="Text on highilted:" style="display: inline-block; width: 100px"></label>
+						<textbox value="${color1text }" id="color1Texttb" action="onInput:onChangeTBColor('color1TextSelector',this.value)"/> 
+						<h:input type='color' id="color1TextSelector" value="${color1text }" onChange="onChangeColor('${color1Texttb.uuid }', this.value)"></h:input >
+					</div>
+				</div>
+				<image style="width:250px; display:block; margin:auto" content="${logoImage }" id="logoImage"/>
+				<div >
+					<label style="vertical-align: top" value="Upload new image (250px wide):"/>
+					<fileupload native="true" mold="logo" style="display:inline-block; width:500px; height:40px" onUpload="colorManager.onUpload(event)"/> 
+				</div>
+				<div style="margin-top: 2em">
+					<button label="${c:l('parametres.zul.Reset') }" onClick="colorManager.reset(event)"
+						style="text-align:right"/>
+					<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="colorManager.commit(event)"
+						style="text-align:right"/>
+				</div>
 			</tabpanel>
 			<tabpanel >
 				<form dataPath="/samlmodel:/conf" id="samlform">

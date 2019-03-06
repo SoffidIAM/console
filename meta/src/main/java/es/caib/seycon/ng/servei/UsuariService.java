@@ -6,28 +6,27 @@
 
 package es.caib.seycon.ng.servei;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.impl.AttributeValidationService;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AccountPasswordEntity;
 import es.caib.seycon.ng.model.RegistreAccesEntity;
 import es.caib.seycon.ng.model.SecretEntity;
 import es.caib.seycon.ng.model.UserAccountEntity;
-
-import java.util.Date;
-import java.util.concurrent.Future;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverPath="/seycon/UsuariService", serverRole="agent",
 	translatedName="UserService", translatedPackage="com.soffid.iam.service")

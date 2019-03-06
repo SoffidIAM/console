@@ -6,33 +6,33 @@
 
 package es.caib.seycon.ng.servei;
 
-import com.soffid.iam.model.TenantEntity;
-
 import java.util.Collection;
 import java.util.Map;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.ScheduledTaskService;
-import com.soffid.iam.service.TenantService;
 import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
-import es.caib.seycon.ng.comu.Server;
-import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import roles.agent_create;
 import roles.agent_queryObjects;
 import roles.agent_update;

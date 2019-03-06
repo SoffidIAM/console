@@ -5,14 +5,16 @@
 //
 
 package es.caib.seycon.ng.servei;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.model.EntryPointAccountEntity;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={roles.intranetMenus_admin.class,roles.Tothom.class},
 		translatedName="EntryPointService",

@@ -6,18 +6,21 @@
 
 package es.caib.seycon.ng.servei;
 
-import com.soffid.iam.model.TenantEntity;
-import com.soffid.iam.ui.SeyconTask;
-import com.soffid.mda.annotation.*;
-
-import es.caib.seycon.ng.comu.SeyconServerInfo;
-import es.caib.seycon.ng.comu.Tasca;
-import es.caib.seycon.ng.model.ConfiguracioEntity;
-
 import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.ui.SeyconTask;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
+
+import es.caib.seycon.ng.comu.SeyconServerInfo;
+import es.caib.seycon.ng.model.ConfiguracioEntity;
 
 @Service(translatedName = "SyncServerService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.TasqueEntity.class, es.caib.seycon.ng.model.TaskLogEntity.class,

@@ -8,19 +8,22 @@ package es.caib.seycon.ng.servei;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.service.EntitlementDelegationService;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
-import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.DadaUsuariEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service ( grantees={roles.Tothom.class},
 		translatedName="SelfService",

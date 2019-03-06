@@ -9,30 +9,26 @@ package es.caib.seycon.ng.servei;
 import java.util.Collection;
 import java.util.List;
 
-import com.soffid.iam.api.CustomObject;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
-import com.soffid.mda.annotation.*;
+import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
+import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.model.DispatcherEntity;
-import net.sourceforge.plantuml.png.MetadataTag;
-
-import org.springframework.transaction.annotation.Transactional;
-
-import roles.ALL;
 import roles.Tothom;
 import roles.customObjectType_create;
 import roles.customObjectType_delete;
 import roles.customObjectType_query;
 import roles.customObjectType_update;
-import roles.customObject_create;
-import roles.customObject_delete;
-import roles.customObject_query;
-import roles.customObject_update;
 
 @Service(serverPath = "/seycon/DadesAddicionalsService", serverRole = "agent", translatedName = "AdditionalDataService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.TipusDadaEntity.class,

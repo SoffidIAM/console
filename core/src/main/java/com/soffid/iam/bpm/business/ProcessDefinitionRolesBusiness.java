@@ -148,6 +148,10 @@ public class ProcessDefinitionRolesBusiness {
 			{
 				return true;
 			}
+			if ("tothom".equals(role.getUserRole())) //$NON-NLS-1$
+			{
+				return true;
+			}
 			for (int j = 0; j < userRoles.length; j++)
 				if (userRoles[j].equals(role.getUserRole()))
 					return true;

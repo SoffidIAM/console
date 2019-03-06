@@ -115,6 +115,7 @@
 			width="100%" height="">
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.CustomObject#${objectType}" 
+				preference="co-${objectType }"
 				defaultAttributes="name, description"
 				dataPath="/model:/object" variableName="query"></searchbox>
 
@@ -122,6 +123,7 @@
 		
 		<navegador id="lista" width="100%">
 			<toolbar>
+				<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="custom-${objectType }"/>
 				<insertbutton id="b_inserir" acces="${canCreate}"
 					onClick='Events.postEvent("onSelect", listbox, null)' 
 					listbox="/esquema/lista/listbox"/>
@@ -132,7 +134,8 @@
 					label="${c:l('grups.zul.CancelChanges')}" />
 			</toolbar>
 			<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" 
-				 onSelect="select()" rows="${fileres}" autocommit="false">
+				 onSelect="select()" rows="${fileres}" autocommit="false" use="com.soffid.iam.web.CustomObjectListbox"
+				 objectType="${objectType }">
 				<listhead>
 					<listheader label="${c:l('com.soffid.iam.api.CustomObject.name')}"
 						sort="auto" width="20%" />

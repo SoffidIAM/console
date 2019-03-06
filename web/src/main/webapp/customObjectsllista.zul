@@ -67,6 +67,8 @@
 				
 				String objectType = page.getAttribute("type");
 				model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
+		    	listbox.setObjectType(objectType);
+		    	esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("columnsSelector").refresh();
 				
 				esquema.getFellow("queryWindow").getFellow("searchBox").
 					setJsonObject("com.soffid.iam.api.CustomObject#"+objectType);
@@ -101,6 +103,7 @@
 			
 			<navegador id="lista">
 				<toolbar>
+					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="customlist }" id="columnsSelector"/>
 					<insertbutton id="b_inserir" acces="${canCreate}"
 						onClick='Events.postEvent("onSelect", listbox, null)' 
 						listbox="/esquema/lista/listbox"/>
@@ -110,7 +113,8 @@
 						visible="${false}"
 						label="${c:l('grups.zul.CancelChanges')}" />
 				</toolbar>
-				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="30" autocommit="false">
+				<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" rows="30" autocommit="false"
+					use="com.soffid.iam.web.CustomObjectListbox">
 					<attribute name="onSelect">
 						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
 					</attribute>

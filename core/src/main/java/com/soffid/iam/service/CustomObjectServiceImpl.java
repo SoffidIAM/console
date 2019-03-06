@@ -171,28 +171,29 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			HashSet<String> keys = new HashSet<String>();
 			for (String key: attributes.keySet() )
 			{
-				for (MetaDataEntity metadata: entity.getType().getAttributes())
+				List<MetaDataEntity> ml = getMetaDataEntityDao().findByObjectTypeAndName(obj.getType(), key);
+				if (ml == null || ml.isEmpty())
+					throw new InternalErrorException("Attribute definition not found for attribute "+key);
+				MetaDataEntity metadata = ml.iterator().next();
+				Object v = attributes.get(key);
+				if (v == null)
 				{
-					Object v = attributes.get(key);
-					if (v == null)
+					// Do nothing
+				}
+				else if (v instanceof List)
+				{
+					List l = (List) v;
+					for (Object o: (List) v)
 					{
-						// Do nothing
-					}
-					else if (v instanceof List)
-					{
-						List l = (List) v;
-						for (Object o: (List) v)
+						if (o != null)
 						{
-							if (o != null)
-							{
-								updateAttribute(entity, entities, key, metadata, o);
-							}
+							updateAttribute(entity, entities, key, metadata, o);
 						}
 					}
-					else
-					{
-						updateAttribute(entity, entities, key, metadata, v);
-					}
+				}
+				else
+				{
+					updateAttribute(entity, entities, key, metadata, v);
 				}
 			}
 			

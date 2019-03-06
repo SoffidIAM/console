@@ -771,6 +771,7 @@ public class DeployerBean implements DeployerService {
 
 	AppInfo failedWarInfo = null;
 	private AppInfo appInfo = null;
+	private Throwable exceptionToThrow = null;
 	private static boolean ongoing = false;
 	private void deploy(boolean firstTime) throws Exception {
 
@@ -853,7 +854,19 @@ public class DeployerBean implements DeployerService {
 				uncompressEar();
 				updateApplicationXml();
 				log.info("Deploying "+deployDir().getPath());
-				appInfo = deployer.deploy(deployDir().getPath());
+				exceptionToThrow = null;
+				java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+					public Object run() {
+						try {
+							appInfo = deployer.deploy(deployDir().getPath());
+						} catch (Throwable th) {
+							exceptionToThrow = th;
+						}
+						return null;
+					}
+				});
+				if (exceptionToThrow != null)
+					throw exceptionToThrow;
 			} finally {
 				Thread.sleep(1000);
 			}

@@ -7,7 +7,26 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
+	<script>
+	Droppable_effect = function(B, A) {
+            if (A) {
+//                zk.restoreStyle(B, "backgroundColor")
+            	B.classList.remove("dropping");
+            } else {
+//                zk.backupStyle(B, "backgroundColor");
+//               B.style.backgroundColor = "#80ADE7";
+            	B.classList.add("dropping");
+            }
+        }
+        </script>
+
 	<datamodel id="model" rootNode="dadesAddicionals" src="descriptorDadaAddicional.xml" />
+
+	<style>
+		tr.dropping td {
+			border-top: 16px solid #c0dDf7;
+		}
+	</style>
 
 	<zscript src="comu/netejaCriteris.zul" />
 	<zscript src="comu/checkTruncatedResults.zul" />
@@ -209,7 +228,8 @@
 		</listbox>
 	</window>
 
-	<window id="objectTypeWindow" sclass="hidden"  onOK="accept()" onCancel="cancel()" width="95%">
+	<window id="objectTypeWindow" sclass="hidden"  onOK="accept()" onCancel="cancel()" width="95%"
+		use="com.soffid.iam.web.AttributesWindow">
 		<form dataPath="/objectList/listbox:/" id="form">
 			<div>
 				<div>
@@ -229,16 +249,19 @@
 			</toolbar>
 			<listbox visible="true" id="listbox" autocommit="false"
 				dataPath="dadaAddicional" fixedLayout="true" width="100%"
-				onSelect="onSelectAttribute()" rows="${fileres}" >
+				onSelect="onSelectAttribute()" rows="${fileres}" 
+				onNewRow="objectTypeWindow.onNewRow(event)">
 				<listhead>
-					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto" />
+					<listheader label="${c:l('dadesAddicionals.zul.Ordre')}" sort="auto" width="32px"/>
 					<listheader label="${c:l('dadesAddicionals.zul.Codi-2')}" sort="auto" />
 					<listheader label="${c:l('dadesAddicionals.zul.Label')}" sort="auto" />
 					<listheader label="${c:l('dadesAddicionals.zul.Type')}" sort="auto" />
 					<listheader label="" width="32px" />
 				</listhead>
-				<dataitem bind=".">
-					<listcell bind="@ordre" />
+				<dataitem bind="." droppable="true">
+					<listcell>
+						<image src="/img/move_hint.png" draggable="true" style="margin-left: 8px; cursor: move"/>
+					</listcell>
 					<listcell bind="@codi" />
 					<listcell bind="@label" />
 					<listcell bind="@typeDescription" />

@@ -191,19 +191,7 @@ public class AdditionalDataServiceImpl extends
 	 * Validate unique order for different custom objects types
 	 */
 	private void validateUniqueOrderForMetaData(DataType dataTypeVO) {
-		List<MetaDataEntity> dataTypeEntityList = null;
-		if (dataTypeVO.getScope().equals(MetadataScope.CUSTOM)) {
-			dataTypeEntityList = getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null);
-		} else {
-			dataTypeEntityList = getMetaDataEntityDao().findByScope(dataTypeVO.getScope());
-		}
-		for (MetaDataEntity dataTypeEntity : dataTypeEntityList) {
-			if ((dataTypeVO.getId() == null || ! dataTypeVO.getId().equals(dataTypeEntity.getId())) && 
-					dataTypeVO.getOrder().equals(dataTypeEntity.getOrder())) {
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
-						dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
-			}
-		}
+		// Do not check now
 	}
 
 	/**
@@ -475,7 +463,7 @@ public class AdditionalDataServiceImpl extends
 		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
 		{
 			MetaDataEntity td = it.next();
-			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER) ||
+			if ((td.getScope() == null || td.getScope().equals(MetadataScope.USER) ) &&
 					Boolean.TRUE.equals( td.getBuiltin() ) )
 				it.remove();
 		}

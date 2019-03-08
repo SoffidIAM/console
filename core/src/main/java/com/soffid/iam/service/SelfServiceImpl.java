@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
@@ -41,6 +42,7 @@ import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -79,6 +81,8 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	@Override
 	protected Collection<Account> handleGetUserAccounts () throws Exception
 	{
+		String filter = ConfigurationCache.getProperty("selfservice.account.filter");
+				
 		User u = getCurrentUser();
 		Security.nestedLogin(u.getUserName(), new String[] {
 			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
@@ -90,7 +94,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 			Collection<Account> accounts = new LinkedList<Account>();
 			for (Account acc: getAccountService().getUserAccounts(u))
 			{
-				if (acc.getType().equals(AccountType.USER))
+				if (acc.getType().equals(AccountType.USER) && (
+						filter == null || filter.trim().isEmpty() ||
+						Pattern.matches(filter, acc.getSystem()))) 
 				{
 					com.soffid.iam.api.System d = getDispatcherService().findDispatcherByName(acc.getSystem());
 					if (d != null && d.getUrl() != null && d.getUrl().trim().length() > 0 ||

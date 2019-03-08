@@ -610,8 +610,6 @@
 							sort="auto" width="13%" />
 						<listheader label="${c:l('usuaris.zul.Grup')}" sort="auto"
 							width="13%" />
-						<listheader label="${c:l('usuaris.zul.NIF-2')}" sort="auto" visible="false"
-							width="12%" />
 						<listheader label="${c:l('usuaris.zul.Nomcurt-2')}" sort="auto"
 							width="12%" />
 						<listheader label="${c:l('usuaris.zul.DominiCorreu')}" sort="auto"
@@ -625,8 +623,6 @@
 						<listheader label="${c:l('usuaris.zul.ServidorCorreu')}" sort="auto" visible="false"
 							width="12%" />
 						<listheader label="${c:l('usuaris.zul.Aliesdecorreu')}" sort="auto" visible="false"
-							width="12%" />
-						<listheader label="${c:l('usuaris.zul.Telafon')}" sort="auto" visible="false"
 							width="12%" />
 					</listhead>
 					<listfoot>

@@ -628,6 +628,10 @@
 				try {
 					String numAgents = model.getJXPathContext().getValue("/server[1]/@numAgents");
 					
+					
+					if (numAgents.indexOf("/") > 0) numAgents = numAgents.substring(0, numAgents.indexOf("/")); 
+					if (numAgents.indexOf(" ") > 0) numAgents = numAgents.substring(0, numAgents.indexOf(" ")); 
+
 					int agents = Integer.parseInt(numAgents);
 					
 					if (agents >= 10)

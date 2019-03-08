@@ -152,9 +152,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
 	private void createGroupMailListTaks(GroupEntity grupEntity) throws InternalErrorException {
 		// Second, primary group
-        for (MailListGroupMemberEntity mlge : grupEntity.getMailLists()) {
-            getEmailListEntityDao().generateUpdateTasks(mlge.getMailList());
-        }
+		if (grupEntity != null && grupEntity.getMailLists() != null)
+		{
+	        for (MailListGroupMemberEntity mlge : grupEntity.getMailLists()) {
+	            getEmailListEntityDao().generateUpdateTasks(mlge.getMailList());
+	        }
+		}
 	}
     
     
@@ -228,13 +231,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
                     	rolsAPropagar.addAll(rolsAtorgatsGrupISubgrups);
                 }
             }
-            super.remove(usuari);
-            getSession(false).flush();
             // Herencia de Roles: Propagamos los roles: (creamos las tareas)
             propagarRolsAtorgatsGrups(rolsAPropagar);
             createTask(usuari);
 
-            getSession(false).flush();
+            super.remove(usuari);
+
             auditarUsuari("D", codiUsuari, usuari.getPrimaryGroup()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);

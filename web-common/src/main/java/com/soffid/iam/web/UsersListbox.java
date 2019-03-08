@@ -21,28 +21,11 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 	public void afterCompose() {
 		try {
 			DadesAddicionalsService bean = EJBLocator.getDadesAddicionalsService();
-			for (TipusDada tda: bean.findTipusDadesByCodi("%") )
+			for (TipusDada tda: bean.findDataTypes(MetadataScope.USER) )
 			{
-				if (( AttributeVisibilityEnum.EDITABLE.equals(tda.getOperatorVisibility()) ||
-						AttributeVisibilityEnum.READONLY.equals(tda.getOperatorVisibility()) ))
+				if ( ! ( AttributeVisibilityEnum.HIDDEN.equals(tda.getOperatorVisibility()) ))
 				{
-					if ( TypeEnumeration.STRING_TYPE.equals(tda.getType()) || 
-							TypeEnumeration.EMAIL_TYPE.equals(tda.getType()) ||
-							TypeEnumeration.USER_TYPE.equals(tda.getType()) ||
-							TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(tda.getType()) ||
-							TypeEnumeration.APPLICATION_TYPE.equals(tda.getType()) ||
-							TypeEnumeration.GROUP_TYPE.equals(tda.getType()) )
-					{
-						Listheader h = new Listheader(tda.getLabel());
-						h.setWidth("12%");
-						h.setVisible(false);
-						h.setParent(getListhead());
-						h.setSort("auto");
-						DataListcell lc = new DataListcell();
-						lc.setParent(getMasterListItem());
-						lc.setBind("dada[@codiDada='" + tda.getCodi() + "']/valorDada");
-					}
-					else if (TypeEnumeration.DATE_TYPE.equals(tda.getType()))
+					if (TypeEnumeration.DATE_TYPE.equals(tda.getType()))
 					{
 						Listheader h = new Listheader(tda.getLabel());
 						h.setWidth("12%");
@@ -56,8 +39,25 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 						db.setReadonly(true);
 						db.setSclass("dateboxreadnoborder");
 						db.setParent(lc);;
-						db.setBind("dada[@codiDada='" + tda.getCodi() + "']/valorDadaDate");
+						db.setBind("/attributes[@name='" + tda.getCodi() + "']");
 						db.setFormat(Labels.getLabel("usuaris.zul.dateFormat2"));
+					}
+					else if ( TypeEnumeration.HTML.equals(tda.getType()) ||
+							TypeEnumeration.BINARY_TYPE.equals(tda.getType()) ||
+							TypeEnumeration.PHOTO_TYPE.equals(tda.getType()))
+					{
+						
+					}
+					else
+					{
+						Listheader h = new Listheader(tda.getLabel());
+						h.setWidth("12%");
+						h.setVisible(false);
+						h.setParent(getListhead());
+						h.setSort("auto");
+						DataListcell lc = new DataListcell();
+						lc.setParent(getMasterListItem());
+						lc.setBind("/attributes[@name='" + tda.getCodi() + "']");
 					}
 				}
 			}

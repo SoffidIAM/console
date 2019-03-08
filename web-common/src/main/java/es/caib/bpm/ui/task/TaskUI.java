@@ -698,7 +698,7 @@ public class TaskUI extends Frame implements EventListener {
                     		}
                     	}
                     }
-                   	Application.goBack();
+                   	Application.jumpTo(Application.getApplication().getInitialPage());
 
                 } catch (Exception ex) {
                     log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$

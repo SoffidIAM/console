@@ -25,7 +25,7 @@ public abstract class PuntEntradaEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column(name = "PUE_CODI", length = 10, translated = "code")
+	@Column(name = "PUE_CODI", length = 50, translated = "code")
 	@Nullable
 	public java.lang.String codi;
 

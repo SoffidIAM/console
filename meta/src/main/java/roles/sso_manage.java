@@ -7,6 +7,6 @@
 package roles;
 import com.soffid.mda.annotation.*;
 
-@Role (name="sso:manage" )
+@Role (name="sso:manageAccounts" )
 public abstract class sso_manage {
 }

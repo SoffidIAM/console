@@ -172,4 +172,31 @@ public class ParseTest extends TestCase {
 
 	}
 
+	// Test corró d’avall
+	public void testParseQuote () throws Exception
+	{
+		ClassConfig config = new ClassConfig();
+		config.setClazz(AttributeValueEntity.class.getCanonicalName());
+		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
+		AttributeConfig attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("numericValue");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		attributeConfig.setAttributeName("employee");
+		config.getAttributes().put("employee", attributeConfig);
+
+		attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("value");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		config.setDefaultVirtualAttribute(attributeConfig);
+
+		Configuration.registerClass(config);
+
+		expressionTester2(
+				"attributes.employee co \"corró d’avall ꓨ\"",
+				Account.class ,
+				false);
+		
+	}
 }

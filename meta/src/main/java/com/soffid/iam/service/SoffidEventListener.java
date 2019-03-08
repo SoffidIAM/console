@@ -19,4 +19,16 @@ public abstract class SoffidEventListener {
 		es.caib.seycon.ng.model.UsuariEntity user)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void onGrant(
+		es.caib.seycon.ng.model.RolAccountEntity grant)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void onRevoke(
+		es.caib.seycon.ng.model.RolAccountEntity grant)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 }

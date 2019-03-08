@@ -30,6 +30,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.service.SoffidEventListener;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.ExceptionTranslator;
@@ -61,12 +62,19 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.hibernate.Hibernate;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @see es.caib.seycon.ng.model.RolAccountEntity
  */
-public class RoleAccountEntityDaoImpl extends
-		com.soffid.iam.model.RoleAccountEntityDaoBase {
+public class RoleAccountEntityDaoImpl 
+	extends com.soffid.iam.model.RoleAccountEntityDaoBase
+	implements ApplicationContextAware
+{
+
+	private ApplicationContext applicationContext;
 
 	private void auditarRolAccount(String accio, RoleAccountEntity grant) {
 		String codiUsuari = Security.getCurrentAccount();
@@ -222,6 +230,19 @@ public class RoleAccountEntityDaoImpl extends
 			generateTasks(old);
 
 			auditarRolAccount(auditType, rolsUsuaris); //$NON-NLS-1$
+			
+			for (String name : applicationContext.getBeanNamesForType(SoffidEventListener.class))
+			{
+				SoffidEventListener bean = (SoffidEventListener) applicationContext.getBean(name);
+				if (bean != null)
+				{
+					if ( rolsUsuaris.isEnabled())
+						bean.onGrant(rolsUsuaris);
+					else
+						bean.onRevoke(rolsUsuaris);
+				}
+			}
+
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
@@ -331,6 +352,16 @@ public class RoleAccountEntityDaoImpl extends
 				generateTasks(rolsUsuaris);
 				auditarRolAccount("C", rolsUsuaris); //$NON-NLS-1$
 
+				if ( rolsUsuaris.isEnabled())
+				{
+					for (String name : applicationContext.getBeanNamesForType(SoffidEventListener.class))
+					{
+						SoffidEventListener bean = (SoffidEventListener) applicationContext.getBean(name);
+						if (bean != null)
+							bean.onGrant(rolsUsuaris);
+					}
+
+				}
 			} else {
 				throw new SeyconException(
 						Messages.getString("RolsUsuarisEntityDaoImpl.3")); //$NON-NLS-1$
@@ -408,6 +439,16 @@ public class RoleAccountEntityDaoImpl extends
 
 			auditarRolAccount("D", rolsUsuaris); //$NON-NLS-1$
 			
+			if ( rolsUsuaris.isEnabled())
+			{
+				for (String name : applicationContext.getBeanNamesForType(SoffidEventListener.class))
+				{
+					SoffidEventListener bean = (SoffidEventListener) applicationContext.getBean(name);
+					if (bean != null)
+						bean.onRevoke(rolsUsuaris);
+				}
+
+			}
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
@@ -1094,6 +1135,11 @@ public class RoleAccountEntityDaoImpl extends
 			target.setHolderGroup(null);
 		else
 			target.setHolderGroup(source.getHolderGroup().getName());
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
 
 }

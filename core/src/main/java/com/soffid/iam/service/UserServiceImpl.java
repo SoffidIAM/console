@@ -3256,6 +3256,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					}
 				}
 			}
+			getRuleEvaluatorService().applyRules(entity);
 		}
 	}
 

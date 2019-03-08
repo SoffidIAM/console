@@ -20,4 +20,5 @@ public class TypeEnumeration {
 	public String mailDomainType = "M";
 	public String ssoFormType = "F";
 	public java.lang.String html="H";
+	public String separator = "-";
 }

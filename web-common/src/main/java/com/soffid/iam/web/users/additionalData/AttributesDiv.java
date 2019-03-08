@@ -30,6 +30,7 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.TipusDada;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
@@ -202,7 +203,10 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					appendChild(d);
 					d.setSclass(getSclass()+"_row");
 					Label l = new Label (att.getLabel());
-					l.setSclass(getSclass()+"_label");
+					if ( att.getType() == TypeEnumeration.SEPARATOR)
+						l.setSclass(getSclass()+"_label separator_label");
+					else
+						l.setSclass(getSclass()+"_label");
 					d.appendChild(l);
 					InputField2 input = new InputField2();
 					if (! attributes.containsKey(att.getCodi()))

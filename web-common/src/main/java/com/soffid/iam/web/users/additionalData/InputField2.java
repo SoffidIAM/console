@@ -1016,6 +1016,10 @@ public class InputField2 extends Div
 					result = "<div><checkbox  id=\""+id+"\" "
 							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+"</div>";
 			}
+			else if ( TypeEnumeration.SEPARATOR.equals(type))
+			{
+					result = "<div sclass='separator'/>";
+			}
 			else if (dataType.getValues() != null && ! dataType.getValues().isEmpty())//String
 			{
 				result = "<listbox mold=\"select\" onChange=\"\" "

@@ -325,6 +325,8 @@ public class AccountEntityDaoImpl extends
 		target.setVaultFolder(entry.account.getVaultFolder());
 		target.setVaultFolderId(entry.account.getVaultFolderId());
 		target.setStatus(entry.account.getStatus());
+		target.setLastLogin(entry.account.getLastLogin());
+		target.setCreated(entry.account.getCreated());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);

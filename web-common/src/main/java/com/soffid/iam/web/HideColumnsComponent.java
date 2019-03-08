@@ -38,6 +38,10 @@ public class HideColumnsComponent extends Toolbarbutton
 		this.preferenceName = preferenceName;
 	}
 
+	public void refresh () throws InternalErrorException, NamingException, CreateException
+	{
+		generateMenu();
+	}
 	boolean created = false;
 	private Menupopup popupMenu;
 	

@@ -263,6 +263,7 @@ div.tabpanel {
 	font-family: Arial, sans-serif;	font-size: 11px; font-weight: bold; color: {BLUETEXT};
 	border: 0px; text-decoration: none; background: ;
 	white-space:nowrap; 
+	display: inline-block;
 }
 
 .toolbar a:hover {

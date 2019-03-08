@@ -1794,3 +1794,8 @@ div.inputField_input {
 	padding-bottom: 2px;
 }
 			
+span.separator_label {
+	color: {BLUE};
+	font-weight: bold;
+	padding-top: 15px;
+}

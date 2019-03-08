@@ -29,10 +29,10 @@ public abstract class AplicacioEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="APL_CODI", length=20, translated="name")
+	@Column (name="APL_CODI", length=100, translated="name")
 	public java.lang.String codi;
 
-	@Column (name="APL_NOM", length=50, translated="description")
+	@Column (name="APL_NOM", length=100, translated="description")
 	public java.lang.String nom;
 
 	@Column (name="APL_DIRFON", length=50, translated="sourceDir")

@@ -107,7 +107,10 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 
 	public Object setAttribute (String attribute, Object value)
 	{
-		return attributes.put(attribute, value);
+		if (value instanceof bsh.Primitive)
+			return attributes.put(attribute, ((bsh.Primitive) value).getValue());
+		else
+			return attributes.put(attribute, value);
 	}
 
 	public void removeAttribte(String attribute)

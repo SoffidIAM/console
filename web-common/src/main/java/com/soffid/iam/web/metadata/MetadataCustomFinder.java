@@ -3,6 +3,7 @@ package com.soffid.iam.web.metadata;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,6 +32,11 @@ public class MetadataCustomFinder implements FinderHandler {
 		{
 			l = new Vector<TipusDada>(
 					EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName2(co.getName(), null));
+		}
+		for (Iterator<TipusDada> it = l.iterator(); it.hasNext(); )
+		{
+			if (Boolean.TRUE.equals( it.next().getBuiltin() ) )
+				it.remove();
 		}
 		Collections.sort(l, new Comparator<TipusDada>() {
 			public int compare(TipusDada o1, TipusDada o2) {

@@ -1655,6 +1655,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 NetworkEntity x = guessNetwork(addr.getAddress());
                 if (x != null) {
                 	if (x.isDchpSupport()) {
+                		log.info("Register host "+maquina.getName()+" address "+ip);
                 		anyChange = true;
                 		maquina.setDeleted(Boolean.FALSE);
     	                maquina.setHostIP(ip);

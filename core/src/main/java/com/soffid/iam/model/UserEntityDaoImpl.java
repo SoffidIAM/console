@@ -169,9 +169,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         getTaskEntityDao().createForce(tasque);
         tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-        tasque.setGroup(usuari.getPrimaryGroup().getName());
-        getTaskEntityDao().createForce(tasque);
+        if (usuari.getPrimaryGroup() != null)
+        {
+	        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+	        tasque.setGroup(usuari.getPrimaryGroup().getName());
+	        getTaskEntityDao().createForce(tasque);
+        }
         if (usuari.getShortName() != null)
         {
             tasque = getTaskEntityDao().newTaskEntity();

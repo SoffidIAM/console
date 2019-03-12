@@ -301,32 +301,33 @@ public class AccountEntityDaoImpl extends
 	private void fetchFromCache(Account target, AccountCacheEntry entry)
 			throws InternalErrorException {
 		target.setAttributes( new HashMap<String, Object>( entry.account.getAttributes()) );
+		target.setCreated(entry.account.getCreated());
 		target.setDescription(entry.account.getDescription());
 		target.setDisabled(entry.account.isDisabled());
-		target.setSystem(entry.account.getSystem());
 		target.setGrantedGroups(entry.account.getGrantedGroups());
 		target.setGrantedRoles(entry.account.getGrantedRoles());
 		target.setGrantedUsers(entry.account.getGrantedUsers());
 		target.setId(entry.account.getId());
 		target.setInheritNewPermissions(entry.account.isInheritNewPermissions());
 		target.setLastPasswordSet(entry.account.getLastPasswordSet());
+		target.setLastLogin(entry.account.getLastLogin());
 		target.setLastUpdated(entry.account.getLastUpdated());
 		target.setLoginUrl(entry.account.getLoginUrl());
 		target.setManagerGroups(entry.account.getManagerGroups());
 		target.setManagerRoles(entry.account.getManagerRoles());
 		target.setManagerUsers(entry.account.getManagerUsers());
 		target.setName(entry.account.getName());
+		target.setOldName(entry.account.getOldName());
 		target.setOwnerGroups(entry.account.getOwnerGroups());
 		target.setOwnerRoles(entry.account.getOwnerRoles());
 		target.setOwnerUsers(entry.account.getOwnerUsers());
 		target.setPasswordExpiration(entry.account.getPasswordExpiration());
 		target.setPasswordPolicy(entry.account.getPasswordPolicy());
+		target.setStatus(entry.account.getStatus());
+		target.setSystem(entry.account.getSystem());
 		target.setType(entry.account.getType());
 		target.setVaultFolder(entry.account.getVaultFolder());
 		target.setVaultFolderId(entry.account.getVaultFolderId());
-		target.setStatus(entry.account.getStatus());
-		target.setLastLogin(entry.account.getLastLogin());
-		target.setCreated(entry.account.getCreated());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);

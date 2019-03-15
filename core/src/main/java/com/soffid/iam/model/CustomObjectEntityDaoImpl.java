@@ -1,7 +1,11 @@
 package com.soffid.iam.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
@@ -14,9 +18,26 @@ public class CustomObjectEntityDaoImpl extends CustomObjectEntityDaoBase {
 		super.toCustomObject(source, target);
 		target.setType(source.getType().getName());
 		target.setAttributes(new HashMap<String, Object>());
-		for ( CustomObjectAttributeEntity att: source.getAttributes())
+		Map<String, Object> attributes = target.getAttributes();
+		for (CustomObjectAttributeEntity att : source.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
+		}
+		for (Object o: attributes.values())
 		{
-			target.getAttributes().put(att.getMetadata().getName(), att.getObjectValue());
+			if (o != null && o instanceof List) Collections.sort((List) o);
 		}
 	}
 

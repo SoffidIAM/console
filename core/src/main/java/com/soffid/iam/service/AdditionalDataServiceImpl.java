@@ -191,7 +191,17 @@ public class AdditionalDataServiceImpl extends
 	 * Validate unique order for different custom objects types
 	 */
 	private void validateUniqueOrderForMetaData(DataType dataTypeVO) {
-		// Do not check now
+		if (dataTypeVO.getOrder() == null)
+		{
+			long max = 1;
+			List<MetaDataEntity> dt = dataTypeVO.getScope() == MetadataScope.CUSTOM ?
+					getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null):
+					getMetaDataEntityDao().findByScope(dataTypeVO.getScope()) ;
+			for ( MetaDataEntity d: dt)
+				if (d.getOrder() != null && d.getOrder().longValue() >= max)
+					max = d.getOrder().longValue()+1;
+			dataTypeVO.setOrder(new Long(max));
+		}
 	}
 
 	/**

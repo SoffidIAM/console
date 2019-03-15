@@ -297,14 +297,9 @@
 					<row>
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Codi-2')} :" />
 
-						<hbox width="100%" widths="25% ,2%, 20%, 15%, *, 2%">
+						<hbox width="100%" widths="*, 64px">
 							<textbox bind="@codi" id="detall_codi" readonly="${!canModifyMetadata}"
 								maxlength="25" constraint="no empty" />
-							<label value="*" />
-							<separator />
-							<label value="${c:l('dadesAddicionals.zul.Ordre')}  :" />
-							<intbox bind="@ordre" id="detall_ordre" maxlength="10"
-								sclass="textbox" constraint="no empty" />
 							<label value="*" />
 						</hbox>
 					</row>

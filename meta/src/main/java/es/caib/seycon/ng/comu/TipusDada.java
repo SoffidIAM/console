@@ -24,6 +24,7 @@ public class TipusDada {
 	public java.lang.String codi;
 
 	@Attribute(translated = "order" )
+	@Nullable
 	public java.lang.Long ordre;
 
 	@Nullable

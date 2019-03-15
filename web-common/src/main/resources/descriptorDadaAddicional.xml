@@ -88,7 +88,6 @@
 		</custom-attribute>
 		<validator>
 			<attribute-validator expr="${instance.scope}" notNull="true" friendlyName="dadesAddicionals.ScopeValidation"/>
-			<attribute-validator expr="${instance.ordre}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
 			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
 		</validator>
 	</datanode>

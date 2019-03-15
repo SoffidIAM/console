@@ -16,6 +16,7 @@ import es.caib.seycon.ng.servei.ejb.DadesAddicionalsService;
 import es.caib.zkib.component.DataDatebox;
 import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.component.DataListcell;
+import es.caib.zkib.component.MasterListItem;
 
 public class CustomObjectListbox extends DataListbox implements AfterCompose {
 	String objectType;
@@ -35,6 +36,10 @@ public class CustomObjectListbox extends DataListbox implements AfterCompose {
 			Listhead listhead = getListhead();
 			while (listhead.getChildren().size() > numberOfColumns)
 				listhead.getLastChild().detach();
+			MasterListItem listitem = getMasterListItem();
+			while (listitem.getChildren().size() > numberOfColumns)
+				listitem.getLastChild().detach();
+
 			if (objectType == null)
 				return;
 			

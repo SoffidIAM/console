@@ -89,7 +89,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_delete.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.Dispatcher dispatcher)
+	public void delete(@Nullable es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -125,7 +125,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_delete.class, roles.agent_accessControl_delete.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.ControlAcces controlAcces)
+	public void delete(@Nullable es.caib.seycon.ng.comu.ControlAcces controlAcces)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -171,7 +171,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_delete.class, roles.agent_update.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.TipusUsuariDispatcher tipusUsuari)
+	public void delete(@Nullable es.caib.seycon.ng.comu.TipusUsuariDispatcher tipusUsuari)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -184,7 +184,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_delete.class, roles.agent_update.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.GrupDispatcher grupDispatcher)
+	public void delete(@Nullable es.caib.seycon.ng.comu.GrupDispatcher grupDispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -275,7 +275,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.server_manage_proxy.class, roles.server_manage_server.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.Server server) throws es.caib.seycon.ng.exception.InternalErrorException {
+	public void delete(@Nullable es.caib.seycon.ng.comu.Server server) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Operation(grantees = { roles.server_manage_proxy.class, roles.server_manage_server.class }, translated = "create")
@@ -301,7 +301,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_update.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.AttributeMapping mapping)
+	public void delete(@Nullable es.caib.seycon.ng.comu.AttributeMapping mapping)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -325,7 +325,7 @@ public abstract class DispatcherService {
 	}
 
 	@Operation(grantees = { roles.agent_update.class })
-	public void delete(ObjectMappingTrigger tirger) throws es.caib.seycon.ng.exception.InternalErrorException {
+	public void delete(@Nullable ObjectMappingTrigger tirger) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Operation(grantees = { roles.agent_query.class })
@@ -356,7 +356,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_update.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.ObjectMapping om)
+	public void delete(@Nullable es.caib.seycon.ng.comu.ObjectMapping om)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -376,7 +376,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_update.class }, translated = "delete")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(es.caib.seycon.ng.comu.ObjectMappingProperty omp)
+	public void delete(@Nullable es.caib.seycon.ng.comu.ObjectMappingProperty omp)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
@@ -430,7 +430,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_update.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void delete(ReconcileTrigger rp) throws es.caib.seycon.ng.exception.InternalErrorException {
+	public void delete(@Nullable ReconcileTrigger rp) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Operation(grantees = { roles.agent_update.class })

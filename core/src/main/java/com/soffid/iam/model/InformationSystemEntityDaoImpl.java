@@ -15,6 +15,7 @@ package com.soffid.iam.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -146,6 +147,10 @@ public class InformationSystemEntityDaoImpl
 			}
 		}
 
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
+		}
     }
 
 

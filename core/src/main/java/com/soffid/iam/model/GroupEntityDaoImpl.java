@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,6 +284,10 @@ public class GroupEntityDaoImpl extends
 			{
 				attributes.put(att.getMetadata().getName(),att.getObjectValue());
 			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
 		}
 
 	}

@@ -42,11 +42,13 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -227,6 +229,10 @@ public class EmailListEntityDaoImpl extends
 			}
 		}
 
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
+		}
 
 	}
 

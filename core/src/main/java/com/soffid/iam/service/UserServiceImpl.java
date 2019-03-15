@@ -1226,10 +1226,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				getSecretEntityDao().remove(secret);
 			}
 			usuariEntity.getSecrets().clear();
+
+			getSessionEntityDao().remove(usuariEntity.getSessions());
+			
 			for (AccessLogEntity al: getAccessLogEntityDao().findLastAccessLogByUserName(usuariEntity.getUserName(),null))
 				getAccessLogEntityDao().remove(al);
 
-			getSessionEntityDao().remove(usuariEntity.getSessions());
 
 			getUserEntityDao().remove(usuariEntity);
 		}
@@ -3183,6 +3185,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
 				}
 			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
 		}
 	}
 

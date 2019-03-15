@@ -764,10 +764,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 						.getProcessDefinition();
 	
 				if (!isInternalService()
-						&& !business.isUserAuthorized(OBSERVER_ROLE,
-								getUserGroups(), definition)
-						&& !business.isUserAuthorized(SUPERVISOR_ROLE,
-								getUserGroups(), definition)) {
+						&& !business.isUserAuthorized(OBSERVER_ROLE, getUserGroups(), definition)
+						&& !business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(), definition)) 
+				{
+					if (tm.getInitiator() != null && Security.getCurrentUser().equals(tm.getInitiator()))
+						return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
 					Collection list = process.getTaskMgmtInstance()
 							.getTaskInstances();
 					for (Iterator it = list.iterator(); it.hasNext();) {
@@ -3293,6 +3294,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (task.isDummyTask())
 			{
 				org.jbpm.graph.def.ProcessDefinition definition = context.getGraphSession().getProcessDefinition(task.getProcessDefinition());
+				definition = context.getGraphSession().findLatestProcessDefinition(definition.getName());
 				ProcessInstance pi = newProcessInstance(context, definition, false);
 				org.jbpm.graph.exe.ProcessInstance proc = context.getGraphSession().getProcessInstance(pi.getId());
 				startAuthenticationLog(proc.getRootToken());

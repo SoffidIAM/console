@@ -262,7 +262,7 @@
 						ds = form.getDataSource(); 
 						ctx =  ds.getJXPathContext(); 
 						registre = ctx.getValue("/");
-						form.getFellow("detall_codi").setDisabled(!registre.isNew());
+						form.getFellow("detall_codi").setDisabled(false);
 					} catch (Throwable e) {
 						form.getFellow("detall_codi").setDisabled(true);
 					}

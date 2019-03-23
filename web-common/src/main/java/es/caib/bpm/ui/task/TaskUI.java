@@ -598,7 +598,7 @@ public class TaskUI extends Frame implements EventListener {
         boolean iniciado = user.equals(task.getActorId())
                 && task.getStart() != null;
         btnSalvar.setVisible(iniciado && !task.isCancelled() && task.getEnd()==null && ! task.isDummyTask());
-        btnCerrar.setVisible(! task.isDummyTask());
+        btnCerrar.setVisible(true);
         
         //només mostrar botons de transició si la tasca està activa
         if(!task.isCancelled() && task.getEnd()==null){
@@ -709,9 +709,12 @@ public class TaskUI extends Frame implements EventListener {
                     Throwable ex2 = ex;
                     while (ex2 != null) {
                         if (ex2 instanceof WorkflowException)
+                        {
                             message = Labels.getLabel("task.msgError") //$NON-NLS-1$
                                     + " " + ex2.getMessage(); //$NON-NLS-1$
-
+                            Missatgebox.error(message);
+                            return;
+                        }
                         if (ex2 instanceof EJBException)
                         	ex2 = ((EJBException)ex2).getCausedByException();
                         else if (ex2.getCause() == ex2)
@@ -719,7 +722,7 @@ public class TaskUI extends Frame implements EventListener {
                         else
                             ex2 = ex2.getCause();
                     }
-                    Missatgebox.error(message);
+                    throw new UiException(message, ex);
                 }
             } else {
             	Missatgebox.info(Labels.getLabel("task.msgSeleccionTarea"), //$NON-NLS-1$

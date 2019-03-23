@@ -70,6 +70,10 @@ public class CustomDialect extends Dialect {
 	        {
 	        	mysql = true;
 	            proxyDialect = new MySQL5InnoDBDialect();
+	        } else if ("mariadb".equals(type))  //$NON-NLS-1$
+	        {
+	        	mysql = true;
+	            proxyDialect = new MySQL5InnoDBDialect();
 	        } else if ("oracle".equals (type)) { //$NON-NLS-1$
 	        	oracle = true;
 	            proxyDialect = new Oracle10gDialect();
@@ -83,8 +87,6 @@ public class CustomDialect extends Dialect {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
         }
-//        registerFunction("currenttenant", new CurrentTenantFunction());
-//        proxyDialect.getKeywords().add("currenttenant");
     }
 
     public String getTypeName(int code) throws HibernateException {

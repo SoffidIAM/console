@@ -58,7 +58,8 @@ public class PropertiesStore {
                     }
                     else
                     {
-                    	if (ctx.getVariable(key) == null && !key.equals("dbPassword"))
+                    	if (ctx.getVariable(key) == null && !key.equals("dbPassword") &&
+                    			!key.equals("dbPasswordCipher"))
                     		ctx.setVariable(key, v);
                     }
                 }
@@ -99,9 +100,7 @@ public class PropertiesStore {
                         p.setProperty(keys[i], value.toString());
                 }
             }
-            if ((p.getProperty("dbPasswordCipher") == null ||
-            		p.getProperty("dbPasswordCipher").equals("PlainText")) &&
-            		p.getProperty("dbPassword") != null)
+            if (p.getProperty("dbPassword") != null && (p.getProperty("dbPasswordCipher") == null || p.getProperty("dbPasswordCipher").equals("PlainText")))
             {
             	p.setProperty("dbPasswordCipher", "com.soffid.iam.tomcat.SoffidPasswordCipher");
             	String pass = p.getProperty("dbPassword");

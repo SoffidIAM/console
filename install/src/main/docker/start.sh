@@ -38,8 +38,8 @@ function configure {
 		echo "dbPassword=$MARIADB_PASS"
 		echo "dbPasswordCipher=PlainText"
 		echo "dbValidationQuery=select 1"
-		echo "dbDriverString=mysql"
-		echo "dbDriverUrl=jdbc\:mysql\://$MARIADB_HOST\:$MARIADB_PORT/$MARIADB_DB"
+		echo "dbDriverString=mariadb"
+		echo "dbDriverUrl=jdbc\:mariadb\://$MARIADB_HOST\:$MARIADB_PORT/$MARIADB_DB"
 	) > /opt/soffid/iam-console-2/conf/system.properties		
 
 	touch /opt/soffid/iam-console-2/conf/configured 

@@ -32,6 +32,7 @@ public class DatabaseCreator {
     private static final int SQLSERVER_DRIVER=2;
     private static final int ORACLE_DRIVER_SVC = 3;
     private static final int POSTGRESQL_DRIVER=4;
+    private static final int MARIADB_DRIVER = 5;
     Context ctx;
     private String user;
     private String password;
@@ -98,10 +99,16 @@ public class DatabaseCreator {
             driverClass= "org.postgresql.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
             //connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MSSQLValidConnectionChecker"; //$NON-NLS-1$
-        } else {
+        } else if (driver == MYSQL_DRIVER ){
             driverString = "mysql"; //$NON-NLS-1$
             driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             		"?useUnicode=yes&characterEncoding=UTF-8"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            driverClass= "org.mysql.jdbc.Driver"; //$NON-NLS-1$
+            sanitySelect = "select 1"; //$NON-NLS-1$
+        } else {
+            driverString = "mariadb"; //$NON-NLS-1$
+            driverUrl = "jdbc:mariadb://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            		""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             driverClass= "org.mariadb.jdbc.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
         }
@@ -149,8 +156,12 @@ public class DatabaseCreator {
         	url = "jdbc:sqlserver://" + host + ":" + port;
         	return DriverManager.getConnection(url, user, password);
         }
-        else{
+        else if (driver == MYSQL_DRIVER){
             url = "jdbc:mysql://" + host + ":" + port + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            return DriverManager.getConnection(url, user, password);
+        } 
+        else{
+            url = "jdbc:mariadb://" + host + ":" + port + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return DriverManager.getConnection(url, user, password);
         } 
     }
@@ -226,7 +237,7 @@ public class DatabaseCreator {
             rset.close();
             pstmt.close();
             executeSentence("GRANT ALL PRIVILEGES ON DATABASE "+sid+" TO " + schema); //$NON-NLS-1$
-        } else if (MYSQL_DRIVER == (driver)){
+        } else if (MYSQL_DRIVER == (driver) || MARIADB_DRIVER == driver){
             PreparedStatement pstmt = c.prepareStatement("SHOW DATABASES"); //$NON-NLS-1$
             ResultSet rset = pstmt.executeQuery();
             boolean found = false;

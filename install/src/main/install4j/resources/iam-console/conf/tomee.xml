@@ -19,7 +19,7 @@
 		definition =
 		ignoreDefaultValues = false
 		initialSize = 0
-		jdbcDriver = com.mysql.jdbc.Driver
+		jdbcDriver = com.mariadb.jdbc.Driver
 		jdbcUrl = ${dbDriverUrl}
 		jtaManaged = true
 		maxActive = 50

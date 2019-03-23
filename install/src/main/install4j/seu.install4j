@@ -1020,7 +1020,9 @@ return true;</string>
                 </object>
               </java>
             </serializedBean>
-            <condition>if (null != context.getVariable("dbStatus"))
+            <condition>es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
+p.load ();
+if (null != context.getVariable("dbStatus"))
    return false;
 else
    return true;</condition>
@@ -1126,6 +1128,9 @@ else
           if (current.intValue() == 4) { // SQLSERVIER
             context.setVariable("dbPort", new Long(5432));
           }
+          if (current.intValue() == 5) { // MARIADB
+            context.setVariable("dbPort", new Long(3306));
+          }
     }
 es.caib.seycon.ng.install.PropertiesStore p = new es.caib.seycon.ng.install.PropertiesStore(context);
 p.save ();
@@ -1164,13 +1169,16 @@ return;</preActivation>
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.DropdownListComponent">
+                      <void property="initiallySelectedIndex">
+                        <int>5</int>
+                      </void>
                       <void property="labelText">
                         <string>Database driver</string>
                       </void>
                       <void property="listEntries">
-                        <array class="java.lang.String" length="5">
+                        <array class="java.lang.String" length="6">
                           <void index="0">
-                            <string>Mysql or MariaDB</string>
+                            <string>Mysql</string>
                           </void>
                           <void index="1">
                             <string>Oracle(SID)</string>
@@ -1183,6 +1191,9 @@ return;</preActivation>
                           </void>
                           <void index="4">
                             <string>PostgreSQL</string>
+                          </void>
+                          <void index="5">
+                            <string>MariaDB</string>
                           </void>
                         </array>
                       </void>

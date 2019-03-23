@@ -452,7 +452,6 @@ public class Security {
 				{
 					if (auths == null)
 						auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
-					
 					List<String> dp = getTenantService().getDisabledPermissions(t);
 					LinkedList<String> auths2 = new LinkedList<String>();
 					for (SoffidAuthorization a: auths)
@@ -463,6 +462,8 @@ public class Security {
 							auths2.add(a.getCodi()+Security.AUTO_ALL);
 						}
 					}
+					if ( !dp.contains (AUTO_METADATA_UPDATE_ALL))
+						auths2.add(AUTO_METADATA_UPDATE_ALL);
 			        p = new SoffidPrincipalImpl(tenant+"\\"+user, auths2, currentPrincipal);
 				}
 				else

@@ -583,13 +583,13 @@ div.menubar td {
 
 td.menu1ck {
 	padding-right: 6px;
-	background-image: url('../img/checked.gif');
+	background-image: url('../zkau/web/img/checked.gif');
 	background-repeat: no-repeat;
 }	
 
 
 td.menu1 {
-	background-image: url('../img/unchecked.gif');
+	background-image: url('../zkau/web/img/unchecked.gif');
 	background-repeat: no-repeat;
 	padding-right: 6px;
 }
@@ -642,19 +642,19 @@ div.frame-vertical-none div.record-form-shrinked { display: none;}
 
 div.listbox-head th.sort div.head-cell-inner,
 div.grid-head th.sort div.head-cell-inner {
-	background: transparent url(../img/sort_hint.png);
+	background: transparent url(../zkau/web/img/sort_hint.png);
 	background-position: 99% center;
 	background-repeat: no-repeat;
 }
 
 div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner {
-  background: transparent url(../img/sort_hint_up.png);
+  background: transparent url(../zkau/web/img/sort_hint_up.png);
   background-position: 99% center;
   background-repeat: no-repeat;
 }
 
 div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner {
-  background: transparent url(../img/sort_hint_down.png);
+  background: transparent url(../zkau/web/img/sort_hint_down.png);
   background-position: 99% center;
   background-repeat: no-repeat;
 }
@@ -1542,21 +1542,21 @@ div.tree-head th, div.listbox-head th, div.grid-head th
 div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
 	 {
 	cursor: pointer; padding-right: 9px;
-	background:transparent url(/zkau/web/zul/img/sort/v_hint.gif);
+	background:transparent url(../zkau/web/zul/img/sort/v_hint.gif);
 	background-position: 99% center;
 	background-repeat: no-repeat;
 }
 div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner
 	 {
 	cursor: pointer; padding-right: 9px;
-	background:transparent url(/zkau/web/zul/img/sort/v_asc.gif);
+	background:transparent url(../zkau/web/zul/img/sort/v_asc.gif);
 	background-position: 99% center;
 	background-repeat: no-repeat;
 }
 div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner
 	 {
 	cursor: pointer; padding-right: 9px;
-	background:transparent url(/zkau/web/zul/img/sort/v_dsc.gif);
+	background:transparent url(../zkau/web/zul/img/sort/v_dsc.gif);
 	background-position: 99% center;
 	background-repeat: no-repeat;
 }
@@ -1732,15 +1732,10 @@ select.listbox {
     min-width:80px;
     padding-right: 16px;
 
-  /* styling */
   background-color: white;
   border-radius: 2px;
   display: inline-block;
   font: inherit;
-/*  line-height: 1.1em; 
-  padding: 2em 3.5em 0.5em 1em; */
-
-  /* reset */
 
   margin: 0;      
   -webkit-box-sizing: border-box;
@@ -1748,11 +1743,16 @@ select.listbox {
   box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: nane;
 
-  background: transparent url(/zkau/web/zul/img/combobtn.gif);
+  background: transparent url(../zkau/web/zul/img/combobtn.gif);
   background-position:
     calc(100% - 4px) calc(50%) ;
   background-repeat: no-repeat;
+}
+
+select.listbox select::-ms-expand{
+    display: none;
 }
 
 select.listbox:disabled {
@@ -1782,7 +1782,7 @@ div.inputField {
 }
 span.inputField_label {
 	display: table-cell;
-	width: 120px;
+	width: 12px;
 	vertical-align: top;
 	padding-top: 4px;
 }

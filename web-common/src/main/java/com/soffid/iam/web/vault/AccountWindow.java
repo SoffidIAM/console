@@ -502,7 +502,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		}
 	}
 
-	void queryPassword(Component button) throws WrongValueException, InternalErrorException, NamingException, CreateException {
+	public void queryPassword(Component button) throws WrongValueException, InternalErrorException, NamingException, CreateException {
 		try {
 			Component queryImg = getFellow("queryImg");
 			Window showPassword = (Window) getFellow ("showPassword");
@@ -564,7 +564,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		}
 	}
 
-	void setPassword(Component button) throws InternalErrorException, CommitException, NamingException, CreateException {
+	public void setPassword(Component button) throws InternalErrorException, CommitException, NamingException, CreateException {
 		model.commit();
 		try {
 			Component passwordImg = getFellow("passwordImg");

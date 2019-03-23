@@ -93,7 +93,7 @@
 							<label bind="@description" style="display: inline-block; padding-bottom: 5px; padding-top: 5px;"/>
 							<imageclic src="/img/link.png" title="Open" style="margin-left: 1em; margin-right: 1em">
 								<attribute name="onClick"><![CDATA[
-									String url = XPathUtils.getValue(self, "/attributes[@name='SSO:URL']");
+									String url = es.caib.zkib.datasource.XPathUtils.getValue(self, "/attributes[@name='SSO:URL']");
 									if (url != null)
 									{
 					               		Executions.getCurrent().sendRedirect(url, "_blank");

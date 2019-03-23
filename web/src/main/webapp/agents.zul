@@ -1578,7 +1578,7 @@
 												</columns>
 												<datarow>
 													<input_dada bind="@property" width_custom ="95%"></input_dada>
-													<textbox bind="@value" width ="95%" onChange="" style="display:block; resize: none"  multiline="true"  height="1em">
+													<textbox bind="@value" width ="95%" onChange="" style="display:block; resize: vertical"  multiline="true"  height="1em">
 															<attribute name="onFocus"><![CDATA[
 			  String v = self.getValue();
 			  if (v.length() > 50 || v.indexOf ('\n') >= 0)

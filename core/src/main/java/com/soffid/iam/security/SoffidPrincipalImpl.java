@@ -1,5 +1,6 @@
 package com.soffid.iam.security;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,13 +65,15 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			this.soffidRoles = new String[0];
 		else
 			this.soffidRoles = soffidRoles;
-		
 		groupsAndRoles = new String [groups.length + soffidRoles.length];
 		int idx = 0;
 		for (int j = 0; j < soffidRoles.length; j++)
 			groupsAndRoles[idx++] = soffidRoles[j];
 		for (int j = 0; j < groups.length; j++)
 			groupsAndRoles[idx++] = groups[j];
+		Arrays.sort(soffidRoles);
+		Arrays.sort(groups);
+		Arrays.sort(groupsAndRoles);
 	}
 
 

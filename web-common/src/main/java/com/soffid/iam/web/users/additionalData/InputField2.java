@@ -155,66 +155,84 @@ public class InputField2 extends Div
 	private String ownerContext;
 	
 	public void onSelectUser (Event event) {
-		Page p = getDesktop().getPage("usuarisLlista");
-		Boolean multiValued = dataType.isMultiValued();
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-		Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued });
+		if (!readonly)
+		{
+			Page p = getDesktop().getPage("usuarisLlista");
+			Boolean multiValued = dataType.isMultiValued();
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued });
+		}
 	}
 
 	public void onSelectGroup(Event event) {
-		Page p = getDesktop().getPage("grupsLlista");
-		p.setAttribute("tipus", "");
-		p.setAttribute("llistaObsolets", false);
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-		Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued() });
+		if (!readonly)
+		{
+			Page p = getDesktop().getPage("grupsLlista");
+			p.setAttribute("tipus", "");
+			p.setAttribute("llistaObsolets", false);
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued() });
+		}
 	}
 
 	public void onSelectApplication(Event event) {
-		Page p = getDesktop().getPage("aplicacionsLlista");
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		if (!readonly)
+		{
+			Page p = getDesktop().getPage("aplicacionsLlista");
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+		}
 	}
 
 	public void onSelectCustomObject(Event event) {
-		Page p = getDesktop().getPage("customObjectsLlista");
-		p.setAttribute("type", dataType.getDataObjectType());
-		Boolean multiValued = dataType.isMultiValued();
-		Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
+		if (!readonly)
+		{
+			Page p = getDesktop().getPage("customObjectsLlista");
+			p.setAttribute("type", dataType.getDataObjectType());
+			Boolean multiValued = dataType.isMultiValued();
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
+		}
 	}
 
 	public void onSelectHost(Event event) {
-		Page p = getDesktop().getPageIfAny("maquinesLlista");
-		if ( p == null)
+		if (!readonly)
 		{
-			Component hostsWindow = getPage().getFellowIfAny("hostsWindow");
-			if (hostsWindow == null)
+			Page p = getDesktop().getPageIfAny("maquinesLlista");
+			if ( p == null)
 			{
-				hostsWindow = new Window();
-				hostsWindow.setId("hostsWindow");
-				hostsWindow.setPage(getPage());
-				Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap());
+				Component hostsWindow = getPage().getFellowIfAny("hostsWindow");
+				if (hostsWindow == null)
+				{
+					hostsWindow = new Window();
+					hostsWindow.setId("hostsWindow");
+					hostsWindow.setPage(getPage());
+					Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap());
+				}
+				Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget());
 			}
-			Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget());
+			else
+				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 		}
-		else
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 	}
 
 	public void onSelectMailDomain(Event event) {
-		Page p = getDesktop().getPageIfAny("dominisCorreuLlista");
-		if ( p == null)
+		if (!readonly)
 		{
-			Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow");
-			if (mailDomainWindow == null)
+			Page p = getDesktop().getPageIfAny("dominisCorreuLlista");
+			if ( p == null)
 			{
-				mailDomainWindow = new Window();
-				mailDomainWindow.setId("mailDomainWindow");
-				mailDomainWindow.setPage(getPage());
-				Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap());
+				Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow");
+				if (mailDomainWindow == null)
+				{
+					mailDomainWindow = new Window();
+					mailDomainWindow.setId("mailDomainWindow");
+					mailDomainWindow.setPage(getPage());
+					Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap());
+				}
+				Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget());
 			}
-			Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget());
+			else
+				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 		}
-		else
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 	}
 
 	/** 
@@ -904,7 +922,7 @@ public class InputField2 extends Div
 				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
 						+ "id=\""+id+"\" "
 						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='~./img/mail.png' "
+				sb.append("<imageclic src='~./img/servidorCorreu.gif' "
 						+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
 						+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
 						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
@@ -1111,10 +1129,14 @@ public class InputField2 extends Div
 			Component c3 = getFellowIfAny(id3);
 			if (c3 != null && c3 instanceof Label && value != null)
 				((Label) c3).setValue(value.toString());
-			if (updateUser) updateUser(id);
-			if (updateGroup) updateGroup(id);
-			if (updateApplication) updateApplication(id);
-			if (updateCustomObject) updateCustomObject(id);
+			try {
+				if (updateUser) updateUser(id);
+				if (updateGroup) updateGroup(id);
+				if (updateApplication) updateApplication(id);
+				if (updateCustomObject) updateCustomObject(id);
+			} catch (Exception e) {
+				// Possibly user or application or anything else not found exception
+			}
 		}
 		//Aquí s'ha de fer que mostri cada camp amb el size i el type corresponen
 		//A dins el zul dels usuaris falta que mostri valorDada o el blob segons estigui ple un o l'altre

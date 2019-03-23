@@ -44,6 +44,8 @@ public class CustomField extends Div implements XPathSubscriber {
 	String visibilityScript;
 	private SingletonBinder binder = new SingletonBinder(this);
 	private SearchFilter searchFilter;
+	boolean visible = true;
+	boolean required = false;
 	
 	private List<TipusDada> dataTypes;
 
@@ -62,6 +64,7 @@ public class CustomField extends Div implements XPathSubscriber {
 		dataTypeObj.setScope(null);
 		dataTypeObj.setSize(maxLength);
 		dataTypeObj.setType(TypeEnumeration.STRING_TYPE);
+		dataTypeObj.setRequired(required);
 		if (listOfValues != null)
 			dataTypeObj.setValues(Arrays.asList(listOfValues));
 
@@ -134,7 +137,7 @@ public class CustomField extends Div implements XPathSubscriber {
 					Events.postEvent(new Event("onChange", inputField3));
 				}
 			});
-			setVisible(input.attributeVisible());
+			adjustVisibility();
 		}
 	}
 
@@ -187,7 +190,7 @@ public class CustomField extends Div implements XPathSubscriber {
 	}
 
 	public void setListOfValues(String listOfValues) {
-		this.listOfValues = listOfValues.trim().split("[ ,]+");
+		this.listOfValues = listOfValues.trim().split("\\s*[,]+\\s*");
 	}
 
 	public boolean isReadonly() {
@@ -309,6 +312,19 @@ public class CustomField extends Div implements XPathSubscriber {
 	
 	public void adjustVisibility ()
 	{
-		setVisible ( input.attributeVisible() );
+		super.setVisible ( visible && input.attributeVisible() );
+	}
+
+	public boolean setVisible(boolean visible) {
+		this.visible = visible;
+		return super.setVisible(visible);
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 }

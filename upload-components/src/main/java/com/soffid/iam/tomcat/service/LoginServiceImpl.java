@@ -211,7 +211,7 @@ public class LoginServiceImpl implements LoginService {
 			if (holderGroup == null)
     			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId());
     		else
-    			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId() );
+    			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId(), holderGroup );
 			for ( Group g: groups)
 				result.add(g.getName());
     	}

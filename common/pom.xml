@@ -281,11 +281,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.30</version>
-		</dependency>
-		<dependency>
 			<groupId>org.beanshell</groupId>
 			<artifactId>bsh</artifactId>
 			<scope>provided</scope>

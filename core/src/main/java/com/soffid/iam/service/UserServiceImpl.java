@@ -1197,7 +1197,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (usuariEntity != null) {
 			disableUser(usuari.getUserName());
 			removeOldAlias(usuari);
-			getUserDataEntityDao().remove(usuariEntity.getUserData());
+			getUserDataEntityDao().remove(new LinkedList<UserDataEntity>(usuariEntity.getUserData()));
 			usuariEntity.getUserData().clear();
 			for (VaultFolderAccessEntity ua: new LinkedList<VaultFolderAccessEntity> ( usuariEntity.getVaultFolders()))
 			{

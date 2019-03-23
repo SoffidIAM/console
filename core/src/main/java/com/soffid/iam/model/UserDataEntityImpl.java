@@ -30,6 +30,7 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 	}
 
 	private AttributeVisibilityEnum getInitialVisibility() {
+		
 		if (Security.isSyncServer())
 			return AttributeVisibilityEnum.EDITABLE;
 
@@ -46,9 +47,6 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 				return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN
 						: tda.getUserVisibility();
 		}
-
-		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
-			return AttributeVisibilityEnum.EDITABLE;
 
 		if (Security.isUserInRole(Security.AUTO_METADATA_UPDATE_ALL))
 			return AttributeVisibilityEnum.EDITABLE;

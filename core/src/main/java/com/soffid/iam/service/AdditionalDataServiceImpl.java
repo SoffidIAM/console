@@ -277,23 +277,26 @@ public class AdditionalDataServiceImpl extends
 	}
 
 	public void handleDelete(UserData dadaUsuari) throws InternalErrorException {
-		UserDataEntity dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);
-
-		AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility(); 
-
-		if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
-			throw new SecurityException(String.format("Not allowed to modify the attributes %s", dadaUsuari.getAttribute()));
-
-		UserEntity usuari = dadaUsuariEntity.getUser();
-		usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-		usuari.setLastUserModification(Security.getCurrentAccount());
-		getUserEntityDao().update(usuari);
-
-		getUserDataEntityDao().remove(dadaUsuariEntity);
-
-		auditChange(dadaUsuari);
-
-		getRuleEvaluatorService().applyRules(usuari);
+		if (dadaUsuari.getId() != null)
+		{
+			UserDataEntity dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);
+	
+			AttributeVisibilityEnum visibility = dadaUsuariEntity.getAttributeVisibility(); 
+	
+			if (!visibility.equals(AttributeVisibilityEnum.EDITABLE))
+				throw new SecurityException(String.format("Not allowed to modify the attributes %s", dadaUsuari.getAttribute()));
+	
+			UserEntity usuari = dadaUsuariEntity.getUser();
+			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+			usuari.setLastUserModification(Security.getCurrentAccount());
+			getUserEntityDao().update(usuari);
+	
+			getUserDataEntityDao().remove(dadaUsuariEntity);
+	
+			auditChange(dadaUsuari);
+	
+			getRuleEvaluatorService().applyRules(usuari);
+		}
 	}
 
 	public UserData handleUpdate(UserData dadaUsuari) throws InternalErrorException {

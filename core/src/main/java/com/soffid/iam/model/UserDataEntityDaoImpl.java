@@ -100,6 +100,7 @@ public class UserDataEntityDaoImpl
 	
 	public void remove(com.soffid.iam.model.UserDataEntity dadaUsuari) throws RuntimeException {
 		try {
+			dadaUsuari.getUser().getUserData().remove(dadaUsuari);
 			super.remove(dadaUsuari);
 			getSession(false).flush();
 		} catch (Throwable e) {

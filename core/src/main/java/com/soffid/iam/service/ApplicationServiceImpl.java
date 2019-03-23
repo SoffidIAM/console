@@ -771,8 +771,6 @@ public class ApplicationServiceImpl extends
     }
 
     protected RoleAccount handleCreate(RoleAccount rolsUsuaris) throws Exception {
-        rolsUsuaris.setParentGrant(null);
-        
         if (rolsUsuaris.getAccountId() == null && rolsUsuaris.getAccountName() != null)
         {
         	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(rolsUsuaris.getAccountName(), rolsUsuaris.getSystem());
@@ -781,6 +779,9 @@ public class ApplicationServiceImpl extends
         	}
         }
         	
+        if ( rolsUsuaris.getStartDate() == null)
+        	rolsUsuaris.setStartDate(new Date());
+        
         List<RoleAccount> grantsToCreate = new LinkedList<RoleAccount>();
         grantsToCreate.add(rolsUsuaris);
         boolean first = true;

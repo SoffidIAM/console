@@ -29,7 +29,7 @@ public class UserEntityImpl extends UserEntity
 			}
 			return b.toString();
 		} else {
-			return String.format(nameFormat, getFirstName(), getMiddleName(), getLastName());
+			return String.format(nameFormat, getFirstName(), getMiddleName() == null? "": getMiddleName(), getLastName());
 		}
 	}
 

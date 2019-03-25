@@ -103,7 +103,7 @@ public class DatabaseCreator {
             driverString = "mysql"; //$NON-NLS-1$
             driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             		"?useUnicode=yes&characterEncoding=UTF-8"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            driverClass= "org.mysql.jdbc.Driver"; //$NON-NLS-1$
+            driverClass= "com.mysql.jdbc.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
         } else {
             driverString = "mariadb"; //$NON-NLS-1$

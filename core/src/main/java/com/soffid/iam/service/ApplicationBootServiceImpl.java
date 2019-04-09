@@ -472,7 +472,7 @@ public class ApplicationBootServiceImpl extends
 		try
 		{
 			Long tenantId = tenantService.getMasterTenant().getId();
-			PreparedStatement stmt = conn.prepareStatement("UPDATE SC_BLOCON SET BCO_TEN_ID=? WHERE BCO_TEN_ID IS NULL");
+			PreparedStatement stmt = conn.prepareStatement("UPDATE SC_BLOCON SET BCO_TEN_ID=? WHERE BCO_TEN_ID IS NULL OR BCO_TEN_ID=0");
 			stmt.setLong(1, tenantId);
 			stmt.execute();
 			stmt.close();

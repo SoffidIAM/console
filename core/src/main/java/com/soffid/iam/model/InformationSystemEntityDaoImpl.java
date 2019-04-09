@@ -238,7 +238,7 @@ public class InformationSystemEntityDaoImpl
 			if (valor==null || "".equals(valor.trim())) return; //$NON-NLS-1$
 			String [] valors = valor.split(","); //$NON-NLS-1$
 			if (valors.length>=1) {
-				java.util.regex.Pattern p = java.util.regex.Pattern.compile("[a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\\.[a-zA-Z]+)+"); //$NON-NLS-1$
+				java.util.regex.Pattern p = java.util.regex.Pattern.compile("[a-zA-Z0-9_.]+@[a-zA-Z0-9_]+(\\.[a-zA-Z]+)+"); //$NON-NLS-1$
 				for (int i=0; i < valors.length; i++) {
 					if (valors[i]!=null) {
 						java.util.regex.Matcher m = p.matcher(valors[i].trim());

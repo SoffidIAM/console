@@ -25,55 +25,61 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 		if (!checkOwnership (ra))
 			throw new SecurityException(String.format("User is not owner of entitlement #%d", roleAccount.getId()));
 		
-		List<UserAccount> accounts = getAccountService().findUsersAccounts(user, ra.getAccount().getSystem().getName());
-		
-		UserAccount acc = null;
-		if (accounts.isEmpty() && account == null)
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		try
 		{
-			UserEntity userEntity = getUserEntityDao().findByUserName(user);
-			if (userEntity == null)
-				throw new InternalErrorException(String.format("Unknown user %s", user));
-			User userObject = getUserEntityDao().toUser(userEntity);
-			com.soffid.iam.api.System d = getSystemEntityDao().toSystem(ra.getAccount().getSystem());
-			getAccountService().createAccount(userObject, d, null);
-		}
-		else
-		{
-			for (Iterator<UserAccount> it = accounts.iterator(); it.hasNext();)
+			List<UserAccount> accounts = getAccountService().findUsersAccounts(user, ra.getAccount().getSystem().getName());
+			
+			UserAccount acc = null;
+			if (accounts.isEmpty() && account == null)
 			{
-				acc = it.next();
-				if (acc.getName().equals(account))
-					break;
-				acc = null;
+				UserEntity userEntity = getUserEntityDao().findByUserName(user);
+				if (userEntity == null)
+					throw new InternalErrorException(String.format("Unknown user %s", user));
+				User userObject = getUserEntityDao().toUser(userEntity);
+				com.soffid.iam.api.System d = getSystemEntityDao().toSystem(ra.getAccount().getSystem());
+				getAccountService().createAccount(userObject, d, null);
 			}
+			else
+			{
+				for (Iterator<UserAccount> it = accounts.iterator(); it.hasNext();)
+				{
+					acc = it.next();
+					if (acc.getName().equals(account))
+						break;
+					acc = null;
+				}
+			}
+			
+			if (acc == null)
+				throw new InternalErrorException( String.format("Account %s does not exist", account));
+			
+			AccountEntity targetAccountEntity = getAccountEntityDao().load(acc.getId());
+			
+			if (ra.getOwnerAccount() == null)
+				ra.setOwnerAccount(ra.getAccount());
+			ra.setDelegateAccount(targetAccountEntity);
+			String auditType;
+			if (new Date().after(since))
+			{
+				ra.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
+				ra.setAccount(targetAccountEntity);
+				getAccountEntityDao().propagateChanges(ra.getOwnerAccount());
+				auditType = "l";
+			}
+			else
+			{
+				ra.setDelegationStatus(DelegationStatus.DELEGATION_PENDING);
+				auditType = "L";
+			}
+			ra.setDelegateSince(since);
+			ra.setDelegateUntil(until);
+			getRoleAccountEntityDao().update(ra, auditType);
+			
+			return getRoleAccountEntityDao().toRoleAccount(ra);
+		} finally {
+			Security.nestedLogoff();
 		}
-		
-		if (acc == null)
-			throw new InternalErrorException( String.format("Account %s does not exist", account));
-		
-		AccountEntity targetAccountEntity = getAccountEntityDao().load(acc.getId());
-		
-		if (ra.getOwnerAccount() == null)
-			ra.setOwnerAccount(ra.getAccount());
-		ra.setDelegateAccount(targetAccountEntity);
-		String auditType;
-		if (new Date().after(since))
-		{
-			ra.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
-			ra.setAccount(targetAccountEntity);
-			getAccountEntityDao().propagateChanges(ra.getOwnerAccount());
-			auditType = "l";
-		}
-		else
-		{
-			ra.setDelegationStatus(DelegationStatus.DELEGATION_PENDING);
-			auditType = "L";
-		}
-		ra.setDelegateSince(since);
-		ra.setDelegateUntil(until);
-		getRoleAccountEntityDao().update(ra, auditType);
-		
-		return getRoleAccountEntityDao().toRoleAccount(ra);
 	}
 
 	private boolean checkOwnership(RoleAccountEntity ra) {

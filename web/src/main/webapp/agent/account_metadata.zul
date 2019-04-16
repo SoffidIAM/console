@@ -11,11 +11,33 @@
 		es.caib.zkib.datasource.XPathUtils.createPath(ds, path);
 	}
 	canModifyMetadata = es.caib.seycon.ng.utils.AutoritzacionsUsuari.hasUpdateMetadata();
+
+    void onNewAttribute (Row row)
+    {
+    	es.caib.seycon.ng.comu.TypeEnumeration type = XPathUtils.getValue(
+    			row, 
+    			"type");
+    	row.getFellow ("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
+    			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE ||
+    			type == es.caib.seycon.ng.comu.TypeEnumeration.APPLICATION_TYPE ||
+				type == es.caib.seycon.ng.comu.TypeEnumeration.CUSTOM_OBJECT_TYPE);
+    }
+
+    void onChangeDataType (Listbox lb)
+    {
+    	es.caib.seycon.ng.comu.TypeEnumeration type = XPathUtils.getValue(
+    			lb.parent, 
+    			"type");
+//    	alert("type = "+type);
+    	lb.getFellow ("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
+    			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE);
+    }
+
 	]]></zscript>
 	<toolbar>
 		<insertbutton listbox="metadataGrid" acces="${canModifyMetadata}" onClick="addMetaData()"></insertbutton>
 	</toolbar>
-	<grid dataPath="/metadata" id="metadataGrid" fixedLayout="true">
+	<grid dataPath="/metadata" id="metadataGrid" fixedLayout="true"  onNewRow="onNewAttribute(event.data)">
 		<columns>
 			<column label="${c:l('dadesAddicionals.zul.Ordre')}" width="4em"></column>
 			<column label="${c:l('dadesAddicionals.zul.Codi-2')}" width="10em"></column>
@@ -48,7 +70,7 @@
 						<listbox width="99%" visible="true" bind="." mold="select"
 							use="com.soffid.iam.web.agent.CustomDataTypeListbox"
 							disabled="${!canModifyMetadata}" style="font-size: 10px"
-							onChange='checkListboxCustomObjectTypes(this)'>
+							onSelect='onChangeDataType(self)'>
 							<dataitem bind="@value">
 								<listcell bind="@literal" />
 							</dataitem>
@@ -66,8 +88,12 @@
 					</row>
 					<row >
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Multivalued')}" />
-						<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
-							onClick="" onCheck="" />
+						<div>
+							<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
+								onClick="" onCheck="" />
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.MultivaluedRows')}" />
+							<intbox bind="@multiValuedRows" onChange=""/>
+						</div>
 					</row>
 					<row >
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')}" />
@@ -143,6 +169,61 @@
 								</dataitem>
 							</listbox>
 							<label value="*" />
+						</div>
+					</row>
+					<row id="visibility4">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.VisibilityExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@visibilityExpression" rows="1" multiline="true"  onChange=""/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars( null )
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+						</div>
+					</row>
+					<row id="visibility5">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.ValidExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;value: ${c:l('dadesAddicionals.zul.var4')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@validationExpression" rows="1" multiline="true"  onChange=""/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null)
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+						</div>
+					</row>
+					<row id="visibility6">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.FilterExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('dadesAddicionals.zul.var6') }" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@filterExpression" multiline="true" onChange=""/>
+							</div>
 						</div>
 					</row>
 				</rows>

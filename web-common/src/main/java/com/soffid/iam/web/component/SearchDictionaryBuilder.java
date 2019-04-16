@@ -176,8 +176,23 @@ public class SearchDictionaryBuilder {
 				sad.setName(attributesPath+"."+att.getCode());
 				if (att.getValues() != null && ! att.getValues().isEmpty())
 				{
-					sad.setLabels(att.getValues());
-					sad.setValues(att.getValues());
+					List<String> labels = new LinkedList<String>();
+					List<String> values = new LinkedList<String>();
+					for ( String s: att.getValues())
+					{
+						if (s.contains(":"))
+						{
+							values.add ( s.substring(0, s.indexOf(":")).trim());
+							labels.add( s.substring(s.indexOf(":")).trim());
+						}
+						else
+						{
+							values.add(s);
+							labels.add(s);
+						}
+					}
+					sad.setLabels(labels);
+					sad.setValues(values);
 				}
 				sd2.getAttributes().add(sad);
 			}
@@ -279,8 +294,23 @@ public class SearchDictionaryBuilder {
 					sad.setType(att.getType());
 					sad.setName("attributes."+att.getCode());
 					if (att.getValues() != null && ! att.getValues().isEmpty()) {
-						sad.setLabels(att.getValues());
-						sad.setValues(att.getValues());
+						LinkedList<String> values = new LinkedList<String>();
+						LinkedList<String> labels = new LinkedList<String>();
+						for ( String s: att.getValues())
+						{
+							if (s.contains(":"))
+							{
+								values.add ( s.substring(0, s.indexOf(":")).trim());
+								labels.add( s.substring(s.indexOf(":")).trim());
+							}
+							else
+							{
+								values.add(s);
+								labels.add(s);
+							}
+						}
+						sad.setLabels(labels);
+						sad.setValues(values);
 					}
 					sd2.getAttributes().add(sad);
 				}

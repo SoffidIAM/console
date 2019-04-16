@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
@@ -35,6 +36,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.ConfiguracioEntity.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
+	UserGroupAttributeEntity.class,
 	/************** Services ***************/
 	AutoritzacioService.class,
 	com.soffid.iam.service.RuleEvaluatorService.class,
@@ -169,6 +171,14 @@ public abstract class GrupService {
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.UsuariGrup create(
+		es.caib.seycon.ng.comu.UsuariGrup usuariGrup)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Operation ( grantees={roles.user_group_create.class},
+			translated="update")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.UsuariGrup update(
 		es.caib.seycon.ng.comu.UsuariGrup usuariGrup)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -315,6 +325,22 @@ public abstract class GrupService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupByTextAsync(
 			@Nullable String text) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String filter) {
 		return null;
 	}
 

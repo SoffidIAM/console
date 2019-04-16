@@ -10,14 +10,6 @@
 	<datamodel id="model" rootNode="objects" src="descriptorCustomObject.xml"
 		onChange="showCancelButton()"/>
 
-	<style>
-		.objectatt {display: table; padding: 0px; width: 100%}
-		.objectatt_row {display: table-row;}
-		.objectatt_row div {padding-top: 6px}
-		.objectatt_label {display: table-cell; width: 15em}
-		.objectatt_input {display: table-cell}
-	</style>
-
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
 	<zscript>

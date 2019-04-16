@@ -62,6 +62,16 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public Boolean multiValued;
 
+	@Description("Include field in quick searches")
+	@Column (name="TDA_QUSECR")
+	@Nullable
+	public Boolean searchCriteria;
+	
+	@Description ("Display a maxim of rows values. For more values, a scroll bar will appear")
+	@Column(name = "TDA_MVROWS")
+	@Nullable
+	public Integer multiValuedRows;
+
 	@Description ("blank separated list of url-encoded values")
 	@Column (name="TDA_VALUE", length=64000)
 	@Nullable

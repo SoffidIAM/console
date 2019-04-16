@@ -1,6 +1,7 @@
 package com.soffid.iam.web.users.additionalData;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,10 +13,13 @@ import java.util.Map;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
@@ -34,7 +38,9 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
+import es.caib.zkib.binder.CollectionBinder;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
@@ -154,7 +160,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	
 	public void onCreate () throws NamingException, CreateException, InternalErrorException, IOException
 	{
-		updateMetadata();
+		deferUpdate();
 	}
 	
 	public void onUpdate(XPathEvent arg0) 
@@ -353,4 +359,49 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		this.system = accountSystem;
 	}
 
+    public Object clone() {
+        AttributesDiv clone = (AttributesDiv) super.clone();
+        clone.binder = new SingletonBinder(clone);
+        clone.ownerBinder = new SingletonBinder(clone);
+        clone.setDataPath(binder.getDataPath());
+        clone.setOwnerBind(ownerBinder.getDataPath());
+        clone.initListener = null;
+        clone.deferUpdate();
+        return clone;
+    }
+
+    public void setPage(Page page) {
+        super.setPage(page);
+        binder.setPage(page);
+        ownerBinder.setPage(page);
+		deferUpdate();
+    }
+
+    public void setParent(Component parent) {
+        super.setParent(parent);
+        binder.setParent(parent);
+        ownerBinder.setParent(parent);
+		deferUpdate();
+    }
+
+    
+    OnInitEventListener initListener = null;
+	private void deferUpdate() {
+		if (initListener == null)
+		{
+			initListener = new OnInitEventListener();
+			addEventListener("onInitData", initListener);
+		}
+		Events.postEvent(new Event("onInitData", this));
+	}
+
+	class OnInitEventListener implements EventListener {
+		@Override
+		public void onEvent(Event event) throws Exception {
+			ownerBinder.invalidate();
+			binder.invalidate();
+			updateMetadata();
+		}
+		
+	}
 }

@@ -6,14 +6,9 @@
 <zk>
 
 	<style>
-		.roleatt {display: table; padding: 0px; width: 100%}
-		.roleatt_row {display: table-row}
-		.roleatt_row div {padding-top: 5px}
-		.roleatt_label {display: table-cell; width: 200px}
-		.roleatt_input {display: table-cell}
 		.gc {padding-left: 0px !important}
-		.etiqueta {margin-left: 0px !important}
-		.textbox {width: 300px !important}
+		.etiqueta {margin-left: 0px }
+		.textbox {width: 300px}
 		tr.vbox-sp {height: 0px !important;}
 	</style>
 
@@ -449,7 +444,7 @@
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolinfo.zul.Nom')}"/>
 							<hbox>
-								<textbox id="detall_nom" maxlength="64" sclass="textbox"
+								<textbox id="detall_nom" maxlength="150" sclass="textbox"
 									bind="@nom" constraint="no empty">
 									<attribute name="onChange">
 										<![CDATA[
@@ -465,7 +460,7 @@
 						<row>
 							<input_etiqueta value="${c:l('aplica_rolsllista.zul.Aplicacia')}"/>
 							<hbox>
-								<textbox bind="@codiAplicacio" maxlength="20"
+								<textbox bind="@codiAplicacio" maxlength="100"
 									sclass="textbox"
 									constraint="no empty" id="detall_codiAplicacio"/>
 								<imageclic src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '

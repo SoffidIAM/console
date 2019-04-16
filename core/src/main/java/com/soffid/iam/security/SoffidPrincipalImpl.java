@@ -43,7 +43,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		else
 		{
 			init(name, parent.getGroups(), parent.getSoffidRoles());
-			userName = parent.getUserName();
+			userName = parent.getUserName() == null ? 
+					null: 
+				parent.getUserName().startsWith("*")? 
+					parent.getUserName(): 
+					"*"+parent.getUserName();
 			fullName = parent.getFullName();
 			holderGroup = parent.getHolderGroup();
 		}

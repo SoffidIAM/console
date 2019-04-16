@@ -49,6 +49,23 @@
 				}else{
 					self.visible = true;
 				}
+				esquema.getFellow("lista").getFellow("listbox").setMultiple(false);
+				esquema.getFellow("lista").getFellow("listbox").setCheckmark(false);
+			]]>
+		</attribute>
+		<attribute name="onConfigure">
+			<![CDATA[
+				pageScope.put("filter", event.data[0]);
+				pageScope.put("multi", event.data[1]);
+				if (event.data[1])
+				{
+//					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
+//					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
+				}
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter( 
+						event.data.length >= 3 ? event.data[2]: null);
+				if ( ! esquema.getFellow("lista").getFellow("listbox").getItems().isEmpty())
+					esquema.getFellow("queryWindow").getFellow("searchBox").search();
 			]]>
 		</attribute>
 		<attribute name="onClose">

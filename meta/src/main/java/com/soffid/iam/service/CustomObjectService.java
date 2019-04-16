@@ -41,6 +41,14 @@ public class CustomObjectService {
 	@Operation(grantees={customObject_query.class})
 	public AsyncList<CustomObject> findCustomObjectByTextAsync (String objectType, @Nullable String query) { return null;}
 
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Operation(grantees={customObject_query.class})
+	public AsyncList<CustomObject> findCustomObjectByTextAndFilterAsync(String objectType, @Nullable String text, @Nullable String filter) { return null; }
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Operation(grantees={customObject_query.class})
+	public Collection<CustomObject> findCustomObjectByTextAndFilter(String objectType, @Nullable String text, @Nullable String filter) { return null; }
+
 	@Operation(grantees={customObject_query.class})
 	public CustomObject findCustomObjectByTypeAndName (String objectType, String name) { return null;}
 

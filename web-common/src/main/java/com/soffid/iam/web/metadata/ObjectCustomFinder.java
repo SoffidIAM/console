@@ -21,7 +21,8 @@ public class ObjectCustomFinder implements FinderHandler {
 			MetadataScope.ROLE,
 			MetadataScope.USER,
 			MetadataScope.GROUP,
-			MetadataScope.MAIL_LIST
+			MetadataScope.MAIL_LIST,
+			MetadataScope.GROUP_MEMBERSHIP
 	};
 	
 	@Override

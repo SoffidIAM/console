@@ -41,6 +41,10 @@
 			td.dataTreeCelldestacada div
 			.dateboxreadnoborderinp.text-disd { color: red !important; }
 
+			.useratt {display: table; padding: 0px; width: 100%}
+			.useratt_row {display: table-row}
+			.useratt_label {display: table-cell; width: 120px}
+			.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		</style>
 
 		<zscript src="comu/netejaCriteris.zul"/>
@@ -52,7 +56,7 @@
 			<![CDATA[
 			    String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
 				pageScope{"requestedUser"} = requestedUser;
-				boolean readOnly = false;
+				boolean readOnly = true;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
 			
@@ -90,9 +94,9 @@
 				canDeleteUser = !readOnly && com.soffid.iam.utils.Security.isUserInRole("user:delete");
 				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
 				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
-				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
+				canUpdateUserPassword = false;
 				canQueryUser = AutoritzacionsUsuari.hasQueryUser();
-				canRefreshUser = AutoritzacionsUsuari.hasRefreshUser();
+				canRefreshUser = false;
 				canQueryUserRole = AutoritzacionsUsuari.hasQueryUserRole();
 				canQueryUserSession = AutoritzacionsUsuari.hasQueryUserSession();
 				//canQueryUserGroup = AutoritzacionsUsuari.canQueryUserGroup();
@@ -1047,183 +1051,31 @@
 												</rows>
 											</grid>
 									</vbox>
-									<vbox align="center" width="100%"
+									<vbox align="center" width="100%" visible="false"
 										style="border:1px solid #7F9196;padding:2px;background-color:#EEEEEE">
 										<imageclic id="imgPwd" src="~./img/pwd.gif" 
 											title="${c:l('usuaris.zul.Canviacontrasenya')}">
-											<attribute name="onClick">
-												<![CDATA[
-													llista = (DataListbox) esquema.getFellow("lista").getFellow("listbox");
-													if (llista.isCommitPending()) {
-														Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("usuaris.ConfirmarPerCanviarPWD"));
-														return;
-													}
-													if (!form.getFellow("codi").value.equals(""))
-													{
-														// Comprovem que el nif estiga complert
-//														String nifusu = form.getFellow("NIF").value;
-														//												if (nifusu==null || "".equals(nifusu.trim())) {
-														//													Missatgebox.error(org.zkoss.util.resource.Labels.getLabel("usuaris.NoPermes"),org.zkoss.util.resource.Labels.getLabel("usuaris.Error2"));
-														//													return;
-														//												}
-														
-														Missatgebox.confirmaOK_CANCEL(org.zkoss.util
-																.resource.Labels.getLabel("usuaris.SegurCanviar"),
-															org.zkoss.util.resource.Labels
-																.getLabel("usuaris.CanviarPwd"),
-															new EventListener()
-															{
-																public void onEvent(Event evt)
-																{
-																	if ("onOK".equals(evt.getName()))
-																	{
-																		if (form.getFellow("actiu").isChecked())
-																		{
-																			//Commit model + refresh accounts
-																			model.commit();
-																			form.getJXPathContext()
-																				.getValue("/domini").refresh();
-																			changePasswordDefaultDomain();
-																		}
-																		
-																		else
-																		{
-																			Missatgebox.info(org.zkoss.util
-																					.resource.Labels
-																					.getLabel("usuaris.NoActiu"),
-																				org.zkoss.util.resource.Labels
-																					.getLabel("usuaris.CanviarPwd"));
-																		}
-																	}
-																}
-															}
-														);
-													}
-													
-													else
-													{
-														Missatgebox.info(org.zkoss.util.resource.Labels
-																	.getLabel("usuaris.SelUsuari"),
-																org.zkoss.util.resource.Labels
-																	.getLabel("usuaris.CanviarPwd"));
-													}
-												]]>
-											</attribute>
 										</imageclic>
 										<imageclic id="imgPropaga" src="~./img/propaga.gif"
 											title="${c:l('usuaris.zul.Propagaelscanvis')}">
-											<attribute name="onClick">
-												if (!form.getFellow("codi").value.equals("")) {
-													Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels
-															.getLabel("usuaris.SegurPropagarCanvi"),
-															org.zkoss.util.resource.Labels
-																	.getLabel("usuaris.PropagarCanvi"),
-															new EventListener() {
-																public void onEvent(Event evt) {
-																	if ("onOK".equals(evt.getName())) {
-																		propagaCanvis();
-																	}
-																}
-															});
-												} else {
-													Missatgebox.info(org.zkoss.util.resource.Labels
-															.getLabel("usuaris.SelUsuari"), org.zkoss.util.resource.Labels
-															.getLabel("usuaris.PropagarCanvi"));
-												}
-											</attribute>
 										</imageclic>
 										<imageclic id="imgTasquesPendents"
 											src="~./img/exclamacio.gif" 
 											title="${c:l('usuaris.zul.Llistalestasquespend')}"
 											visible="false">
-											<attribute name="onClick">
-												if (!form.getFellow("codi").value.equals("")) {
-													llistaTasquesPendents();
-												} else {
-													Missatgebox.info(
-															org.zkoss.util.resource.Labels.getLabel("usuaris.SelUsuari"),
-															org.zkoss.util.resource.Labels.getLabel("usuaris.Tasques"));
-												}
-											</attribute>
 										</imageclic>
 										<imageclic
 											id="imgRegistresAcces" src="~./img/aplicacio.gif"
 											title="${c:l('usuaris.zul.Registresdaccas')}">
-											<attribute name="onClick">
-												if (!form.getFellow("codi").value.equals("")) {
-													desktop.getPage("registresAccesUsuari").setAttribute("usuari",
-															form.getFellow("codi").getValue());
-													Events.postEvent("onInicia", desktop.getPage("registresAccesUsuari")
-															.getFellow("esquemaLlista"), form);
-												} else {
-													Missatgebox.info(
-															org.zkoss.util.resource.Labels.getLabel("usuaris.SelUsuari"),
-															org.zkoss.util.resource.Labels.getLabel("usuaris.RegAcces"));
-												}
-											</attribute>
 										</imageclic>
 										<imageclic id="imgMazinger" src="img/mazinger.gif"
 											title="${c:l('usuaris.zul.ConfiguraciadeMazing')}">
-											<attribute name="onClick">
-												if (!form.getFellow("codi").value.equals("")) {
-													desktop.getPage("mazingerconfig").setAttribute("usuari",
-															form.getFellow("codi").getValue());
-													Events.postEvent("onInicia", desktop.getPage("mazingerconfig")
-															.getFellow("esquemaLlista"), form);
-												} else {
-													Missatgebox.info(org.zkoss.util.resource.Labels
-															.getLabel("usuaris.SelUsuari"), org.zkoss.util.resource.Labels
-															.getLabel("usuaris.ConfiguracioMazinger"));
-												}
-											</attribute>
 										</imageclic>
 										<imageclic id="imgAuditausu" src="img/auditoria.png"
 											title="${c:l('usuaris.zul.Auditoriadusuari')}" visible="${canQueryCustomAudit}">
-											<attribute name="onClick">
-												<![CDATA[
-													if (!form.getFellow("codi").value.equals("")) {
-														try {
-															String codiUsu = form.getFellow("codi").value;
-															java.util.Calendar hui = java.util.Calendar.getInstance();
-															hui.add(java.util.Calendar.MONTH, 0);
-															hui.add(java.util.Calendar.DATE, -1);
-															java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat(
-																	"dd/MM/yyyy");
-															String data = dateFormat.format(hui.getTime());
-															java.util.Calendar hui2 = java.util.Calendar.getInstance();
-															java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat(
-																	"dd/MM/yyyy");
-															String data2 = dateFormat.format(hui2.getTime());
-															es.caib.zkib.zkiblaf.Application
-																	.call("/auditoria.zul?codiUsuariAuditat=" + codiUsu
-																			+ "&dataIniciAuditoria=" + data
-																			+ "&dataFiAuditoria=" + data2);
-														} catch (Throwable th) {
-															Missatgebox.error(th.getMessage());
-														}
-													} else {
-														Missatgebox.info(org.zkoss.util.resource.Labels
-																.getLabel("usuaris.SelUsuari"), org.zkoss.util.resource.Labels
-																.getLabel("usuaris.ApliAccesibles"));
-													}
-												]]>
-											</attribute>
 										</imageclic>
 										<imageclic id="imgWF"
 											src="img/nouwf.png" title="${c:l('usuaris.zul.Crearprocasdelusuar')}">
-											<attribute name="onClick">
-	if (!form.getFellow("codi").value.equals("")) {
-		desktop.getPage("usuNouProces").setAttribute("codiUsuari",
-				form.getFellow("codi").getValue());
-		Events.postEvent("onInicia",
-				desktop.getPage("usuNouProces").getFellow("esquemaGeneric"),
-				form);
-	} else {
-		Missatgebox.info(org.zkoss.util.resource.Labels
-				.getLabel("usuaris.SelUsuari"), org.zkoss.util.resource.Labels
-				.getLabel("usuaris.IniciarProces"));
-	}
-</attribute>
 										</imageclic>
 									</vbox>
 								</hbox>
@@ -1375,7 +1227,7 @@
 											<attribute name="onOpen">
 	if (event.getReference() instanceof DataLabel) {
 		dataLab = event.getReference();
-		dataRow = dataLab.getParent().getParent().getParent();
+		dataRow = dataLab.getParent().getParent();
 		xpath = dataRow.getXPath();
 		dataSource = gridGrups.getDataSource();
 		context = dataSource.getJXPathContext();
@@ -2659,224 +2511,6 @@ String nomRolsBorrar = "";
 			</detalls>
 		</esquemavertical>
 
-		<window closable="false" id="selectAccountWnd"
-			position="center, center"
-			title="${c:l('usuaris.zul.selectAccount.title')}" visible="false"
-			width="300px">
-			<zscript>
-				void accept() {
-					if (select.getSelectedItem() == null) {
-						Missatgebox(org.zkoss.util.resource.Labels
-								.getLabel("usuaris.zul.selectAccount.selectone"));
-					} else {
-						ctx = selectAccountWnd.getAttribute("context");
-						path = selectAccountWnd.getAttribute("xpath");
-						ctx.getJXPathContext().setValue(path + "/@accountName",
-								select.getSelectedItem().getValue());
-						selectAccountWnd.visible = false;
-					}
-				}
-				void cancel() {
-					ctx = selectAccountWnd.getAttribute("context");
-					path = selectAccountWnd.getAttribute("xpath");
-					es.caib.zkib.datasource.XPathUtils.removePath(ctx, path);
-					selectAccountWnd.visible = false;
-				}
-			</zscript>
-			<vbox width="100%">
-				<separator spacing="10px" />
-				<hbox width="95%" pack="center" align="center">
-					<label
-						value="${c:l('usuaris.zul.selectAccount.account')}" />
-					<listbox id="select"></listbox>
-				</hbox>
-				<separator spacing="10px" />
-				<hbox width="95%" pack="end" align="end">
-					<button
-						label="${c:l('usuaris.zul.selectAccount.ok') }"
-						onClick="accept()" />
-					<separator spacing="10px" />
-					<button
-						label="${c:l('usuaris.zul.selectAccount.cancel') }"
-						onClick="cancel()" />
-				</hbox>
-				<separator spacing="10px" />
-			</vbox>
-		</window>
-		<window visible="false" id="binarywindow" width="50%" height="50%" title="Binary-Viewer" border="normal" 
-		closable="true" onClose="close()">
-		<iframe id="iframe" height="100%" width="100%" />
-		<zscript><![CDATA[
-			void close(){
-				binarywindow.detach();
-			}
-		]]>
-		</zscript>
-		</window>
-
-		<include src="usuarisllista.zul" />
-		<include src="dominisCorreullista.zul" />
-		<include src="grupsllista.zul" />
-		<include src="aplicacionsllista.zul" />
-		<include src="customObjectsllista.zul" />
-		<include src="finestres/maquinesllistaUsuari.zul" />
-		<include src="impressoresllista.zul" />
-		<include src="rolsllista.zul" />
-		<include src="finestres/canviPassword.zul" />
-		<include src="tasquesSeycon.zul" />
-		<include src="finestres/llistaRegistreAccesUsuari.zul" />
-		<include src="finestres/getmazingerconfig.zul" />
-		<include src="finestres/usu_nouProces.zul" />
-		<include src="finestres/user_renameAccount.zul" />
-		<include src="finestres/user_createAccount.zul" />
-		<include src="finestres/identity.zul" />
-		<include src="finestres/editorHTML.zul" />
-
-		<window closable="true" id="newPassword" position="center, center"
-			sizable="true" title="${c:l('accounts.setPassword.title')}"
-			visible="false" width="34em"
-			onClose="onCancelPassword(); event.stopPropagation();">
-			<zscript>
-				<![CDATA[
-					void onCancelPassword()
-					{
-						Window wnd = Path.getComponent("/newPassword");
-						password.setValue("");
-						wnd.setVisible(false);
-					}
-					
-					void onSetPassword()
-					{
-						es.caib.seycon.ng.servei.ejb.AccountService service = es.caib.seycon.ng.EJBLocator.getAccountService();
-						model.commit();
-				
-						es.caib.zkib.datasource.DataSource ds = newPassword.getAttribute("ds");
-						String xpath = newPassword.getAttribute("xpath");
-						account = ds.getJXPathContext().getValue(xpath+"/account[1]").instance;
-
-						service.setAccountPassword(account, new Password(password.getValue()));
-						es.caib.zkib.zkiblaf.Missatgebox
-								.confirmaOK(org.zkoss.util.resource.Labels
-										.getLabel("accounts.setPassword.msg"));
-						onCancelPassword();
-					}
-				]]>
-			</zscript>
-			<vbox width="30em" heights="5em, 3em" align="center">
-				<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
-				<hbox align="center" height="5em" >
-					<hbox width="8em" align="center" pack="end">
-						<label 
-							value="${c:l('accounts.setPassword.label')}">
-						</label>
-					</hbox>
-					<space width="2em"></space>
-					<hbox width="18em" align="center" pack="start">
-						<h:form style="display:inline">
-								<textbox type="password" width="18em" id="password"
-									onOK="onSetPassword();">
-								</textbox>
-						</h:form>
-					</hbox>
-				</hbox>
-				<hbox align="center" pack="end" width="30em">
-					<button
-						label="${c:l('accounts.setPassword.Cancel')}"
-						onClick="onCancelPassword()" />
-					<button label="${c:l('accounts.setPassword.OK')}"
-						onClick="onSetPassword()" />
-				</hbox>
-			</vbox>
-		</window>
-
-		<window closable="true" id="newPassword2" position="center, center"
-			sizable="true" title="${c:l('accounts.setPassword.title')}"
-			visible="false" width="34em"
-			onClose="onCancelPassword(); event.stopPropagation();">
-			<attribute name="onStart"><![CDATA[
-			        newPassword2.doHighlighted();
-			        generationType.selectedItem = generationRandom;
-			        onChangeSelectedGeneration ();
-			]]></attribute>
-			<zscript>
-				<![CDATA[
-					void onCancelPassword()
-					{
-						Window wnd = Path.getComponent("/newPassword2");
-						password.setValue("");
-						wnd.setVisible(false);
-					}
-					
-					void onSetPassword()
-					{
-						model.commit();
-						es.caib.seycon.ng.servei.ejb.UsuariService service = es.caib.seycon.ng.EJBLocator.getUsuariService();
-						String user = newPassword2.getAttribute("user");
-						String domain = newPassword2.getAttribute("domain");
-						if (generationType.selectedItem == generationSet)
-						{
-							service.setTemporaryPassword(user, domain, new Password(password.getValue()));
-							es.caib.zkib.zkiblaf.Missatgebox
-									.confirmaOK(org.zkoss.util.resource.Labels
-											.getLabel("accounts.setPassword.msg"));
-						}
-						else
-						{
-							String nouPassword = service.canviPassword(user, domain);
-							Events.postEvent("onInicia", desktop.getPage("canviPassword")
-									.getFellow("password"), new String[] { nouPassword,
-									domain });
-						}
-				
-						onCancelPassword();
-					}
-					
-					void onChangeSelectedGeneration ()
-					{
-						if (generationType.selectedItem == generationSet)
-						{
-							password.setDisabled (false);
-							password.setFocus(true);
-							passworddiv.setStyle("visibility: visible");
-						} else {
-							password.setDisabled (true);
-							setButton.setFocus(true);
-							passworddiv.setStyle("visibility: hidden");
-						}
-					}
-				]]>
-			</zscript>
-			<vbox width="30em" heights="2em, 2em" style="margin: 4em">
-				<radiogroup id="generationType" width="24em" orient="vertical">
-					<attribute name="onCheck"><![CDATA[
-					    onChangeSelectedGeneration();
-					]]></attribute>
-					<radio label="${c:l('usuaris.zul.radomPassword')}" id="generationRandom" width="20em" 
-						selected="true" value="random" onSelect=""/>
-					<div>
-						<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
-					</div>
-					<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
-						value="set" onSelect="" />
-				</radiogroup>
-				<div style="visibility: hidden" id="passworddiv">
-					<label 
-						value="${c:l('accounts.setPassword.label')}">
-					</label>
-					<textbox style="margin-left: 2em;" disabled="true" type="password" width="18em" id="password"
-						onOK="onSetPassword();">
-					</textbox>
-				</div>
-				<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
-					<button
-						label="${c:l('accounts.setPassword.Cancel')}"
-						onClick="onCancelPassword()" />
-					<button id = "setButton"
-					    label="${c:l('accounts.setPassword.OK')}"
-						onClick="onSetPassword()" />
-				</hbox>
-			</vbox>
-		</window>
 
 	</frame>
 </zk>

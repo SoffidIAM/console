@@ -204,13 +204,23 @@ public abstract class AbstractExpression implements Serializable {
 						obj = ROOT_OBJECT_NAME +number;
 						query.getObjects().put(path, obj);
 						query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
+						String obj2 = obj+"aux";
+						String s[] = attConfig.getVirtualAttributeName().split("\\.");
+
+						int i = query.getNextParameter();
+						String param  = "p"+i;
+						query.getParameters().put(param, part);
+
+						query.getJoinString().append("\nleft join "+obj+"."+s[0]+
+								" as "+obj2+" with "+
+								obj2+"."+s[1]+"=:"+param);
 					}
 					ctx.partialPath = null;
 					int i = query.getNextParameter();
-					String param  = "p"+i;
-					ctx.objectCondition = obj+"."+attConfig.getVirtualAttributeName()+"=:"+param+" and ";
+					String obj2 = obj+"aux";
+					String s[] = attConfig.getVirtualAttributeName().split("\\.");
+					ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
 					ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
-					query.getParameters().put(param, part);
 				} else {
 					flushParts(query, ctx);
 					ctx.objectName = ctx.objectName+"."+part;					

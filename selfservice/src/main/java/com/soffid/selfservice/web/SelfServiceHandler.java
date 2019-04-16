@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 
 import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
@@ -74,39 +75,44 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 
 	private Window showPassword;
 
-	private Form fusuaris;
-
 	void onClientInfo (Event ev) {
 		if (ev instanceof ClientInfoEvent)
 		{
 			ClientInfoEvent event = (ClientInfoEvent) ev;
-			Box form = (Box) Path.getComponent("//selfservice/fusuaris");
-			if (form != null){
-				int heigthPantalla = event.getDesktopHeight();
-				int hPantalla2 = (int) ((heigthPantalla)*0.90);
-				form.setHeight(""+hPantalla2+"px");
-				int ample = event.getDesktopWidth();
-				if(ample <568){
-					Listheader headQ = (Listheader) getFellow("headQuery");
-					headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords2"));
-					Listheader headP = (Listheader) getFellow("headChange");
-					headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword2"));
-				}else{
-					Listheader headQ = (Listheader) getFellow("headQuery");
-					headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords"));
-					Listheader headP = (Listheader) getFellow("headChange");
-					headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword"));
+			try 
+			{
+				Box form = (Box) Path.getComponent("//selfservice/fusuaris");
+				if (form != null){
+					int heigthPantalla = event.getDesktopHeight();
+					int hPantalla2 = (int) ((heigthPantalla)*0.90);
+					form.setHeight(""+hPantalla2+"px");
 				}
+				
+			} catch (ComponentNotFoundException e) {}
+			int ample = event.getDesktopWidth();
+			if(ample <568){
+				Listheader headQ = (Listheader) getFellowIfAny("headQuery");
+				if (headQ != null)
+					headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords2"));
+				Listheader headP = (Listheader) getFellowIfAny("headChange");
+				if (headP != null)
+					headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword2"));
+			}else{
+				Listheader headQ = (Listheader) getFellowIfAny("headQuery");
+				if (headQ != null)
+					headQ.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.QueryPasswords"));
+				Listheader headP = (Listheader) getFellowIfAny("headChange");
+				if (headP != null)
+					headP.setLabel(org.zkoss.util.resource.Labels.getLabel("selfService.ChangePassword"));
 			}
 		}
 	}
 
 	public void onCreate() {
-		model = (DataModel) getFellow("model");
-		newPasswordS = (Window) getFellow("newPasswordS");
-		newPassword = (Window) getFellow("newPassword");
-		showPassword = (Window) getFellow("showPassword");
-		fusuaris = (Form) getFellow("fusuaris");
+		model = (DataModel) getFellowIfAny("model");
+		newPasswordS = (Window) getFellowIfAny("newPasswordS");
+		newPassword = (Window) getFellowIfAny("newPassword");
+		showPassword = (Window) getFellowIfAny("showPassword");
 
 		addEventListener("onClientInfo", new SerializableEventListener() {
 			
@@ -122,64 +128,70 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			}
 		});
 		
-		getFellow("listadoAccounts").addEventListener("onNewRow", new SerializableEventListener() {
-			
-			public void onEvent(Event event) throws Exception {
-				onNewAccount((Listitem) event.getData());
-			}
-		});
 		
-		final Textbox appfinder = (Textbox) getFellow("appfinder");
-		appfinder.addEventListener("onChanging", new SerializableEventListener() {
-			public void onEvent(Event event) throws Exception {
-				if (event instanceof InputEvent)
-					search(((InputEvent) event).getValue());
-			}
-		});
-
-		appfinder.addEventListener("onOK", new SerializableEventListener() {
-			public void onEvent(Event event) throws Exception {
-				search(appfinder.getValue());
-			}
-		});
-
-		appfinder.addEventListener("onCancel", new SerializableEventListener() {
-			public void onEvent(Event event) throws Exception {
-				appfinder.setValue("");
-				search(null);
-			}
-		});
-
-		getTreebox().addEventListener("onNewRow", new SerializableEventListener() {
-			public void onEvent(Event event) throws Exception {
-				carregaIcona((Component) event.getData());
-			}
-		});
-
-		getTreebox().addEventListener("onSelect", new SerializableEventListener() {
-			public void onEvent(Event event) throws Exception {
-				select();
-			}
-		});
-
-		getFellow("appcancelbutton").addEventListener("onClick", new SerializableEventListener() {
-			
-			public void onEvent(Event event) throws Exception {
-				appfinder.setValue("");
-				search(null);
-			}
-		});
-				
-		model.getVariables().declareVariable("query", false);
-		
-/*		enableTimers = false;
-		
-		es.caib.zkib.datamodel.DataModelCollection lm = (DataModelCollection) model.getJXPathContext().getValue("/usuari/account");
-		if (lm.getSize() > 10)
+		Component l = getFellowIfAny("listadoAccounts");
+		if (l !=null)
 		{
-			enableTimers = false;
+			l.addEventListener("onNewRow", new SerializableEventListener() {
+				
+				public void onEvent(Event event) throws Exception {
+					onNewAccount((Listitem) event.getData());
+				}
+			});
 		}
-	*/	
+		
+		try {
+			final Textbox appfinder = (Textbox) getFellow("appfinder");
+			appfinder.addEventListener("onChanging", new SerializableEventListener() {
+				public void onEvent(Event event) throws Exception {
+					if (event instanceof InputEvent)
+						search(((InputEvent) event).getValue());
+				}
+			});
+	
+			appfinder.addEventListener("onOK", new SerializableEventListener() {
+				public void onEvent(Event event) throws Exception {
+					search(appfinder.getValue());
+				}
+			});
+	
+			appfinder.addEventListener("onCancel", new SerializableEventListener() {
+				public void onEvent(Event event) throws Exception {
+					appfinder.setValue("");
+					search(null);
+				}
+			});
+			try {
+				getFellow("appcancelbutton").addEventListener("onClick", new SerializableEventListener() {
+					
+					public void onEvent(Event event) throws Exception {
+						appfinder.setValue("");
+						search(null);
+					}
+				});
+			} catch (ComponentNotFoundException e) {}
+		} catch (ComponentNotFoundException e) {}
+	
+		if (getTreebox() != null)
+		{
+			getTreebox().addEventListener("onNewRow", new SerializableEventListener() {
+				public void onEvent(Event event) throws Exception {
+					carregaIcona((Component) event.getData());
+				}
+			});
+			getTreebox().addEventListener("onSelect", new SerializableEventListener() {
+				public void onEvent(Event event) throws Exception {
+					select();
+				}
+			});
+		}
+
+
+
+				
+		if (model != null)
+			model.getVariables().declareVariable("query", false);
+		
 		try
 		{
 			es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -290,7 +302,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 	}
 	
 	Tree getTreebox() {
-		return (Tree) fusuaris.getFellow("treebox");
+		return (Tree) getFellowIfAny("treebox");
 	}
 	
 	void select() throws InterruptedException{

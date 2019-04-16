@@ -9,7 +9,18 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 	String nom = Executions.getCurrent().getUserPrincipal().getFullName();
 	String holderGroup = Executions.getCurrent().getUserPrincipal().getHolderGroup();
 	if (holderGroup != null)
-		usuari = usuari + " ("+holderGroup+")";
+	{
+		usuari1 = usuari + " ("+holderGroup+")";
+		try {
+			usuari2 = usuari + " (" + com.soffid.iam.EJBLocator.getGroupService().findGroupByGroupName(holderGroup).getDescription()+")";
+		} catch (Exception e) {
+			usuari2 = usuari + " ("+holderGroup+")";
+		}
+	}
+	else
+	{
+		usuari1 = usuari2 = usuari;
+	}
 	//boolean mostraFavorits = es.caib.zkib.zkiblaf.Application.isFavoritesVisible();
 	void openMenu(){
 		if(!otherlogoutButton.getStyle().contains("display:none")){
@@ -25,12 +36,15 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<div align="right" sclass="col_der">
 			<div sclass="benvingutmsg" unless="${arg.embed}">
 				<label sclass="benvingut" value="${c:l('zkiblaf.lblUsuario')}: "/>
-		    	<label if="${arg.showProfile}" id="fullNameLabel" onClick='es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul")' sclass="codiusuari" value="${nom} (${usuari})"/>
-				<label if="${!arg.showProfile}" id="userNameLabel" sclass="codiusuari" onClick="openMenu();" value="${usuari}"/>	
+		    	<label if="${arg.showProfile}" id="fullNameLabel" onClick='es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul")' sclass="codiusuari" value="${nom} (${usuari1})"/>
+				<div if="${!arg.showProfile}" id="userNameLabel" sclass="codiusuari" style="display: inline" onClick="openMenu();">
+					<label value="${usuari1}" sclass="small-screen codiusuari" />
+					<label value="${usuari2}" sclass="wide-screen codiusuari" />
+				</div>	
 				<label if="${arg.showProfile}" id="logoutButton" sclass="titol_tanca" value="${c:l('zkiblaf.tancarSessio')}"/>
 			</div>
 			<div sclass="benvingutmsg" if="${arg.embed}">
-				<label sclass="codiusuari" value="${usuari}"/>
+				<label sclass="codiusuari" value="${usuari1}"/>
 			</div>
 			<div>
 				<label if="${!arg.showProfile}" id="otherlogoutButton" sclass="menuperfil menu-display shadow-window" style="display:none;" value="${c:l('zkiblaf.tancarSessio')}" width="15em"/>

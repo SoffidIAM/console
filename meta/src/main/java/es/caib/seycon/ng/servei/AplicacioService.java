@@ -665,6 +665,22 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.ValorDomini> findDomainValueByText(

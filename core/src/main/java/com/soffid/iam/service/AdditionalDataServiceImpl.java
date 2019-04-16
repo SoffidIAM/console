@@ -101,6 +101,19 @@ public class AdditionalDataServiceImpl extends
 				return getAccountMetadataEntityDao().toDataType(tipusDadaEntity);
 			}
 		}
+		else if (tipusDada.getScope() == MetadataScope.CUSTOM)
+		{
+			validateUniqueOrderForMetaData(tipusDada);
+			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findByObjectTypeAndName(tipusDada.getCustomObjectType(), tipusDada.getCode());
+			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
+				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
+			if (tipusDadaEntity != null) {
+				getMetaDataEntityDao().create(tipusDadaEntity);
+				tipusDada.setId(tipusDadaEntity.getId());
+				return getMetaDataEntityDao().toDataType(tipusDadaEntity);
+			}
+		}
 		else
 		{
 			validateUniqueOrderForMetaData(tipusDada);

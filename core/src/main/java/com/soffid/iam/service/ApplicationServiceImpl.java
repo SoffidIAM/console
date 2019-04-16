@@ -63,6 +63,7 @@ import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
@@ -76,8 +77,11 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.service.attribute.AttributePersister;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.service.impl.RolGrantDiffReport;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
@@ -2244,7 +2248,7 @@ public class ApplicationServiceImpl extends
         }
 		
 		GroupEntity ge = getGroupEntityDao().load(groupId);
-		for (UserAccountEntity uae : user.getAccounts()) {
+		for (UserAccountEntity uae : new LinkedList<UserAccountEntity>(user.getAccounts())) {
             AccountEntity acc = uae.getAccount();
             for (RoleAccountEntity rae : new LinkedList<RoleAccountEntity>(acc.getRoles())) {
                 if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals(groupId)) {
@@ -2656,45 +2660,62 @@ public class ApplicationServiceImpl extends
 		}
 	}
 
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			for (MetaDataEntity att: atts)
+			{
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				{
+					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+				}
+			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	protected AsyncList<Application> handleFindApplicationByTextAndFilterAsync(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindApplicationByJsonQueryAsync(q);
+			
+	}
+
+	@Override
+	protected Collection<Application> handleFindApplicationByTextAndFilter(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindApplicationByJsonQuery(q);
+	}
+
 	@Override
 	protected Collection<Application> handleFindApplicationByText(String text) throws Exception {
-		LinkedList<Application> result = new LinkedList<Application>();
-		TimeOutUtils tou = new TimeOutUtils();
-		for (InformationSystemEntity ue : getInformationSystemEntityDao().findByText(text)) {
-			Application u = getInformationSystemEntityDao().toApplication(ue);
-			if (getAuthorizationService().hasPermission(
-					Security.AUTO_ROLE_QUERY, ue)) {
-				result.add(u);
-			}
-			if (tou.timedOut())
-				return result;
-		}
-
-		return result;
+		return handleFindApplicationByTextAndFilter(text, null);
 	}
 
 	@Override
 	protected AsyncList<Application> handleFindApplicationByTextAsync(final String text) throws Exception {
-		final AsyncList<Application> result = new AsyncList<Application>();
-		getAsyncRunnerService().run(
-				new Runnable() {
-					public void run () {
-						try {
-							for (InformationSystemEntity e : getInformationSystemEntityDao().findByText(text)) {
-								if (result.isCancelled())
-									return;
-								Application v = getInformationSystemEntityDao().toApplication(e);
-								if (getAuthorizationService().hasPermission(
-										Security.AUTO_APPLICATION_QUERY, v)) {
-									result.add(v);
-								}
-							}
-						} catch (InternalErrorException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}, result);
-		return result;
+		return handleFindApplicationByTextAndFilterAsync(text, null);
 	}
 
 	@Override
@@ -3090,6 +3111,122 @@ public class ApplicationServiceImpl extends
 	protected Collection<RoleAccount> handleFindUserRolesByUserNameNoSoD(String codiUsuari) throws Exception {
     	return internalFindUserRolesByUserName (codiUsuari, false);
 	}
+
+
+	class RoleAttributePersister extends AttributePersister<RoleEntity,RoleAttributeEntity> {
+		@Override
+		protected List<RoleAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getRoleAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(RoleEntity entity) {
+			getRoleEntityDao().update(entity);
+		}
+
+		@Override
+		protected MetadataScope getMetadataScope() {
+			return MetadataScope.GROUP;
+		}
+
+		@Override
+		protected Collection<RoleAttributeEntity> getEntityAttributes(RoleEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected RoleAttributeEntity createNewAttribute(RoleEntity entity, MetaDataEntity metadata, Object value) {
+			RoleAttributeEntity aae = getRoleAttributeEntityDao().newRoleAttributeEntity();
+			aae.setRole(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getRoleAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected RoleAttributeEntity findAttributeEntity(LinkedList<RoleAttributeEntity> entities, String key,
+				Object o) {
+			for (RoleAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return ApplicationServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return ApplicationServiceImpl.this.getAttributeValidationService();
+		}
+		
+	}
+
+	class ApplicationAttributePersister extends AttributePersister<InformationSystemEntity,ApplicationAttributeEntity> {
+		@Override
+		protected List<ApplicationAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(InformationSystemEntity entity) {
+			getInformationSystemEntityDao().update(entity);
+		}
+
+		@Override
+		protected MetadataScope getMetadataScope() {
+			return MetadataScope.GROUP;
+		}
+
+		@Override
+		protected Collection<ApplicationAttributeEntity> getEntityAttributes(InformationSystemEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected ApplicationAttributeEntity createNewAttribute(InformationSystemEntity entity, MetaDataEntity metadata, Object value) {
+			ApplicationAttributeEntity aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity();
+			aae.setInformationSystem(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getApplicationAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected ApplicationAttributeEntity findAttributeEntity(LinkedList<ApplicationAttributeEntity> entities, String key,
+				Object o) {
+			for (ApplicationAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return ApplicationServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return ApplicationServiceImpl.this.getAttributeValidationService();
+		}
+		
+	}
+
 }
 
 class RolAccountDetail
@@ -3189,5 +3326,4 @@ class RolAccountDetail
 			return false;
 	}
 	
-
 }

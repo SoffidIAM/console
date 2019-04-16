@@ -691,6 +691,21 @@ public abstract class UsuariService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
 
 	@Operation
 	@Transactional(readOnly=true)

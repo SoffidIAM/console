@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.zkoss.image.AImage;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
@@ -38,6 +39,7 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
@@ -45,6 +47,8 @@ import org.zkoss.zul.Image;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listhead;
+import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timer;
@@ -160,7 +164,7 @@ public class InputField2 extends Div
 			Page p = getDesktop().getPage("usuarisLlista");
 			Boolean multiValued = dataType.isMultiValued();
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued });
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() });
 		}
 	}
 
@@ -171,7 +175,7 @@ public class InputField2 extends Div
 			p.setAttribute("tipus", "");
 			p.setAttribute("llistaObsolets", false);
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued() });
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() });
 		}
 	}
 
@@ -180,6 +184,7 @@ public class InputField2 extends Div
 		{
 			Page p = getDesktop().getPage("aplicacionsLlista");
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() });
 		}
 	}
 
@@ -190,6 +195,7 @@ public class InputField2 extends Div
 			p.setAttribute("type", dataType.getDataObjectType());
 			Boolean multiValued = dataType.isMultiValued();
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() });
 		}
 	}
 
@@ -279,6 +285,7 @@ public class InputField2 extends Div
 	private String searchCriteria;
 	private InputElement currentSearchTextbox;
 	private SearchFilter filter;
+	private Listbox containerListbox;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
 		searchCriteria = (String) event.getValue();
@@ -292,19 +299,22 @@ public class InputField2 extends Div
 		{
 			if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
 			{
-				currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAsync(dataType.getDataObjectType(), searchCriteria);
+				currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAndFilterAsync(
+						dataType.getDataObjectType(), 
+						searchCriteria, 
+						dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			{
-				currentSearch = EJBLocator.getUserService().findUserByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getUserService().findUserByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
 			{
-				currentSearch = EJBLocator.getGroupService().findGroupByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getGroupService().findGroupByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			{
-				currentSearch = EJBLocator.getApplicationService().findApplicationByTextAsync(searchCriteria);
+				currentSearch = EJBLocator.getApplicationService().findApplicationByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 		} catch (Exception e) {
 			log.warn("Error querying objects", e);
@@ -326,7 +336,7 @@ public class InputField2 extends Div
 		searchProgress.setSrc("~./img/soffid-progress.gif");
 		searchProgress .setStyle("height: 2em");
 		searchBox.appendChild(searchProgress);
-		
+		searchBox.invalidate();
 		updateSearchStatus ();
 		
 	}
@@ -446,19 +456,53 @@ public class InputField2 extends Div
 			if (lb.getSelectedItem() != null)
 				value = lb.getSelectedItem().getValue();
 		}
+		else if (tb instanceof Checkbox)
+		{
+			value = ((Checkbox) tb).isChecked();
+		}
 		Events.postEvent("onChange", this, null);
-		applyChange(tb, value);
+		try {
+			applyChange(tb, value);
+		} catch (WrongValueException e) {
+			if (currentSearch == null)
+				throw e;
+			if (currentSearch.isDone() &&  currentSearch.size() >= 1 && searchResults.size() > 0)
+			{
+				Object o = searchResults.get(0).getObject();
+				if ( o instanceof User )
+					value = ((User) o).getUserName();
+				else if ( o instanceof Group )
+					value = ((Group) o).getName();
+				else if ( o instanceof CustomObject )
+					value = ((CustomObject) o).getName();
+				else if ( o instanceof Host )
+					value = ((Host) o).getName();
+				else if ( o instanceof MailDomain)
+					value = ((MailDomain) o).getCode();
+				else if ( o instanceof Application)
+					value = ((Application) o).getName();
+				else
+					throw e;
+				((InputElement) tb).setRawValue( value );
+				applyChange(tb, value);
+			}
+			else
+				throw e;
+		}
 	}
 
 	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
 		Integer order = (Integer) tb.getAttribute("position");
 		boolean refresh = false;
 		boolean novallidate = false;
-		if (order == null)
+		if (order == null) {
+			attributeValidate( order , value);			
 			binder.setValue(value);
+		}
 		else {
 			List l = (List) binder.getValue();
 			if (l == null) l = new LinkedList();
+			else l = new LinkedList(l);
 			if (order.intValue() == l.size() )
 			{
 				l.add(value);
@@ -480,6 +524,8 @@ public class InputField2 extends Div
 					refresh = true;
 				}
 			}
+			if ( ! novallidate)
+				attributeValidate( order, value );
 			binder.setValue(l2);
 		}
 				
@@ -497,8 +543,6 @@ public class InputField2 extends Div
 			
 		}
 
-		if ( ! novallidate)
-			attributeValidate( order );
 		
 		
 		Component c = this;
@@ -637,7 +681,9 @@ public class InputField2 extends Div
 		{
 			try {
 				UserService ejb = com.soffid.iam.EJBLocator.getUserService();
-				u = ejb.findUserByUserName(user);
+				Collection<User> users = com.soffid.iam.EJBLocator.getUserService().findUserByJsonQuery(buildJsonFilter("userName", user));
+				if (users != null && ! users.isEmpty())
+					u = users.iterator().next();
 			} catch (Exception e) {
 			}
 			if (u == null || ( filter != null && ! filter.isAllowedValue(u)))
@@ -669,7 +715,9 @@ public class InputField2 extends Div
 		else {
 			Group g = null;
 			try {
-				g = com.soffid.iam.EJBLocator.getGroupService().findGroupByGroupName(group);
+				Collection<Group> groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByJsonQuery(buildJsonFilter("name", group));
+				if (groups != null && ! groups.isEmpty())
+					g = groups.iterator().next();
 			} catch (Exception e) {}
 			if (g == null || ( filter != null && ! filter.isAllowedValue(g))) {
 				if (l != null) l.setValue("?");
@@ -681,6 +729,22 @@ public class InputField2 extends Div
 		return true;
 	}
 
+	String buildJsonFilter (String attribute, String value) {
+		String q = attribute+" eq \""+escapeJson(value)+"\"";
+		if (dataType.getFilterExpression() == null || dataType.getFilterExpression().trim().isEmpty())
+			return q;
+		else
+		{
+			q = q + " and ("+dataType.getFilterExpression()+")";
+			return q;
+		}
+	}
+	
+	private String escapeJson (String s)
+	{
+		return s.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
+	}
+	
 	public void updateApplication(String id) {
 
 		InputElement inputElement = (InputElement) getFellow(id);
@@ -694,7 +758,9 @@ public class InputField2 extends Div
 		} else {
 			Application a = null;
 			try {
-				a = EJBLocator.getApplicationService().findApplicationByApplicationName(application);
+				Collection<Application> apps = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByJsonQuery(buildJsonFilter("name", application));
+				if (apps != null && ! apps.isEmpty())
+					a = apps.iterator().next();
 			} catch (Exception e) {}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
@@ -763,7 +829,10 @@ public class InputField2 extends Div
 		else {
 			CustomObject co = null;
 			try {
-				co = EJBLocator.getCustomObjectService().findCustomObjectByTypeAndName(dataType.getDataObjectType(), customObject);
+				Collection<CustomObject> cos = com.soffid.iam.EJBLocator.getCustomObjectService()
+						.findCustomObjectByJsonQuery(dataType.getDataObjectType(), buildJsonFilter("name", customObject));
+				if (cos != null && ! cos.isEmpty())
+					co = cos.iterator().next();
 			} catch (Exception e) {}
 			if (co == null || ( filter != null && ! filter.isAllowedValue(co))) {
 				if (l != null) l.setValue("?");
@@ -799,12 +868,40 @@ public class InputField2 extends Div
 					if (value == null)
 					{
 						value = new LinkedList();
-//						binder.setValue(value);
 					}
 					if (value instanceof List)
 					{
 						List l = (List) value;
 						int i;
+						if ( dataType.getMultiValuedRows() != null )
+						{
+							containerListbox = new Listbox();
+							containerListbox.setFixedLayout(true);
+							containerListbox.setRows(dataType.getMultiValuedRows().intValue());
+							Listheader header1 = new Listheader( Labels.getLabel("accounts.name"));
+							header1.setSortDescending( new SmartListitemComparator(header1, false, true));
+							header1.setSortAscending( new SmartListitemComparator(header1, true, true));
+							header1.setSort("auto");
+							Listhead head = new Listhead();
+							head.appendChild(header1);
+							if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.USER_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.HOST_TYPE))
+							{
+								Listheader header3 = new Listheader( Labels.getLabel("accounts.description"));
+								header3.setSortDescending( new SmartListitemComparator(header3, false, true));
+								header3.setSortAscending( new SmartListitemComparator(header3, true, true));
+								header3.setSort("auto");
+								head.appendChild(header3);
+							}
+							containerListbox.appendChild(head);
+							appendChild(containerListbox);
+						}
+						else {
+							containerListbox = null;
+						}
 						for ( i = 0; i < l.size(); i++)
 						{
 							createFieldElement(new Integer(i), l.get(i));
@@ -850,6 +947,8 @@ public class InputField2 extends Div
 			if(TypeEnumeration.USER_TYPE.equals(type))
 			{
 				updateUser = true;
+				if (containerListbox == null)
+				{
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
 									+ "id=\""+id+"\" "
@@ -862,92 +961,193 @@ public class InputField2 extends Div
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()' id=\""+id2+"\" />"
 							+ required+"</div>";
+				} else {
+					result = "<listitem>"
+							+ "<listcell>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+									+ "</listcell><listcell>"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser()' id=\""+id2+"\" />"
+							+ required+"</listcell></listitem>";
+				}
 			}
 			else if(TypeEnumeration.GROUP_TYPE.equals(type))
 			{
 				updateGroup = true;
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display:block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
-						+ "onChange='self.parent.parent.onChildChange(event)' "  
-						+ "onBlur='self.parent.parent.onBlur(event)' "
-						+ "onChanging='self.parent.parent.onChanging(event)' "
-						+ "id=\""+id+"\" "
-						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
-						+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
-						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-						+ " visible=\""+(!readonly)+"\" />");
-				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()' id=\""+id2+"\"/>");
-				sb.append(required+"</div>");
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display:block' visible='true'>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
+							+ "onChange='self.parent.parent.onChildChange(event)' "  
+							+ "onBlur='self.parent.parent.onBlur(event)' "
+							+ "onChanging='self.parent.parent.onChanging(event)' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\" />");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()' id=\""+id2+"\"/>");
+					sb.append(required+"</div>");
+				} else {
+					sb.append("<listitem><listcell>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
+							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
+							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' "
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\" />");
+					sb.append("</listcell><listcell>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup()' id=\""+id2+"\"/>");
+					sb.append(required+"</listcell></listitem>");
+				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.APPLICATION_TYPE.equals(type))
 			{
 				updateApplication = true;
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display: block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-						+ "id=\""+id+"\" "
-						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
-						+ "onClick='self.parent.parent.onSelectApplication(event)' "
-						+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
-						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-						+ " visible=\""+(!readonly)+"\"/>");
-				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()' id=\""+id2+"\"/>");
-				sb.append(required+"</div>");
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display: block' visible='true'>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
+							+ "onClick='self.parent.parent.onSelectApplication(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()' id=\""+id2+"\"/>");
+					sb.append(required+"</div>");
+				} else {
+					sb.append("<listitem><listcell>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
+							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' "
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaApplication(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("</listcell><listcell>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication()' id=\""+id2+"\"/>");
+					sb.append(required+"</listcell></listitem>");
+				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.HOST_TYPE.equals(type))
 			{
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display: block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-						+ "id=\""+id+"\" "
-						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='/zkau/web/img/host.png' "
-						+ "onClick='self.parent.parent.onSelectHost(event)' "
-						+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
-						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-						+ " visible=\""+(!readonly)+"\"/>");
-				sb.append("<label id=\""+id2+"\"/>");
-				sb.append(required+"</div>");
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display: block' visible='true'>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/host.png' "
+							+ "onClick='self.parent.parent.onSelectHost(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("<label id=\""+id2+"\"/>");
+					sb.append(required+"</div>");
+				} else {
+					sb.append("<listitem><listcell>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/host.png' "
+							+ "onClick='self.parent.parent.onSelectHost(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("</listcell><listcell>");
+					sb.append("<label id=\""+id2+"\"/>");
+					sb.append(required+"</listcell></listitem>");
+				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.MAIL_DOMAIN_TYPE.equals(type))
 			{
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display: block' visible='true'>");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-						+ "id=\""+id+"\" "
-						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='~./img/servidorCorreu.gif' "
-						+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
-						+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
-						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-						+ " visible=\""+(!readonly)+"\"/>");
-				sb.append("<label id=\""+id2+"\" visible='false'/>");
-				sb.append(required+"</div>");
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display: block' visible='true'>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
+							+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("<label id=\""+id2+"\" visible='false'/>");
+					sb.append(required+"</div>");
+				} else {
+					sb.append("<listitem><listcell>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
+							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' "
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaMailDomain(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
+							+ " visible=\""+(!readonly)+"\"/>");
+					sb.append("</listcell><listcell>");
+					sb.append("<label id=\""+id2+"\" visible='false'/>");
+					sb.append(required+"</listcell></listitem>");
+				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.CUSTOM_OBJECT_TYPE.equals(type))
 			{
 				updateCustomObject = true;
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div style='display:block' visible='true' >");
-				sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-						+ "onBlur='self.parent.parent.onBlur(event)' "
-						+ "onChanging='self.parent.parent.onChanging(event)'  "
-						+ "id=\""+id+"\" "
-						+ "readonly='"+readonlyExpr+"'/>");
-				sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-						+ " visible=\""+(!readonly)+"\" "
-						+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
-						+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
-						+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-				sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
-				sb.append(required+"</div>");
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display:block' visible='true' >");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
+							+ "onBlur='self.parent.parent.onBlur(event)' "
+							+ "onChanging='self.parent.parent.onChanging(event)'  "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
+							+ " visible=\""+(!readonly)+"\" "
+							+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
+					sb.append(required+"</div>");
+				} else {
+					sb.append("<listitem><listcell>");
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
+							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)'  "
+							+ "id=\""+id+"\" "
+							+ "readonly='"+readonlyExpr+"'/>");
+					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
+							+ " visible=\""+(!readonly)+"\" "
+							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' "
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' "
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+					sb.append("</listcell><listcell>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
+					sb.append(required);
+					sb.append("</listcell><listitem>");
+				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.BINARY_TYPE.equals(type))
@@ -984,23 +1184,46 @@ public class InputField2 extends Div
 			}
 			else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 			{
-				result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
+				if (containerListbox == null)
+				{
+					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
 						+ "id=\""+id+"\" "
 							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
 									+ "onChange='self.parent.parent.onChildChange(event)'/>";
-				result = "<div>"+result+required+"</div>";
+					result = "<div>"+result+required+"</div>";
+				}
+				else {
+					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
+							+ "id=\""+id+"\" "
+								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
+										+ "onChange='self.parent.parent.parent.parent.onChildChange(event)'/>";
+					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
+				}
 			}	
 			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
 			{
 				String []split = getFormValues ();
-				result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+				if (containerListbox == null)
+				{
+					result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+								+ "id=\""+id+"\" "
+								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
+								+ "<label value=' = '/>"
+								+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+								+ "id=\""+id2+"\" "
+								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
+					result = "<div>"+result+required+"</div>";
+				} else {
+					result = "<listitem><listcell><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
 							+ "id=\""+id+"\" "
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
-							+ "<label value=' = '/>"
+							+ "</listcell><listcell>"
 							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
 							+ "id=\""+id2+"\" "
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
-				result = "<div>"+result+required+"</div>"; 
+					result = result+required+"</listitem></listcell>";
+					
+				}
 			}	
 			else if ( TypeEnumeration.HTML.equals(type))
 			{
@@ -1040,39 +1263,77 @@ public class InputField2 extends Div
 			}
 			else if (dataType.getValues() != null && ! dataType.getValues().isEmpty())//String
 			{
-				result = "<listbox mold=\"select\" onChange=\"\" "
-						+ "id=\""+id+"\" "
-						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
-				if (! dataType.isRequired())
-					result = result + "<listitem value=\"\"/>";
-				for (String v: dataType.getValues())
+				if (containerListbox == null)
 				{
-					String s = escapeString(v);
-					int separator = s.indexOf(':');
-					if (separator > 0)
-						result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
-					else
-						result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+					result = "<listbox mold=\"select\" onChange=\"\" "
+							+ "id=\""+id+"\" "
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
+					if (! dataType.isRequired())
+						result = result + "<listitem value=\"\"/>";
+					for (String v: dataType.getValues())
+					{
+						String s = escapeString(v);
+						int separator = s.indexOf(':');
+						if (separator > 0)
+							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
+						else
+							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+					}
+					result = result + "</listbox>";
+					result = "<div>"+result+required+"</div>"; 
+				} else {
+					result = "<listbox mold=\"select\" onChange=\"\" "
+							+ "id=\""+id+"\" "
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>";
+					if (! dataType.isRequired())
+						result = result + "<listitem value=\"\"/>";
+					for (String v: dataType.getValues())
+					{
+						String s = escapeString(v);
+						int separator = s.indexOf(':');
+						if (separator > 0)
+							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
+						else
+							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+					}
+					result = result + "</listbox>";
+					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
 				}
-				result = result + "</listbox>";
-				result = "<div>"+result+required+"</div>"; 
 			}
 			else if (TypeEnumeration.USER_TYPE_TYPE.equals(type))
 			{
-				result = "<listbox mold=\"select\" onChange=\"\" "
-						+ "id=\""+id+"\" "
-						+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
-				result = result + "<listitem value=\"\"/>";
-				try {
-					for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
-					{
-						result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+				if (containerListbox == null)
+				{
+					result = "<listbox mold=\"select\" onChange=\"\" "
+							+ "id=\""+id+"\" "
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
+					result = result + "<listitem value=\"\"/>";
+					try {
+						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
+						{
+							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+						}
+					} catch (Exception e) {
+						log.info("Error getting user types", e);
 					}
-				} catch (Exception e) {
-					log.info("Error getting user types", e);
+					result = result + "</listbox>";
+					result = "<div>"+result+required+"</div>"; 
+				} else {
+					result = "<listbox mold=\"select\" onChange=\"\" "
+							+ "id=\""+id+"\" "
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>";
+					result = result + "<listitem value=\"\"/>";
+					try {
+						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
+						{
+							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+						}
+					} catch (Exception e) {
+						log.info("Error getting user types", e);
+					}
+					result = result + "</listbox>";
+					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
 				}
-				result = result + "</listbox>";
-				result = "<div>"+result+required+"</div>"; 
 			} else { // Listbox
 				result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
 						+ "id=\""+id+"\" "
@@ -1098,7 +1359,7 @@ public class InputField2 extends Div
 		if(compos.isEmpty() || !compos.equals(result))
 		{
 			compos=result;
-			Executions.createComponentsDirectly(result, "zul", this, map);
+			Executions.createComponentsDirectly(result, "zul", containerListbox != null ? containerListbox : this, map);
 			Component c = getFellowIfAny(id);
 			if (c != null)
 			{
@@ -1120,7 +1381,10 @@ public class InputField2 extends Div
 								lb.setSelectedItem(item);
 						}
 					}
-					else if (c instanceof InputElement) ((InputElement) c).setRawValue(value);
+					else if (c instanceof InputElement) 
+						((InputElement) c).setRawValue(value);
+					else if (c instanceof Checkbox)
+						((Checkbox) c).setChecked( value != null && value.toString().equals("true"));
 				}
 			}
 			Component c2 = getFellowIfAny(id2);
@@ -1351,7 +1615,7 @@ public class InputField2 extends Div
 		binder.setValue(URLEncoder.encode(values[0], "UTF-8")
 				+ "="
 				+URLEncoder.encode(values[1], "UTF-8"));
-		attributeValidate( null );
+		attributeValidate( null, null );
 
 		Component c = this;
 		do
@@ -1379,14 +1643,23 @@ public class InputField2 extends Div
 		this.ownerObject = ownerObject;
 	}
 	
-	public boolean attributeValidate(Integer position)
+	public boolean attributeValidate(Integer position, Object currentValue)
 	{
 		Clients.closeErrorBox(this);
 		
 		BindContext ctx = XPathUtils.getComponentContext(this);
-		Object value = XPathUtils.getValue(ctx, bind);
-		if (position != null && value instanceof List)
-			value = ((List)value).get(position.intValue());
+		Object value;
+		if (currentValue != null)
+			value = currentValue;
+		else
+		{
+			value = XPathUtils.getValue(ctx, bind);
+			if (position != null && value instanceof List)
+			{
+				if ( position.intValue() >= 0 && position.intValue() < ((List)value).size() )
+					value = ((List)value).get(position.intValue());
+			}
+		}
 
 		Component input = getFellow(getIdForPosition(position));
 		if (input instanceof InputElement)
@@ -1544,12 +1817,12 @@ public class InputField2 extends Div
 					int i;
 					for ( i = 0; i < l.size(); i++)
 					{
-						attributeValidate(new Integer(i));
+						attributeValidate(new Integer(i), null);
 					}
 				}
 			}
 			else
-				attributeValidate(null);
+				attributeValidate(null, null);
 		}
 		return true;
 	}

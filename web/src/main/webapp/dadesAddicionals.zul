@@ -91,14 +91,36 @@
 		    	com.soffid.iam.api.MetadataScope scope = XPathUtils.getValue(
 		    			objectAttributeWindow.getFellow("form"), 
 		    			"scope");
+		    	if (scope == null)
+		    	{
+			    	scope = XPathUtils.getValue(
+			    			objectTypeWindow.getFellow("form"), 
+			    			"scope");
+		    	}
+		    			
 		    	boolean display = scope == com.soffid.iam.api.MetadataScope.USER;
 		    	objectAttributeWindow.getFellow ("visibility1").setVisible(display);
 		    	objectAttributeWindow.getFellow ("visibility2").setVisible(display);
 		    	objectAttributeWindow.getFellow ("visibility3").setVisible(display);
 		    	objectAttributeWindow.getFellow ("visibility4").setVisible(true);
 		    	objectAttributeWindow.getFellow ("visibility5").setVisible(true);
+		    	es.caib.seycon.ng.comu.TypeEnumeration type = XPathUtils.getValue(
+		    			objectAttributeWindow.getFellow("form"), 
+		    			"type");
+		    	objectAttributeWindow.getFellow ("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
+		    			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE ||
+		    			type == es.caib.seycon.ng.comu.TypeEnumeration.APPLICATION_TYPE ||
+		    			type == es.caib.seycon.ng.comu.TypeEnumeration.CUSTOM_OBJECT_TYPE);
 		    }
 		    
+		    void onChangeDataType (Listbox lb)
+		    {
+		    	es.caib.seycon.ng.comu.TypeEnumeration type = XPathUtils.getValue(
+		    			objectAttributeWindow.getFellow("form"), 
+		    			"type");
+		    	objectAttributeWindow.getFellow ("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
+		    			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE);
+		    }
 			void displayValues ()
 			{
 					Listbox ds = objectTypeWindow.getFellow("listbox"); 
@@ -313,7 +335,7 @@
 						<listbox use="com.soffid.iam.web.agent.CustomDataTypeListbox"
 							width="99%" visible="true" bind="." mold="select"
 							disabled="${!canModifyMetadata}" style="font-size: 10px"
-							onChange='checkListboxCustomObjectTypes(this)'>
+							onSelect='onChangeDataType(self)'>
 						</listbox>
 						<label value="*" />
 					</row>
@@ -328,9 +350,18 @@
 							onClick="" onCheck="" />
 					</row>
 					<row >
-						<input_etiqueta value="${c:l('dadesAddicionals.zul.Multivalued')}" />
-						<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
+						<input_etiqueta value="${c:l('dadesAddicionals.zul.IncludeInSearch')}" />
+						<checkbox bind="@searchCriteria" disabled="${!canModifyMetadata}"
 							onClick="" onCheck="" />
+					</row>
+					<row >
+						<input_etiqueta value="${c:l('dadesAddicionals.zul.Multivalued')}" />
+						<div>
+							<checkbox bind="@multiValued" disabled="${!canModifyMetadata}"
+								onClick="" onCheck="" />
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.MultivaluedRows')}" />
+							<intbox bind="@multiValuedRows"  onChange=""/>
+						</div>
 					</row>
 					<row>
 						<input_etiqueta value="${c:l('dadesAddicionals.zul.Size')} :" />
@@ -455,7 +486,17 @@
 									]]></attribute>
 								</imageclic>
 							</div>
-							<input_etiqueta value="${c:l('rules.availableVariables') }"/>
+						</div>
+					</row>
+					<row id="visibility6">
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.FilterExpr')} :" />
+							<imageclic src="/img/info.png" title="${c:l('dadesAddicionals.zul.var6') }" />
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@filterExpression" rows="4"/>
+							</div>
 						</div>
 					</row>
 				</rows>

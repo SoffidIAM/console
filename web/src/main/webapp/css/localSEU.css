@@ -1801,3 +1801,59 @@ span.separator_label {
 	padding-top: 15px;
 }
 			
+.appatt {display: table; padding: 0px; width: 100%}
+.appatt_row {display: table-row}
+.appatt_row span {}
+.appatt_label {display: table-cell; width: 202px}
+.appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.appatt_input table th:first-child {width: 340px;}
+.appatt_input > div.listbox {padding-bottom: 20px;}
+.appatt_input table.listbox-btable tr {height: 20px;}
+
+.roleatt {display: table; padding: 0px; width: 100%}
+.roleatt_row {display: table-row}
+.roleatt_row div {padding-top: 5px}
+.roleatt_label {display: table-cell; width: 200px}
+.roleatt_input {display: table-cell}
+.roleatt_input table th:first-child {width: 340px;}
+.roleatt_input > div.listbox {padding-bottom: 20px;}
+.roleatt_input table.listbox-btable tr {height: 20px;}
+
+.accatt {display: table; padding: 0px; width: 100%}
+.accatt_row {display: table-row}
+.accatt_row span {}
+.accatt_label {display: table-cell; width: 202px}
+.accatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.accatt_input table th:first-child {width: 160px;}
+.accatt_input > div.listbox {padding-bottom: 20px;}
+.accatt_input table.listbox-btable tr {height: 20px;}
+
+.groupatt {display: table; padding: 0px; width: 100%}
+.groupatt_row {display: table-row}
+.groupatt_row span {}
+.groupatt_label {display: table-cell; width: 202px}
+.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.groupatt_input table th:first-child {width: 160px;}
+.groupatt_input > div.listbox {padding-bottom: 20px;}
+.groupatt_input table.listbox-btable tr {height: 20px;}
+
+.useratt {display: table; padding: 0px; width: 100%}
+.useratt_row {display: table-row}
+.useratt_label {display: table-cell; width: 120px}
+.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.useratt_input table th:first-child {width: 160px;}
+.useratt_input > div.listbox {padding-bottom: 20px;}
+.useratt_input table.listbox-btable tr {height: 20px;}
+
+.objectatt {display: table; padding: 0px; width: 100%}
+.objectatt_row {display: table-row;}
+.objectatt_row div {padding-top: 6px}
+.objectatt_label {display: table-cell; width: 15em}
+.objectatt_input {display: table-cell}
+.objectatt_input > div.listbox {padding-bottom: 20px;}
+.objectatt_input table.listbox-btable tr {height: 20px;}
+
+.messagebox {
+    word-break: break-word;
+    overflow: auto;
+}

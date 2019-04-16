@@ -51,6 +51,14 @@ public class TipusDada {
 	
 	public boolean multiValued;
 	
+	@Description("Include field in quick searches")
+	@Nullable
+	public Boolean searchCriteria;
+
+	@Description ("Display a maxim of rows values. For more values, a scroll bar will appear")
+	@Nullable
+	public Integer multiValuedRows;
+
 	@Nullable
 	public String label;
 	

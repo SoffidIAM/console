@@ -218,6 +218,7 @@ div.tabpanel {
 .own-ip span {color: white;font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px;}
 /* #Media Queries
 ================================================== */
+
 /* Smaller than standard 960 (devices and browsers) */
 @media only screen and (max-width: 876px) {
 	.content{display: block; overflow: hidden; width: auto; margin-top: 10px;}
@@ -227,18 +228,24 @@ div.tabpanel {
 	span.tree-root-close, span.tree-tee-close, span.tree-last-close,
 	span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 2px 10px 0px 0px;}
 	.own-ip{top:37px; padding:3px; bottom:initial;}
+	.wide-screen {display:none;}
+	.small-screen {display:inline;}
 }
 
 /* Tablet Portrait size to standard 960 (devices and browsers) */
-@media only screen and (min-width: 877px) and (max-width: 1024px) {
+@media only screen and (min-width: 877px) and (max-width: 1023px) {
 	.sidebar{width:23%;}
 	.wrap{width:73%;}
+	.wide-screen {display:none;}
+	.small-screen {display:inline;}
 }
 
 /* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
 @media only screen and (min-width: 480px) and (max-width: 767px) {
 	div.listbox-head th, div.listbox-head th.sort div.head-cell-inner{padding:1px; white-space: nowrap;}
 	.aplications img { margin-top: -6px;}
+	.wide-screen {display:none;}
+	.small-screen {display:inline;}
 }
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
@@ -252,6 +259,14 @@ div.tabpanel {
 	#logo{width:30px;}
 	div.listbox-head th div, div.listbox-head th, div.listbox-head th.sort div.head-cell-inner{padding:1px; white-space: nowrap;}
 	.aplications img { margin-top: -6px;}
+	.wide-screen {display:none;}
+	.small-screen {display:inline;}
+}
+
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 1024px) {
+	.wide-screen {display: inline;}
+	.small-screen {display: none;}
 }
 
 /* Barra de botons */

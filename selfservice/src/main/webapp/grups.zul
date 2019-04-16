@@ -18,9 +18,6 @@
 		.groupatt_row > span {padding-left:5px}
 		.groupatt_label {display: table-cell; width: 202px}
 		.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
-		.groupatt_input table th:first-child {width: 160px;}
-		.groupatt_input > div.listbox {padding-bottom: 20px;}
-		.groupatt_input table.listbox-btable tr {height: 20px;}
 		.ourcheck input {vertical-align:-7px}
 	</style>
 
@@ -45,15 +42,15 @@
 			
 			// Autoritzacions
 			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
-			boolean canCreateGroup = AutoritzacionsUsuari.hasCreateGroup();
-			boolean canUpdateGroup = AutoritzacionsUsuari.hasUpdateGroup();
+			boolean canCreateGroup = false;
+			boolean canUpdateGroup = false;
 			boolean canQueryGroup = AutoritzacionsUsuari.hasQueryGroup();
 			boolean canQueryRoles = AutoritzacionsUsuari.canQueryAllUserRole();
 			boolean canQueryGroupRoles =  AutoritzacionsUsuari.hasQueryGroupRoles();
 			boolean canQueryGroupUsers =  AutoritzacionsUsuari.hasQueryGroupUsers();
-			boolean canCreateGroupPrinter = AutoritzacionsUsuari.hasCreateGroupPrinter();
-			boolean canDeleteGroupPrinter = AutoritzacionsUsuari.hasDeleteGroupPrinter();
-			boolean canModifyAplicacio = AutoritzacionsUsuari.hasUpdateAplicacio();
+			boolean canCreateGroupPrinter = false;
+			boolean canDeleteGroupPrinter = false;
+			boolean canModifyAplicacio = false;
 			
 			model.getVariables().declareVariable("queryEnabled", canQueryGroup);
 			
@@ -138,9 +135,7 @@
 				}
 				
 				// Refresquem el contingut
-				model.getVariables().declareVariable("synchro", true);
 				model.getJXPathContext().getValue("/grup").refresh();
-				model.getVariables().undeclareVariable("synchro");
 				//treebox.setDataPath("/model:/");
 				
 				// I tornem a obrir les branques als dos arbres
@@ -754,14 +749,6 @@
 		</detalls>
 	</esquemavertical>
 	
-	<include src="grupsllista.zul"/>
-	<include src="finestres/maquinesllistaUsuari.zul"/>
-	<include src="impressoresllista.zul"/>
-	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
-	<include src="usuarisllista.zul"/>
-	<include src="aplicacionsllista.zul" />
-	<include src="customObjectsllista.zul" />
-	<include src="finestres/identity.zul" />
 	<include src="finestres/editorHTML.zul" />
 	
 </frame>

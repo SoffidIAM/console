@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <zk>
-	<style>
-		.accatt {display: table; padding: 0px; width: 100%}
-		.accatt_row {display: table-row}
-		.accatt_row span {}
-		.accatt_label {display: table-cell; width: 202px}
-		.accatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
-	</style>
 	<zscript><![CDATA[
 		import es.caib.seycon.ng.utils.AutoritzacionsUsuari;;
 		boolean canUpdateUserMetadata = AutoritzacionsUsuari.hasUpdateUserMetadata();
@@ -34,7 +27,7 @@
 		}
 	]]>
 	</zscript>
-	<div dataPath="attributes" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
+	<div dataPath="attributes[1]" use="com.soffid.iam.web.users.additionalData.AttributesDiv"
 		ownerBind="." id="attributes"
 		if="${canUpdateUserMetadata}" scope="account" sclass="accatt" >
 	</div>

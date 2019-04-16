@@ -11,4 +11,5 @@ public class MetadataScope {
 	public static String ACCOUNT = "account";
 	public static String CUSTOM = "custom";
 	public static String MAIL_LIST = "mail_list";
+	public static String GROUP_MEMBERSHIP = "group_membership";
 }

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="GroupUser",
@@ -30,4 +32,9 @@ public class UsuariGrup {
 	@Nullable
 	public java.lang.String info;
 
+	@Description ("User group custom attributes")
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
+	@Nullable
+	public Map<String,Object> attributes; 
 }

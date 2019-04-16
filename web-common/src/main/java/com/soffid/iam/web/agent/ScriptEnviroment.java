@@ -552,7 +552,13 @@ public class ScriptEnviroment {
 	public String getUserAttributeValidationVars (CustomObjectType t) throws InternalErrorException, NamingException, CreateException
 	{
 		String partial = "";
-		if (t.isBuiltin() && t.getScope() == MetadataScope.USER)
+		if (t == null)
+		{
+			partial = "\"application\":\"com.soffid.iam.api.Application\","
+					+ "\"object\":\"com.soffid.iam.api.Account\","+ 
+					"\"attributes\":\"accountAttributes\",";
+		}
+		else if (t.isBuiltin() && t.getScope() == MetadataScope.USER)
 		{
 			defineUserAttributes(null);
 			partial = "\"user\":\"com.soffid.iam.api.User\"," +

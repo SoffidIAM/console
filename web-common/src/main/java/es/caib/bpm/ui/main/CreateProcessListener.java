@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Messagebox;
@@ -30,7 +31,10 @@ public class CreateProcessListener implements EventListener, Serializable {
 	public void onEvent(Event event) throws Exception {
 		BpmEngine engine = BPMApplication.getEngine();
 		
-		event.getTarget().getFellow("menu").setVisible(false); //$NON-NLS-1$
+		try {
+			event.getTarget().getFellow("menu").setVisible(false); //$NON-NLS-1$
+		} catch (ComponentNotFoundException e) {
+		}
 		
 		TaskInstance taskInstance = engine.createDummyTask(def.getId());
 		if (taskInstance != null)

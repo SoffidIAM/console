@@ -41,10 +41,6 @@
 			td.dataTreeCelldestacada div
 			.dateboxreadnoborderinp.text-disd { color: red !important; }
 
-			.useratt {display: table; padding: 0px; width: 100%}
-			.useratt_row {display: table-row}
-			.useratt_label {display: table-cell; width: 120px}
-			.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		</style>
 
 		<zscript src="comu/netejaCriteris.zul"/>
@@ -709,6 +705,7 @@
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Accounts')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />
+							<tab label="${c:l('usuaris.zul.SharedAccounts')}" />
 							<tab label="${c:l('usuaris.zul.RolsHeretats')}" />
 							<tab label="${c:l('usuaris.zul.Impressora')}" />
 							<tab label="${c:l('usuaris.zul.Sessions')}" />
@@ -1327,7 +1324,8 @@
 											</columns>
 											<datarow>
 												<div>
-													<label bind="@codiGrup" tooltip="grupsTooltip" style="margin-right:1em"/>
+													<div style="width:100%">
+														<label bind="@codiGrup" tooltip="grupsTooltip" style="margin-right:1em"/>
 														<imageclic src="/img/link.png">
 																<attribute name="onClick"><![CDATA[
 																String group = self.getPreviousSibling().getValue();
@@ -1338,6 +1336,14 @@
 																]]>
 																</attribute>
 															</imageclic>
+														<label bind="@descripcioGrup" style="margin-left:1em"/>
+													</div>
+													<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" scope="group_membership" 
+														dataPath="attributes[1]" readonly="${!canCreateUserGroup}"
+														ownerBind="./"
+														ownerContext="console"
+														sclass="useratt"
+														style="padding:5px; padding-right: 16px"/>
 												</div>
 												<imageclic align="right"
 													src="~./img/list-remove.gif">
@@ -1369,7 +1375,7 @@
 											<attribute name="onOpen">
 	if (event.getReference() instanceof DataLabel) {
 		dataLab = event.getReference();
-		dataRow = dataLab.getParent().getParent();
+		dataRow = dataLab.getParent().getParent().getParent();
 		xpath = dataRow.getXPath();
 		dataSource = gridGrups.getDataSource();
 		context = dataSource.getJXPathContext();
@@ -1755,6 +1761,23 @@
 														if (ra.getDomainValue() != null) {
 															es.caib.seycon.ng.comu.ValorDomini valor = ValorDomini.toValorDomini(ra.getDomainValue());
 															ctx2.setValue("/valorDomini", valor);
+															if (showHolderGroup)
+															{
+																String groupName = valor.getValor();
+																es.caib.zkib.jxpath.JXPathContext jxpc = form.getDataSource().getJXPathContext();
+																g = jxpc.getValue("/@codiGrupPrimari");
+																if (g.equals (groupName))
+																	ctx2.setValue("@holderGroup", groupName);
+																else
+																{
+																	for (Iterator it = jxpc.iterate("/grup/@codiGrup"); it.hasNext();)
+																	{
+																		if (it.next().equals(groupName))
+																			ctx2.setValue("@holderGroup", groupName);
+																	}
+																}
+																String hg = ctx2.getValue("@holderGroup");
+															}
 														}
 														
 														pointer.invalidate ();
@@ -1843,117 +1866,9 @@ String nomRolsBorrar = "";
 									<listbox
 										dataPath="/esquema/lista/listbox:/rol" fixedLayout="true"
 										height="400px" id="gridRols" sclass="likeagrid"
-										onActualitza="actualitza(event)"
 										onNewRow="newRolRow()">
 										<zscript>
 <![CDATA[
-void actualitza (event) {
-										dada = (String)(event.getData()[0]);
-										modelProxy = gridRols.getModel();
-	
-										ds = gridRols.getDataSource(); 
-										ctx =  ds.getJXPathContext();
-										if (event.getData()[3] != null) {
-											valorDomini = (event.getData()[3])[0];
-											bbdd = (String)(event.getData()[5]);
-											xpath = "/rol" + 
-												"[@nomRol = '" + dada + "' and @baseDeDades = '" + bbdd + "' and valorDomini/@valor = '" + valorDomini + "']";
-										} else {
-											valorDomini = "";
-											bbdd = (String)(event.getData()[5]);
-											xpath = "/rol" + 
-												"[@nomRol = '" + dada + "' and @baseDeDades = '" + bbdd + "']";
-										}
-
-										// Test if more than one account is applicable
-										list = new LinkedList();
-										dispatcher = event.getData()[5];
-										for (it = form.getJXPathContext().iterate("/domini/politica/account[@dispatcher='"+dispatcher+"']");
-											it.hasNext();)
-										{
-											list.add(it.next());
-										}
-
-										boolean jaExisteix = false;
-										boolean hasAccount = ! list.isEmpty();
-										boolean multipleAccounts = list.size() > 1;
-										try{
-											for (it = ctx.iterate(xpath); it.hasNext();)
-											{
-											
-												grant = it.next();
-												if (grant{"accountName"} == null)
-													jaExisteix = true;
-												else
-												{
-													for (it2 = list.iterator(); it2.hasNext();)
-													{
-														account = it2.next();
-														if (account{"name"}.equals (grant{"accountName"}))
-														{
-															it2.remove();
-														}
-													}
-												}
-											}
-											if (list.isEmpty() && hasAccount)
-												jaExisteix = true;
-												
-										} catch(Exception e){
-											alert(e);
-											jaExisteix = false;
-										}
-										// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
-										if(jaExisteix) {
-											Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("usuaris.RolAssignat"), new Object [] {dada,bbdd,valorDomini}),org.zkoss.util.resource.Labels.getLabel("usuaris.ErrorRol"));
-										} else {
-											position = modelProxy.newInstance();
-											ds = gridRols.getDataSource(); 
-											ctx =  ds.getJXPathContext(); 
-											xpath = gridRols.getXPath() + modelProxy.getBind(position); 
-											pointer = ctx.createPath (xpath);
-											ctx2 = ctx.getRelativeContext(pointer);
-												
-											campCodiUsuari = (DataTextbox) form.getFellow("codi");
-											codiUsuari = campCodiUsuari.getValue();
-						
-											ctx2.setValue("@codiUsuari", codiUsuari);
-											ctx2.setValue("@nomRol", event.getData()[0]);
-											ctx2.setValue("@roleCategory", event.getData()[7]);
-											ctx2.setValue("@baseDeDades", dispatcher);
-											ctx2.setValue("@codiAplicacio", event.getData()[1]);
-											ctx2.setValue("@descripcioRol", event.getData()[2]);
-											ctx2.setValue("@nomComplertUsuari", nomUsuari());
-											ctx2.setValue("@startDate", new Date());
-											
-											if (event.getData()[3] != null) {
-												es.caib.seycon.ng.comu.ValorDomini valor = new es.caib.seycon.ng.comu.ValorDomini();
-												valor.setValor((event.getData()[3])[0]);
-												valor.setDescripcio((event.getData()[3])[1]);
-												valor.setNomDomini(event.getData()[4]);
-												valor.setCodiExternDomini(event.getData()[1]);
-												ctx2.setValue("/valorDomini", valor);
-											}
-											
-											pointer.invalidate ();
-											
-											
-											if (multipleAccounts)
-											{
-												Listbox select = selectAccountWnd.getFellow("select");
-												select.getItems().clear();
-												for (Object c: list)
-												{
-													Listitem item = new Listitem (c{"name"}, c{"name"});
-													select.getItems().add(item);
-												}
-												selectAccountWnd.setAttribute("context", ds);
-												selectAccountWnd.setAttribute("xpath", xpath);
-												selectAccountWnd.setMode("highlighted");
-											}
-										}
-									}
-
 									void newRolRow ()
 									{
 										List listcells = event.data.getChildren ();
@@ -2089,52 +2004,61 @@ void actualitza (event) {
 										if (! cell.getChildren().isEmpty())
 										{
 											cell.getChildren().get(0).visible = false;
-											es.caib.zkib.component.DataListbox lb = new es.caib.zkib.component.DataListbox ();
-											lb.setBind("@holderGroup");
-											lb.setMold("select");
-											lb.setParent(cell);
-											Listitem selected = null;
-											if (! enforceHolderGroup)
+											cell.getChildren().get(1).visible = false;
+											createHolderGroupListbox(row, true);
+											createHolderGroupListbox(row, false);
+										}
+									}
+									
+									void createHolderGroupListbox(Listitem row, boolean name) {
+										Listcell cell = row.getChildren().get(8);
+										es.caib.zkib.component.DataListbox lb = new es.caib.zkib.component.DataListbox ();
+										lb.setMold("select");
+										lb.setParent(cell);
+										lb.setSclass(name? "small-screen": "wide-screen");
+										Listitem selected = null;
+										if (! enforceHolderGroup)
+										{
+											Listitem item = new Listitem();
+											item.setValue("");
+											item.setLabel("");
+											lb.getChildren().add (item);
+											lb.setSelectedItem(item);
+										}
+										Set groups = new LinkedHashSet();
+										es.caib.zkib.jxpath.JXPathContext jxpc = form.getDataSource().getJXPathContext();
+										groups.add(jxpc.getValue("/@codiGrupPrimari"));
+										for (Iterator it = jxpc.iterate("/grup/@codiGrup"); it.hasNext();)
+										{
+											groups.add(it.next());
+										}
+										es.caib.seycon.ng.servei.ejb.GrupService gs = es.caib.seycon.ng.EJBLocator.getGrupService();
+										es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus = es.caib.seycon.ng.EJBLocator.getTipusUnitatOrganitzativaService();
+										for (String group: groups)
+										{
+											Grup grup = gs.findGrupByCodiGrup(group);
+											if (grup.getTipus() != null)
 											{
-												Listitem item = new Listitem();
-												item.setValue("");
-												item.setLabel("");
-												lb.getChildren().add (item);
-												lb.setSelectedItem(item);
-											}
-											Set groups = new LinkedHashSet();
-											es.caib.zkib.jxpath.JXPathContext jxpc = form.getDataSource().getJXPathContext();
-											groups.add(jxpc.getValue("/@codiGrupPrimari"));
-											for (Iterator it = jxpc.iterate("/grup/@codiGrup"); it.hasNext();)
-											{
-												groups.add(it.next());
-											}
-											es.caib.seycon.ng.servei.ejb.GrupService gs = es.caib.seycon.ng.EJBLocator.getGrupService();
-											es.caib.seycon.ng.servei.ejb.TipusUnitatOrganitzativaService tus = es.caib.seycon.ng.EJBLocator.getTipusUnitatOrganitzativaService();
-											for (String group: groups)
-											{
-												Grup grup = gs.findGrupByCodiGrup(group);
-												if (grup.getTipus() != null)
+												list = tus.findTipusUnitatOrganitzativaByFiltre(grup.getTipus(), null);
+												if (! list.isEmpty())
 												{
-													list = tus.findTipusUnitatOrganitzativaByFiltre(grup.getTipus(), null);
-													if (! list.isEmpty())
-													{
-										 				TipusUnitatOrganitzativa tuo = list.get(0);
-										 				if (tuo.isRoleHolder())
-										 				{
-															Listitem item = new Listitem();
-															item.setValue(group);
-															item.setLabel(group);
-															if (selected == null)
-																selected = item;
-															lb.getChildren().add (item);
-										 				}
-													}
+									 				TipusUnitatOrganitzativa tuo = list.get(0);
+									 				if (tuo.isRoleHolder())
+									 				{
+														Listitem item = new Listitem();
+														item.setValue(group);
+														item.setLabel(name ? group: grup.getDescripcio());
+														if (selected == null)
+															selected = item;
+														lb.getChildren().add (item);
+									 				}
 												}
 											}
-											if (selected != null)
-												lb.setSelectedItem(selected);
 										}
+										lb.setBind("@holderGroup");
+										lb.onCreate();
+										if (selected != null && lb.getSelectedItem() == null)
+											lb.setSelectedItem(selected);
 									}
 ]]>
 </zscript>
@@ -2213,8 +2137,9 @@ void actualitza (event) {
 											<listcell >
 												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
 												<div style="display:inline" tooltip="domainTooltip">
-													<label value = "/" style="margin-left:1em; margin-right: 1em;"></label>
-													<label  bind="valorDomini/@valor"/>
+													<label value = " / " />
+													<label  bind="valorDomini/@valor" sclass="small-screen"/>
+													<label  bind="valorDomini/@descripcio" sclass="wide-screen"/>
 												</div>
 											</listcell>
 											<listcell
@@ -2232,7 +2157,8 @@ void actualitza (event) {
 												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"></datebox>
 											</listcell>
 											<listcell>
-												<label bind="@holderGroup" />
+												<label bind="@holderGroup" sclass="small-screen"/>
+												<label bind="holderGroupData[1]/descripcio" sclass="wide-screen"/>
 											</listcell>
 											<listcell>
 												<imageclic align="right"
@@ -2357,6 +2283,105 @@ void actualitza (event) {
 											multiline="true" value="" />
 									</popup>
 								</div>
+							</tabpanel>
+
+							<tabpanel id="sharedAccounts">
+								<zscript><![CDATA[
+	void onDisplaySharedAccount(Component r) {
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
+		try {
+			if (r != null) {
+				Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
+				if (instance instanceof Account) {
+					disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@disabled");
+					if (disabled != null && disabled) {
+						it = r.getChildren().iterator();
+						while (it.hasNext()) {
+							Component c = it.next();
+							if (c instanceof HtmlBasedComponent) {
+								c.setStyle("text-decoration:line-through;");
+							}
+						}
+					}
+				}
+			}
+		} catch (Throwable e) {
+		}
+	}
+]]>
+								</zscript>
+
+								<vbox width="100%">
+									<listbox autocommit="false"
+										dataPath="/esquema/lista/listbox:/sharedAccount"
+										fixedLayout="true" width="100%"
+										onNewRow="onDisplaySharedAccount(event.data)">
+										<listhead>
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.Bbdd')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.Account')}" />
+											<listheader sort="auto"
+												label="${c:l('vault.folder.description')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataUpdate')}" />
+											<listheader sort="auto"
+												label="${c:l('accounts.lastLogin')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataAssignacia')}" width="110px" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataCaducitat')}" width="110px" />
+										</listhead>
+										<dataitem bind=".">
+											<listcell
+												bind="@dispatcher" />
+											<listcell bind="@name"/>
+											<listcell>
+												<label bind="@description" style="margin-right: 16px"/>
+												<imageclic 
+													src="/img/link.png">
+													<attribute name="onClick"><![CDATA[
+															String name = es.caib.zkib.datasource.XPathUtils.getValue(
+								                          						self,
+								                          						"@name");
+															String system = es.caib.zkib.datasource.XPathUtils.getValue(
+					                          						self,
+					                          						"dispatcher");
+								                            if (esquema.canClose())
+								                           		Executions.getCurrent().sendRedirect(
+								                           			"index.zul?embed&target=/accounts/accounts.zul?account="+name+"&system="+system,
+								                          				"soffid_popup");
+														]]>
+													</attribute>
+												</imageclic>
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastUpdated" buttonVisible="false" disabled="true"
+													format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastLogin" buttonVisible="false" disabled="true"
+													format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastPasswordSet" buttonVisible="false"
+													disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@passwordExpiration" buttonVisible="false"
+													disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+										</dataitem>
+									</listbox>
+								</vbox>
 							</tabpanel>
 
 							<tabpanel id="rolsHeredats">

@@ -36,6 +36,7 @@ import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
@@ -2243,6 +2244,24 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	public Password handleGenerateAccountTemporaryPassword(Account account)
 			throws  Exception {
 		return setAccountPassword(account, null, false);
+	}
+
+	@Override
+	protected List<Account> handleFindSharedAccountsByUser(String userName) throws Exception {
+		com.soffid.iam.api.System mainDispatcher = getDispatcherService().findSoffidDispatcher();
+		List<Account> accounts = new LinkedList<Account>();
+		User u = getUserService().findUserByUserName(userName);
+		if (u == null)
+			return accounts;
+		for (Account acc: handleGetUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+		{
+			if (!acc.getType().equals(AccountType.USER))
+			{
+				accounts.add (acc);
+			}
+		}
+		return accounts;
+		
 	}
 
 }

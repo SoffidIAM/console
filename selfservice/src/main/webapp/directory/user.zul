@@ -18,6 +18,19 @@
 	]]></attribute>
 	<datamodel id="model" rootNode="usuaris" src="descriptorUsuari.xml" />
 
+		<style>
+			span.etiqueta {white-space:nowrap !important;}
+			.dataListcelldestacada div { background-color: #FF0000; }
+			td.dataTreeCelldestacada div { border: 1px solid red; }
+			td.dataTreeCelldestacada div
+			.dateboxreadnoborderinp.text-disd { color: red !important; }
+
+			.useratt {display: table; padding: 0px; width: 100%}
+			.useratt_row {display: table-row}
+			.useratt_label {display: table-cell; width: 120px}
+			.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		</style>
+
 	<zscript>
 			<![CDATA[
 			    String requestedUser = Executions.getCurrent().getNativeRequest().getParameter("user");
@@ -46,6 +59,7 @@
 				canRefreshUser = false;
 				canQueryUserRole = AutoritzacionsUsuari.hasQueryUserRole();
 				canQueryUserSession = AutoritzacionsUsuari.hasQueryUserSession();
+				canQueryAccounts = com.soffid.iam.utils.Security.isUserInRole("account:query");
 				canUpdateUserMetadata = false;
 				canCreateUserRole = false;
 				canDeleteUserRole = false;
@@ -82,6 +96,7 @@
 							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 							<tab label="${c:l('usuaris.zul.Accounts')}" />
 							<tab label="${c:l('usuaris.zul.Rols')}" />
+							<tab label="${c:l('usuaris.zul.SharedAccounts')}"  if="${canQueryAccounts }"/>
 							<tab
 								label="${c:l('usuaris.zul.Processosdusuari')}" />
 						</tabs>
@@ -183,7 +198,7 @@
 															<input_dada id="codiGrupPrimari"
 																bind="@codiGrupPrimari" mascara="no empty"
 																lectura="${!canModifyUser}" width_custom="200px" 
-																tooltip="tooltipGrup" style="display: inline-block; "/>
+																style="display: inline-block; "/>
 															<label bind="primaryGroup[1]/descripcio" style="display: inline; padding-left: 4px;"/>
 														</div>
 													</row>
@@ -280,26 +295,28 @@
 											</columns>
 											<datarow>
 												<div>
-													<label bind="@codiGrup" tooltip="grupsTooltip" style="margin-right:1em"/>
+													<div style="width:100%">
+														<label bind="@codiGrup" tooltip="grupsTooltip" style="margin-right:1em"/>
+														<imageclic src="/img/link.png">
+																<attribute name="onClick"><![CDATA[
+																String group = self.getPreviousSibling().getValue();
+								                           		Executions.getCurrent().sendRedirect(
+									                           			"index.zul?embed&target=/grups.zul?group="+group, 
+									                           			"soffid_popup");
+								                           		]]>
+																</attribute>
+															</imageclic>
+														<label bind="@descripcioGrup" style="margin-left:1em"/>
+													</div>
+													<div use="com.soffid.iam.web.users.additionalData.AttributesDiv" scope="group_membership" 
+														dataPath="attributes[1]" readonly="${!canCreateUserGroup}"
+														ownerBind="./"
+														ownerContext="console"
+														sclass="useratt"
+														style="padding:5px; padding-right: 16px"/>
 												</div>
 											</datarow>
 										</grid>
-										<popup id="grupsTooltip"
-											width="200px">
-											<attribute name="onOpen">
-	if (event.getReference() instanceof DataLabel) {
-		dataLab = event.getReference();
-		dataRow = dataLab.getParent().getParent();
-		xpath = dataRow.getXPath();
-		dataSource = gridGrups.getDataSource();
-		context = dataSource.getJXPathContext();
-		value = context.getValue(xpath + "/@descripcioGrup");
-		grupsTooltipLabel.value = value;
-	}
-</attribute>
-											<label
-												id="grupsTooltipLabel" value="" />
-										</popup>
 										<separator width="10px" />
 										<input_etiqueta
 											value="${c:l('usuaris.zul.Observacions')}" />
@@ -584,31 +601,31 @@
 												label="Risk"
 												width="30px" />
 											<listheader
-												label="${c:l('usuaris.zul.RoleCategory')}" sort="auto" width="20%" visible="false">
+												label="${c:l('usuaris.zul.RoleCategory')}" sort="auto" width="80px" visible="false">
 												<listboxfilter bind="@roleCategory"/>
 											</listheader>
 											<listheader
-												label="${c:l('usuaris.zul.Rol')}" sort="auto" width="20%" >
+												label="${c:l('usuaris.zul.Rol')}" sort="auto" width="100px" >
 												<textboxfilter bind="@nomRol"/>
 											</listheader>
 											<listheader
-												label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" >
+												label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="80px" >
 												<listboxfilter bind="@baseDeDades"/>
 											</listheader>
 											<listheader
 												label="${c:l('usuaris.zul.Account')}" sort="auto"
-												width="10%" />
+												width="80px" />
 											<listheader
 												label="${c:l('usuaris.zul.Aplicacia')}" sort="auto"
-												width="20%" >
+												width="100px" >
 												<listboxfilter mold="select" bind="@codiAplicacio"  />
 											</listheader>
 											<listheader
-												label="${c:l('usuaris.zul.startDate')}" width="10%"  sort="auto"/>
+												label="${c:l('usuaris.zul.startDate')}" width="80px"  sort="auto"/>
 											<listheader
-												label="${c:l('usuaris.zul.endDate')}" width="10%"  sort="auto"/>
+												label="${c:l('usuaris.zul.endDate')}" width="80px"  sort="auto"/>
 											<listheader
-												label="${c:l('usuaris.zul.holderGroup')}" width="10%" visible="${showHolderGroup}"  sort="auto">
+												label="${c:l('usuaris.zul.holderGroup')}" width="100px" visible="${showHolderGroup}"  sort="auto">
 												<listboxfilter mold="select" bind="@holderGroup"/>
 											</listheader>
 										</listhead>
@@ -646,10 +663,11 @@
 											<listcell
 												bind="@roleCategory" />
 											<listcell >
-												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
-												<div style="display:inline" tooltip="domainTooltip">
-													<label value = "/" style="margin-left:1em; margin-right: 1em;"></label>
-													<label  bind="valorDomini/@valor"/>
+												<label  bind="@nomRol" ></label>
+												<div style="display:inline">
+													<label value = " / "></label>
+													<label  bind="valorDomini/@valor" sclass="small-screen"/><label value=" "/>
+													<label  bind="valorDomini/@descripcio" sclass="wide-screen"/>
 												</div>
 											</listcell>
 											<listcell
@@ -667,61 +685,110 @@
 												<datebox format="${c:l('usuaris.zul.dateFormat2')}" disabled="${!canCreateUserRole}" bind="@endDate"  buttonVisible="false"></datebox>
 											</listcell>
 											<listcell>
-												<label bind="@holderGroup" />
+												<label bind="@holderGroup" sclass="small-screen"/>
+												<label bind="holderGroupData[1]/descripcio" sclass="wide-screen"/>
 											</listcell>
 										</dataitem>
 									</listbox>
-									<popup id="rolsTooltip"
-										width="200px">
-										<attribute name="onOpen">
-    label = event.getReference();
-    if (label != null)
-    {
-		listCell = label.parent;
-		if (listCell instanceof DataListcell) {
-			dlistbox = listCell.getListbox();
-			modelo = dlistbox.getModel();
-			listItem = listCell.getParent();
-			posicio = listItem.getIndex();
-			elemPos = modelo.getElementAt(posicio);
-			xpath = elemPos.getDataContext().getXPath();
-			dataSource = gridRols.getDataSource();
-			context = dataSource.getJXPathContext();
-			dada = context.getValue(xpath + "/@nomRol");
-			desc = context.getValue(xpath + "/@descripcioRol");
-			rolsTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
-		}
-	}
-</attribute>
-										<label id="rolsTooltipLabel"
-											multiline="true" value="" />
-									</popup>
-									<popup id="domainTooltip"
-										width="200px">
-										<attribute name="onOpen">
-    label = event.getReference();
-    if (label != null)
-    {
-		listCell = label.parent;
-		if (listCell instanceof DataListcell) {
-			dlistbox = listCell.getListbox();
-			modelo = dlistbox.getModel();
-			listItem = listCell.getParent();
-			posicio = listItem.getIndex();
-			elemPos = modelo.getElementAt(posicio);
-			xpath = elemPos.getDataContext().getXPath();
-			dataSource = gridRols.getDataSource();
-			context = dataSource.getJXPathContext();
-			dada = context.getValue(xpath + "/valorDomini/@nomDomini");
-			desc = context.getValue(xpath + "/valorDomini/@descripcio");
-			domainTooltipLabel.value = dada + (desc != null ? ("\n" + desc) : "");
-		}
-	}
-</attribute>
-										<label id="domainTooltipLabel"
-											multiline="true" value="" />
-									</popup>
 								</div>
+							</tabpanel>
+
+							<tabpanel id="sharedAccounts" if="${canQueryAccounts }">
+								<zscript><![CDATA[
+	void onDisplaySharedAccount(Component r) {
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
+		try {
+			if (r != null) {
+				Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
+				if (instance instanceof Account) {
+					disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@disabled");
+					if (disabled != null && disabled) {
+						it = r.getChildren().iterator();
+						while (it.hasNext()) {
+							Component c = it.next();
+							if (c instanceof HtmlBasedComponent) {
+								c.setStyle("text-decoration:line-through;");
+							}
+						}
+					}
+				}
+			}
+		} catch (Throwable e) {
+		}
+	}
+]]>
+								</zscript>
+
+								<vbox width="100%">
+									<listbox autocommit="false"
+										dataPath="/sharedAccount"
+										fixedLayout="true" width="100%"
+										onNewRow="onDisplaySharedAccount(event.data)">
+										<listhead>
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.Bbdd')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.Account')}" />
+											<listheader sort="auto"
+												label="${c:l('vault.folder.description')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataUpdate')}" />
+											<listheader sort="auto"
+												label="${c:l('accounts.lastLogin')}" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataAssignacia')}" width="110px" />
+											<listheader sort="auto"
+												label="${c:l('usuaris.zul.DataCaducitat')}" width="110px" />
+										</listhead>
+										<dataitem bind=".">
+											<listcell
+												bind="@dispatcher" />
+											<listcell bind="@name"/>
+											<listcell>
+												<label bind="@description" style="margin-right: 16px"/>
+												<imageclic 
+													src="/img/link.png">
+													<attribute name="onClick"><![CDATA[
+															String name = es.caib.zkib.datasource.XPathUtils.getValue(
+								                          						self,
+								                          						"@name");
+															String system = es.caib.zkib.datasource.XPathUtils.getValue(
+					                          						self,
+					                          						"dispatcher");
+								                           		Executions.getCurrent().sendRedirect(
+								                           			"index.zul?embed&target=/accounts/accounts.zul?account="+name+"&system="+system,
+								                          				"soffid_popup");
+														]]>
+													</attribute>
+												</imageclic>
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastUpdated" buttonVisible="false" disabled="true"
+													format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastLogin" buttonVisible="false" disabled="true"
+													format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@lastPasswordSet" buttonVisible="false"
+													disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+											<listcell>
+												<datebox
+													bind="@passwordExpiration" buttonVisible="false"
+													disabled="true" format="${c:l('usuaris.zul.dateFormat')}"
+													sclass="dateboxreadnoborder" width="100%" />
+											</listcell>
+										</dataitem>
+									</listbox>
+								</vbox>
 							</tabpanel>
 
 							<tabpanel id="processos">

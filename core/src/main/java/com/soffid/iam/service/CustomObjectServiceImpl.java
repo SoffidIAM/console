@@ -16,6 +16,7 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.User;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
@@ -118,25 +119,12 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 
 	@Override
 	protected Collection<CustomObject> handleFindCustomObjectByText(String objectType, String query) throws Exception {
-		Collection<CustomObjectEntity> list = getCustomObjectEntityDao().findByText(objectType, query);
-		return getCustomObjectEntityDao().toCustomObjectList(list);
+		return handleFindCustomObjectByTextAndFilter(objectType,  query, null);
 	}
 
 	@Override
 	protected AsyncList<CustomObject> handleFindCustomObjectByTextAsync(final String objectType, final String query) throws Exception {
-		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
-		getAsyncRunnerService().run(
-				new Runnable() {
-					public void run () {
-						for (CustomObjectEntity e : getCustomObjectEntityDao().findByText(objectType, query)) {
-							if (result.isCancelled())
-								return;
-							CustomObject v = getCustomObjectEntityDao().toCustomObject(e);
-							result.add(v);
-						}
-					}
-				}, result);
-		return result;
+		return handleFindCustomObjectByTextAndFilterAsync(objectType,  query, null);
 	}
 	@Override
 	protected CustomObject handleUpdateCustomObject(CustomObject obj) throws Exception {
@@ -295,5 +283,53 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	@Override
 	protected Collection<String> handleFindCustomObjectNames(String objectType) throws Exception {
 		return getCustomObjectEntityDao().findCustomObjectNames(objectType);
+	}
+
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			for (MetaDataEntity att: atts)
+			{
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				{
+					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+				}
+			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndFilterAsync(String objectType, String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindCustomObjectByJsonQueryAsync(objectType, q);
+			
+	}
+
+	@Override
+	protected Collection<CustomObject> handleFindCustomObjectByTextAndFilter(String objectType, String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindCustomObjectByJsonQuery(objectType, q);
 	}
 }

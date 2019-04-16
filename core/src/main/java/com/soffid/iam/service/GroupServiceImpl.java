@@ -18,6 +18,7 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
@@ -53,7 +55,10 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.service.attribute.AttributePersister;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -101,7 +106,14 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		// Si és administrador d'usuaris els pot llistar tots
 		Collection<GroupEntity> groups = getGroupEntityDao().findByParent(codiGrup);
 		if (groups != null) {
-			Collection<Group> groupsList = filterGroups(groups);
+			List<Group> groupsList = filterGroups(groups);
+			Collections.sort(groupsList, new Comparator<Group>() {
+				@Override
+				public int compare(Group o1, Group o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}
+				
+			});
 			return groupsList;
 		}
 
@@ -412,11 +424,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			getUserEntityDao().update(usuari);
 
 			getUserGroupEntityDao().create(usuariGrupEntity);
-			usuariGrup.setId(usuariGrupEntity.getId());
-			usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
 			
 			usuari.getSecondaryGroups().add(usuariGrupEntity);
 			usuariGrupEntity.getGroup().getSecondaryGroupUsers().add(usuariGrupEntity);
+			
+			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
+			usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
 			
 			handlePropagateRolsChangesToDispatcher(usuariGrup.getGroup());
 			getRuleEvaluatorService().applyRules(usuari);
@@ -476,29 +489,38 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	protected GroupUser handleUpdate(GroupUser usuariGrup) throws Exception {
-
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().load(usuariGrup.getId());
-		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
-			throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
-		}
-		usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
-
-		// En principi no ha d'existir update--- seria un create
-		if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
-
-			UserEntity usuari = usuariGrupEntity.getUser();
-			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-			usuari.setLastUserModification(Security.getCurrentAccount());
-			getUserEntityDao().update(usuari);
-
-			getUserGroupEntityDao().update(usuariGrupEntity);
-			usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
+		if ( usuariGrup.getUser().equals(usuariGrupEntity.getUser().getUserName()) && 
+				usuariGrup.getGroup().equals(usuariGrupEntity.getGroup().getName()))
+		{
+			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
 			return usuariGrup;
-		} else {
-			throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:create", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		else
+		{
+			if (!getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
+				throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
-
+			}
+			usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
+			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
+	
+			// En principi no ha d'existir update--- seria un create
+			if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
+	
+				UserEntity usuari = usuariGrupEntity.getUser();
+				usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+				usuari.setLastUserModification(Security.getCurrentAccount());
+				getUserEntityDao().update(usuari);
+	
+				getUserGroupEntityDao().update(usuariGrupEntity);
+				usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
+				return usuariGrup;
+			} else {
+				throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:create", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
+	
+			}
 		}
 	}
 
@@ -666,138 +688,68 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	private void updateGroupAttributes (Group app, GroupEntity entity) throws InternalErrorException
 	{
-		if (entity != null)
+		new GroupAttributePersister().updateAttributes(app.getAttributes(), entity);
+	}
+
+
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
 		{
-			Map<String, Object> attributes = app.getAttributes();
-			if (attributes == null)
-				attributes = (new HashMap<String, Object>());
-			
-			LinkedList<GroupAttributeEntity> entities = new LinkedList<GroupAttributeEntity> (entity.getAttributes());
-			HashSet<String> keys = new HashSet<String>();
-			for (String key: attributes.keySet() )
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			for (MetaDataEntity att: atts)
 			{
-				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(MetadataScope.GROUP, key))
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
 				{
-					Object v = attributes.get(key);
-					if (v == null)
-					{
-						// Do nothing
-					}
-					else if (v instanceof Collection)
-					{
-						Collection l = (Collection) v;
-						for (Object o: (Collection) v)
-						{
-							if (o != null)
-							{
-								updateGroupAttribute(entity, entities, key, metadata, o);
-							}
-						}
-					}
-					else
-					{
-						updateGroupAttribute(entity, entities, key, metadata, v);
-					}
+					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
 				}
 			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindGroupByJsonQueryAsync(q);
 			
-			entity.getAttributes().removeAll(entities);
-			getGroupEntityDao().update(entity);
-
-			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
-			
-			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
-			{
-				Object o = attributes.get(m.getName());
-				if ( o == null || "".equals(o))
-				{
-					if (m.getRequired() != null && m.getRequired().booleanValue())
-						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
-				} else {
-					if (m.getUnique() != null && m.getUnique().booleanValue())
-					{
-						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
-						for (String v: l)
-						{
-							List<GroupAttributeEntity> p = getGroupAttributeEntityDao().findByNameAndValue(m.getName(), v);
-							if (p.size() > 1)
-								throw new InternalErrorException(String.format("Already exists a user with %s %s",
-										m.getLabel(), v));
-						}
-					}
-				}
-			}
-		}
 	}
 
-	private void updateGroupAttribute(GroupEntity entity, LinkedList<GroupAttributeEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) throws InternalErrorException {
-		GroupAttributeEntity aae = findGroupAttributeEntity(attributes, key, value);
-		if (aae == null)
-		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
-			aae = getGroupAttributeEntityDao().newGroupAttributeEntity();
-			aae.setGroup(entity);
-			aae.setMetadata(metadata);
-			aae.setObjectValue(value);
-			getGroupAttributeEntityDao().create(aae);
-			entity.getAttributes().add(aae);
-		}
-		else
-			attributes.remove(aae);
+	@Override
+	protected Collection<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindGroupByJsonQuery(q);
 	}
-
-	private GroupAttributeEntity findGroupAttributeEntity(LinkedList<GroupAttributeEntity> entities, String key,
-			Object o) {
-		for (GroupAttributeEntity aae: entities)
-		{
-			if (aae.getMetadata().getName().equals(key))
-			{
-				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
-					return aae;
-			}
-		}
-		return null;
-	}
-
-
 
 	@Override
 	protected Collection<Group> handleFindGroupByText(String text) throws Exception {
-		LinkedList<Group> result = new LinkedList<Group>();
-		for (GroupEntity ue : getGroupEntityDao().findByText(text)) {
-			if (getAuthorizationService().hasPermission(
-					Security.AUTO_GROUP_QUERY, ue)) {
-				Group u = getGroupEntityDao().toGroup(ue);
-				result.add(u);
-			}
-		}
-
-		return result;
+		String q = generateQuickSearchQuery(text);
+		return handleFindGroupByJsonQuery(q);
 	}
 	
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAsync(final String text) throws Exception {
-		final AsyncList<Group> result = new AsyncList<Group>();
-		getAsyncRunnerService().run(
-				new Runnable() {
-					public void run () {
-						try {
-							for (GroupEntity e : getGroupEntityDao().findByText(text)) {
-								if (result.isCancelled())
-									return;
-								if (getAuthorizationService().hasPermission(
-										Security.AUTO_GROUP_QUERY, e)) {
-									Group v = getGroupEntityDao().toGroup(e);
-									result.add(v);
-								}
-							}
-						} catch (InternalErrorException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}, result);
-		return result;
+		String q = generateQuickSearchQuery(text);
+		return handleFindGroupByJsonQueryAsync(q);
 	}
 
 
@@ -882,5 +834,119 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			}
 		}, result);
 		return result;
+	}
+	
+	class GroupAttributePersister extends AttributePersister<GroupEntity,GroupAttributeEntity> {
+		@Override
+		protected List<GroupAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getGroupAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(GroupEntity entity) {
+			getGroupEntityDao().update(entity);
+		}
+
+		@Override
+		protected MetadataScope getMetadataScope() {
+			return MetadataScope.GROUP;
+		}
+
+		@Override
+		protected Collection<GroupAttributeEntity> getEntityAttributes(GroupEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected GroupAttributeEntity createNewAttribute(GroupEntity entity, MetaDataEntity metadata, Object value) {
+			GroupAttributeEntity aae = getGroupAttributeEntityDao().newGroupAttributeEntity();
+			aae.setGroup(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getGroupAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected GroupAttributeEntity findAttributeEntity(LinkedList<GroupAttributeEntity> entities, String key,
+				Object o) {
+			for (GroupAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return GroupServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return GroupServiceImpl.this.getAttributeValidationService();
+		}
+		
+	}
+
+	class UserGroupAttributePersister extends AttributePersister<UserGroupEntity,UserGroupAttributeEntity> {
+		@Override
+		protected List<UserGroupAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getUserGroupAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(UserGroupEntity entity) {
+			getUserGroupEntityDao().update(entity);
+		}
+
+		@Override
+		protected MetadataScope getMetadataScope() {
+			return MetadataScope.GROUP_MEMBERSHIP;
+		}
+
+		@Override
+		protected Collection<UserGroupAttributeEntity> getEntityAttributes(UserGroupEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected UserGroupAttributeEntity createNewAttribute(UserGroupEntity entity, MetaDataEntity metadata, Object value) {
+			UserGroupAttributeEntity aae = getUserGroupAttributeEntityDao().newUserGroupAttributeEntity();
+			aae.setUserGroup(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getUserGroupAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected UserGroupAttributeEntity findAttributeEntity(LinkedList<UserGroupAttributeEntity> entities, String key,
+				Object o) {
+			for (UserGroupAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return GroupServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return GroupServiceImpl.this.getAttributeValidationService();
+		}
+		
 	}
 }

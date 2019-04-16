@@ -63,6 +63,7 @@ public class SearchBox extends HtmlBasedComponent {
 	String variableName;
 	String variableNameText;
 	String dataPath;
+	String enforcedFilter;
 	private String defaultAttributes;
 	boolean auto=false;
 	private String lastQuery = "";
@@ -145,11 +146,21 @@ public class SearchBox extends HtmlBasedComponent {
 			
 			lastQuery  = getQueryString();
 
+			String q = lastQuery;
+			
+			if (enforcedFilter != null && ! enforcedFilter.trim().isEmpty())
+			{
+				if (lastQuery != null && ! lastQuery.isEmpty())
+					q = "("+enforcedFilter+") and ("+lastQuery+")";
+				else
+					q = enforcedFilter;
+			}
+			
 			if (variableName != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? null: lastQuery);
+				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? null: q);
 			
 			if (variableNameText != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: null);
+				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: enforcedFilter);
 
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)
@@ -790,5 +801,13 @@ public class SearchBox extends HtmlBasedComponent {
 			return "change-mode-label-selected";
 		else
 			return "change-mode-label";
+	}
+
+	public String getEnforcedFilter() {
+		return enforcedFilter;
+	}
+
+	public void setEnforcedFilter(String enforcedFilter) {
+		this.enforcedFilter = enforcedFilter;
 	}
 }

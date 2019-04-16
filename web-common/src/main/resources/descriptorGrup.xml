@@ -11,8 +11,13 @@
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByJsonQuery" if = "${query != null  &amp;&amp; synchro != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
-			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByText" if = "${queryText != null}">
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByTextAndFilterAsync" if = "${queryText != null &amp;&amp; synchro == null}">
 				<parameter value="${queryText}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGroupByTextAndFilterAsync" if = "${queryText != null &amp;&amp; synchro != null}">
+				<parameter value="${queryText}"/>
+				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:comp/env/ejb/GrupEJB" method="findGrupsByFiltre"
 				if="${query == null &amp;&amp; queryText == null &amp;&amp; codi != null}"> <!-- grup: query -->

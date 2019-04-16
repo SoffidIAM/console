@@ -48,6 +48,11 @@ public abstract class AccountMetadataEntity {
 	@Nullable
 	public Boolean multiValued;
 
+	@Description ("Display a maxim of rows values. For more values, a scroll bar will appear")
+	@Column(name = "AME_MVROWS")
+	@Nullable
+	public Integer multiValuedRows;
+
 	@Description("blank separated list of url-encoded values")
 	@Column(name = "AME_VALUE", length = 64000)
 	@Nullable
@@ -82,6 +87,23 @@ public abstract class AccountMetadataEntity {
 	@Column (name="TDA_COT_ID", reverseAttribute="refererncedBy", composition=true)
 	@Nullable
 	CustomObjectTypeEntity dataObjectType;
+
+	
+	
+	@Column (name="AME_VISEXP", length=2048)
+	@Nullable
+	String visibilityExpression;
+	
+	@Column (name="AME_VALEXP", length=2048)
+	@Nullable
+	String validationExpression;
+	
+	@Description("Expression to test if the reference object can be selected ")
+	@Nullable
+	@Column(name="AME_FILEXP")
+	String filterExpression;
+
+
 	/********************** DAOS ************************/
 	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name\n"
 			+ "and system.tenant.id=:tenantId")

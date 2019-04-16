@@ -3090,21 +3090,59 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return result;
 	}
 
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("userName co \""+t+"\"");
+			sb.append(" or firstName co \""+t+"\"");
+			sb.append(" or lastName co \""+t+"\"");
+			sb.append(" or middleName co \""+t+"\"");
+			for (MetaDataEntity att: atts)
+			{
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				{
+					sb.append(" or userData."+att.getName()+" co \""+t+"\"");
+				}
+			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	protected AsyncList<User> handleFindUserByTextAndFilterAsync(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindUserByJsonQueryAsync(q);
+			
+	}
+
+	@Override
+	protected Collection<User> handleFindUserByTextAndFilter(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindUserByJsonQuery(q);
+	}
+
 	@Override
 	protected Collection<User> handleFindUserByText(String text) throws Exception {
-		LinkedList<User> result = new LinkedList<User>();
-		TimeOutUtils tou = new TimeOutUtils();
-		for (UserEntity ue : getUserEntityDao().findByText(text)) {
-			User u = getUserEntityDao().toUser(ue);
-			if (getAuthorizationService().hasPermission(
-					Security.AUTO_USER_QUERY, ue)) {
-				result.add(u);
-			}
-			if (tou.timedOut())
-				return result;
-		}
-
-		return result;
+		return handleFindUserByTextAndFilter(text, null);
 	}
 
 	@Override
@@ -3114,27 +3152,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	@Override
 	protected AsyncList<User> handleFindUserByTextAsync(final String text) throws Exception {
-		final AsyncList<User> result = new AsyncList<User>();
-		getAsyncRunnerService().run(
-				new Runnable() {
-					public void run () {
-						try {
-							for (UserEntity ue : getUserEntityDao().findByText(text)) {
-								if (result.isCancelled())
-									return;
-								User u = getUserEntityDao().toUser(ue);
-								if (getAuthorizationService().hasPermission(
-										Security.AUTO_USER_QUERY, ue)) {
-									result.add(u);
-								}
-							}
-						} catch (InternalErrorException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				}, result);
-		return result;
-		
+		return handleFindUserByTextAndFilterAsync(text, null);
 	}
 
 	@Override
@@ -3194,6 +3212,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	@Override
 	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
+		boolean anyChange = false;
 		UserEntity entity = getUserEntityDao().findByUserName(codiUsuari);
 		if (entity != null)
 		{
@@ -3219,12 +3238,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					{
 						if (o != null)
 						{
+							anyChange = true;
 							updateUserAttribute(entity, entities, key, metadata, o);
 						}
 					}
 				}
 				else
 				{
+					anyChange = true;
 					updateUserAttribute(entity, entities, key, metadata, v);
 				}
 			}
@@ -3233,6 +3254,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
 				{
+					anyChange = true;
 					getUserDataEntityDao().remove(attribute);
 					entity.getUserData().remove(attribute);
 				}
@@ -3263,6 +3285,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 			}
 			getRuleEvaluatorService().applyRules(entity);
+			if (anyChange)
+				getUserEntityDao().update(entity);
 		}
 	}
 

@@ -227,7 +227,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			getHostEntityDao().remove(maq);
         		else
             		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
-    						new Object[]{xarxaEntity.getName()}));
+    						new Object[]{xarxaEntity.getName(), maq.getName()}));
         	}
             getNetworkEntityDao().remove(xarxaEntity);
         } else {

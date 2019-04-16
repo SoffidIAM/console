@@ -18,7 +18,7 @@
 				xpath = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox").getXPath();
 				ctx = ds.getJXPathContext();
 				Component formComponent = (Component) pageScope.get("contextComponent");
-				Boolean multi = (Boolean) pageScope.get("contextMultiple");
+				Boolean multi = (Boolean) pageScope.get("multi");
 				if ( multi )
 				{
 					List result = new LinkedList();
@@ -63,7 +63,10 @@
 		    	listbox.setMultiple(multi);
 		    	listbox.setCheckmark(multi);
 				pageScope.put("contextComponent", c);
-				pageScope.put("contextMultiple", multi);
+				if (multi)
+					pageScope.put("multi", true);
+				else
+					pageScope.remove("multi");
 				
 				String objectType = page.getAttribute("type");
 				model.getJXPathContext().getVariables().declareVariable("objectType", objectType);
@@ -83,6 +86,25 @@
 				}else{
 					self.visible = true;
 				}
+				pageScope.put("filter", null);
+				esquema.getFellow("lista").getFellow("listbox").setMultiple(multi);
+				esquema.getFellow("lista").getFellow("listbox").setCheckmark(multi);
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter(null);
+			]]>
+		</attribute>
+		<attribute name="onConfigure">
+			<![CDATA[
+				pageScope.put("filter", event.data[0]);
+				pageScope.put("multi", event.data[1]);
+				if (event.data[1])
+				{
+					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
+					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
+				}
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter( 
+						event.data.length >= 3 ? event.data[2]: null);
+				if ( ! esquema.getFellow("lista").getFellow("listbox").getItems().isEmpty())
+					esquema.getFellow("queryWindow").getFellow("searchBox").search();
 			]]>
 		</attribute>
 		<attribute name="onClose">

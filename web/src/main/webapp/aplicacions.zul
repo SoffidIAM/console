@@ -8,11 +8,6 @@
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('aplicacions.lblGestioAplicacions') }">
 	<style>
 		.tcoth div {text-align:center !important;}
-		.appatt {display: table; padding: 0px; width: 100%}
-		.appatt_row {display: table-row}
-		.appatt_row span {}
-		.appatt_label {display: table-cell; width: 202px}
-		.appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
 		.ourcheck input {vertical-align:-7px}
 	</style>
 	
@@ -314,7 +309,7 @@
 										<input_etiqueta value="${c:l('aplicacions.zul.Codi-2')}"/>
 										
 										<hbox width="100%">
-											<textbox id="detall_codi" bind="@codi" maxlength="50"
+											<textbox id="detall_codi" bind="@codi" maxlength="100"
 												sclass="textbox" width="100%" constraint="no empty">
 												<attribute name="onChange">
 													self.value = self.value.toUpperCase().replaceAll(" ","");//llevem espais

@@ -37,8 +37,8 @@
 			                for (String account: accounts)
 			                {
 			                	lb.appendChild(new Listitem(account, account));
+				                lb.setSelectedIndex(0);
 			                }
-			                lb.setSelectedIndex(0);
 			                java.util.Calendar c = java.util.Calendar.getInstance();
 			                c.set(java.util.Calendar.HOUR, 0);
 			                c.set(java.util.Calendar.MINUTE, 0);
@@ -84,7 +84,7 @@
 			 			RolAccount ra = es.caib.zkib.datasource.XPathUtils.getValue(comp, ".").getInstance();
 			 			if (ra.getDelegationStatus() != null) {
 			 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
-			 				Component listitem = comp.getChildren().get(6);
+			 				Component listitem = comp.getChildren().get(5);
 			 				listitem.insertBefore(ic, listitem.getFirstChild());
 			 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
 			 				String since = df.format(ra.getDelegateSince());
@@ -321,7 +321,6 @@
 												<listheader label="${c:l('usuaris.zul.Account')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Aplicacia')}" sort="auto" width="15%" />
 												<listheader label="${c:l('usuaris.zul.Domini')}" width="15%" />
-												<listheader label="${c:l('usuaris.zul.Valor')}" width="15%" />
 												<listheader width="10%" visible="${canDelegate }"></listheader>
 											</listhead>
 											<dataitem>
@@ -329,7 +328,6 @@
 												<listcell bind="@baseDeDades" />
 												<listcell bind="@accountName"/>
 												<listcell bind="@codiAplicacio" />
-												<listcell bind="valorDomini/@nomDomini" />
 												<listcell bind="valorDomini/@descripcio"/>
 												<listcell>
 													<button label="${c:l('seleccionUsuario.btnDelegar') }" onClick='delegate(event.getTarget())' visible='${canDelegate}'/>

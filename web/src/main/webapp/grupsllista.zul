@@ -78,6 +78,7 @@
 				pageScope.put("multi", false);
 				esquema.getFellow("lista").getFellow("listbox").setMultiple(false);
 				esquema.getFellow("lista").getFellow("listbox").setCheckmark(false);
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter(null);
 			]]>
 		</attribute>
 		<attribute name="onConfigure">
@@ -89,6 +90,10 @@
 					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
 					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
 				}
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter( 
+						event.data.length >= 3 ? event.data[2]: null);
+				if ( ! esquema.getFellow("lista").getFellow("listbox").getItems().isEmpty())
+					esquema.getFellow("queryWindow").getFellow("searchBox").search();
 			]]>
 		</attribute>
 		<attribute name="onClose">

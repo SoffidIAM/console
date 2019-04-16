@@ -18,6 +18,9 @@
 		.groupatt_row > span {padding-left:5px}
 		.groupatt_label {display: table-cell; width: 202px}
 		.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+		.groupatt_input table th:first-child {width: 160px;}
+		.groupatt_input > div.listbox {padding-bottom: 20px;}
+		.groupatt_input table.listbox-btable tr {height: 20px;}
 		.ourcheck input {vertical-align:-7px}
 	</style>
 
@@ -135,7 +138,9 @@
 				}
 				
 				// Refresquem el contingut
+				model.getVariables().declareVariable("synchro", true);
 				model.getJXPathContext().getValue("/grup").refresh();
+				model.getVariables().undeclareVariable("synchro");
 				//treebox.setDataPath("/model:/");
 				
 				// I tornem a obrir les branques als dos arbres

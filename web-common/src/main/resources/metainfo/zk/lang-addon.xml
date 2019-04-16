@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <language-addon>
-
-	<addon-name>BPM-web</addon-name>
+	<addon-name>common-web</addon-name>
+	<depends>ZKIB-LAF</depends>
 	 <version>
 	  	<version-class>es.caib.bpm.ui.Version</version-class>
 	  	<version-uid>1.0</version-uid>
@@ -63,13 +63,14 @@
 		</mold>
 	</component>	
 	
+
 	<component>
 		<extends>frame</extends>
 		<component-name>frame</component-name>
 		<component-class>com.soffid.iam.web.component.Frame</component-class>
 	</component>
 
-	
+
 	<component>
 		<component-name>fileupload</component-name>
 		<extends>fileupload</extends>

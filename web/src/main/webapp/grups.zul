@@ -399,7 +399,7 @@
 										<input_etiqueta value="${c:l('grups.zul.Codi-2')}"/>
 										
 										<hbox>
-											<textbox bind="@codi" id="detall_codi" maxlength="20"
+											<textbox bind="@codi" id="detall_codi" maxlength="50"
 												onChange="llevaEspais(self)" sclass="textbox"
 												constraint="no empty"/>
 											<imageclic id='detall_codi_edit' src='/img/pencil.png' onClick='self.previousSibling.disabled = false; self.visible = false; '/>

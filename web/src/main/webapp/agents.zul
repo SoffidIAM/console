@@ -29,8 +29,8 @@
 			}
 			catch (Exception ex){}
 			
-			queryWindowMin = "50px";
-			queryWindowMax = "110px";
+//			queryWindowMin = "50px";
+//			queryWindowMax = "110px";
 			
 			mode = "query"; 
 			view_altres = false;
@@ -212,14 +212,14 @@
 			{
 				if (view_altres == false)
 				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
+//					esquema.getFellow("queryWindow").setHeight(queryWindowMax); 
 					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(true);
 					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa-baix.gif");
 					view_altres = true;
 				}
 				else
 				{
-					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
+//					esquema.getFellow("queryWindow").setHeight(queryWindowMin); 
 					esquema.getFellow("queryWindow").getFellow("queryWindowAltres").setVisible(false);
 					esquema.getFellow("queryWindow").getFellow("img_altres").setSrc("~./img/fletxa.gif");
 					view_altres = false;
@@ -461,10 +461,19 @@
 		]]>
 	</zscript>
 
+	<toolbar id="toolbar1" sclass="toolbar fixedToolbar">
+		<hbox>
+			<commitbutton datamodel="/model" />
+			<undobutton datamodel="/model"
+				listbox="/esquema/lista/listbox"
+				onClick="setVisibleControlAcces(false); setVisibleAttributeMapping(false); setVisibleMetadata(false);" />
+		</hbox>
+	</toolbar>
+	
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi"
 		onHideFormulari="showLista()">
 	
-		<criteris id="queryWindow" height="${queryWindowMin}" onOK="search()"
+		<criteris id="queryWindow" onOK="search()"
 			width="${amplaria}">
 
 			<hbox style="margin-bottom:1px">
@@ -494,7 +503,7 @@
 		</criteris>
 		
 		<navegador id="lista" width="${amplaria}">
-			<toolbar>
+			<toolbar id="toolbar2">
 				<hbox>
 					<insertbutton acces="${canCreateAgent}" listbox="/esquema/lista/listbox"
 						onClick="creaNou()"/>
@@ -512,6 +521,11 @@
 						listbox="/esquema/lista/listbox"/>
 				</hbox>
 			</toolbar>
+			<script><![CDATA[
+				floatingToolbar.setToolbar ( ${toolbar2.uuid });
+				floatingToolbar.setFloatingToolbar ( ${toolbar1.uuid });
+			]]>
+			</script>
 			
 			<listbox id="listbox" autocommit="false" dataPath="/model:/agent"
 				fixedLayout="true" height="96%" onClick="showDetall()" 

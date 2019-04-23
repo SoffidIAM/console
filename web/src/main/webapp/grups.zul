@@ -156,6 +156,7 @@
 			{
 				b_cancel = esquema.getFellow("lista").getFellow("b_cancel");
 				b_cancel.setVisible(true);
+				b_cancel2.setVisible(true);
 			}
 			
 			void hiddeButtons()
@@ -165,10 +166,21 @@
 				
 				b_commit.setVisible(false);
 				b_cancel.setVisible(false);
+				b_cancel2.setVisible(false);
 			}
 		]]>
 	</zscript>
 
+	<toolbar id="toolbar1" sclass="toolbar fixedToolbar">
+		<hbox>
+			<commitbutton datamodel="/model" />
+				<toolbarbutton id="b_cancel2" image="~./img/document-undo.gif"
+					visible="${false}"
+					label="${c:l('grups.zul.CancelChanges')}"
+					onClick="onRefrescaArbreIntern(false);" />
+		</hbox>
+	</toolbar>
+	
 	<esquemavertical id="esquema" datamodel="/model" focusCriteri="queryCodi" hideSearchToolbar="true" onHideFormulari="showLista()">
 
 		<attribute name="onCreate">
@@ -205,7 +217,7 @@
 		</criteris>
 
 		<navegador id="lista" width="${amplaria}">
-			<toolbar>
+			<toolbar id = "toolbar2">
 				<inserttreebutton id="b_inserir" acces="${canCreateGroup}"
 					onClick="onInserir()" path="/grup" tree="/esquema/lista/treebox"/>
 				<!-- No és permés eliminar grups -->
@@ -216,6 +228,11 @@
 					label="${c:l('grups.zul.CancelChanges')}"
 					onClick="onRefrescaArbreIntern(false);" />
 			</toolbar>
+			<script><![CDATA[
+				floatingToolbar.setToolbar ( ${toolbar2.uuid });
+				floatingToolbar.setFloatingToolbar ( ${toolbar1.uuid });
+			]]>
+			</script>
 			<tree id="treebox" dataPath="/model:/" fixedLayout="true" pageSize="19" 
 				 style="min-height: 100px"
 				 onSelect="select()" rows="${fileres}" autocommit="false">

@@ -1857,3 +1857,11 @@ span.separator_label {
     word-break: break-word;
     overflow: auto;
 }
+
+div.fixedToolbar {
+	position: fixed; width: 100%; left: 0; top: 35px; display: none; z-index: 10;
+    border-top: none;
+    border-bottom: 2px solid white;
+    padding: 0px;
+}
+

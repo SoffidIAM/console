@@ -13,25 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service(serverOnly = true, serverPath = "/seycon/AgentManager", serverRole = "server", translatedName = "AgentManager", translatedPackage = "com.soffid.iam.sync.agent")
 public abstract class AgentManager {
 
-	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public java.lang.Object createLocalAgent(es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
 
-	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public java.lang.String createAgent(es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
 
-	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public java.lang.Object createLocalAgentDebug(es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
 
-	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public java.lang.String createAgentDebug(es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

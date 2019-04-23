@@ -2,6 +2,7 @@ package com.soffid.iam.sync.engine;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Map;
 
 import com.soffid.iam.api.ScheduledTask;
@@ -67,6 +68,8 @@ public abstract class DispatcherHandler {
 	public abstract GetObjectResults  getNativeObject(String systemName, SoffidObjectType type, String object1,
 			String object2) throws Exception;
 
+	public abstract Collection<Map<String, Object>> invoke(String verb, String command,
+			Map<String, Object> params) throws Exception ;
 	/**
 	 * Executes a single action
 	 * 

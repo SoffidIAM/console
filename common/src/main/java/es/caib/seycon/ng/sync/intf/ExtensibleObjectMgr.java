@@ -28,7 +28,9 @@
 
 package es.caib.seycon.ng.sync.intf;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Map;
 
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -51,5 +53,8 @@ public interface ExtensibleObjectMgr extends java.rmi.Remote {
 
   public ExtensibleObject getSoffidObject (SoffidObjectType type, String object1, String object2)  throws java.rmi.RemoteException, 
   InternalErrorException;
+
+  public Collection<Map<String, Object>> invoke(String verb, String command,
+			Map<String, Object> params) throws RemoteException, InternalErrorException ;
 }
 

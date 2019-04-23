@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.sync.servei;
 import java.util.Collection;
+import java.util.Map;
 
 import com.soffid.iam.api.AttributeTranslation;
 import com.soffid.iam.api.CustomObject;
@@ -13,6 +14,9 @@ import com.soffid.iam.service.AttributeTranslationService;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Server;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.ServerEntity;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
 
@@ -57,6 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 	UsuariService.class,
 	PasswordService.class,
 	CustomObjectService.class,
+	ServerEntity.class,
 	AttributeTranslationService.class})
 public abstract class ServerService {
 
@@ -447,4 +452,11 @@ public abstract class ServerService {
 	public Collection<AttributeTranslation> translate2 (String domain, String column1) { return null ; }
 	public Collection<AttributeTranslation> reverseTranslate2 (String domain, String column2) { return null ; }
 	
+	/** Direct agent execution **/
+	@Transactional(noRollbackFor={java.lang.Exception.class})
+	Collection<Map<String,Object>> invoke(String agent, @Nullable String verb, @Nullable String command, @Nullable Map<String, Object> params) throws InternalErrorException {return null;}
+	
+	/** Syncserver gateway support **/
+	Server findRemoteServerByUrl(String url) { return null;}
+
 }

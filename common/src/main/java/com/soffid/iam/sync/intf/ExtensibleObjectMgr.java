@@ -30,6 +30,7 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Map;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.SoffidObjectType;
@@ -56,5 +57,8 @@ public interface ExtensibleObjectMgr extends java.rmi.Remote {
   public ExtensibleObject getNativeObject (SoffidObjectType type, String object1, String object2) throws RemoteException, InternalErrorException;
 
   public ExtensibleObject getSoffidObject (SoffidObjectType type, String object1, String object2) throws RemoteException, InternalErrorException;
+
+  public Collection<Map<String, Object>> invoke(String verb, String command,
+			Map<String, Object> params) throws RemoteException, InternalErrorException ;
 }
 

@@ -34,7 +34,7 @@ public abstract class GrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="GRU_CODI", length=20, translated="name")
+	@Column (name="GRU_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="GRU_UNIOFI", length=2, translated="homeDrive")

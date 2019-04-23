@@ -189,8 +189,8 @@
 					onClick="upload()"/>
 			</toolbar>
 			<grid id="listbox"  mold="paging" dataPath="/model:/translation"
-				fixedLayout="true" height="340px" 
-				pageSize="18" onCreate="checkTruncatedList(self)" >
+				fixedLayout="true" 
+				pageSize="18" >
 				<attribute name="onNewRow"><![CDATA[
 				   Row r = event.data;
 				   r.getChildren().get(0).getFellow("dada").setReadonly (!canModifyParameter);

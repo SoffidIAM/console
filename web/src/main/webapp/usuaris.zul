@@ -562,7 +562,13 @@
 			]]>
 		</zscript>
 
-		<esquemavertical id="esquema" datamodel="/model"
+				<toolbar id="toolbar1" sclass="toolbar fixedToolbar">
+					<commitbutton datamodel="/model"
+						onClick="doCommit(event)" />
+					<undobutton datamodel="/model"
+						listbox="/esquema/lista/listbox" />
+				</toolbar>
+				<esquemavertical id="esquema" datamodel="/model"
 			hideSearchToolbar="true"
 			onHideFormulari="showLista()">
 
@@ -577,7 +583,7 @@
 			</criteris>
 
 			<navegador id="lista" width="${amplaria}">
-				<toolbar>
+				<toolbar id="toolbar2"> 
 					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="user"/>
 					<insertbutton acces="${canCreateUser}"
 						listbox="/esquema/lista/listbox" onClick="showDetall()" />
@@ -589,6 +595,11 @@
 					<listexporttoolbarbutton acces="${canQueryUser}"
 						listbox="/esquema/lista/listbox" />
 				</toolbar>
+			<script><![CDATA[
+				floatingToolbar.setToolbar ( ${toolbar2.uuid });
+				floatingToolbar.setFloatingToolbar ( ${toolbar1.uuid });
+			]]>
+			</script>
 				<listbox id="listbox" autocommit="false" dataPath="/model:/usuari"
 					use="com.soffid.iam.web.UsersListbox"
 					fixedLayout="true" height="96%" onClick="showDetall()"

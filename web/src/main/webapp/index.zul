@@ -7,6 +7,42 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
 	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: hidden">
+	<script><![CDATA[
+		var floatingToolbar = {
+			floating: null,
+			toolbar: null,
+			setToolbar: function (n) { floatingToolbar.toolbar = n; } ,
+			setFloatingToolbar: function (n) { floatingToolbar.floating = n; } ,
+		}
+	                 
+		document.addEventListener ("scroll", function() {
+			console.log("onscroll "+floatingToolbar.toolbar);
+		    var el = floatingToolbar.toolbar;
+		    var el2 = floatingToolbar.floating;
+		    if (el2 != null)
+		    {
+		    	console.log("el "+floatingToolbar.toolbar+" = " +el);
+		    	if (el == null)
+		    		el2.style.display = 'none';
+		    	else
+		    	{
+					var rect = el.getBoundingClientRect();
+		 			if (
+			           (rect.x + rect.width) < 0 
+			             || (rect.y + rect.height) < 35
+			             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+			         ) {
+		 				console.log("Visible");
+						el2.style.display = 'block';
+					} else {
+		 				console.log("Hidden");
+						el2.style.display = 'none';
+					}		    		
+		    	}
+		    }
+		});
+	]]></script>
+	
 	<attribute name="onCreate">
 		principal = com.soffid.iam.utils.Security.getPrincipal();
 		try {
@@ -17,6 +53,7 @@
 	</attribute>
 	
     <div>
+    
     	<include src="wf/menu.zul"/>
 		<zscript>
 			<![CDATA[

@@ -66,7 +66,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String impressora;
 
-	@Column (name="AUD_APL", length=500, translated="informationSystem")
+	@Column (name="AUD_APL", length=100, translated="informationSystem")
 	@Nullable
 	public java.lang.String aplicacio;
 
@@ -82,7 +82,7 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public java.lang.String xarxa;
 
-	@Column (name="AUD_ROL", length=100, translated="role")
+	@Column (name="AUD_ROL", length=150, translated="role")
 	@Nullable
 	public java.lang.String rol;
 

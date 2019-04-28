@@ -32,6 +32,7 @@ public class Config {
 	public static final String SEYCON_SERVER_STANDBY_PROPERTY = "seycon.server.standby";
 	public static final String AUTOUPDATE_PROPERTY = "autoupdate";
 	public static final String SERVERLIST_PROPERTY = "serverlist";
+	public static final String URL_PROPERTY = "url";
 	private static Config theConfig;
     Properties prop = new Properties();
 
@@ -52,7 +53,8 @@ public class Config {
     	BACKUPDB_PROPERTY,
     	BACKUP_PASSWORD_PROPERTY,
     	BACKUPUSER_PROPERTY,
-    	JAVA_OPT_PROPERTY
+    	JAVA_OPT_PROPERTY,
+    	URL_PROPERTY
     };
     
     public void updateFromServer () throws IOException, InternalErrorException
@@ -240,7 +242,7 @@ public class Config {
     }
 
     public boolean isAgent() {
-        return "agent".equals(getRole()); //$NON-NLS-1$
+        return "agent".equals(getRole()) || "remote".equals(getRole()); //$NON-NLS-1$
     }
 
     public boolean isUpdateEnabled() {
@@ -548,5 +550,16 @@ public class Config {
         else
             prop.remove("requestId"); //$NON-NLS-1$
         update();
+    }
+    
+    public void setCustomProperty (String s, String v) throws IOException
+    {
+    	prop.put(s, v);
+    	update();
+    }
+    
+    public String getCustomProperty (String s)
+    {
+    	return prop.getProperty(s);
     }
 }

@@ -269,7 +269,7 @@ public abstract class RolAccountEntity {
                 + "((:groupName is null and grup is null) or (grup.name = :groupName)) and " //$NON-NLS-1$
                 + "((:informationSystem is null and aplicacio is null) or (aplicacio.name = :informationSystem)) and " //$NON-NLS-1$
                 + "((:domainValue is null and valorDominiAplicacio is null) or (valorDominiAplicacio.value = :domainValue)) and "
-                + "rolsUsuaris.account.system.tenant.id = :tenantId") //$NON-NLS-1$
+                + "rolsUsuaris.account.system.tenant.id = :tenantId and rolsUsuaris.enabled = true") //$NON-NLS-1$
      public java.util.List<RolAccountEntity> findMatching (
     		 Long accountId,
     		 Long roleId,

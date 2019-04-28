@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -47,4 +49,16 @@ public abstract class AccountAccessEntity {
 	@Description("Identifier")
 	public java.lang.Long id;
 
+	@Column (name="AAC_START")
+	@Nullable
+	public Date start;
+
+	@Column (name="AAC_END")
+	@Nullable
+	public Date end;
+
+	@Column (name="AAC_DISABLED")
+	@Nullable
+	public Boolean disabled;
 }
+

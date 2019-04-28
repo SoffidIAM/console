@@ -144,43 +144,46 @@ public class AccountEntityDaoImpl extends
 				}
 			} else {
 				for (com.soffid.iam.model.AccountAccessEntity acl : source.getAcl()) {
-					if (acl.getGroup() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_USER))
-						grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
-					if (acl.getRole() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_USER))
-						roles.add(getRoleEntityDao().toRole(acl.getRole()));
-					if (acl.getUser() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_USER))
-						usuaris.add(getUserEntityDao().toUser(acl.getUser()));
-					if (acl.getGroup() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_MANAGER))
-						managerGrups.add(getGroupEntityDao()
-								.toGroup(acl.getGroup()));
-					if (acl.getRole() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_MANAGER))
-						managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
-					if (acl.getUser() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_MANAGER))
-						managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
-					if (acl.getGroup() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_OWNER))
-						ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
-					if (acl.getRole() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_OWNER))
-						ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
-					if (acl.getUser() != null
-							& acl.getLevel().equals(
-									AccountAccessLevelEnum.ACCESS_OWNER))
-						ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+					if ( ! Boolean.TRUE.equals(acl.getDisabled()))
+					{
+						if (acl.getGroup() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_USER))
+							grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+						if (acl.getRole() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_USER))
+							roles.add(getRoleEntityDao().toRole(acl.getRole()));
+						if (acl.getUser() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_USER))
+							usuaris.add(getUserEntityDao().toUser(acl.getUser()));
+						if (acl.getGroup() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_MANAGER))
+							managerGrups.add(getGroupEntityDao()
+									.toGroup(acl.getGroup()));
+						if (acl.getRole() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_MANAGER))
+							managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+						if (acl.getUser() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_MANAGER))
+							managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+						if (acl.getGroup() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_OWNER))
+							ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+						if (acl.getRole() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_OWNER))
+							ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+						if (acl.getUser() != null
+								& acl.getLevel().equals(
+										AccountAccessLevelEnum.ACCESS_OWNER))
+							ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+					}
 				}
 			}
 			target.setGrantedGroups(grups);
@@ -377,7 +380,7 @@ public class AccountEntityDaoImpl extends
 		AccessControlList acl = new AccessControlList();
 		for ( AccountAccessEntity entry: source.getAcl())
 		{
-			if (entry.getLevel().equals (al))
+			if (entry.getLevel().equals (al) && ! Boolean.TRUE.equals(entry.getDisabled()))
 			{
 				if (entry.getUser() != null)
 					acl.getUsers().add(entry.getUser().getId());
@@ -390,7 +393,7 @@ public class AccountEntityDaoImpl extends
 		return acl;
 	}
 
-		@Override
+	@Override
 	public void accountToEntity(Account source,
 			com.soffid.iam.model.AccountEntity target, boolean copyIfNull) {
 		super.accountToEntity(source, target, copyIfNull);

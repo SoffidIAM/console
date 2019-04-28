@@ -17,14 +17,13 @@ import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
-import org.jbpm.graph.def.ProcessDefinition;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.logging.exe.LoggingInstance;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountHistory;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
@@ -35,6 +34,7 @@ import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
@@ -544,11 +544,23 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         }
                     }
                     if (!found) {
-					anyChange = true;
+                    	anyChange = true;
 
-                        aclIterator.remove();
                         notifyAccountPasswordChange(access.getAccount(), access.getGroup(), access.getRole(), access.getUser());
-                        getAccountAccessEntityDao().remove(access);
+                        if ( ConfigurationCache.isHistoryEnabled())
+                        {
+                        	if ( ! Boolean.TRUE.equals(access.getDisabled()))
+                        	{
+                        		access.setDisabled(true);
+                        		access.setEnd(new Date());
+                        		getAccountAccessEntityDao().update(access);
+                        	}
+                        }
+                        else
+                        {                        	
+                        	aclIterator.remove();
+                        	getAccountAccessEntityDao().remove(access);
+                        }
                     }
                 }
             }
@@ -564,6 +576,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     access.setGroup(ge);
                     access.setAccount(acc);
                     access.setLevel(levels[index]);
+                    access.setDisabled(false);
+                    access.setStart(new Date());
                     getAccountAccessEntityDao().create(access);
                     acc.getAcl().add(access);
                     notifyAccountPasswordChange(acc, ge, null, null);
@@ -578,6 +592,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     access.setRole(re);
                     access.setAccount(acc);
                     access.setLevel(levels[index]);
+                    access.setDisabled(false);
+                    access.setStart(new Date());
                     getAccountAccessEntityDao().create(access);
                     acc.getAcl().add(access);
                     notifyAccountPasswordChange(acc, null, re, null);
@@ -592,6 +608,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     access.setUser(ue);
                     access.setAccount(acc);
                     access.setLevel(levels[index]);
+                    access.setDisabled(false);
+                    access.setStart(new Date());
                     getAccountAccessEntityDao().create(access);
                     acc.getAcl().add(access);
                     notifyAccountPasswordChange(acc, null, null, ue);
@@ -1017,7 +1035,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				
 		groups = new HashMap<String, Group>();
 		addGroups(groups, ue.getPrimaryGroup());
-		for (UserGroupEntity grup : ue.getSecondaryGroups()) addGroups(groups, grup.getGroup());
+		for (UserGroupEntity grup : ue.getSecondaryGroups()) 
+			if (! Boolean.TRUE.equals(grup.getDisabled()))
+				addGroups(groups, grup.getGroup());
 			
 		interpreter.set("attributes", attributes); //$NON-NLS-1$
 		interpreter.set("groups", groups); //$NON-NLS-1$
@@ -1116,15 +1136,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             }
 		} else {
 			for (AccountAccessEntity aae : acc.getAcl()) {
-                if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
-                    addGroupMembers(aae.getGroup(), users);
-                }
-                if (aae.getRole() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
-                    addRolMembers(aae.getRole(), users);
-                }
-                if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
-                    users.add(aae.getUser().getUserName());
-                }
+				if (! Boolean.TRUE.equals(aae.getDisabled()))
+				{
+					if (aae.getGroup() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+						addGroupMembers(aae.getGroup(), users);
+					}
+					if (aae.getRole() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+						addRolMembers(aae.getRole(), users);
+					}
+					if (aae.getUser() != null && isGreaterOrIqualThan(aae.getLevel(), level)) {
+						users.add(aae.getUser().getUserName());
+					}
+				}
             }
 		}
 		
@@ -1152,7 +1175,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             users.add(u.getUserName());
         }
 		for (UserGroupEntity ug : group.getSecondaryGroupUsers()) {
-            users.add(ug.getUser().getUserName());
+			if (! Boolean.TRUE.equals(ug.getDisabled()))
+				users.add(ug.getUser().getUserName());
         }
 		for (GroupEntity child : group.getChildren()) {
             addGroupMembers(child, users);
@@ -1174,7 +1198,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	private void addGrantedAccounts(GroupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level) {
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
-			if (isGreaterOrIqualThan(aae.getLevel(), level))
+			if (!Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
 			{
 				accounts.add(aae.getAccount());
 			}
@@ -1905,18 +1929,20 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (RoleGrant rg : grants) {
             RoleEntity r = getRoleEntityDao().load(rg.getRoleId());
             for (AccountAccessEntity aae : r.getAccountAccess()) {
-                if (isGreaterOrIqualThan(aae.getLevel(), level)) accounts.add(aae.getAccount());
+                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level)) 
+                	accounts.add(aae.getAccount());
             }
         }
 		UserEntity ue = getUserEntityDao().load(usuari.getId());
 		addGrantedAccounts(ue.getPrimaryGroup(), accounts, level);
 		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
-            addGrantedAccounts(ug.getGroup(), accounts, level);
+			if (! Boolean.TRUE.equals(ug.getDisabled()))
+				addGrantedAccounts(ug.getGroup(), accounts, level);
         }
 		
 		for (AccountAccessEntity aae: ue.getAccountAccess())
 		{
-			if (isGreaterOrIqualThan(aae.getLevel(), level))
+			if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
 				accounts.add(aae.getAccount());
 		}
 		
@@ -2248,12 +2274,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	@Override
 	protected List<Account> handleFindSharedAccountsByUser(String userName) throws Exception {
-		com.soffid.iam.api.System mainDispatcher = getDispatcherService().findSoffidDispatcher();
 		List<Account> accounts = new LinkedList<Account>();
 		User u = getUserService().findUserByUserName(userName);
 		if (u == null)
 			return accounts;
-		for (Account acc: handleGetUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_MANAGER))
+		for (Account acc: handleGetUserGrantedAccounts(u, AccountAccessLevelEnum.ACCESS_USER))
 		{
 			if (!acc.getType().equals(AccountType.USER))
 			{
@@ -2262,6 +2287,85 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 		return accounts;
 		
+	}
+
+	
+	@Override
+	protected List<AccountHistory> handleFindSharedAccountsHistoryByUser(String userName) throws Exception {
+		Set<Long> ids = new HashSet<Long>();
+		List<AccountHistory> accounts = new LinkedList<AccountHistory>();
+		User u = getUserService().findUserByUserName(userName);
+		if (u == null)
+			return accounts;
+		if (!AutoritzacionsUsuari.hasQueryAccount())
+		{
+			User caller = AutoritzacionsUsuari.getCurrentUsuari();
+			if (caller != null && caller.getId() != u.getId())
+				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
+		}
+		
+		// Role granted accounts
+		Collection<RoleAccount> grants = getApplicationService().findUserRolesHistoryByUserName(userName);
+		for (RoleAccount rg : grants) {
+            RoleEntity r = getRoleEntityDao().findByNameAndSystem(rg.getRoleName(), rg.getSystem());
+            for (AccountAccessEntity aae : r.getAccountAccess()) {
+                if (isGreaterOrIqualThan(aae.getLevel(), AccountAccessLevelEnum.ACCESS_USER) &&
+                		!ids.contains(aae.getAccount().getId())) 
+                {
+                	AccountHistory h = new AccountHistory();
+                	h.setStart( h.getStart() == null || 
+                			aae.getStart() != null && rg.getStartDate().after(aae.getStart()) ? 
+                					aae.getStart():
+                					rg.getStartDate());
+                	h.setEnd( h.getEnd() == null || 
+                			aae.getEnd() != null && rg.getEndDate().before(aae.getEnd()) ? 
+                					aae.getEnd():
+                					rg.getEndDate());
+                	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+                	accounts.add(h);
+                	ids.add(aae.getAccount().getId());
+                }
+            }
+        }
+
+		// User granted accounts
+		UserEntity ue = getUserEntityDao().load(u.getId());
+        for (AccountAccessEntity aae : ue.getAccountAccess()) {
+            if (isGreaterOrIqualThan(aae.getLevel(), AccountAccessLevelEnum.ACCESS_USER) &&
+            		!ids.contains(aae.getAccount().getId())) 
+            {
+            	AccountHistory h = new AccountHistory();
+            	h.setStart( aae.getStart());
+            	h.setEnd( aae.getEnd());
+            	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+            	accounts.add(h);
+            	ids.add(aae.getAccount().getId());
+            }
+        }
+		
+		// Group granted accounts
+		Collection<UserGroupEntity> groups = ue.getSecondaryGroups();
+		for (UserGroupEntity rg : groups) {
+            for (AccountAccessEntity aae : rg.getGroup().getAccountAccess()) {
+                if (isGreaterOrIqualThan(aae.getLevel(), AccountAccessLevelEnum.ACCESS_USER) &&
+                		!ids.contains(aae.getAccount().getId())) 
+                {
+                	AccountHistory h = new AccountHistory();
+                	h.setStart( h.getStart() == null || 
+                			aae.getStart() != null && rg.getStart().after(aae.getStart()) ? 
+                					aae.getStart():
+                					rg.getStart());
+                	h.setEnd( h.getEnd() == null || 
+                			aae.getEnd() != null && rg.getEnd().before(aae.getEnd()) ? 
+                					aae.getEnd():
+                					rg.getEnd());
+                	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+                	accounts.add(h);
+                	ids.add(aae.getAccount().getId());
+                }
+            }
+        }
+		return accounts;
 	}
 
 }

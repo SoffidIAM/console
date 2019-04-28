@@ -51,7 +51,8 @@ public class ACLServiceImpl extends ACLServiceBase  {
 			recursivelyAddGroup (acl, ue.getPrimaryGroup());
 			for (UserGroupEntity uge: ue.getSecondaryGroups())
 			{
-				recursivelyAddGroup (acl, uge.getGroup());
+				if (! Boolean.TRUE.equals(uge.getDisabled()))
+					recursivelyAddGroup (acl, uge.getGroup());
 			}
 		}
 		pc = new PermissionCache();
@@ -193,7 +194,8 @@ public class ACLServiceImpl extends ACLServiceBase  {
 			users.add(ue.getId());
 
 		for ( UserGroupEntity ue: ge.getSecondaryGroupUsers())
-			users.add(ue.getUser().getId());
+			if (! Boolean.TRUE.equals(ue.getDisabled()))
+				users.add(ue.getUser().getId());
 		
 		for (GroupEntity child: ge.getChildren())
 			addGroupMembers(child, users);
@@ -205,7 +207,8 @@ public class ACLServiceImpl extends ACLServiceBase  {
 			addUserAccounts(ue, d, accounts);
 
 		for ( UserGroupEntity ue: ge.getSecondaryGroupUsers())
-			addUserAccounts(ue.getUser(), d, accounts);
+			if (! Boolean.TRUE.equals(ue.getDisabled()))
+				addUserAccounts(ue.getUser(), d, accounts);
 		
 		for (GroupEntity child: ge.getChildren())
 			addGroupMembers(child, d, accounts);

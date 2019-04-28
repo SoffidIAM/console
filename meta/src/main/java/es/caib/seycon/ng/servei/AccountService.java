@@ -96,6 +96,15 @@ public abstract class AccountService {
 	 return null;
 	}
 	
+	////////// findUserAccounts
+	@Description("Gets the non single-user accounts history for a user")
+	@Operation ( grantees={roles.user_query.class},
+			translated="findSharedAccountsHistoryByUser")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List<es.caib.seycon.ng.comu.AccountHistory> findSharedAccountsHistoryByUser(String userName) {
+	 return null;
+	}
+	
 	/////////////////
 	@Operation ( grantees={roles.user_create.class,roles.user_update.class},
 			translated="createAccount")

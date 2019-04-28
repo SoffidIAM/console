@@ -125,4 +125,8 @@ public class ConfigurationCache {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public static boolean isHistoryEnabled() {
+		return "true".equals( ConfigurationCache.getProperty("soffid.history.enabled") );
+	}
 }

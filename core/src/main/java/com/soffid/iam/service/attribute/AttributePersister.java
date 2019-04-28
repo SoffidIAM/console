@@ -16,8 +16,9 @@ import com.soffid.iam.service.impl.AttributeValidationService;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
-	public void updateAttributes (Map<String,Object> attributes, ENTITY entity) throws InternalErrorException
+	public boolean updateAttributes (Map<String,Object> attributes, ENTITY entity) throws InternalErrorException
 	{
+		boolean anyChange = false;
 		if (entity != null)
 		{
 			if (attributes == null)
@@ -41,18 +42,24 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 						{
 							if (o != null)
 							{
-								updateAttribute(entity, entities, key, metadata, o);
+								if (updateAttribute(entity, entities, key, metadata, o))
+									anyChange = true;
 							}
 						}
 					}
 					else
 					{
-						updateAttribute(entity, entities, key, metadata, v);
+						if (updateAttribute(entity, entities, key, metadata, v))
+							anyChange = true;
 					}
 				}
 			}
-			
-			getEntityAttributes(entity).removeAll(entities);
+
+			if (!entities.isEmpty())
+			{
+				getEntityAttributes(entity).removeAll(entities);
+				anyChange = true;
+			}
 			updateEntity(entity);
 
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(getMetadataScope());
@@ -79,9 +86,10 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 				}
 			}
 		}
+		return anyChange;
 	}
 
-	private void updateAttribute(ENTITY entity, LinkedList<ATTRIBUTEENTITY> attributes, String key,
+	private boolean updateAttribute(ENTITY entity, LinkedList<ATTRIBUTEENTITY> attributes, String key,
 			MetaDataEntity metadata, Object value) throws InternalErrorException {
 		ATTRIBUTEENTITY aae = findAttributeEntity(attributes, key, value);
 		if (aae == null)
@@ -89,9 +97,13 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
 			aae = createNewAttribute(entity, metadata, value);
 			getEntityAttributes(entity).add(aae);
+			return true;
 		}
 		else
+		{
 			attributes.remove(aae);
+			return false;
+		}
 	}
 	
 	protected abstract List<ATTRIBUTEENTITY> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) ;

@@ -3,6 +3,7 @@ package com.soffid.iam.service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountCriteria;
@@ -70,7 +72,18 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Remove previous permissions
 		for ( AccountAccessEntity aae: new LinkedList<AccountAccessEntity> (accountEntity.getAcl()))
 		{
-			getAccountAccessEntityDao().remove (aae);
+			if ( ! Boolean.TRUE.equals(aae.getDisabled()))
+			{
+				if (ConfigurationCache.isHistoryEnabled())
+				{
+					aae.setDisabled(true);
+					aae.setEnd(new Date());
+					getAccountAccessEntityDao().update (aae);
+				}
+				else
+					getAccountAccessEntityDao().remove (aae);
+				
+			}
 		}
 		// Add new permissions
 		for ( VaultFolderAccessEntity fae: accountEntity.getFolder().getAcl())
@@ -95,6 +108,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		aae.setRole(folderAccess.getRole());
 		aae.setUser(folderAccess.getUser());
 		aae.setLevel(folderAccess.getLevel());
+		aae.setStart(new Date());
+		aae.setDisabled(false);
 		return aae;
 	}
 
@@ -630,6 +645,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	private boolean matchACE (VaultFolderAccessEntity vfae, AccountAccessEntity aae)
 	{
+		if (Boolean.TRUE.equals(aae.getDisabled()))
+			return false;
+		
 		if (vfae.getGroup() != aae.getGroup())
 			return false;
 		
@@ -650,7 +668,14 @@ public class VaultServiceImpl extends VaultServiceBase {
 			{
 				if (matchACE (access, aae))
 				{
-					getAccountAccessEntityDao().remove(aae);
+					if (ConfigurationCache.isHistoryEnabled())
+					{
+						aae.setDisabled(true);
+						aae.setEnd(new Date());
+						getAccountAccessEntityDao().update(aae);
+					}
+					else
+						getAccountAccessEntityDao().remove(aae);
 					createAccountTask(ae);
 					break;
 				}
@@ -741,7 +766,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 			ap.setPermissions(new Vector<AccountAccessLevelEnum>());
 			for (AccountAccessEntity perm : accountEntity.getAcl())
 			{
-				addPermissions (grantee, ap, perm.getUser(), perm.getGroup(), perm.getRole(), perm.getLevel());
+				if ( ! Boolean.TRUE.equals(perm.getDisabled()))
+					addPermissions (grantee, ap, perm.getUser(), perm.getGroup(), perm.getRole(), perm.getLevel());
 			}
 			p.getAccounts().add(ap);
 		}
@@ -845,12 +871,23 @@ public class VaultServiceImpl extends VaultServiceBase {
 			AccountAccessLevelEnum level) {
 		for ( AccountAccessEntity ace: account.getAcl())
 		{
-			if (match (object, ace.getUser(), ace.getGroup(), ace.getRole()))
+			if (!Boolean.TRUE.equals(ace.getDisabled()) &&
+					match (object, ace.getUser(), ace.getGroup(), ace.getRole()))
 			{
 				if (! ace.getLevel().equals (level))
 				{
 					if (level.equals (AccountAccessLevelEnum.ACCESS_NONE))
-						getAccountAccessEntityDao().remove(ace);
+					{
+						if (ConfigurationCache.isHistoryEnabled())
+						{
+							ace.setDisabled(true);
+							ace.setEnd(new Date());
+							getAccountAccessEntityDao().update(ace);
+						}
+						else
+							getAccountAccessEntityDao().remove(ace);
+						
+					}
 					else
 					{
 						ace.setLevel(level);
@@ -875,6 +912,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		if (object instanceof Role)
 			ace.setRole( getRoleEntityDao().load (((Role) object).getId()));
 		ace.setLevel(level);
+		ace.setStart(new Date());
+		ace.setDisabled(Boolean.FALSE);
 		getAccountAccessEntityDao().create(ace);
 		account.getAcl().add(ace);
 		

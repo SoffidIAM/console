@@ -1174,14 +1174,24 @@ public class ApplicationServiceImpl extends
 	    }
 	    else
 	    {
-			List<RoleAccountEntity> list = new LinkedList<RoleAccountEntity>();
-			list.add(rolsUsuarisEntity);
 			if (rolsUsuarisEntity.getParent() != null)
 			{
 				rolsUsuarisEntity.getChildren().remove(rolsUsuarisEntity);
 			}
-			getRoleAccountEntityDao().remove(rolsUsuarisEntity);
-			
+			for ( RoleAccountEntity child: new LinkedList<RoleAccountEntity> (rolsUsuarisEntity.getChildren()) )
+				deleteRoleAccountEntity(child, null, true);
+			if (ConfigurationCache.isHistoryEnabled())
+			{
+				rolsUsuarisEntity.setEnabled(false);
+				if (rolsUsuarisEntity.getEndDate() == null ||
+						rolsUsuarisEntity.getEndDate().after(new Date()))
+					rolsUsuarisEntity.setEndDate(new Date());
+				getRoleAccountEntityDao().update(rolsUsuarisEntity);
+			}
+			else
+			{
+				getRoleAccountEntityDao().remove(rolsUsuarisEntity);
+			}
 			if (user != null)
 				getRuleEvaluatorService().applyRules(user);
 			getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
@@ -1285,18 +1295,24 @@ public class ApplicationServiceImpl extends
     }
 
     protected Collection<RoleAccount> handleFindUserRolesByUserName(String codiUsuari) throws Exception {// desde usuaris.zul para ver qué roles puede
-    	return internalFindUserRolesByUserName (codiUsuari, true);
+    	return internalFindUserRolesByUserName (codiUsuari, true, false);
     }
 
-    private Collection<RoleAccount> internalFindUserRolesByUserName(String codiUsuari, boolean sod) throws InternalErrorException {
+    protected Collection<RoleAccount> handleFindUserRolesHistoryByUserName(String codiUsuari) throws Exception {// desde usuaris.zul para ver qué roles puede
+    	return internalFindUserRolesByUserName (codiUsuari, false, true);
+    }
+
+    private Collection<RoleAccount> internalFindUserRolesByUserName(String codiUsuari, boolean sod, boolean history) throws InternalErrorException {
     	List<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByUserName(codiUsuari);
     	
     	if (rolusus != null) {
     		// Filtrem per autoritzacions
     		List<RoleAccount> ra = new LinkedList<RoleAccount>();
     		for (RoleAccountEntity rae : rolusus) {
-    			if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) ;
-    			ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
+    			if ( history || shouldBeEnabled(rae)){
+    				if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) 
+    					ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
+    			}
     		}
     		if (sod)
     			getSoDRuleService().qualifyRolAccountList(ra);
@@ -1694,7 +1710,8 @@ public class ApplicationServiceImpl extends
     		if (holderGroup == null || holderGroup  == user.getPrimaryGroup())
     			populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user);
     		for (UserGroupEntity ug : user.getSecondaryGroups()) {
-        		if (holderGroup == null || holderGroup  == ug.getGroup())
+        		if (! Boolean.TRUE.equals(ug.getDisabled()) &&
+        				(holderGroup == null || holderGroup  == ug.getGroup()))
         			populateGroupRoles(rad, ALL, ug.getGroup(), user);
             }
     	}
@@ -1878,7 +1895,24 @@ public class ApplicationServiceImpl extends
 		return rg;
 	}
 
-	@Override
+    protected Collection<RoleAccount> handleFindRoleAccountHistoryByAccount(long accountId) throws Exception {
+		LinkedList<RoleAccount> rg = new LinkedList<RoleAccount>();
+		AccountEntity account = getAccountEntityDao().load(accountId);
+		if (account == null)
+			return rg;
+		
+    	Collection<RoleAccountEntity> rolusus = account.getRoles();
+    	
+		// Filtrem per autoritzacions
+		List<RoleAccount> ra = new LinkedList<RoleAccount>();
+		for (RoleAccountEntity rae : rolusus) {
+			ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
+		}
+		return ra;
+	}
+
+
+    @Override
     protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUser(long userId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
 		if (user.getUserName().equals(Security.getCurrentUser()) && 
@@ -2079,7 +2113,7 @@ public class ApplicationServiceImpl extends
         }
 		
 		for (UserGroupEntity sg : grup.getSecondaryGroupUsers()) {
-			if (sg.getUser().getActive().equals("S"))
+			if (! Boolean.TRUE.equals(sg.getDisabled())  && sg.getUser().getActive().equals("S"))
 				populateParentGrantsForUser(radSet, sg.getUser(), originalGrant, grup);
         }
 
@@ -2244,7 +2278,8 @@ public class ApplicationServiceImpl extends
 			return;
 		
 		for (UserGroupEntity uge : user.getSecondaryGroups()) {
-            if (uge.getGroup().getId().equals(groupId)) return;
+            if (uge.getGroup().getId().equals(groupId) && ! Boolean.TRUE.equals(uge.getDisabled())) 
+            	return;
         }
 		
 		GroupEntity ge = getGroupEntityDao().load(groupId);
@@ -3109,7 +3144,7 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	protected Collection<RoleAccount> handleFindUserRolesByUserNameNoSoD(String codiUsuari) throws Exception {
-    	return internalFindUserRolesByUserName (codiUsuari, false);
+    	return internalFindUserRolesByUserName (codiUsuari, false, false);
 	}
 
 

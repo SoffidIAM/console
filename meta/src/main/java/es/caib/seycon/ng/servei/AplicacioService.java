@@ -596,6 +596,15 @@ public abstract class AplicacioService {
 	}
 
 	@Operation(grantees = { roles.application_query.class,
+			roles.user_query.class }, translated = "findUserRolesHistoryByUserName")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuariHistoric(
+			java.lang.String codiUsuari)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class,
 			roles.user_query.class },
 			translated = "findUserRolesByInformationSystem")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByInformationSystem(

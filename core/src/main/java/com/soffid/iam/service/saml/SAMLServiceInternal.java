@@ -2,10 +2,13 @@ package com.soffid.iam.service.saml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyPair;
@@ -75,6 +78,8 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.metadata.criteria.entity.EvaluableEntityDescriptorCriterion;
+import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
+import org.opensaml.saml.metadata.resolver.impl.FilesystemMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.HTTPMetadataResolver;
 import org.opensaml.saml.saml2.assertion.ConditionValidator;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
@@ -704,9 +709,9 @@ public class SAMLServiceInternal {
     }
     
     
-    Map<String,HTTPMetadataResolver> resolver = new HashMap<String, HTTPMetadataResolver>();
+    Map<String,AbstractReloadingMetadataResolver> resolver = new HashMap<String, AbstractReloadingMetadataResolver>();
     
-    private EntityDescriptor getIdpMetadata (String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException
+    private EntityDescriptor getIdpMetadata (String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, MalformedURLException
     {
     	String metadataUrl = ConfigurationCache.getTenantProperty(tenant, "soffid.saml.metadata.url");
     	String metadataCache = ConfigurationCache.getTenantProperty(tenant, "soffid.saml.metadata.cache");
@@ -719,7 +724,7 @@ public class SAMLServiceInternal {
     		throw new InternalErrorException("Identity provider ID is not configured");
     	
     	String entryName = tenant + " " + metadataUrl + " " + metadataIdp;
-    	HTTPMetadataResolver r = resolver.get(entryName);
+    	AbstractReloadingMetadataResolver r = resolver.get(entryName);
     	if ( r == null)
     	{
     		r = configureMetadataResolver(metadataUrl, metadataCache);
@@ -732,25 +737,45 @@ public class SAMLServiceInternal {
     	return entity;
     }
 
-	private HTTPMetadataResolver configureMetadataResolver(String metadataUrl, String metadataCache)
-			throws ResolverException, ComponentInitializationException {
-		HttpClient client = HttpClients.createDefault();
-		HTTPMetadataResolver r = new HTTPMetadataResolver(client, metadataUrl);
-		r.setMinRefreshDelay(Long.parseLong(metadataCache) * 1000L);
-		r.setId(metadataUrl);
-		r.setResolveViaPredicatesOnly(true);
-		r.setUseDefaultPredicateRegistry(true);
-		BasicParserPool pool = new BasicParserPool();
-		pool.initialize();
-		r.setParserPool(pool);
-		r.initialize();
+	private AbstractReloadingMetadataResolver configureMetadataResolver(String metadataUrl, String metadataCache)
+			throws ResolverException, ComponentInitializationException, MalformedURLException {
 		
-		return r;
+		if (metadataUrl.startsWith("http"))
+		{
+			HttpClient client = HttpClients.createDefault();
+			HTTPMetadataResolver r = new HTTPMetadataResolver(client, metadataUrl);
+			r.setMinRefreshDelay(Long.parseLong(metadataCache) * 1000L);
+			r.setId(metadataUrl);
+			r.setResolveViaPredicatesOnly(true);
+			r.setUseDefaultPredicateRegistry(true);
+			BasicParserPool pool = new BasicParserPool();
+			pool.initialize();
+			r.setParserPool(pool);
+			r.initialize();
+			return r;
+		}
+		else
+		{
+			String file = metadataUrl;
+			if (file.startsWith("file:"))
+				file = new URL(file).getFile();
+			FilesystemMetadataResolver r = new FilesystemMetadataResolver(new File (file));
+			r.setMinRefreshDelay(Long.parseLong(metadataCache) * 1000L);
+			r.setId(metadataUrl);
+			r.setResolveViaPredicatesOnly(true);
+			r.setUseDefaultPredicateRegistry(true);
+			BasicParserPool pool = new BasicParserPool();
+			pool.initialize();
+			r.setParserPool(pool);
+			r.initialize();
+			return r;
+		}
+		
 	}
     
     Log log = LogFactory.getLog(getClass());
     
-    private boolean validateAssertion (String hostName, Assertion assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
+    private boolean validateAssertion (String hostName, Assertion assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException, MalformedURLException
     {
     	SAML20AssertionValidator validator = getValidator(hostName);
     	
@@ -817,7 +842,7 @@ public class SAMLServiceInternal {
 		return true;
 	}
 
-	private SAML20AssertionValidator getValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
+	private SAML20AssertionValidator getValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException, MalformedURLException {
 		EntityDescriptor md = getIdpMetadata(tenant);
 
 		List<ConditionValidator> conditionValidators = new LinkedList<ConditionValidator>();
@@ -864,7 +889,7 @@ public class SAMLServiceInternal {
     	return new SAML20AssertionValidator(conditionValidators, subjectConfirmationValidators, statementValidators, signatureTrustEngine, signaturePrevalidator);
 	}
 
-    private boolean validateResponse (String tenant, Response assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException
+    private boolean validateResponse (String tenant, Response assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException, MalformedURLException
     {
     	SAML20ResponseValidator validator = getResponseValidator(tenant);
     	
@@ -893,7 +918,7 @@ public class SAMLServiceInternal {
     	
     }
 
-    private SAML20ResponseValidator getResponseValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException {
+    private SAML20ResponseValidator getResponseValidator(String tenant) throws ResolverException, InternalErrorException, ComponentInitializationException, CertificateException, MalformedURLException {
 		EntityDescriptor md = getIdpMetadata(tenant);
 
 		List<ConditionValidator> conditionValidators = new LinkedList<ConditionValidator>();
@@ -938,7 +963,7 @@ public class SAMLServiceInternal {
     	return new SAML20ResponseValidator(conditionValidators, subjectConfirmationValidators, statementValidators, signatureTrustEngine, signaturePrevalidator);
 	}
 
-	public List<String> findIdentityProviders() throws InternalErrorException, ResolverException, ComponentInitializationException {
+	public List<String> findIdentityProviders() throws InternalErrorException, ResolverException, ComponentInitializationException, MalformedURLException {
     	String metadataUrl = ConfigurationCache.getProperty("soffid.saml.metadata.url");
     	String metadataCache = ConfigurationCache.getProperty("soffid.saml.metadata.cache");
     	if (metadataCache == null) metadataCache="600";
@@ -948,7 +973,7 @@ public class SAMLServiceInternal {
     	
     	String tenant = com.soffid.iam.utils.Security.getCurrentTenantName();
 
-    	HTTPMetadataResolver r = configureMetadataResolver(metadataUrl, metadataCache);
+    	AbstractReloadingMetadataResolver r = configureMetadataResolver(metadataUrl, metadataCache);
 
     	CriteriaSet criteria = new CriteriaSet();
     	String metadataIdp = ConfigurationCache.getProperty("soffid.saml.idp");
@@ -967,8 +992,8 @@ public class SAMLServiceInternal {
     	return ids;
 	}
 	
-	public List<String> findIdentityProviders(String url) throws InternalErrorException, ResolverException, ComponentInitializationException {
-		HTTPMetadataResolver r = configureMetadataResolver(url, "5");
+	public List<String> findIdentityProviders(String url) throws InternalErrorException, ResolverException, ComponentInitializationException, MalformedURLException {
+		AbstractReloadingMetadataResolver r = configureMetadataResolver(url, "5");
     	
     	CriteriaSet criteria = new CriteriaSet();
     	criteria.add( new EvaluableEntityDescriptorCriterion() {

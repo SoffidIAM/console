@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
 import java.util.Map;
 
 import com.soffid.mda.annotation.*;
@@ -31,6 +32,21 @@ public class UsuariGrup {
 
 	@Nullable
 	public java.lang.String info;
+
+	@Nullable
+	public Date start;
+
+	@Nullable
+	public Date end;
+
+	@Nullable
+	@Attribute(defaultValue="Boolean.FALSE")
+	public Boolean disabled;
+
+	@Description("This column indicates that this membership is an historic snapshot of a primary group membership")
+	@Attribute(defaultValue="Boolean.FALSE")
+	@Nullable
+	public Boolean primaryGroup;
 
 	@Description ("User group custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")

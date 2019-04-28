@@ -1970,8 +1970,6 @@ String nomRolsBorrar = "";
 													{
 														c.style = "text-decoration: line-through;";
 													}
-												} else {
-													event.data.style = event.data.style + "; background-color: transparent;";
 												}
 											} else if (showHolderGroup) {
 												// Change holdergroup textbox to a new listbox

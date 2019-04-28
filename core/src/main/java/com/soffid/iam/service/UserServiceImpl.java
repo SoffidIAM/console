@@ -205,7 +205,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				.findUserMailListByUserName(usuariEntity.getUserName());
 		for (Iterator it = llistesDeCorreu.iterator(); it.hasNext();) {
 			UserMailList llistaCorreuUsuari = (UserMailList) it.next();
-			getMailListsService().userMailList(llistaCorreuUsuari);
+			getMailListsService().deleteUserMailList(llistaCorreuUsuari);
 		}
 
 		/*
@@ -446,6 +446,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 		getRuleEvaluatorService().applyRules(usuariEntity);
 
+		if (ConfigurationCache.isHistoryEnabled())
+		{
+			UserGroupEntity uge = getUserGroupEntityDao().newUserGroupEntity();
+			uge.setGroup(usuariEntity.getPrimaryGroup());
+			uge.setDisabled(Boolean.TRUE);
+			uge.setStart(new Date());
+			getUserGroupEntityDao().create(uge);
+		}
+		
 		return getUserEntityDao().toUser(usuariEntity);
 	}
 
@@ -1309,7 +1318,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 							.findUserMailListByListNameAndDomainNameAndUserName(
 									alies, domini, usuari.getUserName());
 					if (llistaCorreuUsuari != null) {
-						getMailListsService().userMailList(llistaCorreuUsuari);
+						getMailListsService().deleteUserMailList(llistaCorreuUsuari);
 					}
 					Collection usuaris = getMailListsService()
 							.findUsersByMailListNameAndDomainName(alies, domini);
@@ -1404,7 +1413,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				.findUserMailListByListNameAndDomainNameAndUserName(alies,
 						domini, codiUsuari);
 		if (llistaCorreuUsuari != null) {
-			getMailListsService().userMailList(llistaCorreuUsuari);
+			getMailListsService().deleteUserMailList(llistaCorreuUsuari);
 		}
 
 		// La neteja de llistes es fa al delete de listaCorreuUsuari
@@ -1621,6 +1630,31 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			service.propagateRolsChangesToDispatcher(usuari.getPrimaryGroup());
 			service.propagateRolsChangesToDispatcher(usuariAbans
 					.getPrimaryGroup().getName());
+			
+			if (ConfigurationCache.isHistoryEnabled())
+			{
+				for (UserGroupEntity uge: usuariAbans.getSecondaryGroups())
+				{
+					if ( uge.getEnd() == null && Boolean.TRUE.equals ( uge.getDisabled() ) && 
+							Boolean.TRUE.equals(uge.getPrimaryGroup()))
+					{
+						uge.setEnd(new Date());
+						getUserGroupEntityDao().update(uge);
+					}
+				}
+				UserGroupEntity uge = getUserGroupEntityDao().newUserGroupEntity();
+				GroupEntity group = getGroupEntityDao().findByName( usuari.getPrimaryGroup());
+				if (group != null)
+				{
+					uge.setGroup( group );
+					uge.setUser(usuariAbans);
+					uge.setDisabled(Boolean.TRUE);
+					uge.setStart(new Date());
+					uge.setPrimaryGroup(Boolean.TRUE);
+					getUserGroupEntityDao().create(uge);
+				}
+			}
+
 		}
 
 		arreglaAlias(usuari);

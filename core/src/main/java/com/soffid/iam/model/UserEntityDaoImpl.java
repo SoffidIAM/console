@@ -131,7 +131,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         //  Now, updates any mail lists the users belongs
         //  First, directly
         for (UserEmailEntity lce : usuari.getUserMailList()) {
-            getEmailListEntityDao().generateUpdateTasks(lce.getMailList());
+        	if (!Boolean.TRUE.equals(lce.getDisabled()))
+        		getEmailListEntityDao().generateUpdateTasks(lce.getMailList());
         }
         createGroupMailListTaks(usuari.getPrimaryGroup());
         // Next, secondary groups
@@ -256,10 +257,15 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         String aliesDeCorreu = ""; //$NON-NLS-1$
         for (Iterator iterator = sourceEntity.getUserMailList().iterator(); iterator.hasNext(); ) {
             UserEmailEntity llistaCorreuUsuariEntity = (UserEmailEntity) iterator.next();
-            UserMailList llistaCorreuUsuari = getUserEmailEntityDao().toUserMailList(llistaCorreuUsuariEntity);
-            String nomLlista = llistaCorreuUsuari.getMailListName();
-            String domini = llistaCorreuUsuari.getDomainCode();
-            aliesDeCorreu += nomLlista + (domini == null ? "" : "@" + domini) + (iterator.hasNext() ? ", " : "");
+            if ( ! Boolean.TRUE.equals( llistaCorreuUsuariEntity.getDisabled()))
+            {
+            	if ( ! aliesDeCorreu.isEmpty())
+            		aliesDeCorreu += ", ";
+	            UserMailList llistaCorreuUsuari = getUserEmailEntityDao().toUserMailList(llistaCorreuUsuariEntity);
+	            String nomLlista = llistaCorreuUsuari.getMailListName();
+	            String domini = llistaCorreuUsuari.getDomainCode();
+	            aliesDeCorreu += nomLlista + (domini == null ? "" : "@" + domini);
+            }
         }
         targetVO.setMailAlias(aliesDeCorreu);
 

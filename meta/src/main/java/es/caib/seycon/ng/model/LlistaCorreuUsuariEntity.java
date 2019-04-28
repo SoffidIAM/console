@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_USULCO" , translatedName="UserEmailEntity", translatedPackage="com.soffid.iam.model")
@@ -25,6 +27,18 @@ public abstract class LlistaCorreuUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
+	@Column (name="ULC_START")
+	@Nullable
+	public Date start;
+
+	@Column (name="ULC_END")
+	@Nullable
+	public Date end;
+
+	@Column (name="ULC_DISABLED")
+	@Nullable
+	public Boolean disabled;
+
 	@Operation(translated="findByListAndUser")
 	@DaoFinder("select liu "
 			+ "from com.soffid.iam.model.UserEmailEntity liu "
@@ -33,7 +47,7 @@ public abstract class LlistaCorreuUsuariEntity {
 			+ "  liu.mailList.tenant.id = :tenantId and "
 			+ " ((:domain is null and dominiCorreu is null) or "
 			+ " ( :domain is not null and dominiCorreu is not null and dominiCorreu.name = :domain)) and"
-			+ " liu.user.userName = :user ")
+			+ " liu.user.userName = :user and liu.disabled = false")
 	public es.caib.seycon.ng.model.LlistaCorreuUsuariEntity findByNomLlistaCorreuAndCodiDominiAndCodiUsuari(
 		java.lang.String mailList, 
 		java.lang.String domain, 
@@ -43,7 +57,7 @@ public abstract class LlistaCorreuUsuariEntity {
 	@Operation(translated="findByUser")
 	@DaoFinder("select liu "
 			+ "from  com.soffid.iam.model.UserEmailEntity liu "
-			+ "where liu.user.userName = :user and liu.user.tenant.id = :tenantId "
+			+ "where liu.user.userName = :user and liu.user.tenant.id = :tenantId and liu.disabled = false "
 			+ "order by liu.mailList.name, liu.mailList.domain.name")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> findByCodiUsuari(
 		java.lang.String user) {
@@ -55,6 +69,7 @@ public abstract class LlistaCorreuUsuariEntity {
 			+ "left join liu.mailList.domain as dominiCorreu "
 			+ "where liu.mailList.name = :mailList and "
 			+ "liu.mailList.tenant.id = :tenantId and "
+			+ "liu.disabled = false and "
 			+ "((:domain is null and dominiCorreu is null) or "
 			+ " ( :domain is not null and dominiCorreu is not null and dominiCorreu.name = :domain))")
 	public java.util.List<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> findByNomLlistaCorreuAndCodiDomini(

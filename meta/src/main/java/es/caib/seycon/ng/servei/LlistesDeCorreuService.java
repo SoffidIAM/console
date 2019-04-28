@@ -148,7 +148,7 @@ public abstract class LlistesDeCorreuService {
 	}
 	@Operation ( grantees={roles.mail_delete.class,roles.user_delete.class,
 			roles.mail_update.class},
-			translated="userMailList")
+			translated="deleteUserMailList")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void delete(
 		es.caib.seycon.ng.comu.LlistaCorreuUsuari llistaCorreuUsuari)
@@ -180,6 +180,7 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation ( grantees={roles.mail_query.class,roles.user_delete.class},
 			translated="findUserMailListByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -188,6 +189,16 @@ public abstract class LlistesDeCorreuService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.mail_query.class,roles.user_delete.class},
+			translated="findUserMailListHistoryByUserName")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.LlistaCorreuUsuari> findLlistaCorreuUsuariHistoricByCodiUsuari(
+		java.lang.String codiUsuari)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.mail_create.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})

@@ -149,6 +149,7 @@ public class UserEmailEntityDaoImpl extends
         if (dominiCorreu != null) {
             target.setDomainCode(dominiCorreu.getName());
         }
+        target.setMailListDescription(llistaCorreu.getDescription());
         UserEntity usuari = source.getUser();
         target.setUserCode(usuari.getUserName());
         String nomComplert = usuari.getFirstName() != null ? usuari.getFirstName() : ""; //$NON-NLS-1$

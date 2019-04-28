@@ -61,6 +61,7 @@ import java.io.UnsupportedEncodingException;
 import java.rmi.activation.UnknownGroupException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +109,9 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		EmailListEntity llista = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection<UserEntity> usuaris = new LinkedList<UserEntity>();
 		for (Iterator<UserEmailEntity> it = llista.getUserMailLists().iterator(); it.hasNext(); ) {
-            usuaris.add(it.next().getUser());
+			UserEmailEntity llistaCorreuUsuari = it.next();
+			if (! Boolean.TRUE.equals(llistaCorreuUsuari.getDisabled()))
+				usuaris.add(llistaCorreuUsuari.getUser());
         }
 		return getUserEntityDao().toUserList(usuaris);
 	}
@@ -191,6 +194,9 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	protected UserMailList handleCreate(UserMailList llistaCorreuUsuari) throws Exception {
 		UserEmailEntity llistaCorreuUsuariEntity = getUserEmailEntityDao().userMailListToEntity(llistaCorreuUsuari);
 
+		llistaCorreuUsuariEntity.setDisabled(false);
+		llistaCorreuUsuariEntity.setStart(new Date());
+		llistaCorreuUsuariEntity.setEnd(null);
 		getUserEmailEntityDao().create(llistaCorreuUsuariEntity);
 
 		// Marquem l'usuari com a modificat
@@ -206,7 +212,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		return getExternEmailEntityDao().toExternalName(correuExternEntity);
 	}
 
-	protected void handleUserMailList(UserMailList llistaCorreuUsuari) throws Exception {
+	protected void handleDeleteUserMailList(UserMailList llistaCorreuUsuari) throws Exception {
 		UserEmailEntity llistaCorreuUsuariEntity = getUserEmailEntityDao().userMailListToEntity(llistaCorreuUsuari);
 		// Dades per fer feina...
 		UserEntity usuariLlista = llistaCorreuUsuariEntity.getUser();
@@ -214,7 +220,17 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		String domini = llistaCorreuUsuari.getDomainCode();
 
 		// L'esborrem
-		getUserEmailEntityDao().remove(llistaCorreuUsuariEntity);
+		if ( ConfigurationCache.isHistoryEnabled())
+		{
+			if ( ! Boolean.TRUE.equals( llistaCorreuUsuariEntity.getDisabled()))
+			{
+				llistaCorreuUsuariEntity.setEnd(new Date());
+				llistaCorreuUsuariEntity.setDisabled(true);
+				getUserEmailEntityDao().update(llistaCorreuUsuariEntity);
+			}
+		}
+		else
+			getUserEmailEntityDao().remove(llistaCorreuUsuariEntity);
 
 		// Mirem si hem de fer neteja de la llista:
 		checkEmptyMailList(alies, domini);
@@ -413,6 +429,15 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		return new Vector();
 	}
 
+	protected Collection<UserMailList> handleFindUserMailListHistoryByUserName(String codiUsuari) throws Exception {
+		UserEntity u = getUserEntityDao().findByUserName(codiUsuari);
+		Collection<UserEmailEntity> llistaCorreuUsuaris = u.getUserMailList();
+		if (llistaCorreuUsuaris != null) {
+			return getUserEmailEntityDao().toUserMailListList(llistaCorreuUsuaris);
+		}
+		return new Vector();
+	}
+
 	protected String handleFindLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(String nomLlistaCorreu, String codiDomini)
 			throws Exception {
 		String llistat = ""; //$NON-NLS-1$
@@ -460,7 +485,8 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			Iterator iterator = llistaCorreuUsuaris.iterator();
 			while (iterator.hasNext()) {
 				UserEmailEntity llistaCorreuUsuari = (UserEmailEntity) iterator.next();
-				llistat += llistaCorreuUsuari.getUser().getUserName() + ", "; //$NON-NLS-1$
+				if (! Boolean.TRUE.equals(llistaCorreuUsuari.getDisabled()))
+						llistat += llistaCorreuUsuari.getUser().getUserName() + ", "; //$NON-NLS-1$
 			}
 		}
 		if ("".equals(llistat)) { //$NON-NLS-1$
@@ -482,7 +508,13 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 				&& llistesDeCorreuPertany.size() == 0) {
 			EmailListEntity llistaEsborrar = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 			if (llistaEsborrar != null)
+			{
+				for (UserEmailEntity ul: llistaEsborrar.getUserMailLists())
+				{
+					getUserEmailEntityDao().remove(ul);
+				}
 				getEmailListEntityDao().remove(llistaEsborrar);
+			}
 		}
 
 	}
@@ -495,7 +527,14 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		UserEntity usuariLlista = llistaCorreuUsuariEntity.getUser();
 
 		// L'esborrem
-		getUserEmailEntityDao().remove(llistaCorreuUsuariEntity);
+		if (ConfigurationCache.isHistoryEnabled())
+		{
+			llistaCorreuUsuariEntity.setDisabled(true);
+			llistaCorreuUsuariEntity.setEnd(new Date());
+			getUserEmailEntityDao().update(llistaCorreuUsuariEntity);
+		}
+		else
+			getUserEmailEntityDao().remove(llistaCorreuUsuariEntity);
 
 		// Marquem l'usuari com a modificat
 		updateUserModification(usuariLlista);

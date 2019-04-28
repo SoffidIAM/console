@@ -65,17 +65,7 @@
 				descripcio = esquema.getFellow("queryWindow").getFellow("queryDescripcio").getFellow("textbox");
 				
 				// Check enable query
-				if ((nom.value.trim().length() == 0) &&
-						(domini.value.trim().length() == 0) &&
-						(descripcio.value.trim().length() == 0))
-				{
-					queryEnabled = false;
-				}
-				
-				else
-				{
-					queryEnabled = true;
-				}
+				queryEnabled = true;
 				
 				// Add parameters to search
 				searchValues.put("nom", nom.value);
@@ -500,7 +490,13 @@
 					es.caib.seycon.ng.servei.ejb.UsuariService usuariService = es.caib.seycon.ng.EJBLocator.getUsuariService();
 					
 					es.caib.seycon.ng.comu.Usuari usuario = usuariService.findUsuariByCodiUsuari(codiUsuari);
-					return usuario.getNom() + " " + usuario.getPrimerLlinatge() + " " + usuario.getSegonLlinatge();
+					if (usuario == null)
+					{
+						Missatgebox.avis( String.format ( org.zkoss.util.resource.Labels.getLabel("llistesCorreu.UserDoesNotExist"), new String[] {codiUsuari}) );
+						return "";					
+					}
+					else
+						return usuario.getNom() + " " + usuario.getPrimerLlinatge() + " " + usuario.getSegonLlinatge();
 				} else {
 					return "";
 				}
@@ -515,10 +511,10 @@
 				LinkedList esborrar = new LinkedList();
 				
 				if (!"".equals(membres_antic)) {
-					String[] old = membres_antic.split(",");
+					String[] old = membres_antic.split("[, ]+");
 					longitud_old = old.length;
 					membres_old = new String[longitud_old];
-					membres_old = membres_antic.split(",");
+					membres_old = membres_antic.split("[, ]+");
 				} else {
 					longitud_old = 0;
 					membres_old = null;
@@ -544,10 +540,10 @@
 	
 				membres = (String) camp.getValue();
 				if (!"".equals(membres)) {
-					String[] now = membres.split(" *, *");
+					String[] now = membres.split("[, ]+");
 					longitud_now = now.length;
 					membres_now = new String[longitud_now];
-					membres_now = membres.split(" *, *");
+					membres_now = membres.split("[, ]+");
 				} else {
 					longitud_now = 0;
 					membres_now = null;
@@ -717,10 +713,10 @@
 					lli = original.getLlistaLlistes();
 					llp = original.getLlistaLlistesOnPertany();
 					
-					String[] usus = usu.split(",");
-					String[] exts = ext.split(",");
-					String[] llis = lli.split(",");
-					String[] llps = llp.split(",");
+					String[] usus = usu.split("[, ]+");
+					String[] exts = ext.split("[, ]+");
+					String[] llis = lli.split("[, ]+");
+					String[] llps = llp.split("[, ]+");
 					
 					for (int i=0 ; i @lt usus.length; i++) {
 						String codi = usus[i].trim();

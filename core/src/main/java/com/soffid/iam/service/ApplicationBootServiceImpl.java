@@ -327,6 +327,12 @@ public class ApplicationBootServiceImpl extends
 				configSvc.update(cfg);
 			}
 
+			if (version < 103) { //$NON-NLS-1$
+				cfg.setValue("103"); //$NON-NLS-1$
+				updateDisabledAttribute();
+				configSvc.update(cfg);
+			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -476,6 +482,41 @@ public class ApplicationBootServiceImpl extends
 			stmt.setLong(1, tenantId);
 			stmt.execute();
 			stmt.close();
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updateDisabledAttribute() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			PreparedStatement stmt = conn.prepareStatement(
+					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
+							"UPDATE SC_USUGRU SET UGR_DISABLED=false WHERE UGR_DISABLED IS NULL":
+							"UPDATE SC_USUGRU SET UGR_DISABLED=0 WHERE UGR_DISABLED IS NULL");
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn.prepareStatement(
+					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
+							"UPDATE SC_ACCACC SET AAC_DISABLED=false WHERE AAC_DISABLED IS NULL":
+							"UPDATE SC_ACCACC SET AAC_DISABLED=0 WHERE AAC_DISABLED IS NULL");
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn.prepareStatement(
+					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
+							"UPDATE SC_USULCO SET ULC_DISABLED=false WHERE ULC_DISABLED IS NULL":
+							"UPDATE SC_USULCO SET ULC_DISABLED=0 WHERE ULC_DISABLED IS NULL");
+			stmt.execute();
+			stmt.close();
+
 		}
 		finally
 		{

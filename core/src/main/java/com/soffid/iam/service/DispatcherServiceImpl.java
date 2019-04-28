@@ -700,7 +700,9 @@ public class DispatcherServiceImpl extends
 			return true;
 		for (Iterator<UserGroupEntity> it = userEntity.getSecondaryGroups()
 				.iterator(); it.hasNext();) {
-			if (isChildGroup(it.next().getGroup(), grup))
+			UserGroupEntity ug = it.next();
+			if (! Boolean.TRUE.equals(ug.getDisabled()) &&
+					isChildGroup(ug.getGroup(), grup))
 				return true;
 		}
 		return false;
@@ -1623,7 +1625,8 @@ public class DispatcherServiceImpl extends
 			{
 				for (UserGroupEntity ug: u.getSecondaryGroups())
 				{
-					if (matchGroup(ug.getGroup(), groups))
+					if (! Boolean.TRUE.equals(ug.getDisabled()) && 
+							matchGroup(ug.getGroup(), groups))
 					{
 						return true;
 					}
@@ -1766,5 +1769,38 @@ public class DispatcherServiceImpl extends
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	protected String handleCreateRemoteServer(String name, String tenant) throws Exception {
+		ServerEntity gateway = null;
+		int guests = Integer.MAX_VALUE;
+		for ( ServerEntity candidate: getServerEntityDao().findGatewayByTenant(tenant))
+		{
+			Integer q = getServerEntityDao().countServersByName("%."+candidate.getName());
+			if ( q.intValue() < guests)
+			{
+				guests = q.intValue();
+				gateway = candidate;
+			}
+		}
+		if (gateway == null)
+			return null;
+		
+		
+		
+		ServerEntity r = getServerEntityDao().newServerEntity();
+		Configuration p = getConfigurationService().findMasterParameterByNameAndNetwork("server.nextRemoteServer", null);
+		if (p == null)
+		{
+			p = new Configuration();
+			p.setCode("server.nextRemoteServer");
+			p.setValue("" + System.currentTimeMillis());
+			getConfigurationService().create(p);
+		}
+		String assignedName = "s"+p.getValue()+"."+gateway.getName();
+		p.setValue( Long.toString( 1L + Long.parseLong(p.getValue())));
+		getConfigurationService().update(p);
+		return assignedName;
 	}
 }

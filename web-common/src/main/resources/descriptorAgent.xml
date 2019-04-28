@@ -173,6 +173,14 @@
 					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.agent"));
 					obj.setSecond(es.caib.seycon.ng.comu.ServerType.PROXYSERVER);
 					v.add(obj);
+					obj = new es.caib.seycon.ng.web.PairContainer();
+					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.hub"));
+					obj.setSecond(es.caib.seycon.ng.comu.ServerType.GATEWAY);
+					v.add(obj);
+					obj = new es.caib.seycon.ng.web.PairContainer();
+					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.remote"));
+					obj.setSecond(es.caib.seycon.ng.comu.ServerType.REMOTESERVER);
+					v.add(obj);
 				}
 				return v;				
 			</script-finder>

@@ -71,7 +71,7 @@ public class SeyconKeyStore {
 
     public static File getKeyStoreFile() throws IOException {
         Config config = Config.getConfig();
-        if (config.isAgent() || config.isServer())
+        if (config.getRole() != null && !"client".equals(config.getRole()))
             return new File (config.getHomeDir(), "conf/keystore.jks"); //$NON-NLS-1$
         else
             return null;

@@ -30,6 +30,7 @@ public abstract class CertificateEnrollService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return 0;
 	}
+	
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"CertificateEnrollDenied"})
 	public java.security.cert.X509Certificate getCertificate(
 		@Nullable java.lang.String tenant, 
@@ -41,6 +42,20 @@ public abstract class CertificateEnrollService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.CertificateEnrollDenied, es.caib.seycon.ng.exception.CertificateEnrollWaitingForAproval {
 	 return null;
 	}
+
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"CertificateEnrollDenied"})
+	public java.security.cert.X509Certificate getCertificate(
+		@Nullable java.lang.String tenant, 
+		java.lang.String user, 
+		java.lang.String password, 
+		@Nullable java.lang.String domain, 
+		java.lang.String hostName, 
+		java.lang.Long request, 
+		boolean remote)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.CertificateEnrollDenied, es.caib.seycon.ng.exception.CertificateEnrollWaitingForAproval {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getServerList()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

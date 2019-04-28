@@ -14,4 +14,8 @@ public class ServerType {
 
 	public java.lang.String PROXYSERVER="agent";
 
+	public java.lang.String GATEWAY="gateway";
+
+	public java.lang.String REMOTESERVER="remote";
+
 }

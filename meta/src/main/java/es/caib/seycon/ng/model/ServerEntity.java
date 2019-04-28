@@ -68,6 +68,27 @@ public abstract class ServerEntity {
 		java.lang.String name) {
 	 return null;
 	}
+
+	@DaoFinder("select server "
+			+ "from com.soffid.iam.model.ServerEntity as server "
+			+ "join server.tenants as t "
+			+ "where t.serverTenant.name = :name and server.type='gateway'")
+	public Collection<es.caib.seycon.ng.model.ServerEntity> findGatewayByTenant(
+		java.lang.String name) {
+	 return null;
+	}
+
+	@DaoFinder("select count(*) "
+			+ "from com.soffid.iam.model.ServerEntity as server "
+			+ "where server.name like :name")
+	public Integer countServersByName(java.lang.String name) {
+		return null;
+	}
+	
+	@DaoFinder("select server "
+			+ "from com.soffid.iam.model.ServerEntity as server "
+			+ "where server.url=:url and server.type='remote'")
+	public ServerEntity findRemoteByUrl (String url) { return null;}
 }
 
 @Index (name="SC_SERVER_UK1",	unique=true,

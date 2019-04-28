@@ -451,4 +451,9 @@ public abstract class DispatcherService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+	
+	@Operation
+	String createRemoteServer (String name, String tenant) {
+		return null;
+	}
 }

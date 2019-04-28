@@ -214,6 +214,13 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	@Operation ( grantees={roles.user_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.UsuariGrup> findUserGroupHistoryByUserName(
+		java.lang.String userName)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 	@Operation (translated="findUsersRolesWithGroupByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisAmbGrupByCodiUsuari(

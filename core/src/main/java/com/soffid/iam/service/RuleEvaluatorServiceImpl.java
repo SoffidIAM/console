@@ -338,7 +338,9 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			
 			groups = new HashMap<String, Group>();
 			addGroups(groups, user.getPrimaryGroup());
-			for (UserGroupEntity grup : user.getSecondaryGroups()) addGroups(groups, grup.getGroup());
+			for (UserGroupEntity grup : user.getSecondaryGroups()) 
+				if (! Boolean.TRUE.equals(grup.getDisabled()))
+					addGroups(groups, grup.getGroup());
 			
 		}
 		

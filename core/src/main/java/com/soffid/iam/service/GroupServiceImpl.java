@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -412,6 +413,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected GroupUser handleCreate(GroupUser usuariGrup) throws Exception {
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
+		usuariGrupEntity.setStart(new Date());
+		usuariGrupEntity.setEnd(null);
+		usuariGrupEntity.setDisabled(Boolean.FALSE);
 		if (usuariGrupEntity.getUser().getUserName().equals (Security.getCurrentUser())) {
 			throw new SeyconException(Messages.getString("GroupServiceImpl.7")); //$NON-NLS-1$
 		}
@@ -475,9 +479,18 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			long groupId = usuariGrupEntity.getGroup().getId();
 
 			
-			usuari.getSecondaryGroups().remove(usuariGrupEntity);
-			usuariGrupEntity.getGroup().getSecondaryGroupUsers().remove(usuariGrupEntity);
-			getUserGroupEntityDao().remove(usuariGrupEntity);
+			if ( ConfigurationCache.isHistoryEnabled())
+			{
+				usuariGrupEntity.setDisabled(true);
+				usuariGrupEntity.setEnd(new Date());
+				getUserGroupEntityDao().update(usuariGrupEntity);
+			}
+			else
+			{
+				usuari.getSecondaryGroups().remove(usuariGrupEntity);
+				usuariGrupEntity.getGroup().getSecondaryGroupUsers().remove(usuariGrupEntity);
+				getUserGroupEntityDao().remove(usuariGrupEntity);
+			}
 
 			getApplicationService().revokeRolesHoldedOnGroup(usuari.getId(), groupId);
 
@@ -493,7 +506,25 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if ( usuariGrup.getUser().equals(usuariGrupEntity.getUser().getUserName()) && 
 				usuariGrup.getGroup().equals(usuariGrupEntity.getGroup().getName()))
 		{
-			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
+			if (ConfigurationCache.isHistoryEnabled())
+			{
+				GroupUser old = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
+				if (new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity))
+				{
+					UserGroupEntity ug2 = getUserGroupEntityDao().newUserGroupEntity();
+					ug2.setDisabled(true);
+					ug2.setStart(usuariGrupEntity.getStart());
+					ug2.setEnd(new Date());
+					ug2.setGroup(usuariGrupEntity.getGroup());
+					ug2.setUser(usuariGrupEntity.getUser());
+					getUserGroupEntityDao().create(usuariGrupEntity);
+					new UserGroupAttributePersister().updateAttributes(old.getAttributes(), ug2);
+				}
+			}
+			else
+			{
+				new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity) ;
+			}
 			return usuariGrup;
 		}
 		else
@@ -502,6 +533,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 				throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
 			}
+			usuariGrup.setEnd(usuariGrupEntity.getEnd());
+			usuariGrup.setStart(usuariGrupEntity.getStart());
+			usuariGrup.setDisabled(usuariGrupEntity.getDisabled());
 			usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
 			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
 	
@@ -948,5 +982,14 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			return GroupServiceImpl.this.getAttributeValidationService();
 		}
 		
+	}
+
+	@Override
+	protected Collection<GroupUser> handleFindUserGroupHistoryByUserName(String userName) throws Exception {
+		UserEntity userEntity = getUserEntityDao().findByUserName(userName);
+		if (userEntity == null)
+			return new LinkedList<GroupUser>();
+		
+		return getUserGroupEntityDao().toGroupUserList(userEntity.getSecondaryGroups());
 	}
 }

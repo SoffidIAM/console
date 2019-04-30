@@ -28,11 +28,11 @@ public abstract class LlistaCorreuEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="LCO_DESCRI", length=50, translated="description")
+	@Column (name="LCO_DESCRI", length=100, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="LCO_NOM", length=25, translated="name")
+	@Column (name="LCO_NOM", length=50, translated="name")
 	public java.lang.String nom;
 
 	@ForeignKey (foreignColumn="ELC_IDLCO", translated="externals")

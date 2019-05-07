@@ -7,7 +7,7 @@ import com.soffid.mda.annotation.Service;
 import es.caib.seycon.ng.comu.Challenge;
 import roles.Tothom;
 
-@Service(serverPath="/seycon/otpValidationService")
+@Service(serverPath="/seycon/otpValidationService",serverRole="agent")
 public class OTPValidationService {
 	public void registerOTPHandler (OTPHandler handler) { }
 

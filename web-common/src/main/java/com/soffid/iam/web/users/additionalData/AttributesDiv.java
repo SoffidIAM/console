@@ -186,9 +186,10 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	}
 	
 	private void refresh() {
+		// Mind binder.getValue can trigger the onUpdate event
+		Map<String, Object> attributes = (Map<String, Object>) binder.getValue();
 		while (getFirstChild() != null)
 			removeChild(getFirstChild());
-		Map<String, Object> attributes = (Map<String, Object>) binder.getValue();
 		if (attributes == null)
 		{
 			attributes = new HashMap<String, Object>();

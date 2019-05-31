@@ -17,6 +17,7 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountPasswordEntity;
@@ -47,6 +48,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
 import es.caib.seycon.util.Base64;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -66,6 +68,8 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -81,7 +85,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public class InternalPasswordServiceImpl extends com.soffid.iam.service.InternalPasswordServiceBase
 		implements ApplicationContextAware {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	private ApplicationContext ctx;
 
 	/**
@@ -528,10 +533,15 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
 		tasque.setStatus("P"); //$NON-NLS-1$
 		try {
-			if (force)
-				getTaskEntityDao().createForce(tasque);
+			tasque.setServer( Config.getConfig().getHostName() );
+			log.info("Creating task for host "+ tasque.getServer());
 			return getTaskQueue().addTask(tasque);
 		} catch (NoSuchBeanDefinitionException e) {
+			tasque.setServer( null );
+			getTaskEntityDao().createNoFlush(tasque);
+			return null;
+		} catch (IOException e) {
+			tasque.setServer( null );
 			getTaskEntityDao().createNoFlush(tasque);
 			return null;
 		}
@@ -722,6 +732,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	protected PasswordValidation handleCheckPassword(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password,
 			boolean checkTrusted, boolean checkExpired) throws java.lang.Exception {
+		
+		log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName());
+		
 		String digest = getDigest(password);
 
 		if (user.getActive().equals("N")) //$NON-NLS-1$
@@ -745,10 +758,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		boolean taskQueue = false;
 		try {
 			if (checkTrusted && getTaskQueue() != null) {
+				log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
 				taskQueue = true;
 				final long timeToWait = 60000; // 1 minute
 				TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
-						password, false);
+						password, false, true);
 
 				th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
 				synchronized (th) {
@@ -764,6 +778,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		}
 		if (checkTrusted && !taskQueue && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
+			log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
 			for (UserAccountEntity userAccount : user.getAccounts()) {
 				AccountEntity ae = userAccount.getAccount();
 				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain() == passwordDomain) {

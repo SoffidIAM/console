@@ -84,5 +84,11 @@
 		</mold>
 	</component>
 
+	<component>
+		<extends>div</extends>
+		<component-name>inputfield</component-name>
+		<component-class>com.soffid.iam.web.users.additionalData.CustomField</component-class>
+	</component>
+
 </language-addon>
 

@@ -506,25 +506,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if ( usuariGrup.getUser().equals(usuariGrupEntity.getUser().getUserName()) && 
 				usuariGrup.getGroup().equals(usuariGrupEntity.getGroup().getName()))
 		{
-			if (ConfigurationCache.isHistoryEnabled())
-			{
-				GroupUser old = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
-				if (new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity))
-				{
-					UserGroupEntity ug2 = getUserGroupEntityDao().newUserGroupEntity();
-					ug2.setDisabled(true);
-					ug2.setStart(usuariGrupEntity.getStart());
-					ug2.setEnd(new Date());
-					ug2.setGroup(usuariGrupEntity.getGroup());
-					ug2.setUser(usuariGrupEntity.getUser());
-					getUserGroupEntityDao().create(usuariGrupEntity);
-					new UserGroupAttributePersister().updateAttributes(old.getAttributes(), ug2);
-				}
-			}
-			else
-			{
-				new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity) ;
-			}
+			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity) ;
 			return usuariGrup;
 		}
 		else

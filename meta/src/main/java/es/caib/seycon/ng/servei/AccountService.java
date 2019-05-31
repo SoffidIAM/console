@@ -600,4 +600,9 @@ public abstract class AccountService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation
+	public void synchronizeAccount(String accountName, String system)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 }

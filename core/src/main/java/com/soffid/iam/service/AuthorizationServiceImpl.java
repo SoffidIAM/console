@@ -267,67 +267,70 @@ public class AuthorizationServiceImpl extends
             for (Iterator it = autoritzacionsRolVO.iterator(); it.hasNext(); ) {
                 AuthorizationRole autoRolVO = (AuthorizationRole) it.next();
                 SoffidAuthorization autoSEU = (SoffidAuthorization) getAuthorizations().get(autoRolVO.getAuthorization());
-                String scope = autoSEU != null ? autoSEU.getScope() : null;
-                autoRolVO.setBusinessGroupScope(scope != null ? scope : Security.AUTO_SCOPE_ONE);
-                if (autoRolVO.getUserRoleValueDomain() == null) {
-                    autoRolVO.setUserRoleValueDomain(new HashSet());
-                }
-                Long idRol = autoRolVO.getRole().getId();
-                if (rols.containsKey(idRol)) {
-                    for (RoleGrant rg : rols.get(idRol)) {
-                        String tipusDomini = null;
-                        RoleEntity role = getRoleEntityDao().load(idRol);
-                        if (role != null) tipusDomini = role.getDomainType();
-                   		boolean compatibleDomain;
-
-                   		if ( autoSEU.getTipusDomini() == null || autoSEU.getTipusDomini().trim().isEmpty() )
-                   			compatibleDomain = false;
-                   		else if (tipusDomini == null || tipusDomini.trim().isEmpty())
-                   			compatibleDomain = false;
-                   		else
-                   		{
-                   			compatibleDomain = false;
-                   			for (String s: autoSEU.getTipusDomini().split("[, ]+"))
-                   			{
-                   				if (tipusDomini.startsWith(s))
-                   				{
-                   					compatibleDomain = true;
-                   					break;
-                   				}
-                   			}
-                   		}
-                   		
-                    	if (compatibleDomain)
-                        {
-                            autoRolVO.getUserRoleValueDomain().add(new DomainValue(rg.getDomainValue(), tipusDomini));
-                            if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
-                                Collection grupsAutoritzacio = null;
-                                if (Security.AUTO_SCOPE_PARES.equals(autoRolVO.getBusinessGroupScope())) {
-                                    grupsAutoritzacio = getCodiGrupsParesGrup(rg.getDomainValue());
-                                } else if (Security.AUTO_SCOPE_FILLS.equals(autoRolVO.getBusinessGroupScope())) {
-                                    grupsAutoritzacio = getCodiGrupsFillsGrup(rg.getDomainValue());
-                                } else if (Security.AUTO_SCOPE_BOTH.equals(autoRolVO.getBusinessGroupScope())) {
-                                    Collection pares = getCodiGrupsParesGrup(rg.getDomainValue());
-                                    Collection fills = getCodiGrupsFillsGrup(rg.getDomainValue());
-                                    grupsAutoritzacio = new HashSet();
-                                    grupsAutoritzacio.addAll(pares);
-                                    grupsAutoritzacio.addAll(fills);
-                                } else {
-                                    grupsAutoritzacio = new ArrayList();
-                                    grupsAutoritzacio.add(rg.getDomainValue());
-                                }
-                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext(); ) {
-                                    String codiGrup = (String) git.next();
-                                    autoRolVO.getUserRoleValueDomain().add(new DomainValue(codiGrup, tipusDomini));
-                                }
-                            }
-                        } else {
-                            DomainValue estrelleta = new DomainValue("*", TIPUS_DOMINI_ESTRELLETA);
-                            autoRolVO.getUserRoleValueDomain().add(estrelleta);
-                        }
-                    }
-                    autoritzacionsUsuari.add(autoRolVO);
-                    addInheriedAuthorizations(autoritzacionsUsuari, autoRolVO, autoSEU);
+                if (autoSEU != null)
+                {
+	                String scope = autoSEU != null ? autoSEU.getScope() : null;
+	                autoRolVO.setBusinessGroupScope(scope != null ? scope : Security.AUTO_SCOPE_ONE);
+	                if (autoRolVO.getUserRoleValueDomain() == null) {
+	                    autoRolVO.setUserRoleValueDomain(new HashSet());
+	                }
+	                Long idRol = autoRolVO.getRole().getId();
+	                if (rols.containsKey(idRol)) {
+	                    for (RoleGrant rg : rols.get(idRol)) {
+	                        String tipusDomini = null;
+	                        RoleEntity role = getRoleEntityDao().load(idRol);
+	                        if (role != null) tipusDomini = role.getDomainType();
+	                   		boolean compatibleDomain;
+	
+	                   		if ( autoSEU.getTipusDomini() == null || autoSEU.getTipusDomini().trim().isEmpty() )
+	                   			compatibleDomain = false;
+	                   		else if (tipusDomini == null || tipusDomini.trim().isEmpty())
+	                   			compatibleDomain = false;
+	                   		else
+	                   		{
+	                   			compatibleDomain = false;
+	                   			for (String s: autoSEU.getTipusDomini().split("[, ]+"))
+	                   			{
+	                   				if (tipusDomini.startsWith(s))
+	                   				{
+	                   					compatibleDomain = true;
+	                   					break;
+	                   				}
+	                   			}
+	                   		}
+	                   		
+	                    	if (compatibleDomain)
+	                        {
+	                            autoRolVO.getUserRoleValueDomain().add(new DomainValue(rg.getDomainValue(), tipusDomini));
+	                            if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+	                                Collection grupsAutoritzacio = null;
+	                                if (Security.AUTO_SCOPE_PARES.equals(autoRolVO.getBusinessGroupScope())) {
+	                                    grupsAutoritzacio = getCodiGrupsParesGrup(rg.getDomainValue());
+	                                } else if (Security.AUTO_SCOPE_FILLS.equals(autoRolVO.getBusinessGroupScope())) {
+	                                    grupsAutoritzacio = getCodiGrupsFillsGrup(rg.getDomainValue());
+	                                } else if (Security.AUTO_SCOPE_BOTH.equals(autoRolVO.getBusinessGroupScope())) {
+	                                    Collection pares = getCodiGrupsParesGrup(rg.getDomainValue());
+	                                    Collection fills = getCodiGrupsFillsGrup(rg.getDomainValue());
+	                                    grupsAutoritzacio = new HashSet();
+	                                    grupsAutoritzacio.addAll(pares);
+	                                    grupsAutoritzacio.addAll(fills);
+	                                } else {
+	                                    grupsAutoritzacio = new ArrayList();
+	                                    grupsAutoritzacio.add(rg.getDomainValue());
+	                                }
+	                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext(); ) {
+	                                    String codiGrup = (String) git.next();
+	                                    autoRolVO.getUserRoleValueDomain().add(new DomainValue(codiGrup, tipusDomini));
+	                                }
+	                            }
+	                        } else {
+	                            DomainValue estrelleta = new DomainValue("*", TIPUS_DOMINI_ESTRELLETA);
+	                            autoRolVO.getUserRoleValueDomain().add(estrelleta);
+	                        }
+	                    }
+	                    autoritzacionsUsuari.add(autoRolVO);
+	                    addInheriedAuthorizations(autoritzacionsUsuari, autoRolVO, autoSEU);
+	                }
                 }
             }
 

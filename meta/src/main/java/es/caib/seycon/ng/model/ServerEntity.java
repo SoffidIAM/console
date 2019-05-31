@@ -81,7 +81,7 @@ public abstract class ServerEntity {
 	@DaoFinder("select count(*) "
 			+ "from com.soffid.iam.model.ServerEntity as server "
 			+ "where server.name like :name")
-	public Integer countServersByName(java.lang.String name) {
+	public Long countServersByName(java.lang.String name) {
 		return null;
 	}
 	

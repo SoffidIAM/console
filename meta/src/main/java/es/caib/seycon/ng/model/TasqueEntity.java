@@ -64,7 +64,7 @@ public abstract class TasqueEntity {
 	@Column(name = "TAS_TRANSA", length = 50, translated = "transaction")
 	public java.lang.String transa;
 
-	@Column(name = "TAS_GRUP", length = 20, translated = "group")
+	@Column(name = "TAS_GRUP", length = 50, translated = "group")
 	@Nullable
 	public java.lang.String grup;
 

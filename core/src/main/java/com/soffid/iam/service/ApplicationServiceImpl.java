@@ -29,10 +29,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.json.JSONException;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -112,12 +116,24 @@ import es.caib.seycon.ng.exception.UnknownUserException;
  */
 @SuppressWarnings("rawtypes")
 public class ApplicationServiceImpl extends
-        com.soffid.iam.service.ApplicationServiceBase {
+        com.soffid.iam.service.ApplicationServiceBase 
+        implements ApplicationContextAware
+{
 	final int DIRECT = 0;
 	final int INDIRECT = 1;
 	final int ALL = 2;
 	final int NONE=3;
+	private ApplicationContext ctx;
 
+	/* (non-Javadoc)
+	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+	 */
+	public void setApplicationContext (ApplicationContext applicationContext)
+					throws BeansException
+	{
+		ctx = applicationContext;
+		
+	}
     /**
      * @see es.caib.seycon.ng.servei.AplicacioService#getAplicacions()
      */
@@ -798,6 +814,10 @@ public class ApplicationServiceImpl extends
         		rolsUsuaris = ra;
             first = false;
         }
+        
+        if (rolsUsuaris.getUserCode() != null)
+        	notifyUserChange(getUserEntityDao().findByUserName(rolsUsuaris.getUserCode()));
+
         return rolsUsuaris;
     }
 
@@ -1077,6 +1097,16 @@ public class ApplicationServiceImpl extends
 		}
 	}
 
+	private void notifyUserChange (UserEntity user) throws InternalErrorException
+	{
+		for (String name : ctx.getBeanNamesForType(SoffidEventListener.class))
+		{
+			SoffidEventListener bean = (SoffidEventListener) ctx.getBean(name);
+			if (bean != null)
+				bean.onUserChange(user);
+		}
+
+	}
 	protected void handleDelete(RoleAccount rolsUsuaris) throws Exception {
         String codiAplicacio = rolsUsuaris.getInformationSystemName();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
@@ -1103,6 +1133,9 @@ public class ApplicationServiceImpl extends
             }
             
             deleteRoleAccountEntity(rolsUsuarisEntity, user, false);
+            if (user != null && rolsUsuaris.getRuleId() == null)
+            	notifyUserChange(user);
+            
             return;
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1192,8 +1225,10 @@ public class ApplicationServiceImpl extends
 			{
 				getRoleAccountEntityDao().remove(rolsUsuarisEntity);
 			}
-			if (user != null)
-				getRuleEvaluatorService().applyRules(user);
+			if (Hibernate.isInitialized(rolsUsuarisEntity.getAccount().getRoles()))
+				rolsUsuarisEntity.getAccount().getRoles().remove(rolsUsuarisEntity);
+			if (Hibernate.isInitialized(rolsUsuarisEntity.getRole().getAccounts()))
+				rolsUsuarisEntity.getRole().getAccounts().remove(rolsUsuarisEntity);
 			getAccountEntityDao().propagateChanges(rolsUsuarisEntity.getAccount());
 	    }
 	}
@@ -1282,6 +1317,9 @@ public class ApplicationServiceImpl extends
             	// Actualitzem darrera actualització de l'usuari
             	getAccountEntityDao().propagateChanges(roleAccountEntity.getAccount());
             
+                if (rolsUsuaris.getUserCode() != null && rolsUsuaris.getRuleId() == null)
+                	notifyUserChange(getUserEntityDao().findByUserName(rolsUsuaris.getUserCode()));
+
             	return rolsUsuaris;
     		} else {
             	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -29,6 +29,8 @@ public class Challenge {
 	@Nullable
     Usuari user;
 	@Nullable
+    Account account;
+	@Nullable
     String userKey;
 	@Nullable
     Maquina host;

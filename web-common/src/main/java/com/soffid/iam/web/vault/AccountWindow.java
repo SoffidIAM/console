@@ -45,6 +45,7 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
@@ -505,13 +506,13 @@ public class AccountWindow extends Window implements AfterCompose {
 	public void queryPassword(Component button) throws WrongValueException, InternalErrorException, NamingException, CreateException {
 		try {
 			Component queryImg = getFellow("queryImg");
-			Window showPassword = (Window) getFellow ("showPassword");
+			Window showPassword = (Window) getParent().getFellow ("showPassword");
 			if (!queryImg.isVisible())
 				return;
 
 			Textbox qpassword = (Textbox)showPassword.getFellow("qpassword");
 			qpassword.setValue("");
-			Textbox popupPwd = (Textbox)showPassword.getFellow("popupPwd");
+			Label popupPwd = (Label)showPassword.getFellow("popupPwd");
 			popupPwd.setValue("");
 			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(button);
 			Account account = (Account) ((DataNode) XPathUtils.getValue(ctx, ".")).getInstance();
@@ -568,8 +569,8 @@ public class AccountWindow extends Window implements AfterCompose {
 		model.commit();
 		try {
 			Component passwordImg = getFellow("passwordImg");
-			final Window newPasswordS = (Window) getFellow("newPasswordS");
-			final Window newPassword = (Window) getFellow("newPassword");
+			final Window newPasswordS = (Window) getParent().getFellow("newPasswordS");
+			final Window newPassword = (Window) getParent().getFellow("newPassword");
 			
 			if (!passwordImg.isVisible())
 				return;

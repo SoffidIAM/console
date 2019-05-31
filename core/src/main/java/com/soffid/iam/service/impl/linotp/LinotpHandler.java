@@ -130,7 +130,18 @@ public class LinotpHandler implements OTPHandler {
 						{
 							challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
 							challenge.setCell("Value");
-							return challenge;
+							if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
+								Response response2 =
+										WebClient
+											.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
+											.accept(MediaType.APPLICATION_JSON)
+											.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
+											.form(new Form()
+												.param("user", linOtpUser)
+												.param("session", getSessionId()));
+
+							}
+ 							return challenge;
 						}
 					}
 				}

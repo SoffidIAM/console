@@ -300,6 +300,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     		return;
 		tasque.setStatus("P");
 		this.getHibernateTemplate().save(tasque);
+		this.getHibernateTemplate().flush();
 	}
 
 

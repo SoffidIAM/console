@@ -75,3 +75,5 @@ openejb.deploymentId.format = {appId}-{ejbClass}
 dbMaxConnections=200
 soffid.server.port=8080
 dbPasswordCipher=PlainText
+
+org.apache.johnzon.buffer-strategy=BY_INSTANCE

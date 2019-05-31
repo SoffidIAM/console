@@ -2,5 +2,7 @@
 <resources>
   <Service id="johnzon" class-name="com.soffid.iam.json.ConfigurableJohnzonProvider">
     accessModeName = field
+    maxSize = 1048576
+    bufferSize = 1048576
   </Service>
 </resources>

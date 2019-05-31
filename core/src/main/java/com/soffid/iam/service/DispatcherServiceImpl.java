@@ -1777,7 +1777,7 @@ public class DispatcherServiceImpl extends
 		int guests = Integer.MAX_VALUE;
 		for ( ServerEntity candidate: getServerEntityDao().findGatewayByTenant(tenant))
 		{
-			Integer q = getServerEntityDao().countServersByName("%."+candidate.getName());
+			Long q = getServerEntityDao().countServersByName("%."+candidate.getName());
 			if ( q.intValue() < guests)
 			{
 				guests = q.intValue();

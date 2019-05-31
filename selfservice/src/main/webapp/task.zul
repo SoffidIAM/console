@@ -8,21 +8,39 @@
 	<style src="/css/devices.css"/>
 	
     <zscript><![CDATA[
+        String url = "/self_service.zul";
 		String task = Executions.getCurrent().getNativeRequest().getParameter("id");
-		try {
-			es.caib.bpm.servei.BpmEngine engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
-			es.caib.bpm.vo.TaskInstance ti = engine.getTask(Long.parseLong(task));
-			if (ti != null && ti.getStart() == null)
-			{
-				engine.startTask(ti);
+		if (task != null)
+		{
+			org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("task.zul");
+			try {
+				es.caib.bpm.servei.ejb.BpmEngine engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
+				es.caib.bpm.vo.TaskInstance ti = engine.getTask(Long.parseLong(task));
+				if (ti != null && ti.getEnd() == null)
+				{
+					if (ti.getStart() == null)
+						engine.startTask(ti);
+					url = "wf/task.zul?id="+task;
+				}
+			} catch (Exception e) {
+				log.warn(e);				
 			}
-		} catch (Exception e) {
 			
+		} else {
+			String def = Executions.getCurrent().getNativeRequest().getParameter("def");
+			if (def != null)
+			{
+				es.caib.bpm.servei.ejb.BpmEngine engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
+				for ( es.caib.bpm.vo.ProcessDefinition definition : engine.findProcessDefinitions(def, true))
+				{
+					url = "wf/task.zul?def="+definition.getId();
+				}
+			}
 		}
 		]]></zscript>
 		
 	<application id="app" allowOpenMultipleTabs="false" autoReload="false" favorits="//favorits/favorits" 
-		initialPage="wf/task.zul?id=${task}"
+		initialPage="${url}"
 		menu="//menu/menu"
 		logoutPage="/logout/" mainWindowTitle="Soffid IAM" width="100%">
 		<attribute name="onExit">

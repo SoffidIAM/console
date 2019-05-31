@@ -69,14 +69,16 @@ public class LinotpHandler implements OTPHandler {
 			return p;
 	}
 
-	private String getLinotpUserName (User user)
+	private String getLinotpUserName (Challenge challenge)
 	{
+		if ( challenge.getAccount() != null )
+			return challenge.getAccount().getName();
 		String ud = getUserDomain();
 		if (ud == null)
-			return user.getUserName();
+			return challenge.getUser().getUserName();
 		
 		try {
-			return ServiceLocator.instance().getAccountService().guessAccountNameForDomain(user.getUserName(), ud);
+			return ServiceLocator.instance().getAccountService().guessAccountNameForDomain(challenge.getUser().getUserName(), ud);
 		} catch (Exception e) {
 			return null;
 		}
@@ -102,7 +104,7 @@ public class LinotpHandler implements OTPHandler {
 	public Challenge selectToken(Challenge challenge) throws Exception {
 		if (isEnabled())
 		{
-			String linOtpUser = getLinotpUserName(challenge.getUser());
+			String linOtpUser = getLinotpUserName(challenge);
 			Response response =
 				WebClient
 					.create(getUrl("/admin/show"), getUser(), getPassword().getPassword(), null)
@@ -157,7 +159,7 @@ public class LinotpHandler implements OTPHandler {
 	public boolean validatePin(Challenge challenge, String pin) throws IllegalArgumentException, InternalErrorException {
 		if (isEnabled())
 		{
-			String linOtpUser = getLinotpUserName(challenge.getUser());
+			String linOtpUser = getLinotpUserName(challenge);
 			Response response =
 				WebClient
 					.create(getUrl("/validate"), getUser(), getPassword().getPassword(), null)

@@ -498,7 +498,7 @@
 							<separator spacing="10px"/>
 							<vbox width="99%">
 							<listbox autocommit="false" dataPath="/esquema/lista/treebox:/usuari" fixedLayout="true" 
-								id="gridUsuaris" if="${canQueryGroupUsers}" mold="paging" pageSize="20" sclass="likeagrid">
+								id="gridUsuaris" if="${canQueryGroupUsers}" sclass="likeagrid">
 								<listhead>
 									<listheader label="${c:l('grups.zul.Codi-2')}" sort="auto" width="200px">
 									</listheader>

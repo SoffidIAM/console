@@ -243,6 +243,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			UserAccountEntity ua = list.iterator().next();
 			
 			createAccountTask(acc);
+			for (RoleAccountEntity ra: acc.getRoles())
+			{
+				getRoleAccountEntityDao().remove(ra);
+			}
+			acc.getRoles().clear();
 			getAccountEntityDao().remove(acc);
 		}
 	}
@@ -758,6 +763,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			getUserAccountEntityDao().remove(userAccount);
 		}
 		ae.getUsers().clear();
+		for (RoleAccountEntity ra: ae.getRoles())
+		{
+			getRoleAccountEntityDao().remove(ra);
+		}
+		ae.getRoles().clear();
 		getAccountEntityDao().remove(ae);
 	}
 
@@ -2366,6 +2376,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             }
         }
 		return accounts;
+	}
+
+	@Override
+	protected void handleSynchronizeAccount(String accountName, String system) throws Exception {
+		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
+		if (acc != null)
+			createAccountTask(acc);
 	}
 
 }

@@ -132,6 +132,7 @@
       <archive location="../../../target/install-${compiler:seu.version}.jar" />
       <archive location="../../../target/lib/ojdbc7.jar" />
       <archive location="../../../target/lib/mariadb-java-client.jar" />
+      <archive location="resources/iam-console/lib/mysql-connector-java-5.1.21.jar" />
       <archive location="../../../target/lib/sqljdbc4.jar" />
       <archive location="../../../target/lib/postgresql.jar" />
     </customCode>

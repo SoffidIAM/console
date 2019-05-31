@@ -9,6 +9,7 @@
 	<frame id="p_selfService" saveContent="true" use="com.soffid.selfservice.web.SelfServiceHandler"
 		title="${c:l('selfService.Titol')}" width="100%" height="100%">
 
+		<script src="/js/ssokm.js"/>
 		<datamodel id="model" rootNode="root" src="descriptorSelfService.xml"/>
 		<zscript>
 			<![CDATA[

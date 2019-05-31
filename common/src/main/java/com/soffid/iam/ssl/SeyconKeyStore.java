@@ -79,9 +79,10 @@ public class SeyconKeyStore {
 
     public static File getRootKeyStoreFile() throws IOException, InternalErrorException {
         Config config = Config.getConfig();
-        if (config.isMainServer())
-            return new File (config.getHomeDir(), "conf/root.jks"); //$NON-NLS-1$
-        else
+        File rootKeystore = new File (config.getHomeDir(), "conf/root.jks");
+        if (rootKeystore.canRead())
+			return rootKeystore;
+		else
             return null;
     }
 

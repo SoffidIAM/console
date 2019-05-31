@@ -161,5 +161,6 @@
 			// -->
 			</script>
    		]]></html>
+   		
    		<div use="com.soffid.iam.web.groupHolder.HolderGroupHandler" id="hgh"/>
 </zk>

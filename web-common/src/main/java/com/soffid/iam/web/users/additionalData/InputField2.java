@@ -112,6 +112,7 @@ public class InputField2 extends Div
 	private String bind;
 	private Object ownerObject;
 	SingletonBinder binder = new SingletonBinder(this);
+	boolean hideUserName = false;
 	
 	public DataType getDataType() {
 		return dataType;
@@ -164,7 +165,11 @@ public class InputField2 extends Div
 			Page p = getDesktop().getPage("usuarisLlista");
 			Boolean multiValued = dataType.isMultiValued();
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() });
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  
+					filter, 
+					multiValued, 
+					dataType.getFilterExpression(),
+					hideUserName });
 		}
 	}
 
@@ -255,9 +260,9 @@ public class InputField2 extends Div
 	}
 
 	public void onActualitzaUser(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		InputElement textbox = (InputElement) event.getTarget().getParent().getFirstChild();
 		if (dataType.isMultiValued())
 		{
-			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling();
 			List<String> data = (List<String>) event.getData();
 			for (String s: data)
 			{
@@ -272,8 +277,8 @@ public class InputField2 extends Div
 		{
 			String[] data = (String[]) event.getData();
 			String userName = data[0];
-			((InputElement) event.getTarget().getPreviousSibling()).setRawValue(userName);
-			onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+			textbox.setRawValue(userName);
+			onChildChange( new Event (event.getName(), textbox ) );
 		}
 	}
 
@@ -286,8 +291,10 @@ public class InputField2 extends Div
 	private InputElement currentSearchTextbox;
 	private SearchFilter filter;
 	private Listbox containerListbox;
+	private String targetSearchTextboxUuid;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
+		targetSearchTextboxUuid = currentSearchTextbox.getParent().getFirstChild().getUuid();
 		searchCriteria = (String) event.getValue();
 		cancelSearch();
 		if (searchBox != null)
@@ -306,6 +313,7 @@ public class InputField2 extends Div
 			}
 			if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			{
+				currentSearchTextbox.setStyle("background-color: yellow");
 				currentSearch = EJBLocator.getUserService().findUserByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
@@ -401,8 +409,11 @@ public class InputField2 extends Div
 					if (value != null)
 					{
 						value = org.apache.commons.lang3.StringEscapeUtils.escapeJava(value);
+						if ( hideUserName && dataType.getType() == TypeEnumeration.USER_TYPE)
+							id.setSelectorLabel( ((User)o).getFullName() );
 						Div d = id.generateSelector(searchCriteria);
-						d.setAction("onMouseDown: document.getElementById('"+currentSearchTextbox.getUuid()+"').value='" + value + "'");
+						d.setAction("onMouseDown: {var e=document.getElementById('"+targetSearchTextboxUuid+"');e.value='" + value + "'; "
+									+ "zkTxbox.onupdate(e);}");
 						searchContent.appendChild(d);
 					}
 				}
@@ -491,6 +502,41 @@ public class InputField2 extends Div
 		}
 	}
 
+	/**
+	 * Method for user selector without user name
+	 * 
+	 * @param event
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 * @throws CommitException
+	 */
+	public void onChildChange2(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+//		cancelSearch();
+		Component tb = event.getTarget().getParent().getFirstChild();
+		
+		if (currentSearch != null && currentSearch.isDone() &&  currentSearch.size() >= 1 && searchResults.size() > 0)
+		{
+			Object o = searchResults.get(0).getObject();
+			String value;
+			if ( o instanceof User )
+				value = ((User) o).getUserName();
+			else if ( o instanceof Group )
+				value = ((Group) o).getName();
+			else if ( o instanceof CustomObject )
+				value = ((CustomObject) o).getName();
+			else if ( o instanceof Host )
+				value = ((Host) o).getName();
+			else if ( o instanceof MailDomain)
+				value = ((MailDomain) o).getCode();
+			else if ( o instanceof Application)
+				value = ((Application) o).getName();
+			else
+				value = null;
+			((InputElement) tb).setRawValue( value );
+			applyChange(tb, value);
+		}
+	}
+
 	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
 		Integer order = (Integer) tb.getAttribute("position");
 		boolean refresh = false;
@@ -534,9 +580,9 @@ public class InputField2 extends Div
 			try {
 				createField();
 				String id = getIdForPosition(order);
-				InputElement component = (InputElement) getFellowIfAny(id);
-				if (component != null)
-					component.focus();
+				Component component = (Component) getFellowIfAny(id);
+				if (component != null && component instanceof HtmlBasedComponent)
+					((HtmlBasedComponent) component).focus();
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
@@ -640,24 +686,28 @@ public class InputField2 extends Div
 		XPathUtils.getComponentContext(this).getDataSource().commit();
 	}
 
-	public void openUser() {
-		String user = (String) getValue();
+	public void openUser(Event event) {
+		InputElement textbox = (InputElement) event.getTarget().getParent().getFirstChild();
+		String user = (String) textbox.getRawText();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new");
 	}
 
-	public void openGroup() {
-		String grup = (String) getValue();
+	public void openGroup(Event event) {
+		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+		String grup = (String) textbox.getRawText();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new");
 	}
 
-	public void openApplication() {
-		String application = (String) getValue();
+	public void openApplication(Event event) {
+		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+		String application = (String) textbox.getRawText();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new");
 	}
 
-	public void openCustomObject() {
+	public void openCustomObject(Event event) {
 		String type = dataType.getDataObjectType();
-		String customObject = (String) getValue();
+		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+		String customObject = (String) textbox.getRawText();
 		Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new");
 	}
 
@@ -670,7 +720,9 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String user = inputElement.getText();
 		
-		Label l = (Label) getFellowIfAny(id+"b");
+		Component c = getFellowIfAny(id+"b");
+		Label l = (Label) (c != null && c instanceof Label? c: null);
+		Textbox tb = (Textbox) (c != null && c instanceof Textbox ? c: null);
 		
 		User u = null;
 		if (user == null || user.isEmpty())
@@ -694,6 +746,10 @@ public class InputField2 extends Div
 			else
 			{
 				if (l != null) l.setValue(u.getFullName());
+				if (tb != null) {
+					tb.setValue(u.getFullName());
+					tb.setStyle("background-color: white");
+				}
 			}
 		}
 		
@@ -944,22 +1000,26 @@ public class InputField2 extends Div
 		String id2 = id + "b";
 		String id3 = id + "c";
 		if(stringType != null && !stringType.trim().isEmpty()){
-			if(TypeEnumeration.USER_TYPE.equals(type))
+			if(TypeEnumeration.USER_TYPE.equals(type) && hideUserName) 
 			{
 				updateUser = true;
 				if (containerListbox == null)
 				{
 					result = "<div style='display:block' visible='true'>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
+							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" "
 									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
-									+ "onClick='self.parent.parent.onSelectUser(event)' "
-									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser()' id=\""+id2+"\" />"
+									+ "id=\""+id+"\" "
+									+ "readonly=\"" +readonlyExpr+ "\"/>"
+							+ "<textbox  "
+								+ "id=\""+id2+"\" "
+								+ "onBlur='self.parent.parent.onBlur(event)' "
+								+ "onChanging='self.parent.parent.onChanging(event)' "
+								+ "onOK='self.parent.parent.onChildChange2(event)' "
+								+ "width=\"250px\" "   
+								+ "/>"
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+							+ "onClick='self.parent.parent.onSelectUser(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ required+"</div>";
 				} else {
 					result = "<listitem>"
@@ -974,7 +1034,41 @@ public class InputField2 extends Div
 									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "</listcell><listcell>"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser()' id=\""+id2+"\" />"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
+							+ required+"</listcell></listitem>";
+				}
+			}
+			else if(TypeEnumeration.USER_TYPE.equals(type))
+			{
+				updateUser = true;
+				if (containerListbox == null)
+				{
+					result = "<div style='display:block' visible='true'>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+									+ "onClick='self.parent.parent.onSelectUser(event)' "
+									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />"
+							+ required+"</div>";
+				} else {
+					result = "<listitem>"
+							+ "<listcell>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+									+ "</listcell><listcell>"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
 							+ required+"</listcell></listitem>";
 				}
 			}
@@ -995,7 +1089,7 @@ public class InputField2 extends Div
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly)+"\" />");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
@@ -1010,7 +1104,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly)+"\" />");
 					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
 				}
 				result = sb.toString();
@@ -1030,7 +1124,7 @@ public class InputField2 extends Div
 							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly)+"\"/>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
@@ -1043,7 +1137,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly)+"\"/>");
 					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
 				}
 				result = sb.toString();
@@ -1129,7 +1223,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
@@ -1144,7 +1238,7 @@ public class InputField2 extends Div
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject()' id=\""+id2+"\"/>");
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
 					sb.append(required);
 					sb.append("</listcell><listitem>");
 				}
@@ -1829,6 +1923,14 @@ public class InputField2 extends Div
 
 	public void setSearchFilter(SearchFilter filter) {
 		this.filter = filter;
+	}
+
+	public boolean isHideUserName() {
+		return hideUserName;
+	}
+
+	public void setHideUserName(boolean hideUserName) {
+		this.hideUserName = hideUserName;
 	}
 
 }

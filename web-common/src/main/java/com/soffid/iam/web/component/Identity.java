@@ -294,4 +294,12 @@ public class Identity implements Comparable<Identity>{
 	{
 		return comparator ;
 	}
+
+	public String getSelectorLabel() {
+		return selectorLabel;
+	}
+
+	public void setSelectorLabel(String selectorLabel) {
+		this.selectorLabel = selectorLabel;
+	}
 }

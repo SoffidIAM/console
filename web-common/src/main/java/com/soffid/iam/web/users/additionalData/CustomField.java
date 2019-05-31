@@ -46,6 +46,7 @@ public class CustomField extends Div implements XPathSubscriber {
 	private SearchFilter searchFilter;
 	boolean visible = true;
 	boolean required = false;
+	boolean hideUserName = false;
 	
 	private List<TipusDada> dataTypes;
 
@@ -126,6 +127,7 @@ public class CustomField extends Div implements XPathSubscriber {
 			input.setBind(binder.getDataPath());
 			input.setSearchFilter(searchFilter);
 			input.setOwnerObject(ownerObject);
+			input.setHideUserName(hideUserName);
 			try {
 				input.createField();
 			} catch (Exception e) {
@@ -326,5 +328,13 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public boolean isHideUserName() {
+		return hideUserName;
+	}
+
+	public void setHideUserName(boolean hideUserName) {
+		this.hideUserName = hideUserName;
 	}
 }

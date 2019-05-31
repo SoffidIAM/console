@@ -78,6 +78,7 @@
 				}
 				esquema.getFellow("lista").getFellow("listbox").setMultiple(false);
 				esquema.getFellow("lista").getFellow("listbox").setCheckmark(false);
+				esquema.getFellow("lista").getFellow("userNameHeader").setVisible(true);
 			]]>
 		</attribute>
 		<attribute name="onConfigure">
@@ -89,6 +90,12 @@
 					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
 					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
 				}
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter( 
+						event.data.length >= 3 ? event.data[2]: null);
+				if ( ! esquema.getFellow("lista").getFellow("listbox").getItems().isEmpty())
+					esquema.getFellow("queryWindow").getFellow("searchBox").search();
+				if (event.data.length > 3 && event.data[3] != null)
+					esquema.getFellow("lista").getFellow("userNameHeader").setVisible( ! event.data[3] );
 			]]>
 		</attribute>
 		<attribute name="onClose">
@@ -114,7 +121,7 @@
 						esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
 					</attribute>
 					<listhead>
-						<listheader label="${c:l('usuarisllista.zul.Codi-2')}" width="150px"/>
+						<listheader label="${c:l('usuarisllista.zul.Codi-2')}" width="150px" id="userNameHeader"/>
 						<listheader label="${c:l('usuarisllista.zul.Nom-2')}" width="150px"/>
 						<listheader label="${c:l('usuarisllista.zul.PrimerLlinatge')}" width="150px"/>
 						<listheader label="${c:l('usuarisllista.zul.SegonLlinatge')}" width="100px"/>

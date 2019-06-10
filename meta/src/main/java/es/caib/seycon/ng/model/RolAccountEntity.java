@@ -103,7 +103,7 @@ public abstract class RolAccountEntity {
 	public Date certificationDate;
 	
 	@Description("Parent grant. Used only in non mandatory rol to rol grants")
-	@Column(name="RLU_RLU_ID", composition=true, reverseAttribute="children")
+	@Column(name="RLU_RLU_ID", reverseAttribute="children")
 	@Nullable
 	public RolAccountEntity parent;
 	

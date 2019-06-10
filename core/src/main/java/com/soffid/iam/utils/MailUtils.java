@@ -14,12 +14,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class MailUtils {
-
 	public static void sendMail(String smtpServer, String to, String from,
 			String subject, String body) throws MessagingException,
 			NamingException {
@@ -77,7 +77,9 @@ public class MailUtils {
 		if ("smtps".equals(protocol))
 		{
 		    props.put("mail.smtp.socketFactory.class",
-		            "javax.net.ssl.SSLSocketFactory");
+		            "com.soffid.iam.utils.CustomSSLFactory");
+		    props.put("mail.smtp.socketFactory.fallback", "false");
+		    props.put("mail.smtp.starttls.enable", "true");
 		}
 		String auth = getConfigValue("mail.auth", "false");
 		if ("true".equals(auth))
@@ -93,6 +95,7 @@ public class MailUtils {
 			final String password = getConfigValue("mail.password", null);
 			if (password != null)
 			{
+				props.put("password", password);
 				props.put("mail.smtp.password", password);
 				props.put("mail.smtps.password", password);
 			}
@@ -113,7 +116,6 @@ public class MailUtils {
 		// -- Attaching to default Session, or we could start a new one --
 		props.put("mail.smtp.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
 		props.put("mail.smtps.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
-		LogFactory.getLog(MailUtils.class).info("Mail host: "+props.getProperty("mail.smtp.host"));
 		Session session = Session.getDefaultInstance(props, authenticator);
 		session.setDebug(true);
 		return session;

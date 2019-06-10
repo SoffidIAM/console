@@ -87,7 +87,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	protected void findCustomObjectByJsonQuery(AsyncList<CustomObject> result, String objectType, String query) throws Exception {
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(CustomObject.class);

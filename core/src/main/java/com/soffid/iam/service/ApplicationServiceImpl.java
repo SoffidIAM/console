@@ -815,7 +815,7 @@ public class ApplicationServiceImpl extends
             first = false;
         }
         
-        if (rolsUsuaris.getUserCode() != null)
+        if (rolsUsuaris.getUserCode() != null && rolsUsuaris.getRuleId() == null)
         	notifyUserChange(getUserEntityDao().findByUserName(rolsUsuaris.getUserCode()));
 
         return rolsUsuaris;
@@ -1133,7 +1133,7 @@ public class ApplicationServiceImpl extends
             }
             
             deleteRoleAccountEntity(rolsUsuarisEntity, user, false);
-            if (user != null && rolsUsuaris.getRuleId() == null)
+            if (user != null && rolsUsuarisEntity.getRule() == null)
             	notifyUserChange(user);
             
             return;
@@ -2594,7 +2594,7 @@ public class ApplicationServiceImpl extends
 			throws InternalErrorException, Exception {
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(RoleAttributeEntityImpl.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(Role.class);
@@ -2700,7 +2700,7 @@ public class ApplicationServiceImpl extends
 	{
 
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);

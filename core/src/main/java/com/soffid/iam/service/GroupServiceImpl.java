@@ -773,7 +773,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected void findByJsonQuery ( AsyncList<Group> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
 	{
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);

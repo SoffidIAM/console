@@ -115,6 +115,8 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
@@ -2709,7 +2711,20 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		User u = (User) getSessionCacheService().getObject("currentUser");
 		if (u != null)
 			return u;
-		 		
+
+		
+		String userName = Security.getCurrentUser();
+
+		if (userName != null)
+		{
+			UserEntity ue = getUserEntityDao().findByUserName(userName);
+			if (ue != null)
+			{
+				u = getUserEntityDao().toUser(ue);
+				getSessionCacheService().putObject("currentUser", u);
+				return u;
+			}
+		}
 
 		String dispatcherName = getInternalPasswordService()
 				.getDefaultDispatcher();
@@ -3061,7 +3076,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);

@@ -218,6 +218,8 @@ public class SAMLServiceInternal {
 		// Marshall the Subject
 		Response saml2Response = (Response) marshaller.unmarshall(doc.getDocumentElement());
 
+		log.info("Processing authentication response from "+saml2Response.getIssuer().getValue());
+		
 		if (! validateResponse(hostName, saml2Response))
 			return null;
 
@@ -319,6 +321,7 @@ public class SAMLServiceInternal {
 			requestEntity.setFinished(true);
 			requestEntity.setKey(sb.toString());
 			requestDao.update(requestEntity);
+			log.info("Authenticated user "+user);
 			return new String[]{requestEntity.getExternalId(), sb.toString()};
 		}
 		log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");

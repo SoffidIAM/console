@@ -113,6 +113,7 @@ public class SAMLLoginRequester extends HttpServlet {
 	}
 
 	protected void authenticate(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
+		log.info("Receiving SAML response");
 		String hostName = new TenantExtractor().getTenant(req);
 		
 		String context = getContext(req);

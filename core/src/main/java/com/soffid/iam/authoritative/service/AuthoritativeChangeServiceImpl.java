@@ -239,10 +239,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 
 	private boolean detectChange (AuthoritativeChange change) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InternalErrorException
 	{
-		if ( ! detectUserChange (change) && ! detectGroupChange (change) && ! detecteAttributeChange (change))
-			return false;
-		else
-			return true;
+		boolean anyChange;
+		anyChange = detectUserChange (change) ;
+		anyChange = detectGroupChange (change) || anyChange;
+		anyChange = detecteAttributeChange (change) || anyChange;
+		return anyChange;
 	}
 	
 	/**
@@ -264,13 +265,28 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                     value = c;
                 }
                 UserData dada = getUserService().findDataByUserAndCode(change.getUser().getUserName(), attribute);
-                if (dada == null && value != null) return true; 
-                else if (value == null && dada != null) return true; 
+                if (dada == null && value != null) {
+                	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);
+                	return true; 
+                }
+                else if (value == null && dada != null) {
+                	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);
+                	return true; 
+                }
                 else if (value != null && value instanceof byte[]) {
-                    if (((byte[]) value).equals(dada.getBlobDataValue())) return true;
+                    if (((byte[]) value).equals(dada.getBlobDataValue())) {
+                    	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);
+                    	return true;
+                    }
                 } else if (value != null && value instanceof Calendar) {
-                    if (!((Calendar) value).equals(dada.getDateValue())) return true;
-                } else if (value != null && !value.toString().equals(dada.getValue())) return true;
+                    if (!((Calendar) value).equals(dada.getDateValue())) {
+                    	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);
+                    	return true;
+                    }
+                } else if (value != null && !value.toString().equals(dada.getValue())) {
+                	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);
+                	return true;
+                }
             }
 		}
 		return false;

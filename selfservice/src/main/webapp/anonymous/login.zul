@@ -20,11 +20,13 @@
 				if (option.length == 0)
 				{
 					document.getElementById("j_username").value = '';
-					document.getElementById('loginButton').style.display="none";
+					if (document.getElementById('loginButton'))
+						document.getElementById('loginButton').style.display="none";
 					return;
 				}
 				account = option+"\\"+account;
-				document.getElementById('loginButton').style.display="";
+				if (document.getElementById('loginButton'))
+					document.getElementById('loginButton').style.display="";
 			}
 			if (tenant == null || tenant.length == 0)
 			{
@@ -35,7 +37,8 @@
 		}
 		
 		function displayHolderGroup(groups) {
-			document.getElementById('holderGroupDiv').style.display="";
+			if (document.getElementById('holderGroupDiv'))
+				document.getElementById('holderGroupDiv').style.display="";
 			var selector = document.getElementById('j_group');
 			while (selector.firstElementChild != null)
 				selector.firstElementChild.remove();
@@ -51,7 +54,8 @@
 				selector.appendChild(option);
 			}
 			selector.size = groups.length + 1;
-			document.getElementById('loginButton').style.display="none";
+			if (document.getElementById('loginButton'))
+				document.getElementById('loginButton').style.display="none";
 			selector.focus();
 			useHolderGroup = true;
 			updateAccountName();
@@ -59,8 +63,10 @@
 
 		function hideHolderGroup() {
 			useHolderGroup = false;
-			document.getElementById('holderGroupDiv').style.display="none";
-			document.getElementById('loginButton').style.display="";
+			if (document.getElementById('holderGroupDiv'))
+				document.getElementById('holderGroupDiv').style.display="none";
+			if (document.getElementById('loginButton'))
+				document.getElementById('loginButton').style.display="";
 			updateAccountName();
 		}
 	]]></script>
@@ -156,7 +162,8 @@
 		<html if="${autoLogin}"><![CDATA[
 			<script type="text/javascript">
 			// <!--
-			document.getElementById('loginbox').setAttribute("style","display: none");
+			if (document.getElementById('loginButton'))
+				document.getElementById('loginbox').setAttribute("style","display: none");
 			document.getElementById('loginForm').submit();
 			// -->
 			</script>

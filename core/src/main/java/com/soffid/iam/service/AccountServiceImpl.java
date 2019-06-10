@@ -716,6 +716,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
 				ae.isDisabled() != account.isDisabled() ||
 				(ae.getLoginUrl() == null ? account.getLoginUrl() != null : ! ae.getLoginUrl().equals(account.getLoginUrl())) ||
+				(ae.getLoginName() == null ? account.getLoginName() != null : ! ae.getLoginName().equals(account.getLoginName())) ||
 				! ae.getPasswordPolicy().getName().equals(account.getPasswordPolicy()))
 			anyChange = true;
 		
@@ -2138,7 +2139,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			throws Exception
 	{
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		expr.setOracleWorkaround( new CustomDialect().isOracle());

@@ -108,6 +108,11 @@ public abstract class AccountEntity {
 	@Nullable
 	String loginUrl;
 
+	@Description("Login name. Used for SSO accounts")
+	@Nullable
+	@Column (name="ACC_LOGNAM")
+	String loginName;
+
 	@ForeignKey (foreignColumn="APW_ACC_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountPasswordEntity> passwords;
 

@@ -126,6 +126,11 @@ public class Account {
 	@Attribute(defaultValue="false")
 	boolean inheritNewPermissions;
 
+	@Description("Login URL")
 	@Nullable
 	String loginUrl;
+
+	@Description("Login name. Used for SSO accounts")
+	@Nullable
+	String loginName;
 }

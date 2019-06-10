@@ -100,8 +100,10 @@
 		<html if="${autoLogin}"><![CDATA[
 			<script type="text/javascript">
 			// <!--
-			document.getElementById('loginbox').setAttribute("style","display: none");
-			document.getElementById('loginForm').submit();
+			if (document.getElementById('loginbox'))
+				document.getElementById('loginbox').setAttribute("style","display: none");
+			if (document.getElementById('loginForm'))
+				document.getElementById('loginForm').submit();
 			// -->
 			</script>
    		]]></html>

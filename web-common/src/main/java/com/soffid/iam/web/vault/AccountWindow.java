@@ -101,7 +101,7 @@ public class AccountWindow extends Window implements AfterCompose {
 
 		es.caib.zkib.component.Form form = (Form) getFellow("form");
 		getFellow("serverRow").setVisible(false);
-		getFellow("urlRow").setVisible(false);
+		getFellow("urlRow").setVisible(true);
 		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(null);
 		((DataTextbox) getFellow("urlTextbox")).setBind(null);
 
@@ -187,14 +187,19 @@ public class AccountWindow extends Window implements AfterCompose {
 		boolean isAdmin = displayAccountAcl();
 
 		if (ssoSystem.equals(es.caib.zkib.datasource.XPathUtils.getValue((DataSource) model, path + "/@system"))) {
-			String accountAttributeXPath = findNameAttribute();
-			if (accountAttributeXPath != null) {
-				Map<String, Object> attributes = 
-						(Map<String, Object>) XPathUtils.getValue((DataSource) model, path + "/attributes");
-				String value = (String) attributes.get(accountAttributeXPath);
-				if (value != null) {
-					String[] result = splitValues(value);
-					((Textbox) getFellow("txtAccountName2")).setValue(result[1]);
+			String loginName = (String) XPathUtils.getValue((DataSource)model, path+"/@loginName");
+			if (loginName == null)
+			{
+				String accountAttributeXPath = findNameAttribute();
+				if (accountAttributeXPath != null) {
+					Map<String, Object> attributes = 
+							(Map<String, Object>) XPathUtils.getValue((DataSource) model, path + "/attributes");
+					String value = (String) attributes.get(accountAttributeXPath);
+					if (value != null) {
+						String[] result = splitValues(value);
+						((Textbox) getFellow("txtAccountName2")).setValue(result[1]);
+						XPathUtils.setValue((DataSource)model, path+"/@loginName", result[1]);
+					}
 				}
 			}
 			displayFormatSSO(isAdmin);
@@ -221,12 +226,6 @@ public class AccountWindow extends Window implements AfterCompose {
 			String att = ctx.getXPath(); // Gest /attribute[...] path
 			att = att.substring(att.lastIndexOf("/") + 1) + "/@value";
 			((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(att);
-		} else if (attribute.equals("SSO:URL")) {
-			getFellow("urlRow").setVisible(true);
-			row.setVisible(false);
-			String att = ctx.getXPath(); // Gest /attribute[...] path
-			att = att.substring(att.lastIndexOf("/") + 1) + "/@value";
-			((DataTextbox) getFellow("urlTextbox")).setBind(att);
 		}
 	}
 
@@ -239,7 +238,8 @@ public class AccountWindow extends Window implements AfterCompose {
 		getFellow("passwordPolicyRow").setVisible(false);
 
 		getFellow("txtAccountName2").setVisible(true);
-
+		getFellow("urlRow").setVisible(true);
+		
 		getFellow("changeFolderButton").setVisible(isAdmin);
 		((Textbox) getFellow("txtAccountName2")).setReadonly(!isAdmin);
 		((Textbox) getFellow("serverTextbox").getFellow("dada")).setReadonly(!isAdmin);
@@ -264,6 +264,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		((Textbox) getFellow("txtAccountDescription").getFellow("dada")).setReadonly(!isAdmin);
 
 		getFellow("txtAccountName2").setVisible(false);
+		getFellow("urlRow").setVisible(false);
 		((Textbox) getFellow("txtAccountName").getFellow("dada")).focus();
 	}
 
@@ -353,6 +354,35 @@ public class AccountWindow extends Window implements AfterCompose {
 		return accountNameOnAttribute;
 	}
 
+	public void onChangeLoginUrl (Textbox txtBox)
+	{
+	    String value = txtBox.getValue();
+	    Textbox serverTextbox = (Textbox) getFellow("serverTextbox").getFellow("dada");
+	    if (value == null || value.trim().length () == 0)
+	    {
+	    	serverTextbox.setValue("");
+	    }
+	    else
+	    {
+	    	try {
+		    	java.net.URL url = new java.net.URL(value);
+	    		txtBox.setStyle("");
+	    		String h = url.getHost();
+	    		if (h.startsWith("www."))
+	    			h = h.substring(4);
+		    	serverTextbox.setValue( h );
+	    	} catch (Exception e) {
+	    		e.printStackTrace();
+	    		txtBox.setStyle("background-color: pink");
+	    	}
+	    }
+
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(txtBox);
+		Map<String, Object> attributes = (Map<String, Object>) ctx.getDataSource().getJXPathContext()
+				.getValue(ctx.getXPath() + "/attributes");
+		attributes.put("SSO:URL", value);
+	}
+	
 	public void onChangeAccountName(Textbox txtBox) throws UnsupportedEncodingException {
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(txtBox);
 		String accountAttributeXPath = accountNameOnAttribute;

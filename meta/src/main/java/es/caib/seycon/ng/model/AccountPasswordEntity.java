@@ -16,8 +16,13 @@ public abstract class AccountPasswordEntity {
 	@Identifier
 	public java.lang.Long id;
 
+	@Nullable
 	@Column (name="APW_PASSWD", length=255)
 	public java.lang.String password;
+
+	@Nullable
+	@Column (name="APW_PASSWD2", length=255)
+	public java.lang.String password2;
 
 	@Column (name="APW_ORDER")
 	public java.lang.Long order;

@@ -24,6 +24,10 @@ public abstract class ContrasenyaEntity {
 	@Nullable
 	public java.lang.String contrasenya;
 
+	@Column (name="CTR_PASSWD", length=150, translated="password2")
+	@Nullable
+	public java.lang.String contrasenya2;
+
 	@Column (name="CTR_ACTIU", length=1, translated="active")
 	@Nullable
 	public java.lang.String actiu;

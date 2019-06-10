@@ -47,6 +47,7 @@ public class CustomField extends Div implements XPathSubscriber {
 	boolean visible = true;
 	boolean required = false;
 	boolean hideUserName = false;
+	boolean raisePrivileges = false;
 	
 	private List<TipusDada> dataTypes;
 
@@ -55,6 +56,8 @@ public class CustomField extends Div implements XPathSubscriber {
 	private InputField2 input;
 
 	private Object ownerObject;
+
+	private String filterExpression;
 
 	public void updateMetadata() {
 		dataTypeObj = new DataType();
@@ -66,6 +69,7 @@ public class CustomField extends Div implements XPathSubscriber {
 		dataTypeObj.setSize(maxLength);
 		dataTypeObj.setType(TypeEnumeration.STRING_TYPE);
 		dataTypeObj.setRequired(required);
+		dataTypeObj.setFilterExpression(filterExpression);
 		if (listOfValues != null)
 			dataTypeObj.setValues(Arrays.asList(listOfValues));
 
@@ -128,6 +132,7 @@ public class CustomField extends Div implements XPathSubscriber {
 			input.setSearchFilter(searchFilter);
 			input.setOwnerObject(ownerObject);
 			input.setHideUserName(hideUserName);
+			input.setRaisePrivileges(raisePrivileges);
 			try {
 				input.createField();
 			} catch (Exception e) {
@@ -336,5 +341,21 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setHideUserName(boolean hideUserName) {
 		this.hideUserName = hideUserName;
+	}
+
+	public boolean isRaisePrivileges() {
+		return raisePrivileges;
+	}
+
+	public void setRaisePrivileges(boolean raisePrivileges) {
+		this.raisePrivileges = raisePrivileges;
+	}
+
+	public String getFilterExpression() {
+		return filterExpression;
+	}
+
+	public void setFilterExpression(String filterExpression) {
+		this.filterExpression = filterExpression;
 	}
 }

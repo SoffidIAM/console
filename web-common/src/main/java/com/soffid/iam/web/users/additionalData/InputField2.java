@@ -113,7 +113,8 @@ public class InputField2 extends Div
 	private Object ownerObject;
 	SingletonBinder binder = new SingletonBinder(this);
 	boolean hideUserName = false;
-	
+	boolean raisePrivileges = false;
+
 	public DataType getDataType() {
 		return dataType;
 	}
@@ -301,7 +302,8 @@ public class InputField2 extends Div
 			searchBox.detach();
 		searchResults = new LinkedList<Identity>();
 		searchPosition = 0;
-//		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		if (raisePrivileges)
+			Security.nestedLogin(Security.ALL_PERMISSIONS);
 		try
 		{
 			if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
@@ -313,7 +315,8 @@ public class InputField2 extends Div
 			}
 			if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			{
-				currentSearchTextbox.setStyle("background-color: yellow");
+				if (hideUserName)
+					currentSearchTextbox.setStyle("background-color: yellow");
 				currentSearch = EJBLocator.getUserService().findUserByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
@@ -327,7 +330,8 @@ public class InputField2 extends Div
 		} catch (Exception e) {
 			log.warn("Error querying objects", e);
 		} finally {
-//			Security.nestedLogoff();
+			if (raisePrivileges)
+				Security.nestedLogoff();
 		}
 		searchBox = new org.zkoss.zhtml.Div();
 		searchBox.setDynamicProperty("tabindex", "-1");
@@ -731,12 +735,17 @@ public class InputField2 extends Div
 		}
 		else
 		{
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				UserService ejb = com.soffid.iam.EJBLocator.getUserService();
 				Collection<User> users = com.soffid.iam.EJBLocator.getUserService().findUserByJsonQuery(buildJsonFilter("userName", user));
 				if (users != null && ! users.isEmpty())
 					u = users.iterator().next();
 			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
 			}
 			if (u == null || ( filter != null && ! filter.isAllowedValue(u)))
 			{
@@ -770,11 +779,17 @@ public class InputField2 extends Div
 		}
 		else {
 			Group g = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				Collection<Group> groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByJsonQuery(buildJsonFilter("name", group));
 				if (groups != null && ! groups.isEmpty())
 					g = groups.iterator().next();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
 			if (g == null || ( filter != null && ! filter.isAllowedValue(g))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -813,11 +828,17 @@ public class InputField2 extends Div
 				l.setValue("");
 		} else {
 			Application a = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				Collection<Application> apps = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByJsonQuery(buildJsonFilter("name", application));
 				if (apps != null && ! apps.isEmpty())
 					a = apps.iterator().next();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -838,9 +859,15 @@ public class InputField2 extends Div
 				l.setValue("");
 		} else {
 			Host a = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				a = com.soffid.iam.EJBLocator.getNetworkService().findHostByName(host);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -861,9 +888,15 @@ public class InputField2 extends Div
 				l.setValue("");
 		} else {
 			MailDomain a = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				a = com.soffid.iam.EJBLocator.getMailListsService().findMailDomainByName(mailDomain);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -884,12 +917,18 @@ public class InputField2 extends Div
 		}
 		else {
 			CustomObject co = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				Collection<CustomObject> cos = com.soffid.iam.EJBLocator.getCustomObjectService()
 						.findCustomObjectByJsonQuery(dataType.getDataObjectType(), buildJsonFilter("name", customObject));
 				if (cos != null && ! cos.isEmpty())
 					co = cos.iterator().next();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
 			if (co == null || ( filter != null && ! filter.isAllowedValue(co))) {
 				if (l != null) l.setValue("?");
 				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
@@ -1012,6 +1051,7 @@ public class InputField2 extends Div
 									+ "readonly=\"" +readonlyExpr+ "\"/>"
 							+ "<textbox  "
 								+ "id=\""+id2+"\" "
+								+ "readonly=\""+(readonly)+"\" "
 								+ "onBlur='self.parent.parent.onBlur(event)' "
 								+ "onChanging='self.parent.parent.onChanging(event)' "
 								+ "onOK='self.parent.parent.onChildChange2(event)' "
@@ -1402,6 +1442,8 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
 					result = result + "<listitem value=\"\"/>";
+					if (raisePrivileges)
+						Security.nestedLogin(Security.ALL_PERMISSIONS);
 					try {
 						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
 						{
@@ -1409,6 +1451,10 @@ public class InputField2 extends Div
 						}
 					} catch (Exception e) {
 						log.info("Error getting user types", e);
+
+					} finally {
+						if (raisePrivileges)
+							Security.nestedLogoff();
 					}
 					result = result + "</listbox>";
 					result = "<div>"+result+required+"</div>"; 
@@ -1417,6 +1463,8 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>";
 					result = result + "<listitem value=\"\"/>";
+					if (raisePrivileges)
+						Security.nestedLogin(Security.ALL_PERMISSIONS);
 					try {
 						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
 						{
@@ -1424,6 +1472,10 @@ public class InputField2 extends Div
 						}
 					} catch (Exception e) {
 						log.info("Error getting user types", e);
+
+					} finally {
+						if (raisePrivileges)
+							Security.nestedLogoff();
 					}
 					result = result + "</listbox>";
 					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
@@ -1931,6 +1983,14 @@ public class InputField2 extends Div
 
 	public void setHideUserName(boolean hideUserName) {
 		this.hideUserName = hideUserName;
+	}
+
+	public boolean isRaisePrivileges() {
+		return raisePrivileges;
+	}
+
+	public void setRaisePrivileges(boolean raisePrivileges) {
+		this.raisePrivileges = raisePrivileges;
 	}
 
 }

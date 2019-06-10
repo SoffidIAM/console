@@ -1,12 +1,16 @@
 package com.soffid.selfservice.web;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Collection;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.ComponentNotFoundException;
@@ -36,6 +40,7 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
@@ -305,7 +310,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return (Tree) getFellowIfAny("treebox");
 	}
 	
-	void select() throws InterruptedException{
+	void select() throws InterruptedException, InternalErrorException, NamingException, CreateException{
 		openTree(getTreebox().getSelectedItem());
 	}
 	
@@ -394,7 +399,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
-	public void openTree(Treeitem selected) throws InterruptedException{
+	public void openTree(Treeitem selected) throws InterruptedException, InternalErrorException, NamingException, CreateException{
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(selected);
 		DataNode obj2 = (DataNode) XPathUtils.getValue(ctx, ".");
 		Object obj = obj2.getInstance();
@@ -413,13 +418,49 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 					Messagebox.show("Cannot execute");
 			}
 				
-		} else if (obj instanceof Account) {
-			Account account = (Account) obj;
-			String url = (String) account.getAttributes().get("SSO:URL");
+		} else if (obj instanceof com.soffid.iam.api.Account) {
+			selected.setSelected(false);
+			com.soffid.iam.api.Account account = (com.soffid.iam.api.Account) obj;
+			String url = account.getLoginUrl();
+			if ( url == null || url.trim().isEmpty())
+				url = (String) account.getAttributes().get("SSO:URL");
 			if (url != null)
 			{
 				url.replaceAll("'", "\\'");
-				Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+				String name = account.getName();
+				com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+				boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
+				if (password == null || ! ssokm)
+					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+				else
+				{
+					JSONObject j = new JSONObject();
+					for (String att: account.getAttributes().keySet())
+					{
+						if (att.startsWith("SSO:") &&
+								!att.equals("SSO:URL") && 
+								!att.equals("SSO:Server"))
+						{
+							try {
+								String value = (String) account.getAttributes().get(att);
+								String[] values = value.split("=");
+								if (values.length == 2)
+								{
+									j.put( URLDecoder.decode(values[0], "UTF-8"), 
+											URLDecoder.decode(values[1], "UTF-8"));
+								}
+							} catch (Exception e) {}
+						}
+					}
+					try {
+						j.put("url", url);
+						j.put("account", name);
+						j.put("password", password.getPassword());
+						Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+					} catch (JSONException e) {
+						Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+					}
+				}
 			}
 		}
 	}

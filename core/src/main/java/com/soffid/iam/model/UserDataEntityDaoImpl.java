@@ -131,7 +131,7 @@ public class UserDataEntityDaoImpl
         				calendar .setTime(dateObj);
         				targetVO.setDateValue(calendar);
         			}catch (ParseException e){
-        				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.IsNotDate"), targetVO.getValue())); //$NON-NLS-1$
+//        				throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.IsNotDate"), targetVO.getValue())); //$NON-NLS-1$
         			}
         		}else 
         			targetVO.setDateValue(null);

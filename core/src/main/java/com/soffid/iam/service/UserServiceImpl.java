@@ -3259,6 +3259,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
+	private void auditChange(UserDataEntity dadaUsuari) throws InternalErrorException {
+		Audit audit = new Audit();
+		audit.setObject("SC_DADUSU");
+		audit.setAction("U");
+		audit.setAuthor(Security.getCurrentAccount());
+		audit.setCalendar(Calendar.getInstance());
+		audit.setConfigurationParameter(dadaUsuari.getDataType().getName());
+		audit.setUser(dadaUsuari.getUser().getUserName());
+		getAuditService().create(audit);
+	}
+
 	@Override
 	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
 		boolean anyChange = false;
@@ -3287,15 +3298,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					{
 						if (o != null)
 						{
-							anyChange = true;
-							updateUserAttribute(entity, entities, key, metadata, o);
+							if (updateUserAttribute(entity, entities, key, metadata, o))
+								anyChange = true;
 						}
 					}
 				}
 				else
 				{
-					anyChange = true;
-					updateUserAttribute(entity, entities, key, metadata, v);
+					if (updateUserAttribute(entity, entities, key, metadata, v))
+						anyChange = true;
 				}
 			}
 
@@ -3304,6 +3315,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
 				{
 					anyChange = true;
+					auditChange(attribute);
 					getUserDataEntityDao().remove(attribute);
 					entity.getUserData().remove(attribute);
 				}
@@ -3339,8 +3351,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	private void updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
+	private boolean updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
 			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		boolean anyChange = false;
 		UserDataEntity aae = findUserDataEntity(attributes, key, value);
 		if (aae == null)
 		{
@@ -3353,10 +3366,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getUserDataEntityDao().create(aae);
 				entity.getUserData().add(aae);
+				auditChange(aae);
+				anyChange = true;
 			}
 		}
 		else
 			attributes.remove(aae);
+		return anyChange;
 	}
 
 	private UserDataEntity findUserDataEntity(LinkedList<UserDataEntity> entities, String key,

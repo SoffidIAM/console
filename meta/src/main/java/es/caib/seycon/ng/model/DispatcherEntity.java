@@ -33,7 +33,7 @@ public abstract class DispatcherEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DIS_CODI", length=50, translated="name")
+	@Column (name="DIS_CODI", length=150, translated="name")
 	@Nullable
 	public java.lang.String codi;
 

@@ -552,11 +552,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			return getTaskQueue().addTask(tasque);
 		} catch (NoSuchBeanDefinitionException e) {
 			tasque.setServer( null );
-			getTaskEntityDao().createNoFlush(tasque);
+			if (force)
+				getTaskEntityDao().createForce(tasque);
+			else
+				getTaskEntityDao().createNoFlush(tasque);
 			return null;
 		} catch (IOException e) {
 			tasque.setServer( null );
-			getTaskEntityDao().createNoFlush(tasque);
+			if (force)
+				getTaskEntityDao().createForce(tasque);
+			else
+				getTaskEntityDao().createNoFlush(tasque);
 			return null;
 		}
 	}

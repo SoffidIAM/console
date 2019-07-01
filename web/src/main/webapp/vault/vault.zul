@@ -93,11 +93,48 @@
 							<label bind="@description" style="display: inline-block; padding-bottom: 5px; padding-top: 5px;"/>
 							<imageclic src="/img/link.png" title="Open" style="margin-left: 1em; margin-right: 1em">
 								<attribute name="onClick"><![CDATA[
-									String url = es.caib.zkib.datasource.XPathUtils.getValue(self, "/attributes[@name='SSO:URL']");
-									if (url != null)
-									{
-					               		Executions.getCurrent().sendRedirect(url, "_blank");
-									}
+						        com.soffid.iam.api.Account account = es.caib.zkib.datasource.XPathUtils.getValue(self, ".").instance;
+                    			String url = account.getLoginUrl();
+                    			if ( url == null || url.trim().isEmpty())
+                    				url = (String) account.getAttributes().get("SSO:URL");
+                    			if (url != null)
+                    			{
+                    				url.replaceAll("'", "\\'");
+                    				String name = account.getName();
+                    				com.soffid.iam.api.Password password = com.soffid.iam.EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+                    				boolean ssokm = "true".equals(com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.ssokm.enable"));
+                    				if (password == null || ! ssokm)
+                    					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+                    				else
+                    				{
+                    					org.json.JSONObject j = new org.json.JSONObject();
+                    					for (String att: account.getAttributes().keySet())
+                    					{
+                    						if (att.startsWith("SSO:") &&
+                    								!att.equals("SSO:URL") && 
+                    								!att.equals("SSO:Server"))
+                    						{
+                    							try {
+                    								String value = (String) account.getAttributes().get(att);
+                    								String[] values = value.split("=");
+                    								if (values.length == 2)
+                    								{
+                    									j.put( java.net.URLDecoder.decode(values[0], "UTF-8"), 
+                    											java.net.URLDecoder.decode(values[1], "UTF-8"));
+                    								}
+                    							} catch (Exception e) {}
+                    						}
+                    					}
+                    					try {
+                    						j.put("url", url);
+                    						j.put("account", name);
+                    						j.put("password", password.getPassword());
+                    						Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+                    					} catch (Exception e) {
+                    						Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+                    					}
+                    				}
+                    			}
 								]]></attribute>
 							</imageclic>
 							<div sclass="hpowner">

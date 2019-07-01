@@ -507,6 +507,7 @@
 				
 				if ("N".equals(nodeActual.getMenu())) {// de tipus Acció
 					p_execucions.setVisible(visible); //solo si autorizado (o público) o pot veure tots
+					systemRow.setVisible(true);
 					orow_tipusmenu.setVisible(false);
 					// Obtenim els mètodes d'execució
 					Collection execucions = nodeActual.getExecucions();
@@ -535,6 +536,7 @@
 				else { // Tipus Menú
 					//Amaguem les Execucions
 					p_execucions.setVisible(false);
+					systemRow.setVisible(false);
 					//I mostrem la fila de tipus de menu
 					orow_tipusmenu.setVisible(true);
 					// Mostrem la branca actual a l'abre per moure (si pot moure)
@@ -1728,6 +1730,8 @@
 											</dataitem>
 										</listbox>
 									</row>
+
+
 									<row>
 										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Tipus')}"/>
 										<listbox bind="@menu" disabled="${true}" id="oesmenu" mold="select" onSelect="canviaTipusPUE(self.selectedItem.value)" width="100px"> <!--  no es pot canviar: només a les noves -->
@@ -1746,6 +1750,20 @@
 											<button label="${c:l('aplicacionsIntranet.zul.SortChildren')}" id="bt_sortchildren" onClick="sortChildren(self);"/>
 										</hbox>
 									</row>
+
+									<row id="systemRow">
+										<input_etiqueta
+											value="${c:l('com.soffid.iam.api.Audit.database')}"/>
+										<listbox id="select_sytem"
+											bind="@system"
+											dataPath="/model:/systems" disabled="${false}"
+											mold="select">
+											<dataitem bind="@name">
+												<listcell bind="@name"/>
+											</dataitem>
+										</listbox>
+									</row>
+
 									<row>
 										<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Accas')}"/>
 										<listbox bind="@esPublic" disabled="${true}" id="opublicaccess" mold="select" onSelect="" width="100px">

@@ -1,10 +1,13 @@
 package com.soffid.selfservice.web;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -19,7 +22,6 @@ import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.util.Clients;
@@ -27,6 +29,8 @@ import org.zkoss.zul.Box;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
@@ -41,21 +45,22 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PuntEntrada;
+import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.ejb.AccountService;
 import es.caib.zkib.component.DataModel;
-import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.SerializableEventListener;
-import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SelfServiceHandler extends com.soffid.iam.web.component.Frame 
@@ -404,67 +409,168 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		DataNode obj2 = (DataNode) XPathUtils.getValue(ctx, ".");
 		Object obj = obj2.getInstance();
 		if(obj instanceof PuntEntrada){
-			PuntEntrada instance = (PuntEntrada) obj;
-			if(!selected.isOpen() && instance.getMenu().equals("S")){
-				selected.setOpen(true);
-			}else if (instance.getMenu().equals("S"))
-				selected.setOpen(false);
-			else{
-				Long name = instance.getId();
-				Collection<ExecucioPuntEntrada> punt = instance.getExecucions();
-				if(!punt.isEmpty())
-					Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
-				else
-					Messagebox.show("Cannot execute");
-			}
+			openEntryPoint(selected, obj);
 				
 		} else if (obj instanceof com.soffid.iam.api.Account) {
-			selected.setSelected(false);
-			com.soffid.iam.api.Account account = (com.soffid.iam.api.Account) obj;
-			String url = account.getLoginUrl();
-			if ( url == null || url.trim().isEmpty())
-				url = (String) account.getAttributes().get("SSO:URL");
-			if (url != null)
+			openAccount(selected, obj);
+		}
+	}
+	private void openAccount(Treeitem selected, Object obj)
+			throws InternalErrorException, NamingException, CreateException {
+		selected.setSelected(false);
+		com.soffid.iam.api.Account account = (com.soffid.iam.api.Account) obj;
+		String url = account.getLoginUrl();
+		if ( url == null || url.trim().isEmpty())
+			url = (String) account.getAttributes().get("SSO:URL");
+		if (url != null)
+		{
+			url.replaceAll("'", "\\'");
+			String name = account.getName();
+			if (account.getLoginName() != null && ! account.getLoginName().isEmpty())
+				name = account.getLoginName();
+			com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+			boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
+			if (password == null || ! ssokm)
+				Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+			else
 			{
-				url.replaceAll("'", "\\'");
-				String name = account.getName();
-				com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
-				boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
-				if (password == null || ! ssokm)
-					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-				else
+				JSONObject j = new JSONObject();
+				for (String att: account.getAttributes().keySet())
 				{
-					JSONObject j = new JSONObject();
-					for (String att: account.getAttributes().keySet())
+					if (att.startsWith("SSO:") &&
+							!att.equals("SSO:URL") && 
+							!att.equals("SSO:Server"))
 					{
-						if (att.startsWith("SSO:") &&
-								!att.equals("SSO:URL") && 
-								!att.equals("SSO:Server"))
-						{
-							try {
-								String value = (String) account.getAttributes().get(att);
-								String[] values = value.split("=");
-								if (values.length == 2)
-								{
-									j.put( URLDecoder.decode(values[0], "UTF-8"), 
-											URLDecoder.decode(values[1], "UTF-8"));
-								}
-							} catch (Exception e) {}
-						}
+						try {
+							String value = (String) account.getAttributes().get(att);
+							String[] values = value.split("=");
+							if (values.length == 2)
+							{
+								j.put( URLDecoder.decode(values[0], "UTF-8"), 
+										URLDecoder.decode(values[1], "UTF-8"));
+							}
+						} catch (Exception e) {}
 					}
-					try {
-						j.put("url", url);
-						j.put("account", name);
-						j.put("password", password.getPassword());
-						Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
-					} catch (JSONException e) {
-						Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-					}
+				}
+				try {
+					j.put("url", url);
+					j.put("account", name);
+					j.put("password", password.getPassword());
+					Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+				} catch (JSONException e) {
+					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
 				}
 			}
 		}
 	}
+
+	private void openEntryPoint(Treeitem selected, Object obj)
+			throws InternalErrorException, NamingException, CreateException, InterruptedException {
+		PuntEntrada instance = (PuntEntrada) obj;
+		if(!selected.isOpen() && instance.getMenu().equals("S")){
+			selected.setOpen(true);
+		}else if (instance.getMenu().equals("S"))
+			selected.setOpen(false);
+		else{
+			Long name = instance.getId();
+			Collection<ExecucioPuntEntrada> punt = instance.getExecucions();
+			if(!punt.isEmpty())
+			{
+				boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
+				String system = instance.getSystem();
+				String type = instance.getExecucions().iterator().next().getCodiTipusExecucio();
+				if (! ssokm || system == null || ! type.equals("URL"))
+					Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
+				else 
+				{
+					String user = Security.getCurrentUser();
+					List<Account> accounts = null;
+					// Get accounts list
+					Security.nestedLogin(Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
+					try {
+						es.caib.seycon.ng.servei.AccountService accountService = ServiceLocator.instance().getAccountService();
+						accounts = new LinkedList<Account>(accountService.findUserAccounts(user, system));
+						for (Account acc: accountService.findSharedAccountsByUser(user))
+						{
+							if (acc.getDispatcher().equals(system))
+								accounts.add(acc);
+						}
+					} finally {
+						Security.nestedLogoff();
+					}
+					// Get passwords
+					List<String[]> r = new LinkedList<String[]>();
+					es.caib.seycon.ng.servei.ejb.SelfService sss = es.caib.seycon.ng.EJBLocator.getSelfService();
+					String url = instance.getExecucions().iterator().next().getContingut();
+					for (Account account: accounts)
+					{
+						com.soffid.iam.api.Password password = sss.queryAccountPasswordBypassPolicy(account);
+						if (password != null)
+							r.add(new String [] { account.getName(), account.getDescription(), password.toString(), url });
+					}
+					if (r.size() == 0)
+					{
+						Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
+					}
+					else if (r.size() == 1)
+					{
+						try {
+							JSONObject j = new JSONObject();
+							j.put("url", url);
+							String[] row = r.get(0);
+							j.put("account", row[0]);
+							j.put("password", Password.decode(row[2]).getPassword());
+							Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+						} catch (JSONException e) {
+							Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+						}
+					} else {
+						Window w = (Window) getFellow ("selectAccount");
+						Listbox lb = (Listbox) w.getFellow("accountsListbox");
+						lb.getItems().clear();
+						Collections.sort(r, new Comparator<String[]>() {
+							public int compare(String[] o1, String[] o2) {
+								return o1[0].compareTo(o2[0]);
+							}
+							
+						});
+						for ( String[] row: r)
+						{
+							Listitem item = new Listitem();
+							item.setValue(row);
+							item.appendChild(new Listcell(row[0]));
+							item.appendChild(new Listcell(row[1]));
+							lb.appendChild(item);
+						}
+						w.doHighlighted();
+					}
+					
+				}
+			}
+			else
+				Messagebox.show("Cannot execute");
+		}
+	}
 	
+	public void launchSSOKMAccount () {
+		Window w = (Window) getFellow ("selectAccount");
+		Listbox lb = (Listbox) w.getFellow("accountsListbox");
+		Listitem selected = lb.getSelectedItem();
+		if (selected != null)
+		{
+			String[] values = (String[]) selected.getValue();
+			try {
+				JSONObject j = new JSONObject();
+				j.put("url", values[3]);
+				j.put("account", values[0]);
+				j.put("password", Password.decode(values[2]).getPassword());
+				Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+			} catch (JSONException e) {
+				Clients.evalJavaScript("window.open('"+values[3]+"', '_blank');");
+			}
+		}
+		
+	}
 	void onNewAccount (Listitem row)
 	{
 		es.caib.zkib.binder.BindContext ctx  = XPathUtils.getComponentContext(row);

@@ -133,7 +133,8 @@
 											sclass="textbox" 
 											maxlength="255"
 											bind="@loginUrl"
-											multiline="false" width="100%" >
+											multiline="false" width="100%" 
+											onChange="innerWindow.onChangeLoginUrl(self)"											>
 											<attribute name="onChanging"><![CDATA[
 										    		self.setStyle("");
 											]]></attribute>

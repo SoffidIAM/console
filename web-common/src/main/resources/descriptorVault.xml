@@ -176,13 +176,13 @@
 	
 	<datanode name="account">
 		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService">
-			<insert-method method="createAccount" returnBean="true" >  <!-- user:create -->
+			<insert-method method="createAccount2" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
 			</insert-method>
 			<delete-method method="removeAccount">    
 				<parameter value="${instance}" />
 			</delete-method>
-			<update-method method="updateAccount"> <!-- user:update -->
+			<update-method method="updateAccount2"> <!-- user:update -->
 				<parameter value="${instance}" />
 			</update-method>
 		

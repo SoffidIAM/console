@@ -1,8 +1,11 @@
 function launchSsoUrl (secrets) {
-	if ( document.firstElementChild.getAttribute("soffidAraleExtensionPresent") == "true")
+	var d = document.getElementById("soffidAraleExtensionDetector");
+	if ( d && d.getAttribute("soffidAraleExtensionPresent") == "true")
 	{
-		window.postMessage({type:"soffid",action:"prepare",url:secrets.url,secrets:secrets});
-	} else {
+		var ev = new CustomEvent("soffidMessage", {detail: 
+			{type:"soffid",action:"prepare",url:secrets.url,secrets:secrets}});
+		d.dispatchEvent(ev);
+	} else if (d) {
 		var isChromium = window.chrome;
 		var winNav = window.navigator;
 		var vendorName = winNav.vendor;
@@ -25,6 +28,6 @@ function launchSsoUrl (secrets) {
 				return;
 			}
 		}
+		window.setTimeout(function(){window.open(secrets.url, "_blank")}, 100);
 	}
-	window.setTimeout(function(){window.open(secrets.url, "_blank")}, 100);
 }

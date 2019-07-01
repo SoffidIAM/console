@@ -234,6 +234,9 @@ public class AccountEntityDaoImpl extends
 						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
 				}
 			}
+			
+			Object o = attributes.get("SSO:URL");
+			if (o != null) target.setLoginUrl(o.toString());
 	
 			// Assign vault folder
 			if (source.getFolder() == null)
@@ -331,6 +334,8 @@ public class AccountEntityDaoImpl extends
 		target.setType(entry.account.getType());
 		target.setVaultFolder(entry.account.getVaultFolder());
 		target.setVaultFolderId(entry.account.getVaultFolderId());
+		target.setLoginName(entry.account.getLoginName());
+		target.setLoginUrl(entry.account.getLoginUrl());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);

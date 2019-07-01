@@ -114,6 +114,12 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 			getRoleEntityDao().remove(dispatcherEntity.getRole());
 			dispatcherEntity.getRole().clear();
 
+			for ( EntryPointEntity ep: dispatcherEntity.getEntryPoints())
+			{
+				ep.setSystem(null);
+				getEntryPointEntityDao().update(ep);
+			}
+			
 			super.remove(dispatcherEntity);
 			getSession(false).flush();
 			auditarDispatcher("D", codiDispatcher); //$NON-NLS-1$

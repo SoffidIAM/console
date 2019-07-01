@@ -80,5 +80,8 @@ public class PuntEntrada {
 	@Nullable
 	@Attribute(translated = "treeRoute" )
 	public java.lang.String rutaArbre;
+	
+	@Nullable
+	public java.lang.String system;
 
 }

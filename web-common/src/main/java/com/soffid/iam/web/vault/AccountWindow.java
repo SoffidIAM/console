@@ -16,6 +16,7 @@ import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.events.XPathRerunEvent;
 import es.caib.zkib.jxpath.Pointer;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -37,6 +38,7 @@ import java.util.Map;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
@@ -62,7 +64,8 @@ public class AccountWindow extends Window implements AfterCompose {
 	private String accountNameOnAttribute;
 	private boolean newAccount;
 	private DataModel model;
-
+	private String newAccountType;
+	
 	public void afterCompose() {
 		boolean canUpdateUserMetadata = false;
 		Component macro = getParent();
@@ -91,6 +94,10 @@ public class AccountWindow extends Window implements AfterCompose {
 		accountPath = path;
 		accountNameOnAttribute = null;
 		newAccount = true;
+		
+		getFellow("accountTypeSelector").setVisible(true);
+		getFellow("panels").setVisible(false);
+		newAccountType = null;
 
 		if (ssoSystem == null)
 			throw new UiException("Configuration parameter AutoSSOSystem is not defined. Please, configure it");
@@ -103,7 +110,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		getFellow("serverRow").setVisible(false);
 		getFellow("urlRow").setVisible(true);
 		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(null);
-		((DataTextbox) getFellow("urlTextbox")).setBind(null);
+//		((DataTextbox) getFellow("urlTextbox")).setBind(null);
 
 		form.setDataPath("/model:" + path);
 
@@ -126,6 +133,8 @@ public class AccountWindow extends Window implements AfterCompose {
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@passwordPolicy", ssoPolicy);
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@type",
 				es.caib.seycon.ng.comu.AccountType.SHARED);
+		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/attributes", new HashMap<String, Object>());
+		((AttributesDiv) getFellow("attributesDiv")).updateMetadata();
 
 		displayFormatStandard(true);
 		doHighlighted();
@@ -170,13 +179,18 @@ public class AccountWindow extends Window implements AfterCompose {
 		newAccount = false;
 		accountPath = path;
 
+		getFellow("accountTypeSelector").setVisible(false);
+		getFellow("panels").setVisible(true);
+
 		canUpdateUserMetadata = true;
 
 		getFellow("serverRow").setVisible(false);
 		getFellow("urlRow").setVisible(false);
 		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(null);
-		((DataTextbox) getFellow("urlTextbox")).setBind(null);
+//		((DataTextbox) getFellow("urlTextbox")).setBind(null);
 
+		DataNode account = (DataNode) XPathUtils.getValue((DataSource)model, path);
+		
 		es.caib.zkib.component.Form form = (Form) getFellow("form");
 		form.setDataPath("/model:" + path);
 
@@ -217,18 +231,6 @@ public class AccountWindow extends Window implements AfterCompose {
 		doHighlighted();
 	}
 
-	void onNewAttributeRow(Row row) {
-		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(row);
-		String attribute = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@attribute");
-		if (attribute.equals("SSO:Server")) {
-			row.setVisible(false);
-			getFellow("serverRow").setVisible(true);
-			String att = ctx.getXPath(); // Gest /attribute[...] path
-			att = att.substring(att.lastIndexOf("/") + 1) + "/@value";
-			((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(att);
-		}
-	}
-
 	void displayFormatSSO(boolean isAdmin) {
 		getFellow("txtAccountName").setVisible(false);
 		getFellow("dispatcherRow").setVisible(false);
@@ -243,6 +245,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		getFellow("changeFolderButton").setVisible(isAdmin);
 		((Textbox) getFellow("txtAccountName2")).setReadonly(!isAdmin);
 		((Textbox) getFellow("serverTextbox").getFellow("dada")).setReadonly(!isAdmin);
+		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind("/attributes[@name='SSO:Server']");
 		((Textbox) getFellow("urlTextbox")).setReadonly(!isAdmin);
 		((Textbox) getFellow("txtAccountDescription").getFellow("dada")).setReadonly(!isAdmin);
 
@@ -356,31 +359,37 @@ public class AccountWindow extends Window implements AfterCompose {
 
 	public void onChangeLoginUrl (Textbox txtBox)
 	{
+		txtBox.setStyle("");
 	    String value = txtBox.getValue();
-	    Textbox serverTextbox = (Textbox) getFellow("serverTextbox").getFellow("dada");
-	    if (value == null || value.trim().length () == 0)
-	    {
-	    	serverTextbox.setValue("");
-	    }
-	    else
-	    {
-	    	try {
-		    	java.net.URL url = new java.net.URL(value);
-	    		txtBox.setStyle("");
-	    		String h = url.getHost();
-	    		if (h.startsWith("www."))
-	    			h = h.substring(4);
-		    	serverTextbox.setValue( h );
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    		txtBox.setStyle("background-color: pink");
-	    	}
-	    }
+	    es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(txtBox);
+	    if (ssoSystem.equals(es.caib.zkib.datasource.XPathUtils.getValue((DataSource) model, 
+	    		ctx.getXPath() + "/@system"))) {
+		    Textbox serverTextbox = (Textbox) getFellow("serverTextbox").getFellow("dada");
+		    if (value == null || value.trim().length () == 0)
+		    {
+		    	serverTextbox.setValue("");
+		    }
+		    else
+		    {
+		    	try {
+			    	java.net.URL url = new java.net.URL(value);
+		    		txtBox.setStyle("");
+		    		String h = url.getHost();
+		    		if (h.startsWith("www."))
+		    			h = h.substring(4);
+		    		serverTextbox.setValue( h );
+		    	} catch (Exception e) {
+		    		e.printStackTrace();
+		    		txtBox.setStyle("background-color: pink");
+		    	}
+	
+		    }
 
-		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(txtBox);
-		Map<String, Object> attributes = (Map<String, Object>) ctx.getDataSource().getJXPathContext()
-				.getValue(ctx.getXPath() + "/attributes");
-		attributes.put("SSO:URL", value);
+			ctx.getDataSource().getJXPathContext()
+					.setValue(ctx.getXPath() + "/attributes[@name='SSO:URL']", value);
+			ctx.getDataSource().sendEvent(new XPathRerunEvent(ctx.getDataSource(), ctx.getXPath()+"/attributes"));
+		}
+		
 	}
 	
 	public void onChangeAccountName(Textbox txtBox) throws UnsupportedEncodingException {
@@ -406,38 +415,64 @@ public class AccountWindow extends Window implements AfterCompose {
 	}
 
 	public void onApply() throws InternalErrorException, CommitException {
-
-		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(getFellow("form"));
-		String system = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@system");
-		if (newAccount)
+		if ( newAccount && newAccountType == null)
 		{
-			String currentName = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@name");
-			long l = findLastAccount (ssoSystem) + 1;
-			es.caib.zkib.datasource.XPathUtils.setValue(ctx, "/@name", ""+l);	
+			Listbox lb = (Listbox) getFellow("accountTypeSelectorListbox");
+			if (lb.getSelectedItem() == null)
+			{
+				Missatgebox.avis(Labels.getLabel("accounts.selectAccountTypeWarning"));
+			}
+			else
+			{
+				newAccountType = (String) lb.getSelectedItem().getValue();
+				getFellow("accountTypeSelector").setVisible(false);
+				getFellow("panels").setVisible(true);
+				if (newAccountType.equals("m"))
+				{
+					displayFormatStandard(true);
+				}
+				else 
+				{
+					displayFormatSSO(true);
+				}
+			}
 		}
-		Long folderId = (Long) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@vaultFolderId");
-		
-		model.commit();
-		setVisible(false);
-		
-		Tree treebox = (Tree) getPage().getFellow("esquema").getFellow("lista").getFellow("treebox");
-		
-		String xPath = null;
-		
-		if (treebox.getSelectedItem() != null)
-			xPath = ((DataNode)treebox.getSelectedItem().getValue()).getXPath();
-		
-		model.getVariables().declareVariable("directFilter", false);
-		
-		try {
-			es.caib.zkib.datamodel.DataNode dn =  (DataNode) es.caib.zkib.datasource.XPathUtils.getValue( (DataSource) model, accountPath);
-			dn.getContainer().refresh();
-			// Refresh previous parent folder
-			es.caib.zkib.datamodel.DataNodeCollection c = (DataNodeCollection) es.caib.zkib.datasource.XPathUtils.getValue((DataSource)model, "/folder");
-			searchAndRefresh (c, folderId);
-		} catch (Throwable e) {
-		
+		else
+		{
+			
+			es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(getFellow("form"));
+			String system = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@system");
+			if (newAccount)
+			{
+				String currentName = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@name");
+				long l = findLastAccount (ssoSystem) + 1;
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx, "/@name", ""+l);	
+			}
+			Long folderId = (Long) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@vaultFolderId");
+			
+			model.commit();
+			setVisible(false);
+			
+			Tree treebox = (Tree) getPage().getFellow("esquema").getFellow("lista").getFellow("treebox");
+			
+			String xPath = null;
+			
+			if (treebox.getSelectedItem() != null)
+				xPath = ((DataNode)treebox.getSelectedItem().getValue()).getXPath();
+			
+			model.getVariables().declareVariable("directFilter", false);
+			
+			try {
+				es.caib.zkib.datamodel.DataNode dn =  (DataNode) es.caib.zkib.datasource.XPathUtils.getValue( (DataSource) model, accountPath);
+				dn.getContainer().refresh();
+				// Refresh previous parent folder
+				es.caib.zkib.datamodel.DataNodeCollection c = (DataNodeCollection) es.caib.zkib.datasource.XPathUtils.getValue((DataSource)model, "/folder");
+				searchAndRefresh (c, folderId);
+			} catch (Throwable e) {
+				
+			}
 		}
+
 	}
 
 	void searchAndRefresh(es.caib.zkib.datamodel.DataNodeCollection coll, Long folderId) {

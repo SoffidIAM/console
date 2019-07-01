@@ -295,7 +295,9 @@ public class InputField2 extends Div
 	private String targetSearchTextboxUuid;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
-		targetSearchTextboxUuid = currentSearchTextbox.getParent().getFirstChild().getUuid();
+		targetSearchTextboxUuid = dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ?
+				currentSearchTextbox.getParent().getFirstChild().getUuid() :
+				currentSearchTextbox.getUuid();
 		searchCriteria = (String) event.getValue();
 		cancelSearch();
 		if (searchBox != null)
@@ -435,8 +437,8 @@ public class InputField2 extends Div
 		if (value != null)
 		{
 			cancelSearch();
-			currentSearchTextbox.setRawValue( value );
-			applyChange(currentSearchTextbox, value);
+			currentSearchTextbox.setRawValue( value.toString() );
+			applyChange(currentSearchTextbox, value.toString());
 			Events.postEvent("onChange", this, null);
 		}
 	}
@@ -446,6 +448,18 @@ public class InputField2 extends Div
 		cancelSearch();
 	}
 	
+	public void onBlur2 (Event event) throws UnsupportedEncodingException, IOException, CommitException
+	{
+		cancelSearch();
+		Component tb = event.getTarget().getParent().getFirstChild();
+		InputElement ie = (InputElement) event.getTarget();
+		if (ie.getText() == null || ie.getText().trim().isEmpty())
+		{
+			((InputElement) tb).setRawValue ( "" );
+			applyChange(tb, "");
+		}
+	}
+
 	public void cancelSearch() {
 		if (currentSearch != null)
 		{
@@ -498,7 +512,7 @@ public class InputField2 extends Div
 					value = ((Application) o).getName();
 				else
 					throw e;
-				((InputElement) tb).setRawValue( value );
+				((InputElement) tb).setRawValue( value.toString() );
 				applyChange(tb, value);
 			}
 			else
@@ -517,6 +531,7 @@ public class InputField2 extends Div
 	public void onChildChange2(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 //		cancelSearch();
 		Component tb = event.getTarget().getParent().getFirstChild();
+		InputElement ie = (InputElement) event.getTarget();
 		
 		if (currentSearch != null && currentSearch.isDone() &&  currentSearch.size() >= 1 && searchResults.size() > 0)
 		{
@@ -536,7 +551,7 @@ public class InputField2 extends Div
 				value = ((Application) o).getName();
 			else
 				value = null;
-			((InputElement) tb).setRawValue( value );
+			((InputElement) tb).setRawValue( value.toString() );
 			applyChange(tb, value);
 		}
 	}
@@ -691,28 +706,46 @@ public class InputField2 extends Div
 	}
 
 	public void openUser(Event event) {
-		InputElement textbox = (InputElement) event.getTarget().getParent().getFirstChild();
-		String user = (String) textbox.getRawText();
-		Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new");
+		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_USUARIS))
+		{
+			Component c = event.getTarget().getParent().getFirstChild();
+			while (! (c instanceof InputElement))
+			{
+				c = c.getNextSibling();
+				if ( c == null) return;
+			}
+			InputElement textbox = (InputElement) c;
+			String user = (String) textbox.getRawText();
+			Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new");
+		}
 	}
 
 	public void openGroup(Event event) {
-		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
-		String grup = (String) textbox.getRawText();
-		Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new");
+		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_GRUPS))
+		{
+			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+			String grup = (String) textbox.getRawText();
+			Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new");
+		}
 	}
 
 	public void openApplication(Event event) {
-		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
-		String application = (String) textbox.getRawText();
-		Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new");
+		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_APLICACIONS))
+		{
+			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+			String application = (String) textbox.getRawText();
+			Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new");
+		}
 	}
 
 	public void openCustomObject(Event event) {
-		String type = dataType.getDataObjectType();
-		InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
-		String customObject = (String) textbox.getRawText();
-		Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new");
+		if ( Security.isUserInRole( "seu:customObject:show"))
+		{
+			String type = dataType.getDataObjectType();
+			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
+			String customObject = (String) textbox.getRawText();
+			Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new");
+		}
 	}
 
 	private Object getValue() {
@@ -1052,12 +1085,12 @@ public class InputField2 extends Div
 							+ "<textbox  "
 								+ "id=\""+id2+"\" "
 								+ "readonly=\""+(readonly)+"\" "
-								+ "onBlur='self.parent.parent.onBlur(event)' "
+								+ "onBlur='self.parent.parent.onBlur2(event)' "
 								+ "onChanging='self.parent.parent.onChanging(event)' "
 								+ "onOK='self.parent.parent.onChildChange2(event)' "
 								+ "width=\"250px\" "   
 								+ "/>"
-							+ "<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" "
 							+ "onClick='self.parent.parent.onSelectUser(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ required+"</div>";
@@ -1070,7 +1103,7 @@ public class InputField2 extends Div
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
 									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" "
 									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "</listcell><listcell>"
@@ -1090,7 +1123,7 @@ public class InputField2 extends Div
 									+ "onBlur='self.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.onChanging(event)' "
 									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+							"<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
 									+ "onClick='self.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />"
@@ -1104,7 +1137,7 @@ public class InputField2 extends Div
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
 									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly)+"\" "
+							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" "
 									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "</listcell><listcell>"
@@ -1128,7 +1161,7 @@ public class InputField2 extends Div
 					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\" />");
+							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
@@ -1142,7 +1175,7 @@ public class InputField2 extends Div
 					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\" />");
+							+ " visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" />");
 					sb.append("</listcell><listcell>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
@@ -1163,7 +1196,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectApplication(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
@@ -1175,7 +1208,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaApplication(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
@@ -1195,7 +1228,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:query"))+"\"/>");
 					sb.append("<label id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
@@ -1207,7 +1240,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
@@ -1227,7 +1260,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
 					sb.append("<label id=\""+id2+"\" visible='false'/>");
 					sb.append(required+"</div>");
 				} else {
@@ -1239,7 +1272,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaMailDomain(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly)+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label id=\""+id2+"\" visible='false'/>");
 					sb.append(required+"</listcell></listitem>");
@@ -1259,7 +1292,7 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly)+"\" "
+							+ " visible=\""+(!readonly  && Security.isUserInRole("host:query"))+"\" "
 							+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
@@ -1273,7 +1306,7 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly)+"\" "
+							+ " visible=\""+(!readonly  && Security.isUserInRole("host:query"))+"\" "
 							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
@@ -1518,7 +1551,10 @@ public class InputField2 extends Div
 						else if (value instanceof Calendar)
 							((Datebox) c).setValue ( ((Calendar) value ).getTime() );
 						else
-							((Datebox) c).setRawValue(value);
+						{
+							log.info("Wrong value "+value+" for datebox");
+//							((Datebox) c).setRawValue(value);
+						}
 					}
 					else if (c instanceof Listbox) {
 						Listbox lb = (Listbox) c;
@@ -1528,7 +1564,7 @@ public class InputField2 extends Div
 						}
 					}
 					else if (c instanceof InputElement) 
-						((InputElement) c).setRawValue(value);
+						((InputElement) c).setRawValue(value == null ? null: value.toString());
 					else if (c instanceof Checkbox)
 						((Checkbox) c).setChecked( value != null && value.toString().equals("true"));
 				}
@@ -1751,7 +1787,7 @@ public class InputField2 extends Div
 	{
 		String values[] = new String[] { "", ""};
 		int i = 0;
-		for (Object obj: getChildren())
+		for (Object obj: event.getTarget().getParent().getChildren())
 		{
 			if (i < 2 && obj instanceof Textbox)
 			{	

@@ -8,6 +8,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -115,16 +116,22 @@ public class CustomField extends Div implements XPathSubscriber {
 		if (dataTypeObj != null)
 		{
 			while (getFirstChild() != null)
-				removeChild(getFirstChild());
+			{
+				HtmlBasedComponent v = (HtmlBasedComponent) getFirstChild();
+				if ( v.getSclass() != null && v.getSclass().contains("inputField_tail"))
+						break;
+				removeChild(v);
+			}
+			Component last = getFirstChild();
 	
 			Label l = new Label(label);
 			if ( dataTypeObj.getType() == TypeEnumeration.SEPARATOR)
 				l.setSclass(getSclass()+"_label separator_label");
 			else
 				l.setSclass(getSclass()+"_label");
-			appendChild(l);
+			insertBefore(l, last);
 			input = new InputField2();
-			appendChild(input);
+			insertBefore(input, last);
 			input.setDataType(dataTypeObj);
 			input.setSclass(getSclass()+"_input");
 			input.setReadonly(readonly);

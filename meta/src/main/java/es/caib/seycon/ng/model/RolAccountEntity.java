@@ -296,7 +296,7 @@ public abstract class RolAccountEntity {
 				+ "join users.user as user " //$NON-NLS-1$
 				+ "where " //$NON-NLS-1$
 				+ "rolusu.role.informationSystem.name = :informationSystem and "
-				+ "rolusu.role.system.tenant.id = :tenantId " //$NON-NLS-1$
+				+ "rolusu.role.system.tenant.id = :tenantId and rolusu.enabled = true " //$NON-NLS-1$
 				+ "order by user.userName, rolusu.role.name, rolusu.role.system.name") //$NON-NLS-1$
      public java.util.List<RolAccountEntity> findByInformationSystem (
     		 String informationSystem
@@ -312,7 +312,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.delegateAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) and ra.delegationStatus = 'P' and "
-			   + "user.userName = :user and user.tenant.id=:tenantId")
+			   + "user.userName = :user and user.tenant.id=:tenantId and ra.enabled = true ")
 	@Operation(translated="findRoleAccountToStartDelegation")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToStartDelegation(
 		String user,
@@ -326,7 +326,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.delegateAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null and "
-			   + "user.userName = :user and user.tenant.id=:tenantId")
+			   + "user.userName = :user and user.tenant.id=:tenantId and ra.enabled = true ")
 	@Operation(translated="findRoleAccountToEndDelegation")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findRolAccountToEndDelegation(
 		String user,
@@ -340,7 +340,7 @@ public abstract class RolAccountEntity {
 			   + "join ra.ownerAccount.users as userAccount "
 			   + "join userAccount.user as user "
 			   + "where ra.delegationStatus='A' and "
-			   + "user.userName = :user and user.tenant.id=:tenantId")
+			   + "user.userName = :user and user.tenant.id=:tenantId and ra.enabled = true ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findDelegatedRolAccounts(
 		String user) {
 		return null;
@@ -351,7 +351,7 @@ public abstract class RolAccountEntity {
 			   + "from com.soffid.iam.model.RoleAccountEntity as ra\n"
 			   + "where ra.delegateSince < :now and (ra.delegateUntil is null or ra.delegateUntil >= :now) "
 			   + "      and ra.delegationStatus = 'P' "
-			   + "      and ra.role.system.tenant.id=:tenantId")
+			   + "      and ra.role.system.tenant.id=:tenantId and ra.enabled = true ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToStartDelegation(
 		Date now) {
 		return null;
@@ -361,7 +361,7 @@ public abstract class RolAccountEntity {
 	@DaoFinder("select ra "
 			   + "from com.soffid.iam.model.RoleAccountEntity as ra\n"
 			   + "where ra.delegateUntil < :now and ra.delegationStatus is not null and"
-			   + "      ra.role.system.tenant.id=:tenantId")
+			   + "      ra.role.system.tenant.id=:tenantId and ra.enabled = true ")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findAllRolAccountToEndDelegation(
 		Date now) {
 		return null;

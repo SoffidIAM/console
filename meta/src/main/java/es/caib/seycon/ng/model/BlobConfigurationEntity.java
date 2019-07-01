@@ -42,4 +42,12 @@ public abstract class BlobConfigurationEntity {
 		java.lang.String name, Long tenantId) {
 	 return null;
 	}
+
+	@DaoFinder ("select b from "
+			+ "com.soffid.iam.model.BlobConfigurationEntity as b "
+			+ "where b.name=:name and b.tenant.name=:tenantName")
+	public java.util.List<es.caib.seycon.ng.model.BlobConfigurationEntity> findByNameAndTenantName(
+		java.lang.String name, String tenantName) {
+	 return null;
+	}
 }

@@ -642,7 +642,7 @@ public class ApplicationServiceImpl extends
             Collection<User> toReturn = new LinkedList<User>();
             for (RoleAccountEntity ra : rolEntity.getAccounts()) {
                 AccountEntity acc = ra.getAccount();
-                if (acc.getType().equals(AccountType.USER) && acc.getUsers().size() == 1) {
+                if (acc.getType().equals(AccountType.USER) && acc.getUsers().size() == 1 && ra.isEnabled()) {
                     UserEntity user = acc.getUsers().iterator().next().getUser();
                     toReturn.add(getUserEntityDao().toUser(user));
                 }
@@ -662,7 +662,8 @@ public class ApplicationServiceImpl extends
 
         List<RoleAccount> toReturn = new LinkedList<RoleAccount>();
         for (RoleAccountEntity ra : rolEntity.getAccounts()) {
-            toReturn.add(getRoleAccountEntityDao().toRoleAccount(ra));
+        	if (ra.isEnabled())
+        		toReturn.add(getRoleAccountEntityDao().toRoleAccount(ra));
         }
  		getSoDRuleService().qualifyRolAccountList(toReturn);
         return toReturn;
@@ -1347,7 +1348,7 @@ public class ApplicationServiceImpl extends
     		// Filtrem per autoritzacions
     		List<RoleAccount> ra = new LinkedList<RoleAccount>();
     		for (RoleAccountEntity rae : rolusus) {
-    			if ( history || shouldBeEnabled(rae)){
+    			if ( history || (rae.isEnabled() && shouldBeEnabled(rae))) {
     				if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) 
     					ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
     			}
@@ -2057,7 +2058,7 @@ public class ApplicationServiceImpl extends
     	// Remove inactive grants
     	List<RoleGrant> result = new LinkedList<RoleGrant>();
     	for (RoleAccountEntity rae : role.getAccounts()) {
-            if (shouldBeEnabled(rae)) result.add(getRoleAccountEntityDao().toRoleGrant(rae));
+            if (rae.isEnabled() && shouldBeEnabled(rae)) result.add(getRoleAccountEntityDao().toRoleGrant(rae));
         }
         return result;
 	}
@@ -2109,7 +2110,7 @@ public class ApplicationServiceImpl extends
 			RoleEntity roleToAddOrUpdate) {
 		
 		for (RoleAccountEntity rac : rol.getAccounts()) {
-            if (shouldBeEnabled(rac)) {
+            if (rac.isEnabled() && shouldBeEnabled(rac)) {
                 RolAccountDetail rad;
                 if (originalGrant == null) 
                 	rad = new RolAccountDetail(rac, rac.getAccount()); 

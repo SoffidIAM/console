@@ -777,7 +777,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	protected void findByJsonQuery ( AsyncList<MailList> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
 	{
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);

@@ -140,6 +140,7 @@
 /tomee/.settings/
 /tomee/.externalToolBuilders/
 /tomee/target/
+/tomee/bin/target/
 
 /upload-components/.project
 /upload-components/.classpath
@@ -189,4 +190,3 @@
 /web/src/main/webapp/codetest/
 
 pom.xml~
-//*~

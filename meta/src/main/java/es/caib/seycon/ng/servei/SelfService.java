@@ -121,6 +121,12 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password queryAccountPasswordBypassPolicy(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 	@Operation(translated="getClientHost")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getClientHost()

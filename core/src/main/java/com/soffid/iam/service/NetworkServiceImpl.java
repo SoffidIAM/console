@@ -844,7 +844,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected Host handleFindHostByIp(String ip) throws Exception {
     	for (HostEntity host: getHostEntityDao().findByIP(ip))
     	{
-            return getHostEntityDao().toHost(host);
+    		if (host.getDeleted() == null || ! host.getDeleted().booleanValue())
+    			return getHostEntityDao().toHost(host);
+    	}
+    	for (HostEntity host: getHostEntityDao().findByIP(ip))
+    	{
+   			return getHostEntityDao().toHost(host);
     	}
         return null;
     }

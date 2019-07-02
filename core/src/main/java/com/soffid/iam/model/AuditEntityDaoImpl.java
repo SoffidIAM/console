@@ -148,6 +148,7 @@ public class AuditEntityDaoImpl extends
         byte buf [] = out.toByteArray();
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         s.send (packet);
+        s.close();
 	}
 
 	public void remove(com.soffid.iam.model.AuditEntity auditoria) throws RuntimeException {
@@ -334,6 +335,8 @@ public class AuditEntityDaoImpl extends
 			{
 				String domain = passwordService.getDefaultDispatcher();
 				com.soffid.iam.model.AccountEntity usuariEntity = getAccountEntityDao().findByNameAndSystem(usuari, domain);
+				if (usuariEntity == null && usuari.startsWith("*"))
+					usuariEntity = getAccountEntityDao().findByNameAndSystem(usuari.substring(1), domain);
 				targetEntity.setAccountAssoc(usuariEntity);
 			}
 			catch (InternalErrorException e)

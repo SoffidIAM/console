@@ -24,6 +24,13 @@
 		position="center,center" width="80%" use="com.soffid.iam.web.vault.AccountWindow">
 		<form id="form" dataPath="/model:/void" orient="vertical"
 			width="100%" style="padding: 10px">
+			<div id="accountTypeSelector" visible="false">
+				<label value="${c:l('accounts.selectAccountType')}"/>
+				<listbox checkmark="true" id="accountTypeSelectorListbox">
+					<listitem value="m" label="${c:l('accounts.managedAccount') }"></listitem> 
+					<listitem value="e" label="${c:l('accounts.externalAccount') }"></listitem> 
+				</listbox>
+			</div>
 			<tabbox id="panels" width="${amplaria2}"
 				class="thicktabbox">
 				<tabs>
@@ -62,6 +69,7 @@
 												<textbox sclass="textbox"
 													id="txtAccountName2" 
 													onChange="innerWindow.onChangeAccountName(self)"
+													bind="@loginName"
 													maxlength="128"
 													multiline="false" width="90%" />
 											</div>
@@ -130,32 +138,13 @@
 											id="urlTextbox"
 											sclass="textbox" 
 											maxlength="255"
+											bind="loginUrl"
 											multiline="false" width="100%" >
 											<attribute name="onChanging"><![CDATA[
 										    		self.setStyle("");
 											]]></attribute>
 											<attribute name="onChange">
-												<![CDATA[
-												    String value = self.getValue();
-												    if (value == null || value.trim().length () == 0)
-												    {
-												    	serverTextbox.getFellow("dada").setValue("");
-												    }
-												    else
-												    {
-												    	try {
-													    	java.net.URL url = new java.net.URL(value);
-												    		self.setStyle("");
-												    		String h = url.getHost();
-												    		if (h.startsWith("www."))
-												    			h = h.substring(4);
-													    	serverTextbox.getFellow("dada").setValue( h );
-												    	} catch (Exception e) {
-												    		e.printStackTrace();
-												    		self.setStyle("background-color: pink");
-												    	}
-												    }
-												]]>
+												<![CDATA[innerWindow.onChangeLoginUrl(self)]]>
 											</attribute>
 										</textbox>
 									</row>

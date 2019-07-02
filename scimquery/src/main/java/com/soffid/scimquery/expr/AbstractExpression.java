@@ -191,6 +191,9 @@ public abstract class AbstractExpression implements Serializable {
 		
 		try {
 			ClassConfig entityConfig = Configuration.getClassConfig(entityClass);
+			if (part.startsWith("_"))
+				part = part.substring(1);
+			
 			if (entityConfig != null && entityConfig.getAttribute(part) != null)
 			{
 				AttributeConfig attConfig = entityConfig.getAttribute(part);

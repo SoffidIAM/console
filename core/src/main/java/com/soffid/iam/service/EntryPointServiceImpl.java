@@ -13,6 +13,32 @@
  */
 package com.soffid.iam.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ejb.CreateException;
+import javax.ejb.RemoveException;
+
+import org.apache.commons.jcs.access.behavior.ICacheAccess;
+import org.dom4j.Document;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.AccessTreeExecution;
@@ -21,7 +47,6 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
-import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountEntity;
@@ -39,10 +64,8 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
-import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 
@@ -50,39 +73,6 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.ejb.CreateException;
-import javax.ejb.RemoveException;
-
-import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.jcs.access.behavior.ICacheAccess;
-import org.dom4j.Document;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * @see es.caib.seycon.ng.servei.PuntEntradaService

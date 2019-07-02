@@ -1,8 +1,11 @@
-function launchSsoUrl (url, secrets) {
-	if ( firstElementChild.getAttribute("soffidAraleExtensionPresent") == "true")
+function launchSsoUrl (secrets) {
+	var d = document.getElementById("soffidAraleExtensionDetector");
+	if ( d && d.getAttribute("soffidAraleExtensionPresent") == "true")
 	{
-		window.postMessage({type:"soffid",action:"prepare",url:url,secrets:secrets});
-	} else {
+		var ev = new CustomEvent("soffidMessage", {detail: 
+			{type:"soffid",action:"prepare",url:secrets.url,secrets:secrets}});
+		d.dispatchEvent(ev);
+	} else if (d) {
 		var isChromium = window.chrome;
 		var winNav = window.navigator;
 		var vendorName = winNav.vendor;
@@ -21,10 +24,10 @@ function launchSsoUrl (url, secrets) {
 		) {
 			if (confirm ("A Google chrome extension must be installed to get single sign-on. Please, confirm to install it"))
 			{
-				window.open("https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf", "_blank");
+				location.href="https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf";
 				return;
 			}
 		}
+		window.setTimeout(function(){window.open(secrets.url, "_blank")}, 100);
 	}
-	window.setTimeout(function(){window.open(url, "_blank")}, 100);
 }

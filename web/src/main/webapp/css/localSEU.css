@@ -1781,6 +1781,7 @@ div.attributeSearchPopup {
 div.inputField {
 	display: table-row
 }
+
 span.inputField_label {
 	display: table-cell;
 	width: 120px;
@@ -1795,6 +1796,13 @@ div.inputField_input {
 	padding-bottom: 2px;
 }
 			
+span.inputField_tail {
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 4px
+}
+			
+
 span.separator_label {
 	color: {BLUE};
 	font-weight: bold;

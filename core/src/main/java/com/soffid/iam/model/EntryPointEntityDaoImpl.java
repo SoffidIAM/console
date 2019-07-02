@@ -100,6 +100,11 @@ public class EntryPointEntityDaoImpl extends
 		// Núm de columnes
 		if (source.getNumberOfColumns() != null) target.setColumnsNumber(source.getNumberOfColumns().toString());
 		
+		if (source.getSystem() == null)
+			target.setSystem(null);
+		else
+			target.setSystem(source.getSystem().getName());
+
 		// Autorizaciones
 		Collection autoritzaGrup = source.getAuthorizedGroups();
 		Collection autoritzaRol = source.getAuthorizedRoles();
@@ -232,6 +237,16 @@ public class EntryPointEntityDaoImpl extends
 		target.setAuthorizedRoles(autoritzaRol);
 		target.setAuthorizedGroups(autoritzaGrup);
 		target.setAuthorizedAccounts(autoritzaAccount);
+
+		if ( source.getSystem() == null || source.getSystem().isEmpty())
+			target.setSystem(null);
+		else
+		{
+			SystemEntity d = getSystemEntityDao().findByName(source.getSystem());
+			if (d == null)
+				throw new RuntimeException ("System not found: "+source.getSystem());
+			target.setSystem( d);
+		}
 	}
 
 }

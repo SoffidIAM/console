@@ -115,6 +115,8 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
@@ -2709,7 +2711,20 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		User u = (User) getSessionCacheService().getObject("currentUser");
 		if (u != null)
 			return u;
-		 		
+
+		
+		String userName = Security.getCurrentUser();
+
+		if (userName != null)
+		{
+			UserEntity ue = getUserEntityDao().findByUserName(userName);
+			if (ue != null)
+			{
+				u = getUserEntityDao().toUser(ue);
+				getSessionCacheService().putObject("currentUser", u);
+				return u;
+			}
+		}
 
 		String dispatcherName = getInternalPasswordService()
 				.getDefaultDispatcher();
@@ -3061,7 +3076,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(User.class);
@@ -3244,6 +3259,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
+	private void auditChange(UserDataEntity dadaUsuari) throws InternalErrorException {
+		Audit audit = new Audit();
+		audit.setObject("SC_DADUSU");
+		audit.setAction("U");
+		audit.setAuthor(Security.getCurrentAccount());
+		audit.setCalendar(Calendar.getInstance());
+		audit.setConfigurationParameter(dadaUsuari.getDataType().getName());
+		audit.setUser(dadaUsuari.getUser().getUserName());
+		getAuditService().create(audit);
+	}
+
 	@Override
 	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
 		boolean anyChange = false;
@@ -3272,15 +3298,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					{
 						if (o != null)
 						{
-							anyChange = true;
-							updateUserAttribute(entity, entities, key, metadata, o);
+							if (updateUserAttribute(entity, entities, key, metadata, o))
+								anyChange = true;
 						}
 					}
 				}
 				else
 				{
-					anyChange = true;
-					updateUserAttribute(entity, entities, key, metadata, v);
+					if (updateUserAttribute(entity, entities, key, metadata, v))
+						anyChange = true;
 				}
 			}
 
@@ -3289,6 +3315,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
 				{
 					anyChange = true;
+					auditChange(attribute);
 					getUserDataEntityDao().remove(attribute);
 					entity.getUserData().remove(attribute);
 				}
@@ -3324,8 +3351,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	private void updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
+	private boolean updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
 			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		boolean anyChange = false;
 		UserDataEntity aae = findUserDataEntity(attributes, key, value);
 		if (aae == null)
 		{
@@ -3338,10 +3366,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getUserDataEntityDao().create(aae);
 				entity.getUserData().add(aae);
+				auditChange(aae);
+				anyChange = true;
 			}
 		}
 		else
 			attributes.remove(aae);
+		return anyChange;
 	}
 
 	private UserDataEntity findUserDataEntity(LinkedList<UserDataEntity> entities, String key,

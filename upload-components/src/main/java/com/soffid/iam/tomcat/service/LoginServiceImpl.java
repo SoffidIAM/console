@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.openejb.loader.SystemInstance;
 import org.apache.openejb.spi.Assembler;
-import org.apache.openejb.spi.SecurityService;
 import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;

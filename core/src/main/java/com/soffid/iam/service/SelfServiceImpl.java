@@ -256,6 +256,14 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		return p;
 	}
 	
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.SelfService#queryAccountPassword(es.caib.seycon.ng.comu.Account)
+	 */
+	public Password handleQueryAccountPasswordBypassPolicy (Account account) throws InternalErrorException
+	{
+		Password p = getAccountService().queryAccountPasswordBypassPolicy(account.getId());
+		return p;
+	}
 	
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handlePasswordsStatus(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Usuari)

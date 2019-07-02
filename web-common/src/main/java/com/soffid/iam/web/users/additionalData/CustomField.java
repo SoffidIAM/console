@@ -8,6 +8,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -47,6 +48,7 @@ public class CustomField extends Div implements XPathSubscriber {
 	boolean visible = true;
 	boolean required = false;
 	boolean hideUserName = false;
+	boolean raisePrivileges = false;
 	
 	private List<TipusDada> dataTypes;
 
@@ -55,6 +57,8 @@ public class CustomField extends Div implements XPathSubscriber {
 	private InputField2 input;
 
 	private Object ownerObject;
+
+	private String filterExpression;
 
 	public void updateMetadata() {
 		dataTypeObj = new DataType();
@@ -66,6 +70,7 @@ public class CustomField extends Div implements XPathSubscriber {
 		dataTypeObj.setSize(maxLength);
 		dataTypeObj.setType(TypeEnumeration.STRING_TYPE);
 		dataTypeObj.setRequired(required);
+		dataTypeObj.setFilterExpression(filterExpression);
 		if (listOfValues != null)
 			dataTypeObj.setValues(Arrays.asList(listOfValues));
 
@@ -111,16 +116,22 @@ public class CustomField extends Div implements XPathSubscriber {
 		if (dataTypeObj != null)
 		{
 			while (getFirstChild() != null)
-				removeChild(getFirstChild());
+			{
+				HtmlBasedComponent v = (HtmlBasedComponent) getFirstChild();
+				if ( v.getSclass() != null && v.getSclass().contains("inputField_tail"))
+						break;
+				removeChild(v);
+			}
+			Component last = getFirstChild();
 	
 			Label l = new Label(label);
 			if ( dataTypeObj.getType() == TypeEnumeration.SEPARATOR)
 				l.setSclass(getSclass()+"_label separator_label");
 			else
 				l.setSclass(getSclass()+"_label");
-			appendChild(l);
+			insertBefore(l, last);
 			input = new InputField2();
-			appendChild(input);
+			insertBefore(input, last);
 			input.setDataType(dataTypeObj);
 			input.setSclass(getSclass()+"_input");
 			input.setReadonly(readonly);
@@ -128,6 +139,7 @@ public class CustomField extends Div implements XPathSubscriber {
 			input.setSearchFilter(searchFilter);
 			input.setOwnerObject(ownerObject);
 			input.setHideUserName(hideUserName);
+			input.setRaisePrivileges(raisePrivileges);
 			try {
 				input.createField();
 			} catch (Exception e) {
@@ -336,5 +348,21 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setHideUserName(boolean hideUserName) {
 		this.hideUserName = hideUserName;
+	}
+
+	public boolean isRaisePrivileges() {
+		return raisePrivileges;
+	}
+
+	public void setRaisePrivileges(boolean raisePrivileges) {
+		this.raisePrivileges = raisePrivileges;
+	}
+
+	public String getFilterExpression() {
+		return filterExpression;
+	}
+
+	public void setFilterExpression(String filterExpression) {
+		this.filterExpression = filterExpression;
 	}
 }

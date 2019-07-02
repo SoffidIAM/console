@@ -218,7 +218,10 @@ public class SAMLServiceInternal {
 		// Marshall the Subject
 		Response saml2Response = (Response) marshaller.unmarshall(doc.getDocumentElement());
 
-		if (! validateResponse(hostName, saml2Response))
+		log.info("Processing authentication response from "+saml2Response.getIssuer().getValue());
+
+		boolean responseSigned = saml2Response.isSigned();
+		if (responseSigned && ! validateResponse(hostName, saml2Response))
 			return null;
 
 		String originalrequest = saml2Response.getInResponseTo();
@@ -237,14 +240,14 @@ public class SAMLServiceInternal {
 		for ( EncryptedAssertion encryptedAssertion: saml2Response.getEncryptedAssertions())
 		{
 			Assertion assertion = decrypt (encryptedAssertion);
-			if (validateAssertion(hostName, assertion))
+			if (validateAssertion(hostName, assertion, responseSigned))
 			{
 				return createAuthenticationRecord(hostName, requestEntity, assertion);
 			}
 		}
 		for ( Assertion assertion: saml2Response.getAssertions())
 		{
-			if (validateAssertion(hostName, assertion))
+			if (validateAssertion(hostName, assertion, responseSigned))
 			{
 				return createAuthenticationRecord(hostName, requestEntity, assertion);
 			}
@@ -319,6 +322,7 @@ public class SAMLServiceInternal {
 			requestEntity.setFinished(true);
 			requestEntity.setKey(sb.toString());
 			requestDao.update(requestEntity);
+			log.info("Authenticated user "+user);
 			return new String[]{requestEntity.getExternalId(), sb.toString()};
 		}
 		log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");
@@ -775,7 +779,7 @@ public class SAMLServiceInternal {
     
     Log log = LogFactory.getLog(getClass());
     
-    private boolean validateAssertion (String hostName, Assertion assertion) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException, MalformedURLException
+    private boolean validateAssertion (String hostName, Assertion assertion, boolean responseSigned) throws ResolverException, InternalErrorException, ComponentInitializationException, AssertionValidationException, CertificateException, MalformedURLException
     {
     	SAML20AssertionValidator validator = getValidator(hostName);
     	
@@ -793,11 +797,14 @@ public class SAMLServiceInternal {
     	set.add(getBaseURL(hostName)+"saml/slo/redirect");
     	params.put (SAML2AssertionValidationParameters.SC_VALID_RECIPIENTS, set);
 
+    	if (responseSigned)
+    		params.put(SAML2AssertionValidationParameters.SIGNATURE_REQUIRED, Boolean.FALSE);
+
     	org.opensaml.saml.common.assertion.ValidationContext ctx = new ValidationContext(params);
 
-		ValidationResult result = validator.validate(assertion, ctx);
+    	ValidationResult result = validator.validate(assertion, ctx);
 		if (result != ValidationResult.VALID)
-			log.info("Error validating SAML message: "+ctx.getValidationFailureMessage());
+			log.info("Error validating Assertion: "+ctx.getValidationFailureMessage());
 		
 		if ( ! validDate (assertion.getIssueInstant()))
 			return false;

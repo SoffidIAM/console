@@ -61,6 +61,7 @@
 													multiline_custom="false" width_custom="95%" />
 												<textbox sclass="textbox"
 													id="txtAccountName2" 
+													bind="@loginName"
 													onChange="innerWindow.onChangeAccountName(self)"
 													maxlength="128"
 													multiline="false" width="90%" />
@@ -129,34 +130,14 @@
 										<textbox
 											id="urlTextbox"
 											sclass="textbox" 
+											bind="@loginUrl"
 											maxlength="255"
-											multiline="false" width="100%" >
+											multiline="false" width="100%"
+											onChange="innerWindow.onChangeLoginUrl(self)"
+											 >
 											<attribute name="onChanging"><![CDATA[
 										    		self.setStyle("");
 											]]></attribute>
-											<attribute name="onChange">
-												<![CDATA[
-												    String value = self.getValue();
-												    if (value == null || value.trim().length () == 0)
-												    {
-												    	serverTextbox.getFellow("dada").setValue("");
-												    }
-												    else
-												    {
-												    	try {
-													    	java.net.URL url = new java.net.URL(value);
-												    		self.setStyle("");
-												    		String h = url.getHost();
-												    		if (h.startsWith("www."))
-												    			h = h.substring(4);
-													    	serverTextbox.getFellow("dada").setValue( h );
-												    	} catch (Exception e) {
-												    		e.printStackTrace();
-												    		self.setStyle("background-color: pink");
-												    	}
-												    }
-												]]>
-											</attribute>
 										</textbox>
 									</row>
 									<row id="serverRow">

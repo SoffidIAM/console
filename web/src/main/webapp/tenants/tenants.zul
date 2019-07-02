@@ -240,7 +240,7 @@
 								effectiveRoles.add(role);
 						}
 
-						com.soffid.iam.common.security.SoffidPrincipal p = new com.soffid.iam.common.security.SoffidPrincipal (
+						com.soffid.iam.common.security.SoffidPrincipal p = new com.soffid.iam.security.SoffidPrincipalImpl (
 								name+"\\"+Security.getCurrentAccount(),
 								effectiveRoles,
 								Security.getSoffidPrincipal());

@@ -62,6 +62,7 @@
 													multiline_custom="false" width_custom="95%" />
 												<textbox sclass="textbox"
 													id="txtAccountName2" 
+													bind="@loginName"
 													onChange="innerWindow.onChangeAccountName(self)"
 													maxlength="128"
 													multiline="false" width="90%" />
@@ -131,7 +132,9 @@
 											id="urlTextbox"
 											sclass="textbox" 
 											maxlength="255"
-											multiline="false" width="100%" >
+											bind="@loginUrl"
+											multiline="false" width="100%" 
+											onChange="innerWindow.onChangeLoginUrl(self)"											>
 											<attribute name="onChanging"><![CDATA[
 										    		self.setStyle("");
 											]]></attribute>

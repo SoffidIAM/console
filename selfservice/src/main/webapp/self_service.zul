@@ -511,6 +511,28 @@
 					onClick="cancelDelegate()" />
 			</div>
 		</window>
+		<window id="selectAccount" closable="true" sclass="new-pass"
+			position="center, center" sizable="true"
+			title="${c:l('selfService.SelectAccount')}" visible="false" width="34em"
+			onClose="self.setVisible(false); event.stopPropagation();">
+			<zscript>
+				<![CDATA[
+				]]>
+			</zscript>
+	 		<listbox style="margin-left: 2em" checkmark="true" id="accountsListbox">
+	 			<listhead>
+	 				<listheader label="${c:l('accounts.name') }" sort="auto"></listheader>
+	 				<listheader label="${c:l('accounts.description') }" sort="auto"></listheader>
+	 			</listhead>
+	 		</listbox>
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="p_selfService.launchSSOKMAccount(); selectAccount.setVisible(false);" />
+				<space width="1em"/>
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="selectAccount.setVisible(false)" />
+			</div>
+		</window>
 		<include src="finestres/editorHTML.zul" />
 	</frame>
 </zk>

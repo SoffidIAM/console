@@ -4,6 +4,13 @@ import java.io.UnsupportedEncodingException;
 
 import org.json.JSONException;
 
+import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.CustomObjectAttributeEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.model.MailListAttributeEntity;
+import com.soffid.iam.model.RoleAttributeEntityImpl;
+import com.soffid.iam.model.UserDataEntity;
 import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
@@ -24,5 +31,15 @@ public class AdditionalDataJSONConfiguration {
 			classConfig.setHibernateClass(additionalDataClass.getCanonicalName());
 			Configuration.registerClass(classConfig);
 		}
+	}
+
+	public static void registerVirtualAttributes() throws UnsupportedEncodingException, ClassNotFoundException, JSONException {
+		registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value");
+		registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
+		registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
+		registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value");
+		registerVirtualAttribute(RoleAttributeEntityImpl.class, "metadata.name", "value");
+		registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value");
+		registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value");
 	}
 }

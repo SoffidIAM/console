@@ -49,6 +49,10 @@ public abstract class PuntEntradaEntity {
 	@Column(name = "PUE_TIPMEN", length = 1, translated = "menuType")
 	@Nullable
 	public java.lang.String tipusMenu;
+	
+	@Column(name = "PUE_DIS_ID", reverseAttribute="entryPoints")
+	@Nullable
+	DispatcherEntity system;
 
 	@ForeignKey(foreignColumn = "RPE_IDPUE", translated = "authorizedRoles")
 	public java.util.Collection<es.caib.seycon.ng.model.AutoritzacioPUERolEntity> autoritzaRol;

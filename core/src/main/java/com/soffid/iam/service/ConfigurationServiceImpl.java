@@ -65,7 +65,7 @@ public class ConfigurationServiceImpl
 		catch (NASException ex)
 		{
 			Log log = LogFactory.getLog(getClass());
-			log.warn(String.format("Document manager: parameter not defined: %1$s", configuracio.getCode()));
+//			log.warn(String.format("Document manager: parameter not defined: %1$s", configuracio.getCode()));
 		}
 	}
 	
@@ -212,12 +212,13 @@ public class ConfigurationServiceImpl
 		Collection result = dao.findByName(name);
 		if (result.isEmpty())
 		{
-			Security.nestedLogin("master", "none", Security.ALL_PERMISSIONS);
+//			Security.nestedLogin("master", "none", Security.ALL_PERMISSIONS);
 			try
 			{
+				String masterTenant = Security.getMasterTenantName();
 				result = dao.findByNameAndTenant(name, Security.getCurrentTenantId());
 			} finally {
-				Security.nestedLogoff();
+//				Security.nestedLogoff();
 			}
 		}
 		if (result.isEmpty()) {

@@ -43,6 +43,18 @@
 				<parameter value="${false}" />
 			</ejb-finder>
 		</finder>
+		<finder name="systems" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<script-finder>
+				d = new com.soffid.iam.api.System();
+				return d;
+			</script-finder>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.DispatcherService"
+				method="findSoffidDispatcher">
+			</ejb-finder>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.DispatcherService"
+				method="findAllActiveDispatchers">
+			</ejb-finder>
+		</finder>
 		<finder name="plantilles" type="String">  <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
 				method="getPlantillaTipusMimeExecucio">

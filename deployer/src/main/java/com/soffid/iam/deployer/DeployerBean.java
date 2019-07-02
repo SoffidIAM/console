@@ -6,9 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -778,6 +776,8 @@ public class DeployerBean implements DeployerService {
 		if (ongoing)
 			return;
 
+		waitForDatabase ();
+		
 		ongoing = true;
 		File home = getJbossHomeDir();
 		File failedWar = new File(new File(home, "soffid"), "failed.ear");
@@ -883,6 +883,27 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
+
+	private void waitForDatabase() {
+		do
+		{
+			try {
+				Connection conn = ds.getConnection();
+				if (conn.isValid(0))
+				{
+					conn.close();
+					return;
+				}
+			} catch (Exception e) {
+				log.warn("Cannot get database connection: ", e);
+			}
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				return;
+			}
+		} while (true);
+	}
 
 	private void updateCacheProperties(QueryHelper qh) throws SQLException, IOException {
 		deleteCacheProperties();

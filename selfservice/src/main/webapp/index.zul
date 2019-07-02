@@ -3,7 +3,7 @@
 <?page id="index" title="Soffid Identity and Access Manager" ?>
 <?meta name="viewport" content="width=device-width, initial-scale=1"?>
 <?meta http-equiv="X-UA-Compatible" content="IE=9" ?>
-<?link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf">
+<?link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf" ?>
 
 <vbox xmlns="http://www.zkoss.org/2005/zul" 
 	xmlns:h="http://www.w3.org/1999/xhtml" 

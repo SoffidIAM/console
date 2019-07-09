@@ -1,6 +1,7 @@
 package com.soffid.iam.service.impl.linotp;
 
 import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.Random;
 
 import javax.ws.rs.core.Cookie;
@@ -8,6 +9,8 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
@@ -26,6 +29,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
 
 public class LinotpHandler implements OTPHandler {
+
+	Log log = LogFactory.getLog(getClass());
 
 	private boolean isEnabled ()
 	{
@@ -104,6 +109,7 @@ public class LinotpHandler implements OTPHandler {
 	public Challenge selectToken(Challenge challenge) throws Exception {
 		if (isEnabled())
 		{
+			log.debug("selectToken");
 			String linOtpUser = getLinotpUserName(challenge);
 			Response response =
 				WebClient
@@ -116,9 +122,9 @@ public class LinotpHandler implements OTPHandler {
 			if ( response.getStatus() != HttpStatus.SC_OK)
 				throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
 			
-			System.out.println(response.getHeaderString("Content-Type"));
-			System.out.println(response.getStatus());
-			System.out.println(response.getStatusInfo().getReasonPhrase());
+			log.debug(response.getHeaderString("Content-Type"));
+			log.debug(response.getStatus());
+			log.debug(response.getStatusInfo().getReasonPhrase());
 			JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
 			JSONObject r;
 			if ( (r = result.optJSONObject("result")) != null)
@@ -133,6 +139,18 @@ public class LinotpHandler implements OTPHandler {
 							challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
 							challenge.setCell("Value");
 							if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
+
+								String pass = "";
+								String realm = "";
+
+								log.debug("validate/smspin");
+								log.debug("- getUser()="+getUser());
+								log.debug("- getPassword().getPassword()="+getPassword().getPassword());
+								log.debug("- user="+linOtpUser);
+								log.debug("- pass()="+pass);
+								log.debug("- realm()="+realm);
+								log.debug("- session="+getSessionId());
+
 								Response response2 =
 										WebClient
 											.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
@@ -140,15 +158,16 @@ public class LinotpHandler implements OTPHandler {
 											.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
 											.form(new Form()
 												.param("user", linOtpUser)
+												.param("pass", "")
+												.param("realm", "")
 												.param("session", getSessionId()));
-
 							}
  							return challenge;
 						}
 					}
 				}
 			}
-			System.out.println(result.toString());
+			log.debug(result.toString());
 		}
 		
 		return challenge;
@@ -159,6 +178,7 @@ public class LinotpHandler implements OTPHandler {
 	public boolean validatePin(Challenge challenge, String pin) throws IllegalArgumentException, InternalErrorException {
 		if (isEnabled())
 		{
+			log.debug("validatePin");
 			String linOtpUser = getLinotpUserName(challenge);
 			Response response =
 				WebClient
@@ -168,13 +188,14 @@ public class LinotpHandler implements OTPHandler {
 					.form(new Form()
 						.param("user", linOtpUser)
 						.param("pass", pin)
+						.param("realm", "")
 						.param("session", getSessionId()));
 			if ( response.getStatus() != HttpStatus.SC_OK)
 				throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
 			
-			System.out.println(response.getHeaderString("Content-Type"));
-			System.out.println(response.getStatus());
-			System.out.println(response.getStatusInfo().getReasonPhrase());
+			log.debug(response.getHeaderString("Content-Type"));
+			log.debug(response.getStatus());
+			log.debug(response.getStatusInfo().getReasonPhrase());
 			JSONObject result;
 			try {
 				result = new JSONObject( response.readEntity(String.class));
@@ -188,7 +209,7 @@ public class LinotpHandler implements OTPHandler {
 					return true;
 				}
 			}
-			System.out.println(result.toString());
+			log.debug(result.toString());
 		}
 		
 		return false;

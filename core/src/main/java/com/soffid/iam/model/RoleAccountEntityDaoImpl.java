@@ -433,14 +433,14 @@ public class RoleAccountEntityDaoImpl
 				rolsUsuaris.getAccount().getRoles().remove(rolsUsuaris);
 			}
 
-			generateTasks(rolsUsuaris);
-
-			super.remove(rolsUsuaris);
-
-			auditarRolAccount("D", rolsUsuaris); //$NON-NLS-1$
-			
 			if ( rolsUsuaris.isEnabled())
 			{
+				generateTasks(rolsUsuaris);
+				
+				super.remove(rolsUsuaris);
+				
+				auditarRolAccount("D", rolsUsuaris); //$NON-NLS-1$
+				
 				for (String name : applicationContext.getBeanNamesForType(SoffidEventListener.class))
 				{
 					SoffidEventListener bean = (SoffidEventListener) applicationContext.getBean(name);
@@ -448,6 +448,10 @@ public class RoleAccountEntityDaoImpl
 						bean.onRevoke(rolsUsuaris);
 				}
 
+			}
+			else
+			{
+				super.remove(rolsUsuaris);
 			}
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);

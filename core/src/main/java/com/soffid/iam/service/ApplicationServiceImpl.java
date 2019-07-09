@@ -737,6 +737,9 @@ public class ApplicationServiceImpl extends
         if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_DELETE, rolEntity))
         {
         	getSoDRuleService().internalRemovingRole(rolEntity.getId());
+        	for (RoleAccountEntity ra: rolEntity.getAccounts())
+        		if (!ra.isEnabled())
+        			getRoleAccountEntityDao().remove(ra);
             getRoleEntityDao().remove(rolEntity);
         } else {
             throw new SeyconAccessLocalException(

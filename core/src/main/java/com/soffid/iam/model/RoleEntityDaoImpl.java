@@ -465,6 +465,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         if (RoleDependencyStatus.STATUS_TOAPPROVE.equals( entity.getStatus()) || 
         		!startApprovalProcess(ownerRole))
         {
+        	if (Hibernate.isInitialized(entity.getContained().getContainerRoles()))
+        		entity.getContained().getContainedRoles().remove(entity);
+        	if (Hibernate.isInitialized(entity.getContainer().getContainedRoles()))
+        		entity.getContainer().getContainerRoles().remove(entity);
         	getRoleDependencyEntityDao().remove(entity);
         } else {
         	entity.setStatus(RoleDependencyStatus.STATUS_TOREMOVE);
@@ -487,21 +491,21 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		return anyChange;
 	}
 
-	public void remove(com.soffid.iam.model.RoleEntity Role)
+	public void remove(com.soffid.iam.model.RoleEntity roleEntity)
 			throws RuntimeException {
 		try {
-			updateMailLists(Role);
+			updateMailLists(roleEntity);
 			// NO SE PUEDE BORRAR UN Role SI TIENE RELACIONES EXTERNAS
 			// SE DA UN AVISO Y NO SE DEJA BORRAR EL Role
 
 			// Obtenemos sus relaciones con otros roles (como contenedor o
 			// contenido)
-			Collection rolAssociacioRolSocContenidor = Role.getContainedRoles();
-			Collection rolAssociacioRolSocContingut = Role.getContainerRoles();
-			Collection grupsPosseidors = Role.getContainerGroups();
+			Collection rolAssociacioRolSocContenidor = roleEntity.getContainedRoles();
+			Collection rolAssociacioRolSocContingut = roleEntity.getContainerRoles();
+			Collection grupsPosseidors = roleEntity.getContainerGroups();
 			// Collection rolFitxers = Role.getRolFitxers();
-			Collection rolsUsuari = Role.getAccounts();
-			Collection rolsAutoritzacioXarxa = Role.getNetworkAuthorization();
+			Collection rolsUsuari = roleEntity.getAccounts();
+			Collection rolsAutoritzacioXarxa = roleEntity.getNetworkAuthorization();
 
 			String msgError = ""; //$NON-NLS-1$
 			if (rolAssociacioRolSocContenidor.size() != 0) {
@@ -516,7 +520,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				msgError += Messages.getString("RoleEntityDaoImpl.7"); //$NON-NLS-1$
 			} else if (rolsAutoritzacioXarxa.size() != 0) {
 				msgError += Messages.getString("RoleEntityDaoImpl.8"); //$NON-NLS-1$
-			} else if (Role.getNotificationEntities().size() != 0) {
+			} else if (roleEntity.getNotificationEntities().size() != 0) {
 				msgError += Messages.getString("RoleEntityDaoImpl.9"); //$NON-NLS-1$
 			}
 
@@ -564,9 +568,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			 * getXarxaACEntityDao().remove (autoritzacio); }
 			 */
 
-			String nomRol = Role.getName();
-			String codiBaseDeDades = Role.getSystem().getName();
-			String codiAplicacio = Role.getInformationSystem().getName();
+			String nomRol = roleEntity.getName();
+			String codiBaseDeDades = roleEntity.getSystem().getName();
+			String codiAplicacio = roleEntity.getInformationSystem().getName();
 
 			// Abans d'eliminar el Role, obtenim els grups, rols i usuaris
 			// afectats indirectament (per herència)
@@ -577,10 +581,13 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			// Obtenim el resultat de rols a la creació del Role
 			// Ho cerquem a la base de dades (relació amb rols-grups): encara
 			// que no hauria de tindre cap relació.. per si de cas
-			getHerenciaRol_Usuaris_Rols_Grups(Role, usuarisPropagar,
+			getHerenciaRol_Usuaris_Rols_Grups(roleEntity, usuarisPropagar,
 					accountsPropagar, rolsPropagar, grupsPropagar, true);
 
-			super.remove(Role);
+			if (Hibernate.isInitialized(roleEntity.getInformationSystem()) &&
+					Hibernate.isInitialized(roleEntity.getInformationSystem().getRoles()))
+				roleEntity.getInformationSystem().getRoles().remove(roleEntity);
+			super.remove(roleEntity);
 			getSession(false).flush();
 
 			// Propaguem els canvis d'eliminar l'herència:
@@ -590,16 +597,16 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
 			tasque.setDate(new Timestamp(System.currentTimeMillis()));
 			tasque.setTransaction(TaskHandler.UPDATE_ROLE);
-			tasque.setRole(Role.getName());
-			tasque.setDb(Role.getSystem().getName());
-			tasque.setSystemName(Role.getSystem().getName());
+			tasque.setRole(roleEntity.getName());
+			tasque.setDb(roleEntity.getSystem().getName());
+			tasque.setSystemName(roleEntity.getSystem().getName());
 			getTaskEntityDao().createNoFlush(tasque);
 			auditarRol("D", nomRol, codiAplicacio, codiBaseDeDades); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(
 					String.format(
-							Messages.getString("RoleEntityDaoImpl.11"), Role.getName(), message)); //$NON-NLS-1$
+							Messages.getString("RoleEntityDaoImpl.11"), roleEntity.getName(), message)); //$NON-NLS-1$
 		}
 	}
 

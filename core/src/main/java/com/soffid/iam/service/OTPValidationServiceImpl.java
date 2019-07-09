@@ -21,7 +21,7 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 	@Override
 	protected boolean handleValidatePin(Challenge challenge, String pin) throws Exception {
 		if (challenge.getOtpHandler () == null)
-			return true;
+			return false;
 		for ( OTPHandler handler: handlers)
 		{
 			if (handler.getClass().getName().equals(challenge.getOtpHandler()))

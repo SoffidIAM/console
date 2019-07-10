@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -119,6 +121,7 @@ public class ApplicationServiceImpl extends
         com.soffid.iam.service.ApplicationServiceBase 
         implements ApplicationContextAware
 {
+	Log log = LogFactory.getLog(getClass());
 	final int DIRECT = 0;
 	final int INDIRECT = 1;
 	final int ALL = 2;
@@ -741,9 +744,12 @@ public class ApplicationServiceImpl extends
         	{
         		if ( ! ra.isEnabled())
         		{
+        			log.info ("Removing roleAccount "+ra.getId());
         			getRoleAccountEntityDao().remove(ra);
         			rolEntity.getAccounts().remove(ra);
         		}
+        		else
+        			log.info ("Keeping roleAccount "+ra.getId());
         	}
             getRoleEntityDao().remove(rolEntity);
         } else {

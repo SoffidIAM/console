@@ -275,6 +275,7 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setSearchFilter(SearchFilter searchFilter) {
 		this.searchFilter = searchFilter;
+		invalidate();
 	}
 
 	public String getDataObjectType() {
@@ -364,5 +365,6 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setFilterExpression(String filterExpression) {
 		this.filterExpression = filterExpression;
+		updateMetadata();
 	}
 }

@@ -614,11 +614,21 @@
 					
 					void displayTasksStatus () {
 						for (String type: new String[] { "reconcile", "import", "impact"} ) {
-							String task = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/name");
-							Boolean active = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/active");
-							Boolean error =  XPathUtils.getValue(form, "tasks[1]/"+type+"Task/error");
-							java.util.Calendar last1 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastExecution");
-							java.util.Calendar last2 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastEnd");
+							Boolean active = false;
+							Boolean error = false;
+							java.util.Calendar last1 = null;
+							java.util.Calendar last2 = null;
+							
+							try {
+								active = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/active");
+								error =  XPathUtils.getValue(form, "tasks[1]/"+type+"Task/error");
+								last1 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastExecution");
+								last2 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastEnd");
+								form.getFellow (type+"Div"). setVisible(true);
+							} catch (Exception e) {
+								form.getFellow (type+"Div"). setVisible(false);
+								// Ignore
+							}
 							statusComponent = form.getFellow (type+"Status");
 							lastComponent = form.getFellow (type+"Last");
 							labelComponent = form.getFellow (type+"Label");
@@ -2069,7 +2079,7 @@
 								</attribute>
 							</button>
 							<space width="4px"/>
-							<div>
+							<div id="reconcileDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}"> 
 									<attribute name="onClick">
 										startTask("reconcileTask");
@@ -2080,7 +2090,7 @@
 								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='showTaskMessage("reconcileTask")'/>
 							</div>
 							<space width="4px"/>
-							<div>
+							<div id="importDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.loadAuhtoratitve')}"> 
 									<attribute name="onClick">
 										startTask("importTask");
@@ -2091,7 +2101,7 @@
 								<image visible="false" id="importStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='showTaskMessage("importTask")'/>
 							</div>
 							<space width="4px"/>
-							<div>
+							<div  id="impactDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.impactAnalyis')}"> 
 									<attribute name="onClick">
 										startTask("impactTask");

@@ -321,6 +321,12 @@
 			</new-instance-bean>
 		</finder>	
 
+		<finder name="tasks" type="tasks">
+			<script-finder>
+				return com.soffid.iam.web.agent.AgentTasksStatusHelper.getStatus(instance.codi);
+			</script-finder>
+		</finder>	
+
 		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
@@ -343,6 +349,8 @@
 
 	</datanode>
 	
+	<datanode name="tasks" transient="true" />
+
 	<datanode name="metadata">
 		<script-handler>
 			<insert-script>

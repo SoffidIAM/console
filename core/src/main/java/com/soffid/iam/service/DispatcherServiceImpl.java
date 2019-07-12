@@ -197,6 +197,10 @@ public class DispatcherServiceImpl extends
 					"Reconcile all accounts from %s", //$NON-NLS-1$
 					dispatcher, true);
 
+			updateAutomaticTasks(SystemScheduledTasks.DISPATCHER_IMPACT,
+					"Analize impact for changes on %s", //$NON-NLS-1$
+					dispatcher, true);
+
 			updateAutomaticTasks(
 					SystemScheduledTasks.AUTHORITATIVE_DATA_IMPORT,
 					"Import authoritative data from %s", //$NON-NLS-1$
@@ -210,6 +214,10 @@ public class DispatcherServiceImpl extends
 				updateAutomaticTasks(SystemScheduledTasks.RECONCILE_DISPATCHER,
 						"Reconcile unmanaged accounts from %s", //$NON-NLS-1$
 						dispatcher, remove);
+
+			updateAutomaticTasks(SystemScheduledTasks.DISPATCHER_IMPACT,
+					"Analize impact for changes on %s", //$NON-NLS-1$
+					dispatcher, remove);
 
 			updateAutomaticTasks(
 					SystemScheduledTasks.AUTHORITATIVE_DATA_IMPORT,

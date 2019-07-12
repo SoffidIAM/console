@@ -175,7 +175,7 @@ public abstract class AccountEntity {
 	@DaoFinder("select account.name "
 			+ "from com.soffid.iam.model.AccountEntity as account "
 			+ "where account.system.name=:systemName and "
-			+ "(account.status is null or account.status = 'a' or account.status='d')")
+			+ "account.system.tenant.id = :tenantId")
 	public java.util.List<String> findAcountNames(
 			String systemName) {
 		return null;

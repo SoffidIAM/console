@@ -20,11 +20,6 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -392,6 +387,13 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("102");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("102"))
+		{
+			createScheduledTasks();
+			cfg.setValue("103");
+			configSvc.update(cfg);
+		}
+		
 
 	}
 
@@ -584,6 +586,14 @@ public class ApplicationBootServiceImpl extends
 			getScheduledTaskService().create(handler);
 		}
 
+		if (!handlers
+				.containsKey(SystemScheduledTasks.DISPATCHER_IMPACT)) {
+			ScheduledTaskHandler handler = new ScheduledTaskHandler();
+			handler.setClassName("com.soffid.iam.sync.engine.cron.AgentImpactTask"); //$NON-NLS-1$
+			handler.setName(SystemScheduledTasks.DISPATCHER_IMPACT);
+			getScheduledTaskService().create(handler);
+		}
+
 		for (ScheduledTask task : getScheduledTaskService().listTasks()) {
 			String id = task.getHandlerName();
 			if (task.getParams() != null)
@@ -633,6 +643,22 @@ public class ApplicationBootServiceImpl extends
 				task.setMonthsPattern("*");
 				task.setParams(dispatcher.getId().toString());
 				task.setName("Reconcile unmanaged accounts from "
+						+ dispatcher.getName());
+				getScheduledTaskService().create(task);
+			}
+			if (dispatcher.getUrl() != null && 
+					!tasks.containsKey(SystemScheduledTasks.DISPATCHER_IMPACT
+					+ ":" + dispatcher.getId())) {
+				ScheduledTask task = new ScheduledTask();
+				task.setActive(false);
+				task.setDayOfWeekPattern("*");
+				task.setDayPattern("*");
+				task.setHandlerName(SystemScheduledTasks.DISPATCHER_IMPACT);
+				task.setHoursPattern("0");
+				task.setMinutesPattern("30");
+				task.setMonthsPattern("*");
+				task.setParams(dispatcher.getId().toString());
+				task.setName("Analyze impact for changes on "
 						+ dispatcher.getName());
 				getScheduledTaskService().create(task);
 			}

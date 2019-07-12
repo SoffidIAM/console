@@ -603,9 +603,69 @@
 							else
 								serverStatusRow.setVisible(false);
 
+							// Task status
+							displayTasksStatus ();
 						} catch (Exception e) {
+							e.printStackTrace();
 							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
 							//Missatgebox.error ("Error "+e.getMessage());
+						}
+					}
+					
+					void displayTasksStatus () {
+						for (String type: new String[] { "reconcile", "import", "impact"} ) {
+							String task = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/name");
+							Boolean active = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/active");
+							Boolean error =  XPathUtils.getValue(form, "tasks[1]/"+type+"Task/error");
+							java.util.Calendar last1 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastExecution");
+							java.util.Calendar last2 = XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastEnd");
+							statusComponent = form.getFellow (type+"Status");
+							lastComponent = form.getFellow (type+"Last");
+							labelComponent = form.getFellow (type+"Label");
+							
+							if ( active != null && active.booleanValue())
+							{
+								statusComponent.setVisible(true);
+								statusComponent.setSrc("/img/wait.gif");
+								lastComponent.setVisible(true);
+								lastComponent.setValue(last1.getTime());
+								labelComponent.setVisible(true);
+							}
+							else if ( error != null && error.booleanValue())
+							{
+								statusComponent.setVisible(true);
+								statusComponent.setSrc ("/img/semafor-vermell.png");
+								lastComponent.setVisible(true);
+								lastComponent.setValue(last1.getTime());
+								labelComponent.setVisible(true);
+							}
+							else if ( error != null && last2 != null)
+							{
+								statusComponent.setSrc ("/img/semafor-verd.png");
+								statusComponent.setVisible(true);
+								lastComponent.setVisible(true);
+								lastComponent.setValue(last2.getTime());
+								labelComponent.setVisible(true);
+							}
+							else 
+							{
+								statusComponent.setVisible(false);
+								lastComponent.setVisible(false);
+								labelComponent.setVisible(false);
+							}
+						}
+					}
+					
+					void refreshTasks () {
+						try {
+							es.caib.zkib.datamodel.DataNodeCollection coll = XPathUtils.getValue(form, "tasks");
+							if (coll != null)
+							{
+								coll .refresh();
+								displayTasksStatus();
+							}
+						} catch (Exception e) {
+							refreshTasksTimer.stop();
 						}
 					}
 					
@@ -1022,6 +1082,62 @@
 						testWindow.doHighlighted();
 					}
 						
+					void showTaskMessage (String type)
+					{
+						String ref = es.caib.zkib.datasource.XPathUtils.getValue(form, "tasks[1]/"+type+"/@logReferenceID");
+						Long id = es.caib.zkib.datasource.XPathUtils.getValue(form, "tasks[1]/"+type+"/@id");
+						for ( com.soffid.iam.api.ScheduledTask t: com.soffid.iam.EJBLocator.getScheduledTaskService().listTasks())
+						{
+							if (t.getId().equals ( id ))
+							{
+								ref = t.getLogReferenceID();
+							}
+						}
+						if (ref == null)
+							return;
+						String name = es.caib.zkib.datasource.XPathUtils.getValue(form, "tasks[1]/"+type+"/@name");
+						com.soffid.iam.doc.service.ejb.DocumentService doc = es.caib.seycon.ng.EJBLocator.getDocumentService();
+						doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(ref));
+						java.io.InputStream in = new com.soffid.iam.doc.api.DocumentInputStream(doc);
+						byte[] b = new byte[8000];
+						int read = in.read(b);
+						in.close();
+						
+						if (read == b.length)
+						{                              
+							Filedownload.save(new com.soffid.iam.doc.api.DocumentInputStream(doc),
+									"text/plain; charset=utf-8",
+									name+".txt");
+						}
+						else if (read <= 0)
+						{
+							logWindow.setTitle(name);
+							logWindow.getFellow("tb").value = "";
+							logWindow.doHighlighted();
+						}
+						else
+						{
+							logWindow.setTitle(name);
+							logWindow.getFellow("tb").value = new String(b, 0, read);
+							logWindow.doHighlighted();
+						}
+						
+						
+					}
+
+					void startTask(String type)
+					{
+						com.soffid.iam.api.ScheduledTask task = es.caib.zkib.datasource.XPathUtils.getValue(form, "tasks[1]/"+type);
+						
+						com.soffid.iam.EJBLocator.getScheduledTaskService().startNow (task);
+						
+						Thread.currentThread().sleep(2000);
+						
+						es.caib.zkib.datasource.XPathUtils.getValue(form, "tasks").refresh();
+
+						onChangeDades();
+					}
+
 				]]>
 			</zscript>
 			
@@ -1041,11 +1157,24 @@
 					<!-- Va afegint els grups separats per comes -->
 					camp.setValue((oldValue == null ? "" : oldValue + ", ") + dada);
 				</attribute>
+				<timer delay="20000" onTimer="refreshTasks()" id="refreshTasksTimer" running="false" repeats="true" />
 				<tabbox id="panels" width="100%">
+				<attribute name="onSelect">
+				<![CDATA[
+				         	if (panels.getSelectedTab() == r_tasksTab)
+				         	{
+				         		refreshTasks();
+				         		refreshTasksTimer.start();
+				         	}
+				         	else
+				         		refreshTasksTimer.stop();
+				]]>
+				</attribute>
 				<tabs>
 					<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
 					<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
 					<tab id="r_reconcileTriggers" label="${c:l('agents.loadTriggers')}"/>
+					<tab label="${c:l('agents.zul.MassiveActions')}" if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}" id ="r_tasksTab"/>
 					<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
 					<tab id="r_metadata" label="${c:l('agents.zul.accountMetadata')}"/>
 				</tabs>
@@ -1062,44 +1191,10 @@
 							<row>
 								<input_etiqueta value="${c:l('agents.zul.Codi-2')}"/>
 								<hbox width="100%">
-									<attribute if="${canPropagateAgentUsers or canPropagateAgentRoles}" name="widths">90%,10%</attribute>
-									<attribute name="width" unless="${canPropagateAgentUsers or canPropagateAgentRoles}">90%</attribute>
-									
-									<hbox width="100%">
-										<input_dada bind="@codi" id="detall_codi" maxim="50"
-											width_custom="99%" mascara="no empty"/>
-											
-										<label value="*" />
-									</hbox>
-									
-									<div if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}">
-										<imageclic id="imgPropaga" if="${canPropagateAgentUsers}" src="/img/propagausu.gif" tooltiptext="${c:l('agents.PropagaUsuaris')}"> 
-											<attribute name="onClick">
-												<![CDATA[
-													if (canPropagateAgentUsers)
-													{
-														propagaCanvisAgent_Usuaris();
-													}
-												]]>
-											</attribute>
-										</imageclic>
-										<space width="4px"/>
-										<imageclic id="imgPropagaRols" if="${canPropagateAgentRoles}" src="/img/propagarols.gif" tooltiptext="${c:l('agents.PropagaRols')}"> 
-											<attribute name="onClick">
-											 	if (canPropagateAgentRoles) {
-													propagaCanvisAgent_Rols();
-												}
-											</attribute>
-										</imageclic>
-										<space width="4px"/>
-										<imageclic id="imgPropagaGroups" if="${canPropagateAgentGroups}" src="/img/propagagroup.png" tooltiptext="${c:l('agents.PropagaGroups')}"> 
-											<attribute name="onClick">
-											 	if (canPropagateAgentGroups) {
-													propagaCanvisAgent_Groups();
-												}
-											</attribute>
-										</imageclic>
-									</div>
+									<input_dada bind="@codi" id="detall_codi" maxim="50"
+										width_custom="99%" mascara="no empty"/>
+										
+									<label value="*" />
 								</hbox>
 							</row>
 							<row>
@@ -1943,7 +2038,71 @@
 							</datarow>
 						</grid>
 					</tabpanel>
-
+			
+					<tabpanel if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}">
+						<vbox>
+							<button image="/img/propagausu.gif" label="${c:l('agents.PropagaUsuaris')}"
+									id="imgPropaga" if="${canPropagateAgentUsers}" > 
+								<attribute name="onClick">
+									<![CDATA[
+										if (canPropagateAgentUsers)
+										{
+											propagaCanvisAgent_Usuaris();
+										}
+									]]>
+								</attribute>
+							</button>
+							<space width="4px"/>
+							<button id="imgPropagaRols" if="${canPropagateAgentRoles}" image="/img/propagarols.gif" label="${c:l('agents.PropagaRols')}"> 
+								<attribute name="onClick">
+								 	if (canPropagateAgentRoles) {
+										propagaCanvisAgent_Rols();
+									}
+								</attribute>
+							</button>
+							<space width="4px"/>
+							<button id="imgPropagaGroups" if="${canPropagateAgentGroups}" image="/img/propagagroup.png" label="${c:l('agents.PropagaGroups')}"> 
+								<attribute name="onClick">
+								 	if (canPropagateAgentGroups) {
+										propagaCanvisAgent_Groups();
+									}
+								</attribute>
+							</button>
+							<space width="4px"/>
+							<div>
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}"> 
+									<attribute name="onClick">
+										startTask("reconcileTask");
+									</attribute>
+								</button>
+								<label value="Last run:" id="reconcileLabel"/> 
+								<datebox id="reconcileLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='showTaskMessage("reconcileTask")'/>
+							</div>
+							<space width="4px"/>
+							<div>
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.loadAuhtoratitve')}"> 
+									<attribute name="onClick">
+										startTask("importTask");
+									</attribute>
+								</button>
+								<label value="Last run:" id="importLabel"/> 
+								<datebox id="importLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="importStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='showTaskMessage("importTask")'/>
+							</div>
+							<space width="4px"/>
+							<div>
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.impactAnalyis')}"> 
+									<attribute name="onClick">
+										startTask("impactTask");
+									</attribute>
+								</button>
+								<label value="Last run:" id="impactLabel"/> 
+								<datebox id="impactLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="impactStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='showTaskMessage("impactTask")'/>
+							</div>
+						</vbox>
+					</tabpanel>
 
 					<tabpanel id="tabControlAcces">
 					<vbox width="${amplaria2}">
@@ -2342,6 +2501,13 @@
 				</attribute>
 			</button>
 		</div>
+	</window>
+
+	<window closable="true" width="80%" id="logWindow"
+		title=""
+		onClose='self.visible=false; event.stopPropagation();'
+		visible="false">
+		<textbox id="tb" width="100%" height="150px" multiline="true" style="font-family: monospace; resize: vertical"/>
 	</window>
 	
 	<include src="grupsllista.zul"/>

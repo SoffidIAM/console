@@ -30,11 +30,9 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.User;
 
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 /** 
@@ -100,5 +98,6 @@ public interface UserMgr extends java.rmi.Remote {
   public boolean validateUserPassword (String userName, com.soffid.iam.api.Password password)
     throws java.rmi.RemoteException,
             InternalErrorException;
+  
 }
 

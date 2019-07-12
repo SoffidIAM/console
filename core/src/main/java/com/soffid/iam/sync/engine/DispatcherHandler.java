@@ -62,6 +62,8 @@ public abstract class DispatcherHandler {
 
 	public abstract void doAuthoritativeImport (ScheduledTask task, PrintWriter out);
 
+	public abstract void doImpact (ScheduledTask task, PrintWriter out);
+
 	public abstract GetObjectResults  getSoffidObject(String systemName, SoffidObjectType type, String object1,
 			String object2) throws Exception;
 

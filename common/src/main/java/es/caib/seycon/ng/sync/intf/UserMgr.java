@@ -98,5 +98,6 @@ public interface UserMgr extends java.rmi.Remote {
   public boolean validateUserPassword (String userName, Password password)
     throws java.rmi.RemoteException,
             InternalErrorException;
+
 }
 

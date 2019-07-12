@@ -6,8 +6,8 @@ package es.caib.seycon.ng.sync.intf;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -110,4 +110,9 @@ public interface ReconcileMgr extends java.rmi.Remote
 	public List<Rol> getAccountRoles(String userAccount)
 			throws RemoteException, InternalErrorException;
 
+
+
+	public List<String[]> getAccountChangesToApply (Account account) throws RemoteException, InternalErrorException;
+
+	public List<String[]> getRoleChangesToApply (Rol role) throws RemoteException, InternalErrorException;
 }

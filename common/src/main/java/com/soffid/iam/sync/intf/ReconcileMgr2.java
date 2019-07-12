@@ -6,6 +6,7 @@ package com.soffid.iam.sync.intf;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
 
@@ -110,4 +111,8 @@ public interface ReconcileMgr2 extends java.rmi.Remote
 	public List<RoleGrant> getAccountGrants(String userAccount)
 			throws RemoteException, InternalErrorException;
 
+
+	public List<String[]> getAccountChangesToApply (Account account) throws RemoteException, InternalErrorException;
+
+	public List<String[]> getRoleChangesToApply (Role role) throws RemoteException, InternalErrorException;
 }

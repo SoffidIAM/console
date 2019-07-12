@@ -255,9 +255,6 @@ public class ConfigurationServiceImpl
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void handleDeleteBlob(String name) throws Exception {
-		if (! Security.isMasterTenant())
-			throw new SecurityException("Blob configuration can only be updated from master tenant");
-
 		BlobConfigurationEntityDao dao = getBlobConfigurationEntityDao();
 		Collection result = dao.findByName(name);
 		for (Iterator it = result.iterator(); it.hasNext(); )

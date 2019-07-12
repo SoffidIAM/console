@@ -61,33 +61,36 @@ public class CustomField extends Div implements XPathSubscriber {
 	private String filterExpression;
 
 	public void updateMetadata() {
-		dataTypeObj = new DataType();
-		dataTypeObj.setDataObjectType(dataObjectType);
-		dataTypeObj.setLabel(label);
-		dataTypeObj.setMultiValued(multiValue);
-		dataTypeObj.setRequired(false);
-		dataTypeObj.setScope(null);
-		dataTypeObj.setSize(maxLength);
-		dataTypeObj.setType(TypeEnumeration.STRING_TYPE);
-		dataTypeObj.setRequired(required);
-		dataTypeObj.setFilterExpression(filterExpression);
-		if (listOfValues != null)
-			dataTypeObj.setValues(Arrays.asList(listOfValues));
-
-		List names = TypeEnumeration.names();
-		for ( int i = 0; i < names.size(); i++)
+		if (dataType != null)
 		{
-			String name = (String) names.get(i);
-			TypeEnumeration type = TypeEnumeration.fromString( (String) TypeEnumeration.literals().get(i) );
-			if (type.toString().equals(dataType) ||
-					name.equalsIgnoreCase(dataType) ||
-					name.toLowerCase().equals(dataType.toLowerCase()+"_type") ) {
-				dataTypeObj.setType( type );
-			} 
+			dataTypeObj = new DataType();
+			dataTypeObj.setDataObjectType(dataObjectType);
+			dataTypeObj.setLabel(label);
+			dataTypeObj.setMultiValued(multiValue);
+			dataTypeObj.setRequired(false);
+			dataTypeObj.setScope(null);
+			dataTypeObj.setSize(maxLength);
+			dataTypeObj.setType(TypeEnumeration.STRING_TYPE);
+			dataTypeObj.setRequired(required);
+			dataTypeObj.setFilterExpression(filterExpression);
+			if (listOfValues != null)
+				dataTypeObj.setValues(Arrays.asList(listOfValues));
+	
+			List names = TypeEnumeration.names();
+			for ( int i = 0; i < names.size(); i++)
+			{
+				String name = (String) names.get(i);
+				TypeEnumeration type = TypeEnumeration.fromString( (String) TypeEnumeration.literals().get(i) );
+				if (type.toString().equals(dataType) ||
+						name.equalsIgnoreCase(dataType) ||
+						name.toLowerCase().equals(dataType.toLowerCase()+"_type") ) {
+					dataTypeObj.setType( type );
+				} 
+			}
+			dataTypeObj.setValidationExpression(validationScript);
+			dataTypeObj.setVisibilityExpression(visibilityScript);
+			refresh ();
 		}
-		dataTypeObj.setValidationExpression(validationScript);
-		dataTypeObj.setVisibilityExpression(visibilityScript);
-		refresh ();
 	}
 
 	public CustomField(){

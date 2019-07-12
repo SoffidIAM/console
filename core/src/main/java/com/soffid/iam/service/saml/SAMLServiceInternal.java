@@ -43,6 +43,7 @@ import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -98,6 +99,7 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.saml.saml2.metadata.AssertionConsumerService;
+import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.KeyDescriptor;
@@ -106,6 +108,7 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.SingleLogoutService;
 import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.saml.saml2.metadata.impl.AssertionConsumerServiceBuilder;
+import org.opensaml.saml.saml2.metadata.impl.EntitiesDescriptorBuilder;
 import org.opensaml.saml.saml2.metadata.impl.EntityDescriptorBuilder;
 import org.opensaml.saml.saml2.metadata.impl.KeyDescriptorBuilder;
 import org.opensaml.saml.saml2.metadata.impl.NameIDFormatBuilder;
@@ -331,82 +334,79 @@ public class SAMLServiceInternal {
 	}
 
 	public String generateMetadata(String hostName) throws MarshallingException, InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
-		EntityDescriptor idp = new EntityDescriptorBuilder().buildObject();
-		// Generate entity descriptor
-		idp.setEntityID(getEntityId(hostName));		
-
-		SPSSODescriptor spsso = new SPSSODescriptorBuilder().buildObject();
-		idp.getRoleDescriptors().add(spsso);
-		spsso.setWantAssertionsSigned(true);
-		spsso.setAuthnRequestsSigned(true);
-		spsso.addSupportedProtocol(SAMLConstants.SAML20P_NS);
+		EntitiesDescriptor entities = new EntitiesDescriptorBuilder().buildObject();
 		
-		// Generate security keys
-		KeyDescriptor kd = new KeyDescriptorBuilder ().buildObject();
-		spsso.getKeyDescriptors().add(kd);
-		kd.setUse(UsageType.SIGNING);
-		KeyInfo keyInfo = generateKeyInfo();
-		kd.setKeyInfo(keyInfo);
-
-		KeyDescriptor kdCrypt = new KeyDescriptorBuilder ().buildObject();
-		spsso.getKeyDescriptors().add(kdCrypt);
-		kdCrypt.setUse(UsageType.ENCRYPTION);
-		KeyInfo keyInfoCrypt = generateKeyInfo();
-		kdCrypt.setKeyInfo(keyInfoCrypt);
-
-		// Generate Login services
-		AssertionConsumerService acs = new AssertionConsumerServiceBuilder().buildObject();
-		spsso.getAssertionConsumerServices().add(acs);
-		acs.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-		acs.setLocation(getBaseURL(hostName)+"saml/log/post");
-		acs.setIndex(0);
-		
-		acs = new AssertionConsumerServiceBuilder().buildObject();
-		spsso.getAssertionConsumerServices().add(acs);
-		acs.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-		acs.setLocation(getBaseURL(hostName)+"selfservice/saml/log/post");
-		acs.setIndex(1);
-
-		acs = new AssertionConsumerServiceBuilder().buildObject();
-		spsso.getAssertionConsumerServices().add(acs);
-		acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
-		acs.setLocation(getBaseURL(hostName)+"saml/log/simple-post");
-		acs.setIndex(2);
-		
-		acs = new AssertionConsumerServiceBuilder().buildObject();
-		spsso.getAssertionConsumerServices().add(acs);
-		acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
-		acs.setLocation(getBaseURL(hostName)+"selfservice/saml/log/simple-post");
-		acs.setIndex(3);
-		// Generate logout service
-		SingleLogoutService sls = new SingleLogoutServiceBuilder().buildObject();
-		spsso.getSingleLogoutServices().add(sls);
-		sls.setBinding(SAMLConstants.SAML2_SOAP11_BINDING_URI);
-		sls.setLocation(getBaseURL(hostName)+"saml/slo/soap");
-
-		sls = new SingleLogoutServiceBuilder().buildObject();
-		spsso.getSingleLogoutServices().add(sls);
-		sls.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-		sls.setLocation(getBaseURL(hostName)+"saml/slo/post");
-
-		sls = new SingleLogoutServiceBuilder().buildObject();
-		spsso.getSingleLogoutServices().add(sls);
-		sls.setBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
-		sls.setLocation(getBaseURL(hostName)+"saml/slo/redirect");
-
-		// Generates name-id format
-		NameIDFormat nid = new NameIDFormatBuilder().buildObject();
-		spsso.getNameIDFormats().add(nid);
-		nid.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+		for ( Boolean console: new Boolean[] {true, false})
+		{
+			EntityDescriptor entity = new EntityDescriptorBuilder().buildObject();
+			// Generate entity descriptor
+			entity.setEntityID(getEntityId(hostName, console));		
+	
+			SPSSODescriptor spsso = new SPSSODescriptorBuilder().buildObject();
+			entity.getRoleDescriptors().add(spsso);
+			spsso.setWantAssertionsSigned(true);
+			spsso.setAuthnRequestsSigned(true);
+			spsso.addSupportedProtocol(SAMLConstants.SAML20P_NS);
+			
+			// Generate security keys
+			KeyDescriptor kd = new KeyDescriptorBuilder ().buildObject();
+			spsso.getKeyDescriptors().add(kd);
+			kd.setUse(UsageType.SIGNING);
+			KeyInfo keyInfo = generateKeyInfo();
+			kd.setKeyInfo(keyInfo);
+	
+			KeyDescriptor kdCrypt = new KeyDescriptorBuilder ().buildObject();
+			spsso.getKeyDescriptors().add(kdCrypt);
+			kdCrypt.setUse(UsageType.ENCRYPTION);
+			KeyInfo keyInfoCrypt = generateKeyInfo();
+			kdCrypt.setKeyInfo(keyInfoCrypt);
+	
+			// Generate Login services
+			String prefix = console ? "": "selfservice/";
+			AssertionConsumerService acs = new AssertionConsumerServiceBuilder().buildObject();
+			spsso.getAssertionConsumerServices().add(acs);
+			acs.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+			acs.setLocation(getBaseURL(hostName)+prefix+"saml/log/post");
+			acs.setIndex(0);
+			
+			acs = new AssertionConsumerServiceBuilder().buildObject();
+			spsso.getAssertionConsumerServices().add(acs);
+			acs.setBinding(SAMLConstants.SAML2_POST_SIMPLE_SIGN_BINDING_URI);
+			acs.setLocation(getBaseURL(hostName)+prefix+"saml/log/simple-post");
+			acs.setIndex(2);
+			
+			// Generate logout service
+			SingleLogoutService sls = new SingleLogoutServiceBuilder().buildObject();
+			spsso.getSingleLogoutServices().add(sls);
+			sls.setBinding(SAMLConstants.SAML2_SOAP11_BINDING_URI);
+			sls.setLocation(getBaseURL(hostName)+prefix+"saml/slo/soap");
+	
+			sls = new SingleLogoutServiceBuilder().buildObject();
+			spsso.getSingleLogoutServices().add(sls);
+			sls.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+			sls.setLocation(getBaseURL(hostName)+prefix+"saml/slo/post");
+	
+			sls = new SingleLogoutServiceBuilder().buildObject();
+			spsso.getSingleLogoutServices().add(sls);
+			sls.setBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+			sls.setLocation(getBaseURL(hostName)+prefix+"saml/slo/redirect");
+	
+			// Generates name-id format
+			NameIDFormat nid = new NameIDFormatBuilder().buildObject();
+			spsso.getNameIDFormats().add(nid);
+			nid.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+			
+			entities.getEntityDescriptors().add(entity);
+		}
 		
 		// Get the marshaller factory
 		MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
 		 
 		// Get the Subject marshaller
-		Marshaller marshaller = marshallerFactory.getMarshaller(idp);
+		Marshaller marshaller = marshallerFactory.getMarshaller(entities);
 		 
 		// Marshall the Subject
-		Element xml = marshaller.marshall(idp);
+		Element xml = marshaller.marshall(entities);
 
 		return generateString(xml);
 	}
@@ -493,7 +493,7 @@ public class SAMLServiceInternal {
 			req.setID(newID);
 			req.setIssueInstant(new DateTime ());
 			Issuer issuer = ( (SAMLObjectBuilder<Issuer>) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME)).buildObject();
-			issuer.setValue(getEntityId(hostName));
+			issuer.setValue(getEntityId(hostName, !path.contains("selfservice")));
 			
 			req.setIssuer( issuer );
 			
@@ -619,8 +619,10 @@ public class SAMLServiceInternal {
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException {
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-//		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
+		transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+		
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(xml);
 		transformer.transform(source, result);
@@ -644,9 +646,12 @@ public class SAMLServiceInternal {
 		return url;
 	}
 
-	private String getEntityId(String hostName) 
+	private String getEntityId(String hostName, Boolean console) 
 	{
-		return getBaseURL(hostName)+"soffid-iam-console";
+		if (console)
+			return getBaseURL(hostName)+"soffid-iam-console";
+		else
+			return getBaseURL(hostName)+"soffid-iam-selfservice";
 	}
 
 	private KeyStore getKeyStore () throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, InternalErrorException, InvalidKeyException, IllegalStateException, NoSuchProviderException, SignatureException
@@ -784,9 +789,11 @@ public class SAMLServiceInternal {
     	SAML20AssertionValidator validator = getValidator(hostName);
     	
     	HashMap<String, Object> params = new HashMap<String, Object>();
+    	LinkedList<String> names = new LinkedList<String>();
+    	names.add(getEntityId(hostName, true));
+    	names.add(getEntityId(hostName, false));
     	params.put(
-                SAML2AssertionValidationParameters.COND_VALID_AUDIENCES, 
-                	Collections.singleton(getEntityId(hostName)));
+                SAML2AssertionValidationParameters.COND_VALID_AUDIENCES, names);
     	Set<String> set = new HashSet<String>();
     	set.add(getBaseURL(hostName)+"saml/log/post");
     	set.add(getBaseURL(hostName)+"saml/log/simple-post");
@@ -795,6 +802,9 @@ public class SAMLServiceInternal {
     	set.add(getBaseURL(hostName)+"saml/slo/soap");
     	set.add(getBaseURL(hostName)+"saml/slo/post");
     	set.add(getBaseURL(hostName)+"saml/slo/redirect");
+    	set.add(getBaseURL(hostName)+"selfservice/saml/slo/soap");
+    	set.add(getBaseURL(hostName)+"selfservice/saml/slo/post");
+    	set.add(getBaseURL(hostName)+"selfservice/saml/slo/redirect");
     	params.put (SAML2AssertionValidationParameters.SC_VALID_RECIPIENTS, set);
 
     	if (responseSigned)

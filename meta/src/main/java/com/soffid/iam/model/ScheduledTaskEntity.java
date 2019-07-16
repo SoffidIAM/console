@@ -23,7 +23,7 @@ public abstract class ScheduledTaskEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="SCT_NAME", length=100)
+	@Column (name="SCT_NAME", length=250)
 	public java.lang.String name;
 
 	@Column (name="SCT_PARAM", length=250)

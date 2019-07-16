@@ -567,6 +567,7 @@
 					{
 						onEnableManualAccount();
 						try {
+							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
 							ds = form.getDataSource(); 
 							es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext(); 
 							registre = ctx.getValue("/");
@@ -593,7 +594,9 @@
 									.getFellow("imgPropaga").setDisabled(false);
 								}
 							} 
-						
+							Boolean b = registre.getInstance().sharedDispatcher;
+							agentThreadsBox.setDisabled(Boolean.TRUE.equals ( b ) );
+							
 							String taskMode = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.mode");
 							if (taskMode == null || "auto".equals(taskMode))
 							{
@@ -607,7 +610,7 @@
 							displayTasksStatus ();
 						} catch (Exception e) {
 							e.printStackTrace();
-							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
+//							form.getFellow("detall_codi").getFellow("dada").setDisabled(true);
 							//Missatgebox.error ("Error "+e.getMessage());
 						}
 					}
@@ -1249,7 +1252,9 @@
 											</dataitem>
 										</listbox>
 										<label value=" ${c:l('agents.zul.sharedThread')}:" />
-										<checkbox bind="@sharedDispatcher" onCheck=""/>
+										<checkbox bind="@sharedDispatcher" onCheck="agentThreadsBox.setDisabled(self.isChecked())"/>
+										<label value=" ${c:l('agents.zul.threads')}:" />
+										<intbox bind="@threads" onChange="" id="agentThreadsBox"/>
 									</div>
 									<listbox
 										disabled="${!canModifyAgent}"

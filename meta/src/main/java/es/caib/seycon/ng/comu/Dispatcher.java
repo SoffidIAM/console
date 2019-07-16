@@ -125,6 +125,11 @@ public class Dispatcher {
 	@Description ("false to use a dedicated server thread. true to use a shared server thread")
 	public Boolean sharedDispatcher;
 
+	@Attribute (defaultValue="1L")
+	@Description ("Number of concurrent threads to process this agent tasks")
+	@Nullable
+	public Long threads;
+
 	@Description("Time out for normal operations (milliseconds)")
 	@Nullable
 	public Long timeout;

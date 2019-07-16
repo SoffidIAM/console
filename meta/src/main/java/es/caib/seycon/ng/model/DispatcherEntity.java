@@ -178,6 +178,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public Boolean sharedDispatcher;
 	
+	@Column (name="DIS_THREADS", defaultValue="1L")
+	@Description ("Number of concurrent threads to process this agent tasks")
+	@Nullable
+	public Long threads;
+	
 	@ForeignKey(foreignColumn="PAU_DIS_ID")
 	@Description ("Current authoritative changes pending to apply")
 	public Collection<AuthoritativeChangeEntity> pendingChanges;

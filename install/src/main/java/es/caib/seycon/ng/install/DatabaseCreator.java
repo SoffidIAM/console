@@ -1,21 +1,13 @@
 package es.caib.seycon.ng.install;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.Random;
@@ -69,7 +61,7 @@ public class DatabaseCreator {
         port = (Long) ctx.getVariable("dbPort"); //$NON-NLS-1$
         sid = (String) ctx.getVariable("dbSid"); //$NON-NLS-1$
         schema = (String) ctx.getVariable("dbUser"); //$NON-NLS-1$
-        schemaPassword = (String) ctx.getVariable("dbPassword"); //$NON-NLS-1$
+        schemaPassword = (String) ctx.getVariable("dbPasswordClearText"); //$NON-NLS-1$
         createUser = (Boolean) ctx.getVariable("dbCreateUser"); //$NON-NLS-1$
 
         tableTablespace = (String) ctx.getVariable("dbTableTablespace"); //$NON-NLS-1$
@@ -99,12 +91,12 @@ public class DatabaseCreator {
             driverClass= "org.postgresql.Driver"; //$NON-NLS-1$
             sanitySelect = "select 1"; //$NON-NLS-1$
             //connectionChecker="org.jboss.resource.adapter.jdbc.vendor.MSSQLValidConnectionChecker"; //$NON-NLS-1$
-        } else if (driver == MYSQL_DRIVER ){
-            driverString = "mysql"; //$NON-NLS-1$
-            driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            		"?useUnicode=yes&characterEncoding=UTF-8"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            driverClass= "com.mysql.jdbc.Driver"; //$NON-NLS-1$
-            sanitySelect = "select 1"; //$NON-NLS-1$
+//        } else if (driver == MYSQL_DRIVER ){
+//            driverString = "mysql"; //$NON-NLS-1$
+//            driverUrl = "jdbc:mysql://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//            		"?useUnicode=yes&characterEncoding=UTF-8"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//            driverClass= "com.mysql.jdbc.Driver"; //$NON-NLS-1$
+//            sanitySelect = "select 1"; //$NON-NLS-1$
         } else {
             driverString = "mariadb"; //$NON-NLS-1$
             driverUrl = "jdbc:mariadb://"+host+":"+port+"/"+sid+ //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -156,10 +148,10 @@ public class DatabaseCreator {
         	url = "jdbc:sqlserver://" + host + ":" + port;
         	return DriverManager.getConnection(url, user, password);
         }
-        else if (driver == MYSQL_DRIVER){
-            url = "jdbc:mysql://" + host + ":" + port + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            return DriverManager.getConnection(url, user, password);
-        } 
+//        else if (driver == MYSQL_DRIVER){
+//            url = "jdbc:mysql://" + host + ":" + port + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//            return DriverManager.getConnection(url, user, password);
+//        } 
         else{
             url = "jdbc:mariadb://" + host + ":" + port + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return DriverManager.getConnection(url, user, password);

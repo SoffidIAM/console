@@ -172,6 +172,15 @@
                       <void property="failIfNotRootUnix">
                         <boolean>true</boolean>
                       </void>
+                      <void property="obtainIfAdminMac">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="obtainIfNormalMac">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="obtainIfNormalWin">
+                        <boolean>true</boolean>
+                      </void>
                     </object>
                   </java>
                 </serializedBean>
@@ -1394,8 +1403,8 @@ if (b == null || b.booleanValue ())
     return true;
 else
     return false;</condition>
-            <validation>String p1 = (String) context.getVariable("dbPassword");
-String p2 = (String) context.getVariable("dbPassword2");
+            <validation>String p1 = (String) context.getVariable("dbPasswordClearText");
+String p2 = (String) context.getVariable("dbPasswordClearText2");
 if (p1 == null || p2 == null || ! p2.equals(p1) )
 {
     if (context.isConsole())
@@ -1438,7 +1447,7 @@ return true;</validation>
                         <string>Password</string>
                       </void>
                       <void property="variableName">
-                        <string>dbPassword</string>
+                        <string>dbPasswordClearText</string>
                       </void>
                     </object>
                   </java>
@@ -1454,7 +1463,7 @@ return true;</validation>
                         <string>Repeat password</string>
                       </void>
                       <void property="variableName">
-                        <string>dbPassword2</string>
+                        <string>dbPasswordClearText2</string>
                       </void>
                     </object>
                   </java>
@@ -1621,7 +1630,7 @@ If it already exists, the password will be changed.</string>
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="189" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="3" errorMessage="Do you want to modify the database configuration?">
+              <action name="" id="189" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="4" errorMessage="Do you want to modify the database configuration?">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -1632,7 +1641,9 @@ If it already exists, the password will be changed.</string>
 
 try
 {
-    return c.create();
+    boolean b = c.create();
+    context.getProgressInterface().setStatusMessage("Database connection verified");
+    return b;
 }
 catch (Exception e)
 {
@@ -1647,6 +1658,18 @@ catch (Exception e)
 </string>
                           </void>
                         </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="1417" customizedId="" beanClass="com.install4j.runtime.beans.actions.services.StartServiceAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.services.StartServiceAction">
+                      <void property="launcherId">
+                        <string>1301</string>
                       </void>
                     </object>
                   </java>
@@ -1669,7 +1692,9 @@ catch (Exception e)
                     </object>
                   </java>
                 </serializedBean>
-                <condition />
+                <condition>    context.getProgressInterface().setStatusMessage("Waiting for service startup");
+    return true;
+</condition>
               </action>
             </actions>
             <formComponents />
@@ -1695,7 +1720,7 @@ catch (Exception e)
                     </object>
                   </java>
                 </serializedBean>
-                <condition>!context.isUnattended()</condition>
+                <condition>return !context.isUnattended() &amp;&amp; java.io.File.separatorChar == '\\';</condition>
               </action>
             </actions>
             <formComponents />

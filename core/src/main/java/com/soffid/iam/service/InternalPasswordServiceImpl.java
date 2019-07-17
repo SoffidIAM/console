@@ -361,12 +361,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 	public String getDigest2(Long id, Password password) throws InternalErrorException {
 		try {
-			if (digest == null) {
-				digest = MessageDigest.getInstance("SHA-256"); //$NON-NLS-1$
+			if (digest2 == null) {
+				digest2 = MessageDigest.getInstance("SHA-256"); //$NON-NLS-1$
 			}
-			synchronized (digest) {
-				digest.update( id.toString().getBytes("UTF-8") );
-				byte bytes[] = digest.digest(password.getPassword().getBytes("UTF-8")); //$NON-NLS-1$
+			synchronized (digest2) {
+				digest2.update( id.toString().getBytes("UTF-8") );
+				byte bytes[] = digest2.digest(password.getPassword().getBytes("UTF-8")); //$NON-NLS-1$
 				return Base64.encodeBytes(bytes);
 			}
 		} catch (Exception e) {
@@ -375,6 +375,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private static MessageDigest digest;
+	private static MessageDigest digest2;
 
 	private void reorderOldPasswords(UserEntity user, PasswordDomainEntity dce, PasswordPolicyEntity pcd) {
 

@@ -12,7 +12,8 @@ function launchSsoUrl (secrets) {
 		var isOpera = typeof window.opr !== "undefined";
 		var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
 		var isIOSChrome = winNav.userAgent.match("CriOS");
-
+		var isFirefox = winNav.userAgent.match("Firefox/");
+		
 		if (isIOSChrome) {
 		   // is Google Chrome on IOS
 		} else if(
@@ -22,9 +23,15 @@ function launchSsoUrl (secrets) {
 		  isOpera === false &&
 		  isIEedge === false
 		) {
-			if (confirm ("A Google chrome extension must be installed to get single sign-on. Please, confirm to install it"))
+			if (confirm ("A Google chrome extension must be installed to get single sign-on. Please, confirm to install it. After installing the addon, you can come backup to Soffid self service portal"))
 			{
 				location.href="https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf";
+				return;
+			}
+		} else if ( isFirefox) {
+			if (confirm ("A Firefox extension must be installed to get single sign-on. Please, confirm to install it. After installing the addon, you can come backup to Soffid self service portal"))
+			{
+				location.href="https://addons.mozilla.org/es/firefox/addon/soffid-self-service/";
 				return;
 			}
 		}

@@ -46,7 +46,7 @@ public class Config {
     static final String []propertiesToMerge = new String [] {
     	ROL_PROPERTY,
     	SERVERLIST_PROPERTY,
-    	PORT_PROPERTY,
+//    	PORT_PROPERTY,
     	DB_PROPERTY,
     	PASSWORD_PROPERTY,
     	USER_PROPERTY,
@@ -382,7 +382,7 @@ public class Config {
 
 	public String port = null;
     public String getPort() throws RemoteException, InternalErrorException {
-        if (isServer())
+        if (isServer() && prop.getProperty(PORT_PROPERTY) == null)
         {
         	if (port == null)
                 port = serverService.getConfig("seycon.https.port"); //$NON-NLS-1$

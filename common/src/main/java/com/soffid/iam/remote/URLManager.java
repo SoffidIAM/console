@@ -53,12 +53,25 @@ public class URLManager {
             url2 = new URL("http:"+url);             //$NON-NLS-1$
         }
 
-        if (port == null) port = Integer.toString(url2.getPort());
-
         if (url.startsWith("https:")) //$NON-NLS-1$
-            return new URL ("https://"+url2.getHost()+":"+url2.getPort()+service); //$NON-NLS-1$ //$NON-NLS-2$
+        {
+    		if (url2.getPort() == -1)
+    			port = "";
+    		else
+    			port = ":"+Integer.toString(url2.getPort());
+            return new URL ("https://"+url2.getHost()+port+service); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         else
-            return new URL ("https://"+url2.getHost()+":"+port+service); //$NON-NLS-1$ //$NON-NLS-2$
+        {
+        	if (port == null)
+        	{
+        		if (url2.getPort() == -1)
+        			port = "";
+        		else
+        			port = ":"+Integer.toString(url2.getPort());
+        	}
+            return new URL ("https://"+url2.getHost()+port+service); //$NON-NLS-1$ //$NON-NLS-2$
+        }
     }
     
     public URL getServerURL () throws IOException, InternalErrorException

@@ -1804,7 +1804,7 @@ public class DispatcherServiceImpl extends
 			p = new Configuration();
 			p.setCode("server.nextRemoteServer");
 			p.setValue("" + System.currentTimeMillis());
-			getConfigurationService().create(p);
+			p = getConfigurationService().create(p);
 		}
 		String assignedName = "s"+p.getValue()+"."+gateway.getName();
 		p.setValue( Long.toString( 1L + Long.parseLong(p.getValue())));

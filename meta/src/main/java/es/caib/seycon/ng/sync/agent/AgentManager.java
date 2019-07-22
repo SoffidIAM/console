@@ -8,6 +8,9 @@ package es.caib.seycon.ng.sync.agent;
 
 import com.soffid.mda.annotation.*;
 
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service(serverOnly = true, serverPath = "/seycon/AgentManager", serverRole = "server", translatedName = "AgentManager", translatedPackage = "com.soffid.iam.sync.agent")
@@ -44,5 +47,14 @@ public abstract class AgentManager {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Date getCertificateValidityDate() throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
+	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PublicKey generateNewKey() throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void storeNewCertificate(X509Certificate cert, X509Certificate root) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 }

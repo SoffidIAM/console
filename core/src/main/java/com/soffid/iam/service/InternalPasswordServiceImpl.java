@@ -374,6 +374,21 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 	}
 
+	public String getDigest2b(Long id, Password password) throws InternalErrorException {
+		try {
+			if (digest == null) {
+				digest = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
+			}
+			synchronized (digest) {
+				digest.update( id.toString().getBytes("UTF-8") );
+				byte bytes[] = digest.digest(password.getPassword().getBytes("UTF-8")); //$NON-NLS-1$
+				return Base64.encodeBytes(bytes);
+			}
+		} catch (Exception e) {
+			throw new InternalErrorException(e.getMessage());
+		}
+	}
+
 	private static MessageDigest digest;
 	private static MessageDigest digest2;
 
@@ -548,6 +563,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
 		tasque.setStatus("P"); //$NON-NLS-1$
 		try {
+			tasque.setTenant( getTenantEntityDao().load( Security.getCurrentTenantId() ));
 			tasque.setServer( Config.getConfig().getHostName() );
 			log.info("Creating task for host "+ tasque.getServer());
 			return getTaskQueue().addTask(tasque);
@@ -756,16 +772,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		
 		log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName());
 		
-		String digest = getDigest(password);
-		String digest2 = getDigest2(user.getId(), password);
-
 		if (user.getActive().equals("N")) //$NON-NLS-1$
 			return PasswordValidation.PASSWORD_WRONG;
 		for (PasswordEntity contra : getPasswordEntityDao().findLastByUserDomain(user, passwordDomain)) {
 			if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") //$NON-NLS-1$
 					|| contra.getActive().equals("E"))) {
-				if (contra.getPassword() != null && digest.equals(contra.getPassword()) ||
-						contra.getPassword2() != null && digest2.equals(contra.getPassword2())) {
+				if ( isRightPassword(password, contra) ) {
 					if (new Date().before(contra.getExpirationDate())) {
 						updateAccountLastLogin(user, passwordDomain);
 						return PasswordValidation.PASSWORD_GOOD;
@@ -815,6 +827,15 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 
 		return PasswordValidation.PASSWORD_WRONG;
+	}
+
+	public boolean isRightPassword(Password password, PasswordEntity contra) throws InternalErrorException {
+		String digest = getDigest(password);
+		String digest2 = getDigest2(contra.getUser().getId(), password);
+		String digest2b = getDigest2b(contra.getUser().getId(), password);
+
+		return contra.getPassword() != null && digest.equals(contra.getPassword()) ||
+				contra.getPassword2() != null && (digest2.equals(contra.getPassword2()) || digest2b.equals(contra.getPassword2()));
 	}
 
 	private void updateAccountLastLogin(UserEntity user, PasswordDomainEntity passwordDomain) {
@@ -901,12 +922,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	 */
 	protected boolean handleIsOldPassword(UserEntity user, PasswordDomainEntity passwordDomain, Password password)
 			throws java.lang.Exception {
-		String digest = getDigest(password);
-		String digest2 = getDigest2(user.getId(), password);
 		for (Iterator it = getPasswordEntityDao().findByUserDomain(user, passwordDomain).iterator(); it.hasNext();) {
 			PasswordEntity contra = (PasswordEntity) it.next();
-			if (contra.getPassword() != null && digest.equals(contra.getPassword()) ||
-					contra.getPassword2() != null && digest2.equals(contra.getPassword2())) 
+			if (isRightPassword(password, contra) ) 
 				return true;
 		}
 		return false;
@@ -1153,15 +1171,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			return handleCheckPassword(user, passwordDomain, password, checkTrusted, checkExpired);
 		} else {
-			String digest = getDigest(password);
-			String digest2 = getDigest2(account.getId(), password);
-
 			AccountPasswordEntity contra = getAccountPasswordEntityDao().findLastByAccount(account.getId());
 			if (contra != null && (contra.getActive().equals("S") || //$NON-NLS-1$
 					contra.getActive().equals("N") || contra //$NON-NLS-1$ //$NON-NLS-2$
 							.getActive().equals("E"))) { //$NON-NLS-1$
-				if (contra.getPassword() != null && digest.equals(contra.getPassword()) ||
-						contra.getPassword2() != null && digest2.equals(contra.getPassword2())) 
+				if (isRightPassword(password, contra)) 
 				{
 					if (new Date().before(contra.getExpirationDate())) {
 						return PasswordValidation.PASSWORD_GOOD;
@@ -1248,12 +1262,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 	@Override
 	protected void handleConfirmAccountPassword(AccountEntity account, Password password) throws Exception {
-		String digest = getDigest(password);
-		String digest2 = getDigest2(account.getId(), password);
 		AccountPasswordEntity contra = getAccountPasswordEntityDao().findLastByAccount(account.getId());
 		if (contra != null && 
-				(contra.getPassword() != null && digest.equals(contra.getPassword()) ||
-				contra.getPassword2() != null && digest2.equals(contra.getPassword2())) && 
+				isRightPassword(password, contra) && 
 				contra.getActive().equals("N")) { //$NON-NLS-1$
 			contra.setActive("S"); //$NON-NLS-1$
 			getAccountPasswordEntityDao().update(contra);
@@ -1267,15 +1278,22 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
 			return handleIsOldPassword(user, passwordDomain, password);
 		} else {
-			String digest = getDigest(password);
-			String digest2 = getDigest2(account.getId(), password);
 			for (AccountPasswordEntity contra : account.getPasswords()) {
-				if (contra.getPassword() != null && digest.equals(contra.getPassword()) ||
-						contra.getPassword2() != null && digest2.equals(contra.getPassword2())) 
+				if (isRightPassword(password, contra)) 
 					return true;
 			}
 			return false;
 		}
+	}
+
+	public boolean isRightPassword(Password password, AccountPasswordEntity contra) throws InternalErrorException {
+		String digest = getDigest(password);
+		String digest2 = getDigest2(contra.getAccount().getId(), password);
+		String digest2b = getDigest2b(contra.getAccount().getId(), password);
+
+		return contra.getPassword() != null && digest.equals(contra.getPassword()) ||
+				contra.getPassword2() != null && (digest2.equals(contra.getPassword2())  || 
+						digest2b.equals(contra.getPassword2()));
 	}
 
 	private Password generateRandomPassword(AccountEntity account, PasswordPolicyEntity pc, boolean minLength,

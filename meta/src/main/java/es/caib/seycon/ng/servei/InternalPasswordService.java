@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
@@ -29,6 +30,7 @@ import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.model.AccountPasswordEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
+	TenantEntity.class,
 	SeyconServerService.class})
 
 public abstract class InternalPasswordService {

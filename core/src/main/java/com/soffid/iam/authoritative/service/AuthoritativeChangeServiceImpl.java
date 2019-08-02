@@ -264,6 +264,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                     c.setTime((Date) value);
                     value = c;
                 }
+                if (change.getUser().getUserName() == null)
+                {
+                	log.info("No user name. Assuming change on attribute "+attribute);
+                	return true; 
+                }
                 UserData dada = getUserService().findDataByUserAndCode(change.getUser().getUserName(), attribute);
                 if (dada == null && value != null) {
                 	log.info("User "+change.getUser().getUserName()+". Detected change on attribute "+attribute);

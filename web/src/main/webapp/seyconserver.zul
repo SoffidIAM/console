@@ -573,14 +573,14 @@
 					if (es.caib.zkib.zkiblaf.Missatgebox
 							.confirmaOK_CANCEL(String.format(org.zkoss.util.resource
 									.Labels.getLabel("seyconServer.VolReiniciar"),
-							new Object [] {url})))
+							new Object [] {dadaurl})))
 					{
 						com.soffid.iam.EJBLocator.getSyncServerService().
-								resetSyncServer(urlserver, url);
+								resetSyncServer(urlserver, dadaurl);
 						Missatgebox.info ( 
 							String.format(org.zkoss.util.resource
 									.Labels.getLabel("seyconServer.Restarting"),
-							new Object [] {url}));
+							new Object [] {dadaurl}));
 					}
 				}
 				

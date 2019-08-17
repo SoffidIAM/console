@@ -80,4 +80,6 @@ public abstract class DispatcherHandler {
 	 * @throws InternalErrorException
 	 */
 	public abstract boolean runStep () throws InternalErrorException;
+
+	public abstract String parseKerberosToken(String domain, String serviceName, byte[] keytab, byte[] token) throws Exception ;
 }

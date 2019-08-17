@@ -3,18 +3,13 @@ package es.caib.bpm.ui.inbox;
 import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.metainfo.EventHandler;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
@@ -22,18 +17,13 @@ import org.zkoss.zul.Listitem;
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.BPMApplication;
-import es.caib.bpm.util.Timer;
 import es.caib.bpm.vo.ProcessInstance;
-import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
-import es.caib.zkib.zkiblaf.Frame;
 
-import javax.servlet.http.HttpServletRequest;
-
-public class MyProcessHandler extends Frame {
+public class MyProcessHandler extends com.soffid.iam.web.component.Frame {
 
 	/**
 	 * 

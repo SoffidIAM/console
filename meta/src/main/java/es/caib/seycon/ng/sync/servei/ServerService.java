@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.soffid.iam.api.AttributeTranslation;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.authoritative.service.AuthoritativeChangeService;
 import com.soffid.iam.service.AttributeTranslationService;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
@@ -19,6 +20,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
+import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +64,8 @@ import org.springframework.transaction.annotation.Transactional;
 	PasswordService.class,
 	CustomObjectService.class,
 	ServerEntity.class,
-	AttributeTranslationService.class})
+	AttributeTranslationService.class, 
+	AuthoritativeChangeService.class})
 public abstract class ServerService {
 
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
@@ -458,5 +461,13 @@ public abstract class ServerService {
 	
 	/** Syncserver gateway support **/
 	Server findRemoteServerByUrl(String url) { return null;}
+	
+	/** Life updates support **/
+	void processAuthoritativeChange (AuthoritativeChange change, boolean remove) 
+	{
+	}
+	
+	@Description("Parses a kerberos token.")
+    public String parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}
 
 }

@@ -403,7 +403,7 @@ public class TaskHandler
 		if (cancelled || isExpired())
 			return true;
 		else
-			return !"P".equals(task.getStatus()) && !"E".equals(task.getStatus()); //$NON-NLS-1$ //$NON-NLS-2$
+			return task.getStatus() != null && !"P".equals(task.getStatus()) && !"E".equals(task.getStatus()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public boolean isExpired ()

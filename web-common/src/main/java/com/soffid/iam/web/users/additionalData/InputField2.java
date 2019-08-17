@@ -1228,7 +1228,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("host:query"))+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
 					sb.append("<label id=\""+id2+"\"/>");
 					sb.append(required+"</div>");
 				} else {
@@ -1240,7 +1240,7 @@ public class InputField2 extends Div
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("host:query"))+"\"/>");
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label id=\""+id2+"\"/>");
 					sb.append(required+"</listcell></listitem>");
@@ -1292,7 +1292,7 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly  && Security.isUserInRole("host:query"))+"\" "
+							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
 							+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
@@ -1306,7 +1306,7 @@ public class InputField2 extends Div
 							+ "id=\""+id+"\" "
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly  && Security.isUserInRole("host:query"))+"\" "
+							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
 							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");

@@ -340,7 +340,8 @@ public class GroupEntityDaoImpl extends
 			if (grupPare == null) {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.3"), codiPare)); //$NON-NLS-1$
 			} else {
-				if (grupPare.getObsolete() != null && grupPare.getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
+				if (grupPare.getObsolete() != null && grupPare.getObsolete().compareTo("S") == 0 &&
+						! Boolean.TRUE.equals(sourceVO.getObsolete())) { //$NON-NLS-1$
 					throw new SeyconException(
 							Messages.getString("GroupEntityDaoImpl.4")); //$NON-NLS-1$
 				} else {

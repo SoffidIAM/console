@@ -30,7 +30,7 @@ import es.caib.zkib.zkiblaf.Frame;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class InboxHandler extends Frame {
+public class InboxHandler extends com.soffid.iam.web.component.Frame {
 
 	/**
 	 * 

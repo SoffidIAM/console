@@ -339,31 +339,12 @@
 				}
 			}
 			
-			public abstract class IconaClickEvent implements org.zkoss.zk.ui.event.EventListener {
-				public void onEvent(Event event);
-			};
-		
-			public IconaClickEvent iconaAdd = new IconaClickEvent(){
-				 public void onEvent(Event event) {
-				 	setIcona(event.getTarget().getId());
-				 }
-			};
-			
-			public IconaClickEvent iconaDelete = new IconaClickEvent(){
-				 public void onEvent(Event event) {
-				 	esborraIcona(event.getTarget().getId());
-				 }
-			};
-			
-		
-			void mostraImatge(quina, byte[] imatge, boolean canAdmin) {
+			void mostraImatge(String quina, byte[] imatge, boolean canAdmin) {
 				org.zkoss.zul.Image img = form.getFellow("img_"+quina);
 				add = form.getFellow("oafegir_"+quina);
 				del = form.getFellow("oesborrar_"+quina);
 				
 				if (canAdmin) {
-					add.addEventListener(Events.ON_CLICK,iconaAdd);
-					del.addEventListener(Events.ON_CLICK,iconaDelete);
 					add.setSclass("click");
 					del.setSclass("click");
 					
@@ -376,8 +357,6 @@
 						img.setSclass("pue_noimg_noclick");
 					}
 				} else {
-					add.removeEventListener(Events.ON_CLICK,iconaAdd);
-					del.removeEventListener(Events.ON_CLICK,iconaDelete);
 					add.setSclass("noclick");
 					del.setSclass("noclick");
 					if (imatge!=null && imatge.length!=0) {
@@ -1784,8 +1763,24 @@
 								<input_etiqueta value="${c:l('aplicacionsIntranet.zul.Iconas')}"/>
 								<image id="img_icona1" sclass="pue_img"/>
 								<vbox id="opcionsicona1" visible="true">
-									<image id="oafegir_icona1" src="~./img/list-add.gif" tooltiptext="${c:l('aplicacionsIntranet.AfegirIcona')}"/>
-									<image id="oesborrar_icona1" src="~./img/list-remove.gif" tooltiptext="${c:l('aplicacionsIntranet.EsborraIcona')}"/>
+									<image id="oafegir_icona1" src="~./img/list-add.gif" tooltiptext="${c:l('aplicacionsIntranet.AfegirIcona')}">
+										<attribute name="onClick"><![CDATA[
+									        es.caib.zkib.component.DataTree arbre = esquema.getFellow("lista").getFellow("treebox");
+											PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
+										    boolean canAdmin = nodeActual.getId() == null || getPuntEntradaService().canAdmin(nodeActual);
+											if (canAdmin)
+											 	setIcona(event.getTarget().getId());
+										]]></attribute>
+									</image>
+									<image id="oesborrar_icona1" src="~./img/list-remove.gif" tooltiptext="${c:l('aplicacionsIntranet.EsborraIcona')}">
+										<attribute name="onClick"><![CDATA[
+									        es.caib.zkib.component.DataTree arbre = esquema.getFellow("lista").getFellow("treebox");
+											PuntEntrada nodeActual = arbre.selectedItem.getValue().getInstance();
+										    boolean canAdmin = nodeActual.getId() == null || getPuntEntradaService().canAdmin(nodeActual);
+											if (canAdmin)
+											 	esborraIcona(event.getTarget().getId());
+										]]></attribute>
+									</image>
 								</vbox>
 							</hbox></hbox>
 						</tabpanel>

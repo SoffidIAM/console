@@ -666,8 +666,8 @@ div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.
 .wc-overlapped {overflow-y: scroll}
 .vbox {margin-top:20px;margin-right:2px;background-color:#EEEEEE}
 button.vbuton {text-align:left;width:130px;margin:0 0 5px 0;padding:1px;}
-.pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer}
-.pue_img_noclick {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;}
+.pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer;width:30px;}
+.pue_img_noclick {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;}
 .pue_noimg {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;height:30px;background-color:lightgrey;cursor:pointer}
 .pue_noimg_noclick {border:1px solid gray;margin:10px 0;padding:3px;width:30px;height:30px;background-color:lightgrey;}
 .ticona td {vertical-align:middle;}

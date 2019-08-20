@@ -15,6 +15,7 @@ import com.soffid.iam.service.AttributeTranslationService;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
@@ -468,6 +469,6 @@ public abstract class ServerService {
 	}
 	
 	@Description("Parses a kerberos token.")
-    public String parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}
+    public Account parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}
 
 }

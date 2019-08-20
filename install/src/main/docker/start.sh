@@ -53,7 +53,7 @@ function configure {
 	then
 		DB_DRIVER=org.postgresql.Driver
 	else
-		echo "Cannot guess database driver for url $DB_URL" >2
+		echo "Cannot guess database driver for url $DB_URL" 
 		exit 1
 	fi
 
@@ -83,7 +83,7 @@ function configure {
 			echo "dbValidationQuery=select 1"
 			echo "dbDriverString=postgresql"
 		else
-			echo "Cannot guess database driver for url $DB_URL" >2
+			echo "Cannot guess database driver for url $DB_URL"
 			exit 1
 		fi
 		echo "dbDriverUrl=$DB_URL"
@@ -111,6 +111,16 @@ else
     INSTALL4J_ADD_VM_PARAMS="$JAVA_OPT"
 fi
 export INSTALL4J_ADD_VM_PARAMS
+
+for trustedcert in /opt/soffid/iam-console-2/trustedcerts/*
+do   
+   if [[ -r "$trustedcert" ]]
+   then
+     echo "Loading $trustedcert"   
+     keytool -import -keystore /etc/ssl/certs/java/cacerts -storepass changeit -noprompt -alias $(basename $trustedcert) -file "$trustedcert" -trustcacerts
+   fi
+done
+
 
 if [[ "$SECURE" == "true" ]]
 then

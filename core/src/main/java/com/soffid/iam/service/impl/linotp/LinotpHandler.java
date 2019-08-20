@@ -111,63 +111,80 @@ public class LinotpHandler implements OTPHandler {
 		{
 			log.debug("selectToken");
 			String linOtpUser = getLinotpUserName(challenge);
-			Response response =
-				WebClient
+			int attempts = 0;
+			boolean retry;
+			do
+			{
+				retry = false;
+				attempts++;
+				Response response = 
+					WebClient
 					.create(getUrl("/admin/show"), getUser(), getPassword().getPassword(), null)
 					.accept(MediaType.APPLICATION_JSON)
 					.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
 					.form(new Form()
 						.param("user", linOtpUser)
 						.param("session", getSessionId()));
-			if ( response.getStatus() != HttpStatus.SC_OK)
-				throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
-			
-			log.debug(response.getHeaderString("Content-Type"));
-			log.debug(response.getStatus());
-			log.debug(response.getStatusInfo().getReasonPhrase());
-			JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
-			JSONObject r;
-			if ( (r = result.optJSONObject("result")) != null)
-			{
-				if (r.getBoolean("status")) {
-					JSONArray data = r.getJSONObject("value").getJSONArray("data");
-					for (int i = 0; i< data.length(); i++)
-					{
-						JSONObject token = data.optJSONObject(i);
-						if (token != null && token.getBoolean("LinOtp.Isactive"))
+				if ( response.getStatus() != HttpStatus.SC_OK)
+					throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
+				log.debug(response.getHeaderString("Content-Type"));
+				log.debug(response.getStatus());
+				log.debug(response.getStatusInfo().getReasonPhrase());
+				JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
+				JSONObject r;
+				if ( (r = result.optJSONObject("result")) != null)
+				{
+					if (r.getBoolean("status")) {
+						JSONArray data = r.getJSONObject("value").getJSONArray("data");
+						for (int i = 0; i< data.length(); i++)
 						{
-							challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
-							challenge.setCell("Value");
-							if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
-
-								String pass = "";
-								String realm = "";
-
-								log.debug("validate/smspin");
-								log.debug("- getUser()="+getUser());
-								log.debug("- getPassword().getPassword()="+getPassword().getPassword());
-								log.debug("- user="+linOtpUser);
-								log.debug("- pass()="+pass);
-								log.debug("- realm()="+realm);
-								log.debug("- session="+getSessionId());
-
-								Response response2 =
-										WebClient
+							JSONObject token = data.optJSONObject(i);
+							if (token != null && token.getBoolean("LinOtp.Isactive"))
+							{
+								challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
+								challenge.setCell("Value");
+								if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
+									
+									String pass = "";
+									String realm = "";
+									
+									log.debug("validate/smspin");
+									log.debug("- getUser()="+getUser());
+									log.debug("- getPassword().getPassword()="+getPassword().getPassword());
+									log.debug("- user="+linOtpUser);
+									log.debug("- pass()="+pass);
+									log.debug("- realm()="+realm);
+									log.debug("- session="+getSessionId());
+									
+									Response response2 =
+											WebClient
 											.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
 											.accept(MediaType.APPLICATION_JSON)
 											.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
 											.form(new Form()
-												.param("user", linOtpUser)
-												.param("pass", "")
-												.param("realm", "")
-												.param("session", getSessionId()));
+													.param("user", linOtpUser)
+													.param("pass", "")
+													.param("realm", "")
+													.param("session", getSessionId()));
+								}
+								return challenge;
 							}
- 							return challenge;
+						}
+					}
+					else
+					{
+						JSONObject error = r.getJSONObject("error");
+						if (error != null)
+						{
+							String message = error.getString("message");
+							if (message != null && message.contains("MySQL server has gone away"))
+								retry = true;
 						}
 					}
 				}
-			}
-			log.debug(result.toString());
+				log.debug(result.toString());
+			} while (retry && attempts <= 3);
+			
 		}
 		
 		return challenge;
@@ -180,36 +197,63 @@ public class LinotpHandler implements OTPHandler {
 		{
 			log.debug("validatePin");
 			String linOtpUser = getLinotpUserName(challenge);
-			Response response =
-				WebClient
-					.create(getUrl("/validate"), getUser(), getPassword().getPassword(), null)
-					.accept(MediaType.APPLICATION_JSON)
-					.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
-					.form(new Form()
-						.param("user", linOtpUser)
-						.param("pass", pin)
-						.param("realm", "")
-						.param("session", getSessionId()));
-			if ( response.getStatus() != HttpStatus.SC_OK)
-				throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
-			
-			log.debug(response.getHeaderString("Content-Type"));
-			log.debug(response.getStatus());
-			log.debug(response.getStatusInfo().getReasonPhrase());
-			JSONObject result;
-			try {
-				result = new JSONObject( response.readEntity(String.class));
-			} catch (JSONException e) {
-				throw new InternalErrorException("Error decoding LinOTP response", e);
-			}
-			JSONObject r;
-			if ( (r = result.optJSONObject("result")) != null)
+			int attempts = 0;
+			boolean retry;
+			do
 			{
-				if (r.optBoolean("status") && r.optBoolean("value")) {
-					return true;
+				retry = false;
+				attempts++;
+				Response response =
+					WebClient
+						.create(getUrl("/validate"), getUser(), getPassword().getPassword(), null)
+						.accept(MediaType.APPLICATION_JSON)
+						.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
+						.form(new Form()
+							.param("user", linOtpUser)
+							.param("pass", pin)
+							.param("realm", "")
+							.param("session", getSessionId()));
+				if ( response.getStatus() == HttpStatus.SC_INTERNAL_SERVER_ERROR)
+					response = WebClient
+						.create(getUrl("/validate"), getUser(), getPassword().getPassword(), null)
+						.accept(MediaType.APPLICATION_JSON)
+						.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
+						.form(new Form()
+							.param("user", linOtpUser)
+							.param("pass", pin)
+							.param("realm", "")
+							.param("session", getSessionId()));
+				if ( response.getStatus() != HttpStatus.SC_OK)
+					throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
+				
+				log.debug(response.getHeaderString("Content-Type"));
+				log.debug(response.getStatus());
+				log.debug(response.getStatusInfo().getReasonPhrase());
+				JSONObject result;
+				try {
+					result = new JSONObject( response.readEntity(String.class));
+					JSONObject r;
+					if ( (r = result.optJSONObject("result")) != null)
+					{
+						if (r.optBoolean("status") && r.optBoolean("value")) {
+							return true;
+						}
+						else
+						{
+							JSONObject error = r.getJSONObject("error");
+							if (error != null)
+							{
+								String message = error.getString("message");
+								if (message != null && message.contains("MySQL server has gone away"))
+									retry = true;
+							}
+						}
+					}
+					log.debug(result.toString());
+				} catch (JSONException e) {
+					throw new InternalErrorException("Error decoding LinOTP response", e);
 				}
-			}
-			log.debug(result.toString());
+			} while (retry && attempts <= 3);
 		}
 		
 		return false;

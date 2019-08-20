@@ -408,7 +408,7 @@ public class SAMLServiceInternal {
 		// Marshall the Subject
 		Element xml = marshaller.marshall(entities);
 
-		return generateString(xml);
+		return generateString(xml, true);
 	}
 
 	private KeyInfo generateKeyInfo() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
@@ -499,7 +499,7 @@ public class SAMLServiceInternal {
 			
 			Element xml = sign (builderFactory, req);
 			
-			String xmlString = generateString(xml);
+			String xmlString = generateString(xml, false);
 			
 			r.getParameters().put("RelayState", newID);
 			r.getParameters().put("SAMLRequest", Base64.encodeBytes(xmlString.getBytes("UTF-8")));
@@ -615,13 +615,16 @@ public class SAMLServiceInternal {
 
 	}
 
-	private String generateString(Element xml)
+	private String generateString(Element xml, boolean pretty)
 			throws TransformerConfigurationException,
 			TransformerFactoryConfigurationError, TransformerException {
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+		if (pretty)
+		{
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+		}
 		
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(xml);
@@ -789,7 +792,7 @@ public class SAMLServiceInternal {
     	SAML20AssertionValidator validator = getValidator(hostName);
     	
     	HashMap<String, Object> params = new HashMap<String, Object>();
-    	LinkedList<String> names = new LinkedList<String>();
+    	HashSet<String> names = new HashSet<String>();
     	names.add(getEntityId(hostName, true));
     	names.add(getEntityId(hostName, false));
     	params.put(

@@ -507,6 +507,8 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 						com.soffid.iam.api.Password password = sss.queryAccountPasswordBypassPolicy(account);
 						if (password != null)
 							r.add(new String [] { account.getName(), account.getDescription(), password.toString(), url });
+						else
+							r.add(new String [] { account.getName(), account.getDescription(), "", url });
 					}
 					if (r.size() == 0)
 					{

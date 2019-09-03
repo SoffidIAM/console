@@ -57,4 +57,12 @@ public abstract class AgentManager {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void storeNewCertificate(X509Certificate cert, X509Certificate root) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Operation(grantees = { roles.base_log_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public String[] tailServerLog()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 }

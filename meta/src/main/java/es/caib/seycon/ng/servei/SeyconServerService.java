@@ -69,6 +69,13 @@ public abstract class SeyconServerService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.base_log_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public String[] tailServerLog(java.lang.String urlServer)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.monitor_server_list.class }, translated = "getPendingTasksInfo")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.SeyconServerInfo> getPendingTasksInfo()

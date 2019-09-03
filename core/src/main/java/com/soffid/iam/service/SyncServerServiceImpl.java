@@ -688,5 +688,23 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         }
 	}
 
+	@Override
+	protected String[] handleTailServerLog(String urlServer) throws Exception {
+        List<String> serv = getServerList();
+        
+        roundrobin ++;
+        for (int i = 0; i < serv.size(); i++) {
+        	String serverName = serv.get( (i + roundrobin) % serv.size());
+            try {
+                RemoteServiceLocator rsl = createRemoteServiceLocator(serverName);
+                SyncStatusService stats = rsl.getSyncStatusService();
+                
+                return stats.tailServerLog(urlServer);
+            } catch (Throwable e) {
+            }
+        }
+		return null;
+	}
+
 }
 

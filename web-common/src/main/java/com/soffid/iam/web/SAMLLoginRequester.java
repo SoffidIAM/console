@@ -138,7 +138,7 @@ public class SAMLLoginRequester extends HttpServlet {
 	private String getContext(HttpServletRequest req) {
 		String context = req.getContextPath();
 		if (context.isEmpty())
-			context = "/";
+			context = "/index.zul";
 		return context;
 	}
 }

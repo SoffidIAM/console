@@ -24,6 +24,13 @@
 		position="center,center" width="80%" use="com.soffid.iam.web.vault.AccountWindow">
 		<form id="form" dataPath="/model:/void" orient="vertical"
 			width="100%" style="padding: 10px">
+			<div id="accountTypeSelector" visible="false">
+				<label value="${c:l('accounts.selectAccountType')}"/>
+				<listbox checkmark="true" id="accountTypeSelectorListbox">
+					<listitem value="m" label="${c:l('accounts.managedAccount') }"></listitem> 
+					<listitem value="e" label="${c:l('accounts.externalAccount') }"></listitem> 
+				</listbox>
+			</div>
 			<tabbox id="panels" width="${amplaria2}"
 				class="thicktabbox">
 				<tabs>
@@ -61,8 +68,8 @@
 													multiline_custom="false" width_custom="95%" />
 												<textbox sclass="textbox"
 													id="txtAccountName2" 
-													bind="@loginName"
 													onChange="innerWindow.onChangeAccountName(self)"
+													bind="@loginName"
 													maxlength="128"
 													multiline="false" width="90%" />
 											</div>
@@ -130,14 +137,15 @@
 										<textbox
 											id="urlTextbox"
 											sclass="textbox" 
-											bind="@loginUrl"
 											maxlength="255"
-											multiline="false" width="100%"
-											onChange="innerWindow.onChangeLoginUrl(self)"
-											 >
+											bind="loginUrl"
+											multiline="false" width="100%" >
 											<attribute name="onChanging"><![CDATA[
 										    		self.setStyle("");
 											]]></attribute>
+											<attribute name="onChange">
+												<![CDATA[innerWindow.onChangeLoginUrl(self)]]>
+											</attribute>
 										</textbox>
 									</row>
 									<row id="serverRow">

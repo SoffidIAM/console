@@ -40,18 +40,21 @@ public class ConfigEntityDaoImpl extends
 		com.soffid.iam.model.ConfigEntityDaoBase {
 	
 	private void auditarConfiguracio(String accio, String parametre) {
-		String codiUsuari = Security.getCurrentAccount();
-		Audit auditoria = new Audit();
-		auditoria.setAuthor(codiUsuari);
-		auditoria.setAction(accio);
-		auditoria.setConfigurationParameter(parametre);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
-		auditoria.setObject("SC_CONFIG"); //$NON-NLS-1$
-
-		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
-		getAuditEntityDao().create(auditoriaEntity);
+		if ( parametre != null && !parametre.contains("addon.report"))
+		{
+			String codiUsuari = Security.getCurrentAccount();
+			Audit auditoria = new Audit();
+			auditoria.setAuthor(codiUsuari);
+			auditoria.setAction(accio);
+			auditoria.setConfigurationParameter(parametre);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
+			auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+			auditoria.setObject("SC_CONFIG"); //$NON-NLS-1$
+	
+			AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
+			getAuditEntityDao().create(auditoriaEntity);
+		}
 	}
 	
 	public void create(com.soffid.iam.model.ConfigEntity configuracio) throws RuntimeException {

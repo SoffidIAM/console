@@ -358,5 +358,12 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
-	
+	@Operation(translated="getPasswordExpiredDate")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Calendar getPasswordExpiredDate(
+		long user,
+		long passwordDomain)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 }

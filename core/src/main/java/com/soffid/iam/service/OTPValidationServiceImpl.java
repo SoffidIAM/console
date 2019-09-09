@@ -36,15 +36,11 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 	protected Challenge handleSelectToken(Challenge challenge) throws Exception {
 		for ( OTPHandler handler: handlers)
 		{
-			try {
-				Challenge ch = handler.selectToken(challenge);
-				if (ch.getCardNumber() != null)
-				{
-					ch.setOtpHandler(handler.getClass().getName());
-					return ch;
-				}
-			} catch (Throwable th) {
-				log.warn(th);
+			Challenge ch = handler.selectToken(challenge);
+			if (ch.getCardNumber() != null)
+			{
+				ch.setOtpHandler(handler.getClass().getName());
+				return ch;
 			}
 		}
 		return challenge;
@@ -55,4 +51,11 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 		handlers.add(handler);
 	}
 
+	@Override
+	protected boolean handleResetFailCount(String account) throws Exception {
+		for (OTPHandler handler: handlers) {
+			return handler.resetFailCount(account);
+		}
+		return false;
+	}
 }

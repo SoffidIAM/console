@@ -100,10 +100,10 @@ public class ConfigurationCache {
 	}
 
 	public static String getMasterProperty(String property) {
-		Tenant tenant;
+//		Tenant tenant;
 		try {
-    		tenant = ServiceLocator.instance().getTenantService ().getMasterTenant();
-			return getProperty (tenant.getName(), property);
+//    		tenant = ServiceLocator.instance().getTenantService ().getMasterTenant();
+			return getProperty ("master", property);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

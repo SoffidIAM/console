@@ -6,6 +6,10 @@
 	
 }
 
+body {
+	direction: {DIRECTION};
+}
+
 .title td, .title .caption td ,
 td.lwt-modal, td.lwt-highlighted, td.lwt-overlapped,
 td.mwt-modal, td.mwt-highlighted, td.mwt-overlapped,
@@ -319,7 +323,7 @@ button:hover, input[type="button"]:hover {
 
 /* Títols de les capceleres dels listbox, trees i grids */
 div.head-cell-inner {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: black; text-align: left;
+	font-family: Arial;	font-size: 11px; font-weight: normal; color: {GREENTEXT}; text-align: left;
 }
 	
 tr.odd {
@@ -334,7 +338,7 @@ div.listbox {
 
 /* Capçalera del listbox i del tree */
 div.listbox-head th, div.listbox-paging th, div.tree-head th, div.tree-paging th {
-	font-family: Arial;	font-size: 21px; color: black;	
+	font-family: Arial;	font-size: 21px; color: {GREENTEXT} ;	
 	background: {GREEN};
 	overflow: hidden;
 	border-top: none;

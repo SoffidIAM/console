@@ -294,14 +294,14 @@ div.whitetoolbar a {
 
 /* Home attribute name of user */
 div.cell-inner span.etiqueta {
-	color: {DARKBLUE};
+	color: {BLUEDARK};
 	font-weight: bold;
 	font-size: 14px
 }
 
 /* Home label additinal data component */
 div.cell-inner span.component-description {
-	color: {DARKBLUE};
+	color: {BLUEDARK};
 	font-size: 13px;
 	font-weight: normal;
 	font-style: italic;

@@ -52,7 +52,7 @@ public class ColorManager {
 		String blueText = ConfigurationCache.getProperty("soffid.ui.text2");
 		if (blueText == null) blueText = "#ffffff";
 
-		String skyText = ConfigurationCache.getProperty("soffid.ui.text2");
+		String skyText = ConfigurationCache.getProperty("soffid.ui.text3");
 		if (skyText == null) skyText = "#ffffff";
 		
 		c.setVariable("color1", green, true);

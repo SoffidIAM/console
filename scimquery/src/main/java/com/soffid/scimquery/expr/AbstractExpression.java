@@ -391,10 +391,19 @@ public abstract class AbstractExpression implements Serializable {
 		if (cl.isAssignableFrom(Collection.class))
 			return false;
 		
-		return cl.isPrimitive() ||
-				cl.getPackage().getName().startsWith("java.") ||
-				cl.getPackage().getName().startsWith("javax.") ||
-				cl.getName().equals("es.caib.seycon.ng.comu.AccountType");
+		try {
+			return cl.isPrimitive() ||
+					cl.getPackage().getName().startsWith("java.") ||
+					cl.getPackage().getName().startsWith("javax.") ||
+					(Serializable.class.isAssignableFrom(cl) &&
+						cl.getMethod("literals") != null &&
+						cl.getMethod("names") != null &&
+						cl.getMethod("fromString", String.class) != null);
+		} catch (NoSuchMethodException e) {
+			return false;
+		} catch (SecurityException e) {
+			return false;
+		}
 	}
 
 	public HQLQuery generateHSQLString (Class clazz) throws EvalException, UnsupportedEncodingException, ClassNotFoundException, JSONException

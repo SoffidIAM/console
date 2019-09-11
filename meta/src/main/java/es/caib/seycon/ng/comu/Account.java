@@ -100,7 +100,7 @@ public class Account {
 	public boolean disabled;
 
 	@Description("Account status: active / disabled / removed")
-	@Column (name="ACC_STATUS")
+	@JsonAttribute(hibernateAttribute="status")
 	@Nullable
 	public AccountStatus status;
 

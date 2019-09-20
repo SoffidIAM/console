@@ -29,7 +29,7 @@ public abstract class CSSTranslator extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String currentLocale = org.zkoss.util.Locales.getCurrent().getLanguage();
-		String direction = "ar".equals(currentLocale) ? "rtl": "ltr";
+		boolean rtl = "ar".equals(currentLocale) ;
 		
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
 		if (green == null) green = "#9ec73c";
@@ -70,7 +70,13 @@ public abstract class CSSTranslator extends HttpServlet {
 			.replaceAll("\\{SKYLIGHT\\}", skyLight)
 			.replaceAll("\\{SKYTEXT\\}", skyText)
 			.replaceAll("\\{SKY\\}", sky)
-			.replaceAll("\\{DIRECTION\\}", direction);
+			.replaceAll("\\{DIRECTION\\}", rtl? "rtl" : "ltr")
+			.replaceAll("\\{COLSORTER_POSITION\\}", rtl? "1%" : "99%")
+			.replaceAll("\\{TEXT_ALIGN_LEFT\\}", rtl? "right": "left")
+			.replaceAll("\\{TEXT_ALIGN_RIGHT\\}", rtl? "left": "right")
+			.replaceAll("\\{COLLAPSE_IMG\\}", rtl? "collapse-rtl": "collapse")
+			
+			;
 		
 		byte[] b = t.getBytes("UTF-8");
 		resp.setStatus(200);

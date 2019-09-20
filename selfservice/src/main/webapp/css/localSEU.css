@@ -73,14 +73,14 @@ div.z-loading-indicator {box-sizing: content-box;}
 
 .col_der, .col_izq, .col_cen {height: 100%;}
 .col_der {
-	float: right; 
-	text-align:right;
+	float: {TEXT_ALIGN_RIGHT}; 
+	text-align: {TEXT_ALIGN_RIGHT};
 	vertical-align:middle;
 	padding-right:5px;
 	padding-top: 10px;
 }
 .col_izq {
-	float: left;
+	float: {TEXT_ALIGN_LEFT};
 	vertical-align:middle;
 }
 .col_cen {
@@ -116,11 +116,11 @@ div.z-loading-indicator {box-sizing: content-box;}
 	white-space: nowrap;
 	text-align:center;
 	z-index: 32768;
-	float:left; /* per a alinear favorits */
+	float: {TEXT_ALIGN_LEFT}; /* per a alinear favorits */
 }
 
 .favorits {
-	float:left;	
+	float:{TEXT_ALIGN_LEFT};	
 	margin-left: 2px;
 	margin-top: 1px;
 	position: relative;
@@ -169,14 +169,14 @@ div.z-loading-indicator {box-sizing: content-box;}
 /* menú de inicio */
 .menuprincipal {
 	top: 35px !important;
-	left: 0px !important;
+	{TEXT_ALIGN_LEFT}: 0px !important;
 	position:absolute;	
 	border: 1px solid {SKY};
 }
 
 .menufavorits {
 	top: 29px !important;
-	left: 80px !important;
+	{TEXT_ALIGN_LEFT}: 80px !important;
 	position:absolute;	
 	border: 1px solid #BE6200;
 }
@@ -323,7 +323,7 @@ button:hover, input[type="button"]:hover {
 
 /* Títols de les capceleres dels listbox, trees i grids */
 div.head-cell-inner {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: {GREENTEXT}; text-align: left;
+	font-family: Arial;	font-size: 11px; font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
 }
 	
 tr.odd {
@@ -368,8 +368,8 @@ div.grid-head th div {
 div.listbox-head { background-color: {GREEN}; }
 
 /* Font del contingut del listbox i del tree (capçalera i files) */
-div.head-cell-inner, div.cell-inner {GREENTEXT}
-	font-family: Arial;	font-size: 11px; color: {}black; text-align: left;
+div.head-cell-inner, div.cell-inner {
+	font-family: Arial;	font-size: 11px; text-align: {TEXT_ALIGN_LEFT};
 }
 
 /* Fila del Listbox amb el cursor damunt (clar) */
@@ -647,19 +647,19 @@ div.frame-vertical-none div.record-form-shrinked { display: none;}
 div.listbox-head th.sort div.head-cell-inner,
 div.grid-head th.sort div.head-cell-inner {
 	background: transparent url(../zkau/web/img/sort_hint.png);
-	background-position: 99% center;
+	background-position: {COLSORTER_POSITION} center;
 	background-repeat: no-repeat;
 }
 
 div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner {
   background: transparent url(../zkau/web/img/sort_hint_up.png);
-  background-position: 99% center;
+  background-position: {COLSORTER_POSITION} center;
   background-repeat: no-repeat;
 }
 
 div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner {
   background: transparent url(../zkau/web/img/sort_hint_down.png);
-  background-position: 99% center;
+  background-position: {COLSORTER_POSITION} center;
   background-repeat: no-repeat;
 }
 
@@ -669,9 +669,9 @@ div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.
 
 .wc-overlapped {overflow-y: scroll}
 .vbox {margin-top:20px;margin-right:2px;background-color:#EEEEEE}
-button.vbuton {text-align:left;width:130px;margin:0 0 5px 0;padding:1px;}
-.pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer}
-.pue_img_noclick {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;}
+button.vbuton {text-align:{TEXT_ALIGN_LEFT};width:130px;margin:0 0 5px 0;padding:1px;}
+.pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer;width:30px;}
+.pue_img_noclick {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;}
 .pue_noimg {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;height:30px;background-color:lightgrey;cursor:pointer}
 .pue_noimg_noclick {border:1px solid gray;margin:10px 0;padding:3px;width:30px;height:30px;background-color:lightgrey;}
 .ticona td {vertical-align:middle;}
@@ -682,7 +682,7 @@ button.pue {padding: 1px !important;}
 div.modal_mask {background-color: white;}
 div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {SKY}; background: #FFF;}
 .text-disd {color:#000 !important;}
-.titol_tancar_back {padding: 4px; float:right; border: 1px solid #BE6200; background-color:#EEEEEE;}
+.titol_tancar_back {padding: 4px; float:{TEXT_ALIGN_RIGHT}; border: 1px solid #BE6200; background-color:#EEEEEE;}
 .titol_tancar, .titol_tancar_fletxa {
 	font-family: sans-serif; font-size: 11px; font-weight: bold; color: #BE6200; cursor: pointer; 
 }
@@ -696,7 +696,7 @@ div.head-cell-inner, div.cell-inner,
 }
 
 .titol_tancar_back:hover {background-color:#FFF7EE;}
-div.head-cell-inner {text-align:left;}
+div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
 .dateboxinp  {
 	font-size: 11px;
 	padding-left: 2px;
@@ -846,7 +846,7 @@ tr.seld td.UNKNOWN {
 
 .inputlogin{
 	padding: 0 0 0 10px;
-	text-align: right;
+	text-align: {TEXT_ALIGN_RIGHT};
 	margin-right: 50px;
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -961,7 +961,7 @@ tr.seld td.UNKNOWN {
 }
 
 .col_izq {
-	float: left;
+	float: {TEXT_ALIGN_LEFT};
 	vertical-align:middle;
 }
 
@@ -979,7 +979,7 @@ tr.seld td.UNKNOWN {
 	white-space: nowrap;
 	text-align:center;
 	z-index: 32768;
-	float:left; /* per a alinear favorits */
+	float: {TEXT_ALIGN_LEFT}; /* per a alinear favorits */
 }
 /* Titol principal */
 
@@ -1251,7 +1251,7 @@ div.CodeMirror-linenumber {font-size: 12px}
 }
 
 .button-container .buttons {
-	text-align: right;
+	text-align: {TEXT_ALIGN_RIGHT};
 }
 
 span.search-box ul li {
@@ -1544,24 +1544,26 @@ div.tree-head th, div.listbox-head th, div.grid-head th
 	vertical-align: top;
 }
 div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
-	 {
+{
 	cursor: pointer; padding-right: 9px;
 	background:transparent url(../zkau/web/zul/img/sort/v_hint.gif);
-	background-position: 99% center;
+	background-position: {COLSORTER_POSITION} center;
 	background-repeat: no-repeat;
 }
-div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner
-	 {
+
+div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
+{
 	cursor: pointer; padding-right: 9px;
-	background:transparent url(../zkau/web/zul/img/sort/v_asc.gif);
-	background-position: 99% center;
+	background:transparent url(../zkau/web/zul/img/sort/v_hint.gif);
+	background-position: {COLSORTER_POSITION} center;
 	background-repeat: no-repeat;
 }
+
 div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner
 	 {
 	cursor: pointer; padding-right: 9px;
 	background:transparent url(../zkau/web/zul/img/sort/v_dsc.gif);
-	background-position: 99% center;
+	background-position: {COLSORTER_POSITION} center;
 	background-repeat: no-repeat;
 }
 div.tree-body, div.listbox-body, div.grid-body {
@@ -1702,7 +1704,7 @@ div.record-form > div > img.imageclic {
 
 .roundedWindow {
 	border-radius: 7px;
-	border: solid #22B9D8 7px;
+	border: solid {SKY} 7px;
 	background-color: white;
 	animation-name: appear;
 	animation-duration: 0.7s;
@@ -1755,9 +1757,10 @@ select.listbox {
   background-repeat: no-repeat;
 }
 
-select.listbox select::-ms-expand{
+select.listbox::-ms-expand {
     display: none;
 }
+
 
 select.listbox:disabled {
     background: white;
@@ -1772,7 +1775,7 @@ select.classic:focus {
 div.attributeSearchPopup {
     border: solid 2px #AAB;
     z-index: 10;
-    float: left;
+    float: {TEXT_ALIGN_LEFT};
     margin-top: 20px;
     position: absolute;
     min-width: 150px;
@@ -1784,11 +1787,12 @@ div.attributeSearchPopup {
 div.inputField {
 	display: table-row
 }
+
 span.inputField_label {
 	display: table-cell;
-	width: 12px;
+	width: 120px;
 	vertical-align: top;
-	padding-top: 4px;
+	padding-top: 4px
 }
 			
 div.inputField_input {
@@ -1798,18 +1802,25 @@ div.inputField_input {
 	padding-bottom: 2px;
 }
 			
+span.inputField_tail {
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 4px
+}
+			
+
 span.separator_label {
 	color: {BLUE};
 	font-weight: bold;
 	padding-top: 15px;
 }
-
+			
 .appatt {display: table; padding: 0px; width: 100%}
 .appatt_row {display: table-row}
 .appatt_row span {}
 .appatt_label {display: table-cell; width: 202px}
 .appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
-.appatt_input table th:first-child {width: 320px;}
+.appatt_input table th:first-child {width: 340px;}
 .appatt_input > div.listbox {padding-bottom: 20px;}
 .appatt_input table.listbox-btable tr {height: 20px;}
 
@@ -1818,7 +1829,7 @@ span.separator_label {
 .roleatt_row div {padding-top: 5px}
 .roleatt_label {display: table-cell; width: 200px}
 .roleatt_input {display: table-cell}
-.roleatt_input table th:first-child {width: 320px;}
+.roleatt_input table th:first-child {width: 340px;}
 .roleatt_input > div.listbox {padding-bottom: 20px;}
 .roleatt_input table.listbox-btable tr {height: 20px;}
 
@@ -1856,8 +1867,15 @@ span.separator_label {
 .objectatt_input > div.listbox {padding-bottom: 20px;}
 .objectatt_input table.listbox-btable tr {height: 20px;}
 
-
 .messagebox {
     word-break: break-word;
     overflow: auto;
 }
+
+div.fixedToolbar {
+	position: fixed; width: 100%; left: 0; top: 35px; display: none; z-index: 10;
+    border-top: none;
+    border-bottom: 2px solid white;
+    padding: 0px;
+}
+

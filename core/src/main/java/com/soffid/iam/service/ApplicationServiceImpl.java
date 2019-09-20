@@ -865,7 +865,7 @@ public class ApplicationServiceImpl extends
            		else if (accounts.size() == 0)
            		{
            			User usu = getUserService().findUserByUserName(inital.getUserCode());
-           			SystemEntity dispatcher = getSystemEntityDao().findByName(inital.getSystem());
+           			SystemEntity dispatcher = getSystemEntityDao().findByName(ra.getSystem());
            			if (dispatcher == null)
            				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UnknownSystem"), 
            						inital.getSystem()));
@@ -1038,6 +1038,7 @@ public class ApplicationServiceImpl extends
 					pi.getContextInstance().createVariable("requesterAccount", Security.getCurrentAccount());
 					pi.getContextInstance().createVariable("requesterUser", Security.getCurrentUser());
 					pi.getContextInstance().createVariable("action", action);
+					// For new workflow interface
 					pi.signal();
 					ctx.save(pi);
 					
@@ -1352,7 +1353,7 @@ public class ApplicationServiceImpl extends
     }
 
     protected Collection<RoleAccount> handleFindUserRolesHistoryByUserName(String codiUsuari) throws Exception {// desde usuaris.zul para ver qué roles puede
-    	return internalFindUserRolesByUserName (codiUsuari, false, true);
+    	return internalFindUserRolesByUserName (codiUsuari, true, true);
     }
 
     private Collection<RoleAccount> internalFindUserRolesByUserName(String codiUsuari, boolean sod, boolean history) throws InternalErrorException {
@@ -1362,7 +1363,9 @@ public class ApplicationServiceImpl extends
     		// Filtrem per autoritzacions
     		List<RoleAccount> ra = new LinkedList<RoleAccount>();
     		for (RoleAccountEntity rae : rolusus) {
-    			if ( history || (rae.isEnabled() && shouldBeEnabled(rae))) {
+    			if ( history || 
+    					(rae.isEnabled() && shouldBeEnabled(rae)) ||
+    					(!history && rae.isApprovalPending())) {
     				if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_QUERY, rae)) 
     					ra.add(getRoleAccountEntityDao().toRoleAccount(rae));
     			}

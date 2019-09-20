@@ -244,7 +244,7 @@ public class LoginServiceImpl implements LoginService {
     		if (grant.getSystem().equals(soffidSystem.getName()))
     			result.add(grant.getRoleName());
     		result.add(grant.getRoleName()+"@"+grant.getSystem());
-    		if (grant.isHasDomain())
+    		if (grant.getDomainValue() != null)
     		{
     			if (grant.getSystem().equals(soffidSystem.getName()))
     				result.add(grant.getRoleName()+"/"+grant.getDomainValue());

@@ -179,6 +179,9 @@ public class VOFactory {
 				process.setVariables(instance.getContextInstance().getVariables());
 				if (process.getVariables() == null)
 					process.setVariables(new HashMap<String, Object>());
+			} catch (Throwable th) {
+				log.warn("Error deserializing process",th);
+				process.setVariables(new HashMap<String, Object>());
 			} finally {
 				Thread.currentThread().setContextClassLoader(oldcl);
 			}

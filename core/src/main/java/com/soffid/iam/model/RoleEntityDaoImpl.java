@@ -304,6 +304,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		for ( RoleDependencyEntity grantEntity: currentGrants)
 		{
 			deleteRolDependency(grantEntity);
+			entity.getContainerRoles().remove (grantEntity);
 		}
 	}
 	 
@@ -373,6 +374,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		{
 			deleteRolDependency(grantEntity);
 			anyChange = true;
+			entity.getContainedRoles().remove (grantEntity);
 		}
 		return anyChange;
 	}
@@ -1523,7 +1525,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             	forcePropagation = updateGrantedRoles(role, entity);
 
             updateGranteeGroups(role, entity);
-
+            
             getSession(false).flush();
             auditarRol("U", entity.getName(), entity.getInformationSystem().getName(), entity //$NON-NLS-1$
                     .getSystem().getName());

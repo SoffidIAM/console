@@ -173,7 +173,7 @@ public class LinotpHandler implements OTPHandler {
 					}
 					else
 					{
-						JSONObject error = r.getJSONObject("error");
+						JSONObject error = r.optJSONObject("error");
 						if (error != null)
 						{
 							String message = error.getString("message");

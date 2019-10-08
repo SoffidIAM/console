@@ -356,7 +356,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkiblaf</artifactId>
-        <version>1.24</version>
+        <version>1.25</version>
       </dependency>
       <dependency>
         <groupId>com.soffid.zkib</groupId>
@@ -414,7 +414,7 @@
     <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.25-SNAPSHOT</zkiblaf.version>
+    <zkiblaf.version>1.25</zkiblaf.version>
     <zkdb.version>1.42-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>

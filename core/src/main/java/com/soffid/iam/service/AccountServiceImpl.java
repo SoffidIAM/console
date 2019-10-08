@@ -96,7 +96,8 @@ import es.caib.seycon.ng.sync.servei.SyncStatusService;
 
 public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBase implements ApplicationContextAware
 {
-
+	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
+			
 	private ApplicationContext applicationContext;
 
 	private UserEntity getUser(String usuari) throws InternalErrorException {
@@ -520,54 +521,57 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		// Remove grants
 		for (Iterator<AccountAccessEntity> aclIterator = acc.getAcl().iterator(); aclIterator.hasNext(); ) {
             AccountAccessEntity access = aclIterator.next();
-            for (int index = 0; index < levels.length; index++) {
-                if (levels[index] == access.getLevel()) {
-                    boolean found = false;
-                    if (access.getGroup() != null) {
-                        for (Iterator<Group> it = newgrups[index].iterator(); !found && it.hasNext(); ) {
-                            Group g = it.next();
-                            if (g.getId().equals(access.getGroup().getId())) {
-                                it.remove();
-                                found = true;
-                            }
-                        }
-                    } else if (access.getRole() != null) {
-                        for (Iterator<Role> it = newroles[index].iterator(); !found && it.hasNext(); ) {
-                            Role r = it.next();
-                            if (r.getId().equals(access.getRole().getId())) {
-                                it.remove();
-                                found = true;
-                            }
-                        }
-                    } else if (access.getUser() != null) {
-                        for (Iterator<User> it = newusers[index].iterator(); !found && it.hasNext(); ) {
-                            User u = it.next();
-                            if (u.getId().equals(access.getUser().getId())) {
-                                it.remove();
-                                found = true;
-                            }
-                        }
-                    }
-                    if (!found) {
-                    	anyChange = true;
-
-                        notifyAccountPasswordChange(access.getAccount(), access.getGroup(), access.getRole(), access.getUser());
-                        if ( ConfigurationCache.isHistoryEnabled())
-                        {
-                        	if ( ! Boolean.TRUE.equals(access.getDisabled()))
-                        	{
-                        		access.setDisabled(true);
-                        		access.setEnd(new Date());
-                        		getAccountAccessEntityDao().update(access);
-                        	}
-                        }
-                        else
-                        {                        	
-                        	aclIterator.remove();
-                        	getAccountAccessEntityDao().remove(access);
-                        }
-                    }
-                }
+            if ( ! Boolean.TRUE.equals(access.getDisabled()))
+            {
+	            for (int index = 0; index < levels.length; index++) {
+	                if (levels[index] == access.getLevel()) {
+	                    boolean found = false;
+	                    if (access.getGroup() != null) {
+	                        for (Iterator<Group> it = newgrups[index].iterator(); !found && it.hasNext(); ) {
+	                            Group g = it.next();
+	                            if (g.getId().equals(access.getGroup().getId())) {
+	                                it.remove();
+	                                found = true;
+	                            }
+	                        }
+	                    } else if (access.getRole() != null) {
+	                        for (Iterator<Role> it = newroles[index].iterator(); !found && it.hasNext(); ) {
+	                            Role r = it.next();
+	                            if (r.getId().equals(access.getRole().getId())) {
+	                                it.remove();
+	                                found = true;
+	                            }
+	                        }
+	                    } else if (access.getUser() != null) {
+	                        for (Iterator<User> it = newusers[index].iterator(); !found && it.hasNext(); ) {
+	                            User u = it.next();
+	                            if (u.getId().equals(access.getUser().getId())) {
+	                                it.remove();
+	                                found = true;
+	                            }
+	                        }
+	                    }
+	                    if (!found) {
+	                    	anyChange = true;
+	
+	                        notifyAccountPasswordChange(access.getAccount(), access.getGroup(), access.getRole(), access.getUser());
+	                        if ( ConfigurationCache.isHistoryEnabled())
+	                        {
+	                        	if ( ! Boolean.TRUE.equals(access.getDisabled()))
+	                        	{
+	                        		access.setDisabled(true);
+	                        		access.setEnd(new Date());
+	                        		getAccountAccessEntityDao().update(access);
+	                        	}
+	                        }
+	                        else
+	                        {                        	
+	                        	aclIterator.remove();
+	                        	getAccountAccessEntityDao().remove(access);
+	                        }
+	                    }
+	                }
+	            }
             }
         }
 		// Add new groups
@@ -851,12 +855,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return;
 		
 		Collection<RoleGrant> perms = getApplicationService().findEffectiveRoleGrantByUser(ue.getId());
+        List<AccountEntity> accounts = getAccountEntityDao().findByUser(ue.getId());
 		
 		SystemEntityDao disDao = getSystemEntityDao();
 		for (SystemEntity disEntity : disDao.loadAll()) {
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
-                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, disEntity.getName());
-                for (AccountEntity acc : accs) {
+                for (AccountEntity acc : accounts) if (acc.getSystem() == disEntity) {
                     if (acc.getStatus() == AccountStatus.DISABLED && "S".equals(ue.getActive())) {
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
@@ -873,9 +877,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 }
             } else if (disEntity.isMainSystem() || disEntity.getUrl() != null) {
                 com.soffid.iam.api.System dis = disDao.toSystem(disEntity);
-                List<AccountEntity> accs = getAccountEntityDao().findByUserAndSystem(user, dis.getName());
                 String description = ue.getUserName() + " - " + ue.getFullName();
                 if (description.length() > 50) description = description.substring(0, 47) + "...";
+                LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
+                for (AccountEntity account: accounts)
+                	if (account.getSystem() == disEntity)
+                		accs.add(account);
                 if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user, perms)) {
                     if (accs.isEmpty()) {
                         try {
@@ -1567,6 +1574,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			log.setActorId(Security.getCurrentUser());
 			li.startCompositeLog(log);
 			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
+			pi.getContextInstance().createVariable("requesterFullName", Security.getSoffidPrincipal().getFullName());
 			pi.getContextInstance().createVariable("account", acc.getId());
 			pi.getContextInstance().createVariable("accountSystem", acc.getSystem());
 			pi.getContextInstance().createVariable("accountName", acc.getName());

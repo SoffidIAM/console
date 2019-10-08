@@ -1752,13 +1752,10 @@ public class ApplicationServiceImpl extends
     private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup) {
     	if (type == NONE)
     		return;
-    	
-    	for (UserAccountEntity uac: user.getAccounts())
+
+    	for (AccountEntity account: getAccountEntityDao().findByUser(user.getId()))
     	{
-    		if (uac.getAccount().getType().equals (AccountType.USER))
-    		{
-    			populateAccountRoles (rad, type, uac.getAccount(), user, holderGroup);
-    		}
+   			populateAccountRoles (rad, type, account, user, holderGroup);
     	}
     	
     	if (type == INDIRECT || type == ALL)

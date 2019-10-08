@@ -34,6 +34,11 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	private IndexerThread indexerThread;
 
 	public void start() {
+		start(true);
+	}
+
+	@Override
+	public void start(boolean delayed) {
 		try {
 			log.info("Starting");
 
@@ -49,7 +54,13 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 			indexerThread = new IndexerThread();
 			indexerThread.setDelay(scheduledInterval);
 
-			new DelayedThread().start();
+			if (delayed)
+			{
+				new DelayedThread().start();
+			} else {
+				scheduler.start();
+				indexerThread.start();
+			}
 			log.info("Started");
 		} catch (Throwable e) {
 			log.warn("Cannot start JBPM async thread", e);
@@ -75,9 +86,14 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 		}
 	}
 
+	@Override
+	public boolean isStarted () {
+		return scheduler != null && scheduler.isStarted();
+	}
 	/**
 	 * @return the scheduledInterval
 	 */
+	@Override
 	public int getScheduledInterval() {
 		return scheduledInterval;
 	}
@@ -86,6 +102,7 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	 * @param scheduledInterval
 	 *            the scheduledInterval to set
 	 */
+	@Override
 	public void setScheduledInterval(int scheduledInterval) {
 		this.scheduledInterval = scheduledInterval;
 	}
@@ -93,6 +110,7 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	/**
 	 * @return the maxScheduledInterval
 	 */
+	@Override
 	public int getMaxScheduledInterval() {
 		return maxScheduledInterval;
 	}
@@ -101,6 +119,7 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	 * @param maxScheduledInterval
 	 *            the maxScheduledInterval to set
 	 */
+	@Override
 	public void setMaxScheduledInterval(int maxScheduledInterval) {
 		this.maxScheduledInterval = maxScheduledInterval;
 	}
@@ -108,6 +127,7 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	/**
 	 * @return the schedulerThreads
 	 */
+	@Override
 	public int getSchedulerThreads() {
 		return schedulerThreads;
 	}
@@ -116,6 +136,7 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	 * @param schedulerThreads
 	 *            the schedulerThreads to set
 	 */
+	@Override
 	public void setSchedulerThreads(int schedulerThreads) {
 		this.schedulerThreads = schedulerThreads;
 	}

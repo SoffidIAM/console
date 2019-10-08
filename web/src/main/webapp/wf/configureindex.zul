@@ -174,5 +174,37 @@
 			<label value="${c:l('configure.reindex')}"/>
 			<button label="${c:l('configure.reindexBtn')}" onClick="ui.reindex()"/>
 		</hbox>
+
+		
+		<div sclass="titolpagina">
+			<label value="${c:l('configure.taskScheduler') }:"></label>
+		</div>
+		<grid>
+			<rows>
+				<row>
+					<label value="${c:l('configure.status') }:"></label>
+					<label id="statusLabel"/>
+				</row>
+				<row>
+					<label value="${c:l('configure.threads') }:"/>
+					<intbox id="threads"/>
+				</row>
+				<row>
+					<label value="${c:l('configure.interval') }:"/>
+					<intbox id="interval"/>
+				</row>
+				<row>
+					<label/>
+					<hbox>
+						<button label="${c:l('configure.stop')}" id="stop"
+							onClick="ui.stopJobExecutor()"/>
+						<button label="${c:l('configure.start')}" id="start"
+							onClick="ui.startJobExecutor()"/>
+					</hbox>
+				</row>
+			</rows>
+			
+		</grid>
+		
 	</frame>
 </zk>

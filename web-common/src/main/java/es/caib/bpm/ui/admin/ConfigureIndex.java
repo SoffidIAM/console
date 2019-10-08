@@ -10,19 +10,24 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Fileupload;
+import org.zkoss.zul.Intbox;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.doc.exception.NASException;
+import com.soffid.iam.service.workflow.JbpmSchedulerServiceInterface;
 
 import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.seycon.ng.EJBLocator;
@@ -34,7 +39,6 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class ConfigureIndex extends Frame
 {
-	
 	private static final long serialVersionUID = 1L;
 	private Textbox txt;
 	private Listbox selected;
@@ -43,11 +47,65 @@ public class ConfigureIndex extends Frame
 	private Textbox tempPath;
 	private Textbox user;
 	private Textbox password;
+	private Button stop;
+	private Button start;
+	private Intbox threads;
+	private Intbox interval;
+	private Label status;
+	private JbpmSchedulerServiceInterface ejb;
 
 	public void onCreate () throws Exception
 	{
+		ejb = getJobSchedulerEjb();
+		status = (Label) getFellow("statusLabel");
+		interval = (Intbox) getFellow("interval");
+		threads = (Intbox) getFellow("threads");
+		start = (Button) getFellow("start");
+		stop = (Button) getFellow("stop");
 		getDocumentManagerSettings();
 		getIndexSettings();
+		getJobExecutorStatus();
+	}
+
+	private void getJobExecutorStatus() throws NamingException {
+		if (ejb.isStarted())
+		{
+			status.setValue(Labels.getLabel("configure.started"));
+			status.setStyle("color: green");
+			threads.setDisabled(true);
+			interval.setDisabled(true);
+			start.setVisible(false);
+			stop.setVisible(true);
+		} else {
+			status.setValue(Labels.getLabel("configure.stopped"));
+			status.setStyle("color: red");
+			threads.setDisabled(false);
+			interval.setDisabled(false);
+			start.setVisible(true);
+			stop.setVisible(false);
+		}
+		interval.setValue(ejb.getScheduledInterval()/1000);
+		threads.setValue(ejb.getSchedulerThreads());
+	}
+
+	public void startJobExecutor() throws NamingException {
+		ejb.setScheduledInterval(interval.getValue() == null ? 30000 : 1000 * interval.getValue().intValue());
+		ejb.setMaxScheduledInterval(interval.getValue() == null ? 30000 : 1000 * interval.getValue().intValue());
+		ejb.setSchedulerThreads(threads.getValue() == null ? 1 : threads.getValue().intValue());
+		if ( ! ejb.isStarted())
+			ejb.start(false);
+		getJobExecutorStatus();
+	}
+	
+	public void stopJobExecutor() throws NamingException, InterruptedException {
+		if (ejb.isStarted())
+			ejb.stop();
+		getJobExecutorStatus();
+	}
+
+	public JbpmSchedulerServiceInterface getJobSchedulerEjb() throws NamingException {
+		return (JbpmSchedulerServiceInterface) new InitialContext()
+				.lookup("openejb:/local/JbpmSchedulerServiceLocal");
 	}
 
 	public void configure () throws IOException, CreateException,

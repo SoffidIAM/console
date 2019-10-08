@@ -7,7 +7,7 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?component name="input_password" macro-uri="comu/input_password.zul"?>
 
-<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+<frame xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<datamodel id="model" rootNode="parametres" src="descriptorParametre.xml"/>
 	<datamodel id="samlmodel" class="com.soffid.web.saml.SamlDataModel"/>
@@ -686,4 +686,4 @@
 	</tabbox>
 
 	<include src="xarxesllista.zul"/>
-</zk>
+</frame>

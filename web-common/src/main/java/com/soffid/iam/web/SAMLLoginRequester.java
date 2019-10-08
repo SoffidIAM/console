@@ -116,7 +116,7 @@ public class SAMLLoginRequester extends HttpServlet {
 		log.info("Receiving SAML response");
 		String hostName = new TenantExtractor().getTenant(req);
 		
-		String context = getContext(req);
+		String context = getRedirectPage(req);
 		
 		Map<String,String> params = new HashMap<String, String>();
 		for ( Enumeration e = req.getParameterNames(); e.hasMoreElements(); )
@@ -136,6 +136,13 @@ public class SAMLLoginRequester extends HttpServlet {
 	}
 
 	private String getContext(HttpServletRequest req) {
+		String context = req.getContextPath();
+		if (context.isEmpty())
+			context = "/";
+		return context;
+	}
+
+	private String getRedirectPage(HttpServletRequest req) {
 		String context = req.getContextPath();
 		if (context.isEmpty())
 			context = "/index.zul";

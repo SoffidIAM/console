@@ -25,6 +25,11 @@ public abstract class SoDRuleEntity {
 	@Column (name="SOD_RISK")
 	public es.caib.seycon.ng.comu.SoDRisk risk;
 
+	@Column (name="SOD_NUMBER")
+	@Description("Number of roles to match to trigger the risk")
+	@Nullable
+	public Integer number;
+
 	@Column (name="SOD_APL_ID")
 	public es.caib.seycon.ng.model.AplicacioEntity application;
 	

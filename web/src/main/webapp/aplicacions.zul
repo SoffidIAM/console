@@ -1032,13 +1032,17 @@ void removeSodRule (Component button)
 								onSelect="selectSodRule()">	
 								<treecols>
 									<treecol label="Rule" />
-									<treecol label="Level" />
+									<treecol label="#Roles to match" width="100px"/>
+									<treecol label="Level"  width="100px"/>
 									<treecol label="Actions" />
 								</treecols>
 								<treeitemfinder bind="." open="true" path="/sodRule">
 									<treerow>
 										<treecell>
-											<textbox bind="@name" maxlength="150" width="90%"/>
+											<textbox bind="@name" maxlength="150" width="90%" onChange=""/>
+										</treecell>
+										<treecell>
+											<intbox bind="@number" width="90%" onChange=""/>
 										</treecell>
 										<treecell>
 											<listbox bind="@risk" dataPath="/model:/risk" mold="select">

@@ -15,6 +15,9 @@ public class SoDRule {
 
 	public java.lang.String name;
 
+	@Nullable
+	public Integer number;
+
 	public es.caib.seycon.ng.comu.SoDRisk risk;
 
 	public java.lang.Long applicationId;

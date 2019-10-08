@@ -180,7 +180,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		LinkedList<RoleGrant> targetList = null;
 		for (RoleAccount rolAccount : ra) {
             RoleEntity role = getRoleEntityDao().findByNameAndSystem(rolAccount.getRoleName(), rolAccount.getSystem());
-            if (role != null && !role.getSodRules().isEmpty()) {
+            if (role != null) {
                 if (targetList == null) {
                     targetList = generateTargetList(ra, rolAccount);
                 }
@@ -272,7 +272,9 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		List<SoDRuleEntity> rules = new LinkedList<SoDRuleEntity>();
 		for (SoDRoleEntity sourceSodRole : role.getSodRules()) {
             SoDRuleEntity rule = sourceSodRole.getRule();
-            if (!rule.getRoles().isEmpty()) {
+            if ((rule.getNumber() == null || rule.getNumber().intValue() > 0) && 
+            		(!rule.getRoles().isEmpty())) {
+            	int failures = rule.getNumber() == null ? 0 : rule.getRoles().size() - rule.getNumber().intValue();
                 boolean add = true;
                 for (SoDRoleEntity targetSodRole : rule.getRoles()) {
                     if (targetSodRole.getId().equals(sourceSodRole.getId())) {
@@ -285,8 +287,13 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                             }
                         }
                         if (!found) {
-                            add = false;
-                            break;
+                        	if (failures > 0)
+                        		failures --;
+                        	else
+                        	{
+	                            add = false;
+	                            break;
+                        	}
                         }
                     }
                 }

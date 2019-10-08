@@ -128,6 +128,19 @@ public abstract class AccountEntity {
 		return null;
 	}
 
+	@Operation()
+	@DaoFinder("select acc\n"
+			+ "from   com.soffid.iam.model.AccountEntity acc\n"
+			+ "left join     acc.users as users\n"
+			+ "left join     users.user as user\n"
+			+ "where acc.type='U' and user.id = :userId  "
+			+ "order by acc.name")
+	public java.util.List<es.caib.seycon.ng.model.AccountEntity> findByUser(
+			Long userId) {
+		return null;
+	}
+
+
 	@Operation(translated = "findByUserAndSystem")
 	@DaoFinder("select acc\n"
 			+ "from   com.soffid.iam.model.AccountEntity acc\n"

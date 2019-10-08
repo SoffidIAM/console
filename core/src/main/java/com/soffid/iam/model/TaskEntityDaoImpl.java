@@ -267,7 +267,6 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	 */
 	@Override
     protected void handleCreateNoFlush(TaskEntity tasque) throws Exception {
-    	log.info("Creatinc task "+tasque.getTransaction());
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
 		if ("readonly".equals( status ) || "manual".equals( status ))
 			return;

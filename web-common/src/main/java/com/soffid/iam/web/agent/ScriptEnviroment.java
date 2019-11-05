@@ -90,7 +90,7 @@ public class ScriptEnviroment {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("{\"serverService\":\"es.caib.seycon.ng.sync.servei.ServerService\","
-				+ "\"remoteServiceLocator\":\"cam.soffid.iam.remote.RemoteServiceLocator\","
+				+ "\"remoteServiceLocator\":\"com.soffid.iam.remote.RemoteServiceLocator\","
 				+ "\"serviceLocatorV1\":\"es.caib.seycon.ng.ServiceLocator\","
 				+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\",\"dispatcherService\":\"es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject\"");
 

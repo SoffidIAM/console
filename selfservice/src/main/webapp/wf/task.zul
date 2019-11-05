@@ -4,7 +4,7 @@
 <?component name="attachments" macroURI="task/attachments.zul" inline="true"?>
 <?component name="comments" macroURI="task/comments.zul" inline="true"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-	<frame id="ui" use="es.caib.bpm.ui.task.TaskUI" width="100%">
+	<frame id="ui" use="es.caib.bpm.ui.task.TaskUI" width="100%" onIdentity="ui.onIdentity(event.data)">
 		<style>
 			.redtab a {color:red}
 			.redtab.tabsel a {color: #9EC73C};
@@ -73,6 +73,7 @@
 		<include src="aplicacionsllista.zul" />
 		<include src="customObjectsllista.zul" />
 		<include src="rolsllista.zul" />
+		<include src="finestres/identity.zul" />
 
 	</frame>
 </zk>

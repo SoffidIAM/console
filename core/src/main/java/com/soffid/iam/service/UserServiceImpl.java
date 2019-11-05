@@ -451,6 +451,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (ConfigurationCache.isHistoryEnabled())
 		{
 			UserGroupEntity uge = getUserGroupEntityDao().newUserGroupEntity();
+			uge.setUser(usuariEntity);
 			uge.setGroup(usuariEntity.getPrimaryGroup());
 			uge.setDisabled(Boolean.TRUE);
 			uge.setStart(new Date());

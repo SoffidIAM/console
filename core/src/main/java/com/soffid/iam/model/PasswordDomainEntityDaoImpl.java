@@ -102,6 +102,9 @@ public class PasswordDomainEntityDaoImpl
 	@Override
     public void remove(PasswordDomainEntity entity) {
     	audit ("D", entity); //$NON-NLS-1$
+    	getSession().createQuery("delete from com.soffid.iam.model.PasswordEntity where domain.id=:domain")
+    		.setParameter("domain", entity.getId())
+    		.executeUpdate();
 		super.remove(entity);
 	}
 

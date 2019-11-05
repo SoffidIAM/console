@@ -62,7 +62,7 @@ public abstract class UsuariEntity {
 	@Column(name = "USU_PRILLI", length = 50, translated = "lastName")
 	public java.lang.String primerLlinatge;
 
-	@Column(name = "USU_NOMCUR", length = 25, translated = "shortName")
+	@Column(name = "USU_NOMCUR", length = 100, translated = "shortName")
 	@Nullable
 	public java.lang.String nomCurt;
 

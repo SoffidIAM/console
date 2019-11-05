@@ -7,17 +7,50 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <?component name="input_password" macro-uri="comu/input_password.zul"?>
 <?component name="accountMetadata" macro-uri="agent/account_metadata.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml">
-
+<frame xmlns:h="http://www.w3.org/1999/xhtml">  
 	<style>
 		.tcoth div {text-align:center !important;} tr.seld td
 		div.cell-inner input.text { background-color: #D3D3D3; }
 		.readonly {background-color: transparent !important}
+		
+		div.method-collapsed-div div.grid {
+			max-height:48px;
+			overflow: hidden;
+		}
+
+		div.method-full-div div.grid {
+			max-height: inherit;
+			overflow: hidden;
+		}
+		
+		div.method-collapse-button-div {
+			text-align: center;
+		}
+
+		div.method-collapse-button-div:hover {
+			background-color: #c0c0c0;
+		}
+		
 	</style>
 
 	<zscript src="comu/netejaCriteris.zul"/>
 	<zscript src="comu/checkTruncatedResults.zul"/>
 
+	<script>
+	function collapse(id) {
+		e = document.getElementById(id);
+		if (e) {
+			i = e.firstElementChild.nextElementSibling.firstElementChild;
+			if (e.className == 'method-collapsed-div') {
+				e.className = 'method-full-div';
+				i.src = "/icons/up.png";
+			} else {
+				e.className = 'method-collapsed-div';
+				i.src = "/icons/down.png";
+			}
+		}
+	}
+	</script>
 	<zscript>
 		<![CDATA[
 			fileres = es.caib.seycon.ng.web.Custom.FILERES_ESQUEMA;
@@ -556,6 +589,7 @@
 		<detalls id="dades" width="${amplaria}">
 			<zscript>
 				<![CDATA[
+				    pageScope.put("methodDescriptor", null); 
 					es.caib.zkib.component.DataModel dm = model;
 					dm.addEventListener("onCommit", new org.zkoss.zk.ui.event.EventListener ()
 					{
@@ -730,7 +764,14 @@
 								defaultAgentProperties.visible = false;
 								java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(data);
 								xmlDoc = new org.zkoss.idom.input.SAXBuilder(false, false).build(in);
+								oldScope = pageScope.get("methodDescripton");
+							    pageScope.put("methodDescriptor", null); 
 								Executions.createComponentsDirectly(xmlDoc, "zul", customAgentProperties, new java.util.HashMap());
+								if (pageScope.get("methodDescriptor") != null && pageScope.get("methodDescriptor").equals(oldScope)) // Different scope
+								{
+		   							es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();
+									XPathUtils.getValue(listbox, "/objectMapping").refresh();
+								}
 								customAgentProperties.visible = true;
 								enable = ctx.getValue("/plugin[className='"+value+"']/@enableAttributeMapping");
 								agentId = XPathUtils.getValue(
@@ -1618,6 +1659,9 @@
       						es.caib.zkib.jxpath.JXPathContext ctx = model.getJXPathContext ();
       						Row r = event.getData();
       						Div  triggersBlock = r.getFirstChild().getFellow("triggersBlock"); 
+      						Div methodsBlock = r.getFirstChild().getFellow("methodsBlock");
+      						
+      						methodsBlock.setVisible( pageScope.get("methodDescriptor") != null);
 
       						try {
    								auth = ctx.getValue("/plugin[className='"+value+"']/@enableObjectTriggers");
@@ -1658,298 +1702,339 @@
 										
 									<div style="width: 90%; float: right; display:block; ">
 									
+										<div style="display: block; " id="methodsBlock">
+	
+											<image src="~./zul/img/tree/close.png" width="16px" style="float: left; ">
+												<attribute name="onClick">
+													propertiesDiv2 = event.target.getFellow("propertiesDiv2");
+													if (propertiesDiv2.isVisible() )
+													{
+														propertiesDiv2.setVisible(false);
+														propertiesLabel2.setVisible(true);
+														self.src = "~./zul/img/tree/close.png";
+													} else {
+														propertiesDiv2.setVisible(true);
+														propertiesLabel2.setVisible(false);
+														self.src = "~./zul/img/tree/open.png";
+													}
+												</attribute>
+											</image>
+											
+											<div id="propertiesLabel2" style="height: 20px;" >
+												<label value="Methods" />
+											</div>
+																						
+											<div id="propertiesDiv2"  visible="false">																				
+												<grid sclass="noBorderGrid" style="display: inline-block;"
+													width="95%"  
+													fixedLayout="true" id="propertiesGrid2"
+													dataPath="property"
+													use="com.soffid.iam.web.agent.CustomPropertiesGrid">
+													<columns>
+														<column label="Method" width = "15em">
+														</column>
+														<column label="Properties">
+														</column>
+														<column label="" width="2em">
+															<imageclic align="right" src="~./img/list-add.gif" onClick="propertiesGrid2.createMethod()"/>
+														</column>
+													</columns>
+												</grid>
+												<div style="height: 20px;" />
+											</div>
+										</div>
+										
 										<div style="display: block; ">
 	
-										<image src="~./zul/img/tree/close.png" width="16px" style="float: left; ">
-											<attribute name="onClick">
-												propertiesDiv = event.target.getFellow("propertiesDiv");
-												if (propertiesDiv.isVisible() )
-												{
-													propertiesDiv.setVisible(false);
-													propertiesLabel.setVisible(true);
-													self.src = "~./zul/img/tree/close.png";
-												} else {
-													propertiesDiv.setVisible(true);
-													propertiesLabel.setVisible(false);
-													self.src = "~./zul/img/tree/open.png";
-												}
-											</attribute>
-										</image>
-										
-										<div id="propertiesLabel" style="height: 20px;" >
-											<label value="Properties" />
-										</div>
-																					
-										<div style="" id="propertiesDiv"  visible="false" >																				
-											<grid sclass="noBorderGrid" style="display: inline-block" dataPath="property" width="95%"  fixedLayout="true" id ="propertiesGrid">
-												<columns>
-													<column label="Property" width = "15em">
-													</column>
-													<column label="Value">
-													</column>
-													<column label="" width="2em">
-														<imageclic align="right" src="~./img/list-add.gif">
-															<attribute name="onClick"><![CDATA[
-								if (canUpdateAgent)
-								{
-															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
-															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
-								}
-															]]>
+											<image src="~./zul/img/tree/close.png" width="16px" style="float: left; ">
+												<attribute name="onClick">
+													propertiesDiv = event.target.getFellow("propertiesDiv");
+													if (propertiesDiv.isVisible() )
+													{
+														propertiesDiv.setVisible(false);
+														propertiesLabel.setVisible(true);
+														self.src = "~./zul/img/tree/close.png";
+													} else {
+														propertiesDiv.setVisible(true);
+														propertiesLabel.setVisible(false);
+														self.src = "~./zul/img/tree/open.png";
+													}
+												</attribute>
+											</image>
+											
+											<div id="propertiesLabel" style="height: 20px;" >
+												<label value="Properties" />
+											</div>
+																						
+											<div style="" id="propertiesDiv"  visible="false" >																				
+												<grid sclass="noBorderGrid" style="display: inline-block" dataPath="property" width="95%"  fixedLayout="true" id ="propertiesGrid">
+													<columns>
+														<column label="Property" width = "15em">
+														</column>
+														<column label="Value">
+														</column>
+														<column label="" width="2em">
+															<imageclic align="right" src="~./img/list-add.gif">
+																<attribute name="onClick"><![CDATA[
+									if (canUpdateAgent)
+									{
+																es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
+																XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+									}
+																]]>
+																</attribute>
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<textbox bind="@property" width="95%" onChange="propertiesGrid2.generateGrid()"/>
+														<textbox bind="@value" width ="95%" onChange="propertiesGrid2.generateGrid()" style="display:block; resize: vertical"  multiline="true"  height="1em">
+																<attribute name="onFocus"><![CDATA[
+				  String v = self.getValue();
+				  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+				  {
+					  self.setMultiline(true);
+					  self.setHeight("5em");
+				  }
+				
+																]]></attribute>
+														</textbox>
+														<imageclic align="right" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																<![CDATA[
+					if (canUpdateAgent)
+					{
+								es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext (event.target);
+								XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
+					}												]]>
 															</attribute>
 														</imageclic>
-													</column>
-												</columns>
-												<datarow>
-													<input_dada bind="@property" width_custom ="95%"></input_dada>
-													<textbox bind="@value" width ="95%" onChange="" style="display:block; resize: vertical"  multiline="true"  height="1em">
-															<attribute name="onFocus"><![CDATA[
-			  String v = self.getValue();
-			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
-			  {
-				  self.setMultiline(true);
-				  self.setHeight("5em");
-			  }
-			
+													</datarow>
+												</grid>
+												<div style="height: 20px;" />
+											</div>
+										</div>
+
+										<div style="display: block">
+											<image src="~./zul/img/tree/close.png" style="float: left;" 
+												id="openAttributesIcon" >
+												<attribute name="onClick"><![CDATA[
+													attributesDiv = event.target.getFellow("attributesDiv");
+													String objectType = XPathUtils.getValue(event.getTarget(), "@systemObject"); 
+													if (attributesDiv.isVisible() )
+													{
+														pageScope.put("attributes-div-"+objectType, "false");
+														attributesDiv.setVisible(false);
+														attributesLabel.setVisible(true);
+														event.target.src = "~./zul/img/tree/close.png";
+													} else {
+														pageScope.put("attributes-div-"+objectType, "true");
+														attributesDiv.setVisible(true);
+														attributesLabel.setVisible(false);
+														event.target.src = "~./zul/img/tree/open.png";
+													}
+												]]></attribute>
+											</image>
+		
+											<div id="attributesLabel" style="height: 20px;" >
+												<label value="Attributes" sclass=""/>
+											</div>
+																						
+																																
+											<div style="" id="attributesDiv"  visible="false">																				
+												<grid sclass="noBorderGrid" dataPath="attributeMapping" id="attributesGrid" style="display: inline-block; width: 95%">
+													<columns>
+														<column label="System attribute">
+														</column>
+														<column width="2em"/>
+														<column label="Direction" width="6em">
+														</column>
+														<column label="Soffid attribute">
+														</column>
+														<column width="2em"/>
+														<column label="Test result" id="testColumn" visible="false">
+														</column>
+														<column label="" width="2em">
+															<imageclic  align="right" src="~./img/list-add.gif">
+																<attribute name="onClick"><![CDATA[
+									if (canUpdateAgent)
+									{
+																es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
+																XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+									}														                                   
+																]]>
+																</attribute>
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" height="1em">
+																<attribute name="onFocus"><![CDATA[
+				  String v = self.getValue();
+				  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+				  {
+					  self.setMultiline(true);
+					  self.setHeight("5em");
+				  }
+				
+																]]></attribute>
+														</textbox>
+														<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
+															<attribute name="onClick"><![CDATA[
+															    Events.sendEvent(new Event ("onEdit", 
+															    		desktop.getPage("editor").getFellow("top"),
+															    		new Object[] {
+																			    event.getTarget().getPreviousSibling(),
+																			    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(self)
+																		}
+															    ));
 															]]></attribute>
-													</textbox>
-													<imageclic align="right" src="~./img/list-remove.gif">
-														<attribute name="onClick">
-															<![CDATA[
-				if (canUpdateAgent)
-				{
+														</imageclic>
+														<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection">
+															<dataitem bind="@value">
+																<listcell bind="@literal"/>
+															</dataitem>
+														</listbox>
+														<textbox bind="@soffidAttribute" width ="100%" onChange=""  style="display:block; resize: none" multiline="true"  height="1em">
+																<attribute name="onFocus"><![CDATA[
+				  String v = self.getValue();
+				  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+				  {
+					  self.setMultiline(true);
+					  self.setHeight("5em");
+				  }
+				
+																]]></attribute>
+														</textbox>
+														<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
+															<attribute name="onClick"><![CDATA[
+															    Events.sendEvent(new Event ("onEdit", 
+															    		desktop.getPage("editor").getFellow("top"),
+															    		new Object[] {
+																			    event.getTarget().getPreviousSibling(),
+																			    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(self)
+																		}
+															    ));
+															]]></attribute>
+														</imageclic>
+														<div>
+															<label multiline="true"/>
+															<imageclic src="/img/exclamation.png" visible="false"/>
+														</div>
+														<imageclic align="right" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																<![CDATA[
 							es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext (event.target);
 							XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
-				}												]]>
-														</attribute>
-													</imageclic>
-												</datarow>
-											</grid>
-											<div style="height: 20px;" />
-										</div>
-									</div>
-									
-									<div style="display: block">
-	
-										<image src="~./zul/img/tree/close.png" style="float: left;" 
-											id="openAttributesIcon" >
-											<attribute name="onClick"><![CDATA[
-												attributesDiv = event.target.getFellow("attributesDiv");
-												String objectType = XPathUtils.getValue(event.getTarget(), "@systemObject"); 
-												if (attributesDiv.isVisible() )
-												{
-													pageScope.put("attributes-div-"+objectType, "false");
-													attributesDiv.setVisible(false);
-													attributesLabel.setVisible(true);
-													event.target.src = "~./zul/img/tree/close.png";
-												} else {
-													pageScope.put("attributes-div-"+objectType, "true");
-													attributesDiv.setVisible(true);
-													attributesLabel.setVisible(false);
-													event.target.src = "~./zul/img/tree/open.png";
-												}
-											]]></attribute>
-										</image>
-	
-										<div id="attributesLabel" style="height: 20px;" >
-											<label value="Attributes" sclass=""/>
-										</div>
-																					
-																															
-										<div style="" id="attributesDiv"  visible="false">																				
-											<grid sclass="noBorderGrid" dataPath="attributeMapping" id="attributesGrid" style="display: inline-block; width: 95%">
-												<columns>
-													<column label="System attribute">
-													</column>
-													<column width="2em"/>
-													<column label="Direction" width="6em">
-													</column>
-													<column label="Soffid attribute">
-													</column>
-													<column width="2em"/>
-													<column label="Test result" id="testColumn" visible="false">
-													</column>
-													<column label="" width="2em">
-														<imageclic  align="right" src="~./img/list-add.gif">
-															<attribute name="onClick"><![CDATA[
-								if (canUpdateAgent)
-								{
-															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
-															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
-								}														                                   
-															]]>
+																]]>
 															</attribute>
 														</imageclic>
-													</column>
-												</columns>
-												<datarow>
-													<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" height="1em">
-															<attribute name="onFocus"><![CDATA[
-			  String v = self.getValue();
-			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
-			  {
-				  self.setMultiline(true);
-				  self.setHeight("5em");
-			  }
-			
-															]]></attribute>
-													</textbox>
-													<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
-														<attribute name="onClick"><![CDATA[
-														    Events.sendEvent(new Event ("onEdit", 
-														    		desktop.getPage("editor").getFellow("top"),
-														    		new Object[] {
-																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(self)
-																	}
-														    ));
-														]]></attribute>
-													</imageclic>
-													<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection">
-														<dataitem bind="@value">
-															<listcell bind="@literal"/>
-														</dataitem>
-													</listbox>
-													<textbox bind="@soffidAttribute" width ="100%" onChange=""  style="display:block; resize: none" multiline="true"  height="1em">
-															<attribute name="onFocus"><![CDATA[
-			  String v = self.getValue();
-			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
-			  {
-				  self.setMultiline(true);
-				  self.setHeight("5em");
-			  }
-			
-															]]></attribute>
-													</textbox>
-													<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
-														<attribute name="onClick"><![CDATA[
-														    Events.sendEvent(new Event ("onEdit", 
-														    		desktop.getPage("editor").getFellow("top"),
-														    		new Object[] {
-																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(self)
-																	}
-														    ));
-														]]></attribute>
-													</imageclic>
-													<div>
-														<label multiline="true"/>
-														<imageclic src="/img/exclamation.png" visible="false"/>
-													</div>
-													<imageclic align="right" src="~./img/list-remove.gif">
-														<attribute name="onClick">
-															<![CDATA[
-						es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext (event.target);
-						XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
-															]]>
-														</attribute>
-													</imageclic>
-												</datarow>
-											</grid>
-											<div id="testRow" style="margin-left: 18px">
-												<button id="testRowButton1" label="Test" onClick="displayTestRow(event)"/>
-												<label id="testRowLabel1" visible="false"/>
-												<textbox id="testRowTextbox1" visible="false" onOK="testRowTextbox1OK(event)"/>
-												<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
-												<textbox id="testRowTextbox2" visible="false" onOK="doTest(event)"/>
-												<button id="testRowButton2" label="${c:l('agents.zul.TestExpression') }" 
-												onClick="doTest(event)" visible="false"/>
-												<button id="testRowButton3" label="${c:l('agents.zul.TestFull') }" 
-													onClick="doFullTest(event)" visible="false"/>
-												<button id="testRowButton4" label="${c:l('agents.zul.TestQuery') }"
-													onClick="doQueryTest(event)" visible="false"/>
-												<button id="testRowButton5" label="${c:l('agents.zul.TestLoad') }" 
-													onClick="doLoadTest(event)" visible="false"/>
+													</datarow>
+												</grid>
+												<div id="testRow" style="margin-left: 18px">
+													<button id="testRowButton1" label="Test" onClick="displayTestRow(event)"/>
+													<label id="testRowLabel1" visible="false"/>
+													<textbox id="testRowTextbox1" visible="false" onOK="testRowTextbox1OK(event)"/>
+													<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
+													<textbox id="testRowTextbox2" visible="false" onOK="doTest(event)"/>
+													<button id="testRowButton2" label="${c:l('agents.zul.TestExpression') }" 
+													onClick="doTest(event)" visible="false"/>
+													<button id="testRowButton3" label="${c:l('agents.zul.TestFull') }" 
+														onClick="doFullTest(event)" visible="false"/>
+													<button id="testRowButton4" label="${c:l('agents.zul.TestQuery') }"
+														onClick="doQueryTest(event)" visible="false"/>
+													<button id="testRowButton5" label="${c:l('agents.zul.TestLoad') }" 
+														onClick="doLoadTest(event)" visible="false"/>
+												</div>
+												<div style="height: 20px;" />
 											</div>
-											<div style="height: 20px;" />
 										</div>
-									</div>
-
-<!--  TRIGGERS -->
-									<div style="display: block" id="triggersBlock">
 	
-										<image src="~./zul/img/tree/close.png" style="float: left;" >
-											<attribute name="onClick">
-												Div triggersDiv = event.target.getFellow("triggersDiv");
-												Div triggersLabel = event.target.getFellow("triggersLabel");
-												if (triggersDiv.isVisible() )
-												{
-													triggersDiv.setVisible(false);
-													triggersLabel.setVisible(true);
-													self.src = "~./zul/img/tree/close.png";
-												} else {
-													triggersDiv.setVisible(true);
-													triggersDiv.invalidate();
-													triggersLabel.setVisible(false);
-													self.src = "~./zul/img/tree/open.png";
-												}
-											</attribute>
-										</image>
-	
-										<div id="triggersLabel" style="height: 20px;" >
-											<label value="Triggers" sclass=""/>
-										</div>
-																					
-																															
-										<div style="" id="triggersDiv"  visible="false">	
-											<grid sclass="noBorderGrid" dataPath="objectMappingTrigger" fixedLayout="false" id="triggersGrid" style="width: 95%; display:inline-block">
-												<columns>
-													<column label="Trigger" width="15em" valign="top">
-													</column>
-													<column label="Script" >
-													</column>
-													<column label="" width="2em"/>
-													<column label="" width="2em">
-														<imageclic  align="right" src="~./img/list-add.gif">
+	<!--  TRIGGERS -->
+										<div style="display: block" id="triggersBlock">
+		
+											<image src="~./zul/img/tree/close.png" style="float: left;" >
+												<attribute name="onClick">
+													Div triggersDiv = event.target.getFellow("triggersDiv");
+													Div triggersLabel = event.target.getFellow("triggersLabel");
+													if (triggersDiv.isVisible() )
+													{
+														triggersDiv.setVisible(false);
+														triggersLabel.setVisible(true);
+														self.src = "~./zul/img/tree/close.png";
+													} else {
+														triggersDiv.setVisible(true);
+														triggersDiv.invalidate();
+														triggersLabel.setVisible(false);
+														self.src = "~./zul/img/tree/open.png";
+													}
+												</attribute>
+											</image>
+		
+											<div id="triggersLabel" style="height: 20px;" >
+												<label value="Triggers" sclass=""/>
+											</div>
+																						
+																																
+											<div style="" id="triggersDiv"  visible="false">	
+												<grid sclass="noBorderGrid" dataPath="objectMappingTrigger" fixedLayout="false" id="triggersGrid" style="width: 95%; display:inline-block">
+													<columns>
+														<column label="Trigger" width="15em" valign="top">
+														</column>
+														<column label="Script" >
+														</column>
+														<column label="" width="2em"/>
+														<column label="" width="2em">
+															<imageclic  align="right" src="~./img/list-add.gif">
+																<attribute name="onClick"><![CDATA[
+									if (canUpdateAgent)
+									{
+																es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
+																XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
+									}														                                   
+																]]>
+																</attribute>
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" style="vertical-align: top;">
+															<dataitem bind="@value">
+																<listcell bind="@literal"/>
+															</dataitem>
+														</listbox>
+														<textbox bind="@script" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" height="1em">
+																<attribute name="onFocus"><![CDATA[
+				  String v = self.getValue();
+				  if (v.length() > 50 || v.indexOf ('\n') >= 0)
+				  {
+					  self.setMultiline(true);
+					  self.setHeight("5em");
+				  }
+				
+																]]></attribute>
+														</textbox>
+														<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
 															<attribute name="onClick"><![CDATA[
-								if (canUpdateAgent)
-								{
-															es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext(event.target);							                                   
-															XPathUtils.createPath(bindCtx.getDataSource(), bindCtx.getXPath());
-								}														                                   
-															]]>
+															    Events.sendEvent(new Event ("onEdit", 
+															    		desktop.getPage("editor").getFellow("top"),
+															    		new Object[] {
+																			    event.getTarget().getPreviousSibling(),
+																			    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(self)
+																		}
+															    ));
+															]]></attribute>
+														</imageclic>
+														<imageclic align="right" src="~./img/list-remove.gif">
+															<attribute name="onClick">
+																<![CDATA[
+							es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext ((Component) event.target);
+							XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
+																]]>
 															</attribute>
 														</imageclic>
-													</column>
-												</columns>
-												<datarow>
-													<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" style="vertical-align: top;">
-														<dataitem bind="@value">
-															<listcell bind="@literal"/>
-														</dataitem>
-													</listbox>
-													<textbox bind="@script" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" height="1em">
-															<attribute name="onFocus"><![CDATA[
-			  String v = self.getValue();
-			  if (v.length() > 50 || v.indexOf ('\n') >= 0)
-			  {
-				  self.setMultiline(true);
-				  self.setHeight("5em");
-			  }
-			
-															]]></attribute>
-													</textbox>
-													<imageclic style="display:table-cell" src="/img/pencil.png" width="2em" >
-														<attribute name="onClick"><![CDATA[
-														    Events.sendEvent(new Event ("onEdit", 
-														    		desktop.getPage("editor").getFellow("top"),
-														    		new Object[] {
-																		    event.getTarget().getPreviousSibling(),
-																		    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(self)
-																	}
-														    ));
-														]]></attribute>
-													</imageclic>
-													<imageclic align="right" src="~./img/list-remove.gif">
-														<attribute name="onClick">
-															<![CDATA[
-						es.caib.zkib.binder.BindContext bindCtx = XPathUtils.getComponentContext ((Component) event.target);
-						XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
-															]]>
-														</attribute>
-													</imageclic>
-												</datarow>
-											</grid>
+													</datarow>
+												</grid>
 											<div style="height: 20px;" />
 										</div>
 									</div>
@@ -2529,4 +2614,4 @@
 	<include src="controlAcces.zul"/>
  	<include src="finestres/editor.zul"/>
  	<include src="finestres/agent_objectAttributes.zul"/>
-</zk>
+</frame>

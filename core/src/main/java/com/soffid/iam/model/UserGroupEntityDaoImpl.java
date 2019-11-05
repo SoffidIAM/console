@@ -153,7 +153,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("C", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"),
+            		usuariGrup.getUser() == null ? "<Unknown>": usuariGrup.getUser().getUserName(), 
+            		usuariGrup.getGroup() == null ? "<Unknown>": usuariGrup.getGroup().getName(), message));
         }
     }
 

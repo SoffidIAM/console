@@ -1090,7 +1090,7 @@ public class InputField2 extends Div
 								+ "onOK='self.parent.parent.onChildChange2(event)' "
 								+ "width=\"250px\" "   
 								+ "/>"
-							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" "
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
 							+ "onClick='self.parent.parent.onSelectUser(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ required+"</div>";

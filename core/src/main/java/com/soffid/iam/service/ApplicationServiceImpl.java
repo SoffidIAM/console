@@ -1256,8 +1256,6 @@ public class ApplicationServiceImpl extends
 			return ;
 		if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_DELETE, rolsUsuarisEntity))
 		{
-        	if (rolsUsuarisEntity.getRule() != null)
-                throw new InternalErrorException("This role cannot be manually revoked. It's granted by a rule.");
             // Disable assigning roles to himself
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
                 if (ua.getUser().getUserName().equals(Security.getCurrentUser())) {
@@ -1265,7 +1263,16 @@ public class ApplicationServiceImpl extends
                 }
             }
             
-            getRoleAccountEntityDao().remove(rolsUsuarisEntity);
+            if (rolsUsuarisEntity.getRule() != null)
+            {
+            	rolsUsuarisEntity.setApprovalPending(false);
+            	rolsUsuarisEntity.setEndDate(new Date());
+            	rolsUsuarisEntity.setStartDate(new Date());
+            	rolsUsuarisEntity.setEnabled(false);
+            	getRoleAccountEntityDao().update(rolsUsuarisEntity);
+            }
+            else
+            	getRoleAccountEntityDao().remove(rolsUsuarisEntity);
             
             return;
         } 
@@ -1928,6 +1935,15 @@ public class ApplicationServiceImpl extends
             }
         }
 		return rg;
+	}
+
+	@Override
+    protected RoleAccount handleFindRoleAccountById(long id) throws Exception {
+		RoleAccountEntity entity = getRoleAccountEntityDao().load(id);
+		if (entity == null)
+			return null;
+		
+		return getRoleAccountEntityDao().toRoleAccount(entity);
 	}
 
 	@Override
@@ -3161,6 +3177,7 @@ public class ApplicationServiceImpl extends
 		if (ra != null && ra.getRemovalPending() != null && ra.getRemovalPending().booleanValue())
 		{
 			ra.setRemovalPending(false);
+			ra.setRule(null);
 			getRoleAccountEntityDao().update(ra);
 		}
 	}

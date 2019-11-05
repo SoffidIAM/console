@@ -341,8 +341,11 @@ public class ProcessUI extends Frame {
                 window.setEngine(engine);
                 window.setSignatureHandler(new SignatureManager(window));
 
-                Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
-
+                try {
+                	Events.sendEvent(new Event(WorkflowWindow.LOAD_EVENT, window));
+                } catch (Exception e) {
+                	log.warn("Error opening process "+getCurrentProcess().getId(), e);
+                }
                 tabAnexos.setVisible(window.isShowAttachments());
                 anexos.setVisible(window.isShowAttachments());
 

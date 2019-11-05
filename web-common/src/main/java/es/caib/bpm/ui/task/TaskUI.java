@@ -34,8 +34,10 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zhtml.impl.AbstractTag;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -62,11 +64,13 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.User;
 import com.soffid.iam.common.TransactionalTask;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.Identity;
 
 import es.caib.bpm.attachment.TaskAttachmentManager;
 import es.caib.bpm.classloader.UIClassLoader;
@@ -810,8 +814,7 @@ public class TaskUI extends Frame implements EventListener {
         }
     }
 
-    public void delegarTarea() throws InterruptedException, CreateException,
-            NamingException {
+	public void delegarTarea () throws CreateException, NamingException {
         WorkflowWindow workflowWindow = getWorkflowWindow();
         TaskInstance task = null;
         BpmEngine engine = getEngine();
@@ -828,23 +831,16 @@ public class TaskUI extends Frame implements EventListener {
                         workflowWindow));
                 
                 
-                window = (SeleccionUsuarioUI) Executions.createComponents(
-                        "/wf/task/seleccionUsuario.zul", this, null); //$NON-NLS-1$
-                window.doModal();
-
-                usuarioSeleccionado = window.getUsuarioSeleccionado();
-
-                if (usuarioSeleccionado != null) {
-                    if (newComment.getValue() != null
-                            && newComment.getValue().length() > 0)
-                        task = engine.addComment(task, newComment.getValue());
-                    task = engine.delegateTaskToUser(task,
-                            usuarioSeleccionado);
-                    workflowWindow.setTask(task);
-
-                    log.debug(Messages.getString("TaskUI.ClearSelectionTasks")); //$NON-NLS-1$
-                    Application.goBack();
-                }
+    			Page p = getDesktop().getPage("identity");
+    			p.setVariable("types",
+    						new com.soffid.iam.web.component.Identity.Type[] {
+    								com.soffid.iam.web.component.Identity.Type.USER
+    						}
+    					);
+    			p.setVariable("singleIdentity", true);
+    			p.setVariable("title", org.zkoss.util.resource.Labels.getLabel("seleccionUsuario.btnDelegar"));
+    			p.setVariable("invoker", this);
+    			Events.sendEvent(new Event("onDisplay", p.getFellow("identityWindow")));
             } else {
             	Missatgebox.info(Labels.getLabel("task.msgSeleccionTarea"), //$NON-NLS-1$
                         "Workflow BPM"); //$NON-NLS-1$
@@ -855,9 +851,25 @@ public class TaskUI extends Frame implements EventListener {
                     + ex.getMessage());
         } finally {
         }
-    }
+	}
+	
+	public void onIdentity(List<Identity> identities) throws NamingException, CreateException, WrongValueException, InternalErrorException {
+		StringBuffer sb = new StringBuffer();
+		if (identities.size() == 1)
+		{
+			Identity id = identities.get(0);
+			User u = (User) id.getObject();
+			BpmEngine engine = getEngine();
+            if (newComment.getValue() != null
+                        && newComment.getValue().length() > 0)
+               currentTask = engine.addComment(currentTask, newComment.getValue());
+            currentTask = engine.delegateTaskToUser(currentTask, u.getUserName());
+            Application.goBack();
+		}
+	}
 
-    private BpmEngine getEngine() throws CreateException, NamingException {
+
+	private BpmEngine getEngine() throws CreateException, NamingException {
         return BPMApplication.getEngine();
     }
 

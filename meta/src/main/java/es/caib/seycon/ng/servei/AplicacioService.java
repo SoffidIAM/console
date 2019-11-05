@@ -545,6 +545,13 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation()
+	public es.caib.seycon.ng.comu.RolAccount findRoleAccountById(
+			long id) {
+		return null;
+	}
+
+
 	@Operation(grantees = { roles.application_query.class }, translated = "findEffectiveRoleGrantByUser")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> findEffectiveRolGrantByUser(

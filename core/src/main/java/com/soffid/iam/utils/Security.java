@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -468,15 +469,22 @@ public class Security {
 				}
 				else
 				{
+					List<String> rolesList = new LinkedList<String>();
+					
+					for ( String role: roles) rolesList.add(role);
+					
 					for ( String tp: getTenantService().getDisabledPermissions(t))
 					{
-						for ( String role: roles)
+						for ( Iterator<String> it = rolesList.iterator(); it.hasNext();)
 						{
+							String role = it.next();
 							if (role.startsWith(tp))
-								throw new RuntimeException("Cannot elevate permission "+role);
+							{
+								it.remove();
+							}
 						}
 					}
-			        p = new SoffidPrincipalImpl(tenant+"\\"+user, Arrays.asList(roles), currentPrincipal);
+			        p = new SoffidPrincipalImpl(tenant+"\\"+user, rolesList, currentPrincipal);
 				}
     		}
 		} catch (InternalErrorException e) {

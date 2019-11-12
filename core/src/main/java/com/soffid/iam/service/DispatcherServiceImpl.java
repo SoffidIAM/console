@@ -1474,6 +1474,8 @@ public class DispatcherServiceImpl extends
 		GetObjectResults o = svc.getNativeObject(dispatcher, type, object1, object2);
 		Map<String,Object> r = new HashMap<String, Object>();
 
+		if (o == null)
+			throw new InternalErrorException ("Cannot connect to target system");
 		fill ("", "", r, o.getObject());
 		
 		o.setObject(r);
@@ -1575,7 +1577,7 @@ public class DispatcherServiceImpl extends
 
 		
 		List<AccountEntity> accounts = getAccountEntityDao().findByUserAndSystem(u.getUserName(), dispatcher.getName());
-		if (accounts.isEmpty())
+		if (accounts.isEmpty() && u.getActive().equals("S"))
 		{
 			match = match && ! Boolean.TRUE.equals(dispatcher.getManualAccountCreation());
 			if (match && Boolean.TRUE.equals(dispatcher.getRolebased()))
@@ -1602,7 +1604,8 @@ public class DispatcherServiceImpl extends
 		} else {
 			for (AccountEntity acc: accounts)
 			{
-				boolean willBeEnabled = match && 
+				boolean willBeEnabled =  u.getActive().equals("S") && 
+						match && 
 						(! Boolean.TRUE.equals( dispatcher.getRolebased() ) || 
 								! getApplicationService().findEffectiveRoleGrantByAccount(acc.getId()).isEmpty());
 				

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="rolsLlista2" title="Llista de rols"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<div xmlns:h="http://www.w3.org/1999/xhtml" width="80%">
+	<datamodel id="model" rootNode="roles" src="descriptorAplicacio.xml"/>
+	
+	<zscript>
+		<![CDATA[
+			fileres = es.caib.seycon.ng.web.Custom.FILERES;
+			
+			model.getVariables().declareVariable("queryEnabled", false);
+			model.getVariables().declareVariable("gestionableWF", "N");
+			
+			void acceptData() {
+				Component formComponent = (Component) pageScope.get("contextComponent");
+				Listbox listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
+				List result = new LinkedList();
+				for (Listitem item: listbox.getSelectedItems())
+				{
+					es.caib.seycon.ng.comu.Rol role =  item.getValue().getInstance(); 
+					result.add ( role.getNom()+"@"+role.getBaseDeDades()); 
+				}
+				Events.postEvent ("onActualitza", formComponent, result);						
+				cleanWindow();
+			}
+
+			void cleanWindow() {
+				model.getVariables().declareVariable("queryEnabled", false);
+				model.refresh();
+				esquemaLlista.visible=false;
+				esquemaLlista.getFellow("finishButton").disabled = true;
+			}
+			
+			void applyFilter (Event event)
+			{
+				com.soffid.iam.web.users.additionalData.SearchFilter filter = pageScope.get("filter");
+				if (filter != null)
+				{
+					Listitem item = event.getData();
+					es.caib.seycon.ng.comu.Usuari value = item.getValue().getInstance();
+					if ( ! filter.isAllowedValue( com.soffid.iam.api.User.toUser(value) ))
+						item.detach();
+				}
+			}
+		]]>
+	</zscript>
+	
+	<window id="esquemaLlista" closable="true" position="center, center"
+		sizable="true" title="${c:l('rolsllista.Titol')}" visible="false"
+		width="80%">
+		<attribute name="onInicia">
+			<![CDATA[
+				pageScope.put("contextComponent", event.data);
+				pageScope.put("filter", null);
+				pageScope.put("multi", false);
+				if(self.mode.compareToIgnoreCase("highlighted") != 0){
+					self.setMode("highlighted");
+				}else{
+					self.visible = true;
+				}
+				esquema.getFellow("lista").getFellow("listbox").setMultiple(false);
+				esquema.getFellow("lista").getFellow("listbox").setCheckmark(false);
+			]]>
+		</attribute>
+		<attribute name="onConfigure">
+			<![CDATA[
+				pageScope.put("filter", event.data[0]);
+				pageScope.put("multi", event.data[1]);
+				if (event.data[1])
+				{
+					esquema.getFellow("lista").getFellow("listbox").setMultiple(true);
+					esquema.getFellow("lista").getFellow("listbox").setCheckmark(true);
+				}
+				esquema.getFellow("queryWindow").getFellow("searchBox").setEnforcedFilter( 
+						event.data.length >= 3 ? event.data[2]: null);
+				if ( ! esquema.getFellow("lista").getFellow("listbox").getItems().isEmpty())
+					esquema.getFellow("queryWindow").getFellow("searchBox").search();
+			]]>
+		</attribute>
+		<attribute name="onClose">
+			<![CDATA[
+				cleanWindow();
+				event.stopPropagation ();
+			]]>
+		</attribute>
+		
+		<esquemavertical id="esquema" hideSearchToolbar="true" style="margin:10px">
+			<criteris id="queryWindow" style="margin-bottom:1em;" 
+				width="100%" height="">
+				<searchbox auto="true" id="searchBox"
+					jsonObject="com.soffid.iam.api.Role" 
+					defaultAttributes="name, description, informationSystemName, system"
+					dataPath="/model:/rol" variableName="roleQuery"></searchbox>
+	
+			</criteris>
+	
+			
+			<navegador id="lista" width="99%">
+				<listbox id="listbox" autocommit="false" dataPath="/model:/rol"
+					fixedLayout="true" rows="${fileres}">
+					<attribute name="onSelect">
+						<![CDATA[
+							esquemaLlista.getFellow("finishButton").
+								setDisabled(listbox.selectedIndex @lt 0);
+						]]>
+					</attribute>
+					<listhead>
+						<listheader label="${c:l('aplica_rolinfo.zul.Category')}" width="10%"/>
+						<listheader label="${c:l('rolsllista.zul.Nom-2')}" width="15%"/>
+						<listheader label="${c:l('rolsllista.zul.Basededades-2')}" width="10%"/>
+						<listheader label="${c:l('rolsllista.zul.Aplicacia-2')}" width="10%"/>
+						<listheader label="${c:l('rolsllista.zul.Descripcia-2')}" width="*"/>
+						<listheader label="${c:l('rolsllista.zul.Domini')}" width="15%"/>
+					</listhead>
+					<listfoot>
+						<listfooter span="3">
+							<label id="listboxFoot" style="margin-left: 10px;" />
+						</listfooter>
+					</listfoot>
+					<dataitem bind=".">
+						<listcell bind="@category">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+						<listcell bind="@nom">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+						<listcell bind="@baseDeDades">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+						<listcell bind="@codiAplicacio">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+						<listcell bind="@descripcio">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+						<listcell bind="domainName">
+							<attribute name="onDoubleClick">
+								seguent();
+							</attribute>
+						</listcell>
+					</dataitem>
+				</listbox>
+			</navegador>
+			
+			<separator spacing="5px"/>	
+		</esquemavertical>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button disabled="true" id="finishButton" label="${c:l('usuarisllista.zul.Accepta')}">
+				<attribute name="onClick">
+					if (!self.disabled)
+						acceptData();
+				</attribute>
+			</button>
+			<button label="${c:l('usuarisllista.zul.Cancel·la')}" onClick="cleanWindow()"/>
+		</hbox>
+	</window>
+	<include src="valorsDominisllista.zul"/>
+	<include src="valorsDominisllistaAmbCerca.zul"/>
+</div>

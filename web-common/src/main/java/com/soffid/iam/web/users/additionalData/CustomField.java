@@ -49,6 +49,7 @@ public class CustomField extends Div implements XPathSubscriber {
 	boolean required = false;
 	boolean hideUserName = false;
 	boolean raisePrivileges = false;
+	boolean noLabel = false;
 	
 	private List<TipusDada> dataTypes;
 
@@ -127,12 +128,15 @@ public class CustomField extends Div implements XPathSubscriber {
 			}
 			Component last = getFirstChild();
 	
-			Label l = new Label(label);
-			if ( dataTypeObj.getType() == TypeEnumeration.SEPARATOR)
-				l.setSclass(getSclass()+"_label separator_label");
-			else
-				l.setSclass(getSclass()+"_label");
-			insertBefore(l, last);
+			if ( ! noLabel)
+			{
+				Label l = new Label(label);
+				if ( dataTypeObj.getType() == TypeEnumeration.SEPARATOR)
+					l.setSclass(getSclass()+"_label separator_label");
+				else
+					l.setSclass(getSclass()+"_label");
+				insertBefore(l, last);
+			}
 			input = new InputField2();
 			insertBefore(input, last);
 			input.setDataType(dataTypeObj);
@@ -196,6 +200,7 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setMultiValue(boolean multiValue) {
 		this.multiValue = multiValue;
+		updateMetadata();
 	}
 
 	public String[] getListOfValues() {
@@ -369,5 +374,13 @@ public class CustomField extends Div implements XPathSubscriber {
 	public void setFilterExpression(String filterExpression) {
 		this.filterExpression = filterExpression;
 		updateMetadata();
+	}
+
+	public boolean isNoLabel() {
+		return noLabel;
+	}
+
+	public void setNoLabel(boolean noLabel) {
+		this.noLabel = noLabel;
 	}
 }

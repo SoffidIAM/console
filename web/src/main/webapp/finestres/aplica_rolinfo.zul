@@ -979,7 +979,7 @@ Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss
 	<include src="/dominisllista.zul"/>
 	
 	<include src="/finestres/aplica_rol_valorDomini.zul"/>
-	<include src="finestres/identity.zul" />
+	<include src="/finestres/identity.zul" />
 </div>
 
 

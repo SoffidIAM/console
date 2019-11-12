@@ -863,44 +863,14 @@
 													</row>
 													<row>
 														<input_etiqueta
-															value="${c:l('usuaris.zul.Grupprimari-2')}" />
+															value="${c:l('usuaris.zul.Grupprimari-2')} *:" />
 
-														<div style="display: inline; ">
-															<input_dada id="codiGrupPrimari"
-																bind="@codiGrupPrimari" mascara="no empty"
-																lectura="${!canModifyUser}" width_custom="200px" 
-																tooltip="tooltipGrup" style="display: inline-block; "/>
-															<label value="*" style="display: inline-block;"/>
-															<imageclic src="~./img/grup.gif" style="display: inline-block; ">
-																<attribute name="onClick">
-																	if (canModifyUser)
-																	{
-																		idActualitza = "codiGrupPrimari";
-																		desktop.getPage("grupsLlista")
-																			.setAttribute("tipus", "");
-																		desktop.getPage("grupsLlista")
-																			.setAttribute("llistaObsolets", false);
-																		Events.postEvent("onInicia",
-																				desktop.getPage("grupsLlista")
-																					.getFellow("esquemaLlista"), form);
-																	}
-																</attribute>
-															</imageclic>
-															<label bind="primaryGroup[1]/descripcio" style="display: inline; padding-left: 4px;"/>
-															<imageclic src="/img/link.png">
-																<attribute name="onClick"><![CDATA[
-				                                                if (esquema.canClose())
-									                           		Executions.getCurrent().sendRedirect(
-									                           			"index.zul?embed&target=/grups.zul?group="+
-																		codiGrupPrimari.getFellow("dada").getValue(), "soffid_popup");
-																]]>
-																</attribute>
-															</imageclic>
-														</div>
+														<inputfield bind="@codiGrupPrimari" dataType="group" readonly="${!canModifyUser}" width="100%" noLabel="true">
+														</inputfield>
 													</row>
 													<row>
 														<input_etiqueta
-															value="${c:l('usuaris.zul.Servidorhome')}" />
+															value="${c:l('usuaris.zul.Servidorhome')} *:"  />
 
 														<hbox>
 															<input_dada id="servidorHome" bind="@servidorHome"

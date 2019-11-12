@@ -1801,7 +1801,11 @@ div.inputField_input {
 	padding-top: 2px;
 	padding-bottom: 2px;
 }
-			
+
+div.inputField_input .widetextbox {
+	width: 350px;	
+}			
+
 span.inputField_tail {
 	display: table-cell;
 	vertical-align: top;
@@ -1879,3 +1883,10 @@ div.fixedToolbar {
     padding: 0px;
 }
 
+.removeValueIcon {
+	width: 24px; margin-left: 4px; padding: 6px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
+}
+
+.removeValueIcon:hover {
+	opacity:1;
+}

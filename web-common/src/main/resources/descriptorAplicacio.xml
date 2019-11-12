@@ -385,6 +385,34 @@
 		</finder>
 	</datanode>
 
+	<datanode name="roles">
+		<finder name="rol" type="rol">
+			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB" method="findRoleByJsonQuery"
+				if="${roleQuery != null}"> 
+				<parameter value="${roleQuery}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Rol">
+			</new-instance-bean>
+		</finder>
+
+		<finder name="dispatcher" type="dispatcher">
+			<script-finder>
+				es.caib.seycon.ng.comu.Dispatcher dis = new
+				es.caib.seycon.ng.comu.Dispatcher();
+				return dis;
+			</script-finder>
+			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB" method="findDispatchersByFiltre"
+				if="${isUserInRole('agent:query')}">
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+				<parameter value="${null}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+
 	<datanode name="rolUsuari" />
 
 	<datanode name="usuarisRol">

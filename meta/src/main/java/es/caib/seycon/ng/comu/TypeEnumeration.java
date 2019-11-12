@@ -13,6 +13,7 @@ public class TypeEnumeration {
 	public String emailType = "E";
 	public String userType = "U";
 	public String groupType = "G";
+	public String roleType = "R";
 	public String applicationType = "A";
 	public String hostType = "1";
 	public String userTypeType = "T";

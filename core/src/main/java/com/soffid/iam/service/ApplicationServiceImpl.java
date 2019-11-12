@@ -99,6 +99,7 @@ import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.bpm.vo.PredefinedProcessType;
 import es.caib.seycon.ng.common.DelegationStatus;
@@ -2620,10 +2621,7 @@ public class ApplicationServiceImpl extends
 	}
 
 
-	@Override
-	protected Collection<Role> handleFindRoleByJsonQuery(String query)
-			throws InternalErrorException, Exception {
-
+	private void findRoleByJsonQuery(AsyncList<Role> result, String query) throws Exception {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
@@ -2642,11 +2640,10 @@ public class ApplicationServiceImpl extends
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		LinkedList<Role> result = new LinkedList<Role>();
-		TimeOutUtils tou = new TimeOutUtils();
 		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
 				paramArray)) {
-			tou.checkTimeOut();
+			if (result.isCancelled())
+				return;
 			Role u = getRoleEntityDao().toRole(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
@@ -2655,8 +2652,6 @@ public class ApplicationServiceImpl extends
 				}
 			}
 		}
-
-		return result;
 	}
 
 	@Override
@@ -3331,6 +3326,79 @@ public class ApplicationServiceImpl extends
 		}
 		
 	}
+
+	String generateRoleQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			for (MetaDataEntity att: atts)
+			{
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				{
+					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+				}
+			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public AsyncList<Role> handleFindRoleByTextAndFilterAsync(String text, String filter) throws Exception {
+		String q = generateRoleQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindRoleByJsonQueryAsync(q);
+	}
+	@Override
+	public Collection<Role> handleFindRoleByTextAndFilter(String text, String filter) throws Exception {
+		String q = generateRoleQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindRoleByJsonQuery(q);
+	}
+
+	@Override
+	protected AsyncList<Role> handleFindRoleByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<Role> result = new AsyncList<Role>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findRoleByJsonQuery(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	@Override
+	protected Collection<Role> handleFindRoleByJsonQuery(String query) throws Exception {
+		AsyncList<Role> result = new AsyncList<Role>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findRoleByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
 
 }
 

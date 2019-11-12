@@ -44,7 +44,6 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Image;
-import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
@@ -57,7 +56,6 @@ import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
@@ -70,6 +68,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
@@ -83,7 +82,6 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.ejb.UsuariService;
 import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
@@ -154,6 +152,7 @@ public class InputField2 extends Div
 	
 	boolean disableRecursive = false;
 	private boolean updateUser;
+	private boolean updateRole;
 	private boolean updateGroup;
 	private boolean updateApplication;
 	private boolean updateCustomObject;
@@ -164,6 +163,20 @@ public class InputField2 extends Div
 		if (!readonly)
 		{
 			Page p = getDesktop().getPage("usuarisLlista");
+			Boolean multiValued = dataType.isMultiValued();
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  
+					filter, 
+					multiValued, 
+					dataType.getFilterExpression(),
+					hideUserName });
+		}
+	}
+
+	public void onSelectRole (Event event) {
+		if (!readonly)
+		{
+			Page p = getDesktop().getPage("rolsLlista2");
 			Boolean multiValued = dataType.isMultiValued();
 			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
 			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  
@@ -283,6 +296,28 @@ public class InputField2 extends Div
 		}
 	}
 
+	public void onActualitzaRole(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		InputElement textbox = (InputElement) event.getTarget().getParent().getFirstChild();
+		List<String> roles = (List<String>) event.getData();
+		if (dataType.isMultiValued())
+		{
+			for (String s: roles)
+			{
+				textbox.setRawValue(s);
+				onChildChange( new Event (event.getName(), textbox ) );
+				List l = (List) binder.getValue();
+				int currentSize = l.size();
+				textbox = (InputElement) getFellow( getIdForPosition(currentSize));
+			}			
+		}
+		else
+		{
+			String userName = roles.get(0);
+			textbox.setRawValue(userName);
+			onChildChange( new Event (event.getName(), textbox ) );
+		}
+	}
+	
 	org.zkoss.zhtml.Div searchBox = null;
 	AsyncList<?> currentSearch = null;
 	private Div searchContent;
@@ -295,7 +330,8 @@ public class InputField2 extends Div
 	private String targetSearchTextboxUuid;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
-		targetSearchTextboxUuid = dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ?
+		targetSearchTextboxUuid = dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ||
+				dataType.getType() == TypeEnumeration.ROLE_TYPE && hideUserName ?
 				currentSearchTextbox.getParent().getFirstChild().getUuid() :
 				currentSearchTextbox.getUuid();
 		searchCriteria = (String) event.getValue();
@@ -320,6 +356,12 @@ public class InputField2 extends Div
 				if (hideUserName)
 					currentSearchTextbox.setStyle("background-color: yellow");
 				currentSearch = EJBLocator.getUserService().findUserByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
+			}
+			if (dataType.getType() == TypeEnumeration.ROLE_TYPE)
+			{
+				if (hideUserName)
+					currentSearchTextbox.setStyle("background-color: yellow");
+				currentSearch = EJBLocator.getApplicationService().findRoleByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
 			{
@@ -389,6 +431,8 @@ public class InputField2 extends Div
 							identity = new Identity( (Group ) o);
 						if (o instanceof User)
 							identity = new Identity( (User ) o);
+						if (o instanceof Role)
+							identity = new Identity( (Role ) o);
 						if (o instanceof Application)
 							identity = new Identity( (Application ) o);
 						if (identity != null)
@@ -408,6 +452,7 @@ public class InputField2 extends Div
 					Object o = id.getObject();
 					String value = o instanceof CustomObject ? ((CustomObject) o).getName() :
 						o instanceof User ? ((User) o).getUserName() :
+						o instanceof Role ? ((Role) o).getName()+"@"+ ((Role) o).getSystem() :
 						o instanceof Group ? ((Group) o).getName() :
 						o instanceof Application ? ((Application) o).getName() :
 						o instanceof Role ? ((Role) o).getName() :
@@ -415,7 +460,7 @@ public class InputField2 extends Div
 					if (value != null)
 					{
 						value = org.apache.commons.lang3.StringEscapeUtils.escapeJava(value);
-						if ( hideUserName && dataType.getType() == TypeEnumeration.USER_TYPE)
+						if ( hideUserName && dataType.getType() == TypeEnumeration.USER_TYPE )
 							id.setSelectorLabel( ((User)o).getFullName() );
 						Div d = id.generateSelector(searchCriteria);
 						d.setAction("onMouseDown: {var e=document.getElementById('"+targetSearchTextboxUuid+"');e.value='" + value + "'; "
@@ -500,6 +545,8 @@ public class InputField2 extends Div
 				Object o = searchResults.get(0).getObject();
 				if ( o instanceof User )
 					value = ((User) o).getUserName();
+				else if ( o instanceof Role )
+					value = ((Role) o).getName()+"@"+((Role) o).getSystem();
 				else if ( o instanceof Group )
 					value = ((Group) o).getName();
 				else if ( o instanceof CustomObject )
@@ -518,6 +565,17 @@ public class InputField2 extends Div
 			else
 				throw e;
 		}
+	}
+
+	public void onRemoveValue(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		Component tb = event.getTarget().getParent().getFirstChild();
+		
+		try {
+			applyChange(tb, null);
+		} catch (WrongValueException e) {
+//				throw e;
+		}
+		Events.postEvent("onChange", this, null);
 	}
 
 	/**
@@ -549,6 +607,8 @@ public class InputField2 extends Div
 				value = ((MailDomain) o).getCode();
 			else if ( o instanceof Application)
 				value = ((Application) o).getName();
+			else if ( o instanceof Role)
+				value = ((Role) o).getName() + "@" + ((Role) o).getSystem();
 			else
 				value = null;
 			((InputElement) tb).setRawValue( value.toString() );
@@ -558,6 +618,8 @@ public class InputField2 extends Div
 
 	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
 		Integer order = (Integer) tb.getAttribute("position");
+		String id = getIdForPosition(order);
+		String removeIconId = id+"_removeIcon";
 		boolean refresh = false;
 		boolean novallidate = false;
 		if (order == null) {
@@ -598,7 +660,6 @@ public class InputField2 extends Div
 		{
 			try {
 				createField();
-				String id = getIdForPosition(order);
 				Component component = (Component) getFellowIfAny(id);
 				if (component != null && component instanceof HtmlBasedComponent)
 					((HtmlBasedComponent) component).focus();
@@ -606,6 +667,11 @@ public class InputField2 extends Div
 				throw new UiException(e);
 			}
 			
+		}
+		else
+		{
+			if (getFellowIfAny(removeIconId) != null )
+				getFellowIfAny(removeIconId).setVisible( value != null && ! value.equals(""));			
 		}
 
 		
@@ -798,6 +864,54 @@ public class InputField2 extends Div
 		return true;
 	}
 
+	public boolean updateRole(String id)
+	{
+		InputElement inputElement = (InputElement) getFellow(id);
+		String n = inputElement.getText();
+		int i = n.lastIndexOf('@');
+		String roleName = i >= 0 ? n.substring(0, i): n;
+		String roleSystem = i >= 0 ? n.substring(i+1): "";
+		Component c = getFellowIfAny(id+"b");
+		Label l = (Label) (c != null && c instanceof Label? c: null);
+		Textbox tb = (Textbox) (c != null && c instanceof Textbox ? c: null);
+		
+		Role r = null;
+		if (roleName == null || roleName.isEmpty())
+		{
+			if (l != null) l.setValue("");
+		}
+		else
+		{
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
+			try {
+				ApplicationService ejb = com.soffid.iam.EJBLocator.getApplicationService();
+				Collection<Role> roles = ejb.findRoleByJsonQuery(buildJsonFilter("name", roleName, "system", roleSystem));
+				if (roles != null && ! roles.isEmpty())
+					r = roles.iterator().next();
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
+			if (r == null || ( filter != null && ! filter.isAllowedValue(r)))
+			{
+				if (l != null) l.setValue("?");
+				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+			}
+			else
+			{
+				if (l != null) l.setValue(r.getDescription());
+				if (tb != null) {
+					tb.setValue(r.getDescription());
+					tb.setStyle("background-color: white");
+				}
+			}
+		}
+		
+		return true;
+	}
+
 	public boolean updateGroup(String id) {
 
 		InputElement inputElement = (InputElement) getFellow(id);
@@ -843,7 +957,19 @@ public class InputField2 extends Div
 			return q;
 		}
 	}
-	
+
+	String buildJsonFilter (String attribute1, String value1, String attribute2, String value2) {
+		String q = attribute1+" eq \""+escapeJson(value1)+"\" and "+
+			attribute2+" eq \""+escapeJson(value2)+"\"";
+		if (dataType.getFilterExpression() == null || dataType.getFilterExpression().trim().isEmpty())
+			return q;
+		else
+		{
+			q = q + " and ("+dataType.getFilterExpression()+")";
+			return q;
+		}
+	}
+
 	private String escapeJson (String s)
 	{
 		return s.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
@@ -979,6 +1105,10 @@ public class InputField2 extends Div
 		if (disableRecursive)
 			return;
 		
+		if (getId().equals(getUuid()))
+		{
+			setId("inputField_"+getUuid());
+		}
 		disableRecursive = true;
 		
 		try
@@ -1016,6 +1146,7 @@ public class InputField2 extends Div
 									dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.USER_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.ROLE_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.HOST_TYPE))
 							{
 								Listheader header3 = new Listheader( Labels.getLabel("accounts.description"));
@@ -1053,6 +1184,7 @@ public class InputField2 extends Div
 		String result = "";
 		Map <String,Object> map=new HashMap<String, Object>();
 		updateUser = false;
+		updateRole = false;
 		updateGroup = false;
 		updateApplication = false;
 		updateCustomObject = false;
@@ -1067,10 +1199,19 @@ public class InputField2 extends Div
 		String required = "";
 		if (dataType.isRequired())
 			required = "*";
-			
+
 		String id = getIdForPosition(position);
 		String id2 = id + "b";
 		String id3 = id + "c";
+
+		String removeAction = dataType.isMultiValued() && !readonly? 
+				"<imageclic src='~./img/remove.png' sclass='removeValueIcon' "
+				+ "onClick='event.getTarget().getFellow(\""+getId()+"\").onRemoveValue(event)' "
+				+ "id='"+id+"_removeIcon' title='"+
+				Labels.getLabel("contenidoTarea.btnEliminar")+"' "
+						+ "visible='"+ (value==null || value.equals("") ? "false": "true")+"'/>": 
+					"";
+		
 		if(stringType != null && !stringType.trim().isEmpty()){
 			if(TypeEnumeration.USER_TYPE.equals(type) && hideUserName) 
 			{
@@ -1088,12 +1229,12 @@ public class InputField2 extends Div
 								+ "onBlur='self.parent.parent.onBlur2(event)' "
 								+ "onChanging='self.parent.parent.onChanging(event)' "
 								+ "onOK='self.parent.parent.onChildChange2(event)' "
-								+ "width=\"250px\" "   
+								+ "sclass='widetextbox textbox' "   
 								+ "/>"
 							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
 							+ "onClick='self.parent.parent.onSelectUser(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ required+"</div>";
+							+ required+removeAction+"</div>";
 				} else {
 					result = "<listitem>"
 							+ "<listcell>"
@@ -1108,7 +1249,7 @@ public class InputField2 extends Div
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "</listcell><listcell>"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+"</listcell></listitem>";
+							+ required+removeAction+"</listcell></listitem>";
 				}
 			}
 			else if(TypeEnumeration.USER_TYPE.equals(type))
@@ -1127,7 +1268,7 @@ public class InputField2 extends Div
 									+ "onClick='self.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+"</div>";
+							+ required+removeAction+"</div>";
 				} else {
 					result = "<listitem>"
 							+ "<listcell>"
@@ -1142,7 +1283,80 @@ public class InputField2 extends Div
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 									+ "</listcell><listcell>"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+"</listcell></listitem>";
+							+ required+removeAction+"</listcell></listitem>";
+				}
+			}
+			else if(TypeEnumeration.ROLE_TYPE.equals(type) && hideUserName) 
+			{
+				updateRole = true;
+				if (containerListbox == null)
+				{
+					result = "<div style='display:block' visible='true'>"
+							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" "
+									+ "onChange='self.parent.parent.onChildChange(event)' "  
+									+ "id=\""+id+"\" "
+									+ "readonly=\"" +readonlyExpr+ "\"/>"
+							+ "<textbox  "
+								+ "id=\""+id2+"\" "
+								+ "readonly=\""+(readonly)+"\" "
+								+ "onBlur='self.parent.parent.onBlur2(event)' "
+								+ "onChanging='self.parent.parent.onChanging(event)' "
+								+ "onOK='self.parent.parent.onChildChange2(event)' "
+								+ "sclass='textbox widetextbox' "   
+								+ "/>"
+							+ "<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" "
+							+ "onClick='self.parent.parent.onSelectRole(event)' "
+							+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+							+ required+removeAction+"</div>";
+				} else {
+					result = "<listitem>"
+							+ "<listcell>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" "
+									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' "
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+									+ "</listcell><listcell>"
+							+ "<label id=\""+id2+"\" />"
+							+ required+removeAction+"</listcell></listitem>";
+				}
+			}
+			else if(TypeEnumeration.ROLE_TYPE.equals(type))
+			{
+				updateRole = true;
+				if (containerListbox == null)
+				{
+					result = "<div style='display:block' visible='true'>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" "
+									+ "onClick='self.parent.parent.onSelectRole(event)' "
+									+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+							+ "<label id=\""+id2+"\" />"
+							+ required+removeAction+"</div>";
+				} else {
+					result = "<listitem>"
+							+ "<listcell>"
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+									+ "id=\""+id+"\" "
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
+									+ "readonly=\"" +readonlyExpr+ "\"/>" +
+							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" "
+									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' "
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
+									+ "</listcell><listcell>"
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
+							+ required+removeAction+"</listcell></listitem>";
 				}
 			}
 			else if(TypeEnumeration.GROUP_TYPE.equals(type))
@@ -1163,7 +1377,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
-					sb.append(required+"</div>");
+					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
@@ -1178,7 +1392,7 @@ public class InputField2 extends Div
 							+ " visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" />");
 					sb.append("</listcell><listcell>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
-					sb.append(required+"</listcell></listitem>");
+					sb.append(required+removeAction+"</listcell></listitem>");
 				}
 				result = sb.toString();
 			}
@@ -1198,7 +1412,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
-					sb.append(required+"</div>");
+					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
@@ -1211,7 +1425,7 @@ public class InputField2 extends Div
 							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
-					sb.append(required+"</listcell></listitem>");
+					sb.append(required+removeAction+"</listcell></listitem>");
 				}
 				result = sb.toString();
 			}
@@ -1230,7 +1444,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
 					sb.append("<label id=\""+id2+"\"/>");
-					sb.append(required+"</div>");
+					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
@@ -1243,7 +1457,7 @@ public class InputField2 extends Div
 							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label id=\""+id2+"\"/>");
-					sb.append(required+"</listcell></listitem>");
+					sb.append(required+removeAction+"</listcell></listitem>");
 				}
 				result = sb.toString();
 			}
@@ -1262,7 +1476,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
 							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
 					sb.append("<label id=\""+id2+"\" visible='false'/>");
-					sb.append(required+"</div>");
+					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
@@ -1275,7 +1489,7 @@ public class InputField2 extends Div
 							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
 					sb.append("</listcell><listcell>");
 					sb.append("<label id=\""+id2+"\" visible='false'/>");
-					sb.append(required+"</listcell></listitem>");
+					sb.append(required+removeAction+"</listcell></listitem>");
 				}
 				result = sb.toString();
 			}
@@ -1297,7 +1511,7 @@ public class InputField2 extends Div
 							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
-					sb.append(required+"</div>");
+					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
@@ -1312,7 +1526,7 @@ public class InputField2 extends Div
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 					sb.append("</listcell><listcell>");
 					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
-					sb.append(required);
+					sb.append(required+removeAction);
 					sb.append("</listcell><listitem>");
 				}
 				result = sb.toString();
@@ -1323,9 +1537,9 @@ public class InputField2 extends Div
 				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
 							"onClick=\"self.parent.parent.uploadBinary();\" "
 							+ "disabled=\""+readonlyExpr+"\">" +
-							"</button><button label=\"Download\" disabled=\"${!canUpdateUserMetadata}\" visible=\"" + visible + "\" "
+							"</button><button label=\"Download\" disabled=\""+readonlyExpr+"\" visible=\"" + visible + "\" "
 									+ "onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
-							"</button>"+required+"</h:span>";
+							"</button>"+required+removeAction+"</h:span>";
 			}
 			else if(TypeEnumeration.PHOTO_TYPE.equals(type))
 			{
@@ -1334,12 +1548,12 @@ public class InputField2 extends Div
 					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" "
 						    + " onClick=\"self.parent.parent.upload(self.parent);\" "
 						    + "disabled=\""+readonlyExpr+"\"/>"
-							+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+"</h:span>";
+							+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+removeAction+"</h:span>";
 				}else{
 					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
 						    " onClick=\"self.parent.parent.upload(self.parent);\" "
 						    + "disabled=\""+readonlyExpr+"\">" +
-							"</button>"+required+"</h:span>";
+							"</button>"+required+removeAction+"</h:span>";
 				}
 			}
 			else if(TypeEnumeration.DATE_TYPE.equals(type))
@@ -1347,7 +1561,7 @@ public class InputField2 extends Div
 				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
 						+ (readonly ? "buttonVisible=\"false\" ": "")
 						+ "id=\""+id+"\" "
-						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+"</div>"; 
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>"; 
 			}
 			else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 			{
@@ -1357,14 +1571,14 @@ public class InputField2 extends Div
 						+ "id=\""+id+"\" "
 							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
 									+ "onChange='self.parent.parent.onChildChange(event)'/>";
-					result = "<div>"+result+required+"</div>";
+					result = "<div>"+result+required+removeAction+"</div>";
 				}
 				else {
 					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
 							+ "id=\""+id+"\" "
 								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
 										+ "onChange='self.parent.parent.parent.parent.onChildChange(event)'/>";
-					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
 				}
 			}	
 			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
@@ -1379,7 +1593,7 @@ public class InputField2 extends Div
 								+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
 								+ "id=\""+id2+"\" "
 								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
-					result = "<div>"+result+required+"</div>";
+					result = "<div>"+result+required+removeAction+"</div>";
 				} else {
 					result = "<listitem><listcell><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
 							+ "id=\""+id+"\" "
@@ -1388,7 +1602,7 @@ public class InputField2 extends Div
 							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
 							+ "id=\""+id2+"\" "
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
-					result = result+required+"</listitem></listcell>";
+					result = result+required+removeAction+"</listitem></listcell>";
 					
 				}
 			}	
@@ -1417,12 +1631,12 @@ public class InputField2 extends Div
 								"]]></attribute>" + 
 							"</imageclic>";
 				}
-				result = result +  "</div>";
+				result = result + removeAction+ "</div>";
 			}
 			else if ( TypeEnumeration.BOOLEAN_TYPE.equals(type))
 			{
 					result = "<div><checkbox  id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+"</div>";
+							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";
 			}
 			else if ( TypeEnumeration.SEPARATOR.equals(type))
 			{
@@ -1447,7 +1661,7 @@ public class InputField2 extends Div
 							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
 					}
 					result = result + "</listbox>";
-					result = "<div>"+result+required+"</div>"; 
+					result = "<div>"+result+required+removeAction+"</div>"; 
 				} else {
 					result = "<listbox mold=\"select\" onChange=\"\" "
 							+ "id=\""+id+"\" "
@@ -1464,7 +1678,7 @@ public class InputField2 extends Div
 							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
 					}
 					result = result + "</listbox>";
-					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
 				}
 			}
 			else if (TypeEnumeration.USER_TYPE_TYPE.equals(type))
@@ -1490,7 +1704,7 @@ public class InputField2 extends Div
 							Security.nestedLogoff();
 					}
 					result = result + "</listbox>";
-					result = "<div>"+result+required+"</div>"; 
+					result = "<div>"+result+required+removeAction+"</div>"; 
 				} else {
 					result = "<listbox mold=\"select\" onChange=\"\" "
 							+ "id=\""+id+"\" "
@@ -1511,12 +1725,12 @@ public class InputField2 extends Div
 							Security.nestedLogoff();
 					}
 					result = result + "</listbox>";
-					result = "<listitem><listcell>"+result+required+"</listitem></listcell>";
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
 				}
 			} else { // Listbox
 				result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
 						+ "id=\""+id+"\" "
-						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+"</div>";
+						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+removeAction+"</div>";
 			}
 		}
 		if (result.equals(""))
@@ -1531,7 +1745,7 @@ public class InputField2 extends Div
 								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
 										+ "onChange='parent.parent.onChildChange(event)'/>"
 						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
-						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+"</div>";
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";
 			else
 				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
 		}
@@ -1577,6 +1791,7 @@ public class InputField2 extends Div
 				((Label) c3).setValue(value.toString());
 			try {
 				if (updateUser) updateUser(id);
+				if (updateRole) updateRole(id);
 				if (updateGroup) updateGroup(id);
 				if (updateApplication) updateApplication(id);
 				if (updateCustomObject) updateCustomObject(id);
@@ -1777,6 +1992,7 @@ public class InputField2 extends Div
 		clone.compos = this.compos;
 		clone.twoPhaseEdit = this.twoPhaseEdit;
 		clone.updateUser = this.updateUser;
+		clone.updateRole = this.updateRole;
 		clone.binder = new SingletonBinder (clone);
 		clone.binder.setDataPath(binder.getDataPath());
 		return clone;
@@ -1857,6 +2073,8 @@ public class InputField2 extends Div
 			updateApplication( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			updateUser( getIdForPosition(position) );
+		if (dataType.getType() == TypeEnumeration.ROLE_TYPE)
+			updateRole( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
 			updateGroup( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)

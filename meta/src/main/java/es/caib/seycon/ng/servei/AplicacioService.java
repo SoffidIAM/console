@@ -635,6 +635,14 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Rol> findRoleByJsonQueryAsync(
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByText(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -692,6 +700,22 @@ public abstract class AplicacioService {
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public AsyncList<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilterAsync(
 			@Nullable String text,
 			@Nullable String filter) {
 		return null;

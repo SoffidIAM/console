@@ -1059,9 +1059,12 @@
 						String o2 = g.getFellow("testRowTextbox2").getValue();
 						if (o2 == null || o2.trim().length() == 0)
 							o2 = "-";
+						
+						es.caib.seycon.ng.comu.SoffidObjectType objectType = XPathUtils.getValue(g, "../@soffidObject"); 
+						String systemName = XPathUtils.getValue(g, "../../@codi");
 						com.soffid.iam.sync.engine.intf.GetObjectResults result = svc.getSoffidObject(
-								XPathUtils.getValue(g, "../../@codi"),
-								XPathUtils.getValue(g, "../@soffidObject"),
+								systemName,
+								objectType,
 								o1, o2);
 						map = result.getObject();
 						if (map == null)
@@ -1074,10 +1077,21 @@
 						{
 							map.put(key, stringify(map.get(key), ""));
 						}
-						Events.postEvent("onStart", c, new Object[]{
-								o1,
-								result
-						});
+						if (objectType == es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT)
+						{
+							Events.postEvent("onStart", c, new Object[]{
+									o1,
+									result,
+									new String[] {systemName, o1}
+							});
+						}
+						else
+						{
+							Events.postEvent("onStart", c, new Object[]{
+									o1,
+									result
+							});
+						}
 					}
 
 					void doQueryTest (Event event)

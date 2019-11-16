@@ -33,9 +33,11 @@
 		<listbox id="listbox" fixedLayout="true" mold="paging"
 			pageSize="15" width="100%">
 			<listhead>
-				<listheader label="${c:l('deploy.lblProceso')}" sort="auto" />
-				<listheader label="${c:l('deploy.lblVersion')}" sort="auto" />
-				<listheader label="${c:l('deploy.CanviarEstat')}" sort="auto" />
+				<listheader label="${c:l('deploy.lblProceso')}" sort="auto"  />
+				<listheader label="${c:l('deploy.lblVersion')}" sort="auto" width="150px" />
+				<listheader label="${c:l('deploy.DeployedBy')}" sort="auto" width="150px"/>
+				<listheader label="${c:l('deploy.Date')}" sort="auto" width="150px"/>
+				<listheader label="${c:l('deploy.CanviarEstat')}" sort="auto" width="150px"/>
 			</listhead>
 		</listbox>
 		<separator height="8px" />

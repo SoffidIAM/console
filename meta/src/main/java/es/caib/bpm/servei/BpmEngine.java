@@ -14,6 +14,7 @@ import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskDefinition;
 import es.caib.bpm.vo.TaskInstance;
+import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.servei.AplicacioService;
 
 import java.util.Collection;
@@ -26,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.servei.SessionCacheService.class,
-	ProcessHierarchyEntity.class})
+	ProcessHierarchyEntity.class, 
+	AuditoriaEntity.class})
 public abstract class BpmEngine {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

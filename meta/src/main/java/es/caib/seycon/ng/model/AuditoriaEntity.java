@@ -120,7 +120,7 @@ public abstract class AuditoriaEntity {
 
 	@Column (name="AUD_MESSAG", length=1024)
 	@Nullable
-	public java.lang.String message;
+	public java.lang.String comment;
 
 	@Column (name="AUD_TIPUSU", length=255)
 	@Nullable

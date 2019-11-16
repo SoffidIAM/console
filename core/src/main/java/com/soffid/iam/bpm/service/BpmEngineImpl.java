@@ -96,6 +96,7 @@ import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.log.TaskAssignLog;
 import org.xml.sax.SAXException;
 
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
@@ -125,6 +126,7 @@ import com.soffid.iam.bpm.service.impl.UserContextCache;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
 import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ProcessHierarchyEntity;
@@ -2468,6 +2470,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				prop.setValue(value);
 				context.getSession().save(prop);
 			}
+    		audit(def, value.equals("true")?"D": "E");
 			return VOFactory.newProcessDefinition(def, context);
 		} catch (JpdlException ex) {
 			generateUpgradeMessages(ex);
@@ -2590,6 +2593,27 @@ public class BpmEngineImpl extends BpmEngineBase {
 			String result[] = business.procesarDefinicionUI(tempFile,
 					definition);
 
+			ProcessDefinitionPropertyDal dal = new ProcessDefinitionPropertyDal();
+			SoffidPrincipal p = Security.getSoffidPrincipal();
+			if (p != null)
+			{
+                ProcessDefinitionProperty prop = new ProcessDefinitionProperty();
+                prop.setProcessDefinitionId(
+                		new Long(definition.getId()));
+                prop.setName("author"); //$NON-NLS-1$
+                prop.setValue(p.getUserName());
+                context.getSession().save(prop);
+			}
+            ProcessDefinitionProperty prop2 = new ProcessDefinitionProperty();
+            prop2.setProcessDefinitionId(
+            		new Long(definition.getId()));
+            prop2.setName("deployed"); //$NON-NLS-1$
+            prop2.setValue(Long.toString(System.currentTimeMillis()));
+            context.getSession().save(prop2);
+
+
+            // Audit deployment
+    		audit(definition, "C");
 			return result;
 		} catch (Exception e) {
 			context.setRollbackOnly();
@@ -2600,6 +2624,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 				streamLectura.close();
 			}
 		}
+	}
+
+	public void audit(org.jbpm.graph.def.ProcessDefinition definition, String action) {
+		Audit auditoria = new Audit();
+		auditoria.setAction(action); //$NON-NLS-1$
+		auditoria.setAuthor(Security.getCurrentAccount());
+		auditoria.setConfigurationParameter( definition.getName());
+		auditoria.setObject("JBPM_PROCESSDEFINITON"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
+				auditoria);
+		getAuditEntityDao().create(auditoriaEntity);
 	}
 
 	@Override

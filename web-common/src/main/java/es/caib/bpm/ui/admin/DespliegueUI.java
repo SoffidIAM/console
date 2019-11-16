@@ -89,6 +89,14 @@ public class DespliegueUI extends Frame
 			tag.setStyle("color: " + color + ";"); //$NON-NLS-1$ //$NON-NLS-2$
 			item.getChildren().add(nom);
 			item.getChildren().add(tag);
+			Listcell l = new Listcell (definition.getAuthor());
+			item.getChildren().add(l);
+			Listcell lcDate = new Listcell();
+			if ( definition.getDeployed() != null)
+			{
+				lcDate.setLabel( new SimpleDateFormat(Labels.getLabel("selfService.Format")).format(definition.getDeployed()));
+			}
+			item.getChildren().add(lcDate);
 			if (definition.isEnabled())
 			{
 				Button boto = new Button();
@@ -168,6 +176,14 @@ public class DespliegueUI extends Frame
 				tag.setStyle("color: " + color + ";"); //$NON-NLS-1$ //$NON-NLS-2$
 				item.getChildren().add(nom);
 				item.getChildren().add(tag);
+				Listcell l = new Listcell (definition.getAuthor());
+				item.getChildren().add(l);
+				Listcell lcDate = new Listcell();
+				if ( definition.getDeployed() != null)
+				{
+					lcDate.setLabel( new SimpleDateFormat(Labels.getLabel("selfService.Format")).format(definition.getDeployed()));
+				}
+				item.getChildren().add(lcDate);
 			
 				Button boto = new Button();
 				boto.setLabel(Labels.getLabel("deploy.btnDisable")); //$NON-NLS-1$

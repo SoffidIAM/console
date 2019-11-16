@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -294,6 +295,10 @@ public class VOFactory {
 		{
 			vo.setType(es.caib.bpm.vo.PredefinedProcessType.fromString(type));
 		}
+		vo.setAuthor(dal.getProcessDefinitionProperty(instance.getId(), "author")); //$NON-NLS-1$ 
+		String deployed = dal.getProcessDefinitionProperty(instance.getId(), "deployed"); //$NON-NLS-1$
+		if (deployed != null)
+			vo.setDeployed(new Date(Long.parseLong(deployed)));
 		String disabled = dal.getProcessDefinitionProperty(instance.getId(), "disabled"); //$NON-NLS-1$
 		vo.setEnabled( ! "true".equals(disabled) ); //$NON-NLS-1$
 		String userCentric = dal.getProcessDefinitionProperty(instance.getId(), "appliesTo"); //$NON-NLS-1$

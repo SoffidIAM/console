@@ -14,9 +14,9 @@ import es.caib.seycon.ng.model.AuditoriaEntity;
 @JsonObject(hibernateClass=AuditoriaEntity.class)
 public class Auditoria {
 
-	@Attribute(translated = "additionalInfo" )
-	@Nullable
-	public java.lang.String data;
+//	@Attribute(translated = "additionalInfo" )
+//	@Nullable
+//	public java.lang.String data;
 
 	@Nullable
 	@Attribute(translated = "object" )
@@ -122,6 +122,9 @@ public class Auditoria {
 
 	@Nullable
 	public java.lang.String account;
+
+	@Nullable
+	public java.lang.String comment;
 
 	@Nullable
 	public java.lang.String message;

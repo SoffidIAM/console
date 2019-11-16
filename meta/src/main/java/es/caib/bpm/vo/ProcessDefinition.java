@@ -1,5 +1,7 @@
 package es.caib.bpm.vo;
 
+import java.util.Date;
+
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
@@ -17,5 +19,9 @@ public class ProcessDefinition {
 	protected String appliesTo;
 	@Nullable
 	PredefinedProcessType type;
+	@Nullable
+	Date deployed;
+	@Nullable
+	String author;
 
 }

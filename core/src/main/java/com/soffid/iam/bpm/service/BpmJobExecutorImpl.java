@@ -94,6 +94,12 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 				boolean success = job.execute(jbpmContext);
 				if (success)
 					jobSession.deleteJob(job);
+				else
+				{
+					job.setLockOwner(null);
+					job.setLockTime(null);
+					jobSession.saveJob(job);
+				}
 			} finally {
 				Security.nestedLogoff();
 			}
@@ -121,6 +127,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 			Date d = new Date (System.currentTimeMillis()+10 * 60 * 1000); // Esperar deu minuts
 			job.setDueDate(d);
 			job.setLockOwner(null);
+			job.setLockTime(null);
 			jbpmContext.getSession().update(job);
 
 			String mailNotification = System.getProperty("soffid.bpm.error.notify"); //$NON-NLS-1$
@@ -183,7 +190,6 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 				job.setLockTime(null);
 				jobSession.saveJob(job);
 			}
-
 		} finally {
 			jbpmContext.close();
 		}

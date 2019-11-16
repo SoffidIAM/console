@@ -377,6 +377,15 @@
     ]]>
   </query>
 
+  
+  <query name="JobSession.findJobsWithOverdueLockTime">
+    <![CDATA[
+      select job
+      from org.jbpm.job.Job as job
+      where job.lockTime < :now
+    ]]>
+  </query>
+
   <!-- related to Tasks            -->
   <!-- ########################### -->
 

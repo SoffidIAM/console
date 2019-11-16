@@ -26,12 +26,15 @@ import javax.resource.spi.SecurityException;
 
 import com.soffid.iam.api.AgentDescriptor;
 import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.ServerPlugin;
 import com.soffid.iam.api.ServerPluginModule;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AgentDescriptorEntity;
 import com.soffid.iam.model.AgentDescriptorEntityDao;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DefaultAttributeMappingEntity;
 import com.soffid.iam.model.DefaultAttributeMappingEntityDao;
 import com.soffid.iam.model.DefaultObjectMappingEntity;
@@ -96,12 +99,24 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     		plugin.setName(spp.getPlugin().getName());
     		plugin.setEnabled(true);
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
+    		SoffidPrincipal p = Security.getSoffidPrincipal();
+    		if (p.getUserName() != null)
+    			plugin.setAuthor(p.getUserName());
+    		plugin.setDeployed(new Date());
     		getServerPluginEntityDao().create(plugin);
+    		audit(plugin, "C");
     	} 
     	else if (plugin.getTenant().getId().equals(Security.getCurrentTenantId()))
     	{
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
+    		SoffidPrincipal p = Security.getSoffidPrincipal();
+    		if (p.getUserName() != null)
+    			plugin.setAuthor(p.getUserName());
+    		else
+    			plugin.setAuthor(null);
+    		plugin.setDeployed(new Date());
     		getServerPluginEntityDao().update(plugin);
+    		audit(plugin, "U");
     		for (ServerPluginModuleEntity module: plugin.getModules())
     		{
     			for ( AgentDescriptorEntity agent: module.getAgents())
@@ -302,6 +317,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 	        }
 	        entity.setEnabled(status);
 	        getServerPluginEntityDao().update(entity);
+    		audit(entity, status?"E":"D");
 	        updateConfig();
         }
     }
@@ -441,6 +457,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
         ServerPluginEntity p = sped.load(plugin.getId());
         if (p.getTenant().getId().equals(Security.getCurrentTenantId()))
         {
+    		audit(p, "R");
 	        for (ServerPluginModuleEntity module: spe.getModules())
 	        {
 	        	for (AgentDescriptorEntity agent: module.getAgents())
@@ -481,4 +498,15 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     		getConfigurationService().update(config);
     	}
     }
+
+	public void audit(ServerPluginEntity entity, String action) {
+		Audit auditoria = new Audit();
+		auditoria.setAction(action); //$NON-NLS-1$
+		auditoria.setAuthor(Security.getCurrentAccount());
+		auditoria.setConfigurationParameter( entity.getName());
+		auditoria.setObject("SC_SERPLU"); //$NON-NLS-1$
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
+				auditoria);
+		getAuditEntityDao().create(auditoriaEntity);
+	}
 }

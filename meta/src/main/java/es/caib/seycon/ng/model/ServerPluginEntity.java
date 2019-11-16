@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Date;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -27,6 +29,14 @@ public abstract class ServerPluginEntity {
 
 	@Column (name="SPL_NAME", length=100)
 	public java.lang.String name;
+
+	@Column (name="SPL_AUTHOR", length=100)
+	@Nullable
+	public java.lang.String author;
+
+	@Column (name="SPL_DEPLOYED", length=100)
+	@Nullable
+	public Date deployed;
 
 	@Column (name="SPL_ENABLE")
 	public boolean enabled;

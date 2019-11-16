@@ -11,6 +11,8 @@ import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.AuditoriaEntity;
+
 @Service (translatedName="ServerPluginService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.ServerPluginModuleEntity.class,
@@ -19,6 +21,7 @@ import com.soffid.mda.annotation.Service;
 	es.caib.seycon.ng.model.DefaultObjectMappingPropertyEntity.class,
 	es.caib.seycon.ng.model.ServerPluginEntity.class,
 	es.caib.seycon.ng.model.AgentDescriptorEntity.class,
+	AuditoriaEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class})
 public abstract class ServerPluginService {
 

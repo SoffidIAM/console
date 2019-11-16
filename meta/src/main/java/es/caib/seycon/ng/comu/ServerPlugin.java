@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="ServerPlugin",
@@ -18,6 +20,12 @@ public class ServerPlugin {
 	public java.lang.String name;
 
 	public boolean enabled;
+
+	@Nullable
+	public java.lang.String author;
+
+	@Nullable
+	public Date deployed;
 
 	@Nullable
 	public java.util.Collection<es.caib.seycon.ng.comu.ServerPluginModule> modules;

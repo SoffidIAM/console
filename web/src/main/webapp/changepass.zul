@@ -3,7 +3,10 @@
 <?page id="changepass" title="${c:l('changepass.Titol')}" ?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-<!-- NOTA: n'hi ha tres: a public/changepass.zul, /changepass.zul i perfil/changepassPerfil.zul -->
+	<style src="~./styles/estil.css" />
+	<style src="/css/localSEU.css" />
+	<style src="/css/devices.css"/>
+
 
 	<zscript>
 		<![CDATA[
@@ -150,6 +153,10 @@
 								new Object [] {msg}));
 						}
 					}
+
+					boolean mustChangePassword = execution.getNativeRequest().isUserInRole("PASSWORD:EXPIRED"); //$NON-NLS-1$
+					Boolean passwordAlreadyChanged = (Boolean) session.getAttribute("$$SoffidPasswordChanged$$");
+
 				]]>
 			</zscript>
 			
@@ -181,7 +188,8 @@
 							</attribute>
 						</button>
 						
-						<button label="${c:l('changepass.zul.Cancel')}">
+						<button label="${c:l('changepass.zul.Cancel')}"
+							if="${! mustChangePassword || passwordAlreadyChanged != null}">
 							<attribute name="onClick">
 								logout();
 							</attribute>

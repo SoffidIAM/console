@@ -1809,10 +1809,6 @@ public class EntryPointServiceImpl extends
 				.setApplication(nomPuntEntrada.length() >= 100 ? nomPuntEntrada
 						.substring(0, 100) : nomPuntEntrada);
 		auditoria.setAuthor(codiUsuari);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar
-				.getInstance().getTime()));
 		auditoria.setObject("SC_PUNENT"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
 				auditoria);
@@ -1826,10 +1822,6 @@ public class EntryPointServiceImpl extends
 		auditoria.setApplication(execucio.length() >= 100 ? execucio.substring(
 				0, 100) : execucio);
 		auditoria.setAuthor(codiUsuari);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar
-				.getInstance().getTime()));
 		auditoria.setObject("SC_EXEPUE"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
 				auditoria);
@@ -1844,10 +1836,6 @@ public class EntryPointServiceImpl extends
 		auditoria.setApplication(autoritzacio.length() > 100 ? autoritzacio
 				.substring(0, 100) : autoritzacio);
 		auditoria.setAuthor(codiUsuari);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar
-				.getInstance().getTime()));
 		auditoria.setAccount(account);
 		auditoria.setRole(role);
 		auditoria.setUser(user);

@@ -87,10 +87,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		auditoria.setRole(nomRol);
 		auditoria.setAuthor(codiUsuari);
 		auditoria.setDatabase(bbdd);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar
-				.getInstance().getTime()));
 		auditoria.setObject("SC_ROLES"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
 				auditoria);

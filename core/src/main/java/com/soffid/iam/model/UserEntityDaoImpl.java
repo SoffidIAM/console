@@ -81,11 +81,9 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         auditoria.setAction(accio);
         auditoria.setUser(codiUsuariAuditat);
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat(Messages.getString("UserEntityDaoImpl.dateFormat")); //$NON-NLS-1$
         // Afegim auditoria del grup primari de l'usuari
         if (grupPrimari != null)
             auditoria.setGroup(grupPrimari.getName());
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObject("SC_USUARI"); //$NON-NLS-1$
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);

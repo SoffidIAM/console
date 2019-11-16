@@ -148,8 +148,6 @@ public class RulesServiceImpl extends RulesServiceBase
         auditoria.setAction(accio);
         auditoria.setRule(rule.getDescription());
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObject("SC_RULE"); //$NON-NLS-1$
         getAuditEntityDao().create(getAuditEntityDao().auditToEntity(auditoria));
     }
@@ -162,8 +160,6 @@ public class RulesServiceImpl extends RulesServiceBase
         auditoria.setRole(role.getRole().getName());
         auditoria.setDatabase(role.getRole().getSystem().getName());
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObject("SC_RULROL"); //$NON-NLS-1$
         getAuditEntityDao().create(getAuditEntityDao().auditToEntity(auditoria));
     }

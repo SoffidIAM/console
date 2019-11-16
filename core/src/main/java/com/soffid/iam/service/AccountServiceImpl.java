@@ -768,7 +768,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			getUserAccountEntityDao().remove(userAccount);
 		}
 		ae.getUsers().clear();
-		for (RoleAccountEntity ra: ae.getRoles())
+		for (RoleAccountEntity ra:  new LinkedList<RoleAccountEntity>(ae.getRoles()))
 		{
 			getRoleAccountEntityDao().remove(ra);
 		}
@@ -1326,7 +1326,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         audit.setCalendar(Calendar.getInstance());
                         audit.setAccount(acc.getName());
                         audit.setDatabase(acc.getSystem().getName());
-                        audit.setAdditionalInfo("-");
+                        audit.setApplication("-");
                         getAuditService().create(audit);
                         return p;
                     }
@@ -1712,8 +1712,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         auditoria.setDatabase(account.getSystem().getName());
         auditoria.setAuthor(codiUsuariCanvi);
         auditoria.setCalendar(Calendar.getInstance());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObject("SC_ACCOUN"); //$NON-NLS-1$
         if (account.getType().equals (AccountType.USER))
         {

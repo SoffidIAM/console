@@ -1911,7 +1911,9 @@ public class ApplicationServiceImpl extends
 	
 	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user, GroupEntity holderGroup) {
 		for (RoleAccountEntity ra : account.getRoles()) {
-			if (holderGroup == null || ra.getHolderGroup() == holderGroup)
+			if (holderGroup == null || 
+				ra.getHolderGroup() == null ||
+				ra.getHolderGroup() == holderGroup)
 			{
 	            RolAccountDetail n = new RolAccountDetail(ra, account);
 	            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {

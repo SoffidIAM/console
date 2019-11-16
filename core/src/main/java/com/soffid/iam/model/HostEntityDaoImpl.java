@@ -239,9 +239,6 @@ public class HostEntityDaoImpl extends
         auditoria.setAction(accio);
         auditoria.setHost(nomMaquina);
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObject("SC_MAQUIN"); //$NON-NLS-1$
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);

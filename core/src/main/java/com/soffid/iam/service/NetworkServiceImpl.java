@@ -1321,8 +1321,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         auditoria.setAction("A"); // Administrador //$NON-NLS-1$
         auditoria.setHost(maquina);
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObject("SC_ADMMAQ"); //$NON-NLS-1$
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
@@ -1456,8 +1454,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         auditoria.setAction(accio);
         auditoria.setHost(sessio.getHost().getName());
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObject("VNC"); //$NON-NLS-1$
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
@@ -1537,8 +1533,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         auditoria.setHost(maquina);
         auditoria.setAuthor(codiUsuariCanvi);
         auditoria.setUser(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObject("SC_ADMMAQ"); //$NON-NLS-1$
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
@@ -1554,8 +1548,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         auditoria.setAction("U"); //$NON-NLS-1$
         auditoria.setHost(maquina);
         auditoria.setAuthor(codiUsuariCanvi);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(Calendar.getInstance().getTime()));
         auditoria.setObject("SC_ADMMAQ"); //$NON-NLS-1$
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);

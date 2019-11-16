@@ -96,9 +96,6 @@ public class PasswordServiceImpl
 		auditoria.setAction("p"); //$NON-NLS-1$
 		auditoria.setUser(codiUsuariAuditat);
 		auditoria.setAuthor(codiUsuari);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 		auditoria.setObject("SC_USUARI"); //$NON-NLS-1$
 		auditoria.setPasswordDomain(codiDominiContrasenyes);
 

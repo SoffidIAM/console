@@ -171,11 +171,6 @@ public class AuditEntityDaoImpl extends
 	public void toAuditoriaCustom(com.soffid.iam.model.AuditEntity sourceEntity, com.soffid.iam.api.Audit targetVO) {
 		targetVO.setAccount(sourceEntity.getAccount());
 		Date data = sourceEntity.getDate();
-		if (data != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-			targetVO.setAdditionalInfo(dateFormat.format(data));
-		}
 		targetVO.setCalendar (Calendar.getInstance());
 		targetVO.getCalendar().setTime (data);
 
@@ -309,15 +304,7 @@ public class AuditEntityDaoImpl extends
 		}
 		else
 		{
-    		String dateString = sourceVO.getAdditionalInfo();
-    		try {
-    			SimpleDateFormat dateFormat = new SimpleDateFormat(
-    					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-    			Date date = dateFormat.parse(dateString);
-    			targetEntity.setDate(date);
-    		} catch (Exception e) {
-    			throw new SeyconException(String.format(Messages.getString("AuditEntityDaoImpl.5"), dateString)); //$NON-NLS-1$
-    		}
+   			targetEntity.setDate( new Date());
 		}
 
 		targetEntity.setDomainValue(sourceVO.getDomainValue());

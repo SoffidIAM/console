@@ -59,9 +59,6 @@ public class AuthorizationEntityDaoImpl
 		auditoria.setApplication(codiAplicacio);
 		auditoria.setDomain(domini);
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 		auditoria.setObject("SC_AUTROL"); //$NON-NLS-1$
 
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);

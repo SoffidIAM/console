@@ -66,9 +66,6 @@ public class EmailListEntityDaoImpl extends
 		auditoria.setMailList(nomLlistaDeCorreu);
 		auditoria.setMailDomain(dominiLlistaCorreu);
 		auditoria.setAuthor(codiUsuari);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				Messages.getString("EmailListEntityDaoImpl.dateFormat")); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 		auditoria.setObject("SC_LLICOR"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);

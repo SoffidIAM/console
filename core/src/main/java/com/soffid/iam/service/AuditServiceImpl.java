@@ -77,9 +77,7 @@ public class AuditServiceImpl extends
         auditoria.setAction("Q"); // Administrador //$NON-NLS-1$
         auditoria.setObject("SC_AUDITO"); //$NON-NLS-1$
         auditoria.setAuthor(codiUsuari);
-        auditoria.setMessage(query);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
+        auditoria.setComment(query);
 
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);

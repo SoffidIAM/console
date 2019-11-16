@@ -37,8 +37,6 @@ public class AccountAccessEntityDaoImpl extends com.soffid.iam.model.AccountAcce
 		if (entity.getUser() != null)
 			auditoria.setUser(entity.getUser().getUserName());
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 		auditoria.setCalendar(Calendar.getInstance());
 		auditoria.setObject("SC_ACCACC"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);

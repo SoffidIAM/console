@@ -110,10 +110,6 @@ public class RoleAccountEntityDaoImpl
 					auditoria.setDomainValue(null);
 					auditoria.setDomain(null);
 				}
-				SimpleDateFormat dateFormat = new SimpleDateFormat(
-						"dd/MM/yyyy kk:mm:ss");
-				auditoria.setAdditionalInfo(dateFormat.format(Calendar
-						.getInstance().getTime()));
 				auditoria.setObject("SC_ROLUSU");
 				getAuditEntityDao().create(
 						getAuditEntityDao().auditToEntity(auditoria));
@@ -146,10 +142,6 @@ public class RoleAccountEntityDaoImpl
 				auditoria.setDomainValue(null);
 				auditoria.setDomain(null);
 			}
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					"dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-			auditoria.setAdditionalInfo(dateFormat.format(Calendar
-					.getInstance().getTime()));
 			auditoria.setObject("SC_ROLUSU"); //$NON-NLS-1$
 			getAuditEntityDao().create(
 					getAuditEntityDao().auditToEntity(auditoria));

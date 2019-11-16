@@ -56,9 +56,6 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		auditoria.setAuthor(codiUsuari);
 		auditoria.setRole(rol);
 		auditoria.setDatabase(codiBbdd);
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				Messages.getString("NetworkAuthorizationEntityDaoImpl.1")); //$NON-NLS-1$
-		auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
 		auditoria.setObject("SC_AUTXAR"); //$NON-NLS-1$
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
 		getAuditEntityDao().create(auditoriaEntity);

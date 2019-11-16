@@ -35,9 +35,6 @@ public class UserTypeEntityDaoImpl
         auditoria.setAction(accio);
         auditoria.setUserType(type.getName());
         auditoria.setAuthor(codiUsuari);
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
-        auditoria.setAdditionalInfo(dateFormat.format(GregorianCalendar.getInstance().getTime()));
         auditoria.setObject("SC_TIPUSU"); //$NON-NLS-1$
         AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
         getAuditEntityDao().create(auditoriaEntity);

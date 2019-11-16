@@ -155,4 +155,5 @@ public abstract class TaskQueue {
 	public TaskHandler findTaskHandlerById(long taskId) throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
 }

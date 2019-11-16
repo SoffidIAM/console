@@ -68,6 +68,8 @@ public class Configuration {
 				cc.getAttributes().put(attName, attConfig);
 			}
 		
+			registerClass (cc);
+			
 			return cc;
 		} catch (JSONException e ) {
 			throw new JSONException("Error parsing resource "+resourceName+": "+e.getMessage());

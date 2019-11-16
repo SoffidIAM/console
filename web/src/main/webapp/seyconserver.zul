@@ -16,7 +16,7 @@
 		div.nosel table.listbox-btable tr.seld td {background-color: #EEEEEE !important;}
 		div.nosel table.listbox-btable tr.seld td div, 
 		div.nosel table.listbox-btable tr.seld td div span {font-weight:normal;}
-		.st0 {margin:0 0 5px 0;cursor:pointer !important;}
+		.st0 {margin: 0px 0 5px 15px;cursor:pointer !important; display: inline}
 		div.doscolors tr td { vertical-align:top;}
 		div.doscolors tr.odd td {background-color: lightblue;}
 		div.doscolors tr.seld td {background-color: #DBDBDB;}
@@ -1006,14 +1006,12 @@
 						style="text-align:center;"/>
 					<listcell bind="@missatge">
 						<divVisible bind="@stackTrace" sclass="st0" valorNoVisible="NULL">
-							<div>
-								<label sclass="st" style="font-weight:normal !important;"
-									value="${c:l('seyconserver.zul.mostrastacktrace')}">
-									<attribute name="onClick">
-										showTaskErrors(self);
-									</attribute>
-								</label>
-							</div>
+							<label sclass="st" style="font-weight:normal !important;"
+								value="${c:l('seyconserver.zul.mostrastacktrace')}">
+								<attribute name="onClick">
+									showTaskErrors(self);
+								</attribute>
+							</label>
 						</divVisible>
 						
 					</listcell>

@@ -53,6 +53,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -177,14 +179,20 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             SyncStatusService status = rsl.getSyncStatusService();
 
             // Obtenin tots els agents del servidor
-            Collection<AgentStatusInfo> agentstatus = status.getSyncAgentsInfo(Security.getCurrentTenantName());
+            Collection<AgentStatusInfo> agentstatus0 = status.getSyncAgentsInfo(Security.getCurrentTenantName());
+            LinkedList<AgentStatusInfo> agentstatus;
+			if (agentstatus0 == null)
+            	agentstatus = new LinkedList<AgentStatusInfo>();
+			else
+				agentstatus = new LinkedList<AgentStatusInfo> (agentstatus0);
+            Collections.sort(agentstatus, new Comparator<AgentStatusInfo>() {
+				@Override
+				public int compare(AgentStatusInfo o1, AgentStatusInfo o2) {
+					return o1.getAgentName().compareToIgnoreCase(o2.getAgentName());
+				}
+			});
 
-            // Hem de contar les tasques pendents realment en cada agent
-            // hem de tindre: url server[url], codiAgent[nomAgent]
-            URLManager m = new URLManager(url);
-            String host = m.getServerURL().getHost();
-
-            return agentstatus != null ? agentstatus : new LinkedList<AgentStatusInfo>();
+            return agentstatus;
 
         } catch (Throwable th) {
         	LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
@@ -642,7 +650,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		for (TaskEntity e: l)
 		{
 			SeyconTask st = new SeyconTask(e.getId(), tascaToString(e));
-			st.setStatus(e.getStatus().equals("P") ? SeyconTask.Estat.PENDING :
+			st.setStatus(e.getStatus() == null || e.getStatus().equals("P") ? SeyconTask.Estat.PENDING :
 				e.getStatus().equals("E") ? SeyconTask.Estat.ERROR :
 				e.getStatus().equals("X") ? SeyconTask.Estat.PAUSED :
 				 SeyconTask.Estat.UNKNOWN

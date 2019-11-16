@@ -5,13 +5,13 @@ img, video, canvas { max-width: 100%;}
 .topline{height:35px !important; background-color: {SKY} !important; border-bottom: 0.1em solid {SKYDARK} !important; padding: 0 !important; margin: 0 !important; box-shadow: 0px 1px 7px #888888;}
 .startmenu, .startmenu:hover{border: 0px !important; float: {TEXT_ALIGN_LEFT}; width: 65px; border: 0; height: 22px; border-radius: 0; background-color: {SKY} !important; padding: 7px !important; margin: 0 !important;}
 #logo{ margin: 0px 10px 0px 5px; vertical-align: -45%; background: transparent}
-.benvingutmsg{padding:7px 5px 0px 0px;}
+.benvingutmsg{padding:4px 5px 0px 0px;}
 .topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{font-family: "Avenir LT Std", Calibri, Arial, sans-serif !important; font-size:18px !important; color: white; font-weight: normal !important;}
-.col_cen, .benvingut, .titol_tanca{display:none;}
+.benvingut, .titol_tanca{display:none;}
 .codiusuari:hover{
 	text-decoration: underline;
 }
-.col_cen {margin-top: 7px}
+.col_cen {margin-top: 4px}
 
 /****** MENU PRINCIPAL/PERFIL Y VENTANAS ******/
 .shadow-window{ box-shadow: 0px 1px 7px #888888; }
@@ -228,6 +228,7 @@ div.tabpanel {
 //	.own-ip{top:37px; padding:3px; bottom:initial;}
 	.wide-screen {display:none;}
 	.small-screen {display:inline;}
+	.col_cen {display:none;}
 }
 
 div.whitetoolbar {

@@ -337,7 +337,10 @@ div.listbox {
 }
 
 /* Capçalera del listbox i del tree */
-div.listbox-head th, div.listbox-paging th, div.tree-head th, div.tree-paging th {
+div.listbox-head th, div.listbox-paging th, 
+div.tree-head th, div.tree-paging th,
+div.listbox-head th span, div.listbox-paging th span,
+div.tree-head th span, div.tree-paging th span  {
 	font-family: Arial;	font-size: 21px; color: {GREENTEXT} ;	
 	background: {GREEN};
 	overflow: hidden;
@@ -951,7 +954,7 @@ tr.seld td.UNKNOWN {
 	padding-top: 5px;
 	text-align:center;
 	vertical-align:middle;
-	margin-left: 140px;
+	margin-left: 20px;
 	margin-right: 5px;
 	white-space: nowrap;
 	max-width: 50%;

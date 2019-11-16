@@ -9,13 +9,13 @@ img, video, canvas { max-width: 100%;}
 	}
 
 #logo{ margin: 7px 10px 0px 5px; vertical-align: -45%; background: transparent; height: 25px; }
-.col_cen {margin-top: 7px;}
+.col_cen {margin-top: 4px;}
 .col_der {margin-top: 0px;}
 
 .startmenu:hover {background:  #70a3cc !important;}
 
 /*.startmenu img{width:15px;}*/
-.benvingutmsg{padding:7px 5px 0px 0px;}
+.benvingutmsg{padding:4px 5px 0px 0px;}
 .topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{font-family: "Avenir LT Std", Calibri, Arial, sans-serif, !important; font-size:18px !important; color: white; font-weight: normal !important;}
 
 /****** MENU PRINCIPAL/PERFIL Y VENTANAS ******/

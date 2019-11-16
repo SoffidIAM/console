@@ -83,8 +83,10 @@ public class SoffidStackTrace
             	s.println (); //$NON-NLS-1$
             	s.print (Messages.getString("Throws")); //$NON-NLS-1$
             }
-            s.print(e.getClass().getName());
-            s.print(": "); //$NON-NLS-1$
+            if (!hasCause || e.getClass() != InternalErrorException.class) {
+            	s.print(e.getClass().getName());
+            	s.print(": "); //$NON-NLS-1$
+            }
             s.println (e.getMessage());
             for (int i = 0; i < trace.length; i++) {
                 if (i == 0 || displayStackTrace(trace[i]))
@@ -116,8 +118,11 @@ public class SoffidStackTrace
         	s.print (Messages.getString("Throws")); //$NON-NLS-1$
         }
 
-        s.print(th.getClass().getName());
-        s.print(": "); //$NON-NLS-1$
+        if ( (ourCause != null && ourCause != th) || th.getClass() == InternalErrorException.class)
+        {
+	        s.print(th.getClass().getName());
+	        s.print(": "); //$NON-NLS-1$
+        }
         s.println (th.getMessage());
         if (th instanceof InternalErrorException)
         {

@@ -2,6 +2,7 @@ package com.soffid.iam.sync.engine;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Map;
 
@@ -60,6 +61,8 @@ public abstract class DispatcherHandler {
 
 	public abstract void doReconcile (ScheduledTask task, PrintWriter out);
 
+	public abstract void doReconcile (String account, PrintWriter out, boolean debug) throws Exception;
+
 	public abstract void doAuthoritativeImport (ScheduledTask task, PrintWriter out);
 
 	public abstract void doImpact (ScheduledTask task, PrintWriter out);
@@ -82,4 +85,5 @@ public abstract class DispatcherHandler {
 	public abstract boolean runStep () throws InternalErrorException;
 
 	public abstract String parseKerberosToken(String domain, String serviceName, byte[] keytab, byte[] token) throws Exception ;
+
 }

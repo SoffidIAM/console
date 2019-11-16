@@ -5,7 +5,7 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
 	<window closable="true" id="objectAttributesWindow" position="center, center"
-		sizable="true" title="${c:l('agets.zul.ObjectDetails')}"
+		sizable="true" title="${c:l('agents.zul.ObjectDetails')}"
 		onStart="onStart(event)"
 		style="min-width:40em"
 		visible="false"  onClose="onWindowClose(event)">
@@ -26,6 +26,10 @@
 	{
 		String objectName = event.getData()[0];
 		com.soffid.iam.sync.engine.intf.GetObjectResults o = event.getData()[1];
+		String[] account = event.data.length > 2 ?  event.getData()[2] : null;
+		pageScope.put("account", account);
+		boolean displayReconcile = account != null;
+		loadButton.visible = displayReconcile;
 		objectAttributesWindow.doHighlighted();
 		
 		objectAttributesWindow.getFellow("detall_nom").setValue(objectName);
@@ -50,6 +54,16 @@
 		log.setValue( o.getLog() );
 		status.setValue(o.getStatus());
 		
+	}
+	void doLoad() 
+	{
+		String[] account = pageScope.get("account");
+		com.soffid.iam.service.ejb.DispatcherService svc = com.soffid.iam.EJBLocator.getDispatcherService();
+		com.soffid.iam.sync.engine.intf.GetObjectResults o = svc.reconcile(
+				account[0], account[1]);
+		loadButton.setVisible(false);
+		log.setValue( o.getLog() );
+		status.setValue(o.getStatus());
 	}
 ]]>
 	</zscript>
@@ -92,6 +106,9 @@
 			<hbox style="margin-left:auto; margin-right:auto">
 				<button label="${c:l('user_renameaccount.Accept')}"
 					onClick="cleanWindow()" />
+				<button label="${c:l('user_renameaccount.Load')}"
+					id="loadButton"
+					onClick="doLoad()" />
 			</hbox>
 	</window>
 

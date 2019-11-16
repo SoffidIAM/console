@@ -421,6 +421,12 @@ public abstract class DispatcherService {
 		return null;
 	}
 
+	@Operation(grantees = { agent_create.class, agent_update.class })
+	@Description("Loads account into soffid database")
+	public GetObjectResults reconcile(String dispatcher, String accountName) throws InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { agent_create.class, agent_update.class, agent_queryObjects.class })
 	@Description("Loads system object attributes")
 	public GetObjectResults getNativeObject(String dispatcher, SoffidObjectType type, String object1,

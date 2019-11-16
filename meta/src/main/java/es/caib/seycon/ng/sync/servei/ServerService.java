@@ -464,9 +464,8 @@ public abstract class ServerService {
 	Server findRemoteServerByUrl(String url) { return null;}
 	
 	/** Life updates support **/
-	void processAuthoritativeChange (AuthoritativeChange change, boolean remove) 
-	{
-	}
+	void processAuthoritativeChange (AuthoritativeChange change, boolean remove) {	}
+	void reconcileAccount (String system, String account) 	{	}
 	
 	@Description("Parses a kerberos token.")
     public Account parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}

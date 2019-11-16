@@ -132,6 +132,9 @@ public abstract class SyncStatusService {
 			SoffidObjectType type, String object1, @Nullable String object2)
 	{ return null; }
 
+	public GetObjectResults reconcile (String dispatcher, String accountName)
+	{ return null; }
+
 	@Operation(grantees = { roles.base_log_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public String[] tailServerLog(java.lang.String urlServer)

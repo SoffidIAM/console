@@ -1814,4 +1814,19 @@ public class DispatcherServiceImpl extends
 		getConfigurationService().update(p);
 		return assignedName;
 	}
+
+	@Override
+	protected GetObjectResults handleReconcile(String dispatcher, String accountName) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		GetObjectResults o = svc.reconcile(dispatcher, accountName);
+		Map<String,Object> r = new HashMap<String, Object>();
+		fill ("", "", r, o.getObject());
+		
+		o.setObject(r);
+		
+		return o;
+	}
 }

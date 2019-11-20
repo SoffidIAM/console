@@ -9,7 +9,6 @@ import java.util.Date;
 
 import com.soffid.mda.annotation.*;
 
-import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
 
@@ -124,7 +123,7 @@ public class RolAccount {
 	@Description("Delegation status")
 	@Column(name="RLU_DELSTA")
 	@Nullable
-	public DelegationStatus delegationStatus;
+	public com.soffid.iam.api.DelegationStatus delegationStatus;
 
 	@Description("Entitled account who delegatse to delegateAccount")
 	@Nullable

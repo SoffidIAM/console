@@ -1,4 +1,4 @@
-package es.caib.seycon.ng.common;
+package com.soffid.iam.api;
 
 import com.soffid.mda.annotation.Enumeration;
 

@@ -13,7 +13,7 @@ import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 
-import es.caib.seycon.ng.common.DelegationStatus;
+import com.soffid.iam.api.DelegationStatus;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
 

@@ -102,7 +102,7 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.bpm.vo.PredefinedProcessType;
-import es.caib.seycon.ng.common.DelegationStatus;
+import com.soffid.iam.api.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.TipusDomini;

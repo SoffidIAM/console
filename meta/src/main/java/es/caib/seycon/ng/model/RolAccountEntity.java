@@ -11,7 +11,6 @@ import java.util.Date;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.mda.annotation.*;
-import es.caib.seycon.ng.common.DelegationStatus;
 
 @Entity(table = "SC_ROLUSU", translatedName = "RoleAccountEntity", translatedPackage = "com.soffid.iam.model",
 		tenantFilter="role.system.tenant.id")
@@ -111,7 +110,7 @@ public abstract class RolAccountEntity {
 	@Description("Delegation status")
 	@Column(name="RLU_DELSTA")
 	@Nullable
-	public DelegationStatus delegationStatus;
+	public com.soffid.iam.api.DelegationStatus delegationStatus;
 
 	@Description("Entitled account who delegatse to delegateAccount")
 	@Column (name="RLU_OMNACC_ID")

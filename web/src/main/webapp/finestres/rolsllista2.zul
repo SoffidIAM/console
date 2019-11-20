@@ -35,7 +35,6 @@
 				model.getVariables().declareVariable("queryEnabled", false);
 				model.refresh();
 				esquemaLlista.visible=false;
-				esquemaLlista.getFellow("finishButton").disabled = true;
 			}
 			
 			void applyFilter (Event event)

@@ -486,7 +486,14 @@ public class DispatcherServiceImpl extends
 						0, limitResults);
 			}
 
-			return getSystemEntityDao().toSystemList(dispatchers);
+			List<com.soffid.iam.api.System> l = getSystemEntityDao().toSystemList(dispatchers);
+			Collections.sort(l, new Comparator<com.soffid.iam.api.System>() {
+				@Override
+				public int compare(com.soffid.iam.api.System o1, com.soffid.iam.api.System o2) {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
+			});
+			return l;
 		}
 
 		return new Vector();
@@ -1799,20 +1806,25 @@ public class DispatcherServiceImpl extends
 			return null;
 		
 		
-		
-		ServerEntity r = getServerEntityDao().newServerEntity();
-		Configuration p = getConfigurationService().findMasterParameterByNameAndNetwork("server.nextRemoteServer", null);
-		if (p == null)
+		Security.nestedLogin("master", "admin", Security.ALL_PERMISSIONS);
+		try
 		{
-			p = new Configuration();
-			p.setCode("server.nextRemoteServer");
-			p.setValue("" + System.currentTimeMillis());
-			p = getConfigurationService().create(p);
+			ServerEntity r = getServerEntityDao().newServerEntity();
+			Configuration p = getConfigurationService().findMasterParameterByNameAndNetwork("server.nextRemoteServer", null);
+			if (p == null)
+			{
+				p = new Configuration();
+				p.setCode("server.nextRemoteServer");
+				p.setValue("" + System.currentTimeMillis());
+				p = getConfigurationService().create(p);
+			}
+			String assignedName = "s"+p.getValue()+"."+gateway.getName();
+			p.setValue( Long.toString( 1L + Long.parseLong(p.getValue())));
+			getConfigurationService().update(p);
+			return assignedName;
+		} finally {
+			Security.nestedLogoff();
 		}
-		String assignedName = "s"+p.getValue()+"."+gateway.getName();
-		p.setValue( Long.toString( 1L + Long.parseLong(p.getValue())));
-		getConfigurationService().update(p);
-		return assignedName;
 	}
 
 	@Override

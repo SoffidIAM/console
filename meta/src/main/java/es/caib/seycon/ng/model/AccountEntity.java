@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
@@ -104,6 +105,11 @@ public abstract class AccountEntity {
 	@Nullable
 	Boolean inheritNewPermissions;
 
+	@Column(name="ACC_SVCTYP", length = 50)
+	@Nullable
+	@Description("Known values are Windows, Linux and Database")
+	String serviceType;
+	
 	@Column (name="ACC_URL")
 	@Nullable
 	String loginUrl;
@@ -113,6 +119,14 @@ public abstract class AccountEntity {
 	@Column (name="ACC_LOGNAM")
 	String loginName;
 
+	@Column (name="ACC_LAUTYP")
+	@Nullable
+	com.soffid.iam.api.LaunchType launchType;
+	
+	@Column (name="ACC_JSG_ID")
+	@Nullable
+	JumpServerGroupEntity jumpServerGroup;
+	
 	@ForeignKey (foreignColumn="APW_ACC_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.AccountPasswordEntity> passwords;
 

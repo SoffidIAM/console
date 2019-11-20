@@ -1462,4 +1462,53 @@
 		<ambit>Custom objects</ambit>
 	</autoritzacio>
 
+	<autoritzacio>
+		<codi>seu:pamSessionConfigure</codi>
+		<descripcio>Open PAM session configuration page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:pamSessionAudit</codi>
+		<descripcio>Open PAM session audit page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>jumpServer:create</codi>
+		<descripcio>Create jump server groups</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>jumpServer:delete</codi>
+		<descripcio>Delete jump server groups</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>jumpServer:update</codi>
+		<descripcio>Update jump server groups</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>jumpServer:query</codi>
+		<descripcio>Query jump server groups</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>jumpServer:create</codi>
+		<descripcio>Create jump server groups</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamSession:query</codi>
+		<descripcio>Query jump server sessions</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+
 </autoritzacions>

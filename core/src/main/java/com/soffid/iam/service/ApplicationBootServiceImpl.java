@@ -1088,8 +1088,8 @@ public class ApplicationBootServiceImpl extends
 			usu.setPrimaryGroup("admingroup"); //$NON-NLS-1$
 			usu.setComments("Autocreated"); //$NON-NLS-1$
 			usu.setMultiSession(new Boolean(true));
-			usu.setFirstName("Admin"); //$NON-NLS-1$
-			usu.setLastName("Admin"); //$NON-NLS-1$
+			usu.setFirstName("Soffid"); //$NON-NLS-1$
+			usu.setLastName("Administrator"); //$NON-NLS-1$
 			usu.setHomeServer("null"); //$NON-NLS-1$
 			usu.setProfileServer("null"); //$NON-NLS-1$
 			usu.setMailServer("null"); //$NON-NLS-1$

@@ -17,13 +17,18 @@
 				Component formComponent = (Component) pageScope.get("contextComponent");
 				Listbox listbox = esquemaLlista.getFellow("esquema").getFellow("lista").getFellow("listbox");
 				List result = new LinkedList();
+				boolean any = false;
 				for (Listitem item: listbox.getSelectedItems())
 				{
+					any = true;
 					es.caib.seycon.ng.comu.Rol role =  item.getValue().getInstance(); 
 					result.add ( role.getNom()+"@"+role.getBaseDeDades()); 
 				}
-				Events.postEvent ("onActualitza", formComponent, result);						
-				cleanWindow();
+				if (any)
+				{
+					Events.postEvent ("onActualitza", formComponent, result);						
+					cleanWindow();
+				}
 			}
 
 			void cleanWindow() {
@@ -122,32 +127,32 @@
 					<dataitem bind=".">
 						<listcell bind="@category">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 						<listcell bind="@nom">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 						<listcell bind="@baseDeDades">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 						<listcell bind="@codiAplicacio">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 						<listcell bind="@descripcio">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 						<listcell bind="domainName">
 							<attribute name="onDoubleClick">
-								seguent();
+								acceptData();
 							</attribute>
 						</listcell>
 					</dataitem>
@@ -157,7 +162,7 @@
 			<separator spacing="5px"/>	
 		</esquemavertical>
 		<hbox style="margin-left:auto; margin-right:auto">
-			<button disabled="true" id="finishButton" label="${c:l('usuarisllista.zul.Accepta')}">
+			<button disabled="false" id="finishButton" label="${c:l('usuarisllista.zul.Accepta')}">
 				<attribute name="onClick">
 					if (!self.disabled)
 						acceptData();

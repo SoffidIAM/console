@@ -169,7 +169,10 @@
 					</listfoot>
 					
 					<dataitem bind=".">
-						<listcell bind="@data"/>
+						<listcell>
+							<datebox bind="@calendar" format="${c:l('auditoria.dateFormat') }" buttonVisible="true" readonly="true"
+								disabled="true"/>
+						</listcell>
 						<listcell>
 							<label bind="@autor" tooltip="tooltipInfoAutor" style="margin-right: 1em">
 							</label>

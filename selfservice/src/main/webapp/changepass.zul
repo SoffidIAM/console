@@ -58,7 +58,7 @@
 				HttpServletResponse resp = (HttpServletResponse) ex.getNativeResponse();
 
 				sessionScope.put("$$SoffidPasswordChanged$$", Boolean.TRUE);
-				ex.sendRedirect("/selfservice");
+				ex.sendRedirect("/");
 			}
 		]]>
 	</zscript>

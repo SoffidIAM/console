@@ -26,6 +26,9 @@ public class DocumentBlockEntity {
 	@Nullable
 	byte content[];
 	
+	@Column(name="DBL_TEN_ID")
+	TenantEntity tenant;
+	
 	@DaoFinder("select db "
 			+ "from com.soffid.iam.doc.model.DocumentBlockEntity as db "
 			+ "where db.path=:path "

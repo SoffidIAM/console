@@ -43,6 +43,10 @@ public class SamlRequestEntity {
 	@Nullable
 	public String key;
 	
+	@Column (name="REQ_TEN_ID")
+	public TenantEntity tenant;
+	
+
 	@DaoFinder
 	public SamlRequestEntity findByExternalId(String externalId) {return null;}
 

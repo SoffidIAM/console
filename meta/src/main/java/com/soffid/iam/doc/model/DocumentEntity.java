@@ -29,7 +29,6 @@ public class DocumentEntity {
 	String fsPath;
 	
 	@Column(name="DOC_TEN_ID")
-	@Nullable
 	TenantEntity tenant;
 	
 	

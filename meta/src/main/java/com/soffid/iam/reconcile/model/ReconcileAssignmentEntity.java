@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.reconcile.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_RECASI" )
@@ -37,6 +38,9 @@ public abstract class ReconcileAssignmentEntity {
 	@Column (name="RAS_DOMVAL")
 	@Nullable
 	public java.lang.String domainValue;
+
+	@Column (name="RAS_TEN_ID")
+	public TenantEntity tenant;
 
 	@DaoFinder
 	public java.util.List<com.soffid.iam.reconcile.model.ReconcileAssignmentEntity> findByProcessId(

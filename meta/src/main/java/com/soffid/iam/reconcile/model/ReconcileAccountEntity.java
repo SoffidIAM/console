@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.reconcile.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.AccountEntity;
@@ -64,6 +65,10 @@ public abstract class ReconcileAccountEntity {
 		defaultValue="true")
 	public boolean active;
 
+	@Column (name="RAC_TEN_ID")
+	public TenantEntity tenant;
+
+	
 	@DaoFinder
 	public java.util.List<com.soffid.iam.reconcile.model.ReconcileAccountEntity> findByProcessId(
 		java.lang.Long processId) {

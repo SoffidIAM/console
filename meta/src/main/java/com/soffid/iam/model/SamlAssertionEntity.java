@@ -29,6 +29,9 @@ public class SamlAssertionEntity {
 	@Column (name="ASS_ISSUER")
 	public String issuer;
 	
+	@Column (name="ASS_TEN_ID")
+	public TenantEntity tenant;
+
 	@DaoFinder
 	public SamlAssertionEntity findByExternalId(String externalId) {return null;}
 

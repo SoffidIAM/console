@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.reconcile.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_RECROL" )
@@ -34,6 +35,9 @@ public abstract class ReconcileRoleEntity {
 	@Column (name="RRL_APPNAM")
 	@Nullable
 	public java.lang.String appName;
+
+	@Column (name="RRL_TEN_ID")
+	public TenantEntity tenant;
 
 	@DaoFinder
 	public java.util.List<com.soffid.iam.reconcile.model.ReconcileRoleEntity> findByProcessId(

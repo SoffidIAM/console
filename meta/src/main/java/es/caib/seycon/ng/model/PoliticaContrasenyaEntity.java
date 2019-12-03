@@ -26,7 +26,6 @@ public abstract class PoliticaContrasenyaEntity {
 	public java.lang.String descripcio;
 
 	@Column (name="PCD_TUS_ID", translated="userType")
-	@Nullable
 	public es.caib.seycon.ng.model.TipusUsuariEntity tipusUsuariDomini;
 
 	@Column (name="PCD_TIPUS", length=1, translated="type")

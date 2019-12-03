@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -97,4 +98,9 @@ public class TenantService extends Object {
 	@Operation(grantees={tenantUpdate.class})
 	public void removeTenantServer (Tenant tenant, String server) {
 	}
+
+	@Description("Exports tenant to a file")
+	@Operation(grantees={tenantUpdate.class})
+	void exportTenant ( Tenant tenant, OutputStream out ) {}
+
 }

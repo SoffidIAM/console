@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.TenantDisabledPermissionEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.model.TenantServerEntity;
+import com.soffid.iam.service.impl.tenant.TenantExporter;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -205,4 +207,14 @@ public class TenantServiceImpl extends TenantServiceBase {
 		}
 	}
 
+	
+	@Override
+	protected void handleExportTenant ( Tenant tenant, OutputStream out ) throws Exception
+	{
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		if (te != null)
+		{
+			new TenantExporter().export (te.getId(), out);
+		}
+	}
 }
